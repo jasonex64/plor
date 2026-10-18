@@ -25,11 +25,11 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [ ] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
   - [ ] a host answer count that differs from "host answers per question"
 - [ ] A valid fixture passes.
-- [ ] 14 daily puzzles on consecutive dates, written by the host, pass the validator. Each puzzle is one file holding one full 7-question chain for its date.
+- [ ] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. The mix includes concrete chains with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding one full 7-question chain for its date.
 - [ ] CI runs the validator over all puzzle files.
 
 ## Out of scope
-Serving puzzles (M02), an admin UI and AI-generated content.
+Serving puzzles (M02), an admin UI, and automated AI puzzle generation (a later milestone; see ROADMAP). Claude drafting this milestone's 14 puzzles for human review is in scope (human, 2026-10-18).
 
 ## Numbers
 | Value | Used for | Origin |

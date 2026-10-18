@@ -23,7 +23,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 | — | **MVP line** | | | |
 
 Tickets for M02 and later get written when their milestone comes up, so they don't go stale.
-After the MVP, order the work by beta data: streaks, answer stats ("12% picked lion"), reminders, admin UI for content, global leaderboard, game #2 (pull the platform/game boundary out at that point), native app wrapper, public comment moderation.
+After the MVP, order the work by beta data: streaks, answer stats ("12% picked lion"), reminders, admin UI for content, AI-generated puzzles (Claude drafts, the M01 validator gates, a human approves; the human wants this eventually, 2026-10-18), global leaderboard, game #2 (pull the platform/game boundary out at that point), native app wrapper, public comment moderation.
 
 ## Next revision (deferred)
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side.

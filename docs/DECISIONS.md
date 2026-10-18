@@ -52,7 +52,7 @@ These are the only exceptions to "build for today". Decide them and get them rev
 ### Answer model (confirmed)
 | Bank | Contents | Sent to client? |
 |---|---|---|
-| Accepted bank | Every valid answer, including obscure ones | Yes, as canonical entries, for autocomplete |
+| Accepted bank | Every valid answer, including obscure ones. For an abstract question with no complete answer set (e.g. "something you'd bring to a potluck"), a curated set of reasonable answers instead (human, 2026-10-18) | Yes, as canonical entries, for autocomplete |
 | Host bank | A small subset of common, typical answers | Never, and nothing marks which entries are in it |
 | Host answer(s) | Picked from the host bank | Only after the player has answered that question |
 
