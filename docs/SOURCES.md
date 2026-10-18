@@ -34,3 +34,4 @@ These are the only sources agents may treat as authoritative. Memory, blog posts
 | PostgreSQL ALTER ROLE | https://www.postgresql.org/docs/17/sql-alterrole.html | 17 | Password handling: `\password` avoids sending cleartext | — |
 | gitleaks | https://github.com/gitleaks/gitleaks | v8.30.1 (2026-03-21), MIT | Secret detection, pre-commit hook (`gitleaks git --pre-commit --redact --staged`) | — |
 | gitleaks-action | https://github.com/gitleaks/gitleaks-action | v3.0.0 (2026-05-30) | CI secret scan; no license needed for personal accounts | — |
+| Vercel project config | https://vercel.com/docs/project-configuration/vercel-json | accessed 2026-10-18 | `framework` and `regions` override the Project Settings; schema at openapi.vercel.sh/vercel.json | — |
