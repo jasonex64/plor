@@ -13,7 +13,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 | # | Milestone | Scope | Status | Ticket |
 |---|---|---|---|---|
 | M00 | Foundations | Stack and tooling decisions, the hard-to-reverse designs, CI, `scripts/status`, staging deploy | done | `docs/milestones/M00-foundations.md` |
-| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 14 real daily puzzles (7 questions per date) | in progress | `docs/milestones/M01-puzzle-content.md` |
+| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 14 real daily puzzles (7 questions per date) | in review | `docs/milestones/M01-puzzle-content.md` |
 | M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: measure each question's real catch rate against its estimate, check that most players usually finish, and collect missing answers before building any social features. | planned | — |
 | M03 | Share | Spoiler-free share text whose link opens today's game | planned | — |
 | M04 | Friends and live board | Invite link, mutual friends, a live board (status for everyone, plus where each friend died once you've finished), friends-only delivery, reconnect logged and counted | planned | — |

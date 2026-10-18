@@ -1,6 +1,6 @@
 # M01 — Puzzle content format and validator
 
-**Status:** in progress
+**Status:** in review
 
 ## Goal
 Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 14 real daily puzzles (7 independent questions per date).
@@ -15,17 +15,17 @@ Define a versioned file format for daily puzzles and a validator script that rej
 - M00-data-design.md §4 (authoring path, `format: 1`, single TypeScript validator) and the Game 1 section of DECISIONS.md (`game_id` `offbeat`).
 
 ## Acceptance criteria
-- [ ] A puzzle file holds: version, game_id, date, and an ordered list of questions. Each question has an accepted bank of canonical entries (ID plus aliases), a host bank of entry IDs, host answer(s) and match groups.
-- [ ] The validator is a script run through the task runner. It exits non-zero and names the file, question and entry for each of these, and each has its own failing fixture:
-  - [ ] an alias that maps to more than one entry, or two aliases that collide after normalization (case, whitespace, punctuation, diacritics)
-  - [ ] a host bank entry that isn't in the accepted bank
-  - [ ] a host answer that isn't in the host bank
-  - [ ] a match group that references an entry that doesn't exist
-  - [ ] an entry with no plural alias where an inflection exists (the generated plurals are shown for human review, not trusted silently)
-  - [ ] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
-  - [ ] a question with no host answers *(human, 2026-10-18: the count varies by question, so the fixed-count check became "at least 1")*
-- [ ] A valid fixture passes.
-- [ ] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. Every day mixes concrete questions with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding the 7 questions for its date.
+- [x] A puzzle file holds: version, game_id, date, and an ordered list of questions. Each question has an accepted bank of canonical entries (ID plus aliases), a host bank of entry IDs, host answer(s) and match groups.
+- [x] The validator is a script run through the task runner. It exits non-zero and names the file, question and entry for each of these, and each has its own failing fixture:
+  - [x] an alias that maps to more than one entry, or two aliases that collide after normalization (case, whitespace, punctuation, diacritics)
+  - [x] a host bank entry that isn't in the accepted bank
+  - [x] a host answer that isn't in the host bank
+  - [x] a match group that references an entry that doesn't exist
+  - [x] an entry with no plural alias where an inflection exists (the generated plurals are shown for human review, not trusted silently)
+  - [x] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
+  - [x] a question with no host answers *(human, 2026-10-18: the count varies by question, so the fixed-count check became "at least 1")*
+- [x] A valid fixture passes.
+- [x] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. Every day mixes concrete questions with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding the 7 questions for its date.
 - [ ] CI runs the validator over all puzzle files.
 
 ## Out of scope
@@ -41,17 +41,17 @@ Serving puzzles (M02), an admin UI, and automated AI puzzle generation (a later 
 
 ## Plan
 *Refreshed 2026-10-18 against the repo.* No migration creates `private.puzzle` or `private.today()` yet; the only migration is `restrict_public_defaults`. M01 is therefore file-only and needs no database. The `private.puzzle` column trim and the `seed.sql` line in `supabase/config.toml` stay in ROADMAP "Next revision" for M02, which writes the first puzzle migration.
-1. Record the schema in DECISIONS.md (done) and the two numbers in `src/config/tunables.ts`.
+1. Record the schema in DECISIONS.md (done) and the questions-per-day number in `src/config/tunables.ts`.
 2. Write fixtures under `scripts/fixtures/content/<case>/offbeat/2026-11-02.json` (next to the script tests, the repo's test layout): one valid, and one per rule that breaks only that rule.
 3. Write the validator, `src/content/puzzle.ts` (the module M02's server will import), and `scripts/content-validate.ts`. It runs as `npm run content:validate [-- <root>]`, with `content/` as the default root. It prints one line per error naming the file, question and entry, and exits 1 on any error or if no puzzle files are found.
    Hypothesis: each failing fixture produces exactly its rule's error and nothing else, and the valid fixture passes. Any other result means the rule or the fixture is wrong.
 4. Write `scripts/content-plurals.ts` (`npm run content:plurals [-- <root>]`, default `content/`). It adds each entry's expected plural (its `plural` override, otherwise `pluralize(name)`) to `aliases` when it's missing, and prints every plural it adds so the human reviews them in the diff.
 5. Add `npm run content:validate` to CI.
-6. The host writes 14 daily puzzles in `content/offbeat/`, one file per date, each holding 7 independent questions. They pass the validator locally and in CI.
+6. Claude drafts 14 daily puzzles in `content/offbeat/` (2026-12-11 to 2026-12-24), one file per date, each holding 7 independent questions; the host reviews and approves them. They pass the validator locally and in CI.
 7. Reviewer pass, then a PR.
 
 ## Removes
-Nothing in code: this is the first content code. The `tsconfig.json` change (`allowImportingTsExtensions`, so Node can run scripts that import `src/`) adds an option. Its caller is `scripts/content-validate.ts`.
+This is the first content code, so it removes no earlier code. Within the milestone, each design change removed the way it replaced: the narrowing-chain rule, the `HOST_ANSWERS_PER_QUESTION` and `HOST_ANSWERS_BY_QUESTION` settings, the `chain-length` and `host-answer-count` fixtures, kind-based match groups, and the blank puzzle skeletons. The `tsconfig.json` change (`allowImportingTsExtensions`, so Node can run scripts that import `src/`) adds an option. Its callers are `src/content/puzzle.ts` and both `scripts/content-*.ts`.
 
 ---
 *Fill in the sections below at the end.*
@@ -64,9 +64,48 @@ Nothing in code: this is the first content code. The `tsconfig.json` change (`al
 | Ticket: rules for aliases, banks, groups, plurals and counts | Those rules, plus: duplicate entry IDs, a match group keyed by an entry that isn't a host answer, a host answer listed in its own group (human, 2026-10-18), IDs listed twice in `host_bank` or `host_answers`, names that normalize to empty, and shape errors (missing or unknown fields, wrong types, `format` ≠ 1, `game_id` ≠ `offbeat`, impossible dates) | Matching by ID needs unique IDs. Keying groups by host answer is the approved format. The file is untrusted disk input (CLAUDE.md: validate at boundaries). |
 | Data design §4: one validator the server also imports | `src/content/puzzle.ts`, imported by both scripts | As designed. The server import arrives in M02. |
 | Approved normalization: lowercase, NFKD, strip marks and punctuation, collapse whitespace | Exactly that, in that order. Punctuation is removed, not replaced by a space, so "bald-eagle" normalizes to "baldeagle", not "bald eagle". | Lowercasing first makes U+0130 (İ) produce a combining mark that NFKD stripping then removes (tested). |
+| Ticket and roadmap: a chain of questions that narrows each day | 7 independent questions per day, mixing concrete and abstract | Human, 2026-10-18 (DECISIONS.md: Game 1). Mixed days are less dry, and difficulty comes from the host's answers instead. |
+| Ticket Numbers: 1 host answer per question, then 1–7 by position | The count varies by question; the validator requires at least 1 | Human, 2026-10-18: difficulty is the share of players caught, rising gently, with daily variance welcome. |
+| Answer model: accepted bank holds "every valid answer"; groups cover kinds (eagle covers bald eagle) | Lists as complete as practical, one level of detail per question, no match groups in the drafts | Human, 2026-10-18. Abstract questions have no complete list; kind-based groups made the game harsher than intended (a Ferris wheel isn't a wheel). Niche answers are an intended escape. |
+| SOURCES rule: anchor to a source | The 14 drafts' answer lists come from Claude's knowledge plus the host's review, not from named reference lists | Human chose "Claude drafts, I review" (2026-10-18). Naming a reference source per concrete question is in ROADMAP "Next revision"; M02's miss log grows the lists. |
 | Plural check covers "an entry" | The plural of the entry's `name` only. Synonym aliases (e.g. "cougar") don't need their own plural. | Ticket wording. Players submit entry IDs from autocomplete, so aliases only help search. |
 
 ## Evidence
+Run on branch `m01-puzzle-content` at 76cda42, 2026-10-18 (Windows, Node 24.11.0).
+
+```text
+$ npm run content:validate
+CONTENT OK content: 14 file(s)                                  exit=0
+
+$ npm run content:validate -- scripts/fixtures/content/<case>   (one line per fixture)
+valid                            CONTENT OK scripts/fixtures/content/valid: 1 file(s)   exit=0
+alias-normalized                 q3 entry "zebra": "  LÏON'S " collides with "lions" of entry "lion" (both normalize to "lions")   exit=1
+alias-shared                     q2 entry "tiger": "lions" collides with "lions" of entry "lion" (both normalize to "lions")   exit=1
+host-bank-unknown-entry          q1 entry "panda": in host_bank but not in the accepted bank   exit=1
+host-answer-not-in-bank          q3 entry "giraffe": host answer is not in host_bank   exit=1
+match-group-unknown-entry        q1 entry "golden-eagle": in match group "eagle" but not in the accepted bank   exit=1
+match-group-key-not-host-answer  q1 entry "lion": match group key is not a host answer   exit=1
+match-group-contains-key         q1 entry "eagle": listed in its own match group (a host answer always matches itself)   exit=1
+plural-missing                   q1 entry "lion": no plural alias "lions" (run npm run content:plurals, or set "plural" to override)   exit=1
+path-mismatch                    offbeat/2026-11-02.json: path must be offbeat/2026-11-03.json to match its game_id and date   exit=1
+question-count                   offbeat/2026-11-02.json: has 6 questions, expected 7   exit=1
+no-host-answers                  q2: has no host answers   exit=1
+duplicate-entry-id               q2 entry "lion": ID used by more than one entry   exit=1
+(each failing fixture printed exactly 1 error; every line starts with offbeat/2026-11-02.json)
+
+$ npm test
+ Test Files  6 passed (6)
+      Tests  55 passed (55)
+
+$ npm run lint                   exit=0, no output
+$ npx tsc --noEmit -p .          exit=0, no output
+$ npm run build                  ✓ Compiled successfully; ✓ Generating static pages (5/5); exit=0
+$ npm run lockfile -- check      LOCKFILE CHECK OK (Linux, node:24)
+```
+
+- **Plurals reviewed:** `npm run content:plurals` added 1,001 plural aliases to the drafts. Claude reviewed every one and overrode 14 that were wrong or awkward (e.g. Dobermen → Dobermans, gulves → gulfs, UFOS → UFOs).
+- **Host approval:** the human approved the drafts on 2026-10-18 ("sure that works so far"), then asked for international answers, which were added in 76cda42 (3,203 → 3,876 accepted answers).
+- **CI:** `.github/workflows/ci.yml` runs `npm run content:validate` after `npm test`. The PR's CI run is the evidence (added below once green).
 
 ## Review
 Reviewer run 1 (2026-10-18, on fa31fa9): 1 blocking finding, 8 non-blocking.
