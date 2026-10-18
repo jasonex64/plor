@@ -91,6 +91,15 @@ $ next start + npm run -s status -- http://127.0.0.1:3104  -> UP (protocol 1), e
 $ same, DATABASE_CA_CERT=<throwaway self-signed CA>       -> DOWN HTTP 500, exit=1
      log: "error":"Error: self-signed certificate in certificate chain"   <- proves verify-full is enforced
 ```
+Least-privileged app role (2026-10-18):
+```
+$ npx supabase db push --include-roles      -> created riff_app (roles.sql), applied 20261018065320_restrict_public_defaults.sql on riff-staging
+$ npm run test:sql (local)                  -> Tests=9, Result: PASS
+$ (human) psql \password riff_app as postgres, verify-full with supabase/certs/prod-ca-2021.crt
+$ (human) psql as riff_app.<ref> via the transaction pooler :6543, verify-full -> current_user = riff_app (1 row)
+```
+The staging run of the pgTAP role checks (`supabase test db --linked`) is still failing because pgTAP needs `extensions` on the search path. The fix is waiting on human approval.
+
 Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
 
 ## Review
