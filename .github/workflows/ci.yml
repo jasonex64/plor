@@ -18,3 +18,16 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+
+  # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
+  # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a
+  # personal account (github.com/gitleaks/gitleaks-action). Full history so old commits are scanned too.
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

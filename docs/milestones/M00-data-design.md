@@ -4,7 +4,7 @@
 Sources: Supabase docs (keys and RLS, Realtime) and PostgreSQL 17 (`ddl-priv`), as pinned in SOURCES.md.
 
 ## Principles used throughout
-- **Route handlers are the only way in to game data.** Every game table, view and function lives in the **`private` schema**, which the Data API doesn't expose. Route handlers use the secret key and contain the single gating function. As a backstop, RLS is enabled with no policies, and grants to `anon` and `authenticated` are revoked. pgTAP tests prove that those two roles can't reach any `private` object, including views. Views run as their owner and skip RLS, so a view left in `public` would leak data; that's why views live in `private` too. *(fixes review 2, BLOCKING 1)*
+- **Route handlers are the only way in to game data.** Every game table, view and function lives in the **`private` schema**, which the Data API doesn't expose. Route handlers connect as the least-privileged `riff_app` role (DECISIONS.md: App database role) and contain the single gating function. As a backstop, RLS is enabled with no policies, and grants to `anon` and `authenticated` are revoked. pgTAP tests prove that those two roles can't reach any `private` object, including views. Views run as their owner and skip RLS, so a view left in `public` would leak data; that's why views live in `private` too. *(fixes review 2, BLOCKING 1)*
 - **The database enforces invariants.** Uniqueness, append-only rules and foreign keys live in Postgres, so a bug in app code fails at the database with a constraint error instead of corrupting data.
 - **The database clock decides what "today" is.** One SQL function, `private.today()` (section 8), is the only definition of "today". The run start, the answer insert, the status view and `content:publish` all call it. TypeScript never computes the date. The date is **pinned when a run starts**, and the client never sends a date or a timezone. *(fixes review 2, BLOCKING 2)*
 
@@ -82,7 +82,7 @@ private.points_ledger(
 - The leaderboard is `SUM(points)` over the ledger.
 
 ## 7. Append-only enforcement (`run`, `run_event`, `points_ledger`)
-- `REVOKE ALL` on these tables from `anon`, `authenticated` and `service_role`, then `GRANT SELECT, INSERT` to `service_role` only. This removes UPDATE, DELETE and TRUNCATE (PG17 lists TRUNCATE as its own privilege). `service_role` bypasses RLS but is still bound by grants.
+- `REVOKE ALL` on these tables from `anon`, `authenticated` and `service_role`, then `GRANT SELECT, INSERT` to `riff_app` only (plus `USAGE` on schema `private`). This removes UPDATE, DELETE and TRUNCATE (PG17 lists TRUNCATE as its own privilege). `riff_app` doesn't bypass RLS and is bound by grants. *(Changed 2026-10-17: was `service_role`, before the app role existed.)*
 - pgTAP tests cover each role × {UPDATE, DELETE, TRUNCATE} and assert that each one is denied.
 - **Account deletion (M07)** relies on `on delete cascade` from `auth.users`. It's **unverified** whether a referential cascade works once DELETE has been revoked. A pgTAP test in M02 checks this. If it fails, deletion goes through a single owner-privileged function in a non-exposed schema.
 

@@ -30,3 +30,7 @@ These are the only sources agents may treat as authoritative. Memory, blog posts
 | Vercel functions package | https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package | `@vercel/functions` 3.10.1 (2026-10-13). | `attachDatabasePool` for Fluid compute | — |
 | Supabase SSL | https://supabase.com/docs/guides/platform/ssl-enforcement | accessed 2026-10-17 | SSL enforcement (opt-in), CA download, `verify-full` recommendation | — |
 | node-postgres Pool and SSL | https://node-postgres.com/apis/pool, https://node-postgres.com/features/ssl | `pg` 8.23.1 | Pool defaults (`max` 10, `idleTimeoutMillis` 10000, `connectionTimeoutMillis` 0), the `ssl` object, URL params replacing it | — |
+| Supabase database roles | https://supabase.com/docs/guides/database/postgres/roles, https://supabase.com/docs/guides/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c | accessed 2026-10-17 | Custom login roles, `[ROLE].[PROJECT-REF]` pooler username, PUBLIC grants to revoke and their caveats | — |
+| PostgreSQL ALTER ROLE | https://www.postgresql.org/docs/17/sql-alterrole.html | 17 | Password handling: `\password` avoids sending cleartext | — |
+| gitleaks | https://github.com/gitleaks/gitleaks | v8.30.1 (2026-03-21), MIT | Secret detection, pre-commit hook (`gitleaks git --pre-commit --redact --staged`) | — |
+| gitleaks-action | https://github.com/gitleaks/gitleaks-action | v3.0.0 (2026-05-30) | CI secret scan; no license needed for personal accounts | — |

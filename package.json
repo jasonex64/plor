@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "vitest run --exclude \"**/*.db.test.ts\"",
     "status": "node scripts/status.ts",
-    "test:db": "vitest run db.test"
+    "test:db": "vitest run db.test",
+    "test:sql": "supabase test db"
   },
   "dependencies": {
     "@vercel/functions": "3.10.1",
