@@ -1,0 +1,2301 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-22",
+  "questions": [
+    {
+      "prompt": "Name something people celebrate",
+      "entries": [
+        {
+          "id": "birthday",
+          "name": "birthday",
+          "aliases": [
+            "birthdays"
+          ]
+        },
+        {
+          "id": "wedding",
+          "name": "wedding",
+          "aliases": [
+            "weddings"
+          ]
+        },
+        {
+          "id": "anniversary",
+          "name": "anniversary",
+          "aliases": [
+            "anniversaries"
+          ]
+        },
+        {
+          "id": "graduation",
+          "name": "graduation",
+          "aliases": [
+            "graduations"
+          ]
+        },
+        {
+          "id": "retirement",
+          "name": "retirement",
+          "aliases": [
+            "retirements"
+          ]
+        },
+        {
+          "id": "promotion",
+          "name": "promotion",
+          "aliases": [
+            "promotions"
+          ]
+        },
+        {
+          "id": "engagement",
+          "name": "engagement",
+          "aliases": [
+            "engagements"
+          ]
+        },
+        {
+          "id": "baby-shower",
+          "name": "baby shower",
+          "aliases": [
+            "baby showers"
+          ]
+        },
+        {
+          "id": "housewarming",
+          "name": "housewarming",
+          "aliases": [
+            "housewarmings"
+          ]
+        },
+        {
+          "id": "new-baby",
+          "name": "new baby",
+          "aliases": [
+            "new babies"
+          ]
+        },
+        {
+          "id": "christmas",
+          "name": "Christmas",
+          "aliases": [
+            "Xmas"
+          ],
+          "plural": "Christmas"
+        },
+        {
+          "id": "christmas-eve",
+          "name": "Christmas Eve",
+          "aliases": [],
+          "plural": "Christmas Eve"
+        },
+        {
+          "id": "hanukkah",
+          "name": "Hanukkah",
+          "aliases": [
+            "Chanukah",
+            "Hanukah"
+          ],
+          "plural": "Hanukkah"
+        },
+        {
+          "id": "kwanzaa",
+          "name": "Kwanzaa",
+          "aliases": [],
+          "plural": "Kwanzaa"
+        },
+        {
+          "id": "new-years-eve",
+          "name": "New Year's Eve",
+          "aliases": [
+            "NYE"
+          ],
+          "plural": "New Year's Eve"
+        },
+        {
+          "id": "new-years-day",
+          "name": "New Year's Day",
+          "aliases": [],
+          "plural": "New Year's Day"
+        },
+        {
+          "id": "boxing-day",
+          "name": "Boxing Day",
+          "aliases": [],
+          "plural": "Boxing Day"
+        },
+        {
+          "id": "st-nicholas-day",
+          "name": "St. Nicholas Day",
+          "aliases": [
+            "Saint Nicholas Day"
+          ],
+          "plural": "St. Nicholas Day"
+        },
+        {
+          "id": "festivus",
+          "name": "Festivus",
+          "aliases": [],
+          "plural": "Festivus"
+        },
+        {
+          "id": "winter-solstice",
+          "name": "winter solstice",
+          "aliases": [
+            "solstice"
+          ],
+          "plural": "winter solstice"
+        },
+        {
+          "id": "lunar-new-year",
+          "name": "Lunar New Year",
+          "aliases": [
+            "Chinese New Year"
+          ],
+          "plural": "Lunar New Year"
+        },
+        {
+          "id": "valentines-day",
+          "name": "Valentine's Day",
+          "aliases": [],
+          "plural": "Valentine's Day"
+        },
+        {
+          "id": "martin-luther-king-jr-day",
+          "name": "Martin Luther King Jr. Day",
+          "aliases": [
+            "MLK Day"
+          ],
+          "plural": "Martin Luther King Jr. Day"
+        },
+        {
+          "id": "presidents-day",
+          "name": "Presidents' Day",
+          "aliases": [],
+          "plural": "Presidents' Day"
+        },
+        {
+          "id": "groundhog-day",
+          "name": "Groundhog Day",
+          "aliases": [],
+          "plural": "Groundhog Day"
+        },
+        {
+          "id": "thanksgiving",
+          "name": "Thanksgiving",
+          "aliases": [],
+          "plural": "Thanksgiving"
+        },
+        {
+          "id": "halloween",
+          "name": "Halloween",
+          "aliases": [],
+          "plural": "Halloween"
+        },
+        {
+          "id": "easter",
+          "name": "Easter",
+          "aliases": [],
+          "plural": "Easter"
+        },
+        {
+          "id": "diwali",
+          "name": "Diwali",
+          "aliases": [],
+          "plural": "Diwali"
+        },
+        {
+          "id": "fourth-of-july",
+          "name": "Fourth of July",
+          "aliases": [
+            "July 4th",
+            "Independence Day"
+          ],
+          "plural": "Fourth of July"
+        },
+        {
+          "id": "mothers-day",
+          "name": "Mother's Day",
+          "aliases": [],
+          "plural": "Mother's Day"
+        },
+        {
+          "id": "fathers-day",
+          "name": "Father's Day",
+          "aliases": [],
+          "plural": "Father's Day"
+        },
+        {
+          "id": "st-patricks-day",
+          "name": "St. Patrick's Day",
+          "aliases": [
+            "Saint Patrick's Day",
+            "St. Paddy's Day"
+          ],
+          "plural": "St. Patrick's Day"
+        },
+        {
+          "id": "cinco-de-mayo",
+          "name": "Cinco de Mayo",
+          "aliases": [],
+          "plural": "Cinco de Mayo"
+        },
+        {
+          "id": "eid-al-fitr",
+          "name": "Eid al-Fitr",
+          "aliases": [
+            "Eid"
+          ],
+          "plural": "Eid al-Fitr"
+        },
+        {
+          "id": "passover",
+          "name": "Passover",
+          "aliases": [],
+          "plural": "Passover"
+        },
+        {
+          "id": "rosh-hashanah",
+          "name": "Rosh Hashanah",
+          "aliases": [],
+          "plural": "Rosh Hashanah"
+        },
+        {
+          "id": "juneteenth",
+          "name": "Juneteenth",
+          "aliases": [],
+          "plural": "Juneteenth"
+        },
+        {
+          "id": "labor-day",
+          "name": "Labor Day",
+          "aliases": [],
+          "plural": "Labor Day"
+        },
+        {
+          "id": "memorial-day",
+          "name": "Memorial Day",
+          "aliases": [],
+          "plural": "Memorial Day"
+        },
+        {
+          "id": "veterans-day",
+          "name": "Veterans Day",
+          "aliases": [],
+          "plural": "Veterans Day"
+        },
+        {
+          "id": "mardi-gras",
+          "name": "Mardi Gras",
+          "aliases": [],
+          "plural": "Mardi Gras"
+        },
+        {
+          "id": "holi",
+          "name": "Holi",
+          "aliases": [],
+          "plural": "Holi"
+        },
+        {
+          "id": "quinceanera",
+          "name": "quinceañera",
+          "aliases": [],
+          "plural": "quinceañera"
+        },
+        {
+          "id": "bar-mitzvah",
+          "name": "bar mitzvah",
+          "aliases": [],
+          "plural": "bar mitzvah"
+        },
+        {
+          "id": "bat-mitzvah",
+          "name": "bat mitzvah",
+          "aliases": [],
+          "plural": "bat mitzvah"
+        },
+        {
+          "id": "baptism",
+          "name": "baptism",
+          "aliases": [
+            "christening"
+          ],
+          "plural": "baptism"
+        },
+        {
+          "id": "first-communion",
+          "name": "first communion",
+          "aliases": [],
+          "plural": "first communion"
+        },
+        {
+          "id": "sweet-sixteen",
+          "name": "sweet sixteen",
+          "aliases": [],
+          "plural": "sweet sixteen"
+        },
+        {
+          "id": "bachelor-party",
+          "name": "bachelor party",
+          "aliases": [],
+          "plural": "bachelor party"
+        },
+        {
+          "id": "bachelorette-party",
+          "name": "bachelorette party",
+          "aliases": [],
+          "plural": "bachelorette party"
+        },
+        {
+          "id": "bridal-shower",
+          "name": "bridal shower",
+          "aliases": [],
+          "plural": "bridal shower"
+        },
+        {
+          "id": "gender-reveal",
+          "name": "gender reveal",
+          "aliases": [],
+          "plural": "gender reveal"
+        },
+        {
+          "id": "new-job",
+          "name": "new job",
+          "aliases": [],
+          "plural": "new job"
+        },
+        {
+          "id": "first-day-of-school",
+          "name": "first day of school",
+          "aliases": [],
+          "plural": "first day of school"
+        },
+        {
+          "id": "saint-lucia-day",
+          "name": "Saint Lucia Day",
+          "aliases": [
+            "St. Lucia Day"
+          ],
+          "plural": "Saint Lucia Day"
+        },
+        {
+          "id": "epiphany",
+          "name": "Epiphany",
+          "aliases": [
+            "Three Kings Day"
+          ],
+          "plural": "Epiphany"
+        },
+        {
+          "id": "hogmanay",
+          "name": "Hogmanay",
+          "aliases": [],
+          "plural": "Hogmanay"
+        },
+        {
+          "id": "australia-day",
+          "name": "Australia Day",
+          "aliases": [],
+          "plural": "Australia Day"
+        },
+        {
+          "id": "waitangi-day",
+          "name": "Waitangi Day",
+          "aliases": [],
+          "plural": "Waitangi Day"
+        },
+        {
+          "id": "lantern-festival",
+          "name": "Lantern Festival",
+          "aliases": [],
+          "plural": "Lantern Festival"
+        },
+        {
+          "id": "seollal",
+          "name": "Seollal",
+          "aliases": [
+            "Korean New Year"
+          ],
+          "plural": "Seollal"
+        },
+        {
+          "id": "tet",
+          "name": "Tết",
+          "aliases": [
+            "Vietnamese New Year"
+          ],
+          "plural": "Tết"
+        },
+        {
+          "id": "lohri",
+          "name": "Lohri",
+          "aliases": [],
+          "plural": "Lohri"
+        },
+        {
+          "id": "pongal",
+          "name": "Pongal",
+          "aliases": [],
+          "plural": "Pongal"
+        },
+        {
+          "id": "makar-sankranti",
+          "name": "Makar Sankranti",
+          "aliases": [],
+          "plural": "Makar Sankranti"
+        },
+        {
+          "id": "candlemas",
+          "name": "Candlemas",
+          "aliases": [],
+          "plural": "Candlemas"
+        },
+        {
+          "id": "imbolc",
+          "name": "Imbolc",
+          "aliases": [],
+          "plural": "Imbolc"
+        },
+        {
+          "id": "burns-night",
+          "name": "Burns Night",
+          "aliases": [],
+          "plural": "Burns Night"
+        },
+        {
+          "id": "republic-day",
+          "name": "Republic Day",
+          "aliases": [],
+          "plural": "Republic Day"
+        },
+        {
+          "id": "bodhi-day",
+          "name": "Bodhi Day",
+          "aliases": [],
+          "plural": "Bodhi Day"
+        },
+        {
+          "id": "yule",
+          "name": "Yule",
+          "aliases": [],
+          "plural": "Yule"
+        },
+        {
+          "id": "eid-al-adha",
+          "name": "Eid al-Adha",
+          "aliases": [],
+          "plural": "Eid al-Adha"
+        },
+        {
+          "id": "ramadan",
+          "name": "Ramadan",
+          "aliases": [],
+          "plural": "Ramadan"
+        },
+        {
+          "id": "yom-kippur",
+          "name": "Yom Kippur",
+          "aliases": [],
+          "plural": "Yom Kippur"
+        },
+        {
+          "id": "purim",
+          "name": "Purim",
+          "aliases": [],
+          "plural": "Purim"
+        },
+        {
+          "id": "sukkot",
+          "name": "Sukkot",
+          "aliases": [],
+          "plural": "Sukkot"
+        },
+        {
+          "id": "vesak",
+          "name": "Vesak",
+          "aliases": [
+            "Buddha's Birthday"
+          ],
+          "plural": "Vesak"
+        },
+        {
+          "id": "songkran",
+          "name": "Songkran",
+          "aliases": [],
+          "plural": "Songkran"
+        },
+        {
+          "id": "nowruz",
+          "name": "Nowruz",
+          "aliases": [
+            "Persian New Year"
+          ],
+          "plural": "Nowruz"
+        },
+        {
+          "id": "dia-de-los-muertos",
+          "name": "Día de los Muertos",
+          "aliases": [
+            "Day of the Dead"
+          ],
+          "plural": "Día de los Muertos"
+        },
+        {
+          "id": "mid-autumn-festival",
+          "name": "Mid-Autumn Festival",
+          "aliases": [
+            "Moon Festival"
+          ],
+          "plural": "Mid-Autumn Festival"
+        },
+        {
+          "id": "dragon-boat-festival",
+          "name": "Dragon Boat Festival",
+          "aliases": [],
+          "plural": "Dragon Boat Festival"
+        },
+        {
+          "id": "chuseok",
+          "name": "Chuseok",
+          "aliases": [],
+          "plural": "Chuseok"
+        },
+        {
+          "id": "obon",
+          "name": "Obon",
+          "aliases": [],
+          "plural": "Obon"
+        },
+        {
+          "id": "carnival",
+          "name": "Carnival",
+          "aliases": [
+            "Carnaval"
+          ],
+          "plural": "Carnival"
+        },
+        {
+          "id": "oktoberfest",
+          "name": "Oktoberfest",
+          "aliases": [],
+          "plural": "Oktoberfest"
+        },
+        {
+          "id": "bastille-day",
+          "name": "Bastille Day",
+          "aliases": [],
+          "plural": "Bastille Day"
+        },
+        {
+          "id": "canada-day",
+          "name": "Canada Day",
+          "aliases": [],
+          "plural": "Canada Day"
+        },
+        {
+          "id": "guy-fawkes-night",
+          "name": "Guy Fawkes Night",
+          "aliases": [
+            "Bonfire Night"
+          ],
+          "plural": "Guy Fawkes Night"
+        },
+        {
+          "id": "good-friday",
+          "name": "Good Friday",
+          "aliases": [],
+          "plural": "Good Friday"
+        },
+        {
+          "id": "ash-wednesday",
+          "name": "Ash Wednesday",
+          "aliases": [],
+          "plural": "Ash Wednesday"
+        },
+        {
+          "id": "all-saints-day",
+          "name": "All Saints' Day",
+          "aliases": [],
+          "plural": "All Saints' Day"
+        },
+        {
+          "id": "midsummer",
+          "name": "Midsummer",
+          "aliases": [],
+          "plural": "Midsummer"
+        },
+        {
+          "id": "navratri",
+          "name": "Navratri",
+          "aliases": [],
+          "plural": "Navratri"
+        },
+        {
+          "id": "raksha-bandhan",
+          "name": "Raksha Bandhan",
+          "aliases": [],
+          "plural": "Raksha Bandhan"
+        },
+        {
+          "id": "ganesh-chaturthi",
+          "name": "Ganesh Chaturthi",
+          "aliases": [],
+          "plural": "Ganesh Chaturthi"
+        },
+        {
+          "id": "durga-puja",
+          "name": "Durga Puja",
+          "aliases": [],
+          "plural": "Durga Puja"
+        },
+        {
+          "id": "onam",
+          "name": "Onam",
+          "aliases": [],
+          "plural": "Onam"
+        },
+        {
+          "id": "vaisakhi",
+          "name": "Vaisakhi",
+          "aliases": [
+            "Baisakhi"
+          ],
+          "plural": "Vaisakhi"
+        },
+        {
+          "id": "earth-day",
+          "name": "Earth Day",
+          "aliases": [],
+          "plural": "Earth Day"
+        },
+        {
+          "id": "april-fools-day",
+          "name": "April Fools' Day",
+          "aliases": [],
+          "plural": "April Fools' Day"
+        },
+        {
+          "id": "may-day",
+          "name": "May Day",
+          "aliases": [],
+          "plural": "May Day"
+        },
+        {
+          "id": "international-womens-day",
+          "name": "International Women's Day",
+          "aliases": [],
+          "plural": "International Women's Day"
+        },
+        {
+          "id": "qingming-festival",
+          "name": "Qingming Festival",
+          "aliases": [
+            "Tomb-Sweeping Day"
+          ],
+          "plural": "Qingming Festival"
+        },
+        {
+          "id": "anzac-day",
+          "name": "Anzac Day",
+          "aliases": [],
+          "plural": "Anzac Day"
+        },
+        {
+          "id": "kings-day",
+          "name": "King's Day",
+          "aliases": [
+            "Koningsdag"
+          ],
+          "plural": "King's Day"
+        },
+        {
+          "id": "matariki",
+          "name": "Matariki",
+          "aliases": [],
+          "plural": "Matariki"
+        },
+        {
+          "id": "remembrance-day",
+          "name": "Remembrance Day",
+          "aliases": [],
+          "plural": "Remembrance Day"
+        },
+        {
+          "id": "victoria-day",
+          "name": "Victoria Day",
+          "aliases": [],
+          "plural": "Victoria Day"
+        },
+        {
+          "id": "columbus-day",
+          "name": "Columbus Day",
+          "aliases": [],
+          "plural": "Columbus Day"
+        },
+        {
+          "id": "indigenous-peoples-day",
+          "name": "Indigenous Peoples' Day",
+          "aliases": [],
+          "plural": "Indigenous Peoples' Day"
+        },
+        {
+          "id": "st-georges-day",
+          "name": "St. George's Day",
+          "aliases": [],
+          "plural": "St. George's Day"
+        }
+      ],
+      "host_bank": [
+        "wedding",
+        "birthday",
+        "christmas",
+        "new-years-eve",
+        "thanksgiving",
+        "graduation"
+      ],
+      "host_answers": [
+        "wedding"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a car brand",
+      "entries": [
+        {
+          "id": "toyota",
+          "name": "Toyota",
+          "aliases": [],
+          "plural": "Toyota"
+        },
+        {
+          "id": "honda",
+          "name": "Honda",
+          "aliases": [],
+          "plural": "Honda"
+        },
+        {
+          "id": "ford",
+          "name": "Ford",
+          "aliases": [],
+          "plural": "Ford"
+        },
+        {
+          "id": "chevrolet",
+          "name": "Chevrolet",
+          "aliases": [
+            "Chevy"
+          ],
+          "plural": "Chevrolet"
+        },
+        {
+          "id": "tesla",
+          "name": "Tesla",
+          "aliases": [],
+          "plural": "Tesla"
+        },
+        {
+          "id": "bmw",
+          "name": "BMW",
+          "aliases": [],
+          "plural": "BMW"
+        },
+        {
+          "id": "mercedes-benz",
+          "name": "Mercedes-Benz",
+          "aliases": [
+            "Mercedes"
+          ],
+          "plural": "Mercedes-Benz"
+        },
+        {
+          "id": "audi",
+          "name": "Audi",
+          "aliases": [],
+          "plural": "Audi"
+        },
+        {
+          "id": "volkswagen",
+          "name": "Volkswagen",
+          "aliases": [
+            "VW"
+          ],
+          "plural": "Volkswagen"
+        },
+        {
+          "id": "nissan",
+          "name": "Nissan",
+          "aliases": [],
+          "plural": "Nissan"
+        },
+        {
+          "id": "hyundai",
+          "name": "Hyundai",
+          "aliases": [],
+          "plural": "Hyundai"
+        },
+        {
+          "id": "kia",
+          "name": "Kia",
+          "aliases": [],
+          "plural": "Kia"
+        },
+        {
+          "id": "subaru",
+          "name": "Subaru",
+          "aliases": [],
+          "plural": "Subaru"
+        },
+        {
+          "id": "mazda",
+          "name": "Mazda",
+          "aliases": [],
+          "plural": "Mazda"
+        },
+        {
+          "id": "jeep",
+          "name": "Jeep",
+          "aliases": [],
+          "plural": "Jeep"
+        },
+        {
+          "id": "dodge",
+          "name": "Dodge",
+          "aliases": [],
+          "plural": "Dodge"
+        },
+        {
+          "id": "ram",
+          "name": "Ram",
+          "aliases": [],
+          "plural": "Ram"
+        },
+        {
+          "id": "gmc",
+          "name": "GMC",
+          "aliases": [],
+          "plural": "GMC"
+        },
+        {
+          "id": "cadillac",
+          "name": "Cadillac",
+          "aliases": [],
+          "plural": "Cadillac"
+        },
+        {
+          "id": "buick",
+          "name": "Buick",
+          "aliases": [],
+          "plural": "Buick"
+        },
+        {
+          "id": "lincoln",
+          "name": "Lincoln",
+          "aliases": [],
+          "plural": "Lincoln"
+        },
+        {
+          "id": "chrysler",
+          "name": "Chrysler",
+          "aliases": [],
+          "plural": "Chrysler"
+        },
+        {
+          "id": "lexus",
+          "name": "Lexus",
+          "aliases": [],
+          "plural": "Lexus"
+        },
+        {
+          "id": "acura",
+          "name": "Acura",
+          "aliases": [],
+          "plural": "Acura"
+        },
+        {
+          "id": "infiniti",
+          "name": "Infiniti",
+          "aliases": [],
+          "plural": "Infiniti"
+        },
+        {
+          "id": "volvo",
+          "name": "Volvo",
+          "aliases": [],
+          "plural": "Volvo"
+        },
+        {
+          "id": "porsche",
+          "name": "Porsche",
+          "aliases": [],
+          "plural": "Porsche"
+        },
+        {
+          "id": "ferrari",
+          "name": "Ferrari",
+          "aliases": [],
+          "plural": "Ferrari"
+        },
+        {
+          "id": "lamborghini",
+          "name": "Lamborghini",
+          "aliases": [],
+          "plural": "Lamborghini"
+        },
+        {
+          "id": "maserati",
+          "name": "Maserati",
+          "aliases": [],
+          "plural": "Maserati"
+        },
+        {
+          "id": "jaguar",
+          "name": "Jaguar",
+          "aliases": [],
+          "plural": "Jaguar"
+        },
+        {
+          "id": "land-rover",
+          "name": "Land Rover",
+          "aliases": [],
+          "plural": "Land Rover"
+        },
+        {
+          "id": "mini",
+          "name": "Mini",
+          "aliases": [],
+          "plural": "Mini"
+        },
+        {
+          "id": "fiat",
+          "name": "Fiat",
+          "aliases": [],
+          "plural": "Fiat"
+        },
+        {
+          "id": "alfa-romeo",
+          "name": "Alfa Romeo",
+          "aliases": [],
+          "plural": "Alfa Romeo"
+        },
+        {
+          "id": "bentley",
+          "name": "Bentley",
+          "aliases": [],
+          "plural": "Bentley"
+        },
+        {
+          "id": "rolls-royce",
+          "name": "Rolls-Royce",
+          "aliases": [],
+          "plural": "Rolls-Royce"
+        },
+        {
+          "id": "aston-martin",
+          "name": "Aston Martin",
+          "aliases": [],
+          "plural": "Aston Martin"
+        },
+        {
+          "id": "mclaren",
+          "name": "McLaren",
+          "aliases": [],
+          "plural": "McLaren"
+        },
+        {
+          "id": "bugatti",
+          "name": "Bugatti",
+          "aliases": [],
+          "plural": "Bugatti"
+        },
+        {
+          "id": "mitsubishi",
+          "name": "Mitsubishi",
+          "aliases": [],
+          "plural": "Mitsubishi"
+        },
+        {
+          "id": "genesis",
+          "name": "Genesis",
+          "aliases": [],
+          "plural": "Genesis"
+        },
+        {
+          "id": "rivian",
+          "name": "Rivian",
+          "aliases": [],
+          "plural": "Rivian"
+        },
+        {
+          "id": "lucid",
+          "name": "Lucid",
+          "aliases": [],
+          "plural": "Lucid"
+        },
+        {
+          "id": "polestar",
+          "name": "Polestar",
+          "aliases": [],
+          "plural": "Polestar"
+        },
+        {
+          "id": "tata",
+          "name": "Tata",
+          "aliases": [],
+          "plural": "Tata"
+        },
+        {
+          "id": "byd",
+          "name": "BYD",
+          "aliases": [],
+          "plural": "BYD"
+        },
+        {
+          "id": "geely",
+          "name": "Geely",
+          "aliases": [],
+          "plural": "Geely"
+        },
+        {
+          "id": "nio",
+          "name": "NIO",
+          "aliases": [],
+          "plural": "NIO"
+        },
+        {
+          "id": "skoda",
+          "name": "Škoda",
+          "aliases": [],
+          "plural": "Škoda"
+        },
+        {
+          "id": "seat",
+          "name": "SEAT",
+          "aliases": [],
+          "plural": "SEAT"
+        },
+        {
+          "id": "renault",
+          "name": "Renault",
+          "aliases": [],
+          "plural": "Renault"
+        },
+        {
+          "id": "peugeot",
+          "name": "Peugeot",
+          "aliases": [],
+          "plural": "Peugeot"
+        },
+        {
+          "id": "citroen",
+          "name": "Citroën",
+          "aliases": [],
+          "plural": "Citroën"
+        },
+        {
+          "id": "opel",
+          "name": "Opel",
+          "aliases": [],
+          "plural": "Opel"
+        },
+        {
+          "id": "dacia",
+          "name": "Dacia",
+          "aliases": [],
+          "plural": "Dacia"
+        },
+        {
+          "id": "lada",
+          "name": "Lada",
+          "aliases": [],
+          "plural": "Lada"
+        },
+        {
+          "id": "proton",
+          "name": "Proton",
+          "aliases": [],
+          "plural": "Proton"
+        },
+        {
+          "id": "mahindra",
+          "name": "Mahindra",
+          "aliases": [],
+          "plural": "Mahindra"
+        },
+        {
+          "id": "maruti-suzuki",
+          "name": "Maruti Suzuki",
+          "aliases": [
+            "Maruti"
+          ],
+          "plural": "Maruti Suzuki"
+        },
+        {
+          "id": "suzuki",
+          "name": "Suzuki",
+          "aliases": [],
+          "plural": "Suzuki"
+        },
+        {
+          "id": "lancia",
+          "name": "Lancia",
+          "aliases": [],
+          "plural": "Lancia"
+        },
+        {
+          "id": "isuzu",
+          "name": "Isuzu",
+          "aliases": [],
+          "plural": "Isuzu"
+        },
+        {
+          "id": "daihatsu",
+          "name": "Daihatsu",
+          "aliases": [],
+          "plural": "Daihatsu"
+        },
+        {
+          "id": "lotus",
+          "name": "Lotus",
+          "aliases": [],
+          "plural": "Lotus"
+        },
+        {
+          "id": "pagani",
+          "name": "Pagani",
+          "aliases": [],
+          "plural": "Pagani"
+        },
+        {
+          "id": "koenigsegg",
+          "name": "Koenigsegg",
+          "aliases": [],
+          "plural": "Koenigsegg"
+        },
+        {
+          "id": "xpeng",
+          "name": "Xpeng",
+          "aliases": [],
+          "plural": "Xpeng"
+        }
+      ],
+      "host_bank": [
+        "honda",
+        "toyota",
+        "ford",
+        "tesla",
+        "chevrolet",
+        "bmw"
+      ],
+      "host_answers": [
+        "honda"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a dessert you'd bring to a potluck",
+      "entries": [
+        {
+          "id": "brownie",
+          "name": "brownie",
+          "aliases": [
+            "brownies"
+          ]
+        },
+        {
+          "id": "cookie",
+          "name": "cookie",
+          "aliases": [
+            "cookies"
+          ]
+        },
+        {
+          "id": "cupcake",
+          "name": "cupcake",
+          "aliases": [
+            "cupcakes"
+          ]
+        },
+        {
+          "id": "cake",
+          "name": "cake",
+          "aliases": [
+            "cakes"
+          ]
+        },
+        {
+          "id": "cheesecake",
+          "name": "cheesecake",
+          "aliases": [
+            "cheesecakes"
+          ]
+        },
+        {
+          "id": "banana-bread",
+          "name": "banana bread",
+          "aliases": [],
+          "plural": "banana bread"
+        },
+        {
+          "id": "pumpkin-bread",
+          "name": "pumpkin bread",
+          "aliases": [],
+          "plural": "pumpkin bread"
+        },
+        {
+          "id": "zucchini-bread",
+          "name": "zucchini bread",
+          "aliases": [],
+          "plural": "zucchini bread"
+        },
+        {
+          "id": "apple-pie",
+          "name": "apple pie",
+          "aliases": [
+            "apple pies"
+          ]
+        },
+        {
+          "id": "cherry-pie",
+          "name": "cherry pie",
+          "aliases": [
+            "cherry pies"
+          ]
+        },
+        {
+          "id": "blueberry-pie",
+          "name": "blueberry pie",
+          "aliases": [
+            "blueberry pies"
+          ]
+        },
+        {
+          "id": "peach-pie",
+          "name": "peach pie",
+          "aliases": [
+            "peach pies"
+          ]
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "pecan-pie",
+          "name": "pecan pie",
+          "aliases": [
+            "pecan pies"
+          ]
+        },
+        {
+          "id": "blackberry-pie",
+          "name": "blackberry pie",
+          "aliases": [
+            "blackberry pies"
+          ]
+        },
+        {
+          "id": "raspberry-pie",
+          "name": "raspberry pie",
+          "aliases": [
+            "raspberry pies"
+          ]
+        },
+        {
+          "id": "mixed-berry-pie",
+          "name": "mixed berry pie",
+          "aliases": [
+            "mixed berry pies"
+          ]
+        },
+        {
+          "id": "key-lime-pie",
+          "name": "key lime pie",
+          "aliases": [
+            "key lime pies"
+          ]
+        },
+        {
+          "id": "lemon-bar",
+          "name": "lemon bar",
+          "aliases": [
+            "lemon bars"
+          ]
+        },
+        {
+          "id": "apple-crisp",
+          "name": "apple crisp",
+          "aliases": [],
+          "plural": "apple crisp"
+        },
+        {
+          "id": "peach-cobbler",
+          "name": "peach cobbler",
+          "aliases": [],
+          "plural": "peach cobbler"
+        },
+        {
+          "id": "blackberry-cobbler",
+          "name": "blackberry cobbler",
+          "aliases": [],
+          "plural": "blackberry cobbler"
+        },
+        {
+          "id": "blueberry-cobbler",
+          "name": "blueberry cobbler",
+          "aliases": [],
+          "plural": "blueberry cobbler"
+        },
+        {
+          "id": "apple-crumble",
+          "name": "apple crumble",
+          "aliases": [],
+          "plural": "apple crumble"
+        },
+        {
+          "id": "fruit-tart",
+          "name": "fruit tart",
+          "aliases": [
+            "fruit tarts"
+          ]
+        },
+        {
+          "id": "blueberry-muffin",
+          "name": "blueberry muffin",
+          "aliases": [
+            "blueberry muffins"
+          ]
+        },
+        {
+          "id": "banana-pudding",
+          "name": "banana pudding",
+          "aliases": [],
+          "plural": "banana pudding"
+        },
+        {
+          "id": "fudge",
+          "name": "fudge",
+          "aliases": [],
+          "plural": "fudge"
+        },
+        {
+          "id": "tiramisu",
+          "name": "tiramisu",
+          "aliases": [],
+          "plural": "tiramisu"
+        },
+        {
+          "id": "jell-o",
+          "name": "Jell-O",
+          "aliases": [
+            "gelatin"
+          ],
+          "plural": "Jell-O"
+        },
+        {
+          "id": "rice-krispie-treat",
+          "name": "rice krispie treat",
+          "aliases": [
+            "rice crispy treat",
+            "rice krispie treats"
+          ]
+        },
+        {
+          "id": "baklava",
+          "name": "baklava",
+          "aliases": [],
+          "plural": "baklava"
+        },
+        {
+          "id": "flan",
+          "name": "flan",
+          "aliases": [
+            "flans"
+          ]
+        },
+        {
+          "id": "tres-leches",
+          "name": "tres leches",
+          "aliases": [],
+          "plural": "tres leches"
+        },
+        {
+          "id": "mochi",
+          "name": "mochi",
+          "aliases": [],
+          "plural": "mochi"
+        },
+        {
+          "id": "brigadeiro",
+          "name": "brigadeiro",
+          "aliases": [
+            "brigadeiros"
+          ]
+        },
+        {
+          "id": "churro",
+          "name": "churro",
+          "aliases": [
+            "churros"
+          ]
+        },
+        {
+          "id": "mango-sticky-rice",
+          "name": "mango sticky rice",
+          "aliases": [],
+          "plural": "mango sticky rice"
+        },
+        {
+          "id": "rice-pudding",
+          "name": "rice pudding",
+          "aliases": [],
+          "plural": "rice pudding"
+        },
+        {
+          "id": "gulab-jamun",
+          "name": "gulab jamun",
+          "aliases": [],
+          "plural": "gulab jamun"
+        },
+        {
+          "id": "alfajores",
+          "name": "alfajores",
+          "aliases": [],
+          "plural": "alfajores"
+        },
+        {
+          "id": "cannoli",
+          "name": "cannoli",
+          "aliases": [],
+          "plural": "cannoli"
+        },
+        {
+          "id": "nanaimo-bar",
+          "name": "Nanaimo bar",
+          "aliases": [
+            "Nanaimo bars"
+          ]
+        },
+        {
+          "id": "pavlova",
+          "name": "pavlova",
+          "aliases": []
+        },
+        {
+          "id": "sticky-toffee-pudding",
+          "name": "sticky toffee pudding",
+          "aliases": [],
+          "plural": "sticky toffee pudding"
+        },
+        {
+          "id": "bread-pudding",
+          "name": "bread pudding",
+          "aliases": [],
+          "plural": "bread pudding"
+        },
+        {
+          "id": "mooncake",
+          "name": "mooncake",
+          "aliases": [
+            "mooncakes"
+          ]
+        },
+        {
+          "id": "egg-tart",
+          "name": "egg tart",
+          "aliases": [
+            "pastel de nata",
+            "egg tarts"
+          ]
+        },
+        {
+          "id": "lamington",
+          "name": "lamington",
+          "aliases": [
+            "lamingtons"
+          ]
+        },
+        {
+          "id": "halva",
+          "name": "halva",
+          "aliases": [],
+          "plural": "halva"
+        },
+        {
+          "id": "rugelach",
+          "name": "rugelach",
+          "aliases": [],
+          "plural": "rugelach"
+        },
+        {
+          "id": "macaron",
+          "name": "macaron",
+          "aliases": [
+            "macarons"
+          ]
+        },
+        {
+          "id": "madeleine",
+          "name": "madeleine",
+          "aliases": [
+            "madeleines"
+          ]
+        },
+        {
+          "id": "creme-brulee",
+          "name": "crème brûlée",
+          "aliases": [
+            "crème brûlées"
+          ]
+        },
+        {
+          "id": "eclair",
+          "name": "éclair",
+          "aliases": [
+            "éclairs"
+          ]
+        },
+        {
+          "id": "cream-puff",
+          "name": "cream puff",
+          "aliases": [
+            "profiterole",
+            "cream puffs"
+          ]
+        }
+      ],
+      "host_bank": [
+        "cupcake",
+        "cookie",
+        "brownie",
+        "cake",
+        "apple-pie",
+        "banana-pudding"
+      ],
+      "host_answers": [
+        "cupcake"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something that's red",
+      "entries": [
+        {
+          "id": "apple",
+          "name": "apple",
+          "aliases": [
+            "apples"
+          ]
+        },
+        {
+          "id": "strawberry",
+          "name": "strawberry",
+          "aliases": [
+            "strawberries"
+          ]
+        },
+        {
+          "id": "fire-truck",
+          "name": "fire truck",
+          "aliases": [
+            "firetruck",
+            "fire trucks"
+          ]
+        },
+        {
+          "id": "stop-sign",
+          "name": "stop sign",
+          "aliases": [
+            "stop signs"
+          ]
+        },
+        {
+          "id": "cherry",
+          "name": "cherry",
+          "aliases": [
+            "cherries"
+          ]
+        },
+        {
+          "id": "tomato",
+          "name": "tomato",
+          "aliases": [
+            "tomatoes"
+          ]
+        },
+        {
+          "id": "rose",
+          "name": "rose",
+          "aliases": [
+            "roses"
+          ]
+        },
+        {
+          "id": "blood",
+          "name": "blood",
+          "aliases": [],
+          "plural": "blood"
+        },
+        {
+          "id": "heart",
+          "name": "heart",
+          "aliases": [
+            "hearts"
+          ]
+        },
+        {
+          "id": "ketchup",
+          "name": "ketchup",
+          "aliases": [],
+          "plural": "ketchup"
+        },
+        {
+          "id": "lobster",
+          "name": "lobster",
+          "aliases": [
+            "lobsters"
+          ]
+        },
+        {
+          "id": "ladybug",
+          "name": "ladybug",
+          "aliases": [
+            "ladybugs"
+          ]
+        },
+        {
+          "id": "cardinal",
+          "name": "cardinal",
+          "aliases": [
+            "cardinals"
+          ]
+        },
+        {
+          "id": "brick",
+          "name": "brick",
+          "aliases": [
+            "bricks"
+          ]
+        },
+        {
+          "id": "lipstick",
+          "name": "lipstick",
+          "aliases": [],
+          "plural": "lipstick"
+        },
+        {
+          "id": "fire",
+          "name": "fire",
+          "aliases": [],
+          "plural": "fire"
+        },
+        {
+          "id": "red-light",
+          "name": "red light",
+          "aliases": [
+            "stop light",
+            "red lights"
+          ]
+        },
+        {
+          "id": "santas-suit",
+          "name": "Santa's suit",
+          "aliases": [
+            "Santa Claus"
+          ],
+          "plural": "Santa's suit"
+        },
+        {
+          "id": "mars",
+          "name": "Mars",
+          "aliases": [],
+          "plural": "Mars"
+        },
+        {
+          "id": "watermelon",
+          "name": "watermelon",
+          "aliases": [
+            "watermelons"
+          ]
+        },
+        {
+          "id": "raspberry",
+          "name": "raspberry",
+          "aliases": [
+            "raspberries"
+          ]
+        },
+        {
+          "id": "chili-pepper",
+          "name": "chili pepper",
+          "aliases": [
+            "chili peppers"
+          ]
+        },
+        {
+          "id": "radish",
+          "name": "radish",
+          "aliases": [
+            "radishes"
+          ]
+        },
+        {
+          "id": "beet",
+          "name": "beet",
+          "aliases": [
+            "beets"
+          ]
+        },
+        {
+          "id": "cranberry",
+          "name": "cranberry",
+          "aliases": [
+            "cranberries"
+          ]
+        },
+        {
+          "id": "elmo",
+          "name": "Elmo",
+          "aliases": [],
+          "plural": "Elmo"
+        },
+        {
+          "id": "clifford-the-big-red-dog",
+          "name": "Clifford the Big Red Dog",
+          "aliases": [
+            "Clifford"
+          ],
+          "plural": "Clifford the Big Red Dog"
+        },
+        {
+          "id": "coke-can",
+          "name": "Coke can",
+          "aliases": [
+            "Coca-Cola can",
+            "Coke cans"
+          ]
+        },
+        {
+          "id": "poppy",
+          "name": "poppy",
+          "aliases": [
+            "poppies"
+          ]
+        },
+        {
+          "id": "crab",
+          "name": "crab",
+          "aliases": [
+            "crabs"
+          ]
+        },
+        {
+          "id": "barn",
+          "name": "barn",
+          "aliases": [
+            "barns"
+          ]
+        }
+      ],
+      "host_bank": [
+        "stop-sign",
+        "apple",
+        "strawberry",
+        "fire-truck",
+        "cherry",
+        "tomato"
+      ],
+      "host_answers": [
+        "stop-sign"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a body part you have two of",
+      "entries": [
+        {
+          "id": "eye",
+          "name": "eye",
+          "aliases": [
+            "eyes"
+          ]
+        },
+        {
+          "id": "ear",
+          "name": "ear",
+          "aliases": [
+            "ears"
+          ]
+        },
+        {
+          "id": "arm",
+          "name": "arm",
+          "aliases": [
+            "arms"
+          ]
+        },
+        {
+          "id": "leg",
+          "name": "leg",
+          "aliases": [
+            "legs"
+          ]
+        },
+        {
+          "id": "hand",
+          "name": "hand",
+          "aliases": [
+            "hands"
+          ]
+        },
+        {
+          "id": "foot",
+          "name": "foot",
+          "aliases": [
+            "feet"
+          ]
+        },
+        {
+          "id": "knee",
+          "name": "knee",
+          "aliases": [
+            "knees"
+          ]
+        },
+        {
+          "id": "elbow",
+          "name": "elbow",
+          "aliases": [
+            "elbows"
+          ]
+        },
+        {
+          "id": "shoulder",
+          "name": "shoulder",
+          "aliases": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "ankle",
+          "name": "ankle",
+          "aliases": [
+            "ankles"
+          ]
+        },
+        {
+          "id": "wrist",
+          "name": "wrist",
+          "aliases": [
+            "wrists"
+          ]
+        },
+        {
+          "id": "hip",
+          "name": "hip",
+          "aliases": [
+            "hips"
+          ]
+        },
+        {
+          "id": "kidney",
+          "name": "kidney",
+          "aliases": [
+            "kidneys"
+          ]
+        },
+        {
+          "id": "lung",
+          "name": "lung",
+          "aliases": [
+            "lungs"
+          ]
+        },
+        {
+          "id": "cheek",
+          "name": "cheek",
+          "aliases": [
+            "cheeks"
+          ]
+        },
+        {
+          "id": "eyebrow",
+          "name": "eyebrow",
+          "aliases": [
+            "eyebrows"
+          ]
+        },
+        {
+          "id": "nostril",
+          "name": "nostril",
+          "aliases": [
+            "nostrils"
+          ]
+        },
+        {
+          "id": "thumb",
+          "name": "thumb",
+          "aliases": [
+            "thumbs"
+          ]
+        },
+        {
+          "id": "heel",
+          "name": "heel",
+          "aliases": [
+            "heels"
+          ]
+        },
+        {
+          "id": "big-toe",
+          "name": "big toe",
+          "aliases": [
+            "big toes"
+          ]
+        },
+        {
+          "id": "thigh",
+          "name": "thigh",
+          "aliases": [
+            "thighs"
+          ]
+        },
+        {
+          "id": "shin",
+          "name": "shin",
+          "aliases": [
+            "shins"
+          ]
+        },
+        {
+          "id": "calf",
+          "name": "calf",
+          "aliases": [
+            "calves"
+          ]
+        },
+        {
+          "id": "armpit",
+          "name": "armpit",
+          "aliases": [
+            "armpits"
+          ]
+        },
+        {
+          "id": "collarbone",
+          "name": "collarbone",
+          "aliases": [
+            "collarbones"
+          ]
+        }
+      ],
+      "host_bank": [
+        "ear",
+        "eye",
+        "arm",
+        "leg",
+        "hand",
+        "foot",
+        "knee"
+      ],
+      "host_answers": [
+        "ear"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of apple",
+      "entries": [
+        {
+          "id": "granny-smith",
+          "name": "Granny Smith",
+          "aliases": [],
+          "plural": "Granny Smith"
+        },
+        {
+          "id": "honeycrisp",
+          "name": "Honeycrisp",
+          "aliases": [],
+          "plural": "Honeycrisp"
+        },
+        {
+          "id": "gala",
+          "name": "Gala",
+          "aliases": [],
+          "plural": "Gala"
+        },
+        {
+          "id": "fuji",
+          "name": "Fuji",
+          "aliases": [],
+          "plural": "Fuji"
+        },
+        {
+          "id": "red-delicious",
+          "name": "Red Delicious",
+          "aliases": [],
+          "plural": "Red Delicious"
+        },
+        {
+          "id": "golden-delicious",
+          "name": "Golden Delicious",
+          "aliases": [],
+          "plural": "Golden Delicious"
+        },
+        {
+          "id": "mcintosh",
+          "name": "McIntosh",
+          "aliases": [],
+          "plural": "McIntosh"
+        },
+        {
+          "id": "pink-lady",
+          "name": "Pink Lady",
+          "aliases": [],
+          "plural": "Pink Lady"
+        },
+        {
+          "id": "braeburn",
+          "name": "Braeburn",
+          "aliases": [],
+          "plural": "Braeburn"
+        },
+        {
+          "id": "jazz",
+          "name": "Jazz",
+          "aliases": [],
+          "plural": "Jazz"
+        },
+        {
+          "id": "cosmic-crisp",
+          "name": "Cosmic Crisp",
+          "aliases": [],
+          "plural": "Cosmic Crisp"
+        },
+        {
+          "id": "empire",
+          "name": "Empire",
+          "aliases": [],
+          "plural": "Empire"
+        },
+        {
+          "id": "jonagold",
+          "name": "Jonagold",
+          "aliases": [],
+          "plural": "Jonagold"
+        },
+        {
+          "id": "ambrosia",
+          "name": "Ambrosia",
+          "aliases": [],
+          "plural": "Ambrosia"
+        },
+        {
+          "id": "envy",
+          "name": "Envy",
+          "aliases": [],
+          "plural": "Envy"
+        },
+        {
+          "id": "macoun",
+          "name": "Macoun",
+          "aliases": [],
+          "plural": "Macoun"
+        },
+        {
+          "id": "cortland",
+          "name": "Cortland",
+          "aliases": [],
+          "plural": "Cortland"
+        },
+        {
+          "id": "bramley",
+          "name": "Bramley",
+          "aliases": [],
+          "plural": "Bramley"
+        },
+        {
+          "id": "coxs-orange-pippin",
+          "name": "Cox's Orange Pippin",
+          "aliases": [
+            "Cox"
+          ],
+          "plural": "Cox's Orange Pippin"
+        },
+        {
+          "id": "jonathan",
+          "name": "Jonathan",
+          "aliases": [],
+          "plural": "Jonathan"
+        },
+        {
+          "id": "northern-spy",
+          "name": "Northern Spy",
+          "aliases": [],
+          "plural": "Northern Spy"
+        },
+        {
+          "id": "winesap",
+          "name": "Winesap",
+          "aliases": [],
+          "plural": "Winesap"
+        },
+        {
+          "id": "rome",
+          "name": "Rome",
+          "aliases": [],
+          "plural": "Rome"
+        },
+        {
+          "id": "opal",
+          "name": "Opal",
+          "aliases": [],
+          "plural": "Opal"
+        },
+        {
+          "id": "sweetango",
+          "name": "SweeTango",
+          "aliases": [],
+          "plural": "SweeTango"
+        },
+        {
+          "id": "mutsu",
+          "name": "Mutsu",
+          "aliases": [
+            "Crispin"
+          ],
+          "plural": "Mutsu"
+        },
+        {
+          "id": "gravenstein",
+          "name": "Gravenstein",
+          "aliases": [],
+          "plural": "Gravenstein"
+        }
+      ],
+      "host_bank": [
+        "honeycrisp",
+        "granny-smith",
+        "gala",
+        "fuji",
+        "red-delicious",
+        "golden-delicious",
+        "mcintosh"
+      ],
+      "host_answers": [
+        "honeycrisp"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of whale",
+      "entries": [
+        {
+          "id": "orca",
+          "name": "orca",
+          "aliases": [
+            "killer whale",
+            "orcas"
+          ]
+        },
+        {
+          "id": "beluga",
+          "name": "beluga",
+          "aliases": [
+            "beluga whale",
+            "belugas"
+          ]
+        },
+        {
+          "id": "narwhal",
+          "name": "narwhal",
+          "aliases": [
+            "narwhals"
+          ]
+        },
+        {
+          "id": "blue-whale",
+          "name": "blue whale",
+          "aliases": [
+            "blue whales"
+          ]
+        },
+        {
+          "id": "humpback-whale",
+          "name": "humpback whale",
+          "aliases": [
+            "humpback whales"
+          ]
+        },
+        {
+          "id": "sperm-whale",
+          "name": "sperm whale",
+          "aliases": [
+            "sperm whales"
+          ]
+        },
+        {
+          "id": "gray-whale",
+          "name": "gray whale",
+          "aliases": [
+            "grey whale",
+            "gray whales"
+          ]
+        },
+        {
+          "id": "minke-whale",
+          "name": "minke whale",
+          "aliases": [
+            "minke whales"
+          ]
+        },
+        {
+          "id": "fin-whale",
+          "name": "fin whale",
+          "aliases": [
+            "fin whales"
+          ]
+        },
+        {
+          "id": "right-whale",
+          "name": "right whale",
+          "aliases": [
+            "right whales"
+          ]
+        },
+        {
+          "id": "bowhead-whale",
+          "name": "bowhead whale",
+          "aliases": [
+            "bowhead whales"
+          ]
+        },
+        {
+          "id": "pilot-whale",
+          "name": "pilot whale",
+          "aliases": [
+            "pilot whales"
+          ]
+        }
+      ],
+      "host_bank": [
+        "blue-whale",
+        "humpback-whale",
+        "orca",
+        "sperm-whale",
+        "beluga",
+        "gray-whale",
+        "narwhal",
+        "minke-whale",
+        "right-whale"
+      ],
+      "host_answers": [
+        "blue-whale"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

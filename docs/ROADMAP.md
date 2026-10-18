@@ -5,7 +5,7 @@ At the start of each session, agents report the current milestone, its status an
 ## Product
 This is a daily game platform. Players play the day's game, watch friends' runs live (including where each friend "died"), comment and react on the day's game, and earn cumulative points for a friends leaderboard. It's built to hold more than one game later, but it ships with one.
 
-**Game 1: Don't Match the Host.** A fixed chain of questions narrows each day (e.g. Animal → Mammal → African mammal → Big cat). The player names an answer and must avoid the host's secret answer. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
+**Game 1: Don't Match the Host.** Each day has 7 fixed, independent questions that mix concrete and abstract (e.g. "Name a day of the month", "Name something you'd bring to a potluck"). The player names an answer and must avoid the host's secret answers, which catch a slowly rising share of players through the day. Niche answers are a fair escape, and some days are harder than others. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
 
 ## Milestones
 Status: `planned` → `in progress` → `in review` → `done`
@@ -13,8 +13,8 @@ Status: `planned` → `in progress` → `in review` → `done`
 | # | Milestone | Scope | Status | Ticket |
 |---|---|---|---|---|
 | M00 | Foundations | Stack and tooling decisions, the hard-to-reverse designs, CI, `scripts/status`, staging deploy | done | `docs/milestones/M00-foundations.md` |
-| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 7 days of real puzzles | planned | `docs/milestones/M01-puzzle-content.md` |
-| M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: confirm the narrowing creates tension and check the obscure-answer escape risk before building any social features. | planned | — |
+| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 14 real daily puzzles (7 questions per date) | in review | `docs/milestones/M01-puzzle-content.md` |
+| M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: measure each question's real catch rate against its estimate, check that most players usually finish, and collect missing answers before building any social features. | planned | — |
 | M03 | Share | Spoiler-free share text whose link opens today's game | planned | — |
 | M04 | Friends and live board | Invite link, mutual friends, a live board (status for everyone, plus where each friend died once you've finished), friends-only delivery, reconnect logged and counted | planned | — |
 | M05 | Comments and reactions | On the day's game, friends-only, visible after you've played, delete your own, report others | planned | — |
@@ -23,7 +23,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 | — | **MVP line** | | | |
 
 Tickets for M02 and later get written when their milestone comes up, so they don't go stale.
-After the MVP, order the work by beta data: streaks, answer stats ("12% picked lion"), reminders, admin UI for content, global leaderboard, game #2 (pull the platform/game boundary out at that point), native app wrapper, public comment moderation.
+After the MVP, order the work by beta data: streaks, answer stats ("12% picked lion"), reminders, admin UI for content, AI-generated puzzles (Claude drafts, the M01 validator gates, a human approves; the human wants this eventually, 2026-10-18), global leaderboard, game #2 (pull the platform/game boundary out at that point), native app wrapper, public comment moderation.
 
 ## Next revision (deferred)
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side.
@@ -51,4 +51,23 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The Supabase CA exists twice: `supabase/certs/prod-ca-2021.crt` (psql) and the `DATABASE_CA_CERT` env var (app). Consider one source. Found in M00 (review 3).
 - [ ] Local Node is v24.11.0 with npm 11.6.1, while CI uses Node 24.2x with npm 11.19.1. Upgrade local Node to the current 24 LTS (a human install). Found in M00 (CI on PR #1). `npm run lockfile` already guards against the drift.
 - [ ] The production domain `riff-sixfour.vercel.app` is behind Vercel Authentication, like the previews. It must be public before the M07 closed beta, which also lets `npm run status` check production without a bypass token. Found in M00 (status check after merge). Previews should stay protected.
+- [ ] Measure in the M02 playtest whether each question's host bank holds the answers players actually give, then decide a host bank size guideline (a human number). Found in M01 (planning, human 2026-10-18: "No fixed size yet"). M01 only checks that the bank covers the host answers.
+- [ ] `content:validate` skips files that don't end in lowercase `.json` without saying so (e.g. `2026-11-05.JSON`), and still prints CONTENT OK. Report non-`.json` files under the root, or check for date gaps. Found in M01 (review). Nothing publishes yet; the file count shows it.
+- [ ] Nothing checks that the authored puzzles are on consecutive dates (the M01 AC). Add a check when the publish step exists. Found in M01 (review). Checked by eye for 14 files.
+- [ ] Normalization doesn't strip format characters (`p{Cf}`, e.g. a zero-width space), so "li​on" doesn't collide with "lion". It's outside the approved spec; ask the human if content gets pasted from the web. Found in M01 (review).
+- [ ] The plural check only goes singular name → plural alias. An entry named in the plural ("cats") passes without "cat". Found in M01 (review). Players pick IDs from autocomplete, so the risk is low.
+- [ ] `content:plurals` rewrites the whole file with `JSON.stringify(…, null, 2)`, so a hand-formatted file shows a full reformat in the diff. Found in M01 (review). The added plurals are also printed one per line.
+- [ ] The M01 ticket's "Removes" names only `scripts/content-validate.ts` as a caller of `allowImportingTsExtensions`; `src/content/puzzle.ts` and `scripts/content-plurals.ts` use it too. Found in M01 (review). Docs only.
+- [ ] Tests import `./puzzle` and `./content-validate` without an extension, while runtime code uses `.ts`. Pick one style. Found in M01 (review). Both work.
+- [ ] Merged remote branches `m00-closeout`, `m00-followup` and `m00-foundations` still exist on origin (CLAUDE.md: delete after merge). Found in M01 (review). Deleting a remote branch needs the human's OK.
+- [ ] When a player types something that isn't in the accepted list: reply "not in our list yet, try another" with no penalty, and log the typed text for a human to review and add (human, 2026-10-18). This is a new network message (today the client sends only entry IDs). Found in M01 (planning). It's M02 work, because it needs the play screen.
+- [ ] Name a reference source for each concrete question's answer list (e.g. a public list of dog breeds). The M01 drafts come from Claude's knowledge and the human's review. Found in M01 (planning). Lists can grow from logged misses in the meantime.
+- [ ] The M01 ticket's AC line about "a chain whose length differs from 'questions per chain'" still uses chain wording; the check is now the question count. Found in M01 (review 2). Docs only.
+- [ ] DECISIONS.md Log has the 2026-10-18 "question k has k host answers" row, superseded the same day by the next row. History, but it reads like a live rule. Found in M01 (review 2). Docs only.
+- [ ] Some draft days may have no concrete question (a closed answer set), e.g. 2026-12-18, 12-19, 12-23, depending on whether "a kind of nut" or "a coffee drink" counts as concrete. Needs a human reading of "concrete". Found in M01 (review 2).
+- [ ] Validator branches without a fixture or test: match-group key not in the accepted bank, an ID listed twice in host_bank or host_answers, a name that normalizes to empty. Found in M01 (review 2). Simple branches.
+- [ ] 2026-12-24 q3 "entirely east of the Mississippi River": Kaskaskia, Illinois lies west of today's channel, so "entirely" is arguable for Illinois. Soften the prompt or accept it. Found in M01 (review 2). Content only, editable before its day.
+- [ ] Completeness gaps in near-closed draft sets: whales (no sei, Bryde's, beaked), ocean mammals (no dugong, polar bear), cat family (14 of about 40 felids). Found in M01 (review 2). Lists can grow before each day.
+- [ ] The country list mixes United Kingdom with England, Scotland, Wales and Northern Ireland (two levels). Found in M01 (review 2). It doesn't touch the host answer.
+- [ ] Late draft questions with one dominant host answer (citrus: orange, pet: dog, room: kitchen, shoe: sneakers) may catch far more than a gentle share. Measure in the M02 playtest. Found in M01 (review 2).
 - [x] The `DATABASE_CA_CERT` error said "check .env.local", which misleads on Vercel. Reworded on 2026-10-18 after a Production value with extra text at the start failed at boot. Found in M00 (staging check).

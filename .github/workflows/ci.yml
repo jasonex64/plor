@@ -23,6 +23,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      # Every puzzle file must pass the answer-model rules before it can be published (M01).
+      - run: npm run content:validate
       - run: npm run build
 
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
