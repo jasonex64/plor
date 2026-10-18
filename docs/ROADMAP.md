@@ -41,4 +41,3 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
 - [ ] `scripts/status.ts` has no explicit fetch timeout, so a hung server waits for undici's default. A timeout value is a human number. Found in M00 (implementation). An unreachable server already fails fast.
 - [ ] `/api/health` doesn't check the database yet. Add `select 1` once a Supabase project is linked (M00 still needs this for the staging evidence). Found in M00 (implementation).
-- [ ] The CI action versions (`actions/checkout@v4`, `actions/setup-node@v4`) are unverified against the official docs and should be pinned in SOURCES.md. Found in M00 (implementation). Do this before the first CI run.

@@ -23,3 +23,5 @@ These are the only sources agents may treat as authoritative. Memory, blog posts
 | Supabase migrations | https://supabase.com/docs/guides/deployment/database-migrations | CLI 2.121.0 | Applying the schema to hosted projects | — |
 | Supabase regions | https://supabase.com/docs/guides/platform/regions | accessed 2026-10-17 | Region choice (permanent) | — |
 | Node.js | https://nodejs.org/en/about/previous-releases | v24.22.0 LTS (2026-10-14), npm 11.19.1 | Runtime | — |
+| GitHub Actions: checkout | https://github.com/actions/checkout/releases | v7.0.1 (released 20 Jul, year unverified), accessed 2026-10-17. *Pending human approval.* | CI checkout step | — |
+| GitHub Actions: setup-node | https://github.com/actions/setup-node (README, `docs/advanced-usage.md`) | v7, accessed 2026-10-17. *Pending human approval.* | CI Node setup: `node-version-file: package.json` reads `volta.node`, then `devEngines.runtime`, then `engines.node`; `cache: npm` | — |
