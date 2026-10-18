@@ -1280,6 +1280,72 @@
           "name": "Phase 10",
           "aliases": [],
           "plural": "Phase 10"
+        },
+        {
+          "id": "big-two",
+          "name": "Big Two",
+          "aliases": [],
+          "plural": "Big Two"
+        },
+        {
+          "id": "tien-len",
+          "name": "Tiến lên",
+          "aliases": [],
+          "plural": "Tiến lên"
+        },
+        {
+          "id": "scopa",
+          "name": "Scopa",
+          "aliases": [],
+          "plural": "Scopa"
+        },
+        {
+          "id": "briscola",
+          "name": "Briscola",
+          "aliases": [],
+          "plural": "Briscola"
+        },
+        {
+          "id": "truco",
+          "name": "Truco",
+          "aliases": [],
+          "plural": "Truco"
+        },
+        {
+          "id": "durak",
+          "name": "Durak",
+          "aliases": [],
+          "plural": "Durak"
+        },
+        {
+          "id": "belote",
+          "name": "Belote",
+          "aliases": [],
+          "plural": "Belote"
+        },
+        {
+          "id": "teen-patti",
+          "name": "Teen Patti",
+          "aliases": [],
+          "plural": "Teen Patti"
+        },
+        {
+          "id": "hanafuda",
+          "name": "Hanafuda",
+          "aliases": [],
+          "plural": "Hanafuda"
+        },
+        {
+          "id": "jass",
+          "name": "Jass",
+          "aliases": [],
+          "plural": "Jass"
+        },
+        {
+          "id": "mus",
+          "name": "Mus",
+          "aliases": [],
+          "plural": "Mus"
         }
       ],
       "host_bank": [
@@ -1402,6 +1468,101 @@
           "name": "red eye",
           "aliases": [],
           "plural": "red eye"
+        },
+        {
+          "id": "vietnamese-iced-coffee",
+          "name": "Vietnamese iced coffee",
+          "aliases": [
+            "cà phê sữa đá"
+          ],
+          "plural": "Vietnamese iced coffee"
+        },
+        {
+          "id": "cafe-de-olla",
+          "name": "café de olla",
+          "aliases": [],
+          "plural": "café de olla"
+        },
+        {
+          "id": "cuban-coffee",
+          "name": "Cuban coffee",
+          "aliases": [
+            "cafecito",
+            "café cubano"
+          ],
+          "plural": "Cuban coffee"
+        },
+        {
+          "id": "frappe",
+          "name": "frappé",
+          "aliases": [
+            "Greek frappé"
+          ],
+          "plural": "frappé"
+        },
+        {
+          "id": "dalgona-coffee",
+          "name": "dalgona coffee",
+          "aliases": [],
+          "plural": "dalgona coffee"
+        },
+        {
+          "id": "long-black",
+          "name": "long black",
+          "aliases": [],
+          "plural": "long black"
+        },
+        {
+          "id": "ristretto",
+          "name": "ristretto",
+          "aliases": [],
+          "plural": "ristretto"
+        },
+        {
+          "id": "lungo",
+          "name": "lungo",
+          "aliases": [],
+          "plural": "lungo"
+        },
+        {
+          "id": "cafe-con-leche",
+          "name": "café con leche",
+          "aliases": [],
+          "plural": "café con leche"
+        },
+        {
+          "id": "kopi",
+          "name": "kopi",
+          "aliases": [],
+          "plural": "kopi"
+        },
+        {
+          "id": "yuenyeung",
+          "name": "yuenyeung",
+          "aliases": [],
+          "plural": "yuenyeung"
+        },
+        {
+          "id": "viennese-coffee",
+          "name": "Viennese coffee",
+          "aliases": [
+            "Wiener Melange"
+          ],
+          "plural": "Viennese coffee"
+        },
+        {
+          "id": "cafe-bombon",
+          "name": "café bombón",
+          "aliases": [],
+          "plural": "café bombón"
+        },
+        {
+          "id": "filter-coffee",
+          "name": "filter coffee",
+          "aliases": [
+            "Indian filter coffee"
+          ],
+          "plural": "filter coffee"
         }
       ],
       "host_bank": [
@@ -1552,6 +1713,41 @@
           "name": "frog",
           "aliases": [
             "frogs"
+          ]
+        },
+        {
+          "id": "chinchilla",
+          "name": "chinchilla",
+          "aliases": [
+            "chinchillas"
+          ]
+        },
+        {
+          "id": "axolotl",
+          "name": "axolotl",
+          "aliases": [
+            "axolotls"
+          ]
+        },
+        {
+          "id": "tarantula",
+          "name": "tarantula",
+          "aliases": [
+            "tarantulas"
+          ]
+        },
+        {
+          "id": "sugar-glider",
+          "name": "sugar glider",
+          "aliases": [
+            "sugar gliders"
+          ]
+        },
+        {
+          "id": "chicken",
+          "name": "chicken",
+          "aliases": [
+            "chickens"
           ]
         }
       ],

@@ -1378,6 +1378,71 @@
           "aliases": [
             "bottle openers"
           ]
+        },
+        {
+          "id": "mortar-and-pestle",
+          "name": "mortar and pestle",
+          "aliases": [
+            "mortars and pestles"
+          ],
+          "plural": "mortars and pestles"
+        },
+        {
+          "id": "rice-paddle",
+          "name": "rice paddle",
+          "aliases": [
+            "rice paddles"
+          ]
+        },
+        {
+          "id": "mandoline",
+          "name": "mandoline",
+          "aliases": [
+            "mandolines"
+          ]
+        },
+        {
+          "id": "garlic-press",
+          "name": "garlic press",
+          "aliases": [
+            "garlic presses"
+          ]
+        },
+        {
+          "id": "zester",
+          "name": "zester",
+          "aliases": [
+            "zesters"
+          ]
+        },
+        {
+          "id": "skewer",
+          "name": "skewer",
+          "aliases": [
+            "skewers"
+          ]
+        },
+        {
+          "id": "kitchen-shears",
+          "name": "kitchen shears",
+          "aliases": [
+            "scissors"
+          ]
+        },
+        {
+          "id": "cleaver",
+          "name": "cleaver",
+          "aliases": [
+            "cleavers"
+          ]
+        },
+        {
+          "id": "strainer",
+          "name": "strainer",
+          "aliases": [
+            "tea strainer",
+            "strainers"
+          ]
         }
       ],
       "host_bank": [

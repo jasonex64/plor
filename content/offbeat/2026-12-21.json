@@ -355,6 +355,126 @@
           "aliases": [
             "quinces"
           ]
+        },
+        {
+          "id": "rambutan",
+          "name": "rambutan",
+          "aliases": [],
+          "plural": "rambutan"
+        },
+        {
+          "id": "mangosteen",
+          "name": "mangosteen",
+          "aliases": [],
+          "plural": "mangosteen"
+        },
+        {
+          "id": "longan",
+          "name": "longan",
+          "aliases": [],
+          "plural": "longan"
+        },
+        {
+          "id": "soursop",
+          "name": "soursop",
+          "aliases": [],
+          "plural": "soursop"
+        },
+        {
+          "id": "cherimoya",
+          "name": "cherimoya",
+          "aliases": [],
+          "plural": "cherimoya"
+        },
+        {
+          "id": "feijoa",
+          "name": "feijoa",
+          "aliases": [],
+          "plural": "feijoa"
+        },
+        {
+          "id": "tamarind",
+          "name": "tamarind",
+          "aliases": [],
+          "plural": "tamarind"
+        },
+        {
+          "id": "jabuticaba",
+          "name": "jabuticaba",
+          "aliases": [],
+          "plural": "jabuticaba"
+        },
+        {
+          "id": "salak",
+          "name": "salak",
+          "aliases": [
+            "snake fruit"
+          ],
+          "plural": "salak"
+        },
+        {
+          "id": "yuzu",
+          "name": "yuzu",
+          "aliases": [],
+          "plural": "yuzu"
+        },
+        {
+          "id": "calamansi",
+          "name": "calamansi",
+          "aliases": [],
+          "plural": "calamansi"
+        },
+        {
+          "id": "ugli-fruit",
+          "name": "ugli fruit",
+          "aliases": [],
+          "plural": "ugli fruit"
+        },
+        {
+          "id": "breadfruit",
+          "name": "breadfruit",
+          "aliases": [],
+          "plural": "breadfruit"
+        },
+        {
+          "id": "ackee",
+          "name": "ackee",
+          "aliases": [],
+          "plural": "ackee"
+        },
+        {
+          "id": "sapodilla",
+          "name": "sapodilla",
+          "aliases": [],
+          "plural": "sapodilla"
+        },
+        {
+          "id": "acerola",
+          "name": "acerola",
+          "aliases": [],
+          "plural": "acerola"
+        },
+        {
+          "id": "loquat",
+          "name": "loquat",
+          "aliases": [],
+          "plural": "loquat"
+        },
+        {
+          "id": "ground-cherry",
+          "name": "ground cherry",
+          "aliases": [
+            "physalis"
+          ],
+          "plural": "ground cherry"
+        },
+        {
+          "id": "horned-melon",
+          "name": "horned melon",
+          "aliases": [
+            "kiwano"
+          ],
+          "plural": "horned melon"
         }
       ],
       "host_bank": [

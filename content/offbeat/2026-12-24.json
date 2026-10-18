@@ -324,6 +324,106 @@
           "name": "kickball",
           "aliases": [],
           "plural": "kickball"
+        },
+        {
+          "id": "sumo",
+          "name": "sumo",
+          "aliases": [],
+          "plural": "sumo"
+        },
+        {
+          "id": "kabaddi",
+          "name": "kabaddi",
+          "aliases": [],
+          "plural": "kabaddi"
+        },
+        {
+          "id": "hurling",
+          "name": "hurling",
+          "aliases": [],
+          "plural": "hurling"
+        },
+        {
+          "id": "sepak-takraw",
+          "name": "sepak takraw",
+          "aliases": [],
+          "plural": "sepak takraw"
+        },
+        {
+          "id": "netball",
+          "name": "netball",
+          "aliases": [],
+          "plural": "netball"
+        },
+        {
+          "id": "polo",
+          "name": "polo",
+          "aliases": [],
+          "plural": "polo"
+        },
+        {
+          "id": "jai-alai",
+          "name": "jai alai",
+          "aliases": [],
+          "plural": "jai alai"
+        },
+        {
+          "id": "capoeira",
+          "name": "capoeira",
+          "aliases": [],
+          "plural": "capoeira"
+        },
+        {
+          "id": "muay-thai",
+          "name": "muay thai",
+          "aliases": [],
+          "plural": "muay thai"
+        },
+        {
+          "id": "kendo",
+          "name": "kendo",
+          "aliases": [],
+          "plural": "kendo"
+        },
+        {
+          "id": "kung-fu",
+          "name": "kung fu",
+          "aliases": [],
+          "plural": "kung fu"
+        },
+        {
+          "id": "tai-chi",
+          "name": "tai chi",
+          "aliases": [],
+          "plural": "tai chi"
+        },
+        {
+          "id": "padel",
+          "name": "padel",
+          "aliases": [],
+          "plural": "padel"
+        },
+        {
+          "id": "floorball",
+          "name": "floorball",
+          "aliases": [],
+          "plural": "floorball"
+        },
+        {
+          "id": "mixed-martial-arts",
+          "name": "mixed martial arts",
+          "aliases": [
+            "MMA"
+          ],
+          "plural": "mixed martial arts"
+        },
+        {
+          "id": "jiu-jitsu",
+          "name": "jiu-jitsu",
+          "aliases": [
+            "BJJ"
+          ],
+          "plural": "jiu-jitsu"
         }
       ],
       "host_bank": [
@@ -494,6 +594,134 @@
           "name": "steak and eggs",
           "aliases": [],
           "plural": "steak and eggs"
+        },
+        {
+          "id": "congee",
+          "name": "congee",
+          "aliases": [
+            "jook",
+            "rice porridge"
+          ],
+          "plural": "congee"
+        },
+        {
+          "id": "chilaquiles",
+          "name": "chilaquiles",
+          "aliases": [],
+          "plural": "chilaquiles"
+        },
+        {
+          "id": "full-english-breakfast",
+          "name": "full English breakfast",
+          "aliases": [
+            "fry-up"
+          ],
+          "plural": "full English breakfast"
+        },
+        {
+          "id": "beans-on-toast",
+          "name": "beans on toast",
+          "aliases": [],
+          "plural": "beans on toast"
+        },
+        {
+          "id": "arepa",
+          "name": "arepa",
+          "aliases": [],
+          "plural": "arepa"
+        },
+        {
+          "id": "idli",
+          "name": "idli",
+          "aliases": [],
+          "plural": "idli"
+        },
+        {
+          "id": "dosa",
+          "name": "dosa",
+          "aliases": [],
+          "plural": "dosa"
+        },
+        {
+          "id": "paratha",
+          "name": "paratha",
+          "aliases": [],
+          "plural": "paratha"
+        },
+        {
+          "id": "poha",
+          "name": "poha",
+          "aliases": [],
+          "plural": "poha"
+        },
+        {
+          "id": "upma",
+          "name": "upma",
+          "aliases": [],
+          "plural": "upma"
+        },
+        {
+          "id": "menemen",
+          "name": "menemen",
+          "aliases": [],
+          "plural": "menemen"
+        },
+        {
+          "id": "ful-medames",
+          "name": "ful medames",
+          "aliases": [],
+          "plural": "ful medames"
+        },
+        {
+          "id": "kaya-toast",
+          "name": "kaya toast",
+          "aliases": [],
+          "plural": "kaya toast"
+        },
+        {
+          "id": "roti-canai",
+          "name": "roti canai",
+          "aliases": [],
+          "plural": "roti canai"
+        },
+        {
+          "id": "youtiao",
+          "name": "youtiao",
+          "aliases": [],
+          "plural": "youtiao"
+        },
+        {
+          "id": "baozi",
+          "name": "baozi",
+          "aliases": [
+            "bao",
+            "steamed bun"
+          ],
+          "plural": "baozi"
+        },
+        {
+          "id": "breakfast-taco",
+          "name": "breakfast taco",
+          "aliases": [],
+          "plural": "breakfast taco"
+        },
+        {
+          "id": "crumpet",
+          "name": "crumpet",
+          "aliases": [],
+          "plural": "crumpet"
+        },
+        {
+          "id": "miso-soup",
+          "name": "miso soup",
+          "aliases": [],
+          "plural": "miso soup"
+        },
+        {
+          "id": "dim-sum",
+          "name": "dim sum",
+          "aliases": [],
+          "plural": "dim sum"
         }
       ],
       "host_bank": [
@@ -916,6 +1144,80 @@
           "aliases": [
             "tiaras"
           ]
+        },
+        {
+          "id": "conical-hat",
+          "name": "conical hat",
+          "aliases": [
+            "nón lá",
+            "rice hat",
+            "conical hats"
+          ]
+        },
+        {
+          "id": "kufi",
+          "name": "kufi",
+          "aliases": [
+            "kufis"
+          ]
+        },
+        {
+          "id": "kippah",
+          "name": "kippah",
+          "aliases": [
+            "yarmulke",
+            "kippahs"
+          ]
+        },
+        {
+          "id": "ushanka",
+          "name": "ushanka",
+          "aliases": [
+            "ushankas"
+          ]
+        },
+        {
+          "id": "tam-o-shanter",
+          "name": "tam o' shanter",
+          "aliases": [
+            "tam o' shanters"
+          ]
+        },
+        {
+          "id": "cloche",
+          "name": "cloche",
+          "aliases": [
+            "cloches"
+          ]
+        },
+        {
+          "id": "boater",
+          "name": "boater",
+          "aliases": [
+            "boaters"
+          ]
+        },
+        {
+          "id": "deerstalker",
+          "name": "deerstalker",
+          "aliases": [
+            "deerstalkers"
+          ]
+        },
+        {
+          "id": "trilby",
+          "name": "trilby",
+          "aliases": [
+            "trilbys"
+          ],
+          "plural": "trilbys"
+        },
+        {
+          "id": "chullo",
+          "name": "chullo",
+          "aliases": [
+            "chullos"
+          ]
         }
       ],
       "host_bank": [
@@ -1051,6 +1353,72 @@
           "name": "chervil",
           "aliases": [],
           "plural": "chervil"
+        },
+        {
+          "id": "curry-leaves",
+          "name": "curry leaves",
+          "aliases": [
+            "curry leaf"
+          ],
+          "plural": "curry leaves"
+        },
+        {
+          "id": "makrut-lime-leaves",
+          "name": "makrut lime leaves",
+          "aliases": [
+            "kaffir lime leaves"
+          ],
+          "plural": "makrut lime leaves"
+        },
+        {
+          "id": "shiso",
+          "name": "shiso",
+          "aliases": [
+            "perilla"
+          ],
+          "plural": "shiso"
+        },
+        {
+          "id": "culantro",
+          "name": "culantro",
+          "aliases": [],
+          "plural": "culantro"
+        },
+        {
+          "id": "epazote",
+          "name": "epazote",
+          "aliases": [],
+          "plural": "epazote"
+        },
+        {
+          "id": "lovage",
+          "name": "lovage",
+          "aliases": [],
+          "plural": "lovage"
+        },
+        {
+          "id": "sorrel",
+          "name": "sorrel",
+          "aliases": [],
+          "plural": "sorrel"
+        },
+        {
+          "id": "hoja-santa",
+          "name": "hoja santa",
+          "aliases": [],
+          "plural": "hoja santa"
+        },
+        {
+          "id": "savory",
+          "name": "savory",
+          "aliases": [],
+          "plural": "savory"
+        },
+        {
+          "id": "pandan",
+          "name": "pandan",
+          "aliases": [],
+          "plural": "pandan"
         }
       ],
       "host_bank": [
@@ -1306,6 +1674,92 @@
           "name": "dress shoes",
           "aliases": [],
           "plural": "dress shoes"
+        },
+        {
+          "id": "geta",
+          "name": "geta",
+          "aliases": [],
+          "plural": "geta"
+        },
+        {
+          "id": "huaraches",
+          "name": "huaraches",
+          "aliases": [],
+          "plural": "huaraches"
+        },
+        {
+          "id": "espadrilles",
+          "name": "espadrilles",
+          "aliases": [],
+          "plural": "espadrilles"
+        },
+        {
+          "id": "jutti",
+          "name": "jutti",
+          "aliases": [
+            "mojari"
+          ],
+          "plural": "jutti"
+        },
+        {
+          "id": "babouches",
+          "name": "babouches",
+          "aliases": [],
+          "plural": "babouches"
+        },
+        {
+          "id": "mary-janes",
+          "name": "Mary Janes",
+          "aliases": [],
+          "plural": "Mary Janes"
+        },
+        {
+          "id": "oxfords",
+          "name": "oxfords",
+          "aliases": [],
+          "plural": "oxfords"
+        },
+        {
+          "id": "brogues",
+          "name": "brogues",
+          "aliases": [],
+          "plural": "brogues"
+        },
+        {
+          "id": "platform-shoes",
+          "name": "platform shoes",
+          "aliases": [],
+          "plural": "platform shoes"
+        },
+        {
+          "id": "mules",
+          "name": "mules",
+          "aliases": [],
+          "plural": "mules"
+        },
+        {
+          "id": "boat-shoes",
+          "name": "boat shoes",
+          "aliases": [],
+          "plural": "boat shoes"
+        },
+        {
+          "id": "water-shoes",
+          "name": "water shoes",
+          "aliases": [],
+          "plural": "water shoes"
+        },
+        {
+          "id": "zori",
+          "name": "zōri",
+          "aliases": [],
+          "plural": "zōri"
+        },
+        {
+          "id": "tabi",
+          "name": "tabi",
+          "aliases": [],
+          "plural": "tabi"
         }
       ],
       "host_bank": [

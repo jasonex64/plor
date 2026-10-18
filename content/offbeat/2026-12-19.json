@@ -444,6 +444,85 @@
           "aliases": [
             "windows"
           ]
+        },
+        {
+          "id": "wok",
+          "name": "wok",
+          "aliases": [
+            "woks"
+          ]
+        },
+        {
+          "id": "tortilla-press",
+          "name": "tortilla press",
+          "aliases": [
+            "tortilla presses"
+          ]
+        },
+        {
+          "id": "tagine",
+          "name": "tagine",
+          "aliases": [
+            "tagines"
+          ]
+        },
+        {
+          "id": "mortar-and-pestle",
+          "name": "mortar and pestle",
+          "aliases": [
+            "mortars and pestles"
+          ],
+          "plural": "mortars and pestles"
+        },
+        {
+          "id": "bamboo-steamer",
+          "name": "bamboo steamer",
+          "aliases": [
+            "steamer",
+            "bamboo steamers"
+          ]
+        },
+        {
+          "id": "pressure-cooker",
+          "name": "pressure cooker",
+          "aliases": [
+            "Instant Pot",
+            "pressure cookers"
+          ]
+        },
+        {
+          "id": "chopsticks",
+          "name": "chopsticks",
+          "aliases": [],
+          "plural": "chopsticks"
+        },
+        {
+          "id": "tawa",
+          "name": "tawa",
+          "aliases": [
+            "tawas"
+          ]
+        },
+        {
+          "id": "comal",
+          "name": "comal",
+          "aliases": [
+            "comals"
+          ]
+        },
+        {
+          "id": "molcajete",
+          "name": "molcajete",
+          "aliases": [
+            "molcajetes"
+          ]
+        },
+        {
+          "id": "dutch-oven",
+          "name": "Dutch oven",
+          "aliases": [
+            "Dutch ovens"
+          ]
         }
       ],
       "host_bank": [
@@ -1153,6 +1232,116 @@
           "name": "matzo",
           "aliases": [],
           "plural": "matzo"
+        },
+        {
+          "id": "chapati",
+          "name": "chapati",
+          "aliases": [
+            "roti"
+          ],
+          "plural": "chapati"
+        },
+        {
+          "id": "injera",
+          "name": "injera",
+          "aliases": [],
+          "plural": "injera"
+        },
+        {
+          "id": "arepa",
+          "name": "arepa",
+          "aliases": [],
+          "plural": "arepa"
+        },
+        {
+          "id": "pandesal",
+          "name": "pandesal",
+          "aliases": [],
+          "plural": "pandesal"
+        },
+        {
+          "id": "lavash",
+          "name": "lavash",
+          "aliases": [],
+          "plural": "lavash"
+        },
+        {
+          "id": "paratha",
+          "name": "paratha",
+          "aliases": [],
+          "plural": "paratha"
+        },
+        {
+          "id": "khachapuri",
+          "name": "khachapuri",
+          "aliases": [],
+          "plural": "khachapuri"
+        },
+        {
+          "id": "pao-de-queijo",
+          "name": "pão de queijo",
+          "aliases": [
+            "cheese bread"
+          ],
+          "plural": "pão de queijo"
+        },
+        {
+          "id": "soda-bread",
+          "name": "soda bread",
+          "aliases": [
+            "Irish soda bread"
+          ],
+          "plural": "soda bread"
+        },
+        {
+          "id": "damper",
+          "name": "damper",
+          "aliases": [],
+          "plural": "damper"
+        },
+        {
+          "id": "bannock",
+          "name": "bannock",
+          "aliases": [],
+          "plural": "bannock"
+        },
+        {
+          "id": "frybread",
+          "name": "frybread",
+          "aliases": [],
+          "plural": "frybread"
+        },
+        {
+          "id": "simit",
+          "name": "simit",
+          "aliases": [],
+          "plural": "simit"
+        },
+        {
+          "id": "stollen",
+          "name": "stollen",
+          "aliases": [],
+          "plural": "stollen"
+        },
+        {
+          "id": "panettone",
+          "name": "panettone",
+          "aliases": [],
+          "plural": "panettone"
+        },
+        {
+          "id": "sopapilla",
+          "name": "sopapilla",
+          "aliases": [],
+          "plural": "sopapilla"
+        },
+        {
+          "id": "milk-bread",
+          "name": "milk bread",
+          "aliases": [
+            "shokupan"
+          ],
+          "plural": "milk bread"
         }
       ],
       "host_bank": [
@@ -1602,6 +1791,46 @@
           "aliases": [
             "farm dogs"
           ]
+        },
+        {
+          "id": "water-buffalo",
+          "name": "water buffalo",
+          "aliases": [
+            "water buffalos"
+          ]
+        },
+        {
+          "id": "yak",
+          "name": "yak",
+          "aliases": [
+            "yaks"
+          ]
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "camels"
+          ]
+        },
+        {
+          "id": "ostrich",
+          "name": "ostrich",
+          "aliases": [
+            "ostriches"
+          ]
+        },
+        {
+          "id": "guinea-fowl",
+          "name": "guinea fowl",
+          "aliases": [],
+          "plural": "guinea fowl"
+        },
+        {
+          "id": "quail",
+          "name": "quail",
+          "aliases": [],
+          "plural": "quail"
         }
       ],
       "host_bank": [

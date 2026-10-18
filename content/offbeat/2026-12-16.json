@@ -1506,6 +1506,116 @@
           "name": "Groundhog Day",
           "aliases": [],
           "plural": "Groundhog Day"
+        },
+        {
+          "id": "saint-lucia-day",
+          "name": "Saint Lucia Day",
+          "aliases": [
+            "St. Lucia Day"
+          ],
+          "plural": "Saint Lucia Day"
+        },
+        {
+          "id": "epiphany",
+          "name": "Epiphany",
+          "aliases": [
+            "Three Kings Day"
+          ],
+          "plural": "Epiphany"
+        },
+        {
+          "id": "hogmanay",
+          "name": "Hogmanay",
+          "aliases": [],
+          "plural": "Hogmanay"
+        },
+        {
+          "id": "australia-day",
+          "name": "Australia Day",
+          "aliases": [],
+          "plural": "Australia Day"
+        },
+        {
+          "id": "waitangi-day",
+          "name": "Waitangi Day",
+          "aliases": [],
+          "plural": "Waitangi Day"
+        },
+        {
+          "id": "lantern-festival",
+          "name": "Lantern Festival",
+          "aliases": [],
+          "plural": "Lantern Festival"
+        },
+        {
+          "id": "seollal",
+          "name": "Seollal",
+          "aliases": [
+            "Korean New Year"
+          ],
+          "plural": "Seollal"
+        },
+        {
+          "id": "tet",
+          "name": "Tết",
+          "aliases": [
+            "Vietnamese New Year"
+          ],
+          "plural": "Tết"
+        },
+        {
+          "id": "lohri",
+          "name": "Lohri",
+          "aliases": [],
+          "plural": "Lohri"
+        },
+        {
+          "id": "pongal",
+          "name": "Pongal",
+          "aliases": [],
+          "plural": "Pongal"
+        },
+        {
+          "id": "makar-sankranti",
+          "name": "Makar Sankranti",
+          "aliases": [],
+          "plural": "Makar Sankranti"
+        },
+        {
+          "id": "candlemas",
+          "name": "Candlemas",
+          "aliases": [],
+          "plural": "Candlemas"
+        },
+        {
+          "id": "imbolc",
+          "name": "Imbolc",
+          "aliases": [],
+          "plural": "Imbolc"
+        },
+        {
+          "id": "burns-night",
+          "name": "Burns Night",
+          "aliases": [],
+          "plural": "Burns Night"
+        },
+        {
+          "id": "republic-day",
+          "name": "Republic Day",
+          "aliases": [],
+          "plural": "Republic Day"
+        },
+        {
+          "id": "bodhi-day",
+          "name": "Bodhi Day",
+          "aliases": [],
+          "plural": "Bodhi Day"
+        },
+        {
+          "id": "yule",
+          "name": "Yule",
+          "aliases": [],
+          "plural": "Yule"
         }
       ],
       "host_bank": [

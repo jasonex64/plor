@@ -667,6 +667,116 @@
           "aliases": [
             "labradoodles"
           ]
+        },
+        {
+          "id": "xoloitzcuintli",
+          "name": "Xoloitzcuintli",
+          "aliases": [
+            "Xolo",
+            "Xoloitzcuintlis"
+          ]
+        },
+        {
+          "id": "basenji",
+          "name": "Basenji",
+          "aliases": [
+            "Basenjis"
+          ]
+        },
+        {
+          "id": "shar-pei",
+          "name": "Shar-Pei",
+          "aliases": [
+            "Shar-Peis"
+          ]
+        },
+        {
+          "id": "chow-chow",
+          "name": "Chow Chow",
+          "aliases": [
+            "Chow Chows"
+          ]
+        },
+        {
+          "id": "lhasa-apso",
+          "name": "Lhasa Apso",
+          "aliases": [
+            "Lhasa Apsos"
+          ]
+        },
+        {
+          "id": "pekingese",
+          "name": "Pekingese",
+          "aliases": []
+        },
+        {
+          "id": "jindo",
+          "name": "Jindo",
+          "aliases": [
+            "Jindos"
+          ]
+        },
+        {
+          "id": "borzoi",
+          "name": "Borzoi",
+          "aliases": [
+            "Borzois"
+          ]
+        },
+        {
+          "id": "saluki",
+          "name": "Saluki",
+          "aliases": [
+            "Salukis"
+          ]
+        },
+        {
+          "id": "afghan-hound",
+          "name": "Afghan hound",
+          "aliases": [
+            "Afghan hounds"
+          ]
+        },
+        {
+          "id": "rhodesian-ridgeback",
+          "name": "Rhodesian ridgeback",
+          "aliases": [
+            "Rhodesian ridgebacks"
+          ]
+        },
+        {
+          "id": "kelpie",
+          "name": "kelpie",
+          "aliases": [
+            "Australian kelpie",
+            "kelpies"
+          ]
+        },
+        {
+          "id": "vizsla",
+          "name": "Vizsla",
+          "aliases": [
+            "Vizslas"
+          ]
+        },
+        {
+          "id": "havanese",
+          "name": "Havanese",
+          "aliases": []
+        },
+        {
+          "id": "papillon",
+          "name": "Papillon",
+          "aliases": [
+            "Papillons"
+          ]
+        },
+        {
+          "id": "keeshond",
+          "name": "Keeshond",
+          "aliases": [
+            "Keeshonds"
+          ]
         }
       ],
       "host_bank": [
@@ -898,6 +1008,110 @@
           "name": "paneer",
           "aliases": [],
           "plural": "paneer"
+        },
+        {
+          "id": "cotija",
+          "name": "cotija",
+          "aliases": [],
+          "plural": "cotija"
+        },
+        {
+          "id": "oaxaca",
+          "name": "Oaxaca",
+          "aliases": [
+            "quesillo"
+          ],
+          "plural": "Oaxaca"
+        },
+        {
+          "id": "emmental",
+          "name": "Emmental",
+          "aliases": [],
+          "plural": "Emmental"
+        },
+        {
+          "id": "comte",
+          "name": "Comté",
+          "aliases": [],
+          "plural": "Comté"
+        },
+        {
+          "id": "raclette",
+          "name": "raclette",
+          "aliases": [],
+          "plural": "raclette"
+        },
+        {
+          "id": "taleggio",
+          "name": "Taleggio",
+          "aliases": [],
+          "plural": "Taleggio"
+        },
+        {
+          "id": "fontina",
+          "name": "fontina",
+          "aliases": [],
+          "plural": "fontina"
+        },
+        {
+          "id": "edam",
+          "name": "Edam",
+          "aliases": [],
+          "plural": "Edam"
+        },
+        {
+          "id": "jarlsberg",
+          "name": "Jarlsberg",
+          "aliases": [],
+          "plural": "Jarlsberg"
+        },
+        {
+          "id": "wensleydale",
+          "name": "Wensleydale",
+          "aliases": [],
+          "plural": "Wensleydale"
+        },
+        {
+          "id": "red-leicester",
+          "name": "Red Leicester",
+          "aliases": [],
+          "plural": "Red Leicester"
+        },
+        {
+          "id": "double-gloucester",
+          "name": "Double Gloucester",
+          "aliases": [],
+          "plural": "Double Gloucester"
+        },
+        {
+          "id": "labneh",
+          "name": "labneh",
+          "aliases": [],
+          "plural": "labneh"
+        },
+        {
+          "id": "kashkaval",
+          "name": "kashkaval",
+          "aliases": [],
+          "plural": "kashkaval"
+        },
+        {
+          "id": "queso-blanco",
+          "name": "queso blanco",
+          "aliases": [],
+          "plural": "queso blanco"
+        },
+        {
+          "id": "limburger",
+          "name": "Limburger",
+          "aliases": [],
+          "plural": "Limburger"
+        },
+        {
+          "id": "brunost",
+          "name": "brunost",
+          "aliases": [],
+          "plural": "brunost"
         }
       ],
       "host_bank": [
@@ -1085,6 +1299,112 @@
           "name": "sumac",
           "aliases": [],
           "plural": "sumac"
+        },
+        {
+          "id": "five-spice",
+          "name": "five-spice",
+          "aliases": [
+            "Chinese five-spice"
+          ],
+          "plural": "five-spice"
+        },
+        {
+          "id": "sichuan-peppercorn",
+          "name": "Sichuan peppercorn",
+          "aliases": [
+            "Szechuan pepper"
+          ],
+          "plural": "Sichuan peppercorn"
+        },
+        {
+          "id": "gochugaru",
+          "name": "gochugaru",
+          "aliases": [],
+          "plural": "gochugaru"
+        },
+        {
+          "id": "berbere",
+          "name": "berbere",
+          "aliases": [],
+          "plural": "berbere"
+        },
+        {
+          "id": "ras-el-hanout",
+          "name": "ras el hanout",
+          "aliases": [],
+          "plural": "ras el hanout"
+        },
+        {
+          "id": "asafoetida",
+          "name": "asafoetida",
+          "aliases": [
+            "hing"
+          ],
+          "plural": "asafoetida"
+        },
+        {
+          "id": "fenugreek",
+          "name": "fenugreek",
+          "aliases": [],
+          "plural": "fenugreek"
+        },
+        {
+          "id": "mace",
+          "name": "mace",
+          "aliases": [],
+          "plural": "mace"
+        },
+        {
+          "id": "juniper-berries",
+          "name": "juniper berries",
+          "aliases": [],
+          "plural": "juniper berries"
+        },
+        {
+          "id": "caraway",
+          "name": "caraway",
+          "aliases": [],
+          "plural": "caraway"
+        },
+        {
+          "id": "nigella-seeds",
+          "name": "nigella seeds",
+          "aliases": [
+            "kalonji"
+          ],
+          "plural": "nigella seeds"
+        },
+        {
+          "id": "amchur",
+          "name": "amchur",
+          "aliases": [],
+          "plural": "amchur"
+        },
+        {
+          "id": "togarashi",
+          "name": "togarashi",
+          "aliases": [
+            "shichimi togarashi"
+          ],
+          "plural": "togarashi"
+        },
+        {
+          "id": "baharat",
+          "name": "baharat",
+          "aliases": [],
+          "plural": "baharat"
+        },
+        {
+          "id": "dukkah",
+          "name": "dukkah",
+          "aliases": [],
+          "plural": "dukkah"
+        },
+        {
+          "id": "aleppo-pepper",
+          "name": "Aleppo pepper",
+          "aliases": [],
+          "plural": "Aleppo pepper"
         }
       ],
       "host_bank": [
@@ -1281,6 +1601,128 @@
             "government"
           ],
           "plural": "civics"
+        },
+        {
+          "id": "mandarin",
+          "name": "Mandarin",
+          "aliases": [
+            "Chinese"
+          ],
+          "plural": "Mandarin"
+        },
+        {
+          "id": "german",
+          "name": "German",
+          "aliases": [],
+          "plural": "German"
+        },
+        {
+          "id": "japanese",
+          "name": "Japanese",
+          "aliases": [],
+          "plural": "Japanese"
+        },
+        {
+          "id": "latin",
+          "name": "Latin",
+          "aliases": [],
+          "plural": "Latin"
+        },
+        {
+          "id": "arabic",
+          "name": "Arabic",
+          "aliases": [],
+          "plural": "Arabic"
+        },
+        {
+          "id": "korean",
+          "name": "Korean",
+          "aliases": [],
+          "plural": "Korean"
+        },
+        {
+          "id": "hindi",
+          "name": "Hindi",
+          "aliases": [],
+          "plural": "Hindi"
+        },
+        {
+          "id": "religious-studies",
+          "name": "religious studies",
+          "aliases": [
+            "religion"
+          ],
+          "plural": "religious studies"
+        },
+        {
+          "id": "philosophy",
+          "name": "philosophy",
+          "aliases": [],
+          "plural": "philosophy"
+        },
+        {
+          "id": "home-economics",
+          "name": "home economics",
+          "aliases": [
+            "home ec"
+          ],
+          "plural": "home economics"
+        },
+        {
+          "id": "woodshop",
+          "name": "woodshop",
+          "aliases": [
+            "shop"
+          ],
+          "plural": "woodshop"
+        },
+        {
+          "id": "statistics",
+          "name": "statistics",
+          "aliases": [],
+          "plural": "statistics"
+        },
+        {
+          "id": "literature",
+          "name": "literature",
+          "aliases": [],
+          "plural": "literature"
+        },
+        {
+          "id": "sociology",
+          "name": "sociology",
+          "aliases": [],
+          "plural": "sociology"
+        },
+        {
+          "id": "anthropology",
+          "name": "anthropology",
+          "aliases": [],
+          "plural": "anthropology"
+        },
+        {
+          "id": "astronomy",
+          "name": "astronomy",
+          "aliases": [],
+          "plural": "astronomy"
+        },
+        {
+          "id": "robotics",
+          "name": "robotics",
+          "aliases": [],
+          "plural": "robotics"
+        },
+        {
+          "id": "dance",
+          "name": "dance",
+          "aliases": [],
+          "plural": "dance"
+        },
+        {
+          "id": "photography",
+          "name": "photography",
+          "aliases": [],
+          "plural": "photography"
         }
       ],
       "host_bank": [
@@ -1553,6 +1995,56 @@
           "aliases": [
             "entryway",
             "foyers"
+          ]
+        },
+        {
+          "id": "balcony",
+          "name": "balcony",
+          "aliases": [
+            "balconies"
+          ]
+        },
+        {
+          "id": "patio",
+          "name": "patio",
+          "aliases": [
+            "patios"
+          ]
+        },
+        {
+          "id": "library",
+          "name": "library",
+          "aliases": [
+            "libraries"
+          ]
+        },
+        {
+          "id": "game-room",
+          "name": "game room",
+          "aliases": [
+            "game rooms"
+          ]
+        },
+        {
+          "id": "home-gym",
+          "name": "home gym",
+          "aliases": [
+            "gym",
+            "home gyms"
+          ]
+        },
+        {
+          "id": "sauna",
+          "name": "sauna",
+          "aliases": [
+            "saunas"
+          ]
+        },
+        {
+          "id": "prayer-room",
+          "name": "prayer room",
+          "aliases": [
+            "prayer rooms"
           ]
         }
       ],

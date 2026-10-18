@@ -579,6 +579,372 @@
             "foil"
           ],
           "plural": "aluminum foil"
+        },
+        {
+          "id": "lumpia",
+          "name": "lumpia",
+          "aliases": [],
+          "plural": "lumpia"
+        },
+        {
+          "id": "pancit",
+          "name": "pancit",
+          "aliases": [],
+          "plural": "pancit"
+        },
+        {
+          "id": "chicken-adobo",
+          "name": "chicken adobo",
+          "aliases": [
+            "adobo"
+          ],
+          "plural": "chicken adobo"
+        },
+        {
+          "id": "jollof-rice",
+          "name": "jollof rice",
+          "aliases": [],
+          "plural": "jollof rice"
+        },
+        {
+          "id": "samosa",
+          "name": "samosa",
+          "aliases": [],
+          "plural": "samosa"
+        },
+        {
+          "id": "spring-roll",
+          "name": "spring roll",
+          "aliases": [],
+          "plural": "spring roll"
+        },
+        {
+          "id": "biryani",
+          "name": "biryani",
+          "aliases": [],
+          "plural": "biryani"
+        },
+        {
+          "id": "empanada",
+          "name": "empanada",
+          "aliases": [],
+          "plural": "empanada"
+        },
+        {
+          "id": "arroz-con-pollo",
+          "name": "arroz con pollo",
+          "aliases": [],
+          "plural": "arroz con pollo"
+        },
+        {
+          "id": "kimchi",
+          "name": "kimchi",
+          "aliases": [],
+          "plural": "kimchi"
+        },
+        {
+          "id": "bulgogi",
+          "name": "bulgogi",
+          "aliases": [],
+          "plural": "bulgogi"
+        },
+        {
+          "id": "japchae",
+          "name": "japchae",
+          "aliases": [],
+          "plural": "japchae"
+        },
+        {
+          "id": "sushi",
+          "name": "sushi",
+          "aliases": [],
+          "plural": "sushi"
+        },
+        {
+          "id": "onigiri",
+          "name": "onigiri",
+          "aliases": [],
+          "plural": "onigiri"
+        },
+        {
+          "id": "curry",
+          "name": "curry",
+          "aliases": [],
+          "plural": "curry"
+        },
+        {
+          "id": "tabbouleh",
+          "name": "tabbouleh",
+          "aliases": [],
+          "plural": "tabbouleh"
+        },
+        {
+          "id": "falafel",
+          "name": "falafel",
+          "aliases": [],
+          "plural": "falafel"
+        },
+        {
+          "id": "pierogi",
+          "name": "pierogi",
+          "aliases": [],
+          "plural": "pierogi"
+        },
+        {
+          "id": "kugel",
+          "name": "kugel",
+          "aliases": [],
+          "plural": "kugel"
+        },
+        {
+          "id": "jerk-chicken",
+          "name": "jerk chicken",
+          "aliases": [],
+          "plural": "jerk chicken"
+        },
+        {
+          "id": "fried-plantains",
+          "name": "fried plantains",
+          "aliases": [
+            "plantains"
+          ],
+          "plural": "fried plantains"
+        },
+        {
+          "id": "elote",
+          "name": "elote",
+          "aliases": [
+            "Mexican street corn"
+          ],
+          "plural": "elote"
+        },
+        {
+          "id": "pozole",
+          "name": "pozole",
+          "aliases": [],
+          "plural": "pozole"
+        },
+        {
+          "id": "spanakopita",
+          "name": "spanakopita",
+          "aliases": [],
+          "plural": "spanakopita"
+        },
+        {
+          "id": "dolmas",
+          "name": "dolmas",
+          "aliases": [
+            "stuffed grape leaves"
+          ],
+          "plural": "dolmas"
+        },
+        {
+          "id": "gyoza",
+          "name": "gyoza",
+          "aliases": [],
+          "plural": "gyoza"
+        },
+        {
+          "id": "pupusa",
+          "name": "pupusa",
+          "aliases": [],
+          "plural": "pupusa"
+        },
+        {
+          "id": "arancini",
+          "name": "arancini",
+          "aliases": [],
+          "plural": "arancini"
+        },
+        {
+          "id": "bruschetta",
+          "name": "bruschetta",
+          "aliases": [],
+          "plural": "bruschetta"
+        },
+        {
+          "id": "injera",
+          "name": "injera",
+          "aliases": [],
+          "plural": "injera"
+        },
+        {
+          "id": "banh-mi",
+          "name": "bánh mì",
+          "aliases": [],
+          "plural": "bánh mì"
+        },
+        {
+          "id": "red-beans-and-rice",
+          "name": "red beans and rice",
+          "aliases": [],
+          "plural": "red beans and rice"
+        },
+        {
+          "id": "gumbo",
+          "name": "gumbo",
+          "aliases": [],
+          "plural": "gumbo"
+        },
+        {
+          "id": "jambalaya",
+          "name": "jambalaya",
+          "aliases": [],
+          "plural": "jambalaya"
+        },
+        {
+          "id": "baklava",
+          "name": "baklava",
+          "aliases": [],
+          "plural": "baklava"
+        },
+        {
+          "id": "flan",
+          "name": "flan",
+          "aliases": [],
+          "plural": "flan"
+        },
+        {
+          "id": "tres-leches",
+          "name": "tres leches",
+          "aliases": [],
+          "plural": "tres leches"
+        },
+        {
+          "id": "mochi",
+          "name": "mochi",
+          "aliases": [],
+          "plural": "mochi"
+        },
+        {
+          "id": "brigadeiro",
+          "name": "brigadeiro",
+          "aliases": [],
+          "plural": "brigadeiro"
+        },
+        {
+          "id": "churro",
+          "name": "churro",
+          "aliases": [],
+          "plural": "churro"
+        },
+        {
+          "id": "mango-sticky-rice",
+          "name": "mango sticky rice",
+          "aliases": [],
+          "plural": "mango sticky rice"
+        },
+        {
+          "id": "rice-pudding",
+          "name": "rice pudding",
+          "aliases": [],
+          "plural": "rice pudding"
+        },
+        {
+          "id": "gulab-jamun",
+          "name": "gulab jamun",
+          "aliases": [],
+          "plural": "gulab jamun"
+        },
+        {
+          "id": "alfajores",
+          "name": "alfajores",
+          "aliases": [],
+          "plural": "alfajores"
+        },
+        {
+          "id": "cannoli",
+          "name": "cannoli",
+          "aliases": [],
+          "plural": "cannoli"
+        },
+        {
+          "id": "nanaimo-bar",
+          "name": "Nanaimo bar",
+          "aliases": [],
+          "plural": "Nanaimo bar"
+        },
+        {
+          "id": "pavlova",
+          "name": "pavlova",
+          "aliases": [],
+          "plural": "pavlova"
+        },
+        {
+          "id": "sticky-toffee-pudding",
+          "name": "sticky toffee pudding",
+          "aliases": [],
+          "plural": "sticky toffee pudding"
+        },
+        {
+          "id": "bread-pudding",
+          "name": "bread pudding",
+          "aliases": [],
+          "plural": "bread pudding"
+        },
+        {
+          "id": "mooncake",
+          "name": "mooncake",
+          "aliases": [],
+          "plural": "mooncake"
+        },
+        {
+          "id": "egg-tart",
+          "name": "egg tart",
+          "aliases": [
+            "pastel de nata"
+          ],
+          "plural": "egg tart"
+        },
+        {
+          "id": "lamington",
+          "name": "lamington",
+          "aliases": [],
+          "plural": "lamington"
+        },
+        {
+          "id": "halva",
+          "name": "halva",
+          "aliases": [],
+          "plural": "halva"
+        },
+        {
+          "id": "rugelach",
+          "name": "rugelach",
+          "aliases": [],
+          "plural": "rugelach"
+        },
+        {
+          "id": "macaron",
+          "name": "macaron",
+          "aliases": [],
+          "plural": "macaron"
+        },
+        {
+          "id": "madeleine",
+          "name": "madeleine",
+          "aliases": [],
+          "plural": "madeleine"
+        },
+        {
+          "id": "creme-brulee",
+          "name": "crème brûlée",
+          "aliases": [],
+          "plural": "crème brûlée"
+        },
+        {
+          "id": "eclair",
+          "name": "éclair",
+          "aliases": [],
+          "plural": "éclair"
+        },
+        {
+          "id": "cream-puff",
+          "name": "cream puff",
+          "aliases": [
+            "profiterole"
+          ],
+          "plural": "cream puff"
         }
       ],
       "host_bank": [
@@ -1171,6 +1537,112 @@
           "name": "pesto",
           "aliases": [],
           "plural": "pesto"
+        },
+        {
+          "id": "paneer",
+          "name": "paneer",
+          "aliases": [],
+          "plural": "paneer"
+        },
+        {
+          "id": "sweetcorn",
+          "name": "sweetcorn",
+          "aliases": [
+            "corn"
+          ],
+          "plural": "sweetcorn"
+        },
+        {
+          "id": "tuna",
+          "name": "tuna",
+          "aliases": [],
+          "plural": "tuna"
+        },
+        {
+          "id": "shrimp",
+          "name": "shrimp",
+          "aliases": [
+            "prawns"
+          ],
+          "plural": "shrimp"
+        },
+        {
+          "id": "egg",
+          "name": "egg",
+          "aliases": [],
+          "plural": "egg"
+        },
+        {
+          "id": "kimchi",
+          "name": "kimchi",
+          "aliases": [],
+          "plural": "kimchi"
+        },
+        {
+          "id": "bulgogi",
+          "name": "bulgogi",
+          "aliases": [],
+          "plural": "bulgogi"
+        },
+        {
+          "id": "potato",
+          "name": "potato",
+          "aliases": [],
+          "plural": "potato"
+        },
+        {
+          "id": "chorizo",
+          "name": "chorizo",
+          "aliases": [],
+          "plural": "chorizo"
+        },
+        {
+          "id": "nduja",
+          "name": "nduja",
+          "aliases": [],
+          "plural": "nduja"
+        },
+        {
+          "id": "capers",
+          "name": "capers",
+          "aliases": [],
+          "plural": "capers"
+        },
+        {
+          "id": "eggplant",
+          "name": "eggplant",
+          "aliases": [],
+          "plural": "eggplant"
+        },
+        {
+          "id": "zucchini",
+          "name": "zucchini",
+          "aliases": [],
+          "plural": "zucchini"
+        },
+        {
+          "id": "truffle",
+          "name": "truffle",
+          "aliases": [],
+          "plural": "truffle"
+        },
+        {
+          "id": "salami",
+          "name": "salami",
+          "aliases": [],
+          "plural": "salami"
+        },
+        {
+          "id": "soppressata",
+          "name": "soppressata",
+          "aliases": [],
+          "plural": "soppressata"
+        },
+        {
+          "id": "mussels",
+          "name": "mussels",
+          "aliases": [],
+          "plural": "mussels"
         }
       ],
       "host_bank": [
@@ -1335,6 +1807,46 @@
             "Connect 4"
           ],
           "plural": "Connect Four"
+        },
+        {
+          "id": "mahjong",
+          "name": "mahjong",
+          "aliases": [],
+          "plural": "mahjong"
+        },
+        {
+          "id": "carrom",
+          "name": "carrom",
+          "aliases": [],
+          "plural": "carrom"
+        },
+        {
+          "id": "dominoes",
+          "name": "dominoes",
+          "aliases": [],
+          "plural": "dominoes"
+        },
+        {
+          "id": "rummikub",
+          "name": "Rummikub",
+          "aliases": [],
+          "plural": "Rummikub"
+        },
+        {
+          "id": "table-football",
+          "name": "table football",
+          "aliases": [
+            "foosball"
+          ],
+          "plural": "table football"
+        },
+        {
+          "id": "billiards",
+          "name": "billiards",
+          "aliases": [
+            "pool"
+          ],
+          "plural": "billiards"
         }
       ],
       "host_bank": [

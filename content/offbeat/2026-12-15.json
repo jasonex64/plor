@@ -273,6 +273,232 @@
           "name": "steak and eggs",
           "aliases": [],
           "plural": "steak and eggs"
+        },
+        {
+          "id": "congee",
+          "name": "congee",
+          "aliases": [
+            "jook",
+            "rice porridge"
+          ],
+          "plural": "congee"
+        },
+        {
+          "id": "dim-sum",
+          "name": "dim sum",
+          "aliases": [],
+          "plural": "dim sum"
+        },
+        {
+          "id": "miso-soup",
+          "name": "miso soup",
+          "aliases": [],
+          "plural": "miso soup"
+        },
+        {
+          "id": "steamed-rice",
+          "name": "steamed rice",
+          "aliases": [],
+          "plural": "steamed rice"
+        },
+        {
+          "id": "natto",
+          "name": "natto",
+          "aliases": [],
+          "plural": "natto"
+        },
+        {
+          "id": "tamagoyaki",
+          "name": "tamagoyaki",
+          "aliases": [],
+          "plural": "tamagoyaki"
+        },
+        {
+          "id": "chilaquiles",
+          "name": "chilaquiles",
+          "aliases": [],
+          "plural": "chilaquiles"
+        },
+        {
+          "id": "full-english-breakfast",
+          "name": "full English breakfast",
+          "aliases": [
+            "fry-up"
+          ],
+          "plural": "full English breakfast"
+        },
+        {
+          "id": "beans-on-toast",
+          "name": "beans on toast",
+          "aliases": [],
+          "plural": "beans on toast"
+        },
+        {
+          "id": "pain-au-chocolat",
+          "name": "pain au chocolat",
+          "aliases": [],
+          "plural": "pain au chocolat"
+        },
+        {
+          "id": "churros-con-chocolate",
+          "name": "churros con chocolate",
+          "aliases": [],
+          "plural": "churros con chocolate"
+        },
+        {
+          "id": "arepa",
+          "name": "arepa",
+          "aliases": [],
+          "plural": "arepa"
+        },
+        {
+          "id": "idli",
+          "name": "idli",
+          "aliases": [],
+          "plural": "idli"
+        },
+        {
+          "id": "dosa",
+          "name": "dosa",
+          "aliases": [],
+          "plural": "dosa"
+        },
+        {
+          "id": "paratha",
+          "name": "paratha",
+          "aliases": [],
+          "plural": "paratha"
+        },
+        {
+          "id": "poha",
+          "name": "poha",
+          "aliases": [],
+          "plural": "poha"
+        },
+        {
+          "id": "upma",
+          "name": "upma",
+          "aliases": [],
+          "plural": "upma"
+        },
+        {
+          "id": "masala-chai",
+          "name": "masala chai",
+          "aliases": [
+            "chai"
+          ],
+          "plural": "masala chai"
+        },
+        {
+          "id": "menemen",
+          "name": "menemen",
+          "aliases": [],
+          "plural": "menemen"
+        },
+        {
+          "id": "simit",
+          "name": "simit",
+          "aliases": [],
+          "plural": "simit"
+        },
+        {
+          "id": "ful-medames",
+          "name": "ful medames",
+          "aliases": [],
+          "plural": "ful medames"
+        },
+        {
+          "id": "pandesal",
+          "name": "pandesal",
+          "aliases": [],
+          "plural": "pandesal"
+        },
+        {
+          "id": "kaya-toast",
+          "name": "kaya toast",
+          "aliases": [],
+          "plural": "kaya toast"
+        },
+        {
+          "id": "roti-canai",
+          "name": "roti canai",
+          "aliases": [],
+          "plural": "roti canai"
+        },
+        {
+          "id": "youtiao",
+          "name": "youtiao",
+          "aliases": [],
+          "plural": "youtiao"
+        },
+        {
+          "id": "soy-milk",
+          "name": "soy milk",
+          "aliases": [],
+          "plural": "soy milk"
+        },
+        {
+          "id": "baozi",
+          "name": "baozi",
+          "aliases": [
+            "bao",
+            "steamed bun"
+          ],
+          "plural": "baozi"
+        },
+        {
+          "id": "onigiri",
+          "name": "onigiri",
+          "aliases": [],
+          "plural": "onigiri"
+        },
+        {
+          "id": "acai-bowl",
+          "name": "açaí bowl",
+          "aliases": [],
+          "plural": "açaí bowl"
+        },
+        {
+          "id": "muesli",
+          "name": "muesli",
+          "aliases": [],
+          "plural": "muesli"
+        },
+        {
+          "id": "vegemite-toast",
+          "name": "Vegemite toast",
+          "aliases": [],
+          "plural": "Vegemite toast"
+        },
+        {
+          "id": "crumpet",
+          "name": "crumpet",
+          "aliases": [],
+          "plural": "crumpet"
+        },
+        {
+          "id": "scone",
+          "name": "scone",
+          "aliases": [],
+          "plural": "scone"
+        },
+        {
+          "id": "kolache",
+          "name": "kolache",
+          "aliases": [],
+          "plural": "kolache"
+        },
+        {
+          "id": "breakfast-taco",
+          "name": "breakfast taco",
+          "aliases": [],
+          "plural": "breakfast taco"
+        },
+        {
+          "id": "bagel-and-lox",
+          "name": "bagel and lox",
+          "aliases": [],
+          "plural": "bagel and lox"
         }
       ],
       "host_bank": [
@@ -778,6 +1004,88 @@
           "name": "Pictionary",
           "aliases": [],
           "plural": "Pictionary"
+        },
+        {
+          "id": "mahjong",
+          "name": "mahjong",
+          "aliases": [],
+          "plural": "mahjong"
+        },
+        {
+          "id": "xiangqi",
+          "name": "xiangqi",
+          "aliases": [
+            "Chinese chess"
+          ],
+          "plural": "xiangqi"
+        },
+        {
+          "id": "shogi",
+          "name": "shogi",
+          "aliases": [
+            "Japanese chess"
+          ],
+          "plural": "shogi"
+        },
+        {
+          "id": "carrom",
+          "name": "carrom",
+          "aliases": [],
+          "plural": "carrom"
+        },
+        {
+          "id": "ludo",
+          "name": "Ludo",
+          "aliases": [],
+          "plural": "Ludo"
+        },
+        {
+          "id": "nine-mens-morris",
+          "name": "Nine Men's Morris",
+          "aliases": [],
+          "plural": "Nine Men's Morris"
+        },
+        {
+          "id": "senet",
+          "name": "Senet",
+          "aliases": [],
+          "plural": "Senet"
+        },
+        {
+          "id": "azul",
+          "name": "Azul",
+          "aliases": [],
+          "plural": "Azul"
+        },
+        {
+          "id": "carcassonne",
+          "name": "Carcassonne",
+          "aliases": [],
+          "plural": "Carcassonne"
+        },
+        {
+          "id": "splendor",
+          "name": "Splendor",
+          "aliases": [],
+          "plural": "Splendor"
+        },
+        {
+          "id": "wingspan",
+          "name": "Wingspan",
+          "aliases": [],
+          "plural": "Wingspan"
+        },
+        {
+          "id": "sequence",
+          "name": "Sequence",
+          "aliases": [],
+          "plural": "Sequence"
+        },
+        {
+          "id": "rummikub",
+          "name": "Rummikub",
+          "aliases": [],
+          "plural": "Rummikub"
         }
       ],
       "host_bank": [
@@ -964,6 +1272,209 @@
           "name": "gazpacho",
           "aliases": [],
           "plural": "gazpacho"
+        },
+        {
+          "id": "bingsoo",
+          "name": "bingsoo",
+          "aliases": [
+            "bingsu",
+            "patbingsu"
+          ],
+          "plural": "bingsoo"
+        },
+        {
+          "id": "kulfi",
+          "name": "kulfi",
+          "aliases": [],
+          "plural": "kulfi"
+        },
+        {
+          "id": "halo-halo",
+          "name": "halo-halo",
+          "aliases": [],
+          "plural": "halo-halo"
+        },
+        {
+          "id": "paleta",
+          "name": "paleta",
+          "aliases": [],
+          "plural": "paleta"
+        },
+        {
+          "id": "raspado",
+          "name": "raspado",
+          "aliases": [],
+          "plural": "raspado"
+        },
+        {
+          "id": "granita",
+          "name": "granita",
+          "aliases": [],
+          "plural": "granita"
+        },
+        {
+          "id": "spumoni",
+          "name": "spumoni",
+          "aliases": [],
+          "plural": "spumoni"
+        },
+        {
+          "id": "semifreddo",
+          "name": "semifreddo",
+          "aliases": [],
+          "plural": "semifreddo"
+        },
+        {
+          "id": "dondurma",
+          "name": "dondurma",
+          "aliases": [
+            "Turkish ice cream"
+          ],
+          "plural": "dondurma"
+        },
+        {
+          "id": "kakigori",
+          "name": "kakigōri",
+          "aliases": [],
+          "plural": "kakigōri"
+        },
+        {
+          "id": "ais-kacang",
+          "name": "ais kacang",
+          "aliases": [],
+          "plural": "ais kacang"
+        },
+        {
+          "id": "cendol",
+          "name": "cendol",
+          "aliases": [],
+          "plural": "cendol"
+        },
+        {
+          "id": "faloodeh",
+          "name": "faloodeh",
+          "aliases": [],
+          "plural": "faloodeh"
+        },
+        {
+          "id": "mangonada",
+          "name": "mangonada",
+          "aliases": [],
+          "plural": "mangonada"
+        },
+        {
+          "id": "ice-cream-cake",
+          "name": "ice cream cake",
+          "aliases": [],
+          "plural": "ice cream cake"
+        },
+        {
+          "id": "baked-alaska",
+          "name": "baked Alaska",
+          "aliases": [],
+          "plural": "baked Alaska"
+        },
+        {
+          "id": "tartufo",
+          "name": "tartufo",
+          "aliases": [],
+          "plural": "tartufo"
+        },
+        {
+          "id": "nieve-de-garrafa",
+          "name": "nieve de garrafa",
+          "aliases": [],
+          "plural": "nieve de garrafa"
+        },
+        {
+          "id": "frozen-lemonade",
+          "name": "frozen lemonade",
+          "aliases": [],
+          "plural": "frozen lemonade"
+        },
+        {
+          "id": "thai-iced-tea",
+          "name": "Thai iced tea",
+          "aliases": [],
+          "plural": "Thai iced tea"
+        },
+        {
+          "id": "horchata",
+          "name": "horchata",
+          "aliases": [],
+          "plural": "horchata"
+        },
+        {
+          "id": "bubble-tea",
+          "name": "bubble tea",
+          "aliases": [
+            "boba"
+          ],
+          "plural": "bubble tea"
+        },
+        {
+          "id": "agua-fresca",
+          "name": "agua fresca",
+          "aliases": [],
+          "plural": "agua fresca"
+        },
+        {
+          "id": "naengmyeon",
+          "name": "naengmyeon",
+          "aliases": [
+            "cold noodles"
+          ],
+          "plural": "naengmyeon"
+        },
+        {
+          "id": "poke",
+          "name": "poke",
+          "aliases": [],
+          "plural": "poke"
+        },
+        {
+          "id": "ceviche",
+          "name": "ceviche",
+          "aliases": [],
+          "plural": "ceviche"
+        },
+        {
+          "id": "zaru-soba",
+          "name": "zaru soba",
+          "aliases": [
+            "cold soba"
+          ],
+          "plural": "zaru soba"
+        },
+        {
+          "id": "frappe",
+          "name": "frappé",
+          "aliases": [],
+          "plural": "frappé"
+        },
+        {
+          "id": "ayran",
+          "name": "ayran",
+          "aliases": [],
+          "plural": "ayran"
+        },
+        {
+          "id": "lassi",
+          "name": "lassi",
+          "aliases": [],
+          "plural": "lassi"
+        },
+        {
+          "id": "sikhye",
+          "name": "sikhye",
+          "aliases": [],
+          "plural": "sikhye"
+        },
+        {
+          "id": "che",
+          "name": "chè",
+          "aliases": [],
+          "plural": "chè"
         }
       ],
       "host_bank": [

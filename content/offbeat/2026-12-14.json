@@ -1240,6 +1240,130 @@
           "aliases": [
             "shallots"
           ]
+        },
+        {
+          "id": "daikon",
+          "name": "daikon",
+          "aliases": [],
+          "plural": "daikon"
+        },
+        {
+          "id": "taro",
+          "name": "taro",
+          "aliases": [],
+          "plural": "taro"
+        },
+        {
+          "id": "cassava",
+          "name": "cassava",
+          "aliases": [
+            "yuca"
+          ],
+          "plural": "cassava"
+        },
+        {
+          "id": "jicama",
+          "name": "jicama",
+          "aliases": [],
+          "plural": "jicama"
+        },
+        {
+          "id": "bitter-melon",
+          "name": "bitter melon",
+          "aliases": [],
+          "plural": "bitter melon"
+        },
+        {
+          "id": "lotus-root",
+          "name": "lotus root",
+          "aliases": [],
+          "plural": "lotus root"
+        },
+        {
+          "id": "bamboo-shoot",
+          "name": "bamboo shoot",
+          "aliases": [],
+          "plural": "bamboo shoot"
+        },
+        {
+          "id": "water-chestnut",
+          "name": "water chestnut",
+          "aliases": [],
+          "plural": "water chestnut"
+        },
+        {
+          "id": "chayote",
+          "name": "chayote",
+          "aliases": [],
+          "plural": "chayote"
+        },
+        {
+          "id": "tomatillo",
+          "name": "tomatillo",
+          "aliases": [],
+          "plural": "tomatillo"
+        },
+        {
+          "id": "nopales",
+          "name": "nopales",
+          "aliases": [
+            "cactus"
+          ],
+          "plural": "nopales"
+        },
+        {
+          "id": "kohlrabi",
+          "name": "kohlrabi",
+          "aliases": [],
+          "plural": "kohlrabi"
+        },
+        {
+          "id": "fennel",
+          "name": "fennel",
+          "aliases": [],
+          "plural": "fennel"
+        },
+        {
+          "id": "celeriac",
+          "name": "celeriac",
+          "aliases": [],
+          "plural": "celeriac"
+        },
+        {
+          "id": "rutabaga",
+          "name": "rutabaga",
+          "aliases": [],
+          "plural": "rutabaga"
+        },
+        {
+          "id": "watercress",
+          "name": "watercress",
+          "aliases": [],
+          "plural": "watercress"
+        },
+        {
+          "id": "endive",
+          "name": "endive",
+          "aliases": [],
+          "plural": "endive"
+        },
+        {
+          "id": "radicchio",
+          "name": "radicchio",
+          "aliases": [],
+          "plural": "radicchio"
+        },
+        {
+          "id": "bean-sprout",
+          "name": "bean sprout",
+          "aliases": [],
+          "plural": "bean sprout"
+        },
+        {
+          "id": "choy-sum",
+          "name": "choy sum",
+          "aliases": [],
+          "plural": "choy sum"
         }
       ],
       "host_bank": [
@@ -1453,6 +1577,154 @@
           "name": "dulce de leche",
           "aliases": [],
           "plural": "dulce de leche"
+        },
+        {
+          "id": "ube",
+          "name": "ube",
+          "aliases": [],
+          "plural": "ube"
+        },
+        {
+          "id": "black-sesame",
+          "name": "black sesame",
+          "aliases": [],
+          "plural": "black sesame"
+        },
+        {
+          "id": "red-bean",
+          "name": "red bean",
+          "aliases": [],
+          "plural": "red bean"
+        },
+        {
+          "id": "lychee",
+          "name": "lychee",
+          "aliases": [],
+          "plural": "lychee"
+        },
+        {
+          "id": "taro",
+          "name": "taro",
+          "aliases": [],
+          "plural": "taro"
+        },
+        {
+          "id": "durian",
+          "name": "durian",
+          "aliases": [],
+          "plural": "durian"
+        },
+        {
+          "id": "stracciatella",
+          "name": "stracciatella",
+          "aliases": [],
+          "plural": "stracciatella"
+        },
+        {
+          "id": "hazelnut",
+          "name": "hazelnut",
+          "aliases": [
+            "gianduja"
+          ],
+          "plural": "hazelnut"
+        },
+        {
+          "id": "malai",
+          "name": "malai",
+          "aliases": [],
+          "plural": "malai"
+        },
+        {
+          "id": "horchata",
+          "name": "horchata",
+          "aliases": [],
+          "plural": "horchata"
+        },
+        {
+          "id": "cinnamon",
+          "name": "cinnamon",
+          "aliases": [],
+          "plural": "cinnamon"
+        },
+        {
+          "id": "maple-walnut",
+          "name": "maple walnut",
+          "aliases": [],
+          "plural": "maple walnut"
+        },
+        {
+          "id": "pumpkin",
+          "name": "pumpkin",
+          "aliases": [],
+          "plural": "pumpkin"
+        },
+        {
+          "id": "eggnog",
+          "name": "eggnog",
+          "aliases": [],
+          "plural": "eggnog"
+        },
+        {
+          "id": "peppermint",
+          "name": "peppermint",
+          "aliases": [],
+          "plural": "peppermint"
+        },
+        {
+          "id": "butterscotch",
+          "name": "butterscotch",
+          "aliases": [],
+          "plural": "butterscotch"
+        },
+        {
+          "id": "toffee",
+          "name": "toffee",
+          "aliases": [],
+          "plural": "toffee"
+        },
+        {
+          "id": "praline",
+          "name": "praline",
+          "aliases": [
+            "pecan praline"
+          ],
+          "plural": "praline"
+        },
+        {
+          "id": "chai",
+          "name": "chai",
+          "aliases": [],
+          "plural": "chai"
+        },
+        {
+          "id": "earl-grey",
+          "name": "Earl Grey",
+          "aliases": [],
+          "plural": "Earl Grey"
+        },
+        {
+          "id": "ginger",
+          "name": "ginger",
+          "aliases": [],
+          "plural": "ginger"
+        },
+        {
+          "id": "rose",
+          "name": "rose",
+          "aliases": [],
+          "plural": "rose"
+        },
+        {
+          "id": "saffron",
+          "name": "saffron",
+          "aliases": [],
+          "plural": "saffron"
+        },
+        {
+          "id": "cardamom",
+          "name": "cardamom",
+          "aliases": [],
+          "plural": "cardamom"
         }
       ],
       "host_bank": [

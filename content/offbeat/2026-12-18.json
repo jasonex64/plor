@@ -1950,6 +1950,56 @@
           "name": "drought",
           "aliases": [],
           "plural": "drought"
+        },
+        {
+          "id": "typhoon",
+          "name": "typhoon",
+          "aliases": [
+            "typhoons"
+          ]
+        },
+        {
+          "id": "cyclone",
+          "name": "cyclone",
+          "aliases": [
+            "cyclones"
+          ]
+        },
+        {
+          "id": "sandstorm",
+          "name": "sandstorm",
+          "aliases": [
+            "dust storm",
+            "sandstorms"
+          ]
+        },
+        {
+          "id": "smog",
+          "name": "smog",
+          "aliases": [
+            "haze"
+          ],
+          "plural": "smog"
+        },
+        {
+          "id": "cold-snap",
+          "name": "cold snap",
+          "aliases": [
+            "cold snaps"
+          ]
+        },
+        {
+          "id": "freezing-rain",
+          "name": "freezing rain",
+          "aliases": [],
+          "plural": "freezing rain"
+        },
+        {
+          "id": "derecho",
+          "name": "derecho",
+          "aliases": [
+            "derechos"
+          ]
         }
       ],
       "host_bank": [
