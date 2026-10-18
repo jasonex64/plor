@@ -8,16 +8,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
-    "status": "node scripts/status.ts"
+    "test": "vitest run --exclude \"**/*.db.test.ts\"",
+    "status": "node scripts/status.ts",
+    "test:db": "vitest run db.test"
   },
   "dependencies": {
+    "@vercel/functions": "3.10.1",
     "next": "16.4.2",
+    "pg": "8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/node": "^24",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

@@ -56,6 +56,8 @@ From the `create-next-app@16.4.2` scaffold: the demo page and its CSS module, fi
 |---|---|---|
 | The `create-next-app` defaults include an `AGENTS.md` that tells agents to read `node_modules/next/dist/docs/` | Kept the file, but didn't adopt it as a rule | Agent rules live only in CLAUDE.md. Whether the bundled docs become a pinned source is a human decision. |
 | DECISIONS.md: `npm run status -- <env>` | `npm run status -- <base-url>` | No environment URLs exist yet, so a name-to-URL mapping would have no caller. Revisit when staging exists. |
+| DECISIONS.md: env validation "throws at startup" | `register()` throws, but `next start` keeps listening and returns 500s | That's how Next.js handles a failing instrumentation hook. It's still loud. Logged in Next revision. |
+| Supabase: `verify-full` recommended | `ssl: { ca }` from `DATABASE_CA_CERT`, any remote host | Follows the source. Local stack has no TLS, so no CA is needed there. |
 
 ## Evidence
 Commands and their output, from 2026-10-17 on Windows 11 with Node v24.11.0:
@@ -70,7 +72,18 @@ $ (server stopped) npm run -s status -- http://127.0.0.1:3100
     DOWN http://127.0.0.1:3100: unreachable: http://127.0.0.1:3100/api/health (fetch failed)  exit=1
 $ npm run -s status                 -> usage message, exit=2
 ```
-Still needed: the same status up and down evidence against **staging**, and a CI run.
+Database access (2026-10-17, the local Supabase stack on Docker Desktop 29.8.2):
+```
+$ npm test                          -> Test Files 2 passed (2), Tests 13 passed (13)   (no database)
+$ npm run test:db                   -> Test Files 1 passed (1), Tests 4 passed (4)     (local stack)
+$ (mutation: ROLLBACK replaced with select 1) npm run test:db -> Tests 3 failed | 1 passed (4)
+$ env -u DATABASE_URL npm run build -> exit 0, /api/health (Dynamic), no error logged during prerender
+$ next start, DATABASE_URL=local stack           -> UP http://127.0.0.1:3101 (protocol 1)          exit=0
+$ next start, DATABASE_URL=dead port 54399       -> DOWN ... HTTP 500                               exit=1
+     log: {"level":"error","msg":"unhandled route error",...,"error":"Error: connect ECONNREFUSED 127.0.0.1:54399",...}
+$ next start, DATABASE_URL unset                 -> boot log "Failed to prepare server ... DATABASE_URL is not set"; DOWN HTTP 500, exit=1
+```
+Still needed: the same status up and down evidence against **staging** (needs `.env.local` with `DATABASE_URL` and `DATABASE_CA_CERT`, plus the Vercel import), and a CI run.
 
 ## Review
 - Blocking findings and how each was fixed:

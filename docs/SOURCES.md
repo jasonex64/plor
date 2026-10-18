@@ -23,5 +23,10 @@ These are the only sources agents may treat as authoritative. Memory, blog posts
 | Supabase migrations | https://supabase.com/docs/guides/deployment/database-migrations | CLI 2.121.0 | Applying the schema to hosted projects | — |
 | Supabase regions | https://supabase.com/docs/guides/platform/regions | accessed 2026-10-17 | Region choice (permanent) | — |
 | Node.js | https://nodejs.org/en/about/previous-releases | v24.22.0 LTS (2026-10-14), npm 11.19.1 | Runtime | — |
-| GitHub Actions: checkout | https://github.com/actions/checkout/releases | v7.0.1 (released 20 Jul, year unverified), accessed 2026-10-17. *Pending human approval.* | CI checkout step | — |
-| GitHub Actions: setup-node | https://github.com/actions/setup-node (README, `docs/advanced-usage.md`) | v7, accessed 2026-10-17. *Pending human approval.* | CI Node setup: `node-version-file: package.json` reads `volta.node`, then `devEngines.runtime`, then `engines.node`; `cache: npm` | — |
+| GitHub Actions: checkout | https://github.com/actions/checkout/releases | v7.0.1 (released 20 Jul, year unverified), accessed 2026-10-17. | CI checkout step | — |
+| GitHub Actions: setup-node | https://github.com/actions/setup-node (README, `docs/advanced-usage.md`) | v7, accessed 2026-10-17. | CI Node setup: `node-version-file: package.json` reads `volta.node`, then `devEngines.runtime`, then `engines.node`; `cache: npm` | — |
+| Supabase Postgres connections | https://supabase.com/docs/guides/database/connecting-to-postgres | accessed 2026-10-17. | Pooler modes, ports, transaction-mode caveats, connection strings | — |
+| node-postgres | https://node-postgres.com/features/transactions | `pg` 8.23.1 (2026-09-30). | Pool, transactions on a single client | — |
+| Vercel functions package | https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package | `@vercel/functions` 3.10.1 (2026-10-13). | `attachDatabasePool` for Fluid compute | — |
+| Supabase SSL | https://supabase.com/docs/guides/platform/ssl-enforcement | accessed 2026-10-17 | SSL enforcement (opt-in), CA download, `verify-full` recommendation | — |
+| node-postgres Pool and SSL | https://node-postgres.com/apis/pool, https://node-postgres.com/features/ssl | `pg` 8.23.1 | Pool defaults (`max` 10, `idleTimeoutMillis` 10000, `connectionTimeoutMillis` 0), the `ssl` object, URL params replacing it | — |
