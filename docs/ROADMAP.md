@@ -46,6 +46,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Run `npm run test:db` in CI (start the Supabase stack in the job) once migrations exist in M02. Found in M00 (implementation). Today it only covers the transaction helper, which is tested locally.
 - [ ] The M00 ticket's Evidence section has broken code fences, and an old "Still needed" line contradicts the deploy evidence. Found in M00 (review 3). Docs only.
 - [ ] `withTransaction`'s rollback-failure branch (destroying the client) has no test. Found in M00 (review 3). Hard to trigger locally, and the logic is small.
-- [ ] `ci.yml` has no `permissions:` block, and the actions are pinned to mutable tags (`@v7`, `@v3`) instead of commit SHAs. Found in M00 (review 3). Harden before adding secrets to CI.
+- [ ] The CI actions are pinned to mutable tags (`@v7`, `@v3`) instead of commit SHAs. *(`permissions:` was done 2026-10-18.)* Found in M00 (review 3). Harden before adding secrets to CI.
 - [ ] `supabase/config.toml` has seeding enabled with `./seed.sql`, which doesn't exist (a template default). Found in M00 (review 3). Disable it, or add the file when M01 seeds puzzles.
 - [ ] The Supabase CA exists twice: `supabase/certs/prod-ca-2021.crt` (psql) and the `DATABASE_CA_CERT` env var (app). Consider one source. Found in M00 (review 3).
+- [ ] Local Node is v24.11.0 with npm 11.6.1, while CI uses Node 24.2x with npm 11.19.1. Upgrade local Node to the current 24 LTS (a human install). Found in M00 (CI on PR #1). `npm run lockfile` already guards against the drift.
