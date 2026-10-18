@@ -2,7 +2,7 @@
 // M00-data-design.md §4). Hand-written checks, no schema library (human, 2026-10-18). The M02 server
 // imports this same module, so content is checked one way.
 import pluralize from "pluralize";
-import { HOST_ANSWERS_PER_QUESTION, QUESTIONS_PER_CHAIN } from "../config/tunables.ts";
+import { HOST_ANSWERS_BY_QUESTION, QUESTIONS_PER_DAY } from "../config/tunables.ts";
 
 // Permanent: stored with every run and ledger row (DECISIONS.md: Game 1).
 export const GAME_ID = "offbeat";
@@ -128,7 +128,8 @@ function duplicates(ids: string[]): string[] {
   return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
 }
 
-function checkQuestionRules(where: string, q: Question): string[] {
+// `expectedAnswers` is undefined past the last position; the question-count error already covers that.
+function checkQuestionRules(where: string, q: Question, expectedAnswers: number | undefined): string[] {
   const errors: string[] = [];
   const ids = q.entries.map((e) => e.id);
   for (const id of duplicates(ids)) errors.push(`${where} entry "${id}": ID used by more than one entry`);
@@ -158,8 +159,8 @@ function checkQuestionRules(where: string, q: Question): string[] {
   }
 
   const bank = new Set(q.host_bank);
-  if (q.host_answers.length !== HOST_ANSWERS_PER_QUESTION) {
-    errors.push(`${where}: has ${q.host_answers.length} host answers, expected ${HOST_ANSWERS_PER_QUESTION}`);
+  if (expectedAnswers !== undefined && q.host_answers.length !== expectedAnswers) {
+    errors.push(`${where}: has ${q.host_answers.length} host answers, expected ${expectedAnswers}`);
   }
   for (const id of duplicates(q.host_answers)) errors.push(`${where} entry "${id}": listed twice in host_answers`);
   for (const id of q.host_answers) {
@@ -188,9 +189,9 @@ export function checkPuzzleFile(file: string, text: string): string[] {
   // The path is the puzzle's identity, so two files can never claim the same day (human, 2026-10-18).
   const expected = `${puzzle.game_id}/${puzzle.date}.json`;
   if (file !== expected) out.push(`${file}: path must be ${expected} to match its game_id and date`);
-  if (puzzle.questions.length !== QUESTIONS_PER_CHAIN) {
-    out.push(`${file}: chain has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_CHAIN}`);
+  if (puzzle.questions.length !== QUESTIONS_PER_DAY) {
+    out.push(`${file}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
   }
-  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q)));
+  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q, HOST_ANSWERS_BY_QUESTION[i])));
   return out;
 }

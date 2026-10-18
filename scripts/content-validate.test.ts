@@ -19,8 +19,8 @@ const EXPECTED: Record<string, string> = {
   "match-group-contains-key": `${FILE} q1 entry "eagle": listed in its own match group (a host answer always matches itself)`,
   "plural-missing": `${FILE} q1 entry "lion": no plural alias "lions" (run npm run content:plurals, or set "plural" to override)`,
   "path-mismatch": `${FILE}: path must be offbeat/2026-11-03.json to match its game_id and date`,
-  "chain-length": `${FILE}: chain has 6 questions, expected 7`,
-  "host-answer-count": `${FILE} q2: has 2 host answers, expected 1`,
+  "question-count": `${FILE}: has 6 questions, expected 7`,
+  "host-answer-count": `${FILE} q2: has 3 host answers, expected 2`,
   "duplicate-entry-id": `${FILE} q2 entry "lion": ID used by more than one entry`,
 };
 
