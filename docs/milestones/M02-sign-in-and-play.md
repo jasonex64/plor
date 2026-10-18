@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** planned. Decisions D1–D4 and Numbers were set by a human on 2026-10-18; the ticket is ready to implement.
+**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it waits on review, the human setup below, and two human approvals (the riff_app RLS policies and the new SOURCES rows). PR 2b (game loop) is next.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -12,7 +12,7 @@ A signed-in player can play today's Offbeat puzzle end to end on staging, with e
 ## Source
 - `docs/milestones/M00-data-design.md` rev 4: §2 network messages, §3 identity, §4 content, §5 runs and run events, §7 append-only, §8 day boundary.
 - `docs/DECISIONS.md`: Game 1 rules, answer model, database access, app database role, error handling, logging.
-- Supabase Auth with Next.js SSR (`@supabase/ssr`), pinned in SOURCES.md. **The sign-in method's own docs are added once the human picks a method (D1).**
+- Supabase Auth with Next.js SSR (`@supabase/ssr`), plus the D1 docs (magic link, email sending and rate limits, Google sign-in, redirect URLs), all pinned in SOURCES.md at supabase/supabase `7425d49`. *(Rows added 2026-10-18 for D1; only a human can add a source, so they need the human's OK.)*
 - Next.js App Router docs bundled at `node_modules/next/dist/docs/` (route handlers, `connection()`).
 
 ## Decisions needed before any code
@@ -46,6 +46,19 @@ Each criterion must be checkable with a command or other observable result.
 - [ ] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `riff_app`'s grants allow, or through an admin path).
 - [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
 
+**Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.
+
+## Human setup for 2a
+Only the human can do these. Secrets go only into the Supabase dashboard, Vercel and the password manager, never into chat or files. Do them in this order, before PR 2a is merged.
+1. **Pick an email sender (decision).** Supabase's built-in sender mails only the project's team members, at most 2 emails per hour, so friends can't get sign-in links (Supabase SMTP docs). Choose a provider from Supabase's list (Resend, AWS SES, Postmark, SendGrid, ZeptoMail, Brevo). Most need a domain you own, for SPF and DKIM. Create the account and verify the domain, then in Supabase go to **Authentication → Emails → SMTP Settings**, turn on custom SMTP, and fill in the host, port, user and password from the provider. Use sender name `Offbeat` and a `no-reply@` address on your domain. Supabase then allows 30 emails per hour to start with (its default, adjustable under Rate Limits), which is plenty for a few friends.
+2. **Email templates.** In **Authentication → Emails → Templates**, set both **Confirm signup** and **Magic link** to the HTML in `supabase/templates/sign_in_link.html`, with the subjects in `supabase/config.toml` ("Welcome to Offbeat: your sign-in link" and "Your Offbeat sign-in link"). A new address gets "Confirm signup" until its first link is used, and "Magic link" after that (observed locally), so both need the change.
+3. **URLs.** In **Authentication → URL Configuration**, set **Site URL** to `https://riff-sixfour.vercel.app` and add the redirect URL `https://riff-sixfour.vercel.app/auth/callback` (an exact path, as the docs recommend for production).
+4. **Google client.** In the Google Cloud console, open **Google Auth Platform**. Under **Branding**, set the app name `Offbeat` and a support email. Under **Audience**, pick External; while the app is in "Testing", only the Google accounts you add as test users can sign in, so add yourself and each playtester. Under **Data Access**, add the `openid` scope. Under **Clients**, create a **Web application** client: authorized JavaScript origin `https://riff-sixfour.vercel.app`, and the authorized redirect URI copied from Supabase's **Authentication → Sign In / Providers → Google** page (it ends in `/auth/v1/callback`). Paste the client ID and secret into that Supabase page and enable Google.
+5. **Check two settings and tell Claude what they say.** (a) **Project Settings → Data API → Exposed schemas** must not include `private`. (b) **Authentication → Sign In / Providers → Email → Confirm email**: on or off? (The local stack is set to on, to match the hosted default.)
+6. **Vercel env vars** (Production and Preview): `SUPABASE_URL` = `https://<project-ref>.supabase.co`, and `SUPABASE_PUBLISHABLE_KEY` = the publishable key from **Project Settings → API Keys** (it starts with `sb_publishable_`; the app refuses any other kind). The app won't boot without both.
+7. **Database.** From the repo, run `npx supabase db push`, then `npx supabase test db --linked`, and paste the output (it has no secrets).
+8. **After merge.** Production deploys while still behind Vercel Authentication. Sign in there once by email and once with Google, pick a username, and tell Claude the result. Only then turn off Vercel Authentication for **Production only** (D3); previews stay protected.
+
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
 
@@ -76,8 +89,61 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| SSR guide: browser and server clients, env vars `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Server client only, env vars `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Every auth call runs in a route handler, so nothing in the browser needs the values, and `NEXT_PUBLIC_` would inline them into the bundle. |
+| SSR guide's server client: `setAll` wrapped in try/catch with the error ignored (for Server Components) | No try/catch; only route handlers create the client | Route handlers can write cookies, so a failed write is a real error (CLAUDE.md: fail loudly). No Server Component reads the session. |
+| SSR guide's proxy: redirects signed-out users to `/login` | Refresh only; logs a warning if `getClaims()` errors | The Next.js proxy docs say proxy is not for authorization. Each route checks the session and fails with 401 (or 500). |
+| SSR guide: apply the `setAll` cache headers to the response | The proxy applies them; `handle()` sets the same three headers on every route response | Route handlers can't see the headers `setAll` gets, and Next.js sends route responses with no Cache-Control at all (observed). Every route response belongs to one request. |
+| Google guide's callback: redirect to `origin` or `https://${x-forwarded-host}` plus `next` | Relative `Location: /` (or `/?error=<code>`); no `next` parameter | `request.url` says `localhost` whatever the Host header is (observed on `next start`; the first browser run lost its session this way). A relative Location needs no host. There is one landing page, so `next` has no caller. |
+| Google guide: `redirectTo` is an absolute callback URL | Built from the request's `Origin` header | Same `request.url` problem. Supabase only redirects to allow-listed URLs, so a forged Origin can't send a code elsewhere. |
+| Magic-link guide: `verifyOtp` with whatever `type` arrives | Only `type=email` is accepted | It's the only type our template sends. |
+| Magic-link guide: change the Magic Link template | Both "Confirm signup" and "Magic link" templates, one HTML file | A new address gets "Confirm signup" until its first link is used (observed locally with `enable_confirmations = true`). |
+| M00 data design: "RLS is enabled with no policies" | RLS on, with `select` and `insert` policies for `riff_app` only | With no policy, RLS blocks riff_app too (observed). **Needs human approval** (DECISIONS.md: Row-level security in `private`). |
+| M00 data design §3: `username citext unique` | citext, plus a check constraint on `username::text` | citext's regex match ignores case, so the format check must cast to text (tested). |
 
 ## Evidence
+### 2a (sign-in and profile)
+Run on branch `m02-sign-in-and-play`, 2026-10-18 (Windows, Node 24.11.0), against a freshly reset local stack (`npx supabase db reset`).
+
+```text
+$ npm run test:sql
+/Users/jason/RIFF/supabase/tests/private_schema.test.sql .. ok
+/Users/jason/RIFF/supabase/tests/profile.test.sql ......... ok
+/Users/jason/RIFF/supabase/tests/riff_app_role.test.sql ... ok
+Files=3, Tests=34
+Result: PASS
+
+$ npm test
+ Test Files  9 passed (9)
+      Tests  74 passed (74)
+
+$ npm run test:db        # real local Supabase Auth + Mailpit + Postgres
+ Test Files  3 passed (3)
+      Tests  13 passed (13)
+
+$ npm run lint           # no findings
+$ npm run lockfile -- check
+LOCKFILE CHECK OK (Linux, node:24)
+$ npm run build          # 9 routes plus the Proxy
+$ npm run check:client-bundle
+CLIENT BUNDLE OK: 13 files, 5 patterns, 3 env values (DATABASE_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+```
+
+Acceptance criteria (2a):
+- **Signed-out players are refused:** `src/app/api/profile/route.test.ts`, "refuses a signed-out player with 401 not_signed_in". (`POST /run/start` gets the same test in 2b.)
+- **First sign-in creates the profile; a duplicate fails with an AppError:** `src/app/api/profile/route.db.test.ts` signs in through the real local Auth server and the emailed link, creates a profile, then a second user gets `409 username_taken`; bad formats get `400 username_invalid`; a second pick gets `409 profile_exists`. The rules are pinned in `supabase/tests/profile.test.sql` (3 and 20 characters pass, 2 and 21 fail, upper case and `-` fail). `src/lib/profile.db.test.ts` runs the same SQL **as riff_app** (grants, policies, foreign key, citext).
+- **`@supabase/ssr` cookies, no secret in the client bundle:** sessions are the `sb-…` cookies written through `@supabase/ssr` (route.db.test.ts checks them, and that sign-out clears them). `npm run check:client-bundle` scans `.next/static` for key and URL patterns and for the actual server env values, and runs in CI after the build. It caught a planted `sb_secret_` file (exit 1) before that file was removed.
+- **Data API roles reach nothing in `private`** (ROADMAP item, done now because `private` now exists): `supabase/tests/private_schema.test.sql` checks every table, view and function for `anon` and `authenticated`, and that RLS is on with riff_app-only policies. It reported `{"anon select private.profile"}` when a grant was added inside a rolled-back transaction. The dashboard's Exposed schemas setting is human setup step 5.
+
+Browser run, local `next start` at phone width (375×812), 2026-10-18: the email was sent ("Check … for a sign-in link"), the link from Mailpit opened "Pick a username", an email typed as a username got the format message, `Browser_Check` was saved as `browser_check` ("Signed in as browser_check."), sign-out returned to the sign-in form, a second address signed in, and picking `browser_check` got "That username is taken. Try another." The server log showed no errors. The first attempt exposed the `localhost` redirect bug (Source diff), which was fixed before this run.
+
+Hypotheses recorded on the way:
+1. "riff_app can insert and read profiles with USAGE plus SELECT/INSERT, because type I/O, index upkeep and FK checks don't check its privileges." **Disproved:** RLS with no policy blocked it. Re-planned: riff_app-only policies (needs human approval).
+2. "Dynamic route handlers send a no-store Cache-Control." **Disproved:** no Cache-Control at all. Fixed in `handle()`.
+3. "`request.url` follows the Host header." **Disproved** (curl with `Host:` and with `x-forwarded-host:` both gave `localhost`). Fixed with relative redirects and `Origin`.
+4. "A new address gets the confirmation template, a returning one the magic-link template." Confirmed by the subjects in route.db.test.ts.
+
+Not yet verified: anything on staging (Google sign-in, the hosted email sender, `Origin` on Vercel). That is human setup step 8.
+
 
 ## Review
 - Blocking findings and how each was fixed:

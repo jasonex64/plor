@@ -26,6 +26,8 @@ jobs:
       # Every puzzle file must pass the answer-model rules before it can be published (M01).
       - run: npm run content:validate
       - run: npm run build
+      # No secret or server-only value may reach the browser bundle (M02 acceptance criterion).
+      - run: npm run check:client-bundle
 
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
   # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a

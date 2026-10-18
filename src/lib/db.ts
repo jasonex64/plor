@@ -21,7 +21,7 @@ export function getPool(): Pool {
 
 // Explicit fields, never `connectionString`: pg would read URL query params from a connection string,
 // and those can override `ssl` and `host` (M00 review 3). Remote hosts always verify against the CA.
-export function poolConfig(env: ServerEnv): PoolConfig {
+export function poolConfig(env: Pick<ServerEnv, "database" | "databaseCaCert">): PoolConfig {
   return { ...env.database, ssl: env.databaseCaCert ? { ca: env.databaseCaCert } : false };
 }
 
