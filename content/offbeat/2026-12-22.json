@@ -1412,8 +1412,9 @@
         {
           "id": "flan",
           "name": "flan",
-          "aliases": [],
-          "plural": "flan"
+          "aliases": [
+            "flans"
+          ]
         },
         {
           "id": "tres-leches",
@@ -1430,14 +1431,16 @@
         {
           "id": "brigadeiro",
           "name": "brigadeiro",
-          "aliases": [],
-          "plural": "brigadeiro"
+          "aliases": [
+            "brigadeiros"
+          ]
         },
         {
           "id": "churro",
           "name": "churro",
-          "aliases": [],
-          "plural": "churro"
+          "aliases": [
+            "churros"
+          ]
         },
         {
           "id": "mango-sticky-rice",
@@ -1472,14 +1475,14 @@
         {
           "id": "nanaimo-bar",
           "name": "Nanaimo bar",
-          "aliases": [],
-          "plural": "Nanaimo bar"
+          "aliases": [
+            "Nanaimo bars"
+          ]
         },
         {
           "id": "pavlova",
           "name": "pavlova",
-          "aliases": [],
-          "plural": "pavlova"
+          "aliases": []
         },
         {
           "id": "sticky-toffee-pudding",
@@ -1496,22 +1499,24 @@
         {
           "id": "mooncake",
           "name": "mooncake",
-          "aliases": [],
-          "plural": "mooncake"
+          "aliases": [
+            "mooncakes"
+          ]
         },
         {
           "id": "egg-tart",
           "name": "egg tart",
           "aliases": [
-            "pastel de nata"
-          ],
-          "plural": "egg tart"
+            "pastel de nata",
+            "egg tarts"
+          ]
         },
         {
           "id": "lamington",
           "name": "lamington",
-          "aliases": [],
-          "plural": "lamington"
+          "aliases": [
+            "lamingtons"
+          ]
         },
         {
           "id": "halva",
@@ -1528,34 +1533,38 @@
         {
           "id": "macaron",
           "name": "macaron",
-          "aliases": [],
-          "plural": "macaron"
+          "aliases": [
+            "macarons"
+          ]
         },
         {
           "id": "madeleine",
           "name": "madeleine",
-          "aliases": [],
-          "plural": "madeleine"
+          "aliases": [
+            "madeleines"
+          ]
         },
         {
           "id": "creme-brulee",
           "name": "crème brûlée",
-          "aliases": [],
-          "plural": "crème brûlée"
+          "aliases": [
+            "crème brûlées"
+          ]
         },
         {
           "id": "eclair",
           "name": "éclair",
-          "aliases": [],
-          "plural": "éclair"
+          "aliases": [
+            "éclairs"
+          ]
         },
         {
           "id": "cream-puff",
           "name": "cream puff",
           "aliases": [
-            "profiterole"
-          ],
-          "plural": "cream puff"
+            "profiterole",
+            "cream puffs"
+          ]
         }
       ],
       "host_bank": [

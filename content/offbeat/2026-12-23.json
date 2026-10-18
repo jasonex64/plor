@@ -1368,38 +1368,45 @@
         {
           "id": "latte",
           "name": "latte",
-          "aliases": [],
-          "plural": "latte"
+          "aliases": [
+            "lattes"
+          ]
         },
         {
           "id": "cappuccino",
           "name": "cappuccino",
-          "aliases": [],
-          "plural": "cappuccino"
+          "aliases": [
+            "cappuccinos"
+          ]
         },
         {
           "id": "espresso",
           "name": "espresso",
-          "aliases": [],
-          "plural": "espresso"
+          "aliases": [
+            "espressos"
+          ]
         },
         {
           "id": "americano",
           "name": "americano",
-          "aliases": [],
-          "plural": "americano"
+          "aliases": [
+            "americanos"
+          ]
         },
         {
           "id": "mocha",
           "name": "mocha",
-          "aliases": [],
-          "plural": "mocha"
+          "aliases": [
+            "mochas"
+          ]
         },
         {
           "id": "macchiato",
           "name": "macchiato",
-          "aliases": [],
-          "plural": "macchiato"
+          "aliases": [
+            "macchiatos"
+          ],
+          "plural": "macchiatos"
         },
         {
           "id": "cold-brew",
@@ -1410,8 +1417,9 @@
         {
           "id": "flat-white",
           "name": "flat white",
-          "aliases": [],
-          "plural": "flat white"
+          "aliases": [
+            "flat whites"
+          ]
         },
         {
           "id": "iced-coffee",
@@ -1422,8 +1430,9 @@
         {
           "id": "frappuccino",
           "name": "frappuccino",
-          "aliases": [],
-          "plural": "frappuccino"
+          "aliases": [
+            "frappuccinos"
+          ]
         },
         {
           "id": "drip-coffee",
@@ -1436,14 +1445,17 @@
         {
           "id": "cortado",
           "name": "cortado",
-          "aliases": [],
-          "plural": "cortado"
+          "aliases": [
+            "cortados"
+          ]
         },
         {
           "id": "affogato",
           "name": "affogato",
-          "aliases": [],
-          "plural": "affogato"
+          "aliases": [
+            "affogatos"
+          ],
+          "plural": "affogatos"
         },
         {
           "id": "irish-coffee",
@@ -1466,8 +1478,9 @@
         {
           "id": "red-eye",
           "name": "red eye",
-          "aliases": [],
-          "plural": "red eye"
+          "aliases": [
+            "red eyes"
+          ]
         },
         {
           "id": "vietnamese-iced-coffee",
@@ -1509,20 +1522,23 @@
         {
           "id": "long-black",
           "name": "long black",
-          "aliases": [],
-          "plural": "long black"
+          "aliases": [
+            "long blacks"
+          ]
         },
         {
           "id": "ristretto",
           "name": "ristretto",
-          "aliases": [],
-          "plural": "ristretto"
+          "aliases": [
+            "ristrettos"
+          ]
         },
         {
           "id": "lungo",
           "name": "lungo",
-          "aliases": [],
-          "plural": "lungo"
+          "aliases": [
+            "lungos"
+          ]
         },
         {
           "id": "cafe-con-leche",

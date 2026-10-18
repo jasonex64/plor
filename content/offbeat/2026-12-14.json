@@ -1244,8 +1244,9 @@
         {
           "id": "daikon",
           "name": "daikon",
-          "aliases": [],
-          "plural": "daikon"
+          "aliases": [
+            "daikons"
+          ]
         },
         {
           "id": "taro",
@@ -1270,8 +1271,9 @@
         {
           "id": "bitter-melon",
           "name": "bitter melon",
-          "aliases": [],
-          "plural": "bitter melon"
+          "aliases": [
+            "bitter melons"
+          ]
         },
         {
           "id": "lotus-root",
@@ -1282,26 +1284,30 @@
         {
           "id": "bamboo-shoot",
           "name": "bamboo shoot",
-          "aliases": [],
-          "plural": "bamboo shoot"
+          "aliases": [
+            "bamboo shoots"
+          ]
         },
         {
           "id": "water-chestnut",
           "name": "water chestnut",
-          "aliases": [],
-          "plural": "water chestnut"
+          "aliases": [
+            "water chestnuts"
+          ]
         },
         {
           "id": "chayote",
           "name": "chayote",
-          "aliases": [],
-          "plural": "chayote"
+          "aliases": [
+            "chayotes"
+          ]
         },
         {
           "id": "tomatillo",
           "name": "tomatillo",
-          "aliases": [],
-          "plural": "tomatillo"
+          "aliases": [
+            "tomatillos"
+          ]
         },
         {
           "id": "nopales",
@@ -1332,8 +1338,9 @@
         {
           "id": "rutabaga",
           "name": "rutabaga",
-          "aliases": [],
-          "plural": "rutabaga"
+          "aliases": [
+            "rutabagas"
+          ]
         },
         {
           "id": "watercress",
@@ -1344,8 +1351,9 @@
         {
           "id": "endive",
           "name": "endive",
-          "aliases": [],
-          "plural": "endive"
+          "aliases": [
+            "endives"
+          ]
         },
         {
           "id": "radicchio",
@@ -1356,8 +1364,9 @@
         {
           "id": "bean-sprout",
           "name": "bean sprout",
-          "aliases": [],
-          "plural": "bean sprout"
+          "aliases": [
+            "bean sprouts"
+          ]
         },
         {
           "id": "choy-sum",

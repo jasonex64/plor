@@ -359,38 +359,44 @@
         {
           "id": "rambutan",
           "name": "rambutan",
-          "aliases": [],
-          "plural": "rambutan"
+          "aliases": [
+            "rambutans"
+          ]
         },
         {
           "id": "mangosteen",
           "name": "mangosteen",
-          "aliases": [],
-          "plural": "mangosteen"
+          "aliases": [
+            "mangosteens"
+          ]
         },
         {
           "id": "longan",
           "name": "longan",
-          "aliases": [],
-          "plural": "longan"
+          "aliases": [
+            "longans"
+          ]
         },
         {
           "id": "soursop",
           "name": "soursop",
-          "aliases": [],
-          "plural": "soursop"
+          "aliases": [
+            "soursops"
+          ]
         },
         {
           "id": "cherimoya",
           "name": "cherimoya",
-          "aliases": [],
-          "plural": "cherimoya"
+          "aliases": [
+            "cherimoyas"
+          ]
         },
         {
           "id": "feijoa",
           "name": "feijoa",
-          "aliases": [],
-          "plural": "feijoa"
+          "aliases": [
+            "feijoas"
+          ]
         },
         {
           "id": "tamarind",
@@ -401,40 +407,45 @@
         {
           "id": "jabuticaba",
           "name": "jabuticaba",
-          "aliases": [],
-          "plural": "jabuticaba"
+          "aliases": [
+            "jabuticabas"
+          ]
         },
         {
           "id": "salak",
           "name": "salak",
           "aliases": [
-            "snake fruit"
-          ],
-          "plural": "salak"
+            "snake fruit",
+            "salaks"
+          ]
         },
         {
           "id": "yuzu",
           "name": "yuzu",
-          "aliases": [],
-          "plural": "yuzu"
+          "aliases": [
+            "yuzus"
+          ]
         },
         {
           "id": "calamansi",
           "name": "calamansi",
-          "aliases": [],
-          "plural": "calamansi"
+          "aliases": [
+            "calamansis"
+          ]
         },
         {
           "id": "ugli-fruit",
           "name": "ugli fruit",
-          "aliases": [],
-          "plural": "ugli fruit"
+          "aliases": [
+            "ugli fruits"
+          ]
         },
         {
           "id": "breadfruit",
           "name": "breadfruit",
-          "aliases": [],
-          "plural": "breadfruit"
+          "aliases": [
+            "breadfruits"
+          ]
         },
         {
           "id": "ackee",
@@ -445,36 +456,39 @@
         {
           "id": "sapodilla",
           "name": "sapodilla",
-          "aliases": [],
-          "plural": "sapodilla"
+          "aliases": [
+            "sapodillas"
+          ]
         },
         {
           "id": "acerola",
           "name": "acerola",
-          "aliases": [],
-          "plural": "acerola"
+          "aliases": [
+            "acerolas"
+          ]
         },
         {
           "id": "loquat",
           "name": "loquat",
-          "aliases": [],
-          "plural": "loquat"
+          "aliases": [
+            "loquats"
+          ]
         },
         {
           "id": "ground-cherry",
           "name": "ground cherry",
           "aliases": [
-            "physalis"
-          ],
-          "plural": "ground cherry"
+            "physalis",
+            "ground cherries"
+          ]
         },
         {
           "id": "horned-melon",
           "name": "horned melon",
           "aliases": [
-            "kiwano"
-          ],
-          "plural": "horned melon"
+            "kiwano",
+            "horned melons"
+          ]
         }
       ],
       "host_bank": [
@@ -914,15 +928,15 @@
         }
       ],
       "host_bank": [
-        "planet",
-        "star",
         "moon",
+        "star",
+        "planet",
         "sun",
         "asteroid",
         "black-hole"
       ],
       "host_answers": [
-        "planet"
+        "moon"
       ],
       "match_groups": {}
     },

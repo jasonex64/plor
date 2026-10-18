@@ -1849,9 +1849,9 @@
           "name": "thunderstorm",
           "aliases": [
             "storm",
-            "thunder"
-          ],
-          "plural": "thunderstorm"
+            "thunder",
+            "thunderstorms"
+          ]
         },
         {
           "id": "clouds",
@@ -1870,8 +1870,9 @@
         {
           "id": "tornado",
           "name": "tornado",
-          "aliases": [],
-          "plural": "tornado"
+          "aliases": [
+            "tornadoes"
+          ]
         },
         {
           "id": "hail",
@@ -1894,8 +1895,9 @@
         {
           "id": "hurricane",
           "name": "hurricane",
-          "aliases": [],
-          "plural": "hurricane"
+          "aliases": [
+            "hurricanes"
+          ]
         },
         {
           "id": "drizzle",
@@ -1906,14 +1908,16 @@
         {
           "id": "blizzard",
           "name": "blizzard",
-          "aliases": [],
-          "plural": "blizzard"
+          "aliases": [
+            "blizzards"
+          ]
         },
         {
           "id": "heat-wave",
           "name": "heat wave",
-          "aliases": [],
-          "plural": "heat wave"
+          "aliases": [
+            "heat waves"
+          ]
         },
         {
           "id": "frost",
@@ -1930,8 +1934,9 @@
         {
           "id": "rainbow",
           "name": "rainbow",
-          "aliases": [],
-          "plural": "rainbow"
+          "aliases": [
+            "rainbows"
+          ]
         },
         {
           "id": "mist",
@@ -1942,14 +1947,16 @@
         {
           "id": "monsoon",
           "name": "monsoon",
-          "aliases": [],
-          "plural": "monsoon"
+          "aliases": [
+            "monsoons"
+          ]
         },
         {
           "id": "drought",
           "name": "drought",
-          "aliases": [],
-          "plural": "drought"
+          "aliases": [
+            "droughts"
+          ]
         },
         {
           "id": "typhoon",

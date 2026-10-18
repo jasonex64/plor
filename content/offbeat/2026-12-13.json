@@ -609,14 +609,16 @@
         {
           "id": "samosa",
           "name": "samosa",
-          "aliases": [],
-          "plural": "samosa"
+          "aliases": [
+            "samosas"
+          ]
         },
         {
           "id": "spring-roll",
           "name": "spring roll",
-          "aliases": [],
-          "plural": "spring roll"
+          "aliases": [
+            "spring rolls"
+          ]
         },
         {
           "id": "biryani",
@@ -627,8 +629,9 @@
         {
           "id": "empanada",
           "name": "empanada",
-          "aliases": [],
-          "plural": "empanada"
+          "aliases": [
+            "empanadas"
+          ]
         },
         {
           "id": "arroz-con-pollo",
@@ -747,8 +750,9 @@
         {
           "id": "pupusa",
           "name": "pupusa",
-          "aliases": [],
-          "plural": "pupusa"
+          "aliases": [
+            "pupusas"
+          ]
         },
         {
           "id": "arancini",
@@ -801,8 +805,9 @@
         {
           "id": "flan",
           "name": "flan",
-          "aliases": [],
-          "plural": "flan"
+          "aliases": [
+            "flans"
+          ]
         },
         {
           "id": "tres-leches",
@@ -819,14 +824,16 @@
         {
           "id": "brigadeiro",
           "name": "brigadeiro",
-          "aliases": [],
-          "plural": "brigadeiro"
+          "aliases": [
+            "brigadeiros"
+          ]
         },
         {
           "id": "churro",
           "name": "churro",
-          "aliases": [],
-          "plural": "churro"
+          "aliases": [
+            "churros"
+          ]
         },
         {
           "id": "mango-sticky-rice",
@@ -861,14 +868,14 @@
         {
           "id": "nanaimo-bar",
           "name": "Nanaimo bar",
-          "aliases": [],
-          "plural": "Nanaimo bar"
+          "aliases": [
+            "Nanaimo bars"
+          ]
         },
         {
           "id": "pavlova",
           "name": "pavlova",
-          "aliases": [],
-          "plural": "pavlova"
+          "aliases": []
         },
         {
           "id": "sticky-toffee-pudding",
@@ -885,22 +892,24 @@
         {
           "id": "mooncake",
           "name": "mooncake",
-          "aliases": [],
-          "plural": "mooncake"
+          "aliases": [
+            "mooncakes"
+          ]
         },
         {
           "id": "egg-tart",
           "name": "egg tart",
           "aliases": [
-            "pastel de nata"
-          ],
-          "plural": "egg tart"
+            "pastel de nata",
+            "egg tarts"
+          ]
         },
         {
           "id": "lamington",
           "name": "lamington",
-          "aliases": [],
-          "plural": "lamington"
+          "aliases": [
+            "lamingtons"
+          ]
         },
         {
           "id": "halva",
@@ -917,34 +926,38 @@
         {
           "id": "macaron",
           "name": "macaron",
-          "aliases": [],
-          "plural": "macaron"
+          "aliases": [
+            "macarons"
+          ]
         },
         {
           "id": "madeleine",
           "name": "madeleine",
-          "aliases": [],
-          "plural": "madeleine"
+          "aliases": [
+            "madeleines"
+          ]
         },
         {
           "id": "creme-brulee",
           "name": "crème brûlée",
-          "aliases": [],
-          "plural": "crème brûlée"
+          "aliases": [
+            "crème brûlées"
+          ]
         },
         {
           "id": "eclair",
           "name": "éclair",
-          "aliases": [],
-          "plural": "éclair"
+          "aliases": [
+            "éclairs"
+          ]
         },
         {
           "id": "cream-puff",
           "name": "cream puff",
           "aliases": [
-            "profiterole"
-          ],
-          "plural": "cream puff"
+            "profiterole",
+            "cream puffs"
+          ]
         }
       ],
       "host_bank": [
@@ -1569,8 +1582,9 @@
         {
           "id": "egg",
           "name": "egg",
-          "aliases": [],
-          "plural": "egg"
+          "aliases": [
+            "eggs"
+          ]
         },
         {
           "id": "kimchi",
@@ -1587,8 +1601,9 @@
         {
           "id": "potato",
           "name": "potato",
-          "aliases": [],
-          "plural": "potato"
+          "aliases": [
+            "potatoes"
+          ]
         },
         {
           "id": "chorizo",
@@ -1611,20 +1626,23 @@
         {
           "id": "eggplant",
           "name": "eggplant",
-          "aliases": [],
-          "plural": "eggplant"
+          "aliases": [
+            "eggplants"
+          ]
         },
         {
           "id": "zucchini",
           "name": "zucchini",
-          "aliases": [],
-          "plural": "zucchini"
+          "aliases": [
+            "zucchinis"
+          ]
         },
         {
           "id": "truffle",
           "name": "truffle",
-          "aliases": [],
-          "plural": "truffle"
+          "aliases": [
+            "truffles"
+          ]
         },
         {
           "id": "salami",
@@ -1850,15 +1868,15 @@
         }
       ],
       "host_bank": [
+        "charades",
         "board-game",
         "card-game",
         "video-game",
-        "charades",
         "hide-and-seek",
         "monopoly"
       ],
       "host_answers": [
-        "board-game"
+        "charades"
       ],
       "match_groups": {}
     },
@@ -2137,79 +2155,89 @@
         {
           "id": "dragon",
           "name": "dragon",
-          "aliases": [],
-          "plural": "dragon"
+          "aliases": [
+            "dragons"
+          ]
         },
         {
           "id": "tiger",
           "name": "tiger",
-          "aliases": [],
-          "plural": "tiger"
+          "aliases": [
+            "tigers"
+          ]
         },
         {
           "id": "rat",
           "name": "rat",
-          "aliases": [],
-          "plural": "rat"
+          "aliases": [
+            "rats"
+          ]
         },
         {
           "id": "snake",
           "name": "snake",
-          "aliases": [],
-          "plural": "snake"
+          "aliases": [
+            "snakes"
+          ]
         },
         {
           "id": "horse",
           "name": "horse",
-          "aliases": [],
-          "plural": "horse"
+          "aliases": [
+            "horses"
+          ]
         },
         {
           "id": "monkey",
           "name": "monkey",
-          "aliases": [],
-          "plural": "monkey"
+          "aliases": [
+            "monkeys"
+          ]
         },
         {
           "id": "dog",
           "name": "dog",
-          "aliases": [],
-          "plural": "dog"
+          "aliases": [
+            "dogs"
+          ]
         },
         {
           "id": "ox",
           "name": "ox",
-          "aliases": [],
-          "plural": "ox"
+          "aliases": [
+            "oxen"
+          ]
         },
         {
           "id": "rabbit",
           "name": "rabbit",
-          "aliases": [],
-          "plural": "rabbit"
+          "aliases": [
+            "rabbits"
+          ]
         },
         {
           "id": "goat",
           "name": "goat",
           "aliases": [
             "sheep",
-            "ram"
-          ],
-          "plural": "goat"
+            "ram",
+            "goats"
+          ]
         },
         {
           "id": "rooster",
           "name": "rooster",
           "aliases": [
-            "chicken"
-          ],
-          "plural": "rooster"
+            "chicken",
+            "roosters"
+          ]
         },
         {
           "id": "pig",
           "name": "pig",
-          "aliases": [],
-          "plural": "pig"
+          "aliases": [
+            "pigs"
+          ]
         }
       ],
       "host_bank": [

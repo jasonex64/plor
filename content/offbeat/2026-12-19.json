@@ -1237,9 +1237,9 @@
           "id": "chapati",
           "name": "chapati",
           "aliases": [
-            "roti"
-          ],
-          "plural": "chapati"
+            "roti",
+            "chapatis"
+          ]
         },
         {
           "id": "injera",
@@ -1250,8 +1250,9 @@
         {
           "id": "arepa",
           "name": "arepa",
-          "aliases": [],
-          "plural": "arepa"
+          "aliases": [
+            "arepas"
+          ]
         },
         {
           "id": "pandesal",
@@ -1268,8 +1269,9 @@
         {
           "id": "paratha",
           "name": "paratha",
-          "aliases": [],
-          "plural": "paratha"
+          "aliases": [
+            "parathas"
+          ]
         },
         {
           "id": "khachapuri",
@@ -1314,8 +1316,9 @@
         {
           "id": "simit",
           "name": "simit",
-          "aliases": [],
-          "plural": "simit"
+          "aliases": [
+            "simits"
+          ]
         },
         {
           "id": "stollen",
@@ -1332,8 +1335,9 @@
         {
           "id": "sopapilla",
           "name": "sopapilla",
-          "aliases": [],
-          "plural": "sopapilla"
+          "aliases": [
+            "sopapillas"
+          ]
         },
         {
           "id": "milk-bread",

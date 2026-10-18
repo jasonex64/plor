@@ -1675,15 +1675,15 @@
         }
       ],
       "host_bank": [
-        "fish",
         "shark",
+        "fish",
         "whale",
         "water",
         "wave",
         "dolphin"
       ],
       "host_answers": [
-        "fish"
+        "shark"
       ],
       "match_groups": {}
     },
@@ -2618,14 +2618,16 @@
         {
           "id": "paleta",
           "name": "paleta",
-          "aliases": [],
-          "plural": "paleta"
+          "aliases": [
+            "paletas"
+          ]
         },
         {
           "id": "raspado",
           "name": "raspado",
-          "aliases": [],
-          "plural": "raspado"
+          "aliases": [
+            "raspados"
+          ]
         },
         {
           "id": "granita",
@@ -2680,14 +2682,16 @@
         {
           "id": "mangonada",
           "name": "mangonada",
-          "aliases": [],
-          "plural": "mangonada"
+          "aliases": [
+            "mangonadas"
+          ]
         },
         {
           "id": "ice-cream-cake",
           "name": "ice cream cake",
-          "aliases": [],
-          "plural": "ice cream cake"
+          "aliases": [
+            "ice cream cakes"
+          ]
         },
         {
           "id": "baked-alaska",
@@ -2698,8 +2702,9 @@
         {
           "id": "tartufo",
           "name": "tartufo",
-          "aliases": [],
-          "plural": "tartufo"
+          "aliases": [
+            "tartufos"
+          ]
         },
         {
           "id": "nieve-de-garrafa",
@@ -2735,105 +2740,105 @@
           "id": "ace",
           "name": "ace",
           "aliases": [
-            "A"
-          ],
-          "plural": "ace"
+            "A",
+            "aces"
+          ]
         },
         {
           "id": "two",
           "name": "two",
           "aliases": [
-            "2"
-          ],
-          "plural": "two"
+            "2",
+            "twos"
+          ]
         },
         {
           "id": "three",
           "name": "three",
           "aliases": [
-            "3"
-          ],
-          "plural": "three"
+            "3",
+            "threes"
+          ]
         },
         {
           "id": "four",
           "name": "four",
           "aliases": [
-            "4"
-          ],
-          "plural": "four"
+            "4",
+            "fours"
+          ]
         },
         {
           "id": "five",
           "name": "five",
           "aliases": [
-            "5"
-          ],
-          "plural": "five"
+            "5",
+            "fives"
+          ]
         },
         {
           "id": "six",
           "name": "six",
           "aliases": [
-            "6"
-          ],
-          "plural": "six"
+            "6",
+            "sixes"
+          ]
         },
         {
           "id": "seven",
           "name": "seven",
           "aliases": [
-            "7"
-          ],
-          "plural": "seven"
+            "7",
+            "sevens"
+          ]
         },
         {
           "id": "eight",
           "name": "eight",
           "aliases": [
-            "8"
-          ],
-          "plural": "eight"
+            "8",
+            "eights"
+          ]
         },
         {
           "id": "nine",
           "name": "nine",
           "aliases": [
-            "9"
-          ],
-          "plural": "nine"
+            "9",
+            "nines"
+          ]
         },
         {
           "id": "ten",
           "name": "ten",
           "aliases": [
-            "10"
-          ],
-          "plural": "ten"
+            "10",
+            "tens"
+          ]
         },
         {
           "id": "jack",
           "name": "jack",
           "aliases": [
-            "J"
-          ],
-          "plural": "jack"
+            "J",
+            "jacks"
+          ]
         },
         {
           "id": "queen",
           "name": "queen",
           "aliases": [
-            "Q"
-          ],
-          "plural": "queen"
+            "Q",
+            "queens"
+          ]
         },
         {
           "id": "king",
           "name": "king",
           "aliases": [
-            "K"
-          ],
-          "plural": "king"
+            "K",
+            "kings"
+          ]
         }
       ],
       "host_bank": [

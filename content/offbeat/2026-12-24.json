@@ -286,14 +286,16 @@
         {
           "id": "triathlon",
           "name": "triathlon",
-          "aliases": [],
-          "plural": "triathlon"
+          "aliases": [
+            "triathlons"
+          ]
         },
         {
           "id": "marathon",
           "name": "marathon",
-          "aliases": [],
-          "plural": "marathon"
+          "aliases": [
+            "marathons"
+          ]
         },
         {
           "id": "diving",
@@ -614,9 +616,9 @@
           "id": "full-english-breakfast",
           "name": "full English breakfast",
           "aliases": [
-            "fry-up"
-          ],
-          "plural": "full English breakfast"
+            "fry-up",
+            "full English breakfasts"
+          ]
         },
         {
           "id": "beans-on-toast",
@@ -627,26 +629,30 @@
         {
           "id": "arepa",
           "name": "arepa",
-          "aliases": [],
-          "plural": "arepa"
+          "aliases": [
+            "arepas"
+          ]
         },
         {
           "id": "idli",
           "name": "idli",
-          "aliases": [],
-          "plural": "idli"
+          "aliases": [
+            "idlis"
+          ]
         },
         {
           "id": "dosa",
           "name": "dosa",
-          "aliases": [],
-          "plural": "dosa"
+          "aliases": [
+            "dosas"
+          ]
         },
         {
           "id": "paratha",
           "name": "paratha",
-          "aliases": [],
-          "plural": "paratha"
+          "aliases": [
+            "parathas"
+          ]
         },
         {
           "id": "poha",
@@ -702,14 +708,16 @@
         {
           "id": "breakfast-taco",
           "name": "breakfast taco",
-          "aliases": [],
-          "plural": "breakfast taco"
+          "aliases": [
+            "breakfast tacos"
+          ]
         },
         {
           "id": "crumpet",
           "name": "crumpet",
-          "aliases": [],
-          "plural": "crumpet"
+          "aliases": [
+            "crumpets"
+          ]
         },
         {
           "id": "miso-soup",

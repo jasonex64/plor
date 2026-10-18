@@ -323,9 +323,9 @@
           "id": "full-english-breakfast",
           "name": "full English breakfast",
           "aliases": [
-            "fry-up"
-          ],
-          "plural": "full English breakfast"
+            "fry-up",
+            "full English breakfasts"
+          ]
         },
         {
           "id": "beans-on-toast",
@@ -336,8 +336,10 @@
         {
           "id": "pain-au-chocolat",
           "name": "pain au chocolat",
-          "aliases": [],
-          "plural": "pain au chocolat"
+          "aliases": [
+            "pains au chocolat"
+          ],
+          "plural": "pains au chocolat"
         },
         {
           "id": "churros-con-chocolate",
@@ -348,26 +350,30 @@
         {
           "id": "arepa",
           "name": "arepa",
-          "aliases": [],
-          "plural": "arepa"
+          "aliases": [
+            "arepas"
+          ]
         },
         {
           "id": "idli",
           "name": "idli",
-          "aliases": [],
-          "plural": "idli"
+          "aliases": [
+            "idlis"
+          ]
         },
         {
           "id": "dosa",
           "name": "dosa",
-          "aliases": [],
-          "plural": "dosa"
+          "aliases": [
+            "dosas"
+          ]
         },
         {
           "id": "paratha",
           "name": "paratha",
-          "aliases": [],
-          "plural": "paratha"
+          "aliases": [
+            "parathas"
+          ]
         },
         {
           "id": "poha",
@@ -398,8 +404,9 @@
         {
           "id": "simit",
           "name": "simit",
-          "aliases": [],
-          "plural": "simit"
+          "aliases": [
+            "simits"
+          ]
         },
         {
           "id": "ful-medames",
@@ -455,8 +462,9 @@
         {
           "id": "acai-bowl",
           "name": "açaí bowl",
-          "aliases": [],
-          "plural": "açaí bowl"
+          "aliases": [
+            "açaí bowls"
+          ]
         },
         {
           "id": "muesli",
@@ -473,26 +481,30 @@
         {
           "id": "crumpet",
           "name": "crumpet",
-          "aliases": [],
-          "plural": "crumpet"
+          "aliases": [
+            "crumpets"
+          ]
         },
         {
           "id": "scone",
           "name": "scone",
-          "aliases": [],
-          "plural": "scone"
+          "aliases": [
+            "scones"
+          ]
         },
         {
           "id": "kolache",
           "name": "kolache",
-          "aliases": [],
-          "plural": "kolache"
+          "aliases": [
+            "kolaches"
+          ]
         },
         {
           "id": "breakfast-taco",
           "name": "breakfast taco",
-          "aliases": [],
-          "plural": "breakfast taco"
+          "aliases": [
+            "breakfast tacos"
+          ]
         },
         {
           "id": "bagel-and-lox",
@@ -1297,14 +1309,16 @@
         {
           "id": "paleta",
           "name": "paleta",
-          "aliases": [],
-          "plural": "paleta"
+          "aliases": [
+            "paletas"
+          ]
         },
         {
           "id": "raspado",
           "name": "raspado",
-          "aliases": [],
-          "plural": "raspado"
+          "aliases": [
+            "raspados"
+          ]
         },
         {
           "id": "granita",
@@ -1359,14 +1373,16 @@
         {
           "id": "mangonada",
           "name": "mangonada",
-          "aliases": [],
-          "plural": "mangonada"
+          "aliases": [
+            "mangonadas"
+          ]
         },
         {
           "id": "ice-cream-cake",
           "name": "ice cream cake",
-          "aliases": [],
-          "plural": "ice cream cake"
+          "aliases": [
+            "ice cream cakes"
+          ]
         },
         {
           "id": "baked-alaska",
@@ -1377,8 +1393,9 @@
         {
           "id": "tartufo",
           "name": "tartufo",
-          "aliases": [],
-          "plural": "tartufo"
+          "aliases": [
+            "tartufos"
+          ]
         },
         {
           "id": "nieve-de-garrafa",
