@@ -53,7 +53,7 @@ export function readServerEnv(source: Record<string, string | undefined> = proce
   const ca = source.DATABASE_CA_CERT;
   if (!ca) throw new Error(`DATABASE_CA_CERT is required for remote database host ${url.hostname}`);
   if (!ca.trim().startsWith("-----BEGIN CERTIFICATE-----")) {
-    throw new Error("DATABASE_CA_CERT is not a PEM certificate (check multi-line quoting in .env.local)");
+    throw new Error("DATABASE_CA_CERT is not a PEM certificate: it must start with -----BEGIN CERTIFICATE----- (check for quotes or extra text in the Vercel env var or .env.local)");
   }
   return { database, databaseCaCert: ca };
 }
