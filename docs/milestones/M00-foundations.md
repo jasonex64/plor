@@ -4,6 +4,7 @@
 
 **Progress (2026-10-17):** stack A chosen and its sources pinned. Tooling rows and data design revision 4 approved by a human. Repo initialized in the RIFF folder: the docs are committed on `main`, and the scaffold is on branch `m00-foundations`. Scaffold done: Next.js 16.4.2, Vitest, the status script with tests, `/api/health`, Supabase CLI config and the CI workflow. Lint, tests and build pass locally, and the status script has been checked up and down against a real running server.
 **Toolchain (checked 2026-10-17):** Node v24.11.0, npm 11.6.1, Git 2.56.0 and Docker 29.8.2 are installed. **The Docker Desktop engine fails to start** ("Docker Desktop is unable to start"). The hypervisor is present, but WSL has no `docker-desktop` distro, which blocks `supabase start`.
+**Done since:** `.env.local` set up by the human (`DATABASE_URL`, plus Supabase's CA added by Claude from the downloaded certificate, which was then deleted). The staging database is verified with TLS.
 **Blocked on the human:**
 - getting the Docker engine running
 - `supabase login`, then creating or linking the hosted Supabase project (the region is permanent, so a human picks it)
@@ -83,7 +84,14 @@ $ next start, DATABASE_URL=dead port 54399       -> DOWN ... HTTP 500           
      log: {"level":"error","msg":"unhandled route error",...,"error":"Error: connect ECONNREFUSED 127.0.0.1:54399",...}
 $ next start, DATABASE_URL unset                 -> boot log "Failed to prepare server ... DATABASE_URL is not set"; DOWN HTTP 500, exit=1
 ```
-Still needed: the same status up and down evidence against **staging** (needs `.env.local` with `DATABASE_URL` and `DATABASE_CA_CERT`, plus the Vercel import), and a CI run.
+Staging database (2026-10-17, a local `next start` using `.env.local`, which points at `riff-staging` through the Supavisor transaction pooler `aws-0-us-east-1.pooler.supabase.com:6543`):
+```
+$ (.env.local loaded by @next/env) readServerEnv()   -> ok, CA present (23-line PEM survived multi-line quoting)
+$ next start + npm run -s status -- http://127.0.0.1:3104  -> UP (protocol 1), exit=0
+$ same, DATABASE_CA_CERT=<throwaway self-signed CA>       -> DOWN HTTP 500, exit=1
+     log: "error":"Error: self-signed certificate in certificate chain"   <- proves verify-full is enforced
+```
+Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
 
 ## Review
 - Blocking findings and how each was fixed:
