@@ -1,15 +1,8 @@
 # M00 — Foundations
 
-**Status:** in progress
+**Status:** done (2026-10-18). Merged via PR #1 (`8ed6945`) and follow-up PR #2 (`b4bbee2`).
 
-**Progress (2026-10-17):** stack A chosen and its sources pinned. Tooling rows and data design revision 4 approved by a human. Repo initialized in the RIFF folder: the docs are committed on `main`, and the scaffold is on branch `m00-foundations`. Scaffold done: Next.js 16.4.2, Vitest, the status script with tests, `/api/health`, Supabase CLI config and the CI workflow. Lint, tests and build pass locally, and the status script has been checked up and down against a real running server.
-**Toolchain (checked 2026-10-17):** Node v24.11.0, npm 11.6.1, Git 2.56.0 and Docker 29.8.2 are installed. **The Docker Desktop engine fails to start** ("Docker Desktop is unable to start"). The hypervisor is present, but WSL has no `docker-desktop` distro, which blocks `supabase start`.
-**Done since:** `.env.local` set up by the human (`DATABASE_URL`, plus Supabase's CA added by Claude from the downloaded certificate, which was then deleted). The staging database is verified with TLS.
-**Blocked on the human:**
-- getting the Docker engine running
-- `supabase login`, then creating or linking the hosted Supabase project (the region is permanent, so a human picks it)
-- `vercel login`, then linking the project (the Pro plan; set the function region to match Supabase)
-- a GitHub remote so CI can actually run
+**Outcome:** Next.js 16 on Vercel (`iad1`) talks to Supabase Postgres 17 (`us-east-1`) as the least-privileged `riff_app` role, through the Supavisor transaction pooler with verify-full TLS. CI runs lint, tests, build and gitleaks on every push. Every staging and production secret lives only in Vercel and the human's password manager; `.env.local` points at the local stack only. The full record is in Evidence and Review below.
 
 ## Goal
 Make the decisions every later milestone depends on, and prove the toolchain works end to end with a deploy to staging.
@@ -25,10 +18,10 @@ None yet. Choosing and pinning sources is part of this milestone. Each stack cho
 - [x] Every `TBD` row in DECISIONS.md "Current" is filled in, with a reason and a source. *(Approved on 2026-10-17. Exception: the exact regions are still for a human to pick.)*
 - [x] Every row in DECISIONS.md "Hard to reverse" is filled in and has been reviewed by the `reviewer` agent and approved by a human. *(2 reviews, revision 4 approved on 2026-10-17)*
 - [x] The "proposed" items in DECISIONS.md (client platform, sudden death, fixed sequence) are confirmed or replaced by a human.
-- [ ] The repo has a single task runner entry point. `<runner> test` runs one real test and passes, and CI runs the same command. *(Local part done. CI is written but hasn't run, because there's no GitHub remote yet.)*
-- [ ] A hello-world client and server are deployed to staging and reachable at a recorded URL.
-- [ ] `scripts/status` checks the staging deployment, exits non-zero when it's down, and its output is pasted as evidence for both the up and down cases.
-- [ ] The debug procedure in DECISIONS.md has been followed once against staging, and the output is in Evidence.
+- [x] The repo has a single task runner entry point. `<runner> test` runs one real test and passes, and CI runs the same command. *(`npm test` in CI: green on PR #1 (`4031f3a`) and PR #2 (`a55cd5a`), along with lint, build and gitleaks.)*
+- [x] A hello-world client and server are deployed to staging and reachable at a recorded URL. *(Production `https://riff-sixfour.vercel.app` and previews `riff-git-<branch>-sixfour.vercel.app`, both behind Vercel Authentication.)*
+- [x] `scripts/status` checks the staging deployment, exits non-zero when it's down, and its output is pasted as evidence for both the up and down cases. *(With the human-approved deviation (option C, 2026-10-18): Vercel Authentication blocks the script on staging, so UP on staging is the human's browser check and UP/DOWN by script is against a real local server. See Source diff.)*
+- [x] The debug procedure in DECISIONS.md has been followed once against staging, and the output is in Evidence. *(A production boot failure was diagnosed from Vercel runtime logs, and the healthy request was confirmed there with status 200.)*
 
 ## Out of scope
 Any game logic, content format implementation, accounts or UI beyond hello-world.
@@ -57,6 +50,7 @@ From the `create-next-app@16.4.2` scaffold: the demo page and its CSS module, fi
 |---|---|---|
 | The `create-next-app` defaults include an `AGENTS.md` that tells agents to read `node_modules/next/dist/docs/` | Kept the file, but didn't adopt it as a rule | Agent rules live only in CLAUDE.md. Whether the bundled docs become a pinned source is a human decision. |
 | DECISIONS.md: `npm run status -- <env>` | `npm run status -- <base-url>` | No environment URLs exist yet, so a name-to-URL mapping would have no caller. Revisit when staging exists. |
+| Ticket: `scripts/status` evidence for staging UP and DOWN | Staging UP comes from a human browser check on the production URL; script UP/DOWN runs against a real local server | Vercel Authentication protects both previews and production (`302` to `vercel.com/sso-api`), so the script can't reach staging without a bypass secret. The human chose option C on 2026-10-18. Making production public before M07 is in Next revision. |
 | DECISIONS.md: env validation "throws at startup" | `register()` throws, but `next start` keeps listening and returns 500s | That's how Next.js handles a failing instrumentation hook. It's still loud. Logged in Next revision. |
 | Supabase: `verify-full` recommended | `ssl: { ca }` from `DATABASE_CA_CERT`, any remote host | Follows the source. Local stack has no TLS, so no CA is needed there. |
 
@@ -112,6 +106,15 @@ $ npm run -s status -- https://riff-git-m00-foundations-sixfour.vercel.app
 Before the env vars were set, the build failed with "No Output Directory named public": the Framework Preset had been auto-detected as Other from the docs-only `main`. Fixed by `vercel.json`.
 
 Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
+
+Production after merge (2026-10-18), on `main` at `b4bbee2`:
+```
+$ npm run -s status -- https://riff-sixfour.vercel.app   -> DOWN, not JSON: 302 to vercel.com/sso-api (Vercel Authentication, as expected)
+$ (Vercel runtime logs, first production build) Failed to handle /api/health Error: ... DATABASE_CA_CERT is not a PEM certificate
+     -> the human fixed the Production env value (extra text before the PEM header) and scoped both vars to Production + Preview (all branches)
+$ (human, logged in, browser) GET https://riff-sixfour.vercel.app/api/health   -> {"ok":true,"protocol":1}
+$ (human) Vercel Logs                                                              -> /api/health, status 200
+```
 
 ## Review
 **Review 3 (reviewer agent, full M00 diff, 2026-10-18).** Re-ran lint, test, build, test:db and test:sql locally: all passed.
