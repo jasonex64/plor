@@ -1,0 +1,2073 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-14",
+  "questions": [
+    {
+      "prompt": "Name a chemical element",
+      "entries": [
+        {
+          "id": "hydrogen",
+          "name": "hydrogen",
+          "aliases": [
+            "H"
+          ],
+          "plural": "hydrogen"
+        },
+        {
+          "id": "helium",
+          "name": "helium",
+          "aliases": [
+            "He"
+          ],
+          "plural": "helium"
+        },
+        {
+          "id": "lithium",
+          "name": "lithium",
+          "aliases": [
+            "Li"
+          ],
+          "plural": "lithium"
+        },
+        {
+          "id": "beryllium",
+          "name": "beryllium",
+          "aliases": [
+            "Be"
+          ],
+          "plural": "beryllium"
+        },
+        {
+          "id": "boron",
+          "name": "boron",
+          "aliases": [
+            "B"
+          ],
+          "plural": "boron"
+        },
+        {
+          "id": "carbon",
+          "name": "carbon",
+          "aliases": [
+            "C"
+          ],
+          "plural": "carbon"
+        },
+        {
+          "id": "nitrogen",
+          "name": "nitrogen",
+          "aliases": [
+            "N"
+          ],
+          "plural": "nitrogen"
+        },
+        {
+          "id": "oxygen",
+          "name": "oxygen",
+          "aliases": [
+            "O"
+          ],
+          "plural": "oxygen"
+        },
+        {
+          "id": "fluorine",
+          "name": "fluorine",
+          "aliases": [
+            "F"
+          ],
+          "plural": "fluorine"
+        },
+        {
+          "id": "neon",
+          "name": "neon",
+          "aliases": [
+            "Ne"
+          ],
+          "plural": "neon"
+        },
+        {
+          "id": "sodium",
+          "name": "sodium",
+          "aliases": [
+            "Na"
+          ],
+          "plural": "sodium"
+        },
+        {
+          "id": "magnesium",
+          "name": "magnesium",
+          "aliases": [
+            "Mg"
+          ],
+          "plural": "magnesium"
+        },
+        {
+          "id": "aluminum",
+          "name": "aluminum",
+          "aliases": [
+            "Al",
+            "aluminium"
+          ],
+          "plural": "aluminum"
+        },
+        {
+          "id": "silicon",
+          "name": "silicon",
+          "aliases": [
+            "Si"
+          ],
+          "plural": "silicon"
+        },
+        {
+          "id": "phosphorus",
+          "name": "phosphorus",
+          "aliases": [
+            "P"
+          ],
+          "plural": "phosphorus"
+        },
+        {
+          "id": "sulfur",
+          "name": "sulfur",
+          "aliases": [
+            "S",
+            "sulphur"
+          ],
+          "plural": "sulfur"
+        },
+        {
+          "id": "chlorine",
+          "name": "chlorine",
+          "aliases": [
+            "Cl"
+          ],
+          "plural": "chlorine"
+        },
+        {
+          "id": "argon",
+          "name": "argon",
+          "aliases": [
+            "Ar"
+          ],
+          "plural": "argon"
+        },
+        {
+          "id": "potassium",
+          "name": "potassium",
+          "aliases": [
+            "K"
+          ],
+          "plural": "potassium"
+        },
+        {
+          "id": "calcium",
+          "name": "calcium",
+          "aliases": [
+            "Ca"
+          ],
+          "plural": "calcium"
+        },
+        {
+          "id": "scandium",
+          "name": "scandium",
+          "aliases": [
+            "Sc"
+          ],
+          "plural": "scandium"
+        },
+        {
+          "id": "titanium",
+          "name": "titanium",
+          "aliases": [
+            "Ti"
+          ],
+          "plural": "titanium"
+        },
+        {
+          "id": "vanadium",
+          "name": "vanadium",
+          "aliases": [
+            "V"
+          ],
+          "plural": "vanadium"
+        },
+        {
+          "id": "chromium",
+          "name": "chromium",
+          "aliases": [
+            "Cr"
+          ],
+          "plural": "chromium"
+        },
+        {
+          "id": "manganese",
+          "name": "manganese",
+          "aliases": [
+            "Mn"
+          ],
+          "plural": "manganese"
+        },
+        {
+          "id": "iron",
+          "name": "iron",
+          "aliases": [
+            "Fe"
+          ],
+          "plural": "iron"
+        },
+        {
+          "id": "cobalt",
+          "name": "cobalt",
+          "aliases": [
+            "Co"
+          ],
+          "plural": "cobalt"
+        },
+        {
+          "id": "nickel",
+          "name": "nickel",
+          "aliases": [
+            "Ni"
+          ],
+          "plural": "nickel"
+        },
+        {
+          "id": "copper",
+          "name": "copper",
+          "aliases": [
+            "Cu"
+          ],
+          "plural": "copper"
+        },
+        {
+          "id": "zinc",
+          "name": "zinc",
+          "aliases": [
+            "Zn"
+          ],
+          "plural": "zinc"
+        },
+        {
+          "id": "gallium",
+          "name": "gallium",
+          "aliases": [
+            "Ga"
+          ],
+          "plural": "gallium"
+        },
+        {
+          "id": "germanium",
+          "name": "germanium",
+          "aliases": [
+            "Ge"
+          ],
+          "plural": "germanium"
+        },
+        {
+          "id": "arsenic",
+          "name": "arsenic",
+          "aliases": [
+            "As"
+          ],
+          "plural": "arsenic"
+        },
+        {
+          "id": "selenium",
+          "name": "selenium",
+          "aliases": [
+            "Se"
+          ],
+          "plural": "selenium"
+        },
+        {
+          "id": "bromine",
+          "name": "bromine",
+          "aliases": [
+            "Br"
+          ],
+          "plural": "bromine"
+        },
+        {
+          "id": "krypton",
+          "name": "krypton",
+          "aliases": [
+            "Kr"
+          ],
+          "plural": "krypton"
+        },
+        {
+          "id": "rubidium",
+          "name": "rubidium",
+          "aliases": [
+            "Rb"
+          ],
+          "plural": "rubidium"
+        },
+        {
+          "id": "strontium",
+          "name": "strontium",
+          "aliases": [
+            "Sr"
+          ],
+          "plural": "strontium"
+        },
+        {
+          "id": "yttrium",
+          "name": "yttrium",
+          "aliases": [
+            "Y"
+          ],
+          "plural": "yttrium"
+        },
+        {
+          "id": "zirconium",
+          "name": "zirconium",
+          "aliases": [
+            "Zr"
+          ],
+          "plural": "zirconium"
+        },
+        {
+          "id": "niobium",
+          "name": "niobium",
+          "aliases": [
+            "Nb"
+          ],
+          "plural": "niobium"
+        },
+        {
+          "id": "molybdenum",
+          "name": "molybdenum",
+          "aliases": [
+            "Mo"
+          ],
+          "plural": "molybdenum"
+        },
+        {
+          "id": "technetium",
+          "name": "technetium",
+          "aliases": [
+            "Tc"
+          ],
+          "plural": "technetium"
+        },
+        {
+          "id": "ruthenium",
+          "name": "ruthenium",
+          "aliases": [
+            "Ru"
+          ],
+          "plural": "ruthenium"
+        },
+        {
+          "id": "rhodium",
+          "name": "rhodium",
+          "aliases": [
+            "Rh"
+          ],
+          "plural": "rhodium"
+        },
+        {
+          "id": "palladium",
+          "name": "palladium",
+          "aliases": [
+            "Pd"
+          ],
+          "plural": "palladium"
+        },
+        {
+          "id": "silver",
+          "name": "silver",
+          "aliases": [
+            "Ag"
+          ],
+          "plural": "silver"
+        },
+        {
+          "id": "cadmium",
+          "name": "cadmium",
+          "aliases": [
+            "Cd"
+          ],
+          "plural": "cadmium"
+        },
+        {
+          "id": "indium",
+          "name": "indium",
+          "aliases": [
+            "In"
+          ],
+          "plural": "indium"
+        },
+        {
+          "id": "tin",
+          "name": "tin",
+          "aliases": [
+            "Sn"
+          ],
+          "plural": "tin"
+        },
+        {
+          "id": "antimony",
+          "name": "antimony",
+          "aliases": [
+            "Sb"
+          ],
+          "plural": "antimony"
+        },
+        {
+          "id": "tellurium",
+          "name": "tellurium",
+          "aliases": [
+            "Te"
+          ],
+          "plural": "tellurium"
+        },
+        {
+          "id": "iodine",
+          "name": "iodine",
+          "aliases": [
+            "I"
+          ],
+          "plural": "iodine"
+        },
+        {
+          "id": "xenon",
+          "name": "xenon",
+          "aliases": [
+            "Xe"
+          ],
+          "plural": "xenon"
+        },
+        {
+          "id": "cesium",
+          "name": "cesium",
+          "aliases": [
+            "Cs",
+            "caesium"
+          ],
+          "plural": "cesium"
+        },
+        {
+          "id": "barium",
+          "name": "barium",
+          "aliases": [
+            "Ba"
+          ],
+          "plural": "barium"
+        },
+        {
+          "id": "lanthanum",
+          "name": "lanthanum",
+          "aliases": [
+            "La"
+          ],
+          "plural": "lanthanum"
+        },
+        {
+          "id": "cerium",
+          "name": "cerium",
+          "aliases": [
+            "Ce"
+          ],
+          "plural": "cerium"
+        },
+        {
+          "id": "praseodymium",
+          "name": "praseodymium",
+          "aliases": [
+            "Pr"
+          ],
+          "plural": "praseodymium"
+        },
+        {
+          "id": "neodymium",
+          "name": "neodymium",
+          "aliases": [
+            "Nd"
+          ],
+          "plural": "neodymium"
+        },
+        {
+          "id": "promethium",
+          "name": "promethium",
+          "aliases": [
+            "Pm"
+          ],
+          "plural": "promethium"
+        },
+        {
+          "id": "samarium",
+          "name": "samarium",
+          "aliases": [
+            "Sm"
+          ],
+          "plural": "samarium"
+        },
+        {
+          "id": "europium",
+          "name": "europium",
+          "aliases": [
+            "Eu"
+          ],
+          "plural": "europium"
+        },
+        {
+          "id": "gadolinium",
+          "name": "gadolinium",
+          "aliases": [
+            "Gd"
+          ],
+          "plural": "gadolinium"
+        },
+        {
+          "id": "terbium",
+          "name": "terbium",
+          "aliases": [
+            "Tb"
+          ],
+          "plural": "terbium"
+        },
+        {
+          "id": "dysprosium",
+          "name": "dysprosium",
+          "aliases": [
+            "Dy"
+          ],
+          "plural": "dysprosium"
+        },
+        {
+          "id": "holmium",
+          "name": "holmium",
+          "aliases": [
+            "Ho"
+          ],
+          "plural": "holmium"
+        },
+        {
+          "id": "erbium",
+          "name": "erbium",
+          "aliases": [
+            "Er"
+          ],
+          "plural": "erbium"
+        },
+        {
+          "id": "thulium",
+          "name": "thulium",
+          "aliases": [
+            "Tm"
+          ],
+          "plural": "thulium"
+        },
+        {
+          "id": "ytterbium",
+          "name": "ytterbium",
+          "aliases": [
+            "Yb"
+          ],
+          "plural": "ytterbium"
+        },
+        {
+          "id": "lutetium",
+          "name": "lutetium",
+          "aliases": [
+            "Lu"
+          ],
+          "plural": "lutetium"
+        },
+        {
+          "id": "hafnium",
+          "name": "hafnium",
+          "aliases": [
+            "Hf"
+          ],
+          "plural": "hafnium"
+        },
+        {
+          "id": "tantalum",
+          "name": "tantalum",
+          "aliases": [
+            "Ta"
+          ],
+          "plural": "tantalum"
+        },
+        {
+          "id": "tungsten",
+          "name": "tungsten",
+          "aliases": [
+            "W"
+          ],
+          "plural": "tungsten"
+        },
+        {
+          "id": "rhenium",
+          "name": "rhenium",
+          "aliases": [
+            "Re"
+          ],
+          "plural": "rhenium"
+        },
+        {
+          "id": "osmium",
+          "name": "osmium",
+          "aliases": [
+            "Os"
+          ],
+          "plural": "osmium"
+        },
+        {
+          "id": "iridium",
+          "name": "iridium",
+          "aliases": [
+            "Ir"
+          ],
+          "plural": "iridium"
+        },
+        {
+          "id": "platinum",
+          "name": "platinum",
+          "aliases": [
+            "Pt"
+          ],
+          "plural": "platinum"
+        },
+        {
+          "id": "gold",
+          "name": "gold",
+          "aliases": [
+            "Au"
+          ],
+          "plural": "gold"
+        },
+        {
+          "id": "mercury",
+          "name": "mercury",
+          "aliases": [
+            "Hg"
+          ],
+          "plural": "mercury"
+        },
+        {
+          "id": "thallium",
+          "name": "thallium",
+          "aliases": [
+            "Tl"
+          ],
+          "plural": "thallium"
+        },
+        {
+          "id": "lead",
+          "name": "lead",
+          "aliases": [
+            "Pb"
+          ],
+          "plural": "lead"
+        },
+        {
+          "id": "bismuth",
+          "name": "bismuth",
+          "aliases": [
+            "Bi"
+          ],
+          "plural": "bismuth"
+        },
+        {
+          "id": "polonium",
+          "name": "polonium",
+          "aliases": [
+            "Po"
+          ],
+          "plural": "polonium"
+        },
+        {
+          "id": "astatine",
+          "name": "astatine",
+          "aliases": [
+            "At"
+          ],
+          "plural": "astatine"
+        },
+        {
+          "id": "radon",
+          "name": "radon",
+          "aliases": [
+            "Rn"
+          ],
+          "plural": "radon"
+        },
+        {
+          "id": "francium",
+          "name": "francium",
+          "aliases": [
+            "Fr"
+          ],
+          "plural": "francium"
+        },
+        {
+          "id": "radium",
+          "name": "radium",
+          "aliases": [
+            "Ra"
+          ],
+          "plural": "radium"
+        },
+        {
+          "id": "actinium",
+          "name": "actinium",
+          "aliases": [
+            "Ac"
+          ],
+          "plural": "actinium"
+        },
+        {
+          "id": "thorium",
+          "name": "thorium",
+          "aliases": [
+            "Th"
+          ],
+          "plural": "thorium"
+        },
+        {
+          "id": "protactinium",
+          "name": "protactinium",
+          "aliases": [
+            "Pa"
+          ],
+          "plural": "protactinium"
+        },
+        {
+          "id": "uranium",
+          "name": "uranium",
+          "aliases": [
+            "U"
+          ],
+          "plural": "uranium"
+        },
+        {
+          "id": "neptunium",
+          "name": "neptunium",
+          "aliases": [
+            "Np"
+          ],
+          "plural": "neptunium"
+        },
+        {
+          "id": "plutonium",
+          "name": "plutonium",
+          "aliases": [
+            "Pu"
+          ],
+          "plural": "plutonium"
+        },
+        {
+          "id": "americium",
+          "name": "americium",
+          "aliases": [
+            "Am"
+          ],
+          "plural": "americium"
+        },
+        {
+          "id": "curium",
+          "name": "curium",
+          "aliases": [
+            "Cm"
+          ],
+          "plural": "curium"
+        },
+        {
+          "id": "berkelium",
+          "name": "berkelium",
+          "aliases": [
+            "Bk"
+          ],
+          "plural": "berkelium"
+        },
+        {
+          "id": "californium",
+          "name": "californium",
+          "aliases": [
+            "Cf"
+          ],
+          "plural": "californium"
+        },
+        {
+          "id": "einsteinium",
+          "name": "einsteinium",
+          "aliases": [
+            "Es"
+          ],
+          "plural": "einsteinium"
+        },
+        {
+          "id": "fermium",
+          "name": "fermium",
+          "aliases": [
+            "Fm"
+          ],
+          "plural": "fermium"
+        },
+        {
+          "id": "mendelevium",
+          "name": "mendelevium",
+          "aliases": [
+            "Md"
+          ],
+          "plural": "mendelevium"
+        },
+        {
+          "id": "nobelium",
+          "name": "nobelium",
+          "aliases": [
+            "No"
+          ],
+          "plural": "nobelium"
+        },
+        {
+          "id": "lawrencium",
+          "name": "lawrencium",
+          "aliases": [
+            "Lr"
+          ],
+          "plural": "lawrencium"
+        },
+        {
+          "id": "rutherfordium",
+          "name": "rutherfordium",
+          "aliases": [
+            "Rf"
+          ],
+          "plural": "rutherfordium"
+        },
+        {
+          "id": "dubnium",
+          "name": "dubnium",
+          "aliases": [
+            "Db"
+          ],
+          "plural": "dubnium"
+        },
+        {
+          "id": "seaborgium",
+          "name": "seaborgium",
+          "aliases": [
+            "Sg"
+          ],
+          "plural": "seaborgium"
+        },
+        {
+          "id": "bohrium",
+          "name": "bohrium",
+          "aliases": [
+            "Bh"
+          ],
+          "plural": "bohrium"
+        },
+        {
+          "id": "hassium",
+          "name": "hassium",
+          "aliases": [
+            "Hs"
+          ],
+          "plural": "hassium"
+        },
+        {
+          "id": "meitnerium",
+          "name": "meitnerium",
+          "aliases": [
+            "Mt"
+          ],
+          "plural": "meitnerium"
+        },
+        {
+          "id": "darmstadtium",
+          "name": "darmstadtium",
+          "aliases": [
+            "Ds"
+          ],
+          "plural": "darmstadtium"
+        },
+        {
+          "id": "roentgenium",
+          "name": "roentgenium",
+          "aliases": [
+            "Rg"
+          ],
+          "plural": "roentgenium"
+        },
+        {
+          "id": "copernicium",
+          "name": "copernicium",
+          "aliases": [
+            "Cn"
+          ],
+          "plural": "copernicium"
+        },
+        {
+          "id": "nihonium",
+          "name": "nihonium",
+          "aliases": [
+            "Nh"
+          ],
+          "plural": "nihonium"
+        },
+        {
+          "id": "flerovium",
+          "name": "flerovium",
+          "aliases": [
+            "Fl"
+          ],
+          "plural": "flerovium"
+        },
+        {
+          "id": "moscovium",
+          "name": "moscovium",
+          "aliases": [
+            "Mc"
+          ],
+          "plural": "moscovium"
+        },
+        {
+          "id": "livermorium",
+          "name": "livermorium",
+          "aliases": [
+            "Lv"
+          ],
+          "plural": "livermorium"
+        },
+        {
+          "id": "tennessine",
+          "name": "tennessine",
+          "aliases": [
+            "Ts"
+          ],
+          "plural": "tennessine"
+        },
+        {
+          "id": "oganesson",
+          "name": "oganesson",
+          "aliases": [
+            "Og"
+          ],
+          "plural": "oganesson"
+        }
+      ],
+      "host_bank": [
+        "gold",
+        "oxygen",
+        "hydrogen",
+        "carbon",
+        "iron",
+        "helium"
+      ],
+      "host_answers": [
+        "gold"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a vegetable",
+      "entries": [
+        {
+          "id": "carrot",
+          "name": "carrot",
+          "aliases": [
+            "carrots"
+          ]
+        },
+        {
+          "id": "broccoli",
+          "name": "broccoli",
+          "aliases": [],
+          "plural": "broccoli"
+        },
+        {
+          "id": "potato",
+          "name": "potato",
+          "aliases": [
+            "potatoes"
+          ]
+        },
+        {
+          "id": "tomato",
+          "name": "tomato",
+          "aliases": [
+            "tomatoes"
+          ]
+        },
+        {
+          "id": "lettuce",
+          "name": "lettuce",
+          "aliases": [],
+          "plural": "lettuce"
+        },
+        {
+          "id": "spinach",
+          "name": "spinach",
+          "aliases": [],
+          "plural": "spinach"
+        },
+        {
+          "id": "cucumber",
+          "name": "cucumber",
+          "aliases": [
+            "cucumbers"
+          ]
+        },
+        {
+          "id": "onion",
+          "name": "onion",
+          "aliases": [
+            "onions"
+          ]
+        },
+        {
+          "id": "garlic",
+          "name": "garlic",
+          "aliases": [],
+          "plural": "garlic"
+        },
+        {
+          "id": "corn",
+          "name": "corn",
+          "aliases": [],
+          "plural": "corn"
+        },
+        {
+          "id": "pea",
+          "name": "pea",
+          "aliases": [
+            "peas"
+          ]
+        },
+        {
+          "id": "green-bean",
+          "name": "green bean",
+          "aliases": [
+            "green beans"
+          ]
+        },
+        {
+          "id": "celery",
+          "name": "celery",
+          "aliases": [],
+          "plural": "celery"
+        },
+        {
+          "id": "bell-pepper",
+          "name": "bell pepper",
+          "aliases": [
+            "pepper",
+            "bell peppers"
+          ]
+        },
+        {
+          "id": "zucchini",
+          "name": "zucchini",
+          "aliases": [
+            "zucchinis"
+          ]
+        },
+        {
+          "id": "eggplant",
+          "name": "eggplant",
+          "aliases": [
+            "aubergine",
+            "eggplants"
+          ]
+        },
+        {
+          "id": "cauliflower",
+          "name": "cauliflower",
+          "aliases": [],
+          "plural": "cauliflower"
+        },
+        {
+          "id": "cabbage",
+          "name": "cabbage",
+          "aliases": [
+            "cabbages"
+          ]
+        },
+        {
+          "id": "kale",
+          "name": "kale",
+          "aliases": [],
+          "plural": "kale"
+        },
+        {
+          "id": "asparagus",
+          "name": "asparagus",
+          "aliases": [],
+          "plural": "asparagus"
+        },
+        {
+          "id": "sweet-potato",
+          "name": "sweet potato",
+          "aliases": [
+            "yam",
+            "sweet potatoes"
+          ]
+        },
+        {
+          "id": "radish",
+          "name": "radish",
+          "aliases": [
+            "radishes"
+          ]
+        },
+        {
+          "id": "beet",
+          "name": "beet",
+          "aliases": [
+            "beetroot",
+            "beets"
+          ]
+        },
+        {
+          "id": "mushroom",
+          "name": "mushroom",
+          "aliases": [
+            "mushrooms"
+          ]
+        },
+        {
+          "id": "squash",
+          "name": "squash",
+          "aliases": [
+            "squashes"
+          ]
+        },
+        {
+          "id": "pumpkin",
+          "name": "pumpkin",
+          "aliases": [
+            "pumpkins"
+          ]
+        },
+        {
+          "id": "brussels-sprout",
+          "name": "Brussels sprout",
+          "aliases": [
+            "Brussels sprouts"
+          ]
+        },
+        {
+          "id": "artichoke",
+          "name": "artichoke",
+          "aliases": [
+            "artichokes"
+          ]
+        },
+        {
+          "id": "leek",
+          "name": "leek",
+          "aliases": [
+            "leeks"
+          ]
+        },
+        {
+          "id": "okra",
+          "name": "okra",
+          "aliases": [],
+          "plural": "okra"
+        },
+        {
+          "id": "turnip",
+          "name": "turnip",
+          "aliases": [
+            "turnips"
+          ]
+        },
+        {
+          "id": "parsnip",
+          "name": "parsnip",
+          "aliases": [
+            "parsnips"
+          ]
+        },
+        {
+          "id": "arugula",
+          "name": "arugula",
+          "aliases": [],
+          "plural": "arugula"
+        },
+        {
+          "id": "bok-choy",
+          "name": "bok choy",
+          "aliases": [],
+          "plural": "bok choy"
+        },
+        {
+          "id": "collard-greens",
+          "name": "collard greens",
+          "aliases": [],
+          "plural": "collard greens"
+        },
+        {
+          "id": "jalapeno",
+          "name": "jalapeño",
+          "aliases": [
+            "jalapeños"
+          ]
+        },
+        {
+          "id": "chili-pepper",
+          "name": "chili pepper",
+          "aliases": [
+            "chili peppers"
+          ]
+        },
+        {
+          "id": "edamame",
+          "name": "edamame",
+          "aliases": [],
+          "plural": "edamame"
+        },
+        {
+          "id": "green-onion",
+          "name": "green onion",
+          "aliases": [
+            "scallion",
+            "green onions"
+          ]
+        },
+        {
+          "id": "shallot",
+          "name": "shallot",
+          "aliases": [
+            "shallots"
+          ]
+        }
+      ],
+      "host_bank": [
+        "broccoli",
+        "carrot",
+        "potato",
+        "lettuce",
+        "corn",
+        "tomato"
+      ],
+      "host_answers": [
+        "broccoli"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an ice cream flavor",
+      "entries": [
+        {
+          "id": "vanilla",
+          "name": "vanilla",
+          "aliases": [],
+          "plural": "vanilla"
+        },
+        {
+          "id": "chocolate",
+          "name": "chocolate",
+          "aliases": [],
+          "plural": "chocolate"
+        },
+        {
+          "id": "strawberry",
+          "name": "strawberry",
+          "aliases": [],
+          "plural": "strawberry"
+        },
+        {
+          "id": "mint-chocolate-chip",
+          "name": "mint chocolate chip",
+          "aliases": [
+            "mint chip"
+          ],
+          "plural": "mint chocolate chip"
+        },
+        {
+          "id": "cookies-and-cream",
+          "name": "cookies and cream",
+          "aliases": [
+            "cookies n cream"
+          ],
+          "plural": "cookies and cream"
+        },
+        {
+          "id": "cookie-dough",
+          "name": "cookie dough",
+          "aliases": [
+            "chocolate chip cookie dough"
+          ],
+          "plural": "cookie dough"
+        },
+        {
+          "id": "rocky-road",
+          "name": "rocky road",
+          "aliases": [],
+          "plural": "rocky road"
+        },
+        {
+          "id": "butter-pecan",
+          "name": "butter pecan",
+          "aliases": [],
+          "plural": "butter pecan"
+        },
+        {
+          "id": "coffee",
+          "name": "coffee",
+          "aliases": [],
+          "plural": "coffee"
+        },
+        {
+          "id": "pistachio",
+          "name": "pistachio",
+          "aliases": [],
+          "plural": "pistachio"
+        },
+        {
+          "id": "neapolitan",
+          "name": "Neapolitan",
+          "aliases": [],
+          "plural": "Neapolitan"
+        },
+        {
+          "id": "chocolate-chip",
+          "name": "chocolate chip",
+          "aliases": [],
+          "plural": "chocolate chip"
+        },
+        {
+          "id": "salted-caramel",
+          "name": "salted caramel",
+          "aliases": [],
+          "plural": "salted caramel"
+        },
+        {
+          "id": "birthday-cake",
+          "name": "birthday cake",
+          "aliases": [
+            "cake batter"
+          ],
+          "plural": "birthday cake"
+        },
+        {
+          "id": "black-raspberry",
+          "name": "black raspberry",
+          "aliases": [],
+          "plural": "black raspberry"
+        },
+        {
+          "id": "cherry",
+          "name": "cherry",
+          "aliases": [],
+          "plural": "cherry"
+        },
+        {
+          "id": "peach",
+          "name": "peach",
+          "aliases": [],
+          "plural": "peach"
+        },
+        {
+          "id": "mango",
+          "name": "mango",
+          "aliases": [],
+          "plural": "mango"
+        },
+        {
+          "id": "coconut",
+          "name": "coconut",
+          "aliases": [],
+          "plural": "coconut"
+        },
+        {
+          "id": "rum-raisin",
+          "name": "rum raisin",
+          "aliases": [],
+          "plural": "rum raisin"
+        },
+        {
+          "id": "moose-tracks",
+          "name": "moose tracks",
+          "aliases": [],
+          "plural": "moose tracks"
+        },
+        {
+          "id": "raspberry",
+          "name": "raspberry",
+          "aliases": [],
+          "plural": "raspberry"
+        },
+        {
+          "id": "banana",
+          "name": "banana",
+          "aliases": [],
+          "plural": "banana"
+        },
+        {
+          "id": "lemon",
+          "name": "lemon",
+          "aliases": [],
+          "plural": "lemon"
+        },
+        {
+          "id": "green-tea",
+          "name": "green tea",
+          "aliases": [
+            "matcha"
+          ],
+          "plural": "green tea"
+        },
+        {
+          "id": "caramel",
+          "name": "caramel",
+          "aliases": [],
+          "plural": "caramel"
+        },
+        {
+          "id": "peanut-butter",
+          "name": "peanut butter",
+          "aliases": [],
+          "plural": "peanut butter"
+        },
+        {
+          "id": "chocolate-peanut-butter",
+          "name": "chocolate peanut butter",
+          "aliases": [],
+          "plural": "chocolate peanut butter"
+        },
+        {
+          "id": "fudge-ripple",
+          "name": "fudge ripple",
+          "aliases": [],
+          "plural": "fudge ripple"
+        },
+        {
+          "id": "smores",
+          "name": "s'mores",
+          "aliases": [],
+          "plural": "s'mores"
+        },
+        {
+          "id": "dulce-de-leche",
+          "name": "dulce de leche",
+          "aliases": [],
+          "plural": "dulce de leche"
+        }
+      ],
+      "host_bank": [
+        "chocolate",
+        "vanilla",
+        "strawberry",
+        "mint-chocolate-chip",
+        "cookies-and-cream",
+        "rocky-road"
+      ],
+      "host_answers": [
+        "chocolate"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a superpower",
+      "entries": [
+        {
+          "id": "flying",
+          "name": "flying",
+          "aliases": [
+            "flight",
+            "fly"
+          ],
+          "plural": "flying"
+        },
+        {
+          "id": "invisibility",
+          "name": "invisibility",
+          "aliases": [
+            "invisible"
+          ],
+          "plural": "invisibility"
+        },
+        {
+          "id": "super-strength",
+          "name": "super strength",
+          "aliases": [
+            "strength"
+          ],
+          "plural": "super strength"
+        },
+        {
+          "id": "super-speed",
+          "name": "super speed",
+          "aliases": [
+            "speed"
+          ],
+          "plural": "super speed"
+        },
+        {
+          "id": "teleportation",
+          "name": "teleportation",
+          "aliases": [
+            "teleport"
+          ],
+          "plural": "teleportation"
+        },
+        {
+          "id": "mind-reading",
+          "name": "mind reading",
+          "aliases": [
+            "telepathy"
+          ],
+          "plural": "mind reading"
+        },
+        {
+          "id": "time-travel",
+          "name": "time travel",
+          "aliases": [],
+          "plural": "time travel"
+        },
+        {
+          "id": "shapeshifting",
+          "name": "shapeshifting",
+          "aliases": [],
+          "plural": "shapeshifting"
+        },
+        {
+          "id": "x-ray-vision",
+          "name": "x-ray vision",
+          "aliases": [],
+          "plural": "x-ray vision"
+        },
+        {
+          "id": "healing",
+          "name": "healing",
+          "aliases": [
+            "super healing"
+          ],
+          "plural": "healing"
+        },
+        {
+          "id": "immortality",
+          "name": "immortality",
+          "aliases": [],
+          "plural": "immortality"
+        },
+        {
+          "id": "laser-eyes",
+          "name": "laser eyes",
+          "aliases": [
+            "heat vision"
+          ],
+          "plural": "laser eyes"
+        },
+        {
+          "id": "fire-powers",
+          "name": "fire powers",
+          "aliases": [
+            "controlling fire"
+          ],
+          "plural": "fire powers"
+        },
+        {
+          "id": "controlling-the-weather",
+          "name": "controlling the weather",
+          "aliases": [
+            "weather control"
+          ],
+          "plural": "controlling the weather"
+        },
+        {
+          "id": "freezing-time",
+          "name": "freezing time",
+          "aliases": [
+            "stopping time"
+          ],
+          "plural": "freezing time"
+        },
+        {
+          "id": "super-intelligence",
+          "name": "super intelligence",
+          "aliases": [],
+          "plural": "super intelligence"
+        },
+        {
+          "id": "breathing-underwater",
+          "name": "breathing underwater",
+          "aliases": [],
+          "plural": "breathing underwater"
+        },
+        {
+          "id": "talking-to-animals",
+          "name": "talking to animals",
+          "aliases": [],
+          "plural": "talking to animals"
+        },
+        {
+          "id": "mind-control",
+          "name": "mind control",
+          "aliases": [],
+          "plural": "mind control"
+        },
+        {
+          "id": "force-fields",
+          "name": "force fields",
+          "aliases": [
+            "force field"
+          ],
+          "plural": "force fields"
+        },
+        {
+          "id": "stretching",
+          "name": "stretching",
+          "aliases": [
+            "elasticity"
+          ],
+          "plural": "stretching"
+        },
+        {
+          "id": "super-hearing",
+          "name": "super hearing",
+          "aliases": [],
+          "plural": "super hearing"
+        },
+        {
+          "id": "night-vision",
+          "name": "night vision",
+          "aliases": [],
+          "plural": "night vision"
+        },
+        {
+          "id": "climbing-walls",
+          "name": "climbing walls",
+          "aliases": [
+            "wall crawling"
+          ],
+          "plural": "climbing walls"
+        },
+        {
+          "id": "shrinking",
+          "name": "shrinking",
+          "aliases": [],
+          "plural": "shrinking"
+        },
+        {
+          "id": "super-luck",
+          "name": "super luck",
+          "aliases": [
+            "luck"
+          ],
+          "plural": "super luck"
+        }
+      ],
+      "host_bank": [
+        "invisibility",
+        "flying",
+        "super-strength",
+        "teleportation",
+        "super-speed",
+        "mind-reading"
+      ],
+      "host_answers": [
+        "invisibility"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something in our solar system",
+      "entries": [
+        {
+          "id": "sun",
+          "name": "sun",
+          "aliases": [
+            "the sun"
+          ],
+          "plural": "sun"
+        },
+        {
+          "id": "moon",
+          "name": "moon",
+          "aliases": [
+            "the moon",
+            "moons"
+          ]
+        },
+        {
+          "id": "planet",
+          "name": "planet",
+          "aliases": [
+            "planets"
+          ]
+        },
+        {
+          "id": "mercury",
+          "name": "Mercury",
+          "aliases": [],
+          "plural": "Mercury"
+        },
+        {
+          "id": "venus",
+          "name": "Venus",
+          "aliases": [],
+          "plural": "Venus"
+        },
+        {
+          "id": "earth",
+          "name": "Earth",
+          "aliases": [
+            "the earth",
+            "planet earth"
+          ],
+          "plural": "Earth"
+        },
+        {
+          "id": "mars",
+          "name": "Mars",
+          "aliases": [],
+          "plural": "Mars"
+        },
+        {
+          "id": "jupiter",
+          "name": "Jupiter",
+          "aliases": [],
+          "plural": "Jupiter"
+        },
+        {
+          "id": "saturn",
+          "name": "Saturn",
+          "aliases": [],
+          "plural": "Saturn"
+        },
+        {
+          "id": "uranus",
+          "name": "Uranus",
+          "aliases": [],
+          "plural": "Uranus"
+        },
+        {
+          "id": "neptune",
+          "name": "Neptune",
+          "aliases": [],
+          "plural": "Neptune"
+        },
+        {
+          "id": "pluto",
+          "name": "Pluto",
+          "aliases": [],
+          "plural": "Pluto"
+        },
+        {
+          "id": "ceres",
+          "name": "Ceres",
+          "aliases": [],
+          "plural": "Ceres"
+        },
+        {
+          "id": "eris",
+          "name": "Eris",
+          "aliases": [],
+          "plural": "Eris"
+        },
+        {
+          "id": "haumea",
+          "name": "Haumea",
+          "aliases": [],
+          "plural": "Haumea"
+        },
+        {
+          "id": "makemake",
+          "name": "Makemake",
+          "aliases": [],
+          "plural": "Makemake"
+        },
+        {
+          "id": "comet",
+          "name": "comet",
+          "aliases": [
+            "comets"
+          ]
+        },
+        {
+          "id": "halleys-comet",
+          "name": "Halley's Comet",
+          "aliases": [],
+          "plural": "Halley's Comet"
+        },
+        {
+          "id": "asteroid",
+          "name": "asteroid",
+          "aliases": [
+            "asteroids"
+          ]
+        },
+        {
+          "id": "asteroid-belt",
+          "name": "asteroid belt",
+          "aliases": [],
+          "plural": "asteroid belt"
+        },
+        {
+          "id": "satellite",
+          "name": "satellite",
+          "aliases": [
+            "satellites"
+          ]
+        },
+        {
+          "id": "international-space-station",
+          "name": "International Space Station",
+          "aliases": [
+            "ISS",
+            "space station"
+          ],
+          "plural": "International Space Station"
+        }
+      ],
+      "host_bank": [
+        "mars",
+        "sun",
+        "moon",
+        "earth",
+        "jupiter",
+        "saturn",
+        "planet"
+      ],
+      "host_answers": [
+        "mars"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a US coin or bill",
+      "entries": [
+        {
+          "id": "penny",
+          "name": "penny",
+          "aliases": [
+            "one cent",
+            "pennies"
+          ]
+        },
+        {
+          "id": "nickel",
+          "name": "nickel",
+          "aliases": [
+            "nickels"
+          ]
+        },
+        {
+          "id": "dime",
+          "name": "dime",
+          "aliases": [
+            "dimes"
+          ]
+        },
+        {
+          "id": "quarter",
+          "name": "quarter",
+          "aliases": [
+            "quarters"
+          ]
+        },
+        {
+          "id": "half-dollar",
+          "name": "half dollar",
+          "aliases": [
+            "50 cent piece",
+            "half dollars"
+          ]
+        },
+        {
+          "id": "dollar-coin",
+          "name": "dollar coin",
+          "aliases": [
+            "silver dollar",
+            "dollar coins"
+          ]
+        },
+        {
+          "id": "one-dollar-bill",
+          "name": "one-dollar bill",
+          "aliases": [
+            "dollar bill",
+            "$1 bill",
+            "one-dollar bills"
+          ]
+        },
+        {
+          "id": "two-dollar-bill",
+          "name": "two-dollar bill",
+          "aliases": [
+            "$2 bill",
+            "two-dollar bills"
+          ]
+        },
+        {
+          "id": "five-dollar-bill",
+          "name": "five-dollar bill",
+          "aliases": [
+            "$5 bill",
+            "five-dollar bills"
+          ]
+        },
+        {
+          "id": "ten-dollar-bill",
+          "name": "ten-dollar bill",
+          "aliases": [
+            "$10 bill",
+            "ten-dollar bills"
+          ]
+        },
+        {
+          "id": "twenty-dollar-bill",
+          "name": "twenty-dollar bill",
+          "aliases": [
+            "$20 bill",
+            "twenty",
+            "twenty-dollar bills"
+          ]
+        },
+        {
+          "id": "fifty-dollar-bill",
+          "name": "fifty-dollar bill",
+          "aliases": [
+            "$50 bill",
+            "fifty-dollar bills"
+          ]
+        },
+        {
+          "id": "hundred-dollar-bill",
+          "name": "hundred-dollar bill",
+          "aliases": [
+            "$100 bill",
+            "Benjamin",
+            "hundred-dollar bills"
+          ]
+        }
+      ],
+      "host_bank": [
+        "quarter",
+        "penny",
+        "dime",
+        "nickel",
+        "one-dollar-bill",
+        "twenty-dollar-bill",
+        "hundred-dollar-bill"
+      ],
+      "host_answers": [
+        "quarter"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a musical note (like C, F sharp or B flat)",
+      "entries": [
+        {
+          "id": "c",
+          "name": "C",
+          "aliases": [],
+          "plural": "C"
+        },
+        {
+          "id": "g",
+          "name": "G",
+          "aliases": [],
+          "plural": "G"
+        },
+        {
+          "id": "a",
+          "name": "A",
+          "aliases": [],
+          "plural": "A"
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "aliases": [],
+          "plural": "D"
+        },
+        {
+          "id": "e",
+          "name": "E",
+          "aliases": [],
+          "plural": "E"
+        },
+        {
+          "id": "f",
+          "name": "F",
+          "aliases": [],
+          "plural": "F"
+        },
+        {
+          "id": "b",
+          "name": "B",
+          "aliases": [],
+          "plural": "B"
+        },
+        {
+          "id": "c-sharp",
+          "name": "C sharp",
+          "aliases": [
+            "D flat",
+            "Db"
+          ],
+          "plural": "C sharp"
+        },
+        {
+          "id": "d-sharp",
+          "name": "D sharp",
+          "aliases": [
+            "E flat",
+            "Eb"
+          ],
+          "plural": "D sharp"
+        },
+        {
+          "id": "f-sharp",
+          "name": "F sharp",
+          "aliases": [
+            "G flat",
+            "Gb"
+          ],
+          "plural": "F sharp"
+        },
+        {
+          "id": "g-sharp",
+          "name": "G sharp",
+          "aliases": [
+            "A flat",
+            "Ab"
+          ],
+          "plural": "G sharp"
+        },
+        {
+          "id": "a-sharp",
+          "name": "A sharp",
+          "aliases": [
+            "B flat",
+            "Bb"
+          ],
+          "plural": "A sharp"
+        }
+      ],
+      "host_bank": [
+        "c",
+        "g",
+        "a",
+        "d",
+        "e",
+        "f",
+        "b",
+        "c-sharp",
+        "d-sharp",
+        "f-sharp",
+        "g-sharp",
+        "a-sharp"
+      ],
+      "host_answers": [
+        "c",
+        "g"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

@@ -1,0 +1,1971 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-18",
+  "questions": [
+    {
+      "prompt": "Name a mammal",
+      "entries": [
+        {
+          "id": "aardvark",
+          "name": "aardvark",
+          "aliases": [
+            "aardvarks"
+          ]
+        },
+        {
+          "id": "alpaca",
+          "name": "alpaca",
+          "aliases": [
+            "alpacas"
+          ]
+        },
+        {
+          "id": "anteater",
+          "name": "anteater",
+          "aliases": [
+            "anteaters"
+          ]
+        },
+        {
+          "id": "antelope",
+          "name": "antelope",
+          "aliases": [
+            "antelopes"
+          ]
+        },
+        {
+          "id": "armadillo",
+          "name": "armadillo",
+          "aliases": [
+            "armadillos"
+          ]
+        },
+        {
+          "id": "baboon",
+          "name": "baboon",
+          "aliases": [
+            "baboons"
+          ]
+        },
+        {
+          "id": "badger",
+          "name": "badger",
+          "aliases": [
+            "badgers"
+          ]
+        },
+        {
+          "id": "bat",
+          "name": "bat",
+          "aliases": [
+            "bats"
+          ]
+        },
+        {
+          "id": "bear",
+          "name": "bear",
+          "aliases": [
+            "bears"
+          ]
+        },
+        {
+          "id": "beaver",
+          "name": "beaver",
+          "aliases": [
+            "beavers"
+          ]
+        },
+        {
+          "id": "bison",
+          "name": "bison",
+          "aliases": [],
+          "plural": "bison"
+        },
+        {
+          "id": "bobcat",
+          "name": "bobcat",
+          "aliases": [
+            "bobcats"
+          ]
+        },
+        {
+          "id": "buffalo",
+          "name": "buffalo",
+          "aliases": []
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "camels"
+          ]
+        },
+        {
+          "id": "caracal",
+          "name": "caracal",
+          "aliases": [
+            "caracals"
+          ]
+        },
+        {
+          "id": "cat",
+          "name": "cat",
+          "aliases": [
+            "house cat",
+            "kitten",
+            "cats"
+          ]
+        },
+        {
+          "id": "cheetah",
+          "name": "cheetah",
+          "aliases": [
+            "cheetahs"
+          ]
+        },
+        {
+          "id": "chimpanzee",
+          "name": "chimpanzee",
+          "aliases": [
+            "chimp",
+            "chimpanzees"
+          ]
+        },
+        {
+          "id": "chipmunk",
+          "name": "chipmunk",
+          "aliases": [
+            "chipmunks"
+          ]
+        },
+        {
+          "id": "clouded-leopard",
+          "name": "clouded leopard",
+          "aliases": [
+            "clouded leopards"
+          ]
+        },
+        {
+          "id": "cougar",
+          "name": "cougar",
+          "aliases": [
+            "puma",
+            "mountain lion",
+            "cougars"
+          ]
+        },
+        {
+          "id": "cow",
+          "name": "cow",
+          "aliases": [
+            "cows"
+          ]
+        },
+        {
+          "id": "coyote",
+          "name": "coyote",
+          "aliases": [
+            "coyotes"
+          ]
+        },
+        {
+          "id": "deer",
+          "name": "deer",
+          "aliases": [],
+          "plural": "deer"
+        },
+        {
+          "id": "dingo",
+          "name": "dingo",
+          "aliases": [
+            "dingoes"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "puppy",
+            "dogs"
+          ]
+        },
+        {
+          "id": "dolphin",
+          "name": "dolphin",
+          "aliases": [
+            "dolphins"
+          ]
+        },
+        {
+          "id": "donkey",
+          "name": "donkey",
+          "aliases": [
+            "donkeys"
+          ]
+        },
+        {
+          "id": "elephant",
+          "name": "elephant",
+          "aliases": [
+            "elephants"
+          ]
+        },
+        {
+          "id": "elk",
+          "name": "elk",
+          "aliases": []
+        },
+        {
+          "id": "ferret",
+          "name": "ferret",
+          "aliases": [
+            "ferrets"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "foxes"
+          ]
+        },
+        {
+          "id": "gazelle",
+          "name": "gazelle",
+          "aliases": [
+            "gazelles"
+          ]
+        },
+        {
+          "id": "gerbil",
+          "name": "gerbil",
+          "aliases": [
+            "gerbils"
+          ]
+        },
+        {
+          "id": "giraffe",
+          "name": "giraffe",
+          "aliases": [
+            "giraffes"
+          ]
+        },
+        {
+          "id": "goat",
+          "name": "goat",
+          "aliases": [
+            "goats"
+          ]
+        },
+        {
+          "id": "gorilla",
+          "name": "gorilla",
+          "aliases": [
+            "gorillas"
+          ]
+        },
+        {
+          "id": "guinea-pig",
+          "name": "guinea pig",
+          "aliases": [
+            "guinea pigs"
+          ]
+        },
+        {
+          "id": "hamster",
+          "name": "hamster",
+          "aliases": [
+            "hamsters"
+          ]
+        },
+        {
+          "id": "hedgehog",
+          "name": "hedgehog",
+          "aliases": [
+            "hedgehogs"
+          ]
+        },
+        {
+          "id": "hippopotamus",
+          "name": "hippopotamus",
+          "aliases": [
+            "hippo",
+            "hippopotamuses"
+          ]
+        },
+        {
+          "id": "horse",
+          "name": "horse",
+          "aliases": [
+            "horses"
+          ]
+        },
+        {
+          "id": "hyena",
+          "name": "hyena",
+          "aliases": [
+            "hyenas"
+          ]
+        },
+        {
+          "id": "jackal",
+          "name": "jackal",
+          "aliases": [
+            "jackals"
+          ]
+        },
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        },
+        {
+          "id": "kangaroo",
+          "name": "kangaroo",
+          "aliases": [
+            "kangaroos"
+          ]
+        },
+        {
+          "id": "koala",
+          "name": "koala",
+          "aliases": [
+            "koala bear",
+            "koalas"
+          ]
+        },
+        {
+          "id": "lemur",
+          "name": "lemur",
+          "aliases": [
+            "lemurs"
+          ]
+        },
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "llama",
+          "name": "llama",
+          "aliases": [
+            "llamas"
+          ]
+        },
+        {
+          "id": "lynx",
+          "name": "lynx",
+          "aliases": [
+            "lynxes"
+          ]
+        },
+        {
+          "id": "manatee",
+          "name": "manatee",
+          "aliases": [
+            "manatees"
+          ]
+        },
+        {
+          "id": "meerkat",
+          "name": "meerkat",
+          "aliases": [
+            "meerkats"
+          ]
+        },
+        {
+          "id": "mink",
+          "name": "mink",
+          "aliases": [
+            "minks"
+          ]
+        },
+        {
+          "id": "mole",
+          "name": "mole",
+          "aliases": [
+            "moles"
+          ]
+        },
+        {
+          "id": "monkey",
+          "name": "monkey",
+          "aliases": [
+            "monkeys"
+          ]
+        },
+        {
+          "id": "moose",
+          "name": "moose",
+          "aliases": [],
+          "plural": "moose"
+        },
+        {
+          "id": "mouse",
+          "name": "mouse",
+          "aliases": [
+            "mice"
+          ]
+        },
+        {
+          "id": "ocelot",
+          "name": "ocelot",
+          "aliases": [
+            "ocelots"
+          ]
+        },
+        {
+          "id": "opossum",
+          "name": "opossum",
+          "aliases": [
+            "possum",
+            "opossums"
+          ]
+        },
+        {
+          "id": "orangutan",
+          "name": "orangutan",
+          "aliases": [
+            "orangutans"
+          ]
+        },
+        {
+          "id": "orca",
+          "name": "orca",
+          "aliases": [
+            "killer whale",
+            "orcas"
+          ]
+        },
+        {
+          "id": "otter",
+          "name": "otter",
+          "aliases": [
+            "otters"
+          ]
+        },
+        {
+          "id": "ox",
+          "name": "ox",
+          "aliases": [
+            "oxen"
+          ]
+        },
+        {
+          "id": "panda",
+          "name": "panda",
+          "aliases": [
+            "giant panda",
+            "pandas"
+          ]
+        },
+        {
+          "id": "pig",
+          "name": "pig",
+          "aliases": [
+            "pigs"
+          ]
+        },
+        {
+          "id": "platypus",
+          "name": "platypus",
+          "aliases": [
+            "platypuses"
+          ]
+        },
+        {
+          "id": "porcupine",
+          "name": "porcupine",
+          "aliases": [
+            "porcupines"
+          ]
+        },
+        {
+          "id": "rabbit",
+          "name": "rabbit",
+          "aliases": [
+            "bunny",
+            "rabbits"
+          ]
+        },
+        {
+          "id": "raccoon",
+          "name": "raccoon",
+          "aliases": [
+            "raccoons"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "reindeer",
+          "name": "reindeer",
+          "aliases": [
+            "caribou"
+          ],
+          "plural": "reindeer"
+        },
+        {
+          "id": "rhinoceros",
+          "name": "rhinoceros",
+          "aliases": [
+            "rhino"
+          ]
+        },
+        {
+          "id": "sea-lion",
+          "name": "sea lion",
+          "aliases": [
+            "sea lions"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "seals"
+          ]
+        },
+        {
+          "id": "serval",
+          "name": "serval",
+          "aliases": [
+            "servals"
+          ]
+        },
+        {
+          "id": "sheep",
+          "name": "sheep",
+          "aliases": [
+            "lamb"
+          ],
+          "plural": "sheep"
+        },
+        {
+          "id": "skunk",
+          "name": "skunk",
+          "aliases": [
+            "skunks"
+          ]
+        },
+        {
+          "id": "sloth",
+          "name": "sloth",
+          "aliases": [
+            "sloths"
+          ]
+        },
+        {
+          "id": "snow-leopard",
+          "name": "snow leopard",
+          "aliases": [
+            "snow leopards"
+          ]
+        },
+        {
+          "id": "squirrel",
+          "name": "squirrel",
+          "aliases": [
+            "squirrels"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "walrus",
+          "name": "walrus",
+          "aliases": [
+            "walruses"
+          ]
+        },
+        {
+          "id": "warthog",
+          "name": "warthog",
+          "aliases": [
+            "warthogs"
+          ]
+        },
+        {
+          "id": "weasel",
+          "name": "weasel",
+          "aliases": [
+            "weasels"
+          ]
+        },
+        {
+          "id": "whale",
+          "name": "whale",
+          "aliases": [
+            "whales"
+          ]
+        },
+        {
+          "id": "wolf",
+          "name": "wolf",
+          "aliases": [
+            "wolves"
+          ]
+        },
+        {
+          "id": "wolverine",
+          "name": "wolverine",
+          "aliases": [
+            "wolverines"
+          ]
+        },
+        {
+          "id": "wombat",
+          "name": "wombat",
+          "aliases": [
+            "wombats"
+          ]
+        },
+        {
+          "id": "yak",
+          "name": "yak",
+          "aliases": [
+            "yaks"
+          ]
+        },
+        {
+          "id": "zebra",
+          "name": "zebra",
+          "aliases": [
+            "zebras"
+          ]
+        }
+      ],
+      "host_bank": [
+        "horse",
+        "dog",
+        "cat",
+        "elephant",
+        "lion",
+        "cow"
+      ],
+      "host_answers": [
+        "horse"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a bird",
+      "entries": [
+        {
+          "id": "eagle",
+          "name": "eagle",
+          "aliases": [
+            "eagles"
+          ]
+        },
+        {
+          "id": "hawk",
+          "name": "hawk",
+          "aliases": [
+            "hawks"
+          ]
+        },
+        {
+          "id": "falcon",
+          "name": "falcon",
+          "aliases": [
+            "falcons"
+          ]
+        },
+        {
+          "id": "owl",
+          "name": "owl",
+          "aliases": [
+            "owls"
+          ]
+        },
+        {
+          "id": "robin",
+          "name": "robin",
+          "aliases": [
+            "robins"
+          ]
+        },
+        {
+          "id": "blue-jay",
+          "name": "blue jay",
+          "aliases": [
+            "blue jays"
+          ]
+        },
+        {
+          "id": "cardinal",
+          "name": "cardinal",
+          "aliases": [
+            "cardinals"
+          ]
+        },
+        {
+          "id": "sparrow",
+          "name": "sparrow",
+          "aliases": [
+            "sparrows"
+          ]
+        },
+        {
+          "id": "crow",
+          "name": "crow",
+          "aliases": [
+            "crows"
+          ]
+        },
+        {
+          "id": "raven",
+          "name": "raven",
+          "aliases": [
+            "ravens"
+          ]
+        },
+        {
+          "id": "pigeon",
+          "name": "pigeon",
+          "aliases": [
+            "pigeons"
+          ]
+        },
+        {
+          "id": "dove",
+          "name": "dove",
+          "aliases": [
+            "doves"
+          ]
+        },
+        {
+          "id": "seagull",
+          "name": "seagull",
+          "aliases": [
+            "gull",
+            "seagulls"
+          ]
+        },
+        {
+          "id": "pelican",
+          "name": "pelican",
+          "aliases": [
+            "pelicans"
+          ]
+        },
+        {
+          "id": "flamingo",
+          "name": "flamingo",
+          "aliases": [
+            "flamingos"
+          ]
+        },
+        {
+          "id": "penguin",
+          "name": "penguin",
+          "aliases": [
+            "penguins"
+          ]
+        },
+        {
+          "id": "ostrich",
+          "name": "ostrich",
+          "aliases": [
+            "ostriches"
+          ]
+        },
+        {
+          "id": "emu",
+          "name": "emu",
+          "aliases": [
+            "emus"
+          ]
+        },
+        {
+          "id": "parrot",
+          "name": "parrot",
+          "aliases": [
+            "parrots"
+          ]
+        },
+        {
+          "id": "parakeet",
+          "name": "parakeet",
+          "aliases": [
+            "budgie",
+            "parakeets"
+          ]
+        },
+        {
+          "id": "cockatoo",
+          "name": "cockatoo",
+          "aliases": [
+            "cockatoos"
+          ]
+        },
+        {
+          "id": "macaw",
+          "name": "macaw",
+          "aliases": [
+            "macaws"
+          ]
+        },
+        {
+          "id": "toucan",
+          "name": "toucan",
+          "aliases": [
+            "toucans"
+          ]
+        },
+        {
+          "id": "hummingbird",
+          "name": "hummingbird",
+          "aliases": [
+            "hummingbirds"
+          ]
+        },
+        {
+          "id": "woodpecker",
+          "name": "woodpecker",
+          "aliases": [
+            "woodpeckers"
+          ]
+        },
+        {
+          "id": "peacock",
+          "name": "peacock",
+          "aliases": [
+            "peacocks"
+          ]
+        },
+        {
+          "id": "swan",
+          "name": "swan",
+          "aliases": [
+            "swans"
+          ]
+        },
+        {
+          "id": "duck",
+          "name": "duck",
+          "aliases": [
+            "ducks"
+          ]
+        },
+        {
+          "id": "goose",
+          "name": "goose",
+          "aliases": [
+            "geese"
+          ]
+        },
+        {
+          "id": "chicken",
+          "name": "chicken",
+          "aliases": [
+            "chickens"
+          ]
+        },
+        {
+          "id": "turkey",
+          "name": "turkey",
+          "aliases": [
+            "turkeys"
+          ]
+        },
+        {
+          "id": "vulture",
+          "name": "vulture",
+          "aliases": [
+            "vultures"
+          ]
+        },
+        {
+          "id": "stork",
+          "name": "stork",
+          "aliases": [
+            "storks"
+          ]
+        },
+        {
+          "id": "heron",
+          "name": "heron",
+          "aliases": [
+            "herons"
+          ]
+        },
+        {
+          "id": "crane",
+          "name": "crane",
+          "aliases": [
+            "cranes"
+          ]
+        },
+        {
+          "id": "kingfisher",
+          "name": "kingfisher",
+          "aliases": [
+            "kingfishers"
+          ]
+        },
+        {
+          "id": "canary",
+          "name": "canary",
+          "aliases": [
+            "canaries"
+          ]
+        },
+        {
+          "id": "finch",
+          "name": "finch",
+          "aliases": [
+            "finches"
+          ]
+        },
+        {
+          "id": "magpie",
+          "name": "magpie",
+          "aliases": [
+            "magpies"
+          ]
+        },
+        {
+          "id": "puffin",
+          "name": "puffin",
+          "aliases": [
+            "puffins"
+          ]
+        },
+        {
+          "id": "albatross",
+          "name": "albatross",
+          "aliases": [
+            "albatrosses"
+          ]
+        },
+        {
+          "id": "roadrunner",
+          "name": "roadrunner",
+          "aliases": [
+            "roadrunners"
+          ]
+        },
+        {
+          "id": "blackbird",
+          "name": "blackbird",
+          "aliases": [
+            "blackbirds"
+          ]
+        },
+        {
+          "id": "mockingbird",
+          "name": "mockingbird",
+          "aliases": [
+            "mockingbirds"
+          ]
+        },
+        {
+          "id": "quail",
+          "name": "quail",
+          "aliases": [],
+          "plural": "quail"
+        },
+        {
+          "id": "pheasant",
+          "name": "pheasant",
+          "aliases": [
+            "pheasants"
+          ]
+        },
+        {
+          "id": "kiwi",
+          "name": "kiwi",
+          "aliases": [
+            "kiwis"
+          ]
+        },
+        {
+          "id": "condor",
+          "name": "condor",
+          "aliases": [
+            "condors"
+          ]
+        }
+      ],
+      "host_bank": [
+        "owl",
+        "eagle",
+        "robin",
+        "parrot",
+        "pigeon",
+        "penguin",
+        "crow"
+      ],
+      "host_answers": [
+        "owl"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something that flies",
+      "entries": [
+        {
+          "id": "bird",
+          "name": "bird",
+          "aliases": [
+            "birds"
+          ]
+        },
+        {
+          "id": "airplane",
+          "name": "airplane",
+          "aliases": [
+            "plane",
+            "airplanes"
+          ]
+        },
+        {
+          "id": "helicopter",
+          "name": "helicopter",
+          "aliases": [
+            "helicopters"
+          ]
+        },
+        {
+          "id": "butterfly",
+          "name": "butterfly",
+          "aliases": [
+            "butterflies"
+          ]
+        },
+        {
+          "id": "bee",
+          "name": "bee",
+          "aliases": [
+            "bees"
+          ]
+        },
+        {
+          "id": "fly",
+          "name": "fly",
+          "aliases": [
+            "flies"
+          ]
+        },
+        {
+          "id": "mosquito",
+          "name": "mosquito",
+          "aliases": [
+            "mosquitoes"
+          ],
+          "plural": "mosquitoes"
+        },
+        {
+          "id": "bat",
+          "name": "bat",
+          "aliases": [
+            "bats"
+          ]
+        },
+        {
+          "id": "kite",
+          "name": "kite",
+          "aliases": [
+            "kites"
+          ]
+        },
+        {
+          "id": "drone",
+          "name": "drone",
+          "aliases": [
+            "drones"
+          ]
+        },
+        {
+          "id": "balloon",
+          "name": "balloon",
+          "aliases": [
+            "balloons"
+          ]
+        },
+        {
+          "id": "rocket",
+          "name": "rocket",
+          "aliases": [
+            "rockets"
+          ]
+        },
+        {
+          "id": "jet",
+          "name": "jet",
+          "aliases": [
+            "jets"
+          ]
+        },
+        {
+          "id": "glider",
+          "name": "glider",
+          "aliases": [
+            "gliders"
+          ]
+        },
+        {
+          "id": "blimp",
+          "name": "blimp",
+          "aliases": [
+            "blimps"
+          ]
+        },
+        {
+          "id": "eagle",
+          "name": "eagle",
+          "aliases": [
+            "eagles"
+          ]
+        },
+        {
+          "id": "dragonfly",
+          "name": "dragonfly",
+          "aliases": [
+            "dragonflies"
+          ]
+        },
+        {
+          "id": "moth",
+          "name": "moth",
+          "aliases": [
+            "moths"
+          ]
+        },
+        {
+          "id": "paper-airplane",
+          "name": "paper airplane",
+          "aliases": [
+            "paper airplanes"
+          ]
+        },
+        {
+          "id": "frisbee",
+          "name": "frisbee",
+          "aliases": [
+            "frisbees"
+          ]
+        },
+        {
+          "id": "superhero",
+          "name": "superhero",
+          "aliases": [
+            "superheroes"
+          ]
+        },
+        {
+          "id": "dragon",
+          "name": "dragon",
+          "aliases": [
+            "dragons"
+          ]
+        },
+        {
+          "id": "owl",
+          "name": "owl",
+          "aliases": [
+            "owls"
+          ]
+        },
+        {
+          "id": "parrot",
+          "name": "parrot",
+          "aliases": [
+            "parrots"
+          ]
+        },
+        {
+          "id": "ladybug",
+          "name": "ladybug",
+          "aliases": [
+            "ladybugs"
+          ]
+        },
+        {
+          "id": "space-shuttle",
+          "name": "space shuttle",
+          "aliases": [
+            "space shuttles"
+          ]
+        },
+        {
+          "id": "seagull",
+          "name": "seagull",
+          "aliases": [
+            "seagulls"
+          ]
+        },
+        {
+          "id": "flying-squirrel",
+          "name": "flying squirrel",
+          "aliases": [
+            "flying squirrels"
+          ]
+        },
+        {
+          "id": "fairy",
+          "name": "fairy",
+          "aliases": [
+            "fairies"
+          ]
+        },
+        {
+          "id": "reindeer",
+          "name": "reindeer",
+          "aliases": [],
+          "plural": "reindeer"
+        },
+        {
+          "id": "ufo",
+          "name": "UFO",
+          "aliases": [
+            "flying saucer",
+            "UFOs"
+          ],
+          "plural": "UFOs"
+        }
+      ],
+      "host_bank": [
+        "butterfly",
+        "bird",
+        "airplane",
+        "helicopter",
+        "bee",
+        "kite"
+      ],
+      "host_answers": [
+        "butterfly"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of tree",
+      "entries": [
+        {
+          "id": "oak",
+          "name": "oak",
+          "aliases": [
+            "oaks"
+          ]
+        },
+        {
+          "id": "maple",
+          "name": "maple",
+          "aliases": [
+            "maples"
+          ]
+        },
+        {
+          "id": "pine",
+          "name": "pine",
+          "aliases": [
+            "pines"
+          ]
+        },
+        {
+          "id": "palm",
+          "name": "palm",
+          "aliases": [
+            "palms"
+          ]
+        },
+        {
+          "id": "birch",
+          "name": "birch",
+          "aliases": [
+            "birches"
+          ]
+        },
+        {
+          "id": "willow",
+          "name": "willow",
+          "aliases": [
+            "weeping willow",
+            "willows"
+          ]
+        },
+        {
+          "id": "cherry-tree",
+          "name": "cherry tree",
+          "aliases": [
+            "cherry trees"
+          ]
+        },
+        {
+          "id": "apple-tree",
+          "name": "apple tree",
+          "aliases": [
+            "apple trees"
+          ]
+        },
+        {
+          "id": "redwood",
+          "name": "redwood",
+          "aliases": [
+            "redwoods"
+          ]
+        },
+        {
+          "id": "sequoia",
+          "name": "sequoia",
+          "aliases": [
+            "sequoias"
+          ]
+        },
+        {
+          "id": "cedar",
+          "name": "cedar",
+          "aliases": [
+            "cedars"
+          ]
+        },
+        {
+          "id": "spruce",
+          "name": "spruce",
+          "aliases": [
+            "spruces"
+          ]
+        },
+        {
+          "id": "fir",
+          "name": "fir",
+          "aliases": [
+            "firs"
+          ]
+        },
+        {
+          "id": "christmas-tree",
+          "name": "Christmas tree",
+          "aliases": [
+            "Christmas trees"
+          ]
+        },
+        {
+          "id": "elm",
+          "name": "elm",
+          "aliases": [
+            "elms"
+          ]
+        },
+        {
+          "id": "ash",
+          "name": "ash",
+          "aliases": [
+            "ashes"
+          ]
+        },
+        {
+          "id": "aspen",
+          "name": "aspen",
+          "aliases": [
+            "aspens"
+          ]
+        },
+        {
+          "id": "cypress",
+          "name": "cypress",
+          "aliases": [
+            "cypresses"
+          ]
+        },
+        {
+          "id": "magnolia",
+          "name": "magnolia",
+          "aliases": [
+            "magnolias"
+          ]
+        },
+        {
+          "id": "dogwood",
+          "name": "dogwood",
+          "aliases": [
+            "dogwoods"
+          ]
+        },
+        {
+          "id": "sycamore",
+          "name": "sycamore",
+          "aliases": [
+            "sycamores"
+          ]
+        },
+        {
+          "id": "walnut",
+          "name": "walnut",
+          "aliases": [
+            "walnuts"
+          ]
+        },
+        {
+          "id": "hickory",
+          "name": "hickory",
+          "aliases": [
+            "hickories"
+          ]
+        },
+        {
+          "id": "poplar",
+          "name": "poplar",
+          "aliases": [
+            "poplars"
+          ]
+        },
+        {
+          "id": "beech",
+          "name": "beech",
+          "aliases": [
+            "beeches"
+          ]
+        },
+        {
+          "id": "eucalyptus",
+          "name": "eucalyptus",
+          "aliases": [
+            "eucalyptuses"
+          ],
+          "plural": "eucalyptuses"
+        },
+        {
+          "id": "baobab",
+          "name": "baobab",
+          "aliases": [
+            "baobabs"
+          ]
+        },
+        {
+          "id": "olive-tree",
+          "name": "olive tree",
+          "aliases": [
+            "olive trees"
+          ]
+        },
+        {
+          "id": "orange-tree",
+          "name": "orange tree",
+          "aliases": [
+            "orange trees"
+          ]
+        },
+        {
+          "id": "banyan",
+          "name": "banyan",
+          "aliases": [
+            "banyans"
+          ]
+        },
+        {
+          "id": "juniper",
+          "name": "juniper",
+          "aliases": [
+            "junipers"
+          ]
+        },
+        {
+          "id": "mahogany",
+          "name": "mahogany",
+          "aliases": [],
+          "plural": "mahogany"
+        },
+        {
+          "id": "teak",
+          "name": "teak",
+          "aliases": [],
+          "plural": "teak"
+        },
+        {
+          "id": "hemlock",
+          "name": "hemlock",
+          "aliases": [
+            "hemlocks"
+          ]
+        },
+        {
+          "id": "ginkgo",
+          "name": "ginkgo",
+          "aliases": [
+            "ginkgos"
+          ]
+        },
+        {
+          "id": "cottonwood",
+          "name": "cottonwood",
+          "aliases": [
+            "cottonwoods"
+          ]
+        }
+      ],
+      "host_bank": [
+        "maple",
+        "oak",
+        "pine",
+        "palm",
+        "birch",
+        "willow"
+      ],
+      "host_answers": [
+        "maple"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of pasta",
+      "entries": [
+        {
+          "id": "spaghetti",
+          "name": "spaghetti",
+          "aliases": [],
+          "plural": "spaghetti"
+        },
+        {
+          "id": "penne",
+          "name": "penne",
+          "aliases": [],
+          "plural": "penne"
+        },
+        {
+          "id": "macaroni",
+          "name": "macaroni",
+          "aliases": [
+            "elbow macaroni"
+          ],
+          "plural": "macaroni"
+        },
+        {
+          "id": "fettuccine",
+          "name": "fettuccine",
+          "aliases": [
+            "fettuccini"
+          ],
+          "plural": "fettuccine"
+        },
+        {
+          "id": "linguine",
+          "name": "linguine",
+          "aliases": [],
+          "plural": "linguine"
+        },
+        {
+          "id": "rigatoni",
+          "name": "rigatoni",
+          "aliases": [],
+          "plural": "rigatoni"
+        },
+        {
+          "id": "farfalle",
+          "name": "farfalle",
+          "aliases": [
+            "bow tie",
+            "bowtie"
+          ],
+          "plural": "farfalle"
+        },
+        {
+          "id": "fusilli",
+          "name": "fusilli",
+          "aliases": [],
+          "plural": "fusilli"
+        },
+        {
+          "id": "rotini",
+          "name": "rotini",
+          "aliases": [],
+          "plural": "rotini"
+        },
+        {
+          "id": "lasagna",
+          "name": "lasagna",
+          "aliases": [
+            "lasagne"
+          ],
+          "plural": "lasagna"
+        },
+        {
+          "id": "ravioli",
+          "name": "ravioli",
+          "aliases": [],
+          "plural": "ravioli"
+        },
+        {
+          "id": "tortellini",
+          "name": "tortellini",
+          "aliases": [],
+          "plural": "tortellini"
+        },
+        {
+          "id": "orzo",
+          "name": "orzo",
+          "aliases": [],
+          "plural": "orzo"
+        },
+        {
+          "id": "angel-hair",
+          "name": "angel hair",
+          "aliases": [
+            "capellini"
+          ],
+          "plural": "angel hair"
+        },
+        {
+          "id": "ziti",
+          "name": "ziti",
+          "aliases": [],
+          "plural": "ziti"
+        },
+        {
+          "id": "gnocchi",
+          "name": "gnocchi",
+          "aliases": [],
+          "plural": "gnocchi"
+        },
+        {
+          "id": "shells",
+          "name": "shells",
+          "aliases": [
+            "conchiglie"
+          ],
+          "plural": "shells"
+        },
+        {
+          "id": "ditalini",
+          "name": "ditalini",
+          "aliases": [],
+          "plural": "ditalini"
+        },
+        {
+          "id": "pappardelle",
+          "name": "pappardelle",
+          "aliases": [],
+          "plural": "pappardelle"
+        },
+        {
+          "id": "orecchiette",
+          "name": "orecchiette",
+          "aliases": [],
+          "plural": "orecchiette"
+        },
+        {
+          "id": "bucatini",
+          "name": "bucatini",
+          "aliases": [],
+          "plural": "bucatini"
+        },
+        {
+          "id": "manicotti",
+          "name": "manicotti",
+          "aliases": [],
+          "plural": "manicotti"
+        },
+        {
+          "id": "cannelloni",
+          "name": "cannelloni",
+          "aliases": [],
+          "plural": "cannelloni"
+        }
+      ],
+      "host_bank": [
+        "penne",
+        "spaghetti",
+        "macaroni",
+        "fettuccine",
+        "lasagna",
+        "linguine",
+        "rigatoni"
+      ],
+      "host_answers": [
+        "penne"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of nut",
+      "entries": [
+        {
+          "id": "almond",
+          "name": "almond",
+          "aliases": [
+            "almonds"
+          ]
+        },
+        {
+          "id": "peanut",
+          "name": "peanut",
+          "aliases": [
+            "peanuts"
+          ]
+        },
+        {
+          "id": "cashew",
+          "name": "cashew",
+          "aliases": [
+            "cashews"
+          ]
+        },
+        {
+          "id": "walnut",
+          "name": "walnut",
+          "aliases": [
+            "walnuts"
+          ]
+        },
+        {
+          "id": "pecan",
+          "name": "pecan",
+          "aliases": [
+            "pecans"
+          ]
+        },
+        {
+          "id": "pistachio",
+          "name": "pistachio",
+          "aliases": [
+            "pistachios"
+          ]
+        },
+        {
+          "id": "hazelnut",
+          "name": "hazelnut",
+          "aliases": [
+            "filbert",
+            "hazelnuts"
+          ]
+        },
+        {
+          "id": "macadamia",
+          "name": "macadamia",
+          "aliases": [
+            "macadamia nut",
+            "macadamias"
+          ]
+        },
+        {
+          "id": "brazil-nut",
+          "name": "Brazil nut",
+          "aliases": [
+            "Brazil nuts"
+          ]
+        },
+        {
+          "id": "pine-nut",
+          "name": "pine nut",
+          "aliases": [
+            "pine nuts"
+          ]
+        },
+        {
+          "id": "chestnut",
+          "name": "chestnut",
+          "aliases": [
+            "chestnuts"
+          ]
+        },
+        {
+          "id": "acorn",
+          "name": "acorn",
+          "aliases": [
+            "acorns"
+          ]
+        },
+        {
+          "id": "coconut",
+          "name": "coconut",
+          "aliases": [
+            "coconuts"
+          ]
+        }
+      ],
+      "host_bank": [
+        "cashew",
+        "almond",
+        "peanut",
+        "walnut",
+        "pecan",
+        "pistachio",
+        "macadamia"
+      ],
+      "host_answers": [
+        "cashew"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of weather",
+      "entries": [
+        {
+          "id": "rain",
+          "name": "rain",
+          "aliases": [],
+          "plural": "rain"
+        },
+        {
+          "id": "snow",
+          "name": "snow",
+          "aliases": [],
+          "plural": "snow"
+        },
+        {
+          "id": "sun",
+          "name": "sun",
+          "aliases": [
+            "sunshine",
+            "sunny"
+          ],
+          "plural": "sun"
+        },
+        {
+          "id": "wind",
+          "name": "wind",
+          "aliases": [
+            "windy"
+          ],
+          "plural": "wind"
+        },
+        {
+          "id": "thunderstorm",
+          "name": "thunderstorm",
+          "aliases": [
+            "storm",
+            "thunder"
+          ],
+          "plural": "thunderstorm"
+        },
+        {
+          "id": "clouds",
+          "name": "clouds",
+          "aliases": [
+            "cloudy"
+          ],
+          "plural": "clouds"
+        },
+        {
+          "id": "fog",
+          "name": "fog",
+          "aliases": [],
+          "plural": "fog"
+        },
+        {
+          "id": "tornado",
+          "name": "tornado",
+          "aliases": [],
+          "plural": "tornado"
+        },
+        {
+          "id": "hail",
+          "name": "hail",
+          "aliases": [],
+          "plural": "hail"
+        },
+        {
+          "id": "sleet",
+          "name": "sleet",
+          "aliases": [],
+          "plural": "sleet"
+        },
+        {
+          "id": "lightning",
+          "name": "lightning",
+          "aliases": [],
+          "plural": "lightning"
+        },
+        {
+          "id": "hurricane",
+          "name": "hurricane",
+          "aliases": [],
+          "plural": "hurricane"
+        },
+        {
+          "id": "drizzle",
+          "name": "drizzle",
+          "aliases": [],
+          "plural": "drizzle"
+        },
+        {
+          "id": "blizzard",
+          "name": "blizzard",
+          "aliases": [],
+          "plural": "blizzard"
+        },
+        {
+          "id": "heat-wave",
+          "name": "heat wave",
+          "aliases": [],
+          "plural": "heat wave"
+        },
+        {
+          "id": "frost",
+          "name": "frost",
+          "aliases": [],
+          "plural": "frost"
+        },
+        {
+          "id": "humidity",
+          "name": "humidity",
+          "aliases": [],
+          "plural": "humidity"
+        },
+        {
+          "id": "rainbow",
+          "name": "rainbow",
+          "aliases": [],
+          "plural": "rainbow"
+        },
+        {
+          "id": "mist",
+          "name": "mist",
+          "aliases": [],
+          "plural": "mist"
+        },
+        {
+          "id": "monsoon",
+          "name": "monsoon",
+          "aliases": [],
+          "plural": "monsoon"
+        },
+        {
+          "id": "drought",
+          "name": "drought",
+          "aliases": [],
+          "plural": "drought"
+        }
+      ],
+      "host_bank": [
+        "rain",
+        "snow",
+        "sun",
+        "wind",
+        "thunderstorm",
+        "clouds",
+        "fog",
+        "tornado"
+      ],
+      "host_answers": [
+        "rain"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

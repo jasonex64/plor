@@ -1,0 +1,2373 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-11",
+  "questions": [
+    {
+      "prompt": "Name an animal",
+      "entries": [
+        {
+          "id": "aardvark",
+          "name": "aardvark",
+          "aliases": [
+            "aardvarks"
+          ]
+        },
+        {
+          "id": "alpaca",
+          "name": "alpaca",
+          "aliases": [
+            "alpacas"
+          ]
+        },
+        {
+          "id": "anteater",
+          "name": "anteater",
+          "aliases": [
+            "anteaters"
+          ]
+        },
+        {
+          "id": "antelope",
+          "name": "antelope",
+          "aliases": [
+            "antelopes"
+          ]
+        },
+        {
+          "id": "armadillo",
+          "name": "armadillo",
+          "aliases": [
+            "armadillos"
+          ]
+        },
+        {
+          "id": "baboon",
+          "name": "baboon",
+          "aliases": [
+            "baboons"
+          ]
+        },
+        {
+          "id": "badger",
+          "name": "badger",
+          "aliases": [
+            "badgers"
+          ]
+        },
+        {
+          "id": "bat",
+          "name": "bat",
+          "aliases": [
+            "bats"
+          ]
+        },
+        {
+          "id": "bear",
+          "name": "bear",
+          "aliases": [
+            "bears"
+          ]
+        },
+        {
+          "id": "beaver",
+          "name": "beaver",
+          "aliases": [
+            "beavers"
+          ]
+        },
+        {
+          "id": "bison",
+          "name": "bison",
+          "aliases": [],
+          "plural": "bison"
+        },
+        {
+          "id": "bobcat",
+          "name": "bobcat",
+          "aliases": [
+            "bobcats"
+          ]
+        },
+        {
+          "id": "buffalo",
+          "name": "buffalo",
+          "aliases": []
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "camels"
+          ]
+        },
+        {
+          "id": "caracal",
+          "name": "caracal",
+          "aliases": [
+            "caracals"
+          ]
+        },
+        {
+          "id": "cat",
+          "name": "cat",
+          "aliases": [
+            "house cat",
+            "kitten",
+            "cats"
+          ]
+        },
+        {
+          "id": "cheetah",
+          "name": "cheetah",
+          "aliases": [
+            "cheetahs"
+          ]
+        },
+        {
+          "id": "chimpanzee",
+          "name": "chimpanzee",
+          "aliases": [
+            "chimp",
+            "chimpanzees"
+          ]
+        },
+        {
+          "id": "chipmunk",
+          "name": "chipmunk",
+          "aliases": [
+            "chipmunks"
+          ]
+        },
+        {
+          "id": "clouded-leopard",
+          "name": "clouded leopard",
+          "aliases": [
+            "clouded leopards"
+          ]
+        },
+        {
+          "id": "cougar",
+          "name": "cougar",
+          "aliases": [
+            "puma",
+            "mountain lion",
+            "cougars"
+          ]
+        },
+        {
+          "id": "cow",
+          "name": "cow",
+          "aliases": [
+            "cows"
+          ]
+        },
+        {
+          "id": "coyote",
+          "name": "coyote",
+          "aliases": [
+            "coyotes"
+          ]
+        },
+        {
+          "id": "deer",
+          "name": "deer",
+          "aliases": [],
+          "plural": "deer"
+        },
+        {
+          "id": "dingo",
+          "name": "dingo",
+          "aliases": [
+            "dingoes"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "puppy",
+            "dogs"
+          ]
+        },
+        {
+          "id": "dolphin",
+          "name": "dolphin",
+          "aliases": [
+            "dolphins"
+          ]
+        },
+        {
+          "id": "donkey",
+          "name": "donkey",
+          "aliases": [
+            "donkeys"
+          ]
+        },
+        {
+          "id": "elephant",
+          "name": "elephant",
+          "aliases": [
+            "elephants"
+          ]
+        },
+        {
+          "id": "elk",
+          "name": "elk",
+          "aliases": []
+        },
+        {
+          "id": "ferret",
+          "name": "ferret",
+          "aliases": [
+            "ferrets"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "foxes"
+          ]
+        },
+        {
+          "id": "gazelle",
+          "name": "gazelle",
+          "aliases": [
+            "gazelles"
+          ]
+        },
+        {
+          "id": "gerbil",
+          "name": "gerbil",
+          "aliases": [
+            "gerbils"
+          ]
+        },
+        {
+          "id": "giraffe",
+          "name": "giraffe",
+          "aliases": [
+            "giraffes"
+          ]
+        },
+        {
+          "id": "goat",
+          "name": "goat",
+          "aliases": [
+            "goats"
+          ]
+        },
+        {
+          "id": "gorilla",
+          "name": "gorilla",
+          "aliases": [
+            "gorillas"
+          ]
+        },
+        {
+          "id": "guinea-pig",
+          "name": "guinea pig",
+          "aliases": [
+            "guinea pigs"
+          ]
+        },
+        {
+          "id": "hamster",
+          "name": "hamster",
+          "aliases": [
+            "hamsters"
+          ]
+        },
+        {
+          "id": "hedgehog",
+          "name": "hedgehog",
+          "aliases": [
+            "hedgehogs"
+          ]
+        },
+        {
+          "id": "hippopotamus",
+          "name": "hippopotamus",
+          "aliases": [
+            "hippo",
+            "hippopotamuses"
+          ]
+        },
+        {
+          "id": "horse",
+          "name": "horse",
+          "aliases": [
+            "horses"
+          ]
+        },
+        {
+          "id": "hyena",
+          "name": "hyena",
+          "aliases": [
+            "hyenas"
+          ]
+        },
+        {
+          "id": "jackal",
+          "name": "jackal",
+          "aliases": [
+            "jackals"
+          ]
+        },
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        },
+        {
+          "id": "kangaroo",
+          "name": "kangaroo",
+          "aliases": [
+            "kangaroos"
+          ]
+        },
+        {
+          "id": "koala",
+          "name": "koala",
+          "aliases": [
+            "koala bear",
+            "koalas"
+          ]
+        },
+        {
+          "id": "lemur",
+          "name": "lemur",
+          "aliases": [
+            "lemurs"
+          ]
+        },
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "llama",
+          "name": "llama",
+          "aliases": [
+            "llamas"
+          ]
+        },
+        {
+          "id": "lynx",
+          "name": "lynx",
+          "aliases": [
+            "lynxes"
+          ]
+        },
+        {
+          "id": "manatee",
+          "name": "manatee",
+          "aliases": [
+            "manatees"
+          ]
+        },
+        {
+          "id": "meerkat",
+          "name": "meerkat",
+          "aliases": [
+            "meerkats"
+          ]
+        },
+        {
+          "id": "mink",
+          "name": "mink",
+          "aliases": [
+            "minks"
+          ]
+        },
+        {
+          "id": "mole",
+          "name": "mole",
+          "aliases": [
+            "moles"
+          ]
+        },
+        {
+          "id": "monkey",
+          "name": "monkey",
+          "aliases": [
+            "monkeys"
+          ]
+        },
+        {
+          "id": "moose",
+          "name": "moose",
+          "aliases": [],
+          "plural": "moose"
+        },
+        {
+          "id": "mouse",
+          "name": "mouse",
+          "aliases": [
+            "mice"
+          ]
+        },
+        {
+          "id": "ocelot",
+          "name": "ocelot",
+          "aliases": [
+            "ocelots"
+          ]
+        },
+        {
+          "id": "opossum",
+          "name": "opossum",
+          "aliases": [
+            "possum",
+            "opossums"
+          ]
+        },
+        {
+          "id": "orangutan",
+          "name": "orangutan",
+          "aliases": [
+            "orangutans"
+          ]
+        },
+        {
+          "id": "orca",
+          "name": "orca",
+          "aliases": [
+            "killer whale",
+            "orcas"
+          ]
+        },
+        {
+          "id": "otter",
+          "name": "otter",
+          "aliases": [
+            "otters"
+          ]
+        },
+        {
+          "id": "ox",
+          "name": "ox",
+          "aliases": [
+            "oxen"
+          ]
+        },
+        {
+          "id": "panda",
+          "name": "panda",
+          "aliases": [
+            "giant panda",
+            "pandas"
+          ]
+        },
+        {
+          "id": "pig",
+          "name": "pig",
+          "aliases": [
+            "pigs"
+          ]
+        },
+        {
+          "id": "platypus",
+          "name": "platypus",
+          "aliases": [
+            "platypuses"
+          ]
+        },
+        {
+          "id": "porcupine",
+          "name": "porcupine",
+          "aliases": [
+            "porcupines"
+          ]
+        },
+        {
+          "id": "rabbit",
+          "name": "rabbit",
+          "aliases": [
+            "bunny",
+            "rabbits"
+          ]
+        },
+        {
+          "id": "raccoon",
+          "name": "raccoon",
+          "aliases": [
+            "raccoons"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "reindeer",
+          "name": "reindeer",
+          "aliases": [
+            "caribou"
+          ],
+          "plural": "reindeer"
+        },
+        {
+          "id": "rhinoceros",
+          "name": "rhinoceros",
+          "aliases": [
+            "rhino"
+          ]
+        },
+        {
+          "id": "sea-lion",
+          "name": "sea lion",
+          "aliases": [
+            "sea lions"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "seals"
+          ]
+        },
+        {
+          "id": "serval",
+          "name": "serval",
+          "aliases": [
+            "servals"
+          ]
+        },
+        {
+          "id": "sheep",
+          "name": "sheep",
+          "aliases": [
+            "lamb"
+          ],
+          "plural": "sheep"
+        },
+        {
+          "id": "skunk",
+          "name": "skunk",
+          "aliases": [
+            "skunks"
+          ]
+        },
+        {
+          "id": "sloth",
+          "name": "sloth",
+          "aliases": [
+            "sloths"
+          ]
+        },
+        {
+          "id": "snow-leopard",
+          "name": "snow leopard",
+          "aliases": [
+            "snow leopards"
+          ]
+        },
+        {
+          "id": "squirrel",
+          "name": "squirrel",
+          "aliases": [
+            "squirrels"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "walrus",
+          "name": "walrus",
+          "aliases": [
+            "walruses"
+          ]
+        },
+        {
+          "id": "warthog",
+          "name": "warthog",
+          "aliases": [
+            "warthogs"
+          ]
+        },
+        {
+          "id": "weasel",
+          "name": "weasel",
+          "aliases": [
+            "weasels"
+          ]
+        },
+        {
+          "id": "whale",
+          "name": "whale",
+          "aliases": [
+            "whales"
+          ]
+        },
+        {
+          "id": "wolf",
+          "name": "wolf",
+          "aliases": [
+            "wolves"
+          ]
+        },
+        {
+          "id": "wolverine",
+          "name": "wolverine",
+          "aliases": [
+            "wolverines"
+          ]
+        },
+        {
+          "id": "wombat",
+          "name": "wombat",
+          "aliases": [
+            "wombats"
+          ]
+        },
+        {
+          "id": "yak",
+          "name": "yak",
+          "aliases": [
+            "yaks"
+          ]
+        },
+        {
+          "id": "zebra",
+          "name": "zebra",
+          "aliases": [
+            "zebras"
+          ]
+        },
+        {
+          "id": "alligator",
+          "name": "alligator",
+          "aliases": [
+            "alligators"
+          ]
+        },
+        {
+          "id": "ant",
+          "name": "ant",
+          "aliases": [
+            "ants"
+          ]
+        },
+        {
+          "id": "bee",
+          "name": "bee",
+          "aliases": [
+            "bees"
+          ]
+        },
+        {
+          "id": "beetle",
+          "name": "beetle",
+          "aliases": [
+            "beetles"
+          ]
+        },
+        {
+          "id": "butterfly",
+          "name": "butterfly",
+          "aliases": [
+            "butterflies"
+          ]
+        },
+        {
+          "id": "canary",
+          "name": "canary",
+          "aliases": [
+            "canaries"
+          ]
+        },
+        {
+          "id": "caterpillar",
+          "name": "caterpillar",
+          "aliases": [
+            "caterpillars"
+          ]
+        },
+        {
+          "id": "chicken",
+          "name": "chicken",
+          "aliases": [
+            "chickens"
+          ]
+        },
+        {
+          "id": "cobra",
+          "name": "cobra",
+          "aliases": [
+            "cobras"
+          ]
+        },
+        {
+          "id": "crab",
+          "name": "crab",
+          "aliases": [
+            "crabs"
+          ]
+        },
+        {
+          "id": "crocodile",
+          "name": "crocodile",
+          "aliases": [
+            "crocodiles"
+          ]
+        },
+        {
+          "id": "crow",
+          "name": "crow",
+          "aliases": [
+            "crows"
+          ]
+        },
+        {
+          "id": "dove",
+          "name": "dove",
+          "aliases": [
+            "doves"
+          ]
+        },
+        {
+          "id": "dragonfly",
+          "name": "dragonfly",
+          "aliases": [
+            "dragonflies"
+          ]
+        },
+        {
+          "id": "duck",
+          "name": "duck",
+          "aliases": [
+            "ducks"
+          ]
+        },
+        {
+          "id": "eagle",
+          "name": "eagle",
+          "aliases": [
+            "eagles"
+          ]
+        },
+        {
+          "id": "eel",
+          "name": "eel",
+          "aliases": [
+            "eels"
+          ]
+        },
+        {
+          "id": "emu",
+          "name": "emu",
+          "aliases": [
+            "emus"
+          ]
+        },
+        {
+          "id": "falcon",
+          "name": "falcon",
+          "aliases": [
+            "falcons"
+          ]
+        },
+        {
+          "id": "flamingo",
+          "name": "flamingo",
+          "aliases": [
+            "flamingos"
+          ]
+        },
+        {
+          "id": "fly",
+          "name": "fly",
+          "aliases": [
+            "flies"
+          ]
+        },
+        {
+          "id": "frog",
+          "name": "frog",
+          "aliases": [
+            "frogs"
+          ]
+        },
+        {
+          "id": "gecko",
+          "name": "gecko",
+          "aliases": [
+            "geckos"
+          ]
+        },
+        {
+          "id": "goldfish",
+          "name": "goldfish",
+          "aliases": [],
+          "plural": "goldfish"
+        },
+        {
+          "id": "goose",
+          "name": "goose",
+          "aliases": [
+            "geese"
+          ]
+        },
+        {
+          "id": "grasshopper",
+          "name": "grasshopper",
+          "aliases": [
+            "grasshoppers"
+          ]
+        },
+        {
+          "id": "hawk",
+          "name": "hawk",
+          "aliases": [
+            "hawks"
+          ]
+        },
+        {
+          "id": "hummingbird",
+          "name": "hummingbird",
+          "aliases": [
+            "hummingbirds"
+          ]
+        },
+        {
+          "id": "iguana",
+          "name": "iguana",
+          "aliases": [
+            "iguanas"
+          ]
+        },
+        {
+          "id": "jellyfish",
+          "name": "jellyfish",
+          "aliases": [],
+          "plural": "jellyfish"
+        },
+        {
+          "id": "ladybug",
+          "name": "ladybug",
+          "aliases": [
+            "ladybugs"
+          ]
+        },
+        {
+          "id": "lizard",
+          "name": "lizard",
+          "aliases": [
+            "lizards"
+          ]
+        },
+        {
+          "id": "lobster",
+          "name": "lobster",
+          "aliases": [
+            "lobsters"
+          ]
+        },
+        {
+          "id": "mosquito",
+          "name": "mosquito",
+          "aliases": [
+            "mosquitoes"
+          ],
+          "plural": "mosquitoes"
+        },
+        {
+          "id": "octopus",
+          "name": "octopus",
+          "aliases": [
+            "octopuses"
+          ]
+        },
+        {
+          "id": "ostrich",
+          "name": "ostrich",
+          "aliases": [
+            "ostriches"
+          ]
+        },
+        {
+          "id": "owl",
+          "name": "owl",
+          "aliases": [
+            "owls"
+          ]
+        },
+        {
+          "id": "parrot",
+          "name": "parrot",
+          "aliases": [
+            "parrots"
+          ]
+        },
+        {
+          "id": "peacock",
+          "name": "peacock",
+          "aliases": [
+            "peacocks"
+          ]
+        },
+        {
+          "id": "pelican",
+          "name": "pelican",
+          "aliases": [
+            "pelicans"
+          ]
+        },
+        {
+          "id": "penguin",
+          "name": "penguin",
+          "aliases": [
+            "penguins"
+          ]
+        },
+        {
+          "id": "pigeon",
+          "name": "pigeon",
+          "aliases": [
+            "pigeons"
+          ]
+        },
+        {
+          "id": "rattlesnake",
+          "name": "rattlesnake",
+          "aliases": [
+            "rattlesnakes"
+          ]
+        },
+        {
+          "id": "salmon",
+          "name": "salmon",
+          "aliases": [],
+          "plural": "salmon"
+        },
+        {
+          "id": "scorpion",
+          "name": "scorpion",
+          "aliases": [
+            "scorpions"
+          ]
+        },
+        {
+          "id": "shark",
+          "name": "shark",
+          "aliases": [
+            "sharks"
+          ]
+        },
+        {
+          "id": "shrimp",
+          "name": "shrimp",
+          "aliases": [],
+          "plural": "shrimp"
+        },
+        {
+          "id": "snail",
+          "name": "snail",
+          "aliases": [
+            "snails"
+          ]
+        },
+        {
+          "id": "snake",
+          "name": "snake",
+          "aliases": [
+            "snakes"
+          ]
+        },
+        {
+          "id": "spider",
+          "name": "spider",
+          "aliases": [
+            "spiders"
+          ]
+        },
+        {
+          "id": "squid",
+          "name": "squid",
+          "aliases": [],
+          "plural": "squid"
+        },
+        {
+          "id": "starfish",
+          "name": "starfish",
+          "aliases": [],
+          "plural": "starfish"
+        },
+        {
+          "id": "stingray",
+          "name": "stingray",
+          "aliases": [
+            "stingrays"
+          ]
+        },
+        {
+          "id": "swan",
+          "name": "swan",
+          "aliases": [
+            "swans"
+          ]
+        },
+        {
+          "id": "toad",
+          "name": "toad",
+          "aliases": [
+            "toads"
+          ]
+        },
+        {
+          "id": "tortoise",
+          "name": "tortoise",
+          "aliases": [
+            "tortoises"
+          ]
+        },
+        {
+          "id": "turkey",
+          "name": "turkey",
+          "aliases": [
+            "turkeys"
+          ]
+        },
+        {
+          "id": "turtle",
+          "name": "turtle",
+          "aliases": [
+            "turtles"
+          ]
+        },
+        {
+          "id": "vulture",
+          "name": "vulture",
+          "aliases": [
+            "vultures"
+          ]
+        },
+        {
+          "id": "wasp",
+          "name": "wasp",
+          "aliases": [
+            "wasps"
+          ]
+        },
+        {
+          "id": "woodpecker",
+          "name": "woodpecker",
+          "aliases": [
+            "woodpeckers"
+          ]
+        },
+        {
+          "id": "worm",
+          "name": "worm",
+          "aliases": [
+            "worms"
+          ]
+        }
+      ],
+      "host_bank": [
+        "elephant",
+        "dog",
+        "cat",
+        "lion",
+        "tiger",
+        "horse"
+      ],
+      "host_answers": [
+        "elephant"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a US state",
+      "entries": [
+        {
+          "id": "alabama",
+          "name": "Alabama",
+          "aliases": [
+            "AL"
+          ],
+          "plural": "Alabama"
+        },
+        {
+          "id": "alaska",
+          "name": "Alaska",
+          "aliases": [
+            "AK"
+          ],
+          "plural": "Alaska"
+        },
+        {
+          "id": "arizona",
+          "name": "Arizona",
+          "aliases": [
+            "AZ"
+          ],
+          "plural": "Arizona"
+        },
+        {
+          "id": "arkansas",
+          "name": "Arkansas",
+          "aliases": [
+            "AR"
+          ],
+          "plural": "Arkansas"
+        },
+        {
+          "id": "california",
+          "name": "California",
+          "aliases": [
+            "CA"
+          ],
+          "plural": "California"
+        },
+        {
+          "id": "colorado",
+          "name": "Colorado",
+          "aliases": [
+            "CO"
+          ],
+          "plural": "Colorado"
+        },
+        {
+          "id": "connecticut",
+          "name": "Connecticut",
+          "aliases": [
+            "CT"
+          ],
+          "plural": "Connecticut"
+        },
+        {
+          "id": "delaware",
+          "name": "Delaware",
+          "aliases": [
+            "DE"
+          ],
+          "plural": "Delaware"
+        },
+        {
+          "id": "florida",
+          "name": "Florida",
+          "aliases": [
+            "FL"
+          ],
+          "plural": "Florida"
+        },
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "aliases": [
+            "GA"
+          ],
+          "plural": "Georgia"
+        },
+        {
+          "id": "hawaii",
+          "name": "Hawaii",
+          "aliases": [
+            "HI"
+          ],
+          "plural": "Hawaii"
+        },
+        {
+          "id": "idaho",
+          "name": "Idaho",
+          "aliases": [
+            "ID"
+          ],
+          "plural": "Idaho"
+        },
+        {
+          "id": "illinois",
+          "name": "Illinois",
+          "aliases": [
+            "IL"
+          ],
+          "plural": "Illinois"
+        },
+        {
+          "id": "indiana",
+          "name": "Indiana",
+          "aliases": [
+            "IN"
+          ],
+          "plural": "Indiana"
+        },
+        {
+          "id": "iowa",
+          "name": "Iowa",
+          "aliases": [
+            "IA"
+          ],
+          "plural": "Iowa"
+        },
+        {
+          "id": "kansas",
+          "name": "Kansas",
+          "aliases": [
+            "KS"
+          ],
+          "plural": "Kansas"
+        },
+        {
+          "id": "kentucky",
+          "name": "Kentucky",
+          "aliases": [
+            "KY"
+          ],
+          "plural": "Kentucky"
+        },
+        {
+          "id": "louisiana",
+          "name": "Louisiana",
+          "aliases": [
+            "LA"
+          ],
+          "plural": "Louisiana"
+        },
+        {
+          "id": "maine",
+          "name": "Maine",
+          "aliases": [
+            "ME"
+          ],
+          "plural": "Maine"
+        },
+        {
+          "id": "maryland",
+          "name": "Maryland",
+          "aliases": [
+            "MD"
+          ],
+          "plural": "Maryland"
+        },
+        {
+          "id": "massachusetts",
+          "name": "Massachusetts",
+          "aliases": [
+            "MA"
+          ],
+          "plural": "Massachusetts"
+        },
+        {
+          "id": "michigan",
+          "name": "Michigan",
+          "aliases": [
+            "MI"
+          ],
+          "plural": "Michigan"
+        },
+        {
+          "id": "minnesota",
+          "name": "Minnesota",
+          "aliases": [
+            "MN"
+          ],
+          "plural": "Minnesota"
+        },
+        {
+          "id": "mississippi",
+          "name": "Mississippi",
+          "aliases": [
+            "MS"
+          ],
+          "plural": "Mississippi"
+        },
+        {
+          "id": "missouri",
+          "name": "Missouri",
+          "aliases": [
+            "MO"
+          ],
+          "plural": "Missouri"
+        },
+        {
+          "id": "montana",
+          "name": "Montana",
+          "aliases": [
+            "MT"
+          ],
+          "plural": "Montana"
+        },
+        {
+          "id": "nebraska",
+          "name": "Nebraska",
+          "aliases": [
+            "NE"
+          ],
+          "plural": "Nebraska"
+        },
+        {
+          "id": "nevada",
+          "name": "Nevada",
+          "aliases": [
+            "NV"
+          ],
+          "plural": "Nevada"
+        },
+        {
+          "id": "new-hampshire",
+          "name": "New Hampshire",
+          "aliases": [
+            "NH"
+          ],
+          "plural": "New Hampshire"
+        },
+        {
+          "id": "new-jersey",
+          "name": "New Jersey",
+          "aliases": [
+            "NJ"
+          ],
+          "plural": "New Jersey"
+        },
+        {
+          "id": "new-mexico",
+          "name": "New Mexico",
+          "aliases": [
+            "NM"
+          ],
+          "plural": "New Mexico"
+        },
+        {
+          "id": "new-york",
+          "name": "New York",
+          "aliases": [
+            "NY"
+          ],
+          "plural": "New York"
+        },
+        {
+          "id": "north-carolina",
+          "name": "North Carolina",
+          "aliases": [
+            "NC"
+          ],
+          "plural": "North Carolina"
+        },
+        {
+          "id": "north-dakota",
+          "name": "North Dakota",
+          "aliases": [
+            "ND"
+          ],
+          "plural": "North Dakota"
+        },
+        {
+          "id": "ohio",
+          "name": "Ohio",
+          "aliases": [
+            "OH"
+          ],
+          "plural": "Ohio"
+        },
+        {
+          "id": "oklahoma",
+          "name": "Oklahoma",
+          "aliases": [
+            "OK"
+          ],
+          "plural": "Oklahoma"
+        },
+        {
+          "id": "oregon",
+          "name": "Oregon",
+          "aliases": [
+            "OR"
+          ],
+          "plural": "Oregon"
+        },
+        {
+          "id": "pennsylvania",
+          "name": "Pennsylvania",
+          "aliases": [
+            "PA"
+          ],
+          "plural": "Pennsylvania"
+        },
+        {
+          "id": "rhode-island",
+          "name": "Rhode Island",
+          "aliases": [
+            "RI"
+          ],
+          "plural": "Rhode Island"
+        },
+        {
+          "id": "south-carolina",
+          "name": "South Carolina",
+          "aliases": [
+            "SC"
+          ],
+          "plural": "South Carolina"
+        },
+        {
+          "id": "south-dakota",
+          "name": "South Dakota",
+          "aliases": [
+            "SD"
+          ],
+          "plural": "South Dakota"
+        },
+        {
+          "id": "tennessee",
+          "name": "Tennessee",
+          "aliases": [
+            "TN"
+          ],
+          "plural": "Tennessee"
+        },
+        {
+          "id": "texas",
+          "name": "Texas",
+          "aliases": [
+            "TX"
+          ],
+          "plural": "Texas"
+        },
+        {
+          "id": "utah",
+          "name": "Utah",
+          "aliases": [
+            "UT"
+          ],
+          "plural": "Utah"
+        },
+        {
+          "id": "vermont",
+          "name": "Vermont",
+          "aliases": [
+            "VT"
+          ],
+          "plural": "Vermont"
+        },
+        {
+          "id": "virginia",
+          "name": "Virginia",
+          "aliases": [
+            "VA"
+          ],
+          "plural": "Virginia"
+        },
+        {
+          "id": "washington",
+          "name": "Washington",
+          "aliases": [
+            "WA"
+          ],
+          "plural": "Washington"
+        },
+        {
+          "id": "west-virginia",
+          "name": "West Virginia",
+          "aliases": [
+            "WV"
+          ],
+          "plural": "West Virginia"
+        },
+        {
+          "id": "wisconsin",
+          "name": "Wisconsin",
+          "aliases": [
+            "WI"
+          ],
+          "plural": "Wisconsin"
+        },
+        {
+          "id": "wyoming",
+          "name": "Wyoming",
+          "aliases": [
+            "WY"
+          ],
+          "plural": "Wyoming"
+        }
+      ],
+      "host_bank": [
+        "texas",
+        "california",
+        "new-york",
+        "florida",
+        "ohio",
+        "hawaii"
+      ],
+      "host_answers": [
+        "texas"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something to do on a rainy day",
+      "entries": [
+        {
+          "id": "read-a-book",
+          "name": "read a book",
+          "aliases": [
+            "reading",
+            "read"
+          ],
+          "plural": "read a book"
+        },
+        {
+          "id": "watch-a-movie",
+          "name": "watch a movie",
+          "aliases": [
+            "movie",
+            "watch movies"
+          ],
+          "plural": "watch a movie"
+        },
+        {
+          "id": "take-a-nap",
+          "name": "take a nap",
+          "aliases": [
+            "nap",
+            "sleep"
+          ],
+          "plural": "take a nap"
+        },
+        {
+          "id": "play-a-board-game",
+          "name": "play a board game",
+          "aliases": [
+            "play board games"
+          ],
+          "plural": "play a board game"
+        },
+        {
+          "id": "play-video-games",
+          "name": "play video games",
+          "aliases": [
+            "gaming"
+          ],
+          "plural": "play video games"
+        },
+        {
+          "id": "bake",
+          "name": "bake",
+          "aliases": [
+            "baking",
+            "bake cookies"
+          ],
+          "plural": "bake"
+        },
+        {
+          "id": "cook",
+          "name": "cook",
+          "aliases": [
+            "cooking"
+          ],
+          "plural": "cook"
+        },
+        {
+          "id": "do-a-puzzle",
+          "name": "do a puzzle",
+          "aliases": [
+            "jigsaw puzzle",
+            "puzzle"
+          ],
+          "plural": "do a puzzle"
+        },
+        {
+          "id": "take-a-bath",
+          "name": "take a bath",
+          "aliases": [
+            "bath"
+          ],
+          "plural": "take a bath"
+        },
+        {
+          "id": "clean-the-house",
+          "name": "clean the house",
+          "aliases": [
+            "clean",
+            "cleaning"
+          ],
+          "plural": "clean the house"
+        },
+        {
+          "id": "call-a-friend",
+          "name": "call a friend",
+          "aliases": [
+            "call someone"
+          ],
+          "plural": "call a friend"
+        },
+        {
+          "id": "watch-tv",
+          "name": "watch TV",
+          "aliases": [
+            "tv",
+            "binge a show",
+            "television"
+          ],
+          "plural": "watch TV"
+        },
+        {
+          "id": "draw",
+          "name": "draw",
+          "aliases": [
+            "drawing"
+          ],
+          "plural": "draw"
+        },
+        {
+          "id": "paint",
+          "name": "paint",
+          "aliases": [
+            "painting"
+          ],
+          "plural": "paint"
+        },
+        {
+          "id": "knit",
+          "name": "knit",
+          "aliases": [
+            "knitting"
+          ],
+          "plural": "knit"
+        },
+        {
+          "id": "play-cards",
+          "name": "play cards",
+          "aliases": [
+            "play a card game"
+          ],
+          "plural": "play cards"
+        },
+        {
+          "id": "write",
+          "name": "write",
+          "aliases": [
+            "writing",
+            "journal"
+          ],
+          "plural": "write"
+        },
+        {
+          "id": "do-yoga",
+          "name": "do yoga",
+          "aliases": [
+            "yoga"
+          ],
+          "plural": "do yoga"
+        },
+        {
+          "id": "jump-in-puddles",
+          "name": "jump in puddles",
+          "aliases": [
+            "puddle jumping"
+          ],
+          "plural": "jump in puddles"
+        },
+        {
+          "id": "go-to-a-museum",
+          "name": "go to a museum",
+          "aliases": [
+            "museum"
+          ],
+          "plural": "go to a museum"
+        },
+        {
+          "id": "go-to-the-movies",
+          "name": "go to the movies",
+          "aliases": [
+            "movie theater",
+            "cinema"
+          ],
+          "plural": "go to the movies"
+        },
+        {
+          "id": "go-shopping",
+          "name": "go shopping",
+          "aliases": [
+            "shopping",
+            "go to the mall"
+          ],
+          "plural": "go shopping"
+        },
+        {
+          "id": "go-bowling",
+          "name": "go bowling",
+          "aliases": [
+            "bowling"
+          ],
+          "plural": "go bowling"
+        },
+        {
+          "id": "listen-to-music",
+          "name": "listen to music",
+          "aliases": [
+            "music"
+          ],
+          "plural": "listen to music"
+        },
+        {
+          "id": "build-a-blanket-fort",
+          "name": "build a blanket fort",
+          "aliases": [
+            "blanket fort",
+            "fort"
+          ],
+          "plural": "build a blanket fort"
+        },
+        {
+          "id": "drink-hot-cocoa",
+          "name": "drink hot cocoa",
+          "aliases": [
+            "hot chocolate",
+            "hot cocoa"
+          ],
+          "plural": "drink hot cocoa"
+        }
+      ],
+      "host_bank": [
+        "read-a-book",
+        "watch-a-movie",
+        "take-a-nap",
+        "play-a-board-game",
+        "bake",
+        "watch-tv"
+      ],
+      "host_answers": [
+        "read-a-book"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a letter of the alphabet",
+      "entries": [
+        {
+          "id": "a",
+          "name": "A",
+          "aliases": [
+            "letter A"
+          ],
+          "plural": "A"
+        },
+        {
+          "id": "b",
+          "name": "B",
+          "aliases": [
+            "letter B"
+          ],
+          "plural": "B"
+        },
+        {
+          "id": "c",
+          "name": "C",
+          "aliases": [
+            "letter C"
+          ],
+          "plural": "C"
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "aliases": [
+            "letter D"
+          ],
+          "plural": "D"
+        },
+        {
+          "id": "e",
+          "name": "E",
+          "aliases": [
+            "letter E"
+          ],
+          "plural": "E"
+        },
+        {
+          "id": "f",
+          "name": "F",
+          "aliases": [
+            "letter F"
+          ],
+          "plural": "F"
+        },
+        {
+          "id": "g",
+          "name": "G",
+          "aliases": [
+            "letter G"
+          ],
+          "plural": "G"
+        },
+        {
+          "id": "h",
+          "name": "H",
+          "aliases": [
+            "letter H"
+          ],
+          "plural": "H"
+        },
+        {
+          "id": "i",
+          "name": "I",
+          "aliases": [
+            "letter I"
+          ],
+          "plural": "I"
+        },
+        {
+          "id": "j",
+          "name": "J",
+          "aliases": [
+            "letter J"
+          ],
+          "plural": "J"
+        },
+        {
+          "id": "k",
+          "name": "K",
+          "aliases": [
+            "letter K"
+          ],
+          "plural": "K"
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "aliases": [
+            "letter L"
+          ],
+          "plural": "L"
+        },
+        {
+          "id": "m",
+          "name": "M",
+          "aliases": [
+            "letter M"
+          ],
+          "plural": "M"
+        },
+        {
+          "id": "n",
+          "name": "N",
+          "aliases": [
+            "letter N"
+          ],
+          "plural": "N"
+        },
+        {
+          "id": "o",
+          "name": "O",
+          "aliases": [
+            "letter O"
+          ],
+          "plural": "O"
+        },
+        {
+          "id": "p",
+          "name": "P",
+          "aliases": [
+            "letter P"
+          ],
+          "plural": "P"
+        },
+        {
+          "id": "q",
+          "name": "Q",
+          "aliases": [
+            "letter Q"
+          ],
+          "plural": "Q"
+        },
+        {
+          "id": "r",
+          "name": "R",
+          "aliases": [
+            "letter R"
+          ],
+          "plural": "R"
+        },
+        {
+          "id": "s",
+          "name": "S",
+          "aliases": [
+            "letter S"
+          ],
+          "plural": "S"
+        },
+        {
+          "id": "t",
+          "name": "T",
+          "aliases": [
+            "letter T"
+          ],
+          "plural": "T"
+        },
+        {
+          "id": "u",
+          "name": "U",
+          "aliases": [
+            "letter U"
+          ],
+          "plural": "U"
+        },
+        {
+          "id": "v",
+          "name": "V",
+          "aliases": [
+            "letter V"
+          ],
+          "plural": "V"
+        },
+        {
+          "id": "w",
+          "name": "W",
+          "aliases": [
+            "letter W"
+          ],
+          "plural": "W"
+        },
+        {
+          "id": "x",
+          "name": "X",
+          "aliases": [
+            "letter X"
+          ],
+          "plural": "X"
+        },
+        {
+          "id": "y",
+          "name": "Y",
+          "aliases": [
+            "letter Y"
+          ],
+          "plural": "Y"
+        },
+        {
+          "id": "z",
+          "name": "Z",
+          "aliases": [
+            "letter Z"
+          ],
+          "plural": "Z"
+        }
+      ],
+      "host_bank": [
+        "a",
+        "z",
+        "x",
+        "q",
+        "e",
+        "m"
+      ],
+      "host_answers": [
+        "a"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a letter of the Greek alphabet",
+      "entries": [
+        {
+          "id": "alpha",
+          "name": "alpha",
+          "aliases": [
+            "α"
+          ],
+          "plural": "alpha"
+        },
+        {
+          "id": "beta",
+          "name": "beta",
+          "aliases": [
+            "β"
+          ],
+          "plural": "beta"
+        },
+        {
+          "id": "gamma",
+          "name": "gamma",
+          "aliases": [
+            "γ"
+          ],
+          "plural": "gamma"
+        },
+        {
+          "id": "delta",
+          "name": "delta",
+          "aliases": [
+            "δ"
+          ],
+          "plural": "delta"
+        },
+        {
+          "id": "epsilon",
+          "name": "epsilon",
+          "aliases": [
+            "ε"
+          ],
+          "plural": "epsilon"
+        },
+        {
+          "id": "zeta",
+          "name": "zeta",
+          "aliases": [
+            "ζ"
+          ],
+          "plural": "zeta"
+        },
+        {
+          "id": "eta",
+          "name": "eta",
+          "aliases": [
+            "η"
+          ],
+          "plural": "eta"
+        },
+        {
+          "id": "theta",
+          "name": "theta",
+          "aliases": [
+            "θ"
+          ],
+          "plural": "theta"
+        },
+        {
+          "id": "iota",
+          "name": "iota",
+          "aliases": [
+            "ι"
+          ],
+          "plural": "iota"
+        },
+        {
+          "id": "kappa",
+          "name": "kappa",
+          "aliases": [
+            "κ"
+          ],
+          "plural": "kappa"
+        },
+        {
+          "id": "lambda",
+          "name": "lambda",
+          "aliases": [
+            "λ"
+          ],
+          "plural": "lambda"
+        },
+        {
+          "id": "mu",
+          "name": "mu",
+          "aliases": [
+            "μ"
+          ],
+          "plural": "mu"
+        },
+        {
+          "id": "nu",
+          "name": "nu",
+          "aliases": [
+            "ν"
+          ],
+          "plural": "nu"
+        },
+        {
+          "id": "xi",
+          "name": "xi",
+          "aliases": [
+            "ξ"
+          ],
+          "plural": "xi"
+        },
+        {
+          "id": "omicron",
+          "name": "omicron",
+          "aliases": [
+            "ο"
+          ],
+          "plural": "omicron"
+        },
+        {
+          "id": "pi",
+          "name": "pi",
+          "aliases": [
+            "π"
+          ],
+          "plural": "pi"
+        },
+        {
+          "id": "rho",
+          "name": "rho",
+          "aliases": [
+            "ρ"
+          ],
+          "plural": "rho"
+        },
+        {
+          "id": "sigma",
+          "name": "sigma",
+          "aliases": [
+            "σ"
+          ],
+          "plural": "sigma"
+        },
+        {
+          "id": "tau",
+          "name": "tau",
+          "aliases": [
+            "τ"
+          ],
+          "plural": "tau"
+        },
+        {
+          "id": "upsilon",
+          "name": "upsilon",
+          "aliases": [
+            "υ"
+          ],
+          "plural": "upsilon"
+        },
+        {
+          "id": "phi",
+          "name": "phi",
+          "aliases": [
+            "φ"
+          ],
+          "plural": "phi"
+        },
+        {
+          "id": "chi",
+          "name": "chi",
+          "aliases": [
+            "χ"
+          ],
+          "plural": "chi"
+        },
+        {
+          "id": "psi",
+          "name": "psi",
+          "aliases": [
+            "ψ"
+          ],
+          "plural": "psi"
+        },
+        {
+          "id": "omega",
+          "name": "omega",
+          "aliases": [
+            "ω"
+          ],
+          "plural": "omega"
+        }
+      ],
+      "host_bank": [
+        "alpha",
+        "beta",
+        "omega",
+        "pi",
+        "delta",
+        "sigma",
+        "gamma"
+      ],
+      "host_answers": [
+        "alpha"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a way to cook an egg",
+      "entries": [
+        {
+          "id": "scrambled-eggs",
+          "name": "scrambled eggs",
+          "aliases": [
+            "scrambled egg"
+          ],
+          "plural": "scrambled eggs"
+        },
+        {
+          "id": "fried-eggs",
+          "name": "fried eggs",
+          "aliases": [
+            "fried egg"
+          ],
+          "plural": "fried eggs"
+        },
+        {
+          "id": "poached-eggs",
+          "name": "poached eggs",
+          "aliases": [
+            "poached egg"
+          ],
+          "plural": "poached eggs"
+        },
+        {
+          "id": "hard-boiled-eggs",
+          "name": "hard-boiled eggs",
+          "aliases": [
+            "hard-boiled egg",
+            "hard boiled eggs"
+          ],
+          "plural": "hard-boiled eggs"
+        },
+        {
+          "id": "soft-boiled-eggs",
+          "name": "soft-boiled eggs",
+          "aliases": [
+            "soft-boiled egg",
+            "soft boiled eggs"
+          ],
+          "plural": "soft-boiled eggs"
+        },
+        {
+          "id": "baked-eggs",
+          "name": "baked eggs",
+          "aliases": [
+            "shirred eggs"
+          ],
+          "plural": "baked eggs"
+        },
+        {
+          "id": "coddled-eggs",
+          "name": "coddled eggs",
+          "aliases": [
+            "coddled egg"
+          ],
+          "plural": "coddled eggs"
+        },
+        {
+          "id": "omelet",
+          "name": "omelet",
+          "aliases": [
+            "omelette",
+            "omelets"
+          ]
+        }
+      ],
+      "host_bank": [
+        "scrambled-eggs",
+        "fried-eggs",
+        "hard-boiled-eggs",
+        "poached-eggs",
+        "omelet",
+        "soft-boiled-eggs"
+      ],
+      "host_answers": [
+        "scrambled-eggs"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a zodiac sign",
+      "entries": [
+        {
+          "id": "leo",
+          "name": "Leo",
+          "aliases": [],
+          "plural": "Leo"
+        },
+        {
+          "id": "scorpio",
+          "name": "Scorpio",
+          "aliases": [],
+          "plural": "Scorpio"
+        },
+        {
+          "id": "gemini",
+          "name": "Gemini",
+          "aliases": [],
+          "plural": "Gemini"
+        },
+        {
+          "id": "aries",
+          "name": "Aries",
+          "aliases": [],
+          "plural": "Aries"
+        },
+        {
+          "id": "virgo",
+          "name": "Virgo",
+          "aliases": [],
+          "plural": "Virgo"
+        },
+        {
+          "id": "cancer",
+          "name": "Cancer",
+          "aliases": [],
+          "plural": "Cancer"
+        },
+        {
+          "id": "libra",
+          "name": "Libra",
+          "aliases": [],
+          "plural": "Libra"
+        },
+        {
+          "id": "taurus",
+          "name": "Taurus",
+          "aliases": [],
+          "plural": "Taurus"
+        },
+        {
+          "id": "sagittarius",
+          "name": "Sagittarius",
+          "aliases": [],
+          "plural": "Sagittarius"
+        },
+        {
+          "id": "capricorn",
+          "name": "Capricorn",
+          "aliases": [],
+          "plural": "Capricorn"
+        },
+        {
+          "id": "aquarius",
+          "name": "Aquarius",
+          "aliases": [],
+          "plural": "Aquarius"
+        },
+        {
+          "id": "pisces",
+          "name": "Pisces",
+          "aliases": [],
+          "plural": "Pisces"
+        }
+      ],
+      "host_bank": [
+        "leo",
+        "scorpio",
+        "gemini",
+        "aries",
+        "virgo",
+        "cancer",
+        "libra",
+        "taurus",
+        "sagittarius",
+        "capricorn",
+        "aquarius",
+        "pisces"
+      ],
+      "host_answers": [
+        "leo",
+        "scorpio"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

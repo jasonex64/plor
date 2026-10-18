@@ -1,0 +1,1399 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-17",
+  "questions": [
+    {
+      "prompt": "Name something you'd find at the beach",
+      "entries": [
+        {
+          "id": "sand",
+          "name": "sand",
+          "aliases": [],
+          "plural": "sand"
+        },
+        {
+          "id": "seashell",
+          "name": "seashell",
+          "aliases": [
+            "shell",
+            "shells",
+            "seashells"
+          ]
+        },
+        {
+          "id": "sunscreen",
+          "name": "sunscreen",
+          "aliases": [
+            "sunblock"
+          ],
+          "plural": "sunscreen"
+        },
+        {
+          "id": "beach-towel",
+          "name": "beach towel",
+          "aliases": [
+            "towel",
+            "beach towels"
+          ]
+        },
+        {
+          "id": "beach-umbrella",
+          "name": "beach umbrella",
+          "aliases": [
+            "umbrella",
+            "beach umbrellas"
+          ]
+        },
+        {
+          "id": "sunglasses",
+          "name": "sunglasses",
+          "aliases": [
+            "shades"
+          ],
+          "plural": "sunglasses"
+        },
+        {
+          "id": "swimsuit",
+          "name": "swimsuit",
+          "aliases": [
+            "bathing suit",
+            "swimming costume",
+            "swimsuits"
+          ]
+        },
+        {
+          "id": "flip-flops",
+          "name": "flip-flops",
+          "aliases": [
+            "flip flop"
+          ],
+          "plural": "flip-flops"
+        },
+        {
+          "id": "sandal",
+          "name": "sandal",
+          "aliases": [
+            "sandals"
+          ]
+        },
+        {
+          "id": "cooler",
+          "name": "cooler",
+          "aliases": [
+            "coolers"
+          ]
+        },
+        {
+          "id": "sandcastle",
+          "name": "sandcastle",
+          "aliases": [
+            "sand castle",
+            "sandcastles"
+          ]
+        },
+        {
+          "id": "bucket",
+          "name": "bucket",
+          "aliases": [
+            "buckets"
+          ]
+        },
+        {
+          "id": "shovel",
+          "name": "shovel",
+          "aliases": [
+            "shovels"
+          ]
+        },
+        {
+          "id": "volleyball",
+          "name": "volleyball",
+          "aliases": [
+            "volleyballs"
+          ]
+        },
+        {
+          "id": "frisbee",
+          "name": "frisbee",
+          "aliases": [
+            "frisbees"
+          ]
+        },
+        {
+          "id": "boogie-board",
+          "name": "boogie board",
+          "aliases": [
+            "boogie boards"
+          ]
+        },
+        {
+          "id": "surfboard",
+          "name": "surfboard",
+          "aliases": [
+            "surfboards"
+          ]
+        },
+        {
+          "id": "kite",
+          "name": "kite",
+          "aliases": [
+            "kites"
+          ]
+        },
+        {
+          "id": "wave",
+          "name": "wave",
+          "aliases": [
+            "waves"
+          ]
+        },
+        {
+          "id": "seagull",
+          "name": "seagull",
+          "aliases": [
+            "gull",
+            "seagulls"
+          ]
+        },
+        {
+          "id": "lifeguard",
+          "name": "lifeguard",
+          "aliases": [
+            "lifeguards"
+          ]
+        },
+        {
+          "id": "fish",
+          "name": "fish",
+          "aliases": [],
+          "plural": "fish"
+        },
+        {
+          "id": "shark",
+          "name": "shark",
+          "aliases": [
+            "sharks"
+          ]
+        },
+        {
+          "id": "pier",
+          "name": "pier",
+          "aliases": [
+            "piers"
+          ]
+        },
+        {
+          "id": "boardwalk",
+          "name": "boardwalk",
+          "aliases": [
+            "boardwalks"
+          ]
+        },
+        {
+          "id": "ice-cream",
+          "name": "ice cream",
+          "aliases": [],
+          "plural": "ice cream"
+        },
+        {
+          "id": "sun-hat",
+          "name": "sun hat",
+          "aliases": [
+            "hat",
+            "sun hats"
+          ]
+        },
+        {
+          "id": "beach-chair",
+          "name": "beach chair",
+          "aliases": [
+            "chair",
+            "beach chairs"
+          ]
+        },
+        {
+          "id": "book",
+          "name": "book",
+          "aliases": [
+            "books"
+          ]
+        },
+        {
+          "id": "speaker",
+          "name": "speaker",
+          "aliases": [
+            "radio",
+            "speakers"
+          ]
+        },
+        {
+          "id": "snorkel",
+          "name": "snorkel",
+          "aliases": [
+            "snorkels"
+          ]
+        },
+        {
+          "id": "goggles",
+          "name": "goggles",
+          "aliases": [],
+          "plural": "goggles"
+        },
+        {
+          "id": "driftwood",
+          "name": "driftwood",
+          "aliases": [],
+          "plural": "driftwood"
+        },
+        {
+          "id": "tide-pool",
+          "name": "tide pool",
+          "aliases": [
+            "tide pools"
+          ]
+        },
+        {
+          "id": "boat",
+          "name": "boat",
+          "aliases": [
+            "boats"
+          ]
+        },
+        {
+          "id": "sailboat",
+          "name": "sailboat",
+          "aliases": [
+            "sailboats"
+          ]
+        },
+        {
+          "id": "ocean",
+          "name": "ocean",
+          "aliases": [
+            "the ocean",
+            "the sea"
+          ],
+          "plural": "ocean"
+        },
+        {
+          "id": "water",
+          "name": "water",
+          "aliases": [],
+          "plural": "water"
+        },
+        {
+          "id": "sun",
+          "name": "sun",
+          "aliases": [
+            "the sun"
+          ],
+          "plural": "sun"
+        },
+        {
+          "id": "pelican",
+          "name": "pelican",
+          "aliases": [
+            "pelicans"
+          ]
+        },
+        {
+          "id": "sandpiper",
+          "name": "sandpiper",
+          "aliases": [
+            "sandpipers"
+          ]
+        },
+        {
+          "id": "seaweed",
+          "name": "seaweed",
+          "aliases": [],
+          "plural": "seaweed"
+        },
+        {
+          "id": "dolphin",
+          "name": "dolphin",
+          "aliases": [
+            "dolphins"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "seals"
+          ]
+        },
+        {
+          "id": "sea-lion",
+          "name": "sea lion",
+          "aliases": [
+            "sea lions"
+          ]
+        },
+        {
+          "id": "jellyfish",
+          "name": "jellyfish",
+          "aliases": [],
+          "plural": "jellyfish"
+        },
+        {
+          "id": "crab",
+          "name": "crab",
+          "aliases": [
+            "crabs"
+          ]
+        },
+        {
+          "id": "hermit-crab",
+          "name": "hermit crab",
+          "aliases": [
+            "hermit crabs"
+          ]
+        },
+        {
+          "id": "sea-turtle",
+          "name": "sea turtle",
+          "aliases": [
+            "sea turtles"
+          ]
+        },
+        {
+          "id": "starfish",
+          "name": "starfish",
+          "aliases": [
+            "sea star"
+          ],
+          "plural": "starfish"
+        },
+        {
+          "id": "clam",
+          "name": "clam",
+          "aliases": [
+            "clams"
+          ]
+        },
+        {
+          "id": "sand-dollar",
+          "name": "sand dollar",
+          "aliases": [
+            "sand dollars"
+          ]
+        }
+      ],
+      "host_bank": [
+        "seashell",
+        "sand",
+        "sunscreen",
+        "beach-towel",
+        "beach-umbrella",
+        "wave"
+      ],
+      "host_answers": [
+        "seashell"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a color",
+      "entries": [
+        {
+          "id": "red",
+          "name": "red",
+          "aliases": [],
+          "plural": "red"
+        },
+        {
+          "id": "orange",
+          "name": "orange",
+          "aliases": [],
+          "plural": "orange"
+        },
+        {
+          "id": "yellow",
+          "name": "yellow",
+          "aliases": [],
+          "plural": "yellow"
+        },
+        {
+          "id": "green",
+          "name": "green",
+          "aliases": [],
+          "plural": "green"
+        },
+        {
+          "id": "blue",
+          "name": "blue",
+          "aliases": [],
+          "plural": "blue"
+        },
+        {
+          "id": "purple",
+          "name": "purple",
+          "aliases": [],
+          "plural": "purple"
+        },
+        {
+          "id": "pink",
+          "name": "pink",
+          "aliases": [],
+          "plural": "pink"
+        },
+        {
+          "id": "brown",
+          "name": "brown",
+          "aliases": [],
+          "plural": "brown"
+        },
+        {
+          "id": "black",
+          "name": "black",
+          "aliases": [],
+          "plural": "black"
+        },
+        {
+          "id": "white",
+          "name": "white",
+          "aliases": [],
+          "plural": "white"
+        },
+        {
+          "id": "gray",
+          "name": "gray",
+          "aliases": [
+            "grey"
+          ],
+          "plural": "gray"
+        },
+        {
+          "id": "gold",
+          "name": "gold",
+          "aliases": [],
+          "plural": "gold"
+        },
+        {
+          "id": "silver",
+          "name": "silver",
+          "aliases": [],
+          "plural": "silver"
+        },
+        {
+          "id": "navy",
+          "name": "navy",
+          "aliases": [
+            "navy blue"
+          ],
+          "plural": "navy"
+        },
+        {
+          "id": "teal",
+          "name": "teal",
+          "aliases": [],
+          "plural": "teal"
+        },
+        {
+          "id": "turquoise",
+          "name": "turquoise",
+          "aliases": [],
+          "plural": "turquoise"
+        },
+        {
+          "id": "maroon",
+          "name": "maroon",
+          "aliases": [],
+          "plural": "maroon"
+        },
+        {
+          "id": "magenta",
+          "name": "magenta",
+          "aliases": [],
+          "plural": "magenta"
+        },
+        {
+          "id": "cyan",
+          "name": "cyan",
+          "aliases": [],
+          "plural": "cyan"
+        },
+        {
+          "id": "lavender",
+          "name": "lavender",
+          "aliases": [],
+          "plural": "lavender"
+        },
+        {
+          "id": "indigo",
+          "name": "indigo",
+          "aliases": [],
+          "plural": "indigo"
+        },
+        {
+          "id": "violet",
+          "name": "violet",
+          "aliases": [],
+          "plural": "violet"
+        },
+        {
+          "id": "lime-green",
+          "name": "lime green",
+          "aliases": [
+            "lime"
+          ],
+          "plural": "lime green"
+        },
+        {
+          "id": "olive",
+          "name": "olive",
+          "aliases": [],
+          "plural": "olive"
+        },
+        {
+          "id": "peach",
+          "name": "peach",
+          "aliases": [],
+          "plural": "peach"
+        },
+        {
+          "id": "coral",
+          "name": "coral",
+          "aliases": [],
+          "plural": "coral"
+        },
+        {
+          "id": "mint",
+          "name": "mint",
+          "aliases": [],
+          "plural": "mint"
+        },
+        {
+          "id": "burgundy",
+          "name": "burgundy",
+          "aliases": [],
+          "plural": "burgundy"
+        },
+        {
+          "id": "crimson",
+          "name": "crimson",
+          "aliases": [],
+          "plural": "crimson"
+        },
+        {
+          "id": "scarlet",
+          "name": "scarlet",
+          "aliases": [],
+          "plural": "scarlet"
+        },
+        {
+          "id": "cream",
+          "name": "cream",
+          "aliases": [],
+          "plural": "cream"
+        },
+        {
+          "id": "ivory",
+          "name": "ivory",
+          "aliases": [],
+          "plural": "ivory"
+        },
+        {
+          "id": "tan",
+          "name": "tan",
+          "aliases": [],
+          "plural": "tan"
+        },
+        {
+          "id": "beige",
+          "name": "beige",
+          "aliases": [],
+          "plural": "beige"
+        },
+        {
+          "id": "charcoal",
+          "name": "charcoal",
+          "aliases": [],
+          "plural": "charcoal"
+        },
+        {
+          "id": "aqua",
+          "name": "aqua",
+          "aliases": [],
+          "plural": "aqua"
+        },
+        {
+          "id": "mauve",
+          "name": "mauve",
+          "aliases": [],
+          "plural": "mauve"
+        },
+        {
+          "id": "khaki",
+          "name": "khaki",
+          "aliases": [],
+          "plural": "khaki"
+        }
+      ],
+      "host_bank": [
+        "green",
+        "blue",
+        "red",
+        "purple",
+        "yellow",
+        "black"
+      ],
+      "host_answers": [
+        "green"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a mammal that mostly eats meat",
+      "entries": [
+        {
+          "id": "bobcat",
+          "name": "bobcat",
+          "aliases": [
+            "bobcats"
+          ]
+        },
+        {
+          "id": "caracal",
+          "name": "caracal",
+          "aliases": [
+            "caracals"
+          ]
+        },
+        {
+          "id": "cat",
+          "name": "cat",
+          "aliases": [
+            "house cat",
+            "kitten",
+            "cats"
+          ]
+        },
+        {
+          "id": "cheetah",
+          "name": "cheetah",
+          "aliases": [
+            "cheetahs"
+          ]
+        },
+        {
+          "id": "clouded-leopard",
+          "name": "clouded leopard",
+          "aliases": [
+            "clouded leopards"
+          ]
+        },
+        {
+          "id": "cougar",
+          "name": "cougar",
+          "aliases": [
+            "puma",
+            "mountain lion",
+            "cougars"
+          ]
+        },
+        {
+          "id": "coyote",
+          "name": "coyote",
+          "aliases": [
+            "coyotes"
+          ]
+        },
+        {
+          "id": "dingo",
+          "name": "dingo",
+          "aliases": [
+            "dingoes"
+          ]
+        },
+        {
+          "id": "ferret",
+          "name": "ferret",
+          "aliases": [
+            "ferrets"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "foxes"
+          ]
+        },
+        {
+          "id": "hyena",
+          "name": "hyena",
+          "aliases": [
+            "hyenas"
+          ]
+        },
+        {
+          "id": "jackal",
+          "name": "jackal",
+          "aliases": [
+            "jackals"
+          ]
+        },
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        },
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "lynx",
+          "name": "lynx",
+          "aliases": [
+            "lynxes"
+          ]
+        },
+        {
+          "id": "mink",
+          "name": "mink",
+          "aliases": [
+            "minks"
+          ]
+        },
+        {
+          "id": "ocelot",
+          "name": "ocelot",
+          "aliases": [
+            "ocelots"
+          ]
+        },
+        {
+          "id": "orca",
+          "name": "orca",
+          "aliases": [
+            "killer whale",
+            "orcas"
+          ]
+        },
+        {
+          "id": "otter",
+          "name": "otter",
+          "aliases": [
+            "otters"
+          ]
+        },
+        {
+          "id": "polar-bear",
+          "name": "polar bear",
+          "aliases": [
+            "polar bears"
+          ]
+        },
+        {
+          "id": "sea-lion",
+          "name": "sea lion",
+          "aliases": [
+            "sea lions"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "seals"
+          ]
+        },
+        {
+          "id": "serval",
+          "name": "serval",
+          "aliases": [
+            "servals"
+          ]
+        },
+        {
+          "id": "snow-leopard",
+          "name": "snow leopard",
+          "aliases": [
+            "snow leopards"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "walrus",
+          "name": "walrus",
+          "aliases": [
+            "walruses"
+          ]
+        },
+        {
+          "id": "weasel",
+          "name": "weasel",
+          "aliases": [
+            "weasels"
+          ]
+        },
+        {
+          "id": "wolf",
+          "name": "wolf",
+          "aliases": [
+            "wolves"
+          ]
+        },
+        {
+          "id": "wolverine",
+          "name": "wolverine",
+          "aliases": [
+            "wolverines"
+          ]
+        }
+      ],
+      "host_bank": [
+        "wolf",
+        "lion",
+        "tiger",
+        "cat",
+        "cheetah",
+        "fox"
+      ],
+      "host_answers": [
+        "wolf"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a breakfast dish where eggs are the star",
+      "entries": [
+        {
+          "id": "scrambled-eggs",
+          "name": "scrambled eggs",
+          "aliases": [
+            "scrambled egg"
+          ],
+          "plural": "scrambled eggs"
+        },
+        {
+          "id": "fried-eggs",
+          "name": "fried eggs",
+          "aliases": [
+            "fried egg"
+          ],
+          "plural": "fried eggs"
+        },
+        {
+          "id": "poached-eggs",
+          "name": "poached eggs",
+          "aliases": [
+            "poached egg"
+          ],
+          "plural": "poached eggs"
+        },
+        {
+          "id": "hard-boiled-eggs",
+          "name": "hard-boiled eggs",
+          "aliases": [
+            "hard-boiled egg",
+            "hard boiled eggs"
+          ],
+          "plural": "hard-boiled eggs"
+        },
+        {
+          "id": "soft-boiled-eggs",
+          "name": "soft-boiled eggs",
+          "aliases": [
+            "soft-boiled egg",
+            "soft boiled eggs"
+          ],
+          "plural": "soft-boiled eggs"
+        },
+        {
+          "id": "baked-eggs",
+          "name": "baked eggs",
+          "aliases": [
+            "shirred eggs"
+          ],
+          "plural": "baked eggs"
+        },
+        {
+          "id": "coddled-eggs",
+          "name": "coddled eggs",
+          "aliases": [
+            "coddled egg"
+          ],
+          "plural": "coddled eggs"
+        },
+        {
+          "id": "omelet",
+          "name": "omelet",
+          "aliases": [
+            "omelette",
+            "omelets"
+          ]
+        },
+        {
+          "id": "frittata",
+          "name": "frittata",
+          "aliases": [
+            "frittatas"
+          ]
+        },
+        {
+          "id": "eggs-benedict",
+          "name": "eggs Benedict",
+          "aliases": [],
+          "plural": "eggs Benedict"
+        },
+        {
+          "id": "quiche",
+          "name": "quiche",
+          "aliases": [
+            "quiches"
+          ]
+        },
+        {
+          "id": "huevos-rancheros",
+          "name": "huevos rancheros",
+          "aliases": [],
+          "plural": "huevos rancheros"
+        },
+        {
+          "id": "shakshuka",
+          "name": "shakshuka",
+          "aliases": [],
+          "plural": "shakshuka"
+        },
+        {
+          "id": "steak-and-eggs",
+          "name": "steak and eggs",
+          "aliases": [],
+          "plural": "steak and eggs"
+        }
+      ],
+      "host_bank": [
+        "omelet",
+        "scrambled-eggs",
+        "fried-eggs",
+        "eggs-benedict",
+        "hard-boiled-eggs",
+        "poached-eggs"
+      ],
+      "host_answers": [
+        "omelet"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a baked dessert made with fruit",
+      "entries": [
+        {
+          "id": "banana-bread",
+          "name": "banana bread",
+          "aliases": [],
+          "plural": "banana bread"
+        },
+        {
+          "id": "apple-pie",
+          "name": "apple pie",
+          "aliases": [
+            "apple pies"
+          ]
+        },
+        {
+          "id": "cherry-pie",
+          "name": "cherry pie",
+          "aliases": [
+            "cherry pies"
+          ]
+        },
+        {
+          "id": "blueberry-pie",
+          "name": "blueberry pie",
+          "aliases": [
+            "blueberry pies"
+          ]
+        },
+        {
+          "id": "peach-pie",
+          "name": "peach pie",
+          "aliases": [
+            "peach pies"
+          ]
+        },
+        {
+          "id": "blackberry-pie",
+          "name": "blackberry pie",
+          "aliases": [
+            "blackberry pies"
+          ]
+        },
+        {
+          "id": "raspberry-pie",
+          "name": "raspberry pie",
+          "aliases": [
+            "raspberry pies"
+          ]
+        },
+        {
+          "id": "mixed-berry-pie",
+          "name": "mixed berry pie",
+          "aliases": [
+            "mixed berry pies"
+          ]
+        },
+        {
+          "id": "key-lime-pie",
+          "name": "key lime pie",
+          "aliases": [
+            "key lime pies"
+          ]
+        },
+        {
+          "id": "lemon-bar",
+          "name": "lemon bar",
+          "aliases": [
+            "lemon bars"
+          ]
+        },
+        {
+          "id": "apple-crisp",
+          "name": "apple crisp",
+          "aliases": [],
+          "plural": "apple crisp"
+        },
+        {
+          "id": "peach-cobbler",
+          "name": "peach cobbler",
+          "aliases": [],
+          "plural": "peach cobbler"
+        },
+        {
+          "id": "blackberry-cobbler",
+          "name": "blackberry cobbler",
+          "aliases": [],
+          "plural": "blackberry cobbler"
+        },
+        {
+          "id": "blueberry-cobbler",
+          "name": "blueberry cobbler",
+          "aliases": [],
+          "plural": "blueberry cobbler"
+        },
+        {
+          "id": "apple-crumble",
+          "name": "apple crumble",
+          "aliases": [],
+          "plural": "apple crumble"
+        },
+        {
+          "id": "fruit-tart",
+          "name": "fruit tart",
+          "aliases": [
+            "fruit tarts"
+          ]
+        },
+        {
+          "id": "blueberry-muffin",
+          "name": "blueberry muffin",
+          "aliases": [
+            "blueberry muffins"
+          ]
+        }
+      ],
+      "host_bank": [
+        "apple-pie",
+        "banana-bread",
+        "peach-cobbler",
+        "cherry-pie",
+        "blueberry-muffin",
+        "blueberry-pie",
+        "key-lime-pie"
+      ],
+      "host_answers": [
+        "apple-pie"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a unit of time",
+      "entries": [
+        {
+          "id": "second",
+          "name": "second",
+          "aliases": [
+            "seconds"
+          ]
+        },
+        {
+          "id": "minute",
+          "name": "minute",
+          "aliases": [
+            "minutes"
+          ]
+        },
+        {
+          "id": "hour",
+          "name": "hour",
+          "aliases": [
+            "hours"
+          ]
+        },
+        {
+          "id": "day",
+          "name": "day",
+          "aliases": [
+            "days"
+          ]
+        },
+        {
+          "id": "week",
+          "name": "week",
+          "aliases": [
+            "weeks"
+          ]
+        },
+        {
+          "id": "month",
+          "name": "month",
+          "aliases": [
+            "months"
+          ]
+        },
+        {
+          "id": "year",
+          "name": "year",
+          "aliases": [
+            "years"
+          ]
+        },
+        {
+          "id": "decade",
+          "name": "decade",
+          "aliases": [
+            "decades"
+          ]
+        },
+        {
+          "id": "century",
+          "name": "century",
+          "aliases": [
+            "centuries"
+          ]
+        },
+        {
+          "id": "millennium",
+          "name": "millennium",
+          "aliases": [
+            "millennia"
+          ]
+        },
+        {
+          "id": "fortnight",
+          "name": "fortnight",
+          "aliases": [
+            "fortnights"
+          ]
+        },
+        {
+          "id": "millisecond",
+          "name": "millisecond",
+          "aliases": [
+            "milliseconds"
+          ]
+        },
+        {
+          "id": "nanosecond",
+          "name": "nanosecond",
+          "aliases": [
+            "nanoseconds"
+          ]
+        },
+        {
+          "id": "microsecond",
+          "name": "microsecond",
+          "aliases": [
+            "microseconds"
+          ]
+        },
+        {
+          "id": "season",
+          "name": "season",
+          "aliases": [
+            "seasons"
+          ]
+        },
+        {
+          "id": "eon",
+          "name": "eon",
+          "aliases": [
+            "eons"
+          ]
+        }
+      ],
+      "host_bank": [
+        "hour",
+        "second",
+        "minute",
+        "day",
+        "week",
+        "year",
+        "month"
+      ],
+      "host_answers": [
+        "hour"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a utensil or gadget in a kitchen drawer",
+      "entries": [
+        {
+          "id": "fork",
+          "name": "fork",
+          "aliases": [
+            "forks"
+          ]
+        },
+        {
+          "id": "spoon",
+          "name": "spoon",
+          "aliases": [
+            "spoons"
+          ]
+        },
+        {
+          "id": "knife",
+          "name": "knife",
+          "aliases": [
+            "knives"
+          ]
+        },
+        {
+          "id": "spatula",
+          "name": "spatula",
+          "aliases": [
+            "spatulas"
+          ]
+        },
+        {
+          "id": "whisk",
+          "name": "whisk",
+          "aliases": [
+            "whisks"
+          ]
+        },
+        {
+          "id": "ladle",
+          "name": "ladle",
+          "aliases": [
+            "ladles"
+          ]
+        },
+        {
+          "id": "tongs",
+          "name": "tongs",
+          "aliases": [],
+          "plural": "tongs"
+        },
+        {
+          "id": "chopsticks",
+          "name": "chopsticks",
+          "aliases": [],
+          "plural": "chopsticks"
+        },
+        {
+          "id": "spork",
+          "name": "spork",
+          "aliases": [
+            "sporks"
+          ]
+        },
+        {
+          "id": "peeler",
+          "name": "peeler",
+          "aliases": [
+            "peelers"
+          ]
+        },
+        {
+          "id": "can-opener",
+          "name": "can opener",
+          "aliases": [
+            "can openers"
+          ]
+        },
+        {
+          "id": "ice-cream-scoop",
+          "name": "ice cream scoop",
+          "aliases": [
+            "ice cream scoops"
+          ]
+        },
+        {
+          "id": "rolling-pin",
+          "name": "rolling pin",
+          "aliases": [
+            "rolling pins"
+          ]
+        },
+        {
+          "id": "pizza-cutter",
+          "name": "pizza cutter",
+          "aliases": [
+            "pizza cutters"
+          ]
+        },
+        {
+          "id": "grater",
+          "name": "grater",
+          "aliases": [
+            "graters"
+          ]
+        },
+        {
+          "id": "corkscrew",
+          "name": "corkscrew",
+          "aliases": [
+            "corkscrews"
+          ]
+        },
+        {
+          "id": "bottle-opener",
+          "name": "bottle opener",
+          "aliases": [
+            "bottle openers"
+          ]
+        }
+      ],
+      "host_bank": [
+        "fork",
+        "spoon",
+        "knife",
+        "spatula",
+        "whisk",
+        "ladle",
+        "tongs",
+        "chopsticks"
+      ],
+      "host_answers": [
+        "fork"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

@@ -1,0 +1,1301 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-15",
+  "questions": [
+    {
+      "prompt": "Name something people eat or drink for breakfast",
+      "entries": [
+        {
+          "id": "egg",
+          "name": "egg",
+          "aliases": [
+            "eggs"
+          ]
+        },
+        {
+          "id": "omelet",
+          "name": "omelet",
+          "aliases": [
+            "omelette",
+            "omelets"
+          ]
+        },
+        {
+          "id": "frittata",
+          "name": "frittata",
+          "aliases": [
+            "frittatas"
+          ]
+        },
+        {
+          "id": "eggs-benedict",
+          "name": "eggs Benedict",
+          "aliases": [],
+          "plural": "eggs Benedict"
+        },
+        {
+          "id": "quiche",
+          "name": "quiche",
+          "aliases": [
+            "quiches"
+          ]
+        },
+        {
+          "id": "breakfast-burrito",
+          "name": "breakfast burrito",
+          "aliases": [
+            "breakfast burritos"
+          ]
+        },
+        {
+          "id": "huevos-rancheros",
+          "name": "huevos rancheros",
+          "aliases": [],
+          "plural": "huevos rancheros"
+        },
+        {
+          "id": "shakshuka",
+          "name": "shakshuka",
+          "aliases": [],
+          "plural": "shakshuka"
+        },
+        {
+          "id": "pancake",
+          "name": "pancake",
+          "aliases": [
+            "pancakes"
+          ]
+        },
+        {
+          "id": "waffle",
+          "name": "waffle",
+          "aliases": [
+            "waffles"
+          ]
+        },
+        {
+          "id": "french-toast",
+          "name": "French toast",
+          "aliases": [],
+          "plural": "French toast"
+        },
+        {
+          "id": "bacon",
+          "name": "bacon",
+          "aliases": [],
+          "plural": "bacon"
+        },
+        {
+          "id": "sausage",
+          "name": "sausage",
+          "aliases": [
+            "sausages"
+          ]
+        },
+        {
+          "id": "ham",
+          "name": "ham",
+          "aliases": [],
+          "plural": "ham"
+        },
+        {
+          "id": "hash-browns",
+          "name": "hash browns",
+          "aliases": [
+            "hash brown"
+          ],
+          "plural": "hash browns"
+        },
+        {
+          "id": "home-fries",
+          "name": "home fries",
+          "aliases": [],
+          "plural": "home fries"
+        },
+        {
+          "id": "toast",
+          "name": "toast",
+          "aliases": [],
+          "plural": "toast"
+        },
+        {
+          "id": "bagel",
+          "name": "bagel",
+          "aliases": [
+            "bagels"
+          ]
+        },
+        {
+          "id": "english-muffin",
+          "name": "English muffin",
+          "aliases": [
+            "English muffins"
+          ]
+        },
+        {
+          "id": "muffin",
+          "name": "muffin",
+          "aliases": [
+            "muffins"
+          ]
+        },
+        {
+          "id": "croissant",
+          "name": "croissant",
+          "aliases": [
+            "croissants"
+          ]
+        },
+        {
+          "id": "donut",
+          "name": "donut",
+          "aliases": [
+            "doughnut",
+            "donuts"
+          ]
+        },
+        {
+          "id": "cereal",
+          "name": "cereal",
+          "aliases": [],
+          "plural": "cereal"
+        },
+        {
+          "id": "oatmeal",
+          "name": "oatmeal",
+          "aliases": [
+            "porridge",
+            "oats"
+          ],
+          "plural": "oatmeal"
+        },
+        {
+          "id": "grits",
+          "name": "grits",
+          "aliases": [],
+          "plural": "grits"
+        },
+        {
+          "id": "granola",
+          "name": "granola",
+          "aliases": [],
+          "plural": "granola"
+        },
+        {
+          "id": "yogurt",
+          "name": "yogurt",
+          "aliases": [
+            "yoghurt"
+          ],
+          "plural": "yogurt"
+        },
+        {
+          "id": "fruit",
+          "name": "fruit",
+          "aliases": [],
+          "plural": "fruit"
+        },
+        {
+          "id": "banana",
+          "name": "banana",
+          "aliases": [
+            "bananas"
+          ]
+        },
+        {
+          "id": "smoothie",
+          "name": "smoothie",
+          "aliases": [
+            "smoothies"
+          ]
+        },
+        {
+          "id": "orange-juice",
+          "name": "orange juice",
+          "aliases": [
+            "OJ"
+          ],
+          "plural": "orange juice"
+        },
+        {
+          "id": "coffee",
+          "name": "coffee",
+          "aliases": [],
+          "plural": "coffee"
+        },
+        {
+          "id": "tea",
+          "name": "tea",
+          "aliases": [],
+          "plural": "tea"
+        },
+        {
+          "id": "milk",
+          "name": "milk",
+          "aliases": [],
+          "plural": "milk"
+        },
+        {
+          "id": "biscuits-and-gravy",
+          "name": "biscuits and gravy",
+          "aliases": [],
+          "plural": "biscuits and gravy"
+        },
+        {
+          "id": "avocado-toast",
+          "name": "avocado toast",
+          "aliases": [],
+          "plural": "avocado toast"
+        },
+        {
+          "id": "breakfast-sandwich",
+          "name": "breakfast sandwich",
+          "aliases": [
+            "breakfast sandwiches"
+          ]
+        },
+        {
+          "id": "cinnamon-roll",
+          "name": "cinnamon roll",
+          "aliases": [
+            "cinnamon rolls"
+          ]
+        },
+        {
+          "id": "chicken-and-waffles",
+          "name": "chicken and waffles",
+          "aliases": [],
+          "plural": "chicken and waffles"
+        },
+        {
+          "id": "steak-and-eggs",
+          "name": "steak and eggs",
+          "aliases": [],
+          "plural": "steak and eggs"
+        }
+      ],
+      "host_bank": [
+        "pancake",
+        "egg",
+        "bacon",
+        "cereal",
+        "coffee",
+        "toast"
+      ],
+      "host_answers": [
+        "pancake"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something you'd find in a bathroom",
+      "entries": [
+        {
+          "id": "toilet",
+          "name": "toilet",
+          "aliases": [
+            "toilets"
+          ]
+        },
+        {
+          "id": "sink",
+          "name": "sink",
+          "aliases": [
+            "sinks"
+          ]
+        },
+        {
+          "id": "bathtub",
+          "name": "bathtub",
+          "aliases": [
+            "tub",
+            "bathtubs"
+          ]
+        },
+        {
+          "id": "shower",
+          "name": "shower",
+          "aliases": [
+            "showers"
+          ]
+        },
+        {
+          "id": "mirror",
+          "name": "mirror",
+          "aliases": [
+            "mirrors"
+          ]
+        },
+        {
+          "id": "towel",
+          "name": "towel",
+          "aliases": [
+            "towels"
+          ]
+        },
+        {
+          "id": "toilet-paper",
+          "name": "toilet paper",
+          "aliases": [],
+          "plural": "toilet paper"
+        },
+        {
+          "id": "toothbrush",
+          "name": "toothbrush",
+          "aliases": [
+            "toothbrushes"
+          ]
+        },
+        {
+          "id": "toothpaste",
+          "name": "toothpaste",
+          "aliases": [],
+          "plural": "toothpaste"
+        },
+        {
+          "id": "soap",
+          "name": "soap",
+          "aliases": [],
+          "plural": "soap"
+        },
+        {
+          "id": "shampoo",
+          "name": "shampoo",
+          "aliases": [],
+          "plural": "shampoo"
+        },
+        {
+          "id": "conditioner",
+          "name": "conditioner",
+          "aliases": [],
+          "plural": "conditioner"
+        },
+        {
+          "id": "body-wash",
+          "name": "body wash",
+          "aliases": [],
+          "plural": "body wash"
+        },
+        {
+          "id": "razor",
+          "name": "razor",
+          "aliases": [
+            "razors"
+          ]
+        },
+        {
+          "id": "shaving-cream",
+          "name": "shaving cream",
+          "aliases": [],
+          "plural": "shaving cream"
+        },
+        {
+          "id": "hairbrush",
+          "name": "hairbrush",
+          "aliases": [
+            "hairbrushes"
+          ]
+        },
+        {
+          "id": "comb",
+          "name": "comb",
+          "aliases": [
+            "combs"
+          ]
+        },
+        {
+          "id": "hair-dryer",
+          "name": "hair dryer",
+          "aliases": [
+            "blow dryer",
+            "hair dryers"
+          ]
+        },
+        {
+          "id": "deodorant",
+          "name": "deodorant",
+          "aliases": [],
+          "plural": "deodorant"
+        },
+        {
+          "id": "mouthwash",
+          "name": "mouthwash",
+          "aliases": [],
+          "plural": "mouthwash"
+        },
+        {
+          "id": "dental-floss",
+          "name": "dental floss",
+          "aliases": [
+            "floss"
+          ],
+          "plural": "dental floss"
+        },
+        {
+          "id": "lotion",
+          "name": "lotion",
+          "aliases": [],
+          "plural": "lotion"
+        },
+        {
+          "id": "makeup",
+          "name": "makeup",
+          "aliases": [],
+          "plural": "makeup"
+        },
+        {
+          "id": "cotton-swab",
+          "name": "cotton swab",
+          "aliases": [
+            "Q-tip",
+            "cotton swabs"
+          ]
+        },
+        {
+          "id": "cotton-ball",
+          "name": "cotton ball",
+          "aliases": [
+            "cotton balls"
+          ]
+        },
+        {
+          "id": "nail-clippers",
+          "name": "nail clippers",
+          "aliases": [],
+          "plural": "nail clippers"
+        },
+        {
+          "id": "tweezers",
+          "name": "tweezers",
+          "aliases": [],
+          "plural": "tweezers"
+        },
+        {
+          "id": "bath-mat",
+          "name": "bath mat",
+          "aliases": [
+            "bath mats"
+          ]
+        },
+        {
+          "id": "shower-curtain",
+          "name": "shower curtain",
+          "aliases": [
+            "shower curtains"
+          ]
+        },
+        {
+          "id": "plunger",
+          "name": "plunger",
+          "aliases": [
+            "plungers"
+          ]
+        },
+        {
+          "id": "scale",
+          "name": "scale",
+          "aliases": [
+            "scales"
+          ]
+        },
+        {
+          "id": "wastebasket",
+          "name": "wastebasket",
+          "aliases": [
+            "trash can",
+            "wastebaskets"
+          ]
+        },
+        {
+          "id": "medicine-cabinet",
+          "name": "medicine cabinet",
+          "aliases": [
+            "medicine cabinets"
+          ]
+        },
+        {
+          "id": "bandage",
+          "name": "bandage",
+          "aliases": [
+            "band-aid",
+            "bandages"
+          ]
+        },
+        {
+          "id": "loofah",
+          "name": "loofah",
+          "aliases": [
+            "loofahs"
+          ]
+        },
+        {
+          "id": "washcloth",
+          "name": "washcloth",
+          "aliases": [
+            "washcloths"
+          ]
+        },
+        {
+          "id": "rubber-duck",
+          "name": "rubber duck",
+          "aliases": [
+            "rubber ducks"
+          ]
+        },
+        {
+          "id": "candle",
+          "name": "candle",
+          "aliases": [
+            "candles"
+          ]
+        },
+        {
+          "id": "air-freshener",
+          "name": "air freshener",
+          "aliases": [
+            "air fresheners"
+          ]
+        },
+        {
+          "id": "toilet-brush",
+          "name": "toilet brush",
+          "aliases": [
+            "toilet brushes"
+          ]
+        },
+        {
+          "id": "hand-towel",
+          "name": "hand towel",
+          "aliases": [
+            "hand towels"
+          ]
+        },
+        {
+          "id": "perfume",
+          "name": "perfume",
+          "aliases": [
+            "cologne"
+          ],
+          "plural": "perfume"
+        }
+      ],
+      "host_bank": [
+        "toothbrush",
+        "toilet",
+        "towel",
+        "shower",
+        "sink",
+        "toilet-paper"
+      ],
+      "host_answers": [
+        "toothbrush"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a board game",
+      "entries": [
+        {
+          "id": "monopoly",
+          "name": "Monopoly",
+          "aliases": [],
+          "plural": "Monopoly"
+        },
+        {
+          "id": "scrabble",
+          "name": "Scrabble",
+          "aliases": [],
+          "plural": "Scrabble"
+        },
+        {
+          "id": "clue",
+          "name": "Clue",
+          "aliases": [
+            "Cluedo"
+          ],
+          "plural": "Clue"
+        },
+        {
+          "id": "chess",
+          "name": "chess",
+          "aliases": [],
+          "plural": "chess"
+        },
+        {
+          "id": "checkers",
+          "name": "checkers",
+          "aliases": [
+            "draughts"
+          ],
+          "plural": "checkers"
+        },
+        {
+          "id": "risk",
+          "name": "Risk",
+          "aliases": [],
+          "plural": "Risk"
+        },
+        {
+          "id": "sorry",
+          "name": "Sorry!",
+          "aliases": [],
+          "plural": "Sorry!"
+        },
+        {
+          "id": "trouble",
+          "name": "Trouble",
+          "aliases": [],
+          "plural": "Trouble"
+        },
+        {
+          "id": "candy-land",
+          "name": "Candy Land",
+          "aliases": [],
+          "plural": "Candy Land"
+        },
+        {
+          "id": "chutes-and-ladders",
+          "name": "Chutes and Ladders",
+          "aliases": [
+            "Snakes and Ladders"
+          ],
+          "plural": "Chutes and Ladders"
+        },
+        {
+          "id": "battleship",
+          "name": "Battleship",
+          "aliases": [],
+          "plural": "Battleship"
+        },
+        {
+          "id": "connect-four",
+          "name": "Connect Four",
+          "aliases": [
+            "Connect 4"
+          ],
+          "plural": "Connect Four"
+        },
+        {
+          "id": "the-game-of-life",
+          "name": "The Game of Life",
+          "aliases": [
+            "Life",
+            "Game of Life"
+          ],
+          "plural": "The Game of Life"
+        },
+        {
+          "id": "catan",
+          "name": "Catan",
+          "aliases": [
+            "Settlers of Catan"
+          ],
+          "plural": "Catan"
+        },
+        {
+          "id": "ticket-to-ride",
+          "name": "Ticket to Ride",
+          "aliases": [],
+          "plural": "Ticket to Ride"
+        },
+        {
+          "id": "pandemic",
+          "name": "Pandemic",
+          "aliases": [],
+          "plural": "Pandemic"
+        },
+        {
+          "id": "operation",
+          "name": "Operation",
+          "aliases": [],
+          "plural": "Operation"
+        },
+        {
+          "id": "guess-who",
+          "name": "Guess Who?",
+          "aliases": [],
+          "plural": "Guess Who?"
+        },
+        {
+          "id": "mouse-trap",
+          "name": "Mouse Trap",
+          "aliases": [],
+          "plural": "Mouse Trap"
+        },
+        {
+          "id": "stratego",
+          "name": "Stratego",
+          "aliases": [],
+          "plural": "Stratego"
+        },
+        {
+          "id": "backgammon",
+          "name": "backgammon",
+          "aliases": [],
+          "plural": "backgammon"
+        },
+        {
+          "id": "parcheesi",
+          "name": "Parcheesi",
+          "aliases": [],
+          "plural": "Parcheesi"
+        },
+        {
+          "id": "othello",
+          "name": "Othello",
+          "aliases": [
+            "Reversi"
+          ],
+          "plural": "Othello"
+        },
+        {
+          "id": "go",
+          "name": "Go",
+          "aliases": [],
+          "plural": "Go"
+        },
+        {
+          "id": "mancala",
+          "name": "mancala",
+          "aliases": [],
+          "plural": "mancala"
+        },
+        {
+          "id": "trivial-pursuit",
+          "name": "Trivial Pursuit",
+          "aliases": [],
+          "plural": "Trivial Pursuit"
+        },
+        {
+          "id": "chinese-checkers",
+          "name": "Chinese checkers",
+          "aliases": [],
+          "plural": "Chinese checkers"
+        },
+        {
+          "id": "pictionary",
+          "name": "Pictionary",
+          "aliases": [],
+          "plural": "Pictionary"
+        }
+      ],
+      "host_bank": [
+        "scrabble",
+        "monopoly",
+        "chess",
+        "clue",
+        "candy-land",
+        "checkers"
+      ],
+      "host_answers": [
+        "scrabble"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something cold you can eat or drink",
+      "entries": [
+        {
+          "id": "ice",
+          "name": "ice",
+          "aliases": [],
+          "plural": "ice"
+        },
+        {
+          "id": "ice-cream",
+          "name": "ice cream",
+          "aliases": [],
+          "plural": "ice cream"
+        },
+        {
+          "id": "popsicle",
+          "name": "popsicle",
+          "aliases": [
+            "popsicles"
+          ]
+        },
+        {
+          "id": "ice-cube",
+          "name": "ice cube",
+          "aliases": [
+            "ice cubes"
+          ]
+        },
+        {
+          "id": "iced-coffee",
+          "name": "iced coffee",
+          "aliases": [],
+          "plural": "iced coffee"
+        },
+        {
+          "id": "iced-tea",
+          "name": "iced tea",
+          "aliases": [],
+          "plural": "iced tea"
+        },
+        {
+          "id": "lemonade",
+          "name": "lemonade",
+          "aliases": [],
+          "plural": "lemonade"
+        },
+        {
+          "id": "slushie",
+          "name": "slushie",
+          "aliases": [
+            "slushy",
+            "slurpee",
+            "slushies"
+          ]
+        },
+        {
+          "id": "snow-cone",
+          "name": "snow cone",
+          "aliases": [
+            "snow cones"
+          ]
+        },
+        {
+          "id": "gelato",
+          "name": "gelato",
+          "aliases": [],
+          "plural": "gelato"
+        },
+        {
+          "id": "sorbet",
+          "name": "sorbet",
+          "aliases": [],
+          "plural": "sorbet"
+        },
+        {
+          "id": "sherbet",
+          "name": "sherbet",
+          "aliases": [
+            "sherbert"
+          ],
+          "plural": "sherbet"
+        },
+        {
+          "id": "frozen-yogurt",
+          "name": "frozen yogurt",
+          "aliases": [
+            "froyo",
+            "frozen yoghurt"
+          ],
+          "plural": "frozen yogurt"
+        },
+        {
+          "id": "milkshake",
+          "name": "milkshake",
+          "aliases": [
+            "shake",
+            "milkshakes"
+          ]
+        },
+        {
+          "id": "ice-cream-sandwich",
+          "name": "ice cream sandwich",
+          "aliases": [
+            "ice cream sandwiches"
+          ]
+        },
+        {
+          "id": "sundae",
+          "name": "sundae",
+          "aliases": [
+            "sundaes"
+          ]
+        },
+        {
+          "id": "frozen-custard",
+          "name": "frozen custard",
+          "aliases": [],
+          "plural": "frozen custard"
+        },
+        {
+          "id": "italian-ice",
+          "name": "Italian ice",
+          "aliases": [],
+          "plural": "Italian ice"
+        },
+        {
+          "id": "banana-split",
+          "name": "banana split",
+          "aliases": [
+            "banana splits"
+          ]
+        },
+        {
+          "id": "shaved-ice",
+          "name": "shaved ice",
+          "aliases": [],
+          "plural": "shaved ice"
+        },
+        {
+          "id": "smoothie",
+          "name": "smoothie",
+          "aliases": [
+            "smoothies"
+          ]
+        },
+        {
+          "id": "ice-water",
+          "name": "ice water",
+          "aliases": [],
+          "plural": "ice water"
+        },
+        {
+          "id": "cold-brew",
+          "name": "cold brew",
+          "aliases": [],
+          "plural": "cold brew"
+        },
+        {
+          "id": "soda",
+          "name": "soda",
+          "aliases": [
+            "pop"
+          ],
+          "plural": "soda"
+        },
+        {
+          "id": "gazpacho",
+          "name": "gazpacho",
+          "aliases": [],
+          "plural": "gazpacho"
+        }
+      ],
+      "host_bank": [
+        "ice-cream",
+        "popsicle",
+        "iced-coffee",
+        "lemonade",
+        "smoothie",
+        "ice-water"
+      ],
+      "host_answers": [
+        "ice-cream"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a mammal that lives in the ocean",
+      "entries": [
+        {
+          "id": "whale",
+          "name": "whale",
+          "aliases": [
+            "whales"
+          ]
+        },
+        {
+          "id": "orca",
+          "name": "orca",
+          "aliases": [
+            "killer whale",
+            "orcas"
+          ]
+        },
+        {
+          "id": "beluga",
+          "name": "beluga",
+          "aliases": [
+            "beluga whale",
+            "belugas"
+          ]
+        },
+        {
+          "id": "narwhal",
+          "name": "narwhal",
+          "aliases": [
+            "narwhals"
+          ]
+        },
+        {
+          "id": "dolphin",
+          "name": "dolphin",
+          "aliases": [
+            "dolphins"
+          ]
+        },
+        {
+          "id": "porpoise",
+          "name": "porpoise",
+          "aliases": [
+            "porpoises"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "seals"
+          ]
+        },
+        {
+          "id": "sea-lion",
+          "name": "sea lion",
+          "aliases": [
+            "sea lions"
+          ]
+        },
+        {
+          "id": "walrus",
+          "name": "walrus",
+          "aliases": [
+            "walruses"
+          ]
+        },
+        {
+          "id": "manatee",
+          "name": "manatee",
+          "aliases": [
+            "manatees"
+          ]
+        },
+        {
+          "id": "sea-otter",
+          "name": "sea otter",
+          "aliases": [
+            "sea otters"
+          ]
+        }
+      ],
+      "host_bank": [
+        "dolphin",
+        "whale",
+        "seal",
+        "sea-lion",
+        "manatee",
+        "walrus",
+        "sea-otter"
+      ],
+      "host_answers": [
+        "dolphin"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a Winter Olympic sport",
+      "entries": [
+        {
+          "id": "alpine-skiing",
+          "name": "alpine skiing",
+          "aliases": [
+            "downhill skiing",
+            "skiing"
+          ],
+          "plural": "alpine skiing"
+        },
+        {
+          "id": "biathlon",
+          "name": "biathlon",
+          "aliases": [],
+          "plural": "biathlon"
+        },
+        {
+          "id": "bobsled",
+          "name": "bobsled",
+          "aliases": [
+            "bobsleigh"
+          ],
+          "plural": "bobsled"
+        },
+        {
+          "id": "cross-country-skiing",
+          "name": "cross-country skiing",
+          "aliases": [],
+          "plural": "cross-country skiing"
+        },
+        {
+          "id": "curling",
+          "name": "curling",
+          "aliases": [],
+          "plural": "curling"
+        },
+        {
+          "id": "figure-skating",
+          "name": "figure skating",
+          "aliases": [],
+          "plural": "figure skating"
+        },
+        {
+          "id": "freestyle-skiing",
+          "name": "freestyle skiing",
+          "aliases": [
+            "moguls"
+          ],
+          "plural": "freestyle skiing"
+        },
+        {
+          "id": "ice-hockey",
+          "name": "ice hockey",
+          "aliases": [
+            "hockey"
+          ],
+          "plural": "ice hockey"
+        },
+        {
+          "id": "luge",
+          "name": "luge",
+          "aliases": [],
+          "plural": "luge"
+        },
+        {
+          "id": "nordic-combined",
+          "name": "Nordic combined",
+          "aliases": [],
+          "plural": "Nordic combined"
+        },
+        {
+          "id": "short-track-speed-skating",
+          "name": "short track speed skating",
+          "aliases": [
+            "short track"
+          ],
+          "plural": "short track speed skating"
+        },
+        {
+          "id": "skeleton",
+          "name": "skeleton",
+          "aliases": [],
+          "plural": "skeleton"
+        },
+        {
+          "id": "ski-jumping",
+          "name": "ski jumping",
+          "aliases": [],
+          "plural": "ski jumping"
+        },
+        {
+          "id": "snowboarding",
+          "name": "snowboarding",
+          "aliases": [],
+          "plural": "snowboarding"
+        },
+        {
+          "id": "speed-skating",
+          "name": "speed skating",
+          "aliases": [],
+          "plural": "speed skating"
+        },
+        {
+          "id": "ski-mountaineering",
+          "name": "ski mountaineering",
+          "aliases": [],
+          "plural": "ski mountaineering"
+        }
+      ],
+      "host_bank": [
+        "figure-skating",
+        "ice-hockey",
+        "alpine-skiing",
+        "snowboarding",
+        "bobsled",
+        "curling",
+        "speed-skating"
+      ],
+      "host_answers": [
+        "figure-skating"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a citrus fruit",
+      "entries": [
+        {
+          "id": "orange",
+          "name": "orange",
+          "aliases": [
+            "oranges"
+          ]
+        },
+        {
+          "id": "lemon",
+          "name": "lemon",
+          "aliases": [
+            "lemons"
+          ]
+        },
+        {
+          "id": "lime",
+          "name": "lime",
+          "aliases": [
+            "limes"
+          ]
+        },
+        {
+          "id": "grapefruit",
+          "name": "grapefruit",
+          "aliases": [
+            "grapefruits"
+          ]
+        },
+        {
+          "id": "tangerine",
+          "name": "tangerine",
+          "aliases": [
+            "tangerines"
+          ]
+        },
+        {
+          "id": "clementine",
+          "name": "clementine",
+          "aliases": [
+            "clementines"
+          ]
+        },
+        {
+          "id": "mandarin",
+          "name": "mandarin",
+          "aliases": [
+            "mandarin orange",
+            "mandarins"
+          ]
+        },
+        {
+          "id": "kumquat",
+          "name": "kumquat",
+          "aliases": [
+            "kumquats"
+          ]
+        },
+        {
+          "id": "pomelo",
+          "name": "pomelo",
+          "aliases": [
+            "pomelos"
+          ]
+        },
+        {
+          "id": "yuzu",
+          "name": "yuzu",
+          "aliases": [
+            "yuzus"
+          ]
+        },
+        {
+          "id": "citron",
+          "name": "citron",
+          "aliases": [
+            "citrons"
+          ]
+        }
+      ],
+      "host_bank": [
+        "orange",
+        "lemon",
+        "lime",
+        "grapefruit",
+        "tangerine",
+        "clementine",
+        "mandarin"
+      ],
+      "host_answers": [
+        "orange"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

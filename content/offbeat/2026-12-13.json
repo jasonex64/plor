@@ -1,0 +1,1724 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-12-13",
+  "questions": [
+    {
+      "prompt": "Name something you'd bring to a potluck",
+      "entries": [
+        {
+          "id": "mac-and-cheese",
+          "name": "mac and cheese",
+          "aliases": [
+            "macaroni and cheese",
+            "mac n cheese"
+          ],
+          "plural": "mac and cheese"
+        },
+        {
+          "id": "potato-salad",
+          "name": "potato salad",
+          "aliases": [
+            "potato salads"
+          ]
+        },
+        {
+          "id": "pasta-salad",
+          "name": "pasta salad",
+          "aliases": [
+            "pasta salads"
+          ]
+        },
+        {
+          "id": "coleslaw",
+          "name": "coleslaw",
+          "aliases": [
+            "cole slaw",
+            "slaw"
+          ],
+          "plural": "coleslaw"
+        },
+        {
+          "id": "green-salad",
+          "name": "green salad",
+          "aliases": [
+            "salad",
+            "garden salad",
+            "green salads"
+          ]
+        },
+        {
+          "id": "fruit-salad",
+          "name": "fruit salad",
+          "aliases": [
+            "fruit salads"
+          ]
+        },
+        {
+          "id": "deviled-eggs",
+          "name": "deviled eggs",
+          "aliases": [
+            "deviled egg"
+          ],
+          "plural": "deviled eggs"
+        },
+        {
+          "id": "chili",
+          "name": "chili",
+          "aliases": [],
+          "plural": "chili"
+        },
+        {
+          "id": "lasagna",
+          "name": "lasagna",
+          "aliases": [
+            "lasagne"
+          ],
+          "plural": "lasagna"
+        },
+        {
+          "id": "casserole",
+          "name": "casserole",
+          "aliases": [
+            "casseroles"
+          ]
+        },
+        {
+          "id": "baked-beans",
+          "name": "baked beans",
+          "aliases": [],
+          "plural": "baked beans"
+        },
+        {
+          "id": "cornbread",
+          "name": "cornbread",
+          "aliases": [
+            "corn bread"
+          ],
+          "plural": "cornbread"
+        },
+        {
+          "id": "dinner-roll",
+          "name": "dinner roll",
+          "aliases": [
+            "roll",
+            "rolls",
+            "dinner rolls"
+          ]
+        },
+        {
+          "id": "fried-chicken",
+          "name": "fried chicken",
+          "aliases": [],
+          "plural": "fried chicken"
+        },
+        {
+          "id": "meatball",
+          "name": "meatball",
+          "aliases": [
+            "meatballs"
+          ]
+        },
+        {
+          "id": "sandwich",
+          "name": "sandwich",
+          "aliases": [
+            "sandwiches"
+          ]
+        },
+        {
+          "id": "slider",
+          "name": "slider",
+          "aliases": [
+            "sliders"
+          ]
+        },
+        {
+          "id": "chicken-wing",
+          "name": "chicken wing",
+          "aliases": [
+            "wing",
+            "wings",
+            "buffalo wings",
+            "chicken wings"
+          ]
+        },
+        {
+          "id": "chips-and-dip",
+          "name": "chips and dip",
+          "aliases": [],
+          "plural": "chips and dip"
+        },
+        {
+          "id": "salsa",
+          "name": "salsa",
+          "aliases": [],
+          "plural": "salsa"
+        },
+        {
+          "id": "guacamole",
+          "name": "guacamole",
+          "aliases": [
+            "guac"
+          ],
+          "plural": "guacamole"
+        },
+        {
+          "id": "hummus",
+          "name": "hummus",
+          "aliases": [],
+          "plural": "hummus"
+        },
+        {
+          "id": "veggie-tray",
+          "name": "veggie tray",
+          "aliases": [
+            "vegetable tray",
+            "crudites",
+            "veggie trays"
+          ]
+        },
+        {
+          "id": "cheese-plate",
+          "name": "cheese plate",
+          "aliases": [
+            "cheese platter",
+            "cheese plates"
+          ]
+        },
+        {
+          "id": "charcuterie-board",
+          "name": "charcuterie board",
+          "aliases": [
+            "charcuterie boards"
+          ]
+        },
+        {
+          "id": "pigs-in-a-blanket",
+          "name": "pigs in a blanket",
+          "aliases": [],
+          "plural": "pigs in a blanket"
+        },
+        {
+          "id": "spinach-dip",
+          "name": "spinach dip",
+          "aliases": [],
+          "plural": "spinach dip"
+        },
+        {
+          "id": "seven-layer-dip",
+          "name": "seven-layer dip",
+          "aliases": [
+            "7 layer dip"
+          ],
+          "plural": "seven-layer dip"
+        },
+        {
+          "id": "enchilada",
+          "name": "enchilada",
+          "aliases": [
+            "enchiladas"
+          ]
+        },
+        {
+          "id": "tamale",
+          "name": "tamale",
+          "aliases": [
+            "tamales"
+          ]
+        },
+        {
+          "id": "dumpling",
+          "name": "dumpling",
+          "aliases": [
+            "dumplings"
+          ]
+        },
+        {
+          "id": "egg-roll",
+          "name": "egg roll",
+          "aliases": [
+            "egg rolls"
+          ]
+        },
+        {
+          "id": "fried-rice",
+          "name": "fried rice",
+          "aliases": [],
+          "plural": "fried rice"
+        },
+        {
+          "id": "brownie",
+          "name": "brownie",
+          "aliases": [
+            "brownies"
+          ]
+        },
+        {
+          "id": "cookie",
+          "name": "cookie",
+          "aliases": [
+            "cookies"
+          ]
+        },
+        {
+          "id": "cupcake",
+          "name": "cupcake",
+          "aliases": [
+            "cupcakes"
+          ]
+        },
+        {
+          "id": "cake",
+          "name": "cake",
+          "aliases": [
+            "cakes"
+          ]
+        },
+        {
+          "id": "cheesecake",
+          "name": "cheesecake",
+          "aliases": [
+            "cheesecakes"
+          ]
+        },
+        {
+          "id": "banana-bread",
+          "name": "banana bread",
+          "aliases": [],
+          "plural": "banana bread"
+        },
+        {
+          "id": "pumpkin-bread",
+          "name": "pumpkin bread",
+          "aliases": [],
+          "plural": "pumpkin bread"
+        },
+        {
+          "id": "zucchini-bread",
+          "name": "zucchini bread",
+          "aliases": [],
+          "plural": "zucchini bread"
+        },
+        {
+          "id": "apple-pie",
+          "name": "apple pie",
+          "aliases": [
+            "apple pies"
+          ]
+        },
+        {
+          "id": "cherry-pie",
+          "name": "cherry pie",
+          "aliases": [
+            "cherry pies"
+          ]
+        },
+        {
+          "id": "blueberry-pie",
+          "name": "blueberry pie",
+          "aliases": [
+            "blueberry pies"
+          ]
+        },
+        {
+          "id": "peach-pie",
+          "name": "peach pie",
+          "aliases": [
+            "peach pies"
+          ]
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "pecan-pie",
+          "name": "pecan pie",
+          "aliases": [
+            "pecan pies"
+          ]
+        },
+        {
+          "id": "blackberry-pie",
+          "name": "blackberry pie",
+          "aliases": [
+            "blackberry pies"
+          ]
+        },
+        {
+          "id": "raspberry-pie",
+          "name": "raspberry pie",
+          "aliases": [
+            "raspberry pies"
+          ]
+        },
+        {
+          "id": "mixed-berry-pie",
+          "name": "mixed berry pie",
+          "aliases": [
+            "mixed berry pies"
+          ]
+        },
+        {
+          "id": "key-lime-pie",
+          "name": "key lime pie",
+          "aliases": [
+            "key lime pies"
+          ]
+        },
+        {
+          "id": "lemon-bar",
+          "name": "lemon bar",
+          "aliases": [
+            "lemon bars"
+          ]
+        },
+        {
+          "id": "apple-crisp",
+          "name": "apple crisp",
+          "aliases": [],
+          "plural": "apple crisp"
+        },
+        {
+          "id": "peach-cobbler",
+          "name": "peach cobbler",
+          "aliases": [],
+          "plural": "peach cobbler"
+        },
+        {
+          "id": "blackberry-cobbler",
+          "name": "blackberry cobbler",
+          "aliases": [],
+          "plural": "blackberry cobbler"
+        },
+        {
+          "id": "blueberry-cobbler",
+          "name": "blueberry cobbler",
+          "aliases": [],
+          "plural": "blueberry cobbler"
+        },
+        {
+          "id": "apple-crumble",
+          "name": "apple crumble",
+          "aliases": [],
+          "plural": "apple crumble"
+        },
+        {
+          "id": "fruit-tart",
+          "name": "fruit tart",
+          "aliases": [
+            "fruit tarts"
+          ]
+        },
+        {
+          "id": "blueberry-muffin",
+          "name": "blueberry muffin",
+          "aliases": [
+            "blueberry muffins"
+          ]
+        },
+        {
+          "id": "banana-pudding",
+          "name": "banana pudding",
+          "aliases": [],
+          "plural": "banana pudding"
+        },
+        {
+          "id": "fudge",
+          "name": "fudge",
+          "aliases": [],
+          "plural": "fudge"
+        },
+        {
+          "id": "tiramisu",
+          "name": "tiramisu",
+          "aliases": [],
+          "plural": "tiramisu"
+        },
+        {
+          "id": "jell-o",
+          "name": "Jell-O",
+          "aliases": [
+            "gelatin"
+          ],
+          "plural": "Jell-O"
+        },
+        {
+          "id": "rice-krispie-treat",
+          "name": "rice krispie treat",
+          "aliases": [
+            "rice crispy treat",
+            "rice krispie treats"
+          ]
+        },
+        {
+          "id": "lemonade",
+          "name": "lemonade",
+          "aliases": [],
+          "plural": "lemonade"
+        },
+        {
+          "id": "iced-tea",
+          "name": "iced tea",
+          "aliases": [],
+          "plural": "iced tea"
+        },
+        {
+          "id": "sweet-tea",
+          "name": "sweet tea",
+          "aliases": [],
+          "plural": "sweet tea"
+        },
+        {
+          "id": "punch",
+          "name": "punch",
+          "aliases": [],
+          "plural": "punch"
+        },
+        {
+          "id": "soda",
+          "name": "soda",
+          "aliases": [
+            "pop",
+            "soft drinks"
+          ],
+          "plural": "soda"
+        },
+        {
+          "id": "wine",
+          "name": "wine",
+          "aliases": [],
+          "plural": "wine"
+        },
+        {
+          "id": "beer",
+          "name": "beer",
+          "aliases": [],
+          "plural": "beer"
+        },
+        {
+          "id": "juice",
+          "name": "juice",
+          "aliases": [],
+          "plural": "juice"
+        },
+        {
+          "id": "paper-plate",
+          "name": "paper plate",
+          "aliases": [
+            "paper plates"
+          ]
+        },
+        {
+          "id": "napkin",
+          "name": "napkin",
+          "aliases": [
+            "napkins"
+          ]
+        },
+        {
+          "id": "cup",
+          "name": "cup",
+          "aliases": [
+            "plastic cup",
+            "cups"
+          ]
+        },
+        {
+          "id": "plastic-utensils",
+          "name": "plastic utensils",
+          "aliases": [
+            "plasticware",
+            "plastic forks"
+          ],
+          "plural": "plastic utensils"
+        },
+        {
+          "id": "ice",
+          "name": "ice",
+          "aliases": [],
+          "plural": "ice"
+        },
+        {
+          "id": "folding-chair",
+          "name": "folding chair",
+          "aliases": [
+            "folding chairs"
+          ]
+        },
+        {
+          "id": "cooler",
+          "name": "cooler",
+          "aliases": [
+            "coolers"
+          ]
+        },
+        {
+          "id": "serving-spoon",
+          "name": "serving spoon",
+          "aliases": [
+            "serving spoons"
+          ]
+        },
+        {
+          "id": "tablecloth",
+          "name": "tablecloth",
+          "aliases": [
+            "tablecloths"
+          ]
+        },
+        {
+          "id": "aluminum-foil",
+          "name": "aluminum foil",
+          "aliases": [
+            "tin foil",
+            "foil"
+          ],
+          "plural": "aluminum foil"
+        }
+      ],
+      "host_bank": [
+        "potato-salad",
+        "casserole",
+        "mac-and-cheese",
+        "brownie",
+        "chips-and-dip",
+        "cookie",
+        "lasagna"
+      ],
+      "host_answers": [
+        "potato-salad"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a card in a standard 52-card deck",
+      "entries": [
+        {
+          "id": "ace-of-spades",
+          "name": "ace of spades",
+          "aliases": [],
+          "plural": "ace of spades"
+        },
+        {
+          "id": "two-of-spades",
+          "name": "two of spades",
+          "aliases": [
+            "2 of spades"
+          ],
+          "plural": "two of spades"
+        },
+        {
+          "id": "three-of-spades",
+          "name": "three of spades",
+          "aliases": [
+            "3 of spades"
+          ],
+          "plural": "three of spades"
+        },
+        {
+          "id": "four-of-spades",
+          "name": "four of spades",
+          "aliases": [
+            "4 of spades"
+          ],
+          "plural": "four of spades"
+        },
+        {
+          "id": "five-of-spades",
+          "name": "five of spades",
+          "aliases": [
+            "5 of spades"
+          ],
+          "plural": "five of spades"
+        },
+        {
+          "id": "six-of-spades",
+          "name": "six of spades",
+          "aliases": [
+            "6 of spades"
+          ],
+          "plural": "six of spades"
+        },
+        {
+          "id": "seven-of-spades",
+          "name": "seven of spades",
+          "aliases": [
+            "7 of spades"
+          ],
+          "plural": "seven of spades"
+        },
+        {
+          "id": "eight-of-spades",
+          "name": "eight of spades",
+          "aliases": [
+            "8 of spades"
+          ],
+          "plural": "eight of spades"
+        },
+        {
+          "id": "nine-of-spades",
+          "name": "nine of spades",
+          "aliases": [
+            "9 of spades"
+          ],
+          "plural": "nine of spades"
+        },
+        {
+          "id": "ten-of-spades",
+          "name": "ten of spades",
+          "aliases": [
+            "10 of spades"
+          ],
+          "plural": "ten of spades"
+        },
+        {
+          "id": "jack-of-spades",
+          "name": "jack of spades",
+          "aliases": [],
+          "plural": "jack of spades"
+        },
+        {
+          "id": "queen-of-spades",
+          "name": "queen of spades",
+          "aliases": [],
+          "plural": "queen of spades"
+        },
+        {
+          "id": "king-of-spades",
+          "name": "king of spades",
+          "aliases": [],
+          "plural": "king of spades"
+        },
+        {
+          "id": "ace-of-hearts",
+          "name": "ace of hearts",
+          "aliases": [],
+          "plural": "ace of hearts"
+        },
+        {
+          "id": "two-of-hearts",
+          "name": "two of hearts",
+          "aliases": [
+            "2 of hearts"
+          ],
+          "plural": "two of hearts"
+        },
+        {
+          "id": "three-of-hearts",
+          "name": "three of hearts",
+          "aliases": [
+            "3 of hearts"
+          ],
+          "plural": "three of hearts"
+        },
+        {
+          "id": "four-of-hearts",
+          "name": "four of hearts",
+          "aliases": [
+            "4 of hearts"
+          ],
+          "plural": "four of hearts"
+        },
+        {
+          "id": "five-of-hearts",
+          "name": "five of hearts",
+          "aliases": [
+            "5 of hearts"
+          ],
+          "plural": "five of hearts"
+        },
+        {
+          "id": "six-of-hearts",
+          "name": "six of hearts",
+          "aliases": [
+            "6 of hearts"
+          ],
+          "plural": "six of hearts"
+        },
+        {
+          "id": "seven-of-hearts",
+          "name": "seven of hearts",
+          "aliases": [
+            "7 of hearts"
+          ],
+          "plural": "seven of hearts"
+        },
+        {
+          "id": "eight-of-hearts",
+          "name": "eight of hearts",
+          "aliases": [
+            "8 of hearts"
+          ],
+          "plural": "eight of hearts"
+        },
+        {
+          "id": "nine-of-hearts",
+          "name": "nine of hearts",
+          "aliases": [
+            "9 of hearts"
+          ],
+          "plural": "nine of hearts"
+        },
+        {
+          "id": "ten-of-hearts",
+          "name": "ten of hearts",
+          "aliases": [
+            "10 of hearts"
+          ],
+          "plural": "ten of hearts"
+        },
+        {
+          "id": "jack-of-hearts",
+          "name": "jack of hearts",
+          "aliases": [],
+          "plural": "jack of hearts"
+        },
+        {
+          "id": "queen-of-hearts",
+          "name": "queen of hearts",
+          "aliases": [],
+          "plural": "queen of hearts"
+        },
+        {
+          "id": "king-of-hearts",
+          "name": "king of hearts",
+          "aliases": [],
+          "plural": "king of hearts"
+        },
+        {
+          "id": "ace-of-diamonds",
+          "name": "ace of diamonds",
+          "aliases": [],
+          "plural": "ace of diamonds"
+        },
+        {
+          "id": "two-of-diamonds",
+          "name": "two of diamonds",
+          "aliases": [
+            "2 of diamonds"
+          ],
+          "plural": "two of diamonds"
+        },
+        {
+          "id": "three-of-diamonds",
+          "name": "three of diamonds",
+          "aliases": [
+            "3 of diamonds"
+          ],
+          "plural": "three of diamonds"
+        },
+        {
+          "id": "four-of-diamonds",
+          "name": "four of diamonds",
+          "aliases": [
+            "4 of diamonds"
+          ],
+          "plural": "four of diamonds"
+        },
+        {
+          "id": "five-of-diamonds",
+          "name": "five of diamonds",
+          "aliases": [
+            "5 of diamonds"
+          ],
+          "plural": "five of diamonds"
+        },
+        {
+          "id": "six-of-diamonds",
+          "name": "six of diamonds",
+          "aliases": [
+            "6 of diamonds"
+          ],
+          "plural": "six of diamonds"
+        },
+        {
+          "id": "seven-of-diamonds",
+          "name": "seven of diamonds",
+          "aliases": [
+            "7 of diamonds"
+          ],
+          "plural": "seven of diamonds"
+        },
+        {
+          "id": "eight-of-diamonds",
+          "name": "eight of diamonds",
+          "aliases": [
+            "8 of diamonds"
+          ],
+          "plural": "eight of diamonds"
+        },
+        {
+          "id": "nine-of-diamonds",
+          "name": "nine of diamonds",
+          "aliases": [
+            "9 of diamonds"
+          ],
+          "plural": "nine of diamonds"
+        },
+        {
+          "id": "ten-of-diamonds",
+          "name": "ten of diamonds",
+          "aliases": [
+            "10 of diamonds"
+          ],
+          "plural": "ten of diamonds"
+        },
+        {
+          "id": "jack-of-diamonds",
+          "name": "jack of diamonds",
+          "aliases": [],
+          "plural": "jack of diamonds"
+        },
+        {
+          "id": "queen-of-diamonds",
+          "name": "queen of diamonds",
+          "aliases": [],
+          "plural": "queen of diamonds"
+        },
+        {
+          "id": "king-of-diamonds",
+          "name": "king of diamonds",
+          "aliases": [],
+          "plural": "king of diamonds"
+        },
+        {
+          "id": "ace-of-clubs",
+          "name": "ace of clubs",
+          "aliases": [],
+          "plural": "ace of clubs"
+        },
+        {
+          "id": "two-of-clubs",
+          "name": "two of clubs",
+          "aliases": [
+            "2 of clubs"
+          ],
+          "plural": "two of clubs"
+        },
+        {
+          "id": "three-of-clubs",
+          "name": "three of clubs",
+          "aliases": [
+            "3 of clubs"
+          ],
+          "plural": "three of clubs"
+        },
+        {
+          "id": "four-of-clubs",
+          "name": "four of clubs",
+          "aliases": [
+            "4 of clubs"
+          ],
+          "plural": "four of clubs"
+        },
+        {
+          "id": "five-of-clubs",
+          "name": "five of clubs",
+          "aliases": [
+            "5 of clubs"
+          ],
+          "plural": "five of clubs"
+        },
+        {
+          "id": "six-of-clubs",
+          "name": "six of clubs",
+          "aliases": [
+            "6 of clubs"
+          ],
+          "plural": "six of clubs"
+        },
+        {
+          "id": "seven-of-clubs",
+          "name": "seven of clubs",
+          "aliases": [
+            "7 of clubs"
+          ],
+          "plural": "seven of clubs"
+        },
+        {
+          "id": "eight-of-clubs",
+          "name": "eight of clubs",
+          "aliases": [
+            "8 of clubs"
+          ],
+          "plural": "eight of clubs"
+        },
+        {
+          "id": "nine-of-clubs",
+          "name": "nine of clubs",
+          "aliases": [
+            "9 of clubs"
+          ],
+          "plural": "nine of clubs"
+        },
+        {
+          "id": "ten-of-clubs",
+          "name": "ten of clubs",
+          "aliases": [
+            "10 of clubs"
+          ],
+          "plural": "ten of clubs"
+        },
+        {
+          "id": "jack-of-clubs",
+          "name": "jack of clubs",
+          "aliases": [],
+          "plural": "jack of clubs"
+        },
+        {
+          "id": "queen-of-clubs",
+          "name": "queen of clubs",
+          "aliases": [],
+          "plural": "queen of clubs"
+        },
+        {
+          "id": "king-of-clubs",
+          "name": "king of clubs",
+          "aliases": [],
+          "plural": "king of clubs"
+        }
+      ],
+      "host_bank": [
+        "queen-of-hearts",
+        "ace-of-spades",
+        "king-of-hearts",
+        "ace-of-hearts",
+        "jack-of-diamonds",
+        "two-of-clubs"
+      ],
+      "host_answers": [
+        "queen-of-hearts"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a pizza topping",
+      "entries": [
+        {
+          "id": "pepperoni",
+          "name": "pepperoni",
+          "aliases": [],
+          "plural": "pepperoni"
+        },
+        {
+          "id": "sausage",
+          "name": "sausage",
+          "aliases": [],
+          "plural": "sausage"
+        },
+        {
+          "id": "mushroom",
+          "name": "mushroom",
+          "aliases": [
+            "mushrooms"
+          ]
+        },
+        {
+          "id": "onion",
+          "name": "onion",
+          "aliases": [
+            "onions"
+          ]
+        },
+        {
+          "id": "green-pepper",
+          "name": "green pepper",
+          "aliases": [
+            "bell pepper",
+            "pepper",
+            "green peppers"
+          ]
+        },
+        {
+          "id": "black-olive",
+          "name": "black olive",
+          "aliases": [
+            "olive",
+            "black olives"
+          ]
+        },
+        {
+          "id": "extra-cheese",
+          "name": "extra cheese",
+          "aliases": [
+            "cheese"
+          ],
+          "plural": "extra cheese"
+        },
+        {
+          "id": "ham",
+          "name": "ham",
+          "aliases": [],
+          "plural": "ham"
+        },
+        {
+          "id": "pineapple",
+          "name": "pineapple",
+          "aliases": [],
+          "plural": "pineapple"
+        },
+        {
+          "id": "bacon",
+          "name": "bacon",
+          "aliases": [],
+          "plural": "bacon"
+        },
+        {
+          "id": "jalapeno",
+          "name": "jalapeño",
+          "aliases": [
+            "jalapeños"
+          ]
+        },
+        {
+          "id": "spinach",
+          "name": "spinach",
+          "aliases": [],
+          "plural": "spinach"
+        },
+        {
+          "id": "tomato",
+          "name": "tomato",
+          "aliases": [
+            "tomatoes"
+          ]
+        },
+        {
+          "id": "chicken",
+          "name": "chicken",
+          "aliases": [],
+          "plural": "chicken"
+        },
+        {
+          "id": "anchovy",
+          "name": "anchovy",
+          "aliases": [
+            "anchovies"
+          ]
+        },
+        {
+          "id": "garlic",
+          "name": "garlic",
+          "aliases": [],
+          "plural": "garlic"
+        },
+        {
+          "id": "basil",
+          "name": "basil",
+          "aliases": [],
+          "plural": "basil"
+        },
+        {
+          "id": "meatball",
+          "name": "meatball",
+          "aliases": [
+            "meatballs"
+          ]
+        },
+        {
+          "id": "artichoke",
+          "name": "artichoke",
+          "aliases": [
+            "artichokes"
+          ]
+        },
+        {
+          "id": "arugula",
+          "name": "arugula",
+          "aliases": [],
+          "plural": "arugula"
+        },
+        {
+          "id": "prosciutto",
+          "name": "prosciutto",
+          "aliases": [],
+          "plural": "prosciutto"
+        },
+        {
+          "id": "ground-beef",
+          "name": "ground beef",
+          "aliases": [
+            "beef"
+          ],
+          "plural": "ground beef"
+        },
+        {
+          "id": "feta",
+          "name": "feta",
+          "aliases": [],
+          "plural": "feta"
+        },
+        {
+          "id": "ricotta",
+          "name": "ricotta",
+          "aliases": [],
+          "plural": "ricotta"
+        },
+        {
+          "id": "banana-pepper",
+          "name": "banana pepper",
+          "aliases": [
+            "banana peppers"
+          ]
+        },
+        {
+          "id": "pesto",
+          "name": "pesto",
+          "aliases": [],
+          "plural": "pesto"
+        }
+      ],
+      "host_bank": [
+        "mushroom",
+        "pepperoni",
+        "sausage",
+        "extra-cheese",
+        "pineapple",
+        "onion"
+      ],
+      "host_answers": [
+        "mushroom"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a game you could play indoors",
+      "entries": [
+        {
+          "id": "board-game",
+          "name": "board game",
+          "aliases": [
+            "board games"
+          ]
+        },
+        {
+          "id": "card-game",
+          "name": "card game",
+          "aliases": [
+            "card games"
+          ]
+        },
+        {
+          "id": "video-game",
+          "name": "video game",
+          "aliases": [
+            "video games"
+          ]
+        },
+        {
+          "id": "charades",
+          "name": "charades",
+          "aliases": [],
+          "plural": "charades"
+        },
+        {
+          "id": "hide-and-seek",
+          "name": "hide and seek",
+          "aliases": [
+            "hide-and-seek"
+          ],
+          "plural": "hide and seek"
+        },
+        {
+          "id": "pictionary",
+          "name": "Pictionary",
+          "aliases": [],
+          "plural": "Pictionary"
+        },
+        {
+          "id": "twenty-questions",
+          "name": "twenty questions",
+          "aliases": [
+            "20 questions"
+          ],
+          "plural": "twenty questions"
+        },
+        {
+          "id": "i-spy",
+          "name": "I spy",
+          "aliases": [],
+          "plural": "I spy"
+        },
+        {
+          "id": "twister",
+          "name": "Twister",
+          "aliases": [],
+          "plural": "Twister"
+        },
+        {
+          "id": "jenga",
+          "name": "Jenga",
+          "aliases": [],
+          "plural": "Jenga"
+        },
+        {
+          "id": "uno",
+          "name": "Uno",
+          "aliases": [],
+          "plural": "Uno"
+        },
+        {
+          "id": "go-fish",
+          "name": "Go Fish",
+          "aliases": [],
+          "plural": "Go Fish"
+        },
+        {
+          "id": "solitaire",
+          "name": "solitaire",
+          "aliases": [],
+          "plural": "solitaire"
+        },
+        {
+          "id": "poker",
+          "name": "poker",
+          "aliases": [],
+          "plural": "poker"
+        },
+        {
+          "id": "darts",
+          "name": "darts",
+          "aliases": [],
+          "plural": "darts"
+        },
+        {
+          "id": "ping-pong",
+          "name": "ping pong",
+          "aliases": [
+            "table tennis"
+          ],
+          "plural": "ping pong"
+        },
+        {
+          "id": "monopoly",
+          "name": "Monopoly",
+          "aliases": [],
+          "plural": "Monopoly"
+        },
+        {
+          "id": "scrabble",
+          "name": "Scrabble",
+          "aliases": [],
+          "plural": "Scrabble"
+        },
+        {
+          "id": "chess",
+          "name": "chess",
+          "aliases": [],
+          "plural": "chess"
+        },
+        {
+          "id": "checkers",
+          "name": "checkers",
+          "aliases": [
+            "draughts"
+          ],
+          "plural": "checkers"
+        },
+        {
+          "id": "clue",
+          "name": "Clue",
+          "aliases": [
+            "Cluedo"
+          ],
+          "plural": "Clue"
+        },
+        {
+          "id": "connect-four",
+          "name": "Connect Four",
+          "aliases": [
+            "Connect 4"
+          ],
+          "plural": "Connect Four"
+        }
+      ],
+      "host_bank": [
+        "board-game",
+        "card-game",
+        "video-game",
+        "charades",
+        "hide-and-seek",
+        "monopoly"
+      ],
+      "host_answers": [
+        "board-game"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a letter worth more than 1 point in Scrabble",
+      "entries": [
+        {
+          "id": "b",
+          "name": "B",
+          "aliases": [
+            "letter B"
+          ],
+          "plural": "B"
+        },
+        {
+          "id": "c",
+          "name": "C",
+          "aliases": [
+            "letter C"
+          ],
+          "plural": "C"
+        },
+        {
+          "id": "d",
+          "name": "D",
+          "aliases": [
+            "letter D"
+          ],
+          "plural": "D"
+        },
+        {
+          "id": "f",
+          "name": "F",
+          "aliases": [
+            "letter F"
+          ],
+          "plural": "F"
+        },
+        {
+          "id": "g",
+          "name": "G",
+          "aliases": [
+            "letter G"
+          ],
+          "plural": "G"
+        },
+        {
+          "id": "h",
+          "name": "H",
+          "aliases": [
+            "letter H"
+          ],
+          "plural": "H"
+        },
+        {
+          "id": "j",
+          "name": "J",
+          "aliases": [
+            "letter J"
+          ],
+          "plural": "J"
+        },
+        {
+          "id": "k",
+          "name": "K",
+          "aliases": [
+            "letter K"
+          ],
+          "plural": "K"
+        },
+        {
+          "id": "m",
+          "name": "M",
+          "aliases": [
+            "letter M"
+          ],
+          "plural": "M"
+        },
+        {
+          "id": "p",
+          "name": "P",
+          "aliases": [
+            "letter P"
+          ],
+          "plural": "P"
+        },
+        {
+          "id": "q",
+          "name": "Q",
+          "aliases": [
+            "letter Q"
+          ],
+          "plural": "Q"
+        },
+        {
+          "id": "v",
+          "name": "V",
+          "aliases": [
+            "letter V"
+          ],
+          "plural": "V"
+        },
+        {
+          "id": "w",
+          "name": "W",
+          "aliases": [
+            "letter W"
+          ],
+          "plural": "W"
+        },
+        {
+          "id": "x",
+          "name": "X",
+          "aliases": [
+            "letter X"
+          ],
+          "plural": "X"
+        },
+        {
+          "id": "y",
+          "name": "Y",
+          "aliases": [
+            "letter Y"
+          ],
+          "plural": "Y"
+        },
+        {
+          "id": "z",
+          "name": "Z",
+          "aliases": [
+            "letter Z"
+          ],
+          "plural": "Z"
+        }
+      ],
+      "host_bank": [
+        "z",
+        "q",
+        "x",
+        "j",
+        "k",
+        "b",
+        "m"
+      ],
+      "host_answers": [
+        "z"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name one of the original 13 colonies",
+      "entries": [
+        {
+          "id": "new-hampshire",
+          "name": "New Hampshire",
+          "aliases": [
+            "NH"
+          ],
+          "plural": "New Hampshire"
+        },
+        {
+          "id": "massachusetts",
+          "name": "Massachusetts",
+          "aliases": [
+            "MA"
+          ],
+          "plural": "Massachusetts"
+        },
+        {
+          "id": "rhode-island",
+          "name": "Rhode Island",
+          "aliases": [
+            "RI"
+          ],
+          "plural": "Rhode Island"
+        },
+        {
+          "id": "connecticut",
+          "name": "Connecticut",
+          "aliases": [
+            "CT"
+          ],
+          "plural": "Connecticut"
+        },
+        {
+          "id": "new-york",
+          "name": "New York",
+          "aliases": [
+            "NY"
+          ],
+          "plural": "New York"
+        },
+        {
+          "id": "new-jersey",
+          "name": "New Jersey",
+          "aliases": [
+            "NJ"
+          ],
+          "plural": "New Jersey"
+        },
+        {
+          "id": "pennsylvania",
+          "name": "Pennsylvania",
+          "aliases": [
+            "PA"
+          ],
+          "plural": "Pennsylvania"
+        },
+        {
+          "id": "delaware",
+          "name": "Delaware",
+          "aliases": [
+            "DE"
+          ],
+          "plural": "Delaware"
+        },
+        {
+          "id": "maryland",
+          "name": "Maryland",
+          "aliases": [
+            "MD"
+          ],
+          "plural": "Maryland"
+        },
+        {
+          "id": "virginia",
+          "name": "Virginia",
+          "aliases": [
+            "VA"
+          ],
+          "plural": "Virginia"
+        },
+        {
+          "id": "north-carolina",
+          "name": "North Carolina",
+          "aliases": [
+            "NC"
+          ],
+          "plural": "North Carolina"
+        },
+        {
+          "id": "south-carolina",
+          "name": "South Carolina",
+          "aliases": [
+            "SC"
+          ],
+          "plural": "South Carolina"
+        },
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "aliases": [
+            "GA"
+          ],
+          "plural": "Georgia"
+        }
+      ],
+      "host_bank": [
+        "virginia",
+        "massachusetts",
+        "new-york",
+        "pennsylvania",
+        "georgia",
+        "new-jersey",
+        "maryland",
+        "north-carolina"
+      ],
+      "host_answers": [
+        "virginia"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an animal of the Chinese zodiac",
+      "entries": [
+        {
+          "id": "dragon",
+          "name": "dragon",
+          "aliases": [],
+          "plural": "dragon"
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [],
+          "plural": "tiger"
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [],
+          "plural": "rat"
+        },
+        {
+          "id": "snake",
+          "name": "snake",
+          "aliases": [],
+          "plural": "snake"
+        },
+        {
+          "id": "horse",
+          "name": "horse",
+          "aliases": [],
+          "plural": "horse"
+        },
+        {
+          "id": "monkey",
+          "name": "monkey",
+          "aliases": [],
+          "plural": "monkey"
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [],
+          "plural": "dog"
+        },
+        {
+          "id": "ox",
+          "name": "ox",
+          "aliases": [],
+          "plural": "ox"
+        },
+        {
+          "id": "rabbit",
+          "name": "rabbit",
+          "aliases": [],
+          "plural": "rabbit"
+        },
+        {
+          "id": "goat",
+          "name": "goat",
+          "aliases": [
+            "sheep",
+            "ram"
+          ],
+          "plural": "goat"
+        },
+        {
+          "id": "rooster",
+          "name": "rooster",
+          "aliases": [
+            "chicken"
+          ],
+          "plural": "rooster"
+        },
+        {
+          "id": "pig",
+          "name": "pig",
+          "aliases": [],
+          "plural": "pig"
+        }
+      ],
+      "host_bank": [
+        "dragon",
+        "tiger",
+        "rat",
+        "snake",
+        "horse",
+        "monkey",
+        "dog",
+        "ox",
+        "rabbit",
+        "goat",
+        "rooster",
+        "pig"
+      ],
+      "host_answers": [
+        "dragon",
+        "tiger"
+      ],
+      "match_groups": {}
+    }
+  ]
+}
