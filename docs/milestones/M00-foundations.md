@@ -98,7 +98,10 @@ $ npm run test:sql (local)                  -> Tests=9, Result: PASS
 $ (human) psql \password riff_app as postgres, verify-full with supabase/certs/prod-ca-2021.crt
 $ (human) psql as riff_app.<ref> via the transaction pooler :6543, verify-full -> current_user = riff_app (1 row)
 ```
-The staging run of the pgTAP role checks (`supabase test db --linked`) is still failing because pgTAP needs `extensions` on the search path. The fix is waiting on human approval.
+$ npx supabase test db --linked (after the approved fix: set local role postgres + search_path) -> Files=1, Tests=9, Result: PASS
+```
+Getting the staging run to work took 3 disproved hypotheses, each stopped and re-planned with the human: (1) search_path alone failed because there was no USAGE on `extensions`; (2) the role switch alone failed because of the search_path; (3) schema-qualified calls failed because pgTAP internals call `_set` unqualified. Diagnosed with a temporary notice-only query, since deleted.
+```
 
 Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
 

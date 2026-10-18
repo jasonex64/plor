@@ -1,6 +1,11 @@
 -- riff_app must be a plain login role with nothing beyond what a milestone explicitly grants
 -- (DECISIONS.md: App database role). Run with `npm run test:sql`.
 begin;
+-- Remotely, `supabase test db --linked` logs in as cli_login_postgres, which has no USAGE on the
+-- `extensions` schema where pgTAP lives and no `extensions` on its search_path. pgTAP's own functions
+-- call each other unqualified, so both are needed; both are scoped to this transaction only.
+set local role postgres;
+set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
 select plan(9);
 
