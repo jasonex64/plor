@@ -3,7 +3,7 @@
 **Status:** in progress
 
 ## Goal
-Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 7 real days of puzzles.
+Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 14 real daily puzzles (one full 7-question chain per date).
 
 ## Who uses it / what breaks without it
 - Used by: the host (us) when authoring puzzles, and the M02 server, which loads them.
@@ -25,7 +25,7 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [ ] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
   - [ ] a host answer count that differs from "host answers per question"
 - [ ] A valid fixture passes.
-- [ ] 7 consecutive days of real puzzles, written by the host, pass the validator.
+- [ ] 14 daily puzzles on consecutive dates, written by the host, pass the validator. Each puzzle is one file holding one full 7-question chain for its date.
 - [ ] CI runs the validator over all puzzle files.
 
 ## Out of scope
@@ -36,6 +36,7 @@ Serving puzzles (M02), an admin UI and AI-generated content.
 |---|---|---|
 | Questions per chain | Chain length check | **7**, human, 2026-10-18 ("i think each daily chain should have 7", relayed by the parent session) |
 | Host answers per question | Host answer count check | **1**, human, 2026-10-18 ("1 per question"). Tune after the M02 playtest. The format stores host answers as a list, so a change only touches the validator setting. |
+| Daily puzzles to author in M01 | Acceptance criterion: real content before M02 | **14**, human, 2026-10-18 (replaces Claude-invented 7). One puzzle = one full 7-question chain for one date. |
 | Host bank size per question | Validator: the host bank has at least as many entries as the host-answer count, and every host answer is in it. No warning. | **No fixed size yet**, human, 2026-10-18. Whether the bank holds the answers players actually give is measured in the M02 playtest (ROADMAP "Next revision"). |
 
 ## Plan
@@ -46,7 +47,7 @@ Serving puzzles (M02), an admin UI and AI-generated content.
    Hypothesis: each failing fixture produces exactly its rule's error and nothing else, and the valid fixture passes. Any other result means the rule or the fixture is wrong.
 4. Write `scripts/content-plurals.ts` (`npm run content:plurals [-- <root>]`, default `content/`). It adds each entry's expected plural (its `plural` override, otherwise `pluralize(name)`) to `aliases` when it's missing, and prints every plural it adds so the human reviews them in the diff.
 5. Add `npm run content:validate` to CI.
-6. The host writes 7 consecutive days in `content/offbeat/`, and they pass the validator locally and in CI.
+6. The host writes 14 daily puzzles in `content/offbeat/`, one file per date, each a full 7-question chain. They pass the validator locally and in CI.
 7. Reviewer pass, then a PR.
 
 ## Removes
