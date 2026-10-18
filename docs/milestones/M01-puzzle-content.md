@@ -61,7 +61,7 @@ Nothing in code: this is the first content code. The `tsconfig.json` change (`al
 |---|---|---|
 | Ticket: a puzzle file holds a "version" | `format: 1` | DECISIONS.md and data design §4 name the field `format`, and they win over the ticket's wording. |
 | Ticket: reject "a duplicate date" | Reject a file whose path isn't `<game_id>/<date>.json` | Human, 2026-10-18. A filesystem can't hold two files with one path, so a duplicate date can't happen once the path is checked. |
-| Ticket: rules for aliases, banks, groups, plurals and counts | Those rules, plus: duplicate entry IDs, a match group keyed by an entry that isn't a host answer, IDs listed twice in `host_bank` or `host_answers`, names that normalize to empty, and shape errors (missing or unknown fields, wrong types, `format` ≠ 1, `game_id` ≠ `offbeat`, impossible dates) | Matching by ID needs unique IDs. Keying groups by host answer is the approved format. The file is untrusted disk input (CLAUDE.md: validate at boundaries). |
+| Ticket: rules for aliases, banks, groups, plurals and counts | Those rules, plus: duplicate entry IDs, a match group keyed by an entry that isn't a host answer, a host answer listed in its own group (human, 2026-10-18), IDs listed twice in `host_bank` or `host_answers`, names that normalize to empty, and shape errors (missing or unknown fields, wrong types, `format` ≠ 1, `game_id` ≠ `offbeat`, impossible dates) | Matching by ID needs unique IDs. Keying groups by host answer is the approved format. The file is untrusted disk input (CLAUDE.md: validate at boundaries). |
 | Data design §4: one validator the server also imports | `src/content/puzzle.ts`, imported by both scripts | As designed. The server import arrives in M02. |
 | Approved normalization: lowercase, NFKD, strip marks and punctuation, collapse whitespace | Exactly that, in that order. Punctuation is removed, not replaced by a space, so "bald-eagle" normalizes to "baldeagle", not "bald eagle". | Lowercasing first makes U+0130 (İ) produce a combining mark that NFKD stripping then removes (tested). |
 | Plural check covers "an entry" | The plural of the entry's `name` only. Synonym aliases (e.g. "cougar") don't need their own plural. | Ticket wording. Players submit entry IDs from autocomplete, so aliases only help search. |
@@ -69,5 +69,8 @@ Nothing in code: this is the first content code. The `tsconfig.json` change (`al
 ## Evidence
 
 ## Review
+Reviewer run 1 (2026-10-18, on fa31fa9): 1 blocking finding, 8 non-blocking.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - It wasn't defined whether a host answer matches itself. The validator accepted both `{"eagle": ["eagle"]}` and `{}`, so an M02 matcher written as "entry ∈ group" would let a player who picks the host answer survive. **Fixed:** the human decided on 2026-10-18 that a host answer always matches itself (DECISIONS.md: Answer model). The validator now rejects a host answer listed in its own group, and the `match-group-contains-key` fixture covers it. The matching function itself is M02 work (data design §4) and must follow this rule.
+- Deferred to ROADMAP "Next revision": 8 items (files skipped by extension, no consecutive-date check, `p{Cf}` not stripped, one-way plural check, full-file reformat in `content:plurals`, the incomplete caller list in "Removes", mixed import styles, stale M00 remote branches).
+- The reviewer's two unverified items, now checked: `npm run lockfile -- check` printed LOCKFILE CHECK OK (Linux, node:24), and `npm run build` succeeded with `allowImportingTsExtensions` set.

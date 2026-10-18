@@ -16,6 +16,7 @@ const EXPECTED: Record<string, string> = {
   "host-answer-not-in-bank": `${FILE} q3 entry "giraffe": host answer is not in host_bank`,
   "match-group-unknown-entry": `${FILE} q1 entry "golden-eagle": in match group "eagle" but not in the accepted bank`,
   "match-group-key-not-host-answer": `${FILE} q1 entry "lion": match group key is not a host answer`,
+  "match-group-contains-key": `${FILE} q1 entry "eagle": listed in its own match group (a host answer always matches itself)`,
   "plural-missing": `${FILE} q1 entry "lion": no plural alias "lions" (run npm run content:plurals, or set "plural" to override)`,
   "path-mismatch": `${FILE}: path must be offbeat/2026-11-03.json to match its game_id and date`,
   "chain-length": `${FILE}: chain has 6 questions, expected 7`,

@@ -166,11 +166,13 @@ function checkQuestionRules(where: string, q: Question): string[] {
     if (!bank.has(id)) errors.push(`${where} entry "${id}": host answer is not in host_bank`);
   }
 
-  // Groups are keyed by host answer: only a host answer's group is ever used for matching.
+  // Groups are keyed by host answer: only a host answer's group is ever used for matching. A host answer
+  // always matches itself, so its group lists only the other entries it covers (human, 2026-10-18).
   const answers = new Set(q.host_answers);
   for (const [key, members] of Object.entries(q.match_groups)) {
     if (!known.has(key)) errors.push(`${where} entry "${key}": match group key is not in the accepted bank`);
     else if (!answers.has(key)) errors.push(`${where} entry "${key}": match group key is not a host answer`);
+    if (members.includes(key)) errors.push(`${where} entry "${key}": listed in its own match group (a host answer always matches itself)`);
     for (const id of members) {
       if (!known.has(id)) errors.push(`${where} entry "${id}": in match group "${key}" but not in the accepted bank`);
     }
