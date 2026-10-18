@@ -103,6 +103,14 @@ $ npx supabase test db --linked (after the approved fix: set local role postgres
 Getting the staging run to work took 3 disproved hypotheses, each stopped and re-planned with the human: (1) search_path alone failed because there was no USAGE on `extensions`; (2) the role switch alone failed because of the search_path; (3) schema-qualified calls failed because pgTAP internals call `_set` unqualified. Diagnosed with a temporary notice-only query, since deleted.
 ```
 
+Vercel staging deploy (2026-10-18). Preview `riff-git-m00-foundations-sixfour.vercel.app`, behind Vercel Authentication; env `DATABASE_URL` uses riff_app on :6543, plus `DATABASE_CA_CERT`; `vercel.json` pins nextjs and iad1:
+```
+$ (human, logged in to Vercel, in a browser) GET /api/health  -> {"ok":true,"protocol":1}
+$ npm run -s status -- https://riff-git-m00-foundations-sixfour.vercel.app
+    -> DOWN ... not JSON (302 to vercel.com/sso-api: Vercel Authentication blocks unauthenticated requests, as intended)
+```
+Before the env vars were set, the build failed with "No Output Directory named public": the Framework Preset had been auto-detected as Other from the docs-only `main`. Fixed by `vercel.json`.
+
 Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
 
 ## Review
