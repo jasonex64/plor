@@ -12,7 +12,7 @@ A signed-in player can play today's Offbeat puzzle end to end on staging, with e
 ## Source
 - `docs/milestones/M00-data-design.md` rev 4: §2 network messages, §3 identity, §4 content, §5 runs and run events, §7 append-only, §8 day boundary.
 - `docs/DECISIONS.md`: Game 1 rules, answer model, database access, app database role, error handling, logging.
-- Supabase Auth with Next.js SSR (`@supabase/ssr`), plus the D1 docs (magic link, email sending and rate limits, Google sign-in, redirect URLs), all pinned in SOURCES.md at supabase/supabase `7425d49`. *(Rows added 2026-10-18 for D1; only a human can add a source, so they need the human's OK.)*
+- Supabase Auth with Next.js SSR (`@supabase/ssr`), plus the D1 docs (magic link, email sending and rate limits, Google sign-in, redirect URLs), all pinned in SOURCES.md at supabase/supabase `7425d49`. *(Rows added 2026-10-18 for D1, and the Next.js row extended with the Proxy and auth-with-Cache-Components pages; only a human can add a source, so all of these need the human's OK.)*
 - Next.js App Router docs bundled at `node_modules/next/dist/docs/` (route handlers, `connection()`).
 
 ## Decisions needed before any code
@@ -102,7 +102,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 
 ## Evidence
 ### 2a (sign-in and profile)
-Run on branch `m02-sign-in-and-play`, 2026-10-18 (Windows, Node 24.11.0), against a freshly reset local stack (`npx supabase db reset`).
+Run on branch `m02-sign-in-and-play`, 2026-10-18 (Windows, Node 24.11.0), after review 1's fix, on a reset local stack in this order: `test:db` first, then `test:sql`. `test:sql` also passed earlier with leftover profiles in the table, and `test:db` now deletes the users it creates.
 
 ```text
 $ npm run test:sql
@@ -146,5 +146,8 @@ Not yet verified: anything on staging (Google sign-in, the hosted email sender, 
 
 
 ## Review
+**2a, review 1** (reviewer agent, fresh context, diff `5e8e83e..4c0c6c7`, 2026-10-18):
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - `profile.test.sql` asserted the whole table held one row, so it failed once `test:db` (or real staging users) had left profiles behind; the reviewer reproduced `have: 3 want: 1`. **Fixed:** the assertion counts only the test's own user IDs, and `route.db.test.ts` deletes the auth users it created (cascading to profiles). `test:sql` then passed with 2 leftover profiles present, and the user count was unchanged after `test:db`.
+- Deferred to ROADMAP "Next revision": `getClaims()` errors become a 500 if tokens are HS256 (signing keys unverified); the bundle check skips `.next/server/app`; the private-schema sweep comment mentions sequences it doesn't check. The SOURCES Next.js row is now named in the pending human OK. The username-rule drift was already logged.
+- The reviewer's unverified items: the signing algorithm (not checked, to avoid handling tokens); the browser run and the planted-leak check (written claims only); Origin on Vercel, Google and the hosted sender (human setup step 8); the lockfile check (run by the author: LOCKFILE CHECK OK).

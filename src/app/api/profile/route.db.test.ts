@@ -32,6 +32,8 @@ beforeAll(() => {
 });
 
 afterAll(async () => {
+  // Leave the local stack as it was: deleting the auth users cascades to their profiles (M02 review).
+  await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await getPool().end();
 });
 

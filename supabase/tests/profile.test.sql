@@ -44,7 +44,10 @@ select is((select data_type || '/' || udt_name from information_schema.columns
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000a';
 select is((select count(*)::int from private.profile where user_id = '00000000-0000-0000-0000-00000000000a'), 0,
   'deleting the auth user deletes the profile');
-select is((select count(*)::int from private.profile), 1, 'other profiles are untouched');
+-- Only this test's users: the table may already hold real profiles (staging) or test:db leftovers (M02 review).
+select is((select count(*)::int from private.profile where user_id in (
+    '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c')),
+  1, 'other profiles are untouched');
 
 select * from finish();
 rollback;
