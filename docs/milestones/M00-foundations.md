@@ -2,9 +2,13 @@
 
 **Status:** in progress
 
-**Progress (2026-10-17):** stack A chosen and its sources pinned. Tooling rows proposed in DECISIONS.md, waiting on human approval. Hard-to-reverse design drafted in `M00-data-design.md`: review 1's blocking findings are fixed, and Q1–Q5 were answered by a human on 2026-10-17 (applied in revision 3). Review 2's blocking findings are fixed in revision 4, which is waiting on human sign-off.
-**Toolchain (checked 2026-10-17):** Node v24.11.0, npm 11.6.1, Git 2.56.0 and Docker 29.8.2 are installed. **The Docker Desktop engine fails to start**, which blocks `supabase start`.
-**Blocked on the human:** getting Docker Desktop running, approving the tooling rows, signing off on the data design, and moving to a permanent repo folder.
+**Progress (2026-10-17):** stack A chosen and its sources pinned. Tooling rows and data design revision 4 approved by a human. Repo initialized in the RIFF folder: the docs are committed on `main`, and the scaffold is on branch `m00-foundations`. Scaffold done: Next.js 16.4.2, Vitest, the status script with tests, `/api/health`, Supabase CLI config and the CI workflow. Lint, tests and build pass locally, and the status script has been checked up and down against a real running server.
+**Toolchain (checked 2026-10-17):** Node v24.11.0, npm 11.6.1, Git 2.56.0 and Docker 29.8.2 are installed. **The Docker Desktop engine fails to start** ("Docker Desktop is unable to start"). The hypervisor is present, but WSL has no `docker-desktop` distro, which blocks `supabase start`.
+**Blocked on the human:**
+- getting the Docker engine running
+- `supabase login`, then creating or linking the hosted Supabase project (the region is permanent, so a human picks it)
+- `vercel login`, then linking the project (the Pro plan; set the function region to match Supabase)
+- a GitHub remote so CI can actually run
 
 ## Goal
 Make the decisions every later milestone depends on, and prove the toolchain works end to end with a deploy to staging.
@@ -17,10 +21,10 @@ Make the decisions every later milestone depends on, and prove the toolchain wor
 None yet. Choosing and pinning sources is part of this milestone. Each stack choice gets a SOURCES.md entry (official docs, version pinned) **before** it's recorded in DECISIONS.md.
 
 ## Acceptance criteria
-- [ ] Every `TBD` row in DECISIONS.md "Current" is filled in, with a reason and a source.
-- [ ] Every row in DECISIONS.md "Hard to reverse" is filled in and has been reviewed by the `reviewer` agent and approved by a human.
-- [ ] The "proposed" items in DECISIONS.md (client platform, sudden death, fixed sequence) are confirmed or replaced by a human.
-- [ ] The repo has a single task runner entry point. `<runner> test` runs one real test and passes, and CI runs the same command.
+- [x] Every `TBD` row in DECISIONS.md "Current" is filled in, with a reason and a source. *(Approved on 2026-10-17. Exception: the exact regions are still for a human to pick.)*
+- [x] Every row in DECISIONS.md "Hard to reverse" is filled in and has been reviewed by the `reviewer` agent and approved by a human. *(2 reviews, revision 4 approved on 2026-10-17)*
+- [x] The "proposed" items in DECISIONS.md (client platform, sudden death, fixed sequence) are confirmed or replaced by a human.
+- [ ] The repo has a single task runner entry point. `<runner> test` runs one real test and passes, and CI runs the same command. *(Local part done. CI is written but hasn't run, because there's no GitHub remote yet.)*
 - [ ] A hello-world client and server are deployed to staging and reachable at a recorded URL.
 - [ ] `scripts/status` checks the staging deployment, exits non-zero when it's down, and its output is pasted as evidence for both the up and down cases.
 - [ ] The debug procedure in DECISIONS.md has been followed once against staging, and the output is in Evidence.
@@ -42,7 +46,7 @@ Any game logic, content format implementation, accounts or UI beyond hello-world
 5. Deploy to staging, then write and run `scripts/status`.
 
 ## Removes
-Nothing. The repo has no code yet.
+From the `create-next-app@16.4.2` scaffold: the demo page and its CSS module, five template SVGs, the Google fonts (Geist), the boilerplate README, and the template `.gitignore` (merged into ours). None of them had a caller.
 
 ---
 *Fill in the sections below at the end.*
@@ -50,8 +54,23 @@ Nothing. The repo has no code yet.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The `create-next-app` defaults include an `AGENTS.md` that tells agents to read `node_modules/next/dist/docs/` | Kept the file, but didn't adopt it as a rule | Agent rules live only in CLAUDE.md. Whether the bundled docs become a pinned source is a human decision. |
+| DECISIONS.md: `npm run status -- <env>` | `npm run status -- <base-url>` | No environment URLs exist yet, so a name-to-URL mapping would have no caller. Revisit when staging exists. |
 
 ## Evidence
+Commands and their output, from 2026-10-17 on Windows 11 with Node v24.11.0:
+```
+$ npm run lint                      -> exit 0
+$ npx vitest run                    -> Test Files 1 passed (1), Tests 5 passed (5), 283ms
+$ npm run build                     -> exit 0
+    / (Static), /api/health (Dynamic: connection() keeps health off the prerender path)
+$ npx next start -p 3100 & npm run -s status -- http://127.0.0.1:3100
+    UP http://127.0.0.1:3100 (protocol 1)                                        exit=0
+$ (server stopped) npm run -s status -- http://127.0.0.1:3100
+    DOWN http://127.0.0.1:3100: unreachable: http://127.0.0.1:3100/api/health (fetch failed)  exit=1
+$ npm run -s status                 -> usage message, exit=2
+```
+Still needed: the same status up and down evidence against **staging**, and a CI run.
 
 ## Review
 - Blocking findings and how each was fixed:
