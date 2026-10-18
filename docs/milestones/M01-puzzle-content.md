@@ -26,7 +26,7 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [x] a question with no host answers *(human, 2026-10-18: the count varies by question, so the fixed-count check became "at least 1")*
 - [x] A valid fixture passes.
 - [x] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. Every day mixes concrete questions with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding the 7 questions for its date.
-- [ ] CI runs the validator over all puzzle files.
+- [x] CI runs the validator over all puzzle files.
 
 ## Out of scope
 Serving puzzles (M02), an admin UI, and automated AI puzzle generation (a later milestone; see ROADMAP). Claude drafting this milestone's 14 puzzles for human review is in scope (human, 2026-10-18).
@@ -107,7 +107,7 @@ $ npm run lockfile -- check      LOCKFILE CHECK OK (Linux, node:24)
 
 - **Plurals reviewed:** `npm run content:plurals` added 1,143 plural aliases to the drafts, and Claude reviewed every printed one. 23 entries override the generated plural with a different form (e.g. Dobermen → Dobermans, gulves → gulfs, UFOS → UFOs, macchiatoes → macchiatos). A further 2,145 entries set `plural` equal to their name, which tells the validator they have no plural. These are proper nouns (countries, states, holidays, brands), mass nouns (cheddar, snow, sushi), phrases ("read a book"), and letters, numbers and cards. Claude chose them by category; they were never printed by `content:plurals`, so no human reviewed them one by one. Review 2 found countable words wrongly in that set (dragon, ace, samosa, latte, tornado…); those now get generated plurals.
 - **Host approval:** the human approved the drafts on 2026-10-18 ("sure that works so far"), then asked for international answers, which were added in 76cda42 (3,203 → 3,876 accepted answers). After review 2, three host answers changed (fish → shark, board game → charades, planet → moon); see Review.
-- **CI:** `.github/workflows/ci.yml` runs `npm run content:validate` after `npm test`. The PR's CI run is the evidence (added below once green).
+- **CI:** `.github/workflows/ci.yml` runs `npm run content:validate` after `npm test`. PR #4, run 39118599153 on 576de28 (pull_request): job `check` succeeded, with steps lint, test, content:validate and build all green, and the log shows `CONTENT OK content: 14 file(s)`. Job `secrets` (gitleaks) succeeded too. The later commits change docs only.
 
 ## Review
 Reviewer run 1 (2026-10-18, on fa31fa9): 1 blocking finding, 8 non-blocking.
