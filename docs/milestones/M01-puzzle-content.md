@@ -1,6 +1,6 @@
 # M01 — Puzzle content format and validator
 
-**Status:** in review
+**Status:** done (merged in PR #4, 2026-10-18)
 
 ## Goal
 Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 14 real daily puzzles (7 independent questions per date).
