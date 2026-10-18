@@ -1,0 +1,45 @@
+# Runs the same npm scripts a developer runs locally (DECISIONS.md: task runner).
+name: ci
+# Every push on every branch, so a pushed milestone branch is scanned even before a PR exists
+# (DECISIONS.md: Secret scanning; M00 review 3).
+on:
+  push:
+  pull_request:
+
+# Least privilege for GITHUB_TOKEN: anything not listed is `none` (docs.github.com, workflow syntax:
+# permissions). Jobs that need more widen it below.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
+  # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a
+  # personal account (github.com/gitleaks/gitleaks-action). Full history so old commits are scanned too.
+  secrets:
+    runs-on: ubuntu-latest
+    # gitleaks-action lists a PR's commits through the API; without pull-requests: read it got
+    # 403 "Resource not accessible by integration" on PR #1. Read-only; if PR comments need write, that's a
+    # separate human decision (CLAUDE.md: Security changes need a human).
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

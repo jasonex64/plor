@@ -23,6 +23,13 @@ Add a rule here only after an agent has actually made that mistake. Rules for pr
 - **Repeated procedures are scripts.** If a multi-step procedure gets run twice, it becomes a script in `scripts/`, called through the task runner in DECISIONS.md. Don't hand-type a procedure that already has a script.
 - **Leave no scraps.** Before you call a task done, remove temp files, debug code, experiment branches, stale artifacts and any processes you started.
 
+## Security
+- **Secrets never leave their home.** Passwords, connection strings, keys and tokens never appear in chat, commits, logs, test output or docs. When you check one, print only derived facts (host, port, "is set"). Never ask the human to paste a secret to you.
+- **Staging and production secrets live only in Vercel env vars and the human's password manager.** Local files such as `.env.local` point only at the local stack. *(Added after an agent had the human put the staging master password in `.env.local`.)*
+- **Least privilege.** App code connects as a dedicated role with only the grants it needs, never as `postgres` or with the `service_role` key, unless DECISIONS.md says otherwise.
+- **Verify, don't disable.** Remote connections use verified TLS. Never turn off a security check to make something work; stop and ask instead.
+- **Security changes need a human.** Changes to auth, roles, grants, RLS, network exposure or secret handling are proposed first and recorded in DECISIONS.md.
+
 ## Stop and ask when
 - the source is missing, ambiguous or contradicts another source
 - a number is needed and nothing gives it
