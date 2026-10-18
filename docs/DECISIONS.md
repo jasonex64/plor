@@ -53,7 +53,7 @@ These are the only exceptions to "build for today". Decide them and get them rev
 ### Answer model (confirmed)
 | Bank | Contents | Sent to client? |
 |---|---|---|
-| Accepted bank | As complete as practical, so players can escape with niche answers. Concrete questions are built from reference lists; abstract ones (e.g. "something you'd bring to a potluck") are curated and grow from logged misses (M02). One level of detail per question: don't list an answer next to "<kind> <answer>" variants of it (e.g. "cake" with "chocolate cake"). (Human, 2026-10-18) | Yes, as canonical entries, for autocomplete |
+| Accepted bank | As complete as practical, so players can escape with niche answers. Concrete questions are built from reference lists; abstract ones (e.g. "something you'd bring to a potluck") are curated and grow from logged misses (M02). One level of detail per question: don't list an answer next to "<kind> <answer>" variants of it (e.g. "cake" with "chocolate cake"). Differently named kinds may sit next to a general answer ("tuna" next to "fish"), but a general answer is never a host answer when its kinds are listed. (Human, 2026-10-18) | Yes, as canonical entries, for autocomplete |
 | Host bank | A small subset of common, typical answers | Never, and nothing marks which entries are in it |
 | Host answer(s) | Picked from the host bank | Only after the player has answered that question |
 
