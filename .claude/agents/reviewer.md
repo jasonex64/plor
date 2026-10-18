@@ -23,7 +23,7 @@ You will be given a ticket in `docs/milestones/` and a diff (a branch or commit 
 - A breakable path with no test, or a test that was weakened, skipped or mocks the thing under test
 - A second way of doing something that DECISIONS.md already covers
 - A long-running system with no evidence that it ran under realistic conditions
-- Security issues
+- Security issues, including any violation of the CLAUDE.md Security rules: a secret in a file, log or output; a privileged role or key where a least-privileged one would do; disabled TLS or other checks; an unapproved change to auth, roles, grants or RLS
 - Leftover scraps: temp files, debug code, stale branches or artifacts
 
 Anything else, including style, naming, possible future needs or small refactors, is **not blocking**.
