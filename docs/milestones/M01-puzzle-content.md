@@ -1,6 +1,6 @@
 # M01 — Puzzle content format and validator
 
-**Status:** planned
+**Status:** in progress
 
 ## Goal
 Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 7 real days of puzzles.
@@ -11,7 +11,8 @@ Define a versioned file format for daily puzzles and a validator script that rej
 
 ## Source
 - DECISIONS.md: "Puzzle content format" (hard to reverse) and "Answer model".
-- The schema and serialization source chosen in M00, as pinned in SOURCES.md.
+- SOURCES.md: JSON (RFC 8259) for syntax; Unicode normalization (ECMA-262 `String.prototype.normalize`, UAX #15 NFKD, UAX #44 General_Category `M`/`P`); pluralize 8.0.0 for generated plurals. All three were chosen by a human on 2026-10-18.
+- M00-data-design.md §4 (authoring path, `format: 1`, single TypeScript validator) and the Game 1 section of DECISIONS.md (`game_id` `offbeat`).
 
 ## Acceptance criteria
 - [ ] A puzzle file holds: version, game_id, date, and an ordered chain of questions. Each question has an accepted bank of canonical entries (ID plus aliases), a host bank of entry IDs, host answer(s) and match groups.
@@ -21,7 +22,7 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [ ] a host answer that isn't in the host bank
   - [ ] a match group that references an entry that doesn't exist
   - [ ] an entry with no plural alias where an inflection exists (the generated plurals are shown for human review, not trusted silently)
-  - [ ] a duplicate date, or a chain whose length differs from "questions per chain"
+  - [ ] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
   - [ ] a host answer count that differs from "host answers per question"
 - [ ] A valid fixture passes.
 - [ ] 7 consecutive days of real puzzles, written by the host, pass the validator.
@@ -33,18 +34,23 @@ Serving puzzles (M02), an admin UI and AI-generated content.
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
-| Questions per chain | Chain length check | _human_ |
-| Host answers per question | Host answer count check | _human_ |
-| Host bank size guideline per question | Authoring guidance (a validator warning, if the human wants one) | _human_ |
+| Questions per chain | Chain length check | **7**, human, 2026-10-18 ("i think each daily chain should have 7", relayed by the parent session) |
+| Host answers per question | Host answer count check | **1**, human, 2026-10-18 ("1 per question"). Tune after the M02 playtest. The format stores host answers as a list, so a change only touches the validator setting. |
+| Host bank size per question | Validator: the host bank has at least as many entries as the host-answer count, and every host answer is in it. No warning. | **No fixed size yet**, human, 2026-10-18. Whether the bank holds the answers players actually give is measured in the M02 playtest (ROADMAP "Next revision"). |
 
 ## Plan
-1. Draft the schema, following the M00 content format decision.
-2. Write a failing fixture for each rule, then the validator. Hypothesis: every fixture fails with a specific message and the valid fixture passes. Any other result means the rule is wrong.
-3. Add the deterministic plural and alias generation step, with output for the human to review.
-4. The host writes 7 days of puzzles, and they're validated in CI.
+*Refreshed 2026-10-18 against the repo.* No migration creates `private.puzzle` or `private.today()` yet; the only migration is `restrict_public_defaults`. M01 is therefore file-only and needs no database. The `private.puzzle` column trim and the `seed.sql` line in `supabase/config.toml` stay in ROADMAP "Next revision" for M02, which writes the first puzzle migration.
+1. Record the schema in DECISIONS.md (done) and the two numbers in `src/config/tunables.ts`.
+2. Write fixtures under `scripts/fixtures/content/<case>/offbeat/2026-11-02.json` (next to the script tests, the repo's test layout): one valid, and one per rule that breaks only that rule.
+3. Write the validator, `src/content/puzzle.ts` (the module M02's server will import), and `scripts/content-validate.ts`. It runs as `npm run content:validate [-- <root>]`, with `content/` as the default root. It prints one line per error naming the file, question and entry, and exits 1 on any error or if no puzzle files are found.
+   Hypothesis: each failing fixture produces exactly its rule's error and nothing else, and the valid fixture passes. Any other result means the rule or the fixture is wrong.
+4. Write `scripts/content-plurals.ts` (`npm run content:plurals [-- <root>]`, default `content/`). It adds each entry's expected plural (its `plural` override, otherwise `pluralize(name)`) to `aliases` when it's missing, and prints every plural it adds so the human reviews them in the diff.
+5. Add `npm run content:validate` to CI.
+6. The host writes 7 consecutive days in `content/offbeat/`, and they pass the validator locally and in CI.
+7. Reviewer pass, then a PR.
 
 ## Removes
-Nothing. This is the first content code.
+Nothing in code: this is the first content code. The `tsconfig.json` change (`allowImportingTsExtensions`, so Node can run scripts that import `src/`) adds an option. Its caller is `scripts/content-validate.ts`.
 
 ---
 *Fill in the sections below at the end.*
@@ -52,6 +58,12 @@ Nothing. This is the first content code.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket: a puzzle file holds a "version" | `format: 1` | DECISIONS.md and data design §4 name the field `format`, and they win over the ticket's wording. |
+| Ticket: reject "a duplicate date" | Reject a file whose path isn't `<game_id>/<date>.json` | Human, 2026-10-18. A filesystem can't hold two files with one path, so a duplicate date can't happen once the path is checked. |
+| Ticket: rules for aliases, banks, groups, plurals and counts | Those rules, plus: duplicate entry IDs, a match group keyed by an entry that isn't a host answer, IDs listed twice in `host_bank` or `host_answers`, names that normalize to empty, and shape errors (missing or unknown fields, wrong types, `format` ≠ 1, `game_id` ≠ `offbeat`, impossible dates) | Matching by ID needs unique IDs. Keying groups by host answer is the approved format. The file is untrusted disk input (CLAUDE.md: validate at boundaries). |
+| Data design §4: one validator the server also imports | `src/content/puzzle.ts`, imported by both scripts | As designed. The server import arrives in M02. |
+| Approved normalization: lowercase, NFKD, strip marks and punctuation, collapse whitespace | Exactly that, in that order. Punctuation is removed, not replaced by a space, so "bald-eagle" normalizes to "baldeagle", not "bald eagle". | Lowercasing first makes U+0130 (İ) produce a combining mark that NFKD stripping then removes (tested). |
+| Plural check covers "an entry" | The plural of the entry's `name` only. Synonym aliases (e.g. "cougar") don't need their own plural. | Ticket wording. Players submit entry IDs from autocomplete, so aliases only help search. |
 
 ## Evidence
 

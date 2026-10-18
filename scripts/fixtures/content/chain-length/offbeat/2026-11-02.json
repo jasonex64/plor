@@ -1,0 +1,226 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-02",
+  "questions": [
+    {
+      "prompt": "Name an animal",
+      "entries": [
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "eagle",
+          "name": "eagle",
+          "aliases": [
+            "eagles"
+          ]
+        },
+        {
+          "id": "bald-eagle",
+          "name": "bald eagle",
+          "aliases": [
+            "bald eagles"
+          ]
+        },
+        {
+          "id": "salmon",
+          "name": "salmon",
+          "aliases": []
+        }
+      ],
+      "host_bank": [
+        "lion",
+        "eagle"
+      ],
+      "host_answers": [
+        "eagle"
+      ],
+      "match_groups": {
+        "eagle": [
+          "bald-eagle"
+        ]
+      }
+    },
+    {
+      "prompt": "Name a mammal",
+      "entries": [
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "cattle",
+          "name": "cattle",
+          "aliases": [
+            "cow",
+            "cows"
+          ],
+          "plural": "cattle"
+        }
+      ],
+      "host_bank": [
+        "lion",
+        "tiger"
+      ],
+      "host_answers": [
+        "lion"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an African mammal",
+      "entries": [
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "zebra",
+          "name": "zebra",
+          "aliases": [
+            "zebras"
+          ]
+        },
+        {
+          "id": "giraffe",
+          "name": "giraffe",
+          "aliases": [
+            "giraffes"
+          ]
+        }
+      ],
+      "host_bank": [
+        "lion",
+        "zebra"
+      ],
+      "host_answers": [
+        "lion"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a big cat",
+      "entries": [
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "puma",
+          "name": "puma",
+          "aliases": [
+            "pumas",
+            "cougar",
+            "cougars"
+          ]
+        }
+      ],
+      "host_bank": [
+        "lion",
+        "leopard"
+      ],
+      "host_answers": [
+        "leopard"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a spotted cat",
+      "entries": [
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "cheetah",
+          "name": "cheetah",
+          "aliases": [
+            "cheetahs"
+          ]
+        },
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        }
+      ],
+      "host_bank": [
+        "leopard",
+        "cheetah"
+      ],
+      "host_answers": [
+        "cheetah"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a cat found in the Americas",
+      "entries": [
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        },
+        {
+          "id": "puma",
+          "name": "puma",
+          "aliases": [
+            "pumas",
+            "cougar",
+            "cougars"
+          ]
+        },
+        {
+          "id": "ocelot",
+          "name": "ocelot",
+          "aliases": [
+            "ocelots"
+          ]
+        }
+      ],
+      "host_bank": [
+        "jaguar",
+        "puma"
+      ],
+      "host_answers": [
+        "jaguar"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

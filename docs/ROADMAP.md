@@ -13,7 +13,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 | # | Milestone | Scope | Status | Ticket |
 |---|---|---|---|---|
 | M00 | Foundations | Stack and tooling decisions, the hard-to-reverse designs, CI, `scripts/status`, staging deploy | done | `docs/milestones/M00-foundations.md` |
-| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 7 days of real puzzles | planned | `docs/milestones/M01-puzzle-content.md` |
+| M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 7 days of real puzzles | in progress | `docs/milestones/M01-puzzle-content.md` |
 | M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: confirm the narrowing creates tension and check the obscure-answer escape risk before building any social features. | planned | — |
 | M03 | Share | Spoiler-free share text whose link opens today's game | planned | — |
 | M04 | Friends and live board | Invite link, mutual friends, a live board (status for everyone, plus where each friend died once you've finished), friends-only delivery, reconnect logged and counted | planned | — |
@@ -51,4 +51,5 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The Supabase CA exists twice: `supabase/certs/prod-ca-2021.crt` (psql) and the `DATABASE_CA_CERT` env var (app). Consider one source. Found in M00 (review 3).
 - [ ] Local Node is v24.11.0 with npm 11.6.1, while CI uses Node 24.2x with npm 11.19.1. Upgrade local Node to the current 24 LTS (a human install). Found in M00 (CI on PR #1). `npm run lockfile` already guards against the drift.
 - [ ] The production domain `riff-sixfour.vercel.app` is behind Vercel Authentication, like the previews. It must be public before the M07 closed beta, which also lets `npm run status` check production without a bypass token. Found in M00 (status check after merge). Previews should stay protected.
+- [ ] Measure in the M02 playtest whether each question's host bank holds the answers players actually give, then decide a host bank size guideline (a human number). Found in M01 (planning, human 2026-10-18: "No fixed size yet"). M01 only checks that the bank covers the host answers.
 - [x] The `DATABASE_CA_CERT` error said "check .env.local", which misleads on Vercel. Reworded on 2026-10-18 after a Production value with extra text at the start failed at boot. Found in M00 (staging check).

@@ -12,18 +12,22 @@
     "status": "node scripts/status.ts",
     "test:db": "vitest run .db.test",
     "test:sql": "supabase test db",
-    "lockfile": "node scripts/lockfile.ts"
+    "lockfile": "node scripts/lockfile.ts",
+    "content:validate": "node scripts/content-validate.ts",
+    "content:plurals": "node scripts/content-plurals.ts"
   },
   "dependencies": {
     "@vercel/functions": "3.10.1",
     "next": "16.4.2",
     "pg": "8.23.1",
+    "pluralize": "8.0.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/node": "^24",
     "@types/pg": "8.23.1",
+    "@types/pluralize": "0.0.33",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
