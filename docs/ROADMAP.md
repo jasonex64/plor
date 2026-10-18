@@ -5,7 +5,7 @@ At the start of each session, agents report the current milestone, its status an
 ## Product
 This is a daily game platform. Players play the day's game, watch friends' runs live (including where each friend "died"), comment and react on the day's game, and earn cumulative points for a friends leaderboard. It's built to hold more than one game later, but it ships with one.
 
-**Game 1: Don't Match the Host.** Each day has 7 fixed, independent questions that mix concrete and abstract (e.g. "Name a day of the month", "Name something you'd bring to a potluck"). The player names an answer and must avoid the host's secret answers: question k has k of them, so it gets harder as you go. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
+**Game 1: Don't Match the Host.** Each day has 7 fixed, independent questions that mix concrete and abstract (e.g. "Name a day of the month", "Name something you'd bring to a potluck"). The player names an answer and must avoid the host's secret answers, which catch a slowly rising share of players through the day. Niche answers are a fair escape, and some days are harder than others. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
 
 ## Milestones
 Status: `planned` → `in progress` → `in review` → `done`
@@ -14,7 +14,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 |---|---|---|---|---|
 | M00 | Foundations | Stack and tooling decisions, the hard-to-reverse designs, CI, `scripts/status`, staging deploy | done | `docs/milestones/M00-foundations.md` |
 | M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 14 real daily puzzles (7 questions per date) | in progress | `docs/milestones/M01-puzzle-content.md` |
-| M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: confirm the rising host-answer count creates tension and check the obscure-answer escape risk before building any social features. | planned | — |
+| M02 | Sign-in and playable game | Sign-in required before playing; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen. **This is the playtest checkpoint**: measure each question's real catch rate against its estimate, check that most players usually finish, and collect missing answers before building any social features. | planned | — |
 | M03 | Share | Spoiler-free share text whose link opens today's game | planned | — |
 | M04 | Friends and live board | Invite link, mutual friends, a live board (status for everyone, plus where each friend died once you've finished), friends-only delivery, reconnect logged and counted | planned | — |
 | M05 | Comments and reactions | On the day's game, friends-only, visible after you've played, delete your own, report others | planned | — |
@@ -60,4 +60,6 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The M01 ticket's "Removes" names only `scripts/content-validate.ts` as a caller of `allowImportingTsExtensions`; `src/content/puzzle.ts` and `scripts/content-plurals.ts` use it too. Found in M01 (review). Docs only.
 - [ ] Tests import `./puzzle` and `./content-validate` without an extension, while runtime code uses `.ts`. Pick one style. Found in M01 (review). Both work.
 - [ ] Merged remote branches `m00-closeout`, `m00-followup` and `m00-foundations` still exist on origin (CLAUDE.md: delete after merge). Found in M01 (review). Deleting a remote branch needs the human's OK.
+- [ ] When a player types something that isn't in the accepted list: reply "not in our list yet, try another" with no penalty, and log the typed text for a human to review and add (human, 2026-10-18). This is a new network message (today the client sends only entry IDs). Found in M01 (planning). It's M02 work, because it needs the play screen.
+- [ ] Name a reference source for each concrete question's answer list (e.g. a public list of dog breeds). The M01 drafts come from Claude's knowledge and the human's review. Found in M01 (planning). Lists can grow from logged misses in the meantime.
 - [x] The `DATABASE_CA_CERT` error said "check .env.local", which misleads on Vercel. Reworded on 2026-10-18 after a Production value with extra text at the start failed at boot. Found in M00 (staging check).

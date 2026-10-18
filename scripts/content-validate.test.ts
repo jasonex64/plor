@@ -20,7 +20,7 @@ const EXPECTED: Record<string, string> = {
   "plural-missing": `${FILE} q1 entry "lion": no plural alias "lions" (run npm run content:plurals, or set "plural" to override)`,
   "path-mismatch": `${FILE}: path must be offbeat/2026-11-03.json to match its game_id and date`,
   "question-count": `${FILE}: has 6 questions, expected 7`,
-  "host-answer-count": `${FILE} q2: has 3 host answers, expected 2`,
+  "no-host-answers": `${FILE} q2: has no host answers`,
   "duplicate-entry-id": `${FILE} q2 entry "lion": ID used by more than one entry`,
 };
 

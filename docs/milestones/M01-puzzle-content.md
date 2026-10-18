@@ -23,7 +23,7 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [ ] a match group that references an entry that doesn't exist
   - [ ] an entry with no plural alias where an inflection exists (the generated plurals are shown for human review, not trusted silently)
   - [ ] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
-  - [ ] a host answer count that differs from "host answers by question" for that question's position
+  - [ ] a question with no host answers *(human, 2026-10-18: the count varies by question, so the fixed-count check became "at least 1")*
 - [ ] A valid fixture passes.
 - [ ] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. Every day mixes concrete questions with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding the 7 questions for its date.
 - [ ] CI runs the validator over all puzzle files.
@@ -35,7 +35,7 @@ Serving puzzles (M02), an admin UI, and automated AI puzzle generation (a later 
 | Value | Used for | Origin |
 |---|---|---|
 | Questions per day | Question count check | **7**, human, 2026-10-18 ("i think each daily chain should have 7", relayed by the parent session) |
-| Host answers by question | Host answer count check, by position | **1, 2, 3, 4, 5, 6, 7** (question k has k), human, 2026-10-18 ("i think it should be 1-7 answers maybe? flexible on that one"). Replaces "1 per question". Tune after the M02 playtest. |
+| Host answers per question | Validator: at least 1 | **Varies by question**, human, 2026-10-18 ("Let the count vary"). Each question's host answers catch a gently rising share of players, estimated until the M02 playtest. Replaces "1 per question" and then "1–7 by position". |
 | Daily puzzles to author in M01 | Acceptance criterion: real content before M02 | **14**, human, 2026-10-18 (replaces Claude-invented 7). One puzzle = the 7 questions for one date. |
 | Host bank size per question | Validator: the host bank has at least as many entries as the host-answer count, and every host answer is in it. No warning. | **No fixed size yet**, human, 2026-10-18. Whether the bank holds the answers players actually give is measured in the M02 playtest (ROADMAP "Next revision"). |
 

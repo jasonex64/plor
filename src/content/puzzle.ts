@@ -2,7 +2,7 @@
 // M00-data-design.md §4). Hand-written checks, no schema library (human, 2026-10-18). The M02 server
 // imports this same module, so content is checked one way.
 import pluralize from "pluralize";
-import { HOST_ANSWERS_BY_QUESTION, QUESTIONS_PER_DAY } from "../config/tunables.ts";
+import { QUESTIONS_PER_DAY } from "../config/tunables.ts";
 
 // Permanent: stored with every run and ledger row (DECISIONS.md: Game 1).
 export const GAME_ID = "offbeat";
@@ -128,8 +128,7 @@ function duplicates(ids: string[]): string[] {
   return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
 }
 
-// `expectedAnswers` is undefined past the last position; the question-count error already covers that.
-function checkQuestionRules(where: string, q: Question, expectedAnswers: number | undefined): string[] {
+function checkQuestionRules(where: string, q: Question): string[] {
   const errors: string[] = [];
   const ids = q.entries.map((e) => e.id);
   for (const id of duplicates(ids)) errors.push(`${where} entry "${id}": ID used by more than one entry`);
@@ -159,9 +158,8 @@ function checkQuestionRules(where: string, q: Question, expectedAnswers: number 
   }
 
   const bank = new Set(q.host_bank);
-  if (expectedAnswers !== undefined && q.host_answers.length !== expectedAnswers) {
-    errors.push(`${where}: has ${q.host_answers.length} host answers, expected ${expectedAnswers}`);
-  }
+  // The count varies by question; difficulty is the share of players the answers catch (DECISIONS.md: Game 1).
+  if (q.host_answers.length === 0) errors.push(`${where}: has no host answers`);
   for (const id of duplicates(q.host_answers)) errors.push(`${where} entry "${id}": listed twice in host_answers`);
   for (const id of q.host_answers) {
     if (!bank.has(id)) errors.push(`${where} entry "${id}": host answer is not in host_bank`);
@@ -192,6 +190,6 @@ export function checkPuzzleFile(file: string, text: string): string[] {
   if (puzzle.questions.length !== QUESTIONS_PER_DAY) {
     out.push(`${file}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
   }
-  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q, HOST_ANSWERS_BY_QUESTION[i])));
+  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q)));
   return out;
 }
