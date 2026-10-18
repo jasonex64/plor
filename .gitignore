@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# environment and secrets (never committed)
+.env*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+
+# test and tool output
+coverage/
+.vercel/
+
+# OS noise
+.DS_Store
+Thumbs.db

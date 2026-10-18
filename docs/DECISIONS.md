@@ -1,0 +1,63 @@
+# Decisions
+
+There is one way to do each thing, and agents use exactly what is listed here.
+To change a row, record the new decision, remove the old way from the code **in the same change**, and add a line to the log.
+
+## Current
+| Area | Decision | Why | Source |
+|---|---|---|---|
+| Client platform | Mobile-first web app, installable as a PWA. Native apps come later. | Shareable links, no app-store review, the usual distribution for daily games | Next.js PWA guide |
+| Client language / framework | Next.js (App Router), TypeScript | One language across client and server. Route handlers give us server-only code. | Next.js |
+| Server / backend | Supabase: Postgres for data, Supabase Auth for identity | Relational constraints enforce one run per day and a unique ledger, the leaderboard is a SQL `SUM`, and Auth handles sign-in, which is required before play | Supabase, PostgreSQL 17 |
+| Where server logic lives | Next.js route handlers, with constraints enforced in Postgres. No Edge Functions. | One runtime. Edge Functions would add Deno as a second one. | Next.js |
+| Real-time transport (live friends board) | Supabase Realtime **Broadcast** on one private topic per viewer (`board:<viewer_id>`). The server builds each friend's payload. Postgres Changes is not used. | The topic policy never changes, so per-connection caching doesn't matter, and all gating lives in one server function. Postgres Changes runs on a single thread and authorizes every event for each subscriber. | Supabase Realtime |
+| Next.js hosting | Vercel Pro. Set the function region by hand to match the Supabase region (Vercel defaults to `iad1`). | Hobby is "restricted to non-commercial personal use only". Short request/response functions fit; realtime runs on Supabase. | Vercel |
+| Regions | one Supabase region nearest the expected players, with the Vercel function region in the same place. Supabase regions can't be changed after the project is created. | Latency between route handlers and the database. Moving region later means migrating to a new project. | Supabase regions |
+| Runtime | Node.js 24 LTS with its bundled npm (11.x), pinned in `package.json` `engines` | "Production applications should only use Active LTS or Maintenance LTS releases" | Node.js |
+| Task runner (single entry point for every script) | `npm run <script>`. Every procedure is a `package.json` script, and longer ones call files in `scripts/`. `supabase db reset --linked` is never scripted, because it drops the remote database. | No extra tool needed | npm |
+| Test runner | Vitest for TypeScript unit tests, and pgTAP via `supabase test db` for constraints and RLS. Add E2E only when a milestone needs it (M04 needs two real clients). | Vitest has an official Next.js guide. Vitest doesn't support async Server Components, so those get E2E tests. | Next.js Vitest guide, Supabase testing |
+| Logging (one logger, structured) | a small `log` module that writes one JSON object per line through `console.log` / `console.warn` / `console.error`. No logging library. | Vercel infers the log level from the console method, not from the JSON body, so a library writing straight to stdout would hide errors from Vercel's level filter. | Vercel runtime logs |
+| Error handling (how errors propagate, where they're caught) | errors propagate. They're caught only at boundaries: one route handler wrapper maps a typed `AppError` (code + HTTP status) to a JSON response, and logs unknown errors at error level before returning 500. The client shows the error and never retries silently. | Fail loudly, with one place that maps errors | — (pin the Next.js error-handling docs when this is implemented) |
+| Config and tunables (one location for every number, each citing its origin) | `src/config/tunables.ts` for every number, each with an origin comment (ticket, person, date). `src/config/env.ts` validates environment variables at startup and throws if one is missing. Only the server reads secrets. | One place to audit numbers, and the app fails at boot instead of at first use | Next.js data security |
+| Debug procedure (reproduce, where logs go, how to attach) | reproduce locally with `supabase start` and `npm run dev`. Logs go to local stdout, and in production to Vercel runtime logs, which Pro keeps for **1 day**. Write down the hypothesis before changing anything. | One way to debug, and it matches CLAUDE.md | Vercel runtime logs |
+| Process health check (`scripts/status`) | `npm run status -- <env>` calls `/api/health`, which runs `select 1` against the database and returns the build and protocol version. Any failure exits non-zero. | Detects a paused Supabase free project or a broken deploy | — |
+| Database migrations | only via `supabase migration new`. CI runs `supabase db push` on merge. A migration that has been applied is never edited. | All remote schema changes go through migration files | Supabase database migrations |
+| Branching and merge | One branch per milestone, deleted after merge | No stale branches | — |
+
+## Hard to reverse
+These are the only exceptions to "build for today". Decide them and get them reviewed **before** the first code that depends on them, because changing them later means migrating live player data or breaking older clients.
+
+| Area | Questions to answer | Decision |
+|---|---|---|
+| Persisted data (saves, DB schema) | How is it versioned? How are migrations tested? | Drafted: Supabase CLI migrations, never edited after they're applied, pgTAP tests. `milestones/M00-data-design.md` §1. Approved by a human on 2026-10-17. |
+| Network messages | How is it versioned? What happens when the client and server versions differ? (It must fail loudly.) | Drafted: `x-protocol` header, `409 client_outdated`, realtime `v` field. §2. Approved by a human on 2026-10-17. |
+| Player identity | What is the ID format? Which auth provider and sign-in method? | **Sign-in required before play** (human, 2026-10-17). Supabase `auth.users.id`, plus a `profile` table. No anonymous or guest users. §3 |
+| Puzzle content format | What is the version field? What is the schema for entries, aliases, banks and match groups (see the answer model below)? | Drafted: JSON `format: 1`, stored in `private.puzzle`, and it can't be changed once its day has started. §4. Approved by a human on 2026-10-17. |
+| Run events | One row per answered question: (user, game_id, puzzle_date, question_index, entry_id, matched). Results and the live board are derived from these rows. Can a retry write a row twice? | Drafted: `run` (one per user per day, date pinned at start) plus `run_event`, both append-only. Abandoned runs score 0. §5, §7. Approved by a human on 2026-10-17. |
+| Points ledger | Append-only (user, game_id, puzzle_date, points), unique per (user, game_id, puzzle_date). Is the leaderboard always the sum of the ledger? | Drafted: written when a run ends (from M06), unique per (user, game, date), append-only. Formula: k points per survived question k (human, 2026-10-17). §6. Approved by a human on 2026-10-17. |
+| Day boundary | One global reset time, or each player's local midnight? Do friends in different timezones play the same puzzle? | **Global reset at midnight `America/Los_Angeles`, following DST** (human, 2026-10-17). One server function computes "today". §8 |
+
+## Game 1: Don't Match the Host
+- **Sudden death.** Matching the host ends the run, and the score is the number of questions survived.
+- **Fixed sequence.** Every player gets the same chain each day, so friends' scores can be compared directly.
+- **Scoring:** surviving question k (1-based) earns k points, so a run that survives n questions scores n(n+1)/2. Abandoned runs score 0. (Formula proposed by Claude and accepted by a human, 2026-10-17. The values go in `tunables.ts`.)
+- **Server is authoritative.** The client never receives host answers, or anything that marks the host bank, before the player answers that question.
+
+### Answer model (confirmed)
+| Bank | Contents | Sent to client? |
+|---|---|---|
+| Accepted bank | Every valid answer, including obscure ones | Yes, as canonical entries, for autocomplete |
+| Host bank | A small subset of common, typical answers | Never, and nothing marks which entries are in it |
+| Host answer(s) | Picked from the host bank | Only after the player has answered that question |
+
+- **Canonical entries.** Each entry has an ID and aliases (plurals, alternate spellings, synonyms). The client submits the entry ID, never raw text. The server rejects IDs that aren't valid for the question. Matching compares IDs.
+- **Match groups.** A host answer covers more specific entries (*eagle* covers *bald eagle*). It's a match when the player's entry is in the host answer's group.
+- **Normalization** (case, whitespace, punctuation, diacritics) and **plural aliases** are applied when content is authored, by a deterministic step that a human reviews. Nothing is guessed at runtime.
+- **Open risk:** obscure answers may be a free escape in early questions. Assess this in the M02 playtest, and a human decides any fix.
+
+## Log
+| Date | Change | Replaces | Ticket |
+|---|---|---|---|
+| 2026-10-17 | Stack A chosen (Next.js + Supabase). Client platform confirmed. Realtime transport set. | — (first decision) | M00, see `milestones/M00-stack-comparison.md` |
+| 2026-10-17 | Q1–Q5 answered: Pacific-midnight reset, sign-in required, k-points scoring, abandoned runs score 0, default auth rate limits | Guest play and anonymous linking (removed) | M00, `milestones/M00-data-design.md` rev 3 |
+| 2026-10-17 | Human approved the tooling rows (hosting, regions, runtime, task runner, tests, logging, errors, config, debugging, status, migrations, server-logic location) and data design revision 4. Sudden death and fixed sequence confirmed. | — | M00 |
