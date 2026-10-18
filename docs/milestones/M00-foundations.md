@@ -114,5 +114,10 @@ Before the env vars were set, the build failed with "No Output Directory named p
 Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
 
 ## Review
+**Review 3 (reviewer agent, full M00 diff, 2026-10-18).** Re-ran lint, test, build, test:db and test:sql locally: all passed.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. **TLS bypass through URL params.** pg's connection-string parser lets `?ssl=0`, `?ssl=true`, `?sslnegotiation` or `?host=` override TLS or the host. Reproduced with pg's own `Client`. **Fixed:** pg now gets explicit fields (`poolConfig`), any query param is rejected, and there are tests for each param plus a pg-parser test. A mutation check (reverting to a connectionString) fails 2 tests.
+  2. **CI didn't scan every push**, contrary to DECISIONS.md. **Fixed:** `on: push` now covers all branches.
+  3. **Acceptance criteria are still open** (CI run, staging status UP/DOWN through Vercel Authentication, the debug procedure on staging). These are human steps and decisions, not code. Still open.
+  4. **No record that the exposed `postgres` master password was rotated.** This is a human step. Still open. (`.env.local` has pointed only at the local stack since 2026-10-17, which Claude checked by host.)
+- Deferred to ROADMAP "Next revision": the broken fences in this ticket, the untested rollback-failure branch, CI `permissions:` and SHA pinning, the template `seed.sql` setting, and the duplicate CA source.

@@ -1,8 +1,9 @@
 # Runs the same npm scripts a developer runs locally (DECISIONS.md: task runner).
 name: ci
+# Every push on every branch, so a pushed milestone branch is scanned even before a PR exists
+# (DECISIONS.md: Secret scanning; M00 review 3).
 on:
   push:
-    branches: [main]
   pull_request:
 
 jobs:
