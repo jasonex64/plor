@@ -73,6 +73,12 @@ describe("the game day", () => {
     for (const day of changes) expect(midnight(nextDay(day)) - midnight(day)).toBe(25 * HOUR);
   });
 
+  // supabase/tests/game.test.sql repeats these instants so the staging database's tz data is checked too.
+  it("puts the 2026-11-01 day at the instants game.test.sql checks", () => {
+    expect(new Date(midnight("2026-11-01")).toISOString()).toBe("2026-11-01T07:00:00.000Z");
+    expect(new Date(midnight("2026-11-02")).toISOString()).toBe("2026-11-02T08:00:00.000Z");
+  });
+
   it("is what today() returns now", async () => {
     const { rows } = await db.query<{ today: string }>("select private.today()::text as today");
     expect(rows[0].today).toBe(dateAt(Date.now()));

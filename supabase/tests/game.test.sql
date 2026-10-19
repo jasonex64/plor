@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(32);
+select plan(36);
 
 -- Fixtures: two-question puzzles for yesterday, today and tomorrow, and three players.
 create function pg_temp.puzzle(day date) returns jsonb language sql
@@ -22,6 +22,13 @@ insert into auth.users (id, email) values
 
 -- §8
 select is(private.today(), private.day_of(now()), 'today() is day_of(now())');
+-- The two ends of the 25-hour day when DST ends, as src/game/day.db.test.ts derives them from Node's ICU tz data
+-- (that test also asserts these exact instants). Here they check this database's own tz data, including on
+-- staging via `supabase test db --linked` (ROADMAP: verify Supabase has current tzdata).
+select is(private.day_of('2026-11-01T06:59:59.999Z'), date '2026-10-31', 'just before midnight 2026-11-01 Pacific');
+select is(private.day_of('2026-11-01T07:00:00.000Z'), date '2026-11-01', 'midnight 2026-11-01 Pacific (still PDT)');
+select is(private.day_of('2026-11-02T07:59:59.999Z'), date '2026-11-01', 'just before midnight 2026-11-02 Pacific');
+select is(private.day_of('2026-11-02T08:00:00.000Z'), date '2026-11-02', 'midnight 2026-11-02 Pacific (now PST)');
 
 -- §4: the key and the content agree, and a started day can't change.
 select throws_ok($$insert into private.puzzle values ('offbeat', private.today() + 2, pg_temp.puzzle(private.today() + 3))$$,
