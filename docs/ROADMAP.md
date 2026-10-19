@@ -20,6 +20,7 @@ Status: `planned` → `in progress` → `in review` → `done`
 | M05 | Comments and reactions | On the day's game, friends-only, visible after you've played, delete your own, report others | planned | — |
 | M06 | Points and friends leaderboard | Ledger written when a run ends (k points per survived question k), a one-time backfill from earlier runs, an all-time leaderboard equal to the ledger sum | planned | — |
 | M07 | Launch readiness and closed beta | Load test of the reset-time spike, including live connections; alerts, backups, privacy policy and terms, account deletion; closed beta | planned | — |
+| M08 | Visual design | The Plor and Offbeat look beyond M02's plain functional UI: branding, layout, the play and result screens, phone first. Placed last by the human (2026-10-19), so the closed beta (M07) still runs on the plain UI | planned | — |
 | — | **MVP line** | | | |
 
 Tickets for M02 and later get written when their milestone comes up, so they don't go stale.
