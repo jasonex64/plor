@@ -250,11 +250,11 @@ otp_expiry = 3600
 # (supabase.com/docs/guides/auth/auth-email-passwordless). A new address gets the confirmation email and a
 # returning one the magic link, so both use it; the subjects differ so tests can tell them apart. The hosted project's templates get the same HTML (M02).
 [auth.email.template.confirmation]
-subject = "Welcome to Offbeat: your sign-in link"
+subject = "Welcome to Plor: your sign-in link"
 content_path = "./supabase/templates/sign_in_link.html"
 
 [auth.email.template.magic_link]
-subject = "Your Offbeat sign-in link"
+subject = "Your Plor sign-in link"
 content_path = "./supabase/templates/sign_in_link.html"
 
 # Uncomment to customize email template

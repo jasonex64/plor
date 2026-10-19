@@ -3,7 +3,7 @@
 At the start of each session, agents report the current milestone, its status and what comes next.
 
 ## Product
-This is a daily game platform. Players play the day's game, watch friends' runs live (including where each friend "died"), comment and react on the day's game, and earn cumulative points for a friends leaderboard. It's built to hold more than one game later, but it ships with one.
+This is a daily game platform, named **Plor** (human, 2026-10-18; at `plor.app`). Players play the day's game, watch friends' runs live (including where each friend "died"), comment and react on the day's game, and earn cumulative points for a friends leaderboard. It's built to hold more than one game later, but it ships with one.
 
 **Game 1: Don't Match the Host.** Each day has 7 fixed, independent questions that mix concrete and abstract (e.g. "Name a day of the month", "Name something you'd bring to a potluck"). The player names an answer and must avoid the host's secret answers, which catch a slowly rising share of players through the day. Niche answers are a fair escape, and some days are harder than others. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
 

@@ -18,8 +18,8 @@ const MAILPIT = "http://127.0.0.1:54324";
 const RUN = Date.now().toString(36);
 const EMAIL_A = `${RUN}-a@example.test`;
 const EMAIL_B = `${RUN}-b@example.test`;
-const NEW_ADDRESS_SUBJECT = "Welcome to Offbeat: your sign-in link"; // supabase/config.toml, confirmation template
-const RETURNING_SUBJECT = "Your Offbeat sign-in link"; // supabase/config.toml, magic_link template
+const NEW_ADDRESS_SUBJECT = "Welcome to Plor: your sign-in link"; // supabase/config.toml, confirmation template
+const RETURNING_SUBJECT = "Your Plor sign-in link"; // supabase/config.toml, magic_link template
 
 beforeAll(() => {
   // The publishable key comes from the running stack and is never printed.

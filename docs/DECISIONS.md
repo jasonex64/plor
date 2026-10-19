@@ -87,3 +87,4 @@ These are the only exceptions to "build for today". Decide them and get them rev
 | 2026-10-18 | riff_app-only RLS policies in `private`, approved by a human (security change) | M00 "RLS enabled with no policies", which blocks riff_app too | M02 |
 | 2026-10-18 | Sign-in emails go through Resend SMTP from `plor.app` (human) | Supabase's built-in sender | M02 |
 | 2026-10-18 | The game runs at `plor.app` (human). D3 goes public by switching Deployment Protection to Standard Protection, which leaves only production domains public | `riff-sixfour.vercel.app` as the production URL | M02 |
+| 2026-10-18 | The platform is named **Plor** (human). Sign-in surfaces (Google app name, email sender name and templates, page title) use Plor; "Offbeat" stays the name of game 1 | "RIFF" in the page title; "Offbeat" on sign-in emails | M02 |

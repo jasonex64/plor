@@ -21,7 +21,7 @@ export async function api<T>(path: string, init: { method: "GET" | "POST"; body?
   if (response.ok) return json as T;
   if (response.status === 409 && json.error === "client_outdated") {
     // A newer server is live: reload loudly instead of talking to it with an old client (§2).
-    window.alert("Offbeat was updated. The page will reload.");
+    window.alert("Plor was updated. The page will reload.");
     window.location.reload();
   }
   throw new ApiError(String(json.error), response.status);
