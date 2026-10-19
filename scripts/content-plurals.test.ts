@@ -11,7 +11,7 @@ const FILE = "offbeat/2026-11-02.json";
 // The script rewrites files, so each case works on a temporary copy of a fixture.
 let dir: string | undefined;
 function copyOf(fixture: string): string {
-  dir = mkdtempSync(join(tmpdir(), "riff-plurals-"));
+  dir = mkdtempSync(join(tmpdir(), "plor-plurals-"));
   cpSync(join(FIXTURES, fixture), dir, { recursive: true });
   return dir;
 }

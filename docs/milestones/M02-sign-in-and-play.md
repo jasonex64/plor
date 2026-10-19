@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) was merged in PR #6 (merge commit `617ac07`) and works on `plor.app`. The human approved the riff_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
+**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) was merged in PR #6 (merge commit `617ac07`) and works on `plor.app`. The human approved the plor_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -40,10 +40,10 @@ Each criterion must be checkable with a command or other observable result.
 - [ ] A different `entry_id` for an index that's already been answered → `409 already_answered`; the same one returns the stored result; an answer after the reset → `409 day_over`, raised by a database trigger. Two concurrent requests for the same index return the idempotent result or 409, never 500 (concurrency test; ROADMAP item).
 - [ ] Typed text that matches no entry gets "not in our list yet, try another" with no penalty, and is logged for human review under the limits in Numbers (tested).
 - [ ] The run status view gives in_progress / died / survived / abandoned (tested).
-- [ ] `riff_app` gets only the grants these routes need (pgTAP, extending `riff_app_role.test.sql`); nothing in `private` is reachable by `anon` or `authenticated` (test; ROADMAP item).
+- [ ] `plor_app` gets only the grants these routes need (pgTAP, extending `plor_app_role.test.sql`); nothing in `private` is reachable by `anon` or `authenticated` (test; ROADMAP item).
 - [ ] `npm run test:db` runs in CI against a started Supabase stack (ROADMAP item).
 - [ ] UI: autocomplete over the question's accepted bank that submits entry IDs; one question at a time; a result screen. It works on a phone-width screen.
-- [ ] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `riff_app`'s grants allow, or through an admin path).
+- [ ] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `plor_app`'s grants allow, or through an admin path).
 - [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
 
 **Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.
@@ -59,6 +59,14 @@ Only the human can do these. Secrets go only into the Supabase dashboard, Vercel
 7. **Vercel env vars** (Production and Preview): `SUPABASE_URL` = `https://<project-ref>.supabase.co`, and `SUPABASE_PUBLISHABLE_KEY` = the publishable key from **Project Settings → API Keys** (it starts with `sb_publishable_`; the app refuses any other kind). The app won't boot without both.
 8. **Database.** From the repo, run `npx supabase db push`, then `npx supabase test db --linked`, and paste the output (it has no secrets).
 9. **After merge.** Production deploys while still behind Vercel Authentication. On `https://plor.app`, sign in once by email and once with Google, pick a username, and tell Claude the result. Only then make production public (D3): set the Deployment Protection scope to **Standard Protection**, which protects everything except production domains, so previews stay protected.
+
+## Rename to Plor (human, 2026-10-19; before 2b)
+The repo, the app login and the services drop the "riff" names. Claude's part is the rename PR: the migration `20261019070813_rename_riff_app_to_plor_app.sql`, `supabase/roles.sql`, the tests, the package and local project name, and the docs. The local folder `C:\Users\jason\RIFF` keeps its name, because sessions and notes point at it. The human's steps, in this order (the site is down between steps 2 and 3):
+1. **Vercel → Settings → Environment Variables → `DATABASE_URL`** (Production and Preview): change only the user name at the start, from `riff_app.<project-ref>` to `plor_app.<project-ref>`. The password stays the same.
+2. From the repo: `npx.cmd supabase db push` (it applies the rename), then `npx.cmd supabase test db --linked`, which now also checks that no `riff_app` login is left.
+3. Merge the rename PR. Its production deploy picks up the new `DATABASE_URL`. Claude then runs `npm run status -- https://plor.app`. If the login is refused, the password was MD5 and the rename cleared it: set it again with psql `\password plor_app`.
+4. **Vercel → Settings → Domains:** make `plor.app` the primary domain, with `www.plor.app` redirecting to it. Today it's the other way round (D3 evidence).
+5. **Service names:** GitHub repo `jasonex64/RIFF` → `plor` (Settings → General → Repository name); Vercel project `riff` → `plor` (Settings → General → Project Name); Supabase project `riff-staging` → `plor-staging` (Project Settings → General). Claude then updates the git remote and the docs that name them.
 
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
@@ -99,11 +107,12 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Google guide: `redirectTo` is an absolute callback URL | Built from the request's `Origin` header | Same `request.url` problem. Supabase only redirects to allow-listed URLs, so a forged Origin can't send a code elsewhere. |
 | Magic-link guide: `verifyOtp` with whatever `type` arrives | Only `type=email` is accepted | It's the only type our template sends. |
 | Magic-link guide: change the Magic Link template | Both "Confirm signup" and "Magic link" templates, one HTML file | A new address gets "Confirm signup" until its first link is used (observed locally with `enable_confirmations = true`). |
-| M00 data design: "RLS is enabled with no policies" | RLS on, with `select` and `insert` policies for `riff_app` only | With no policy, RLS blocks riff_app too (observed). Approved by the human, 2026-10-18 (DECISIONS.md: Row-level security in `private`). |
+| M00 data design: "RLS is enabled with no policies" | RLS on, with `select` and `insert` policies for `plor_app` only | With no policy, RLS blocks plor_app too (observed). Approved by the human, 2026-10-18 (DECISIONS.md: Row-level security in `private`). |
 | M00 data design §3: `username citext unique` | citext, plus a check constraint on `username::text` | citext's regex match ignores case, so the format check must cast to text (tested). |
 
 ## Evidence
 ### 2a (sign-in and profile)
+*The app login was `riff_app` until 2026-10-19, when it was renamed `plor_app` (DECISIONS.md Log); pasted output below keeps the names it printed.*
 Run on branch `m02-sign-in-and-play`, 2026-10-18 (Windows, Node 24.11.0), after review 1's fix, on a reset local stack in this order: `test:db` first, then `test:sql`. `test:sql` also passed earlier with leftover profiles in the table, and `test:db` now deletes the users it creates.
 
 ```text
@@ -132,14 +141,14 @@ CLIENT BUNDLE OK: 13 files, 5 patterns, 3 env values (DATABASE_URL, SUPABASE_URL
 
 Acceptance criteria (2a):
 - **Signed-out players are refused:** `src/app/api/profile/route.test.ts`, "refuses a signed-out player with 401 not_signed_in". (`POST /run/start` gets the same test in 2b.)
-- **First sign-in creates the profile; a duplicate fails with an AppError:** `src/app/api/profile/route.db.test.ts` signs in through the real local Auth server and the emailed link, creates a profile, then a second user gets `409 username_taken`; bad formats get `400 username_invalid`; a second pick gets `409 profile_exists`. The rules are pinned in `supabase/tests/profile.test.sql` (3 and 20 characters pass, 2 and 21 fail, upper case and `-` fail). `src/lib/profile.db.test.ts` runs the same SQL **as riff_app** (grants, policies, foreign key, citext).
+- **First sign-in creates the profile; a duplicate fails with an AppError:** `src/app/api/profile/route.db.test.ts` signs in through the real local Auth server and the emailed link, creates a profile, then a second user gets `409 username_taken`; bad formats get `400 username_invalid`; a second pick gets `409 profile_exists`. The rules are pinned in `supabase/tests/profile.test.sql` (3 and 20 characters pass, 2 and 21 fail, upper case and `-` fail). `src/lib/profile.db.test.ts` runs the same SQL **as plor_app** (grants, policies, foreign key, citext).
 - **`@supabase/ssr` cookies, no secret in the client bundle:** sessions are the `sb-…` cookies written through `@supabase/ssr` (route.db.test.ts checks them, and that sign-out clears them). `npm run check:client-bundle` scans `.next/static` for key and URL patterns and for the actual server env values, and runs in CI after the build. It caught a planted `sb_secret_` file (exit 1) before that file was removed.
-- **Data API roles reach nothing in `private`** (ROADMAP item, done now because `private` now exists): `supabase/tests/private_schema.test.sql` checks every table, view and function for `anon` and `authenticated`, and that RLS is on with riff_app-only policies. It reported `{"anon select private.profile"}` when a grant was added inside a rolled-back transaction. The dashboard's Exposed schemas setting is human setup step 6.
+- **Data API roles reach nothing in `private`** (ROADMAP item, done now because `private` now exists): `supabase/tests/private_schema.test.sql` checks every table, view and function for `anon` and `authenticated`, and that RLS is on with plor_app-only policies. It reported `{"anon select private.profile"}` when a grant was added inside a rolled-back transaction. The dashboard's Exposed schemas setting is human setup step 6.
 
 Browser run, local `next start` at phone width (375×812), 2026-10-18: the email was sent ("Check … for a sign-in link"), the link from Mailpit opened "Pick a username", an email typed as a username got the format message, `Browser_Check` was saved as `browser_check` ("Signed in as browser_check."), sign-out returned to the sign-in form, a second address signed in, and picking `browser_check` got "That username is taken. Try another." The server log showed no errors. The first attempt exposed the `localhost` redirect bug (Source diff), which was fixed before this run.
 
 Hypotheses recorded on the way:
-1. "riff_app can insert and read profiles with USAGE plus SELECT/INSERT, because type I/O, index upkeep and FK checks don't check its privileges." **Disproved:** RLS with no policy blocked it. Re-planned: riff_app-only policies (approved by the human, 2026-10-18).
+1. "plor_app can insert and read profiles with USAGE plus SELECT/INSERT, because type I/O, index upkeep and FK checks don't check its privileges." **Disproved:** RLS with no policy blocked it. Re-planned: plor_app-only policies (approved by the human, 2026-10-18).
 2. "Dynamic route handlers send a no-store Cache-Control." **Disproved:** no Cache-Control at all. Fixed in `handle()`.
 3. "`request.url` follows the Host header." **Disproved** (curl with `Host:` and with `x-forwarded-host:` both gave `localhost`). Fixed with relative redirects and `Origin`.
 4. "A new address gets the confirmation template, a returning one the magic-link template." Confirmed by the subjects in route.db.test.ts.

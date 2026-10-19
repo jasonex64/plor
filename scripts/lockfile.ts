@@ -20,7 +20,7 @@ if (!(mode in COMMANDS)) {
   process.exit(2);
 }
 
-const dir = mkdtempSync(join(tmpdir(), "riff-lockfile-"));
+const dir = mkdtempSync(join(tmpdir(), "plor-lockfile-"));
 try {
   for (const f of ["package.json", "package-lock.json"]) copyFileSync(f, join(dir, f));
   // Work on a copy inside the container; for `update`, write only the lockfile back.

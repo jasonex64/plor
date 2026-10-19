@@ -34,7 +34,7 @@ describe("validateRoot", () => {
   });
 
   it("fails when the root holds no puzzle files", () => {
-    const empty = mkdtempSync(join(tmpdir(), "riff-content-"));
+    const empty = mkdtempSync(join(tmpdir(), "plor-content-"));
     try {
       expect(validateRoot(empty)).toEqual({ files: 0, errors: [`${empty}: no puzzle files found`] });
     } finally {

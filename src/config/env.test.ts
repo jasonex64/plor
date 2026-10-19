@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readServerEnv } from "./env";
 
 const PEM = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----";
-const REMOTE = "postgresql://riff_app.ref:pw@aws-0-us-east-1.pooler.supabase.com:6543/postgres";
+const REMOTE = "postgresql://plor_app.ref:pw@aws-0-us-east-1.pooler.supabase.com:6543/postgres";
 const LOCAL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const AUTH = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x" };
 
@@ -44,8 +44,8 @@ describe("readServerEnv", () => {
   });
 
   it("decodes percent-encoded credentials", () => {
-    const env = readServerEnv({ DATABASE_URL: "postgresql://riff_app.ref:p%40ss@db.example.com:6543/postgres", DATABASE_CA_CERT: PEM, ...AUTH });
-    expect(env.database).toMatchObject({ user: "riff_app.ref", password: "p@ss" });
+    const env = readServerEnv({ DATABASE_URL: "postgresql://plor_app.ref:p%40ss@db.example.com:6543/postgres", DATABASE_CA_CERT: PEM, ...AUTH });
+    expect(env.database).toMatchObject({ user: "plor_app.ref", password: "p@ss" });
   });
 
   it("requires a CA for a remote host", () => {

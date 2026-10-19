@@ -1,7 +1,7 @@
 -- Nothing in `private` is reachable by the Data API roles, now or for any object added later
 -- (M00 data design, "Principles used throughout"; ROADMAP: verify `private` isn't exposed). Run with `npm run test:sql`.
 begin;
--- Same preamble as riff_app_role.test.sql: remote runs log in as cli_login_postgres.
+-- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
@@ -28,15 +28,15 @@ select is(
    where p.pronamespace = 'private'::regnamespace and has_function_privilege(r.role, p.oid, 'execute')),
   null, 'anon and authenticated cannot execute any private function');
 
--- RLS is the backstop behind the grants: on for every table, with policies only for riff_app.
+-- RLS is the backstop behind the grants: on for every table, with policies only for plor_app.
 select is(
   (select array_agg(c.oid::regclass::text order by 1) from pg_class c
    where c.relnamespace = 'private'::regnamespace and c.relkind in ('r', 'p') and not c.relrowsecurity),
   null, 'every private table has RLS enabled');
 select is(
   (select array_agg(format('%s on %s.%s for %s', policyname, schemaname, tablename, array_to_string(roles, ',')) order by 1)
-   from pg_policies where schemaname = 'private' and roles <> '{riff_app}'),
-  null, 'every private policy applies to riff_app only');
+   from pg_policies where schemaname = 'private' and roles <> '{plor_app}'),
+  null, 'every private policy applies to plor_app only');
 
 select * from finish();
 rollback;
