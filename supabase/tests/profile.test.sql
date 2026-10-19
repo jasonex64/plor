@@ -1,7 +1,7 @@
 -- private.profile enforces the username rules and follows its auth user
 -- (docs/milestones/M02-sign-in-and-play.md, Numbers; M00 data design §3). Run with `npm run test:sql`.
 begin;
--- Same preamble as riff_app_role.test.sql: remote runs log in as cli_login_postgres.
+-- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
@@ -40,7 +40,7 @@ select is((select data_type || '/' || udt_name from information_schema.columns
            where table_schema = 'private' and table_name = 'profile' and column_name = 'username'),
   'USER-DEFINED/citext', 'username is citext');
 
--- Account deletion (M07) relies on this cascade even though riff_app has no DELETE.
+-- Account deletion (M07) relies on this cascade even though plor_app has no DELETE.
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000a';
 select is((select count(*)::int from private.profile where user_id = '00000000-0000-0000-0000-00000000000a'), 0,
   'deleting the auth user deletes the profile');

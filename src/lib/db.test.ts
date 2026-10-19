@@ -8,7 +8,7 @@ type Resolved = { host: string; port: number; ssl: unknown };
 const resolved = (c: Client) => (c as unknown as { connectionParameters: Resolved }).connectionParameters;
 
 const remote = {
-  database: { host: "aws-0-us-east-1.pooler.supabase.com", port: 6543, user: "riff_app.ref", password: "pw", database: "postgres" },
+  database: { host: "aws-0-us-east-1.pooler.supabase.com", port: 6543, user: "plor_app.ref", password: "pw", database: "postgres" },
   databaseCaCert: "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
 };
 
