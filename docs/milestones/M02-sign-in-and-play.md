@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it is reviewed, and it waits on the human setup below. The human approved the riff_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
+**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) was merged in PR #6 (merge commit `617ac07`) and works on `plor.app`. The human approved the riff_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -27,9 +27,9 @@ A signed-in player can play today's Offbeat puzzle end to end on staging, with e
 Each criterion must be checkable with a command or other observable result.
 
 **2a: sign-in and profile**
-- [ ] A player can't start a run without being signed in (tested at the route level).
-- [ ] The first sign-in creates `private.profile` with a unique username under the rules in Numbers; a duplicate username fails loudly with an AppError (tested).
-- [ ] Sessions use `@supabase/ssr` cookies; no secret reaches the client bundle (checked in the build output).
+- [x] A player can't start a run without being signed in (tested at the route level). *(Shown on `/api/profile`; `POST /run/start` repeats the test in 2b.)*
+- [x] The first sign-in creates `private.profile` with a unique username under the rules in Numbers; a duplicate username fails loudly with an AppError (tested).
+- [x] Sessions use `@supabase/ssr` cookies; no secret reaches the client bundle (checked in the build output).
 
 **2b: game loop**
 - [ ] `content:publish` loads validated puzzles into `private.puzzle` and refuses to change a puzzle whose `puzzle_date <= private.today()` (tested against the local stack).
@@ -162,7 +162,11 @@ Files=3, Tests=34
 Result: PASS
 ```
 
-Not yet verified: anything on staging (Google sign-in, the hosted email sender, `Origin` on Vercel). That is human setup step 9.
+Production after merge (human, 2026-10-18/19, on `https://plor.app`, still behind Vercel Authentication): email sign-in sent the link through Resend, the link opened "Pick a username", the username was saved, and Google sign-in returned to plor.app signed in ("everything works"). That covers the hosted sender, Google, and `Origin` on Vercel. Two setup mistakes were found on the way, both in the dashboard, not the code:
+1. The SMTP host was typed as `smpt.resend.com`. Supabase's Auth log said `dial tcp: lookup smpt.resend.com ... no such host`, and the app showed "Something went wrong (internal)", because the route turns Supabase's 500 into a 500. Fixed to `smtp.resend.com`.
+2. The template bodies were still Supabase's defaults (`{{ .ConfirmationURL }}`), and only the subjects had been changed. The link went through `/auth/v1/verify` and came back to `/` with a code the app doesn't use, so the player landed signed out with no error. Fixed by pasting `supabase/templates/sign_in_link.html` into both templates. The newest link now starts with `https://plor.app/auth/confirm?token_hash=`.
+
+Still to do for 2a: the human switches Deployment Protection to Standard Protection (D3, setup step 9), and Claude then checks from outside that `plor.app` is public while previews stay protected.
 
 
 ## Review
