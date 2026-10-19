@@ -91,13 +91,14 @@ $ npx supabase projects list            -> plor-staging us-east-1
 The Vercel project rename is the human's report; Vercel keeps the existing `riff-…vercel.app` aliases, and new previews take the new project name.
 ## Human setup for 2b
 In this order; nothing is public until step 6 deploys the game.
-1. **Approve** the proposed RLS amendment for `plor_publisher` (DECISIONS.md: Row-level security in `private`).
+1. ~~Approve the proposed RLS amendment~~ **Approved by the human, 2026-10-19** (DECISIONS.md: Row-level security in `private`).
 2. `npx.cmd supabase db push --include-roles`: creates the `plor_publisher` login and applies `20261019074108_create_game_tables.sql`.
 3. **Set `plor_publisher`'s password**: make a new letters-and-digits password in the password manager first, then run psql in Docker as `postgres` (the same `docker run … postgres:17 psql …` command used for the riff_app check, with user `postgres.<project-ref>` and port 5432), type `\password plor_publisher`, then `\q`.
 4. `npx.cmd supabase test db --linked`: 74 tests, including the tz check on staging's own data.
 5. `npm.cmd run content:publish -- postgresql://plor_publisher.<project-ref>@aws-0-us-east-1.pooler.supabase.com:6543/postgres`, then type the password when asked. Expected: `PUBLISHED 2026-10-26..2026-11-08 to …: 14 new, 0 updated, 0 unchanged`.
 6. Merge PR 2b.
-7. **Staging run** (acceptance criterion): play one run on `https://plor.app` on a day that has a puzzle, then send Claude the result of the admin query Claude gives (Supabase SQL editor), which lists that run's `run_event` rows.
+5b. **Rehearsal day** (human, 2026-10-19): `npm.cmd run content:publish -- <same URL> content-rehearsal` publishes `content-rehearsal/offbeat/2026-10-20.json`, which is the 2026-11-08 questions (outside the 7 playtest days) dated 2026-10-20. It stays in the database as a past day.
+7. **Staging run** (acceptance criterion): play one run on `https://plor.app` on 2026-10-20 (the rehearsal day), then send Claude the result of the admin query Claude gives (Supabase SQL editor), which lists that run's `run_event` rows.
 
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
@@ -111,6 +112,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M07: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
+| Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19) |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
 
 ## Plan

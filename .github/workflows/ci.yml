@@ -25,6 +25,8 @@ jobs:
       - run: npm test
       # Every puzzle file must pass the answer-model rules before it can be published (M01).
       - run: npm run content:validate
+      # The rehearsal day for the M02 staging run (human, 2026-10-19).
+      - run: npm run content:validate -- content-rehearsal
       - run: npm run build
       # No secret or server-only value may reach the browser bundle (M02 acceptance criterion).
       - run: npm run check:client-bundle
