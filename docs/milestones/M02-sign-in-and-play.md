@@ -143,6 +143,25 @@ Hypotheses recorded on the way:
 3. "`request.url` follows the Host header." **Disproved** (curl with `Host:` and with `x-forwarded-host:` both gave `localhost`). Fixed with relative redirects and `Origin`.
 4. "A new address gets the confirmation template, a returning one the magic-link template." Confirmed by the subjects in route.db.test.ts.
 
+Staging setup (human, 2026-10-18; steps 1-8 done before merge):
+- Steps 1-5: Resend SMTP from `plor.app`, both templates, `plor.app` attached while the protection scope is All Deployments, Site URL `https://plor.app` with the exact redirect `https://plor.app/auth/callback`, and the Google client and provider enabled. Claude checked from outside that `plor.app`, `www.plor.app` and `riff-sixfour.vercel.app` all answer `302` to `vercel.com/sso-api` (still protected).
+- Step 6: Exposed schemas lists `public` only, without `private`. Allow new users to sign up is on, and Confirm email is on, which matches local `enable_confirmations = true`.
+- Step 7: `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` added for Production and Preview (human report; the values were not shared).
+- Step 8, run by the human from the repo on Windows PowerShell (`npx.cmd`, because the execution policy blocks `npx.ps1`):
+
+```text
+$ npx.cmd supabase db push
+Applying migration 20261018105903_create_profile.sql...
+Finished supabase db push.
+$ npx.cmd supabase test db --linked
+/Users/jason/RIFF/supabase/tests/private_schema.test.sql .. ok
+/Users/jason/RIFF/supabase/tests/profile.test.sql ......... ok
+/Users/jason/RIFF/supabase/tests/riff_app_role.test.sql ... ok
+All tests successful.
+Files=3, Tests=34
+Result: PASS
+```
+
 Not yet verified: anything on staging (Google sign-in, the hosted email sender, `Origin` on Vercel). That is human setup step 9.
 
 
