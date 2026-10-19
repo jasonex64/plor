@@ -17,6 +17,8 @@ describe("editDistanceAtMost", () => {
     ["passpord", "passport", true], // a letter wrong
     ["paspsort", "passport", true], // two neighbours swapped
     ["pasprt", "passport", false], // two letters missing
+    ["pasdpord", "passport", false], // two letters wrong, same length (2c review)
+    ["abcd", "badc", false], // two swaps, same length (2c review)
     ["passport", "passport", true],
   ])("%s → %s within one edit: %s", (a, b, within) => {
     expect(editDistanceAtMost(a, b, 1)).toBe(within);
@@ -41,6 +43,11 @@ describe("suggest", () => {
 
   it("offers no typo suggestions for text shorter than 4 letters", () => {
     expect(suggest(entries, "cst").typos).toEqual([]);
+  });
+
+  // The boundary itself (2c review): 4 letters is the first length that gets typo suggestions.
+  it("offers typo suggestions from exactly 4 letters", () => {
+    expect(ids(suggest(entries, "carz").typos)).toEqual(["car"]);
   });
 
   it("offers no typo suggestions while something starts with the text", () => {

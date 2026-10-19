@@ -20,7 +20,8 @@ export default function Privacy() {
       <ul>
         <li>
           <strong>Your account:</strong> your email address, and the username you pick. If you sign in with Google,
-          Google also shares your name and profile picture with our sign-in provider. Plor doesn&apos;t show or use them.
+          Google also shares your name and profile picture, which are stored with your account. Plor doesn&apos;t
+          show or use them.
         </li>
         <li>
           <strong>Your games:</strong> each day you play, which answer you picked for each question, whether it matched
@@ -32,8 +33,8 @@ export default function Privacy() {
           cookies.
         </li>
         <li>
-          <strong>Technical logs:</strong> our hosting providers keep short-lived logs, including IP addresses, to run
-          and protect the service.
+          <strong>Technical logs:</strong> our providers keep logs, which can include your email address, your IP
+          address and when you signed in, to run and protect the service.
         </li>
       </ul>
 
@@ -50,8 +51,9 @@ export default function Privacy() {
       <h2>Who handles it for us</h2>
       <ul>
         <li>Supabase: database and sign-in, in the United States.</li>
-        <li>Vercel: hosts the website, in the United States.</li>
+        <li>Vercel: hosts the website; Plor&apos;s servers run in the United States.</li>
         <li>Resend: sends the sign-in emails, so it sees your email address.</li>
+        <li>An email forwarding service: passes mail sent to privacy@plor.app on to us.</li>
         <li>Google: only if you choose to sign in with Google.</li>
       </ul>
 
@@ -59,7 +61,8 @@ export default function Privacy() {
       <p>
         We keep your account and games until you ask us to delete them. Email{" "}
         <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with, and we will delete
-        your account together with all your games and unlisted answers.
+        your account together with all your games and unlisted answers. Our providers&apos; logs are not part of
+        your account and expire on their own schedules.
       </p>
 
       <h2>Children</h2>

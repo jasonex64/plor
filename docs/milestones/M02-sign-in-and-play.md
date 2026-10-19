@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) was merged in PR #6 (merge commit `617ac07`) and works on `plor.app`. The human approved the plor_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
+**Status:** in progress. 2a (PR #6) and 2b (PR #8) are merged and live on `plor.app`; the rename (PR #7) too. 2c (privacy page, answer-box fixes) is in review. Then the playtest runs 2026-10-26 to 2026-11-01, and its findings close the milestone.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
