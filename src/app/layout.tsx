@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RIFF",
+  title: "Plor",
   description: "A daily social word game.",
 };
 

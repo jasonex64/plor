@@ -9,8 +9,16 @@ export type DbConnection = {
   database: string;
 };
 
+export type SupabaseAuthEnv = {
+  url: string;
+  publishableKey: string;
+};
+
 export type ServerEnv = {
   database: DbConnection;
+  // Supabase Auth, used only by server code (route handlers and the proxy). No browser client exists,
+  // so neither value needs the NEXT_PUBLIC_ prefix that would inline it into the client bundle.
+  supabase: SupabaseAuthEnv;
   // Required for any non-local database: Supabase recommends verify-full against its own CA
   // (supabase.com/docs/guides/platform/ssl-enforcement). Null only for the local stack.
   databaseCaCert: string | null;
@@ -48,12 +56,38 @@ export function readServerEnv(source: Record<string, string | undefined> = proce
     throw new Error("DATABASE_URL must include a user, a password and a database name");
   }
 
-  if (LOCAL_HOSTS.has(url.hostname)) return { database, databaseCaCert: null };
+  const supabase = readSupabaseAuthEnv(source);
+  if (LOCAL_HOSTS.has(url.hostname)) return { database, supabase, databaseCaCert: null };
 
   const ca = source.DATABASE_CA_CERT;
   if (!ca) throw new Error(`DATABASE_CA_CERT is required for remote database host ${url.hostname}`);
   if (!ca.trim().startsWith("-----BEGIN CERTIFICATE-----")) {
     throw new Error("DATABASE_CA_CERT is not a PEM certificate: it must start with -----BEGIN CERTIFICATE----- (check for quotes or extra text in the Vercel env var or .env.local)");
   }
-  return { database, databaseCaCert: ca };
+  return { database, supabase, databaseCaCert: ca };
+}
+
+function readSupabaseAuthEnv(source: Record<string, string | undefined>): SupabaseAuthEnv {
+  const raw = source.SUPABASE_URL;
+  if (!raw) throw new Error("SUPABASE_URL is not set (the project URL, e.g. https://<ref>.supabase.co)");
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error("SUPABASE_URL is not a valid URL");
+  }
+  if (url.pathname !== "/" || url.search || url.hash) throw new Error("SUPABASE_URL must be the project origin, with no path or query");
+  // Auth tokens travel over this connection, so anything but the local stack must use TLS.
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && LOCAL_HOSTS.has(url.hostname))) {
+    throw new Error("SUPABASE_URL must use https:// (plain http:// is allowed only for the local stack)");
+  }
+
+  const publishableKey = source.SUPABASE_PUBLISHABLE_KEY;
+  if (!publishableKey) throw new Error("SUPABASE_PUBLISHABLE_KEY is not set");
+  // Catches a secret key (sb_secret_...) or a legacy JWT key pasted by mistake: the app must never hold
+  // a key that bypasses RLS (CLAUDE.md: Least privilege; supabase.com/docs/guides/api/api-keys).
+  if (!publishableKey.startsWith("sb_publishable_")) {
+    throw new Error("SUPABASE_PUBLISHABLE_KEY must be a publishable key (it starts with sb_publishable_)");
+  }
+  return { url: url.origin, publishableKey };
 }

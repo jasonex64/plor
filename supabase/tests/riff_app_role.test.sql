@@ -7,7 +7,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(9);
+select plan(14);
 
 select has_role('riff_app');
 select ok((select rolcanlogin from pg_roles where rolname = 'riff_app'), 'riff_app can log in');
@@ -27,6 +27,15 @@ select ok(not has_function_privilege('riff_app', 'public.tx_probe_fn()', 'execut
 -- Guard against breaking Supabase itself: the Data API roles keep their own grant on public.
 select ok(has_schema_privilege('anon', 'public', 'usage'), 'anon still uses schema public');
 select ok(has_schema_privilege('authenticated', 'public', 'usage'), 'authenticated still uses schema public');
+
+-- M02: reading and creating a profile, and nothing else (docs/milestones/M02-sign-in-and-play.md).
+select ok(has_schema_privilege('riff_app', 'private', 'usage'), 'riff_app can use schema private');
+select ok(not has_schema_privilege('riff_app', 'private', 'create'), 'riff_app cannot create objects in private');
+select ok(has_table_privilege('riff_app', 'private.profile', 'select'), 'riff_app can read profiles');
+select ok(has_table_privilege('riff_app', 'private.profile', 'insert'), 'riff_app can create profiles');
+-- A comma list is true when any one privilege is held, so this asserts none of them is.
+select ok(not has_table_privilege('riff_app', 'private.profile', 'update, delete, truncate, references, trigger'),
+  'riff_app cannot change, delete, truncate, reference or trigger on profiles');
 
 select * from finish();
 rollback;

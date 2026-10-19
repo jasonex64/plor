@@ -224,7 +224,9 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+# On, like a hosted project's "Confirm email" default, so a new address gets the confirmation template
+# locally too (M02).
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -243,6 +245,17 @@ otp_expiry = 3600
 # pass = "env(SENDGRID_API_KEY)"
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
+
+# The sign-in link for the PKCE flow: a token hash sent to /auth/confirm
+# (supabase.com/docs/guides/auth/auth-email-passwordless). A new address gets the confirmation email and a
+# returning one the magic link, so both use it; the subjects differ so tests can tell them apart. The hosted project's templates get the same HTML (M02).
+[auth.email.template.confirmation]
+subject = "Welcome to Plor: your sign-in link"
+content_path = "./supabase/templates/sign_in_link.html"
+
+[auth.email.template.magic_link]
+subject = "Your Plor sign-in link"
+content_path = "./supabase/templates/sign_in_link.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

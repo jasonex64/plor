@@ -3,3 +3,24 @@ body {
   padding: 16px;
   font-family: system-ui, sans-serif;
 }
+
+/* Phone-first: one column, full-width controls, 16px text so iOS doesn't zoom into inputs. */
+main {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+label,
+input,
+button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input,
+button {
+  font-size: 16px;
+  padding: 12px;
+  margin: 8px 0;
+}
