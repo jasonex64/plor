@@ -29,6 +29,26 @@ jobs:
       # No secret or server-only value may reach the browser bundle (M02 acceptance criterion).
       - run: npm run check:client-bundle
 
+  # The database tests against a real local Supabase stack (ROADMAP: run test:db in CI, M02): migrations from
+  # scratch, pgTAP, then the *.db.test.ts files. Only the services the tests use are started: Postgres, Auth,
+  # the API gateway in front of it, and Mailpit for sign-in emails (checked locally, 2026-10-19).
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+          cache: npm
+      - run: npm ci
+      # The stack prints its local keys; keep them out of the log (CLAUDE.md: Secrets never leave their home).
+      # GitHub's `shell: bash` runs with pipefail, so a failed start still fails the step.
+      - name: Start the local Supabase stack
+        shell: bash
+        run: npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest | grep -viE 'key|secret|jwt|token|password'
+      - run: npm run test:sql
+      - run: npm run test:db
+
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
   # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a
   # personal account (github.com/gitleaks/gitleaks-action). Full history so old commits are scanned too.
