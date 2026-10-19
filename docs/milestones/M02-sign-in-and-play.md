@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it waits on review, the human setup below, and two human approvals (the riff_app RLS policies and the new SOURCES rows). PR 2b (game loop) is next.
+**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it is reviewed; it waits on the human setup below and one human approval (the new SOURCES rows). The riff_app RLS policies were approved by the human on 2026-10-18. PR 2b (game loop) is next.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -97,7 +97,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Google guide: `redirectTo` is an absolute callback URL | Built from the request's `Origin` header | Same `request.url` problem. Supabase only redirects to allow-listed URLs, so a forged Origin can't send a code elsewhere. |
 | Magic-link guide: `verifyOtp` with whatever `type` arrives | Only `type=email` is accepted | It's the only type our template sends. |
 | Magic-link guide: change the Magic Link template | Both "Confirm signup" and "Magic link" templates, one HTML file | A new address gets "Confirm signup" until its first link is used (observed locally with `enable_confirmations = true`). |
-| M00 data design: "RLS is enabled with no policies" | RLS on, with `select` and `insert` policies for `riff_app` only | With no policy, RLS blocks riff_app too (observed). **Needs human approval** (DECISIONS.md: Row-level security in `private`). |
+| M00 data design: "RLS is enabled with no policies" | RLS on, with `select` and `insert` policies for `riff_app` only | With no policy, RLS blocks riff_app too (observed). Approved by the human, 2026-10-18 (DECISIONS.md: Row-level security in `private`). |
 | M00 data design §3: `username citext unique` | citext, plus a check constraint on `username::text` | citext's regex match ignores case, so the format check must cast to text (tested). |
 
 ## Evidence
@@ -137,7 +137,7 @@ Acceptance criteria (2a):
 Browser run, local `next start` at phone width (375×812), 2026-10-18: the email was sent ("Check … for a sign-in link"), the link from Mailpit opened "Pick a username", an email typed as a username got the format message, `Browser_Check` was saved as `browser_check` ("Signed in as browser_check."), sign-out returned to the sign-in form, a second address signed in, and picking `browser_check` got "That username is taken. Try another." The server log showed no errors. The first attempt exposed the `localhost` redirect bug (Source diff), which was fixed before this run.
 
 Hypotheses recorded on the way:
-1. "riff_app can insert and read profiles with USAGE plus SELECT/INSERT, because type I/O, index upkeep and FK checks don't check its privileges." **Disproved:** RLS with no policy blocked it. Re-planned: riff_app-only policies (needs human approval).
+1. "riff_app can insert and read profiles with USAGE plus SELECT/INSERT, because type I/O, index upkeep and FK checks don't check its privileges." **Disproved:** RLS with no policy blocked it. Re-planned: riff_app-only policies (approved by the human, 2026-10-18).
 2. "Dynamic route handlers send a no-store Cache-Control." **Disproved:** no Cache-Control at all. Fixed in `handle()`.
 3. "`request.url` follows the Host header." **Disproved** (curl with `Host:` and with `x-forwarded-host:` both gave `localhost`). Fixed with relative redirects and `Origin`.
 4. "A new address gets the confirmation template, a returning one the magic-link template." Confirmed by the subjects in route.db.test.ts.
