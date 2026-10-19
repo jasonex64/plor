@@ -167,7 +167,18 @@ Production after merge (human, 2026-10-18/19, on `https://plor.app`, still behin
 1. The SMTP host was typed as `smpt.resend.com`. Supabase's Auth log said `dial tcp: lookup smpt.resend.com ... no such host`, and the app showed "Something went wrong (internal)", because the route turns Supabase's 500 into a 500. Fixed to `smtp.resend.com`.
 2. The template bodies were still Supabase's defaults (`{{ .ConfirmationURL }}`), and only the subjects had been changed. The link went through `/auth/v1/verify` and came back to `/` with a code the app doesn't use, so the player landed signed out with no error. Fixed by pasting `supabase/templates/sign_in_link.html` into both templates. The newest link now starts with `https://plor.app/auth/confirm?token_hash=`.
 
-Still to do for 2a: the human switches Deployment Protection to Standard Protection (D3, setup step 9), and Claude then checks from outside that `plor.app` is public while previews stay protected.
+D3 (human, 2026-10-19): Deployment Protection set to Standard Protection. Checked from outside by Claude the same day:
+
+```text
+https://plor.app/                                          308 -> https://www.plor.app/
+https://www.plor.app/                                      200
+https://riff-sixfour.vercel.app/                           302 -> vercel.com/sso-api (protected)
+https://riff-git-m02-sign-in-and-play-sixfour.vercel.app/  302 -> vercel.com/sso-api (protected preview)
+$ npm run status -- https://plor.app
+UP https://plor.app (protocol 1)
+```
+
+**Open:** the domain redirect runs the wrong way (`plor.app` → `www`, while setup step 3 asks for `www` → `plor.app`). Supabase allows only `https://plor.app/auth/callback`, and the Google route builds the return URL from the page's Origin, so Google sign-in started on `www` would not come back signed in (expected from the code; not yet tried). Fix: make `plor.app` the primary domain in Vercel.
 
 
 ## Review
