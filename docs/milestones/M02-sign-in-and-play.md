@@ -103,7 +103,7 @@ In this order; nothing is public until step 6 deploys the game.
 Done 2026-10-19: step 1 checked by Claude with `npx supabase migration list --linked` (all four migrations remote). Steps 2–5 were reported done by the human ("all done"; output not pasted, so the publish counts are unverified until the rehearsal run, which needs the 2026-10-20 puzzle). Step 6: PR #8 merged by Claude on the human's word (`42b8dc6`), after confirming that the migration was on staging and CI was green. About 40 s later `GET https://plor.app/api/run` answered 401 when signed out, and `npm run status -- https://plor.app` printed `UP https://plor.app (protocol 1)`.
 
 ## Out of scope
-Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
+Share (M05), friends and the live board (M06), comments (M07), the points ledger and leaderboard (M08), account deletion and production hardening (M11), and the Offbeat visual theme beyond a plain functional UI.
 
 ## Numbers
 Every value this milestone needs, and where it comes from. A blank origin means stop and ask.
@@ -112,7 +112,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Questions per day | Run length | 7 (human, 2026-10-18) |
 | Username rules | Profile creation | 3–20 characters, `a-z 0-9 _`, unique ignoring case (human, 2026-10-18) |
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
-| Rate limit on answer and not-in-list requests | Abuse control | Deferred to M07: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
+| Rate limit on answer and not-in-list requests | Abuse control | Deferred to M11: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
 | Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19) |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |

@@ -56,12 +56,12 @@ private.run_event(
   - **survived** (every question answered without a match)
   - **abandoned** (`puzzle_date < private.today()` and neither died nor survived)
 
-  The live board (M04) reads this view.
+  The live board (M06) reads this view.
 - **Abandoned runs score zero** (Q4, decided by a human on 2026-10-17). They get no ledger row, so there's no closing job. The view already shows them as abandoned.
 - **Retries are safe.** Resubmitting the same `entry_id` returns the stored result. A different `entry_id` for an index that's already answered gets `409 already_answered`.
 - **Order is enforced** in one transaction: `question_idx` must equal the number of existing events, and no earlier event can be `matched`.
 
-## 6. Points ledger (written from M06, when the leaderboard is built)
+## 6. Points ledger (written from M08, when the leaderboard is built)
 ```
 private.points_ledger(
   id bigint generated always as identity primary key,
@@ -75,7 +75,7 @@ private.points_ledger(
 - **Formula** (Q3: the human asked for points that keep increasing and accepted Claude's proposal, 2026-10-17): surviving question *k* (1-based) earns *k* points. A run that survives *n* questions scores 1 + 2 + … + *n* = *n*(*n*+1)/2. There's no completion bonus, and abandoned runs score 0.
   *Example:* a player who dies on Q4 has survived Q1–Q3, so they score 1 + 2 + 3 = 6.
 - **When it's written:** in the **same transaction** as the run's ending event (the death or the last survived answer). The unique constraint means a retry can never award points twice.
-- **Backfill when M06 ships** *(fixes review 2, BLOCKING 3)*:
+- **Backfill when M08 ships** *(fixes review 2, BLOCKING 3)*:
   1. **Deploy the write path first.** From then on, every run that ends writes its own ledger row.
   2. **Then run `npm run ledger:backfill`.** It reads `private.run_status` for runs that `died` or `survived`, skipping `in_progress` and `abandoned`. It scores them with **the same TypeScript scoring function** the write path uses, and inserts with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`. That makes a rerun a no-op instead of a failure, and it overlaps safely with the live write path.
   3. **Evidence:** run it twice. The second run inserts 0 rows, and the ledger sum equals the recomputed score for every finished run.
@@ -84,7 +84,7 @@ private.points_ledger(
 ## 7. Append-only enforcement (`run`, `run_event`, `points_ledger`)
 - `REVOKE ALL` on these tables from `anon`, `authenticated` and `service_role`, then `GRANT SELECT, INSERT` to `plor_app` only (plus `USAGE` on schema `private`). This removes UPDATE, DELETE and TRUNCATE (PG17 lists TRUNCATE as its own privilege). `plor_app` doesn't bypass RLS and is bound by grants. *(Changed 2026-10-17: was `service_role`, before the app role existed.)*
 - pgTAP tests cover each role × {UPDATE, DELETE, TRUNCATE} and assert that each one is denied.
-- **Account deletion (M07)** relies on `on delete cascade` from `auth.users`. It's **unverified** whether a referential cascade works once DELETE has been revoked. A pgTAP test in M02 checks this. If it fails, deletion goes through a single owner-privileged function in a non-exposed schema.
+- **Account deletion (M11)** relies on `on delete cascade` from `auth.users`. It's **unverified** whether a referential cascade works once DELETE has been revoked. A pgTAP test in M02 checks this. If it fails, deletion goes through a single owner-privileged function in a non-exposed schema.
 
 ## 8. Day boundary
 **Decided (Q1, by a human on 2026-10-17):** one **global** reset at **midnight Pacific time, following daylight saving** (`America/Los_Angeles`). That's 08:00 UTC in winter (PST) and 07:00 UTC in summer (PDT).
@@ -99,4 +99,4 @@ private.points_ledger(
   - backfill ordering, `ON CONFLICT`, and a shared scoring function
 
   Review 2's 4th finding, leftover guest references in other docs, was already fixed in the same change. Non-blocking findings were recorded in ROADMAP "Next revision".
-- **Revision 3 (2026-10-17):** applied Q1–Q5. **Removed:** anonymous users, guest linking, the guest-merge rule, the Turnstile requirement for anonymous sign-up, and the closing job for abandoned runs. **Moved:** the ledger write moved to M06, with a one-time backfill script.
+- **Revision 3 (2026-10-17):** applied Q1–Q5. **Removed:** anonymous users, guest linking, the guest-merge rule, the Turnstile requirement for anonymous sign-up, and the closing job for abandoned runs. **Moved:** the ledger write moved to M08, with a one-time backfill script.
