@@ -1,6 +1,6 @@
 -- Offbeat's game tables: the day boundary, published puzzles, runs, answers and logged misses
 -- (docs/milestones/M00-data-design.md §4, §5, §7, §8; docs/milestones/M02-sign-in-and-play.md).
--- Expected failures raise their own SQLSTATE, which src/game/errors.ts maps to API errors:
+-- Expected failures raise their own SQLSTATE, which src/game/runs.ts and scripts/content-publish.ts map:
 --   OB001 day_over, OB002 out_of_order, OB003 run_over, OB004 puzzle_started.
 
 -- §8: one global day that resets at midnight America/Los_Angeles, following DST (human, 2026-10-17).

@@ -6,6 +6,9 @@ import { Pool, type PoolClient, type PoolConfig } from "pg";
 import { readServerEnv, type ServerEnv } from "@/config/env";
 import { log } from "@/lib/log";
 
+// Either the pool or one transaction's client: single statements can run on both.
+export type Db = Pool | PoolClient;
+
 let pool: Pool | undefined;
 
 // Pool sizes are node-postgres defaults until the M07 load test (human decision, 2026-10-17).
