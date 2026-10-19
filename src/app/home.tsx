@@ -1,10 +1,11 @@
 "use client";
 
-// Sign-in, then picking a username, then (from M02 part 2b) the game. Every step goes through the API;
+// Sign-in, then picking a username, then the game. Every step goes through the API;
 // errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, api } from "@/lib/api-client";
+import { Game } from "./game";
 import { messageFor, messageForRedirect } from "./messages";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null };
@@ -145,12 +146,15 @@ function SignedIn({ username, onSignedOut }: { username: string; onSignedOut: ()
   }
 
   return (
-    <section>
-      <p>Signed in as {username}.</p>
-      <button type="button" onClick={signOut}>
-        Sign out
-      </button>
-      {error && <p role="alert">{error}</p>}
-    </section>
+    <>
+      <Game />
+      <footer>
+        <p>Signed in as {username}.</p>
+        <button type="button" onClick={signOut}>
+          Sign out
+        </button>
+        {error && <p role="alert">{error}</p>}
+      </footer>
+    </>
   );
 }

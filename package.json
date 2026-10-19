@@ -15,7 +15,8 @@
     "test:sql": "supabase test db",
     "lockfile": "node scripts/lockfile.ts",
     "content:validate": "node scripts/content-validate.ts",
-    "content:plurals": "node scripts/content-plurals.ts"
+    "content:plurals": "node scripts/content-plurals.ts",
+    "content:publish": "node scripts/content-publish.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

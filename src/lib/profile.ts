@@ -1,9 +1,8 @@
 // private.profile access (M00 data design §3). The username rules live in the table's check constraint
 // (supabase/migrations/20261018105903_create_profile.sql), so the database is the one place that enforces them.
-import { DatabaseError, type Pool, type PoolClient } from "pg";
+import { DatabaseError } from "pg";
+import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
-
-type Db = Pool | PoolClient;
 
 export async function getUsername(db: Db, userId: string): Promise<string | null> {
   const { rows } = await db.query<{ username: string }>("select username from private.profile where user_id = $1", [userId]);

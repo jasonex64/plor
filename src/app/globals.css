@@ -24,3 +24,16 @@ button {
   padding: 12px;
   margin: 8px 0;
 }
+
+/* Suggestions under the answer box: a plain scrolling list of tappable answers. */
+.suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+footer {
+  margin-top: 32px;
+}

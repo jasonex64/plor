@@ -3,8 +3,13 @@
 // SET, and schema-qualified table names (supabase.com/docs/guides/database/connecting-to-postgres).
 import { attachDatabasePool } from "@vercel/functions";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
-import { readServerEnv, type ServerEnv } from "@/config/env";
-import { log } from "@/lib/log";
+// Relative .ts imports, like src/content/puzzle.ts: scripts/content-publish.ts runs this module under plain Node,
+// which doesn't know the "@/" alias.
+import { readServerEnv, type ServerEnv } from "../config/env.ts";
+import { log } from "./log.ts";
+
+// Either the pool or one transaction's client: single statements can run on both.
+export type Db = Pool | PoolClient;
 
 let pool: Pool | undefined;
 

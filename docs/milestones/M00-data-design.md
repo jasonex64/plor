@@ -27,7 +27,7 @@ Sources: Supabase docs (keys and RLS, Realtime) and PostgreSQL 17 (`ddl-priv`), 
 
 ## 4. Puzzle content format
 - **Authoring:** JSON files at `content/<game_id>/<YYYY-MM-DD>.json` with `"format": 1`, checked by a single TypeScript validator (M01) that the server code also imports.
-- **Storage:** `private.puzzle(game_id text, puzzle_date date, format int, content jsonb, content_hash text, published_at timestamptz, pk(game_id, puzzle_date))`. *(The column trimming is pending under ROADMAP "Next revision".)*
+- **Storage:** `private.puzzle(game_id text, puzzle_date date, content jsonb, pk(game_id, puzzle_date))`, with a check that the content names its own game and date. *(Trimmed in M02: `format` lives in `content`, and nothing read `content_hash` or `published_at`.)*
 - **Publishing:** `npm run content:publish` validates the files and upserts them. **It refuses to change a puzzle whose `puzzle_date <= private.today()`**, checked in the same transaction as the upsert.
 - **Matching** is a pure TypeScript function: `(content, question_idx, entry_id) → matched | invalid_entry`, with unit tests.
 

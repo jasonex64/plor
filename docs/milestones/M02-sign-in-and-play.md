@@ -32,19 +32,21 @@ Each criterion must be checkable with a command or other observable result.
 - [x] Sessions use `@supabase/ssr` cookies; no secret reaches the client bundle (checked in the build output).
 
 **2b: game loop**
-- [ ] `content:publish` loads validated puzzles into `private.puzzle` and refuses to change a puzzle whose `puzzle_date <= private.today()` (tested against the local stack).
-- [ ] `private.today()` is the only definition of "today", with tests just before and after midnight on each `America/Los_Angeles` DST transition during development and the playtest, with the dates taken from the IANA tz database rather than worked out by hand (2026-11-01 is already logged in ROADMAP), plus an ordinary day.
-- [ ] Matching is a pure function `(question, entry_id) → matched | not_matched | invalid_entry`. A host answer always matches itself; match groups cover only the listed extra entries (unit tests for each rule).
-- [ ] `POST /run/start` pins `puzzle_date = private.today()`; one run per user per day (primary key; tested).
-- [ ] Answers are checked one at a time. The response gives the result, the host answer(s) for that question, and the next question. The payload never contains host answers or host-bank markers for questions not yet answered (payload-level test).
-- [ ] A different `entry_id` for an index that's already been answered → `409 already_answered`; the same one returns the stored result; an answer after the reset → `409 day_over`, raised by a database trigger. Two concurrent requests for the same index return the idempotent result or 409, never 500 (concurrency test; ROADMAP item).
-- [ ] Typed text that matches no entry gets "not in our list yet, try another" with no penalty, and is logged for human review under the limits in Numbers (tested).
-- [ ] The run status view gives in_progress / died / survived / abandoned (tested).
-- [ ] `plor_app` gets only the grants these routes need (pgTAP, extending `plor_app_role.test.sql`); nothing in `private` is reachable by `anon` or `authenticated` (test; ROADMAP item).
-- [ ] `npm run test:db` runs in CI against a started Supabase stack (ROADMAP item).
-- [ ] UI: autocomplete over the question's accepted bank that submits entry IDs; one question at a time; a result screen. It works on a phone-width screen.
+- [x] `content:publish` loads validated puzzles into `private.puzzle` and refuses to change a puzzle whose `puzzle_date <= private.today()` (tested against the local stack).
+- [x] `private.today()` is the only definition of "today", with tests just before and after midnight on each `America/Los_Angeles` DST transition during development and the playtest, with the dates taken from the IANA tz database rather than worked out by hand (2026-11-01 is already logged in ROADMAP), plus an ordinary day.
+- [x] Matching is a pure function `(question, entry_id) → matched | not_matched | invalid_entry`. A host answer always matches itself; match groups cover only the listed extra entries (unit tests for each rule).
+- [x] `POST /run/start` pins `puzzle_date = private.today()`; one run per user per day (primary key; tested).
+- [x] Answers are checked one at a time. The response gives the result, the host answer(s) for that question, and the next question. The payload never contains host answers or host-bank markers for questions not yet answered (payload-level test).
+- [x] A different `entry_id` for an index that's already been answered → `409 already_answered`; the same one returns the stored result; an answer after the reset → `409 day_over`, raised by a database trigger. Two concurrent requests for the same index return the idempotent result or 409, never 500 (concurrency test; ROADMAP item).
+- [x] Typed text that matches no entry gets "not in our list yet, try another" with no penalty, and is logged for human review under the limits in Numbers (tested).
+- [x] The run status view gives in_progress / died / survived / abandoned (tested).
+- [x] `plor_app` gets only the grants these routes need (pgTAP, extending `plor_app_role.test.sql`); nothing in `private` is reachable by `anon` or `authenticated` (test; ROADMAP item).
+- [x] `npm run test:db` runs in CI against a started Supabase stack (ROADMAP item).
+- [x] UI: autocomplete over the question's accepted bank that submits entry IDs; one question at a time; a result screen. It works on a phone-width screen.
 - [ ] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `plor_app`'s grants allow, or through an admin path).
 - [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
+
+**Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
 **Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.
 
@@ -68,6 +70,36 @@ The repo, the app login and the services drop the "riff" names. Claude's part is
 4. **Vercel → Settings → Domains:** make `plor.app` the primary domain, with `www.plor.app` redirecting to it. Today it's the other way round (D3 evidence).
 5. **Service names:** GitHub repo `jasonex64/RIFF` → `plor` (Settings → General → Repository name); Vercel project `riff` → `plor` (Settings → General → Project Name); Supabase project `riff-staging` → `plor-staging` (Project Settings → General). Claude then updates the git remote and the docs that name them.
 
+
+Done 2026-10-19: the human confirmed the old password with a read-only psql login as `riff_app` (verify-full; it wasn't in the password manager, which has it now), set `DATABASE_URL` to `plor_app.<ref>`, ran `db push` (rename) and `test db --linked` ("all passed", human report), and approved the merge of PR #7 (`ad938c6`). During the switch `/api/health` answered 500 (old deploy, old name); after the deploy:
+
+```text
+$ npm run status -- https://plor.app
+UP https://plor.app (protocol 1)
+```
+Steps 4 and 5, done by the human on 2026-10-19 and checked by Claude the same day:
+
+```text
+https://plor.app/                       200
+https://www.plor.app/                   308 -> https://plor.app/
+https://www.plor.app/auth/callback      308 -> https://plor.app/auth/callback
+https://riff-omega-dusky.vercel.app/    308 -> https://plor.app/   (Vercel's production alias, also redirected)
+https://riff-sixfour.vercel.app/        302 -> vercel.com/sso-api  (protected)
+$ gh repo view jasonex64/plor           -> plor https://github.com/jasonex64/plor   (git remote updated)
+$ npx supabase projects list            -> plor-staging us-east-1
+```
+The Vercel project rename is the human's report; Vercel keeps the existing `riff-…vercel.app` aliases, and new previews take the new project name.
+## Human setup for 2b
+In this order; nothing is public until step 6 deploys the game.
+1. ~~Approve the proposed RLS amendment~~ **Approved by the human, 2026-10-19** (DECISIONS.md: Row-level security in `private`).
+2. `npx.cmd supabase db push --include-roles`: creates the `plor_publisher` login and applies `20261019074108_create_game_tables.sql`.
+3. **Set `plor_publisher`'s password**: make a new letters-and-digits password in the password manager first, then run psql in Docker as `postgres` (the same `docker run … postgres:17 psql …` command used for the riff_app check, with user `postgres.<project-ref>` and port 5432), type `\password plor_publisher`, then `\q`.
+4. `npx.cmd supabase test db --linked`: 74 tests, including the tz check on staging's own data.
+5. `npm.cmd run content:publish -- postgresql://plor_publisher.<project-ref>@aws-0-us-east-1.pooler.supabase.com:6543/postgres`, then type the password when asked. Expected: `PUBLISHED 2026-10-26..2026-11-08 to …: 14 new, 0 updated, 0 unchanged`.
+6. Merge PR 2b.
+5b. **Rehearsal day** (human, 2026-10-19): `npm.cmd run content:publish -- <same URL> content-rehearsal` publishes `content-rehearsal/offbeat/2026-10-20.json`, which is the 2026-11-08 questions (outside the 7 playtest days) dated 2026-10-20. It stays in the database as a past day.
+7. **Staging run** (acceptance criterion): play one run on `https://plor.app` on 2026-10-20 (the rehearsal day), then send Claude the result of the admin query Claude gives (Supabase SQL editor), which lists that run's `run_event` rows.
+
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
 
@@ -80,6 +112,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M07: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
+| Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19) |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
 
 ## Plan
@@ -99,6 +132,16 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket: `POST /run/start` | `POST /api/run/start`, plus `GET /api/run`, `POST /api/run/answer`, `POST /api/run/miss` | Every API route lives under `/api` (M00). Reading the run's state and logging a miss need their own routes. |
+| M00 §4: `private.puzzle(…, format, content, content_hash, published_at)` | `(game_id, puzzle_date, content)`, plus a check that the content names its own game and date | The ticket's Removes: `format` is inside `content`, and nothing reads a hash or publish time. The check mirrors the path rule for files. |
+| M00 §4: matching `(content, question_idx, entry_id) → matched \| invalid_entry` | `matchAnswer(question, entryId) → matched \| not_matched \| invalid_entry` | The ticket's newer signature. |
+| M00 §5: order "enforced in one transaction" by the app | The `run_event` BEFORE INSERT trigger enforces order and "nothing after a match or the last question", next to `day_over` | "The database enforces invariants" (M00 principles): the app can't get it wrong, and concurrent requests meet at the primary key. The route reads the stored answer again on any conflict (never a 500). |
+| M00 §5: the client never sends a date | `answer` uses the player's latest run; if its day has ended, the trigger raises `day_over` | That is how an answer after the reset reaches the trigger without the client naming a day. |
+| M00 §8: tests on "both 2027 transition dates" | The DST changes found in the tz data between 2026-10-17 (M00) and 2026-11-08 (last puzzle): only 2026-11-01. Both ends of that 25-hour day, plus an ordinary day (2026-10-26) | The ticket's newer rule ("during development and the playtest"). The instants come from Node's ICU tz data by bisection, not by hand. |
+| M00 §5: the status view | `security_invoker = true` | The view is in `private` and plor_app reads it with its own grants and RLS policies, never as the owner. |
+| M00 §3: the profile is created "before the first run" | `POST /api/run/start` refuses with `409 no_profile` until a username exists | Enforces §3. |
+| M00 §4: `content:publish` "validates the files and upserts them" | Also checks that the dates have no gaps, asks for the password instead of reading it from the URL, connects as `plor_publisher` to a remote database, and leaves unchanged days alone (so a started day can be republished unchanged) | ROADMAP item (consecutive dates); keeps the password out of shell history; DECISIONS.md: Content publishing role. |
+| Ticket UI: "autocomplete … that submits entry IDs" | Suggestions are every entry where a word of its name or an alias starts with the typed text (authoring normalization), all shown, in a scrolling list. A picked answer needs a second tap ("Lock in …") | Sudden death makes a mis-tap end the run. Showing all matches avoids inventing a cut-off number. |
 | SSR guide: browser and server clients, env vars `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Server client only, env vars `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Every auth call runs in a route handler, so nothing in the browser needs the values, and `NEXT_PUBLIC_` would inline them into the bundle. |
 | SSR guide's server client: `setAll` wrapped in try/catch with the error ignored (for Server Components) | No try/catch; only route handlers create the client | Route handlers can write cookies, so a failed write is a real error (CLAUDE.md: fail loudly). No Server Component reads the session. |
 | SSR guide's proxy: redirects signed-out users to `/login` | Refresh only; logs a warning if `getClaims()` errors | The Next.js proxy docs say proxy is not for authorization. Each route checks the session and fails with 401 (or 500). |
@@ -190,10 +233,65 @@ UP https://plor.app (protocol 1)
 **Open:** the domain redirect runs the wrong way (`plor.app` → `www`, while setup step 3 asks for `www` → `plor.app`). Supabase allows only `https://plor.app/auth/callback`, and the Google route builds the return URL from the page's Origin, so Google sign-in started on `www` would not come back signed in (expected from the code; not yet tried). Fix: make `plor.app` the primary domain in Vercel.
 
 
+### 2b (game loop)
+Run on branch `m02-sign-in-and-play` after the 2b review fixes, 2026-10-19 (Windows, Node 24.11.0), on a reset local stack.
+
+```text
+$ npm run test:sql
+/Users/jason/RIFF/supabase/tests/game.test.sql ............ ok
+/Users/jason/RIFF/supabase/tests/plor_app_role.test.sql ... ok
+/Users/jason/RIFF/supabase/tests/private_schema.test.sql .. ok
+/Users/jason/RIFF/supabase/tests/profile.test.sql ......... ok
+Files=4, Tests=74
+Result: PASS
+$ npm run test:db
+ Test Files  7 passed (7)
+      Tests  40 passed (40)
+$ npm test
+ Test Files  13 passed (13)
+      Tests  91 passed (91)
+$ npm run lint                       # no findings
+$ npm run content:validate
+CONTENT OK content: 14 file(s)
+$ npm run build                      # 13 routes plus the Proxy
+$ npm run check:client-bundle
+CLIENT BUNDLE OK: 13 files, 5 patterns, 3 env values (DATABASE_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+$ npm run lockfile -- check
+LOCKFILE CHECK OK (Linux, node:24)
+CI (GitHub Actions run 39219369083, commit 94fb55e): jobs check, db and secrets all succeeded; db ran test:sql (PASS) and test:db (38 passed at that commit)
+```
+
+Criteria (2b), and where each is shown:
+- **`content:publish`:** `scripts/content-publish.db.test.ts` (as `plor_publisher`: insert, unchanged, update a future day, republish a started day unchanged, and refuse to change a started day with "has started and can't change; nothing was published"). `scripts/content-publish.test.ts` covers date gaps. The CLI refuses a password in the URL, a missing URL, a remote login other than `plor_publisher`, and a non-interactive stdin (run by hand, each printed `PUBLISH FAILED: …`). The database itself refuses the change too (`game.test.sql`, OB004).
+- **`private.today()`:** the only definition: the SQL for run start, the trigger, the view and publishing all call it, and TypeScript only reads it. `src/game/day.db.test.ts` derives from Node's ICU tz data that the window 2026-10-17..2026-11-08 has one change, 2026-11-01. It checks the millisecond before and the first millisecond of 2026-10-26 (ordinary), 2026-11-01 and 2026-11-02 against the database, and that the day is 25 h long. `game.test.sql` repeats the 2026-11-01 instants so staging's tz data is checked by `test db --linked`.
+- **Matching:** `src/game/matching.test.ts` (a host answer itself, a host answer without a group, a group member, a host-bank non-answer, a niche answer, an unknown ID, and a group on a non-host entry that doesn't count).
+- **One run per day, date pinned:** `game.test.sql` (second run → 23505; no puzzle → 23503). `runs.db.test.ts` shows starting twice returns the same run. The insert uses `private.today()` itself (2b review fix).
+- **One answer at a time; nothing leaks:** `src/game/payload.test.ts` moves every host bank, host answer and match group to other entries, and every question payload stays byte-identical. It caught a deliberately leaky ordering (entries sorted host-bank first) before the code was restored. `runs.db.test.ts` checks the route's question is exactly that public view, and that host answers appear only for answered questions.
+- **Retries, 409s, day_over, concurrency:** `runs.db.test.ts`: same entry → stored result; different → `409 already_answered`; skipping ahead → `409 out_of_order`; after a match → `409 run_over`; a run from yesterday → `409 day_over` from the trigger. Two concurrent identical answers both give 200 or 409, and two concurrent different answers give exactly one 200 and one 409 `already_answered`, never a 500. A retried answer from an ended day returns `abandoned`, not a blank state (2b review fix).
+- **Not in our list:** `runs.db.test.ts`: a miss is logged trimmed and the run carries on at the same question; 41 characters → `400 text_invalid` with nothing stored; a miss for another question → `409 not_current_question`. `game.test.sql` pins the 1–40 character check.
+- **Run status view:** `game.test.sql`: in_progress, died, survived, abandoned.
+- **Grants:** `plor_app_role.test.sql` lists everything `plor_app` and `plor_publisher` hold in `private`, exactly. `private_schema.test.sql` checks that anon, authenticated and service_role hold nothing on any private table, view, sequence or function. `src/game/runs.plor-app.db.test.ts` plays a run as `plor_app` itself. The cascade from `auth.users` through runs, answers and misses is in `game.test.sql` (the §7 "unverified" item, now verified).
+- **UI at phone width:** browser run on local `next start` at 375×812, 2026-10-19. Signed in by the emailed link, picked a username, then "Start today's puzzle" showed "Question 1 of 7 / Name an animal". Typing "axo" showed no suggestion and offered `Not in the list? Send "axo"`; sending "axolotl" showed `"axolotl" is not in our list yet. Try another answer.`, and the row was logged. Typing "aard" suggested aardvark; picking it showed "Lock in aardvark", and locking in showed "Safe! You said aardvark; the host said elephant." and "Question 2 of 7 / Name a US state". Answering Texas (the host answer) showed "Caught on question 2 / You survived 1 of 7 questions" with both questions listed, and a reload showed the same result. No server errors. The test user, the miss and the local puzzle were deleted afterwards.
+
+Hypotheses recorded on the way:
+1. "A plor_app insert into `missed_answer` needs no grant on its identity sequence." Confirmed by `runs.plor-app.db.test.ts`.
+2. "`timezone(text, timestamptz)` is immutable in PG17." Confirmed (`provolatile = i`); `day_of` is still declared `stable`, because tz data can change.
+3. "`supabase start` restored from a backup applies new migrations." **Disproved:** it restored the old schema without the new migration or role. `supabase db reset` applied both.
+4. "The minimal stack (db, Auth, Kong, Mailpit) runs every database test." Confirmed locally, then in CI.
+5. "Filtering lines containing key, secret, jwt, token or password hides the stack's keys in CI." **Disproved:** the "Publishable" row passed the filter. The step now drops stdout entirely.
+
 ## Review
 **2a, review 1** (reviewer agent, fresh context, diff `5e8e83e..4c0c6c7`, 2026-10-18; after the history rewrite below, those commits are `2db4a4b` and `5231b3b`):
 - Blocking findings and how each was fixed:
   - `profile.test.sql` asserted the whole table held one row, so it failed once `test:db` (or real staging users) had left profiles behind; the reviewer reproduced `have: 3 want: 1`. **Fixed:** the assertion counts only the test's own user IDs, and `route.db.test.ts` deletes the auth users it created (cascading to profiles). `test:sql` then passed with 2 leftover profiles present, and the user count was unchanged after `test:db`.
 - Deferred to ROADMAP "Next revision": `getClaims()` errors become a 500 if tokens are HS256 (signing keys unverified); the bundle check skips `.next/server/app`; the private-schema sweep comment mentions sequences it doesn't check. The extended SOURCES Next.js row was included in the human's approval of the new rows. The username-rule drift was already logged.
 - **History rewrite (human-approved, 2026-10-18):** CI's gitleaks scan flagged a made-up JWT-shaped string in `src/config/env.test.ts` (rule `generic-api-key`; it was a fabricated test value, `{"alg":"HS256"}.{}` with signature `x`, never a real key). The value became `legacy_anon_key`, the three commits after the ticket commit were rebuilt without it, and the branch was force-pushed. The final tree differs from the old head only on that line. No gitleaks config was changed.
+**2b, review 1** (reviewer agent, fresh context, diff `45a2663..33a1110`, 2026-10-19):
+- Blocking findings and how each was fixed:
+  - No "Evidence → 2b" section. **Fixed:** the section above.
+  - `startRun` inserted a date read by an earlier statement, so a start across midnight could create yesterday's run, and the UI had no `abandoned` state (a blank screen, also after a retried answer past midnight). **Fixed:** the insert uses `private.today()`, maps a missing puzzle to `404 no_puzzle_today`, then reads today's state again. `abandoned` is a status with its own message and a reload button, and `runs.db.test.ts` covers the retried-answer case.
+  - `game.test.sql` inserted fixture puzzles without clearing real ones, so it would fail on staging once puzzles exist for those days. **Fixed:** it clears runs and puzzles for those days inside its rolled-back transaction. Reproduced the reviewer's failure case, then passed with real puzzles present, and they were untouched afterwards.
+  - The `plor_publisher` RLS policies weren't in the DECISIONS.md RLS row. **Proposed** as an amendment in that row, pending the human's approval (security change).
+- Deferred to ROADMAP "Next revision": the `now()` transaction clock in publish, the CA file in publish, `askHidden` on EOF, the `parseDatabaseUrl` message, no batch-rollback test, fixture cleanup in `runs.db.test.ts`, and the old CI log with the throwaway local key.
+
 - The reviewer's unverified items: the signing algorithm (not checked, to avoid handling tokens); the browser run and the planted-leak check (written claims only); Origin on Vercel, Google and the hosted sender (human setup step 9); the lockfile check (run by the author: LOCKFILE CHECK OK).
