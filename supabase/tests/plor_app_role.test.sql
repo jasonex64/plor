@@ -7,7 +7,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(17);
 
 select has_role('plor_app');
 -- The rename left no login behind under the old name (migration 20261019070813).
@@ -38,6 +38,34 @@ select ok(has_table_privilege('plor_app', 'private.profile', 'insert'), 'plor_ap
 -- A comma list is true when any one privilege is held, so this asserts none of them is.
 select ok(not has_table_privilege('plor_app', 'private.profile', 'update, delete, truncate, references, trigger'),
   'plor_app cannot change, delete, truncate, reference or trigger on profiles');
+
+-- M02 2b: everything plor_app and plor_publisher may do in `private`, listed exactly (M02 ticket: "only the
+-- grants these routes need"). A new grant has to be added here on purpose.
+create function pg_temp.grants(who text) returns text[] language sql return (
+  select array_agg(g order by g) from (
+    select format('%s %s', c.oid::regclass, p.priv) as g
+    from pg_class c
+    cross join (values ('select'), ('insert'), ('update'), ('delete'), ('truncate'), ('references'), ('trigger')) as p(priv)
+    where c.relnamespace = 'private'::regnamespace and c.relkind in ('r', 'v', 'm', 'p', 'f')
+      and has_table_privilege(who, c.oid, p.priv)
+    union all
+    select format('%s execute', f.oid::regprocedure)
+    from pg_proc f
+    where f.pronamespace = 'private'::regnamespace and has_function_privilege(who, f.oid, 'execute')
+  ) as held);
+select is(pg_temp.grants('plor_app'), array[
+  'private.day_of(timestamp with time zone) execute',
+  'private.missed_answer insert',
+  'private.profile insert', 'private.profile select',
+  'private.puzzle select',
+  'private.run insert', 'private.run select',
+  'private.run_event insert', 'private.run_event select',
+  'private.run_status select',
+  'private.today() execute'], 'plor_app holds exactly the grants the routes need');
+select is(pg_temp.grants('plor_publisher'), array[
+  'private.day_of(timestamp with time zone) execute',
+  'private.puzzle insert', 'private.puzzle select', 'private.puzzle update',
+  'private.today() execute'], 'plor_publisher holds exactly what content:publish needs');
 
 select * from finish();
 rollback;
