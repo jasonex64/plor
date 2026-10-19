@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it is reviewed; it waits on the human setup below and one human approval (the new SOURCES rows). The riff_app RLS policies were approved by the human on 2026-10-18. PR 2b (game loop) is next.
+**Status:** in progress. Decisions D1–D4 and Numbers were set by a human on 2026-10-18. PR 2a (sign-in and profile) is built and tested locally; it is reviewed, and it waits on the human setup below. The human approved the riff_app RLS policies and the new SOURCES rows on 2026-10-18. PR 2b (game loop) is next.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -12,7 +12,7 @@ A signed-in player can play today's Offbeat puzzle end to end on staging, with e
 ## Source
 - `docs/milestones/M00-data-design.md` rev 4: §2 network messages, §3 identity, §4 content, §5 runs and run events, §7 append-only, §8 day boundary.
 - `docs/DECISIONS.md`: Game 1 rules, answer model, database access, app database role, error handling, logging.
-- Supabase Auth with Next.js SSR (`@supabase/ssr`), plus the D1 docs (magic link, email sending and rate limits, Google sign-in, redirect URLs), all pinned in SOURCES.md at supabase/supabase `7425d49`. *(Rows added 2026-10-18 for D1, and the Next.js row extended with the Proxy and auth-with-Cache-Components pages; only a human can add a source, so all of these need the human's OK.)*
+- Supabase Auth with Next.js SSR (`@supabase/ssr`), plus the D1 docs (magic link, email sending and rate limits, Google sign-in, redirect URLs), all pinned in SOURCES.md at supabase/supabase `7425d49`. *(Rows added 2026-10-18 for D1, and the Next.js row extended with the Proxy and auth-with-Cache-Components pages; approved by the human the same day.)*
 - Next.js App Router docs bundled at `node_modules/next/dist/docs/` (route handlers, `connection()`).
 
 ## Decisions needed before any code
@@ -149,6 +149,6 @@ Not yet verified: anything on staging (Google sign-in, the hosted email sender, 
 **2a, review 1** (reviewer agent, fresh context, diff `5e8e83e..4c0c6c7`, 2026-10-18; after the history rewrite below, those commits are `2db4a4b` and `5231b3b`):
 - Blocking findings and how each was fixed:
   - `profile.test.sql` asserted the whole table held one row, so it failed once `test:db` (or real staging users) had left profiles behind; the reviewer reproduced `have: 3 want: 1`. **Fixed:** the assertion counts only the test's own user IDs, and `route.db.test.ts` deletes the auth users it created (cascading to profiles). `test:sql` then passed with 2 leftover profiles present, and the user count was unchanged after `test:db`.
-- Deferred to ROADMAP "Next revision": `getClaims()` errors become a 500 if tokens are HS256 (signing keys unverified); the bundle check skips `.next/server/app`; the private-schema sweep comment mentions sequences it doesn't check. The SOURCES Next.js row is now named in the pending human OK. The username-rule drift was already logged.
+- Deferred to ROADMAP "Next revision": `getClaims()` errors become a 500 if tokens are HS256 (signing keys unverified); the bundle check skips `.next/server/app`; the private-schema sweep comment mentions sequences it doesn't check. The extended SOURCES Next.js row was included in the human's approval of the new rows. The username-rule drift was already logged.
 - **History rewrite (human-approved, 2026-10-18):** CI's gitleaks scan flagged a made-up JWT-shaped string in `src/config/env.test.ts` (rule `generic-api-key`; it was a fabricated test value, `{"alg":"HS256"}.{}` with signature `x`, never a real key). The value became `legacy_anon_key`, the three commits after the ticket commit were rebuilt without it, and the branch was force-pushed. The final tree differs from the old head only on that line. No gitleaks config was changed.
 - The reviewer's unverified items: the signing algorithm (not checked, to avoid handling tokens); the browser run and the planted-leak check (written claims only); Origin on Vercel, Google and the hosted sender (human setup step 8); the lockfile check (run by the author: LOCKFILE CHECK OK).
