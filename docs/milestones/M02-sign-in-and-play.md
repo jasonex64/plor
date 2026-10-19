@@ -114,7 +114,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M11: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
-| Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19) |
+| Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19); plus 2026-10-19 with the 2026-11-07 questions, so the human could rehearse the same day (human, 2026-10-19: "can i just do it now") |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
 
 ## Plan
