@@ -68,6 +68,14 @@ The repo, the app login and the services drop the "riff" names. Claude's part is
 4. **Vercel → Settings → Domains:** make `plor.app` the primary domain, with `www.plor.app` redirecting to it. Today it's the other way round (D3 evidence).
 5. **Service names:** GitHub repo `jasonex64/RIFF` → `plor` (Settings → General → Repository name); Vercel project `riff` → `plor` (Settings → General → Project Name); Supabase project `riff-staging` → `plor-staging` (Project Settings → General). Claude then updates the git remote and the docs that name them.
 
+
+Done 2026-10-19: the human confirmed the old password with a read-only psql login as `riff_app` (verify-full; it wasn't in the password manager, which has it now), set `DATABASE_URL` to `plor_app.<ref>`, ran `db push` (rename) and `test db --linked` ("all passed", human report), and approved the merge of PR #7 (`ad938c6`). During the switch `/api/health` answered 500 (old deploy, old name); after the deploy:
+
+```text
+$ npm run status -- https://plor.app
+UP https://plor.app (protocol 1)
+```
+Still open: steps 4 (primary domain) and 5 (service names).
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
 
