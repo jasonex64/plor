@@ -2,6 +2,7 @@
 
 // Sign-in, then picking a username, then the game. Every step goes through the API;
 // errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, api } from "@/lib/api-client";
@@ -88,6 +89,9 @@ function SignIn() {
         </button>
       </form>
       {error && <p role="alert">{error}</p>}
+      <p>
+        <Link href="/privacy">Privacy policy</Link>
+      </p>
     </section>
   );
 }
@@ -154,6 +158,9 @@ function SignedIn({ username, onSignedOut }: { username: string; onSignedOut: ()
           Sign out
         </button>
         {error && <p role="alert">{error}</p>}
+        <p>
+          <Link href="/privacy">Privacy policy</Link>
+        </p>
       </footer>
     </>
   );

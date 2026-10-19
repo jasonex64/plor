@@ -22,6 +22,7 @@ A signed-in player can play today's Offbeat puzzle end to end on staging, with e
 | D2 | Puzzle dates for the playtest | **Re-date the 14 puzzles** (renamed files, content unchanged) so the first lands on the playtest's first day | human, 2026-10-18 |
 | D3 | How playtesters reach the site | **Make production public**; previews stay behind Vercel Authentication. The human switches it in the Vercel dashboard once 2a (sign-in) is deployed, so nothing playable is public before sign-in exists | human, 2026-10-18 (security change) |
 | D4 | Delivery | **One ticket, two PRs**: 2a sign-in and profile, then 2b game loop and playtest. Each PR is reviewed and merged on its own | human, 2026-10-18 |
+| D5 | Google's sign-in screen shows the Supabase project address | **2c:** a simple privacy page, so the human can submit Google brand verification ("Plor" instead of the address). Not the paid Supabase custom domain | human, 2026-10-19 |
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result.
@@ -43,8 +44,14 @@ Each criterion must be checkable with a command or other observable result.
 - [x] `plor_app` gets only the grants these routes need (pgTAP, extending `plor_app_role.test.sql`); nothing in `private` is reachable by `anon` or `authenticated` (test; ROADMAP item).
 - [x] `npm run test:db` runs in CI against a started Supabase stack (ROADMAP item).
 - [x] UI: autocomplete over the question's accepted bank that submits entry IDs; one question at a time; a result screen. It works on a phone-width screen.
-- [ ] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `plor_app`'s grants allow, or through an admin path).
+- [x] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `plor_app`'s grants allow, or through an admin path).
 - [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
+
+**2c: privacy page and Google branding** (D5, human 2026-10-19)
+- [ ] `https://plor.app/privacy` is public and linked from the sign-in screen and the signed-in footer. Its text was approved by the human before merge, and it states only what the code and the services do (Evidence).
+- [ ] The page names a working contact, `privacy@plor.app`, forwarded to the human's inbox (a test email arrives).
+- [ ] Rehearsal fixes (human, 2026-10-19): Enter in the answer box picks an exactly named entry and never sends a miss (it had logged "passport" as not in the list), and "Did you mean" offers entries one typo away (`src/game/suggest.test.ts`; browser check in Evidence).
+- [ ] The human submits Google brand verification with the home page, the privacy link and the verified domain `plor.app`, and records Google's answer. While it is pending, Google keeps showing the Supabase address.
 
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
@@ -102,6 +109,11 @@ In this order; nothing is public until step 6 deploys the game.
 
 Done 2026-10-19: step 1 checked by Claude with `npx supabase migration list --linked` (all four migrations remote). Steps 2–5 were reported done by the human ("all done"; output not pasted, so the publish counts are unverified until the rehearsal run, which needs the 2026-10-20 puzzle). Step 6: PR #8 merged by Claude on the human's word (`42b8dc6`), after confirming that the migration was on staging and CI was green. About 40 s later `GET https://plor.app/api/run` answered 401 when signed out, and `npm run status -- https://plor.app` printed `UP https://plor.app (protocol 1)`.
 
+## Human setup for 2c
+1. **Forwarding for `privacy@plor.app`:** sign up at a forwarding service that Vercel's email guide names (ImprovMX or Forward Email), add `plor.app`, and forward `privacy@plor.app` to your own inbox. Then add the MX and TXT records it shows under Vercel → Domains → `plor.app`. Resend's sending records live on their own subdomain and don't collide (Vercel's guide). Send a test email to `privacy@plor.app`.
+2. **Read and approve the privacy page** on the PR's preview, before merge.
+3. **After merge, Google Auth Platform → Branding:** app name `Plor`, a logo, home page `https://plor.app`, privacy policy `https://plor.app/privacy`, and authorized domain `plor.app`. Google asks you to prove you own the domain, usually with a TXT record in Vercel DNS. Then submit for verification and tell Claude Google's answer.
+
 ## Out of scope
 Share (M05), friends and the live board (M06), comments (M07), the points ledger and leaderboard (M08), account deletion and production hardening (M11), and the Offbeat visual theme beyond a plain functional UI.
 
@@ -114,6 +126,8 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M11: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
+| "Did you mean" | Answer box suggestions | One typo forgiven (a letter missing, extra, wrong, or two neighbours swapped), only for text of 4+ letters (human, 2026-10-19); `src/config/tunables.ts` |
+| Privacy page facts | 2c | Contact `privacy@plor.app`; minimum age 13 (not directed at children under 13); says now that answers may be used, without email or username, to improve puzzles, including with AI tools (all human, 2026-10-19) |
 | Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19); plus 2026-10-19 with the 2026-11-07 questions, so the human could rehearse the same day (human, 2026-10-19: "can i just do it now") |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
 
@@ -234,6 +248,24 @@ UP https://plor.app (protocol 1)
 
 **Open:** the domain redirect runs the wrong way (`plor.app` → `www`, while setup step 3 asks for `www` → `plor.app`). Supabase allows only `https://plor.app/auth/callback`, and the Google route builds the return URL from the page's Origin, so Google sign-in started on `www` would not come back signed in (expected from the code; not yet tried). Fix: make `plor.app` the primary domain in Vercel.
 
+
+### Staging run (rehearsal, 2026-10-19)
+The human signed in on `https://plor.app` by email (after fixing Supabase's Site URL, which still said `riff-sixfour.vercel.app`; links had come back as `?code=` to the old address), and played the rehearsal puzzle published from `content-rehearsal/` (the 2026-11-07 questions dated 2026-10-19). The result screen, which the server builds from that run's stored `run_event` rows:
+
+```text
+You survived all 7!
+You survived 7 of 7 questions. Come back tomorrow for a new puzzle.
+1. Name something you'd pack for a vacation: you said passport, the host said toothbrush (safe)
+2. Name a Halloween costume: you said robot, the host said vampire (safe)
+3. Name an insect: you said cicada, the host said ladybug (safe)
+4. Name something you'd find in a classroom: you said teacher, the host said whiteboard (safe)
+5. Name a card game: you said Egyptian ratscrew, the host said Uno (safe)
+6. Name a coffee drink: you said Vietnamese iced coffee, the host said cappuccino (safe)
+7. Name a common pet: you said turtle, the host said dog (safe)
+```
+Findings from the rehearsal (human): answers that aren't on the list are "incredibly frustrating" (input to M03 and the playtest); Enter sent "passport" as a miss (fixed in 2c); typos should be forgiven (added in 2c).
+
+Browser check of the 2c fixes, local `next start` at 375×812: Enter on "passport" showed "Lock in passport"; "passprt" showed "Did you mean: passport", and Enter on it sent nothing (0 rows in `missed_answer`); `/privacy` renders and the sign-in screen links to it. The test player and the local puzzle were deleted afterwards.
 
 ### 2b (game loop)
 Run on branch `m02-sign-in-and-play` after the 2b review fixes, 2026-10-19 (Windows, Node 24.11.0), on a reset local stack.
