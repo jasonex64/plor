@@ -75,7 +75,18 @@ Done 2026-10-19: the human confirmed the old password with a read-only psql logi
 $ npm run status -- https://plor.app
 UP https://plor.app (protocol 1)
 ```
-Still open: steps 4 (primary domain) and 5 (service names).
+Steps 4 and 5, done by the human on 2026-10-19 and checked by Claude the same day:
+
+```text
+https://plor.app/                       200
+https://www.plor.app/                   308 -> https://plor.app/
+https://www.plor.app/auth/callback      308 -> https://plor.app/auth/callback
+https://riff-omega-dusky.vercel.app/    308 -> https://plor.app/   (Vercel's production alias, also redirected)
+https://riff-sixfour.vercel.app/        302 -> vercel.com/sso-api  (protected)
+$ gh repo view jasonex64/plor           -> plor https://github.com/jasonex64/plor   (git remote updated)
+$ npx supabase projects list            -> plor-staging us-east-1
+```
+The Vercel project rename is the human's report; Vercel keeps the existing `riff-…vercel.app` aliases, and new previews take the new project name.
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
 
