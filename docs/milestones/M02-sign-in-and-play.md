@@ -100,6 +100,8 @@ In this order; nothing is public until step 6 deploys the game.
 5b. **Rehearsal day** (human, 2026-10-19): `npm.cmd run content:publish -- <same URL> content-rehearsal` publishes `content-rehearsal/offbeat/2026-10-20.json`, which is the 2026-11-08 questions (outside the 7 playtest days) dated 2026-10-20. It stays in the database as a past day.
 7. **Staging run** (acceptance criterion): play one run on `https://plor.app` on 2026-10-20 (the rehearsal day), then send Claude the result of the admin query Claude gives (Supabase SQL editor), which lists that run's `run_event` rows.
 
+Done 2026-10-19: step 1 checked by Claude with `npx supabase migration list --linked` (all four migrations remote). Steps 2–5 were reported done by the human ("all done"; output not pasted, so the publish counts are unverified until the rehearsal run, which needs the 2026-10-20 puzzle). Step 6: PR #8 merged by Claude on the human's word (`42b8dc6`), after confirming that the migration was on staging and CI was green. About 40 s later `GET https://plor.app/api/run` answered 401 when signed out, and `npm run status -- https://plor.app` printed `UP https://plor.app (protocol 1)`.
+
 ## Out of scope
 Share (M03), friends and the live board (M04), comments (M05), the points ledger and leaderboard (M06), account deletion and production hardening (M07), and the Offbeat visual theme beyond a plain functional UI.
 
