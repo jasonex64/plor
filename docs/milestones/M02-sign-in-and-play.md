@@ -146,8 +146,9 @@ Not yet verified: anything on staging (Google sign-in, the hosted email sender, 
 
 
 ## Review
-**2a, review 1** (reviewer agent, fresh context, diff `5e8e83e..4c0c6c7`, 2026-10-18):
+**2a, review 1** (reviewer agent, fresh context, diff `5e8e83e..4c0c6c7`, 2026-10-18; after the history rewrite below, those commits are `2db4a4b` and `5231b3b`):
 - Blocking findings and how each was fixed:
   - `profile.test.sql` asserted the whole table held one row, so it failed once `test:db` (or real staging users) had left profiles behind; the reviewer reproduced `have: 3 want: 1`. **Fixed:** the assertion counts only the test's own user IDs, and `route.db.test.ts` deletes the auth users it created (cascading to profiles). `test:sql` then passed with 2 leftover profiles present, and the user count was unchanged after `test:db`.
 - Deferred to ROADMAP "Next revision": `getClaims()` errors become a 500 if tokens are HS256 (signing keys unverified); the bundle check skips `.next/server/app`; the private-schema sweep comment mentions sequences it doesn't check. The SOURCES Next.js row is now named in the pending human OK. The username-rule drift was already logged.
+- **History rewrite (human-approved, 2026-10-18):** CI's gitleaks scan flagged a made-up JWT-shaped string in `src/config/env.test.ts` (rule `generic-api-key`; it was a fabricated test value, `{"alg":"HS256"}.{}` with signature `x`, never a real key). The value became `legacy_anon_key`, the three commits after the ticket commit were rebuilt without it, and the branch was force-pushed. The final tree differs from the old head only on that line. No gitleaks config was changed.
 - The reviewer's unverified items: the signing algorithm (not checked, to avoid handling tokens); the browser run and the planted-leak check (written claims only); Origin on Vercel, Google and the hosted sender (human setup step 8); the lockfile check (run by the author: LOCKFILE CHECK OK).
