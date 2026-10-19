@@ -8,7 +8,8 @@ import { AppError } from "@/lib/http";
 import { matchAnswer } from "./matching";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
 
-export type RunStatus = "not_started" | "in_progress" | "died" | "survived";
+// "abandoned" reaches the client only for a run from a day that has ended, e.g. a retried answer after midnight.
+export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "abandoned";
 
 export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[] };
 
@@ -80,13 +81,19 @@ export async function todaysState(db: Db, userId: string): Promise<RunState> {
 // Starts today's run, or returns it if it already exists: the primary key allows one per player per day,
 // and the date is pinned by private.today() in the insert itself (§5).
 export async function startRun(db: Db, userId: string): Promise<RunState> {
-  const { date, puzzle } = await todaysPuzzle(db);
-  await db.query(
-    `insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)
-     on conflict (user_id, game_id, puzzle_date) do nothing`,
-    [userId, GAME_ID, date],
-  );
-  return stateOf(db, userId, date, puzzle);
+  try {
+    await db.query(
+      `insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, private.today())
+       on conflict (user_id, game_id, puzzle_date) do nothing`,
+      [userId, GAME_ID],
+    );
+  } catch (err) {
+    // The foreign key to private.puzzle: nothing is published for today.
+    if (err instanceof DatabaseError && err.code === "23503") throw new AppError("no_puzzle_today", 404);
+    throw err;
+  }
+  // Read back as "today" again: if midnight passed since the insert, the player sees the new day (not started).
+  return todaysState(db, userId);
 }
 
 // Answers one question of the player's latest run. A retry with the same entry returns the stored result; a

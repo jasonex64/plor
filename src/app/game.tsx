@@ -63,6 +63,11 @@ export function Game() {
         </>
       )}
       {(run.status === "died" || run.status === "survived") && <Result run={run} />}
+      {run.status === "abandoned" && (
+        <p role="alert">
+          That run was from {run.date}, which has ended. <button type="button" onClick={() => window.location.reload()}>Load today&apos;s puzzle</button>
+        </p>
+      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );

@@ -8,6 +8,11 @@ set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
 select plan(36);
 
+-- Real puzzles and runs may exist for the days used here (staging during the playtest). The whole file runs in
+-- one transaction that is rolled back, so clearing them changes nothing outside the test (2b review).
+delete from private.run where game_id = 'offbeat' and puzzle_date between private.today() - 1 and private.today() + 5;
+delete from private.puzzle where game_id = 'offbeat' and puzzle_date between private.today() - 1 and private.today() + 5;
+
 -- Fixtures: two-question puzzles for yesterday, today and tomorrow, and three players.
 create function pg_temp.puzzle(day date) returns jsonb language sql
   return jsonb_build_object('format', 1, 'game_id', 'offbeat', 'date', day::text, 'questions', '[{}, {}]'::jsonb);

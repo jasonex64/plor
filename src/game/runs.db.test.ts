@@ -1,6 +1,7 @@
 // The run routes end to end against the local stack (run with `npm run test:db`): real sign-in, the real game
 // tables and their triggers, and route handlers called the way the browser calls them.
 import { readFileSync } from "node:fs";
+import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -197,6 +198,33 @@ describe("other ways a run ends", () => {
     // A run started yesterday, as if the player had started just before midnight.
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
     expect(await answer(0, safeEntry(puzzle.questions[0]))).toEqual({ status: 409, body: { ok: false, error: "day_over" } });
+  });
+
+  it("shows a retried answer from a day that has ended as an abandoned run, not a blank state (2b review)", async () => {
+    const player = await newPlayer("r");
+    useSession(player.session);
+    const entryId = safeEntry(puzzle.questions[0]);
+    // Yesterday's run with its first answer stored, as if answered just before midnight. The trigger rightly refuses
+    // that insert today, so it goes in with triggers off for this one local superuser session.
+    const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+    try {
+      const client = await admin.connect();
+      try {
+        await client.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
+        await client.query("set session_replication_role = replica");
+        await client.query(
+          "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
+          [player.userId, GAME_ID, yesterday, entryId],
+        );
+      } finally {
+        client.release();
+      }
+    } finally {
+      await admin.end();
+    }
+    const retry = await answer(0, entryId);
+    expect(retry.status).toBe(200);
+    expect(retry.body.run).toMatchObject({ date: yesterday, status: "abandoned", question: null });
   });
 
   it("needs a username before a run can start", async () => {
