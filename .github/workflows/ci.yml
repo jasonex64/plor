@@ -41,11 +41,11 @@ jobs:
           node-version-file: package.json
           cache: npm
       - run: npm ci
-      # The stack prints its local keys; keep them out of the log (CLAUDE.md: Secrets never leave their home).
-      # GitHub's `shell: bash` runs with pipefail, so a failed start still fails the step.
+      # The stack prints a table of its local keys on stdout, so stdout is dropped (CLAUDE.md: Secrets never leave
+      # their home). A word filter missed the "Publishable" row on the first run. Errors go to stderr and still
+      # fail the step.
       - name: Start the local Supabase stack
-        shell: bash
-        run: npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest | grep -viE 'key|secret|jwt|token|password'
+        run: npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
       - run: npm run test:sql
       - run: npm run test:db
 
