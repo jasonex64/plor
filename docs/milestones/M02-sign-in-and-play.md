@@ -51,7 +51,16 @@ Each criterion must be checkable with a command or other observable result.
 - [x] `https://plor.app/privacy` is public and linked from the sign-in screen and the signed-in footer. *(Text approved by the human on the PR #9 preview, 2026-10-19: "looks okay".)* Its text was approved by the human before merge, and it states only what the code and the services do (Evidence).
 - [x] The page names a working contact, `privacy@plor.app`, forwarded to the human's inbox (a test email arrives). *(Human, 2026-10-19: ImprovMX forwarding, its two MX records and SPF TXT added in Vercel DNS, and a test email arrived.)*
 - [x] Rehearsal fixes (human, 2026-10-19): Enter in the answer box picks an exactly named entry and never sends a miss (it had logged "passport" as not in the list), and "Did you mean" offers entries one typo away (`src/game/suggest.test.ts`; browser check in Evidence).
-- [ ] The human submits Google brand verification with the home page, the privacy link and the verified domain `plor.app`, and records Google's answer. While it is pending, Google keeps showing the Supabase address.
+- [ ] The human submits Google brand verification with the home page, the privacy link and the verified domain `plor.app`, and records Google's answer. While it is pending, Google keeps showing the Supabase address. *(2026-10-19, human: app published from Testing to production (basic scopes only, so no data-access review), app name `Plor`, home page and privacy link set, `plor.app` verified in Search Console, branding submitted: "all done". Waiting for Google's answer; if it rejects the Supabase domain in the authorized-domain list, the fallback is the paid Supabase custom domain, after checking its price.)* *Google's first answer (2026-10-19): "Your home page is behind a login page", "does not explain the purpose of your app", and the app name "Plor" "does not match the app name on your home page" (the heading said Offbeat). Fix: the home page has a static introduction headed **Plor**, explaining the site and today's game, with the privacy link in the footer, all in the served HTML before any script runs. The human then chooses "I have fixed the issues".*
+
+  Served HTML, local `next start` on commit `2e2a808`, 2026-10-19 (curl runs no JavaScript):
+  ```text
+  $ curl -s http://127.0.0.1:3000/ | grep -o '<h1>[^<]*</h1>\|Plor is a small site[^<]*\|Today&#x27;s game: Offbeat\|href="/privacy"'
+  <h1>Plor</h1>
+  Plor is a small site for daily word games. Everyone gets the same puzzle each day, and a new one starts at midnight Pacific time.
+  Today&#x27;s game: Offbeat
+  href="/privacy"
+  ```
 
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
@@ -108,6 +117,8 @@ In this order; nothing is public until step 6 deploys the game.
 7. **Staging run** (acceptance criterion): play one run on `https://plor.app` on 2026-10-20 (the rehearsal day), then send Claude the result of the admin query Claude gives (Supabase SQL editor), which lists that run's `run_event` rows.
 
 Done 2026-10-19: step 1 checked by Claude with `npx supabase migration list --linked` (all four migrations remote). Steps 2–5 were reported done by the human ("all done"; output not pasted, so the publish counts are unverified until the rehearsal run, which needs the 2026-10-20 puzzle). Step 6: PR #8 merged by Claude on the human's word (`42b8dc6`), after confirming that the migration was on staging and CI was green. About 40 s later `GET https://plor.app/api/run` answered 401 when signed out, and `npm run status -- https://plor.app` printed `UP https://plor.app (protocol 1)`.
+
+2c merged in PR #9 (`668fe7b`, merged by the human, 2026-10-19). After the deploy: `GET https://plor.app/privacy` → 200 with the approved text, and `npm run status -- https://plor.app` → `UP https://plor.app (protocol 1)`.
 
 ## Human setup for 2c
 1. **Forwarding for `privacy@plor.app`:** sign up at a forwarding service that Vercel's email guide names (ImprovMX or Forward Email), add `plor.app`, and forward `privacy@plor.app` to your own inbox. Then add the MX and TXT records it shows under Vercel → Domains → `plor.app`. Resend's sending records live on their own subdomain and don't collide (Vercel's guide). Send a test email to `privacy@plor.app`.
