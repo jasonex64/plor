@@ -151,6 +151,12 @@ Three host characters were proposed in chat (the Wind, a word-hoarding raven, an
 - Fits what's already drafted: signs wobble more higher up because the wind is stronger there, showing the rising difficulty.
 - Name, face and colours of the Wind are open (D3, D19). Text pairs checked at 4.5:1 or more as in Round 6 (the Wind's banner: 12.5:1).
 
+**Round 7 result (human, 2026-10-20):** "The Wind works. Next, show the friends' ridge and the share card in this style."
+
+**Friends' ridge and share card** (same page, `docs/design/m12/R9-friends.dc.html`). The camera pulls back so the whole ridge and all 7 stops fit, with smaller goats (5 cells instead of 10) on the same 6 px grid.
+- **Friends (M06, after you've played):** friends who reached the top stand by the flag; a friend still playing stands on their stop; friends the Wind blew off sit in a cloud puff beside the ridge, under the stop where it happened. Each goat has a letter tag as well as its scarf colour (not colour alone). Names and how many to draw at one stop are placeholders for M06.
+- **Share card (M05):** the ridge in miniature with blank signs on the stops you passed, a cross where you were blown off, and the Wind puffing at the side; no words, so no spoilers. The text version is unchanged from Round 3 (`▲▲▲▲✕△△ 4/7`).
+
 ## Platform wireframes (human, 2026-10-20)
 The human chose to wireframe the whole platform now ("Yes, wireframe it now", relayed by the parent session), so that M06 (friends and groups), M09 (front page) and M11 (settings and profile) build to an agreed layout. These are rough layouts only, in grey; the final look (colours, art, animation) stays in M12. Plor's shell stays neutral, and each game brings its own stylised look (human's notes above). Canvas page "Wireframes · platform" (`docs/design/m12/W-platform.dc.html`).
 

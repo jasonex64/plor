@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: friends and share</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2d52}a:hover{color:#4a55a0}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3d3f5e}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#2b2d52}
+.scene{position:relative;width:390px;height:336px;overflow:hidden;flex:none;image-rendering:pixelated;background:#7d8fd8}
+.scene i{position:absolute;display:block}
+.sp{position:absolute}
+.sp i{position:absolute;display:block}
+.tag{position:absolute;transform:translateX(-50%);background:#2b2d52;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.tag.you{background:#e8735c;color:#1d1e38}
+.tag.stop{background:#f8f9fd;color:#2b2d52}
+.bob{animation:bob 1.2s steps(2) infinite}
+.drift{animation:drift 3s steps(3) infinite}
+@keyframes bob{50%{translate:0 -3px}}
+@keyframes drift{50%{translate:6px -6px}}
+@media (prefers-reduced-motion: reduce){.bob,.drift{animation:none}}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.stop{font:600 14px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.p{margin:0;font-size:16px;line-height:1.45}
+.standin{font-size:13px;color:#4f516e}
+.btn{min-height:52px;border:0;background:#2b2d52;color:#f4f1e8;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.btn2{min-height:52px;border:3px solid #2b2d52;background:#f4f1e8;color:#2b2d52;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.who-row{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0;border-bottom:1px solid #d9d6e3}
+.who-row b{font:600 12px 'Pixelify Sans',monospace;background:#2b2d52;color:#f4f1e8;padding:2px 6px;min-width:28px;text-align:center}
+.who-row b.you{background:#e8735c;color:#1d1e38}
+.dot{width:12px;height:12px;flex:none;border:2px solid #2b2d52}
+</style>
+</helmet>
+<div style="width: 924px; height: 1000px; box-sizing: border-box; padding: 48px; background: #e6e6ec; display: flex; gap: 48px; font-family: 'Source Serif 4', Georgia, serif">
+
+<div class="col">
+<div class="lbl">1 · Friends' ridge (M06, after you play)</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Today's whole ridge, seen from below and behind: friends A and B stand at the top, friend D is still on stop 4, and the Wind drifts above. Friend C sits in the clouds under stop 7, you under stop 5, and friend E with one more under stop 3.">
+<sc-for list="{{fr.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{fr.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{fr.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{fr.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body" style="gap: 6px">
+<div class="stop" style="margin-bottom: 6px">Today's ridge · your friends</div>
+<div class="who-row"><b>A</b><span class="dot" style="background: #e9c46a"></span>friend A · reached the top · 7</div>
+<div class="who-row"><b>B</b><span class="dot" style="background: #6cc4b8"></span>friend B · reached the top · 7</div>
+<div class="who-row"><b>C</b><span class="dot" style="background: #e79ac4"></span>friend C · blown off at stop 7 · 6</div>
+<div class="who-row"><b>D</b><span class="dot" style="background: #f0a35e"></span>friend D · still climbing</div>
+<div class="who-row"><b class="you">you</b><span class="dot" style="background: #d9583f"></span>you · blown off at stop 5 · 4</div>
+<div class="who-row"><b>E</b><span class="dot" style="background: #a98ee0"></span>friend E and 1 more · blown off at stop 3 · 2</div>
+<p class="p standin" style="margin-top: 8px">Names are placeholders. Each goat has its letter tag as well as its scarf colour.</p>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">2 · Share card (no spoilers)</div>
+<div class="ph">
+<div class="body" style="gap: 16px">
+<div class="stop">Share</div>
+<div style="border: 4px solid #2b2d52; background: #7d8fd8; display: flex; flex-direction: column">
+<div style="height: 280px; overflow: hidden; position: relative">
+<div class="scene" style="transform: scale(0.88); transform-origin: top left" role="img" aria-label="The ridge in miniature: blank signs planted at stops 1 to 4, a cross at stop 5 where the Wind blew you off, and the Wind puffing at the side">
+<sc-for list="{{sh.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{sh.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{sh.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{sh.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+</div>
+<div style="background: #f4f1e8; border-top: 4px solid #2b2d52; padding: 12px 14px; display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-family: 'Young Serif', Georgia, serif; font-size: 30px">4/7</span>
+<span style="font: 600 15px 'Pixelify Sans', monospace">Offbeat · Nov 2 · plor.app</span>
+</div>
+</div>
+<div class="stop" style="margin-top: 6px">As text</div>
+<p class="p" style="font-family: 'Pixelify Sans', monospace; background: #ffffff; border: 3px solid #2b2d52; padding: 12px">Offbeat · Nov 2<br>▲▲▲▲✕△△ 4/7<br>plor.app</p>
+<div style="flex: 1"></div>
+<button class="btn" type="button">Share image</button>
+<button class="btn2" type="button">Copy text</button>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":924,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // The whole ridge at once, on Round 6 and 7's 6 px grid: the camera pulls back so all 7 stops fit. Placeholder art and colours (D3).
+    const U = 6, W = 65, H = 56, HZ = 16;
+    const C = {
+      skyTop: '#7d8fd8', sky2: '#8c9ddf', sky3: '#9dace5', skyLow: '#b3bfeb', wisp: '#c5cff0',
+      farPeak: '#a3afe0', farSnow: '#dfe4f6', nearPeak: '#8592cf',
+      backCloud: '#cfd6ef', backShade: '#bcc5e6', midCloud: '#dfe4f5', midShade: '#c9d1ee', cloud: '#eef1f9', cloudShade: '#d6dcf1', cloudHi: '#f8f9fd',
+      island: '#7280c0', islandLit: '#8d99cf',
+      rockLit: '#5a64a3', rock: '#444d8a', crack: '#363e75',
+      path: '#e8ddc3', pathLine: '#d6c9a8', lip: '#8b7f6a', grass: '#8fa77a', grassDark: '#71895f',
+      ink: '#2b2d52', fur: '#f6f2e8', horn: '#8b7f6a', scarf: '#d9583f', board: '#efe3c8', stake: '#6b4426',
+      windBody: '#fbfbff', windShade: '#dfe4f5', windCheek: '#f0b8c8', windLine: '#6f7cc4', gust: '#f8f9fd', gustSoft: '#d3daf2'
+    };
+    const SCARF = { A: '#e9c46a', B: '#6cc4b8', C: '#e79ac4', D: '#f0a35e', E: '#a98ee0', E2: '#8fb0e8', you: '#d9583f' };
+    const R = (r, x, y, w, h, c) => r.push({ x: Math.round(x) * U, y: Math.round(y) * U, w: Math.max(1, Math.round(w)) * U, h: Math.max(1, Math.round(h)) * U, c });
+    const rnd = (a, b) => { const s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return s - Math.floor(s); };
+    const bank = (r, x0, x1, top, amp, seed, c, shade, hi) => {
+      for (let x = x0; x < x1; x++) {
+        const y = top - Math.round(amp * Math.abs(Math.sin(x / 3.3 + seed)) + (amp / 2) * Math.abs(Math.sin(x / 1.9 + seed * 2)));
+        R(r, x, y, 1, H - y, c); R(r, x, y, 1, 1, hi);
+        if ((x + seed) % 4 !== 0) R(r, x, y + 3, 1, 1, shade);
+      }
+    };
+    const puff = (r, cx, top, w, c, shade, hi) => {
+      R(r, cx - w / 2 + 2, top, w - 4, 1, hi); R(r, cx - w / 2 + 1, top + 1, w - 2, 1, c); R(r, cx - w / 2, top + 2, w, 3, c); R(r, cx - w / 2 + 1, top + 5, w - 2, 1, shade);
+    };
+    const backdrop = (r) => {
+      R(r, 0, 0, W, 4, C.skyTop); R(r, 0, 4, W, 4, C.sky2); R(r, 0, 8, W, 4, C.sky3); R(r, 0, 12, W, H - 12, C.skyLow);
+      R(r, 6, 3, 14, 1, C.wisp); R(r, 9, 2, 6, 1, C.wisp);
+      for (let x = 0; x < W; x++) {
+        const far = HZ - 3 + Math.round(2.5 * Math.sin(x / 5) + 1.5 * Math.sin(x / 2.3 + 1));
+        R(r, x, far, 1, H - far, C.farPeak);
+        if (far <= HZ - 5) R(r, x, far, 1, 1, C.farSnow);
+      }
+      for (let x = 0; x < W; x++) { const near = HZ + 1 + Math.round(1.5 * Math.sin(x / 3.5 + 2)); R(r, x, near, 1, H - near, C.nearPeak); }
+      bank(r, 0, W, HZ + 4, 2, 1, C.backCloud, C.backShade, C.midCloud);
+      [[9, HZ + 7, 5], [56, HZ + 8, 4]].forEach(([cx, top, w]) => { for (let k = 0; k < w; k++) { R(r, cx - k, top + k, 2 * k + 1, 1, C.island); R(r, cx - k, top + k, 1, 1, C.islandLit); } });
+      bank(r, 0, W, HZ + 11, 3, 4, C.midCloud, C.midShade, C.cloud);
+    };
+    const geo = (t) => ({ cx: 32 + 12 * Math.sin(t * 4.2 - 0.6) * (0.35 + 0.65 * t), pw: 1 + t * t * 14, rw: 3 + t * t * 14 + t * 14 });
+    const rowOf = (t) => Math.round(HZ + t * (H - 1 - HZ));
+    const ridge = (r, landings) => {
+      for (let y = HZ; y < H; y++) {
+        const t = (y - HZ) / (H - 1 - HZ), g = geo(t);
+        const l = Math.round(g.cx - g.rw / 2), half = Math.round(g.rw / 2), pl = Math.round(g.cx - g.pw / 2), pw = Math.max(1, Math.round(g.pw));
+        R(r, l, y, half, 1, C.rockLit); R(r, l + half, y, half, 1, C.rock);
+        for (let k = 0; k < 2 * half; k++) if (rnd(y, k) > 0.9 && (l + k < pl - 1 || l + k > pl + pw)) R(r, l + k, y, 1, 1, C.crack);
+        R(r, pl, y, pw, 1, C.path);
+        if (t > 0.35 && y % 3 === 0) R(r, pl + 1, y, pw - 2, 1, C.pathLine);
+        if (t > 0.3 && rnd(y, 99) > 0.55) { R(r, pl - 1, y, 1, 1, C.grass); R(r, pl - 1, y + 1, 1, 1, C.grassDark); }
+        if (t > 0.3 && rnd(y, 77) > 0.6) { R(r, pl + pw, y, 1, 1, C.grass); R(r, pl + pw, y + 1, 1, 1, C.grassDark); }
+      }
+      landings.forEach((t) => {
+        const y = rowOf(t), g = geo(t), pl = Math.round(g.cx - g.pw / 2) - 1, pw = Math.round(g.pw) + 2;
+        R(r, pl, y - 1, pw, 2, C.path); R(r, pl, y + 1, pw, 1, C.lip);
+      });
+    };
+    const ART = {
+      // a small goat seen from behind, for the whole-ridge view
+      kid: ['h...h', '.www.', 'rrrrr', 'wwwww', 'k.k.k'],
+      windCalm: ['....wwww.....', '..wwwwwwww...', '.wwwwwwwwwww.', 'wwwkkwwwkkwww', 'wwppwwwwwppww', 'wwwwwwkwwwwww', '.sssssssssss.', '...sss..sss..'],
+      windBlow: ['....wwww......', '..wwwwwwwww...', '.wwwwwwwwwwww.', 'wwwwkwwwwkwwww', 'wwpppwwwpppwkk', 'wwpppwwwpppwkk', '.ssssssssssss.', '...ssss..sss..'],
+      post: ['bbb', 'bbb', '.s.', '.s.'],
+      flag: ['rr.', 'rrr', 'rr.', 'k..', 'k..', 'k..']
+    };
+    const sprite = (name, pal, x, y, cls, rot, outline) => {
+      const rows = ART[name], filled = new Set(), px = [];
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') filled.add(rx + ',' + ry); }));
+      if (outline) {
+        const seen = new Set();
+        filled.forEach((key) => {
+          const [a, b] = key.split(',').map(Number);
+          [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+            const n = (a + dx) + ',' + (b + dy);
+            if (!filled.has(n) && !seen.has(n)) { seen.add(n); px.push({ x: (a + dx) * U, y: (b + dy) * U, c: outline }); }
+          });
+        });
+      }
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * U, y: ry * U, c: pal[ch] }); }));
+      return { x, y, cls: cls || '', rot: rot || 0, px };
+    };
+    // footCol/footRow: the cell the goat stands on; it is 5 cells wide and tall
+    const kid = (who, footCol, footRow, cls, rot) => sprite('kid', { w: C.fur, h: C.horn, k: C.ink, r: SCARF[who] }, Math.round(footCol - 2.5) * U, (footRow - 4) * U, cls, rot, C.ink);
+    const wind = (art, col, row, cls) => sprite(art, { w: C.windBody, s: C.windShade, p: C.windCheek, k: C.ink }, col * U, row * U, cls, 0, C.windLine);
+    const post = (col, row) => sprite('post', { b: C.board, s: C.stake }, Math.round(col - 1.5) * U, (row - 3) * U, '', 0, C.ink);
+    const flag = (cx, row) => sprite('flag', { r: C.scarf, k: C.ink }, Math.round(cx) * U, (row - 5) * U);
+    // stop k (1 to 7) climbs away from the camera; 'top' is the summit after stop 7
+    const T = { 1: 0.92, 2: 0.78, 3: 0.64, 4: 0.5, 5: 0.36, 6: 0.22, 7: 0.1, top: 0.03 };
+    const stopAt = (k) => { const g = geo(T[k]); return { cx: g.cx, row: rowOf(T[k]), pw: g.pw, rw: g.rw }; };
+
+    const whole = (mode) => {
+      const r = [], sprites = [], tags = [], front = [];
+      backdrop(r);
+      ridge(r, [1, 2, 3, 4, 5, 6, 7].map((k) => T[k]));
+      const top = stopAt('top');
+      sprites.push(flag(top.cx + 1, top.row));
+      for (let k = 1; k <= 7; k++) { const s = stopAt(k); tags.push({ x: (s.cx - s.pw / 2 - 3) * U, y: (s.row - 3) * U, text: String(k), cls: 'stop' }); }
+      // someone blown off at a stop sits in a cloud puff beside the ridge, below that stop
+      const fallen = (who, k, side, dx, label, cls) => {
+        const s = stopAt(k), col = side > 0 ? s.cx + s.rw / 2 + 3 + dx : s.cx - s.rw / 2 - 3 - dx, row = Math.max(s.row + 6, HZ + 12);
+        sprites.push(kid(who, col, row, '', side * 14));
+        puff(front, col, row - 1, 9, C.cloud, C.cloudShade, C.cloudHi);
+        if (label) tags.push({ x: col * U, y: (row - 8) * U, text: label, cls: cls || '' });
+      };
+      if (mode === 'friends') {
+        sprites.push(wind('windCalm', 47, 1, 'drift'));
+        sprites.push(kid('A', top.cx - 2, top.row, 'bob'), kid('B', top.cx + 4, top.row));
+        tags.push({ x: (top.cx - 2) * U, y: (top.row - 8) * U, text: 'A', cls: '' }, { x: (top.cx + 4) * U, y: (top.row - 8) * U, text: 'B', cls: '' });
+        const d = stopAt(4);
+        sprites.push(kid('D', d.cx, d.row, 'bob'));
+        tags.push({ x: d.cx * U, y: (d.row - 8) * U, text: 'D', cls: '' });
+        fallen('C', 7, 1, 1, 'C');
+        fallen('you', 5, 1, 0, 'you', 'you');
+        fallen('E', 3, -1, 0, 'E +1');
+        fallen('E2', 3, -1, 5, '');
+      } else {
+        // share card: blank signs where you were safe, a cross where the Wind blew you off; no words, no friends
+        [1, 2, 3, 4].forEach((k) => { const s = stopAt(k); sprites.push(post(s.cx - s.pw / 2 + 1, s.row)); });
+        const s5 = stopAt(5);
+        tags.push({ x: s5.cx * U, y: (s5.row - 5) * U, text: '✕', cls: 'you' });
+        sprites.push(wind('windBlow', 2, 22, ''));
+        R(r, 16, 26, 10, 1, C.gust); R(r, 18, 27, 6, 1, C.gustSoft); R(r, 15, 29, 12, 1, C.gust);
+      }
+      puff(front, 5, H - 9, 14, C.cloud, C.cloudShade, C.cloudHi); R(front, 0, H - 3, 18, 3, C.cloud);
+      puff(front, 60, H - 9, 14, C.cloud, C.cloudShade, C.cloudHi); R(front, 48, H - 3, 17, 3, C.cloud);
+      return { rects: r, sprites, tags, front };
+    };
+    return { fr: whole('friends'), sh: whole('share') };
+  }
+}
+</script>
+</body>
+</html>
