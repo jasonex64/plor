@@ -39,7 +39,7 @@ select ok(has_table_privilege('plor_app', 'private.profile', 'insert'), 'plor_ap
 select ok(not has_table_privilege('plor_app', 'private.profile', 'update, delete, truncate, references, trigger'),
   'plor_app cannot change, delete, truncate, reference or trigger on profiles');
 
--- M02 2b: everything plor_app and plor_publisher may do in `private`, listed exactly (M02 ticket: "only the
+-- M02 2b and M03: everything plor_app and plor_publisher may do in `private`, listed exactly (M02 ticket: "only the
 -- grants these routes need"). A new grant has to be added here on purpose.
 create function pg_temp.grants(who text) returns text[] language sql return (
   select array_agg(g order by g) from (
@@ -54,8 +54,9 @@ create function pg_temp.grants(who text) returns text[] language sql return (
     where f.pronamespace = 'private'::regnamespace and has_function_privilege(who, f.oid, 'execute')
   ) as held);
 select is(pg_temp.grants('plor_app'), array[
+  'private.admin select',
   'private.day_of(timestamp with time zone) execute',
-  'private.missed_answer insert',
+  'private.missed_answer insert', 'private.missed_answer select',
   'private.profile insert', 'private.profile select',
   'private.puzzle select',
   'private.run insert', 'private.run select',
