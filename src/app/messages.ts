@@ -24,6 +24,8 @@ const MESSAGES: Record<string, string> = {
   not_current_question: "That question isn't the current one. Reload the page.",
   // The 40-character limit is the database's check (M02 ticket, Numbers).
   text_invalid: "That's too long to send. Try a shorter answer.",
+  admins_only: "This page is for admins only.",
+  not_available: "There's no report for that day yet.",
 };
 
 export function messageFor(code: string): string {

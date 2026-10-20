@@ -74,6 +74,36 @@ CONTENT OK content: 14 file(s)
 ```
 Review: 8 blocking findings fixed. They were tamagoyaki (a kind of the host omelet), colour plurals that named other things, epoch and nudibranch plurals, Oreo as a second entry for cookies and cream, three "<kind> <listed>" pizza toppings, Caesar salad next to the general salad, Heads Up! (charades-like, host charades), and the `c-lb-r` ID for çılbır (now `cilbir`). Judgment calls are listed for the human in ROADMAP and the PR.
 
+**2e: puzzles for 2026-11-09 to 11-22** (human, 2026-10-19)
+
+*Why:* the puzzles run out after 2026-11-08, and M04 (AI drafting) won't be ready in time; until M04, new days are drafted the M01 way (ROADMAP, M04 row). Who uses it: every player from 2026-11-09. What breaks without it: there is no puzzle to play from that day (`404 no_puzzle_today`). Asked for by the human in parallel with the M03 ticket. Source: DECISIONS.md "Puzzle content format", "Game 1: Don't Match the Host" and "Answer model"; the M01 ticket (drafting, plural convention); 2d above and its review (fuller lists, aliases for other names, no kinds of a host answer). As in M01 (Source diff), the lists come from Claude's knowledge and the human's review, not named reference lists, so every list is *unverified* until the human approves it. Numbers: 7 questions per day and the 14 dates come from the human; the host-answer count per question varies (DECISIONS.md: Game 1) and is a drafting choice the human approves in the PR; there is still no host bank size (M01 Numbers). Removes: nothing, because these are new content files only; no existing puzzle file changes.
+- [ ] 14 files, `content/offbeat/2026-11-09.json` to `2026-11-22.json`, each with 7 independent questions in format 1 that mix concrete (closed sets) and abstract questions, with difficulty rising gently through the day and the host-answer count varying by question. No prompt repeats one already in `content/offbeat/` (checked by script).
+- [ ] Each question follows the answer model: lists as complete as practical, with aliases for other names of the same thing (2d); one level of detail; no kinds of, or other names for, a host answer as separate entries; match groups only for true sameness.
+- [ ] `npm run content:plurals` output reviewed; wrong plurals get an override, and phrases, names and uncountable things get `"plural"` equal to their name (M01 convention).
+- [ ] `npm run content:validate` passes on `content/` and on a root holding only the 14 new files; `npm test` passes; the existing puzzle files are unchanged (`git diff --stat`).
+- [ ] The reviewer agent has reviewed the diff. The human approves the lists in the PR before merge, then merges and runs `npm run content:publish` (human steps; Claude publishes nothing).
+
+2e evidence (2026-10-19, Windows, Node 24.11.0):
+```text
+$ npm run content:plurals
+PLURALS content: 2307 added (from freshly generated files, after the review fixes). Review each one; set "plural" on an entry to override.
+  (every added line names a 2026-11-09..22 file; Claude read all of them. Wrong ones became overrides,
+   e.g. RVs, DJs, caimans, stomachs, mallei, maids of honor, birds of paradise, children; mass nouns,
+   phrases and names have "plural" equal to their name)
+$ npm run content:validate
+CONTENT OK content: 28 file(s)
+$ npm run content:validate -- <scratch root holding only offbeat/2026-11-09..22.json>
+CONTENT OK <scratch root>: 14 file(s)
+$ node -e '<every prompt under content/offbeat, normalized; count repeats>'
+prompts checked: 196 unique; repeats: 0; new questions: 98; new entries: 6149; host answers: 107
+$ git diff --quiet -- content/offbeat && echo unchanged
+existing puzzle files unchanged
+$ npm test
+ Test Files  15 passed (15)
+      Tests  114 passed (114)
+```
+Review (reviewer agent, fresh context, `eda83d9`): 7 blocking findings. Fixed: a leftover "Telfa pads?" alias; "dressing" as an alias of host gauze while dressings were listed; cowl and snood listed apart from host scarf; "<kind> <listed>" entries folded into the listed answer (back seat, parking brake, meatball sub, neo-soul, Alabama white sauce, pickled onions, spicy mayos, arm cuff, tetrahedron, cuboid) or the general alias removed (salad dressing, "salad", "peppers"); the tesseract (4D) removed; wrong plurals (pill bug, child, hippopotamus, rhinoceros) and 22 countable words marked "no plural". Two findings were kept with a reason and go to the human (ROADMAP: cheddar, Swiss and gorgonzola next to cheese; piercings next to ring). The non-blocking findings are in ROADMAP "Next revision"; Claude also fixed some of them before recording them, which is listed there.
+
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
 **Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.
