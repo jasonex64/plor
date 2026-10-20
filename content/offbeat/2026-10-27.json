@@ -1319,7 +1319,9 @@
         {
           "id": "seaweed",
           "name": "seaweed",
-          "aliases": [],
+          "aliases": [
+            "sea weed"
+          ],
           "plural": "seaweed"
         },
         {
@@ -1338,7 +1340,8 @@
           "id": "boat",
           "name": "boat",
           "aliases": [
-            "boats"
+            "boats",
+            "ship's boat"
           ]
         },
         {
@@ -1672,6 +1675,203 @@
           "name": "krill",
           "aliases": [],
           "plural": "krill"
+        },
+        {
+          "id": "trash",
+          "name": "trash",
+          "aliases": [
+            "garbage",
+            "litter"
+          ],
+          "plural": "trash"
+        },
+        {
+          "id": "plastic",
+          "name": "plastic",
+          "aliases": [],
+          "plural": "plastic"
+        },
+        {
+          "id": "island",
+          "name": "island",
+          "aliases": [
+            "islands"
+          ]
+        },
+        {
+          "id": "iceberg",
+          "name": "iceberg",
+          "aliases": [
+            "icebergs"
+          ]
+        },
+        {
+          "id": "reef",
+          "name": "reef",
+          "aliases": [
+            "reefs"
+          ]
+        },
+        {
+          "id": "rock",
+          "name": "rock",
+          "aliases": [
+            "rocks"
+          ]
+        },
+        {
+          "id": "current",
+          "name": "current",
+          "aliases": [],
+          "plural": "current"
+        },
+        {
+          "id": "tide",
+          "name": "tide",
+          "aliases": [
+            "tides"
+          ]
+        },
+        {
+          "id": "foam",
+          "name": "foam",
+          "aliases": [],
+          "plural": "foam"
+        },
+        {
+          "id": "oil-rig",
+          "name": "oil rig",
+          "aliases": [
+            "oil rigs"
+          ]
+        },
+        {
+          "id": "ship",
+          "name": "ship",
+          "aliases": [
+            "ships"
+          ]
+        },
+        {
+          "id": "surfer",
+          "name": "surfer",
+          "aliases": [
+            "surfers"
+          ]
+        },
+        {
+          "id": "swimmer",
+          "name": "swimmer",
+          "aliases": [
+            "swimmers"
+          ]
+        },
+        {
+          "id": "scuba-diver",
+          "name": "scuba diver",
+          "aliases": [
+            "diver",
+            "scuba divers"
+          ]
+        },
+        {
+          "id": "buoy",
+          "name": "buoy",
+          "aliases": [
+            "buoys"
+          ]
+        },
+        {
+          "id": "anchor",
+          "name": "anchor",
+          "aliases": [
+            "anchors"
+          ]
+        },
+        {
+          "id": "treasure",
+          "name": "treasure",
+          "aliases": [],
+          "plural": "treasure"
+        },
+        {
+          "id": "message-in-a-bottle",
+          "name": "message in a bottle",
+          "aliases": [
+            "messages in bottles"
+          ],
+          "plural": "messages in bottles"
+        },
+        {
+          "id": "pearl",
+          "name": "pearl",
+          "aliases": [
+            "pearls"
+          ]
+        },
+        {
+          "id": "algae",
+          "name": "algae",
+          "aliases": [],
+          "plural": "algae"
+        },
+        {
+          "id": "sea-snake",
+          "name": "sea snake",
+          "aliases": [
+            "sea snakes"
+          ]
+        },
+        {
+          "id": "penguin",
+          "name": "penguin",
+          "aliases": [
+            "penguins"
+          ]
+        },
+        {
+          "id": "seagull",
+          "name": "seagull",
+          "aliases": [
+            "gull",
+            "seagulls"
+          ]
+        },
+        {
+          "id": "barnacle",
+          "name": "barnacle",
+          "aliases": [
+            "barnacles"
+          ]
+        },
+        {
+          "id": "fishing-net",
+          "name": "fishing net",
+          "aliases": [
+            "net",
+            "fishing nets"
+          ]
+        },
+        {
+          "id": "sea-glass",
+          "name": "sea glass",
+          "aliases": [],
+          "plural": "sea glass"
+        },
+        {
+          "id": "trench",
+          "name": "trench",
+          "aliases": [
+            "trenches"
+          ]
+        },
+        {
+          "id": "underwater-volcano",
+          "name": "underwater volcano",
+          "aliases": [
+            "underwater volcanoes"
+          ],
+          "plural": "underwater volcanoes"
         }
       ],
       "host_bank": [
@@ -1694,7 +1894,8 @@
           "id": "christmas",
           "name": "Christmas",
           "aliases": [
-            "Xmas"
+            "Xmas",
+            "Christmas Day"
           ],
           "plural": "Christmas"
         },
@@ -1709,7 +1910,8 @@
           "name": "Hanukkah",
           "aliases": [
             "Chanukah",
-            "Hanukah"
+            "Hanukah",
+            "Hannukah"
           ],
           "plural": "Hanukkah"
         },
@@ -1723,7 +1925,8 @@
           "id": "new-years-eve",
           "name": "New Year's Eve",
           "aliases": [
-            "NYE"
+            "NYE",
+            "New Year's"
           ],
           "plural": "New Year's Eve"
         },
@@ -1798,7 +2001,9 @@
         {
           "id": "thanksgiving",
           "name": "Thanksgiving",
-          "aliases": [],
+          "aliases": [
+            "Turkey Day"
+          ],
           "plural": "Thanksgiving"
         },
         {
@@ -1824,7 +2029,8 @@
           "name": "Fourth of July",
           "aliases": [
             "July 4th",
-            "Independence Day"
+            "Independence Day",
+            "4th of July"
           ],
           "plural": "Fourth of July"
         },
@@ -2284,6 +2490,230 @@
           "name": "St. George's Day",
           "aliases": [],
           "plural": "St. George's Day"
+        },
+        {
+          "id": "black-friday",
+          "name": "Black Friday",
+          "aliases": [],
+          "plural": "Black Friday"
+        },
+        {
+          "id": "palm-sunday",
+          "name": "Palm Sunday",
+          "aliases": [],
+          "plural": "Palm Sunday"
+        },
+        {
+          "id": "lent",
+          "name": "Lent",
+          "aliases": [],
+          "plural": "Lent"
+        },
+        {
+          "id": "pentecost",
+          "name": "Pentecost",
+          "aliases": [],
+          "plural": "Pentecost"
+        },
+        {
+          "id": "all-souls-day",
+          "name": "All Souls' Day",
+          "aliases": [],
+          "plural": "All Souls' Day"
+        },
+        {
+          "id": "flag-day",
+          "name": "Flag Day",
+          "aliases": [],
+          "plural": "Flag Day"
+        },
+        {
+          "id": "arbor-day",
+          "name": "Arbor Day",
+          "aliases": [],
+          "plural": "Arbor Day"
+        },
+        {
+          "id": "pi-day",
+          "name": "Pi Day",
+          "aliases": [],
+          "plural": "Pi Day"
+        },
+        {
+          "id": "star-wars-day",
+          "name": "Star Wars Day",
+          "aliases": [
+            "may the fourth"
+          ],
+          "plural": "Star Wars Day"
+        },
+        {
+          "id": "leap-day",
+          "name": "Leap Day",
+          "aliases": [],
+          "plural": "Leap Day"
+        },
+        {
+          "id": "election-day",
+          "name": "Election Day",
+          "aliases": [],
+          "plural": "Election Day"
+        },
+        {
+          "id": "inauguration-day",
+          "name": "Inauguration Day",
+          "aliases": [],
+          "plural": "Inauguration Day"
+        },
+        {
+          "id": "grandparents-day",
+          "name": "Grandparents Day",
+          "aliases": [],
+          "plural": "Grandparents Day"
+        },
+        {
+          "id": "teachers-day",
+          "name": "Teachers' Day",
+          "aliases": [],
+          "plural": "Teachers' Day"
+        },
+        {
+          "id": "shavuot",
+          "name": "Shavuot",
+          "aliases": [],
+          "plural": "Shavuot"
+        },
+        {
+          "id": "simchat-torah",
+          "name": "Simchat Torah",
+          "aliases": [],
+          "plural": "Simchat Torah"
+        },
+        {
+          "id": "tu-bishvat",
+          "name": "Tu BiShvat",
+          "aliases": [],
+          "plural": "Tu BiShvat"
+        },
+        {
+          "id": "lag-baomer",
+          "name": "Lag BaOmer",
+          "aliases": [],
+          "plural": "Lag BaOmer"
+        },
+        {
+          "id": "mawlid",
+          "name": "Mawlid",
+          "aliases": [],
+          "plural": "Mawlid"
+        },
+        {
+          "id": "ashura",
+          "name": "Ashura",
+          "aliases": [],
+          "plural": "Ashura"
+        },
+        {
+          "id": "thaipusam",
+          "name": "Thaipusam",
+          "aliases": [],
+          "plural": "Thaipusam"
+        },
+        {
+          "id": "dussehra",
+          "name": "Dussehra",
+          "aliases": [],
+          "plural": "Dussehra"
+        },
+        {
+          "id": "janmashtami",
+          "name": "Janmashtami",
+          "aliases": [],
+          "plural": "Janmashtami"
+        },
+        {
+          "id": "ram-navami",
+          "name": "Ram Navami",
+          "aliases": [],
+          "plural": "Ram Navami"
+        },
+        {
+          "id": "maha-shivaratri",
+          "name": "Maha Shivaratri",
+          "aliases": [],
+          "plural": "Maha Shivaratri"
+        },
+        {
+          "id": "karva-chauth",
+          "name": "Karva Chauth",
+          "aliases": [],
+          "plural": "Karva Chauth"
+        },
+        {
+          "id": "st-andrews-day",
+          "name": "St. Andrew's Day",
+          "aliases": [],
+          "plural": "St. Andrew's Day"
+        },
+        {
+          "id": "st-davids-day",
+          "name": "St. David's Day",
+          "aliases": [],
+          "plural": "St. David's Day"
+        },
+        {
+          "id": "family-day",
+          "name": "Family Day",
+          "aliases": [],
+          "plural": "Family Day"
+        },
+        {
+          "id": "emancipation-day",
+          "name": "Emancipation Day",
+          "aliases": [],
+          "plural": "Emancipation Day"
+        },
+        {
+          "id": "childrens-day",
+          "name": "Children's Day",
+          "aliases": [],
+          "plural": "Children's Day"
+        },
+        {
+          "id": "tanabata",
+          "name": "Tanabata",
+          "aliases": [],
+          "plural": "Tanabata"
+        },
+        {
+          "id": "setsubun",
+          "name": "Setsubun",
+          "aliases": [],
+          "plural": "Setsubun"
+        },
+        {
+          "id": "hinamatsuri",
+          "name": "Hinamatsuri",
+          "aliases": [],
+          "plural": "Hinamatsuri"
+        },
+        {
+          "id": "golden-week",
+          "name": "Golden Week",
+          "aliases": [],
+          "plural": "Golden Week"
+        },
+        {
+          "id": "hanami",
+          "name": "Hanami",
+          "aliases": [],
+          "plural": "Hanami"
+        },
+        {
+          "id": "twelfth-night",
+          "name": "Twelfth Night",
+          "aliases": [],
+          "plural": "Twelfth Night"
         }
       ],
       "host_bank": [
@@ -2306,7 +2736,8 @@
           "id": "traffic",
           "name": "traffic",
           "aliases": [
-            "traffic jam"
+            "traffic jam",
+            "rush hour"
           ],
           "plural": "traffic"
         },
@@ -2314,7 +2745,8 @@
           "id": "overslept",
           "name": "overslept",
           "aliases": [
-            "slept in"
+            "slept in",
+            "woke up late"
           ],
           "plural": "overslept"
         },
@@ -2353,7 +2785,9 @@
         {
           "id": "got-lost",
           "name": "got lost",
-          "aliases": [],
+          "aliases": [
+            "took the wrong exit"
+          ],
           "plural": "got lost"
         },
         {
@@ -2398,7 +2832,8 @@
           "id": "lost-keys",
           "name": "lost keys",
           "aliases": [
-            "couldn't find keys"
+            "couldn't find keys",
+            "couldn't find my keys"
           ],
           "plural": "lost keys"
         },
@@ -2479,6 +2914,142 @@
           "name": "spilled coffee",
           "aliases": [],
           "plural": "spilled coffee"
+        },
+        {
+          "id": "hit-snooze",
+          "name": "hit snooze",
+          "aliases": [
+            "snoozed"
+          ],
+          "plural": "hit snooze"
+        },
+        {
+          "id": "forgot-something-at-home",
+          "name": "forgot something at home",
+          "aliases": [
+            "had to go back"
+          ],
+          "plural": "forgot something at home"
+        },
+        {
+          "id": "babysitter-canceled",
+          "name": "babysitter canceled",
+          "aliases": [],
+          "plural": "babysitter canceled"
+        },
+        {
+          "id": "dog-got-out",
+          "name": "dog got out",
+          "aliases": [],
+          "plural": "dog got out"
+        },
+        {
+          "id": "power-outage",
+          "name": "power outage",
+          "aliases": [],
+          "plural": "power outage"
+        },
+        {
+          "id": "flight-delay",
+          "name": "flight delay",
+          "aliases": [
+            "flight was delayed"
+          ],
+          "plural": "flight delay"
+        },
+        {
+          "id": "the-bus-was-late",
+          "name": "the bus was late",
+          "aliases": [
+            "bus was late"
+          ],
+          "plural": "the bus was late"
+        },
+        {
+          "id": "road-closure",
+          "name": "road closure",
+          "aliases": [
+            "road closed"
+          ],
+          "plural": "road closure"
+        },
+        {
+          "id": "detour",
+          "name": "detour",
+          "aliases": [],
+          "plural": "detour"
+        },
+        {
+          "id": "family-emergency",
+          "name": "family emergency",
+          "aliases": [],
+          "plural": "family emergency"
+        },
+        {
+          "id": "work-emergency",
+          "name": "work emergency",
+          "aliases": [],
+          "plural": "work emergency"
+        },
+        {
+          "id": "lost-track-of-time",
+          "name": "lost track of time",
+          "aliases": [],
+          "plural": "lost track of time"
+        },
+        {
+          "id": "got-pulled-over",
+          "name": "got pulled over",
+          "aliases": [],
+          "plural": "got pulled over"
+        },
+        {
+          "id": "hangover",
+          "name": "hangover",
+          "aliases": [
+            "hungover"
+          ],
+          "plural": "hangover"
+        },
+        {
+          "id": "procrastinated",
+          "name": "procrastinated",
+          "aliases": [],
+          "plural": "procrastinated"
+        },
+        {
+          "id": "bad-hair-day",
+          "name": "bad hair day",
+          "aliases": [],
+          "plural": "bad hair day"
+        },
+        {
+          "id": "couldnt-find-shoes",
+          "name": "couldn't find shoes",
+          "aliases": [],
+          "plural": "couldn't find shoes"
+        },
+        {
+          "id": "school-dropoff",
+          "name": "school drop-off",
+          "aliases": [
+            "dropping off kids"
+          ],
+          "plural": "school drop-off"
+        },
+        {
+          "id": "snow",
+          "name": "snow",
+          "aliases": [],
+          "plural": "snow"
+        },
+        {
+          "id": "took-a-wrong-turn",
+          "name": "took a wrong turn",
+          "aliases": [
+            "wrong turn"
+          ],
+          "plural": "took a wrong turn"
         }
       ],
       "host_bank": [
@@ -2507,7 +3078,9 @@
           "id": "popsicle",
           "name": "popsicle",
           "aliases": [
-            "popsicles"
+            "popsicles",
+            "ice lolly",
+            "ice pop"
           ]
         },
         {
@@ -2582,7 +3155,8 @@
           "id": "snow-cone",
           "name": "snow cone",
           "aliases": [
-            "snow cones"
+            "snow cones",
+            "snowball"
           ]
         },
         {
@@ -2591,7 +3165,8 @@
           "aliases": [
             "slushy",
             "slurpee",
-            "slushies"
+            "slushies",
+            "Icee"
           ]
         },
         {
@@ -2717,6 +3292,49 @@
           "name": "frozen lemonade",
           "aliases": [],
           "plural": "frozen lemonade"
+        },
+        {
+          "id": "fudgsicle",
+          "name": "Fudgsicle",
+          "aliases": [
+            "Fudgsicles"
+          ]
+        },
+        {
+          "id": "frozen-banana",
+          "name": "frozen banana",
+          "aliases": [
+            "frozen bananas"
+          ]
+        },
+        {
+          "id": "freeze-pop",
+          "name": "freeze pop",
+          "aliases": [
+            "Otter Pop",
+            "Fla-Vor-Ice",
+            "freeze pops"
+          ]
+        },
+        {
+          "id": "bomb-pop",
+          "name": "Bomb Pop",
+          "aliases": [
+            "Bomb Pops"
+          ]
+        },
+        {
+          "id": "frozen-hot-chocolate",
+          "name": "frozen hot chocolate",
+          "aliases": [],
+          "plural": "frozen hot chocolate"
+        },
+        {
+          "id": "frozen-grape",
+          "name": "frozen grape",
+          "aliases": [
+            "frozen grapes"
+          ]
         }
       ],
       "host_bank": [

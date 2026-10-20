@@ -10,35 +10,41 @@
           "id": "teacher",
           "name": "teacher",
           "aliases": [
-            "teachers"
+            "teachers",
+            "educator"
           ]
         },
         {
           "id": "doctor",
           "name": "doctor",
           "aliases": [
-            "doctors"
+            "doctors",
+            "physician"
           ]
         },
         {
           "id": "nurse",
           "name": "nurse",
           "aliases": [
-            "nurses"
+            "nurses",
+            "RN",
+            "registered nurse"
           ]
         },
         {
           "id": "lawyer",
           "name": "lawyer",
           "aliases": [
-            "lawyers"
+            "lawyers",
+            "attorney"
           ]
         },
         {
           "id": "firefighter",
           "name": "firefighter",
           "aliases": [
-            "firefighters"
+            "firefighters",
+            "fireman"
           ]
         },
         {
@@ -46,7 +52,9 @@
           "name": "police officer",
           "aliases": [
             "cop",
-            "police officers"
+            "police officers",
+            "policeman",
+            "policewoman"
           ]
         },
         {
@@ -162,7 +170,8 @@
           "name": "hairdresser",
           "aliases": [
             "hairstylist",
-            "hairdressers"
+            "hairdressers",
+            "stylist"
           ]
         },
         {
@@ -179,14 +188,16 @@
           "aliases": [
             "mailman",
             "postal worker",
-            "mail carriers"
+            "mail carriers",
+            "postman"
           ]
         },
         {
           "id": "truck-driver",
           "name": "truck driver",
           "aliases": [
-            "truck drivers"
+            "truck drivers",
+            "trucker"
           ]
         },
         {
@@ -194,7 +205,8 @@
           "name": "taxi driver",
           "aliases": [
             "cab driver",
-            "taxi drivers"
+            "taxi drivers",
+            "cabbie"
           ]
         },
         {
@@ -522,7 +534,9 @@
           "id": "flight-attendant",
           "name": "flight attendant",
           "aliases": [
-            "flight attendants"
+            "flight attendants",
+            "stewardess",
+            "steward"
           ]
         },
         {
@@ -587,6 +601,519 @@
           "name": "clown",
           "aliases": [
             "clowns"
+          ]
+        },
+        {
+          "id": "web-designer",
+          "name": "web designer",
+          "aliases": [
+            "web designers"
+          ]
+        },
+        {
+          "id": "maid",
+          "name": "maid",
+          "aliases": [
+            "maids"
+          ]
+        },
+        {
+          "id": "housekeeper",
+          "name": "housekeeper",
+          "aliases": [
+            "housekeepers"
+          ]
+        },
+        {
+          "id": "delivery-driver",
+          "name": "delivery driver",
+          "aliases": [
+            "delivery drivers"
+          ]
+        },
+        {
+          "id": "uber-driver",
+          "name": "Uber driver",
+          "aliases": [
+            "rideshare driver",
+            "Uber drivers"
+          ]
+        },
+        {
+          "id": "barista",
+          "name": "barista",
+          "aliases": [
+            "baristas"
+          ]
+        },
+        {
+          "id": "retail-worker",
+          "name": "retail worker",
+          "aliases": [
+            "retail workers"
+          ]
+        },
+        {
+          "id": "dental-hygienist",
+          "name": "dental hygienist",
+          "aliases": [
+            "dental hygienists"
+          ]
+        },
+        {
+          "id": "optometrist",
+          "name": "optometrist",
+          "aliases": [
+            "optometrists"
+          ]
+        },
+        {
+          "id": "chiropractor",
+          "name": "chiropractor",
+          "aliases": [
+            "chiropractors"
+          ]
+        },
+        {
+          "id": "detective",
+          "name": "detective",
+          "aliases": [
+            "detectives"
+          ]
+        },
+        {
+          "id": "spy",
+          "name": "spy",
+          "aliases": [
+            "spies"
+          ]
+        },
+        {
+          "id": "paralegal",
+          "name": "paralegal",
+          "aliases": [
+            "paralegals"
+          ]
+        },
+        {
+          "id": "financial-advisor",
+          "name": "financial advisor",
+          "aliases": [
+            "financial advisors"
+          ]
+        },
+        {
+          "id": "stockbroker",
+          "name": "stockbroker",
+          "aliases": [
+            "stockbrokers"
+          ]
+        },
+        {
+          "id": "consultant",
+          "name": "consultant",
+          "aliases": [
+            "consultants"
+          ]
+        },
+        {
+          "id": "entrepreneur",
+          "name": "entrepreneur",
+          "aliases": [
+            "entrepreneurs"
+          ]
+        },
+        {
+          "id": "streamer",
+          "name": "streamer",
+          "aliases": [
+            "streamers"
+          ]
+        },
+        {
+          "id": "model",
+          "name": "model",
+          "aliases": [
+            "models"
+          ]
+        },
+        {
+          "id": "fashion-designer",
+          "name": "fashion designer",
+          "aliases": [
+            "fashion designers"
+          ]
+        },
+        {
+          "id": "tailor",
+          "name": "tailor",
+          "aliases": [
+            "tailors"
+          ]
+        },
+        {
+          "id": "seamstress",
+          "name": "seamstress",
+          "aliases": [
+            "seamstresses"
+          ]
+        },
+        {
+          "id": "painter",
+          "name": "painter",
+          "aliases": [
+            "painters"
+          ]
+        },
+        {
+          "id": "sculptor",
+          "name": "sculptor",
+          "aliases": [
+            "sculptors"
+          ]
+        },
+        {
+          "id": "animator",
+          "name": "animator",
+          "aliases": [
+            "animators"
+          ]
+        },
+        {
+          "id": "comedian",
+          "name": "comedian",
+          "aliases": [
+            "comedians"
+          ]
+        },
+        {
+          "id": "news-anchor",
+          "name": "news anchor",
+          "aliases": [
+            "news anchors"
+          ]
+        },
+        {
+          "id": "editor",
+          "name": "editor",
+          "aliases": [
+            "editors"
+          ]
+        },
+        {
+          "id": "poet",
+          "name": "poet",
+          "aliases": [
+            "poets"
+          ]
+        },
+        {
+          "id": "translator",
+          "name": "translator",
+          "aliases": [
+            "translators"
+          ]
+        },
+        {
+          "id": "interpreter",
+          "name": "interpreter",
+          "aliases": [
+            "interpreters"
+          ]
+        },
+        {
+          "id": "tutor",
+          "name": "tutor",
+          "aliases": [
+            "tutors"
+          ]
+        },
+        {
+          "id": "referee",
+          "name": "referee",
+          "aliases": [
+            "referees"
+          ]
+        },
+        {
+          "id": "umpire",
+          "name": "umpire",
+          "aliases": [
+            "umpires"
+          ]
+        },
+        {
+          "id": "rancher",
+          "name": "rancher",
+          "aliases": [
+            "ranchers"
+          ]
+        },
+        {
+          "id": "miner",
+          "name": "miner",
+          "aliases": [
+            "miners"
+          ]
+        },
+        {
+          "id": "logger",
+          "name": "logger",
+          "aliases": [
+            "loggers"
+          ]
+        },
+        {
+          "id": "welder",
+          "name": "welder",
+          "aliases": [
+            "welders"
+          ]
+        },
+        {
+          "id": "roofer",
+          "name": "roofer",
+          "aliases": [
+            "roofers"
+          ]
+        },
+        {
+          "id": "mover",
+          "name": "mover",
+          "aliases": [
+            "movers"
+          ]
+        },
+        {
+          "id": "air-traffic-controller",
+          "name": "air traffic controller",
+          "aliases": [
+            "air traffic controllers"
+          ]
+        },
+        {
+          "id": "ship-captain",
+          "name": "ship captain",
+          "aliases": [
+            "captain",
+            "ship captains"
+          ]
+        },
+        {
+          "id": "sailor",
+          "name": "sailor",
+          "aliases": [
+            "sailors"
+          ]
+        },
+        {
+          "id": "chemist",
+          "name": "chemist",
+          "aliases": [
+            "chemists"
+          ]
+        },
+        {
+          "id": "biologist",
+          "name": "biologist",
+          "aliases": [
+            "biologists"
+          ]
+        },
+        {
+          "id": "physicist",
+          "name": "physicist",
+          "aliases": [
+            "physicists"
+          ]
+        },
+        {
+          "id": "astronomer",
+          "name": "astronomer",
+          "aliases": [
+            "astronomers"
+          ]
+        },
+        {
+          "id": "geologist",
+          "name": "geologist",
+          "aliases": [
+            "geologists"
+          ]
+        },
+        {
+          "id": "archaeologist",
+          "name": "archaeologist",
+          "aliases": [
+            "archaeologists"
+          ]
+        },
+        {
+          "id": "historian",
+          "name": "historian",
+          "aliases": [
+            "historians"
+          ]
+        },
+        {
+          "id": "mathematician",
+          "name": "mathematician",
+          "aliases": [
+            "mathematicians"
+          ]
+        },
+        {
+          "id": "economist",
+          "name": "economist",
+          "aliases": [
+            "economists"
+          ]
+        },
+        {
+          "id": "priest",
+          "name": "priest",
+          "aliases": [
+            "priests"
+          ]
+        },
+        {
+          "id": "pastor",
+          "name": "pastor",
+          "aliases": [
+            "pastors"
+          ]
+        },
+        {
+          "id": "rabbi",
+          "name": "rabbi",
+          "aliases": [
+            "rabbis"
+          ]
+        },
+        {
+          "id": "imam",
+          "name": "imam",
+          "aliases": [
+            "imams"
+          ]
+        },
+        {
+          "id": "nun",
+          "name": "nun",
+          "aliases": [
+            "nuns"
+          ]
+        },
+        {
+          "id": "monk",
+          "name": "monk",
+          "aliases": [
+            "monks"
+          ]
+        },
+        {
+          "id": "butler",
+          "name": "butler",
+          "aliases": [
+            "butlers"
+          ]
+        },
+        {
+          "id": "chauffeur",
+          "name": "chauffeur",
+          "aliases": [
+            "chauffeurs"
+          ]
+        },
+        {
+          "id": "valet",
+          "name": "valet",
+          "aliases": [
+            "valets"
+          ]
+        },
+        {
+          "id": "concierge",
+          "name": "concierge",
+          "aliases": [
+            "concierges"
+          ]
+        },
+        {
+          "id": "travel-agent",
+          "name": "travel agent",
+          "aliases": [
+            "travel agents"
+          ]
+        },
+        {
+          "id": "event-planner",
+          "name": "event planner",
+          "aliases": [
+            "event planners"
+          ]
+        },
+        {
+          "id": "wedding-planner",
+          "name": "wedding planner",
+          "aliases": [
+            "wedding planners"
+          ]
+        },
+        {
+          "id": "florist",
+          "name": "florist",
+          "aliases": [
+            "florists"
+          ]
+        },
+        {
+          "id": "jeweler",
+          "name": "jeweler",
+          "aliases": [
+            "jewelers"
+          ]
+        },
+        {
+          "id": "locksmith",
+          "name": "locksmith",
+          "aliases": [
+            "locksmiths"
+          ]
+        },
+        {
+          "id": "exterminator",
+          "name": "exterminator",
+          "aliases": [
+            "exterminators"
+          ]
+        },
+        {
+          "id": "garbage-collector",
+          "name": "garbage collector",
+          "aliases": [
+            "garbage collectors"
+          ]
+        },
+        {
+          "id": "crossing-guard",
+          "name": "crossing guard",
+          "aliases": [
+            "crossing guards"
+          ]
+        },
+        {
+          "id": "bodyguard",
+          "name": "bodyguard",
+          "aliases": [
+            "bodyguards"
+          ]
+        },
+        {
+          "id": "bouncer",
+          "name": "bouncer",
+          "aliases": [
+            "bouncers"
           ]
         }
       ],
@@ -915,6 +1442,128 @@
           "name": "krill",
           "aliases": [],
           "plural": "krill"
+        },
+        {
+          "id": "penguin",
+          "name": "penguin",
+          "aliases": [
+            "penguins"
+          ]
+        },
+        {
+          "id": "sea-snake",
+          "name": "sea snake",
+          "aliases": [
+            "sea snakes"
+          ]
+        },
+        {
+          "id": "barnacle",
+          "name": "barnacle",
+          "aliases": [
+            "barnacles"
+          ]
+        },
+        {
+          "id": "sea-slug",
+          "name": "sea slug",
+          "aliases": [
+            "sea slugs"
+          ]
+        },
+        {
+          "id": "nudibranch",
+          "name": "nudibranch",
+          "aliases": [
+            "nudibranchs"
+          ],
+          "plural": "nudibranchs"
+        },
+        {
+          "id": "conch",
+          "name": "conch",
+          "aliases": [
+            "conches"
+          ]
+        },
+        {
+          "id": "scallop",
+          "name": "scallop",
+          "aliases": [
+            "scallops"
+          ]
+        },
+        {
+          "id": "sea-sponge",
+          "name": "sea sponge",
+          "aliases": [
+            "sponge",
+            "sea sponges"
+          ]
+        },
+        {
+          "id": "dugong",
+          "name": "dugong",
+          "aliases": [
+            "dugongs"
+          ]
+        },
+        {
+          "id": "cuttlefish",
+          "name": "cuttlefish",
+          "aliases": []
+        },
+        {
+          "id": "nautilus",
+          "name": "nautilus",
+          "aliases": [
+            "nautiluses"
+          ]
+        },
+        {
+          "id": "lionfish",
+          "name": "lionfish",
+          "aliases": []
+        },
+        {
+          "id": "grouper",
+          "name": "grouper",
+          "aliases": [
+            "groupers"
+          ]
+        },
+        {
+          "id": "snapper",
+          "name": "snapper",
+          "aliases": [
+            "snappers"
+          ]
+        },
+        {
+          "id": "mahimahi",
+          "name": "mahi-mahi",
+          "aliases": [],
+          "plural": "mahi-mahi"
+        },
+        {
+          "id": "herring",
+          "name": "herring",
+          "aliases": [
+            "herrings"
+          ]
+        },
+        {
+          "id": "anchovy",
+          "name": "anchovy",
+          "aliases": [
+            "anchovies"
+          ]
+        },
+        {
+          "id": "haddock",
+          "name": "haddock",
+          "aliases": [],
+          "plural": "haddock"
         }
       ],
       "host_bank": [
@@ -1406,7 +2055,8 @@
           "id": "christmas",
           "name": "Christmas",
           "aliases": [
-            "Xmas"
+            "Xmas",
+            "Christmas Day"
           ],
           "plural": "Christmas"
         },
@@ -1421,7 +2071,8 @@
           "name": "Hanukkah",
           "aliases": [
             "Chanukah",
-            "Hanukah"
+            "Hanukah",
+            "Hannukah"
           ],
           "plural": "Hanukkah"
         },
@@ -1484,7 +2135,9 @@
         {
           "id": "valentines-day",
           "name": "Valentine's Day",
-          "aliases": [],
+          "aliases": [
+            "Valentine's"
+          ],
           "plural": "Valentine's Day"
         },
         {
@@ -1498,7 +2151,9 @@
         {
           "id": "presidents-day",
           "name": "Presidents' Day",
-          "aliases": [],
+          "aliases": [
+            "Washington's Birthday"
+          ],
           "plural": "Presidents' Day"
         },
         {
@@ -1616,6 +2271,78 @@
           "name": "Yule",
           "aliases": [],
           "plural": "Yule"
+        },
+        {
+          "id": "mardi-gras",
+          "name": "Mardi Gras",
+          "aliases": [],
+          "plural": "Mardi Gras"
+        },
+        {
+          "id": "tu-bishvat",
+          "name": "Tu BiShvat",
+          "aliases": [],
+          "plural": "Tu BiShvat"
+        },
+        {
+          "id": "inauguration-day",
+          "name": "Inauguration Day",
+          "aliases": [],
+          "plural": "Inauguration Day"
+        },
+        {
+          "id": "las-posadas",
+          "name": "Las Posadas",
+          "aliases": [],
+          "plural": "Las Posadas"
+        },
+        {
+          "id": "omisoka",
+          "name": "Ōmisoka",
+          "aliases": [],
+          "plural": "Ōmisoka"
+        },
+        {
+          "id": "shogatsu",
+          "name": "Shōgatsu",
+          "aliases": [],
+          "plural": "Shōgatsu"
+        },
+        {
+          "id": "leap-day",
+          "name": "Leap Day",
+          "aliases": [],
+          "plural": "Leap Day"
+        },
+        {
+          "id": "lincolns-birthday",
+          "name": "Lincoln's Birthday",
+          "aliases": [],
+          "plural": "Lincoln's Birthday"
+        },
+        {
+          "id": "losar",
+          "name": "Losar",
+          "aliases": [],
+          "plural": "Losar"
+        },
+        {
+          "id": "setsubun",
+          "name": "Setsubun",
+          "aliases": [],
+          "plural": "Setsubun"
+        },
+        {
+          "id": "coming-of-age-day",
+          "name": "Coming of Age Day",
+          "aliases": [],
+          "plural": "Coming of Age Day"
+        },
+        {
+          "id": "twelfth-night",
+          "name": "Twelfth Night",
+          "aliases": [],
+          "plural": "Twelfth Night"
         }
       ],
       "host_bank": [
@@ -1789,6 +2516,124 @@
           "aliases": [
             "pool",
             "swimming pools"
+          ]
+        },
+        {
+          "id": "brook",
+          "name": "brook",
+          "aliases": [
+            "brooks"
+          ]
+        },
+        {
+          "id": "channel",
+          "name": "channel",
+          "aliases": [
+            "channels"
+          ]
+        },
+        {
+          "id": "sound",
+          "name": "sound",
+          "aliases": [
+            "sounds"
+          ]
+        },
+        {
+          "id": "inlet",
+          "name": "inlet",
+          "aliases": [
+            "inlets"
+          ]
+        },
+        {
+          "id": "cove",
+          "name": "cove",
+          "aliases": [
+            "coves"
+          ]
+        },
+        {
+          "id": "bayou",
+          "name": "bayou",
+          "aliases": [
+            "bayous"
+          ]
+        },
+        {
+          "id": "wetland",
+          "name": "wetland",
+          "aliases": [
+            "wetlands"
+          ]
+        },
+        {
+          "id": "oasis",
+          "name": "oasis",
+          "aliases": [
+            "oases"
+          ]
+        },
+        {
+          "id": "geyser",
+          "name": "geyser",
+          "aliases": [
+            "geysers"
+          ]
+        },
+        {
+          "id": "well",
+          "name": "well",
+          "aliases": [
+            "wells"
+          ]
+        },
+        {
+          "id": "aquifer",
+          "name": "aquifer",
+          "aliases": [
+            "aquifers"
+          ]
+        },
+        {
+          "id": "tide-pool",
+          "name": "tide pool",
+          "aliases": [
+            "tide pools"
+          ]
+        },
+        {
+          "id": "rapids",
+          "name": "rapids",
+          "aliases": [],
+          "plural": "rapids"
+        },
+        {
+          "id": "delta",
+          "name": "delta",
+          "aliases": [
+            "deltas"
+          ]
+        },
+        {
+          "id": "moat",
+          "name": "moat",
+          "aliases": [
+            "moats"
+          ]
+        },
+        {
+          "id": "fountain",
+          "name": "fountain",
+          "aliases": [
+            "fountains"
+          ]
+        },
+        {
+          "id": "ditch",
+          "name": "ditch",
+          "aliases": [
+            "ditches"
           ]
         }
       ],

@@ -25,7 +25,8 @@
           "id": "sunscreen",
           "name": "sunscreen",
           "aliases": [
-            "sunblock"
+            "sunblock",
+            "suntan lotion"
           ],
           "plural": "sunscreen"
         },
@@ -42,7 +43,8 @@
           "name": "beach umbrella",
           "aliases": [
             "umbrella",
-            "beach umbrellas"
+            "beach umbrellas",
+            "parasol"
           ]
         },
         {
@@ -59,14 +61,17 @@
           "aliases": [
             "bathing suit",
             "swimming costume",
-            "swimsuits"
+            "swimsuits",
+            "bikini",
+            "swim trunks"
           ]
         },
         {
           "id": "flip-flops",
           "name": "flip-flops",
           "aliases": [
-            "flip flop"
+            "flip flop",
+            "thongs"
           ],
           "plural": "flip-flops"
         },
@@ -379,6 +384,181 @@
           "aliases": [
             "sand dollars"
           ]
+        },
+        {
+          "id": "sea-glass",
+          "name": "sea glass",
+          "aliases": [],
+          "plural": "sea glass"
+        },
+        {
+          "id": "rock",
+          "name": "rock",
+          "aliases": [
+            "rocks"
+          ]
+        },
+        {
+          "id": "pebble",
+          "name": "pebble",
+          "aliases": [
+            "pebbles"
+          ]
+        },
+        {
+          "id": "bonfire",
+          "name": "bonfire",
+          "aliases": [
+            "bonfires"
+          ]
+        },
+        {
+          "id": "picnic",
+          "name": "picnic",
+          "aliases": [
+            "picnics"
+          ]
+        },
+        {
+          "id": "surfer",
+          "name": "surfer",
+          "aliases": [
+            "surfers"
+          ]
+        },
+        {
+          "id": "swimmer",
+          "name": "swimmer",
+          "aliases": [
+            "swimmers"
+          ]
+        },
+        {
+          "id": "kid",
+          "name": "kid",
+          "aliases": [
+            "kids"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "dogs"
+          ]
+        },
+        {
+          "id": "metal-detector",
+          "name": "metal detector",
+          "aliases": [
+            "metal detectors"
+          ]
+        },
+        {
+          "id": "sunburn",
+          "name": "sunburn",
+          "aliases": [],
+          "plural": "sunburn"
+        },
+        {
+          "id": "sunbather",
+          "name": "sunbather",
+          "aliases": [
+            "sunbathers"
+          ]
+        },
+        {
+          "id": "tide",
+          "name": "tide",
+          "aliases": [
+            "tides"
+          ]
+        },
+        {
+          "id": "lighthouse",
+          "name": "lighthouse",
+          "aliases": [
+            "lighthouses"
+          ]
+        },
+        {
+          "id": "dune",
+          "name": "dune",
+          "aliases": [
+            "dunes"
+          ]
+        },
+        {
+          "id": "palm-tree",
+          "name": "palm tree",
+          "aliases": [
+            "palm trees"
+          ]
+        },
+        {
+          "id": "coconut",
+          "name": "coconut",
+          "aliases": [
+            "coconuts"
+          ]
+        },
+        {
+          "id": "snacks",
+          "name": "snacks",
+          "aliases": [
+            "snack"
+          ],
+          "plural": "snacks"
+        },
+        {
+          "id": "beach-ball",
+          "name": "beach ball",
+          "aliases": [
+            "beach balls"
+          ]
+        },
+        {
+          "id": "paddleboard",
+          "name": "paddleboard",
+          "aliases": [
+            "paddleboards"
+          ]
+        },
+        {
+          "id": "kayak",
+          "name": "kayak",
+          "aliases": [
+            "kayaks"
+          ]
+        },
+        {
+          "id": "jet-ski",
+          "name": "jet ski",
+          "aliases": [
+            "jet skis"
+          ]
+        },
+        {
+          "id": "lifeguard-tower",
+          "name": "lifeguard tower",
+          "aliases": [
+            "lifeguard towers"
+          ]
+        },
+        {
+          "id": "trash",
+          "name": "trash",
+          "aliases": [
+            "garbage"
+          ],
+          "plural": "trash"
+        },
+        {
+          "id": "wetsuit",
+          "name": "wetsuit",
+          "aliases": [
+            "wetsuits"
+          ]
         }
       ],
       "host_bank": [
@@ -630,6 +810,172 @@
           "name": "khaki",
           "aliases": [],
           "plural": "khaki"
+        },
+        {
+          "id": "rose",
+          "name": "rose",
+          "aliases": [],
+          "plural": "rose"
+        },
+        {
+          "id": "salmon",
+          "name": "salmon",
+          "aliases": [],
+          "plural": "salmon"
+        },
+        {
+          "id": "fuchsia",
+          "name": "fuchsia",
+          "aliases": [
+            "fuschia"
+          ],
+          "plural": "fuchsia"
+        },
+        {
+          "id": "periwinkle",
+          "name": "periwinkle",
+          "aliases": [],
+          "plural": "periwinkle"
+        },
+        {
+          "id": "lilac",
+          "name": "lilac",
+          "aliases": [],
+          "plural": "lilac"
+        },
+        {
+          "id": "plum",
+          "name": "plum",
+          "aliases": [],
+          "plural": "plum"
+        },
+        {
+          "id": "amber",
+          "name": "amber",
+          "aliases": [],
+          "plural": "amber"
+        },
+        {
+          "id": "rust",
+          "name": "rust",
+          "aliases": [],
+          "plural": "rust"
+        },
+        {
+          "id": "copper",
+          "name": "copper",
+          "aliases": [],
+          "plural": "copper"
+        },
+        {
+          "id": "bronze",
+          "name": "bronze",
+          "aliases": [],
+          "plural": "bronze"
+        },
+        {
+          "id": "mustard",
+          "name": "mustard",
+          "aliases": [],
+          "plural": "mustard"
+        },
+        {
+          "id": "sienna",
+          "name": "sienna",
+          "aliases": [],
+          "plural": "sienna"
+        },
+        {
+          "id": "ochre",
+          "name": "ochre",
+          "aliases": [],
+          "plural": "ochre"
+        },
+        {
+          "id": "sepia",
+          "name": "sepia",
+          "aliases": [],
+          "plural": "sepia"
+        },
+        {
+          "id": "taupe",
+          "name": "taupe",
+          "aliases": [],
+          "plural": "taupe"
+        },
+        {
+          "id": "champagne",
+          "name": "champagne",
+          "aliases": [],
+          "plural": "champagne"
+        },
+        {
+          "id": "cerulean",
+          "name": "cerulean",
+          "aliases": [],
+          "plural": "cerulean"
+        },
+        {
+          "id": "cobalt",
+          "name": "cobalt",
+          "aliases": [],
+          "plural": "cobalt"
+        },
+        {
+          "id": "azure",
+          "name": "azure",
+          "aliases": [],
+          "plural": "azure"
+        },
+        {
+          "id": "sapphire",
+          "name": "sapphire",
+          "aliases": [],
+          "plural": "sapphire"
+        },
+        {
+          "id": "ruby",
+          "name": "ruby",
+          "aliases": [],
+          "plural": "ruby"
+        },
+        {
+          "id": "eggplant",
+          "name": "eggplant",
+          "aliases": [
+            "aubergine"
+          ],
+          "plural": "eggplant"
+        },
+        {
+          "id": "mahogany",
+          "name": "mahogany",
+          "aliases": [],
+          "plural": "mahogany"
+        },
+        {
+          "id": "chestnut",
+          "name": "chestnut",
+          "aliases": [],
+          "plural": "chestnut"
+        },
+        {
+          "id": "slate",
+          "name": "slate",
+          "aliases": [],
+          "plural": "slate"
+        },
+        {
+          "id": "pewter",
+          "name": "pewter",
+          "aliases": [],
+          "plural": "pewter"
+        },
+        {
+          "id": "platinum",
+          "name": "platinum",
+          "aliases": [],
+          "plural": "platinum"
         }
       ],
       "host_bank": [
@@ -862,6 +1208,127 @@
           "aliases": [
             "wolverines"
           ]
+        },
+        {
+          "id": "mongoose",
+          "name": "mongoose",
+          "aliases": [
+            "mongooses"
+          ]
+        },
+        {
+          "id": "meerkat",
+          "name": "meerkat",
+          "aliases": [
+            "meerkats"
+          ]
+        },
+        {
+          "id": "aardwolf",
+          "name": "aardwolf",
+          "aliases": [
+            "aardwolves"
+          ]
+        },
+        {
+          "id": "dolphin",
+          "name": "dolphin",
+          "aliases": [
+            "dolphins"
+          ]
+        },
+        {
+          "id": "porpoise",
+          "name": "porpoise",
+          "aliases": [
+            "porpoises"
+          ]
+        },
+        {
+          "id": "tasmanian-devil",
+          "name": "Tasmanian devil",
+          "aliases": [
+            "Tasmanian devils"
+          ]
+        },
+        {
+          "id": "quoll",
+          "name": "quoll",
+          "aliases": [
+            "quolls"
+          ]
+        },
+        {
+          "id": "fossa",
+          "name": "fossa",
+          "aliases": [
+            "fossas"
+          ]
+        },
+        {
+          "id": "civet",
+          "name": "civet",
+          "aliases": [
+            "civets"
+          ]
+        },
+        {
+          "id": "genet",
+          "name": "genet",
+          "aliases": [
+            "genets"
+          ]
+        },
+        {
+          "id": "dhole",
+          "name": "dhole",
+          "aliases": [
+            "dholes"
+          ]
+        },
+        {
+          "id": "african-wild-dog",
+          "name": "African wild dog",
+          "aliases": [
+            "wild dog",
+            "African wild dogs"
+          ]
+        },
+        {
+          "id": "stoat",
+          "name": "stoat",
+          "aliases": [
+            "ermine",
+            "stoats"
+          ]
+        },
+        {
+          "id": "marten",
+          "name": "marten",
+          "aliases": [
+            "martens"
+          ]
+        },
+        {
+          "id": "fisher",
+          "name": "fisher",
+          "aliases": [
+            "fishers"
+          ]
+        },
+        {
+          "id": "honey-badger",
+          "name": "honey badger",
+          "aliases": [
+            "honey badgers"
+          ]
+        },
+        {
+          "id": "panther",
+          "name": "panther",
+          "aliases": [
+            "panthers"
+          ]
         }
       ],
       "host_bank": [
@@ -983,6 +1450,102 @@
           "name": "steak and eggs",
           "aliases": [],
           "plural": "steak and eggs"
+        },
+        {
+          "id": "egg-sandwich",
+          "name": "egg sandwich",
+          "aliases": [
+            "egg sandwiches"
+          ]
+        },
+        {
+          "id": "egg-in-a-hole",
+          "name": "egg in a hole",
+          "aliases": [
+            "egg in a basket",
+            "toad in the hole"
+          ],
+          "plural": "egg in a hole"
+        },
+        {
+          "id": "scotch-egg",
+          "name": "Scotch egg",
+          "aliases": [
+            "Scotch eggs"
+          ]
+        },
+        {
+          "id": "deviled-egg",
+          "name": "deviled egg",
+          "aliases": [
+            "deviled eggs"
+          ]
+        },
+        {
+          "id": "menemen",
+          "name": "menemen",
+          "aliases": [],
+          "plural": "menemen"
+        },
+        {
+          "id": "migas",
+          "name": "migas",
+          "aliases": [],
+          "plural": "migas"
+        },
+        {
+          "id": "eggs-florentine",
+          "name": "eggs Florentine",
+          "aliases": [],
+          "plural": "eggs Florentine"
+        },
+        {
+          "id": "egg-mcmuffin",
+          "name": "Egg McMuffin",
+          "aliases": [
+            "Egg McMuffins"
+          ]
+        },
+        {
+          "id": "egg-bite",
+          "name": "egg bite",
+          "aliases": [
+            "egg bites"
+          ]
+        },
+        {
+          "id": "bacon-and-eggs",
+          "name": "bacon and eggs",
+          "aliases": [
+            "eggs and bacon"
+          ],
+          "plural": "bacon and eggs"
+        },
+        {
+          "id": "ham-and-eggs",
+          "name": "ham and eggs",
+          "aliases": [],
+          "plural": "ham and eggs"
+        },
+        {
+          "id": "sunny-side-up",
+          "name": "sunny side up",
+          "aliases": [],
+          "plural": "sunny side up"
+        },
+        {
+          "id": "over-easy",
+          "name": "over easy",
+          "aliases": [],
+          "plural": "over easy"
+        },
+        {
+          "id": "cilbir",
+          "name": "çılbır",
+          "aliases": [
+            "turkish eggs"
+          ],
+          "plural": "çılbır"
         }
       ],
       "host_bank": [
@@ -1113,6 +1676,138 @@
           "aliases": [
             "blueberry muffins"
           ]
+        },
+        {
+          "id": "strawberry-shortcake",
+          "name": "strawberry shortcake",
+          "aliases": [
+            "strawberry shortcakes"
+          ]
+        },
+        {
+          "id": "apple-strudel",
+          "name": "apple strudel",
+          "aliases": [
+            "apple strudels"
+          ]
+        },
+        {
+          "id": "cherry-cobbler",
+          "name": "cherry cobbler",
+          "aliases": [
+            "cherry cobblers"
+          ]
+        },
+        {
+          "id": "apple-cake",
+          "name": "apple cake",
+          "aliases": [
+            "apple cakes"
+          ]
+        },
+        {
+          "id": "pineapple-upsidedown-cake",
+          "name": "pineapple upside-down cake",
+          "aliases": [
+            "upside-down cake",
+            "pineapple upside-down cakes"
+          ]
+        },
+        {
+          "id": "banana-muffin",
+          "name": "banana muffin",
+          "aliases": [
+            "banana muffins"
+          ]
+        },
+        {
+          "id": "lemon-cake",
+          "name": "lemon cake",
+          "aliases": [
+            "lemon cakes"
+          ]
+        },
+        {
+          "id": "fruitcake",
+          "name": "fruitcake",
+          "aliases": [
+            "fruitcakes"
+          ]
+        },
+        {
+          "id": "mince-pie",
+          "name": "mince pie",
+          "aliases": [
+            "mince pies"
+          ]
+        },
+        {
+          "id": "galette",
+          "name": "galette",
+          "aliases": [
+            "galettes"
+          ]
+        },
+        {
+          "id": "clafoutis",
+          "name": "clafoutis",
+          "aliases": []
+        },
+        {
+          "id": "crostata",
+          "name": "crostata",
+          "aliases": [
+            "crostatas"
+          ]
+        },
+        {
+          "id": "apple-dumpling",
+          "name": "apple dumpling",
+          "aliases": [
+            "apple dumplings"
+          ]
+        },
+        {
+          "id": "baked-apple",
+          "name": "baked apple",
+          "aliases": [
+            "baked apples"
+          ]
+        },
+        {
+          "id": "rhubarb-pie",
+          "name": "rhubarb pie",
+          "aliases": [
+            "rhubarb pies"
+          ]
+        },
+        {
+          "id": "lemon-meringue-pie",
+          "name": "lemon meringue pie",
+          "aliases": [
+            "lemon meringue pies"
+          ]
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "plum-cake",
+          "name": "plum cake",
+          "aliases": [
+            "plum cakes"
+          ]
+        },
+        {
+          "id": "berry-crumble",
+          "name": "berry crumble",
+          "aliases": [
+            "berry crumbles"
+          ]
         }
       ],
       "host_bank": [
@@ -1136,21 +1831,24 @@
           "id": "second",
           "name": "second",
           "aliases": [
-            "seconds"
+            "seconds",
+            "sec"
           ]
         },
         {
           "id": "minute",
           "name": "minute",
           "aliases": [
-            "minutes"
+            "minutes",
+            "min"
           ]
         },
         {
           "id": "hour",
           "name": "hour",
           "aliases": [
-            "hours"
+            "hours",
+            "hr"
           ]
         },
         {
@@ -1199,7 +1897,8 @@
           "id": "millennium",
           "name": "millennium",
           "aliases": [
-            "millennia"
+            "millennia",
+            "millenium"
           ]
         },
         {
@@ -1242,6 +1941,111 @@
           "name": "eon",
           "aliases": [
             "eons"
+          ]
+        },
+        {
+          "id": "moment",
+          "name": "moment",
+          "aliases": [
+            "moments"
+          ]
+        },
+        {
+          "id": "instant",
+          "name": "instant",
+          "aliases": [
+            "instants"
+          ]
+        },
+        {
+          "id": "semester",
+          "name": "semester",
+          "aliases": [
+            "semesters"
+          ]
+        },
+        {
+          "id": "epoch",
+          "name": "epoch",
+          "aliases": [
+            "epochs"
+          ],
+          "plural": "epochs"
+        },
+        {
+          "id": "era",
+          "name": "era",
+          "aliases": [
+            "eras"
+          ]
+        },
+        {
+          "id": "age",
+          "name": "age",
+          "aliases": [
+            "ages"
+          ]
+        },
+        {
+          "id": "generation",
+          "name": "generation",
+          "aliases": [
+            "generations"
+          ]
+        },
+        {
+          "id": "lifetime",
+          "name": "lifetime",
+          "aliases": [
+            "lifetimes"
+          ]
+        },
+        {
+          "id": "eternity",
+          "name": "eternity",
+          "aliases": [],
+          "plural": "eternity"
+        },
+        {
+          "id": "picosecond",
+          "name": "picosecond",
+          "aliases": [
+            "picoseconds"
+          ]
+        },
+        {
+          "id": "femtosecond",
+          "name": "femtosecond",
+          "aliases": [
+            "femtoseconds"
+          ]
+        },
+        {
+          "id": "jiffy",
+          "name": "jiffy",
+          "aliases": [
+            "jiffies"
+          ]
+        },
+        {
+          "id": "score",
+          "name": "score",
+          "aliases": [
+            "scores"
+          ]
+        },
+        {
+          "id": "weekend",
+          "name": "weekend",
+          "aliases": [
+            "weekends"
+          ]
+        },
+        {
+          "id": "sol",
+          "name": "sol",
+          "aliases": [
+            "sols"
           ]
         }
       ],
@@ -1334,14 +2138,16 @@
           "id": "can-opener",
           "name": "can opener",
           "aliases": [
-            "can openers"
+            "can openers",
+            "tin opener"
           ]
         },
         {
           "id": "ice-cream-scoop",
           "name": "ice cream scoop",
           "aliases": [
-            "ice cream scoops"
+            "ice cream scoops",
+            "scoop"
           ]
         },
         {
@@ -1355,7 +2161,8 @@
           "id": "pizza-cutter",
           "name": "pizza cutter",
           "aliases": [
-            "pizza cutters"
+            "pizza cutters",
+            "pizza wheel"
           ]
         },
         {
@@ -1376,7 +2183,8 @@
           "id": "bottle-opener",
           "name": "bottle opener",
           "aliases": [
-            "bottle openers"
+            "bottle openers",
+            "church key"
           ]
         },
         {
@@ -1412,7 +2220,8 @@
           "id": "zester",
           "name": "zester",
           "aliases": [
-            "zesters"
+            "zesters",
+            "microplane"
           ]
         },
         {
@@ -1441,7 +2250,261 @@
           "name": "strainer",
           "aliases": [
             "tea strainer",
-            "strainers"
+            "strainers",
+            "sieve",
+            "colander"
+          ]
+        },
+        {
+          "id": "measuring-cup",
+          "name": "measuring cup",
+          "aliases": [
+            "measuring cups"
+          ]
+        },
+        {
+          "id": "thermometer",
+          "name": "thermometer",
+          "aliases": [
+            "thermometers"
+          ]
+        },
+        {
+          "id": "baster",
+          "name": "baster",
+          "aliases": [
+            "turkey baster",
+            "basters"
+          ]
+        },
+        {
+          "id": "pastry-brush",
+          "name": "pastry brush",
+          "aliases": [
+            "basting brush",
+            "pastry brushes"
+          ]
+        },
+        {
+          "id": "pastry-cutter",
+          "name": "pastry cutter",
+          "aliases": [
+            "pastry cutters"
+          ]
+        },
+        {
+          "id": "cookie-cutter",
+          "name": "cookie cutter",
+          "aliases": [
+            "cookie cutters"
+          ]
+        },
+        {
+          "id": "melon-baller",
+          "name": "melon baller",
+          "aliases": [
+            "melon ballers"
+          ]
+        },
+        {
+          "id": "apple-corer",
+          "name": "apple corer",
+          "aliases": [
+            "apple corers"
+          ]
+        },
+        {
+          "id": "egg-slicer",
+          "name": "egg slicer",
+          "aliases": [
+            "egg slicers"
+          ]
+        },
+        {
+          "id": "cheese-slicer",
+          "name": "cheese slicer",
+          "aliases": [
+            "cheese slicers"
+          ]
+        },
+        {
+          "id": "masher",
+          "name": "masher",
+          "aliases": [
+            "potato masher",
+            "mashers"
+          ]
+        },
+        {
+          "id": "meat-mallet",
+          "name": "meat mallet",
+          "aliases": [
+            "meat tenderizer",
+            "meat mallets"
+          ]
+        },
+        {
+          "id": "funnel",
+          "name": "funnel",
+          "aliases": [
+            "funnels"
+          ]
+        },
+        {
+          "id": "sifter",
+          "name": "sifter",
+          "aliases": [
+            "sifters"
+          ]
+        },
+        {
+          "id": "nutcracker",
+          "name": "nutcracker",
+          "aliases": [
+            "nutcrackers"
+          ]
+        },
+        {
+          "id": "timer",
+          "name": "timer",
+          "aliases": [
+            "timers"
+          ]
+        },
+        {
+          "id": "oven-mitt",
+          "name": "oven mitt",
+          "aliases": [
+            "oven mitts"
+          ]
+        },
+        {
+          "id": "pot-holder",
+          "name": "pot holder",
+          "aliases": [
+            "pot holders"
+          ]
+        },
+        {
+          "id": "twist-tie",
+          "name": "twist tie",
+          "aliases": [
+            "twist ties"
+          ]
+        },
+        {
+          "id": "rubber-band",
+          "name": "rubber band",
+          "aliases": [
+            "rubber bands"
+          ]
+        },
+        {
+          "id": "battery",
+          "name": "battery",
+          "aliases": [
+            "batteries"
+          ]
+        },
+        {
+          "id": "takeout-menu",
+          "name": "takeout menu",
+          "aliases": [
+            "takeout menus"
+          ]
+        },
+        {
+          "id": "lighter",
+          "name": "lighter",
+          "aliases": [
+            "lighters"
+          ]
+        },
+        {
+          "id": "match",
+          "name": "match",
+          "aliases": [
+            "matches"
+          ]
+        },
+        {
+          "id": "toothpick",
+          "name": "toothpick",
+          "aliases": [
+            "toothpicks"
+          ]
+        },
+        {
+          "id": "chip-clip",
+          "name": "chip clip",
+          "aliases": [
+            "chip clips"
+          ]
+        },
+        {
+          "id": "plastic-wrap",
+          "name": "plastic wrap",
+          "aliases": [],
+          "plural": "plastic wrap"
+        },
+        {
+          "id": "aluminum-foil",
+          "name": "aluminum foil",
+          "aliases": [
+            "tin foil"
+          ],
+          "plural": "aluminum foil"
+        },
+        {
+          "id": "ziptop-bag",
+          "name": "zip-top bag",
+          "aliases": [
+            "ziploc bag",
+            "zip-top bags"
+          ]
+        },
+        {
+          "id": "straw",
+          "name": "straw",
+          "aliases": [
+            "straws"
+          ]
+        },
+        {
+          "id": "birthday-candle",
+          "name": "birthday candle",
+          "aliases": [
+            "birthday candles"
+          ]
+        },
+        {
+          "id": "pie-server",
+          "name": "pie server",
+          "aliases": [
+            "cake server",
+            "pie servers"
+          ]
+        },
+        {
+          "id": "honey-dipper",
+          "name": "honey dipper",
+          "aliases": [
+            "honey dippers"
+          ]
+        },
+        {
+          "id": "citrus-juicer",
+          "name": "citrus juicer",
+          "aliases": [
+            "juicer",
+            "citrus juicers"
+          ]
+        },
+        {
+          "id": "jar-opener",
+          "name": "jar opener",
+          "aliases": [
+            "jar openers"
           ]
         }
       ],

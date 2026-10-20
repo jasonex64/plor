@@ -16,7 +16,8 @@
     "lockfile": "node scripts/lockfile.ts",
     "content:validate": "node scripts/content-validate.ts",
     "content:plurals": "node scripts/content-plurals.ts",
-    "content:publish": "node scripts/content-publish.ts"
+    "content:publish": "node scripts/content-publish.ts",
+    "content:additions-check": "node scripts/content-additions-check.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
