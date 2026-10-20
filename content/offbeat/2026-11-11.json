@@ -1,0 +1,3474 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-11",
+  "questions": [
+    {
+      "prompt": "Name a superhero",
+      "entries": [
+        {
+          "id": "superman",
+          "name": "Superman",
+          "aliases": [
+            "Clark Kent",
+            "Man of Steel",
+            "Kal-El"
+          ],
+          "plural": "Superman"
+        },
+        {
+          "id": "batman",
+          "name": "Batman",
+          "aliases": [
+            "Bruce Wayne",
+            "the Dark Knight",
+            "Caped Crusader"
+          ],
+          "plural": "Batman"
+        },
+        {
+          "id": "spider-man",
+          "name": "Spider-Man",
+          "aliases": [
+            "Spider Man",
+            "Spidey",
+            "Peter Parker",
+            "Miles Morales"
+          ],
+          "plural": "Spider-Man"
+        },
+        {
+          "id": "wonder-woman",
+          "name": "Wonder Woman",
+          "aliases": [
+            "Diana Prince"
+          ],
+          "plural": "Wonder Woman"
+        },
+        {
+          "id": "iron-man",
+          "name": "Iron Man",
+          "aliases": [
+            "Tony Stark"
+          ],
+          "plural": "Iron Man"
+        },
+        {
+          "id": "captain-america",
+          "name": "Captain America",
+          "aliases": [
+            "Cap",
+            "Steve Rogers"
+          ],
+          "plural": "Captain America"
+        },
+        {
+          "id": "hulk",
+          "name": "Hulk",
+          "aliases": [
+            "the Hulk",
+            "Incredible Hulk",
+            "Bruce Banner"
+          ],
+          "plural": "Hulk"
+        },
+        {
+          "id": "thor",
+          "name": "Thor",
+          "aliases": [],
+          "plural": "Thor"
+        },
+        {
+          "id": "black-panther",
+          "name": "Black Panther",
+          "aliases": [
+            "T'Challa"
+          ],
+          "plural": "Black Panther"
+        },
+        {
+          "id": "black-widow",
+          "name": "Black Widow",
+          "aliases": [
+            "Natasha Romanoff"
+          ],
+          "plural": "Black Widow"
+        },
+        {
+          "id": "hawkeye",
+          "name": "Hawkeye",
+          "aliases": [
+            "Clint Barton"
+          ],
+          "plural": "Hawkeye"
+        },
+        {
+          "id": "ant-man",
+          "name": "Ant-Man",
+          "aliases": [
+            "Scott Lang"
+          ],
+          "plural": "Ant-Man"
+        },
+        {
+          "id": "the-wasp",
+          "name": "the Wasp",
+          "aliases": [
+            "Wasp"
+          ],
+          "plural": "the Wasp"
+        },
+        {
+          "id": "doctor-strange",
+          "name": "Doctor Strange",
+          "aliases": [
+            "Dr. Strange",
+            "Stephen Strange"
+          ],
+          "plural": "Doctor Strange"
+        },
+        {
+          "id": "captain-marvel",
+          "name": "Captain Marvel",
+          "aliases": [
+            "Carol Danvers"
+          ],
+          "plural": "Captain Marvel"
+        },
+        {
+          "id": "scarlet-witch",
+          "name": "Scarlet Witch",
+          "aliases": [
+            "Wanda Maximoff",
+            "Wanda"
+          ],
+          "plural": "Scarlet Witch"
+        },
+        {
+          "id": "vision",
+          "name": "Vision",
+          "aliases": [],
+          "plural": "Vision"
+        },
+        {
+          "id": "falcon",
+          "name": "Falcon",
+          "aliases": [
+            "Sam Wilson"
+          ],
+          "plural": "Falcon"
+        },
+        {
+          "id": "winter-soldier",
+          "name": "Winter Soldier",
+          "aliases": [
+            "Bucky Barnes",
+            "Bucky"
+          ],
+          "plural": "Winter Soldier"
+        },
+        {
+          "id": "star-lord",
+          "name": "Star-Lord",
+          "aliases": [
+            "Star Lord",
+            "Peter Quill"
+          ],
+          "plural": "Star-Lord"
+        },
+        {
+          "id": "groot",
+          "name": "Groot",
+          "aliases": [],
+          "plural": "Groot"
+        },
+        {
+          "id": "rocket-raccoon",
+          "name": "Rocket Raccoon",
+          "aliases": [
+            "Rocket"
+          ],
+          "plural": "Rocket Raccoon"
+        },
+        {
+          "id": "gamora",
+          "name": "Gamora",
+          "aliases": [],
+          "plural": "Gamora"
+        },
+        {
+          "id": "drax",
+          "name": "Drax",
+          "aliases": [],
+          "plural": "Drax"
+        },
+        {
+          "id": "deadpool",
+          "name": "Deadpool",
+          "aliases": [
+            "Wade Wilson"
+          ],
+          "plural": "Deadpool"
+        },
+        {
+          "id": "wolverine",
+          "name": "Wolverine",
+          "aliases": [
+            "Logan"
+          ],
+          "plural": "Wolverine"
+        },
+        {
+          "id": "cyclops",
+          "name": "Cyclops",
+          "aliases": [],
+          "plural": "Cyclops"
+        },
+        {
+          "id": "storm",
+          "name": "Storm",
+          "aliases": [],
+          "plural": "Storm"
+        },
+        {
+          "id": "jean-grey",
+          "name": "Jean Grey",
+          "aliases": [
+            "Phoenix"
+          ],
+          "plural": "Jean Grey"
+        },
+        {
+          "id": "rogue",
+          "name": "Rogue",
+          "aliases": [],
+          "plural": "Rogue"
+        },
+        {
+          "id": "beast",
+          "name": "Beast",
+          "aliases": [],
+          "plural": "Beast"
+        },
+        {
+          "id": "gambit",
+          "name": "Gambit",
+          "aliases": [],
+          "plural": "Gambit"
+        },
+        {
+          "id": "nightcrawler",
+          "name": "Nightcrawler",
+          "aliases": [],
+          "plural": "Nightcrawler"
+        },
+        {
+          "id": "iceman",
+          "name": "Iceman",
+          "aliases": [],
+          "plural": "Iceman"
+        },
+        {
+          "id": "professor-x",
+          "name": "Professor X",
+          "aliases": [
+            "Charles Xavier"
+          ],
+          "plural": "Professor X"
+        },
+        {
+          "id": "mister-fantastic",
+          "name": "Mister Fantastic",
+          "aliases": [
+            "Mr. Fantastic",
+            "Reed Richards"
+          ],
+          "plural": "Mister Fantastic"
+        },
+        {
+          "id": "invisible-woman",
+          "name": "Invisible Woman",
+          "aliases": [
+            "Sue Storm"
+          ],
+          "plural": "Invisible Woman"
+        },
+        {
+          "id": "human-torch",
+          "name": "Human Torch",
+          "aliases": [
+            "Johnny Storm"
+          ],
+          "plural": "Human Torch"
+        },
+        {
+          "id": "the-thing",
+          "name": "the Thing",
+          "aliases": [
+            "Ben Grimm"
+          ],
+          "plural": "the Thing"
+        },
+        {
+          "id": "daredevil",
+          "name": "Daredevil",
+          "aliases": [
+            "Matt Murdock"
+          ],
+          "plural": "Daredevil"
+        },
+        {
+          "id": "punisher",
+          "name": "Punisher",
+          "aliases": [
+            "the Punisher"
+          ],
+          "plural": "Punisher"
+        },
+        {
+          "id": "luke-cage",
+          "name": "Luke Cage",
+          "aliases": [],
+          "plural": "Luke Cage"
+        },
+        {
+          "id": "jessica-jones",
+          "name": "Jessica Jones",
+          "aliases": [],
+          "plural": "Jessica Jones"
+        },
+        {
+          "id": "iron-fist",
+          "name": "Iron Fist",
+          "aliases": [],
+          "plural": "Iron Fist"
+        },
+        {
+          "id": "moon-knight",
+          "name": "Moon Knight",
+          "aliases": [],
+          "plural": "Moon Knight"
+        },
+        {
+          "id": "ms-marvel",
+          "name": "Ms. Marvel",
+          "aliases": [
+            "Kamala Khan"
+          ],
+          "plural": "Ms. Marvel"
+        },
+        {
+          "id": "she-hulk",
+          "name": "She-Hulk",
+          "aliases": [
+            "Jennifer Walters"
+          ],
+          "plural": "She-Hulk"
+        },
+        {
+          "id": "silver-surfer",
+          "name": "Silver Surfer",
+          "aliases": [],
+          "plural": "Silver Surfer"
+        },
+        {
+          "id": "blade",
+          "name": "Blade",
+          "aliases": [],
+          "plural": "Blade"
+        },
+        {
+          "id": "ghost-rider",
+          "name": "Ghost Rider",
+          "aliases": [],
+          "plural": "Ghost Rider"
+        },
+        {
+          "id": "spider-woman",
+          "name": "Spider-Woman",
+          "aliases": [
+            "Jessica Drew"
+          ],
+          "plural": "Spider-Woman"
+        },
+        {
+          "id": "spider-gwen",
+          "name": "Spider-Gwen",
+          "aliases": [
+            "Ghost-Spider",
+            "Gwen Stacy"
+          ],
+          "plural": "Spider-Gwen"
+        },
+        {
+          "id": "venom",
+          "name": "Venom",
+          "aliases": [],
+          "plural": "Venom"
+        },
+        {
+          "id": "shang-chi",
+          "name": "Shang-Chi",
+          "aliases": [],
+          "plural": "Shang-Chi"
+        },
+        {
+          "id": "ironheart",
+          "name": "Ironheart",
+          "aliases": [],
+          "plural": "Ironheart"
+        },
+        {
+          "id": "squirrel-girl",
+          "name": "Squirrel Girl",
+          "aliases": [],
+          "plural": "Squirrel Girl"
+        },
+        {
+          "id": "nova",
+          "name": "Nova",
+          "aliases": [],
+          "plural": "Nova"
+        },
+        {
+          "id": "namor",
+          "name": "Namor",
+          "aliases": [],
+          "plural": "Namor"
+        },
+        {
+          "id": "war-machine",
+          "name": "War Machine",
+          "aliases": [],
+          "plural": "War Machine"
+        },
+        {
+          "id": "quicksilver",
+          "name": "Quicksilver",
+          "aliases": [],
+          "plural": "Quicksilver"
+        },
+        {
+          "id": "black-bolt",
+          "name": "Black Bolt",
+          "aliases": [],
+          "plural": "Black Bolt"
+        },
+        {
+          "id": "captain-britain",
+          "name": "Captain Britain",
+          "aliases": [],
+          "plural": "Captain Britain"
+        },
+        {
+          "id": "the-flash",
+          "name": "the Flash",
+          "aliases": [
+            "Flash",
+            "Barry Allen"
+          ],
+          "plural": "the Flash"
+        },
+        {
+          "id": "green-lantern",
+          "name": "Green Lantern",
+          "aliases": [
+            "Hal Jordan"
+          ],
+          "plural": "Green Lantern"
+        },
+        {
+          "id": "aquaman",
+          "name": "Aquaman",
+          "aliases": [
+            "Arthur Curry"
+          ],
+          "plural": "Aquaman"
+        },
+        {
+          "id": "cyborg",
+          "name": "Cyborg",
+          "aliases": [],
+          "plural": "Cyborg"
+        },
+        {
+          "id": "martian-manhunter",
+          "name": "Martian Manhunter",
+          "aliases": [],
+          "plural": "Martian Manhunter"
+        },
+        {
+          "id": "green-arrow",
+          "name": "Green Arrow",
+          "aliases": [
+            "Oliver Queen"
+          ],
+          "plural": "Green Arrow"
+        },
+        {
+          "id": "supergirl",
+          "name": "Supergirl",
+          "aliases": [
+            "Kara Zor-El"
+          ],
+          "plural": "Supergirl"
+        },
+        {
+          "id": "batgirl",
+          "name": "Batgirl",
+          "aliases": [
+            "Barbara Gordon"
+          ],
+          "plural": "Batgirl"
+        },
+        {
+          "id": "robin",
+          "name": "Robin",
+          "aliases": [
+            "Boy Wonder"
+          ],
+          "plural": "Robin"
+        },
+        {
+          "id": "nightwing",
+          "name": "Nightwing",
+          "aliases": [],
+          "plural": "Nightwing"
+        },
+        {
+          "id": "batwoman",
+          "name": "Batwoman",
+          "aliases": [],
+          "plural": "Batwoman"
+        },
+        {
+          "id": "catwoman",
+          "name": "Catwoman",
+          "aliases": [
+            "Selina Kyle"
+          ],
+          "plural": "Catwoman"
+        },
+        {
+          "id": "shazam",
+          "name": "Shazam",
+          "aliases": [],
+          "plural": "Shazam"
+        },
+        {
+          "id": "black-canary",
+          "name": "Black Canary",
+          "aliases": [],
+          "plural": "Black Canary"
+        },
+        {
+          "id": "hawkgirl",
+          "name": "Hawkgirl",
+          "aliases": [],
+          "plural": "Hawkgirl"
+        },
+        {
+          "id": "hawkman",
+          "name": "Hawkman",
+          "aliases": [],
+          "plural": "Hawkman"
+        },
+        {
+          "id": "blue-beetle",
+          "name": "Blue Beetle",
+          "aliases": [],
+          "plural": "Blue Beetle"
+        },
+        {
+          "id": "starfire",
+          "name": "Starfire",
+          "aliases": [],
+          "plural": "Starfire"
+        },
+        {
+          "id": "raven",
+          "name": "Raven",
+          "aliases": [],
+          "plural": "Raven"
+        },
+        {
+          "id": "beast-boy",
+          "name": "Beast Boy",
+          "aliases": [],
+          "plural": "Beast Boy"
+        },
+        {
+          "id": "static-shock",
+          "name": "Static Shock",
+          "aliases": [
+            "Static"
+          ],
+          "plural": "Static Shock"
+        },
+        {
+          "id": "zatanna",
+          "name": "Zatanna",
+          "aliases": [],
+          "plural": "Zatanna"
+        },
+        {
+          "id": "plastic-man",
+          "name": "Plastic Man",
+          "aliases": [],
+          "plural": "Plastic Man"
+        },
+        {
+          "id": "the-atom",
+          "name": "the Atom",
+          "aliases": [],
+          "plural": "the Atom"
+        },
+        {
+          "id": "firestorm",
+          "name": "Firestorm",
+          "aliases": [],
+          "plural": "Firestorm"
+        },
+        {
+          "id": "doctor-fate",
+          "name": "Doctor Fate",
+          "aliases": [],
+          "plural": "Doctor Fate"
+        },
+        {
+          "id": "booster-gold",
+          "name": "Booster Gold",
+          "aliases": [],
+          "plural": "Booster Gold"
+        },
+        {
+          "id": "harley-quinn",
+          "name": "Harley Quinn",
+          "aliases": [],
+          "plural": "Harley Quinn"
+        },
+        {
+          "id": "doctor-manhattan",
+          "name": "Doctor Manhattan",
+          "aliases": [],
+          "plural": "Doctor Manhattan"
+        },
+        {
+          "id": "rorschach",
+          "name": "Rorschach",
+          "aliases": [],
+          "plural": "Rorschach"
+        },
+        {
+          "id": "hellboy",
+          "name": "Hellboy",
+          "aliases": [],
+          "plural": "Hellboy"
+        },
+        {
+          "id": "spawn",
+          "name": "Spawn",
+          "aliases": [],
+          "plural": "Spawn"
+        },
+        {
+          "id": "invincible",
+          "name": "Invincible",
+          "aliases": [],
+          "plural": "Invincible"
+        },
+        {
+          "id": "mr-incredible",
+          "name": "Mr. Incredible",
+          "aliases": [
+            "Mister Incredible"
+          ],
+          "plural": "Mr. Incredible"
+        },
+        {
+          "id": "elastigirl",
+          "name": "Elastigirl",
+          "aliases": [
+            "Mrs. Incredible"
+          ],
+          "plural": "Elastigirl"
+        },
+        {
+          "id": "frozone",
+          "name": "Frozone",
+          "aliases": [],
+          "plural": "Frozone"
+        },
+        {
+          "id": "dash",
+          "name": "Dash",
+          "aliases": [],
+          "plural": "Dash"
+        },
+        {
+          "id": "teenage-mutant-ninja-turtles",
+          "name": "Teenage Mutant Ninja Turtles",
+          "aliases": [
+            "Ninja Turtles",
+            "TMNT"
+          ],
+          "plural": "Teenage Mutant Ninja Turtles"
+        },
+        {
+          "id": "power-rangers",
+          "name": "Power Rangers",
+          "aliases": [],
+          "plural": "Power Rangers"
+        },
+        {
+          "id": "sailor-moon",
+          "name": "Sailor Moon",
+          "aliases": [],
+          "plural": "Sailor Moon"
+        },
+        {
+          "id": "astro-boy",
+          "name": "Astro Boy",
+          "aliases": [],
+          "plural": "Astro Boy"
+        },
+        {
+          "id": "underdog",
+          "name": "Underdog",
+          "aliases": [],
+          "plural": "Underdog"
+        },
+        {
+          "id": "mighty-mouse",
+          "name": "Mighty Mouse",
+          "aliases": [],
+          "plural": "Mighty Mouse"
+        },
+        {
+          "id": "captain-underpants",
+          "name": "Captain Underpants",
+          "aliases": [],
+          "plural": "Captain Underpants"
+        },
+        {
+          "id": "the-tick",
+          "name": "the Tick",
+          "aliases": [],
+          "plural": "the Tick"
+        },
+        {
+          "id": "kick-ass",
+          "name": "Kick-Ass",
+          "aliases": [],
+          "plural": "Kick-Ass"
+        },
+        {
+          "id": "hancock",
+          "name": "Hancock",
+          "aliases": [],
+          "plural": "Hancock"
+        },
+        {
+          "id": "green-hornet",
+          "name": "Green Hornet",
+          "aliases": [],
+          "plural": "Green Hornet"
+        },
+        {
+          "id": "the-phantom",
+          "name": "the Phantom",
+          "aliases": [],
+          "plural": "the Phantom"
+        },
+        {
+          "id": "captain-planet",
+          "name": "Captain Planet",
+          "aliases": [],
+          "plural": "Captain Planet"
+        },
+        {
+          "id": "darkwing-duck",
+          "name": "Darkwing Duck",
+          "aliases": [],
+          "plural": "Darkwing Duck"
+        },
+        {
+          "id": "powerpuff-girls",
+          "name": "Powerpuff Girls",
+          "aliases": [],
+          "plural": "Powerpuff Girls"
+        },
+        {
+          "id": "wonder-twins",
+          "name": "Wonder Twins",
+          "aliases": [],
+          "plural": "Wonder Twins"
+        },
+        {
+          "id": "megamind",
+          "name": "Megamind",
+          "aliases": [],
+          "plural": "Megamind"
+        },
+        {
+          "id": "saitama",
+          "name": "Saitama",
+          "aliases": [
+            "One Punch Man"
+          ],
+          "plural": "Saitama"
+        },
+        {
+          "id": "all-might",
+          "name": "All Might",
+          "aliases": [],
+          "plural": "All Might"
+        }
+      ],
+      "host_bank": [
+        "spider-man",
+        "superman",
+        "batman",
+        "wonder-woman",
+        "iron-man",
+        "captain-america",
+        "hulk",
+        "thor"
+      ],
+      "host_answers": [
+        "spider-man"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something people do in the morning",
+      "entries": [
+        {
+          "id": "wake-up",
+          "name": "wake up",
+          "aliases": [
+            "waking up",
+            "get up",
+            "getting up"
+          ],
+          "plural": "wake up"
+        },
+        {
+          "id": "brush-your-teeth",
+          "name": "brush your teeth",
+          "aliases": [
+            "brush teeth",
+            "brushing teeth",
+            "brushing your teeth"
+          ],
+          "plural": "brush your teeth"
+        },
+        {
+          "id": "take-a-shower",
+          "name": "take a shower",
+          "aliases": [
+            "shower",
+            "showering",
+            "have a shower"
+          ],
+          "plural": "take a shower"
+        },
+        {
+          "id": "take-a-bath",
+          "name": "take a bath",
+          "aliases": [
+            "bath",
+            "have a bath"
+          ],
+          "plural": "take a bath"
+        },
+        {
+          "id": "get-dressed",
+          "name": "get dressed",
+          "aliases": [
+            "getting dressed",
+            "put on clothes",
+            "pick out an outfit",
+            "choose an outfit",
+            "put on shoes"
+          ],
+          "plural": "get dressed"
+        },
+        {
+          "id": "eat-breakfast",
+          "name": "eat breakfast",
+          "aliases": [
+            "breakfast",
+            "have breakfast",
+            "eating breakfast",
+            "eat cereal",
+            "eat toast"
+          ],
+          "plural": "eat breakfast"
+        },
+        {
+          "id": "make-breakfast",
+          "name": "make breakfast",
+          "aliases": [
+            "cook breakfast",
+            "making breakfast"
+          ],
+          "plural": "make breakfast"
+        },
+        {
+          "id": "drink-coffee",
+          "name": "drink coffee",
+          "aliases": [
+            "coffee",
+            "have coffee",
+            "make coffee",
+            "drinking coffee"
+          ],
+          "plural": "drink coffee"
+        },
+        {
+          "id": "drink-tea",
+          "name": "drink tea",
+          "aliases": [
+            "tea",
+            "make tea"
+          ],
+          "plural": "drink tea"
+        },
+        {
+          "id": "drink-water",
+          "name": "drink water",
+          "aliases": [
+            "water",
+            "glass of water"
+          ],
+          "plural": "drink water"
+        },
+        {
+          "id": "drink-juice",
+          "name": "drink juice",
+          "aliases": [
+            "juice",
+            "orange juice"
+          ],
+          "plural": "drink juice"
+        },
+        {
+          "id": "make-a-smoothie",
+          "name": "make a smoothie",
+          "aliases": [
+            "smoothie"
+          ],
+          "plural": "make a smoothie"
+        },
+        {
+          "id": "make-the-bed",
+          "name": "make the bed",
+          "aliases": [
+            "making the bed",
+            "make your bed",
+            "make bed"
+          ],
+          "plural": "make the bed"
+        },
+        {
+          "id": "hit-snooze",
+          "name": "hit snooze",
+          "aliases": [
+            "snooze",
+            "press snooze",
+            "snooze the alarm"
+          ],
+          "plural": "hit snooze"
+        },
+        {
+          "id": "turn-off-the-alarm",
+          "name": "turn off the alarm",
+          "aliases": [
+            "alarm",
+            "alarm clock"
+          ],
+          "plural": "turn off the alarm"
+        },
+        {
+          "id": "sleep-in",
+          "name": "sleep in",
+          "aliases": [
+            "sleep late",
+            "oversleep"
+          ],
+          "plural": "sleep in"
+        },
+        {
+          "id": "stretch",
+          "name": "stretch",
+          "aliases": [
+            "stretching"
+          ],
+          "plural": "stretch"
+        },
+        {
+          "id": "exercise",
+          "name": "exercise",
+          "aliases": [
+            "work out",
+            "workout",
+            "working out",
+            "go to the gym",
+            "gym"
+          ],
+          "plural": "exercise"
+        },
+        {
+          "id": "go-for-a-run",
+          "name": "go for a run",
+          "aliases": [
+            "run",
+            "jog",
+            "jogging",
+            "running"
+          ],
+          "plural": "go for a run"
+        },
+        {
+          "id": "walk-the-dog",
+          "name": "walk the dog",
+          "aliases": [
+            "walking the dog",
+            "dog walk"
+          ],
+          "plural": "walk the dog"
+        },
+        {
+          "id": "let-the-dog-out",
+          "name": "let the dog out",
+          "aliases": [],
+          "plural": "let the dog out"
+        },
+        {
+          "id": "feed-the-pets",
+          "name": "feed the pets",
+          "aliases": [
+            "feed the dog",
+            "feed the cat",
+            "feed pets"
+          ],
+          "plural": "feed the pets"
+        },
+        {
+          "id": "do-yoga",
+          "name": "do yoga",
+          "aliases": [
+            "yoga"
+          ],
+          "plural": "do yoga"
+        },
+        {
+          "id": "meditate",
+          "name": "meditate",
+          "aliases": [
+            "meditation",
+            "meditating"
+          ],
+          "plural": "meditate"
+        },
+        {
+          "id": "pray",
+          "name": "pray",
+          "aliases": [
+            "prayer",
+            "praying"
+          ],
+          "plural": "pray"
+        },
+        {
+          "id": "read-the-news",
+          "name": "read the news",
+          "aliases": [
+            "news",
+            "read the paper",
+            "newspaper",
+            "watch the news"
+          ],
+          "plural": "read the news"
+        },
+        {
+          "id": "check-your-phone",
+          "name": "check your phone",
+          "aliases": [
+            "phone",
+            "check phone",
+            "scroll on phone",
+            "social media",
+            "check messages"
+          ],
+          "plural": "check your phone"
+        },
+        {
+          "id": "check-email",
+          "name": "check email",
+          "aliases": [
+            "email",
+            "emails"
+          ],
+          "plural": "check email"
+        },
+        {
+          "id": "shave",
+          "name": "shave",
+          "aliases": [
+            "shaving"
+          ],
+          "plural": "shave"
+        },
+        {
+          "id": "wash-your-face",
+          "name": "wash your face",
+          "aliases": [
+            "wash face"
+          ],
+          "plural": "wash your face"
+        },
+        {
+          "id": "put-on-makeup",
+          "name": "put on makeup",
+          "aliases": [
+            "makeup",
+            "do makeup",
+            "apply makeup"
+          ],
+          "plural": "put on makeup"
+        },
+        {
+          "id": "do-your-hair",
+          "name": "do your hair",
+          "aliases": [
+            "hair",
+            "brush your hair",
+            "brush hair",
+            "comb your hair",
+            "style hair",
+            "blow-dry hair"
+          ],
+          "plural": "do your hair"
+        },
+        {
+          "id": "put-in-contacts",
+          "name": "put in contacts",
+          "aliases": [
+            "contacts",
+            "contact lenses"
+          ],
+          "plural": "put in contacts"
+        },
+        {
+          "id": "take-medicine",
+          "name": "take medicine",
+          "aliases": [
+            "medication",
+            "take vitamins",
+            "vitamins",
+            "take pills"
+          ],
+          "plural": "take medicine"
+        },
+        {
+          "id": "pack-lunch",
+          "name": "pack lunch",
+          "aliases": [
+            "make lunch",
+            "pack a lunch",
+            "lunch"
+          ],
+          "plural": "pack lunch"
+        },
+        {
+          "id": "get-the-kids-ready",
+          "name": "get the kids ready",
+          "aliases": [
+            "wake the kids"
+          ],
+          "plural": "get the kids ready"
+        },
+        {
+          "id": "take-the-kids-to-school",
+          "name": "take the kids to school",
+          "aliases": [
+            "school run",
+            "drop off the kids"
+          ],
+          "plural": "take the kids to school"
+        },
+        {
+          "id": "go-to-school",
+          "name": "go to school",
+          "aliases": [
+            "school"
+          ],
+          "plural": "go to school"
+        },
+        {
+          "id": "commute",
+          "name": "commute",
+          "aliases": [
+            "drive to work",
+            "go to work",
+            "work"
+          ],
+          "plural": "commute"
+        },
+        {
+          "id": "catch-the-bus",
+          "name": "catch the bus",
+          "aliases": [
+            "take the bus",
+            "bus"
+          ],
+          "plural": "catch the bus"
+        },
+        {
+          "id": "take-the-train",
+          "name": "take the train",
+          "aliases": [
+            "train"
+          ],
+          "plural": "take the train"
+        },
+        {
+          "id": "use-the-bathroom",
+          "name": "use the bathroom",
+          "aliases": [
+            "pee",
+            "go to the toilet",
+            "toilet"
+          ],
+          "plural": "use the bathroom"
+        },
+        {
+          "id": "open-the-curtains",
+          "name": "open the curtains",
+          "aliases": [
+            "open the blinds",
+            "curtains",
+            "blinds"
+          ],
+          "plural": "open the curtains"
+        },
+        {
+          "id": "water-the-plants",
+          "name": "water the plants",
+          "aliases": [
+            "water plants"
+          ],
+          "plural": "water the plants"
+        },
+        {
+          "id": "journal",
+          "name": "journal",
+          "aliases": [
+            "journaling",
+            "write in a journal"
+          ],
+          "plural": "journal"
+        },
+        {
+          "id": "plan-the-day",
+          "name": "plan the day",
+          "aliases": [
+            "make a to-do list",
+            "to-do list",
+            "check calendar"
+          ],
+          "plural": "plan the day"
+        },
+        {
+          "id": "listen-to-music",
+          "name": "listen to music",
+          "aliases": [
+            "music"
+          ],
+          "plural": "listen to music"
+        },
+        {
+          "id": "listen-to-a-podcast",
+          "name": "listen to a podcast",
+          "aliases": [
+            "podcast",
+            "podcasts"
+          ],
+          "plural": "listen to a podcast"
+        },
+        {
+          "id": "watch-tv",
+          "name": "watch TV",
+          "aliases": [
+            "TV",
+            "morning show"
+          ],
+          "plural": "watch TV"
+        },
+        {
+          "id": "put-on-deodorant",
+          "name": "put on deodorant",
+          "aliases": [
+            "deodorant"
+          ],
+          "plural": "put on deodorant"
+        },
+        {
+          "id": "put-on-sunscreen",
+          "name": "put on sunscreen",
+          "aliases": [
+            "sunscreen"
+          ],
+          "plural": "put on sunscreen"
+        },
+        {
+          "id": "moisturize",
+          "name": "moisturize",
+          "aliases": [
+            "skincare",
+            "skin care",
+            "lotion"
+          ],
+          "plural": "moisturize"
+        },
+        {
+          "id": "floss",
+          "name": "floss",
+          "aliases": [
+            "flossing"
+          ],
+          "plural": "floss"
+        },
+        {
+          "id": "use-mouthwash",
+          "name": "use mouthwash",
+          "aliases": [
+            "mouthwash"
+          ],
+          "plural": "use mouthwash"
+        },
+        {
+          "id": "yawn",
+          "name": "yawn",
+          "aliases": [
+            "yawning"
+          ],
+          "plural": "yawn"
+        },
+        {
+          "id": "check-the-weather",
+          "name": "check the weather",
+          "aliases": [
+            "weather"
+          ],
+          "plural": "check the weather"
+        },
+        {
+          "id": "lock-the-door",
+          "name": "lock the door",
+          "aliases": [
+            "lock up"
+          ],
+          "plural": "lock the door"
+        },
+        {
+          "id": "take-out-the-trash",
+          "name": "take out the trash",
+          "aliases": [
+            "trash",
+            "garbage"
+          ],
+          "plural": "take out the trash"
+        },
+        {
+          "id": "empty-the-dishwasher",
+          "name": "empty the dishwasher",
+          "aliases": [
+            "do the dishes",
+            "dishes"
+          ],
+          "plural": "empty the dishwasher"
+        },
+        {
+          "id": "start-the-laundry",
+          "name": "start the laundry",
+          "aliases": [
+            "laundry"
+          ],
+          "plural": "start the laundry"
+        },
+        {
+          "id": "iron-clothes",
+          "name": "iron clothes",
+          "aliases": [
+            "ironing"
+          ],
+          "plural": "iron clothes"
+        },
+        {
+          "id": "read-a-book",
+          "name": "read a book",
+          "aliases": [
+            "read",
+            "reading"
+          ],
+          "plural": "read a book"
+        },
+        {
+          "id": "kiss-your-partner",
+          "name": "kiss your partner",
+          "aliases": [
+            "kiss"
+          ],
+          "plural": "kiss your partner"
+        },
+        {
+          "id": "say-good-morning",
+          "name": "say good morning",
+          "aliases": [
+            "good morning"
+          ],
+          "plural": "say good morning"
+        },
+        {
+          "id": "open-the-window",
+          "name": "open the window",
+          "aliases": [],
+          "plural": "open the window"
+        },
+        {
+          "id": "grab-your-keys",
+          "name": "grab your keys",
+          "aliases": [
+            "keys"
+          ],
+          "plural": "grab your keys"
+        },
+        {
+          "id": "pack-your-bag",
+          "name": "pack your bag",
+          "aliases": [
+            "pack a bag"
+          ],
+          "plural": "pack your bag"
+        },
+        {
+          "id": "watch-the-sunrise",
+          "name": "watch the sunrise",
+          "aliases": [
+            "sunrise"
+          ],
+          "plural": "watch the sunrise"
+        }
+      ],
+      "host_bank": [
+        "make-the-bed",
+        "brush-your-teeth",
+        "take-a-shower",
+        "eat-breakfast",
+        "drink-coffee",
+        "get-dressed",
+        "wake-up",
+        "check-your-phone"
+      ],
+      "host_answers": [
+        "make-the-bed"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something people do to relax",
+      "entries": [
+        {
+          "id": "take-a-bath",
+          "name": "take a bath",
+          "aliases": [
+            "bath",
+            "bubble bath",
+            "have a bath",
+            "soak in the tub"
+          ],
+          "plural": "take a bath"
+        },
+        {
+          "id": "take-a-shower",
+          "name": "take a shower",
+          "aliases": [
+            "shower",
+            "hot shower"
+          ],
+          "plural": "take a shower"
+        },
+        {
+          "id": "hot-tub",
+          "name": "hot tub",
+          "aliases": [
+            "jacuzzi"
+          ],
+          "plural": "hot tub"
+        },
+        {
+          "id": "sauna",
+          "name": "sauna",
+          "aliases": [
+            "steam room"
+          ],
+          "plural": "sauna"
+        },
+        {
+          "id": "go-to-the-spa",
+          "name": "go to the spa",
+          "aliases": [
+            "spa",
+            "spa day"
+          ],
+          "plural": "go to the spa"
+        },
+        {
+          "id": "get-a-massage",
+          "name": "get a massage",
+          "aliases": [
+            "massage"
+          ],
+          "plural": "get a massage"
+        },
+        {
+          "id": "read-a-book",
+          "name": "read a book",
+          "aliases": [
+            "read",
+            "reading",
+            "books"
+          ],
+          "plural": "read a book"
+        },
+        {
+          "id": "watch-tv",
+          "name": "watch TV",
+          "aliases": [
+            "TV",
+            "watch television",
+            "binge-watch",
+            "Netflix",
+            "watch a show"
+          ],
+          "plural": "watch TV"
+        },
+        {
+          "id": "watch-a-movie",
+          "name": "watch a movie",
+          "aliases": [
+            "movie",
+            "movies",
+            "watch movies",
+            "film"
+          ],
+          "plural": "watch a movie"
+        },
+        {
+          "id": "listen-to-music",
+          "name": "listen to music",
+          "aliases": [
+            "music"
+          ],
+          "plural": "listen to music"
+        },
+        {
+          "id": "nap",
+          "name": "nap",
+          "aliases": [
+            "take a nap",
+            "sleep",
+            "sleeping",
+            "napping"
+          ],
+          "plural": "nap"
+        },
+        {
+          "id": "meditate",
+          "name": "meditate",
+          "aliases": [
+            "meditation"
+          ],
+          "plural": "meditate"
+        },
+        {
+          "id": "yoga",
+          "name": "yoga",
+          "aliases": [
+            "do yoga"
+          ],
+          "plural": "yoga"
+        },
+        {
+          "id": "tai-chi",
+          "name": "tai chi",
+          "aliases": [],
+          "plural": "tai chi"
+        },
+        {
+          "id": "go-for-a-walk",
+          "name": "go for a walk",
+          "aliases": [
+            "walk",
+            "walking",
+            "stroll",
+            "take a walk"
+          ],
+          "plural": "go for a walk"
+        },
+        {
+          "id": "light-candles",
+          "name": "light candles",
+          "aliases": [
+            "candles",
+            "candle"
+          ],
+          "plural": "light candles"
+        },
+        {
+          "id": "drink-tea",
+          "name": "drink tea",
+          "aliases": [
+            "tea",
+            "cup of tea"
+          ],
+          "plural": "drink tea"
+        },
+        {
+          "id": "drink-wine",
+          "name": "drink wine",
+          "aliases": [
+            "wine",
+            "glass of wine"
+          ],
+          "plural": "drink wine"
+        },
+        {
+          "id": "play-video-games",
+          "name": "play video games",
+          "aliases": [
+            "video games",
+            "gaming"
+          ],
+          "plural": "play video games"
+        },
+        {
+          "id": "play-board-games",
+          "name": "play board games",
+          "aliases": [
+            "board games"
+          ],
+          "plural": "play board games"
+        },
+        {
+          "id": "play-cards",
+          "name": "play cards",
+          "aliases": [
+            "cards",
+            "solitaire"
+          ],
+          "plural": "play cards"
+        },
+        {
+          "id": "garden",
+          "name": "garden",
+          "aliases": [
+            "gardening"
+          ],
+          "plural": "garden"
+        },
+        {
+          "id": "cook",
+          "name": "cook",
+          "aliases": [
+            "cooking"
+          ],
+          "plural": "cook"
+        },
+        {
+          "id": "bake",
+          "name": "bake",
+          "aliases": [
+            "baking"
+          ],
+          "plural": "bake"
+        },
+        {
+          "id": "knit",
+          "name": "knit",
+          "aliases": [
+            "knitting",
+            "crochet"
+          ],
+          "plural": "knit"
+        },
+        {
+          "id": "crafts",
+          "name": "crafts",
+          "aliases": [
+            "crafting"
+          ],
+          "plural": "crafts"
+        },
+        {
+          "id": "draw",
+          "name": "draw",
+          "aliases": [
+            "drawing",
+            "doodle",
+            "doodling"
+          ],
+          "plural": "draw"
+        },
+        {
+          "id": "paint",
+          "name": "paint",
+          "aliases": [
+            "painting"
+          ],
+          "plural": "paint"
+        },
+        {
+          "id": "color",
+          "name": "color",
+          "aliases": [
+            "coloring",
+            "coloring book"
+          ],
+          "plural": "color"
+        },
+        {
+          "id": "do-a-puzzle",
+          "name": "do a puzzle",
+          "aliases": [
+            "puzzle",
+            "jigsaw",
+            "jigsaw puzzle"
+          ],
+          "plural": "do a puzzle"
+        },
+        {
+          "id": "crossword",
+          "name": "crossword",
+          "aliases": [
+            "do the crossword",
+            "sudoku"
+          ],
+          "plural": "crossword"
+        },
+        {
+          "id": "write",
+          "name": "write",
+          "aliases": [
+            "writing",
+            "journal",
+            "journaling"
+          ],
+          "plural": "write"
+        },
+        {
+          "id": "listen-to-a-podcast",
+          "name": "listen to a podcast",
+          "aliases": [
+            "podcast",
+            "podcasts"
+          ],
+          "plural": "listen to a podcast"
+        },
+        {
+          "id": "scroll-social-media",
+          "name": "scroll social media",
+          "aliases": [
+            "social media",
+            "scroll on phone",
+            "phone",
+            "TikTok"
+          ],
+          "plural": "scroll social media"
+        },
+        {
+          "id": "call-a-friend",
+          "name": "call a friend",
+          "aliases": [
+            "talk to a friend"
+          ],
+          "plural": "call a friend"
+        },
+        {
+          "id": "hang-out-with-friends",
+          "name": "hang out with friends",
+          "aliases": [
+            "friends",
+            "see friends"
+          ],
+          "plural": "hang out with friends"
+        },
+        {
+          "id": "spend-time-with-family",
+          "name": "spend time with family",
+          "aliases": [
+            "family"
+          ],
+          "plural": "spend time with family"
+        },
+        {
+          "id": "cuddle",
+          "name": "cuddle",
+          "aliases": [
+            "snuggle"
+          ],
+          "plural": "cuddle"
+        },
+        {
+          "id": "play-with-pets",
+          "name": "play with pets",
+          "aliases": [
+            "pet the dog",
+            "pet the cat",
+            "pets"
+          ],
+          "plural": "play with pets"
+        },
+        {
+          "id": "exercise",
+          "name": "exercise",
+          "aliases": [
+            "work out",
+            "gym"
+          ],
+          "plural": "exercise"
+        },
+        {
+          "id": "go-for-a-run",
+          "name": "go for a run",
+          "aliases": [
+            "run",
+            "jog",
+            "jogging",
+            "running"
+          ],
+          "plural": "go for a run"
+        },
+        {
+          "id": "swim",
+          "name": "swim",
+          "aliases": [
+            "swimming"
+          ],
+          "plural": "swim"
+        },
+        {
+          "id": "ride-a-bike",
+          "name": "ride a bike",
+          "aliases": [
+            "bike ride",
+            "cycling"
+          ],
+          "plural": "ride a bike"
+        },
+        {
+          "id": "hike",
+          "name": "hike",
+          "aliases": [
+            "hiking"
+          ],
+          "plural": "hike"
+        },
+        {
+          "id": "fish",
+          "name": "fish",
+          "aliases": [
+            "fishing"
+          ],
+          "plural": "fish"
+        },
+        {
+          "id": "go-to-the-beach",
+          "name": "go to the beach",
+          "aliases": [
+            "beach"
+          ],
+          "plural": "go to the beach"
+        },
+        {
+          "id": "sunbathe",
+          "name": "sunbathe",
+          "aliases": [
+            "lie in the sun",
+            "get some sun",
+            "sit outside"
+          ],
+          "plural": "sunbathe"
+        },
+        {
+          "id": "stargaze",
+          "name": "stargaze",
+          "aliases": [
+            "stargazing"
+          ],
+          "plural": "stargaze"
+        },
+        {
+          "id": "deep-breathing",
+          "name": "deep breathing",
+          "aliases": [
+            "breathe deeply",
+            "breathing exercises"
+          ],
+          "plural": "deep breathing"
+        },
+        {
+          "id": "stretch",
+          "name": "stretch",
+          "aliases": [
+            "stretching"
+          ],
+          "plural": "stretch"
+        },
+        {
+          "id": "lie-down",
+          "name": "lie down",
+          "aliases": [
+            "rest"
+          ],
+          "plural": "lie down"
+        },
+        {
+          "id": "put-your-feet-up",
+          "name": "put your feet up",
+          "aliases": [
+            "kick back",
+            "chill",
+            "do nothing",
+            "veg out"
+          ],
+          "plural": "put your feet up"
+        },
+        {
+          "id": "eat-snacks",
+          "name": "eat snacks",
+          "aliases": [
+            "snack",
+            "comfort food",
+            "eat"
+          ],
+          "plural": "eat snacks"
+        },
+        {
+          "id": "eat-chocolate",
+          "name": "eat chocolate",
+          "aliases": [
+            "chocolate"
+          ],
+          "plural": "eat chocolate"
+        },
+        {
+          "id": "eat-ice-cream",
+          "name": "eat ice cream",
+          "aliases": [
+            "ice cream"
+          ],
+          "plural": "eat ice cream"
+        },
+        {
+          "id": "go-shopping",
+          "name": "go shopping",
+          "aliases": [
+            "shopping",
+            "retail therapy"
+          ],
+          "plural": "go shopping"
+        },
+        {
+          "id": "play-an-instrument",
+          "name": "play an instrument",
+          "aliases": [
+            "play music",
+            "play guitar",
+            "play piano"
+          ],
+          "plural": "play an instrument"
+        },
+        {
+          "id": "sing",
+          "name": "sing",
+          "aliases": [
+            "singing"
+          ],
+          "plural": "sing"
+        },
+        {
+          "id": "dance",
+          "name": "dance",
+          "aliases": [
+            "dancing"
+          ],
+          "plural": "dance"
+        },
+        {
+          "id": "go-for-a-drive",
+          "name": "go for a drive",
+          "aliases": [
+            "drive"
+          ],
+          "plural": "go for a drive"
+        },
+        {
+          "id": "pray",
+          "name": "pray",
+          "aliases": [
+            "prayer"
+          ],
+          "plural": "pray"
+        },
+        {
+          "id": "aromatherapy",
+          "name": "aromatherapy",
+          "aliases": [
+            "essential oils",
+            "diffuser"
+          ],
+          "plural": "aromatherapy"
+        },
+        {
+          "id": "face-mask",
+          "name": "face mask",
+          "aliases": [
+            "sheet mask",
+            "skincare"
+          ],
+          "plural": "face mask"
+        },
+        {
+          "id": "get-a-manicure",
+          "name": "get a manicure",
+          "aliases": [
+            "manicure",
+            "pedicure",
+            "get your nails done",
+            "nails"
+          ],
+          "plural": "get a manicure"
+        },
+        {
+          "id": "go-on-vacation",
+          "name": "go on vacation",
+          "aliases": [
+            "vacation",
+            "holiday",
+            "travel"
+          ],
+          "plural": "go on vacation"
+        },
+        {
+          "id": "play-golf",
+          "name": "play golf",
+          "aliases": [
+            "golf"
+          ],
+          "plural": "play golf"
+        },
+        {
+          "id": "watch-sports",
+          "name": "watch sports",
+          "aliases": [
+            "sports",
+            "watch football"
+          ],
+          "plural": "watch sports"
+        },
+        {
+          "id": "bird-watching",
+          "name": "bird watching",
+          "aliases": [
+            "birdwatching"
+          ],
+          "plural": "bird watching"
+        },
+        {
+          "id": "daydream",
+          "name": "daydream",
+          "aliases": [
+            "daydreaming"
+          ],
+          "plural": "daydream"
+        },
+        {
+          "id": "laugh",
+          "name": "laugh",
+          "aliases": [
+            "watch comedy",
+            "comedy"
+          ],
+          "plural": "laugh"
+        },
+        {
+          "id": "hug-someone",
+          "name": "hug someone",
+          "aliases": [
+            "hug"
+          ],
+          "plural": "hug someone"
+        },
+        {
+          "id": "listen-to-rain",
+          "name": "listen to rain",
+          "aliases": [
+            "rain sounds",
+            "white noise"
+          ],
+          "plural": "listen to rain"
+        },
+        {
+          "id": "go-camping",
+          "name": "go camping",
+          "aliases": [
+            "camping"
+          ],
+          "plural": "go camping"
+        },
+        {
+          "id": "sit-by-the-fire",
+          "name": "sit by the fire",
+          "aliases": [
+            "fireplace",
+            "campfire"
+          ],
+          "plural": "sit by the fire"
+        },
+        {
+          "id": "float-in-the-pool",
+          "name": "float in the pool",
+          "aliases": [
+            "pool"
+          ],
+          "plural": "float in the pool"
+        },
+        {
+          "id": "go-to-a-cafe",
+          "name": "go to a café",
+          "aliases": [
+            "cafe",
+            "coffee shop"
+          ],
+          "plural": "go to a café"
+        },
+        {
+          "id": "read-magazines",
+          "name": "read magazines",
+          "aliases": [
+            "magazine"
+          ],
+          "plural": "read magazines"
+        },
+        {
+          "id": "people-watch",
+          "name": "people watch",
+          "aliases": [
+            "people watching"
+          ],
+          "plural": "people watch"
+        },
+        {
+          "id": "pottery",
+          "name": "pottery",
+          "aliases": [],
+          "plural": "pottery"
+        },
+        {
+          "id": "play-with-lego",
+          "name": "play with Lego",
+          "aliases": [
+            "Lego"
+          ],
+          "plural": "play with Lego"
+        },
+        {
+          "id": "look-at-the-sky",
+          "name": "look at the sky",
+          "aliases": [
+            "watch the clouds"
+          ],
+          "plural": "look at the sky"
+        },
+        {
+          "id": "take-a-day-off",
+          "name": "take a day off",
+          "aliases": [
+            "day off"
+          ],
+          "plural": "take a day off"
+        },
+        {
+          "id": "turn-off-your-phone",
+          "name": "turn off your phone",
+          "aliases": [
+            "unplug"
+          ],
+          "plural": "turn off your phone"
+        },
+        {
+          "id": "asmr",
+          "name": "ASMR",
+          "aliases": [],
+          "plural": "ASMR"
+        }
+      ],
+      "host_bank": [
+        "take-a-bath",
+        "read-a-book",
+        "watch-tv",
+        "listen-to-music",
+        "nap",
+        "go-for-a-walk",
+        "meditate",
+        "yoga"
+      ],
+      "host_answers": [
+        "take-a-bath"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a US president",
+      "entries": [
+        {
+          "id": "george-washington",
+          "name": "George Washington",
+          "aliases": [
+            "Washington"
+          ],
+          "plural": "George Washington"
+        },
+        {
+          "id": "john-adams",
+          "name": "John Adams",
+          "aliases": [],
+          "plural": "John Adams"
+        },
+        {
+          "id": "thomas-jefferson",
+          "name": "Thomas Jefferson",
+          "aliases": [
+            "Jefferson"
+          ],
+          "plural": "Thomas Jefferson"
+        },
+        {
+          "id": "james-madison",
+          "name": "James Madison",
+          "aliases": [
+            "Madison"
+          ],
+          "plural": "James Madison"
+        },
+        {
+          "id": "james-monroe",
+          "name": "James Monroe",
+          "aliases": [
+            "Monroe"
+          ],
+          "plural": "James Monroe"
+        },
+        {
+          "id": "john-quincy-adams",
+          "name": "John Quincy Adams",
+          "aliases": [
+            "JQA"
+          ],
+          "plural": "John Quincy Adams"
+        },
+        {
+          "id": "andrew-jackson",
+          "name": "Andrew Jackson",
+          "aliases": [
+            "Jackson"
+          ],
+          "plural": "Andrew Jackson"
+        },
+        {
+          "id": "martin-van-buren",
+          "name": "Martin Van Buren",
+          "aliases": [
+            "Van Buren"
+          ],
+          "plural": "Martin Van Buren"
+        },
+        {
+          "id": "william-henry-harrison",
+          "name": "William Henry Harrison",
+          "aliases": [],
+          "plural": "William Henry Harrison"
+        },
+        {
+          "id": "john-tyler",
+          "name": "John Tyler",
+          "aliases": [
+            "Tyler"
+          ],
+          "plural": "John Tyler"
+        },
+        {
+          "id": "james-k-polk",
+          "name": "James K. Polk",
+          "aliases": [
+            "James Polk",
+            "Polk"
+          ],
+          "plural": "James K. Polk"
+        },
+        {
+          "id": "zachary-taylor",
+          "name": "Zachary Taylor",
+          "aliases": [
+            "Taylor"
+          ],
+          "plural": "Zachary Taylor"
+        },
+        {
+          "id": "millard-fillmore",
+          "name": "Millard Fillmore",
+          "aliases": [
+            "Fillmore"
+          ],
+          "plural": "Millard Fillmore"
+        },
+        {
+          "id": "franklin-pierce",
+          "name": "Franklin Pierce",
+          "aliases": [
+            "Pierce"
+          ],
+          "plural": "Franklin Pierce"
+        },
+        {
+          "id": "james-buchanan",
+          "name": "James Buchanan",
+          "aliases": [
+            "Buchanan"
+          ],
+          "plural": "James Buchanan"
+        },
+        {
+          "id": "abraham-lincoln",
+          "name": "Abraham Lincoln",
+          "aliases": [
+            "Lincoln",
+            "Abe Lincoln",
+            "Honest Abe"
+          ],
+          "plural": "Abraham Lincoln"
+        },
+        {
+          "id": "andrew-johnson",
+          "name": "Andrew Johnson",
+          "aliases": [],
+          "plural": "Andrew Johnson"
+        },
+        {
+          "id": "ulysses-s-grant",
+          "name": "Ulysses S. Grant",
+          "aliases": [
+            "Ulysses Grant",
+            "Grant"
+          ],
+          "plural": "Ulysses S. Grant"
+        },
+        {
+          "id": "rutherford-b-hayes",
+          "name": "Rutherford B. Hayes",
+          "aliases": [
+            "Rutherford Hayes",
+            "Hayes"
+          ],
+          "plural": "Rutherford B. Hayes"
+        },
+        {
+          "id": "james-a-garfield",
+          "name": "James A. Garfield",
+          "aliases": [
+            "James Garfield",
+            "Garfield"
+          ],
+          "plural": "James A. Garfield"
+        },
+        {
+          "id": "chester-a-arthur",
+          "name": "Chester A. Arthur",
+          "aliases": [
+            "Chester Arthur",
+            "Arthur"
+          ],
+          "plural": "Chester A. Arthur"
+        },
+        {
+          "id": "grover-cleveland",
+          "name": "Grover Cleveland",
+          "aliases": [
+            "Cleveland"
+          ],
+          "plural": "Grover Cleveland"
+        },
+        {
+          "id": "benjamin-harrison",
+          "name": "Benjamin Harrison",
+          "aliases": [],
+          "plural": "Benjamin Harrison"
+        },
+        {
+          "id": "william-mckinley",
+          "name": "William McKinley",
+          "aliases": [
+            "McKinley"
+          ],
+          "plural": "William McKinley"
+        },
+        {
+          "id": "theodore-roosevelt",
+          "name": "Theodore Roosevelt",
+          "aliases": [
+            "Teddy Roosevelt",
+            "Teddy",
+            "TR"
+          ],
+          "plural": "Theodore Roosevelt"
+        },
+        {
+          "id": "william-howard-taft",
+          "name": "William Howard Taft",
+          "aliases": [
+            "William Taft",
+            "Taft"
+          ],
+          "plural": "William Howard Taft"
+        },
+        {
+          "id": "woodrow-wilson",
+          "name": "Woodrow Wilson",
+          "aliases": [
+            "Wilson"
+          ],
+          "plural": "Woodrow Wilson"
+        },
+        {
+          "id": "warren-g-harding",
+          "name": "Warren G. Harding",
+          "aliases": [
+            "Warren Harding",
+            "Harding"
+          ],
+          "plural": "Warren G. Harding"
+        },
+        {
+          "id": "calvin-coolidge",
+          "name": "Calvin Coolidge",
+          "aliases": [
+            "Coolidge"
+          ],
+          "plural": "Calvin Coolidge"
+        },
+        {
+          "id": "herbert-hoover",
+          "name": "Herbert Hoover",
+          "aliases": [
+            "Hoover"
+          ],
+          "plural": "Herbert Hoover"
+        },
+        {
+          "id": "franklin-d-roosevelt",
+          "name": "Franklin D. Roosevelt",
+          "aliases": [
+            "Franklin Roosevelt",
+            "FDR"
+          ],
+          "plural": "Franklin D. Roosevelt"
+        },
+        {
+          "id": "harry-s-truman",
+          "name": "Harry S. Truman",
+          "aliases": [
+            "Harry Truman",
+            "Truman"
+          ],
+          "plural": "Harry S. Truman"
+        },
+        {
+          "id": "dwight-d-eisenhower",
+          "name": "Dwight D. Eisenhower",
+          "aliases": [
+            "Dwight Eisenhower",
+            "Eisenhower",
+            "Ike"
+          ],
+          "plural": "Dwight D. Eisenhower"
+        },
+        {
+          "id": "john-f-kennedy",
+          "name": "John F. Kennedy",
+          "aliases": [
+            "John Kennedy",
+            "JFK",
+            "Kennedy"
+          ],
+          "plural": "John F. Kennedy"
+        },
+        {
+          "id": "lyndon-b-johnson",
+          "name": "Lyndon B. Johnson",
+          "aliases": [
+            "Lyndon Johnson",
+            "LBJ"
+          ],
+          "plural": "Lyndon B. Johnson"
+        },
+        {
+          "id": "richard-nixon",
+          "name": "Richard Nixon",
+          "aliases": [
+            "Nixon"
+          ],
+          "plural": "Richard Nixon"
+        },
+        {
+          "id": "gerald-ford",
+          "name": "Gerald Ford",
+          "aliases": [
+            "Ford"
+          ],
+          "plural": "Gerald Ford"
+        },
+        {
+          "id": "jimmy-carter",
+          "name": "Jimmy Carter",
+          "aliases": [
+            "Carter"
+          ],
+          "plural": "Jimmy Carter"
+        },
+        {
+          "id": "ronald-reagan",
+          "name": "Ronald Reagan",
+          "aliases": [
+            "Reagan"
+          ],
+          "plural": "Ronald Reagan"
+        },
+        {
+          "id": "george-h-w-bush",
+          "name": "George H. W. Bush",
+          "aliases": [
+            "George Bush Sr.",
+            "Bush Sr.",
+            "Bush 41"
+          ],
+          "plural": "George H. W. Bush"
+        },
+        {
+          "id": "bill-clinton",
+          "name": "Bill Clinton",
+          "aliases": [
+            "Clinton"
+          ],
+          "plural": "Bill Clinton"
+        },
+        {
+          "id": "george-w-bush",
+          "name": "George W. Bush",
+          "aliases": [
+            "George Bush Jr.",
+            "Bush Jr.",
+            "Dubya",
+            "Bush 43"
+          ],
+          "plural": "George W. Bush"
+        },
+        {
+          "id": "barack-obama",
+          "name": "Barack Obama",
+          "aliases": [
+            "Obama"
+          ],
+          "plural": "Barack Obama"
+        },
+        {
+          "id": "donald-trump",
+          "name": "Donald Trump",
+          "aliases": [
+            "Trump"
+          ],
+          "plural": "Donald Trump"
+        },
+        {
+          "id": "joe-biden",
+          "name": "Joe Biden",
+          "aliases": [
+            "Biden"
+          ],
+          "plural": "Joe Biden"
+        }
+      ],
+      "host_bank": [
+        "abraham-lincoln",
+        "george-washington",
+        "barack-obama",
+        "donald-trump",
+        "john-f-kennedy",
+        "joe-biden",
+        "ronald-reagan",
+        "thomas-jefferson"
+      ],
+      "host_answers": [
+        "abraham-lincoln"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something that's sticky",
+      "entries": [
+        {
+          "id": "honey",
+          "name": "honey",
+          "aliases": [
+            "raw honey",
+            "manuka honey",
+            "clover honey",
+            "comb honey"
+          ],
+          "plural": "honey"
+        },
+        {
+          "id": "glue",
+          "name": "glue",
+          "aliases": [
+            "super glue",
+            "superglue",
+            "glue stick",
+            "hot glue",
+            "rubber cement",
+            "epoxy",
+            "wood glue"
+          ],
+          "plural": "glue"
+        },
+        {
+          "id": "tape",
+          "name": "tape",
+          "aliases": [
+            "duct tape",
+            "masking tape",
+            "Scotch tape",
+            "packing tape",
+            "double-sided tape",
+            "sticky tape"
+          ],
+          "plural": "tape"
+        },
+        {
+          "id": "gum",
+          "name": "gum",
+          "aliases": [
+            "chewing gum",
+            "bubble gum",
+            "bubblegum"
+          ],
+          "plural": "gum"
+        },
+        {
+          "id": "syrup",
+          "name": "syrup",
+          "aliases": [
+            "maple syrup",
+            "pancake syrup",
+            "corn syrup",
+            "golden syrup"
+          ],
+          "plural": "syrup"
+        },
+        {
+          "id": "agave-nectar",
+          "name": "agave nectar",
+          "aliases": [
+            "agave syrup",
+            "agave"
+          ],
+          "plural": "agave nectar"
+        },
+        {
+          "id": "molasses",
+          "name": "molasses",
+          "aliases": [
+            "treacle"
+          ],
+          "plural": "molasses"
+        },
+        {
+          "id": "caramel",
+          "name": "caramel",
+          "aliases": [],
+          "plural": "caramel"
+        },
+        {
+          "id": "toffee",
+          "name": "toffee",
+          "aliases": [],
+          "plural": "toffee"
+        },
+        {
+          "id": "taffy",
+          "name": "taffy",
+          "aliases": [
+            "saltwater taffy",
+            "Laffy Taffy"
+          ],
+          "plural": "taffy"
+        },
+        {
+          "id": "jam",
+          "name": "jam",
+          "aliases": [
+            "jelly",
+            "marmalade",
+            "preserves"
+          ],
+          "plural": "jam"
+        },
+        {
+          "id": "peanut-butter",
+          "name": "peanut butter",
+          "aliases": [],
+          "plural": "peanut butter"
+        },
+        {
+          "id": "nutella",
+          "name": "Nutella",
+          "aliases": [
+            "chocolate spread"
+          ],
+          "plural": "Nutella"
+        },
+        {
+          "id": "marshmallow",
+          "name": "marshmallow",
+          "aliases": [
+            "marshmallows",
+            "Fluff",
+            "marshmallow fluff"
+          ]
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [
+            "candy floss",
+            "fairy floss"
+          ],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "gummy-bears",
+          "name": "gummy bears",
+          "aliases": [
+            "gummies",
+            "gummy candy",
+            "gummy bear"
+          ]
+        },
+        {
+          "id": "fudge",
+          "name": "fudge",
+          "aliases": [],
+          "plural": "fudge"
+        },
+        {
+          "id": "frosting",
+          "name": "frosting",
+          "aliases": [
+            "icing"
+          ],
+          "plural": "frosting"
+        },
+        {
+          "id": "sap",
+          "name": "sap",
+          "aliases": [
+            "tree sap",
+            "maple sap"
+          ],
+          "plural": "sap"
+        },
+        {
+          "id": "resin",
+          "name": "resin",
+          "aliases": [
+            "pine resin"
+          ],
+          "plural": "resin"
+        },
+        {
+          "id": "slime",
+          "name": "slime",
+          "aliases": [],
+          "plural": "slime"
+        },
+        {
+          "id": "putty",
+          "name": "putty",
+          "aliases": [
+            "Silly Putty",
+            "Blu Tack",
+            "poster putty"
+          ],
+          "plural": "putty"
+        },
+        {
+          "id": "sticky-note",
+          "name": "sticky note",
+          "aliases": [
+            "Post-it",
+            "Post-it note",
+            "sticky notes"
+          ]
+        },
+        {
+          "id": "sticker",
+          "name": "sticker",
+          "aliases": [
+            "stickers"
+          ]
+        },
+        {
+          "id": "band-aid",
+          "name": "Band-Aid",
+          "aliases": [
+            "bandage",
+            "adhesive bandage",
+            "Band-Aids"
+          ]
+        },
+        {
+          "id": "velcro",
+          "name": "Velcro",
+          "aliases": [],
+          "plural": "Velcro"
+        },
+        {
+          "id": "flypaper",
+          "name": "flypaper",
+          "aliases": [
+            "fly paper",
+            "fly strip"
+          ],
+          "plural": "flypaper"
+        },
+        {
+          "id": "spider-web",
+          "name": "spider web",
+          "aliases": [
+            "cobweb",
+            "spiderweb",
+            "spider webs"
+          ]
+        },
+        {
+          "id": "mud",
+          "name": "mud",
+          "aliases": [],
+          "plural": "mud"
+        },
+        {
+          "id": "clay",
+          "name": "clay",
+          "aliases": [],
+          "plural": "clay"
+        },
+        {
+          "id": "paste",
+          "name": "paste",
+          "aliases": [
+            "wallpaper paste"
+          ],
+          "plural": "paste"
+        },
+        {
+          "id": "tar",
+          "name": "tar",
+          "aliases": [
+            "asphalt"
+          ],
+          "plural": "tar"
+        },
+        {
+          "id": "sticky-hand",
+          "name": "sticky hand",
+          "aliases": [
+            "sticky hand toy",
+            "sticky hands"
+          ]
+        },
+        {
+          "id": "lint-roller",
+          "name": "lint roller",
+          "aliases": [
+            "lint rollers"
+          ]
+        },
+        {
+          "id": "gecko",
+          "name": "gecko",
+          "aliases": [
+            "geckos"
+          ]
+        },
+        {
+          "id": "snail",
+          "name": "snail",
+          "aliases": [
+            "snails"
+          ]
+        },
+        {
+          "id": "slug",
+          "name": "slug",
+          "aliases": [
+            "slugs"
+          ]
+        },
+        {
+          "id": "snot",
+          "name": "snot",
+          "aliases": [
+            "mucus",
+            "boogers"
+          ],
+          "plural": "snot"
+        },
+        {
+          "id": "earwax",
+          "name": "earwax",
+          "aliases": [
+            "ear wax"
+          ],
+          "plural": "earwax"
+        },
+        {
+          "id": "cinnamon-roll",
+          "name": "cinnamon roll",
+          "aliases": [
+            "cinnamon bun",
+            "sticky bun",
+            "cinnamon rolls"
+          ]
+        },
+        {
+          "id": "sticky-rice",
+          "name": "sticky rice",
+          "aliases": [
+            "glutinous rice"
+          ],
+          "plural": "sticky rice"
+        },
+        {
+          "id": "mochi",
+          "name": "mochi",
+          "aliases": [],
+          "plural": "mochi"
+        },
+        {
+          "id": "date",
+          "name": "date",
+          "aliases": [
+            "dates"
+          ]
+        },
+        {
+          "id": "caramel-apple",
+          "name": "caramel apple",
+          "aliases": [
+            "candy apple",
+            "toffee apple",
+            "caramel apples"
+          ]
+        },
+        {
+          "id": "rice-krispies-treat",
+          "name": "Rice Krispies treat",
+          "aliases": [
+            "Rice Krispie treat",
+            "rice crispy treat",
+            "Rice Krispies treats"
+          ]
+        },
+        {
+          "id": "baklava",
+          "name": "baklava",
+          "aliases": [],
+          "plural": "baklava"
+        },
+        {
+          "id": "barbecue-sauce",
+          "name": "barbecue sauce",
+          "aliases": [
+            "BBQ sauce"
+          ],
+          "plural": "barbecue sauce"
+        },
+        {
+          "id": "sticky-toffee-pudding",
+          "name": "sticky toffee pudding",
+          "aliases": [],
+          "plural": "sticky toffee pudding"
+        },
+        {
+          "id": "lip-gloss",
+          "name": "lip gloss",
+          "aliases": [],
+          "plural": "lip gloss"
+        },
+        {
+          "id": "hair-gel",
+          "name": "hair gel",
+          "aliases": [
+            "gel"
+          ],
+          "plural": "hair gel"
+        },
+        {
+          "id": "wet-paint",
+          "name": "wet paint",
+          "aliases": [
+            "paint"
+          ],
+          "plural": "wet paint"
+        },
+        {
+          "id": "nail-polish",
+          "name": "nail polish",
+          "aliases": [],
+          "plural": "nail polish"
+        },
+        {
+          "id": "sticky-fingers",
+          "name": "sticky fingers",
+          "aliases": [
+            "hands"
+          ],
+          "plural": "sticky fingers"
+        },
+        {
+          "id": "humidity",
+          "name": "humidity",
+          "aliases": [
+            "humid weather"
+          ],
+          "plural": "humidity"
+        },
+        {
+          "id": "movie-theater-floor",
+          "name": "movie theater floor",
+          "aliases": [
+            "cinema floor"
+          ],
+          "plural": "movie theater floor"
+        },
+        {
+          "id": "spilled-soda",
+          "name": "spilled soda",
+          "aliases": [
+            "soda"
+          ],
+          "plural": "spilled soda"
+        },
+        {
+          "id": "lollipop",
+          "name": "lollipop",
+          "aliases": [
+            "lolly",
+            "lollipops"
+          ]
+        },
+        {
+          "id": "glue-trap",
+          "name": "glue trap",
+          "aliases": [
+            "mouse trap",
+            "glue traps"
+          ]
+        },
+        {
+          "id": "sweat",
+          "name": "sweat",
+          "aliases": [
+            "sweaty skin"
+          ],
+          "plural": "sweat"
+        },
+        {
+          "id": "hot-wax",
+          "name": "hot wax",
+          "aliases": [
+            "wax"
+          ],
+          "plural": "hot wax"
+        },
+        {
+          "id": "contact-paper",
+          "name": "contact paper",
+          "aliases": [],
+          "plural": "contact paper"
+        },
+        {
+          "id": "sundew",
+          "name": "sundew",
+          "aliases": [],
+          "plural": "sundew"
+        },
+        {
+          "id": "dough",
+          "name": "dough",
+          "aliases": [
+            "bread dough"
+          ],
+          "plural": "dough"
+        }
+      ],
+      "host_bank": [
+        "honey",
+        "glue",
+        "tape",
+        "gum",
+        "syrup",
+        "slime",
+        "sap",
+        "jam"
+      ],
+      "host_answers": [
+        "honey"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a state in New England",
+      "entries": [
+        {
+          "id": "maine",
+          "name": "Maine",
+          "aliases": [
+            "ME"
+          ],
+          "plural": "Maine"
+        },
+        {
+          "id": "new-hampshire",
+          "name": "New Hampshire",
+          "aliases": [
+            "NH"
+          ],
+          "plural": "New Hampshire"
+        },
+        {
+          "id": "vermont",
+          "name": "Vermont",
+          "aliases": [
+            "VT"
+          ],
+          "plural": "Vermont"
+        },
+        {
+          "id": "massachusetts",
+          "name": "Massachusetts",
+          "aliases": [
+            "Mass",
+            "MA"
+          ],
+          "plural": "Massachusetts"
+        },
+        {
+          "id": "rhode-island",
+          "name": "Rhode Island",
+          "aliases": [
+            "RI"
+          ],
+          "plural": "Rhode Island"
+        },
+        {
+          "id": "connecticut",
+          "name": "Connecticut",
+          "aliases": [
+            "CT",
+            "Conn"
+          ],
+          "plural": "Connecticut"
+        }
+      ],
+      "host_bank": [
+        "massachusetts",
+        "maine",
+        "new-hampshire",
+        "vermont",
+        "rhode-island",
+        "connecticut"
+      ],
+      "host_answers": [
+        "massachusetts"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a natural disaster",
+      "entries": [
+        {
+          "id": "tornado",
+          "name": "tornado",
+          "aliases": [
+            "twister",
+            "waterspout",
+            "tornadoes"
+          ],
+          "plural": "tornadoes"
+        },
+        {
+          "id": "hurricane",
+          "name": "hurricane",
+          "aliases": [
+            "typhoon",
+            "cyclone",
+            "tropical cyclone",
+            "tropical storm",
+            "hurricanes"
+          ]
+        },
+        {
+          "id": "earthquake",
+          "name": "earthquake",
+          "aliases": [
+            "quake",
+            "tremor",
+            "earthquakes"
+          ]
+        },
+        {
+          "id": "tsunami",
+          "name": "tsunami",
+          "aliases": [
+            "tidal wave",
+            "tsunamis"
+          ]
+        },
+        {
+          "id": "flood",
+          "name": "flood",
+          "aliases": [
+            "flooding",
+            "flash flood",
+            "floods"
+          ]
+        },
+        {
+          "id": "wildfire",
+          "name": "wildfire",
+          "aliases": [
+            "forest fire",
+            "bushfire",
+            "brush fire",
+            "wild fire",
+            "wildfires"
+          ]
+        },
+        {
+          "id": "volcanic-eruption",
+          "name": "volcanic eruption",
+          "aliases": [
+            "volcano",
+            "eruption",
+            "volcanic eruptions"
+          ]
+        },
+        {
+          "id": "avalanche",
+          "name": "avalanche",
+          "aliases": [
+            "snow slide",
+            "avalanches"
+          ]
+        },
+        {
+          "id": "landslide",
+          "name": "landslide",
+          "aliases": [
+            "mudslide",
+            "rockslide",
+            "mudflow",
+            "landslip",
+            "landslides"
+          ]
+        },
+        {
+          "id": "drought",
+          "name": "drought",
+          "aliases": [
+            "droughts"
+          ]
+        },
+        {
+          "id": "heat-wave",
+          "name": "heat wave",
+          "aliases": [
+            "heatwave",
+            "extreme heat",
+            "heat waves"
+          ]
+        },
+        {
+          "id": "blizzard",
+          "name": "blizzard",
+          "aliases": [
+            "snowstorm",
+            "blizzards"
+          ]
+        },
+        {
+          "id": "ice-storm",
+          "name": "ice storm",
+          "aliases": [
+            "freezing rain",
+            "ice storms"
+          ]
+        },
+        {
+          "id": "hailstorm",
+          "name": "hailstorm",
+          "aliases": [
+            "hail",
+            "hailstorms"
+          ]
+        },
+        {
+          "id": "thunderstorm",
+          "name": "thunderstorm",
+          "aliases": [
+            "severe storm",
+            "lightning storm",
+            "thunderstorms"
+          ]
+        },
+        {
+          "id": "lightning",
+          "name": "lightning",
+          "aliases": [
+            "lightning strike"
+          ],
+          "plural": "lightning"
+        },
+        {
+          "id": "sandstorm",
+          "name": "sandstorm",
+          "aliases": [
+            "dust storm",
+            "haboob",
+            "sandstorms"
+          ]
+        },
+        {
+          "id": "sinkhole",
+          "name": "sinkhole",
+          "aliases": [
+            "sinkholes"
+          ]
+        },
+        {
+          "id": "monsoon",
+          "name": "monsoon",
+          "aliases": [
+            "monsoons"
+          ]
+        },
+        {
+          "id": "famine",
+          "name": "famine",
+          "aliases": [
+            "famines"
+          ]
+        },
+        {
+          "id": "pandemic",
+          "name": "pandemic",
+          "aliases": [
+            "epidemic",
+            "pandemics"
+          ]
+        },
+        {
+          "id": "meteor-strike",
+          "name": "meteor strike",
+          "aliases": [
+            "asteroid impact",
+            "meteorite",
+            "asteroid",
+            "meteor",
+            "meteor strikes"
+          ]
+        },
+        {
+          "id": "solar-storm",
+          "name": "solar storm",
+          "aliases": [
+            "solar flare",
+            "geomagnetic storm",
+            "solar storms"
+          ]
+        },
+        {
+          "id": "derecho",
+          "name": "derecho",
+          "aliases": [
+            "derechos"
+          ]
+        },
+        {
+          "id": "cold-wave",
+          "name": "cold wave",
+          "aliases": [
+            "cold snap",
+            "polar vortex",
+            "deep freeze",
+            "cold waves"
+          ]
+        },
+        {
+          "id": "storm-surge",
+          "name": "storm surge",
+          "aliases": [
+            "storm surges"
+          ]
+        },
+        {
+          "id": "locust-swarm",
+          "name": "locust swarm",
+          "aliases": [
+            "locusts",
+            "plague of locusts",
+            "locust swarms"
+          ]
+        }
+      ],
+      "host_bank": [
+        "tornado",
+        "earthquake",
+        "hurricane",
+        "flood",
+        "tsunami",
+        "wildfire",
+        "volcanic-eruption",
+        "avalanche"
+      ],
+      "host_answers": [
+        "tornado"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

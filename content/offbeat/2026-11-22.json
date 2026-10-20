@@ -1,0 +1,1967 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-22",
+  "questions": [
+    {
+      "prompt": "Name something you'd find on a Thanksgiving table",
+      "entries": [
+        {
+          "id": "turkey",
+          "name": "turkey",
+          "aliases": [
+            "roast turkey",
+            "the turkey",
+            "turkey legs",
+            "roasted turkey"
+          ],
+          "plural": "turkey"
+        },
+        {
+          "id": "tofurky",
+          "name": "Tofurky",
+          "aliases": [
+            "tofu turkey"
+          ],
+          "plural": "Tofurky"
+        },
+        {
+          "id": "ham",
+          "name": "ham",
+          "aliases": [
+            "glazed ham"
+          ],
+          "plural": "ham"
+        },
+        {
+          "id": "stuffing",
+          "name": "stuffing",
+          "aliases": [
+            "dressing",
+            "oyster stuffing",
+            "cornbread dressing"
+          ],
+          "plural": "stuffing"
+        },
+        {
+          "id": "mashed-potatoes",
+          "name": "mashed potatoes",
+          "aliases": [
+            "mash",
+            "mashed potato"
+          ],
+          "plural": "mashed potatoes"
+        },
+        {
+          "id": "scalloped-potatoes",
+          "name": "scalloped potatoes",
+          "aliases": [],
+          "plural": "scalloped potatoes"
+        },
+        {
+          "id": "gravy",
+          "name": "gravy",
+          "aliases": [],
+          "plural": "gravy"
+        },
+        {
+          "id": "gravy-boat",
+          "name": "gravy boat",
+          "aliases": [
+            "gravy boats"
+          ]
+        },
+        {
+          "id": "cranberry-sauce",
+          "name": "cranberry sauce",
+          "aliases": [
+            "cranberries",
+            "cranberry relish",
+            "canned cranberry sauce",
+            "jellied cranberry sauce"
+          ],
+          "plural": "cranberry sauce"
+        },
+        {
+          "id": "green-bean-casserole",
+          "name": "green bean casserole",
+          "aliases": [],
+          "plural": "green bean casserole"
+        },
+        {
+          "id": "green-beans",
+          "name": "green beans",
+          "aliases": [],
+          "plural": "green beans"
+        },
+        {
+          "id": "sweet-potatoes",
+          "name": "sweet potatoes",
+          "aliases": [
+            "yams",
+            "candied yams",
+            "sweet potato casserole",
+            "sweet potato"
+          ],
+          "plural": "sweet potatoes"
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "pecan-pie",
+          "name": "pecan pie",
+          "aliases": [
+            "pecan pies"
+          ]
+        },
+        {
+          "id": "apple-pie",
+          "name": "apple pie",
+          "aliases": [
+            "apple pies"
+          ]
+        },
+        {
+          "id": "sweet-potato-pie",
+          "name": "sweet potato pie",
+          "aliases": [
+            "sweet potato pies"
+          ]
+        },
+        {
+          "id": "rolls",
+          "name": "rolls",
+          "aliases": [
+            "dinner rolls",
+            "bread rolls",
+            "roll"
+          ],
+          "plural": "rolls"
+        },
+        {
+          "id": "biscuits",
+          "name": "biscuits",
+          "aliases": [
+            "biscuit"
+          ],
+          "plural": "biscuits"
+        },
+        {
+          "id": "cornbread",
+          "name": "cornbread",
+          "aliases": [],
+          "plural": "cornbread"
+        },
+        {
+          "id": "corn",
+          "name": "corn",
+          "aliases": [
+            "corn on the cob",
+            "creamed corn"
+          ],
+          "plural": "corn"
+        },
+        {
+          "id": "mac-and-cheese",
+          "name": "mac and cheese",
+          "aliases": [
+            "macaroni and cheese"
+          ],
+          "plural": "mac and cheese"
+        },
+        {
+          "id": "green-salad",
+          "name": "green salad",
+          "aliases": [
+            "salad",
+            "tossed salad"
+          ],
+          "plural": "green salad"
+        },
+        {
+          "id": "waldorf-salad",
+          "name": "Waldorf salad",
+          "aliases": [],
+          "plural": "Waldorf salad"
+        },
+        {
+          "id": "jell-o-salad",
+          "name": "Jell-O salad",
+          "aliases": [
+            "Jell-O"
+          ],
+          "plural": "Jell-O salad"
+        },
+        {
+          "id": "ambrosia",
+          "name": "ambrosia",
+          "aliases": [
+            "ambrosia salad"
+          ],
+          "plural": "ambrosia"
+        },
+        {
+          "id": "brussels-sprouts",
+          "name": "Brussels sprouts",
+          "aliases": [],
+          "plural": "Brussels sprouts"
+        },
+        {
+          "id": "carrots",
+          "name": "carrots",
+          "aliases": [
+            "glazed carrots"
+          ],
+          "plural": "carrots"
+        },
+        {
+          "id": "squash",
+          "name": "squash",
+          "aliases": [
+            "butternut squash",
+            "acorn squash"
+          ],
+          "plural": "squash"
+        },
+        {
+          "id": "collard-greens",
+          "name": "collard greens",
+          "aliases": [
+            "greens"
+          ],
+          "plural": "collard greens"
+        },
+        {
+          "id": "deviled-eggs",
+          "name": "deviled eggs",
+          "aliases": [],
+          "plural": "deviled eggs"
+        },
+        {
+          "id": "cheese-board",
+          "name": "cheese board",
+          "aliases": [
+            "cheese plate",
+            "charcuterie"
+          ],
+          "plural": "cheese board"
+        },
+        {
+          "id": "relish-tray",
+          "name": "relish tray",
+          "aliases": [],
+          "plural": "relish tray"
+        },
+        {
+          "id": "pickles",
+          "name": "pickles",
+          "aliases": [],
+          "plural": "pickles"
+        },
+        {
+          "id": "olives",
+          "name": "olives",
+          "aliases": [],
+          "plural": "olives"
+        },
+        {
+          "id": "butter",
+          "name": "butter",
+          "aliases": [],
+          "plural": "butter"
+        },
+        {
+          "id": "salt-and-pepper",
+          "name": "salt and pepper",
+          "aliases": [
+            "salt shaker",
+            "pepper shaker",
+            "salt",
+            "pepper"
+          ],
+          "plural": "salt and pepper"
+        },
+        {
+          "id": "wine",
+          "name": "wine",
+          "aliases": [],
+          "plural": "wine"
+        },
+        {
+          "id": "apple-cider",
+          "name": "apple cider",
+          "aliases": [
+            "cider"
+          ],
+          "plural": "apple cider"
+        },
+        {
+          "id": "whipped-cream",
+          "name": "whipped cream",
+          "aliases": [],
+          "plural": "whipped cream"
+        },
+        {
+          "id": "pumpkin-bread",
+          "name": "pumpkin bread",
+          "aliases": [],
+          "plural": "pumpkin bread"
+        },
+        {
+          "id": "plates",
+          "name": "plates",
+          "aliases": [
+            "plate",
+            "china",
+            "dinner plates"
+          ],
+          "plural": "plates"
+        },
+        {
+          "id": "silverware",
+          "name": "silverware",
+          "aliases": [
+            "cutlery",
+            "forks",
+            "fork"
+          ],
+          "plural": "silverware"
+        },
+        {
+          "id": "knife",
+          "name": "knife",
+          "aliases": [
+            "carving knife",
+            "knives"
+          ],
+          "plural": "knives"
+        },
+        {
+          "id": "napkins",
+          "name": "napkins",
+          "aliases": [
+            "napkin"
+          ],
+          "plural": "napkins"
+        },
+        {
+          "id": "tablecloth",
+          "name": "tablecloth",
+          "aliases": [
+            "tablecloths"
+          ]
+        },
+        {
+          "id": "centerpiece",
+          "name": "centerpiece",
+          "aliases": [
+            "table centerpiece",
+            "centerpieces"
+          ]
+        },
+        {
+          "id": "candles",
+          "name": "candles",
+          "aliases": [
+            "candle"
+          ],
+          "plural": "candles"
+        },
+        {
+          "id": "place-cards",
+          "name": "place cards",
+          "aliases": [
+            "place card"
+          ],
+          "plural": "place cards"
+        },
+        {
+          "id": "wishbone",
+          "name": "wishbone",
+          "aliases": [
+            "wishbones"
+          ]
+        },
+        {
+          "id": "cornucopia",
+          "name": "cornucopia",
+          "aliases": [
+            "cornucopias"
+          ]
+        },
+        {
+          "id": "pumpkins",
+          "name": "pumpkins",
+          "aliases": [
+            "pumpkin",
+            "gourds"
+          ],
+          "plural": "pumpkins"
+        },
+        {
+          "id": "glasses",
+          "name": "glasses",
+          "aliases": [
+            "wine glasses",
+            "glass"
+          ],
+          "plural": "glasses"
+        },
+        {
+          "id": "water",
+          "name": "water",
+          "aliases": [
+            "glass of water"
+          ],
+          "plural": "water"
+        },
+        {
+          "id": "family",
+          "name": "family",
+          "aliases": [
+            "relatives"
+          ],
+          "plural": "family"
+        },
+        {
+          "id": "leftovers",
+          "name": "leftovers",
+          "aliases": [],
+          "plural": "leftovers"
+        },
+        {
+          "id": "stuffed-mushrooms",
+          "name": "stuffed mushrooms",
+          "aliases": [],
+          "plural": "stuffed mushrooms"
+        },
+        {
+          "id": "rice",
+          "name": "rice",
+          "aliases": [
+            "wild rice"
+          ],
+          "plural": "rice"
+        }
+      ],
+      "host_bank": [
+        "cranberry-sauce",
+        "turkey",
+        "stuffing",
+        "mashed-potatoes",
+        "pumpkin-pie",
+        "gravy",
+        "rolls",
+        "green-bean-casserole"
+      ],
+      "host_answers": [
+        "cranberry-sauce"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a household chore",
+      "entries": [
+        {
+          "id": "do-the-dishes",
+          "name": "do the dishes",
+          "aliases": [
+            "dishes",
+            "washing dishes",
+            "wash the dishes",
+            "washing up",
+            "doing the dishes"
+          ],
+          "plural": "do the dishes"
+        },
+        {
+          "id": "load-the-dishwasher",
+          "name": "load the dishwasher",
+          "aliases": [
+            "dishwasher",
+            "empty the dishwasher",
+            "unload the dishwasher"
+          ],
+          "plural": "load the dishwasher"
+        },
+        {
+          "id": "laundry",
+          "name": "laundry",
+          "aliases": [
+            "do the laundry",
+            "washing clothes",
+            "wash clothes",
+            "doing laundry",
+            "the washing",
+            "fold laundry",
+            "folding laundry",
+            "folding clothes"
+          ],
+          "plural": "laundry"
+        },
+        {
+          "id": "ironing",
+          "name": "ironing",
+          "aliases": [
+            "iron clothes"
+          ],
+          "plural": "ironing"
+        },
+        {
+          "id": "vacuuming",
+          "name": "vacuuming",
+          "aliases": [
+            "vacuum",
+            "hoovering",
+            "hoover",
+            "vacuum the floor"
+          ],
+          "plural": "vacuuming"
+        },
+        {
+          "id": "sweeping",
+          "name": "sweeping",
+          "aliases": [
+            "sweep the floor",
+            "sweep"
+          ],
+          "plural": "sweeping"
+        },
+        {
+          "id": "mopping",
+          "name": "mopping",
+          "aliases": [
+            "mop the floor",
+            "mop"
+          ],
+          "plural": "mopping"
+        },
+        {
+          "id": "dusting",
+          "name": "dusting",
+          "aliases": [
+            "dust",
+            "dust the shelves",
+            "dusting furniture"
+          ],
+          "plural": "dusting"
+        },
+        {
+          "id": "polish-furniture",
+          "name": "polish furniture",
+          "aliases": [
+            "polishing"
+          ],
+          "plural": "polish furniture"
+        },
+        {
+          "id": "take-out-the-trash",
+          "name": "take out the trash",
+          "aliases": [
+            "trash",
+            "garbage",
+            "take out the garbage",
+            "take out the bins",
+            "bins"
+          ],
+          "plural": "take out the trash"
+        },
+        {
+          "id": "recycling",
+          "name": "recycling",
+          "aliases": [
+            "take out the recycling"
+          ],
+          "plural": "recycling"
+        },
+        {
+          "id": "clean-the-bathroom",
+          "name": "clean the bathroom",
+          "aliases": [
+            "cleaning the bathroom",
+            "bathroom",
+            "scrub the tub",
+            "clean the bathtub",
+            "clean the shower"
+          ],
+          "plural": "clean the bathroom"
+        },
+        {
+          "id": "clean-the-toilet",
+          "name": "clean the toilet",
+          "aliases": [
+            "scrub the toilet",
+            "toilet"
+          ],
+          "plural": "clean the toilet"
+        },
+        {
+          "id": "clean-the-kitchen",
+          "name": "clean the kitchen",
+          "aliases": [
+            "wipe the counters",
+            "wiping counters"
+          ],
+          "plural": "clean the kitchen"
+        },
+        {
+          "id": "make-the-bed",
+          "name": "make the bed",
+          "aliases": [
+            "making the bed"
+          ],
+          "plural": "make the bed"
+        },
+        {
+          "id": "change-the-sheets",
+          "name": "change the sheets",
+          "aliases": [
+            "changing the sheets"
+          ],
+          "plural": "change the sheets"
+        },
+        {
+          "id": "tidy-up",
+          "name": "tidy up",
+          "aliases": [
+            "tidying",
+            "declutter",
+            "pick up",
+            "cleaning up"
+          ],
+          "plural": "tidy up"
+        },
+        {
+          "id": "clean-your-room",
+          "name": "clean your room",
+          "aliases": [
+            "cleaning your room"
+          ],
+          "plural": "clean your room"
+        },
+        {
+          "id": "organize",
+          "name": "organize",
+          "aliases": [
+            "organizing",
+            "organize the closet"
+          ],
+          "plural": "organize"
+        },
+        {
+          "id": "cooking",
+          "name": "cooking",
+          "aliases": [
+            "cook dinner",
+            "make dinner",
+            "meal prep"
+          ],
+          "plural": "cooking"
+        },
+        {
+          "id": "grocery-shopping",
+          "name": "grocery shopping",
+          "aliases": [
+            "groceries",
+            "shopping"
+          ],
+          "plural": "grocery shopping"
+        },
+        {
+          "id": "set-the-table",
+          "name": "set the table",
+          "aliases": [],
+          "plural": "set the table"
+        },
+        {
+          "id": "clear-the-table",
+          "name": "clear the table",
+          "aliases": [
+            "wipe the table"
+          ],
+          "plural": "clear the table"
+        },
+        {
+          "id": "mow-the-lawn",
+          "name": "mow the lawn",
+          "aliases": [
+            "mowing",
+            "mowing the lawn",
+            "lawn mowing"
+          ],
+          "plural": "mow the lawn"
+        },
+        {
+          "id": "yard-work",
+          "name": "yard work",
+          "aliases": [],
+          "plural": "yard work"
+        },
+        {
+          "id": "gardening",
+          "name": "gardening",
+          "aliases": [],
+          "plural": "gardening"
+        },
+        {
+          "id": "weeding",
+          "name": "weeding",
+          "aliases": [
+            "pull weeds"
+          ],
+          "plural": "weeding"
+        },
+        {
+          "id": "rake-leaves",
+          "name": "rake leaves",
+          "aliases": [
+            "raking",
+            "raking leaves"
+          ],
+          "plural": "rake leaves"
+        },
+        {
+          "id": "water-the-plants",
+          "name": "water the plants",
+          "aliases": [
+            "watering plants"
+          ],
+          "plural": "water the plants"
+        },
+        {
+          "id": "feed-the-pets",
+          "name": "feed the pets",
+          "aliases": [
+            "feed the dog",
+            "feed the cat"
+          ],
+          "plural": "feed the pets"
+        },
+        {
+          "id": "walk-the-dog",
+          "name": "walk the dog",
+          "aliases": [
+            "walking the dog"
+          ],
+          "plural": "walk the dog"
+        },
+        {
+          "id": "clean-the-litter-box",
+          "name": "clean the litter box",
+          "aliases": [
+            "litter box",
+            "scoop the litter"
+          ],
+          "plural": "clean the litter box"
+        },
+        {
+          "id": "wash-the-car",
+          "name": "wash the car",
+          "aliases": [
+            "car wash",
+            "washing the car"
+          ],
+          "plural": "wash the car"
+        },
+        {
+          "id": "clean-the-windows",
+          "name": "clean the windows",
+          "aliases": [
+            "washing windows",
+            "wash windows"
+          ],
+          "plural": "clean the windows"
+        },
+        {
+          "id": "clean-the-fridge",
+          "name": "clean the fridge",
+          "aliases": [],
+          "plural": "clean the fridge"
+        },
+        {
+          "id": "clean-the-oven",
+          "name": "clean the oven",
+          "aliases": [],
+          "plural": "clean the oven"
+        },
+        {
+          "id": "scrub-the-floors",
+          "name": "scrub the floors",
+          "aliases": [
+            "scrubbing"
+          ],
+          "plural": "scrub the floors"
+        },
+        {
+          "id": "shovel-snow",
+          "name": "shovel snow",
+          "aliases": [
+            "shoveling snow"
+          ],
+          "plural": "shovel snow"
+        },
+        {
+          "id": "clean-the-gutters",
+          "name": "clean the gutters",
+          "aliases": [
+            "gutters"
+          ],
+          "plural": "clean the gutters"
+        },
+        {
+          "id": "cleaning",
+          "name": "cleaning",
+          "aliases": [
+            "clean the house",
+            "housework",
+            "spring cleaning",
+            "deep cleaning"
+          ],
+          "plural": "cleaning"
+        },
+        {
+          "id": "pay-the-bills",
+          "name": "pay the bills",
+          "aliases": [
+            "bills"
+          ],
+          "plural": "pay the bills"
+        },
+        {
+          "id": "sort-the-mail",
+          "name": "sort the mail",
+          "aliases": [],
+          "plural": "sort the mail"
+        },
+        {
+          "id": "change-light-bulbs",
+          "name": "change light bulbs",
+          "aliases": [],
+          "plural": "change light bulbs"
+        },
+        {
+          "id": "babysitting",
+          "name": "babysitting",
+          "aliases": [],
+          "plural": "babysitting"
+        },
+        {
+          "id": "sewing",
+          "name": "sewing",
+          "aliases": [
+            "mending"
+          ],
+          "plural": "sewing"
+        },
+        {
+          "id": "clean-the-pool",
+          "name": "clean the pool",
+          "aliases": [],
+          "plural": "clean the pool"
+        },
+        {
+          "id": "put-away-groceries",
+          "name": "put away groceries",
+          "aliases": [],
+          "plural": "put away groceries"
+        },
+        {
+          "id": "make-lunches",
+          "name": "make lunches",
+          "aliases": [
+            "pack lunches"
+          ],
+          "plural": "make lunches"
+        }
+      ],
+      "host_bank": [
+        "dusting",
+        "do-the-dishes",
+        "laundry",
+        "vacuuming",
+        "sweeping",
+        "mopping",
+        "take-out-the-trash",
+        "make-the-bed"
+      ],
+      "host_answers": [
+        "dusting"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an animal with a three-letter name",
+      "entries": [
+        {
+          "id": "cat",
+          "name": "cat",
+          "aliases": [
+            "cats"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "dogs"
+          ]
+        },
+        {
+          "id": "pig",
+          "name": "pig",
+          "aliases": [
+            "pigs"
+          ]
+        },
+        {
+          "id": "cow",
+          "name": "cow",
+          "aliases": [
+            "cows"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "bat",
+          "name": "bat",
+          "aliases": [
+            "bats"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "foxes"
+          ]
+        },
+        {
+          "id": "owl",
+          "name": "owl",
+          "aliases": [
+            "owls"
+          ]
+        },
+        {
+          "id": "ant",
+          "name": "ant",
+          "aliases": [
+            "ants"
+          ]
+        },
+        {
+          "id": "bee",
+          "name": "bee",
+          "aliases": [
+            "bees"
+          ]
+        },
+        {
+          "id": "yak",
+          "name": "yak",
+          "aliases": [
+            "yaks"
+          ]
+        },
+        {
+          "id": "emu",
+          "name": "emu",
+          "aliases": [
+            "emus"
+          ]
+        },
+        {
+          "id": "elk",
+          "name": "elk",
+          "aliases": []
+        },
+        {
+          "id": "ape",
+          "name": "ape",
+          "aliases": [
+            "apes"
+          ]
+        },
+        {
+          "id": "hen",
+          "name": "hen",
+          "aliases": [
+            "hens"
+          ]
+        },
+        {
+          "id": "eel",
+          "name": "eel",
+          "aliases": [
+            "eels"
+          ]
+        },
+        {
+          "id": "gnu",
+          "name": "gnu",
+          "aliases": [
+            "gnus"
+          ]
+        },
+        {
+          "id": "ram",
+          "name": "ram",
+          "aliases": [
+            "rams"
+          ]
+        },
+        {
+          "id": "ewe",
+          "name": "ewe",
+          "aliases": [
+            "ewes"
+          ]
+        },
+        {
+          "id": "doe",
+          "name": "doe",
+          "aliases": [
+            "does"
+          ]
+        },
+        {
+          "id": "sow",
+          "name": "sow",
+          "aliases": [
+            "sows"
+          ]
+        },
+        {
+          "id": "hog",
+          "name": "hog",
+          "aliases": [
+            "hogs"
+          ]
+        },
+        {
+          "id": "cub",
+          "name": "cub",
+          "aliases": [
+            "cubs"
+          ]
+        },
+        {
+          "id": "pup",
+          "name": "pup",
+          "aliases": [
+            "pups"
+          ]
+        },
+        {
+          "id": "kit",
+          "name": "kit",
+          "aliases": [
+            "kits"
+          ]
+        },
+        {
+          "id": "jay",
+          "name": "jay",
+          "aliases": [
+            "jays"
+          ]
+        },
+        {
+          "id": "koi",
+          "name": "koi",
+          "aliases": [],
+          "plural": "koi"
+        },
+        {
+          "id": "asp",
+          "name": "asp",
+          "aliases": [
+            "asps"
+          ]
+        },
+        {
+          "id": "boa",
+          "name": "boa",
+          "aliases": [
+            "boas"
+          ]
+        },
+        {
+          "id": "cod",
+          "name": "cod",
+          "aliases": [],
+          "plural": "cod"
+        },
+        {
+          "id": "eft",
+          "name": "eft",
+          "aliases": [
+            "efts"
+          ]
+        },
+        {
+          "id": "gar",
+          "name": "gar",
+          "aliases": [],
+          "plural": "gar"
+        },
+        {
+          "id": "auk",
+          "name": "auk",
+          "aliases": [
+            "auks"
+          ]
+        },
+        {
+          "id": "kea",
+          "name": "kea",
+          "aliases": [
+            "keas"
+          ]
+        },
+        {
+          "id": "roo",
+          "name": "roo",
+          "aliases": [
+            "roos"
+          ]
+        },
+        {
+          "id": "fly",
+          "name": "fly",
+          "aliases": [
+            "flies"
+          ]
+        },
+        {
+          "id": "ray",
+          "name": "ray",
+          "aliases": [
+            "rays"
+          ]
+        },
+        {
+          "id": "pug",
+          "name": "pug",
+          "aliases": [
+            "pugs"
+          ]
+        },
+        {
+          "id": "dab",
+          "name": "dab",
+          "aliases": [
+            "dabs"
+          ]
+        },
+        {
+          "id": "olm",
+          "name": "olm",
+          "aliases": [
+            "olms"
+          ]
+        },
+        {
+          "id": "nag",
+          "name": "nag",
+          "aliases": [
+            "nags"
+          ]
+        },
+        {
+          "id": "cob",
+          "name": "cob",
+          "aliases": [
+            "cobs"
+          ]
+        }
+      ],
+      "host_bank": [
+        "cow",
+        "cat",
+        "dog",
+        "pig",
+        "rat",
+        "bat",
+        "fox",
+        "owl"
+      ],
+      "host_answers": [
+        "cow"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a 3D shape",
+      "entries": [
+        {
+          "id": "cube",
+          "name": "cube",
+          "aliases": [
+            "hexahedron",
+            "cubes"
+          ]
+        },
+        {
+          "id": "sphere",
+          "name": "sphere",
+          "aliases": [
+            "ball",
+            "orb",
+            "spheres"
+          ]
+        },
+        {
+          "id": "cone",
+          "name": "cone",
+          "aliases": [
+            "circular cone",
+            "right cone",
+            "cones"
+          ]
+        },
+        {
+          "id": "cylinder",
+          "name": "cylinder",
+          "aliases": [
+            "tube",
+            "cylinders"
+          ]
+        },
+        {
+          "id": "pyramid",
+          "name": "pyramid",
+          "aliases": [
+            "square pyramid",
+            "pyramids"
+          ]
+        },
+        {
+          "id": "tetrahedron",
+          "name": "tetrahedron",
+          "aliases": [
+            "triangular pyramid",
+            "tetrahedra"
+          ],
+          "plural": "tetrahedra"
+        },
+        {
+          "id": "prism",
+          "name": "prism",
+          "aliases": [
+            "triangular prism",
+            "hexagonal prism",
+            "pentagonal prism",
+            "octagonal prism",
+            "prisms"
+          ]
+        },
+        {
+          "id": "cuboid",
+          "name": "cuboid",
+          "aliases": [
+            "rectangular prism",
+            "box",
+            "rectangular box",
+            "rectangular cuboid",
+            "cuboids"
+          ]
+        },
+        {
+          "id": "octahedron",
+          "name": "octahedron",
+          "aliases": [
+            "octahedra"
+          ],
+          "plural": "octahedra"
+        },
+        {
+          "id": "dodecahedron",
+          "name": "dodecahedron",
+          "aliases": [
+            "dodecahedra"
+          ],
+          "plural": "dodecahedra"
+        },
+        {
+          "id": "icosahedron",
+          "name": "icosahedron",
+          "aliases": [
+            "icosahedra"
+          ],
+          "plural": "icosahedra"
+        },
+        {
+          "id": "torus",
+          "name": "torus",
+          "aliases": [
+            "donut",
+            "doughnut",
+            "ring",
+            "tori"
+          ],
+          "plural": "tori"
+        },
+        {
+          "id": "ellipsoid",
+          "name": "ellipsoid",
+          "aliases": [
+            "spheroid",
+            "egg shape",
+            "ovoid",
+            "ellipsoids"
+          ]
+        },
+        {
+          "id": "hemisphere",
+          "name": "hemisphere",
+          "aliases": [
+            "dome",
+            "half sphere",
+            "hemispheres"
+          ]
+        },
+        {
+          "id": "frustum",
+          "name": "frustum",
+          "aliases": [
+            "frustums"
+          ],
+          "plural": "frustums"
+        },
+        {
+          "id": "parallelepiped",
+          "name": "parallelepiped",
+          "aliases": [
+            "parallelepipeds"
+          ]
+        },
+        {
+          "id": "capsule",
+          "name": "capsule",
+          "aliases": [
+            "spherocylinder",
+            "capsules"
+          ]
+        },
+        {
+          "id": "mobius-strip",
+          "name": "Möbius strip",
+          "aliases": [
+            "Möbius strips"
+          ]
+        },
+        {
+          "id": "polyhedron",
+          "name": "polyhedron",
+          "aliases": [
+            "polyhedra"
+          ],
+          "plural": "polyhedra"
+        },
+        {
+          "id": "rhombohedron",
+          "name": "rhombohedron",
+          "aliases": [
+            "rhombohedra"
+          ]
+        },
+        {
+          "id": "helix",
+          "name": "helix",
+          "aliases": [
+            "spiral",
+            "helices"
+          ],
+          "plural": "helices"
+        },
+        {
+          "id": "klein-bottle",
+          "name": "Klein bottle",
+          "aliases": [
+            "Klein bottles"
+          ]
+        },
+        {
+          "id": "bipyramid",
+          "name": "bipyramid",
+          "aliases": [
+            "bipyramids"
+          ]
+        },
+        {
+          "id": "tesseract",
+          "name": "tesseract",
+          "aliases": [
+            "hypercube",
+            "tesseracts"
+          ]
+        },
+        {
+          "id": "cuboctahedron",
+          "name": "cuboctahedron",
+          "aliases": [
+            "cuboctahedra"
+          ]
+        }
+      ],
+      "host_bank": [
+        "cone",
+        "cube",
+        "sphere",
+        "cylinder",
+        "pyramid",
+        "prism",
+        "cuboid",
+        "torus"
+      ],
+      "host_answers": [
+        "cone"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a word that rhymes with \"cat\"",
+      "entries": [
+        {
+          "id": "bat",
+          "name": "bat",
+          "aliases": [
+            "bats"
+          ]
+        },
+        {
+          "id": "hat",
+          "name": "hat",
+          "aliases": [
+            "hats"
+          ]
+        },
+        {
+          "id": "mat",
+          "name": "mat",
+          "aliases": [
+            "doormat",
+            "welcome mat",
+            "bath mat",
+            "yoga mat",
+            "place mat",
+            "mats"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "sat",
+          "name": "sat",
+          "aliases": [],
+          "plural": "sat"
+        },
+        {
+          "id": "fat",
+          "name": "fat",
+          "aliases": [],
+          "plural": "fat"
+        },
+        {
+          "id": "pat",
+          "name": "pat",
+          "aliases": [
+            "pats"
+          ]
+        },
+        {
+          "id": "vat",
+          "name": "vat",
+          "aliases": [
+            "vats"
+          ]
+        },
+        {
+          "id": "chat",
+          "name": "chat",
+          "aliases": [
+            "chats"
+          ]
+        },
+        {
+          "id": "flat",
+          "name": "flat",
+          "aliases": [
+            "flats"
+          ]
+        },
+        {
+          "id": "that",
+          "name": "that",
+          "aliases": [],
+          "plural": "that"
+        },
+        {
+          "id": "brat",
+          "name": "brat",
+          "aliases": [
+            "brats"
+          ]
+        },
+        {
+          "id": "spat",
+          "name": "spat",
+          "aliases": [
+            "spats"
+          ]
+        },
+        {
+          "id": "splat",
+          "name": "splat",
+          "aliases": [
+            "splats"
+          ]
+        },
+        {
+          "id": "scat",
+          "name": "scat",
+          "aliases": [
+            "scats"
+          ]
+        },
+        {
+          "id": "gnat",
+          "name": "gnat",
+          "aliases": [
+            "gnats"
+          ]
+        },
+        {
+          "id": "slat",
+          "name": "slat",
+          "aliases": [
+            "slats"
+          ]
+        },
+        {
+          "id": "drat",
+          "name": "drat",
+          "aliases": [],
+          "plural": "drat"
+        },
+        {
+          "id": "stat",
+          "name": "stat",
+          "aliases": [
+            "stats"
+          ]
+        },
+        {
+          "id": "tat",
+          "name": "tat",
+          "aliases": [
+            "tats"
+          ]
+        },
+        {
+          "id": "at",
+          "name": "at",
+          "aliases": [],
+          "plural": "at"
+        },
+        {
+          "id": "sprat",
+          "name": "sprat",
+          "aliases": [
+            "sprats"
+          ]
+        },
+        {
+          "id": "frat",
+          "name": "frat",
+          "aliases": [
+            "frats"
+          ]
+        },
+        {
+          "id": "nat",
+          "name": "Nat",
+          "aliases": [],
+          "plural": "Nat"
+        },
+        {
+          "id": "matte",
+          "name": "matte",
+          "aliases": [
+            "Matt"
+          ],
+          "plural": "matte"
+        },
+        {
+          "id": "combat",
+          "name": "combat",
+          "aliases": [
+            "combats"
+          ]
+        },
+        {
+          "id": "acrobat",
+          "name": "acrobat",
+          "aliases": [
+            "acrobats"
+          ]
+        },
+        {
+          "id": "diplomat",
+          "name": "diplomat",
+          "aliases": [
+            "diplomats"
+          ]
+        },
+        {
+          "id": "thermostat",
+          "name": "thermostat",
+          "aliases": [
+            "thermostats"
+          ]
+        },
+        {
+          "id": "aristocrat",
+          "name": "aristocrat",
+          "aliases": [
+            "aristocrats"
+          ]
+        },
+        {
+          "id": "democrat",
+          "name": "democrat",
+          "aliases": [
+            "democrats"
+          ]
+        },
+        {
+          "id": "autocrat",
+          "name": "autocrat",
+          "aliases": [
+            "autocrats"
+          ]
+        },
+        {
+          "id": "bureaucrat",
+          "name": "bureaucrat",
+          "aliases": [
+            "bureaucrats"
+          ]
+        },
+        {
+          "id": "technocrat",
+          "name": "technocrat",
+          "aliases": [
+            "technocrats"
+          ]
+        },
+        {
+          "id": "habitat",
+          "name": "habitat",
+          "aliases": [
+            "habitats"
+          ]
+        },
+        {
+          "id": "format",
+          "name": "format",
+          "aliases": [
+            "formats"
+          ]
+        },
+        {
+          "id": "wombat",
+          "name": "wombat",
+          "aliases": [
+            "wombats"
+          ]
+        },
+        {
+          "id": "copycat",
+          "name": "copycat",
+          "aliases": [
+            "copycats"
+          ]
+        },
+        {
+          "id": "bobcat",
+          "name": "bobcat",
+          "aliases": [
+            "bobcats"
+          ]
+        },
+        {
+          "id": "tomcat",
+          "name": "tomcat",
+          "aliases": [
+            "tomcats"
+          ]
+        },
+        {
+          "id": "wildcat",
+          "name": "wildcat",
+          "aliases": [
+            "wildcats"
+          ]
+        },
+        {
+          "id": "polecat",
+          "name": "polecat",
+          "aliases": [
+            "polecats"
+          ]
+        },
+        {
+          "id": "laundromat",
+          "name": "laundromat",
+          "aliases": [
+            "laundromats"
+          ]
+        },
+        {
+          "id": "chitchat",
+          "name": "chitchat",
+          "aliases": [
+            "chitchats"
+          ]
+        },
+        {
+          "id": "hazmat",
+          "name": "hazmat",
+          "aliases": [],
+          "plural": "hazmat"
+        },
+        {
+          "id": "cravat",
+          "name": "cravat",
+          "aliases": [
+            "cravats"
+          ]
+        },
+        {
+          "id": "dingbat",
+          "name": "dingbat",
+          "aliases": [
+            "dingbats"
+          ]
+        },
+        {
+          "id": "nonfat",
+          "name": "nonfat",
+          "aliases": [],
+          "plural": "nonfat"
+        },
+        {
+          "id": "begat",
+          "name": "begat",
+          "aliases": [],
+          "plural": "begat"
+        },
+        {
+          "id": "ziggurat",
+          "name": "ziggurat",
+          "aliases": [
+            "ziggurats"
+          ]
+        },
+        {
+          "id": "croat",
+          "name": "Croat",
+          "aliases": [
+            "Croats"
+          ]
+        },
+        {
+          "id": "photostat",
+          "name": "photostat",
+          "aliases": [
+            "photostats"
+          ]
+        },
+        {
+          "id": "rheostat",
+          "name": "rheostat",
+          "aliases": [
+            "rheostats"
+          ]
+        },
+        {
+          "id": "aerostat",
+          "name": "aerostat",
+          "aliases": [
+            "aerostats"
+          ]
+        }
+      ],
+      "host_bank": [
+        "mat",
+        "bat",
+        "hat",
+        "rat",
+        "sat",
+        "fat",
+        "pat",
+        "flat"
+      ],
+      "host_answers": [
+        "mat"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name one of the Great Lakes",
+      "entries": [
+        {
+          "id": "superior",
+          "name": "Superior",
+          "aliases": [
+            "Lake Superior"
+          ],
+          "plural": "Superior"
+        },
+        {
+          "id": "michigan",
+          "name": "Michigan",
+          "aliases": [
+            "Lake Michigan"
+          ],
+          "plural": "Michigan"
+        },
+        {
+          "id": "huron",
+          "name": "Huron",
+          "aliases": [
+            "Lake Huron"
+          ],
+          "plural": "Huron"
+        },
+        {
+          "id": "erie",
+          "name": "Erie",
+          "aliases": [
+            "Lake Erie"
+          ],
+          "plural": "Erie"
+        },
+        {
+          "id": "ontario",
+          "name": "Ontario",
+          "aliases": [
+            "Lake Ontario"
+          ],
+          "plural": "Ontario"
+        }
+      ],
+      "host_bank": [
+        "ontario",
+        "superior",
+        "michigan",
+        "huron",
+        "erie"
+      ],
+      "host_answers": [
+        "ontario"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name one of Santa's reindeer",
+      "entries": [
+        {
+          "id": "dasher",
+          "name": "Dasher",
+          "aliases": [],
+          "plural": "Dasher"
+        },
+        {
+          "id": "dancer",
+          "name": "Dancer",
+          "aliases": [],
+          "plural": "Dancer"
+        },
+        {
+          "id": "prancer",
+          "name": "Prancer",
+          "aliases": [],
+          "plural": "Prancer"
+        },
+        {
+          "id": "vixen",
+          "name": "Vixen",
+          "aliases": [],
+          "plural": "Vixen"
+        },
+        {
+          "id": "comet",
+          "name": "Comet",
+          "aliases": [],
+          "plural": "Comet"
+        },
+        {
+          "id": "cupid",
+          "name": "Cupid",
+          "aliases": [],
+          "plural": "Cupid"
+        },
+        {
+          "id": "donner",
+          "name": "Donner",
+          "aliases": [
+            "Donder",
+            "Dunder"
+          ],
+          "plural": "Donner"
+        },
+        {
+          "id": "blitzen",
+          "name": "Blitzen",
+          "aliases": [
+            "Blixem"
+          ],
+          "plural": "Blitzen"
+        },
+        {
+          "id": "rudolph",
+          "name": "Rudolph",
+          "aliases": [
+            "Rudolph the Red-Nosed Reindeer"
+          ],
+          "plural": "Rudolph"
+        }
+      ],
+      "host_bank": [
+        "comet",
+        "blitzen",
+        "dasher",
+        "dancer",
+        "prancer",
+        "vixen",
+        "cupid",
+        "donner",
+        "rudolph"
+      ],
+      "host_answers": [
+        "comet",
+        "blitzen"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

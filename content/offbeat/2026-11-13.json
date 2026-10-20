@@ -1,0 +1,3218 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-13",
+  "questions": [
+    {
+      "prompt": "Name something you'd find at a birthday party",
+      "entries": [
+        {
+          "id": "cake",
+          "name": "cake",
+          "aliases": [
+            "birthday cake",
+            "cakes"
+          ]
+        },
+        {
+          "id": "cupcake",
+          "name": "cupcake",
+          "aliases": [
+            "cupcakes"
+          ]
+        },
+        {
+          "id": "candle",
+          "name": "candle",
+          "aliases": [
+            "birthday candle",
+            "number candle",
+            "candles"
+          ]
+        },
+        {
+          "id": "balloon",
+          "name": "balloon",
+          "aliases": [
+            "helium balloon",
+            "number balloon",
+            "balloons"
+          ]
+        },
+        {
+          "id": "helium-tank",
+          "name": "helium tank",
+          "aliases": [
+            "helium"
+          ],
+          "plural": "helium tank"
+        },
+        {
+          "id": "present",
+          "name": "present",
+          "aliases": [
+            "gift",
+            "birthday present",
+            "birthday gift",
+            "presents"
+          ]
+        },
+        {
+          "id": "gift-bag",
+          "name": "gift bag",
+          "aliases": [
+            "gift bags"
+          ]
+        },
+        {
+          "id": "wrapping-paper",
+          "name": "wrapping paper",
+          "aliases": [
+            "gift wrap"
+          ],
+          "plural": "wrapping paper"
+        },
+        {
+          "id": "ribbon",
+          "name": "ribbon",
+          "aliases": [
+            "bow",
+            "ribbons"
+          ]
+        },
+        {
+          "id": "birthday-card",
+          "name": "birthday card",
+          "aliases": [
+            "card",
+            "birthday cards"
+          ]
+        },
+        {
+          "id": "party-hat",
+          "name": "party hat",
+          "aliases": [
+            "birthday hat",
+            "cone hat",
+            "paper hat",
+            "party hats"
+          ]
+        },
+        {
+          "id": "tiara",
+          "name": "tiara",
+          "aliases": [
+            "crown",
+            "birthday crown",
+            "tiaras"
+          ]
+        },
+        {
+          "id": "birthday-sash",
+          "name": "birthday sash",
+          "aliases": [
+            "sash",
+            "birthday sashes"
+          ]
+        },
+        {
+          "id": "streamer",
+          "name": "streamer",
+          "aliases": [
+            "crepe paper",
+            "streamers"
+          ]
+        },
+        {
+          "id": "banner",
+          "name": "banner",
+          "aliases": [
+            "birthday banner",
+            "Happy Birthday banner",
+            "banners"
+          ]
+        },
+        {
+          "id": "confetti",
+          "name": "confetti",
+          "aliases": [],
+          "plural": "confetti"
+        },
+        {
+          "id": "party-popper",
+          "name": "party popper",
+          "aliases": [
+            "popper",
+            "confetti cannon",
+            "party poppers"
+          ]
+        },
+        {
+          "id": "noisemaker",
+          "name": "noisemaker",
+          "aliases": [
+            "party blower",
+            "party horn",
+            "blowout",
+            "party whistle",
+            "noisemakers"
+          ]
+        },
+        {
+          "id": "decorations",
+          "name": "decorations",
+          "aliases": [
+            "decoration"
+          ],
+          "plural": "decorations"
+        },
+        {
+          "id": "ice-cream",
+          "name": "ice cream",
+          "aliases": [],
+          "plural": "ice cream"
+        },
+        {
+          "id": "pizza",
+          "name": "pizza",
+          "aliases": [
+            "pizzas"
+          ]
+        },
+        {
+          "id": "hot-dog",
+          "name": "hot dog",
+          "aliases": [
+            "hot dogs"
+          ]
+        },
+        {
+          "id": "chips",
+          "name": "chips",
+          "aliases": [
+            "crisps",
+            "potato chips"
+          ],
+          "plural": "chips"
+        },
+        {
+          "id": "snacks",
+          "name": "snacks",
+          "aliases": [
+            "snack"
+          ],
+          "plural": "snacks"
+        },
+        {
+          "id": "candy",
+          "name": "candy",
+          "aliases": [
+            "sweets"
+          ],
+          "plural": "candy"
+        },
+        {
+          "id": "cookie",
+          "name": "cookie",
+          "aliases": [
+            "cookies"
+          ]
+        },
+        {
+          "id": "sprinkles",
+          "name": "sprinkles",
+          "aliases": [],
+          "plural": "sprinkles"
+        },
+        {
+          "id": "frosting",
+          "name": "frosting",
+          "aliases": [
+            "icing"
+          ],
+          "plural": "frosting"
+        },
+        {
+          "id": "punch",
+          "name": "punch",
+          "aliases": [
+            "fruit punch"
+          ],
+          "plural": "punch"
+        },
+        {
+          "id": "soda",
+          "name": "soda",
+          "aliases": [
+            "pop",
+            "fizzy drinks"
+          ],
+          "plural": "soda"
+        },
+        {
+          "id": "juice",
+          "name": "juice",
+          "aliases": [
+            "juice box"
+          ],
+          "plural": "juice"
+        },
+        {
+          "id": "lemonade",
+          "name": "lemonade",
+          "aliases": [],
+          "plural": "lemonade"
+        },
+        {
+          "id": "party-favor",
+          "name": "party favor",
+          "aliases": [
+            "favor",
+            "goody bag",
+            "party bag",
+            "loot bag",
+            "party favors"
+          ]
+        },
+        {
+          "id": "pinata",
+          "name": "piñata",
+          "aliases": [
+            "piñatas"
+          ]
+        },
+        {
+          "id": "party-games",
+          "name": "party games",
+          "aliases": [
+            "games"
+          ],
+          "plural": "party games"
+        },
+        {
+          "id": "musical-chairs",
+          "name": "musical chairs",
+          "aliases": [],
+          "plural": "musical chairs"
+        },
+        {
+          "id": "pin-the-tail-on-the-donkey",
+          "name": "pin the tail on the donkey",
+          "aliases": [],
+          "plural": "pin the tail on the donkey"
+        },
+        {
+          "id": "hot-potato",
+          "name": "hot potato",
+          "aliases": [],
+          "plural": "hot potato"
+        },
+        {
+          "id": "pass-the-parcel",
+          "name": "pass the parcel",
+          "aliases": [],
+          "plural": "pass the parcel"
+        },
+        {
+          "id": "freeze-dance",
+          "name": "freeze dance",
+          "aliases": [
+            "musical statues"
+          ],
+          "plural": "freeze dance"
+        },
+        {
+          "id": "treasure-hunt",
+          "name": "treasure hunt",
+          "aliases": [
+            "scavenger hunt"
+          ],
+          "plural": "treasure hunt"
+        },
+        {
+          "id": "clown",
+          "name": "clown",
+          "aliases": [
+            "clowns"
+          ]
+        },
+        {
+          "id": "magician",
+          "name": "magician",
+          "aliases": [
+            "magic show",
+            "magicians"
+          ]
+        },
+        {
+          "id": "face-painting",
+          "name": "face painting",
+          "aliases": [
+            "face paint"
+          ],
+          "plural": "face painting"
+        },
+        {
+          "id": "balloon-animal",
+          "name": "balloon animal",
+          "aliases": [
+            "balloon artist",
+            "balloon animals"
+          ]
+        },
+        {
+          "id": "bounce-house",
+          "name": "bounce house",
+          "aliases": [
+            "bouncy castle",
+            "moon bounce",
+            "bounce houses"
+          ]
+        },
+        {
+          "id": "music",
+          "name": "music",
+          "aliases": [],
+          "plural": "music"
+        },
+        {
+          "id": "dj",
+          "name": "DJ",
+          "aliases": [
+            "DJs"
+          ],
+          "plural": "DJs"
+        },
+        {
+          "id": "dancing",
+          "name": "dancing",
+          "aliases": [],
+          "plural": "dancing"
+        },
+        {
+          "id": "karaoke",
+          "name": "karaoke",
+          "aliases": [],
+          "plural": "karaoke"
+        },
+        {
+          "id": "happy-birthday-song",
+          "name": "Happy Birthday song",
+          "aliases": [
+            "Happy Birthday",
+            "singing"
+          ],
+          "plural": "Happy Birthday song"
+        },
+        {
+          "id": "birthday-wish",
+          "name": "birthday wish",
+          "aliases": [
+            "making a wish",
+            "wish",
+            "birthday wishes"
+          ]
+        },
+        {
+          "id": "birthday-person",
+          "name": "birthday person",
+          "aliases": [
+            "birthday boy",
+            "birthday girl",
+            "the birthday kid",
+            "birthday people"
+          ]
+        },
+        {
+          "id": "friend",
+          "name": "friend",
+          "aliases": [
+            "friends",
+            "guests",
+            "guest"
+          ]
+        },
+        {
+          "id": "family",
+          "name": "family",
+          "aliases": [],
+          "plural": "family"
+        },
+        {
+          "id": "kid",
+          "name": "kid",
+          "aliases": [
+            "kids",
+            "children",
+            "child"
+          ],
+          "plural": "kids"
+        },
+        {
+          "id": "parent",
+          "name": "parent",
+          "aliases": [
+            "parents",
+            "mom",
+            "dad"
+          ]
+        },
+        {
+          "id": "plate",
+          "name": "plate",
+          "aliases": [
+            "paper plate",
+            "plates"
+          ]
+        },
+        {
+          "id": "napkin",
+          "name": "napkin",
+          "aliases": [
+            "napkins"
+          ]
+        },
+        {
+          "id": "cup",
+          "name": "cup",
+          "aliases": [
+            "paper cup",
+            "cups"
+          ]
+        },
+        {
+          "id": "tablecloth",
+          "name": "tablecloth",
+          "aliases": [
+            "tablecloths"
+          ]
+        },
+        {
+          "id": "fork",
+          "name": "fork",
+          "aliases": [
+            "plastic fork",
+            "forks"
+          ]
+        },
+        {
+          "id": "cake-knife",
+          "name": "cake knife",
+          "aliases": [
+            "knife",
+            "cake knives"
+          ]
+        },
+        {
+          "id": "sparkler",
+          "name": "sparkler",
+          "aliases": [
+            "cake sparkler",
+            "sparklers"
+          ]
+        },
+        {
+          "id": "bubbles",
+          "name": "bubbles",
+          "aliases": [
+            "bubble machine"
+          ],
+          "plural": "bubbles"
+        },
+        {
+          "id": "glow-stick",
+          "name": "glow stick",
+          "aliases": [
+            "glow sticks"
+          ]
+        },
+        {
+          "id": "photo-booth",
+          "name": "photo booth",
+          "aliases": [
+            "photo booths"
+          ]
+        },
+        {
+          "id": "camera",
+          "name": "camera",
+          "aliases": [
+            "photos",
+            "pictures",
+            "cameras"
+          ]
+        },
+        {
+          "id": "cake-smash",
+          "name": "cake smash",
+          "aliases": [],
+          "plural": "cake smash"
+        },
+        {
+          "id": "sleepover",
+          "name": "sleepover",
+          "aliases": [
+            "slumber party",
+            "sleepovers"
+          ]
+        },
+        {
+          "id": "thank-you-card",
+          "name": "thank-you card",
+          "aliases": [
+            "thank you card",
+            "thank-you cards"
+          ]
+        },
+        {
+          "id": "balloon-arch",
+          "name": "balloon arch",
+          "aliases": [
+            "balloon arches"
+          ]
+        },
+        {
+          "id": "cake-topper",
+          "name": "cake topper",
+          "aliases": [
+            "cake toppers"
+          ]
+        },
+        {
+          "id": "invitation",
+          "name": "invitation",
+          "aliases": [
+            "invite",
+            "invitations"
+          ]
+        },
+        {
+          "id": "theme",
+          "name": "theme",
+          "aliases": [
+            "party theme",
+            "themes"
+          ]
+        },
+        {
+          "id": "costume",
+          "name": "costume",
+          "aliases": [
+            "costumes"
+          ]
+        },
+        {
+          "id": "movie",
+          "name": "movie",
+          "aliases": [],
+          "plural": "movie"
+        },
+        {
+          "id": "popcorn",
+          "name": "popcorn",
+          "aliases": [],
+          "plural": "popcorn"
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "fruit-tray",
+          "name": "fruit tray",
+          "aliases": [
+            "fruit"
+          ],
+          "plural": "fruit tray"
+        },
+        {
+          "id": "sandwiches",
+          "name": "sandwiches",
+          "aliases": [
+            "sandwich"
+          ]
+        },
+        {
+          "id": "cheese-and-crackers",
+          "name": "cheese and crackers",
+          "aliases": [
+            "cheese platter"
+          ],
+          "plural": "cheese and crackers"
+        },
+        {
+          "id": "chicken-nuggets",
+          "name": "chicken nuggets",
+          "aliases": [
+            "nuggets"
+          ]
+        }
+      ],
+      "host_bank": [
+        "party-hat",
+        "cake",
+        "balloon",
+        "present",
+        "candle",
+        "ice-cream",
+        "streamer",
+        "confetti"
+      ],
+      "host_answers": [
+        "party-hat"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a reptile",
+      "entries": [
+        {
+          "id": "snake",
+          "name": "snake",
+          "aliases": [
+            "garter snake",
+            "corn snake",
+            "coral snake",
+            "sea snake",
+            "king snake",
+            "kingsnake",
+            "rat snake",
+            "milk snake",
+            "hognose snake",
+            "tree snake",
+            "grass snake",
+            "water snake",
+            "snakes"
+          ]
+        },
+        {
+          "id": "python",
+          "name": "python",
+          "aliases": [
+            "ball python",
+            "Burmese python",
+            "reticulated python",
+            "pythons"
+          ]
+        },
+        {
+          "id": "boa",
+          "name": "boa",
+          "aliases": [
+            "boa constrictor",
+            "boas"
+          ]
+        },
+        {
+          "id": "anaconda",
+          "name": "anaconda",
+          "aliases": [
+            "green anaconda",
+            "anacondas"
+          ]
+        },
+        {
+          "id": "cobra",
+          "name": "cobra",
+          "aliases": [
+            "king cobra",
+            "cobras"
+          ]
+        },
+        {
+          "id": "rattlesnake",
+          "name": "rattlesnake",
+          "aliases": [
+            "rattler",
+            "diamondback",
+            "rattlesnakes"
+          ]
+        },
+        {
+          "id": "viper",
+          "name": "viper",
+          "aliases": [
+            "pit viper",
+            "Gaboon viper",
+            "vipers"
+          ]
+        },
+        {
+          "id": "adder",
+          "name": "adder",
+          "aliases": [
+            "adders"
+          ]
+        },
+        {
+          "id": "mamba",
+          "name": "mamba",
+          "aliases": [
+            "black mamba",
+            "green mamba",
+            "mambas"
+          ]
+        },
+        {
+          "id": "copperhead",
+          "name": "copperhead",
+          "aliases": [
+            "copperheads"
+          ]
+        },
+        {
+          "id": "cottonmouth",
+          "name": "cottonmouth",
+          "aliases": [
+            "water moccasin",
+            "cottonmouths"
+          ]
+        },
+        {
+          "id": "sidewinder",
+          "name": "sidewinder",
+          "aliases": [
+            "sidewinders"
+          ]
+        },
+        {
+          "id": "taipan",
+          "name": "taipan",
+          "aliases": [
+            "inland taipan",
+            "taipans"
+          ]
+        },
+        {
+          "id": "asp",
+          "name": "asp",
+          "aliases": [
+            "asps"
+          ]
+        },
+        {
+          "id": "lizard",
+          "name": "lizard",
+          "aliases": [
+            "glass lizard",
+            "legless lizard",
+            "monitor lizard",
+            "monitor",
+            "horned lizard",
+            "horny toad",
+            "frilled lizard",
+            "wall lizard",
+            "lizards"
+          ]
+        },
+        {
+          "id": "iguana",
+          "name": "iguana",
+          "aliases": [
+            "green iguana",
+            "marine iguana",
+            "iguanas"
+          ]
+        },
+        {
+          "id": "gecko",
+          "name": "gecko",
+          "aliases": [
+            "leopard gecko",
+            "crested gecko",
+            "tokay gecko",
+            "geckos"
+          ]
+        },
+        {
+          "id": "chameleon",
+          "name": "chameleon",
+          "aliases": [
+            "veiled chameleon",
+            "panther chameleon",
+            "chameleons"
+          ]
+        },
+        {
+          "id": "komodo-dragon",
+          "name": "Komodo dragon",
+          "aliases": [
+            "Komodo",
+            "Komodo monitor",
+            "Komodo dragons"
+          ]
+        },
+        {
+          "id": "bearded-dragon",
+          "name": "bearded dragon",
+          "aliases": [
+            "beardie",
+            "bearded dragons"
+          ]
+        },
+        {
+          "id": "skink",
+          "name": "skink",
+          "aliases": [
+            "blue-tongued skink",
+            "skinks"
+          ]
+        },
+        {
+          "id": "gila-monster",
+          "name": "Gila monster",
+          "aliases": [
+            "Gila monsters"
+          ]
+        },
+        {
+          "id": "anole",
+          "name": "anole",
+          "aliases": [
+            "green anole",
+            "anoles"
+          ]
+        },
+        {
+          "id": "basilisk",
+          "name": "basilisk",
+          "aliases": [
+            "Jesus Christ lizard",
+            "basilisk lizard",
+            "basilisks"
+          ]
+        },
+        {
+          "id": "chuckwalla",
+          "name": "chuckwalla",
+          "aliases": [
+            "chuckwallas"
+          ]
+        },
+        {
+          "id": "thorny-devil",
+          "name": "thorny devil",
+          "aliases": [
+            "thorny devils"
+          ]
+        },
+        {
+          "id": "goanna",
+          "name": "goanna",
+          "aliases": [
+            "goannas"
+          ]
+        },
+        {
+          "id": "tegu",
+          "name": "tegu",
+          "aliases": [
+            "tegus"
+          ]
+        },
+        {
+          "id": "uromastyx",
+          "name": "uromastyx",
+          "aliases": [
+            "uromastyxes"
+          ]
+        },
+        {
+          "id": "turtle",
+          "name": "turtle",
+          "aliases": [
+            "sea turtle",
+            "snapping turtle",
+            "box turtle",
+            "painted turtle",
+            "red-eared slider",
+            "green turtle",
+            "turtles"
+          ]
+        },
+        {
+          "id": "leatherback",
+          "name": "leatherback",
+          "aliases": [
+            "leatherback turtle",
+            "leatherback sea turtle",
+            "leatherbacks"
+          ]
+        },
+        {
+          "id": "loggerhead",
+          "name": "loggerhead",
+          "aliases": [
+            "loggerhead turtle",
+            "loggerhead sea turtle",
+            "loggerheads"
+          ]
+        },
+        {
+          "id": "hawksbill",
+          "name": "hawksbill",
+          "aliases": [
+            "hawksbill turtle",
+            "hawksbills"
+          ]
+        },
+        {
+          "id": "tortoise",
+          "name": "tortoise",
+          "aliases": [
+            "Galápagos tortoise",
+            "giant tortoise",
+            "desert tortoise",
+            "tortoises"
+          ]
+        },
+        {
+          "id": "terrapin",
+          "name": "terrapin",
+          "aliases": [
+            "diamondback terrapin",
+            "terrapins"
+          ]
+        },
+        {
+          "id": "alligator",
+          "name": "alligator",
+          "aliases": [
+            "gator",
+            "American alligator",
+            "Chinese alligator",
+            "alligators"
+          ]
+        },
+        {
+          "id": "crocodile",
+          "name": "crocodile",
+          "aliases": [
+            "croc",
+            "saltwater crocodile",
+            "Nile crocodile",
+            "saltie",
+            "crocodiles"
+          ]
+        },
+        {
+          "id": "caiman",
+          "name": "caiman",
+          "aliases": [
+            "caimans"
+          ],
+          "plural": "caimans"
+        },
+        {
+          "id": "gharial",
+          "name": "gharial",
+          "aliases": [
+            "gavial",
+            "gharials"
+          ]
+        },
+        {
+          "id": "tuatara",
+          "name": "tuatara",
+          "aliases": [
+            "tuataras"
+          ]
+        },
+        {
+          "id": "dinosaur",
+          "name": "dinosaur",
+          "aliases": [
+            "dinosaurs"
+          ]
+        },
+        {
+          "id": "amphisbaenian",
+          "name": "amphisbaenian",
+          "aliases": [
+            "worm lizard",
+            "amphisbaenians"
+          ]
+        }
+      ],
+      "host_bank": [
+        "alligator",
+        "snake",
+        "lizard",
+        "turtle",
+        "crocodile",
+        "iguana",
+        "gecko",
+        "chameleon"
+      ],
+      "host_answers": [
+        "alligator"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of sandwich",
+      "entries": [
+        {
+          "id": "blt",
+          "name": "BLT",
+          "aliases": [
+            "bacon lettuce and tomato",
+            "BLT sandwich",
+            "BLTs"
+          ],
+          "plural": "BLTs"
+        },
+        {
+          "id": "grilled-cheese",
+          "name": "grilled cheese",
+          "aliases": [
+            "grilled cheese sandwich",
+            "cheese toastie",
+            "toastie",
+            "toasted sandwich",
+            "grilled cheeses"
+          ]
+        },
+        {
+          "id": "cheese-sandwich",
+          "name": "cheese sandwich",
+          "aliases": [
+            "cheese and pickle sandwich",
+            "cheese sandwiches"
+          ]
+        },
+        {
+          "id": "peanut-butter-and-jelly",
+          "name": "peanut butter and jelly",
+          "aliases": [
+            "PB&J",
+            "PB and J",
+            "peanut butter and jam",
+            "peanut butter jelly"
+          ],
+          "plural": "peanut butter and jelly"
+        },
+        {
+          "id": "ham-sandwich",
+          "name": "ham sandwich",
+          "aliases": [
+            "ham",
+            "ham sandwiches"
+          ]
+        },
+        {
+          "id": "ham-and-cheese",
+          "name": "ham and cheese",
+          "aliases": [
+            "ham and cheese sandwich",
+            "ham & cheese"
+          ],
+          "plural": "ham and cheese"
+        },
+        {
+          "id": "turkey-sandwich",
+          "name": "turkey sandwich",
+          "aliases": [
+            "turkey",
+            "turkey and cheese",
+            "turkey sandwiches"
+          ]
+        },
+        {
+          "id": "club-sandwich",
+          "name": "club sandwich",
+          "aliases": [
+            "club",
+            "turkey club",
+            "clubhouse",
+            "club sandwiches"
+          ]
+        },
+        {
+          "id": "reuben",
+          "name": "Reuben",
+          "aliases": [
+            "Reuben sandwich",
+            "Reubens"
+          ]
+        },
+        {
+          "id": "tuna-melt",
+          "name": "tuna melt",
+          "aliases": [
+            "tuna melts"
+          ]
+        },
+        {
+          "id": "tuna-sandwich",
+          "name": "tuna sandwich",
+          "aliases": [
+            "tuna salad sandwich",
+            "tuna",
+            "tuna mayo",
+            "tuna sandwiches"
+          ]
+        },
+        {
+          "id": "egg-salad-sandwich",
+          "name": "egg salad sandwich",
+          "aliases": [
+            "egg salad",
+            "egg mayo",
+            "egg salad sandwiches"
+          ]
+        },
+        {
+          "id": "chicken-salad-sandwich",
+          "name": "chicken salad sandwich",
+          "aliases": [
+            "chicken salad",
+            "chicken salad sandwiches"
+          ]
+        },
+        {
+          "id": "chicken-sandwich",
+          "name": "chicken sandwich",
+          "aliases": [
+            "fried chicken sandwich",
+            "grilled chicken sandwich",
+            "chicken sandwiches"
+          ]
+        },
+        {
+          "id": "chicken-parm-sandwich",
+          "name": "chicken parm sandwich",
+          "aliases": [
+            "chicken parmesan sandwich",
+            "chicken parm sub",
+            "chicken parm sandwiches"
+          ]
+        },
+        {
+          "id": "philly-cheesesteak",
+          "name": "Philly cheesesteak",
+          "aliases": [
+            "cheesesteak",
+            "Philly cheese steak",
+            "Philly",
+            "Philly cheesesteaks"
+          ]
+        },
+        {
+          "id": "steak-sandwich",
+          "name": "steak sandwich",
+          "aliases": [
+            "steak sandwiches"
+          ]
+        },
+        {
+          "id": "french-dip",
+          "name": "French dip",
+          "aliases": [
+            "French dip sandwich",
+            "French dips"
+          ]
+        },
+        {
+          "id": "cuban-sandwich",
+          "name": "Cuban sandwich",
+          "aliases": [
+            "Cubano",
+            "Cuban",
+            "Cuban sandwiches"
+          ]
+        },
+        {
+          "id": "monte-cristo",
+          "name": "Monte Cristo",
+          "aliases": [
+            "Monte Cristos"
+          ]
+        },
+        {
+          "id": "croque-monsieur",
+          "name": "croque monsieur",
+          "aliases": [
+            "croque monsieurs"
+          ]
+        },
+        {
+          "id": "croque-madame",
+          "name": "croque madame",
+          "aliases": [
+            "croque madames"
+          ]
+        },
+        {
+          "id": "sub",
+          "name": "sub",
+          "aliases": [
+            "submarine sandwich",
+            "hoagie",
+            "hero",
+            "grinder",
+            "Italian sub",
+            "sub sandwich",
+            "subs"
+          ]
+        },
+        {
+          "id": "meatball-sandwich",
+          "name": "meatball sandwich",
+          "aliases": [
+            "meatball sub",
+            "meatball hero",
+            "meatball sandwiches"
+          ]
+        },
+        {
+          "id": "po-boy",
+          "name": "po' boy",
+          "aliases": [
+            "poboy",
+            "shrimp po' boy",
+            "po' boys"
+          ]
+        },
+        {
+          "id": "muffuletta",
+          "name": "muffuletta",
+          "aliases": [
+            "muffaletta",
+            "muffulettas"
+          ]
+        },
+        {
+          "id": "banh-mi",
+          "name": "banh mi",
+          "aliases": [
+            "banh mis"
+          ]
+        },
+        {
+          "id": "panini",
+          "name": "panini",
+          "aliases": [
+            "panino",
+            "paninis"
+          ],
+          "plural": "paninis"
+        },
+        {
+          "id": "gyro",
+          "name": "gyro",
+          "aliases": [
+            "gyros"
+          ]
+        },
+        {
+          "id": "sloppy-joe",
+          "name": "sloppy joe",
+          "aliases": [
+            "sloppy joes"
+          ]
+        },
+        {
+          "id": "pulled-pork-sandwich",
+          "name": "pulled pork sandwich",
+          "aliases": [
+            "pulled pork",
+            "pulled pork sandwiches"
+          ]
+        },
+        {
+          "id": "brisket-sandwich",
+          "name": "brisket sandwich",
+          "aliases": [
+            "brisket sandwiches"
+          ]
+        },
+        {
+          "id": "roast-beef-sandwich",
+          "name": "roast beef sandwich",
+          "aliases": [
+            "roast beef",
+            "beef on weck",
+            "roast beef sandwiches"
+          ]
+        },
+        {
+          "id": "italian-beef",
+          "name": "Italian beef",
+          "aliases": [
+            "Italian beef sandwich",
+            "Italian beefs"
+          ]
+        },
+        {
+          "id": "pastrami-sandwich",
+          "name": "pastrami sandwich",
+          "aliases": [
+            "pastrami on rye",
+            "pastrami",
+            "pastrami sandwiches"
+          ]
+        },
+        {
+          "id": "corned-beef-sandwich",
+          "name": "corned beef sandwich",
+          "aliases": [
+            "corned beef",
+            "corned beef sandwiches"
+          ]
+        },
+        {
+          "id": "bologna-sandwich",
+          "name": "bologna sandwich",
+          "aliases": [
+            "baloney sandwich",
+            "bologna",
+            "baloney",
+            "fried bologna sandwich",
+            "bologna sandwiches"
+          ]
+        },
+        {
+          "id": "salami-sandwich",
+          "name": "salami sandwich",
+          "aliases": [
+            "salami",
+            "salami sandwiches"
+          ]
+        },
+        {
+          "id": "patty-melt",
+          "name": "patty melt",
+          "aliases": [
+            "patty melts"
+          ]
+        },
+        {
+          "id": "breakfast-sandwich",
+          "name": "breakfast sandwich",
+          "aliases": [
+            "bacon egg and cheese",
+            "egg McMuffin",
+            "sausage egg and cheese",
+            "breakfast sandwiches"
+          ]
+        },
+        {
+          "id": "egg-sandwich",
+          "name": "egg sandwich",
+          "aliases": [
+            "fried egg sandwich",
+            "egg sarnie",
+            "egg sandwiches"
+          ]
+        },
+        {
+          "id": "bacon-sandwich",
+          "name": "bacon sandwich",
+          "aliases": [
+            "bacon butty",
+            "bacon sarnie",
+            "bacon roll",
+            "bacon sandwiches"
+          ]
+        },
+        {
+          "id": "chip-butty",
+          "name": "chip butty",
+          "aliases": [
+            "chip sandwich",
+            "chip butties"
+          ]
+        },
+        {
+          "id": "fish-finger-sandwich",
+          "name": "fish finger sandwich",
+          "aliases": [
+            "fish stick sandwich",
+            "fish finger sandwiches"
+          ]
+        },
+        {
+          "id": "fish-sandwich",
+          "name": "fish sandwich",
+          "aliases": [
+            "Filet-O-Fish",
+            "fried fish sandwich",
+            "fish sandwiches"
+          ]
+        },
+        {
+          "id": "lobster-roll",
+          "name": "lobster roll",
+          "aliases": [
+            "lobster rolls"
+          ]
+        },
+        {
+          "id": "cucumber-sandwich",
+          "name": "cucumber sandwich",
+          "aliases": [
+            "tea sandwich",
+            "finger sandwich",
+            "cucumber sandwiches"
+          ]
+        },
+        {
+          "id": "open-faced-sandwich",
+          "name": "open-faced sandwich",
+          "aliases": [
+            "open sandwich",
+            "smørrebrød",
+            "open-faced sandwiches"
+          ]
+        },
+        {
+          "id": "dagwood",
+          "name": "Dagwood",
+          "aliases": [
+            "Dagwoods"
+          ]
+        },
+        {
+          "id": "hot-brown",
+          "name": "hot brown",
+          "aliases": [
+            "Kentucky hot brown",
+            "hot browns"
+          ]
+        },
+        {
+          "id": "pimento-cheese",
+          "name": "pimento cheese",
+          "aliases": [
+            "pimento cheese sandwich"
+          ],
+          "plural": "pimento cheese"
+        },
+        {
+          "id": "fluffernutter",
+          "name": "fluffernutter",
+          "aliases": [
+            "fluffernutters"
+          ]
+        },
+        {
+          "id": "elvis-sandwich",
+          "name": "Elvis sandwich",
+          "aliases": [
+            "peanut butter and banana",
+            "peanut butter banana sandwich",
+            "Elvis sandwiches"
+          ]
+        },
+        {
+          "id": "jam-sandwich",
+          "name": "jam sandwich",
+          "aliases": [
+            "jelly sandwich",
+            "jam sandwiches"
+          ]
+        },
+        {
+          "id": "tomato-sandwich",
+          "name": "tomato sandwich",
+          "aliases": [
+            "tomato sandwiches"
+          ]
+        },
+        {
+          "id": "caprese-sandwich",
+          "name": "caprese sandwich",
+          "aliases": [
+            "caprese",
+            "caprese sandwiches"
+          ]
+        },
+        {
+          "id": "veggie-sandwich",
+          "name": "veggie sandwich",
+          "aliases": [
+            "vegetable sandwich",
+            "veggie sandwiches"
+          ]
+        },
+        {
+          "id": "katsu-sando",
+          "name": "katsu sando",
+          "aliases": [
+            "sando",
+            "katsu sandwich",
+            "katsu sandos"
+          ]
+        },
+        {
+          "id": "tramezzino",
+          "name": "tramezzino",
+          "aliases": [
+            "tramezzinos"
+          ]
+        },
+        {
+          "id": "torta",
+          "name": "torta",
+          "aliases": [
+            "tortas"
+          ]
+        },
+        {
+          "id": "bocadillo",
+          "name": "bocadillo",
+          "aliases": [
+            "bocadillos"
+          ]
+        },
+        {
+          "id": "jambon-beurre",
+          "name": "jambon-beurre",
+          "aliases": [
+            "jambon-beurres"
+          ]
+        },
+        {
+          "id": "francesinha",
+          "name": "francesinha",
+          "aliases": [
+            "francesinhas"
+          ]
+        },
+        {
+          "id": "chivito",
+          "name": "chivito",
+          "aliases": [
+            "chivitos"
+          ]
+        },
+        {
+          "id": "vada-pav",
+          "name": "vada pav",
+          "aliases": [
+            "vada pavs"
+          ]
+        },
+        {
+          "id": "hamburger",
+          "name": "hamburger",
+          "aliases": [
+            "burger",
+            "hamburgers"
+          ]
+        },
+        {
+          "id": "cheeseburger",
+          "name": "cheeseburger",
+          "aliases": [
+            "cheeseburgers"
+          ]
+        },
+        {
+          "id": "hot-dog",
+          "name": "hot dog",
+          "aliases": [
+            "hot dogs"
+          ]
+        },
+        {
+          "id": "ice-cream-sandwich",
+          "name": "ice cream sandwich",
+          "aliases": [
+            "ice cream sandwiches"
+          ]
+        },
+        {
+          "id": "wrap",
+          "name": "wrap",
+          "aliases": [
+            "wraps"
+          ]
+        },
+        {
+          "id": "pita-sandwich",
+          "name": "pita sandwich",
+          "aliases": [
+            "pita",
+            "pita sandwiches"
+          ]
+        },
+        {
+          "id": "spam-sandwich",
+          "name": "Spam sandwich",
+          "aliases": [
+            "Spam sandwiches"
+          ]
+        },
+        {
+          "id": "avocado-sandwich",
+          "name": "avocado sandwich",
+          "aliases": [
+            "avocado sandwiches"
+          ]
+        },
+        {
+          "id": "hummus-sandwich",
+          "name": "hummus sandwich",
+          "aliases": [
+            "hummus sandwiches"
+          ]
+        },
+        {
+          "id": "falafel-sandwich",
+          "name": "falafel sandwich",
+          "aliases": [
+            "falafel",
+            "falafel sandwiches"
+          ]
+        },
+        {
+          "id": "shawarma",
+          "name": "shawarma",
+          "aliases": [
+            "shawarmas"
+          ]
+        },
+        {
+          "id": "crab-cake-sandwich",
+          "name": "crab cake sandwich",
+          "aliases": [
+            "crab cake sandwiches"
+          ]
+        },
+        {
+          "id": "prawn-sandwich",
+          "name": "prawn sandwich",
+          "aliases": [
+            "prawn mayo",
+            "shrimp salad sandwich",
+            "prawn sandwiches"
+          ]
+        },
+        {
+          "id": "coronation-chicken",
+          "name": "coronation chicken",
+          "aliases": [
+            "coronation chicken sandwich"
+          ],
+          "plural": "coronation chicken"
+        },
+        {
+          "id": "nutella-sandwich",
+          "name": "Nutella sandwich",
+          "aliases": [
+            "Nutella sandwiches"
+          ]
+        },
+        {
+          "id": "sausage-sandwich",
+          "name": "sausage sandwich",
+          "aliases": [
+            "sausage sarnie",
+            "sausage sandwiches"
+          ]
+        },
+        {
+          "id": "ploughmans",
+          "name": "ploughman's",
+          "aliases": [
+            "ploughman's sandwich"
+          ]
+        },
+        {
+          "id": "marmite-sandwich",
+          "name": "Marmite sandwich",
+          "aliases": [
+            "Vegemite sandwich",
+            "Marmite sandwiches"
+          ]
+        },
+        {
+          "id": "sardine-sandwich",
+          "name": "sardine sandwich",
+          "aliases": [
+            "sardine sandwiches"
+          ]
+        },
+        {
+          "id": "mortadella-sandwich",
+          "name": "mortadella sandwich",
+          "aliases": [
+            "mortadella",
+            "mortadella sandwiches"
+          ]
+        }
+      ],
+      "host_bank": [
+        "blt",
+        "grilled-cheese",
+        "peanut-butter-and-jelly",
+        "ham-sandwich",
+        "turkey-sandwich",
+        "club-sandwich",
+        "tuna-sandwich",
+        "sub"
+      ],
+      "host_answers": [
+        "blt"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a bone in the human body",
+      "entries": [
+        {
+          "id": "skull",
+          "name": "skull",
+          "aliases": [
+            "cranium",
+            "skulls"
+          ]
+        },
+        {
+          "id": "frontal-bone",
+          "name": "frontal bone",
+          "aliases": [
+            "frontal bones"
+          ]
+        },
+        {
+          "id": "parietal-bone",
+          "name": "parietal bone",
+          "aliases": [
+            "parietal bones"
+          ]
+        },
+        {
+          "id": "temporal-bone",
+          "name": "temporal bone",
+          "aliases": [
+            "temporal bones"
+          ]
+        },
+        {
+          "id": "occipital-bone",
+          "name": "occipital bone",
+          "aliases": [
+            "occipital bones"
+          ]
+        },
+        {
+          "id": "sphenoid",
+          "name": "sphenoid",
+          "aliases": [
+            "sphenoid bone",
+            "sphenoids"
+          ]
+        },
+        {
+          "id": "ethmoid",
+          "name": "ethmoid",
+          "aliases": [
+            "ethmoid bone",
+            "ethmoids"
+          ]
+        },
+        {
+          "id": "nasal-bone",
+          "name": "nasal bone",
+          "aliases": [
+            "nasal bones"
+          ]
+        },
+        {
+          "id": "lacrimal-bone",
+          "name": "lacrimal bone",
+          "aliases": [
+            "lacrimal",
+            "lacrimal bones"
+          ]
+        },
+        {
+          "id": "zygomatic-bone",
+          "name": "zygomatic bone",
+          "aliases": [
+            "cheekbone",
+            "cheek bone",
+            "zygoma",
+            "zygomatic bones"
+          ]
+        },
+        {
+          "id": "maxilla",
+          "name": "maxilla",
+          "aliases": [
+            "upper jaw",
+            "upper jawbone",
+            "maxillae"
+          ],
+          "plural": "maxillae"
+        },
+        {
+          "id": "mandible",
+          "name": "mandible",
+          "aliases": [
+            "jawbone",
+            "jaw",
+            "lower jaw",
+            "jaw bone",
+            "mandibles"
+          ]
+        },
+        {
+          "id": "vomer",
+          "name": "vomer",
+          "aliases": [
+            "vomers"
+          ]
+        },
+        {
+          "id": "palatine-bone",
+          "name": "palatine bone",
+          "aliases": [
+            "palatine",
+            "palatine bones"
+          ]
+        },
+        {
+          "id": "hyoid",
+          "name": "hyoid",
+          "aliases": [
+            "hyoid bone",
+            "hyoids"
+          ]
+        },
+        {
+          "id": "malleus",
+          "name": "malleus",
+          "aliases": [
+            "hammer",
+            "mallei"
+          ],
+          "plural": "mallei"
+        },
+        {
+          "id": "incus",
+          "name": "incus",
+          "aliases": [
+            "anvil",
+            "incudes"
+          ],
+          "plural": "incudes"
+        },
+        {
+          "id": "stapes",
+          "name": "stapes",
+          "aliases": [
+            "stirrup"
+          ],
+          "plural": "stapes"
+        },
+        {
+          "id": "spine",
+          "name": "spine",
+          "aliases": [
+            "backbone",
+            "spinal column",
+            "vertebral column",
+            "back bone",
+            "spines"
+          ]
+        },
+        {
+          "id": "vertebra",
+          "name": "vertebra",
+          "aliases": [
+            "vertebrae"
+          ],
+          "plural": "vertebrae"
+        },
+        {
+          "id": "atlas",
+          "name": "atlas",
+          "aliases": [
+            "atlases"
+          ]
+        },
+        {
+          "id": "axis",
+          "name": "axis",
+          "aliases": [
+            "axes"
+          ],
+          "plural": "axes"
+        },
+        {
+          "id": "sacrum",
+          "name": "sacrum",
+          "aliases": [
+            "sacrums"
+          ]
+        },
+        {
+          "id": "coccyx",
+          "name": "coccyx",
+          "aliases": [
+            "tailbone",
+            "tail bone",
+            "coccyges"
+          ],
+          "plural": "coccyges"
+        },
+        {
+          "id": "rib",
+          "name": "rib",
+          "aliases": [
+            "ribcage",
+            "rib cage",
+            "floating rib",
+            "true rib",
+            "false rib",
+            "ribs"
+          ]
+        },
+        {
+          "id": "sternum",
+          "name": "sternum",
+          "aliases": [
+            "breastbone",
+            "breast bone",
+            "sternums"
+          ]
+        },
+        {
+          "id": "clavicle",
+          "name": "clavicle",
+          "aliases": [
+            "collarbone",
+            "collar bone",
+            "clavicles"
+          ]
+        },
+        {
+          "id": "scapula",
+          "name": "scapula",
+          "aliases": [
+            "shoulder blade",
+            "scapulae"
+          ],
+          "plural": "scapulae"
+        },
+        {
+          "id": "humerus",
+          "name": "humerus",
+          "aliases": [
+            "upper arm bone",
+            "humeri"
+          ],
+          "plural": "humeri"
+        },
+        {
+          "id": "radius",
+          "name": "radius",
+          "aliases": [
+            "radii"
+          ],
+          "plural": "radii"
+        },
+        {
+          "id": "ulna",
+          "name": "ulna",
+          "aliases": [
+            "ulnae"
+          ],
+          "plural": "ulnae"
+        },
+        {
+          "id": "carpal",
+          "name": "carpal",
+          "aliases": [
+            "carpals",
+            "wrist bone"
+          ]
+        },
+        {
+          "id": "scaphoid",
+          "name": "scaphoid",
+          "aliases": [
+            "scaphoids"
+          ]
+        },
+        {
+          "id": "lunate",
+          "name": "lunate",
+          "aliases": [
+            "lunates"
+          ]
+        },
+        {
+          "id": "pisiform",
+          "name": "pisiform",
+          "aliases": [
+            "pisiforms"
+          ]
+        },
+        {
+          "id": "hamate",
+          "name": "hamate",
+          "aliases": [
+            "hamates"
+          ]
+        },
+        {
+          "id": "metacarpal",
+          "name": "metacarpal",
+          "aliases": [
+            "hand bone",
+            "metacarpals"
+          ]
+        },
+        {
+          "id": "phalanx",
+          "name": "phalanx",
+          "aliases": [
+            "phalanges",
+            "finger bone",
+            "toe bone",
+            "knuckle"
+          ],
+          "plural": "phalanges"
+        },
+        {
+          "id": "pelvis",
+          "name": "pelvis",
+          "aliases": [
+            "hip bone",
+            "hipbone",
+            "pelvic bone",
+            "ilium",
+            "ischium",
+            "pubis",
+            "pubic bone",
+            "pelvises"
+          ],
+          "plural": "pelvises"
+        },
+        {
+          "id": "femur",
+          "name": "femur",
+          "aliases": [
+            "thigh bone",
+            "thighbone",
+            "femurs"
+          ],
+          "plural": "femurs"
+        },
+        {
+          "id": "patella",
+          "name": "patella",
+          "aliases": [
+            "kneecap",
+            "knee cap",
+            "patellae"
+          ],
+          "plural": "patellae"
+        },
+        {
+          "id": "tibia",
+          "name": "tibia",
+          "aliases": [
+            "shin bone",
+            "shinbone",
+            "shin",
+            "tibiae"
+          ],
+          "plural": "tibiae"
+        },
+        {
+          "id": "fibula",
+          "name": "fibula",
+          "aliases": [
+            "fibulae"
+          ],
+          "plural": "fibulae"
+        },
+        {
+          "id": "tarsal",
+          "name": "tarsal",
+          "aliases": [
+            "tarsals",
+            "ankle bones"
+          ]
+        },
+        {
+          "id": "talus",
+          "name": "talus",
+          "aliases": [
+            "ankle bone",
+            "anklebone",
+            "tali"
+          ],
+          "plural": "tali"
+        },
+        {
+          "id": "calcaneus",
+          "name": "calcaneus",
+          "aliases": [
+            "heel bone",
+            "heel",
+            "calcanei"
+          ],
+          "plural": "calcanei"
+        },
+        {
+          "id": "navicular",
+          "name": "navicular",
+          "aliases": [
+            "naviculars"
+          ]
+        },
+        {
+          "id": "cuboid",
+          "name": "cuboid",
+          "aliases": [
+            "cuboids"
+          ]
+        },
+        {
+          "id": "cuneiform",
+          "name": "cuneiform",
+          "aliases": [
+            "cuneiforms"
+          ]
+        },
+        {
+          "id": "metatarsal",
+          "name": "metatarsal",
+          "aliases": [
+            "foot bone",
+            "metatarsals"
+          ]
+        },
+        {
+          "id": "sesamoid",
+          "name": "sesamoid",
+          "aliases": [
+            "sesamoid bone",
+            "sesamoids"
+          ]
+        }
+      ],
+      "host_bank": [
+        "rib",
+        "skull",
+        "femur",
+        "spine",
+        "tibia",
+        "humerus",
+        "pelvis",
+        "clavicle"
+      ],
+      "host_answers": [
+        "rib"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a piece of jewelry",
+      "entries": [
+        {
+          "id": "ring",
+          "name": "ring",
+          "aliases": [
+            "toe ring",
+            "engagement ring",
+            "wedding ring",
+            "wedding band",
+            "band",
+            "signet ring",
+            "class ring",
+            "mood ring",
+            "pinky ring",
+            "promise ring",
+            "rings"
+          ]
+        },
+        {
+          "id": "necklace",
+          "name": "necklace",
+          "aliases": [
+            "choker",
+            "pendant",
+            "locket",
+            "chain",
+            "pearl necklace",
+            "medallion",
+            "gold chain",
+            "necklaces"
+          ]
+        },
+        {
+          "id": "earring",
+          "name": "earring",
+          "aliases": [
+            "stud",
+            "studs",
+            "hoop",
+            "hoops",
+            "hoop earrings",
+            "stud earrings",
+            "ear cuff",
+            "dangle earrings",
+            "earrings"
+          ]
+        },
+        {
+          "id": "bracelet",
+          "name": "bracelet",
+          "aliases": [
+            "bangle",
+            "cuff",
+            "charm bracelet",
+            "tennis bracelet",
+            "friendship bracelet",
+            "cuff bracelet",
+            "bracelets"
+          ]
+        },
+        {
+          "id": "anklet",
+          "name": "anklet",
+          "aliases": [
+            "ankle bracelet",
+            "ankle chain",
+            "anklets"
+          ]
+        },
+        {
+          "id": "watch",
+          "name": "watch",
+          "aliases": [
+            "wristwatch",
+            "watches"
+          ]
+        },
+        {
+          "id": "brooch",
+          "name": "brooch",
+          "aliases": [
+            "pin",
+            "broach",
+            "lapel pin",
+            "brooches"
+          ]
+        },
+        {
+          "id": "tiara",
+          "name": "tiara",
+          "aliases": [
+            "crown",
+            "diadem",
+            "tiaras"
+          ]
+        },
+        {
+          "id": "cufflink",
+          "name": "cufflink",
+          "aliases": [
+            "cuff links",
+            "cufflinks"
+          ]
+        },
+        {
+          "id": "tie-clip",
+          "name": "tie clip",
+          "aliases": [
+            "tie bar",
+            "tie pin",
+            "tie clasp",
+            "tie clips"
+          ]
+        },
+        {
+          "id": "nose-stud",
+          "name": "nose stud",
+          "aliases": [
+            "nose ring",
+            "septum ring",
+            "nose piercing",
+            "nose studs"
+          ]
+        },
+        {
+          "id": "belly-bar",
+          "name": "belly bar",
+          "aliases": [
+            "belly button ring",
+            "belly ring",
+            "navel ring",
+            "belly bars"
+          ]
+        },
+        {
+          "id": "tongue-stud",
+          "name": "tongue stud",
+          "aliases": [
+            "tongue ring",
+            "tongue studs"
+          ]
+        },
+        {
+          "id": "belly-chain",
+          "name": "belly chain",
+          "aliases": [
+            "body chain",
+            "waist chain",
+            "belly chains"
+          ]
+        },
+        {
+          "id": "arm-cuff",
+          "name": "arm cuff",
+          "aliases": [
+            "armlet",
+            "arm band",
+            "upper arm bracelet",
+            "arm cuffs"
+          ]
+        },
+        {
+          "id": "charm",
+          "name": "charm",
+          "aliases": [
+            "charms"
+          ]
+        },
+        {
+          "id": "amulet",
+          "name": "amulet",
+          "aliases": [
+            "talisman",
+            "amulets"
+          ]
+        },
+        {
+          "id": "grill",
+          "name": "grill",
+          "aliases": [
+            "grillz",
+            "grills",
+            "gold teeth"
+          ]
+        },
+        {
+          "id": "hair-pin",
+          "name": "hair pin",
+          "aliases": [
+            "hairpin",
+            "jeweled hair clip",
+            "hair pins"
+          ]
+        },
+        {
+          "id": "headpiece",
+          "name": "headpiece",
+          "aliases": [
+            "hair jewelry",
+            "headpieces"
+          ]
+        },
+        {
+          "id": "body-jewelry",
+          "name": "body jewelry",
+          "aliases": [
+            "piercing",
+            "piercings",
+            "eyebrow ring",
+            "lip ring"
+          ],
+          "plural": "body jewelry"
+        },
+        {
+          "id": "rosary",
+          "name": "rosary",
+          "aliases": [
+            "rosaries"
+          ]
+        }
+      ],
+      "host_bank": [
+        "necklace",
+        "ring",
+        "earring",
+        "bracelet",
+        "watch",
+        "anklet",
+        "brooch"
+      ],
+      "host_answers": [
+        "necklace"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a decade of the 20th century (the 1900s to the 1990s)",
+      "entries": [
+        {
+          "id": "1900s",
+          "name": "1900s",
+          "aliases": [
+            "the 1900s",
+            "00s",
+            "the 00s",
+            "aughts",
+            "the aughts",
+            "noughties"
+          ],
+          "plural": "1900s"
+        },
+        {
+          "id": "1910s",
+          "name": "1910s",
+          "aliases": [
+            "the 1910s",
+            "10s",
+            "the 10s",
+            "teens",
+            "the teens"
+          ],
+          "plural": "1910s"
+        },
+        {
+          "id": "1920s",
+          "name": "1920s",
+          "aliases": [
+            "the 1920s",
+            "20s",
+            "the 20s",
+            "twenties",
+            "the twenties",
+            "Roaring Twenties"
+          ],
+          "plural": "1920s"
+        },
+        {
+          "id": "1930s",
+          "name": "1930s",
+          "aliases": [
+            "the 1930s",
+            "30s",
+            "the 30s",
+            "thirties",
+            "the thirties"
+          ],
+          "plural": "1930s"
+        },
+        {
+          "id": "1940s",
+          "name": "1940s",
+          "aliases": [
+            "the 1940s",
+            "40s",
+            "the 40s",
+            "forties",
+            "the forties"
+          ],
+          "plural": "1940s"
+        },
+        {
+          "id": "1950s",
+          "name": "1950s",
+          "aliases": [
+            "the 1950s",
+            "50s",
+            "the 50s",
+            "fifties",
+            "the fifties"
+          ],
+          "plural": "1950s"
+        },
+        {
+          "id": "1960s",
+          "name": "1960s",
+          "aliases": [
+            "the 1960s",
+            "60s",
+            "the 60s",
+            "sixties",
+            "the sixties"
+          ],
+          "plural": "1960s"
+        },
+        {
+          "id": "1970s",
+          "name": "1970s",
+          "aliases": [
+            "the 1970s",
+            "70s",
+            "the 70s",
+            "seventies",
+            "the seventies"
+          ],
+          "plural": "1970s"
+        },
+        {
+          "id": "1980s",
+          "name": "1980s",
+          "aliases": [
+            "the 1980s",
+            "80s",
+            "the 80s",
+            "eighties",
+            "the eighties"
+          ],
+          "plural": "1980s"
+        },
+        {
+          "id": "1990s",
+          "name": "1990s",
+          "aliases": [
+            "the 1990s",
+            "90s",
+            "the 90s",
+            "nineties",
+            "the nineties"
+          ],
+          "plural": "1990s"
+        }
+      ],
+      "host_bank": [
+        "1980s",
+        "1900s",
+        "1910s",
+        "1920s",
+        "1930s",
+        "1940s",
+        "1950s",
+        "1960s",
+        "1970s",
+        "1990s"
+      ],
+      "host_answers": [
+        "1980s"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something that's hot",
+      "entries": [
+        {
+          "id": "sun",
+          "name": "sun",
+          "aliases": [
+            "the sun",
+            "suns"
+          ]
+        },
+        {
+          "id": "fire",
+          "name": "fire",
+          "aliases": [
+            "flame",
+            "flames",
+            "campfire",
+            "bonfire",
+            "wildfire",
+            "blaze",
+            "fires"
+          ]
+        },
+        {
+          "id": "fireplace",
+          "name": "fireplace",
+          "aliases": [
+            "fireplaces"
+          ]
+        },
+        {
+          "id": "candle",
+          "name": "candle",
+          "aliases": [
+            "candle flame",
+            "candles"
+          ]
+        },
+        {
+          "id": "match",
+          "name": "match",
+          "aliases": [
+            "lit match",
+            "matches"
+          ]
+        },
+        {
+          "id": "lighter",
+          "name": "lighter",
+          "aliases": [
+            "lighters"
+          ]
+        },
+        {
+          "id": "torch",
+          "name": "torch",
+          "aliases": [
+            "blowtorch",
+            "torches"
+          ]
+        },
+        {
+          "id": "lava",
+          "name": "lava",
+          "aliases": [
+            "magma",
+            "molten lava"
+          ],
+          "plural": "lava"
+        },
+        {
+          "id": "volcano",
+          "name": "volcano",
+          "aliases": [
+            "volcanoes"
+          ]
+        },
+        {
+          "id": "stove",
+          "name": "stove",
+          "aliases": [
+            "stovetop",
+            "burner",
+            "hob",
+            "stoves"
+          ]
+        },
+        {
+          "id": "oven",
+          "name": "oven",
+          "aliases": [
+            "ovens"
+          ]
+        },
+        {
+          "id": "grill",
+          "name": "grill",
+          "aliases": [
+            "barbecue",
+            "BBQ",
+            "grills"
+          ]
+        },
+        {
+          "id": "toaster",
+          "name": "toaster",
+          "aliases": [
+            "toasters"
+          ]
+        },
+        {
+          "id": "iron",
+          "name": "iron",
+          "aliases": [
+            "clothes iron",
+            "irons"
+          ]
+        },
+        {
+          "id": "hair-dryer",
+          "name": "hair dryer",
+          "aliases": [
+            "blow dryer",
+            "hairdryer",
+            "hair dryers"
+          ]
+        },
+        {
+          "id": "curling-iron",
+          "name": "curling iron",
+          "aliases": [
+            "curling tongs",
+            "curling irons"
+          ]
+        },
+        {
+          "id": "hair-straightener",
+          "name": "hair straightener",
+          "aliases": [
+            "flat iron",
+            "straightener",
+            "hair straighteners"
+          ]
+        },
+        {
+          "id": "radiator",
+          "name": "radiator",
+          "aliases": [
+            "radiators"
+          ]
+        },
+        {
+          "id": "heater",
+          "name": "heater",
+          "aliases": [
+            "space heater",
+            "heaters"
+          ]
+        },
+        {
+          "id": "furnace",
+          "name": "furnace",
+          "aliases": [
+            "furnaces"
+          ]
+        },
+        {
+          "id": "kettle",
+          "name": "kettle",
+          "aliases": [
+            "tea kettle",
+            "kettles"
+          ]
+        },
+        {
+          "id": "hot-water",
+          "name": "hot water",
+          "aliases": [
+            "boiling water"
+          ],
+          "plural": "hot water"
+        },
+        {
+          "id": "steam",
+          "name": "steam",
+          "aliases": [],
+          "plural": "steam"
+        },
+        {
+          "id": "coffee",
+          "name": "coffee",
+          "aliases": [],
+          "plural": "coffee"
+        },
+        {
+          "id": "tea",
+          "name": "tea",
+          "aliases": [],
+          "plural": "tea"
+        },
+        {
+          "id": "hot-chocolate",
+          "name": "hot chocolate",
+          "aliases": [
+            "hot cocoa",
+            "cocoa"
+          ],
+          "plural": "hot chocolate"
+        },
+        {
+          "id": "soup",
+          "name": "soup",
+          "aliases": [],
+          "plural": "soup"
+        },
+        {
+          "id": "pizza",
+          "name": "pizza",
+          "aliases": [
+            "fresh pizza",
+            "pizzas"
+          ]
+        },
+        {
+          "id": "chili-pepper",
+          "name": "chili pepper",
+          "aliases": [
+            "hot pepper",
+            "chilli",
+            "chile",
+            "chili",
+            "jalapeño",
+            "habanero",
+            "ghost pepper",
+            "cayenne",
+            "chili peppers"
+          ]
+        },
+        {
+          "id": "hot-sauce",
+          "name": "hot sauce",
+          "aliases": [
+            "Tabasco",
+            "sriracha"
+          ],
+          "plural": "hot sauce"
+        },
+        {
+          "id": "wasabi",
+          "name": "wasabi",
+          "aliases": [],
+          "plural": "wasabi"
+        },
+        {
+          "id": "buffalo-wings",
+          "name": "buffalo wings",
+          "aliases": [
+            "hot wings",
+            "wings"
+          ],
+          "plural": "buffalo wings"
+        },
+        {
+          "id": "curry",
+          "name": "curry",
+          "aliases": [],
+          "plural": "curry"
+        },
+        {
+          "id": "summer",
+          "name": "summer",
+          "aliases": [],
+          "plural": "summer"
+        },
+        {
+          "id": "heat-wave",
+          "name": "heat wave",
+          "aliases": [
+            "heatwave"
+          ],
+          "plural": "heat wave"
+        },
+        {
+          "id": "desert",
+          "name": "desert",
+          "aliases": [
+            "Sahara",
+            "Death Valley",
+            "deserts"
+          ]
+        },
+        {
+          "id": "sand",
+          "name": "sand",
+          "aliases": [
+            "hot sand",
+            "beach sand"
+          ],
+          "plural": "sand"
+        },
+        {
+          "id": "asphalt",
+          "name": "asphalt",
+          "aliases": [
+            "pavement",
+            "blacktop"
+          ],
+          "plural": "asphalt"
+        },
+        {
+          "id": "sauna",
+          "name": "sauna",
+          "aliases": [
+            "steam room",
+            "saunas"
+          ]
+        },
+        {
+          "id": "hot-tub",
+          "name": "hot tub",
+          "aliases": [
+            "jacuzzi",
+            "spa",
+            "hot tubs"
+          ]
+        },
+        {
+          "id": "hot-spring",
+          "name": "hot spring",
+          "aliases": [
+            "geyser",
+            "hot springs"
+          ]
+        },
+        {
+          "id": "lightning",
+          "name": "lightning",
+          "aliases": [],
+          "plural": "lightning"
+        },
+        {
+          "id": "star",
+          "name": "star",
+          "aliases": [
+            "stars"
+          ]
+        },
+        {
+          "id": "venus",
+          "name": "Venus",
+          "aliases": [],
+          "plural": "Venus"
+        },
+        {
+          "id": "mercury",
+          "name": "Mercury",
+          "aliases": [],
+          "plural": "Mercury"
+        },
+        {
+          "id": "earths-core",
+          "name": "Earth's core",
+          "aliases": [
+            "core",
+            "the core"
+          ],
+          "plural": "Earth's core"
+        },
+        {
+          "id": "coal",
+          "name": "coal",
+          "aliases": [
+            "hot coals",
+            "embers",
+            "ember",
+            "charcoal"
+          ],
+          "plural": "coal"
+        },
+        {
+          "id": "frying-pan",
+          "name": "frying pan",
+          "aliases": [
+            "pan",
+            "skillet",
+            "frying pans"
+          ]
+        },
+        {
+          "id": "pot",
+          "name": "pot",
+          "aliases": [
+            "saucepan",
+            "pots"
+          ]
+        },
+        {
+          "id": "engine",
+          "name": "engine",
+          "aliases": [
+            "car engine",
+            "engines"
+          ]
+        },
+        {
+          "id": "exhaust-pipe",
+          "name": "exhaust pipe",
+          "aliases": [
+            "tailpipe",
+            "exhaust pipes"
+          ]
+        },
+        {
+          "id": "laptop",
+          "name": "laptop",
+          "aliases": [
+            "laptops"
+          ]
+        },
+        {
+          "id": "light-bulb",
+          "name": "light bulb",
+          "aliases": [
+            "bulb",
+            "light bulbs"
+          ]
+        },
+        {
+          "id": "heat-lamp",
+          "name": "heat lamp",
+          "aliases": [
+            "heat lamps"
+          ]
+        },
+        {
+          "id": "heating-pad",
+          "name": "heating pad",
+          "aliases": [
+            "hot water bottle",
+            "heating pads"
+          ]
+        },
+        {
+          "id": "electric-blanket",
+          "name": "electric blanket",
+          "aliases": [
+            "electric blankets"
+          ]
+        },
+        {
+          "id": "hand-warmer",
+          "name": "hand warmer",
+          "aliases": [
+            "hand warmers"
+          ]
+        },
+        {
+          "id": "fever",
+          "name": "fever",
+          "aliases": [],
+          "plural": "fever"
+        },
+        {
+          "id": "hot-dog",
+          "name": "hot dog",
+          "aliases": [
+            "hot dogs"
+          ]
+        },
+        {
+          "id": "baked-potato",
+          "name": "baked potato",
+          "aliases": [
+            "baked potatoes"
+          ]
+        },
+        {
+          "id": "cinnamon",
+          "name": "cinnamon",
+          "aliases": [],
+          "plural": "cinnamon"
+        },
+        {
+          "id": "tropics",
+          "name": "tropics",
+          "aliases": [
+            "the tropics",
+            "equator"
+          ],
+          "plural": "tropics"
+        },
+        {
+          "id": "arizona",
+          "name": "Arizona",
+          "aliases": [
+            "Phoenix"
+          ],
+          "plural": "Arizona"
+        },
+        {
+          "id": "florida",
+          "name": "Florida",
+          "aliases": [],
+          "plural": "Florida"
+        },
+        {
+          "id": "texas",
+          "name": "Texas",
+          "aliases": [],
+          "plural": "Texas"
+        },
+        {
+          "id": "microwave",
+          "name": "microwave",
+          "aliases": [
+            "microwaves"
+          ]
+        },
+        {
+          "id": "popcorn",
+          "name": "popcorn",
+          "aliases": [],
+          "plural": "popcorn"
+        },
+        {
+          "id": "toast",
+          "name": "toast",
+          "aliases": [],
+          "plural": "toast"
+        },
+        {
+          "id": "melted-cheese",
+          "name": "melted cheese",
+          "aliases": [
+            "cheese"
+          ],
+          "plural": "melted cheese"
+        },
+        {
+          "id": "blacksmiths-forge",
+          "name": "blacksmith's forge",
+          "aliases": [
+            "forge",
+            "blacksmith's forges"
+          ]
+        },
+        {
+          "id": "welder",
+          "name": "welder",
+          "aliases": [
+            "welding torch",
+            "welders"
+          ]
+        },
+        {
+          "id": "kiln",
+          "name": "kiln",
+          "aliases": [
+            "kilns"
+          ]
+        },
+        {
+          "id": "tanning-bed",
+          "name": "tanning bed",
+          "aliases": [
+            "tanning beds"
+          ]
+        },
+        {
+          "id": "hot-car",
+          "name": "hot car",
+          "aliases": [
+            "car in the sun",
+            "car seat",
+            "hot cars"
+          ]
+        },
+        {
+          "id": "metal-slide",
+          "name": "metal slide",
+          "aliases": [
+            "slide",
+            "metal slides"
+          ]
+        },
+        {
+          "id": "phone",
+          "name": "phone",
+          "aliases": [
+            "overheated phone",
+            "phones"
+          ]
+        },
+        {
+          "id": "attractive-person",
+          "name": "attractive person",
+          "aliases": [
+            "hottie"
+          ],
+          "plural": "attractive person"
+        }
+      ],
+      "host_bank": [
+        "fire",
+        "sun",
+        "lava",
+        "stove",
+        "oven",
+        "coffee",
+        "summer",
+        "chili-pepper"
+      ],
+      "host_answers": [
+        "fire"
+      ],
+      "match_groups": {}
+    }
+  ]
+}
