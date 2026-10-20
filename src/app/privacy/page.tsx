@@ -20,8 +20,8 @@ export default function Privacy() {
       <ul>
         <li>
           <strong>Your account:</strong> your email address, and the username you pick. If you sign in with Google,
-          Google also shares your name and profile picture, which are stored with your account. Plor doesn&apos;t
-          show or use them.
+          Google also shares your name, and your profile picture if you have one; they are stored with your
+          account. Plor doesn&apos;t show or use them.
         </li>
         <li>
           <strong>Your games:</strong> each day you play, which answer you picked for each question, whether it matched
