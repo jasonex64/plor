@@ -3,9 +3,9 @@
 // Today's Offbeat run: one question at a time, answers picked from the question's accepted bank by entry ID,
 // a no-penalty "not in our list yet" for anything else, and a result screen (M02 ticket, UI criterion).
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { normalize } from "@/content/puzzle";
 import type { RunState } from "@/game/runs";
 import type { PublicEntry, PublicQuestion } from "@/game/payload";
+import { suggest } from "@/game/suggest";
 import { ApiError, api } from "@/lib/api-client";
 import { messageFor } from "./messages";
 
@@ -81,19 +81,6 @@ function LastResult({ answered }: { answered: RunState["answered"][number] }) {
   );
 }
 
-// Every word of an entry's name or aliases that starts with what was typed, compared after the same
-// normalization the content was authored with (DECISIONS.md: Answer model, Normalization).
-function suggestionsFor(entries: PublicEntry[], typed: string): PublicEntry[] {
-  const query = normalize(typed);
-  if (!query) return [];
-  return entries.filter((entry) =>
-    [entry.name, ...entry.aliases].some((text) => {
-      const words = normalize(text);
-      return words.startsWith(query) || words.includes(` ${query}`);
-    }),
-  );
-}
-
 function Question({
   question,
   total,
@@ -108,11 +95,16 @@ function Question({
   const [typed, setTyped] = useState("");
   const [picked, setPicked] = useState<PublicEntry | null>(null);
   const [missNote, setMissNote] = useState<string | null>(null);
-  const suggestions = useMemo(() => suggestionsFor(question.entries, typed), [question.entries, typed]);
-  const exact = suggestions.some((e) => [e.name, ...e.aliases].some((text) => normalize(text) === normalize(typed)));
+  const { matches, typos, exact } = useMemo(() => suggest(question.entries, typed), [question.entries, typed]);
 
-  async function reportMiss(event: FormEvent) {
+  // Enter picks an entry the text names exactly (still confirmed with "Lock in"), and never sends a miss: during
+  // the rehearsal, Enter on "passport" logged it as not in the list (human, 2026-10-19).
+  function pickExact(event: FormEvent) {
     event.preventDefault();
+    if (exact) setPicked(exact);
+  }
+
+  async function reportMiss() {
     setMissNote(null);
     try {
       await api("/api/run/miss", { method: "POST", body: { index: question.index, text: typed } });
@@ -140,7 +132,7 @@ function Question({
           </button>
         </>
       ) : (
-        <form onSubmit={reportMiss}>
+        <form onSubmit={pickExact}>
           <label>
             Your answer
             <input
@@ -155,9 +147,10 @@ function Question({
               }}
             />
           </label>
-          {suggestions.length > 0 && (
+          {typos.length > 0 && <p>Did you mean:</p>}
+          {matches.length + typos.length > 0 && (
             <ul className="suggestions">
-              {suggestions.map((entry) => (
+              {[...matches, ...typos].map((entry) => (
                 <li key={entry.id}>
                   <button type="button" onClick={() => setPicked(entry)}>
                     {entry.name}
@@ -167,7 +160,7 @@ function Question({
             </ul>
           )}
           {typed.trim() !== "" && !exact && (
-            <button type="submit" disabled={busy}>
+            <button type="button" disabled={busy} onClick={reportMiss}>
               Not in the list? Send &quot;{typed.trim()}&quot;
             </button>
           )}

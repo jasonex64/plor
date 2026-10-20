@@ -39,12 +39,12 @@ The guest-to-account merge (R5) has to be written by us whichever stack we pick.
 2. **There's much less to build than C.** Auth with anonymous linking, realtime fan-out and managed backups come with the platform. C's one real advantage is that gating is just code, and A gets the same benefit with the topic design below.
 3. **C is A's way out.** If Supabase Realtime limits ever become a problem, we can replace only the realtime layer with our own SSE server on the same Postgres database, without moving any data.
 
-### How A meets R2 (confirm in M05)
+### How A meets R2 (confirm in M07)
 - Each viewer subscribes to one private topic, `board:<viewer_id>`. The policy only checks that the topic matches the user's own ID. That rule never changes, so connection-level policy caching causes no problems.
 - When a player answers, server code builds a payload for each friend: **status only** if that friend hasn't finished, **details** if they have. All the gating lives in one server function that can be unit-tested.
 - When a viewer finishes, the client fetches the full board through a normal server call that uses the same gating function.
 - Postgres Changes is not used.
-- **UNVERIFIED (check in M05):** whether Broadcast can send to many topics in one call, and whether a database-side `realtime.send()` is part of the surrounding transaction.
+- **UNVERIFIED (check in M07):** whether Broadcast can send to many topics in one call, and whether a database-side `realtime.send()` is part of the surrounding transaction.
 
 ### Risks we accept with A
 1. **Connection and message caps at the reset.** The Pro plan with the spend cap on allows 500 connections and 500 messages per second. Message volume is roughly answers per second × average number of friends. We need a human-set load target to know whether to remove the spend cap (that raises the limits to 10,000 connections and 2,500 messages per second).
