@@ -53,6 +53,16 @@ Three directions, one row each. All use the real 2026-11-02 questions. Host answ
 
 Colours and fonts are placeholders to tell the directions apart, not proposals (D3, D4). Every text colour pair in the mockups was checked at 4.5:1 or more, and input borders and progress marks at 3:1 or more (checked with the WCAG relative-luminance formula, computed with a one-off node command; formula *unverified* against the pinned source). No state is shown by colour alone: each also has a shape and a word. Buttons and list rows are at least 44 px tall (the design tool's own guideline; WCAG 2.5.8's minimum is to be read once pinned).
 
+## The human's design notes (human, 2026-10-20)
+In the human's words where quoted; everything else is a close summary.
+- **Plor vs the games.** The home page should be "a more neutral page", while "each individual game will be more stylized and look unique".
+- **Pixel art and animation** in the game itself, maybe making assets with PixelLab. *Unverified:* what PixelLab costs, its terms, and who owns the assets it makes. The human decides (D14), and it needs a SOURCES.md entry before any asset is used.
+- **References for the game:**
+  - krillion.io. Liked: "the animations, the minimalistic theming". Disliked: "the font can be a bit thin sometimes, and maybe its lacking a little bit of detail".
+  - monkeytype: "really like".
+- **Round 2 tiles:** likes "the font in the first card" (tile 1, Quiet instrument: Young Serif headlines over Source Serif 4 text; *which of the two is meant is unconfirmed*) and "the overall feel of the 4th" (tile 4, the fight card: blue, red and black, Bebas Neue capitals, rounds).
+- **No suggestions while typing:** "i wouldn't want a dropdown menu as i'm typing the answer, becauase i dont want to give users any free hints as to guesses. the list should be internal only". This changes a game rule, not only the look; see D15.
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
@@ -62,7 +72,7 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D2 | The words for the game's moments: survive, match the host, 7 of 7 | A: off the beat / off-key / full scale. B: safe / caught / all 7 cleared. C: dodged / caught / same as me | |
 | D3 | Brand colours for Plor and for Offbeat | Placeholders only; needs the human's choice | |
 | D4 | Fonts: a web font (which) or the phone's system font (no download) | Placeholders only | |
-| D5 | How separate are Plor's look and Offbeat's? (Game 2 will have its own name and look.) | Shared frame with a per-game accent, or each game fully its own | |
+| D5 | How separate are Plor's look and Offbeat's? (Game 2 will have its own name and look.) | Shared frame with a per-game accent, or each game fully its own | Plor's home stays neutral; each game gets its own stylized look (human, 2026-10-20). Still open: what, if anything, the games share (header, sign-in, share card frame) |
 | D6 | Light, dark, or follow the phone's setting | A and B light, C dark | |
 | D7 | Safe answer: its own moment with a "Next" tap (all mockups), or a line above the next question (today's UI) | | |
 | D8 | Share (M05): image and text, or text only first; which symbols | See the table above | |
@@ -71,6 +81,8 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D11 | Accessibility source and numbers: pin WCAG 2.2 in SOURCES.md? Contrast ratios and the tap-target size are human numbers until then | | |
 | D12 | Smallest phone width to support | Mockups are 390 px wide (the design tool's default phone size); no minimum chosen | |
 | D13 | Does the host have a face or name (C)? | C shows a circle marked "H" | |
+| D14 | Pixel art: made with PixelLab, drawn by hand, or bought; who owns the assets, and what it costs | PixelLab suggested by the human (2026-10-20) | |
+| D15 | No suggestions while typing (human, 2026-10-20). The player types free text and the server alone matches it to the list. Open: what happens to a typo or an answer that isn't in the list (today: "did you mean" and a no-penalty "not in our list yet"; both can hint at the list); what the player sees before locking in | Needs a DECISIONS.md change (Answer model: the accepted bank is sent to the client for autocomplete) and changes to M02 code, the network message (entry ID → text) and the security of the bank. That's its own ticket, not M12 | |
 
 ## Acceptance criteria
 For this draft (exploration):
