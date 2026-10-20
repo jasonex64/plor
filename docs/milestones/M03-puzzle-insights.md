@@ -59,9 +59,50 @@ The hand-written SQL that M02's ticket would otherwise use for the playtest find
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket: "players who reached it" | Players who **answered** the question | A run that stopped at a question (still playing, or abandoned) gave no answer to count; catch rate and host-bank share are per answer. |
+| D2: compare each question with the day's others | Only questions with at least 5 answers take part, on both sides of the comparison | A "too few" question's rate isn't reliable enough to flag or be flagged against (Numbers: 5). |
+| Ticket: "lists the day's misses with counts" | Misses that differ only in case, spacing, punctuation or accents are one miss, shown in its most common spelling; the count is every time it was typed | The same normalization the content uses (DECISIONS.md: Answer model), so "okapi" and "Okapi" are one candidate for the human. |
+| D1: the human fills `private.admin` | Nothing writes `private.admin` except `postgres` (the SQL editor); plor_app can only read it | Least privilege: no route can make an admin. |
+| DECISIONS.md Test runner: `test:db` runs the db tests | One file at a time (`--no-file-parallelism`) | Two files raced on today's fixture puzzle (hypothesis 3 in Evidence); the row is updated in the same change. |
 
 ## Evidence
+Run in the M03 worktree, branch `m03-puzzle-insights`, 2026-10-20, on a freshly reset local stack. Windows had reserved ports 54264–54363; the human first ran `net stop winnat` / `net start winnat` as administrator.
+
+```text
+$ npm run test:sql
+game.test.sql ............ ok
+plor_app_role.test.sql ... ok      # exact grant list now also has private.admin select and private.missed_answer select
+private_schema.test.sql .. ok      # private.admin unreachable by anon, authenticated and service_role
+profile.test.sql ......... ok
+Files=4, Tests=74
+Result: PASS
+$ npm run test:db                  # one file at a time
+ Test Files  8 passed (8)
+      Tests  44 passed (44)
+$ npm test
+      Tests  124 passed (124)
+$ npm run lint                     # no findings
+$ npm run build                    # adds ○ /admin and ƒ /api/admin/insights
+```
+
+- **Report maths:** `src/insights/report.test.ts` covers counts, catch rate, host-bank share, "too few" under 5, the 10-point flag (at exactly 10, at 9, and 30% → 20%, which floating point gets wrong), the top 5 with ties, and misses grouped across case and accents.
+- **Admin gate:** `route.test.ts` (signed out → 401). `route.db.test.ts`: player → 403 `admins_only`; admin → the report with no user ID or email in the JSON; malformed date → 400; a published day that hasn't started → 404 and absent from the day list. Removing the `<= private.today()` guards from `queries.ts` made two of these tests fail; restored afterwards (M03 review).
+- **Browser check** (local `next start`, 375×812, a fixture day of 8 players):
+  - Not admin: "This page is for admins only."
+  - After adding the test user to `private.admin`, Q1: "Q1. Name an animal … Caught 3 of 8 (38%) … Most common: elephant (3), aardvark (2), alpaca (2), anteater (1)". "Not in the list" shows "okapi (2)" (typed as "okapi" and "Okapi").
+  - Q2: "Caught 1 of 5 (20%)", with "Catches clearly fewer players than an earlier question".
+  - Q3–Q7: "Too few players to judge yet."
+  - The fixture data, the test users and the local puzzle were deleted afterwards.
+
+Hypotheses on the way:
+1. "Port 54322 is held by another session's stack." **Disproved:** nothing was listening; `netsh interface ipv4 show excludedportrange protocol=tcp` showed 54264–54363 reserved by Windows. Fixed by restarting winnat (human, administrator).
+2. "Floating-point catch rates compare correctly at the 10-point line." **Disproved** by a test: 30% → 20% came out as 9.999… points and wasn't flagged. The comparison now uses whole numbers.
+3. "Database test files can run in parallel." **Disproved:** `route.db.test.ts` and `runs.db.test.ts` both inserted today's fixture puzzle (`puzzle_pkey` duplicate). `test:db` now runs files one at a time.
+
 
 ## Review
+**Review 1** (reviewer agent, fresh context, `origin/main...HEAD`, 2026-10-20):
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - The future-day guard had no test (the test asked for 2099-01-01, which has no puzzle at all). **Fixed:** the fixture publishes tomorrow; the test asserts 404 and that tomorrow is not in the day list; removing the guard makes it fail.
+  - Evidence, Source diff and Review were empty while criteria were ticked (a doc script had failed halfway). **Fixed:** this section, the Evidence and the Source diff.
+- Deferred to ROADMAP "Next revision": no day selector when today has no puzzle; impossible dates become a 500; the column-level grant on `missed_answer`; lower-bound counts in the db test; a test for an earlier "too few" question.

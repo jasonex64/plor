@@ -1,5 +1,6 @@
 // The insights route against the local stack (`npm run test:db`): a signed-in player who isn't an admin gets 403, an
-// admin gets the day's report, and the report names no player. The fixture day has known catch rates.
+// admin gets the day's report, and the report names no player. Other local runs for today may exist, so the counts
+// are checked as lower bounds here; the exact maths is in src/insights/report.test.ts.
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -15,7 +16,9 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 const RUN = Date.now().toString(36);
 let today = "";
 let puzzle: Puzzle;
+let tomorrow = "";
 let createdPuzzle = false;
+let createdTomorrow = false;
 const fixturePlayers: string[] = [];
 
 const report = () => GET(apiRequest("/api/admin/insights", { method: "GET" }));
@@ -23,7 +26,16 @@ const report = () => GET(apiRequest("/api/admin/insights", { method: "GET" }));
 beforeAll(async () => {
   useLocalStack();
   const db = getPool();
-  today = (await db.query<{ d: string }>("select private.today()::text as d")).rows[0].d;
+  ({ today, tomorrow } = (await db.query<{ today: string; tomorrow: string }>(
+    "select private.today()::text as today, (private.today() + 1)::text as tomorrow",
+  )).rows[0]);
+  // A published day that hasn't started: its host answers must stay out of the report (D5; M03 review).
+  const ahead = await db.query("select 1 from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, tomorrow]);
+  if (!ahead.rows.length) {
+    const future = { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date: tomorrow };
+    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, tomorrow, future]);
+    createdTomorrow = true;
+  }
   const existing = await db.query<{ content: Puzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
   if (existing.rows.length) puzzle = existing.rows[0].content;
   else {
@@ -54,6 +66,7 @@ afterAll(async () => {
   const db = getPool();
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   if (createdPuzzle) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+  if (createdTomorrow) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, tomorrow]);
   await db.end();
 });
 
@@ -89,9 +102,11 @@ describe("GET /api/admin/insights", () => {
     expect(response.status).toBe(400);
   });
 
-  it("has no report for a day that hasn't started", async () => {
-    const response = await GET(apiRequest("/api/admin/insights?date=2099-01-01", { method: "GET" }));
+  it("has no report, and no entry in the day list, for a published day that hasn't started", async () => {
+    const response = await GET(apiRequest(`/api/admin/insights?date=${tomorrow}`, { method: "GET" }));
     expect(response.status).toBe(404);
     expect(await response.json()).toEqual({ ok: false, error: "not_available" });
+    const days = (await (await report()).json()).days;
+    expect(days).not.toContain(tomorrow);
   });
 });
