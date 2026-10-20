@@ -140,6 +140,8 @@ Code-drawn at the Round 3 and 5 grid (6 px cells), canvas page "Round 6 · 3rd p
 - **Softer contrast:** a muted blue sky in steps, lighter rock, a dark navy ink instead of black, a softer red, and the same ink for the screen's text and buttons. These are still placeholder colours (D3). Every text pair was checked at 4.5:1 or more with the WCAG luminance formula in a one-off node command (lowest: the "+4" tag at 5.4:1, after its first colour failed at 4.2:1).
 - Every sprite is drawn on the same 6 px grid; the goat gets an outline so it reads against the light path.
 
+**Round 6 result (human, 2026-10-20):** a draft, not final. "the concept looks good for now" and "a good base". But the host needs "more personality than just 'the host'": "we need some sort of character in why or how the sheep falls off, maybe wind? or something" (D19). The human wrote "sheep"; the draft animal is a goat (D18, still open).
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
