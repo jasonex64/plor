@@ -25,12 +25,12 @@ A per-question report shows the human how each puzzle really plays, and lets goo
 | D5 | Which days the report covers | **Any finished day, and today's so far (marked as unfinished)** (human, 2026-10-19) | human, 2026-10-19 |
 
 ## Acceptance criteria
-- [ ] For a chosen day, the report shows for each question: players who reached it, how many were caught, the catch rate, the share of answers that were in the host bank, and the most common answers.
-- [ ] It flags questions that break the day's gently rising shape (D2: a later question catches at least 10 points fewer than an earlier one), and marks questions with fewer than 5 players as "too few".
-- [ ] It lists the day's misses with counts, without who typed them (D4).
-- [ ] Adding a chosen miss to a future puzzle goes through `content:additions-check`, the validator and `content:publish` (D3).
-- [ ] The page is reachable only by admins: signed-out → 401, signed in but not in `private.admin` → 403, admin → the report (route-level tests). The admin list can't be read or changed by `anon`, `authenticated` or a player (pgTAP).
-- [ ] `plor_app` gets only the grants the report needs (pgTAP, extending `plor_app_role.test.sql`).
+- [x] For a chosen day, the report shows for each question: players who reached it, how many were caught, the catch rate, the share of answers that were in the host bank, and the most common answers.
+- [x] It flags questions that break the day's gently rising shape (D2: a later question catches at least 10 points fewer than an earlier one), and marks questions with fewer than 5 players as "too few".
+- [x] It lists the day's misses with counts, without who typed them (D4).
+- [x] *(The flow exists: `content:additions-check` (M02 2d), the validator, review, `content:publish`; first real use after the playtest.)* Adding a chosen miss to a future puzzle goes through `content:additions-check`, the validator and `content:publish` (D3).
+- [x] The page is reachable only by admins: signed-out → 401, signed in but not in `private.admin` → 403, admin → the report (route-level tests). The admin list can't be read or changed by `anon`, `authenticated` or a player (pgTAP).
+- [x] `plor_app` gets only the grants the report needs (pgTAP, extending `plor_app_role.test.sql`).
 - [ ] The M02 playtest findings are produced with it (the M02 criterion).
 
 ## Out of scope
