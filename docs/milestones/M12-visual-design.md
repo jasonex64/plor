@@ -55,12 +55,15 @@ Colours and fonts are placeholders to tell the directions apart, not proposals (
 
 ## The human's design notes (human, 2026-10-20)
 In the human's words where quoted; everything else is a close summary.
-- **Plor vs the games.** The home page should be "a more neutral page", while "each individual game will be more stylized and look unique".
+- **Plor vs the games.** The home page should be "a more neutral page", while "each individual game will be more stylized and look unique". Later: the home page "shouldn't be too far away from any of the individual games"; since each game will have some animation and pixel art, the home page should share that style to some extent.
 - **Pixel art and animation** in the game itself, maybe making assets with PixelLab. *Unverified:* what PixelLab costs, its terms, and who owns the assets it makes. The human decides (D14), and it needs a SOURCES.md entry before any asset is used.
 - **References for the game:**
   - krillion.io. Liked: "the animations, the minimalistic theming". Disliked: "the font can be a bit thin sometimes, and maybe its lacking a little bit of detail".
-  - monkeytype: "really like".
-- **Round 2 tiles:** likes "the font in the first card" (tile 1, Quiet instrument: Young Serif headlines over Source Serif 4 text; *which of the two is meant is unconfirmed*) and "the overall feel of the 4th" (tile 4, the fight card: blue, red and black, Bebas Neue capitals, rounds).
+    Wants "more illustration and small animation"; "the screen information is quite good". Krillion's structure, as the human describes it: you start at sea level and go deeper with each step, each with its own animation, and the answer text is attached to an animation and "shakes as it goes lower". The human shared a screenshot (not committed: it's another site's art): a dark underwater scene with rising bubbles, a pixel-art shrimp in a witch hat perched on a word plate with stepped pixel corners, the answer in a glowing pixel font, and a dashed depth line behind it.
+  - monkeytype: likes "the minimal layout", the caret animation (the text cursor that glides as you type), and the themes ("lots of color variants"). Concern: "the fact that there's only 2 or 3 prominent colors could be a problem".
+- **The word is the centre.** The human wants to do something with the player's word, as Krillion does, partly because players will later collect and personalize **borders on the text bubbles** (M10 cosmetics). So every concept needs a word container that can take a border.
+- **Concept first.** The human asked for help to work out and settle the game's concept and theme before any art: the theme decides which animations and pixel art need making (human, 2026-10-20).
+- **Round 2 tiles:** likes "the font in the first card": the big serif headline (Young Serif); "the body text is alright too" (Source Serif 4). Likes "the overall feel of the 4th" (tile 4, the fight card: blue, red and black, Bebas Neue capitals, rounds).
 - **No suggestions while typing:** "i wouldn't want a dropdown menu as i'm typing the answer, becauase i dont want to give users any free hints as to guesses. the list should be internal only". This changes a game rule, not only the look; see D15.
 
 ## Decisions (for the human)
@@ -72,7 +75,7 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D2 | The words for the game's moments: survive, match the host, 7 of 7 | A: off the beat / off-key / full scale. B: safe / caught / all 7 cleared. C: dodged / caught / same as me | |
 | D3 | Brand colours for Plor and for Offbeat | Placeholders only; needs the human's choice | |
 | D4 | Fonts: a web font (which) or the phone's system font (no download) | Placeholders only | |
-| D5 | How separate are Plor's look and Offbeat's? (Game 2 will have its own name and look.) | Shared frame with a per-game accent, or each game fully its own | Plor's home stays neutral; each game gets its own stylized look (human, 2026-10-20). Still open: what, if anything, the games share (header, sign-in, share card frame) |
+| D5 | How separate are Plor's look and Offbeat's? (Game 2 will have its own name and look.) | Shared frame with a per-game accent, or each game fully its own | Plor's home stays neutral but close to the games, sharing some of their pixel and animation style; each game gets its own stylized look (human, 2026-10-20). Still open: what, if anything, the games share (header, sign-in, share card frame) |
 | D6 | Light, dark, or follow the phone's setting | A and B light, C dark | |
 | D7 | Safe answer: its own moment with a "Next" tap (all mockups), or a line above the next question (today's UI) | | |
 | D8 | Share (M05): image and text, or text only first; which symbols | See the table above | |
@@ -81,6 +84,7 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D11 | Accessibility source and numbers: pin WCAG 2.2 in SOURCES.md? Contrast ratios and the tap-target size are human numbers until then | | |
 | D12 | Smallest phone width to support | Mockups are 390 px wide (the design tool's default phone size); no minimum chosen | |
 | D13 | Does the host have a face or name (C)? | C shows a circle marked "H" | |
+| D16 | Offbeat's concept and theme (what the 7 steps are, what the word sits in, what happens when you match the host) | Concepts proposed in chat, 2026-10-20 | |
 | D14 | Pixel art: made with PixelLab, drawn by hand, or bought; who owns the assets, and what it costs | PixelLab suggested by the human (2026-10-20) | |
 | D15 | No suggestions while typing (human, 2026-10-20). The player types free text and the server alone matches it to the list. Open: what happens to a typo or an answer that isn't in the list (today: "did you mean" and a no-penalty "not in our list yet"; both can hint at the list); what the player sees before locking in | Needs a DECISIONS.md change (Answer model: the accepted bank is sent to the client for autocomplete) and changes to M02 code, the network message (entry ID → text) and the security of the bank. That's its own ticket, not M12 | |
 
