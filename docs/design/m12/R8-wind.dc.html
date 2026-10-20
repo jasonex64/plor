@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: the Wind</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2d52}a:hover{color:#4a55a0}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3d3f5e}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#2b2d52}
+.scene{position:relative;width:390px;height:336px;overflow:hidden;flex:none;image-rendering:pixelated;background:#7d8fd8}
+.scene i{position:absolute;display:block}
+.sp{position:absolute}
+.sp i{position:absolute;display:block}
+.anchor{position:absolute;width:0;height:0}
+.psign{position:absolute;left:0;bottom:0;transform:translateX(-50%);transform-origin:50% 100%;display:flex;flex-direction:column;align-items:center}
+.board{border:6px solid #8a5a34;background:#efe3c8;box-shadow:inset 0 -6px 0 #dfcca5;color:#3a2a1a;font:600 18px 'Pixelify Sans',monospace;padding:0 9px 6px;line-height:30px;white-space:nowrap;text-align:center}
+.board.wind{border-color:#8c9ddf;background:#f8f9fd;box-shadow:inset 0 -6px 0 #dfe4f5;color:#2b2d52;line-height:24px;padding-top:3px}
+.board .who{display:none}
+.board.wind .who{display:block;font-size:12px;font-weight:400;line-height:14px}
+.stake{width:6px;background:#6b4426}
+.tag{position:absolute;transform:translateX(-50%);background:#2b2d52;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.tag.warm{background:#e8735c;color:#1d1e38}
+.bob{animation:bob 1.2s steps(2) infinite}
+.drift{animation:drift 3s steps(3) infinite}
+.puff{animation:puff .5s steps(2) infinite}
+.fall{animation:fall 1.4s steps(4) infinite}
+.wobble{animation:wobble 2.4s steps(3) infinite}
+.flap{animation:flap .4s steps(2) infinite}
+.shake{animation:shake .25s steps(2) infinite}
+.caret{display:inline-block;width:3px;height:18px;background:#3a2a1a;vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.stop{font:600 14px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.q{font-family:'Young Serif',Georgia,serif;font-weight:400;font-size:36px;line-height:1;letter-spacing:-.02em;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.btn{min-height:52px;border:0;background:#2b2d52;color:#f4f1e8;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.in{min-height:52px;border:3px solid #2b2d52;padding:0 14px;font:600 20px 'Pixelify Sans',monospace;color:#2b2d52;background:#ffffff}
+.field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+.standin{font-size:13px;color:#4f516e}
+.score{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid #2b2d52;padding-top:10px;font:600 16px 'Pixelify Sans',monospace}
+@keyframes bob{50%{translate:0 -6px}}
+@keyframes drift{50%{translate:6px -6px}}
+@keyframes puff{50%{scale:1.06}}
+@keyframes fall{0%{translate:-6px -12px}100%{translate:12px 12px}}
+@keyframes wobble{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes flap{50%{rotate:4deg}}
+@keyframes shake{0%{translate:-3px 0}100%{translate:3px 0}}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.bob,.drift,.puff,.fall,.wobble,.flap,.shake,.caret{animation:none}}
+</style>
+</helmet>
+<div style="width: 1362px; height: 1000px; box-sizing: border-box; padding: 48px; background: #e6e6ec; display: flex; gap: 48px; font-family: 'Source Serif 4', Georgia, serif">
+
+<div class="col">
+<div class="lbl">1 · Stop 4: typing, the Wind listens</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The Wind, a small cloud with a face and closed eyes, drifts above the ridge listening. On stop 4 the goat stands beside its sign, being painted with magnol.">
+<sc-for list="{{s1.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s1.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{s1.signs}}" as="sg" hint-placeholder-count="0"><div class="anchor" style="left: {{sg.x}}px; top: {{sg.y}}px"><div class="psign {{sg.cls}}" style="rotate: {{sg.rot}}deg"><div class="board {{sg.kind}}"><span class="who">the wind</span>{{sg.word}}<span class="{{sg.caret}}"></span></div><div class="stake" style="height: {{sg.stake}}px"></div></div></div></sc-for>
+<sc-for list="{{s1.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body">
+<h1 class="q">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in" value="magnol" autocomplete="off"></label>
+<button class="btn" type="button">Plant your sign</button>
+<p class="p standin">Don't say what the Wind is whispering.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>3 safe</span><span>6 points</span></div>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">2 · Stop 4: the gust passes, safe</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The Wind puffs its cheeks and a gust sweeps across the ridge carrying its word, cedar, on a flapping banner. The goat's sign, dogwood, holds firm.">
+<sc-for list="{{s2.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s2.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{s2.signs}}" as="sg" hint-placeholder-count="0"><div class="anchor" style="left: {{sg.x}}px; top: {{sg.y}}px"><div class="psign {{sg.cls}}" style="rotate: {{sg.rot}}deg"><div class="board {{sg.kind}}"><span class="who">the wind</span>{{sg.word}}<span class="{{sg.caret}}"></span></div><div class="stake" style="height: {{sg.stake}}px"></div></div></div></sc-for>
+<sc-for list="{{s2.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body">
+<div class="stop">Stop 4 · safe</div>
+<h1 class="q">The gust passes you by.</h1>
+<p class="p">You planted <b>dogwood</b>. The Wind was whispering <b>cedar</b> <span class="standin">(stand-in)</span>, so your sign held.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 safe</span><span>10 points</span></div>
+<button class="btn" type="button">Climb to stop 5</button>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">3 · Stop 5: same word as the Wind, blown off</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The Wind blows hard. Its word and the goat's sign both say ravioli, so the gust catches the sign like a sail, pulls it out of the stone and blows the goat off the ridge toward the clouds.">
+<sc-for list="{{s3.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s3.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{s3.signs}}" as="sg" hint-placeholder-count="0"><div class="anchor" style="left: {{sg.x}}px; top: {{sg.y}}px"><div class="psign {{sg.cls}}" style="rotate: {{sg.rot}}deg"><div class="board {{sg.kind}}"><span class="who">the wind</span>{{sg.word}}<span class="{{sg.caret}}"></span></div><div class="stake" style="height: {{sg.stake}}px"></div></div></div></sc-for>
+<sc-for list="{{s3.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s3.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body">
+<div class="stop">Stop 5 · blown off</div>
+<h1 class="q">The Wind took your sign.</h1>
+<p class="p">Name a kind of pasta: you and the Wind both said <b>ravioli</b> <span class="standin">(stand-in)</span>. You float down softly into the clouds.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 of 7</span><span>10 points</span></div>
+<button class="btn" type="button">See today's ridge</button>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1362,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Code-drawn placeholder art on one 6 px grid (Round 6's ridge); the Wind replaces the raven as the host (human, 2026-10-20). Colours are placeholders (D3).
+    const U = 6, W = 65, H = 56, HZ = 16;
+    const C = {
+      skyTop: '#7d8fd8', sky2: '#8c9ddf', sky3: '#9dace5', skyLow: '#b3bfeb', wisp: '#c5cff0',
+      farPeak: '#a3afe0', farSnow: '#dfe4f6', nearPeak: '#8592cf', bird: '#5d679f',
+      backCloud: '#cfd6ef', backShade: '#bcc5e6', midCloud: '#dfe4f5', midShade: '#c9d1ee', cloud: '#eef1f9', cloudShade: '#d6dcf1', cloudHi: '#f8f9fd',
+      island: '#7280c0', islandLit: '#8d99cf',
+      rockLit: '#5a64a3', rock: '#444d8a', crack: '#363e75',
+      path: '#e8ddc3', pathLine: '#d6c9a8', worn: '#c9b991', lip: '#8b7f6a', grass: '#8fa77a', grassDark: '#71895f',
+      ink: '#2b2d52', fur: '#f6f2e8', furShade: '#d9d3c4', scarf: '#d9583f', horn: '#8b7f6a',
+      windBody: '#fbfbff', windShade: '#dfe4f5', windCheek: '#f0b8c8', windLine: '#6f7cc4', gust: '#f8f9fd', gustSoft: '#d3daf2'
+    };
+    const R = (r, x, y, w, h, c) => r.push({ x: Math.round(x) * U, y: Math.round(y) * U, w: Math.max(1, Math.round(w)) * U, h: Math.max(1, Math.round(h)) * U, c });
+    const rnd = (a, b) => { const s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return s - Math.floor(s); };
+    const bank = (r, x0, x1, top, amp, seed, c, shade, hi) => {
+      for (let x = x0; x < x1; x++) {
+        const y = top - Math.round(amp * Math.abs(Math.sin(x / 3.3 + seed)) + (amp / 2) * Math.abs(Math.sin(x / 1.9 + seed * 2)));
+        R(r, x, y, 1, H - y, c);
+        R(r, x, y, 1, 1, hi);
+        if ((x + seed) % 4 !== 0) R(r, x, y + 3, 1, 1, shade);
+      }
+    };
+    const puff = (r, cx, top, w, c, shade, hi) => {
+      R(r, cx - w / 2 + 2, top, w - 4, 1, hi); R(r, cx - w / 2 + 1, top + 1, w - 2, 1, c); R(r, cx - w / 2, top + 2, w, 3, c); R(r, cx - w / 2 + 1, top + 5, w - 2, 1, shade);
+    };
+    const backdrop = (r) => {
+      R(r, 0, 0, W, 4, C.skyTop); R(r, 0, 4, W, 4, C.sky2); R(r, 0, 8, W, 4, C.sky3); R(r, 0, 12, W, H - 12, C.skyLow);
+      R(r, 40, 6, 16, 1, C.wisp); R(r, 44, 5, 7, 1, C.wisp);
+      for (let x = 0; x < W; x++) {
+        const far = HZ - 3 + Math.round(2.5 * Math.sin(x / 5) + 1.5 * Math.sin(x / 2.3 + 1));
+        R(r, x, far, 1, H - far, C.farPeak);
+        if (far <= HZ - 5) R(r, x, far, 1, 1, C.farSnow);
+      }
+      for (let x = 0; x < W; x++) {
+        const near = HZ + 1 + Math.round(1.5 * Math.sin(x / 3.5 + 2));
+        R(r, x, near, 1, H - near, C.nearPeak);
+      }
+      [[55, 9], [58, 10]].forEach(([x, y]) => { R(r, x, y, 1, 1, C.bird); R(r, x + 2, y, 1, 1, C.bird); R(r, x + 1, y + 1, 1, 1, C.bird); });
+      bank(r, 0, W, HZ + 4, 2, 1, C.backCloud, C.backShade, C.midCloud);
+      [[9, HZ + 7, 5], [55, HZ + 8, 4]].forEach(([cx, top, w]) => { for (let k = 0; k < w; k++) { R(r, cx - k, top + k, 2 * k + 1, 1, C.island); R(r, cx - k, top + k, 1, 1, C.islandLit); } });
+      bank(r, 0, W, HZ + 11, 3, 4, C.midCloud, C.midShade, C.cloud);
+    };
+    const geo = (t) => ({ cx: 32 + 12 * Math.sin(t * 4.2 - 0.6) * (0.35 + 0.65 * t), pw: 1 + t * t * 14, rw: 3 + t * t * 14 + t * 14 });
+    const rowOf = (t) => Math.round(HZ + t * (H - 1 - HZ));
+    const ridge = (r, landings) => {
+      for (let y = HZ; y < H; y++) {
+        const t = (y - HZ) / (H - 1 - HZ), g = geo(t);
+        const l = Math.round(g.cx - g.rw / 2), half = Math.round(g.rw / 2), pl = Math.round(g.cx - g.pw / 2), pw = Math.max(1, Math.round(g.pw));
+        R(r, l, y, half, 1, C.rockLit);
+        R(r, l + half, y, half, 1, C.rock);
+        for (let k = 0; k < 2 * half; k++) if (rnd(y, k) > 0.9 && (l + k < pl - 1 || l + k > pl + pw)) R(r, l + k, y, 1, 1, C.crack);
+        R(r, pl, y, pw, 1, C.path);
+        if (t > 0.35 && y % 3 === 0) R(r, pl + 1, y, pw - 2, 1, C.pathLine);
+        if (t > 0.3 && rnd(y, 99) > 0.55) { R(r, pl - 1, y, 1, 1, C.grass); R(r, pl - 1, y + 1, 1, 1, C.grassDark); }
+        if (t > 0.3 && rnd(y, 77) > 0.6) { R(r, pl + pw, y, 1, 1, C.grass); R(r, pl + pw, y + 1, 1, 1, C.grassDark); }
+      }
+      landings.forEach((t) => {
+        const y = rowOf(t), g = geo(t), pl = Math.round(g.cx - g.pw / 2) - 1, pw = Math.round(g.pw) + 2;
+        R(r, pl, y - 1, pw, 2, C.path);
+        R(r, pl, y + 1, pw, 1, C.lip);
+      });
+    };
+    const mist = (r) => { R(r, 4, 29, 18, 1, C.cloud); R(r, 1, 30, 22, 1, C.midCloud); R(r, 44, 31, 18, 1, C.cloud); R(r, 42, 32, 23, 1, C.midCloud); };
+    const nearClouds = (r) => {
+      puff(r, 5, H - 11, 14, C.cloud, C.cloudShade, C.cloudHi); puff(r, 11, H - 7, 16, C.cloud, C.cloudShade, C.cloudHi); R(r, 0, H - 3, 22, 3, C.cloud);
+      puff(r, 60, H - 12, 14, C.cloud, C.cloudShade, C.cloudHi); puff(r, 53, H - 7, 18, C.cloud, C.cloudShade, C.cloudHi); R(r, 44, H - 3, 21, 3, C.cloud);
+    };
+    // a gust: a long streak that ends in a curl, with a fainter streak under it
+    const gust = (r, x0, x1, y, strong) => {
+      R(r, x0, y, x1 - x0, 1, C.gust);
+      R(r, x0 + 3, y + 1, (x1 - x0) * 0.6, 1, C.gustSoft);
+      R(r, x1, y - 1, 1, 1, C.gust); R(r, x1 + 1, y - 2, 1, 1, C.gust); R(r, x1, y - 3, 1, 1, C.gust); R(r, x1 - 1, y - 2, 1, 1, C.gust);
+      if (strong) R(r, x0 - 2, y - 2, (x1 - x0) * 0.5, 1, C.gust);
+    };
+    const ART = {
+      goat: ['..h....h..', '..hh..hh..', '...wwww...', '..wwwwww..', '.rrrrrrrr.', '.wwwwwwww.', '.wwwwwwss.', '.wwwwwwss.', '..wwwwss..', '..k.kk.k..'],
+      // the Wind listening: eyes closed, small mouth
+      windCalm: ['....wwww.....', '..wwwwwwww...', '.wwwwwwwwwww.', 'wwwkkwwwkkwww', 'wwppwwwwwppww', 'wwwwwwkwwwwww', '.sssssssssss.', '...sss..sss..'],
+      // the Wind blowing to the right: open eyes, puffed cheeks, round mouth
+      windBlow: ['....wwww......', '..wwwwwwwww...', '.wwwwwwwwwwww.', 'wwwwkwwwwkwwww', 'wwpppwwwpppwkk', 'wwpppwwwpppwkk', '.ssssssssssss.', '...ssss..sss..'],
+      flag: ['rr.', 'rrr', 'rr.', 'k..', 'k..', 'k..']
+    };
+    const sprite = (name, pal, x, y, cls, rot, outline) => {
+      const rows = ART[name], filled = new Set(), px = [];
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') filled.add(rx + ',' + ry); }));
+      if (outline) {
+        const seen = new Set();
+        filled.forEach((key) => {
+          const [a, b] = key.split(',').map(Number);
+          [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+            const n = (a + dx) + ',' + (b + dy);
+            if (!filled.has(n) && !seen.has(n)) { seen.add(n); px.push({ x: (a + dx) * U, y: (b + dy) * U, c: outline }); }
+          });
+        });
+      }
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * U, y: ry * U, c: pal[ch] }); }));
+      return { x, y, cls: cls || '', rot: rot || 0, px };
+    };
+    const goat = (cx, footRow, cls, rot) => sprite('goat', { w: C.fur, s: C.furShade, h: C.horn, k: C.ink, r: C.scarf }, cx * U - 30, (footRow + 1) * U - 60, cls, rot, C.ink);
+    const wind = (art, col, row, cls) => sprite(art, { w: C.windBody, s: C.windShade, p: C.windCheek, k: C.ink }, col * U, row * U, cls, 0, C.windLine);
+    const flag = (cx, row) => sprite('flag', { r: C.scarf, k: C.ink }, cx * U, (row - 5) * U);
+    const sign = (cx, row, word, opts) => Object.assign({ x: Math.round(cx) * U, y: (row + 1) * U, word, kind: '', cls: '', rot: 0, stake: 66, caret: '' }, opts || {});
+
+    const scene = (stop, mode) => {
+      const r = [], sprites = [], signs = [], tags = [], front = [];
+      const ts = [0.8, 0.52, 0.32, 0.17, 0.06].slice(0, 9 - stop);
+      backdrop(r);
+      ridge(r, ts.slice(0, -1));
+      mist(r);
+      const t0 = ts[0], g = geo(t0), row = rowOf(t0), pl = g.cx - g.pw / 2, pr = g.cx + g.pw / 2;
+      ts.slice(1, -1).forEach((t, k) => { const gg = geo(t); tags.push({ x: (gg.cx + gg.pw / 2 + 3) * U, y: (rowOf(t) - 3) * U, text: String(stop + 1 + k), cls: '' }); });
+      const topT = ts[ts.length - 1];
+      sprites.push(flag(geo(topT).cx, rowOf(topT)));
+      if (mode === 'typing') {
+        // the Wind drifts high up, listening; a couple of lazy wisps trail behind it
+        sprites.push(wind('windCalm', 3, 2, 'drift'));
+        R(r, 17, 5, 5, 1, C.gust); R(r, 18, 7, 3, 1, C.gustSoft);
+        signs.push(sign(pl - 1, row, 'magnol', { cls: 'wobble', caret: 'caret' }));
+        sprites.push(goat(pr - 3, row, 'bob'));
+        nearClouds(r);
+      } else if (mode === 'safe') {
+        // the gust carries the Wind's word across the ridge, above the goat's sign, and on past it
+        sprites.push(wind('windBlow', 1, 8, 'puff'));
+        gust(r, 16, 58, 19, false); gust(r, 20, 61, 23, false); gust(r, 14, 50, 27, false);
+        signs.push({ x: 46 * U, y: 23 * U, word: 'cedar', kind: 'wind', cls: 'flap', rot: -6, stake: 0, caret: '' });
+        signs.push(sign(pl - 2, row, 'dogwood'));
+        sprites.push(goat(g.cx, row));
+        tags.push({ x: (pr + 2) * U, y: (row - 3) * U, text: '+4', cls: 'warm' });
+        nearClouds(r);
+      } else {
+        // same word: the gust catches the sign like a sail, pulls the stake out of the stone and blows the goat off the side
+        sprites.push(wind('windBlow', 0, 10, 'puff'));
+        gust(r, 15, 44, 24, true); gust(r, 18, 52, 30, true); gust(r, 16, 58, 36, true); gust(r, 22, 60, 41, false);
+        signs.push({ x: 24 * U, y: 22 * U, word: 'ravioli', kind: 'wind', cls: 'flap', rot: -4, stake: 0, caret: '' });
+        R(r, pl, row - 1, 2, 1, C.lip);
+        signs.push(sign(53, 33, 'ravioli', { cls: 'shake', rot: 38, stake: 36 }));
+        sprites.push(goat(pr + 5, row - 3, 'fall', 70));
+        nearClouds(front);
+      }
+      return { rects: r, sprites, signs, tags, front };
+    };
+    return { s1: scene(4, 'typing'), s2: scene(4, 'safe'), s3: scene(5, 'caught') };
+  }
+}
+</script>
+</body>
+</html>

@@ -7,9 +7,13 @@
   "title": "Plor + Offbeat look directions",
   "launch": {
     "view": "canvas",
-    "page": "r6"
+    "page": "r7"
   },
   "pages": [
+    {
+      "id": "r7",
+      "name": "Round 7 · the Wind"
+    },
     {
       "id": "r6",
       "name": "Round 6 · 3rd person, reworked"
@@ -179,6 +183,14 @@
       "h": 1000,
       "title": "Offbeat · 3rd person: typing, safe, caught",
       "page": "r6"
+    },
+    "R8-wind.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1362,
+      "h": 1000,
+      "title": "Offbeat · the Wind as the host",
+      "page": "r7"
     }
   },
   "order": [
@@ -199,7 +211,8 @@
     "R4-pixellab.dc.html",
     "R5-camera.dc.html",
     "R6-lowres.dc.html",
-    "R7-third.dc.html"
+    "R7-third.dc.html",
+    "R8-wind.dc.html"
   ],
   "notes": {
     "heading": {
@@ -305,6 +318,22 @@
       "fill": "orange",
       "page": "r6",
       "text": "Drawn in code at the sketch resolution, as you chose. Changes from your Round 5 notes:\n\n• Clouds: three layers with rounded tops, peaks poking through, mist across the ridge, birds, and bigger cloud banks up close.\n• Signs: each one is planted on a stake that stands on the stop. The host’s sign stands on its own worn stone; when you’re caught it stays on the far lip while yours falls.\n• Softer colours: muted blue sky, lighter rock, dark navy instead of black, a softer red.\n\nColours are still placeholders (D3)."
+    },
+    "r7heading": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 7: the Wind is the host",
+      "kind": "title1",
+      "maxW": 1362,
+      "page": "r7"
+    },
+    "r7about": {
+      "x": 1442,
+      "y": 0,
+      "w": 400,
+      "fill": "orange",
+      "page": "r7",
+      "text": "The host is now the Wind: a cloud with a face that lives on the mountain. Its words are the common answers it whispers.\n\n1 · While you type, it drifts above, listening.\n2 · At the reveal it puffs a gust that carries its word on a banner. Different word: the gust passes you by.\n3 · Same word: the gust catches your sign like a sail and blows you off the ridge, softly into the clouds.\n\nA draft: the Wind’s name, face and colours are yours to choose."
     }
   },
   "designSystems": []

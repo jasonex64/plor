@@ -142,6 +142,15 @@ Code-drawn at the Round 3 and 5 grid (6 px cells), canvas page "Round 6 · 3rd p
 
 **Round 6 result (human, 2026-10-20):** a draft, not final. "the concept looks good for now" and "a good base". But the host needs "more personality than just 'the host'": "we need some sort of character in why or how the sheep falls off, maybe wind? or something" (D19). The human wrote "sheep"; the draft animal is a goat (D18, still open).
 
+## Round 7: the Wind (2026-10-20)
+Three host characters were proposed in chat (the Wind, a word-hoarding raven, an old ram who keeps the trail); the human chose "Go with the Wind" (human, 2026-10-20, D19). Drafted on the canvas page "Round 7 · the Wind" (`docs/design/m12/R8-wind.dc.html`), on Round 6's ridge:
+- **Who it is:** a cloud with a face that lives on the mountain. The host's answers are the words the Wind whispers (the common answers).
+- **Typing:** the Wind drifts high above with its eyes closed, listening. The hint under the box reads "Don't say what the Wind is whispering" (draft copy).
+- **Reveal, safe:** it puffs its cheeks and a gust sweeps over the ridge carrying its word on a banner; a different word, so the gust passes and the player's sign holds.
+- **Reveal, caught:** same word, so the gust catches the player's sign like a sail, pulls its stake out of the stone and blows the goat off the ridge, softly into the clouds. The ledge no longer crumbles; the Wind is the reason you fall. This replaces "the stone gave way" and the worn-stone story in "Offbeat concept: the ridge" above, for the human to confirm.
+- Fits what's already drafted: signs wobble more higher up because the wind is stronger there, showing the rising difficulty.
+- Name, face and colours of the Wind are open (D3, D19). Text pairs checked at 4.5:1 or more as in Round 6 (the Wind's banner: 12.5:1).
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
@@ -165,7 +174,7 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D16 | Offbeat's concept and theme (what the 7 steps are, what the word sits in, what happens when you match the host) | Trail, spotlight, out of tune, descent (proposed in chat, 2026-10-20) | "Go with the trail along a cliff edge: friends fall off at the stop where they got caught" (human, 2026-10-20). Worked out below in "Offbeat concept: the ridge"; the details there are drafts |
 | D17 | Where a caught player lands, and how soft it should feel | The draft lands them in the clouds below, unhurt | |
 | D18 | The player's character | The draft uses a small mountain goat (no skin tones to choose; friends differ by scarf colour, a slot for M10 cosmetics) | |
-| D19 | The host's character | The draft uses a raven circling above the ridge | |
+| D19 | The host's character | The draft used a raven circling above the ridge; Round 7 proposed the Wind, a word-hoarding raven or an old ram | The Wind: "Go with the Wind" (human, 2026-10-20). Its name and look are still open |
 | D20 | Pixel size, sprite sizes and animation timings | None chosen; human numbers (or the artist's), not set by the mockups | |
 
 ## Acceptance criteria
