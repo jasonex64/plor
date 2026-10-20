@@ -104,15 +104,22 @@ Shown on the canvas page "Round 4 · PixelLab art" (`docs/design/m12/R4-pixellab
 **Generated assets** (all PixelLab MCP, 2026-10-20, 1 generation each as charged):
 | Asset | Tool | Prompt (short) | Seed | Size | Artifact asset id | Status |
 |---|---|---|---|---|---|---|
-| Goat A | `create_image_pixen` | small white goat, grey horns, red scarf, side view | 11 | 64×64 | 6deb5d78520abc03f8b0250fbf31ed40 | shown, awaiting the human |
-| Goat B | `create_image_pixen` | fluffy cream goat kid, beard, red knitted scarf | 27 | 64×64 | c09018a1fd7a701021eb99f1a6335c60 | shown, awaiting the human |
-| Goat C | `create_image_pixen` | round goat, big curled horns, red scarf in the wind | 42 | 64×64 | 54e0c94cc83be8e6f8bd055d2f8d4e50 | shown, awaiting the human |
-| Trail A | `create_image_pixen` | trail along a cliff edge, cream path, navy rock, cloud sea | 5 | 384×192 | e9abbe06293193199389915da4036c4f | shown, awaiting the human. Came out seen from behind, not side on |
-| Trail B | `create_image_pixen` | ledge path along a cliff edge, clouds below, misty peaks | 19 | 384×192 | 3ee00aa86167b9ebccce82b094f7ef11 | shown, awaiting the human |
-| Sign A | `create_image_pixen` | blank cream board in a dark wooden frame on a post | 8 | 64×64 | 59fbcf478e7c81094a60e85d5017ead9 | shown, awaiting the human |
-| Sign B | `create_image_pixen` | blank weathered plank on a stake | 31 | 64×64 | 1bc9b29c6ffe52598d628dea7aa7a93a | shown, awaiting the human |
+| Goat A | `create_image_pixen` | small white goat, grey horns, red scarf, side view | 11 | 64×64 | 6deb5d78520abc03f8b0250fbf31ed40 | not approved: too high-res (human, 2026-10-20) |
+| Goat B | `create_image_pixen` | fluffy cream goat kid, beard, red knitted scarf | 27 | 64×64 | c09018a1fd7a701021eb99f1a6335c60 | not approved: too high-res (human, 2026-10-20) |
+| Goat C | `create_image_pixen` | round goat, big curled horns, red scarf in the wind | 42 | 64×64 | 54e0c94cc83be8e6f8bd055d2f8d4e50 | not approved: too high-res (human, 2026-10-20) |
+| Trail A | `create_image_pixen` | trail along a cliff edge, cream path, navy rock, cloud sea | 5 | 384×192 | e9abbe06293193199389915da4036c4f | not approved: too high-res, but the human likes its angle (human, 2026-10-20) |
+| Trail B | `create_image_pixen` | ledge path along a cliff edge, clouds below, misty peaks | 19 | 384×192 | 3ee00aa86167b9ebccce82b094f7ef11 | not approved: too high-res (human, 2026-10-20) |
+| Sign A | `create_image_pixen` | blank cream board in a dark wooden frame on a post | 8 | 64×64 | 59fbcf478e7c81094a60e85d5017ead9 | not approved: too high-res (human, 2026-10-20) |
+| Sign B | `create_image_pixen` | blank weathered plank on a stake | 31 | 64×64 | 1bc9b29c6ffe52598d628dea7aa7a93a | not approved: too high-res (human, 2026-10-20) |
 
-Still to make once the human picks: the goat's idle (4 frames), hop (8) and fall (8) with `animate_image`, and a crumbling ledge (8 frames).
+**Round 4 result (human, 2026-10-20):** "everything from the goats to the signs to the path is far too high-res for my liking", but the human likes "the angle or perspective of the path" (trail A, seen from behind as it winds away). "maybe the pixellab tool is not the right fit for the job" (D14 reopened). Wants to explore "instead of side view a 1st or 3rd person perspective". None of the seven assets is approved; the animations planned above are on hold.
+
+## Round 5: camera sketches (2026-10-20)
+The human chose: free code-drawn sketches of both camera views first, then a small low-res PixelLab test (about 2 generations) on the one they prefer (human, 2026-10-20). On the canvas page "Round 5 · camera sketches" (`docs/design/m12/R5-camera.dc.html`), each camera shows typing at stop 4 and getting caught at stop 5:
+- **3rd person, behind the goat:** the path winds away up the ridge (Round 4 trail A's angle); the next stops and the top flag are ahead; the player's sign stands beside the path; caught, the landing breaks and the goat tumbles off the side.
+- **1st person, the goat's eyes:** the player's sign stands big in the middle of the screen, so the word is the largest thing shown; the goat's front legs show at the bottom; caught, the view tips and the ground in front drops into the clouds. Friends (M06) would need a separate view.
+
+The sketch grid cell (6 px) is the same as Round 3's and is not a D20 answer. No PixelLab generations were used.
 
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".

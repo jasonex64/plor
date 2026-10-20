@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: camera sketches</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0a0a0a}a:hover{color:#2436ff}
+.grp{display:flex;flex-direction:column;gap:16px}
+.gh{margin:0;font:600 22px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.col{display:flex;flex-direction:column;gap:12px}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3b3b3b}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#0a0a0a}
+.scene{position:relative;width:390px;height:336px;overflow:hidden;flex:none;image-rendering:pixelated;background:#2436ff}
+.layer{position:absolute;left:0;top:0;width:390px;height:336px}
+.scene i{position:absolute;display:block}
+.sp{position:absolute}
+.sp i{position:absolute;display:block}
+.bob{animation:bob 1.2s steps(2) infinite}
+.fall{animation:fall 1.4s steps(4) infinite}
+.tag{position:absolute;transform:translateX(-50%);background:#0a0a0a;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.sign{position:absolute;transform:translateX(-50%);background:#e9e4d4;border:3px solid #0a0a0a;box-shadow:3px 3px 0 #0a0a0a;padding:5px 10px;font:600 18px 'Pixelify Sans',monospace;color:#0a0a0a;white-space:nowrap;line-height:1.2}
+.sign .post{position:absolute;left:50%;top:100%;margin-left:-3px;margin-top:3px;width:6px;height:18px;background:#7a4a1c}
+.sign.host{background:#ff3b1f}
+.sign.big{font-size:40px;padding:10px 22px;border-width:6px;box-shadow:6px 6px 0 #0a0a0a}
+.sign.big .post{width:12px;margin-left:-6px;height:80px}
+.sign .who{display:block;font-size:12px;font-weight:400}
+.wobble{animation:wobble 2.4s steps(3) infinite}
+.shake{animation:shake .25s steps(2) infinite}
+.caret{display:inline-block;width:3px;height:18px;background:#0a0a0a;vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+.big .caret{width:6px;height:38px;vertical-align:-6px}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.stop{font:600 14px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.q{font-family:'Young Serif',Georgia,serif;font-weight:400;font-size:36px;line-height:1;letter-spacing:-.02em;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.btn{min-height:52px;border:0;background:#0a0a0a;color:#f4f1e8;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.btn2{min-height:52px;border:3px solid #0a0a0a;background:#f4f1e8;color:#0a0a0a;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.in{min-height:52px;border:3px solid #0a0a0a;padding:0 14px;font:600 20px 'Pixelify Sans',monospace;color:#0a0a0a;background:#ffffff}
+.field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+.standin{font-size:13px;color:#4a4a4a}
+.score{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid #0a0a0a;padding-top:10px;font:600 16px 'Pixelify Sans',monospace}
+@keyframes bob{50%{translate:0 -4px}}
+@keyframes fall{0%{translate:0 -12px}100%{translate:0 14px}}
+@keyframes wobble{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes shake{0%{translate:-3px 0}100%{translate:3px 0}}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.bob,.fall,.wobble,.shake,.caret{animation:none}}
+</style>
+</helmet>
+<div style="width: 1848px; height: 1060px; box-sizing: border-box; padding: 48px; background: #e4e4e4; display: flex; gap: 96px; font-family: 'Source Serif 4', Georgia, serif">
+
+<section class="grp">
+<h2 class="gh">3rd person · behind the goat</h2>
+<div style="display: flex; gap: 48px">
+
+<div class="col">
+<div class="lbl">Stop 4: typing</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Seen from behind, the goat stands on stop 4 of a path that winds up a ridge into the distance, with the next stops and the top flag ahead. Its sign beside the path is being painted with magnol.">
+<div class="layer">
+<sc-for list="{{t1.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{t1.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: {{p.s}}px; height: {{p.s}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{t1.tags}}" as="t" hint-placeholder-count="0"><span class="tag" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="sign wobble" style="left: 112px; top: 196px">magnol<span class="caret"></span><span class="post"></span></div>
+<span class="tag" style="left: 46px; top: 14px">stop 4 of 7</span>
+</div>
+<div class="body">
+<h1 class="q">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in" value="magnol" autocomplete="off"></label>
+<button class="btn" type="button">Plant your sign</button>
+<div style="flex: 1"></div>
+<div class="score"><span>3 safe</span><span>6 points</span></div>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">Stop 5: caught, you fall</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Seen from behind, the ledge at stop 5 breaks away and the goat and its sign, ravioli, tumble off the side of the ridge toward the clouds. The raven's sign further up also says ravioli.">
+<div class="layer">
+<sc-for list="{{t2.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{t2.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: {{p.s}}px; height: {{p.s}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{t2.tags}}" as="t" hint-placeholder-count="0"><span class="tag" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="sign shake" style="left: 300px; top: 236px; transform: translateX(-50%) rotate(24deg)">ravioli</div>
+<div class="sign host" style="left: 236px; top: 84px"><span class="who">host</span>ravioli</div>
+</div>
+<div class="body">
+<div class="stop">Stop 5 · caught</div>
+<h1 class="q">The stone gave way.</h1>
+<p class="p">Name a kind of pasta: you and the host both said <b>ravioli</b> <span class="standin">(stand-in)</span>. You land softly in the clouds.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 of 7</span><span>10 points</span></div>
+<button class="btn" type="button">See today's ridge</button>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="grp">
+<h2 class="gh">1st person · through the goat's eyes</h2>
+<div style="display: flex; gap: 48px">
+
+<div class="col">
+<div class="lbl">Stop 4: typing</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Through the goat's eyes: its front hooves at the bottom, a big sign right ahead being painted with magnol, and the path climbing to the next stops, where the raven waits.">
+<div class="layer">
+<sc-for list="{{f1.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{f1.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: {{p.s}}px; height: {{p.s}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{f1.tags}}" as="t" hint-placeholder-count="0"><span class="tag" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="sign big wobble" style="left: 195px; top: 150px">magnol<span class="caret"></span><span class="post"></span></div>
+<span class="tag" style="left: 46px; top: 14px">stop 4 of 7</span>
+</div>
+<div class="body">
+<h1 class="q">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in" value="magnol" autocomplete="off"></label>
+<button class="btn" type="button">Plant your sign</button>
+<div style="flex: 1"></div>
+<div class="score"><span>3 safe</span><span>6 points</span></div>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">Stop 5: caught, you fall</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Through the goat's eyes: the view tips sideways as the ground in front cracks and breaks off into the clouds. The sign, ravioli, tips over; up the path the raven's sign also says ravioli.">
+<div class="layer" style="transform: rotate(-9deg) scale(1.18)">
+<sc-for list="{{f2.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{f2.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: {{p.s}}px; height: {{p.s}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+</div>
+<div class="sign host" style="left: 210px; top: 70px"><span class="who">host</span>ravioli</div>
+<div class="sign big shake" style="left: 170px; top: 168px; transform: translateX(-50%) rotate(-22deg)">ravioli</div>
+</div>
+<div class="body">
+<div class="stop">Stop 5 · caught</div>
+<h1 class="q">The stone gave way.</h1>
+<p class="p">Name a kind of pasta: you and the host both said <b>ravioli</b> <span class="standin">(stand-in)</span>. You land softly in the clouds.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 of 7</span><span>10 points</span></div>
+<button class="btn" type="button">See today's ridge</button>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1848,"height":1060}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Free code-drawn sketches to compare camera angles, not proposed art: one grid cell is 6 px.
+    const U = 6, W = 65, H = 56;
+    const C = { sky: '#2436ff', skyLow: '#3d4dff', far: '#4b5bff', far2: '#2f3cd6', rock: '#121a5c', rockLit: '#1f2a80',
+      bone: '#e9e4d4', worn: '#bdb59c', ink: '#0a0a0a', sea: '#e8ecff', seaShade: '#c3ccf5', skyCloud: '#c9d1ff',
+      fur: '#f4f1e8', red: '#ff3b1f' };
+    const R = (r, x, y, w, h, c) => r.push({ x: Math.round(x) * U, y: Math.round(y) * U, w: Math.max(1, Math.round(w)) * U, h: Math.max(1, Math.round(h)) * U, c });
+    const puff = (r, cx, top, w, c, shade) => { R(r, cx - w / 2 + 1, top, w - 2, 1, c); R(r, cx - w / 2, top + 1, w, 2, c); R(r, cx - w / 2 + 1, top + 3, w - 2, 1, shade); };
+    const backdrop = (r, hz) => {
+      R(r, 0, 0, W, H, C.sky);
+      R(r, 0, hz - 7, W, 7, C.skyLow);
+      puff(r, 12, 4, 10, C.skyCloud, C.skyCloud); puff(r, 48, 8, 8, C.skyCloud, C.skyCloud);
+      for (let x = 0; x < W; x++) {
+        const far = hz - 4 + Math.round(2 * Math.sin(x / 5) + 1.5 * Math.sin(x / 2.3 + 1));
+        R(r, x, far, 1, H - far, C.far);
+      }
+      for (let x = 0; x < W; x++) {
+        const near = hz + Math.round(1.5 * Math.sin(x / 3.5 + 2));
+        R(r, x, near, 1, H - near, C.far2);
+      }
+      R(r, 0, hz + 4, W, H - hz - 4, C.sea);
+      for (let k = 0; k < 9; k++) puff(r, k * 8 + 2, hz + 2 + (k % 2), 8, C.sea, C.seaShade);
+    };
+    // the ridge: for each row from the horizon down, a rock band with the path on top; geo(t) gives its centre and widths (t: 0 far, 1 near)
+    const ridge = (r, hz, geo, landings) => {
+      const span = H - 1 - hz;
+      for (let y = hz; y < H; y++) {
+        const g = geo((y - hz) / span);
+        R(r, g.cx - g.rw / 2, y, g.rw / 2, 1, C.rockLit);
+        R(r, g.cx, y, g.rw / 2, 1, C.rock);
+        R(r, g.cx - g.pw / 2, y, g.pw, 1, C.bone);
+      }
+      landings.forEach((t) => {
+        const y = Math.round(hz + t * span), g = geo(t);
+        R(r, g.cx - g.pw / 2 - 1, y - 1, g.pw + 2, 2, C.bone);
+        R(r, g.cx - g.pw / 6, y - 1, g.pw / 3, 1, C.worn);
+        R(r, g.cx - g.pw / 2 - 1, y + 1, g.pw + 2, 1, C.ink);
+      });
+    };
+    const at = (hz, geo, t) => ({ x: geo(t).cx * U, y: Math.round(hz + t * (H - 1 - hz)) * U, g: geo(t) });
+    const ART = {
+      goatBack: ['..k....k..', '..kk..kk..', '...wwww...', '..wwwwww..', '.rrrrrrrr.', '.wwwwwwww.', '.wwwwwwww.', '.wwwwwwww.', '..wwwwww..', '..k.kk.k..'],
+      raven: ['kk.....kk', '.kk...kk.', '..kkkkk..', '...kkky..'],
+      flag: ['rrr.', 'rrrr', 'rrr.', 'k...', 'k...', 'k...']
+    };
+    const sprite = (name, pal, s, x, y, cls, rot) => {
+      const px = [];
+      ART[name].forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * s, y: ry * s, s, c: pal[ch] }); }));
+      return { x, y, cls: cls || '', rot: rot || 0, px };
+    };
+    const goatBack = (x, y, cls, rot) => sprite('goatBack', { w: C.fur, k: C.ink, r: C.red }, 5, x - 25, y - 50, cls, rot);
+    const raven = (x, y) => sprite('raven', { k: C.ink, y: C.red }, 3, x - 13, y - 14, 'bob');
+    const flag = (x, y) => sprite('flag', { r: C.red, k: C.ink }, 3, x, y - 18);
+
+    // 3rd person: the camera sits behind and above the goat; the path winds away up the ridge
+    const third = (stop, caught) => {
+      const hz = 16, r = [];
+      const geo = (t) => ({ cx: 32 + 12 * Math.sin(t * 4.2 - 0.6) * (0.35 + 0.65 * t), pw: 1 + t * t * 14, rw: 3 + t * t * 14 + t * 14 });
+      const ts = [0.8, 0.52, 0.32, 0.17, 0.06].slice(0, 9 - stop);
+      backdrop(r, hz);
+      ridge(r, hz, geo, ts.slice(0, -1));
+      const here = at(hz, geo, ts[0]);
+      const sprites = [], tags = [];
+      ts.slice(1, -1).forEach((t, k) => { const a = at(hz, geo, t); tags.push({ x: a.x, y: a.y - 26, text: String(stop + 1 + k) }); });
+      const top = at(hz, geo, ts[ts.length - 1]);
+      sprites.push(flag(top.x, top.y));
+      if (!caught) {
+        sprites.push(goatBack(here.x, here.y, 'bob'));
+      } else {
+        // the landing breaks away: a gap through the path and rock shows the clouds, with falling chunks
+        const y = here.y / U, cx = here.g.cx, pw = here.g.pw;
+        R(r, cx - pw / 2 + 1, y - 2, pw + 3, 6, C.sea);
+        R(r, cx - pw / 2 + 1, y + 4, pw + 1, 2, C.seaShade);
+        R(r, cx + pw / 2 + 4, y + 3, 2, 2, C.bone); R(r, cx + pw / 2 + 8, y + 7, 2, 1, C.ink); R(r, cx - 2, y + 7, 1, 1, C.bone);
+        sprites.push(goatBack((cx + pw / 2 + 10) * U, (y + 6) * U, 'fall', 50));
+        sprites.push(raven(at(hz, geo, ts[2]).x + 30, at(hz, geo, ts[2]).y - 40));
+      }
+      // clouds drift over the near edges of the ridge
+      puff(r, 3, H - 5, 10, C.sea, C.seaShade); puff(r, 62, H - 6, 12, C.sea, C.seaShade);
+      return { rects: r, sprites, tags };
+    };
+
+    // 1st person: the goat's own view, low down; the sign fills the middle of the screen
+    const first = (stop, caught) => {
+      const hz = 24, r = [];
+      const geo = (t) => ({ cx: 32 + 5 * Math.sin(t * 3 + 1.2) * (1 - t), pw: 1 + t * 6 + t * t * t * 60, rw: 3 + t * 22 + t * t * t * 60 });
+      const ts = [0.45, 0.25, 0.12, 0.04].slice(0, 8 - stop);
+      backdrop(r, hz);
+      ridge(r, hz, geo, ts.slice(0, -1));
+      const sprites = [], tags = [];
+      ts.slice(0, -1).forEach((t, k) => { const a = at(hz, geo, t); tags.push({ x: a.x + a.g.pw * U / 2 + 14, y: a.y - 18, text: String(stop + 1 + k) }); });
+      const top = at(hz, geo, ts[ts.length - 1]);
+      sprites.push(flag(top.x, top.y));
+      if (!caught) {
+        const perch = at(hz, geo, ts[1]);
+        sprites.push(raven(perch.x, perch.y));
+        // the goat's own front legs, at the bottom edge
+        R(r, 22, H - 7, 4, 5, C.fur); R(r, 22, H - 2, 4, 2, C.ink); R(r, 39, H - 7, 4, 5, C.fur); R(r, 39, H - 2, 4, 2, C.ink);
+        R(r, 20, H - 9, 25, 2, C.fur); R(r, 24, H - 10, 17, 1, C.red);
+      } else {
+        // the ground in front cracks and drops away into the clouds
+        R(r, 0, H - 12, W, 12, C.sea);
+        for (let k = 0; k < 8; k++) R(r, k * 8 + (k % 2) * 3, H - 13 - (k % 3), 5, 1, C.ink);
+        R(r, 10, H - 8, 4, 2, C.bone); R(r, 44, H - 6, 5, 2, C.bone); R(r, 30, H - 4, 3, 1, C.ink);
+        puff(r, 18, H - 6, 16, C.sea, C.seaShade); puff(r, 50, H - 5, 14, C.sea, C.seaShade);
+      }
+      return { rects: r, sprites, tags };
+    };
+
+    return { t1: third(4, false), t2: third(5, true), f1: first(4, false), f2: first(5, true) };
+  }
+}
+</script>
+</body>
+</html>

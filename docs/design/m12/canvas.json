@@ -7,9 +7,13 @@
   "title": "Plor + Offbeat look directions",
   "launch": {
     "view": "canvas",
-    "page": "r4"
+    "page": "r5"
   },
   "pages": [
+    {
+      "id": "r5",
+      "name": "Round 5 · camera sketches"
+    },
     {
       "id": "r4",
       "name": "Round 4 · PixelLab art"
@@ -147,6 +151,14 @@
       "h": 1340,
       "title": "First PixelLab art: goat, trail, sign",
       "page": "r4"
+    },
+    "R5-camera.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1848,
+      "h": 1060,
+      "title": "Offbeat · 3rd person vs 1st person",
+      "page": "r5"
     }
   },
   "order": [
@@ -164,7 +176,8 @@
     "R2-09-dark.dc.html",
     "R2-10-type.dc.html",
     "R3-ridge.dc.html",
-    "R4-pixellab.dc.html"
+    "R4-pixellab.dc.html",
+    "R5-camera.dc.html"
   ],
   "notes": {
     "heading": {
@@ -230,6 +243,22 @@
       "fill": "orange",
       "page": "r4",
       "text": "First tries from PixelLab (trial plan, 7 generations so far). Pick a goat, a trail and a sign, or say what to change.\n\nNext, once you pick: the goat gets idle, hop and fall animations, and the trail gets a ledge that crumbles.\n\nThe word on the sign is page text in the pixel font, so any word fits. Sizes are a trial (64 px sprites), not a final choice (D20).\n\nTrail A is seen from behind, not from the side, so the 7 stops would need a different layout there."
+    },
+    "r5heading": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 5: which camera? Behind the goat, or its own eyes",
+      "kind": "title1",
+      "maxW": 1848,
+      "page": "r5"
+    },
+    "r5about": {
+      "x": 1928,
+      "y": 0,
+      "w": 400,
+      "fill": "orange",
+      "page": "r5",
+      "text": "Quick chunky sketches drawn in code (free, no PixelLab), only to compare the two cameras. Same moments for both: typing at stop 4, and getting caught at stop 5.\n\n3rd person uses the winding-path angle you liked from Round 4: the next stops and the top flag are ahead up the ridge.\n\n1st person puts your sign right in front, so the word is the biggest thing on screen. Friends would need a separate view here.\n\nPick one; then a small low-res PixelLab test (about 2 generations) for that camera."
     }
   },
   "designSystems": []
