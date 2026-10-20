@@ -1,0 +1,3635 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-17",
+  "questions": [
+    {
+      "prompt": "Name something with a screen",
+      "entries": [
+        {
+          "id": "tv",
+          "name": "TV",
+          "aliases": [
+            "television",
+            "flat screen",
+            "smart TV",
+            "telly",
+            "TVs"
+          ],
+          "plural": "TVs"
+        },
+        {
+          "id": "phone",
+          "name": "phone",
+          "aliases": [
+            "cell phone",
+            "smartphone",
+            "iPhone",
+            "mobile phone",
+            "Android",
+            "cellphone",
+            "phones"
+          ]
+        },
+        {
+          "id": "computer",
+          "name": "computer",
+          "aliases": [
+            "desktop",
+            "desktop computer",
+            "PC",
+            "Mac",
+            "iMac",
+            "computers"
+          ]
+        },
+        {
+          "id": "laptop",
+          "name": "laptop",
+          "aliases": [
+            "notebook computer",
+            "MacBook",
+            "Chromebook",
+            "notebook",
+            "laptops"
+          ]
+        },
+        {
+          "id": "tablet",
+          "name": "tablet",
+          "aliases": [
+            "iPad",
+            "tablets"
+          ]
+        },
+        {
+          "id": "e-reader",
+          "name": "e-reader",
+          "aliases": [
+            "Kindle",
+            "e-book reader",
+            "e-readers"
+          ]
+        },
+        {
+          "id": "smartwatch",
+          "name": "smartwatch",
+          "aliases": [
+            "Apple Watch",
+            "smart watch",
+            "smartwatches"
+          ]
+        },
+        {
+          "id": "fitness-tracker",
+          "name": "fitness tracker",
+          "aliases": [
+            "Fitbit",
+            "fitness trackers"
+          ]
+        },
+        {
+          "id": "computer-monitor",
+          "name": "computer monitor",
+          "aliases": [
+            "monitor",
+            "computer monitors"
+          ]
+        },
+        {
+          "id": "movie-screen",
+          "name": "movie screen",
+          "aliases": [
+            "cinema screen",
+            "movie theater",
+            "cinema",
+            "big screen",
+            "movie screens"
+          ]
+        },
+        {
+          "id": "projector-screen",
+          "name": "projector screen",
+          "aliases": [
+            "projector",
+            "projector screens"
+          ]
+        },
+        {
+          "id": "handheld-game-console",
+          "name": "handheld game console",
+          "aliases": [
+            "Nintendo Switch",
+            "Switch",
+            "Game Boy",
+            "Nintendo DS",
+            "Steam Deck",
+            "PSP",
+            "handheld console",
+            "handheld game consoles"
+          ]
+        },
+        {
+          "id": "arcade-machine",
+          "name": "arcade machine",
+          "aliases": [
+            "arcade game",
+            "arcade machines"
+          ]
+        },
+        {
+          "id": "atm",
+          "name": "ATM",
+          "aliases": [
+            "cash machine",
+            "ATMs"
+          ],
+          "plural": "ATMs"
+        },
+        {
+          "id": "car-display",
+          "name": "car display",
+          "aliases": [
+            "car screen",
+            "infotainment system",
+            "dashboard screen",
+            "car displays"
+          ]
+        },
+        {
+          "id": "gps",
+          "name": "GPS",
+          "aliases": [
+            "sat nav",
+            "GPS device"
+          ],
+          "plural": "GPS"
+        },
+        {
+          "id": "microwave",
+          "name": "microwave",
+          "aliases": [
+            "microwaves"
+          ]
+        },
+        {
+          "id": "smart-fridge",
+          "name": "smart fridge",
+          "aliases": [
+            "refrigerator",
+            "smart fridges"
+          ]
+        },
+        {
+          "id": "thermostat",
+          "name": "thermostat",
+          "aliases": [
+            "smart thermostat",
+            "thermostats"
+          ]
+        },
+        {
+          "id": "baby-monitor",
+          "name": "baby monitor",
+          "aliases": [
+            "baby monitors"
+          ]
+        },
+        {
+          "id": "digital-camera",
+          "name": "digital camera",
+          "aliases": [
+            "camera",
+            "digital cameras"
+          ]
+        },
+        {
+          "id": "camcorder",
+          "name": "camcorder",
+          "aliases": [
+            "video camera",
+            "camcorders"
+          ]
+        },
+        {
+          "id": "graphing-calculator",
+          "name": "graphing calculator",
+          "aliases": [
+            "calculator",
+            "graphing calculators"
+          ]
+        },
+        {
+          "id": "digital-photo-frame",
+          "name": "digital photo frame",
+          "aliases": [
+            "photo frame",
+            "digital photo frames"
+          ]
+        },
+        {
+          "id": "smart-display",
+          "name": "smart display",
+          "aliases": [
+            "Echo Show",
+            "Nest Hub",
+            "smart displays"
+          ]
+        },
+        {
+          "id": "jumbotron",
+          "name": "Jumbotron",
+          "aliases": [
+            "scoreboard",
+            "stadium screen",
+            "video board",
+            "Jumbotrons"
+          ]
+        },
+        {
+          "id": "digital-billboard",
+          "name": "digital billboard",
+          "aliases": [
+            "billboard",
+            "digital billboards"
+          ]
+        },
+        {
+          "id": "self-checkout",
+          "name": "self-checkout",
+          "aliases": [
+            "kiosk",
+            "self-checkout machine",
+            "touchscreen kiosk",
+            "self-checkouts"
+          ]
+        },
+        {
+          "id": "cash-register",
+          "name": "cash register",
+          "aliases": [
+            "POS",
+            "card reader",
+            "card machine",
+            "cash registers"
+          ]
+        },
+        {
+          "id": "treadmill",
+          "name": "treadmill",
+          "aliases": [
+            "treadmills"
+          ]
+        },
+        {
+          "id": "exercise-bike",
+          "name": "exercise bike",
+          "aliases": [
+            "Peloton",
+            "exercise bikes"
+          ]
+        },
+        {
+          "id": "vr-headset",
+          "name": "VR headset",
+          "aliases": [
+            "virtual reality headset",
+            "Oculus",
+            "Meta Quest",
+            "Vision Pro",
+            "VR headsets"
+          ]
+        },
+        {
+          "id": "in-flight-entertainment",
+          "name": "in-flight entertainment",
+          "aliases": [
+            "seatback screen",
+            "airplane screen"
+          ],
+          "plural": "in-flight entertainment"
+        },
+        {
+          "id": "interactive-whiteboard",
+          "name": "interactive whiteboard",
+          "aliases": [
+            "smart board",
+            "interactive whiteboards"
+          ]
+        },
+        {
+          "id": "mp3-player",
+          "name": "MP3 player",
+          "aliases": [
+            "iPod",
+            "MP3 players"
+          ]
+        },
+        {
+          "id": "digital-clock",
+          "name": "digital clock",
+          "aliases": [
+            "alarm clock",
+            "digital clocks"
+          ]
+        },
+        {
+          "id": "tamagotchi",
+          "name": "Tamagotchi",
+          "aliases": [],
+          "plural": "Tamagotchi"
+        },
+        {
+          "id": "etch-a-sketch",
+          "name": "Etch A Sketch",
+          "aliases": [],
+          "plural": "Etch A Sketch"
+        },
+        {
+          "id": "screen-door",
+          "name": "screen door",
+          "aliases": [
+            "screen doors"
+          ]
+        },
+        {
+          "id": "window-screen",
+          "name": "window screen",
+          "aliases": [
+            "fly screen",
+            "insect screen",
+            "window screens"
+          ]
+        },
+        {
+          "id": "folding-screen",
+          "name": "folding screen",
+          "aliases": [
+            "room divider",
+            "privacy screen",
+            "folding screens"
+          ]
+        },
+        {
+          "id": "fireplace-screen",
+          "name": "fireplace screen",
+          "aliases": [
+            "fire screen",
+            "fireplace screens"
+          ]
+        },
+        {
+          "id": "departure-board",
+          "name": "departure board",
+          "aliases": [
+            "arrivals board",
+            "flight board",
+            "departure boards"
+          ]
+        },
+        {
+          "id": "security-monitor",
+          "name": "security monitor",
+          "aliases": [
+            "CCTV",
+            "security camera",
+            "security monitors"
+          ]
+        },
+        {
+          "id": "heart-monitor",
+          "name": "heart monitor",
+          "aliases": [
+            "patient monitor",
+            "hospital monitor",
+            "heart monitors"
+          ]
+        },
+        {
+          "id": "ultrasound-machine",
+          "name": "ultrasound machine",
+          "aliases": [
+            "ultrasound",
+            "ultrasound machines"
+          ]
+        },
+        {
+          "id": "dashcam",
+          "name": "dashcam",
+          "aliases": [
+            "dash cam",
+            "dashcams"
+          ]
+        },
+        {
+          "id": "drone-controller",
+          "name": "drone controller",
+          "aliases": [
+            "drone controllers"
+          ]
+        },
+        {
+          "id": "oven",
+          "name": "oven",
+          "aliases": [
+            "smart oven",
+            "ovens"
+          ]
+        },
+        {
+          "id": "washing-machine",
+          "name": "washing machine",
+          "aliases": [
+            "washing machines"
+          ]
+        },
+        {
+          "id": "printer",
+          "name": "printer",
+          "aliases": [
+            "printers"
+          ]
+        },
+        {
+          "id": "radar-screen",
+          "name": "radar screen",
+          "aliases": [
+            "radar",
+            "radar screens"
+          ]
+        },
+        {
+          "id": "oscilloscope",
+          "name": "oscilloscope",
+          "aliases": [
+            "oscilloscopes"
+          ]
+        },
+        {
+          "id": "pager",
+          "name": "pager",
+          "aliases": [
+            "pagers"
+          ]
+        },
+        {
+          "id": "pinball-machine",
+          "name": "pinball machine",
+          "aliases": [
+            "pinball machines"
+          ]
+        },
+        {
+          "id": "slot-machine",
+          "name": "slot machine",
+          "aliases": [
+            "slot machines"
+          ]
+        },
+        {
+          "id": "gas-pump",
+          "name": "gas pump",
+          "aliases": [
+            "gas pumps"
+          ]
+        },
+        {
+          "id": "digital-sign",
+          "name": "digital sign",
+          "aliases": [
+            "LED sign",
+            "digital signs"
+          ]
+        }
+      ],
+      "host_bank": [
+        "laptop",
+        "tv",
+        "phone",
+        "computer",
+        "tablet",
+        "smartwatch",
+        "computer-monitor",
+        "movie-screen"
+      ],
+      "host_answers": [
+        "laptop"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a gemstone",
+      "entries": [
+        {
+          "id": "diamond",
+          "name": "diamond",
+          "aliases": [
+            "diamonds"
+          ]
+        },
+        {
+          "id": "ruby",
+          "name": "ruby",
+          "aliases": [
+            "star ruby",
+            "pigeon's blood ruby",
+            "rubies"
+          ],
+          "plural": "rubies"
+        },
+        {
+          "id": "emerald",
+          "name": "emerald",
+          "aliases": [
+            "emeralds"
+          ]
+        },
+        {
+          "id": "sapphire",
+          "name": "sapphire",
+          "aliases": [
+            "blue sapphire",
+            "pink sapphire",
+            "yellow sapphire",
+            "padparadscha",
+            "sapphires"
+          ]
+        },
+        {
+          "id": "pearl",
+          "name": "pearl",
+          "aliases": [
+            "pearls"
+          ]
+        },
+        {
+          "id": "amethyst",
+          "name": "amethyst",
+          "aliases": [
+            "amethysts"
+          ]
+        },
+        {
+          "id": "opal",
+          "name": "opal",
+          "aliases": [
+            "fire opal",
+            "black opal",
+            "opals"
+          ]
+        },
+        {
+          "id": "topaz",
+          "name": "topaz",
+          "aliases": [
+            "blue topaz",
+            "topazes"
+          ],
+          "plural": "topazes"
+        },
+        {
+          "id": "garnet",
+          "name": "garnet",
+          "aliases": [
+            "tsavorite",
+            "demantoid",
+            "garnets"
+          ]
+        },
+        {
+          "id": "aquamarine",
+          "name": "aquamarine",
+          "aliases": [
+            "aquamarines"
+          ]
+        },
+        {
+          "id": "peridot",
+          "name": "peridot",
+          "aliases": [
+            "peridots"
+          ]
+        },
+        {
+          "id": "turquoise",
+          "name": "turquoise",
+          "aliases": [
+            "turquoises"
+          ]
+        },
+        {
+          "id": "jade",
+          "name": "jade",
+          "aliases": [
+            "jadeite",
+            "nephrite"
+          ],
+          "plural": "jade"
+        },
+        {
+          "id": "onyx",
+          "name": "onyx",
+          "aliases": [
+            "onyxes"
+          ],
+          "plural": "onyxes"
+        },
+        {
+          "id": "obsidian",
+          "name": "obsidian",
+          "aliases": [],
+          "plural": "obsidian"
+        },
+        {
+          "id": "jasper",
+          "name": "jasper",
+          "aliases": [
+            "jaspers"
+          ]
+        },
+        {
+          "id": "agate",
+          "name": "agate",
+          "aliases": [
+            "agates"
+          ]
+        },
+        {
+          "id": "tigers-eye",
+          "name": "tiger's eye",
+          "aliases": [
+            "tiger eye"
+          ],
+          "plural": "tiger's eye"
+        },
+        {
+          "id": "lapis-lazuli",
+          "name": "lapis lazuli",
+          "aliases": [
+            "lapis"
+          ],
+          "plural": "lapis lazuli"
+        },
+        {
+          "id": "malachite",
+          "name": "malachite",
+          "aliases": [],
+          "plural": "malachite"
+        },
+        {
+          "id": "moonstone",
+          "name": "moonstone",
+          "aliases": [
+            "moonstones"
+          ]
+        },
+        {
+          "id": "sunstone",
+          "name": "sunstone",
+          "aliases": [
+            "sunstones"
+          ]
+        },
+        {
+          "id": "citrine",
+          "name": "citrine",
+          "aliases": [
+            "citrines"
+          ]
+        },
+        {
+          "id": "tanzanite",
+          "name": "tanzanite",
+          "aliases": [
+            "tanzanites"
+          ]
+        },
+        {
+          "id": "tourmaline",
+          "name": "tourmaline",
+          "aliases": [
+            "pink tourmaline",
+            "watermelon tourmaline",
+            "rubellite",
+            "tourmalines"
+          ]
+        },
+        {
+          "id": "zircon",
+          "name": "zircon",
+          "aliases": [
+            "zircons"
+          ]
+        },
+        {
+          "id": "cubic-zirconia",
+          "name": "cubic zirconia",
+          "aliases": [
+            "CZ",
+            "cubic zirconias"
+          ],
+          "plural": "cubic zirconias"
+        },
+        {
+          "id": "spinel",
+          "name": "spinel",
+          "aliases": [
+            "spinels"
+          ]
+        },
+        {
+          "id": "alexandrite",
+          "name": "alexandrite",
+          "aliases": [
+            "alexandrites"
+          ]
+        },
+        {
+          "id": "morganite",
+          "name": "morganite",
+          "aliases": [
+            "morganites"
+          ]
+        },
+        {
+          "id": "beryl",
+          "name": "beryl",
+          "aliases": [
+            "red beryl",
+            "beryls"
+          ]
+        },
+        {
+          "id": "quartz",
+          "name": "quartz",
+          "aliases": [
+            "rose quartz",
+            "clear quartz",
+            "smoky quartz",
+            "crystal quartz",
+            "quartzes"
+          ],
+          "plural": "quartzes"
+        },
+        {
+          "id": "carnelian",
+          "name": "carnelian",
+          "aliases": [
+            "carnelians"
+          ]
+        },
+        {
+          "id": "bloodstone",
+          "name": "bloodstone",
+          "aliases": [
+            "bloodstones"
+          ]
+        },
+        {
+          "id": "coral",
+          "name": "coral",
+          "aliases": [],
+          "plural": "coral"
+        },
+        {
+          "id": "amber",
+          "name": "amber",
+          "aliases": [],
+          "plural": "amber"
+        },
+        {
+          "id": "jet",
+          "name": "jet",
+          "aliases": [],
+          "plural": "jet"
+        },
+        {
+          "id": "chrysoprase",
+          "name": "chrysoprase",
+          "aliases": [
+            "chrysoprases"
+          ]
+        },
+        {
+          "id": "iolite",
+          "name": "iolite",
+          "aliases": [
+            "iolites"
+          ]
+        },
+        {
+          "id": "kunzite",
+          "name": "kunzite",
+          "aliases": [
+            "kunzites"
+          ]
+        },
+        {
+          "id": "labradorite",
+          "name": "labradorite",
+          "aliases": [
+            "labradorites"
+          ]
+        },
+        {
+          "id": "rhodochrosite",
+          "name": "rhodochrosite",
+          "aliases": [
+            "rhodochrosites"
+          ]
+        },
+        {
+          "id": "amazonite",
+          "name": "amazonite",
+          "aliases": [
+            "amazonites"
+          ]
+        },
+        {
+          "id": "aventurine",
+          "name": "aventurine",
+          "aliases": [
+            "aventurines"
+          ]
+        },
+        {
+          "id": "sodalite",
+          "name": "sodalite",
+          "aliases": [
+            "sodalites"
+          ]
+        },
+        {
+          "id": "hematite",
+          "name": "hematite",
+          "aliases": [
+            "hematites"
+          ]
+        },
+        {
+          "id": "pyrite",
+          "name": "pyrite",
+          "aliases": [
+            "fool's gold"
+          ],
+          "plural": "pyrite"
+        },
+        {
+          "id": "moissanite",
+          "name": "moissanite",
+          "aliases": [
+            "moissanites"
+          ]
+        },
+        {
+          "id": "chalcedony",
+          "name": "chalcedony",
+          "aliases": [
+            "chalcedonies"
+          ]
+        },
+        {
+          "id": "fluorite",
+          "name": "fluorite",
+          "aliases": [
+            "fluorites"
+          ]
+        },
+        {
+          "id": "larimar",
+          "name": "larimar",
+          "aliases": [
+            "larimars"
+          ]
+        },
+        {
+          "id": "painite",
+          "name": "painite",
+          "aliases": [
+            "painites"
+          ]
+        },
+        {
+          "id": "benitoite",
+          "name": "benitoite",
+          "aliases": [
+            "benitoites"
+          ]
+        },
+        {
+          "id": "rhodolite",
+          "name": "rhodolite",
+          "aliases": [
+            "rhodolites"
+          ]
+        },
+        {
+          "id": "ametrine",
+          "name": "ametrine",
+          "aliases": [
+            "ametrines"
+          ]
+        },
+        {
+          "id": "apatite",
+          "name": "apatite",
+          "aliases": [
+            "apatites"
+          ]
+        },
+        {
+          "id": "prehnite",
+          "name": "prehnite",
+          "aliases": [
+            "prehnites"
+          ]
+        },
+        {
+          "id": "kyanite",
+          "name": "kyanite",
+          "aliases": [
+            "kyanites"
+          ]
+        },
+        {
+          "id": "selenite",
+          "name": "selenite",
+          "aliases": [
+            "selenites"
+          ]
+        },
+        {
+          "id": "howlite",
+          "name": "howlite",
+          "aliases": [
+            "howlites"
+          ]
+        },
+        {
+          "id": "chrysocolla",
+          "name": "chrysocolla",
+          "aliases": [
+            "chrysocollas"
+          ]
+        },
+        {
+          "id": "unakite",
+          "name": "unakite",
+          "aliases": [
+            "unakites"
+          ]
+        },
+        {
+          "id": "lepidolite",
+          "name": "lepidolite",
+          "aliases": [
+            "lepidolites"
+          ]
+        },
+        {
+          "id": "heliodor",
+          "name": "heliodor",
+          "aliases": [
+            "golden beryl",
+            "heliodors"
+          ]
+        },
+        {
+          "id": "goshenite",
+          "name": "goshenite",
+          "aliases": [
+            "goshenites"
+          ]
+        },
+        {
+          "id": "taaffeite",
+          "name": "taaffeite",
+          "aliases": [
+            "taaffeites"
+          ]
+        }
+      ],
+      "host_bank": [
+        "ruby",
+        "diamond",
+        "emerald",
+        "sapphire",
+        "pearl",
+        "amethyst",
+        "opal",
+        "topaz"
+      ],
+      "host_answers": [
+        "ruby"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a building you'd find in a town",
+      "entries": [
+        {
+          "id": "library",
+          "name": "library",
+          "aliases": [
+            "public library",
+            "libraries"
+          ],
+          "plural": "libraries"
+        },
+        {
+          "id": "school",
+          "name": "school",
+          "aliases": [
+            "elementary school",
+            "primary school",
+            "high school",
+            "middle school",
+            "secondary school",
+            "schools"
+          ]
+        },
+        {
+          "id": "daycare",
+          "name": "daycare",
+          "aliases": [
+            "preschool",
+            "nursery school",
+            "kindergarten",
+            "daycares"
+          ]
+        },
+        {
+          "id": "university",
+          "name": "university",
+          "aliases": [
+            "college",
+            "universities"
+          ]
+        },
+        {
+          "id": "post-office",
+          "name": "post office",
+          "aliases": [
+            "post offices"
+          ]
+        },
+        {
+          "id": "bank",
+          "name": "bank",
+          "aliases": [
+            "credit union",
+            "banks"
+          ]
+        },
+        {
+          "id": "hospital",
+          "name": "hospital",
+          "aliases": [
+            "hospitals"
+          ]
+        },
+        {
+          "id": "clinic",
+          "name": "clinic",
+          "aliases": [
+            "doctor's office",
+            "medical center",
+            "health center",
+            "clinics"
+          ]
+        },
+        {
+          "id": "dentist",
+          "name": "dentist",
+          "aliases": [
+            "dentist's office",
+            "dental office",
+            "dentists"
+          ]
+        },
+        {
+          "id": "vet",
+          "name": "vet",
+          "aliases": [
+            "veterinarian",
+            "animal hospital",
+            "vet clinic",
+            "vets"
+          ]
+        },
+        {
+          "id": "church",
+          "name": "church",
+          "aliases": [
+            "chapel",
+            "churches"
+          ]
+        },
+        {
+          "id": "cathedral",
+          "name": "cathedral",
+          "aliases": [
+            "cathedrals"
+          ]
+        },
+        {
+          "id": "mosque",
+          "name": "mosque",
+          "aliases": [
+            "mosques"
+          ]
+        },
+        {
+          "id": "synagogue",
+          "name": "synagogue",
+          "aliases": [
+            "synagogues"
+          ]
+        },
+        {
+          "id": "temple",
+          "name": "temple",
+          "aliases": [
+            "temples"
+          ]
+        },
+        {
+          "id": "town-hall",
+          "name": "town hall",
+          "aliases": [
+            "city hall",
+            "council building",
+            "municipal building",
+            "town halls"
+          ]
+        },
+        {
+          "id": "courthouse",
+          "name": "courthouse",
+          "aliases": [
+            "court",
+            "courthouses"
+          ]
+        },
+        {
+          "id": "police-station",
+          "name": "police station",
+          "aliases": [
+            "police department",
+            "police stations"
+          ]
+        },
+        {
+          "id": "fire-station",
+          "name": "fire station",
+          "aliases": [
+            "firehouse",
+            "fire hall",
+            "fire stations"
+          ]
+        },
+        {
+          "id": "jail",
+          "name": "jail",
+          "aliases": [
+            "prison",
+            "jails"
+          ]
+        },
+        {
+          "id": "dmv",
+          "name": "DMV",
+          "aliases": [
+            "motor vehicle office",
+            "DMVs"
+          ],
+          "plural": "DMVs"
+        },
+        {
+          "id": "grocery-store",
+          "name": "grocery store",
+          "aliases": [
+            "supermarket",
+            "grocery",
+            "food store",
+            "grocery stores"
+          ]
+        },
+        {
+          "id": "bakery",
+          "name": "bakery",
+          "aliases": [
+            "bakeries"
+          ],
+          "plural": "bakeries"
+        },
+        {
+          "id": "butcher",
+          "name": "butcher",
+          "aliases": [
+            "butcher shop",
+            "butcher's"
+          ]
+        },
+        {
+          "id": "pharmacy",
+          "name": "pharmacy",
+          "aliases": [
+            "drugstore",
+            "chemist",
+            "drug store",
+            "pharmacies"
+          ]
+        },
+        {
+          "id": "convenience-store",
+          "name": "convenience store",
+          "aliases": [
+            "corner store",
+            "gas station store",
+            "convenience stores"
+          ]
+        },
+        {
+          "id": "gas-station",
+          "name": "gas station",
+          "aliases": [
+            "petrol station",
+            "service station",
+            "gas stations"
+          ]
+        },
+        {
+          "id": "restaurant",
+          "name": "restaurant",
+          "aliases": [
+            "fast-food restaurant",
+            "fast food",
+            "McDonald's",
+            "restaurants"
+          ]
+        },
+        {
+          "id": "diner",
+          "name": "diner",
+          "aliases": [
+            "diners"
+          ]
+        },
+        {
+          "id": "pizzeria",
+          "name": "pizzeria",
+          "aliases": [
+            "pizza place",
+            "pizza shop",
+            "pizzerias"
+          ]
+        },
+        {
+          "id": "cafe",
+          "name": "café",
+          "aliases": [
+            "coffee shop"
+          ]
+        },
+        {
+          "id": "ice-cream-shop",
+          "name": "ice cream shop",
+          "aliases": [
+            "ice cream parlor",
+            "ice cream shops"
+          ]
+        },
+        {
+          "id": "bar",
+          "name": "bar",
+          "aliases": [
+            "pub",
+            "tavern",
+            "bars"
+          ]
+        },
+        {
+          "id": "hotel",
+          "name": "hotel",
+          "aliases": [
+            "hotels"
+          ]
+        },
+        {
+          "id": "motel",
+          "name": "motel",
+          "aliases": [
+            "motels"
+          ]
+        },
+        {
+          "id": "inn",
+          "name": "inn",
+          "aliases": [
+            "bed and breakfast",
+            "B&B",
+            "inns"
+          ]
+        },
+        {
+          "id": "movie-theater",
+          "name": "movie theater",
+          "aliases": [
+            "cinema",
+            "movie theatre",
+            "movie theaters"
+          ]
+        },
+        {
+          "id": "theater",
+          "name": "theater",
+          "aliases": [
+            "theatre",
+            "playhouse",
+            "theaters"
+          ]
+        },
+        {
+          "id": "museum",
+          "name": "museum",
+          "aliases": [
+            "museums"
+          ]
+        },
+        {
+          "id": "art-gallery",
+          "name": "art gallery",
+          "aliases": [
+            "gallery",
+            "art galleries"
+          ]
+        },
+        {
+          "id": "gym",
+          "name": "gym",
+          "aliases": [
+            "fitness center",
+            "health club",
+            "gyms"
+          ]
+        },
+        {
+          "id": "community-center",
+          "name": "community center",
+          "aliases": [
+            "rec center",
+            "recreation center",
+            "community centers"
+          ]
+        },
+        {
+          "id": "swimming-pool",
+          "name": "swimming pool",
+          "aliases": [
+            "pool",
+            "leisure centre",
+            "swimming pools"
+          ]
+        },
+        {
+          "id": "hardware-store",
+          "name": "hardware store",
+          "aliases": [
+            "hardware stores"
+          ]
+        },
+        {
+          "id": "barbershop",
+          "name": "barbershop",
+          "aliases": [
+            "barber",
+            "barber shop",
+            "barbershops"
+          ]
+        },
+        {
+          "id": "hair-salon",
+          "name": "hair salon",
+          "aliases": [
+            "salon",
+            "beauty salon",
+            "hair salons"
+          ]
+        },
+        {
+          "id": "nail-salon",
+          "name": "nail salon",
+          "aliases": [
+            "nail salons"
+          ]
+        },
+        {
+          "id": "bookstore",
+          "name": "bookstore",
+          "aliases": [
+            "bookshop",
+            "bookstores"
+          ]
+        },
+        {
+          "id": "clothing-store",
+          "name": "clothing store",
+          "aliases": [
+            "boutique",
+            "clothes shop",
+            "clothing stores"
+          ]
+        },
+        {
+          "id": "department-store",
+          "name": "department store",
+          "aliases": [
+            "department stores"
+          ]
+        },
+        {
+          "id": "shoe-store",
+          "name": "shoe store",
+          "aliases": [
+            "shoe stores"
+          ]
+        },
+        {
+          "id": "jewelry-store",
+          "name": "jewelry store",
+          "aliases": [
+            "jeweler",
+            "jewelry stores"
+          ]
+        },
+        {
+          "id": "florist",
+          "name": "florist",
+          "aliases": [
+            "flower shop",
+            "florists"
+          ]
+        },
+        {
+          "id": "pet-store",
+          "name": "pet store",
+          "aliases": [
+            "pet shop",
+            "pet stores"
+          ]
+        },
+        {
+          "id": "toy-store",
+          "name": "toy store",
+          "aliases": [
+            "toy shop",
+            "toy stores"
+          ]
+        },
+        {
+          "id": "antique-shop",
+          "name": "antique shop",
+          "aliases": [
+            "antique store",
+            "antique shops"
+          ]
+        },
+        {
+          "id": "thrift-store",
+          "name": "thrift store",
+          "aliases": [
+            "charity shop",
+            "secondhand shop",
+            "thrift stores"
+          ]
+        },
+        {
+          "id": "general-store",
+          "name": "general store",
+          "aliases": [
+            "general stores"
+          ]
+        },
+        {
+          "id": "mall",
+          "name": "mall",
+          "aliases": [
+            "shopping mall",
+            "shopping center",
+            "malls"
+          ]
+        },
+        {
+          "id": "laundromat",
+          "name": "laundromat",
+          "aliases": [
+            "laundrette",
+            "laundromats"
+          ]
+        },
+        {
+          "id": "dry-cleaner",
+          "name": "dry cleaner",
+          "aliases": [
+            "dry cleaners"
+          ]
+        },
+        {
+          "id": "car-wash",
+          "name": "car wash",
+          "aliases": [
+            "car washes"
+          ]
+        },
+        {
+          "id": "auto-shop",
+          "name": "auto shop",
+          "aliases": [
+            "garage",
+            "mechanic",
+            "auto repair shop",
+            "auto shops"
+          ]
+        },
+        {
+          "id": "car-dealership",
+          "name": "car dealership",
+          "aliases": [
+            "dealership",
+            "car dealerships"
+          ]
+        },
+        {
+          "id": "bowling-alley",
+          "name": "bowling alley",
+          "aliases": [
+            "bowling alleys"
+          ]
+        },
+        {
+          "id": "skating-rink",
+          "name": "skating rink",
+          "aliases": [
+            "ice rink",
+            "roller rink",
+            "skating rinks"
+          ]
+        },
+        {
+          "id": "arcade",
+          "name": "arcade",
+          "aliases": [
+            "arcades"
+          ]
+        },
+        {
+          "id": "train-station",
+          "name": "train station",
+          "aliases": [
+            "railway station",
+            "train stations"
+          ]
+        },
+        {
+          "id": "bus-station",
+          "name": "bus station",
+          "aliases": [
+            "bus depot",
+            "bus stations"
+          ]
+        },
+        {
+          "id": "airport",
+          "name": "airport",
+          "aliases": [
+            "airports"
+          ]
+        },
+        {
+          "id": "house",
+          "name": "house",
+          "aliases": [
+            "home",
+            "houses"
+          ]
+        },
+        {
+          "id": "apartment",
+          "name": "apartment",
+          "aliases": [
+            "apartments",
+            "apartment block",
+            "flats"
+          ]
+        },
+        {
+          "id": "offices",
+          "name": "offices",
+          "aliases": [
+            "office block",
+            "office tower"
+          ]
+        },
+        {
+          "id": "factory",
+          "name": "factory",
+          "aliases": [
+            "factories"
+          ]
+        },
+        {
+          "id": "warehouse",
+          "name": "warehouse",
+          "aliases": [
+            "warehouses"
+          ]
+        },
+        {
+          "id": "barn",
+          "name": "barn",
+          "aliases": [
+            "barns"
+          ]
+        },
+        {
+          "id": "silo",
+          "name": "silo",
+          "aliases": [
+            "silos"
+          ]
+        },
+        {
+          "id": "water-tower",
+          "name": "water tower",
+          "aliases": [
+            "water towers"
+          ]
+        },
+        {
+          "id": "lighthouse",
+          "name": "lighthouse",
+          "aliases": [
+            "lighthouses"
+          ]
+        },
+        {
+          "id": "mill",
+          "name": "mill",
+          "aliases": [
+            "mills"
+          ]
+        },
+        {
+          "id": "nursing-home",
+          "name": "nursing home",
+          "aliases": [
+            "retirement home",
+            "care home",
+            "nursing homes"
+          ]
+        },
+        {
+          "id": "funeral-home",
+          "name": "funeral home",
+          "aliases": [
+            "funeral parlor",
+            "funeral homes"
+          ]
+        },
+        {
+          "id": "gazebo",
+          "name": "gazebo",
+          "aliases": [
+            "bandstand",
+            "gazebos"
+          ]
+        },
+        {
+          "id": "greenhouse",
+          "name": "greenhouse",
+          "aliases": [
+            "greenhouses"
+          ]
+        },
+        {
+          "id": "parking-garage",
+          "name": "parking garage",
+          "aliases": [
+            "parking structure",
+            "parking garages"
+          ]
+        },
+        {
+          "id": "stadium",
+          "name": "stadium",
+          "aliases": [
+            "stadiums"
+          ]
+        },
+        {
+          "id": "aquarium",
+          "name": "aquarium",
+          "aliases": [
+            "aquariums"
+          ]
+        },
+        {
+          "id": "observatory",
+          "name": "observatory",
+          "aliases": [
+            "observatories"
+          ]
+        },
+        {
+          "id": "liquor-store",
+          "name": "liquor store",
+          "aliases": [
+            "off-license",
+            "liquor stores"
+          ]
+        },
+        {
+          "id": "casino",
+          "name": "casino",
+          "aliases": [
+            "casinos"
+          ]
+        },
+        {
+          "id": "hostel",
+          "name": "hostel",
+          "aliases": [
+            "hostels"
+          ]
+        },
+        {
+          "id": "tattoo-parlor",
+          "name": "tattoo parlor",
+          "aliases": [
+            "tattoo shop",
+            "tattoo parlors"
+          ]
+        },
+        {
+          "id": "newsagent",
+          "name": "newsagent",
+          "aliases": [
+            "newsstand",
+            "newsagents"
+          ]
+        },
+        {
+          "id": "cottage",
+          "name": "cottage",
+          "aliases": [
+            "cottages"
+          ]
+        },
+        {
+          "id": "mansion",
+          "name": "mansion",
+          "aliases": [
+            "mansions"
+          ]
+        },
+        {
+          "id": "castle",
+          "name": "castle",
+          "aliases": [
+            "castles"
+          ]
+        },
+        {
+          "id": "shed",
+          "name": "shed",
+          "aliases": [
+            "sheds"
+          ]
+        },
+        {
+          "id": "storage-units",
+          "name": "storage units",
+          "aliases": [
+            "storage facility"
+          ]
+        },
+        {
+          "id": "radio-station",
+          "name": "radio station",
+          "aliases": [
+            "radio stations"
+          ]
+        },
+        {
+          "id": "tv-station",
+          "name": "TV station",
+          "aliases": [
+            "TV stations"
+          ]
+        },
+        {
+          "id": "newspaper-office",
+          "name": "newspaper office",
+          "aliases": [
+            "newspaper offices"
+          ]
+        },
+        {
+          "id": "recycling-center",
+          "name": "recycling center",
+          "aliases": [
+            "dump",
+            "landfill",
+            "recycling centers"
+          ]
+        },
+        {
+          "id": "power-plant",
+          "name": "power plant",
+          "aliases": [
+            "power station",
+            "power plants"
+          ]
+        },
+        {
+          "id": "water-treatment-plant",
+          "name": "water treatment plant",
+          "aliases": [
+            "water treatment plants"
+          ]
+        },
+        {
+          "id": "grain-elevator",
+          "name": "grain elevator",
+          "aliases": [
+            "grain elevators"
+          ]
+        },
+        {
+          "id": "brewery",
+          "name": "brewery",
+          "aliases": [
+            "breweries"
+          ]
+        },
+        {
+          "id": "winery",
+          "name": "winery",
+          "aliases": [
+            "wineries"
+          ]
+        },
+        {
+          "id": "distillery",
+          "name": "distillery",
+          "aliases": [
+            "distilleries"
+          ]
+        }
+      ],
+      "host_bank": [
+        "library",
+        "school",
+        "bank",
+        "post-office",
+        "hospital",
+        "church",
+        "police-station",
+        "fire-station"
+      ],
+      "host_answers": [
+        "library"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a language",
+      "entries": [
+        {
+          "id": "english",
+          "name": "English",
+          "aliases": [],
+          "plural": "English"
+        },
+        {
+          "id": "spanish",
+          "name": "Spanish",
+          "aliases": [
+            "Español",
+            "Castilian"
+          ],
+          "plural": "Spanish"
+        },
+        {
+          "id": "french",
+          "name": "French",
+          "aliases": [
+            "Français"
+          ],
+          "plural": "French"
+        },
+        {
+          "id": "german",
+          "name": "German",
+          "aliases": [
+            "Deutsch",
+            "Swiss German",
+            "Austrian German",
+            "High German"
+          ],
+          "plural": "German"
+        },
+        {
+          "id": "yiddish",
+          "name": "Yiddish",
+          "aliases": [],
+          "plural": "Yiddish"
+        },
+        {
+          "id": "italian",
+          "name": "Italian",
+          "aliases": [],
+          "plural": "Italian"
+        },
+        {
+          "id": "portuguese",
+          "name": "Portuguese",
+          "aliases": [
+            "Brazilian Portuguese"
+          ],
+          "plural": "Portuguese"
+        },
+        {
+          "id": "russian",
+          "name": "Russian",
+          "aliases": [],
+          "plural": "Russian"
+        },
+        {
+          "id": "chinese",
+          "name": "Chinese",
+          "aliases": [],
+          "plural": "Chinese"
+        },
+        {
+          "id": "mandarin",
+          "name": "Mandarin",
+          "aliases": [
+            "Mandarin Chinese",
+            "Putonghua"
+          ],
+          "plural": "Mandarin"
+        },
+        {
+          "id": "cantonese",
+          "name": "Cantonese",
+          "aliases": [],
+          "plural": "Cantonese"
+        },
+        {
+          "id": "japanese",
+          "name": "Japanese",
+          "aliases": [],
+          "plural": "Japanese"
+        },
+        {
+          "id": "korean",
+          "name": "Korean",
+          "aliases": [],
+          "plural": "Korean"
+        },
+        {
+          "id": "arabic",
+          "name": "Arabic",
+          "aliases": [],
+          "plural": "Arabic"
+        },
+        {
+          "id": "hindi",
+          "name": "Hindi",
+          "aliases": [],
+          "plural": "Hindi"
+        },
+        {
+          "id": "urdu",
+          "name": "Urdu",
+          "aliases": [],
+          "plural": "Urdu"
+        },
+        {
+          "id": "bengali",
+          "name": "Bengali",
+          "aliases": [
+            "Bangla"
+          ],
+          "plural": "Bengali"
+        },
+        {
+          "id": "punjabi",
+          "name": "Punjabi",
+          "aliases": [
+            "Panjabi"
+          ],
+          "plural": "Punjabi"
+        },
+        {
+          "id": "gujarati",
+          "name": "Gujarati",
+          "aliases": [],
+          "plural": "Gujarati"
+        },
+        {
+          "id": "marathi",
+          "name": "Marathi",
+          "aliases": [],
+          "plural": "Marathi"
+        },
+        {
+          "id": "tamil",
+          "name": "Tamil",
+          "aliases": [],
+          "plural": "Tamil"
+        },
+        {
+          "id": "telugu",
+          "name": "Telugu",
+          "aliases": [],
+          "plural": "Telugu"
+        },
+        {
+          "id": "kannada",
+          "name": "Kannada",
+          "aliases": [],
+          "plural": "Kannada"
+        },
+        {
+          "id": "malayalam",
+          "name": "Malayalam",
+          "aliases": [],
+          "plural": "Malayalam"
+        },
+        {
+          "id": "persian",
+          "name": "Persian",
+          "aliases": [
+            "Farsi"
+          ],
+          "plural": "Persian"
+        },
+        {
+          "id": "turkish",
+          "name": "Turkish",
+          "aliases": [],
+          "plural": "Turkish"
+        },
+        {
+          "id": "hebrew",
+          "name": "Hebrew",
+          "aliases": [],
+          "plural": "Hebrew"
+        },
+        {
+          "id": "greek",
+          "name": "Greek",
+          "aliases": [
+            "Ancient Greek"
+          ],
+          "plural": "Greek"
+        },
+        {
+          "id": "latin",
+          "name": "Latin",
+          "aliases": [],
+          "plural": "Latin"
+        },
+        {
+          "id": "dutch",
+          "name": "Dutch",
+          "aliases": [
+            "Flemish"
+          ],
+          "plural": "Dutch"
+        },
+        {
+          "id": "afrikaans",
+          "name": "Afrikaans",
+          "aliases": [],
+          "plural": "Afrikaans"
+        },
+        {
+          "id": "swedish",
+          "name": "Swedish",
+          "aliases": [],
+          "plural": "Swedish"
+        },
+        {
+          "id": "norwegian",
+          "name": "Norwegian",
+          "aliases": [],
+          "plural": "Norwegian"
+        },
+        {
+          "id": "danish",
+          "name": "Danish",
+          "aliases": [],
+          "plural": "Danish"
+        },
+        {
+          "id": "finnish",
+          "name": "Finnish",
+          "aliases": [],
+          "plural": "Finnish"
+        },
+        {
+          "id": "icelandic",
+          "name": "Icelandic",
+          "aliases": [],
+          "plural": "Icelandic"
+        },
+        {
+          "id": "polish",
+          "name": "Polish",
+          "aliases": [],
+          "plural": "Polish"
+        },
+        {
+          "id": "czech",
+          "name": "Czech",
+          "aliases": [],
+          "plural": "Czech"
+        },
+        {
+          "id": "slovak",
+          "name": "Slovak",
+          "aliases": [],
+          "plural": "Slovak"
+        },
+        {
+          "id": "hungarian",
+          "name": "Hungarian",
+          "aliases": [
+            "Magyar"
+          ],
+          "plural": "Hungarian"
+        },
+        {
+          "id": "romanian",
+          "name": "Romanian",
+          "aliases": [],
+          "plural": "Romanian"
+        },
+        {
+          "id": "bulgarian",
+          "name": "Bulgarian",
+          "aliases": [],
+          "plural": "Bulgarian"
+        },
+        {
+          "id": "serbian",
+          "name": "Serbian",
+          "aliases": [],
+          "plural": "Serbian"
+        },
+        {
+          "id": "croatian",
+          "name": "Croatian",
+          "aliases": [],
+          "plural": "Croatian"
+        },
+        {
+          "id": "bosnian",
+          "name": "Bosnian",
+          "aliases": [],
+          "plural": "Bosnian"
+        },
+        {
+          "id": "slovenian",
+          "name": "Slovenian",
+          "aliases": [
+            "Slovene"
+          ],
+          "plural": "Slovenian"
+        },
+        {
+          "id": "ukrainian",
+          "name": "Ukrainian",
+          "aliases": [],
+          "plural": "Ukrainian"
+        },
+        {
+          "id": "belarusian",
+          "name": "Belarusian",
+          "aliases": [],
+          "plural": "Belarusian"
+        },
+        {
+          "id": "lithuanian",
+          "name": "Lithuanian",
+          "aliases": [],
+          "plural": "Lithuanian"
+        },
+        {
+          "id": "latvian",
+          "name": "Latvian",
+          "aliases": [],
+          "plural": "Latvian"
+        },
+        {
+          "id": "estonian",
+          "name": "Estonian",
+          "aliases": [],
+          "plural": "Estonian"
+        },
+        {
+          "id": "albanian",
+          "name": "Albanian",
+          "aliases": [],
+          "plural": "Albanian"
+        },
+        {
+          "id": "armenian",
+          "name": "Armenian",
+          "aliases": [],
+          "plural": "Armenian"
+        },
+        {
+          "id": "georgian",
+          "name": "Georgian",
+          "aliases": [],
+          "plural": "Georgian"
+        },
+        {
+          "id": "basque",
+          "name": "Basque",
+          "aliases": [],
+          "plural": "Basque"
+        },
+        {
+          "id": "catalan",
+          "name": "Catalan",
+          "aliases": [],
+          "plural": "Catalan"
+        },
+        {
+          "id": "galician",
+          "name": "Galician",
+          "aliases": [],
+          "plural": "Galician"
+        },
+        {
+          "id": "welsh",
+          "name": "Welsh",
+          "aliases": [],
+          "plural": "Welsh"
+        },
+        {
+          "id": "irish",
+          "name": "Irish",
+          "aliases": [
+            "Irish Gaelic"
+          ],
+          "plural": "Irish"
+        },
+        {
+          "id": "scottish-gaelic",
+          "name": "Scottish Gaelic",
+          "aliases": [],
+          "plural": "Scottish Gaelic"
+        },
+        {
+          "id": "breton",
+          "name": "Breton",
+          "aliases": [],
+          "plural": "Breton"
+        },
+        {
+          "id": "maltese",
+          "name": "Maltese",
+          "aliases": [],
+          "plural": "Maltese"
+        },
+        {
+          "id": "luxembourgish",
+          "name": "Luxembourgish",
+          "aliases": [],
+          "plural": "Luxembourgish"
+        },
+        {
+          "id": "vietnamese",
+          "name": "Vietnamese",
+          "aliases": [],
+          "plural": "Vietnamese"
+        },
+        {
+          "id": "thai",
+          "name": "Thai",
+          "aliases": [],
+          "plural": "Thai"
+        },
+        {
+          "id": "lao",
+          "name": "Lao",
+          "aliases": [],
+          "plural": "Lao"
+        },
+        {
+          "id": "khmer",
+          "name": "Khmer",
+          "aliases": [
+            "Cambodian"
+          ],
+          "plural": "Khmer"
+        },
+        {
+          "id": "burmese",
+          "name": "Burmese",
+          "aliases": [],
+          "plural": "Burmese"
+        },
+        {
+          "id": "malay",
+          "name": "Malay",
+          "aliases": [],
+          "plural": "Malay"
+        },
+        {
+          "id": "indonesian",
+          "name": "Indonesian",
+          "aliases": [
+            "Bahasa Indonesia"
+          ],
+          "plural": "Indonesian"
+        },
+        {
+          "id": "javanese",
+          "name": "Javanese",
+          "aliases": [],
+          "plural": "Javanese"
+        },
+        {
+          "id": "tagalog",
+          "name": "Tagalog",
+          "aliases": [
+            "Filipino"
+          ],
+          "plural": "Tagalog"
+        },
+        {
+          "id": "swahili",
+          "name": "Swahili",
+          "aliases": [
+            "Kiswahili"
+          ],
+          "plural": "Swahili"
+        },
+        {
+          "id": "amharic",
+          "name": "Amharic",
+          "aliases": [],
+          "plural": "Amharic"
+        },
+        {
+          "id": "somali",
+          "name": "Somali",
+          "aliases": [],
+          "plural": "Somali"
+        },
+        {
+          "id": "yoruba",
+          "name": "Yoruba",
+          "aliases": [],
+          "plural": "Yoruba"
+        },
+        {
+          "id": "igbo",
+          "name": "Igbo",
+          "aliases": [],
+          "plural": "Igbo"
+        },
+        {
+          "id": "hausa",
+          "name": "Hausa",
+          "aliases": [],
+          "plural": "Hausa"
+        },
+        {
+          "id": "zulu",
+          "name": "Zulu",
+          "aliases": [],
+          "plural": "Zulu"
+        },
+        {
+          "id": "xhosa",
+          "name": "Xhosa",
+          "aliases": [],
+          "plural": "Xhosa"
+        },
+        {
+          "id": "shona",
+          "name": "Shona",
+          "aliases": [],
+          "plural": "Shona"
+        },
+        {
+          "id": "malagasy",
+          "name": "Malagasy",
+          "aliases": [],
+          "plural": "Malagasy"
+        },
+        {
+          "id": "tibetan",
+          "name": "Tibetan",
+          "aliases": [],
+          "plural": "Tibetan"
+        },
+        {
+          "id": "mongolian",
+          "name": "Mongolian",
+          "aliases": [],
+          "plural": "Mongolian"
+        },
+        {
+          "id": "kazakh",
+          "name": "Kazakh",
+          "aliases": [],
+          "plural": "Kazakh"
+        },
+        {
+          "id": "uzbek",
+          "name": "Uzbek",
+          "aliases": [],
+          "plural": "Uzbek"
+        },
+        {
+          "id": "pashto",
+          "name": "Pashto",
+          "aliases": [],
+          "plural": "Pashto"
+        },
+        {
+          "id": "kurdish",
+          "name": "Kurdish",
+          "aliases": [],
+          "plural": "Kurdish"
+        },
+        {
+          "id": "nepali",
+          "name": "Nepali",
+          "aliases": [],
+          "plural": "Nepali"
+        },
+        {
+          "id": "sinhala",
+          "name": "Sinhala",
+          "aliases": [
+            "Sinhalese"
+          ],
+          "plural": "Sinhala"
+        },
+        {
+          "id": "hawaiian",
+          "name": "Hawaiian",
+          "aliases": [],
+          "plural": "Hawaiian"
+        },
+        {
+          "id": "maori",
+          "name": "Māori",
+          "aliases": [],
+          "plural": "Māori"
+        },
+        {
+          "id": "samoan",
+          "name": "Samoan",
+          "aliases": [],
+          "plural": "Samoan"
+        },
+        {
+          "id": "navajo",
+          "name": "Navajo",
+          "aliases": [],
+          "plural": "Navajo"
+        },
+        {
+          "id": "cherokee",
+          "name": "Cherokee",
+          "aliases": [],
+          "plural": "Cherokee"
+        },
+        {
+          "id": "quechua",
+          "name": "Quechua",
+          "aliases": [],
+          "plural": "Quechua"
+        },
+        {
+          "id": "guarani",
+          "name": "Guaraní",
+          "aliases": [],
+          "plural": "Guaraní"
+        },
+        {
+          "id": "nahuatl",
+          "name": "Nahuatl",
+          "aliases": [],
+          "plural": "Nahuatl"
+        },
+        {
+          "id": "inuktitut",
+          "name": "Inuktitut",
+          "aliases": [],
+          "plural": "Inuktitut"
+        },
+        {
+          "id": "esperanto",
+          "name": "Esperanto",
+          "aliases": [],
+          "plural": "Esperanto"
+        },
+        {
+          "id": "sign-language",
+          "name": "sign language",
+          "aliases": [
+            "ASL",
+            "American Sign Language",
+            "British Sign Language",
+            "BSL"
+          ],
+          "plural": "sign language"
+        },
+        {
+          "id": "sanskrit",
+          "name": "Sanskrit",
+          "aliases": [],
+          "plural": "Sanskrit"
+        },
+        {
+          "id": "haitian-creole",
+          "name": "Haitian Creole",
+          "aliases": [
+            "Creole"
+          ],
+          "plural": "Haitian Creole"
+        },
+        {
+          "id": "hmong",
+          "name": "Hmong",
+          "aliases": [],
+          "plural": "Hmong"
+        },
+        {
+          "id": "tigrinya",
+          "name": "Tigrinya",
+          "aliases": [],
+          "plural": "Tigrinya"
+        },
+        {
+          "id": "wolof",
+          "name": "Wolof",
+          "aliases": [],
+          "plural": "Wolof"
+        },
+        {
+          "id": "twi",
+          "name": "Twi",
+          "aliases": [],
+          "plural": "Twi"
+        },
+        {
+          "id": "oromo",
+          "name": "Oromo",
+          "aliases": [],
+          "plural": "Oromo"
+        },
+        {
+          "id": "azerbaijani",
+          "name": "Azerbaijani",
+          "aliases": [
+            "Azeri"
+          ],
+          "plural": "Azerbaijani"
+        },
+        {
+          "id": "tajik",
+          "name": "Tajik",
+          "aliases": [],
+          "plural": "Tajik"
+        },
+        {
+          "id": "kyrgyz",
+          "name": "Kyrgyz",
+          "aliases": [],
+          "plural": "Kyrgyz"
+        },
+        {
+          "id": "turkmen",
+          "name": "Turkmen",
+          "aliases": [],
+          "plural": "Turkmen"
+        },
+        {
+          "id": "uyghur",
+          "name": "Uyghur",
+          "aliases": [],
+          "plural": "Uyghur"
+        },
+        {
+          "id": "cebuano",
+          "name": "Cebuano",
+          "aliases": [],
+          "plural": "Cebuano"
+        },
+        {
+          "id": "ilocano",
+          "name": "Ilocano",
+          "aliases": [],
+          "plural": "Ilocano"
+        },
+        {
+          "id": "fijian",
+          "name": "Fijian",
+          "aliases": [],
+          "plural": "Fijian"
+        },
+        {
+          "id": "tongan",
+          "name": "Tongan",
+          "aliases": [],
+          "plural": "Tongan"
+        },
+        {
+          "id": "cornish",
+          "name": "Cornish",
+          "aliases": [],
+          "plural": "Cornish"
+        },
+        {
+          "id": "manx",
+          "name": "Manx",
+          "aliases": [],
+          "plural": "Manx"
+        },
+        {
+          "id": "frisian",
+          "name": "Frisian",
+          "aliases": [],
+          "plural": "Frisian"
+        },
+        {
+          "id": "romansh",
+          "name": "Romansh",
+          "aliases": [],
+          "plural": "Romansh"
+        },
+        {
+          "id": "sami",
+          "name": "Sámi",
+          "aliases": [],
+          "plural": "Sámi"
+        },
+        {
+          "id": "faroese",
+          "name": "Faroese",
+          "aliases": [],
+          "plural": "Faroese"
+        },
+        {
+          "id": "macedonian",
+          "name": "Macedonian",
+          "aliases": [],
+          "plural": "Macedonian"
+        },
+        {
+          "id": "montenegrin",
+          "name": "Montenegrin",
+          "aliases": [],
+          "plural": "Montenegrin"
+        },
+        {
+          "id": "aramaic",
+          "name": "Aramaic",
+          "aliases": [],
+          "plural": "Aramaic"
+        },
+        {
+          "id": "coptic",
+          "name": "Coptic",
+          "aliases": [],
+          "plural": "Coptic"
+        }
+      ],
+      "host_bank": [
+        "german",
+        "english",
+        "spanish",
+        "french",
+        "chinese",
+        "japanese",
+        "italian",
+        "mandarin"
+      ],
+      "host_answers": [
+        "german"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an organ in the human body",
+      "entries": [
+        {
+          "id": "heart",
+          "name": "heart",
+          "aliases": [
+            "hearts"
+          ]
+        },
+        {
+          "id": "brain",
+          "name": "brain",
+          "aliases": [
+            "brains"
+          ]
+        },
+        {
+          "id": "lung",
+          "name": "lung",
+          "aliases": [
+            "left lung",
+            "right lung",
+            "lungs"
+          ]
+        },
+        {
+          "id": "liver",
+          "name": "liver",
+          "aliases": [
+            "livers"
+          ]
+        },
+        {
+          "id": "kidney",
+          "name": "kidney",
+          "aliases": [
+            "kidneys"
+          ]
+        },
+        {
+          "id": "stomach",
+          "name": "stomach",
+          "aliases": [
+            "tummy",
+            "belly",
+            "stomachs"
+          ],
+          "plural": "stomachs"
+        },
+        {
+          "id": "skin",
+          "name": "skin",
+          "aliases": [],
+          "plural": "skin"
+        },
+        {
+          "id": "intestine",
+          "name": "intestine",
+          "aliases": [
+            "intestines",
+            "small intestine",
+            "large intestine",
+            "bowel",
+            "bowels",
+            "gut",
+            "colon",
+            "guts"
+          ]
+        },
+        {
+          "id": "pancreas",
+          "name": "pancreas",
+          "aliases": [
+            "pancreases"
+          ],
+          "plural": "pancreases"
+        },
+        {
+          "id": "spleen",
+          "name": "spleen",
+          "aliases": [
+            "spleens"
+          ]
+        },
+        {
+          "id": "gallbladder",
+          "name": "gallbladder",
+          "aliases": [
+            "gall bladder",
+            "gallbladders"
+          ]
+        },
+        {
+          "id": "bladder",
+          "name": "bladder",
+          "aliases": [
+            "urinary bladder",
+            "bladders"
+          ]
+        },
+        {
+          "id": "appendix",
+          "name": "appendix",
+          "aliases": [
+            "appendixes"
+          ],
+          "plural": "appendixes"
+        },
+        {
+          "id": "esophagus",
+          "name": "esophagus",
+          "aliases": [
+            "oesophagus",
+            "gullet",
+            "esophagi"
+          ],
+          "plural": "esophagi"
+        },
+        {
+          "id": "thyroid",
+          "name": "thyroid",
+          "aliases": [
+            "thyroid gland",
+            "thyroids"
+          ]
+        },
+        {
+          "id": "adrenal-gland",
+          "name": "adrenal gland",
+          "aliases": [
+            "adrenals",
+            "adrenal glands"
+          ]
+        },
+        {
+          "id": "pituitary-gland",
+          "name": "pituitary gland",
+          "aliases": [
+            "pituitary",
+            "pituitary glands"
+          ]
+        },
+        {
+          "id": "thymus",
+          "name": "thymus",
+          "aliases": [
+            "thymuses"
+          ],
+          "plural": "thymuses"
+        },
+        {
+          "id": "tonsil",
+          "name": "tonsil",
+          "aliases": [
+            "tonsils"
+          ]
+        },
+        {
+          "id": "eye",
+          "name": "eye",
+          "aliases": [
+            "eyeball",
+            "eyes"
+          ]
+        },
+        {
+          "id": "ear",
+          "name": "ear",
+          "aliases": [
+            "ears"
+          ]
+        },
+        {
+          "id": "tongue",
+          "name": "tongue",
+          "aliases": [
+            "tongues"
+          ]
+        },
+        {
+          "id": "nose",
+          "name": "nose",
+          "aliases": [
+            "noses"
+          ]
+        },
+        {
+          "id": "uterus",
+          "name": "uterus",
+          "aliases": [
+            "womb",
+            "uteruses"
+          ],
+          "plural": "uteruses"
+        },
+        {
+          "id": "ovary",
+          "name": "ovary",
+          "aliases": [
+            "ovaries"
+          ],
+          "plural": "ovaries"
+        },
+        {
+          "id": "testicle",
+          "name": "testicle",
+          "aliases": [
+            "testis",
+            "testes",
+            "testicles"
+          ]
+        },
+        {
+          "id": "prostate",
+          "name": "prostate",
+          "aliases": [
+            "prostate gland",
+            "prostates"
+          ]
+        },
+        {
+          "id": "trachea",
+          "name": "trachea",
+          "aliases": [
+            "windpipe",
+            "tracheas"
+          ],
+          "plural": "tracheas"
+        },
+        {
+          "id": "larynx",
+          "name": "larynx",
+          "aliases": [
+            "voice box",
+            "larynxes"
+          ],
+          "plural": "larynxes"
+        },
+        {
+          "id": "pharynx",
+          "name": "pharynx",
+          "aliases": [
+            "throat",
+            "pharynxes"
+          ],
+          "plural": "pharynxes"
+        },
+        {
+          "id": "spinal-cord",
+          "name": "spinal cord",
+          "aliases": [
+            "spinal cords"
+          ]
+        },
+        {
+          "id": "lymph-node",
+          "name": "lymph node",
+          "aliases": [
+            "lymph gland",
+            "lymph nodes"
+          ]
+        },
+        {
+          "id": "bone-marrow",
+          "name": "bone marrow",
+          "aliases": [],
+          "plural": "bone marrow"
+        },
+        {
+          "id": "rectum",
+          "name": "rectum",
+          "aliases": [
+            "rectums"
+          ]
+        },
+        {
+          "id": "placenta",
+          "name": "placenta",
+          "aliases": [
+            "placentas"
+          ]
+        },
+        {
+          "id": "salivary-gland",
+          "name": "salivary gland",
+          "aliases": [
+            "salivary glands"
+          ]
+        },
+        {
+          "id": "diaphragm",
+          "name": "diaphragm",
+          "aliases": [
+            "diaphragms"
+          ]
+        },
+        {
+          "id": "mouth",
+          "name": "mouth",
+          "aliases": [
+            "mouths"
+          ]
+        },
+        {
+          "id": "breast",
+          "name": "breast",
+          "aliases": [
+            "mammary gland",
+            "breasts"
+          ]
+        },
+        {
+          "id": "hypothalamus",
+          "name": "hypothalamus",
+          "aliases": [
+            "hypothalami"
+          ],
+          "plural": "hypothalami"
+        },
+        {
+          "id": "cerebellum",
+          "name": "cerebellum",
+          "aliases": [
+            "cerebellums"
+          ]
+        },
+        {
+          "id": "pineal-gland",
+          "name": "pineal gland",
+          "aliases": [
+            "pineal glands"
+          ]
+        },
+        {
+          "id": "parathyroid-gland",
+          "name": "parathyroid gland",
+          "aliases": [
+            "parathyroid",
+            "parathyroid glands"
+          ]
+        },
+        {
+          "id": "sinus",
+          "name": "sinus",
+          "aliases": [
+            "sinuses"
+          ]
+        },
+        {
+          "id": "penis",
+          "name": "penis",
+          "aliases": []
+        },
+        {
+          "id": "vagina",
+          "name": "vagina",
+          "aliases": [
+            "vaginas"
+          ]
+        }
+      ],
+      "host_bank": [
+        "lung",
+        "heart",
+        "brain",
+        "liver",
+        "kidney",
+        "stomach",
+        "skin",
+        "intestine"
+      ],
+      "host_answers": [
+        "lung"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a country in Central America",
+      "entries": [
+        {
+          "id": "belize",
+          "name": "Belize",
+          "aliases": [],
+          "plural": "Belize"
+        },
+        {
+          "id": "costa-rica",
+          "name": "Costa Rica",
+          "aliases": [],
+          "plural": "Costa Rica"
+        },
+        {
+          "id": "el-salvador",
+          "name": "El Salvador",
+          "aliases": [
+            "Salvador"
+          ],
+          "plural": "El Salvador"
+        },
+        {
+          "id": "guatemala",
+          "name": "Guatemala",
+          "aliases": [],
+          "plural": "Guatemala"
+        },
+        {
+          "id": "honduras",
+          "name": "Honduras",
+          "aliases": [],
+          "plural": "Honduras"
+        },
+        {
+          "id": "nicaragua",
+          "name": "Nicaragua",
+          "aliases": [],
+          "plural": "Nicaragua"
+        },
+        {
+          "id": "panama",
+          "name": "Panama",
+          "aliases": [],
+          "plural": "Panama"
+        }
+      ],
+      "host_bank": [
+        "panama",
+        "belize",
+        "costa-rica",
+        "el-salvador",
+        "guatemala",
+        "honduras",
+        "nicaragua"
+      ],
+      "host_answers": [
+        "panama"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a fairy tale",
+      "entries": [
+        {
+          "id": "cinderella",
+          "name": "Cinderella",
+          "aliases": [
+            "Aschenputtel",
+            "Cendrillon"
+          ],
+          "plural": "Cinderella"
+        },
+        {
+          "id": "snow-white",
+          "name": "Snow White",
+          "aliases": [
+            "Snow White and the Seven Dwarfs"
+          ],
+          "plural": "Snow White"
+        },
+        {
+          "id": "snow-white-and-rose-red",
+          "name": "Snow White and Rose Red",
+          "aliases": [
+            "Snow-White and Rose-Red"
+          ],
+          "plural": "Snow White and Rose Red"
+        },
+        {
+          "id": "sleeping-beauty",
+          "name": "Sleeping Beauty",
+          "aliases": [
+            "Briar Rose",
+            "Little Briar Rose"
+          ],
+          "plural": "Sleeping Beauty"
+        },
+        {
+          "id": "little-red-riding-hood",
+          "name": "Little Red Riding Hood",
+          "aliases": [
+            "Red Riding Hood",
+            "Little Red Cap"
+          ],
+          "plural": "Little Red Riding Hood"
+        },
+        {
+          "id": "hansel-and-gretel",
+          "name": "Hansel and Gretel",
+          "aliases": [
+            "Hansel & Gretel"
+          ],
+          "plural": "Hansel and Gretel"
+        },
+        {
+          "id": "goldilocks-and-the-three-bears",
+          "name": "Goldilocks and the Three Bears",
+          "aliases": [
+            "Goldilocks",
+            "The Three Bears"
+          ],
+          "plural": "Goldilocks and the Three Bears"
+        },
+        {
+          "id": "jack-and-the-beanstalk",
+          "name": "Jack and the Beanstalk",
+          "aliases": [],
+          "plural": "Jack and the Beanstalk"
+        },
+        {
+          "id": "rapunzel",
+          "name": "Rapunzel",
+          "aliases": [],
+          "plural": "Rapunzel"
+        },
+        {
+          "id": "rumpelstiltskin",
+          "name": "Rumpelstiltskin",
+          "aliases": [],
+          "plural": "Rumpelstiltskin"
+        },
+        {
+          "id": "the-three-little-pigs",
+          "name": "The Three Little Pigs",
+          "aliases": [
+            "Three Little Pigs"
+          ],
+          "plural": "The Three Little Pigs"
+        },
+        {
+          "id": "beauty-and-the-beast",
+          "name": "Beauty and the Beast",
+          "aliases": [],
+          "plural": "Beauty and the Beast"
+        },
+        {
+          "id": "the-little-mermaid",
+          "name": "The Little Mermaid",
+          "aliases": [
+            "Little Mermaid"
+          ],
+          "plural": "The Little Mermaid"
+        },
+        {
+          "id": "the-frog-prince",
+          "name": "The Frog Prince",
+          "aliases": [
+            "Frog Prince",
+            "The Princess and the Frog"
+          ],
+          "plural": "The Frog Prince"
+        },
+        {
+          "id": "the-princess-and-the-pea",
+          "name": "The Princess and the Pea",
+          "aliases": [
+            "Princess and the Pea"
+          ],
+          "plural": "The Princess and the Pea"
+        },
+        {
+          "id": "thumbelina",
+          "name": "Thumbelina",
+          "aliases": [],
+          "plural": "Thumbelina"
+        },
+        {
+          "id": "the-ugly-duckling",
+          "name": "The Ugly Duckling",
+          "aliases": [
+            "Ugly Duckling"
+          ],
+          "plural": "The Ugly Duckling"
+        },
+        {
+          "id": "the-emperors-new-clothes",
+          "name": "The Emperor's New Clothes",
+          "aliases": [
+            "Emperor's New Clothes"
+          ],
+          "plural": "The Emperor's New Clothes"
+        },
+        {
+          "id": "the-snow-queen",
+          "name": "The Snow Queen",
+          "aliases": [
+            "Snow Queen"
+          ],
+          "plural": "The Snow Queen"
+        },
+        {
+          "id": "the-little-match-girl",
+          "name": "The Little Match Girl",
+          "aliases": [
+            "Little Match Girl"
+          ],
+          "plural": "The Little Match Girl"
+        },
+        {
+          "id": "the-steadfast-tin-soldier",
+          "name": "The Steadfast Tin Soldier",
+          "aliases": [
+            "The Tin Soldier"
+          ],
+          "plural": "The Steadfast Tin Soldier"
+        },
+        {
+          "id": "the-elves-and-the-shoemaker",
+          "name": "The Elves and the Shoemaker",
+          "aliases": [],
+          "plural": "The Elves and the Shoemaker"
+        },
+        {
+          "id": "puss-in-boots",
+          "name": "Puss in Boots",
+          "aliases": [],
+          "plural": "Puss in Boots"
+        },
+        {
+          "id": "the-gingerbread-man",
+          "name": "The Gingerbread Man",
+          "aliases": [
+            "Gingerbread Man"
+          ],
+          "plural": "The Gingerbread Man"
+        },
+        {
+          "id": "the-tortoise-and-the-hare",
+          "name": "The Tortoise and the Hare",
+          "aliases": [],
+          "plural": "The Tortoise and the Hare"
+        },
+        {
+          "id": "the-boy-who-cried-wolf",
+          "name": "The Boy Who Cried Wolf",
+          "aliases": [],
+          "plural": "The Boy Who Cried Wolf"
+        },
+        {
+          "id": "aladdin",
+          "name": "Aladdin",
+          "aliases": [],
+          "plural": "Aladdin"
+        },
+        {
+          "id": "ali-baba-and-the-forty-thieves",
+          "name": "Ali Baba and the Forty Thieves",
+          "aliases": [
+            "Ali Baba"
+          ],
+          "plural": "Ali Baba and the Forty Thieves"
+        },
+        {
+          "id": "pinocchio",
+          "name": "Pinocchio",
+          "aliases": [],
+          "plural": "Pinocchio"
+        },
+        {
+          "id": "the-twelve-dancing-princesses",
+          "name": "The Twelve Dancing Princesses",
+          "aliases": [],
+          "plural": "The Twelve Dancing Princesses"
+        },
+        {
+          "id": "the-pied-piper-of-hamelin",
+          "name": "The Pied Piper of Hamelin",
+          "aliases": [
+            "Pied Piper"
+          ],
+          "plural": "The Pied Piper of Hamelin"
+        },
+        {
+          "id": "the-bremen-town-musicians",
+          "name": "The Bremen Town Musicians",
+          "aliases": [
+            "Town Musicians of Bremen"
+          ],
+          "plural": "The Bremen Town Musicians"
+        },
+        {
+          "id": "tom-thumb",
+          "name": "Tom Thumb",
+          "aliases": [],
+          "plural": "Tom Thumb"
+        },
+        {
+          "id": "bluebeard",
+          "name": "Bluebeard",
+          "aliases": [],
+          "plural": "Bluebeard"
+        },
+        {
+          "id": "the-golden-goose",
+          "name": "The Golden Goose",
+          "aliases": [],
+          "plural": "The Golden Goose"
+        },
+        {
+          "id": "the-fisherman-and-his-wife",
+          "name": "The Fisherman and His Wife",
+          "aliases": [],
+          "plural": "The Fisherman and His Wife"
+        },
+        {
+          "id": "henny-penny",
+          "name": "Henny Penny",
+          "aliases": [
+            "Chicken Little",
+            "Chicken Licken"
+          ],
+          "plural": "Henny Penny"
+        },
+        {
+          "id": "the-little-red-hen",
+          "name": "The Little Red Hen",
+          "aliases": [
+            "Little Red Hen"
+          ],
+          "plural": "The Little Red Hen"
+        },
+        {
+          "id": "three-billy-goats-gruff",
+          "name": "Three Billy Goats Gruff",
+          "aliases": [
+            "Billy Goats Gruff"
+          ],
+          "plural": "Three Billy Goats Gruff"
+        },
+        {
+          "id": "mulan",
+          "name": "Mulan",
+          "aliases": [],
+          "plural": "Mulan"
+        },
+        {
+          "id": "the-firebird",
+          "name": "The Firebird",
+          "aliases": [],
+          "plural": "The Firebird"
+        },
+        {
+          "id": "momotaro",
+          "name": "Momotarō",
+          "aliases": [
+            "Peach Boy"
+          ],
+          "plural": "Momotarō"
+        },
+        {
+          "id": "the-tale-of-the-bamboo-cutter",
+          "name": "The Tale of the Bamboo Cutter",
+          "aliases": [
+            "Princess Kaguya"
+          ],
+          "plural": "The Tale of the Bamboo Cutter"
+        },
+        {
+          "id": "east-of-the-sun-and-west-of-the-moon",
+          "name": "East of the Sun and West of the Moon",
+          "aliases": [],
+          "plural": "East of the Sun and West of the Moon"
+        },
+        {
+          "id": "the-wild-swans",
+          "name": "The Wild Swans",
+          "aliases": [],
+          "plural": "The Wild Swans"
+        },
+        {
+          "id": "the-nightingale",
+          "name": "The Nightingale",
+          "aliases": [],
+          "plural": "The Nightingale"
+        },
+        {
+          "id": "the-red-shoes",
+          "name": "The Red Shoes",
+          "aliases": [],
+          "plural": "The Red Shoes"
+        },
+        {
+          "id": "stone-soup",
+          "name": "Stone Soup",
+          "aliases": [],
+          "plural": "Stone Soup"
+        },
+        {
+          "id": "the-juniper-tree",
+          "name": "The Juniper Tree",
+          "aliases": [],
+          "plural": "The Juniper Tree"
+        },
+        {
+          "id": "the-goose-girl",
+          "name": "The Goose Girl",
+          "aliases": [],
+          "plural": "The Goose Girl"
+        },
+        {
+          "id": "the-brave-little-tailor",
+          "name": "The Brave Little Tailor",
+          "aliases": [],
+          "plural": "The Brave Little Tailor"
+        },
+        {
+          "id": "king-thrushbeard",
+          "name": "King Thrushbeard",
+          "aliases": [],
+          "plural": "King Thrushbeard"
+        },
+        {
+          "id": "jack-the-giant-killer",
+          "name": "Jack the Giant Killer",
+          "aliases": [],
+          "plural": "Jack the Giant Killer"
+        },
+        {
+          "id": "dick-whittington",
+          "name": "Dick Whittington",
+          "aliases": [],
+          "plural": "Dick Whittington"
+        },
+        {
+          "id": "the-wolf-and-the-seven-young-goats",
+          "name": "The Wolf and the Seven Young Goats",
+          "aliases": [],
+          "plural": "The Wolf and the Seven Young Goats"
+        },
+        {
+          "id": "sinbad-the-sailor",
+          "name": "Sinbad the Sailor",
+          "aliases": [
+            "Sinbad"
+          ],
+          "plural": "Sinbad the Sailor"
+        },
+        {
+          "id": "the-magic-porridge-pot",
+          "name": "The Magic Porridge Pot",
+          "aliases": [
+            "Sweet Porridge"
+          ],
+          "plural": "The Magic Porridge Pot"
+        },
+        {
+          "id": "the-ant-and-the-grasshopper",
+          "name": "The Ant and the Grasshopper",
+          "aliases": [],
+          "plural": "The Ant and the Grasshopper"
+        },
+        {
+          "id": "the-six-swans",
+          "name": "The Six Swans",
+          "aliases": [],
+          "plural": "The Six Swans"
+        },
+        {
+          "id": "donkeyskin",
+          "name": "Donkeyskin",
+          "aliases": [],
+          "plural": "Donkeyskin"
+        },
+        {
+          "id": "diamonds-and-toads",
+          "name": "Diamonds and Toads",
+          "aliases": [],
+          "plural": "Diamonds and Toads"
+        },
+        {
+          "id": "vasilisa-the-beautiful",
+          "name": "Vasilisa the Beautiful",
+          "aliases": [],
+          "plural": "Vasilisa the Beautiful"
+        },
+        {
+          "id": "baba-yaga",
+          "name": "Baba Yaga",
+          "aliases": [],
+          "plural": "Baba Yaga"
+        }
+      ],
+      "host_bank": [
+        "little-red-riding-hood",
+        "hansel-and-gretel",
+        "cinderella",
+        "snow-white",
+        "goldilocks-and-the-three-bears",
+        "sleeping-beauty",
+        "rapunzel",
+        "jack-and-the-beanstalk"
+      ],
+      "host_answers": [
+        "little-red-riding-hood",
+        "hansel-and-gretel"
+      ],
+      "match_groups": {}
+    }
+  ]
+}
