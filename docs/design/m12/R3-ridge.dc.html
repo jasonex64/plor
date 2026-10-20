@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: the ridge</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0a0a0a}a:hover{color:#2436ff}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3b3b3b}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#0a0a0a}
+.scene{position:relative;width:390px;height:336px;overflow:hidden;flex:none;image-rendering:pixelated}
+.scene i{position:absolute;display:block}
+.sp{position:absolute;width:30px;height:24px}
+.sp i{position:absolute;display:block;width:3px;height:3px}
+.bob{animation:bob 1.2s steps(2) infinite}
+.fall{animation:fall 1.4s steps(4) infinite}
+.tag{position:absolute;transform:translateX(-50%);background:#0a0a0a;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.tag.red{background:#ff3b1f;color:#0a0a0a}
+.sign{position:absolute;transform:translateX(-50%);background:#e9e4d4;border:3px solid #0a0a0a;box-shadow:3px 3px 0 #0a0a0a;padding:5px 10px;font:600 18px 'Pixelify Sans',monospace;color:#0a0a0a;white-space:nowrap;line-height:1.2}
+.sign .post{position:absolute;left:50%;top:100%;margin-left:-2px;margin-top:3px;width:4px;height:14px;background:#7a4a1c}
+.sign.host{background:#ff3b1f}
+.sign .who{display:block;font-size:12px;font-weight:400}
+.wobble{animation:wobble 2.4s steps(3) infinite}
+.shake{animation:shake .25s steps(2) infinite}
+.caret{display:inline-block;width:3px;height:18px;background:#0a0a0a;vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.stop{font:600 14px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.q{font-family:'Young Serif',Georgia,serif;font-weight:400;font-size:36px;line-height:1;letter-spacing:-.02em;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.btn{min-height:52px;border:0;background:#0a0a0a;color:#f4f1e8;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.btn2{min-height:52px;border:3px solid #0a0a0a;background:#f4f1e8;color:#0a0a0a;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.in{min-height:52px;border:3px solid #0a0a0a;padding:0 14px;font:600 20px 'Pixelify Sans',monospace;color:#0a0a0a;background:#ffffff}
+.field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+.standin{font-size:13px;color:#4a4a4a}
+.score{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid #0a0a0a;padding-top:10px;font:600 16px 'Pixelify Sans',monospace}
+.who-row{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0;border-bottom:1px solid #d6d1c2}
+.who-row b{font:600 12px 'Pixelify Sans',monospace;background:#0a0a0a;color:#f4f1e8;padding:2px 6px;min-width:28px;text-align:center}
+@keyframes bob{50%{translate:0 -3px}}
+@keyframes fall{0%{translate:0 -12px}100%{translate:0 12px}}
+@keyframes wobble{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes shake{0%{translate:-2px 0}100%{translate:2px 0}}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.bob,.fall,.wobble,.shake,.caret{animation:none}}
+</style>
+</helmet>
+<div style="width: 2238px; height: 1000px; box-sizing: border-box; padding: 48px; background: #e4e4e4; display: flex; gap: 48px; font-family: 'Source Serif 4', Georgia, serif">
+
+<!-- 1 Typing at stop 4 -->
+<div class="col">
+<div class="lbl">1 · Stop 4: typing (no suggestions)</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="A goat stands on the fourth stop of a trail climbing a cliff edge, next to a sign being painted with the word magnol">
+<sc-for list="{{s1.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s1.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<div class="sign wobble" style="left: 214px; top: 134px">magnol<span class="caret"></span><span class="post"></span></div>
+<span class="tag" style="left: 34px; top: 14px">stop 4 of 7</span>
+</div>
+<div class="body">
+<h1 class="q">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in" value="magnol" autocomplete="off"></label>
+<button class="btn" type="button">Plant your sign</button>
+<p class="p standin">No list to pick from: type your own answer. What happens with a typo or an unknown word is still open (D15).</p>
+<div style="flex: 1"></div>
+<div class="score"><span>3 safe</span><span>6 points</span></div>
+</div>
+</div>
+</div>
+
+<!-- 2 Safe reveal -->
+<div class="col">
+<div class="lbl">2 · Reveal: safe</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The raven host holds up its sign, cedar, away from the goat's sign, dogwood. The ledge holds.">
+<sc-for list="{{s2.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s2.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<div class="sign" style="left: 214px; top: 134px">dogwood<span class="post"></span></div>
+<div class="sign host" style="left: 110px; top: 92px"><span class="who">host</span>cedar</div>
+<span class="tag red" style="left: 196px; top: 106px">+4</span>
+</div>
+<div class="body">
+<div class="stop">Stop 4 · safe</div>
+<h1 class="q">The ledge holds.</h1>
+<p class="p">You planted <b>dogwood</b>. The host's sign says <b>cedar</b> <span class="standin">(stand-in)</span>, on a stone you didn't step on.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 safe</span><span>10 points</span></div>
+<button class="btn" type="button">Climb to stop 5</button>
+</div>
+</div>
+</div>
+
+<!-- 3 Caught at stop 5 -->
+<div class="col">
+<div class="lbl">3 · Stop 5: matched the host, you fall</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The fifth ledge crumbles. The goat and its sign, ravioli, fall toward the clouds. The raven's sign also says ravioli.">
+<sc-for list="{{s3.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s3.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<div class="sign shake" style="left: 196px; top: 168px; transform: translateX(-50%) rotate(18deg)">ravioli</div>
+<div class="sign host" style="left: 300px; top: 44px"><span class="who">host</span>ravioli</div>
+<sc-for list="{{s3.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+</div>
+<div class="body">
+<div class="stop">Stop 5 · caught</div>
+<h1 class="q">The stone gave way.</h1>
+<p class="p">Name a kind of pasta: you and the host both said <b>ravioli</b> <span class="standin">(stand-in)</span>. You land softly in the clouds.</p>
+<div style="flex: 1"></div>
+<div class="score"><span>4 of 7</span><span>10 points</span></div>
+<button class="btn" type="button">See today's ridge</button>
+<button class="btn2" type="button">Share</button>
+</div>
+</div>
+</div>
+
+<!-- 4 Friends on the ridge -->
+<div class="col">
+<div class="lbl">4 · Friends' ridge (M06, after you play)</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Today's ridge: two friends at the top, one fell at stop 7, one still climbing at stop 4, two fell at stop 3, and you fell at stop 5">
+<sc-for list="{{s4.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s4.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{s4.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s4.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body" style="gap: 6px">
+<div class="stop" style="margin-bottom: 6px">Today's ridge · your friends</div>
+<div class="who-row"><b>A</b>friend A · reached the top · 7</div>
+<div class="who-row"><b>B</b>friend B · reached the top · 7</div>
+<div class="who-row"><b>C</b>friend C · fell at stop 7 · 6</div>
+<div class="who-row"><b>D</b>friend D · still climbing</div>
+<div class="who-row"><b>you</b>you · fell at stop 5 · 4</div>
+<div class="who-row"><b>E</b>friend E and 1 more · fell at stop 3 · 2</div>
+<p class="p standin" style="margin-top: 8px">Names are placeholders. Each goat differs by its scarf and its letter tag, not by colour alone.</p>
+</div>
+</div>
+</div>
+
+<!-- 5 Share card -->
+<div class="col">
+<div class="lbl">5 · Share card (no spoilers)</div>
+<div class="ph">
+<div class="body" style="gap: 16px">
+<div class="stop">Share</div>
+<div style="border: 3px solid #0a0a0a; box-shadow: 4px 4px 0 #0a0a0a; background: #2436ff; display: flex; flex-direction: column">
+<div style="height: 280px; overflow: hidden; position: relative">
+<div class="scene" style="transform: scale(0.85); transform-origin: top left" role="img" aria-label="The ridge with 4 signs planted and a cross at stop 5 where you fell">
+<sc-for list="{{s5.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{s5.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{s5.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<span class="tag red" style="left: 246px; top: 128px; font-size: 18px">✕</span>
+</div>
+</div>
+<div style="background: #f4f1e8; border-top: 3px solid #0a0a0a; padding: 12px 14px; display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-family: 'Young Serif', Georgia, serif; font-size: 30px">4/7</span>
+<span style="font: 600 15px 'Pixelify Sans', monospace">Offbeat · Nov 2 · plor.app</span>
+</div>
+</div>
+<div class="stop" style="margin-top: 6px">As text</div>
+<p class="p" style="font-family: 'Pixelify Sans', monospace; background: #ffffff; border: 3px solid #0a0a0a; padding: 12px">Offbeat · Nov 2<br>▲▲▲▲✕△△ 4/7<br>plor.app</p>
+<div style="flex: 1"></div>
+<button class="btn" type="button">Share image</button>
+<button class="btn2" type="button">Copy text</button>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2238,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Placeholder pixel art drawn from small character maps, only to show where real art goes.
+    const U = 6, P = 3, H = 336;
+    const TOPS = [46, 41, 36, 31, 26, 21, 16];
+    const C = { sky: '#2436ff', far: '#4b5bff', far2: '#3646ff', rock: '#121a5c', crack: '#1f2a80', bone: '#e9e4d4',
+      worn: '#bdb59c', ink: '#0a0a0a', cloud: '#f4f1e8', shade: '#c8c9e6', red: '#ff3b1f', wood: '#c98b4b', post: '#7a4a1c' };
+    const ledgeX = (i) => (2 + 9 * i) * U;
+    const ledgeY = (i) => TOPS[i] * U;
+    const pathY = (x) => {
+      if (x < 2) return TOPS[0];
+      if (x >= 56) return TOPS[6];
+      const i = Math.floor((x - 2) / 9), off = (x - 2) % 9;
+      if (off < 6) return TOPS[i];
+      return TOPS[i] - [2, 3, 5][off - 6];
+    };
+    const terrain = (crumble) => {
+      const r = [{ x: 0, y: 0, w: 390, h: H, c: C.sky }];
+      const peak = (cx, base, h, c) => { for (let k = 0; k < h; k++) r.push({ x: (cx - k) * U, y: (base - h + k) * U, w: (2 * k + 1) * U, h: U, c }); };
+      peak(9, 34, 14, C.far2); peak(24, 28, 10, C.far); peak(44, 16, 9, C.far);
+      for (let x = 0; x < 65; x++) {
+        const y = pathY(x);
+        const i = Math.floor((x - 2) / 9), off = (x - 2) % 9;
+        const broken = crumble >= 0 && i === crumble && off >= 0 && off < 6;
+        if (broken) { r.push({ x: x * U, y: (y + 6) * U, w: U, h: H - (y + 6) * U, c: C.rock }); continue; }
+        r.push({ x: x * U, y: (y + 2) * U, w: U, h: H - (y + 2) * U, c: C.rock });
+        r.push({ x: x * U, y: y * U, w: U, h: U, c: (off === 2 || off === 3) && x >= 2 ? C.worn : C.bone });
+        r.push({ x: x * U, y: (y + 1) * U, w: U, h: U, c: C.ink });
+      }
+      for (let i = 0; i < 7; i++) {
+        r.push({ x: ledgeX(i) + 14, y: ledgeY(i) + 40, w: U, h: 2 * U, c: C.crack });
+        r.push({ x: ledgeX(i) + 26, y: ledgeY(i) + 70, w: U, h: U, c: C.crack });
+      }
+      if (crumble >= 0) {
+        const x0 = ledgeX(crumble), y0 = ledgeY(crumble);
+        r.push({ x: x0 + 2, y: y0 + 18, w: 12, h: 6, c: C.bone }, { x: x0 + 20, y: y0 + 32, w: 10, h: 6, c: C.bone },
+          { x: x0 + 8, y: y0 + 50, w: 8, h: 8, c: C.ink }, { x: x0 + 26, y: y0 + 12, w: 8, h: 4, c: C.ink });
+      }
+      r.push({ x: 0, y: 312, w: 390, h: 24, c: C.cloud });
+      for (let k = 0; k < 10; k++) r.push({ x: k * 42 - 6, y: 300 - (k % 3) * 6, w: 36, h: 18, c: C.cloud });
+      return r;
+    };
+    const front = () => {
+      const r = [{ x: 0, y: 318, w: 390, h: 18, c: C.cloud }];
+      for (let k = 0; k < 9; k++) r.push({ x: k * 48 - 10, y: 310 + (k % 2) * 4, w: 34, h: 10, c: C.cloud });
+      r.push({ x: 0, y: 331, w: 390, h: 5, c: C.shade });
+      return r;
+    };
+    const ART = {
+      goat: ['......kk..', '......www.', '......wkww', 'wwwwwwrrr.', 'wwwwwwww..', 'wwwwwwww..', '.k.k..k.k.', '.k.k..k.k.'],
+      raven: ['kk.....kk', '.kk...kk.', '..kkkkk..', '...kkky..'],
+      post: ['wwwwww', 'wwwwww', 'wwwwww', '..pp..', '..pp..', '..pp..', '..pp..'],
+      flag: ['rrr.', 'rrrr', 'rrr.', 'k...', 'k...', 'k...', 'k...', 'k...']
+    };
+    const sprite = (name, pal, x, y, cls, rot) => {
+      const px = [];
+      ART[name].forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * P, y: ry * P, c: pal[ch] }); }));
+      return { x, y, cls: cls || '', rot: rot || 0, px };
+    };
+    const goat = (scarf, x, y, cls, rot) => sprite('goat', { w: C.cloud, k: C.ink, r: scarf }, x, y, cls, rot);
+    const raven = (x, y) => sprite('raven', { k: C.ink, y: C.red }, x, y, 'bob');
+    const posts = (n) => Array.from({ length: n }, (_, j) => sprite('post', { w: C.wood, p: C.post }, ledgeX(j) + 20, ledgeY(j) - 21));
+    const flag = () => sprite('flag', { r: C.red, k: C.ink }, 376, ledgeY(6) - 24);
+    const onLedge = (i, dx) => [ledgeX(i) + 2 + (dx || 0), ledgeY(i) - 24];
+    const sc = { yellow: '#ffc013', teal: '#2ec4b6', pink: '#ff8fd1', orange: '#ff9a3c', lime: '#b6f06a', violet: '#b98cff' };
+
+    const s1 = { rects: terrain(-1), sprites: [...posts(3), flag(), goat(C.red, ...onLedge(3), 'bob'), raven(300, 24)] };
+    const s2 = { rects: terrain(-1), sprites: [...posts(3), flag(), goat(C.red, ...onLedge(3), 'bob'), raven(96, 60)] };
+    const s3 = { rects: terrain(4), sprites: [...posts(4), flag(), goat(C.red, 222, 222, 'fall', 40), raven(262, 14)], front: front() };
+    const s4 = {
+      rects: terrain(-1), front: front(),
+      sprites: [flag(), goat(sc.yellow, ...onLedge(6, -2), 'bob'), goat(sc.teal, ...onLedge(6, 14)), goat(sc.pink, ledgeX(6) - 4, 296),
+        goat(sc.orange, ...onLedge(3), 'bob'), goat(sc.lime, ledgeX(2), 296), goat(sc.violet, ledgeX(2) + 16, 300), goat(C.red, ledgeX(4), 296)],
+      tags: [{ x: ledgeX(6) + 6, y: ledgeY(6) - 44, text: 'A', cls: '' }, { x: ledgeX(6) + 30, y: ledgeY(6) - 44, text: 'B', cls: '' },
+        { x: ledgeX(6) + 11, y: 272, text: 'C', cls: '' }, { x: ledgeX(3) + 17, y: ledgeY(3) - 44, text: 'D', cls: '' },
+        { x: ledgeX(2) + 24, y: 272, text: 'E +1', cls: '' }, { x: ledgeX(4) + 15, y: 272, text: 'you', cls: 'red' }]
+    };
+    const s5 = { rects: terrain(4), front: front(), sprites: [...posts(4), flag(), goat(C.red, ledgeX(4), 296)] };
+    return { s1, s2, s3, s4, s5 };
+  }
+}
+</script>
+</body>
+</html>

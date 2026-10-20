@@ -67,6 +67,35 @@ In the human's words where quoted; everything else is a close summary.
 - **Round 2 tiles:** likes "the font in the first card": the big serif headline (Young Serif); "the body text is alright too" (Source Serif 4). Likes "the overall feel of the 4th" (tile 4, the fight card: blue, red and black, Bebas Neue capitals, rounds).
 - **No suggestions while typing:** "i wouldn't want a dropdown menu as i'm typing the answer, becauase i dont want to give users any free hints as to guesses. the list should be internal only". This changes a game rule, not only the look; see D15.
 
+## Offbeat concept: the ridge (draft, from D16)
+Everything below is a draft for the human to change; only the D16 choice itself is decided.
+
+**The story.** "Offbeat" read as *off the beaten path*. Each day the player's character climbs a trail along a cliff edge with 7 stops. The host has walked this trail many times and worn some stones smooth: the common answers. At each stop the player plants a sign with their answer. A worn stone gives way under it, so matching the host's answer means the ledge crumbles and the character falls off the path. The 7 stops climb higher and the drop gets deeper, which shows the rising difficulty (DECISIONS.md, Game 1). Reaching the top after stop 7 is a full run.
+
+**How it maps to the rules.**
+| Rule (DECISIONS.md, Game 1) | On the ridge |
+|---|---|
+| 7 fixed questions, same order for everyone | 7 stops on one trail; everyone climbs the same ridge |
+| Rising difficulty | Each stop is higher, with a deeper drop |
+| Name an answer the host didn't | Plant your sign; the host's sign is revealed on its worn stone |
+| Matching ends the run (sudden death) | The ledge crumbles and you fall at that stop |
+| Host answers shown only after you answer | The host's sign appears only at the reveal |
+| k points for stop k | Shown at each stop (D9) |
+
+**The word.** The player's typed word is painted on a sign they plant at each stop. The sign is the word container: its frame is the slot for collectible borders (M10). Like Krillion's word, the sign reacts: it wobbles in the wind higher up and shakes while the ledge is deciding.
+
+**Typing (D15).** A plain answer box with no suggestions. The word paints onto the sign as it's typed, with a gliding caret like monkeytype's. What happens with typos and unknown words is D15's ticket.
+
+**Friends (M06, after you've played).** One ridge for everyone. Friends' characters stand at the stop they reached; friends who got caught sit in the clouds under the stop where they fell; a crowd at one stop stacks with a count. Each friend's character is told apart by its cosmetic (scarf colour in the draft) and a name tag, never by colour alone.
+
+**Share card (M05).** The ridge in miniature with the stop where you fell marked; text version e.g. `▲▲▲▲✕△△ 4/7`.
+
+**Animations it needs** (timings are D20): idle (character breathing, wind, drifting clouds); the word painting onto the sign as typed; planting the sign; the reveal (ground rumbles, sign shakes more at higher stops); safe (dust settles, the host's sign appears, the character climbs to the next stop); caught (ledge crumbles, the character and sign fall into the clouds); the top (flag, full run); friends appearing on the ridge.
+
+**Pixel art it needs** (D14 decides how it's made): the player character (idle, walk or hop, plant, fall, cheer); the host (D19); signs (blank and painted) and sign frames (M10); the trail and cliff tiles, including a crumbling ledge; sky and far peaks in layers, clouds; the top flag; a share card frame. Plor's home borrows some of this style (D5).
+
+**Mockup:** the canvas page "Round 3 · the ridge" (`docs/design/m12/R3-ridge.dc.html`) shows stop 4 while typing, a safe reveal, the fall at stop 5, the friends' ridge and the share card. The pixel art there is a placeholder drawn in code, not a proposal for the final art. Colours borrow round 2's tile 4 (blue, red, black); the question uses tile 1's serif headline (Young Serif); the sign uses a pixel font (Pixelify Sans) like the Krillion screenshot. All are placeholders (D3, D4).
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
@@ -85,9 +114,13 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D11 | Accessibility source and numbers: pin WCAG 2.2 in SOURCES.md? Contrast ratios and the tap-target size are human numbers until then | | |
 | D12 | Smallest phone width to support | Mockups are 390 px wide (the design tool's default phone size); no minimum chosen | |
 | D13 | Does the host have a face or name (C)? | C shows a circle marked "H" | |
-| D16 | Offbeat's concept and theme (what the 7 steps are, what the word sits in, what happens when you match the host) | Concepts proposed in chat, 2026-10-20 | |
 | D14 | Pixel art: made with PixelLab, drawn by hand, or bought; who owns the assets, and what it costs | PixelLab suggested by the human (2026-10-20) | |
 | D15 | No suggestions while typing (human, 2026-10-20). The player types free text and the server alone matches it to the list. Open: what happens to a typo or an answer that isn't in the list (today: "did you mean" and a no-penalty "not in our list yet"; both can hint at the list); what the player sees before locking in | Needs a DECISIONS.md change (Answer model: the accepted bank is sent to the client for autocomplete) and changes to M02 code, the network message (entry ID → text) and the security of the bank. That's its own ticket, not M12 | |
+| D16 | Offbeat's concept and theme (what the 7 steps are, what the word sits in, what happens when you match the host) | Trail, spotlight, out of tune, descent (proposed in chat, 2026-10-20) | "Go with the trail along a cliff edge: friends fall off at the stop where they got caught" (human, 2026-10-20). Worked out below in "Offbeat concept: the ridge"; the details there are drafts |
+| D17 | Where a caught player lands, and how soft it should feel | The draft lands them in the clouds below, unhurt | |
+| D18 | The player's character | The draft uses a small mountain goat (no skin tones to choose; friends differ by scarf colour, a slot for M10 cosmetics) | |
+| D19 | The host's character | The draft uses a raven circling above the ridge | |
+| D20 | Pixel size, sprite sizes and animation timings | None chosen; human numbers (or the artist's), not set by the mockups | |
 
 ## Acceptance criteria
 For this draft (exploration):
