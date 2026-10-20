@@ -1,0 +1,3034 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-16",
+  "questions": [
+    {
+      "prompt": "Name something you'd find at a playground",
+      "entries": [
+        {
+          "id": "swing",
+          "name": "swing",
+          "aliases": [
+            "swings",
+            "swing set",
+            "tire swing",
+            "baby swing"
+          ]
+        },
+        {
+          "id": "slide",
+          "name": "slide",
+          "aliases": [
+            "tube slide",
+            "spiral slide",
+            "twisty slide",
+            "slides"
+          ]
+        },
+        {
+          "id": "monkey-bars",
+          "name": "monkey bars",
+          "aliases": [],
+          "plural": "monkey bars"
+        },
+        {
+          "id": "jungle-gym",
+          "name": "jungle gym",
+          "aliases": [
+            "climbing frame",
+            "climbing structure",
+            "play structure",
+            "play set",
+            "jungle gyms"
+          ]
+        },
+        {
+          "id": "sandbox",
+          "name": "sandbox",
+          "aliases": [
+            "sandpit",
+            "sand pit",
+            "sand box",
+            "sandboxes"
+          ],
+          "plural": "sandboxes"
+        },
+        {
+          "id": "seesaw",
+          "name": "seesaw",
+          "aliases": [
+            "teeter-totter",
+            "teeter totter",
+            "seesaws"
+          ]
+        },
+        {
+          "id": "merry-go-round",
+          "name": "merry-go-round",
+          "aliases": [
+            "roundabout",
+            "merry go round",
+            "merry-go-rounds"
+          ],
+          "plural": "merry-go-rounds"
+        },
+        {
+          "id": "spinner",
+          "name": "spinner",
+          "aliases": [
+            "spinning cup",
+            "spinning disc",
+            "spinners"
+          ]
+        },
+        {
+          "id": "spring-rider",
+          "name": "spring rider",
+          "aliases": [
+            "spring horse",
+            "bouncy animal",
+            "spring riders"
+          ]
+        },
+        {
+          "id": "climbing-wall",
+          "name": "climbing wall",
+          "aliases": [
+            "rock wall",
+            "rock climbing wall",
+            "climbing walls"
+          ]
+        },
+        {
+          "id": "climbing-net",
+          "name": "climbing net",
+          "aliases": [
+            "cargo net",
+            "rope net",
+            "spider web net",
+            "climbing nets"
+          ]
+        },
+        {
+          "id": "climbing-rope",
+          "name": "climbing rope",
+          "aliases": [
+            "rope",
+            "climbing ropes"
+          ]
+        },
+        {
+          "id": "zip-line",
+          "name": "zip line",
+          "aliases": [
+            "zipline",
+            "flying fox",
+            "zip lines"
+          ]
+        },
+        {
+          "id": "balance-beam",
+          "name": "balance beam",
+          "aliases": [
+            "balance beams"
+          ]
+        },
+        {
+          "id": "firemans-pole",
+          "name": "fireman's pole",
+          "aliases": [
+            "fire pole",
+            "firemen's pole",
+            "fireman's poles"
+          ],
+          "plural": "fireman's poles"
+        },
+        {
+          "id": "tunnel",
+          "name": "tunnel",
+          "aliases": [
+            "crawl tunnel",
+            "tunnels"
+          ]
+        },
+        {
+          "id": "bridge",
+          "name": "bridge",
+          "aliases": [
+            "wobbly bridge",
+            "rope bridge",
+            "bouncy bridge",
+            "bridges"
+          ]
+        },
+        {
+          "id": "ladder",
+          "name": "ladder",
+          "aliases": [
+            "ladders"
+          ]
+        },
+        {
+          "id": "playhouse",
+          "name": "playhouse",
+          "aliases": [
+            "fort",
+            "castle",
+            "play fort",
+            "clubhouse",
+            "playhouses"
+          ]
+        },
+        {
+          "id": "pirate-ship",
+          "name": "pirate ship",
+          "aliases": [
+            "pirate ships"
+          ]
+        },
+        {
+          "id": "splash-pad",
+          "name": "splash pad",
+          "aliases": [
+            "sprinklers",
+            "sprinkler",
+            "spray park",
+            "splash pads"
+          ]
+        },
+        {
+          "id": "water-fountain",
+          "name": "water fountain",
+          "aliases": [
+            "drinking fountain",
+            "water fountains"
+          ]
+        },
+        {
+          "id": "bench",
+          "name": "bench",
+          "aliases": [
+            "park bench",
+            "benches"
+          ]
+        },
+        {
+          "id": "picnic-table",
+          "name": "picnic table",
+          "aliases": [
+            "picnic tables"
+          ]
+        },
+        {
+          "id": "trash-can",
+          "name": "trash can",
+          "aliases": [
+            "garbage can",
+            "bin",
+            "trash cans"
+          ]
+        },
+        {
+          "id": "kid",
+          "name": "kid",
+          "aliases": [
+            "kids",
+            "children",
+            "child",
+            "toddler",
+            "toddlers"
+          ],
+          "plural": "kids"
+        },
+        {
+          "id": "parent",
+          "name": "parent",
+          "aliases": [
+            "parents",
+            "mom",
+            "dad",
+            "moms",
+            "dads"
+          ]
+        },
+        {
+          "id": "babysitter",
+          "name": "babysitter",
+          "aliases": [
+            "nanny",
+            "babysitters"
+          ]
+        },
+        {
+          "id": "ball",
+          "name": "ball",
+          "aliases": [
+            "soccer ball",
+            "kickball",
+            "balls"
+          ]
+        },
+        {
+          "id": "basketball-hoop",
+          "name": "basketball hoop",
+          "aliases": [
+            "basketball court",
+            "hoop",
+            "basketball hoops"
+          ]
+        },
+        {
+          "id": "hopscotch",
+          "name": "hopscotch",
+          "aliases": [],
+          "plural": "hopscotch"
+        },
+        {
+          "id": "four-square",
+          "name": "four square",
+          "aliases": [],
+          "plural": "four square"
+        },
+        {
+          "id": "tetherball",
+          "name": "tetherball",
+          "aliases": [],
+          "plural": "tetherball"
+        },
+        {
+          "id": "sidewalk-chalk",
+          "name": "sidewalk chalk",
+          "aliases": [
+            "chalk"
+          ],
+          "plural": "sidewalk chalk"
+        },
+        {
+          "id": "jump-rope",
+          "name": "jump rope",
+          "aliases": [
+            "skipping rope",
+            "jump ropes"
+          ]
+        },
+        {
+          "id": "bike",
+          "name": "bike",
+          "aliases": [
+            "bicycle",
+            "bikes"
+          ]
+        },
+        {
+          "id": "scooter",
+          "name": "scooter",
+          "aliases": [
+            "scooters"
+          ]
+        },
+        {
+          "id": "skateboard",
+          "name": "skateboard",
+          "aliases": [
+            "skateboards"
+          ]
+        },
+        {
+          "id": "wood-chips",
+          "name": "wood chips",
+          "aliases": [
+            "mulch",
+            "bark chips"
+          ],
+          "plural": "wood chips"
+        },
+        {
+          "id": "rubber-mulch",
+          "name": "rubber mulch",
+          "aliases": [
+            "rubber matting",
+            "rubber mats"
+          ],
+          "plural": "rubber mulch"
+        },
+        {
+          "id": "grass",
+          "name": "grass",
+          "aliases": [],
+          "plural": "grass"
+        },
+        {
+          "id": "tree",
+          "name": "tree",
+          "aliases": [
+            "trees"
+          ]
+        },
+        {
+          "id": "shade",
+          "name": "shade",
+          "aliases": [],
+          "plural": "shade"
+        },
+        {
+          "id": "fence",
+          "name": "fence",
+          "aliases": [
+            "fences"
+          ]
+        },
+        {
+          "id": "gate",
+          "name": "gate",
+          "aliases": [
+            "gates"
+          ]
+        },
+        {
+          "id": "stroller",
+          "name": "stroller",
+          "aliases": [
+            "pram",
+            "strollers"
+          ]
+        },
+        {
+          "id": "bubbles",
+          "name": "bubbles",
+          "aliases": [],
+          "plural": "bubbles"
+        },
+        {
+          "id": "ice-cream-truck",
+          "name": "ice cream truck",
+          "aliases": [
+            "ice cream van",
+            "ice cream trucks"
+          ]
+        },
+        {
+          "id": "scraped-knee",
+          "name": "scraped knee",
+          "aliases": [
+            "scrapes",
+            "skinned knee",
+            "scraped knees"
+          ]
+        },
+        {
+          "id": "restroom",
+          "name": "restroom",
+          "aliases": [
+            "bathroom",
+            "toilets",
+            "restrooms"
+          ]
+        },
+        {
+          "id": "frisbee",
+          "name": "frisbee",
+          "aliases": [
+            "frisbees"
+          ]
+        },
+        {
+          "id": "hula-hoop",
+          "name": "hula hoop",
+          "aliases": [
+            "hula hoops"
+          ]
+        },
+        {
+          "id": "tag",
+          "name": "tag",
+          "aliases": [
+            "game of tag"
+          ],
+          "plural": "tag"
+        },
+        {
+          "id": "hide-and-seek",
+          "name": "hide and seek",
+          "aliases": [
+            "hide-and-seek"
+          ],
+          "plural": "hide and seek"
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "dogs"
+          ]
+        },
+        {
+          "id": "pigeon",
+          "name": "pigeon",
+          "aliases": [
+            "pigeons"
+          ]
+        },
+        {
+          "id": "squirrel",
+          "name": "squirrel",
+          "aliases": [
+            "squirrels"
+          ]
+        },
+        {
+          "id": "bird",
+          "name": "bird",
+          "aliases": [
+            "birds"
+          ]
+        },
+        {
+          "id": "sandcastle",
+          "name": "sandcastle",
+          "aliases": [
+            "sandcastles"
+          ]
+        },
+        {
+          "id": "dirt",
+          "name": "dirt",
+          "aliases": [
+            "mud"
+          ],
+          "plural": "dirt"
+        },
+        {
+          "id": "puddle",
+          "name": "puddle",
+          "aliases": [
+            "puddles"
+          ]
+        },
+        {
+          "id": "snacks",
+          "name": "snacks",
+          "aliases": [
+            "snack"
+          ],
+          "plural": "snacks"
+        },
+        {
+          "id": "water-bottle",
+          "name": "water bottle",
+          "aliases": [
+            "water bottles"
+          ]
+        },
+        {
+          "id": "toys",
+          "name": "toys",
+          "aliases": [
+            "toy",
+            "sand toys",
+            "buckets and spades",
+            "pail and shovel",
+            "bucket and spade"
+          ],
+          "plural": "toys"
+        },
+        {
+          "id": "kite",
+          "name": "kite",
+          "aliases": [
+            "kites"
+          ]
+        },
+        {
+          "id": "band-aid",
+          "name": "Band-Aid",
+          "aliases": [
+            "bandage",
+            "Band-Aids"
+          ]
+        },
+        {
+          "id": "sunscreen",
+          "name": "sunscreen",
+          "aliases": [],
+          "plural": "sunscreen"
+        },
+        {
+          "id": "tic-tac-toe-board",
+          "name": "tic-tac-toe board",
+          "aliases": [
+            "tic-tac-toe"
+          ],
+          "plural": "tic-tac-toe board"
+        },
+        {
+          "id": "musical-chimes",
+          "name": "musical chimes",
+          "aliases": [
+            "drums",
+            "outdoor instruments"
+          ]
+        },
+        {
+          "id": "steering-wheel",
+          "name": "steering wheel",
+          "aliases": [
+            "toy steering wheel",
+            "steering wheels"
+          ]
+        },
+        {
+          "id": "periscope",
+          "name": "periscope",
+          "aliases": [
+            "periscopes"
+          ]
+        },
+        {
+          "id": "telescope",
+          "name": "telescope",
+          "aliases": [
+            "telescopes"
+          ]
+        },
+        {
+          "id": "stepping-stones",
+          "name": "stepping stones",
+          "aliases": [
+            "stepping stone"
+          ]
+        },
+        {
+          "id": "log",
+          "name": "log",
+          "aliases": [
+            "logs",
+            "balance log"
+          ]
+        },
+        {
+          "id": "tire",
+          "name": "tire",
+          "aliases": [
+            "tires"
+          ]
+        },
+        {
+          "id": "gaga-pit",
+          "name": "gaga pit",
+          "aliases": [
+            "gaga ball"
+          ],
+          "plural": "gaga pit"
+        },
+        {
+          "id": "trampoline",
+          "name": "trampoline",
+          "aliases": [
+            "trampolines"
+          ]
+        },
+        {
+          "id": "cozy-coupe",
+          "name": "cozy coupe",
+          "aliases": [
+            "toy car",
+            "cozy coupes"
+          ]
+        },
+        {
+          "id": "sign",
+          "name": "sign",
+          "aliases": [
+            "rules sign",
+            "playground rules",
+            "signs"
+          ]
+        },
+        {
+          "id": "lamp-post",
+          "name": "lamp post",
+          "aliases": [
+            "streetlight",
+            "lamp posts"
+          ]
+        },
+        {
+          "id": "laughter",
+          "name": "laughter",
+          "aliases": [
+            "laughing"
+          ],
+          "plural": "laughter"
+        },
+        {
+          "id": "noise",
+          "name": "noise",
+          "aliases": [],
+          "plural": "noise"
+        }
+      ],
+      "host_bank": [
+        "sandbox",
+        "swing",
+        "slide",
+        "monkey-bars",
+        "seesaw",
+        "merry-go-round",
+        "jungle-gym",
+        "kid"
+      ],
+      "host_answers": [
+        "sandbox"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an animal that lives in Australia",
+      "entries": [
+        {
+          "id": "kangaroo",
+          "name": "kangaroo",
+          "aliases": [
+            "roo",
+            "red kangaroo",
+            "grey kangaroo",
+            "gray kangaroo",
+            "tree kangaroo",
+            "kangaroos"
+          ]
+        },
+        {
+          "id": "wallaby",
+          "name": "wallaby",
+          "aliases": [
+            "wallabies"
+          ]
+        },
+        {
+          "id": "wallaroo",
+          "name": "wallaroo",
+          "aliases": [
+            "wallaroos"
+          ]
+        },
+        {
+          "id": "quokka",
+          "name": "quokka",
+          "aliases": [
+            "quokkas"
+          ]
+        },
+        {
+          "id": "pademelon",
+          "name": "pademelon",
+          "aliases": [
+            "pademelons"
+          ]
+        },
+        {
+          "id": "potoroo",
+          "name": "potoroo",
+          "aliases": [
+            "potoroos"
+          ]
+        },
+        {
+          "id": "bettong",
+          "name": "bettong",
+          "aliases": [
+            "bettongs"
+          ]
+        },
+        {
+          "id": "koala",
+          "name": "koala",
+          "aliases": [
+            "koala bear",
+            "koalas"
+          ]
+        },
+        {
+          "id": "wombat",
+          "name": "wombat",
+          "aliases": [
+            "wombats"
+          ]
+        },
+        {
+          "id": "platypus",
+          "name": "platypus",
+          "aliases": [
+            "duck-billed platypus",
+            "platypuses"
+          ],
+          "plural": "platypuses"
+        },
+        {
+          "id": "echidna",
+          "name": "echidna",
+          "aliases": [
+            "spiny anteater",
+            "echidnas"
+          ]
+        },
+        {
+          "id": "emu",
+          "name": "emu",
+          "aliases": [
+            "emus"
+          ]
+        },
+        {
+          "id": "cassowary",
+          "name": "cassowary",
+          "aliases": [
+            "cassowaries"
+          ]
+        },
+        {
+          "id": "kookaburra",
+          "name": "kookaburra",
+          "aliases": [
+            "laughing kookaburra",
+            "kookaburras"
+          ]
+        },
+        {
+          "id": "cockatoo",
+          "name": "cockatoo",
+          "aliases": [
+            "sulphur-crested cockatoo",
+            "black cockatoo",
+            "cockatoos"
+          ]
+        },
+        {
+          "id": "cockatiel",
+          "name": "cockatiel",
+          "aliases": [
+            "cockatiels"
+          ]
+        },
+        {
+          "id": "galah",
+          "name": "galah",
+          "aliases": [
+            "galahs"
+          ]
+        },
+        {
+          "id": "budgerigar",
+          "name": "budgerigar",
+          "aliases": [
+            "budgie",
+            "parakeet",
+            "budgerigars"
+          ]
+        },
+        {
+          "id": "lorikeet",
+          "name": "lorikeet",
+          "aliases": [
+            "rainbow lorikeet",
+            "lorikeets"
+          ]
+        },
+        {
+          "id": "rosella",
+          "name": "rosella",
+          "aliases": [
+            "rosellas"
+          ]
+        },
+        {
+          "id": "lyrebird",
+          "name": "lyrebird",
+          "aliases": [
+            "lyrebirds"
+          ]
+        },
+        {
+          "id": "bowerbird",
+          "name": "bowerbird",
+          "aliases": [
+            "bowerbirds"
+          ]
+        },
+        {
+          "id": "fairywren",
+          "name": "fairywren",
+          "aliases": [
+            "superb fairywren",
+            "fairy wren",
+            "fairywrens"
+          ]
+        },
+        {
+          "id": "willie-wagtail",
+          "name": "willie wagtail",
+          "aliases": [
+            "willie wagtails"
+          ]
+        },
+        {
+          "id": "tawny-frogmouth",
+          "name": "tawny frogmouth",
+          "aliases": [
+            "frogmouth",
+            "tawny frogmouths"
+          ]
+        },
+        {
+          "id": "black-swan",
+          "name": "black swan",
+          "aliases": [
+            "black swans"
+          ]
+        },
+        {
+          "id": "jabiru",
+          "name": "jabiru",
+          "aliases": [
+            "jabirus"
+          ]
+        },
+        {
+          "id": "brolga",
+          "name": "brolga",
+          "aliases": [
+            "brolgas"
+          ]
+        },
+        {
+          "id": "australian-magpie",
+          "name": "Australian magpie",
+          "aliases": [
+            "magpie",
+            "Australian magpies"
+          ]
+        },
+        {
+          "id": "ibis",
+          "name": "ibis",
+          "aliases": [
+            "bin chicken",
+            "white ibis"
+          ]
+        },
+        {
+          "id": "pelican",
+          "name": "pelican",
+          "aliases": [
+            "Australian pelican",
+            "pelicans"
+          ]
+        },
+        {
+          "id": "little-penguin",
+          "name": "little penguin",
+          "aliases": [
+            "fairy penguin",
+            "penguin",
+            "little penguins"
+          ]
+        },
+        {
+          "id": "tasmanian-devil",
+          "name": "Tasmanian devil",
+          "aliases": [
+            "Tassie devil",
+            "Tasmanian devils"
+          ]
+        },
+        {
+          "id": "dingo",
+          "name": "dingo",
+          "aliases": [
+            "dingoes"
+          ],
+          "plural": "dingoes"
+        },
+        {
+          "id": "quoll",
+          "name": "quoll",
+          "aliases": [
+            "quolls"
+          ]
+        },
+        {
+          "id": "bilby",
+          "name": "bilby",
+          "aliases": [
+            "bilbies"
+          ]
+        },
+        {
+          "id": "bandicoot",
+          "name": "bandicoot",
+          "aliases": [
+            "bandicoots"
+          ]
+        },
+        {
+          "id": "numbat",
+          "name": "numbat",
+          "aliases": [
+            "numbats"
+          ]
+        },
+        {
+          "id": "possum",
+          "name": "possum",
+          "aliases": [
+            "brushtail possum",
+            "ringtail possum",
+            "possums"
+          ]
+        },
+        {
+          "id": "sugar-glider",
+          "name": "sugar glider",
+          "aliases": [
+            "sugar gliders"
+          ]
+        },
+        {
+          "id": "flying-fox",
+          "name": "flying fox",
+          "aliases": [
+            "fruit bat",
+            "flying foxes"
+          ]
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "feral camel",
+            "camels"
+          ]
+        },
+        {
+          "id": "brumby",
+          "name": "brumby",
+          "aliases": [
+            "wild horse",
+            "brumbies"
+          ]
+        },
+        {
+          "id": "thorny-devil",
+          "name": "thorny devil",
+          "aliases": [
+            "thorny devils"
+          ]
+        },
+        {
+          "id": "frilled-lizard",
+          "name": "frilled lizard",
+          "aliases": [
+            "frill-necked lizard",
+            "frilled-neck lizard",
+            "frilled lizards"
+          ]
+        },
+        {
+          "id": "goanna",
+          "name": "goanna",
+          "aliases": [
+            "lace monitor",
+            "goannas"
+          ]
+        },
+        {
+          "id": "perentie",
+          "name": "perentie",
+          "aliases": [
+            "perenties"
+          ]
+        },
+        {
+          "id": "blue-tongued-lizard",
+          "name": "blue-tongued lizard",
+          "aliases": [
+            "blue-tongue skink",
+            "bluey",
+            "blue-tongued lizards"
+          ]
+        },
+        {
+          "id": "bearded-dragon",
+          "name": "bearded dragon",
+          "aliases": [
+            "bearded dragons"
+          ]
+        },
+        {
+          "id": "crocodile",
+          "name": "crocodile",
+          "aliases": [
+            "saltwater crocodile",
+            "saltie",
+            "croc",
+            "freshwater crocodile",
+            "crocodiles"
+          ]
+        },
+        {
+          "id": "inland-taipan",
+          "name": "inland taipan",
+          "aliases": [
+            "taipan",
+            "inland taipans"
+          ]
+        },
+        {
+          "id": "eastern-brown-snake",
+          "name": "eastern brown snake",
+          "aliases": [
+            "brown snake",
+            "eastern brown snakes"
+          ]
+        },
+        {
+          "id": "tiger-snake",
+          "name": "tiger snake",
+          "aliases": [
+            "tiger snakes"
+          ]
+        },
+        {
+          "id": "death-adder",
+          "name": "death adder",
+          "aliases": [
+            "death adders"
+          ]
+        },
+        {
+          "id": "red-bellied-black-snake",
+          "name": "red-bellied black snake",
+          "aliases": [
+            "red-bellied black snakes"
+          ]
+        },
+        {
+          "id": "redback-spider",
+          "name": "redback spider",
+          "aliases": [
+            "redback",
+            "redback spiders"
+          ]
+        },
+        {
+          "id": "funnel-web-spider",
+          "name": "funnel-web spider",
+          "aliases": [
+            "funnel-web",
+            "funnel-web spiders"
+          ]
+        },
+        {
+          "id": "huntsman-spider",
+          "name": "huntsman spider",
+          "aliases": [
+            "huntsman",
+            "huntsman spiders"
+          ]
+        },
+        {
+          "id": "box-jellyfish",
+          "name": "box jellyfish",
+          "aliases": []
+        },
+        {
+          "id": "irukandji-jellyfish",
+          "name": "Irukandji jellyfish",
+          "aliases": [
+            "Irukandji"
+          ]
+        },
+        {
+          "id": "blue-ringed-octopus",
+          "name": "blue-ringed octopus",
+          "aliases": [
+            "blue-ringed octopuses"
+          ]
+        },
+        {
+          "id": "cane-toad",
+          "name": "cane toad",
+          "aliases": [
+            "cane toads"
+          ]
+        },
+        {
+          "id": "green-tree-frog",
+          "name": "green tree frog",
+          "aliases": [
+            "green tree frogs"
+          ]
+        },
+        {
+          "id": "dugong",
+          "name": "dugong",
+          "aliases": [
+            "dugongs"
+          ]
+        },
+        {
+          "id": "australian-sea-lion",
+          "name": "Australian sea lion",
+          "aliases": [
+            "sea lion",
+            "Australian sea lions"
+          ]
+        },
+        {
+          "id": "great-white-shark",
+          "name": "great white shark",
+          "aliases": [
+            "shark",
+            "great white sharks"
+          ]
+        },
+        {
+          "id": "sea-turtle",
+          "name": "sea turtle",
+          "aliases": [
+            "green turtle",
+            "sea turtles"
+          ]
+        },
+        {
+          "id": "clownfish",
+          "name": "clownfish",
+          "aliases": []
+        },
+        {
+          "id": "rabbit",
+          "name": "rabbit",
+          "aliases": [
+            "rabbits"
+          ]
+        },
+        {
+          "id": "red-fox",
+          "name": "red fox",
+          "aliases": [
+            "fox",
+            "red foxes"
+          ]
+        },
+        {
+          "id": "water-buffalo",
+          "name": "water buffalo",
+          "aliases": [
+            "water buffaloes"
+          ],
+          "plural": "water buffaloes"
+        }
+      ],
+      "host_bank": [
+        "emu",
+        "kangaroo",
+        "koala",
+        "wombat",
+        "platypus",
+        "kookaburra",
+        "tasmanian-devil",
+        "dingo"
+      ],
+      "host_answers": [
+        "emu"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something you can recycle",
+      "entries": [
+        {
+          "id": "paper",
+          "name": "paper",
+          "aliases": [
+            "office paper",
+            "printer paper",
+            "paper bags",
+            "brown paper bags",
+            "wrapping paper"
+          ],
+          "plural": "paper"
+        },
+        {
+          "id": "cardboard",
+          "name": "cardboard",
+          "aliases": [
+            "cardboard boxes",
+            "boxes",
+            "box",
+            "corrugated cardboard",
+            "Amazon boxes",
+            "cereal boxes",
+            "pizza boxes",
+            "toilet paper rolls",
+            "paper towel rolls"
+          ],
+          "plural": "cardboard"
+        },
+        {
+          "id": "cartons",
+          "name": "cartons",
+          "aliases": [
+            "milk cartons",
+            "juice cartons",
+            "egg cartons",
+            "Tetra Pak",
+            "carton"
+          ]
+        },
+        {
+          "id": "newspaper",
+          "name": "newspaper",
+          "aliases": [
+            "newspapers"
+          ]
+        },
+        {
+          "id": "magazine",
+          "name": "magazine",
+          "aliases": [
+            "magazines"
+          ]
+        },
+        {
+          "id": "junk-mail",
+          "name": "junk mail",
+          "aliases": [
+            "mail",
+            "envelopes",
+            "envelope"
+          ],
+          "plural": "junk mail"
+        },
+        {
+          "id": "books",
+          "name": "books",
+          "aliases": [
+            "book",
+            "textbooks",
+            "phone books"
+          ],
+          "plural": "books"
+        },
+        {
+          "id": "greeting-cards",
+          "name": "greeting cards",
+          "aliases": [
+            "cards"
+          ],
+          "plural": "greeting cards"
+        },
+        {
+          "id": "plastic",
+          "name": "plastic",
+          "aliases": [
+            "plastics"
+          ],
+          "plural": "plastic"
+        },
+        {
+          "id": "bottle",
+          "name": "bottle",
+          "aliases": [
+            "plastic bottles",
+            "water bottles",
+            "soda bottles",
+            "glass bottles",
+            "detergent bottles",
+            "bottles"
+          ]
+        },
+        {
+          "id": "milk-jug",
+          "name": "milk jug",
+          "aliases": [
+            "jugs",
+            "jug",
+            "milk jugs"
+          ]
+        },
+        {
+          "id": "plastic-containers",
+          "name": "plastic containers",
+          "aliases": [
+            "containers",
+            "takeout containers",
+            "yogurt cups",
+            "tubs",
+            "food containers"
+          ],
+          "plural": "plastic containers"
+        },
+        {
+          "id": "bags",
+          "name": "bags",
+          "aliases": [
+            "plastic bags",
+            "grocery bags",
+            "shopping bags"
+          ],
+          "plural": "bags"
+        },
+        {
+          "id": "bottle-caps",
+          "name": "bottle caps",
+          "aliases": [
+            "caps",
+            "lids",
+            "lid"
+          ],
+          "plural": "bottle caps"
+        },
+        {
+          "id": "glass",
+          "name": "glass",
+          "aliases": [],
+          "plural": "glass"
+        },
+        {
+          "id": "jar",
+          "name": "jar",
+          "aliases": [
+            "jars",
+            "glass jars"
+          ]
+        },
+        {
+          "id": "can",
+          "name": "can",
+          "aliases": [
+            "cans",
+            "aluminum cans",
+            "soda cans",
+            "tin cans",
+            "beer cans",
+            "aerosol cans",
+            "spray cans"
+          ]
+        },
+        {
+          "id": "aluminum",
+          "name": "aluminum",
+          "aliases": [
+            "aluminium"
+          ],
+          "plural": "aluminum"
+        },
+        {
+          "id": "aluminum-foil",
+          "name": "aluminum foil",
+          "aliases": [
+            "foil",
+            "tin foil"
+          ],
+          "plural": "aluminum foil"
+        },
+        {
+          "id": "metal",
+          "name": "metal",
+          "aliases": [
+            "scrap metal",
+            "steel",
+            "tin"
+          ],
+          "plural": "metal"
+        },
+        {
+          "id": "copper",
+          "name": "copper",
+          "aliases": [
+            "copper wire"
+          ],
+          "plural": "copper"
+        },
+        {
+          "id": "batteries",
+          "name": "batteries",
+          "aliases": [
+            "battery",
+            "car batteries"
+          ],
+          "plural": "batteries"
+        },
+        {
+          "id": "electronics",
+          "name": "electronics",
+          "aliases": [
+            "e-waste",
+            "old phones",
+            "phones",
+            "computers",
+            "laptops"
+          ],
+          "plural": "electronics"
+        },
+        {
+          "id": "printer-cartridges",
+          "name": "printer cartridges",
+          "aliases": [
+            "ink cartridges",
+            "toner"
+          ],
+          "plural": "printer cartridges"
+        },
+        {
+          "id": "light-bulbs",
+          "name": "light bulbs",
+          "aliases": [
+            "CFLs",
+            "bulbs",
+            "light bulb"
+          ],
+          "plural": "light bulbs"
+        },
+        {
+          "id": "appliances",
+          "name": "appliances",
+          "aliases": [
+            "old appliances",
+            "fridges"
+          ],
+          "plural": "appliances"
+        },
+        {
+          "id": "clothes",
+          "name": "clothes",
+          "aliases": [
+            "clothing",
+            "textiles",
+            "old clothes"
+          ],
+          "plural": "clothes"
+        },
+        {
+          "id": "shoes",
+          "name": "shoes",
+          "aliases": [],
+          "plural": "shoes"
+        },
+        {
+          "id": "tires",
+          "name": "tires",
+          "aliases": [
+            "tyres",
+            "old tires"
+          ],
+          "plural": "tires"
+        },
+        {
+          "id": "motor-oil",
+          "name": "motor oil",
+          "aliases": [
+            "used oil",
+            "oil",
+            "engine oil"
+          ],
+          "plural": "motor oil"
+        },
+        {
+          "id": "cooking-oil",
+          "name": "cooking oil",
+          "aliases": [],
+          "plural": "cooking oil"
+        },
+        {
+          "id": "food-scraps",
+          "name": "food scraps",
+          "aliases": [
+            "compost",
+            "food waste"
+          ],
+          "plural": "food scraps"
+        },
+        {
+          "id": "yard-waste",
+          "name": "yard waste",
+          "aliases": [
+            "leaves",
+            "grass clippings"
+          ],
+          "plural": "yard waste"
+        },
+        {
+          "id": "wood",
+          "name": "wood",
+          "aliases": [
+            "lumber",
+            "pallets"
+          ],
+          "plural": "wood"
+        },
+        {
+          "id": "styrofoam",
+          "name": "Styrofoam",
+          "aliases": [
+            "polystyrene",
+            "foam"
+          ],
+          "plural": "Styrofoam"
+        },
+        {
+          "id": "corks",
+          "name": "corks",
+          "aliases": [
+            "wine corks",
+            "cork"
+          ],
+          "plural": "corks"
+        },
+        {
+          "id": "cds",
+          "name": "CDs",
+          "aliases": [
+            "DVDs"
+          ],
+          "plural": "CDs"
+        },
+        {
+          "id": "mattresses",
+          "name": "mattresses",
+          "aliases": [
+            "mattress"
+          ],
+          "plural": "mattresses"
+        },
+        {
+          "id": "christmas-trees",
+          "name": "Christmas trees",
+          "aliases": [
+            "Christmas tree"
+          ],
+          "plural": "Christmas trees"
+        },
+        {
+          "id": "cars",
+          "name": "cars",
+          "aliases": [
+            "old cars"
+          ],
+          "plural": "cars"
+        },
+        {
+          "id": "bikes",
+          "name": "bikes",
+          "aliases": [
+            "bicycles"
+          ],
+          "plural": "bikes"
+        },
+        {
+          "id": "furniture",
+          "name": "furniture",
+          "aliases": [],
+          "plural": "furniture"
+        },
+        {
+          "id": "carpet",
+          "name": "carpet",
+          "aliases": [],
+          "plural": "carpet"
+        },
+        {
+          "id": "paint",
+          "name": "paint",
+          "aliases": [],
+          "plural": "paint"
+        },
+        {
+          "id": "crayons",
+          "name": "crayons",
+          "aliases": [],
+          "plural": "crayons"
+        },
+        {
+          "id": "toys",
+          "name": "toys",
+          "aliases": [
+            "old toys"
+          ],
+          "plural": "toys"
+        },
+        {
+          "id": "eyeglasses",
+          "name": "eyeglasses",
+          "aliases": [
+            "glasses"
+          ],
+          "plural": "eyeglasses"
+        },
+        {
+          "id": "hangers",
+          "name": "hangers",
+          "aliases": [
+            "coat hangers"
+          ],
+          "plural": "hangers"
+        },
+        {
+          "id": "rubber",
+          "name": "rubber",
+          "aliases": [],
+          "plural": "rubber"
+        },
+        {
+          "id": "concrete",
+          "name": "concrete",
+          "aliases": [],
+          "plural": "concrete"
+        },
+        {
+          "id": "jokes",
+          "name": "jokes",
+          "aliases": [],
+          "plural": "jokes"
+        }
+      ],
+      "host_bank": [
+        "cardboard",
+        "paper",
+        "plastic",
+        "can",
+        "glass",
+        "bottle",
+        "newspaper",
+        "aluminum"
+      ],
+      "host_answers": [
+        "cardboard"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a kind of tea",
+      "entries": [
+        {
+          "id": "chamomile",
+          "name": "chamomile",
+          "aliases": [
+            "chamomile tea",
+            "camomile",
+            "camomile tea"
+          ],
+          "plural": "chamomile"
+        },
+        {
+          "id": "green-tea",
+          "name": "green tea",
+          "aliases": [
+            "sencha",
+            "gunpowder tea"
+          ],
+          "plural": "green tea"
+        },
+        {
+          "id": "matcha",
+          "name": "matcha",
+          "aliases": [
+            "matcha latte"
+          ],
+          "plural": "matcha"
+        },
+        {
+          "id": "genmaicha",
+          "name": "genmaicha",
+          "aliases": [],
+          "plural": "genmaicha"
+        },
+        {
+          "id": "gyokuro",
+          "name": "gyokuro",
+          "aliases": [],
+          "plural": "gyokuro"
+        },
+        {
+          "id": "jasmine-tea",
+          "name": "jasmine tea",
+          "aliases": [
+            "jasmine"
+          ],
+          "plural": "jasmine tea"
+        },
+        {
+          "id": "black-tea",
+          "name": "black tea",
+          "aliases": [],
+          "plural": "black tea"
+        },
+        {
+          "id": "english-breakfast",
+          "name": "English Breakfast",
+          "aliases": [
+            "English Breakfast tea",
+            "breakfast tea",
+            "builder's tea"
+          ],
+          "plural": "English Breakfast"
+        },
+        {
+          "id": "irish-breakfast",
+          "name": "Irish Breakfast",
+          "aliases": [
+            "Irish Breakfast tea"
+          ],
+          "plural": "Irish Breakfast"
+        },
+        {
+          "id": "earl-grey",
+          "name": "Earl Grey",
+          "aliases": [
+            "Earl Grey tea"
+          ],
+          "plural": "Earl Grey"
+        },
+        {
+          "id": "lady-grey",
+          "name": "Lady Grey",
+          "aliases": [],
+          "plural": "Lady Grey"
+        },
+        {
+          "id": "darjeeling",
+          "name": "Darjeeling",
+          "aliases": [],
+          "plural": "Darjeeling"
+        },
+        {
+          "id": "assam",
+          "name": "Assam",
+          "aliases": [],
+          "plural": "Assam"
+        },
+        {
+          "id": "ceylon",
+          "name": "Ceylon",
+          "aliases": [
+            "Ceylon tea"
+          ],
+          "plural": "Ceylon"
+        },
+        {
+          "id": "keemun",
+          "name": "Keemun",
+          "aliases": [],
+          "plural": "Keemun"
+        },
+        {
+          "id": "lapsang-souchong",
+          "name": "Lapsang souchong",
+          "aliases": [
+            "lapsang"
+          ],
+          "plural": "Lapsang souchong"
+        },
+        {
+          "id": "oolong",
+          "name": "oolong",
+          "aliases": [
+            "oolong tea"
+          ],
+          "plural": "oolong"
+        },
+        {
+          "id": "white-tea",
+          "name": "white tea",
+          "aliases": [
+            "silver needle"
+          ],
+          "plural": "white tea"
+        },
+        {
+          "id": "yellow-tea",
+          "name": "yellow tea",
+          "aliases": [],
+          "plural": "yellow tea"
+        },
+        {
+          "id": "pu-erh",
+          "name": "pu-erh",
+          "aliases": [
+            "pu'er"
+          ],
+          "plural": "pu-erh"
+        },
+        {
+          "id": "rooibos",
+          "name": "rooibos",
+          "aliases": [
+            "red bush",
+            "redbush"
+          ],
+          "plural": "rooibos"
+        },
+        {
+          "id": "honeybush",
+          "name": "honeybush",
+          "aliases": [],
+          "plural": "honeybush"
+        },
+        {
+          "id": "peppermint-tea",
+          "name": "peppermint tea",
+          "aliases": [
+            "peppermint",
+            "mint tea",
+            "mint",
+            "spearmint",
+            "Moroccan mint tea"
+          ],
+          "plural": "peppermint tea"
+        },
+        {
+          "id": "hibiscus",
+          "name": "hibiscus",
+          "aliases": [
+            "hibiscus tea"
+          ],
+          "plural": "hibiscus"
+        },
+        {
+          "id": "ginger-tea",
+          "name": "ginger tea",
+          "aliases": [
+            "ginger",
+            "lemon and ginger"
+          ],
+          "plural": "ginger tea"
+        },
+        {
+          "id": "lemon-tea",
+          "name": "lemon tea",
+          "aliases": [],
+          "plural": "lemon tea"
+        },
+        {
+          "id": "lemongrass-tea",
+          "name": "lemongrass tea",
+          "aliases": [
+            "lemongrass"
+          ],
+          "plural": "lemongrass tea"
+        },
+        {
+          "id": "lemon-balm",
+          "name": "lemon balm",
+          "aliases": [],
+          "plural": "lemon balm"
+        },
+        {
+          "id": "lavender-tea",
+          "name": "lavender tea",
+          "aliases": [
+            "lavender"
+          ],
+          "plural": "lavender tea"
+        },
+        {
+          "id": "herbal-tea",
+          "name": "herbal tea",
+          "aliases": [
+            "tisane",
+            "herbal",
+            "herbal infusion"
+          ],
+          "plural": "herbal tea"
+        },
+        {
+          "id": "fruit-tea",
+          "name": "fruit tea",
+          "aliases": [
+            "fruit infusion",
+            "berry tea"
+          ],
+          "plural": "fruit tea"
+        },
+        {
+          "id": "chai",
+          "name": "chai",
+          "aliases": [
+            "masala chai",
+            "chai tea",
+            "chai latte"
+          ],
+          "plural": "chai"
+        },
+        {
+          "id": "bubble-tea",
+          "name": "bubble tea",
+          "aliases": [
+            "boba",
+            "boba tea",
+            "pearl milk tea"
+          ],
+          "plural": "bubble tea"
+        },
+        {
+          "id": "milk-tea",
+          "name": "milk tea",
+          "aliases": [],
+          "plural": "milk tea"
+        },
+        {
+          "id": "thai-tea",
+          "name": "Thai tea",
+          "aliases": [
+            "Thai iced tea"
+          ],
+          "plural": "Thai tea"
+        },
+        {
+          "id": "iced-tea",
+          "name": "iced tea",
+          "aliases": [],
+          "plural": "iced tea"
+        },
+        {
+          "id": "sweet-tea",
+          "name": "sweet tea",
+          "aliases": [],
+          "plural": "sweet tea"
+        },
+        {
+          "id": "kombucha",
+          "name": "kombucha",
+          "aliases": [],
+          "plural": "kombucha"
+        },
+        {
+          "id": "yerba-mate",
+          "name": "yerba mate",
+          "aliases": [
+            "mate"
+          ],
+          "plural": "yerba mate"
+        },
+        {
+          "id": "barley-tea",
+          "name": "barley tea",
+          "aliases": [
+            "mugicha"
+          ],
+          "plural": "barley tea"
+        },
+        {
+          "id": "butter-tea",
+          "name": "butter tea",
+          "aliases": [
+            "po cha"
+          ],
+          "plural": "butter tea"
+        },
+        {
+          "id": "london-fog",
+          "name": "London Fog",
+          "aliases": [],
+          "plural": "London Fog"
+        },
+        {
+          "id": "echinacea-tea",
+          "name": "echinacea tea",
+          "aliases": [
+            "echinacea"
+          ],
+          "plural": "echinacea tea"
+        },
+        {
+          "id": "nettle-tea",
+          "name": "nettle tea",
+          "aliases": [
+            "nettle"
+          ],
+          "plural": "nettle tea"
+        },
+        {
+          "id": "dandelion-tea",
+          "name": "dandelion tea",
+          "aliases": [
+            "dandelion"
+          ],
+          "plural": "dandelion tea"
+        },
+        {
+          "id": "rosehip-tea",
+          "name": "rosehip tea",
+          "aliases": [
+            "rosehip"
+          ],
+          "plural": "rosehip tea"
+        },
+        {
+          "id": "elderflower-tea",
+          "name": "elderflower tea",
+          "aliases": [
+            "elderflower"
+          ],
+          "plural": "elderflower tea"
+        },
+        {
+          "id": "turmeric-tea",
+          "name": "turmeric tea",
+          "aliases": [
+            "golden milk",
+            "turmeric"
+          ],
+          "plural": "turmeric tea"
+        },
+        {
+          "id": "chrysanthemum-tea",
+          "name": "chrysanthemum tea",
+          "aliases": [
+            "chrysanthemum"
+          ],
+          "plural": "chrysanthemum tea"
+        },
+        {
+          "id": "ginseng-tea",
+          "name": "ginseng tea",
+          "aliases": [
+            "ginseng"
+          ],
+          "plural": "ginseng tea"
+        },
+        {
+          "id": "tulsi",
+          "name": "tulsi",
+          "aliases": [
+            "holy basil"
+          ],
+          "plural": "tulsi"
+        },
+        {
+          "id": "cinnamon-tea",
+          "name": "cinnamon tea",
+          "aliases": [
+            "cinnamon"
+          ],
+          "plural": "cinnamon tea"
+        },
+        {
+          "id": "rose-tea",
+          "name": "rose tea",
+          "aliases": [],
+          "plural": "rose tea"
+        },
+        {
+          "id": "licorice-tea",
+          "name": "licorice tea",
+          "aliases": [],
+          "plural": "licorice tea"
+        },
+        {
+          "id": "arnold-palmer",
+          "name": "Arnold Palmer",
+          "aliases": [],
+          "plural": "Arnold Palmer"
+        },
+        {
+          "id": "hojicha",
+          "name": "hojicha",
+          "aliases": [],
+          "plural": "hojicha"
+        },
+        {
+          "id": "russian-caravan",
+          "name": "Russian Caravan",
+          "aliases": [],
+          "plural": "Russian Caravan"
+        },
+        {
+          "id": "lipton",
+          "name": "Lipton",
+          "aliases": [],
+          "plural": "Lipton"
+        },
+        {
+          "id": "yorkshire-tea",
+          "name": "Yorkshire Tea",
+          "aliases": [],
+          "plural": "Yorkshire Tea"
+        },
+        {
+          "id": "pg-tips",
+          "name": "PG Tips",
+          "aliases": [],
+          "plural": "PG Tips"
+        },
+        {
+          "id": "tetley",
+          "name": "Tetley",
+          "aliases": [],
+          "plural": "Tetley"
+        }
+      ],
+      "host_bank": [
+        "chamomile",
+        "green-tea",
+        "black-tea",
+        "earl-grey",
+        "peppermint-tea",
+        "chai",
+        "iced-tea",
+        "sweet-tea"
+      ],
+      "host_answers": [
+        "chamomile"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something you'd see at a circus",
+      "entries": [
+        {
+          "id": "clown",
+          "name": "clown",
+          "aliases": [
+            "Bozo",
+            "rodeo clown",
+            "clowns"
+          ]
+        },
+        {
+          "id": "acrobat",
+          "name": "acrobat",
+          "aliases": [
+            "tumbler",
+            "acrobatics",
+            "acrobats"
+          ]
+        },
+        {
+          "id": "elephant",
+          "name": "elephant",
+          "aliases": [
+            "elephant act",
+            "circus elephant",
+            "elephants"
+          ]
+        },
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "lion-tamer",
+          "name": "lion tamer",
+          "aliases": [
+            "animal tamer",
+            "tamer",
+            "animal trainer",
+            "lion tamers"
+          ]
+        },
+        {
+          "id": "ringmaster",
+          "name": "ringmaster",
+          "aliases": [
+            "ring master",
+            "MC",
+            "ringmasters"
+          ]
+        },
+        {
+          "id": "trapeze-artist",
+          "name": "trapeze artist",
+          "aliases": [
+            "trapeze",
+            "flying trapeze",
+            "aerialist",
+            "trapeze act",
+            "trapeze artists"
+          ]
+        },
+        {
+          "id": "tightrope-walker",
+          "name": "tightrope walker",
+          "aliases": [
+            "tightrope",
+            "high wire",
+            "wire walker",
+            "tightrope act",
+            "tightrope walkers"
+          ]
+        },
+        {
+          "id": "juggler",
+          "name": "juggler",
+          "aliases": [
+            "juggling",
+            "jugglers"
+          ]
+        },
+        {
+          "id": "unicyclist",
+          "name": "unicyclist",
+          "aliases": [
+            "unicycle",
+            "unicyclists"
+          ]
+        },
+        {
+          "id": "stilt-walker",
+          "name": "stilt walker",
+          "aliases": [
+            "stilts",
+            "stilt walkers"
+          ]
+        },
+        {
+          "id": "fire-breather",
+          "name": "fire breather",
+          "aliases": [
+            "fire eater",
+            "fire-eater",
+            "fire breathing",
+            "fire breathers"
+          ]
+        },
+        {
+          "id": "sword-swallower",
+          "name": "sword swallower",
+          "aliases": [
+            "sword swallowers"
+          ]
+        },
+        {
+          "id": "strongman",
+          "name": "strongman",
+          "aliases": [
+            "strong man",
+            "strongmen"
+          ],
+          "plural": "strongmen"
+        },
+        {
+          "id": "bearded-lady",
+          "name": "bearded lady",
+          "aliases": [
+            "bearded ladies"
+          ],
+          "plural": "bearded ladies"
+        },
+        {
+          "id": "contortionist",
+          "name": "contortionist",
+          "aliases": [
+            "contortionists"
+          ]
+        },
+        {
+          "id": "magician",
+          "name": "magician",
+          "aliases": [
+            "magic tricks",
+            "magicians"
+          ]
+        },
+        {
+          "id": "knife-thrower",
+          "name": "knife thrower",
+          "aliases": [
+            "knife throwers"
+          ]
+        },
+        {
+          "id": "human-cannonball",
+          "name": "human cannonball",
+          "aliases": [
+            "cannon",
+            "human cannonballs"
+          ]
+        },
+        {
+          "id": "bareback-rider",
+          "name": "bareback rider",
+          "aliases": [
+            "trick rider",
+            "horse rider",
+            "bareback riders"
+          ]
+        },
+        {
+          "id": "horse",
+          "name": "horse",
+          "aliases": [
+            "pony",
+            "horses"
+          ]
+        },
+        {
+          "id": "monkey",
+          "name": "monkey",
+          "aliases": [
+            "chimpanzee",
+            "monkeys"
+          ]
+        },
+        {
+          "id": "bear",
+          "name": "bear",
+          "aliases": [
+            "dancing bear",
+            "bears"
+          ]
+        },
+        {
+          "id": "seal",
+          "name": "seal",
+          "aliases": [
+            "sea lion",
+            "seals"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "poodle",
+            "trained dog",
+            "dogs"
+          ]
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "camels"
+          ]
+        },
+        {
+          "id": "zebra",
+          "name": "zebra",
+          "aliases": [
+            "zebras"
+          ]
+        },
+        {
+          "id": "big-top",
+          "name": "big top",
+          "aliases": [
+            "circus tent",
+            "tent",
+            "big tops"
+          ]
+        },
+        {
+          "id": "ring",
+          "name": "ring",
+          "aliases": [
+            "center ring",
+            "three rings",
+            "rings"
+          ]
+        },
+        {
+          "id": "popcorn",
+          "name": "popcorn",
+          "aliases": [],
+          "plural": "popcorn"
+        },
+        {
+          "id": "peanuts",
+          "name": "peanuts",
+          "aliases": [
+            "peanut"
+          ],
+          "plural": "peanuts"
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [
+            "candy floss"
+          ],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "candy-apple",
+          "name": "candy apple",
+          "aliases": [
+            "caramel apple",
+            "candy apples"
+          ]
+        },
+        {
+          "id": "hot-dog",
+          "name": "hot dog",
+          "aliases": [
+            "hot dogs"
+          ]
+        },
+        {
+          "id": "circus-music",
+          "name": "circus music",
+          "aliases": [
+            "calliope",
+            "organ music"
+          ],
+          "plural": "circus music"
+        },
+        {
+          "id": "drumroll",
+          "name": "drumroll",
+          "aliases": [
+            "drum roll",
+            "drumrolls"
+          ]
+        },
+        {
+          "id": "spotlight",
+          "name": "spotlight",
+          "aliases": [
+            "spotlights"
+          ]
+        },
+        {
+          "id": "audience",
+          "name": "audience",
+          "aliases": [
+            "crowd",
+            "audiences"
+          ]
+        },
+        {
+          "id": "ticket",
+          "name": "ticket",
+          "aliases": [
+            "tickets"
+          ]
+        },
+        {
+          "id": "cage",
+          "name": "cage",
+          "aliases": [
+            "cages"
+          ]
+        },
+        {
+          "id": "flaming-hoop",
+          "name": "flaming hoop",
+          "aliases": [
+            "hoop",
+            "hoop of fire",
+            "ring of fire",
+            "flaming hoops"
+          ]
+        },
+        {
+          "id": "whip",
+          "name": "whip",
+          "aliases": [
+            "whips"
+          ]
+        },
+        {
+          "id": "costume",
+          "name": "costume",
+          "aliases": [
+            "sequins",
+            "costumes"
+          ]
+        },
+        {
+          "id": "clown-makeup",
+          "name": "clown makeup",
+          "aliases": [
+            "face paint"
+          ],
+          "plural": "clown makeup"
+        },
+        {
+          "id": "red-nose",
+          "name": "red nose",
+          "aliases": [
+            "clown nose",
+            "red noses"
+          ]
+        },
+        {
+          "id": "clown-car",
+          "name": "clown car",
+          "aliases": [
+            "clown cars"
+          ]
+        },
+        {
+          "id": "balloon",
+          "name": "balloon",
+          "aliases": [
+            "balloons"
+          ]
+        },
+        {
+          "id": "balloon-animal",
+          "name": "balloon animal",
+          "aliases": [
+            "balloon animals"
+          ]
+        },
+        {
+          "id": "safety-net",
+          "name": "safety net",
+          "aliases": [
+            "net",
+            "safety nets"
+          ]
+        },
+        {
+          "id": "trampoline",
+          "name": "trampoline",
+          "aliases": [
+            "trampolines"
+          ]
+        },
+        {
+          "id": "aerial-silks",
+          "name": "aerial silks",
+          "aliases": [
+            "silks",
+            "aerial hoop"
+          ],
+          "plural": "aerial silks"
+        },
+        {
+          "id": "cirque-du-soleil",
+          "name": "Cirque du Soleil",
+          "aliases": [],
+          "plural": "Cirque du Soleil"
+        },
+        {
+          "id": "sideshow",
+          "name": "sideshow",
+          "aliases": [
+            "freak show",
+            "sideshows"
+          ]
+        },
+        {
+          "id": "globe-of-death",
+          "name": "globe of death",
+          "aliases": [
+            "motorcycle globe",
+            "motorcycle stunt",
+            "stunt rider",
+            "globes of death"
+          ],
+          "plural": "globes of death"
+        },
+        {
+          "id": "plate-spinning",
+          "name": "plate spinning",
+          "aliases": [
+            "plate spinner"
+          ],
+          "plural": "plate spinning"
+        },
+        {
+          "id": "mime",
+          "name": "mime",
+          "aliases": [
+            "mimes"
+          ]
+        },
+        {
+          "id": "human-pyramid",
+          "name": "human pyramid",
+          "aliases": [
+            "pyramid",
+            "human pyramids"
+          ]
+        },
+        {
+          "id": "top-hat",
+          "name": "top hat",
+          "aliases": [
+            "top hats"
+          ]
+        },
+        {
+          "id": "circus-train",
+          "name": "circus train",
+          "aliases": [
+            "train",
+            "circus trains"
+          ]
+        },
+        {
+          "id": "band",
+          "name": "band",
+          "aliases": [
+            "circus band",
+            "bands"
+          ]
+        },
+        {
+          "id": "teeterboard",
+          "name": "teeterboard",
+          "aliases": [
+            "Russian swing",
+            "teeterboards"
+          ]
+        },
+        {
+          "id": "hula-hoop",
+          "name": "hula hoop",
+          "aliases": [
+            "hula hooper",
+            "hula hoops"
+          ]
+        },
+        {
+          "id": "peanut-vendor",
+          "name": "peanut vendor",
+          "aliases": [
+            "vendor",
+            "peanut vendors"
+          ]
+        },
+        {
+          "id": "lights",
+          "name": "lights",
+          "aliases": [],
+          "plural": "lights"
+        },
+        {
+          "id": "sawdust",
+          "name": "sawdust",
+          "aliases": [],
+          "plural": "sawdust"
+        },
+        {
+          "id": "child",
+          "name": "child",
+          "aliases": [
+            "kids",
+            "kid",
+            "children"
+          ],
+          "plural": "children"
+        },
+        {
+          "id": "giraffe",
+          "name": "giraffe",
+          "aliases": [
+            "giraffes"
+          ]
+        },
+        {
+          "id": "rope",
+          "name": "rope",
+          "aliases": [
+            "ropes"
+          ]
+        },
+        {
+          "id": "ladder",
+          "name": "ladder",
+          "aliases": [
+            "ladders"
+          ]
+        },
+        {
+          "id": "bicycle",
+          "name": "bicycle",
+          "aliases": [
+            "trick bike",
+            "bicycles"
+          ]
+        },
+        {
+          "id": "ball",
+          "name": "ball",
+          "aliases": [
+            "balancing ball",
+            "balls"
+          ]
+        },
+        {
+          "id": "pole",
+          "name": "pole",
+          "aliases": [
+            "poles"
+          ]
+        }
+      ],
+      "host_bank": [
+        "elephant",
+        "clown",
+        "acrobat",
+        "lion",
+        "ringmaster",
+        "trapeze-artist",
+        "juggler",
+        "tightrope-walker"
+      ],
+      "host_answers": [
+        "elephant"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a part of speech",
+      "entries": [
+        {
+          "id": "noun",
+          "name": "noun",
+          "aliases": [
+            "nouns"
+          ]
+        },
+        {
+          "id": "pronoun",
+          "name": "pronoun",
+          "aliases": [
+            "pronouns"
+          ]
+        },
+        {
+          "id": "verb",
+          "name": "verb",
+          "aliases": [
+            "verbs"
+          ]
+        },
+        {
+          "id": "adjective",
+          "name": "adjective",
+          "aliases": [
+            "adjectives"
+          ]
+        },
+        {
+          "id": "adverb",
+          "name": "adverb",
+          "aliases": [
+            "adverbs"
+          ]
+        },
+        {
+          "id": "preposition",
+          "name": "preposition",
+          "aliases": [
+            "prepositions"
+          ]
+        },
+        {
+          "id": "conjunction",
+          "name": "conjunction",
+          "aliases": [
+            "conjunctions"
+          ]
+        },
+        {
+          "id": "interjection",
+          "name": "interjection",
+          "aliases": [
+            "exclamation",
+            "interjections"
+          ]
+        },
+        {
+          "id": "article",
+          "name": "article",
+          "aliases": [
+            "articles"
+          ]
+        },
+        {
+          "id": "determiner",
+          "name": "determiner",
+          "aliases": [
+            "determiners"
+          ]
+        }
+      ],
+      "host_bank": [
+        "verb",
+        "noun",
+        "pronoun",
+        "adjective",
+        "adverb",
+        "preposition",
+        "conjunction",
+        "interjection",
+        "article",
+        "determiner"
+      ],
+      "host_answers": [
+        "verb"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a prime number less than 50",
+      "entries": [
+        {
+          "id": "2",
+          "name": "2",
+          "aliases": [
+            "two"
+          ],
+          "plural": "2"
+        },
+        {
+          "id": "3",
+          "name": "3",
+          "aliases": [
+            "three"
+          ],
+          "plural": "3"
+        },
+        {
+          "id": "5",
+          "name": "5",
+          "aliases": [
+            "five"
+          ],
+          "plural": "5"
+        },
+        {
+          "id": "7",
+          "name": "7",
+          "aliases": [
+            "seven"
+          ],
+          "plural": "7"
+        },
+        {
+          "id": "11",
+          "name": "11",
+          "aliases": [
+            "eleven"
+          ],
+          "plural": "11"
+        },
+        {
+          "id": "13",
+          "name": "13",
+          "aliases": [
+            "thirteen"
+          ],
+          "plural": "13"
+        },
+        {
+          "id": "17",
+          "name": "17",
+          "aliases": [
+            "seventeen"
+          ],
+          "plural": "17"
+        },
+        {
+          "id": "19",
+          "name": "19",
+          "aliases": [
+            "nineteen"
+          ],
+          "plural": "19"
+        },
+        {
+          "id": "23",
+          "name": "23",
+          "aliases": [
+            "twenty-three",
+            "twenty three"
+          ],
+          "plural": "23"
+        },
+        {
+          "id": "29",
+          "name": "29",
+          "aliases": [
+            "twenty-nine",
+            "twenty nine"
+          ],
+          "plural": "29"
+        },
+        {
+          "id": "31",
+          "name": "31",
+          "aliases": [
+            "thirty-one",
+            "thirty one"
+          ],
+          "plural": "31"
+        },
+        {
+          "id": "37",
+          "name": "37",
+          "aliases": [
+            "thirty-seven",
+            "thirty seven"
+          ],
+          "plural": "37"
+        },
+        {
+          "id": "41",
+          "name": "41",
+          "aliases": [
+            "forty-one",
+            "forty one"
+          ],
+          "plural": "41"
+        },
+        {
+          "id": "43",
+          "name": "43",
+          "aliases": [
+            "forty-three",
+            "forty three"
+          ],
+          "plural": "43"
+        },
+        {
+          "id": "47",
+          "name": "47",
+          "aliases": [
+            "forty-seven",
+            "forty seven"
+          ],
+          "plural": "47"
+        }
+      ],
+      "host_bank": [
+        "7",
+        "2",
+        "3",
+        "5",
+        "11",
+        "13",
+        "17",
+        "19",
+        "23",
+        "29",
+        "31",
+        "37",
+        "41",
+        "43",
+        "47"
+      ],
+      "host_answers": [
+        "7"
+      ],
+      "match_groups": {}
+    }
+  ]
+}

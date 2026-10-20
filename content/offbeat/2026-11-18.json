@@ -1,0 +1,3424 @@
+{
+  "format": 1,
+  "game_id": "offbeat",
+  "date": "2026-11-18",
+  "questions": [
+    {
+      "prompt": "Name something you'd see at a wedding",
+      "entries": [
+        {
+          "id": "bride",
+          "name": "bride",
+          "aliases": [
+            "brides"
+          ]
+        },
+        {
+          "id": "groom",
+          "name": "groom",
+          "aliases": [
+            "bridegroom",
+            "grooms"
+          ]
+        },
+        {
+          "id": "wedding-dress",
+          "name": "wedding dress",
+          "aliases": [
+            "gown",
+            "bridal gown",
+            "wedding gown",
+            "white dress",
+            "dress",
+            "wedding dresses"
+          ]
+        },
+        {
+          "id": "veil",
+          "name": "veil",
+          "aliases": [
+            "veils"
+          ]
+        },
+        {
+          "id": "tuxedo",
+          "name": "tuxedo",
+          "aliases": [
+            "tux",
+            "suit",
+            "morning suit",
+            "tuxedos"
+          ]
+        },
+        {
+          "id": "rings",
+          "name": "rings",
+          "aliases": [
+            "ring",
+            "wedding rings",
+            "wedding band",
+            "wedding ring"
+          ],
+          "plural": "rings"
+        },
+        {
+          "id": "wedding-cake",
+          "name": "wedding cake",
+          "aliases": [
+            "cake",
+            "wedding cakes"
+          ]
+        },
+        {
+          "id": "cake-topper",
+          "name": "cake topper",
+          "aliases": [
+            "cake toppers"
+          ]
+        },
+        {
+          "id": "flowers",
+          "name": "flowers",
+          "aliases": [
+            "flower",
+            "bouquet",
+            "bridal bouquet",
+            "floral arrangements",
+            "roses",
+            "corsage",
+            "boutonniere",
+            "buttonhole",
+            "flower petals",
+            "rose petals",
+            "petals"
+          ],
+          "plural": "flowers"
+        },
+        {
+          "id": "flower-girl",
+          "name": "flower girl",
+          "aliases": [
+            "flower girls"
+          ]
+        },
+        {
+          "id": "ring-bearer",
+          "name": "ring bearer",
+          "aliases": [
+            "ring bearers"
+          ]
+        },
+        {
+          "id": "bridesmaid",
+          "name": "bridesmaid",
+          "aliases": [
+            "bridesmaids"
+          ]
+        },
+        {
+          "id": "maid-of-honor",
+          "name": "maid of honor",
+          "aliases": [
+            "matron of honor",
+            "maid of honour",
+            "maids of honor"
+          ],
+          "plural": "maids of honor"
+        },
+        {
+          "id": "groomsman",
+          "name": "groomsman",
+          "aliases": [
+            "groomsmen"
+          ],
+          "plural": "groomsmen"
+        },
+        {
+          "id": "best-man",
+          "name": "best man",
+          "aliases": [
+            "best men"
+          ],
+          "plural": "best men"
+        },
+        {
+          "id": "usher",
+          "name": "usher",
+          "aliases": [
+            "ushers"
+          ]
+        },
+        {
+          "id": "officiant",
+          "name": "officiant",
+          "aliases": [
+            "priest",
+            "minister",
+            "pastor",
+            "rabbi",
+            "imam",
+            "celebrant",
+            "justice of the peace",
+            "officiants"
+          ]
+        },
+        {
+          "id": "guests",
+          "name": "guests",
+          "aliases": [
+            "guest",
+            "wedding guests"
+          ],
+          "plural": "guests"
+        },
+        {
+          "id": "family",
+          "name": "family",
+          "aliases": [],
+          "plural": "family"
+        },
+        {
+          "id": "father-of-the-bride",
+          "name": "father of the bride",
+          "aliases": [
+            "dad"
+          ],
+          "plural": "father of the bride"
+        },
+        {
+          "id": "mother-of-the-bride",
+          "name": "mother of the bride",
+          "aliases": [
+            "mom"
+          ],
+          "plural": "mother of the bride"
+        },
+        {
+          "id": "grandparents",
+          "name": "grandparents",
+          "aliases": [
+            "grandma",
+            "grandpa"
+          ],
+          "plural": "grandparents"
+        },
+        {
+          "id": "altar",
+          "name": "altar",
+          "aliases": [
+            "altars"
+          ]
+        },
+        {
+          "id": "aisle",
+          "name": "aisle",
+          "aliases": [
+            "walking down the aisle",
+            "aisles"
+          ]
+        },
+        {
+          "id": "church",
+          "name": "church",
+          "aliases": [
+            "chapel",
+            "churches"
+          ]
+        },
+        {
+          "id": "venue",
+          "name": "venue",
+          "aliases": [
+            "venues"
+          ]
+        },
+        {
+          "id": "vows",
+          "name": "vows",
+          "aliases": [
+            "wedding vows",
+            "exchanging vows"
+          ],
+          "plural": "vows"
+        },
+        {
+          "id": "the-kiss",
+          "name": "the kiss",
+          "aliases": [
+            "first kiss",
+            "kiss",
+            "you may kiss the bride"
+          ],
+          "plural": "the kiss"
+        },
+        {
+          "id": "first-dance",
+          "name": "first dance",
+          "aliases": [
+            "first dances"
+          ]
+        },
+        {
+          "id": "dancing",
+          "name": "dancing",
+          "aliases": [
+            "dance floor"
+          ],
+          "plural": "dancing"
+        },
+        {
+          "id": "dj",
+          "name": "DJ",
+          "aliases": [
+            "DJs"
+          ],
+          "plural": "DJs"
+        },
+        {
+          "id": "band",
+          "name": "band",
+          "aliases": [
+            "live band",
+            "bands"
+          ]
+        },
+        {
+          "id": "music",
+          "name": "music",
+          "aliases": [
+            "wedding march",
+            "Here Comes the Bride"
+          ],
+          "plural": "music"
+        },
+        {
+          "id": "speeches",
+          "name": "speeches",
+          "aliases": [
+            "speech",
+            "toasts",
+            "toast",
+            "best man speech"
+          ],
+          "plural": "speeches"
+        },
+        {
+          "id": "champagne",
+          "name": "champagne",
+          "aliases": [],
+          "plural": "champagne"
+        },
+        {
+          "id": "wine",
+          "name": "wine",
+          "aliases": [],
+          "plural": "wine"
+        },
+        {
+          "id": "bar",
+          "name": "bar",
+          "aliases": [
+            "open bar",
+            "bars"
+          ]
+        },
+        {
+          "id": "cocktail-hour",
+          "name": "cocktail hour",
+          "aliases": [],
+          "plural": "cocktail hour"
+        },
+        {
+          "id": "dinner",
+          "name": "dinner",
+          "aliases": [
+            "food",
+            "buffet",
+            "wedding dinner"
+          ],
+          "plural": "dinner"
+        },
+        {
+          "id": "reception",
+          "name": "reception",
+          "aliases": [],
+          "plural": "reception"
+        },
+        {
+          "id": "photographer",
+          "name": "photographer",
+          "aliases": [
+            "photographers"
+          ]
+        },
+        {
+          "id": "videographer",
+          "name": "videographer",
+          "aliases": [
+            "videographers"
+          ]
+        },
+        {
+          "id": "photos",
+          "name": "photos",
+          "aliases": [
+            "photo",
+            "pictures",
+            "wedding photos"
+          ]
+        },
+        {
+          "id": "garter",
+          "name": "garter",
+          "aliases": [
+            "garters"
+          ]
+        },
+        {
+          "id": "garter-toss",
+          "name": "garter toss",
+          "aliases": [],
+          "plural": "garter toss"
+        },
+        {
+          "id": "bouquet-toss",
+          "name": "bouquet toss",
+          "aliases": [
+            "throwing the bouquet"
+          ],
+          "plural": "bouquet toss"
+        },
+        {
+          "id": "rice",
+          "name": "rice",
+          "aliases": [
+            "throwing rice",
+            "birdseed"
+          ],
+          "plural": "rice"
+        },
+        {
+          "id": "confetti",
+          "name": "confetti",
+          "aliases": [],
+          "plural": "confetti"
+        },
+        {
+          "id": "bubbles",
+          "name": "bubbles",
+          "aliases": [],
+          "plural": "bubbles"
+        },
+        {
+          "id": "sparklers",
+          "name": "sparklers",
+          "aliases": [
+            "sparkler send-off",
+            "sparkler"
+          ],
+          "plural": "sparklers"
+        },
+        {
+          "id": "getaway-car",
+          "name": "getaway car",
+          "aliases": [
+            "limo",
+            "limousine",
+            "\"Just Married\" sign",
+            "Just Married",
+            "tin cans",
+            "getaway cars"
+          ]
+        },
+        {
+          "id": "gifts",
+          "name": "gifts",
+          "aliases": [
+            "presents",
+            "wedding gifts",
+            "registry",
+            "gift"
+          ],
+          "plural": "gifts"
+        },
+        {
+          "id": "card-box",
+          "name": "card box",
+          "aliases": [
+            "cards",
+            "card boxes"
+          ]
+        },
+        {
+          "id": "guestbook",
+          "name": "guestbook",
+          "aliases": [
+            "guest book",
+            "guestbooks"
+          ]
+        },
+        {
+          "id": "seating-chart",
+          "name": "seating chart",
+          "aliases": [
+            "place cards",
+            "name cards",
+            "seating charts"
+          ]
+        },
+        {
+          "id": "centerpieces",
+          "name": "centerpieces",
+          "aliases": [
+            "centerpiece",
+            "table decorations"
+          ]
+        },
+        {
+          "id": "candles",
+          "name": "candles",
+          "aliases": [
+            "candle",
+            "unity candle"
+          ],
+          "plural": "candles"
+        },
+        {
+          "id": "chairs",
+          "name": "chairs",
+          "aliases": [
+            "chair"
+          ]
+        },
+        {
+          "id": "wedding-arch",
+          "name": "wedding arch",
+          "aliases": [
+            "arch",
+            "arbor",
+            "arbour",
+            "wedding arches"
+          ]
+        },
+        {
+          "id": "chuppah",
+          "name": "chuppah",
+          "aliases": [
+            "huppah",
+            "chuppahs"
+          ]
+        },
+        {
+          "id": "something-blue",
+          "name": "something blue",
+          "aliases": [
+            "something old",
+            "something new",
+            "something borrowed"
+          ],
+          "plural": "something blue"
+        },
+        {
+          "id": "tears",
+          "name": "tears",
+          "aliases": [
+            "crying",
+            "happy tears"
+          ],
+          "plural": "tears"
+        },
+        {
+          "id": "drunk-uncle",
+          "name": "drunk uncle",
+          "aliases": [
+            "drunk guests"
+          ],
+          "plural": "drunk uncle"
+        },
+        {
+          "id": "wedding-favors",
+          "name": "wedding favors",
+          "aliases": [
+            "favors",
+            "party favors"
+          ],
+          "plural": "wedding favors"
+        },
+        {
+          "id": "photo-booth",
+          "name": "photo booth",
+          "aliases": [
+            "photo booths"
+          ]
+        },
+        {
+          "id": "doves",
+          "name": "doves",
+          "aliases": [
+            "white doves"
+          ],
+          "plural": "doves"
+        },
+        {
+          "id": "horse-and-carriage",
+          "name": "horse and carriage",
+          "aliases": [
+            "carriage",
+            "horses and carriages"
+          ],
+          "plural": "horses and carriages"
+        },
+        {
+          "id": "wedding-planner",
+          "name": "wedding planner",
+          "aliases": [
+            "wedding planners"
+          ]
+        },
+        {
+          "id": "caterer",
+          "name": "caterer",
+          "aliases": [
+            "catering",
+            "caterers"
+          ]
+        },
+        {
+          "id": "waiter",
+          "name": "waiter",
+          "aliases": [
+            "servers",
+            "waiters",
+            "waitstaff"
+          ]
+        },
+        {
+          "id": "wedding-program",
+          "name": "wedding program",
+          "aliases": [
+            "programs",
+            "wedding programs"
+          ]
+        },
+        {
+          "id": "invitations",
+          "name": "invitations",
+          "aliases": [
+            "invitation",
+            "wedding invitations"
+          ]
+        },
+        {
+          "id": "marriage-license",
+          "name": "marriage license",
+          "aliases": [
+            "marriage certificate",
+            "marriage licenses"
+          ]
+        },
+        {
+          "id": "cupcakes",
+          "name": "cupcakes",
+          "aliases": [
+            "cupcake"
+          ]
+        },
+        {
+          "id": "lanterns",
+          "name": "lanterns",
+          "aliases": [
+            "fairy lights",
+            "string lights"
+          ],
+          "plural": "lanterns"
+        },
+        {
+          "id": "jumping-the-broom",
+          "name": "jumping the broom",
+          "aliases": [],
+          "plural": "jumping the broom"
+        },
+        {
+          "id": "breaking-the-glass",
+          "name": "breaking the glass",
+          "aliases": [
+            "stomping the glass"
+          ],
+          "plural": "breaking the glass"
+        },
+        {
+          "id": "ring-box",
+          "name": "ring box",
+          "aliases": [
+            "ring boxes"
+          ]
+        },
+        {
+          "id": "shoes",
+          "name": "shoes",
+          "aliases": [
+            "wedding shoes"
+          ],
+          "plural": "shoes"
+        },
+        {
+          "id": "tiara",
+          "name": "tiara",
+          "aliases": [
+            "headpiece",
+            "tiaras"
+          ]
+        },
+        {
+          "id": "makeup",
+          "name": "makeup",
+          "aliases": [],
+          "plural": "makeup"
+        },
+        {
+          "id": "hairstyle",
+          "name": "hairstyle",
+          "aliases": [
+            "updo",
+            "hairstyles"
+          ]
+        },
+        {
+          "id": "jewelry",
+          "name": "jewelry",
+          "aliases": [],
+          "plural": "jewelry"
+        },
+        {
+          "id": "grooms-cake",
+          "name": "groom's cake",
+          "aliases": [
+            "groom's cakes"
+          ]
+        },
+        {
+          "id": "cake-cutting",
+          "name": "cake cutting",
+          "aliases": [
+            "cutting the cake"
+          ],
+          "plural": "cake cutting"
+        },
+        {
+          "id": "conga-line",
+          "name": "conga line",
+          "aliases": [],
+          "plural": "conga line"
+        },
+        {
+          "id": "electric-slide",
+          "name": "Electric Slide",
+          "aliases": [],
+          "plural": "Electric Slide"
+        },
+        {
+          "id": "cha-cha-slide",
+          "name": "Cha Cha Slide",
+          "aliases": [],
+          "plural": "Cha Cha Slide"
+        },
+        {
+          "id": "ymca",
+          "name": "YMCA",
+          "aliases": [],
+          "plural": "YMCA"
+        },
+        {
+          "id": "macarena",
+          "name": "Macarena",
+          "aliases": [],
+          "plural": "Macarena"
+        },
+        {
+          "id": "kids",
+          "name": "kids",
+          "aliases": [
+            "children"
+          ],
+          "plural": "kids"
+        },
+        {
+          "id": "honeymoon",
+          "name": "honeymoon",
+          "aliases": [],
+          "plural": "honeymoon"
+        },
+        {
+          "id": "newlyweds",
+          "name": "newlyweds",
+          "aliases": [
+            "married couple",
+            "the couple"
+          ],
+          "plural": "newlyweds"
+        },
+        {
+          "id": "bagpipes",
+          "name": "bagpipes",
+          "aliases": [
+            "bagpiper"
+          ],
+          "plural": "bagpipes"
+        },
+        {
+          "id": "string-quartet",
+          "name": "string quartet",
+          "aliases": [],
+          "plural": "string quartet"
+        },
+        {
+          "id": "organ",
+          "name": "organ",
+          "aliases": [
+            "organist",
+            "organs"
+          ]
+        },
+        {
+          "id": "dessert-table",
+          "name": "dessert table",
+          "aliases": [
+            "sweets table"
+          ],
+          "plural": "dessert table"
+        },
+        {
+          "id": "ice-sculpture",
+          "name": "ice sculpture",
+          "aliases": [
+            "ice sculptures"
+          ]
+        },
+        {
+          "id": "fireworks",
+          "name": "fireworks",
+          "aliases": [],
+          "plural": "fireworks"
+        },
+        {
+          "id": "handkerchief",
+          "name": "handkerchief",
+          "aliases": [
+            "hanky",
+            "handkerchiefs"
+          ]
+        },
+        {
+          "id": "champagne-tower",
+          "name": "champagne tower",
+          "aliases": [],
+          "plural": "champagne tower"
+        },
+        {
+          "id": "cocktails",
+          "name": "cocktails",
+          "aliases": [],
+          "plural": "cocktails"
+        },
+        {
+          "id": "signing-the-register",
+          "name": "signing the register",
+          "aliases": [
+            "signing the license"
+          ],
+          "plural": "signing the register"
+        }
+      ],
+      "host_bank": [
+        "flowers",
+        "bride",
+        "groom",
+        "wedding-cake",
+        "rings",
+        "wedding-dress",
+        "dancing",
+        "veil"
+      ],
+      "host_answers": [
+        "flowers"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a tool you'd find in a toolbox",
+      "entries": [
+        {
+          "id": "hammer",
+          "name": "hammer",
+          "aliases": [
+            "claw hammer",
+            "ball-peen hammer",
+            "sledgehammer",
+            "rubber hammer",
+            "hammers"
+          ]
+        },
+        {
+          "id": "mallet",
+          "name": "mallet",
+          "aliases": [
+            "rubber mallet",
+            "wooden mallet",
+            "mallets"
+          ]
+        },
+        {
+          "id": "screwdriver",
+          "name": "screwdriver",
+          "aliases": [
+            "Phillips screwdriver",
+            "flathead screwdriver",
+            "Phillips",
+            "flathead",
+            "precision screwdriver",
+            "electric screwdriver",
+            "cordless screwdriver",
+            "screw driver",
+            "screwdrivers"
+          ]
+        },
+        {
+          "id": "wrench",
+          "name": "wrench",
+          "aliases": [
+            "adjustable wrench",
+            "monkey wrench",
+            "spanner",
+            "pipe wrench",
+            "crescent wrench",
+            "torque wrench",
+            "open-end wrench",
+            "box wrench",
+            "wrenches"
+          ]
+        },
+        {
+          "id": "ratchet",
+          "name": "ratchet",
+          "aliases": [
+            "socket wrench",
+            "socket set",
+            "sockets",
+            "ratchets"
+          ]
+        },
+        {
+          "id": "hex-key",
+          "name": "hex key",
+          "aliases": [
+            "Allen key",
+            "Allen wrench",
+            "hex keys"
+          ],
+          "plural": "hex keys"
+        },
+        {
+          "id": "pliers",
+          "name": "pliers",
+          "aliases": [
+            "needle-nose pliers",
+            "needle nose pliers",
+            "slip-joint pliers",
+            "locking pliers",
+            "Vise-Grips",
+            "vise grips",
+            "channel locks"
+          ],
+          "plural": "pliers"
+        },
+        {
+          "id": "wire-cutters",
+          "name": "wire cutters",
+          "aliases": [
+            "side cutters",
+            "snips",
+            "tin snips"
+          ],
+          "plural": "wire cutters"
+        },
+        {
+          "id": "wire-strippers",
+          "name": "wire strippers",
+          "aliases": [
+            "wire stripper"
+          ],
+          "plural": "wire strippers"
+        },
+        {
+          "id": "tape-measure",
+          "name": "tape measure",
+          "aliases": [
+            "measuring tape",
+            "tape measures"
+          ]
+        },
+        {
+          "id": "level",
+          "name": "level",
+          "aliases": [
+            "spirit level",
+            "bubble level",
+            "torpedo level",
+            "levels"
+          ]
+        },
+        {
+          "id": "saw",
+          "name": "saw",
+          "aliases": [
+            "handsaw",
+            "hand saw",
+            "hacksaw",
+            "coping saw",
+            "circular saw",
+            "saws"
+          ]
+        },
+        {
+          "id": "utility-knife",
+          "name": "utility knife",
+          "aliases": [
+            "box cutter",
+            "Stanley knife",
+            "X-Acto knife",
+            "craft knife",
+            "utility knives"
+          ]
+        },
+        {
+          "id": "pocket-knife",
+          "name": "pocket knife",
+          "aliases": [
+            "penknife",
+            "Swiss Army knife",
+            "pocket knives"
+          ]
+        },
+        {
+          "id": "multi-tool",
+          "name": "multi-tool",
+          "aliases": [
+            "Leatherman",
+            "multi-tools"
+          ]
+        },
+        {
+          "id": "chisel",
+          "name": "chisel",
+          "aliases": [
+            "chisels"
+          ]
+        },
+        {
+          "id": "file",
+          "name": "file",
+          "aliases": [
+            "metal file",
+            "rasp",
+            "files"
+          ]
+        },
+        {
+          "id": "drill",
+          "name": "drill",
+          "aliases": [
+            "power drill",
+            "cordless drill",
+            "drills"
+          ]
+        },
+        {
+          "id": "drill-bits",
+          "name": "drill bits",
+          "aliases": [
+            "bits",
+            "drill bit"
+          ],
+          "plural": "drill bits"
+        },
+        {
+          "id": "nails",
+          "name": "nails",
+          "aliases": [
+            "nail"
+          ],
+          "plural": "nails"
+        },
+        {
+          "id": "screws",
+          "name": "screws",
+          "aliases": [
+            "screw"
+          ],
+          "plural": "screws"
+        },
+        {
+          "id": "bolts",
+          "name": "bolts",
+          "aliases": [
+            "bolt",
+            "nuts and bolts"
+          ],
+          "plural": "bolts"
+        },
+        {
+          "id": "nuts",
+          "name": "nuts",
+          "aliases": [
+            "nut"
+          ],
+          "plural": "nuts"
+        },
+        {
+          "id": "washers",
+          "name": "washers",
+          "aliases": [
+            "washer"
+          ],
+          "plural": "washers"
+        },
+        {
+          "id": "staple-gun",
+          "name": "staple gun",
+          "aliases": [
+            "staple guns"
+          ]
+        },
+        {
+          "id": "tape",
+          "name": "tape",
+          "aliases": [
+            "duct tape",
+            "electrical tape",
+            "masking tape"
+          ],
+          "plural": "tape"
+        },
+        {
+          "id": "pencil",
+          "name": "pencil",
+          "aliases": [
+            "carpenter's pencil",
+            "pencils"
+          ]
+        },
+        {
+          "id": "marker",
+          "name": "marker",
+          "aliases": [
+            "Sharpie",
+            "markers"
+          ]
+        },
+        {
+          "id": "square",
+          "name": "square",
+          "aliases": [
+            "speed square",
+            "try square",
+            "carpenter's square",
+            "set square",
+            "squares"
+          ]
+        },
+        {
+          "id": "clamp",
+          "name": "clamp",
+          "aliases": [
+            "C-clamp",
+            "clamps"
+          ]
+        },
+        {
+          "id": "crowbar",
+          "name": "crowbar",
+          "aliases": [
+            "pry bar",
+            "wrecking bar",
+            "crowbars"
+          ]
+        },
+        {
+          "id": "flashlight",
+          "name": "flashlight",
+          "aliases": [
+            "torch",
+            "flashlights"
+          ]
+        },
+        {
+          "id": "work-gloves",
+          "name": "work gloves",
+          "aliases": [
+            "gloves"
+          ],
+          "plural": "work gloves"
+        },
+        {
+          "id": "safety-glasses",
+          "name": "safety glasses",
+          "aliases": [
+            "goggles",
+            "safety goggles"
+          ],
+          "plural": "safety glasses"
+        },
+        {
+          "id": "ear-protection",
+          "name": "ear protection",
+          "aliases": [
+            "earmuffs",
+            "ear plugs"
+          ],
+          "plural": "ear protection"
+        },
+        {
+          "id": "sandpaper",
+          "name": "sandpaper",
+          "aliases": [],
+          "plural": "sandpaper"
+        },
+        {
+          "id": "glue",
+          "name": "glue",
+          "aliases": [
+            "wood glue",
+            "super glue"
+          ],
+          "plural": "glue"
+        },
+        {
+          "id": "caulk",
+          "name": "caulk",
+          "aliases": [
+            "caulking gun",
+            "caulk gun",
+            "caulks"
+          ]
+        },
+        {
+          "id": "wd-40",
+          "name": "WD-40",
+          "aliases": [],
+          "plural": "WD-40"
+        },
+        {
+          "id": "zip-ties",
+          "name": "zip ties",
+          "aliases": [
+            "zip tie",
+            "cable ties"
+          ],
+          "plural": "zip ties"
+        },
+        {
+          "id": "stud-finder",
+          "name": "stud finder",
+          "aliases": [
+            "stud finders"
+          ]
+        },
+        {
+          "id": "multimeter",
+          "name": "multimeter",
+          "aliases": [
+            "voltage tester",
+            "volt meter",
+            "multimeters"
+          ]
+        },
+        {
+          "id": "soldering-iron",
+          "name": "soldering iron",
+          "aliases": [
+            "soldering irons"
+          ]
+        },
+        {
+          "id": "putty-knife",
+          "name": "putty knife",
+          "aliases": [
+            "scraper",
+            "putty knives"
+          ]
+        },
+        {
+          "id": "ruler",
+          "name": "ruler",
+          "aliases": [
+            "yardstick",
+            "metal ruler",
+            "rulers"
+          ]
+        },
+        {
+          "id": "awl",
+          "name": "awl",
+          "aliases": [
+            "awls"
+          ]
+        },
+        {
+          "id": "wire-brush",
+          "name": "wire brush",
+          "aliases": [
+            "wire brushes"
+          ]
+        },
+        {
+          "id": "plumb-bob",
+          "name": "plumb bob",
+          "aliases": [
+            "plumb bobs"
+          ]
+        },
+        {
+          "id": "chalk-line",
+          "name": "chalk line",
+          "aliases": [
+            "chalk lines"
+          ]
+        },
+        {
+          "id": "pipe-cutter",
+          "name": "pipe cutter",
+          "aliases": [
+            "pipe cutters"
+          ]
+        },
+        {
+          "id": "tool-belt",
+          "name": "tool belt",
+          "aliases": [
+            "tool belts"
+          ]
+        },
+        {
+          "id": "extension-cord",
+          "name": "extension cord",
+          "aliases": [
+            "extension cords"
+          ]
+        },
+        {
+          "id": "batteries",
+          "name": "batteries",
+          "aliases": [],
+          "plural": "batteries"
+        },
+        {
+          "id": "picture-hooks",
+          "name": "picture hooks",
+          "aliases": [
+            "hooks"
+          ],
+          "plural": "picture hooks"
+        },
+        {
+          "id": "plunger",
+          "name": "plunger",
+          "aliases": [
+            "plungers"
+          ]
+        },
+        {
+          "id": "paintbrush",
+          "name": "paintbrush",
+          "aliases": [
+            "paint brush",
+            "paintbrushes"
+          ]
+        },
+        {
+          "id": "paint-roller",
+          "name": "paint roller",
+          "aliases": [
+            "paint rollers"
+          ]
+        },
+        {
+          "id": "nail-gun",
+          "name": "nail gun",
+          "aliases": [
+            "nail guns"
+          ]
+        },
+        {
+          "id": "heat-gun",
+          "name": "heat gun",
+          "aliases": [
+            "heat guns"
+          ]
+        },
+        {
+          "id": "glue-gun",
+          "name": "glue gun",
+          "aliases": [
+            "hot glue gun",
+            "glue guns"
+          ]
+        },
+        {
+          "id": "pick",
+          "name": "pick",
+          "aliases": [
+            "picks"
+          ]
+        },
+        {
+          "id": "center-punch",
+          "name": "center punch",
+          "aliases": [
+            "punch",
+            "center punches"
+          ]
+        },
+        {
+          "id": "nail-set",
+          "name": "nail set",
+          "aliases": [
+            "nail sets"
+          ]
+        },
+        {
+          "id": "stapler",
+          "name": "stapler",
+          "aliases": [
+            "staplers"
+          ]
+        },
+        {
+          "id": "calculator",
+          "name": "calculator",
+          "aliases": [
+            "calculators"
+          ]
+        },
+        {
+          "id": "notepad",
+          "name": "notepad",
+          "aliases": [
+            "notepads"
+          ]
+        },
+        {
+          "id": "oil-can",
+          "name": "oil can",
+          "aliases": [
+            "oil cans"
+          ]
+        },
+        {
+          "id": "grease-gun",
+          "name": "grease gun",
+          "aliases": [
+            "grease guns"
+          ]
+        },
+        {
+          "id": "jigsaw",
+          "name": "jigsaw",
+          "aliases": [
+            "jigsaws"
+          ]
+        },
+        {
+          "id": "sander",
+          "name": "sander",
+          "aliases": [
+            "sanders"
+          ]
+        },
+        {
+          "id": "router",
+          "name": "router",
+          "aliases": [
+            "routers"
+          ]
+        },
+        {
+          "id": "angle-grinder",
+          "name": "angle grinder",
+          "aliases": [
+            "grinder",
+            "angle grinders"
+          ]
+        },
+        {
+          "id": "tire-gauge",
+          "name": "tire gauge",
+          "aliases": [
+            "tire pressure gauge",
+            "tire gauges"
+          ]
+        }
+      ],
+      "host_bank": [
+        "screwdriver",
+        "hammer",
+        "wrench",
+        "pliers",
+        "tape-measure",
+        "saw",
+        "drill",
+        "level"
+      ],
+      "host_answers": [
+        "screwdriver"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a dish made with potatoes",
+      "entries": [
+        {
+          "id": "french-fries",
+          "name": "french fries",
+          "aliases": [
+            "fries",
+            "frites",
+            "pommes frites",
+            "curly fries",
+            "waffle fries",
+            "steak fries",
+            "shoestring fries",
+            "loaded fries",
+            "French fry"
+          ],
+          "plural": "french fries"
+        },
+        {
+          "id": "potato-wedges",
+          "name": "potato wedges",
+          "aliases": [
+            "wedges",
+            "jojos"
+          ],
+          "plural": "potato wedges"
+        },
+        {
+          "id": "mashed-potatoes",
+          "name": "mashed potatoes",
+          "aliases": [
+            "mash",
+            "mashed potato",
+            "creamed potatoes",
+            "garlic mashed potatoes",
+            "whipped potatoes"
+          ],
+          "plural": "mashed potatoes"
+        },
+        {
+          "id": "baked-potato",
+          "name": "baked potato",
+          "aliases": [
+            "jacket potato",
+            "loaded baked potato",
+            "twice-baked potato",
+            "twice baked potatoes",
+            "Hasselback potatoes",
+            "Hasselback potato",
+            "baked potatoes"
+          ]
+        },
+        {
+          "id": "potato-skins",
+          "name": "potato skins",
+          "aliases": [],
+          "plural": "potato skins"
+        },
+        {
+          "id": "roasted-potatoes",
+          "name": "roasted potatoes",
+          "aliases": [
+            "roast potatoes",
+            "roasties",
+            "oven-roasted potatoes"
+          ],
+          "plural": "roasted potatoes"
+        },
+        {
+          "id": "smashed-potatoes",
+          "name": "smashed potatoes",
+          "aliases": [],
+          "plural": "smashed potatoes"
+        },
+        {
+          "id": "hash-browns",
+          "name": "hash browns",
+          "aliases": [
+            "hashbrowns",
+            "hash brown"
+          ],
+          "plural": "hash browns"
+        },
+        {
+          "id": "home-fries",
+          "name": "home fries",
+          "aliases": [
+            "breakfast potatoes"
+          ],
+          "plural": "home fries"
+        },
+        {
+          "id": "tater-tots",
+          "name": "tater tots",
+          "aliases": [
+            "tots"
+          ],
+          "plural": "tater tots"
+        },
+        {
+          "id": "potato-chips",
+          "name": "potato chips",
+          "aliases": [
+            "chips",
+            "crisps"
+          ],
+          "plural": "potato chips"
+        },
+        {
+          "id": "potato-salad",
+          "name": "potato salad",
+          "aliases": [],
+          "plural": "potato salad"
+        },
+        {
+          "id": "scalloped-potatoes",
+          "name": "scalloped potatoes",
+          "aliases": [],
+          "plural": "scalloped potatoes"
+        },
+        {
+          "id": "au-gratin-potatoes",
+          "name": "au gratin potatoes",
+          "aliases": [
+            "potatoes au gratin",
+            "potato gratin",
+            "gratin dauphinois"
+          ],
+          "plural": "au gratin potatoes"
+        },
+        {
+          "id": "potato-soup",
+          "name": "potato soup",
+          "aliases": [
+            "potato leek soup"
+          ],
+          "plural": "potato soup"
+        },
+        {
+          "id": "latkes",
+          "name": "latkes",
+          "aliases": [
+            "potato pancakes",
+            "latke"
+          ],
+          "plural": "latkes"
+        },
+        {
+          "id": "gnocchi",
+          "name": "gnocchi",
+          "aliases": [],
+          "plural": "gnocchi"
+        },
+        {
+          "id": "pierogi",
+          "name": "pierogi",
+          "aliases": [
+            "pierogies",
+            "perogies",
+            "pierogis"
+          ],
+          "plural": "pierogi"
+        },
+        {
+          "id": "samosa",
+          "name": "samosa",
+          "aliases": [
+            "samosas"
+          ]
+        },
+        {
+          "id": "poutine",
+          "name": "poutine",
+          "aliases": [],
+          "plural": "poutine"
+        },
+        {
+          "id": "shepherds-pie",
+          "name": "shepherd's pie",
+          "aliases": [
+            "cottage pie"
+          ],
+          "plural": "shepherd's pie"
+        },
+        {
+          "id": "rosti",
+          "name": "rösti",
+          "aliases": [],
+          "plural": "rösti"
+        },
+        {
+          "id": "croquettes",
+          "name": "croquettes",
+          "aliases": [
+            "potato croquettes",
+            "croquette"
+          ],
+          "plural": "croquettes"
+        },
+        {
+          "id": "duchess-potatoes",
+          "name": "duchess potatoes",
+          "aliases": [],
+          "plural": "duchess potatoes"
+        },
+        {
+          "id": "boiled-potatoes",
+          "name": "boiled potatoes",
+          "aliases": [
+            "new potatoes"
+          ],
+          "plural": "boiled potatoes"
+        },
+        {
+          "id": "fried-potatoes",
+          "name": "fried potatoes",
+          "aliases": [],
+          "plural": "fried potatoes"
+        },
+        {
+          "id": "potatoes-obrien",
+          "name": "potatoes O'Brien",
+          "aliases": [],
+          "plural": "potatoes O'Brien"
+        },
+        {
+          "id": "corned-beef-hash",
+          "name": "corned beef hash",
+          "aliases": [
+            "hash"
+          ],
+          "plural": "corned beef hash"
+        },
+        {
+          "id": "colcannon",
+          "name": "colcannon",
+          "aliases": [],
+          "plural": "colcannon"
+        },
+        {
+          "id": "bubble-and-squeak",
+          "name": "bubble and squeak",
+          "aliases": [],
+          "plural": "bubble and squeak"
+        },
+        {
+          "id": "champ",
+          "name": "champ",
+          "aliases": [],
+          "plural": "champ"
+        },
+        {
+          "id": "spanish-omelette",
+          "name": "Spanish omelette",
+          "aliases": [
+            "tortilla española",
+            "Spanish tortilla"
+          ],
+          "plural": "Spanish omelette"
+        },
+        {
+          "id": "patatas-bravas",
+          "name": "patatas bravas",
+          "aliases": [],
+          "plural": "patatas bravas"
+        },
+        {
+          "id": "aloo-gobi",
+          "name": "aloo gobi",
+          "aliases": [],
+          "plural": "aloo gobi"
+        },
+        {
+          "id": "aloo-paratha",
+          "name": "aloo paratha",
+          "aliases": [],
+          "plural": "aloo paratha"
+        },
+        {
+          "id": "aloo-tikki",
+          "name": "aloo tikki",
+          "aliases": [],
+          "plural": "aloo tikki"
+        },
+        {
+          "id": "bombay-potatoes",
+          "name": "Bombay potatoes",
+          "aliases": [
+            "Bombay aloo"
+          ],
+          "plural": "Bombay potatoes"
+        },
+        {
+          "id": "masala-dosa",
+          "name": "masala dosa",
+          "aliases": [],
+          "plural": "masala dosa"
+        },
+        {
+          "id": "papa-a-la-huancaina",
+          "name": "papa a la huancaína",
+          "aliases": [],
+          "plural": "papa a la huancaína"
+        },
+        {
+          "id": "causa",
+          "name": "causa",
+          "aliases": [],
+          "plural": "causa"
+        },
+        {
+          "id": "vichyssoise",
+          "name": "vichyssoise",
+          "aliases": [],
+          "plural": "vichyssoise"
+        },
+        {
+          "id": "lefse",
+          "name": "lefse",
+          "aliases": [],
+          "plural": "lefse"
+        },
+        {
+          "id": "potato-kugel",
+          "name": "potato kugel",
+          "aliases": [
+            "kugel"
+          ],
+          "plural": "potato kugel"
+        },
+        {
+          "id": "knish",
+          "name": "knish",
+          "aliases": [
+            "knishes"
+          ],
+          "plural": "knish"
+        },
+        {
+          "id": "fondant-potatoes",
+          "name": "fondant potatoes",
+          "aliases": [],
+          "plural": "fondant potatoes"
+        },
+        {
+          "id": "tartiflette",
+          "name": "tartiflette",
+          "aliases": [],
+          "plural": "tartiflette"
+        },
+        {
+          "id": "aligot",
+          "name": "aligot",
+          "aliases": [],
+          "plural": "aligot"
+        },
+        {
+          "id": "raclette",
+          "name": "raclette",
+          "aliases": [],
+          "plural": "raclette"
+        },
+        {
+          "id": "stamppot",
+          "name": "stamppot",
+          "aliases": [],
+          "plural": "stamppot"
+        },
+        {
+          "id": "boxty",
+          "name": "boxty",
+          "aliases": [],
+          "plural": "boxty"
+        },
+        {
+          "id": "potato-dumplings",
+          "name": "potato dumplings",
+          "aliases": [
+            "Kartoffelknödel"
+          ],
+          "plural": "potato dumplings"
+        },
+        {
+          "id": "fish-and-chips",
+          "name": "fish and chips",
+          "aliases": [],
+          "plural": "fish and chips"
+        },
+        {
+          "id": "potato-bread",
+          "name": "potato bread",
+          "aliases": [],
+          "plural": "potato bread"
+        },
+        {
+          "id": "potato-pizza",
+          "name": "potato pizza",
+          "aliases": [],
+          "plural": "potato pizza"
+        },
+        {
+          "id": "chips-and-gravy",
+          "name": "chips and gravy",
+          "aliases": [],
+          "plural": "chips and gravy"
+        },
+        {
+          "id": "potato-curry",
+          "name": "potato curry",
+          "aliases": [
+            "aloo curry"
+          ],
+          "plural": "potato curry"
+        },
+        {
+          "id": "potato-tacos",
+          "name": "potato tacos",
+          "aliases": [
+            "tacos de papa"
+          ],
+          "plural": "potato tacos"
+        },
+        {
+          "id": "pommes-anna",
+          "name": "pommes Anna",
+          "aliases": [],
+          "plural": "pommes Anna"
+        },
+        {
+          "id": "hash-brown-casserole",
+          "name": "hash brown casserole",
+          "aliases": [
+            "funeral potatoes",
+            "cheesy potatoes"
+          ],
+          "plural": "hash brown casserole"
+        },
+        {
+          "id": "potato-casserole",
+          "name": "potato casserole",
+          "aliases": [],
+          "plural": "potato casserole"
+        },
+        {
+          "id": "lyonnaise-potatoes",
+          "name": "Lyonnaise potatoes",
+          "aliases": [],
+          "plural": "Lyonnaise potatoes"
+        },
+        {
+          "id": "pyttipanna",
+          "name": "pyttipanna",
+          "aliases": [],
+          "plural": "pyttipanna"
+        },
+        {
+          "id": "cepelinai",
+          "name": "cepelinai",
+          "aliases": [],
+          "plural": "cepelinai"
+        },
+        {
+          "id": "patatas-a-lo-pobre",
+          "name": "patatas a lo pobre",
+          "aliases": [],
+          "plural": "patatas a lo pobre"
+        },
+        {
+          "id": "vodka",
+          "name": "vodka",
+          "aliases": [],
+          "plural": "vodka"
+        }
+      ],
+      "host_bank": [
+        "baked-potato",
+        "french-fries",
+        "mashed-potatoes",
+        "potato-chips",
+        "hash-browns",
+        "tater-tots",
+        "potato-salad",
+        "roasted-potatoes"
+      ],
+      "host_answers": [
+        "baked-potato"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an NFL team",
+      "entries": [
+        {
+          "id": "arizona-cardinals",
+          "name": "Arizona Cardinals",
+          "aliases": [
+            "Cardinals",
+            "Arizona",
+            "Cards"
+          ],
+          "plural": "Arizona Cardinals"
+        },
+        {
+          "id": "atlanta-falcons",
+          "name": "Atlanta Falcons",
+          "aliases": [
+            "Falcons",
+            "Atlanta"
+          ],
+          "plural": "Atlanta Falcons"
+        },
+        {
+          "id": "baltimore-ravens",
+          "name": "Baltimore Ravens",
+          "aliases": [
+            "Ravens",
+            "Baltimore"
+          ],
+          "plural": "Baltimore Ravens"
+        },
+        {
+          "id": "buffalo-bills",
+          "name": "Buffalo Bills",
+          "aliases": [
+            "Bills",
+            "Buffalo"
+          ],
+          "plural": "Buffalo Bills"
+        },
+        {
+          "id": "carolina-panthers",
+          "name": "Carolina Panthers",
+          "aliases": [
+            "Panthers",
+            "Carolina"
+          ],
+          "plural": "Carolina Panthers"
+        },
+        {
+          "id": "chicago-bears",
+          "name": "Chicago Bears",
+          "aliases": [
+            "Bears",
+            "Chicago"
+          ],
+          "plural": "Chicago Bears"
+        },
+        {
+          "id": "cincinnati-bengals",
+          "name": "Cincinnati Bengals",
+          "aliases": [
+            "Bengals",
+            "Cincinnati"
+          ],
+          "plural": "Cincinnati Bengals"
+        },
+        {
+          "id": "cleveland-browns",
+          "name": "Cleveland Browns",
+          "aliases": [
+            "Browns",
+            "Cleveland"
+          ],
+          "plural": "Cleveland Browns"
+        },
+        {
+          "id": "dallas-cowboys",
+          "name": "Dallas Cowboys",
+          "aliases": [
+            "Cowboys",
+            "Dallas"
+          ],
+          "plural": "Dallas Cowboys"
+        },
+        {
+          "id": "denver-broncos",
+          "name": "Denver Broncos",
+          "aliases": [
+            "Broncos",
+            "Denver"
+          ],
+          "plural": "Denver Broncos"
+        },
+        {
+          "id": "detroit-lions",
+          "name": "Detroit Lions",
+          "aliases": [
+            "Lions",
+            "Detroit"
+          ],
+          "plural": "Detroit Lions"
+        },
+        {
+          "id": "green-bay-packers",
+          "name": "Green Bay Packers",
+          "aliases": [
+            "Packers",
+            "Green Bay"
+          ],
+          "plural": "Green Bay Packers"
+        },
+        {
+          "id": "houston-texans",
+          "name": "Houston Texans",
+          "aliases": [
+            "Texans",
+            "Houston"
+          ],
+          "plural": "Houston Texans"
+        },
+        {
+          "id": "indianapolis-colts",
+          "name": "Indianapolis Colts",
+          "aliases": [
+            "Colts",
+            "Indianapolis",
+            "Indy"
+          ],
+          "plural": "Indianapolis Colts"
+        },
+        {
+          "id": "jacksonville-jaguars",
+          "name": "Jacksonville Jaguars",
+          "aliases": [
+            "Jaguars",
+            "Jacksonville",
+            "Jags"
+          ],
+          "plural": "Jacksonville Jaguars"
+        },
+        {
+          "id": "kansas-city-chiefs",
+          "name": "Kansas City Chiefs",
+          "aliases": [
+            "Chiefs",
+            "Kansas City",
+            "KC"
+          ],
+          "plural": "Kansas City Chiefs"
+        },
+        {
+          "id": "las-vegas-raiders",
+          "name": "Las Vegas Raiders",
+          "aliases": [
+            "Raiders",
+            "Oakland Raiders",
+            "Las Vegas"
+          ],
+          "plural": "Las Vegas Raiders"
+        },
+        {
+          "id": "los-angeles-chargers",
+          "name": "Los Angeles Chargers",
+          "aliases": [
+            "Chargers",
+            "LA Chargers",
+            "San Diego Chargers"
+          ],
+          "plural": "Los Angeles Chargers"
+        },
+        {
+          "id": "los-angeles-rams",
+          "name": "Los Angeles Rams",
+          "aliases": [
+            "Rams",
+            "LA Rams",
+            "St. Louis Rams"
+          ],
+          "plural": "Los Angeles Rams"
+        },
+        {
+          "id": "miami-dolphins",
+          "name": "Miami Dolphins",
+          "aliases": [
+            "Dolphins",
+            "Miami",
+            "Fins"
+          ],
+          "plural": "Miami Dolphins"
+        },
+        {
+          "id": "minnesota-vikings",
+          "name": "Minnesota Vikings",
+          "aliases": [
+            "Vikings",
+            "Minnesota"
+          ],
+          "plural": "Minnesota Vikings"
+        },
+        {
+          "id": "new-england-patriots",
+          "name": "New England Patriots",
+          "aliases": [
+            "Patriots",
+            "New England",
+            "Pats"
+          ],
+          "plural": "New England Patriots"
+        },
+        {
+          "id": "new-orleans-saints",
+          "name": "New Orleans Saints",
+          "aliases": [
+            "Saints",
+            "New Orleans"
+          ],
+          "plural": "New Orleans Saints"
+        },
+        {
+          "id": "new-york-giants",
+          "name": "New York Giants",
+          "aliases": [
+            "Giants",
+            "NY Giants"
+          ],
+          "plural": "New York Giants"
+        },
+        {
+          "id": "new-york-jets",
+          "name": "New York Jets",
+          "aliases": [
+            "Jets",
+            "NY Jets"
+          ],
+          "plural": "New York Jets"
+        },
+        {
+          "id": "philadelphia-eagles",
+          "name": "Philadelphia Eagles",
+          "aliases": [
+            "Eagles",
+            "Philadelphia",
+            "Philly"
+          ],
+          "plural": "Philadelphia Eagles"
+        },
+        {
+          "id": "pittsburgh-steelers",
+          "name": "Pittsburgh Steelers",
+          "aliases": [
+            "Steelers",
+            "Pittsburgh"
+          ],
+          "plural": "Pittsburgh Steelers"
+        },
+        {
+          "id": "san-francisco-49ers",
+          "name": "San Francisco 49ers",
+          "aliases": [
+            "49ers",
+            "Niners",
+            "San Francisco",
+            "Forty Niners"
+          ],
+          "plural": "San Francisco 49ers"
+        },
+        {
+          "id": "seattle-seahawks",
+          "name": "Seattle Seahawks",
+          "aliases": [
+            "Seahawks",
+            "Seattle"
+          ],
+          "plural": "Seattle Seahawks"
+        },
+        {
+          "id": "tampa-bay-buccaneers",
+          "name": "Tampa Bay Buccaneers",
+          "aliases": [
+            "Buccaneers",
+            "Bucs",
+            "Tampa Bay",
+            "Tampa"
+          ],
+          "plural": "Tampa Bay Buccaneers"
+        },
+        {
+          "id": "tennessee-titans",
+          "name": "Tennessee Titans",
+          "aliases": [
+            "Titans",
+            "Tennessee"
+          ],
+          "plural": "Tennessee Titans"
+        },
+        {
+          "id": "washington-commanders",
+          "name": "Washington Commanders",
+          "aliases": [
+            "Commanders",
+            "Washington",
+            "Washington Football Team"
+          ],
+          "plural": "Washington Commanders"
+        }
+      ],
+      "host_bank": [
+        "green-bay-packers",
+        "dallas-cowboys",
+        "new-england-patriots",
+        "kansas-city-chiefs",
+        "pittsburgh-steelers",
+        "san-francisco-49ers",
+        "philadelphia-eagles",
+        "chicago-bears"
+      ],
+      "host_answers": [
+        "green-bay-packers"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name something that's orange",
+      "entries": [
+        {
+          "id": "orange",
+          "name": "orange",
+          "aliases": [
+            "oranges"
+          ],
+          "plural": "oranges"
+        },
+        {
+          "id": "tangerine",
+          "name": "tangerine",
+          "aliases": [
+            "clementine",
+            "mandarin",
+            "satsuma",
+            "tangerines"
+          ]
+        },
+        {
+          "id": "apricot",
+          "name": "apricot",
+          "aliases": [
+            "apricots"
+          ]
+        },
+        {
+          "id": "cantaloupe",
+          "name": "cantaloupe",
+          "aliases": [
+            "rockmelon",
+            "cantaloupes"
+          ]
+        },
+        {
+          "id": "mango",
+          "name": "mango",
+          "aliases": [
+            "mangoes"
+          ],
+          "plural": "mangoes"
+        },
+        {
+          "id": "papaya",
+          "name": "papaya",
+          "aliases": [
+            "papayas"
+          ]
+        },
+        {
+          "id": "peach",
+          "name": "peach",
+          "aliases": [
+            "peaches"
+          ],
+          "plural": "peaches"
+        },
+        {
+          "id": "nectarine",
+          "name": "nectarine",
+          "aliases": [
+            "nectarines"
+          ]
+        },
+        {
+          "id": "persimmon",
+          "name": "persimmon",
+          "aliases": [
+            "persimmons"
+          ]
+        },
+        {
+          "id": "kumquat",
+          "name": "kumquat",
+          "aliases": [
+            "kumquats"
+          ]
+        },
+        {
+          "id": "carrot",
+          "name": "carrot",
+          "aliases": [
+            "carrots"
+          ]
+        },
+        {
+          "id": "pumpkin",
+          "name": "pumpkin",
+          "aliases": [
+            "jack-o'-lantern",
+            "jack o lantern",
+            "pumpkins"
+          ]
+        },
+        {
+          "id": "sweet-potato",
+          "name": "sweet potato",
+          "aliases": [
+            "yam",
+            "sweet potatoes"
+          ],
+          "plural": "sweet potatoes"
+        },
+        {
+          "id": "butternut-squash",
+          "name": "butternut squash",
+          "aliases": [
+            "squash",
+            "butternut squashes"
+          ]
+        },
+        {
+          "id": "orange-juice",
+          "name": "orange juice",
+          "aliases": [
+            "OJ"
+          ],
+          "plural": "orange juice"
+        },
+        {
+          "id": "orange-soda",
+          "name": "orange soda",
+          "aliases": [
+            "Fanta",
+            "Orange Crush",
+            "Crush",
+            "Sunkist"
+          ],
+          "plural": "orange soda"
+        },
+        {
+          "id": "tang",
+          "name": "Tang",
+          "aliases": [],
+          "plural": "Tang"
+        },
+        {
+          "id": "thai-iced-tea",
+          "name": "Thai iced tea",
+          "aliases": [],
+          "plural": "Thai iced tea"
+        },
+        {
+          "id": "marmalade",
+          "name": "marmalade",
+          "aliases": [],
+          "plural": "marmalade"
+        },
+        {
+          "id": "mac-and-cheese",
+          "name": "mac and cheese",
+          "aliases": [
+            "Kraft mac and cheese",
+            "Kraft Dinner",
+            "macaroni and cheese"
+          ],
+          "plural": "mac and cheese"
+        },
+        {
+          "id": "cheddar",
+          "name": "cheddar",
+          "aliases": [
+            "cheddar cheese"
+          ],
+          "plural": "cheddar"
+        },
+        {
+          "id": "american-cheese",
+          "name": "American cheese",
+          "aliases": [],
+          "plural": "American cheese"
+        },
+        {
+          "id": "cheetos",
+          "name": "Cheetos",
+          "aliases": [
+            "cheese puffs",
+            "Cheese Doodles"
+          ],
+          "plural": "Cheetos"
+        },
+        {
+          "id": "doritos",
+          "name": "Doritos",
+          "aliases": [],
+          "plural": "Doritos"
+        },
+        {
+          "id": "goldfish-crackers",
+          "name": "Goldfish crackers",
+          "aliases": [],
+          "plural": "Goldfish crackers"
+        },
+        {
+          "id": "cheez-it",
+          "name": "Cheez-It",
+          "aliases": [
+            "Cheez-Its"
+          ],
+          "plural": "Cheez-It"
+        },
+        {
+          "id": "candy-corn",
+          "name": "candy corn",
+          "aliases": [],
+          "plural": "candy corn"
+        },
+        {
+          "id": "reeses",
+          "name": "Reese's",
+          "aliases": [
+            "Reese's Pieces"
+          ],
+          "plural": "Reese's"
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "orange-chicken",
+          "name": "orange chicken",
+          "aliases": [],
+          "plural": "orange chicken"
+        },
+        {
+          "id": "salmon",
+          "name": "salmon",
+          "aliases": [],
+          "plural": "salmon"
+        },
+        {
+          "id": "egg-yolk",
+          "name": "egg yolk",
+          "aliases": [
+            "yolk",
+            "egg yolks"
+          ]
+        },
+        {
+          "id": "paprika",
+          "name": "paprika",
+          "aliases": [],
+          "plural": "paprika"
+        },
+        {
+          "id": "saffron",
+          "name": "saffron",
+          "aliases": [],
+          "plural": "saffron"
+        },
+        {
+          "id": "basketball",
+          "name": "basketball",
+          "aliases": [
+            "basketballs"
+          ]
+        },
+        {
+          "id": "traffic-cone",
+          "name": "traffic cone",
+          "aliases": [
+            "cone",
+            "safety cone",
+            "road cone",
+            "traffic cones"
+          ]
+        },
+        {
+          "id": "sunset",
+          "name": "sunset",
+          "aliases": [
+            "sunrise",
+            "sunsets"
+          ]
+        },
+        {
+          "id": "sun",
+          "name": "sun",
+          "aliases": [
+            "the sun",
+            "suns"
+          ]
+        },
+        {
+          "id": "fire",
+          "name": "fire",
+          "aliases": [
+            "flames"
+          ],
+          "plural": "fire"
+        },
+        {
+          "id": "lava",
+          "name": "lava",
+          "aliases": [],
+          "plural": "lava"
+        },
+        {
+          "id": "autumn-leaves",
+          "name": "autumn leaves",
+          "aliases": [
+            "fall leaves",
+            "leaves"
+          ],
+          "plural": "autumn leaves"
+        },
+        {
+          "id": "marigold",
+          "name": "marigold",
+          "aliases": [
+            "marigolds"
+          ]
+        },
+        {
+          "id": "tiger-lily",
+          "name": "tiger lily",
+          "aliases": [
+            "tiger lilies"
+          ]
+        },
+        {
+          "id": "poppy",
+          "name": "poppy",
+          "aliases": [
+            "California poppy",
+            "poppies"
+          ]
+        },
+        {
+          "id": "bird-of-paradise",
+          "name": "bird of paradise",
+          "aliases": [
+            "birds of paradise"
+          ],
+          "plural": "birds of paradise"
+        },
+        {
+          "id": "goldfish",
+          "name": "goldfish",
+          "aliases": [],
+          "plural": "goldfish"
+        },
+        {
+          "id": "clownfish",
+          "name": "clownfish",
+          "aliases": [
+            "Nemo"
+          ],
+          "plural": "clownfish"
+        },
+        {
+          "id": "koi",
+          "name": "koi",
+          "aliases": [],
+          "plural": "koi"
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "red fox",
+            "foxes"
+          ],
+          "plural": "foxes"
+        },
+        {
+          "id": "orangutan",
+          "name": "orangutan",
+          "aliases": [
+            "orangutans"
+          ]
+        },
+        {
+          "id": "orange-cat",
+          "name": "orange cat",
+          "aliases": [
+            "ginger cat",
+            "orange tabby",
+            "orange cats"
+          ]
+        },
+        {
+          "id": "monarch-butterfly",
+          "name": "monarch butterfly",
+          "aliases": [
+            "monarch",
+            "monarch butterflies"
+          ]
+        },
+        {
+          "id": "garfield",
+          "name": "Garfield",
+          "aliases": [],
+          "plural": "Garfield"
+        },
+        {
+          "id": "tigger",
+          "name": "Tigger",
+          "aliases": [],
+          "plural": "Tigger"
+        },
+        {
+          "id": "oompa-loompa",
+          "name": "Oompa Loompa",
+          "aliases": [
+            "Oompa Loompas"
+          ]
+        },
+        {
+          "id": "red-hair",
+          "name": "red hair",
+          "aliases": [
+            "ginger hair",
+            "redhead",
+            "ginger"
+          ],
+          "plural": "red hair"
+        },
+        {
+          "id": "prison-jumpsuit",
+          "name": "prison jumpsuit",
+          "aliases": [
+            "prison uniform",
+            "orange jumpsuit",
+            "prison jumpsuits"
+          ]
+        },
+        {
+          "id": "life-jacket",
+          "name": "life jacket",
+          "aliases": [
+            "life vest",
+            "life jackets"
+          ]
+        },
+        {
+          "id": "safety-vest",
+          "name": "safety vest",
+          "aliases": [
+            "hi-vis vest",
+            "high-visibility vest",
+            "hunting vest",
+            "safety vests"
+          ]
+        },
+        {
+          "id": "home-depot",
+          "name": "Home Depot",
+          "aliases": [],
+          "plural": "Home Depot"
+        },
+        {
+          "id": "nickelodeon",
+          "name": "Nickelodeon",
+          "aliases": [],
+          "plural": "Nickelodeon"
+        },
+        {
+          "id": "netherlands",
+          "name": "Netherlands",
+          "aliases": [
+            "Dutch team",
+            "Holland"
+          ],
+          "plural": "Netherlands"
+        },
+        {
+          "id": "monks-robes",
+          "name": "monk's robes",
+          "aliases": [
+            "Buddhist robes"
+          ],
+          "plural": "monk's robes"
+        },
+        {
+          "id": "spray-tan",
+          "name": "spray tan",
+          "aliases": [
+            "fake tan"
+          ],
+          "plural": "spray tan"
+        },
+        {
+          "id": "crayon",
+          "name": "crayon",
+          "aliases": [
+            "orange crayon",
+            "crayons"
+          ]
+        },
+        {
+          "id": "highlighter",
+          "name": "highlighter",
+          "aliases": [
+            "highlighters"
+          ]
+        },
+        {
+          "id": "traffic-barrel",
+          "name": "traffic barrel",
+          "aliases": [
+            "traffic barrels"
+          ]
+        },
+        {
+          "id": "construction-sign",
+          "name": "construction sign",
+          "aliases": [
+            "construction signs"
+          ]
+        },
+        {
+          "id": "halloween",
+          "name": "Halloween",
+          "aliases": [],
+          "plural": "Halloween"
+        },
+        {
+          "id": "cincinnati-bengals",
+          "name": "Cincinnati Bengals",
+          "aliases": [
+            "Bengals"
+          ],
+          "plural": "Cincinnati Bengals"
+        },
+        {
+          "id": "denver-broncos",
+          "name": "Denver Broncos",
+          "aliases": [
+            "Broncos"
+          ],
+          "plural": "Denver Broncos"
+        },
+        {
+          "id": "clemson",
+          "name": "Clemson",
+          "aliases": [],
+          "plural": "Clemson"
+        },
+        {
+          "id": "syracuse",
+          "name": "Syracuse",
+          "aliases": [],
+          "plural": "Syracuse"
+        },
+        {
+          "id": "tennessee-volunteers",
+          "name": "Tennessee Volunteers",
+          "aliases": [
+            "Vols"
+          ],
+          "plural": "Tennessee Volunteers"
+        },
+        {
+          "id": "mars",
+          "name": "Mars",
+          "aliases": [],
+          "plural": "Mars"
+        },
+        {
+          "id": "jupiter",
+          "name": "Jupiter",
+          "aliases": [],
+          "plural": "Jupiter"
+        },
+        {
+          "id": "aperol",
+          "name": "Aperol",
+          "aliases": [
+            "Aperol spritz"
+          ],
+          "plural": "Aperol"
+        },
+        {
+          "id": "creamsicle",
+          "name": "creamsicle",
+          "aliases": [
+            "creamsicles"
+          ]
+        },
+        {
+          "id": "orange-sherbet",
+          "name": "orange sherbet",
+          "aliases": [
+            "sherbet"
+          ],
+          "plural": "orange sherbet"
+        },
+        {
+          "id": "bell-pepper",
+          "name": "bell pepper",
+          "aliases": [
+            "orange pepper",
+            "orange bell pepper",
+            "bell peppers"
+          ]
+        },
+        {
+          "id": "lentils",
+          "name": "lentils",
+          "aliases": [
+            "red lentils"
+          ],
+          "plural": "lentils"
+        },
+        {
+          "id": "amber",
+          "name": "amber",
+          "aliases": [],
+          "plural": "amber"
+        },
+        {
+          "id": "copper",
+          "name": "copper",
+          "aliases": [],
+          "plural": "copper"
+        },
+        {
+          "id": "rust",
+          "name": "rust",
+          "aliases": [],
+          "plural": "rust"
+        }
+      ],
+      "host_bank": [
+        "pumpkin",
+        "orange",
+        "carrot",
+        "basketball",
+        "traffic-cone",
+        "sunset",
+        "goldfish",
+        "cheetos"
+      ],
+      "host_answers": [
+        "pumpkin"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name one of the Seven Dwarfs",
+      "entries": [
+        {
+          "id": "doc",
+          "name": "Doc",
+          "aliases": [],
+          "plural": "Doc"
+        },
+        {
+          "id": "grumpy",
+          "name": "Grumpy",
+          "aliases": [],
+          "plural": "Grumpy"
+        },
+        {
+          "id": "happy",
+          "name": "Happy",
+          "aliases": [],
+          "plural": "Happy"
+        },
+        {
+          "id": "sleepy",
+          "name": "Sleepy",
+          "aliases": [],
+          "plural": "Sleepy"
+        },
+        {
+          "id": "bashful",
+          "name": "Bashful",
+          "aliases": [],
+          "plural": "Bashful"
+        },
+        {
+          "id": "sneezy",
+          "name": "Sneezy",
+          "aliases": [],
+          "plural": "Sneezy"
+        },
+        {
+          "id": "dopey",
+          "name": "Dopey",
+          "aliases": [],
+          "plural": "Dopey"
+        }
+      ],
+      "host_bank": [
+        "dopey",
+        "doc",
+        "grumpy",
+        "happy",
+        "sleepy",
+        "bashful",
+        "sneezy"
+      ],
+      "host_answers": [
+        "dopey"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an amusement park ride",
+      "entries": [
+        {
+          "id": "roller-coaster",
+          "name": "roller coaster",
+          "aliases": [
+            "coaster",
+            "rollercoaster",
+            "wooden coaster",
+            "wooden roller coaster",
+            "looping coaster",
+            "steel coaster",
+            "spinning coaster",
+            "Big Dipper",
+            "mine train",
+            "roller coasters"
+          ]
+        },
+        {
+          "id": "ferris-wheel",
+          "name": "Ferris wheel",
+          "aliases": [
+            "big wheel",
+            "observation wheel",
+            "Ferris wheels"
+          ]
+        },
+        {
+          "id": "carousel",
+          "name": "carousel",
+          "aliases": [
+            "merry-go-round",
+            "carrousel",
+            "gallopers",
+            "flying horses",
+            "carousels"
+          ]
+        },
+        {
+          "id": "bumper-cars",
+          "name": "bumper cars",
+          "aliases": [
+            "dodgems",
+            "dodgem cars",
+            "bumper car",
+            "dodgem"
+          ],
+          "plural": "bumper cars"
+        },
+        {
+          "id": "teacups",
+          "name": "teacups",
+          "aliases": [
+            "spinning teacups",
+            "tea cups",
+            "Mad Tea Party"
+          ],
+          "plural": "teacups"
+        },
+        {
+          "id": "log-flume",
+          "name": "log flume",
+          "aliases": [
+            "log ride",
+            "flume",
+            "log flumes"
+          ]
+        },
+        {
+          "id": "drop-tower",
+          "name": "drop tower",
+          "aliases": [
+            "free fall",
+            "freefall",
+            "Tower of Terror",
+            "Mega Drop",
+            "drop ride",
+            "drop towers"
+          ]
+        },
+        {
+          "id": "swing-ride",
+          "name": "swing ride",
+          "aliases": [
+            "swings",
+            "chair swing",
+            "wave swinger",
+            "Yo-Yo",
+            "flying chairs",
+            "chair-o-plane",
+            "swing rides"
+          ]
+        },
+        {
+          "id": "pirate-ship",
+          "name": "pirate ship",
+          "aliases": [
+            "swinging ship",
+            "Viking ship",
+            "pirate ships"
+          ]
+        },
+        {
+          "id": "tilt-a-whirl",
+          "name": "Tilt-A-Whirl",
+          "aliases": [],
+          "plural": "Tilt-A-Whirl"
+        },
+        {
+          "id": "scrambler",
+          "name": "Scrambler",
+          "aliases": [],
+          "plural": "Scrambler"
+        },
+        {
+          "id": "gravitron",
+          "name": "Gravitron",
+          "aliases": [
+            "Rotor",
+            "Starship 2000"
+          ],
+          "plural": "Gravitron"
+        },
+        {
+          "id": "zipper",
+          "name": "Zipper",
+          "aliases": [],
+          "plural": "Zipper"
+        },
+        {
+          "id": "ring-of-fire",
+          "name": "Ring of Fire",
+          "aliases": [],
+          "plural": "Ring of Fire"
+        },
+        {
+          "id": "haunted-house",
+          "name": "haunted house",
+          "aliases": [
+            "ghost train",
+            "haunted mansion",
+            "haunted houses"
+          ]
+        },
+        {
+          "id": "dark-ride",
+          "name": "dark ride",
+          "aliases": [
+            "dark rides"
+          ]
+        },
+        {
+          "id": "fun-house",
+          "name": "fun house",
+          "aliases": [
+            "funhouse",
+            "house of mirrors",
+            "hall of mirrors",
+            "mirror maze",
+            "fun houses"
+          ]
+        },
+        {
+          "id": "go-karts",
+          "name": "go-karts",
+          "aliases": [
+            "go karts",
+            "go-kart"
+          ],
+          "plural": "go-karts"
+        },
+        {
+          "id": "bumper-boats",
+          "name": "bumper boats",
+          "aliases": [],
+          "plural": "bumper boats"
+        },
+        {
+          "id": "water-slide",
+          "name": "water slide",
+          "aliases": [
+            "waterslide",
+            "flume slide",
+            "water slides"
+          ]
+        },
+        {
+          "id": "lazy-river",
+          "name": "lazy river",
+          "aliases": [
+            "lazy rivers"
+          ]
+        },
+        {
+          "id": "river-rapids",
+          "name": "river rapids",
+          "aliases": [
+            "rapids ride",
+            "raft ride",
+            "river raft"
+          ]
+        },
+        {
+          "id": "monorail",
+          "name": "monorail",
+          "aliases": [
+            "monorails"
+          ]
+        },
+        {
+          "id": "train-ride",
+          "name": "train ride",
+          "aliases": [
+            "park train",
+            "miniature railway",
+            "train",
+            "train rides"
+          ]
+        },
+        {
+          "id": "sky-ride",
+          "name": "sky ride",
+          "aliases": [
+            "chairlift",
+            "gondola",
+            "cable car",
+            "sky rides"
+          ]
+        },
+        {
+          "id": "himalaya",
+          "name": "Himalaya",
+          "aliases": [
+            "Music Express"
+          ],
+          "plural": "Himalaya"
+        },
+        {
+          "id": "pony-ride",
+          "name": "pony ride",
+          "aliases": [
+            "pony rides"
+          ]
+        },
+        {
+          "id": "slingshot",
+          "name": "slingshot",
+          "aliases": [
+            "reverse bungee",
+            "slingshots"
+          ]
+        },
+        {
+          "id": "bungee-jumping",
+          "name": "bungee jumping",
+          "aliases": [
+            "bungee"
+          ],
+          "plural": "bungee jumping"
+        },
+        {
+          "id": "sky-coaster",
+          "name": "Sky Coaster",
+          "aliases": [
+            "skycoaster"
+          ],
+          "plural": "Sky Coaster"
+        },
+        {
+          "id": "top-spin",
+          "name": "Top Spin",
+          "aliases": [],
+          "plural": "Top Spin"
+        },
+        {
+          "id": "paratrooper",
+          "name": "Paratrooper",
+          "aliases": [],
+          "plural": "Paratrooper"
+        },
+        {
+          "id": "octopus",
+          "name": "Octopus",
+          "aliases": [
+            "Monster",
+            "Spider"
+          ],
+          "plural": "Octopus"
+        },
+        {
+          "id": "round-up",
+          "name": "Round Up",
+          "aliases": [],
+          "plural": "Round Up"
+        },
+        {
+          "id": "enterprise",
+          "name": "Enterprise",
+          "aliases": [],
+          "plural": "Enterprise"
+        },
+        {
+          "id": "motion-simulator",
+          "name": "motion simulator",
+          "aliases": [
+            "simulator",
+            "4D ride",
+            "motion simulators"
+          ]
+        },
+        {
+          "id": "giant-slide",
+          "name": "giant slide",
+          "aliases": [
+            "fun slide",
+            "giant slides"
+          ]
+        },
+        {
+          "id": "zip-line",
+          "name": "zip line",
+          "aliases": [
+            "zipline",
+            "zip lines"
+          ]
+        },
+        {
+          "id": "pendulum-ride",
+          "name": "pendulum ride",
+          "aliases": [
+            "Frisbee",
+            "Giant Frisbee"
+          ],
+          "plural": "pendulum ride"
+        },
+        {
+          "id": "kamikaze",
+          "name": "Kamikaze",
+          "aliases": [],
+          "plural": "Kamikaze"
+        },
+        {
+          "id": "super-loop",
+          "name": "Super Loop",
+          "aliases": [
+            "loop ride"
+          ],
+          "plural": "Super Loop"
+        },
+        {
+          "id": "matterhorn",
+          "name": "Matterhorn",
+          "aliases": [],
+          "plural": "Matterhorn"
+        },
+        {
+          "id": "dumbo",
+          "name": "Dumbo",
+          "aliases": [
+            "flying elephants"
+          ],
+          "plural": "Dumbo"
+        },
+        {
+          "id": "kiddie-rides",
+          "name": "kiddie rides",
+          "aliases": [
+            "kiddie ride"
+          ],
+          "plural": "kiddie rides"
+        },
+        {
+          "id": "sizzler",
+          "name": "Sizzler",
+          "aliases": [
+            "Twist"
+          ],
+          "plural": "Sizzler"
+        },
+        {
+          "id": "trabant",
+          "name": "Trabant",
+          "aliases": [
+            "Wipeout"
+          ],
+          "plural": "Trabant"
+        },
+        {
+          "id": "space-mountain",
+          "name": "Space Mountain",
+          "aliases": [],
+          "plural": "Space Mountain"
+        },
+        {
+          "id": "splash-mountain",
+          "name": "Splash Mountain",
+          "aliases": [],
+          "plural": "Splash Mountain"
+        },
+        {
+          "id": "wild-mouse",
+          "name": "Wild Mouse",
+          "aliases": [],
+          "plural": "Wild Mouse"
+        }
+      ],
+      "host_bank": [
+        "carousel",
+        "bumper-cars",
+        "roller-coaster",
+        "ferris-wheel",
+        "teacups",
+        "log-flume",
+        "drop-tower",
+        "swing-ride"
+      ],
+      "host_answers": [
+        "carousel",
+        "bumper-cars"
+      ],
+      "match_groups": {}
+    }
+  ]
+}
