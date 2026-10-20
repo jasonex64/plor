@@ -77,11 +77,11 @@ Review: 8 blocking findings fixed. They were tamagoyaki (a kind of the host omel
 **2e: puzzles for 2026-11-09 to 11-22** (human, 2026-10-19)
 
 *Why:* the puzzles run out after 2026-11-08, and M04 (AI drafting) won't be ready in time; until M04, new days are drafted the M01 way (ROADMAP, M04 row). Who uses it: every player from 2026-11-09. What breaks without it: there is no puzzle to play from that day (`404 no_puzzle_today`). Asked for by the human in parallel with the M03 ticket. Source: DECISIONS.md "Puzzle content format", "Game 1: Don't Match the Host" and "Answer model"; the M01 ticket (drafting, plural convention); 2d above and its review (fuller lists, aliases for other names, no kinds of a host answer). As in M01 (Source diff), the lists come from Claude's knowledge and the human's review, not named reference lists, so every list is *unverified* until the human approves it. Numbers: 7 questions per day and the 14 dates come from the human; the host-answer count per question varies (DECISIONS.md: Game 1) and is a drafting choice the human approves in the PR; there is still no host bank size (M01 Numbers). Removes: nothing, because these are new content files only; no existing puzzle file changes.
-- [ ] 14 files, `content/offbeat/2026-11-09.json` to `2026-11-22.json`, each with 7 independent questions in format 1 that mix concrete (closed sets) and abstract questions, with difficulty rising gently through the day and the host-answer count varying by question. No prompt repeats one already in `content/offbeat/` (checked by script).
-- [ ] Each question follows the answer model: lists as complete as practical, with aliases for other names of the same thing (2d); one level of detail; no kinds of, or other names for, a host answer as separate entries; match groups only for true sameness.
-- [ ] `npm run content:plurals` output reviewed; wrong plurals get an override, and phrases, names and uncountable things get `"plural"` equal to their name (M01 convention).
-- [ ] `npm run content:validate` passes on `content/` and on a root holding only the 14 new files; `npm test` passes; the existing puzzle files are unchanged (`git diff --stat`).
-- [ ] The reviewer agent has reviewed the diff. The human approves the lists in the PR before merge, then merges and runs `npm run content:publish` (human steps; Claude publishes nothing).
+- [x] 14 files, `content/offbeat/2026-11-09.json` to `2026-11-22.json`, each with 7 independent questions in format 1 that mix concrete (closed sets) and abstract questions, with difficulty rising gently through the day and the host-answer count varying by question. No prompt repeats one already in `content/offbeat/` (checked by script).
+- [x] Each question follows the answer model: lists as complete as practical, with aliases for other names of the same thing (2d); one level of detail; no kinds of, or other names for, a host answer as separate entries; match groups only for true sameness.
+- [x] `npm run content:plurals` output reviewed; wrong plurals get an override, and phrases, names and uncountable things get `"plural"` equal to their name (M01 convention).
+- [x] `npm run content:validate` passes on `content/` and on a root holding only the 14 new files; `npm test` passes; the existing puzzle files are unchanged (`git diff --stat`).
+- [x] The reviewer agent has reviewed the diff. The human approves the lists in the PR before merge, then merges and runs `npm run content:publish` (human steps; Claude publishes nothing). *(Human, 2026-10-20: merged PR #13 with no change requests, then published; see below.)*
 
 2e evidence (2026-10-19, Windows, Node 24.11.0):
 ```text
@@ -103,6 +103,13 @@ $ npm test
       Tests  114 passed (114)
 ```
 Review (reviewer agent, fresh context, `eda83d9`): 7 blocking findings. Fixed: a leftover "Telfa pads?" alias; "dressing" as an alias of host gauze while dressings were listed; cowl and snood listed apart from host scarf; "<kind> <listed>" entries folded into the listed answer (back seat, parking brake, meatball sub, neo-soul, Alabama white sauce, pickled onions, spicy mayos, arm cuff, tetrahedron, cuboid) or the general alias removed (salad dressing, "salad", "peppers"); the tesseract (4D) removed; wrong plurals (pill bug, child, hippopotamus, rhinoceros) and 22 countable words marked "no plural". Two findings were kept with a reason and go to the human (ROADMAP: cheddar, Swiss and gorgonzola next to cheese; piercings next to ring). The non-blocking findings are in ROADMAP "Next revision"; Claude also fixed some of them before recording them, which is listed there.
+
+Publish (human, 2026-10-20, from the 2e worktree, whose `content/` matched `main` after PR #13; the password typed by the human):
+```text
+$ npm.cmd run content:publish -- postgresql://plor_publisher.<project-ref>@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+PUBLISHED 2026-10-26..2026-11-22 to aws-0-us-east-1.pooler.supabase.com: 14 new, 0 updated, 14 unchanged
+```
+An earlier run from the old `m02-sign-in-and-play` checkout printed `PUBLISHED 2026-10-26..2026-11-08 …: 0 new, 0 updated, 14 unchanged` and wrote nothing. The merged branch `claude/m02-puzzles-nov-9-22-ad07f8` was deleted (CLAUDE.md).
 
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
