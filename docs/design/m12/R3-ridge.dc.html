@@ -178,8 +178,8 @@ class Component extends DCLogic {
     // Placeholder pixel art drawn from small character maps, only to show where real art goes.
     const U = 6, P = 3, H = 336;
     const TOPS = [46, 41, 36, 31, 26, 21, 16];
-    const C = { sky: '#2436ff', far: '#4b5bff', far2: '#3646ff', rock: '#121a5c', crack: '#1f2a80', bone: '#e9e4d4',
-      worn: '#bdb59c', ink: '#0a0a0a', cloud: '#f4f1e8', shade: '#c8c9e6', red: '#ff3b1f', wood: '#c98b4b', post: '#7a4a1c' };
+    const C = { sky: '#2436ff', far: '#4b5bff', far2: '#2f3cd6', rock: '#121a5c', crack: '#1f2a80', bone: '#e9e4d4',
+      worn: '#bdb59c', sea: '#e8ecff', seaShade: '#c3ccf5', skyCloud: '#c9d1ff', ink: '#0a0a0a', fur: '#f4f1e8', red: '#ff3b1f', wood: '#c98b4b', post: '#7a4a1c' };
     const ledgeX = (i) => (2 + 9 * i) * U;
     const ledgeY = (i) => TOPS[i] * U;
     const pathY = (x) => {
@@ -189,10 +189,23 @@ class Component extends DCLogic {
       if (off < 6) return TOPS[i];
       return TOPS[i] - [2, 3, 5][off - 6];
     };
+    // a rounded pixel cloud: narrow top, wider middle, widest base with a shaded underside
+    const puff = (r, cx, top, w, c, shade) => {
+      r.push({ x: cx - w / 2 + 12, y: top, w: w - 24, h: 6, c }, { x: cx - w / 2 + 6, y: top + 6, w: w - 12, h: 6, c },
+        { x: cx - w / 2, y: top + 12, w, h: 12, c }, { x: cx - w / 2 + 6, y: top + 24, w: w - 12, h: 3, c: shade });
+    };
     const terrain = (crumble) => {
       const r = [{ x: 0, y: 0, w: 390, h: H, c: C.sky }];
-      const peak = (cx, base, h, c) => { for (let k = 0; k < h; k++) r.push({ x: (cx - k) * U, y: (base - h + k) * U, w: (2 * k + 1) * U, h: U, c }); };
-      peak(9, 34, 14, C.far2); peak(24, 28, 10, C.far); peak(44, 16, 9, C.far);
+      // two hazy mountain ranges with uneven ridgelines, and a few small clouds in the sky
+      for (let x = 0; x < 65; x++) {
+        const far = 20 + Math.round(4 * Math.sin(x / 6) + 3 * Math.sin(x / 2.7 + 2));
+        r.push({ x: x * U, y: far * U, w: U, h: H - far * U, c: C.far });
+      }
+      for (let x = 0; x < 65; x++) {
+        const near = 31 + Math.round(4 * Math.sin(x / 4.5 + 1) + 2 * Math.sin(x / 1.9));
+        r.push({ x: x * U, y: near * U, w: U, h: H - near * U, c: C.far2 });
+      }
+      puff(r, 70, 36, 54, C.skyCloud, C.skyCloud); puff(r, 176, 60, 42, C.skyCloud, C.skyCloud); puff(r, 262, 18, 48, C.skyCloud, C.skyCloud);
       for (let x = 0; x < 65; x++) {
         const y = pathY(x);
         const i = Math.floor((x - 2) / 9), off = (x - 2) % 9;
@@ -211,14 +224,16 @@ class Component extends DCLogic {
         r.push({ x: x0 + 2, y: y0 + 18, w: 12, h: 6, c: C.bone }, { x: x0 + 20, y: y0 + 32, w: 10, h: 6, c: C.bone },
           { x: x0 + 8, y: y0 + 50, w: 8, h: 8, c: C.ink }, { x: x0 + 26, y: y0 + 12, w: 8, h: 4, c: C.ink });
       }
-      r.push({ x: 0, y: 312, w: 390, h: 24, c: C.cloud });
-      for (let k = 0; k < 10; k++) r.push({ x: k * 42 - 6, y: 300 - (k % 3) * 6, w: 36, h: 18, c: C.cloud });
+      // mist thickens toward the cloud sea, so the rock fades out instead of stopping at a hard edge
+      [[240, 0.1], [252, 0.2], [264, 0.32], [276, 0.48], [288, 0.66]].forEach(([y, a]) => r.push({ x: 0, y, w: 390, h: 12, c: 'rgba(232,236,255,' + a + ')' }));
+      r.push({ x: 0, y: 306, w: 390, h: 30, c: C.sea });
+      for (let k = 0; k < 8; k++) puff(r, k * 54 + 10, 288 + (k % 3) * 5, 60, C.sea, C.seaShade);
       return r;
     };
     const front = () => {
-      const r = [{ x: 0, y: 318, w: 390, h: 18, c: C.cloud }];
-      for (let k = 0; k < 9; k++) r.push({ x: k * 48 - 10, y: 310 + (k % 2) * 4, w: 34, h: 10, c: C.cloud });
-      r.push({ x: 0, y: 331, w: 390, h: 5, c: C.shade });
+      const r = [{ x: 0, y: 318, w: 390, h: 18, c: C.sea }];
+      for (let k = 0; k < 7; k++) puff(r, k * 62 + 30, 302 + (k % 2) * 6, 48, C.sea, C.seaShade);
+      r.push({ x: 0, y: 331, w: 390, h: 5, c: C.seaShade });
       return r;
     };
     const ART = {
@@ -232,7 +247,7 @@ class Component extends DCLogic {
       ART[name].forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * P, y: ry * P, c: pal[ch] }); }));
       return { x, y, cls: cls || '', rot: rot || 0, px };
     };
-    const goat = (scarf, x, y, cls, rot) => sprite('goat', { w: C.cloud, k: C.ink, r: scarf }, x, y, cls, rot);
+    const goat = (scarf, x, y, cls, rot) => sprite('goat', { w: C.fur, k: C.ink, r: scarf }, x, y, cls, rot);
     const raven = (x, y) => sprite('raven', { k: C.ink, y: C.red }, x, y, 'bob');
     const posts = (n) => Array.from({ length: n }, (_, j) => sprite('post', { w: C.wood, p: C.post }, ledgeX(j) + 20, ledgeY(j) - 21));
     const flag = () => sprite('flag', { r: C.red, k: C.ink }, 376, ledgeY(6) - 24);
