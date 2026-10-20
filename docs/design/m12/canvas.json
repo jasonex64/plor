@@ -159,6 +159,14 @@
       "h": 1060,
       "title": "Offbeat · 3rd person vs 1st person",
       "page": "r5"
+    },
+    "R6-lowres.dc.html": {
+      "x": 0,
+      "y": 1180,
+      "w": 1240,
+      "h": 1000,
+      "title": "Low-res PixelLab test (3rd person)",
+      "page": "r5"
     }
   },
   "order": [
@@ -177,7 +185,8 @@
     "R2-10-type.dc.html",
     "R3-ridge.dc.html",
     "R4-pixellab.dc.html",
-    "R5-camera.dc.html"
+    "R5-camera.dc.html",
+    "R6-lowres.dc.html"
   ],
   "notes": {
     "heading": {
@@ -259,6 +268,14 @@
       "fill": "orange",
       "page": "r5",
       "text": "Quick chunky sketches drawn in code (free, no PixelLab), only to compare the two cameras. Same moments for both: typing at stop 4, and getting caught at stop 5.\n\n3rd person uses the winding-path angle you liked from Round 4: the next stops and the top flag are ahead up the ridge.\n\n1st person puts your sign right in front, so the word is the biggest thing on screen. Friends would need a separate view here.\n\nPick one; then a small low-res PixelLab test (about 2 generations) for that camera."
+    },
+    "r5lowres": {
+      "x": 1320,
+      "y": 1180,
+      "w": 400,
+      "fill": "orange",
+      "page": "r5",
+      "text": "You picked 3rd person. The low-res PixelLab test (2 generations): the trail scene at 128 × 72 px and a goat seen from behind at 32 × 32 px, a third of Round 4’s scene width and half its goat size.\n\nIs this chunky enough, and does it look like the game you want? If PixelLab still feels wrong, the other routes are art drawn in code (like the sketches above) or a pixel artist."
     }
   },
   "designSystems": []

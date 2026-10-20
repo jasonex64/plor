@@ -121,6 +121,16 @@ The human chose: free code-drawn sketches of both camera views first, then a sma
 
 The sketch grid cell (6 px) is the same as Round 3's and is not a D20 answer. No PixelLab generations were used.
 
+**Camera (human, 2026-10-20):** 3rd person, behind the goat.
+
+**Low-res PixelLab test (2026-10-20).** Hypothesis, written before running: at 128 × 72 px for the scene and 32 × 32 px for the goat (trial sizes, not D20), PixelLab draws chunky art close to the Round 3 sketch size when shown at 3×; if it still looks fine-grained or smooth when scaled up, that counts against PixelLab. Pro Flash, which can cap colours, was quoted at 5–6 generations an image (`get_pro_flash_capabilities`), so the test used `create_image_pixen` with "low detail" at 1 generation each. Shown below the sketches on the Round 5 page (`docs/design/m12/R6-lowres.dc.html`), on their own and put together in a stop 4 screen.
+| Asset | Tool | Prompt (short) | Seed | Size | Artifact asset id | Status |
+|---|---|---|---|---|---|---|
+| Low-res trail | `create_image_pixen` | path winds up a ridge seen from behind, clouds both sides, chunky, few colours | 5 | 128×72 | 2c729c765e3f7f90b4ded2d72bce8fc1 | shown, awaiting the human |
+| Low-res goat (back) | `create_image_pixen` | tiny white goat seen from behind, red scarf, chunky, few colours | 11 | 32×32 | 2113353e55704ee298d738ab93fc2435 | shown, awaiting the human |
+
+PixelLab total so far: 9 of 40 trial generations.
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 

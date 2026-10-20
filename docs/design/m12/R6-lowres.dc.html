@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: low-res PixelLab test</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:wght@400;600&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0a0a0a}a:hover{color:#2436ff}
+.px{image-rendering:pixelated;display:block}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3b3b3b}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#0a0a0a}
+.scene{position:relative;width:390px;height:216px;flex:none;overflow:hidden;background:#0a0a0a}
+.tag{position:absolute;transform:translateX(-50%);background:#0a0a0a;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.sign{position:absolute;transform:translateX(-50%);background:#e9e4d4;border:3px solid #0a0a0a;box-shadow:3px 3px 0 #0a0a0a;padding:5px 10px;font:600 18px 'Pixelify Sans',monospace;color:#0a0a0a;white-space:nowrap;line-height:1.2}
+.sign .post{position:absolute;left:50%;top:100%;margin-left:-3px;margin-top:3px;width:6px;height:18px;background:#7a4a1c}
+.wobble{animation:wobble 2.4s steps(3) infinite}
+.bob{animation:bob 1.2s steps(2) infinite}
+.caret{display:inline-block;width:3px;height:18px;background:#0a0a0a;vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+.body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.q{font-family:'Young Serif',Georgia,serif;font-weight:400;font-size:36px;line-height:1;letter-spacing:-.02em;margin:0}
+.btn{min-height:52px;border:0;background:#0a0a0a;color:#f4f1e8;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+.in{min-height:52px;border:3px solid #0a0a0a;padding:0 14px;font:600 20px 'Pixelify Sans',monospace;color:#0a0a0a;background:#ffffff}
+.field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+.score{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid #0a0a0a;padding-top:10px;font:600 16px 'Pixelify Sans',monospace}
+@keyframes wobble{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes bob{50%{translate:0 -3px}}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.wobble,.bob,.caret{animation:none}}
+</style>
+</helmet>
+<div style="width: 1240px; height: 1000px; box-sizing: border-box; padding: 48px; background: #e4e4e4; display: flex; gap: 48px; font-family: 'Source Serif 4', Georgia, serif; color: #0a0a0a">
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div class="lbl">Stop 4: typing, put together (3× size)</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="Low-res PixelLab scene: a stone path climbs straight up a ridge between clouds. The small goat stands on it, seen from behind, beside its sign being painted with magnol.">
+<img class="px" src="/_blob/2c729c765e3f7f90b4ded2d72bce8fc1" alt="" style="position: absolute; left: 3px; top: 0; width: 384px; height: 216px">
+<img class="px bob" src="/_blob/2113353e55704ee298d738ab93fc2435" alt="" style="position: absolute; left: 147px; top: 114px; width: 96px; height: 96px">
+<div class="sign wobble" style="left: 82px; top: 112px">magnol<span class="caret"></span><span class="post"></span></div>
+<span class="tag" style="left: 46px; top: 12px">stop 4 of 7</span>
+</div>
+<div class="body">
+<h1 class="q">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in" value="magnol" autocomplete="off"></label>
+<button class="btn" type="button">Plant your sign</button>
+<div style="flex: 1"></div>
+<div class="score"><span>3 safe</span><span>6 points</span></div>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div class="lbl">The two PixelLab images on their own (4× size)</div>
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+<img class="px" src="/_blob/2c729c765e3f7f90b4ded2d72bce8fc1" alt="Scene: 128 by 72 pixels, a path up a ridge seen from behind, clouds on both sides" style="width: 512px; height: 288px; border: 3px solid #0a0a0a">
+<figcaption style="font: 600 18px 'Pixelify Sans', monospace">Trail, 128 × 72 px (Round 4's was 384 × 192)</figcaption>
+</figure>
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+<div style="width: 128px; height: 128px; background: #2436ff; border: 3px solid #0a0a0a"><img class="px" src="/_blob/2113353e55704ee298d738ab93fc2435" alt="Goat: 32 by 32 pixels, small white goat with a red scarf" style="width: 128px; height: 128px"></div>
+<figcaption style="font: 600 18px 'Pixelify Sans', monospace">Goat, 32 × 32 px (Round 4's were 64 × 64)</figcaption>
+</figure>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
