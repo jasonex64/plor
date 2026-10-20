@@ -11,7 +11,7 @@
     "lint": "eslint",
     "test": "vitest run --exclude \"**/*.db.test.ts\"",
     "status": "node scripts/status.ts",
-    "test:db": "vitest run .db.test",
+    "test:db": "vitest run .db.test --no-file-parallelism",
     "test:sql": "supabase test db",
     "lockfile": "node scripts/lockfile.ts",
     "content:validate": "node scripts/content-validate.ts",
