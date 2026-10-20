@@ -211,6 +211,14 @@
       "h": 1000,
       "title": "Offbeat · friends ridge and share card",
       "page": "r7"
+    },
+    "R10-crowd.dc.html": {
+      "x": 0,
+      "y": 2360,
+      "w": 1362,
+      "h": 1000,
+      "title": "Offbeat · big groups: crowds, a tapped stop, the group switcher",
+      "page": "r7"
     }
   },
   "order": [
@@ -234,7 +242,8 @@
     "R7-third.dc.html",
     "R8-wind.dc.html",
     "W-platform.dc.html",
-    "R9-friends.dc.html"
+    "R9-friends.dc.html",
+    "R10-crowd.dc.html"
   ],
   "notes": {
     "heading": {
@@ -380,6 +389,14 @@
       "fill": "orange",
       "page": "r7",
       "text": "The whole ridge at once: the camera pulls back so all 7 stops fit.\n\nFriends’ ridge: whoever reached the top stands by the flag; anyone still playing stands on their stop; whoever the Wind blew off sits in a cloud puff under the stop where it happened. Each goat has a letter tag as well as a scarf colour.\n\nShare card: blank signs on the stops you passed, a cross where you were blown off, and the Wind puffing at the side. No words, so no spoilers.\n\nNames and the crowd size at one stop are placeholders (M06)."
+    },
+    "r7crowd": {
+      "x": 1442,
+      "y": 2360,
+      "w": 400,
+      "fill": "orange",
+      "page": "r7",
+      "text": "How the ridge scales to big groups.\n\n1 · 40 friends: at each place, up to two named goats, a count (“E, I +6”), and a cloud puff that grows with the crowd. You’re always drawn.\n2 · Tap a stop: a sheet lists everyone who ended there.\n3 · Everyone today: no one but you is drawn; each place shows its share.\n\nThe switcher on top picks the group. “Two goats per place” and every count here are placeholders; the real limit is an M06 choice.\n\nThe same rule could hold for every Plor game: see the ticket."
     }
   },
   "designSystems": []

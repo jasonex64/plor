@@ -157,6 +157,15 @@ Three host characters were proposed in chat (the Wind, a word-hoarding raven, an
 - **Friends (M06, after you've played):** friends who reached the top stand by the flag; a friend still playing stands on their stop; friends the Wind blew off sit in a cloud puff beside the ridge, under the stop where it happened. Each goat has a letter tag as well as its scarf colour (not colour alone). Names and how many to draw at one stop are placeholders for M06.
 - **Share card (M05):** the ridge in miniature with blank signs on the stops you passed, a cross where you were blown off, and the Wind puffing at the side; no words, so no spoilers. The text version is unchanged from Round 3 (`▲▲▲▲✕△△ 4/7`).
 
+**Scaling to big groups.** The human asked how the ridge scales with a larger friend group, "not just for this game but as a whole" (human, 2026-10-20). Answer given in chat: every player ends in one of 9 places (blown off at stop 1 to 7, the top, still climbing), so the picture is a bar chart dressed as a mountain; what doesn't scale is one goat per person, which is a drawing choice. The human asked for a sketch and for the shared rule to be noted (human, 2026-10-20). Sketch on the Round 7 page (`docs/design/m12/R10-crowd.dc.html`):
+- **40 friends:** at each place, up to two named goats, a count tag ("E, I +6") and a cloud puff that grows with the crowd. You're always drawn. A plain list with bars and counts sits under the picture.
+- **A tapped stop:** a sheet lists everyone who ended there and their points.
+- **Everyone today:** only you are drawn; each place shows its share of players as a percentage and a puff sized by it.
+- **Group switcher:** "My group · 6", "All friends · 40", "Everyone". Small groups get individual goats, big ones get crowds and shares.
+- "Two named goats per place", the 40 friends and every count and percentage are mockup placeholders. The real per-place limit is the M06 number already listed there. Bars and the selected-stop ring were checked at 3:1 or more against their backgrounds.
+
+**Proposed shared rule for every Plor game (D28, draft for the human):** each game sorts players' endings into a small fixed set of places (Offbeat: stops 1 to 7, the top, still climbing) and draws those places in its own art. Plor's shell supplies the same behaviour around that picture in every game: you are always shown; then up to a few named friends per place; then a count; a crowd that grows with the number; tap a place for the full list; the group switcher; and the plain list under the picture, which always works. This fits the platform wireframes' live board (a slot for the game's own picture above a plain list), and would be part of what the games share (D5).
+
 ## Platform wireframes (human, 2026-10-20)
 The human chose to wireframe the whole platform now ("Yes, wireframe it now", relayed by the parent session), so that M06 (friends and groups), M09 (front page) and M11 (settings and profile) build to an agreed layout. These are rough layouts only, in grey; the final look (colours, art, animation) stays in M12. Plor's shell stays neutral, and each game brings its own stylised look (human's notes above). Canvas page "Wireframes · platform" (`docs/design/m12/W-platform.dc.html`).
 
@@ -203,6 +212,7 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D25 | Which basic preferences settings offers | None chosen; the wireframe shows empty rows | |
 | D26 | Username changes (M11): how often, and what friends see after a change. Today M02 says the name "can't be changed later" | None chosen; any limit is a human number | |
 | D27 | What a "coming soon" card shows in mockups (a name, or just a shape) | Wireframes show a blank card | |
+| D28 | One rule for every game's "where everyone ended" picture (places drawn in the game's art; you always shown; a few named friends per place, then a count; tap a place for the list; group switcher; plain list underneath) | Proposed 2026-10-20, sketched for Offbeat on the Round 7 page; the per-place limit stays an M06 number | |
 
 ## Acceptance criteria
 For this draft (exploration):

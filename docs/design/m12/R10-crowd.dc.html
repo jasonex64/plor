@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offbeat: big friend groups</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2b2d52}a:hover{color:#4a55a0}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font:600 13px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase;color:#3d3f5e}
+.ph{position:relative;width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#f4f1e8;font-family:'Source Serif 4',Georgia,serif;color:#2b2d52}
+.scene{position:relative;width:390px;height:336px;overflow:hidden;flex:none;image-rendering:pixelated;background:#7d8fd8}
+.scene i{position:absolute;display:block}
+.sp{position:absolute}
+.sp i{position:absolute;display:block}
+.tag{position:absolute;transform:translateX(-50%);background:#2b2d52;color:#f4f1e8;font:600 12px 'Pixelify Sans',monospace;padding:2px 5px;white-space:nowrap}
+.tag.you{background:#e8735c;color:#1d1e38}
+.tag.stop{background:#f8f9fd;color:#2b2d52}
+.tag.sel{background:#ffffff;color:#2b2d52;outline:3px solid #1d1e38}
+.bob{animation:bob 1.2s steps(2) infinite}
+.drift{animation:drift 3s steps(3) infinite}
+@keyframes bob{50%{translate:0 -3px}}
+@keyframes drift{50%{translate:6px -6px}}
+@media (prefers-reduced-motion: reduce){.bob,.drift{animation:none}}
+.body{padding:16px 22px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.stop{font:600 14px 'Pixelify Sans',monospace;letter-spacing:.06em;text-transform:uppercase}
+.p{margin:0;font-size:15px;line-height:1.4}
+.standin{font-size:13px;color:#4f516e}
+.seg{display:flex;border:3px solid #2b2d52}
+.seg button{flex:1;min-height:44px;border:0;background:#f4f1e8;color:#2b2d52;font:600 14px 'Pixelify Sans',monospace;cursor:pointer}
+.seg button+button{border-left:3px solid #2b2d52}
+.seg button[aria-pressed="true"]{background:#2b2d52;color:#f4f1e8}
+.row{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:8px;font-size:14px;min-height:24px}
+.row .bar{height:12px;background:#5a64a3}
+.row.you .bar{background:#c4472f}
+.row b{font:600 14px 'Pixelify Sans',monospace;text-align:right}
+.scrim{position:absolute;left:0;top:0;width:390px;height:336px;background:rgba(43,45,82,.35)}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:520px;box-sizing:border-box;background:#f4f1e8;border-top:4px solid #2b2d52;padding:14px 22px 20px;display:flex;flex-direction:column;gap:6px}
+.grab{width:48px;height:6px;background:#2b2d52;align-self:center;margin-bottom:6px}
+.who-row{display:flex;align-items:center;gap:10px;font-size:15px;min-height:36px;border-bottom:1px solid #d9d6e3}
+.who-row b{font:600 12px 'Pixelify Sans',monospace;background:#2b2d52;color:#f4f1e8;padding:2px 6px;min-width:28px;text-align:center}
+.btn2{min-height:52px;border:3px solid #2b2d52;background:#f4f1e8;color:#2b2d52;font:600 18px 'Pixelify Sans',monospace;cursor:pointer;width:100%}
+</style>
+</helmet>
+<div style="width: 1362px; height: 1000px; box-sizing: border-box; padding: 48px; background: #e6e6ec; display: flex; gap: 48px; font-family: 'Source Serif 4', Georgia, serif">
+
+<div class="col">
+<div class="lbl">1 · All friends (40): crowds and counts</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The whole ridge with 40 friends. At each place a cloud puff grows with the number of friends there, with up to two named goats and a count: A, B and 4 more at the top; C and 2 more blown off at stop 7; F and 3 more at stop 6; you, G and 5 more at stop 5; H and 4 more at stop 4; E, I and 6 more at stop 3; J and 3 more at stop 2; K and 1 more at stop 1; D still climbing on stop 4.">
+<sc-for list="{{fr.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{fr.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{fr.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{fr.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body">
+<div class="seg" role="group" aria-label="Whose ridge to show"><button type="button" aria-pressed="false">My group · 6</button><button type="button" aria-pressed="true">All friends · 40</button><button type="button" aria-pressed="false">Everyone</button></div>
+<div class="stop" style="margin-top: 4px">Where your friends ended</div>
+<sc-for list="{{frRows}}" as="w" hint-placeholder-count="0"><div class="row {{w.cls}}"><span>{{w.label}}</span><span class="bar" style="width: {{w.bar}}px"></span><b>{{w.n}}</b></div></sc-for>
+<p class="p standin">Tap a stop on the ridge to see who's there. Counts and names are placeholders.</p>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">2 · Tapped stop 3: who's there</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The same ridge, dimmed, with the crowd under stop 3 marked as selected.">
+<sc-for list="{{tp.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{tp.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{tp.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<div class="scrim"></div>
+<sc-for list="{{tp.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="sheet" role="dialog" aria-label="Blown off at stop 3">
+<div class="grab"></div>
+<div class="stop">Blown off at stop 3 · 8 friends</div>
+<p class="p standin" style="margin-bottom: 4px">Each got 2 points.</p>
+<sc-for list="{{sheet}}" as="f" hint-placeholder-count="0"><div class="who-row"><b>{{f.tag}}</b>{{f.name}}</div></sc-for>
+<div style="flex: 1"></div>
+<button class="btn2" type="button">Close</button>
+</div>
+</div>
+</div>
+
+<div class="col">
+<div class="lbl">3 · Everyone today: shares, not people</div>
+<div class="ph">
+<div class="scene" role="img" aria-label="The whole ridge for everyone who played today. Cloud puffs grow with the share of players at each place, labelled with percentages: 9% at the top, 6% at stop 7, 8% at stop 6, 14% at stop 5 where you are, 12% at stop 4, 21% at stop 3, 18% at stop 2 and 12% at stop 1.">
+<sc-for list="{{ev.rects}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{ev.sprites}}" as="sp" hint-placeholder-count="0"><div class="sp {{sp.cls}}" style="left: {{sp.x}}px; top: {{sp.y}}px; transform: rotate({{sp.rot}}deg)"><sc-for list="{{sp.px}}" as="p" hint-placeholder-count="0"><i style="left: {{p.x}}px; top: {{p.y}}px; width: 6px; height: 6px; background: {{p.c}}"></i></sc-for></div></sc-for>
+<sc-for list="{{ev.front}}" as="r" hint-placeholder-count="0"><i style="left: {{r.x}}px; top: {{r.y}}px; width: {{r.w}}px; height: {{r.h}}px; background: {{r.c}}"></i></sc-for>
+<sc-for list="{{ev.tags}}" as="t" hint-placeholder-count="0"><span class="tag {{t.cls}}" style="left: {{t.x}}px; top: {{t.y}}px">{{t.text}}</span></sc-for>
+</div>
+<div class="body">
+<div class="seg" role="group" aria-label="Whose ridge to show"><button type="button" aria-pressed="false">My group · 6</button><button type="button" aria-pressed="false">All friends · 40</button><button type="button" aria-pressed="true">Everyone</button></div>
+<div class="stop" style="margin-top: 4px">Where everyone ended</div>
+<sc-for list="{{evRows}}" as="w" hint-placeholder-count="0"><div class="row {{w.cls}}"><span>{{w.label}}</span><span class="bar" style="width: {{w.bar}}px"></span><b>{{w.n}}</b></div></sc-for>
+<p class="p standin">Only you are drawn; everyone else is a share. Percentages are placeholders.</p>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1362,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Round 7's whole-ridge view for big groups: per place, up to two named goats, a count, and a cloud puff that grows with the crowd.
+    // The two-goats limit and all counts here are mockup placeholders; the real limit is an M06 human number.
+    const U = 6, W = 65, H = 56, HZ = 16;
+    const C = {
+      skyTop: '#7d8fd8', sky2: '#8c9ddf', sky3: '#9dace5', skyLow: '#b3bfeb', wisp: '#c5cff0',
+      farPeak: '#a3afe0', farSnow: '#dfe4f6', nearPeak: '#8592cf',
+      backCloud: '#cfd6ef', backShade: '#bcc5e6', midCloud: '#dfe4f5', midShade: '#c9d1ee', cloud: '#eef1f9', cloudShade: '#d6dcf1', cloudHi: '#f8f9fd',
+      island: '#7280c0', islandLit: '#8d99cf',
+      rockLit: '#5a64a3', rock: '#444d8a', crack: '#363e75',
+      path: '#e8ddc3', pathLine: '#d6c9a8', lip: '#8b7f6a', grass: '#8fa77a', grassDark: '#71895f',
+      ink: '#2b2d52', fur: '#f6f2e8', horn: '#8b7f6a', scarf: '#d9583f', anon: '#b8bdd6',
+      windBody: '#fbfbff', windShade: '#dfe4f5', windCheek: '#f0b8c8', windLine: '#6f7cc4'
+    };
+    const SCARF = { A: '#e9c46a', B: '#6cc4b8', C: '#e79ac4', D: '#f0a35e', E: '#a98ee0', F: '#7fc8e8', G: '#c7d36b', H: '#e8a0a0', I: '#9fb4ff', J: '#d4a373', K: '#90d6a8', you: '#d9583f', anon: '#b8bdd6' };
+    const R = (r, x, y, w, h, c) => r.push({ x: Math.round(x) * U, y: Math.round(y) * U, w: Math.max(1, Math.round(w)) * U, h: Math.max(1, Math.round(h)) * U, c });
+    const rnd = (a, b) => { const s = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return s - Math.floor(s); };
+    const bank = (r, x0, x1, top, amp, seed, c, shade, hi) => {
+      for (let x = x0; x < x1; x++) {
+        const y = top - Math.round(amp * Math.abs(Math.sin(x / 3.3 + seed)) + (amp / 2) * Math.abs(Math.sin(x / 1.9 + seed * 2)));
+        R(r, x, y, 1, H - y, c); R(r, x, y, 1, 1, hi);
+        if ((x + seed) % 4 !== 0) R(r, x, y + 3, 1, 1, shade);
+      }
+    };
+    const puff = (r, cx, top, w, c, shade, hi) => {
+      R(r, cx - w / 2 + 2, top, w - 4, 1, hi); R(r, cx - w / 2 + 1, top + 1, w - 2, 1, c); R(r, cx - w / 2, top + 2, w, 3, c); R(r, cx - w / 2 + 1, top + 5, w - 2, 1, shade);
+    };
+    const backdrop = (r) => {
+      R(r, 0, 0, W, 4, C.skyTop); R(r, 0, 4, W, 4, C.sky2); R(r, 0, 8, W, 4, C.sky3); R(r, 0, 12, W, H - 12, C.skyLow);
+      R(r, 6, 3, 14, 1, C.wisp); R(r, 9, 2, 6, 1, C.wisp);
+      for (let x = 0; x < W; x++) {
+        const far = HZ - 3 + Math.round(2.5 * Math.sin(x / 5) + 1.5 * Math.sin(x / 2.3 + 1));
+        R(r, x, far, 1, H - far, C.farPeak);
+        if (far <= HZ - 5) R(r, x, far, 1, 1, C.farSnow);
+      }
+      for (let x = 0; x < W; x++) { const near = HZ + 1 + Math.round(1.5 * Math.sin(x / 3.5 + 2)); R(r, x, near, 1, H - near, C.nearPeak); }
+      bank(r, 0, W, HZ + 4, 2, 1, C.backCloud, C.backShade, C.midCloud);
+      [[9, HZ + 7, 5], [56, HZ + 8, 4]].forEach(([cx, top, w]) => { for (let k = 0; k < w; k++) { R(r, cx - k, top + k, 2 * k + 1, 1, C.island); R(r, cx - k, top + k, 1, 1, C.islandLit); } });
+      bank(r, 0, W, HZ + 11, 3, 4, C.midCloud, C.midShade, C.cloud);
+    };
+    const geo = (t) => ({ cx: 32 + 12 * Math.sin(t * 4.2 - 0.6) * (0.35 + 0.65 * t), pw: 1 + t * t * 14, rw: 3 + t * t * 14 + t * 14 });
+    const rowOf = (t) => Math.round(HZ + t * (H - 1 - HZ));
+    const ridge = (r, landings) => {
+      for (let y = HZ; y < H; y++) {
+        const t = (y - HZ) / (H - 1 - HZ), g = geo(t);
+        const l = Math.round(g.cx - g.rw / 2), half = Math.round(g.rw / 2), pl = Math.round(g.cx - g.pw / 2), pw = Math.max(1, Math.round(g.pw));
+        R(r, l, y, half, 1, C.rockLit); R(r, l + half, y, half, 1, C.rock);
+        for (let k = 0; k < 2 * half; k++) if (rnd(y, k) > 0.9 && (l + k < pl - 1 || l + k > pl + pw)) R(r, l + k, y, 1, 1, C.crack);
+        R(r, pl, y, pw, 1, C.path);
+        if (t > 0.35 && y % 3 === 0) R(r, pl + 1, y, pw - 2, 1, C.pathLine);
+        if (t > 0.3 && rnd(y, 99) > 0.55) { R(r, pl - 1, y, 1, 1, C.grass); R(r, pl - 1, y + 1, 1, 1, C.grassDark); }
+        if (t > 0.3 && rnd(y, 77) > 0.6) { R(r, pl + pw, y, 1, 1, C.grass); R(r, pl + pw, y + 1, 1, 1, C.grassDark); }
+      }
+      landings.forEach((t) => {
+        const y = rowOf(t), g = geo(t), pl = Math.round(g.cx - g.pw / 2) - 1, pw = Math.round(g.pw) + 2;
+        R(r, pl, y - 1, pw, 2, C.path); R(r, pl, y + 1, pw, 1, C.lip);
+      });
+    };
+    const ART = {
+      kid: ['h...h', '.www.', 'rrrrr', 'wwwww', 'k.k.k'],
+      windCalm: ['....wwww.....', '..wwwwwwww...', '.wwwwwwwwwww.', 'wwwkkwwwkkwww', 'wwppwwwwwppww', 'wwwwwwkwwwwww', '.sssssssssss.', '...sss..sss..'],
+      flag: ['rr.', 'rrr', 'rr.', 'k..', 'k..', 'k..']
+    };
+    const sprite = (name, pal, x, y, cls, rot, outline) => {
+      const rows = ART[name], filled = new Set(), px = [];
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') filled.add(rx + ',' + ry); }));
+      if (outline) {
+        const seen = new Set();
+        filled.forEach((key) => {
+          const [a, b] = key.split(',').map(Number);
+          [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+            const n = (a + dx) + ',' + (b + dy);
+            if (!filled.has(n) && !seen.has(n)) { seen.add(n); px.push({ x: (a + dx) * U, y: (b + dy) * U, c: outline }); }
+          });
+        });
+      }
+      rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (ch !== '.') px.push({ x: rx * U, y: ry * U, c: pal[ch] }); }));
+      return { x, y, cls: cls || '', rot: rot || 0, px };
+    };
+    const kid = (who, footCol, footRow, cls, rot) => sprite('kid', { w: C.fur, h: C.horn, k: C.ink, r: SCARF[who] }, Math.round(footCol - 2.5) * U, (footRow - 4) * U, cls, rot, C.ink);
+    const wind = (col, row) => sprite('windCalm', { w: C.windBody, s: C.windShade, p: C.windCheek, k: C.ink }, col * U, row * U, 'drift', 0, C.windLine);
+    const flag = (cx, row) => sprite('flag', { r: C.scarf, k: C.ink }, Math.round(cx) * U, (row - 5) * U);
+    const T = { 1: 0.92, 2: 0.78, 3: 0.64, 4: 0.5, 5: 0.36, 6: 0.22, 7: 0.1, top: 0.03 };
+    const stopAt = (k) => { const g = geo(T[k]); return { cx: g.cx, row: rowOf(T[k]), pw: g.pw, rw: g.rw }; };
+    // which side of the ridge each stop's crowd sits on, so neighbouring crowds don't overlap
+    const SIDE = { 1: -1, 2: 1, 3: -1, 4: 1, 5: 1, 6: -1, 7: 1 };
+
+    // places: { stop or 'top': { who: [names drawn], size: crowd weight for the puff, label: tag text, cls } }
+    const whole = (places, opts) => {
+      const r = [], sprites = [], tags = [], front = [];
+      backdrop(r);
+      ridge(r, [1, 2, 3, 4, 5, 6, 7].map((k) => T[k]));
+      const top = stopAt('top');
+      sprites.push(flag(top.cx + 1, top.row));
+      sprites.push(wind(47, 1));
+      for (let k = 1; k <= 7; k++) { const s = stopAt(k); tags.push({ x: (s.cx - s.pw / 2 - 3) * U, y: (s.row - 3) * U, text: String(k), cls: 'stop' }); }
+      Object.keys(places).forEach((key) => {
+        const pl = places[key];
+        if (key === 'top') {
+          // the summit: goats stand by the flag, the crowd is a puff of cloud behind them
+          puff(r, top.cx + 1, top.row - 3, 6 + pl.size, C.cloud, C.cloudShade, C.cloudHi);
+          pl.who.forEach((w, i) => sprites.push(kid(w, top.cx - 2 + i * 6, top.row, i === 0 ? 'bob' : '')));
+          tags.push({ x: (top.cx + 1) * U, y: (top.row - 9) * U, text: pl.label, cls: pl.cls || '' });
+          return;
+        }
+        const s = stopAt(key), side = SIDE[key], w = 6 + pl.size;
+        const col = side > 0 ? s.cx + s.rw / 2 + w / 2 : s.cx - s.rw / 2 - w / 2, row = Math.max(s.row + 6, HZ + 12);
+        pl.who.forEach((who, i) => sprites.push(kid(who, col - 3 + i * 6, row, '', side * 12)));
+        puff(front, col, row - 1, w, C.cloud, C.cloudShade, C.cloudHi);
+        tags.push({ x: col * U, y: (row - 8) * U, text: pl.label, cls: pl.cls || '' });
+      });
+      if (opts && opts.climbing) {
+        const d = stopAt(4);
+        sprites.push(kid(opts.climbing, d.cx, d.row, 'bob'));
+        tags.push({ x: d.cx * U, y: (d.row - 8) * U, text: opts.climbing, cls: '' });
+      }
+      puff(front, 5, H - 9, 14, C.cloud, C.cloudShade, C.cloudHi); R(front, 0, H - 3, 18, 3, C.cloud);
+      puff(front, 60, H - 9, 14, C.cloud, C.cloudShade, C.cloudHi); R(front, 48, H - 3, 17, 3, C.cloud);
+      return { rects: r, sprites, tags, front };
+    };
+
+    // 40 friends (placeholder): 6 top, 3 + 4 + 7 + 5 + 8 + 4 + 2 blown off at stops 7 to 1, 1 still climbing
+    const friends = {
+      top: { who: ['A', 'B'], size: 6, label: 'A, B +4' },
+      7: { who: ['C'], size: 3, label: 'C +2' },
+      6: { who: ['F'], size: 4, label: 'F +3' },
+      5: { who: ['you', 'G'], size: 7, label: 'you, G +5', cls: 'you' },
+      4: { who: ['H'], size: 5, label: 'H +4' },
+      3: { who: ['E', 'I'], size: 8, label: 'E, I +6' },
+      2: { who: ['J'], size: 4, label: 'J +3' },
+      1: { who: ['K'], size: 2, label: 'K +1' }
+    };
+    const fr = whole(friends, { climbing: 'D' });
+    const tp = whole(Object.assign({}, friends, { 3: Object.assign({}, friends[3], { cls: 'sel' }) }), { climbing: 'D' });
+    const frRows = [['Top', 6], ['Stop 7', 3], ['Stop 6', 4], ['Stop 5 (you)', 7, 'you'], ['Stop 4', 5], ['Stop 3', 8], ['Stop 2', 4], ['Stop 1', 2], ['Still climbing', 1]]
+      .map(([label, n, cls]) => ({ label, n: String(n), bar: n * 18, cls: cls || '' }));
+    const sheet = [['E', 'friend E'], ['I', 'friend I'], ['L', 'friend L'], ['M', 'friend M'], ['N', 'friend N'], ['O', 'friend O'], ['P', 'friend P'], ['Q', 'friend Q']]
+      .map(([tag, name]) => ({ tag, name }));
+
+    // everyone today (placeholder shares): only you are drawn, everyone else is a puff sized by their share
+    const pct = { top: 9, 7: 6, 6: 8, 5: 14, 4: 12, 3: 21, 2: 18, 1: 12 };
+    const everyone = {};
+    Object.keys(pct).forEach((k) => { everyone[k] = { who: k === '5' ? ['you'] : [], size: Math.round(pct[k] / 2), label: (k === '5' ? 'you · ' : '') + pct[k] + '%', cls: k === '5' ? 'you' : '' }; });
+    const ev = whole(everyone, null);
+    const evRows = [['Top', 'top'], ['Stop 7', 7], ['Stop 6', 6], ['Stop 5 (you)', 5, 'you'], ['Stop 4', 4], ['Stop 3', 3], ['Stop 2', 2], ['Stop 1', 1]]
+      .map(([label, k, cls]) => ({ label, n: pct[k] + '%', bar: pct[k] * 6, cls: cls || '' }));
+    return { fr, tp, ev, frRows, sheet, evRows };
+  }
+}
+</script>
+</body>
+</html>
