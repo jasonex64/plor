@@ -1,0 +1,21 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-19T12:00:00Z" },
+  "title": "Plor + Offbeat look directions",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 3114, "h": 1000, "title": "A · Full scale (music)" },
+    "B.dc.html": { "x": 0, "y": 1120, "w": 3114, "h": 1000, "title": "B · Seven steps (plain)" },
+    "C.dc.html": { "x": 0, "y": 2240, "w": 3114, "h": 1000, "title": "C · Host chat (conversation)" }
+  },
+  "order": ["Main.dc.html", "B.dc.html", "C.dc.html"],
+  "notes": {
+    "heading": { "x": 0, "y": -300, "text": "Plor + Offbeat: three directions to compare", "kind": "title1", "maxW": 3114 },
+    "about": {
+      "x": 3234, "y": 0, "w": 380, "fill": "orange",
+      "text": "Same 7 screens in each row: sign-in, home, question with autocomplete, safe answer, the moment you match the host, a full 7/7 run, and the share card.\n\nQuestions are the real 2026-11-02 puzzle. Host answers shown are stand-ins, not the real ones.\n\nColours, fonts and words like \"off-key\" are placeholders for the human to choose. Mix freely: e.g. B's layout with A's share card."
+    }
+  },
+  "designSystems": []
+}

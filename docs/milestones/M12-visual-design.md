@@ -1,0 +1,119 @@
+# M12 — Visual design
+
+**Status:** planned (draft: mockups for comparison, no app code yet)
+
+## Goal
+Give Plor (the platform) and Offbeat (its first game) their look, phone first, beyond M02's plain functional UI.
+
+## Who uses it / what breaks without it
+- Used by: every player, on every screen; anyone who sees a shared result (M05) or the front page (M09) before signing in.
+- Breaks without it: nothing functional. The human placed M12 last (2026-10-19), so the closed beta (M11) runs on the plain UI on purpose. Without it, the share card (M05) has no image look, the front page (M09) has no layout to fill, and profile frames (M10) have no slot to sit in.
+
+## Source
+No entry in `docs/SOURCES.md` covers visual design or accessibility yet. Only a human can add one (SOURCES.md, Rules). Proposed for the human's approval (decision D11):
+- **WCAG 2.2** (W3C Recommendation): 1.4.1 Use of Color, 1.4.3 Contrast (Minimum), 1.4.11 Non-text Contrast, 2.5.8 Target Size (Minimum). The mockups follow these from memory: *unverified* until the source is pinned and read.
+- **Google sign-in branding guidelines** (Google Identity docs), for the "Continue with Google" button. The mockups draw a plain outlined button; *unverified* against the guidelines.
+- If a web font is chosen (D4): its license page (the Google Fonts families shown are under the SIL Open Font License per Google Fonts; *unverified*).
+
+Product facts the mockups follow, already in the repo:
+- `docs/ROADMAP.md`: Product ("welcoming but neutral", human 2026-10-19); M05 Share, M06 Friends, M07 Comments, M08 Leaderboards, M09 Front page, M10 Cosmetics (profile frames, emotes), M12.
+- `docs/DECISIONS.md`, Game 1: 7 questions, rising difficulty, sudden death, k points for surviving question k; host answers shown only after the player answers. "Offbeat" is the display name and can change; `game_id` `offbeat` can't.
+- `docs/DECISIONS.md`, Client platform: mobile-first web app.
+- The current screens in `src/app/` (`page.tsx`, `home.tsx`, `game.tsx`, `globals.css`): sign-in (Google, email link), pick a username, start, question with autocomplete ("did you mean", "Not in the list? Send"), pick then "Lock in", safe line, result list.
+- ROADMAP, after the MVP: game 2 gets its own name and look, and must not use Wordle's green, yellow and gray tiles.
+
+## Screens
+Each direction in the mockups shows all seven:
+1. Sign-in (Google and email link; the privacy link; the intro Google's brand check needs, M02 2c).
+2. Home, signed in, before playing (room for friends M06, leaderboard M08, front page M09, the avatar frame M10).
+3. Question with autocomplete (typed text, suggestions, "Not in the list? Send").
+4. Answer result: safe.
+5. The run-ending moment: the player matched the host.
+6. Full-run result (7 of 7), with room for comments and reactions (M07).
+7. Spoiler-free share card, as an image and as text (M05).
+
+Not mocked yet: pick a username, the "Lock in / Change it" step, "did you mean", errors, loading, the abandoned-run message, the privacy page. They follow once a direction is chosen.
+
+## Mockups
+Artifact (private until the human shares it): https://claude.ai/artifact/NQmsChneJ1uew7mBzHuLvc
+Its source files are copied to `docs/design/m12/` (`Main.dc.html` is direction A, `B.dc.html` and `C.dc.html` the others, `canvas.json` the layout), so the directions stay in the repo if the Artifact changes.
+
+Three directions, one row each. All use the real 2026-11-02 questions. Host answers shown are **stand-ins**, picked only from entries outside each question's host bank, so the mockups reveal no real host answer. The full-run lists leave host answers out.
+
+| | A · Full scale (music) | B · Seven steps (plain) | C · Host chat (conversation) |
+|---|---|---|---|
+| Idea | The day's 7 questions are 7 notes of a rising scale. Staying off the host's answer is "off the beat"; matching is "off-key"; 7 of 7 is a "full scale". The starting idea from the session that started this one, not decided. | No metaphor. 7 bars rising in height show the rising difficulty. "Safe", "Caught", "All 7 cleared". Home is a list of today's games, ready for game 2. | The host is a character who asks in chat bubbles and answers after you. "Dodge", "caught", "same as me". The answer box sits at the bottom, near the thumb. |
+| Progress mark | A staff with 7 notes; filled = survived, ringed = now, slashed + "off-key" label = matched | 7 numbered bars; filled = safe, outlined = now, ✕ + "caught" label | 7 dots; filled = dodged, ringed = now, ✕ + "caught on 5" label |
+| Share text | `♪♪♪♪✕·· 4/7` | `▁▂▃▄✕·· 4/7` | `●●●●✕○○ 4/7` |
+| Placeholder look | Light; indigo accent; Bricolage Grotesque + Inter | Light grey; teal accent, rust for "caught"; Manrope | Dark; amber accent, light blue host; Nunito |
+
+Colours and fonts are placeholders to tell the directions apart, not proposals (D3, D4). Every text colour pair in the mockups was checked at 4.5:1 or more, and input borders and progress marks at 3:1 or more (checked with the WCAG relative-luminance formula, computed with a one-off node command; formula *unverified* against the pinned source). No state is shown by colour alone: each also has a shape and a word. Buttons and list rows are at least 44 px tall (the design tool's own guideline; WCAG 2.5.8's minimum is to be read once pinned).
+
+## Decisions (for the human)
+Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
+
+| # | Decision | Options shown | Answer (origin) |
+|---|---|---|---|
+| D1 | Which direction, or which mix (e.g. B's layout with A's share card)? | A, B, C, or a mix | |
+| D2 | The words for the game's moments: survive, match the host, 7 of 7 | A: off the beat / off-key / full scale. B: safe / caught / all 7 cleared. C: dodged / caught / same as me | |
+| D3 | Brand colours for Plor and for Offbeat | Placeholders only; needs the human's choice | |
+| D4 | Fonts: a web font (which) or the phone's system font (no download) | Placeholders only | |
+| D5 | How separate are Plor's look and Offbeat's? (Game 2 will have its own name and look.) | Shared frame with a per-game accent, or each game fully its own | |
+| D6 | Light, dark, or follow the phone's setting | A and B light, C dark | |
+| D7 | Safe answer: its own moment with a "Next" tap (all mockups), or a line above the next question (today's UI) | | |
+| D8 | Share (M05): image and text, or text only first; which symbols | See the table above | |
+| D9 | Show points during the run (+k per question) before M08 adds the ledger, or only at the end | Mockups show "+4 points · 10 so far" | |
+| D10 | Avatar shape and frame slot (M10 profile frames) | A and C round, B rounded square | |
+| D11 | Accessibility source and numbers: pin WCAG 2.2 in SOURCES.md? Contrast ratios and the tap-target size are human numbers until then | | |
+| D12 | Smallest phone width to support | Mockups are 390 px wide (the design tool's default phone size); no minimum chosen | |
+| D13 | Does the host have a face or name (C)? | C shows a circle marked "H" | |
+
+## Acceptance criteria
+For this draft (exploration):
+- [ ] The mockups show all 7 screens in each direction (open the Artifact link above).
+- [ ] The human has answered D1–D13; each answer is in the table with "human, <date>".
+
+For M12 itself (written now so they don't get lost; refined when M12 starts):
+- [ ] The chosen look is built into `src/app/` with no change to game logic or network messages (`git diff --stat` touches only UI files).
+- [ ] Every text and background colour pair passes the contrast ratio chosen in D11, checked by a script (`npm run …`, to be named), not by eye.
+- [ ] No state is shown by colour alone (checked per screen in the review).
+- [ ] Every tap target meets the size chosen in D11.
+- [ ] Each screen in the list above is checked at the width chosen in D12, with screenshots in Evidence.
+
+## Out of scope
+- App code (`src/`, `supabase/`, `scripts/`) until M12 starts or the human moves it earlier.
+- Building the share feature (M05), friends (M06), comments (M07), leaderboards (M08), the front page (M09) and cosmetics (M10). The mockups only leave room for them.
+- Sound and animation. The music direction invites both; nothing is planned without the human.
+- Game 2's look.
+
+## Numbers
+| Value | Used for | Origin (source section / person + date) |
+|---|---|---|
+| 7 questions | Progress marks | DECISIONS.md, Game 1 (human, 2026-10-18) |
+| k points for question k | "+4 points · 10 so far", "28 points" | DECISIONS.md, Game 1, Scoring (human-accepted, 2026-10-17) |
+| 4.5:1 text, 3:1 non-text contrast | Mockup colour checks | WCAG 2.2 from memory: *unverified*; needs D11 |
+| 44 px minimum tap height | Mockup buttons and rows | The design tool's guideline; *not a project source*; needs D11 |
+| 390 × 844 px phone frame | Mockup size | The design tool's default phone size; needs D12 |
+| 16 px input text | Mockup inputs | Already in `src/app/globals.css` (stops iOS zooming into inputs) |
+
+## Plan
+1. Done: read the ROADMAP rows, DECISIONS.md Game 1 and the current UI; draft this ticket; make three directions as one Artifact canvas.
+2. Now: the human compares the directions and answers D1–D13 (in chat or as comments on the Artifact).
+3. Iterate on the chosen direction: mock the remaining screens (username, lock-in, did-you-mean, errors, loading), dark or light per D6.
+4. When M12 starts (or is moved earlier): write the design tokens and restyle `src/app/`, fill in Source diff, Evidence and Review.
+
+## Removes
+This draft adds one docs file and removes nothing: it is new work with no earlier version. When M12 is built, the plain styles in `src/app/globals.css` are replaced, not kept beside the new ones.
+
+---
+*Fill in the sections below at the end.*
+
+## Source diff
+| Source says | We built | Why different |
+|---|---|---|
+
+## Evidence
+
+## Review
+- Blocking findings and how each was fixed:
+- Deferred to ROADMAP "Next revision":

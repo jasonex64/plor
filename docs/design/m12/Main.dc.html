@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Direction A: Full scale</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4B3FD1}a:hover{color:#2F2699}
+.board{font-family:Inter,system-ui,sans-serif;color:#1D1B2F}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#5B5872}
+.phone{width:390px;height:844px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:1px solid #D9D7E4;overflow:hidden;display:flex;flex-direction:column;padding:20px 22px 28px;gap:18px;box-shadow:0 1px 2px rgba(29,27,47,.06),0 12px 32px rgba(29,27,47,.08)}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.mark{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.02em}
+.game{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:600;font-size:18px}
+.avatar{width:38px;height:38px;border-radius:50%;background:#E6E3F7;border:3px solid #FFFFFF;box-shadow:0 0 0 2px #4B3FD1;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px}
+.h1{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:800;font-size:34px;line-height:1.05;letter-spacing:-.02em;margin:0}
+.h2{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:600;font-size:20px;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.muted{color:#5B5872}
+.small{font-size:14px}
+.btn{min-height:52px;border-radius:14px;border:0;background:#4B3FD1;color:#FFFFFF;font:600 17px Inter,sans-serif;width:100%;cursor:pointer}
+.btn2{min-height:52px;border-radius:14px;border:1.5px solid #1D1B2F;background:#FFFFFF;color:#1D1B2F;font:600 17px Inter,sans-serif;width:100%;cursor:pointer}
+.link{min-height:44px;border:0;background:none;color:#4B3FD1;font:600 15px Inter,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0;text-align:left}
+.card{background:#F4F3FA;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+.in{min-height:52px;border-radius:14px;border:1.5px solid #8E8BA3;padding:0 14px;font:400 17px Inter,sans-serif;color:#1D1B2F;background:#FFFFFF}
+.in.focus{border:2px solid #4B3FD1;box-shadow:0 0 0 4px rgba(75,63,209,.16)}
+.or{display:flex;align-items:center;gap:12px;color:#5B5872;font-size:14px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:#D9D7E4}
+.dash{border:1.5px dashed #B9B6CC;border-radius:16px;padding:14px;color:#5B5872;font-size:14px}
+.sugg{list-style:none;margin:0;padding:0;border:1px solid #D9D7E4;border-radius:14px;overflow:hidden}
+.sugg li+li{border-top:1px solid #E8E6F0}
+.sugg button{width:100%;min-height:52px;border:0;background:#FFFFFF;text-align:left;padding:0 16px;font:500 17px Inter,sans-serif;color:#1D1B2F;cursor:pointer}
+.sugg b{font-weight:700}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{border-radius:16px;padding:14px;background:#F4F3FA;display:flex;flex-direction:column;gap:4px}
+.tile .k{font-size:13px;font-weight:600;color:#5B5872;text-transform:uppercase;letter-spacing:.05em}
+.tile .v{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:600;font-size:22px}
+.standin{font-size:12px;color:#5B5872}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #E8E6F0;font-size:14px}
+.row .q{color:#5B5872}
+.row .a{font-weight:600;text-align:right}
+.spacer{flex:1}
+/* the staff: 7 notes rising like a scale */
+.staff{position:relative;height:84px}
+.line{position:absolute;left:0;right:0;height:1px;background:#CFCCDD}
+.note{position:absolute;width:30px;display:flex;flex-direction:column;align-items:center}
+.stem{width:2px;height:26px;align-self:flex-end;margin-right:7px;background:#858199}
+.head{width:18px;height:13px;border-radius:50%;transform:rotate(-20deg);border:2px solid #858199;background:#FFFFFF;box-sizing:border-box}
+.n-done .head{background:#1D1B2F;border-color:#1D1B2F}
+.n-done .stem{background:#1D1B2F}
+.n-now .head{border:3px solid #4B3FD1;box-shadow:0 0 0 5px rgba(75,63,209,.18)}
+.n-now .stem{background:#4B3FD1}
+.n-off .head{border:3px solid #B4232C}
+.n-off .stem{background:#B4232C}
+.slash{position:absolute;bottom:4px;left:2px;width:28px;height:3px;background:#B4232C;transform:rotate(-45deg);border-radius:2px}
+.n-off .slash{display:block}
+.slash{display:none}
+.tag{position:absolute;top:100%;margin-top:6px;white-space:nowrap;font-size:12px;font-weight:700;color:#B4232C}
+.inv .line{background:rgba(255,255,255,.35)}
+.inv .head{border-color:rgba(255,255,255,.6);background:transparent}
+.inv .stem{background:rgba(255,255,255,.6)}
+.inv .n-done .head{background:#FFFFFF;border-color:#FFFFFF}
+.inv .n-done .stem{background:#FFFFFF}
+.inv .n-off .head{border:3px solid #FFD2D5;background:transparent}
+.inv .n-off .stem,.inv .slash{background:#FFD2D5}
+.inv .tag{color:#FFFFFF}
+.sharecard{background:#4B3FD1;color:#FFFFFF;border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.5;white-space:pre-line;background:#F4F3FA;border-radius:14px;padding:14px;margin:0}
+</style>
+</helmet>
+<div class="board" style="width: 3114px; height: 1000px; box-sizing: border-box; padding: 48px; background: #ECEBF2; display: flex; gap: 48px">
+
+<!-- 1 Sign-in -->
+<div class="col">
+<div class="lbl">1 · Sign-in</div>
+<div class="phone">
+<div class="top"><span class="mark">Plor</span></div>
+<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px">
+<h1 class="h1">Daily word games. Same puzzle for everyone.</h1>
+<p class="p muted">A new puzzle starts at midnight Pacific time.</p>
+</div>
+<div class="card">
+<div class="game">Today: Offbeat</div>
+<div class="staff" role="img" aria-label="Seven questions, rising in difficulty">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{home}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div></div></sc-for>
+</div>
+<p class="p small muted">Seven questions. Give an answer the host didn't. Match the host and your run ends.</p>
+</div>
+<div class="spacer"></div>
+<button class="btn2" type="button">Continue with Google</button>
+<div class="or">or</div>
+<label class="field">Email<input class="in" type="email" placeholder="you@example.com"></label>
+<button class="btn" type="button">Email me a sign-in link</button>
+<a href="#" class="small" style="align-self: center; min-height: 24px">Privacy policy</a>
+</div>
+</div>
+
+<!-- 2 Home -->
+<div class="col">
+<div class="lbl">2 · Home (signed in)</div>
+<div class="phone">
+<div class="top"><span class="mark">Plor</span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div class="small muted">Monday, November 2</div>
+<h1 class="h1">Today's Offbeat</h1>
+</div>
+<div class="card">
+<div class="staff" role="img" aria-label="Seven questions, none played yet">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{home}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div></div></sc-for>
+</div>
+<p class="p">7 questions, each a little harder. Give an answer the host didn't.</p>
+<button class="btn" type="button">Start today's run</button>
+</div>
+<div class="h2">Friends today</div>
+<div class="dash">Friends' runs and where they went off-key show here once you've played (M06).</div>
+<div class="h2">Leaderboard</div>
+<div class="dash">Friends and groups, all-time points (M08).</div>
+<div class="spacer"></div>
+<p class="p small muted" style="text-align: center">Next puzzle at midnight Pacific</p>
+</div>
+</div>
+
+<!-- 3 Question with autocomplete -->
+<div class="col">
+<div class="lbl">3 · Question + autocomplete</div>
+<div class="phone">
+<div class="top"><span class="game">Offbeat</span><span class="small muted">Question 4 of 7</span></div>
+<div class="staff" role="img" aria-label="Questions 1 to 3 survived, question 4 now, 3 still to come">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{asking}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div></div></sc-for>
+</div>
+<h1 class="h1">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in focus" value="ma" autocomplete="off"></label>
+<ul class="sugg" aria-label="Suggestions">
+<li><button type="button"><b>Ma</b>ple</button></li>
+<li><button type="button"><b>Ma</b>gnolia</button></li>
+<li><button type="button"><b>Ma</b>hogany</button></li>
+</ul>
+<button class="link" type="button">Not in the list? Send "ma"</button>
+<div class="spacer"></div>
+<p class="p small muted">Tap an answer, then lock it in. Typos are fine: we'll ask "did you mean".</p>
+</div>
+</div>
+
+<!-- 4 Safe answer -->
+<div class="col">
+<div class="lbl">4 · Answer result: safe</div>
+<div class="phone">
+<div class="top"><span class="game">Offbeat</span><span class="small muted">Question 4 of 7</span></div>
+<div class="staff" role="img" aria-label="Questions 1 to 4 survived, 3 still to come">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{safe}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div></div></sc-for>
+</div>
+<h1 class="h1">Off the beat.</h1>
+<p class="p muted">You didn't match the host. On to question 5.</p>
+<div class="pair">
+<div class="tile"><span class="k">You said</span><span class="v">dogwood</span></div>
+<div class="tile"><span class="k">Host said</span><span class="v">cedar</span><span class="standin">stand-in</span></div>
+</div>
+<div class="card" style="flex-direction: row; justify-content: space-between; align-items: center">
+<span class="p">+4 points</span><span class="p" style="font-weight: 600">10 so far</span>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">Next question</button>
+</div>
+</div>
+
+<!-- 5 Matched the host -->
+<div class="col">
+<div class="lbl">5 · Matched the host (run ends)</div>
+<div class="phone">
+<div class="top"><span class="game">Offbeat</span><span class="small muted">Question 5 of 7</span></div>
+<div class="staff" role="img" aria-label="Questions 1 to 4 survived, off-key on question 5">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{off}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div><div class="slash"></div><div class="tag">{{n.tag}}</div></div></sc-for>
+</div>
+<h1 class="h1" style="margin-top: 16px">Off-key on question 5</h1>
+<p class="p muted">Name a kind of pasta: you and the host both said <b style="color: #1D1B2F">ravioli</b> <span class="standin">(stand-in)</span>.</p>
+<div class="card" style="align-items: center; padding: 24px">
+<span style="font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 800; font-size: 56px; line-height: 1">4/7</span>
+<span class="p muted">survived · 10 points</span>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">See your run</button>
+<button class="btn2" type="button">Share</button>
+</div>
+</div>
+
+<!-- 6 Full run -->
+<div class="col">
+<div class="lbl">6 · Full run: 7 of 7</div>
+<div class="phone">
+<div class="top"><span class="mark">Plor</span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 class="h1">Full scale!</h1>
+<p class="p muted">All 7 survived · 28 points</p>
+</div>
+<div class="staff" role="img" aria-label="All 7 questions survived">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{full}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div></div></sc-for>
+</div>
+<div class="rows">
+<sc-for list="{{run}}" as="r" hint-placeholder-count="7"><div class="row"><span class="q">{{r.n}}. {{r.q}}</span><span class="a">{{r.you}}</span></div></sc-for>
+</div>
+<p class="standin" style="margin: 0">Host answers appear per row in the real screen; left out here so the sample spoils nothing.</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share result</button>
+<div class="dash" style="text-align: center">Comments and reactions open after you play (M07)</div>
+</div>
+</div>
+
+<!-- 7 Share card -->
+<div class="col">
+<div class="lbl">7 · Share card (no spoilers)</div>
+<div class="phone">
+<div class="top"><span class="game">Share</span></div>
+<div class="sharecard">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 800; font-size: 28px">Offbeat</span>
+<span style="font-size: 15px">Nov 2</span>
+</div>
+<div class="staff inv" role="img" aria-label="4 notes survived, off-key on the 5th, 2 not reached" style="margin-bottom: 18px">
+<div class="line" style="bottom: 16px"></div><div class="line" style="bottom: 28px"></div><div class="line" style="bottom: 40px"></div><div class="line" style="bottom: 52px"></div><div class="line" style="bottom: 64px"></div>
+<sc-for list="{{share}}" as="n" hint-placeholder-count="7"><div class="note {{n.cls}}" style="left: {{n.left}}px; bottom: {{n.bottom}}px"><div class="stem"></div><div class="head"></div><div class="slash"></div><div class="tag">{{n.tag}}</div></div></sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 800; font-size: 40px">4/7</span>
+<span style="font-size: 15px">plor.app</span>
+</div>
+</div>
+<div class="h2">As text</div>
+<p class="mono">Offbeat · Nov 2
+♪♪♪♪✕·· 4/7
+plor.app</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share image</button>
+<button class="btn2" type="button">Copy text</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3114,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // state of each of the 7 notes: done count, then the note after them is "now", "off" or untouched
+    const mk = (done, after) => Array.from({ length: 7 }, (_, i) => {
+      let cls = 'n-todo', tag = '';
+      if (i < done) cls = 'n-done';
+      else if (i === done && after === 'now') cls = 'n-now';
+      else if (i === done && after === 'off') { cls = 'n-off'; tag = 'off-key'; }
+      return { cls, tag, left: 8 + i * 48, bottom: 10 + i * 8 };
+    });
+    const run = [
+      ['Name a mammal', 'armadillo'], ['Name a bird', 'pelican'], ['Name something that flies', 'paper airplane'],
+      ['Name a kind of tree', 'dogwood'], ['Name a kind of pasta', 'orecchiette'], ['Name a kind of nut', 'Brazil nut'],
+      ['Name a kind of weather', 'monsoon']
+    ].map(([q, you], i) => ({ n: i + 1, q, you }));
+    return {
+      home: mk(0, ''), asking: mk(3, 'now'), safe: mk(4, ''), off: mk(4, 'off'), full: mk(7, ''), share: mk(4, 'off'), run
+    };
+  }
+}
+</script>
+</body>
+</html>

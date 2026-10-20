@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Direction C: Host chat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8FB8FF}a:hover{color:#C2D8FF}
+.board{font-family:Nunito,system-ui,sans-serif;color:#F3F1F8}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#3A3550}
+.phone{width:390px;height:844px;box-sizing:border-box;border-radius:36px;background:#17151F;overflow:hidden;display:flex;flex-direction:column;padding:20px 20px 24px;gap:14px;box-shadow:0 12px 32px rgba(23,21,31,.25)}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.mark{font-weight:900;font-size:26px;letter-spacing:-.02em}
+.avatar{width:38px;height:38px;border-radius:50%;background:#3A3550;border:3px solid #17151F;box-shadow:0 0 0 2px #FFB547;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.h1{font-weight:900;font-size:32px;line-height:1.1;margin:0}
+.h2{font-weight:800;font-size:18px;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.muted{color:#B4AFC4}
+.small{font-size:14px}
+.btn{min-height:52px;border-radius:26px;border:0;background:#FFB547;color:#17151F;font:800 17px Nunito,sans-serif;width:100%;cursor:pointer}
+.btn2{min-height:52px;border-radius:26px;border:2px solid #F3F1F8;background:transparent;color:#F3F1F8;font:800 17px Nunito,sans-serif;width:100%;cursor:pointer}
+.link{min-height:44px;border:0;background:none;color:#8FB8FF;font:700 15px Nunito,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0;text-align:left}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px;color:#F3F1F8}
+.in{min-height:52px;border-radius:26px;border:2px solid #7A7494;padding:0 18px;font:600 17px Nunito,sans-serif;color:#F3F1F8;background:#24212F}
+.in.focus{border-color:#FFB547}
+.dash{border:2px dashed #4A4462;border-radius:18px;padding:14px;color:#B4AFC4;font-size:14px}
+.thread{display:flex;flex-direction:column;gap:10px}
+.host{display:flex;gap:10px;align-items:flex-end;max-width:92%}
+.face{flex:none;width:34px;height:34px;border-radius:50%;background:#8FB8FF;color:#17151F;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
+.bub{background:#24212F;border-radius:20px 20px 20px 6px;padding:12px 14px;font-size:16px;line-height:1.4}
+.me{align-self:flex-end;background:#FFB547;color:#17151F;border-radius:20px 20px 6px 20px;padding:12px 16px;font-size:17px;font-weight:800;max-width:80%}
+.qno{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#B4AFC4;display:block;margin-bottom:2px}
+.qtext{font-size:22px;font-weight:900;line-height:1.2}
+.standin{font-size:12px;color:#B4AFC4;font-weight:600}
+.sugg{list-style:none;margin:0;padding:6px;background:#24212F;border-radius:20px;display:flex;flex-direction:column;gap:2px}
+.sugg button{width:100%;min-height:48px;border:0;border-radius:14px;background:transparent;text-align:left;padding:0 14px;font:600 17px Nunito,sans-serif;color:#F3F1F8;cursor:pointer}
+.sugg li:first-child button{background:#3A3550}
+.sugg b{font-weight:900;color:#FFB547}
+.rows{display:flex;flex-direction:column;background:#24212F;border-radius:18px;padding:0 14px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;font-size:14px}
+.row+.row{border-top:1px solid #34304A}
+.row .q{color:#B4AFC4}
+.row .a{font-weight:800;text-align:right}
+.spacer{flex:1}
+/* progress: 7 dots */
+.dots{display:flex;gap:8px;align-items:center}
+.dot{width:16px;height:16px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;line-height:1}
+.d-todo{border:2px solid #7A7494}
+.d-done{background:#F3F1F8}
+.d-now{width:22px;height:22px;border:3px solid #FFB547}
+.d-off{width:22px;height:22px;background:#FFB547;color:#17151F}
+.offlbl{font-size:12px;font-weight:800;color:#FFB547}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.5;white-space:pre-line;background:#24212F;border-radius:16px;padding:14px;margin:0}
+.sharecard{background:#24212F;border:2px solid #3A3550;border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:16px}
+</style>
+</helmet>
+<div class="board" style="width: 3114px; height: 1000px; box-sizing: border-box; padding: 48px; background: #D9D6E3; display: flex; gap: 48px">
+
+<!-- 1 Sign-in -->
+<div class="col">
+<div class="lbl">1 · Sign-in</div>
+<div class="phone">
+<div class="top"><span class="mark">plor</span></div>
+<div class="thread" style="margin-top: 24px">
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub">Hi! Every day I pick answers to 7 questions.</div></div>
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub">Your job: <b>don't</b> say what I said. A new game starts at midnight Pacific.</div></div>
+</div>
+<div class="spacer"></div>
+<h1 class="h1">Sign in to play Offbeat</h1>
+<button class="btn2" type="button">Continue with Google</button>
+<label class="field">Or email<input class="in" type="email" placeholder="you@example.com"></label>
+<button class="btn" type="button">Email me a sign-in link</button>
+<a href="#" class="small" style="align-self: center; min-height: 24px">Privacy policy</a>
+</div>
+</div>
+
+<!-- 2 Home -->
+<div class="col">
+<div class="lbl">2 · Home (signed in)</div>
+<div class="phone">
+<div class="top"><span class="mark">plor</span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div class="small muted" style="font-weight: 700">Monday, November 2</div>
+<div style="background: #24212F; border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span class="h1" style="font-size: 26px">Offbeat</span>
+<div class="dots" role="img" aria-label="7 questions, none played"><sc-for list="{{home}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}">{{d.mark}}</span></sc-for></div>
+</div>
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub" style="background: #17151F">I've picked my answers for today. Can you dodge all 7?</div></div>
+<button class="btn" type="button">Play today's game</button>
+</div>
+<div class="h2" style="margin-top: 6px">Friends today</div>
+<div class="dash">Who's playing, and where friends got caught once you've played (M06).</div>
+<div class="h2">Leaderboard</div>
+<div class="dash">Friends and groups, all-time points (M08).</div>
+<div class="spacer"></div>
+</div>
+</div>
+
+<!-- 3 Question with autocomplete -->
+<div class="col">
+<div class="lbl">3 · Question + autocomplete</div>
+<div class="phone">
+<div class="top">
+<span class="h2">Offbeat</span>
+<div class="dots" role="img" aria-label="Questions 1 to 3 dodged, question 4 now, 3 still to come"><sc-for list="{{asking}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}">{{d.mark}}</span></sc-for></div>
+</div>
+<div class="thread">
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub"><span class="qno">Question 4 of 7</span><span class="qtext">Name a kind of tree</span></div></div>
+</div>
+<div class="spacer"></div>
+<ul class="sugg" aria-label="Suggestions">
+<li><button type="button"><b>Ma</b>ple</button></li>
+<li><button type="button"><b>Ma</b>gnolia</button></li>
+<li><button type="button"><b>Ma</b>hogany</button></li>
+</ul>
+<button class="link" type="button" style="align-self: flex-start">Not in the list? Send "ma"</button>
+<label class="field">Your answer<input class="in focus" value="ma" autocomplete="off"></label>
+</div>
+</div>
+
+<!-- 4 Safe answer -->
+<div class="col">
+<div class="lbl">4 · Answer result: safe</div>
+<div class="phone">
+<div class="top">
+<span class="h2">Offbeat</span>
+<div class="dots" role="img" aria-label="Questions 1 to 4 dodged, 3 still to come"><sc-for list="{{safe}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}">{{d.mark}}</span></sc-for></div>
+</div>
+<div class="thread">
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub"><span class="qno">Question 4 of 7</span><span class="qtext">Name a kind of tree</span></div></div>
+<div class="me">dogwood</div>
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub">I said <b>cedar</b>. <span class="standin">(stand-in)</span> You got past me!</div></div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; background: #24212F; border-radius: 18px; padding: 14px 16px">
+<span class="p">+4 points</span><span class="p" style="font-weight: 900">10 so far</span>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">Next question</button>
+</div>
+</div>
+
+<!-- 5 Caught -->
+<div class="col">
+<div class="lbl">5 · Matched the host (run ends)</div>
+<div class="phone">
+<div class="top">
+<span class="h2">Offbeat</span>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+<div class="dots" role="img" aria-label="Questions 1 to 4 dodged, caught on question 5"><sc-for list="{{off}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}">{{d.mark}}</span></sc-for></div>
+<span class="offlbl" aria-hidden="true">caught on 5</span>
+</div>
+</div>
+<div class="thread">
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub"><span class="qno">Question 5 of 7</span><span class="qtext">Name a kind of pasta</span></div></div>
+<div class="me">ravioli</div>
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub">Ravioli! <b>Same as me.</b> <span class="standin">(stand-in)</span> That's the end of today's run.</div></div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; background: #24212F; border-radius: 24px; padding: 22px">
+<span style="font-weight: 900; font-size: 56px; line-height: 1">4/7</span>
+<span class="p muted">dodged · 10 points</span>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">See your run</button>
+<button class="btn2" type="button">Share</button>
+</div>
+</div>
+
+<!-- 6 Full run -->
+<div class="col">
+<div class="lbl">6 · Full run: 7 of 7</div>
+<div class="phone">
+<div class="top"><span class="mark">plor</span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div class="host"><span class="face" aria-hidden="true">H</span><div class="bub">You dodged all 7. I'll get you tomorrow.</div></div>
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div class="dots" role="img" aria-label="All 7 dodged"><sc-for list="{{full}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}">{{d.mark}}</span></sc-for></div>
+<span style="font-weight: 900; font-size: 28px">28 pts</span>
+</div>
+<div class="rows">
+<sc-for list="{{run}}" as="r" hint-placeholder-count="7"><div class="row"><span class="q">{{r.n}}. {{r.q}}</span><span class="a">{{r.you}}</span></div></sc-for>
+</div>
+<p class="standin" style="margin: 0">The real screen adds the host's answer on each row; left out so the sample spoils nothing.</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share result</button>
+<div class="dash" style="text-align: center">Comments and reactions after you play (M07)</div>
+</div>
+</div>
+
+<!-- 7 Share card -->
+<div class="col">
+<div class="lbl">7 · Share card (no spoilers)</div>
+<div class="phone">
+<div class="top"><span class="h2">Share</span></div>
+<div class="sharecard">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-weight: 900; font-size: 28px">Offbeat</span><span style="font-size: 15px; font-weight: 800">Nov 2</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div class="dots" role="img" aria-label="4 dodged, caught on the 5th, 2 not reached" style="gap: 12px"><sc-for list="{{off}}" as="d" hint-placeholder-count="7"><span class="dot {{d.cls}}" style="width: 28px; height: 28px; font-size: 15px">{{d.mark}}</span></sc-for></div>
+<span class="offlbl" aria-hidden="true">caught on 5</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-weight: 900; font-size: 22px">Dodged the host 4 of 7</span>
+</div>
+<span class="small muted">plor.app</span>
+</div>
+<div class="h2">As text</div>
+<p class="mono">Offbeat · Nov 2
+●●●●✕○○ 4/7
+plor.app</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share image</button>
+<button class="btn2" type="button">Copy text</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3114,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // 7 dots: dodged ones filled, the current one ringed, the caught one marked with an x
+    const mk = (done, after) => Array.from({ length: 7 }, (_, i) => {
+      let cls = 'd-todo', mark = '';
+      if (i < done) cls = 'd-done';
+      else if (i === done && after === 'now') cls = 'd-now';
+      else if (i === done && after === 'off') { cls = 'd-off'; mark = '✕'; }
+      return { cls, mark };
+    });
+    const run = [
+      ['Name a mammal', 'armadillo'], ['Name a bird', 'pelican'], ['Name something that flies', 'paper airplane'],
+      ['Name a kind of tree', 'dogwood'], ['Name a kind of pasta', 'orecchiette'], ['Name a kind of nut', 'Brazil nut'],
+      ['Name a kind of weather', 'monsoon']
+    ].map(([q, you], i) => ({ n: i + 1, q, you }));
+    return { home: mk(0, ''), asking: mk(3, 'now'), safe: mk(4, ''), off: mk(4, 'off'), full: mk(7, ''), run };
+  }
+}
+</script>
+</body>
+</html>

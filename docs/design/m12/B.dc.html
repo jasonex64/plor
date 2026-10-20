@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Direction B: Seven steps</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#0B524D}
+.board{font-family:Manrope,system-ui,sans-serif;color:#15202B}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#52606D}
+.phone{width:390px;height:844px;box-sizing:border-box;border-radius:36px;background:#F6F7F8;border:1px solid #D5DBE1;overflow:hidden;display:flex;flex-direction:column;padding:20px 22px 28px;gap:18px;box-shadow:0 12px 32px rgba(21,32,43,.08)}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.mark{font-weight:800;font-size:22px;letter-spacing:-.01em}
+.mark i{font-style:normal;color:#0F766E}
+.avatar{width:38px;height:38px;border-radius:12px;background:#DDEBE9;border:2px solid #F6F7F8;box-shadow:0 0 0 2px #15202B;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.h1{font-weight:800;font-size:32px;line-height:1.1;letter-spacing:-.02em;margin:0}
+.h2{font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:#52606D;margin:0}
+.p{margin:0;font-size:16px;line-height:1.45}
+.muted{color:#52606D}
+.small{font-size:14px}
+.btn{min-height:52px;border-radius:10px;border:0;background:#0F766E;color:#FFFFFF;font:700 17px Manrope,sans-serif;width:100%;cursor:pointer}
+.btn2{min-height:52px;border-radius:10px;border:1.5px solid #15202B;background:#FFFFFF;color:#15202B;font:700 17px Manrope,sans-serif;width:100%;cursor:pointer}
+.link{min-height:44px;border:0;background:none;color:#0F766E;font:700 15px Manrope,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0;text-align:left}
+.panel{background:#FFFFFF;border:1px solid #D5DBE1;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+.in{min-height:52px;border-radius:10px;border:1.5px solid #7B8794;padding:0 14px;font:500 17px Manrope,sans-serif;color:#15202B;background:#FFFFFF}
+.in.focus{border:2px solid #0F766E;box-shadow:0 0 0 4px rgba(15,118,110,.16)}
+.dash{border:1.5px dashed #AAB4BE;border-radius:12px;padding:14px;color:#52606D;font-size:14px}
+.gamerow{display:flex;align-items:center;gap:14px;min-height:72px;background:#FFFFFF;border:1px solid #D5DBE1;border-radius:14px;padding:12px 14px;text-decoration:none;color:#15202B}
+.gamerow .t{font-weight:800;font-size:18px}
+.chev{margin-left:auto;font-weight:800;font-size:20px;color:#52606D}
+.sugg{list-style:none;margin:0;padding:0;background:#FFFFFF;border:1px solid #D5DBE1;border-radius:10px;overflow:hidden}
+.sugg li+li{border-top:1px solid #E6EAEE}
+.sugg button{width:100%;min-height:52px;border:0;background:#FFFFFF;text-align:left;padding:0 16px;font:500 17px Manrope,sans-serif;color:#15202B;cursor:pointer}
+.sugg b{font-weight:800}
+.vs{display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D5DBE1;border-radius:14px}
+.vs div{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px}
+.vs div+div{border-top:1px solid #E6EAEE}
+.vs .k{font-size:14px;color:#52606D;font-weight:700}
+.vs .v{font-size:22px;font-weight:800}
+.standin{font-size:12px;color:#52606D;font-weight:500}
+.rows{display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D5DBE1;border-radius:14px;padding:0 14px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;font-size:14px}
+.row+.row{border-top:1px solid #E6EAEE}
+.row .q{color:#52606D}
+.row .a{font-weight:700;text-align:right}
+.spacer{flex:1}
+.big{font-weight:800;font-size:64px;line-height:1;letter-spacing:-.03em}
+/* the steps: 7 bars rising in height */
+.steps{display:flex;align-items:flex-end;gap:6px;height:80px}
+.step{flex:1;border-radius:6px 6px 2px 2px;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-weight:800;font-size:13px;position:relative}
+.s-todo{background:#E3E7EB;color:#52606D}
+.s-done{background:#0F766E;color:#FFFFFF}
+.s-now{background:#FFFFFF;border:3px solid #0F766E;color:#0F766E}
+.s-off{background:#FFFFFF;border:3px solid #9A3412;color:#9A3412}
+.steplbl{display:flex;gap:6px;font-size:12px;font-weight:700;color:#9A3412}
+.steplbl span{flex:1;text-align:center}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.5;white-space:pre-line;background:#FFFFFF;border:1px solid #D5DBE1;border-radius:10px;padding:14px;margin:0}
+.sharecard{background:#15202B;color:#FFFFFF;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.sharecard .s-todo{background:#2C3A47;color:#AAB4BE}
+.sharecard .s-done{background:#5EEAD4;color:#15202B}
+.sharecard .s-off{background:#15202B;border-color:#FDBA74;color:#FDBA74}
+.sharecard .steplbl{color:#FDBA74}
+</style>
+</helmet>
+<div class="board" style="width: 3114px; height: 1000px; box-sizing: border-box; padding: 48px; background: #E9ECEF; display: flex; gap: 48px">
+
+<!-- 1 Sign-in -->
+<div class="col">
+<div class="lbl">1 · Sign-in</div>
+<div class="phone">
+<div class="top"><span class="mark">plor<i>.</i></span></div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 40px">
+<h1 class="h1">One puzzle a day. Same one for everyone.</h1>
+<p class="p muted">Sign in to play and keep your results. New puzzle at midnight Pacific.</p>
+</div>
+<div class="panel">
+<div class="h2">Today</div>
+<div style="font-weight: 800; font-size: 20px">Offbeat</div>
+<p class="p small muted">7 questions. Don't give the host's answer.</p>
+</div>
+<div class="spacer"></div>
+<button class="btn2" type="button">Continue with Google</button>
+<label class="field">Or use your email<input class="in" type="email" placeholder="you@example.com"></label>
+<button class="btn" type="button">Email me a sign-in link</button>
+<a href="#" class="small" style="align-self: center; min-height: 24px">Privacy policy</a>
+</div>
+</div>
+
+<!-- 2 Home -->
+<div class="col">
+<div class="lbl">2 · Home (signed in)</div>
+<div class="phone">
+<div class="top"><span class="mark">plor<i>.</i></span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div class="small muted" style="font-weight: 700">Monday, November 2</div>
+<h1 class="h1">Today's games</h1>
+</div>
+<a href="#" class="gamerow">
+<div class="steps" style="height: 40px; width: 84px; gap: 3px" aria-hidden="true">
+<sc-for list="{{tiny}}" as="s" hint-placeholder-count="7"><div class="step s-todo" style="height: {{s.h}}px; border-radius: 3px"></div></sc-for>
+</div>
+<div style="display: flex; flex-direction: column"><span class="t">Offbeat</span><span class="small muted">Not played yet</span></div>
+<span class="chev" aria-hidden="true">›</span>
+</a>
+<div class="dash">More games join this list later (game 2 and on).</div>
+<div class="h2" style="margin-top: 8px">Friends</div>
+<div class="dash">Friends' scores and where they were caught, after you play (M06).</div>
+<div class="h2">Leaderboard</div>
+<div class="dash">All-time points for friends and groups (M08).</div>
+<div class="spacer"></div>
+</div>
+</div>
+
+<!-- 3 Question with autocomplete -->
+<div class="col">
+<div class="lbl">3 · Question + autocomplete</div>
+<div class="phone">
+<div class="top"><span class="mark" style="font-size: 18px">Offbeat</span><span class="small muted" style="font-weight: 700">4 / 7</span></div>
+<div class="steps" role="img" aria-label="Questions 1 to 3 safe, question 4 now, 3 still to come">
+<sc-for list="{{asking}}" as="s" hint-placeholder-count="7"><div class="step {{s.cls}}" style="height: {{s.h}}px">{{s.n}}</div></sc-for>
+</div>
+<h1 class="h1" style="margin-top: 8px">Name a kind of tree</h1>
+<label class="field">Your answer<input class="in focus" value="ma" autocomplete="off"></label>
+<ul class="sugg" aria-label="Suggestions">
+<li><button type="button"><b>Ma</b>ple</button></li>
+<li><button type="button"><b>Ma</b>gnolia</button></li>
+<li><button type="button"><b>Ma</b>hogany</button></li>
+</ul>
+<button class="link" type="button">Not in the list? Send "ma"</button>
+<div class="spacer"></div>
+</div>
+</div>
+
+<!-- 4 Safe answer -->
+<div class="col">
+<div class="lbl">4 · Answer result: safe</div>
+<div class="phone">
+<div class="top"><span class="mark" style="font-size: 18px">Offbeat</span><span class="small muted" style="font-weight: 700">4 / 7</span></div>
+<div class="steps" role="img" aria-label="Questions 1 to 4 safe, 3 still to come">
+<sc-for list="{{safe}}" as="s" hint-placeholder-count="7"><div class="step {{s.cls}}" style="height: {{s.h}}px">{{s.n}}</div></sc-for>
+</div>
+<h1 class="h1" style="margin-top: 8px">Safe.</h1>
+<div class="vs">
+<div><span class="k">You</span><span class="v">dogwood</span></div>
+<div><span class="k">Host <span class="standin">(stand-in)</span></span><span class="v">cedar</span></div>
+</div>
+<div style="display: flex; gap: 24px">
+<div><div class="big" style="font-size: 40px">+4</div><div class="small muted">points</div></div>
+<div><div class="big" style="font-size: 40px">10</div><div class="small muted">score so far</div></div>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">Question 5</button>
+</div>
+</div>
+
+<!-- 5 Caught -->
+<div class="col">
+<div class="lbl">5 · Matched the host (run ends)</div>
+<div class="phone">
+<div class="top"><span class="mark" style="font-size: 18px">Offbeat</span><span class="small muted" style="font-weight: 700">5 / 7</span></div>
+<div class="steps" role="img" aria-label="Questions 1 to 4 safe, caught on question 5">
+<sc-for list="{{off}}" as="s" hint-placeholder-count="7"><div class="step {{s.cls}}" style="height: {{s.h}}px">{{s.mark}}</div></sc-for>
+</div>
+<div class="steplbl" aria-hidden="true"><span></span><span></span><span></span><span></span><span>caught</span><span></span><span></span></div>
+<h1 class="h1">Caught on question 5</h1>
+<p class="p muted">Name a kind of pasta. You both said <b style="color: #15202B">ravioli</b> <span class="standin">(stand-in)</span>.</p>
+<div class="panel" style="flex-direction: row; align-items: center; gap: 20px">
+<div class="big">4<span style="font-size: 32px; color: #52606D">/7</span></div>
+<div class="p muted">safe answers<br><b style="color: #15202B">10 points</b></div>
+</div>
+<div class="spacer"></div>
+<button class="btn" type="button">See your run</button>
+<button class="btn2" type="button">Share</button>
+</div>
+</div>
+
+<!-- 6 Full run -->
+<div class="col">
+<div class="lbl">6 · Full run: 7 of 7</div>
+<div class="phone">
+<div class="top"><span class="mark">plor<i>.</i></span><span class="avatar" aria-label="Your profile">Y</span></div>
+<div class="steps" role="img" aria-label="All 7 questions safe">
+<sc-for list="{{full}}" as="s" hint-placeholder-count="7"><div class="step {{s.cls}}" style="height: {{s.h}}px">{{s.n}}</div></sc-for>
+</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h1 class="h1">All 7 cleared</h1><span class="big" style="font-size: 32px">28</span>
+</div>
+<div class="rows">
+<sc-for list="{{run}}" as="r" hint-placeholder-count="7"><div class="row"><span class="q">{{r.n}}. {{r.q}}</span><span class="a">{{r.you}}</span></div></sc-for>
+</div>
+<p class="standin" style="margin: 0">The real screen shows the host's answer on each row; left out so the sample spoils nothing.</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share result</button>
+<div class="dash" style="text-align: center">Comments and reactions after you play (M07)</div>
+</div>
+</div>
+
+<!-- 7 Share card -->
+<div class="col">
+<div class="lbl">7 · Share card (no spoilers)</div>
+<div class="phone">
+<div class="top"><span class="mark" style="font-size: 18px">Share</span></div>
+<div class="sharecard">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-weight: 800; font-size: 26px">Offbeat</span><span style="font-size: 15px; font-weight: 700">Nov 2</span>
+</div>
+<div class="steps" role="img" aria-label="4 safe, caught on the 5th, 2 not reached">
+<sc-for list="{{off}}" as="s" hint-placeholder-count="7"><div class="step {{s.cls}}" style="height: {{s.h}}px">{{s.mark}}</div></sc-for>
+</div>
+<div class="steplbl" aria-hidden="true" style="margin-top: -8px"><span></span><span></span><span></span><span></span><span>caught</span><span></span><span></span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span class="big" style="font-size: 44px">4/7</span><span style="font-size: 15px; font-weight: 700">plor.app</span>
+</div>
+</div>
+<div class="h2">As text</div>
+<p class="mono">Offbeat · Nov 2
+▁▂▃▄✕·· 4/7
+plor.app</p>
+<div class="spacer"></div>
+<button class="btn" type="button">Share image</button>
+<button class="btn2" type="button">Copy text</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3114,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // 7 bars rising in height; done count, then the bar after them is "now", "off" or untouched
+    const mk = (done, after, base, rise) => Array.from({ length: 7 }, (_, i) => {
+      let cls = 's-todo', mark = String(i + 1);
+      if (i < done) cls = 's-done';
+      else if (i === done && after === 'now') cls = 's-now';
+      else if (i === done && after === 'off') { cls = 's-off'; mark = '✕'; }
+      return { cls, n: String(i + 1), mark, h: base + i * rise };
+    });
+    const run = [
+      ['Name a mammal', 'armadillo'], ['Name a bird', 'pelican'], ['Name something that flies', 'paper airplane'],
+      ['Name a kind of tree', 'dogwood'], ['Name a kind of pasta', 'orecchiette'], ['Name a kind of nut', 'Brazil nut'],
+      ['Name a kind of weather', 'monsoon']
+    ].map(([q, you], i) => ({ n: i + 1, q, you }));
+    return {
+      tiny: mk(0, '', 10, 5), asking: mk(3, 'now', 26, 9), safe: mk(4, '', 26, 9), off: mk(4, 'off', 26, 9),
+      full: mk(7, '', 26, 9), run
+    };
+  }
+}
+</script>
+</body>
+</html>
