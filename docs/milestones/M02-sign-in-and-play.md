@@ -48,9 +48,9 @@ Each criterion must be checkable with a command or other observable result.
 - [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
 
 **2c: privacy page and Google branding** (D5, human 2026-10-19)
-- [ ] `https://plor.app/privacy` is public and linked from the sign-in screen and the signed-in footer. Its text was approved by the human before merge, and it states only what the code and the services do (Evidence).
+- [x] `https://plor.app/privacy` is public and linked from the sign-in screen and the signed-in footer. *(Text approved by the human on the PR #9 preview, 2026-10-19: "looks okay".)* Its text was approved by the human before merge, and it states only what the code and the services do (Evidence).
 - [x] The page names a working contact, `privacy@plor.app`, forwarded to the human's inbox (a test email arrives). *(Human, 2026-10-19: ImprovMX forwarding, its two MX records and SPF TXT added in Vercel DNS, and a test email arrived.)*
-- [ ] Rehearsal fixes (human, 2026-10-19): Enter in the answer box picks an exactly named entry and never sends a miss (it had logged "passport" as not in the list), and "Did you mean" offers entries one typo away (`src/game/suggest.test.ts`; browser check in Evidence).
+- [x] Rehearsal fixes (human, 2026-10-19): Enter in the answer box picks an exactly named entry and never sends a miss (it had logged "passport" as not in the list), and "Did you mean" offers entries one typo away (`src/game/suggest.test.ts`; browser check in Evidence).
 - [ ] The human submits Google brand verification with the home page, the privacy link and the verified domain `plor.app`, and records Google's answer. While it is pending, Google keeps showing the Supabase address.
 
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
