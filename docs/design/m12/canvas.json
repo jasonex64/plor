@@ -7,9 +7,13 @@
   "title": "Plor + Offbeat look directions",
   "launch": {
     "view": "canvas",
-    "page": "r5"
+    "page": "r6"
   },
   "pages": [
+    {
+      "id": "r6",
+      "name": "Round 6 · 3rd person, reworked"
+    },
     {
       "id": "r5",
       "name": "Round 5 · camera sketches"
@@ -167,6 +171,14 @@
       "h": 1000,
       "title": "Low-res PixelLab test (3rd person)",
       "page": "r5"
+    },
+    "R7-third.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1362,
+      "h": 1000,
+      "title": "Offbeat · 3rd person: typing, safe, caught",
+      "page": "r6"
     }
   },
   "order": [
@@ -186,7 +198,8 @@
     "R3-ridge.dc.html",
     "R4-pixellab.dc.html",
     "R5-camera.dc.html",
-    "R6-lowres.dc.html"
+    "R6-lowres.dc.html",
+    "R7-third.dc.html"
   ],
   "notes": {
     "heading": {
@@ -276,6 +289,22 @@
       "fill": "orange",
       "page": "r5",
       "text": "You picked 3rd person. The low-res PixelLab test (2 generations): the trail scene at 128 × 72 px and a goat seen from behind at 32 × 32 px, a third of Round 4’s scene width and half its goat size.\n\nIs this chunky enough, and does it look like the game you want? If PixelLab still feels wrong, the other routes are art drawn in code (like the sketches above) or a pixel artist."
+    },
+    "r6heading": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 6: behind the goat, reworked",
+      "kind": "title1",
+      "maxW": 1362,
+      "page": "r6"
+    },
+    "r6about": {
+      "x": 1442,
+      "y": 0,
+      "w": 400,
+      "fill": "orange",
+      "page": "r6",
+      "text": "Drawn in code at the sketch resolution, as you chose. Changes from your Round 5 notes:\n\n• Clouds: three layers with rounded tops, peaks poking through, mist across the ridge, birds, and bigger cloud banks up close.\n• Signs: each one is planted on a stake that stands on the stop. The host’s sign stands on its own worn stone; when you’re caught it stays on the far lip while yours falls.\n• Softer colours: muted blue sky, lighter rock, dark navy instead of black, a softer red.\n\nColours are still placeholders (D3)."
     }
   },
   "designSystems": []
