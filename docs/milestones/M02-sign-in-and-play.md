@@ -127,7 +127,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M11: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
 | Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
 | "Did you mean" | Answer box suggestions | One typo forgiven (a letter missing, extra, wrong, or two neighbours swapped), only for text of 4+ letters (human, 2026-10-19); `src/config/tunables.ts` |
-| Google sign-in data | Privacy page | Checked by the human in Supabase → Users, 2026-10-19: a Google user stores a name; the avatar URL was blank for an account without a photo |
+| Google sign-in data | Privacy page | Checked by the human in Supabase → Users, 2026-10-19: a Google user stores a name and an avatar URL (first reported blank, then corrected by the human) |
 | Privacy page facts | 2c | Contact `privacy@plor.app`; minimum age 13 (not directed at children under 13); says now that answers may be used, without email or username, to improve puzzles, including with AI tools (all human, 2026-10-19) |
 | Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19); plus 2026-10-19 with the 2026-11-07 questions, so the human could rehearse the same day (human, 2026-10-19: "can i just do it now") |
 | Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
