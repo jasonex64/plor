@@ -1535,7 +1535,8 @@
           "name": "cookies and cream",
           "aliases": [
             "cookies n cream",
-            "Oreo cookie"
+            "Oreo cookie",
+            "Oreo"
           ],
           "plural": "cookies and cream"
         },
@@ -1915,12 +1916,6 @@
           "name": "marshmallow",
           "aliases": [],
           "plural": "marshmallow"
-        },
-        {
-          "id": "oreo",
-          "name": "Oreo",
-          "aliases": [],
-          "plural": "Oreo"
         },
         {
           "id": "brownie",

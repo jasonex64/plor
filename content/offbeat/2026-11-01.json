@@ -814,191 +814,168 @@
         {
           "id": "rose",
           "name": "rose",
-          "aliases": [
-            "roses"
-          ]
+          "aliases": [],
+          "plural": "rose"
         },
         {
           "id": "salmon",
           "name": "salmon",
-          "aliases": []
+          "aliases": [],
+          "plural": "salmon"
         },
         {
           "id": "fuchsia",
           "name": "fuchsia",
           "aliases": [
-            "fuchsias",
             "fuschia"
-          ]
+          ],
+          "plural": "fuchsia"
         },
         {
           "id": "periwinkle",
           "name": "periwinkle",
-          "aliases": [
-            "periwinkles"
-          ]
+          "aliases": [],
+          "plural": "periwinkle"
         },
         {
           "id": "lilac",
           "name": "lilac",
-          "aliases": [
-            "lilacs"
-          ]
+          "aliases": [],
+          "plural": "lilac"
         },
         {
           "id": "plum",
           "name": "plum",
-          "aliases": [
-            "plums"
-          ]
+          "aliases": [],
+          "plural": "plum"
         },
         {
           "id": "amber",
           "name": "amber",
-          "aliases": [
-            "ambers"
-          ]
+          "aliases": [],
+          "plural": "amber"
         },
         {
           "id": "rust",
           "name": "rust",
-          "aliases": [
-            "rusts"
-          ]
+          "aliases": [],
+          "plural": "rust"
         },
         {
           "id": "copper",
           "name": "copper",
-          "aliases": [
-            "coppers"
-          ]
+          "aliases": [],
+          "plural": "copper"
         },
         {
           "id": "bronze",
           "name": "bronze",
-          "aliases": [
-            "bronzes"
-          ]
+          "aliases": [],
+          "plural": "bronze"
         },
         {
           "id": "mustard",
           "name": "mustard",
-          "aliases": [
-            "mustards"
-          ]
+          "aliases": [],
+          "plural": "mustard"
         },
         {
           "id": "sienna",
           "name": "sienna",
-          "aliases": [
-            "siennas"
-          ]
+          "aliases": [],
+          "plural": "sienna"
         },
         {
           "id": "ochre",
           "name": "ochre",
-          "aliases": [
-            "ochres"
-          ]
+          "aliases": [],
+          "plural": "ochre"
         },
         {
           "id": "sepia",
           "name": "sepia",
-          "aliases": [
-            "sepias"
-          ]
+          "aliases": [],
+          "plural": "sepia"
         },
         {
           "id": "taupe",
           "name": "taupe",
-          "aliases": [
-            "taupes"
-          ]
+          "aliases": [],
+          "plural": "taupe"
         },
         {
           "id": "champagne",
           "name": "champagne",
-          "aliases": [
-            "champagnes"
-          ]
+          "aliases": [],
+          "plural": "champagne"
         },
         {
           "id": "cerulean",
           "name": "cerulean",
-          "aliases": [
-            "ceruleans"
-          ]
+          "aliases": [],
+          "plural": "cerulean"
         },
         {
           "id": "cobalt",
           "name": "cobalt",
-          "aliases": [
-            "cobalts"
-          ]
+          "aliases": [],
+          "plural": "cobalt"
         },
         {
           "id": "azure",
           "name": "azure",
-          "aliases": [
-            "azures"
-          ]
+          "aliases": [],
+          "plural": "azure"
         },
         {
           "id": "sapphire",
           "name": "sapphire",
-          "aliases": [
-            "sapphires"
-          ]
+          "aliases": [],
+          "plural": "sapphire"
         },
         {
           "id": "ruby",
           "name": "ruby",
-          "aliases": [
-            "rubies"
-          ]
+          "aliases": [],
+          "plural": "ruby"
         },
         {
           "id": "eggplant",
           "name": "eggplant",
           "aliases": [
-            "aubergine",
-            "eggplants"
-          ]
+            "aubergine"
+          ],
+          "plural": "eggplant"
         },
         {
           "id": "mahogany",
           "name": "mahogany",
-          "aliases": [
-            "mahoganies"
-          ]
+          "aliases": [],
+          "plural": "mahogany"
         },
         {
           "id": "chestnut",
           "name": "chestnut",
-          "aliases": [
-            "chestnuts"
-          ]
+          "aliases": [],
+          "plural": "chestnut"
         },
         {
           "id": "slate",
           "name": "slate",
-          "aliases": [
-            "slates"
-          ]
+          "aliases": [],
+          "plural": "slate"
         },
         {
           "id": "pewter",
           "name": "pewter",
-          "aliases": [
-            "pewters"
-          ]
+          "aliases": [],
+          "plural": "pewter"
         },
         {
           "id": "platinum",
           "name": "platinum",
-          "aliases": [
-            "platinums"
-          ]
+          "aliases": [],
+          "plural": "platinum"
         }
       ],
       "host_bank": [
@@ -1505,12 +1482,6 @@
           ]
         },
         {
-          "id": "tamagoyaki",
-          "name": "tamagoyaki",
-          "aliases": [],
-          "plural": "tamagoyaki"
-        },
-        {
           "id": "menemen",
           "name": "menemen",
           "aliases": [],
@@ -1569,7 +1540,7 @@
           "plural": "over easy"
         },
         {
-          "id": "c-lb-r",
+          "id": "cilbir",
           "name": "çılbır",
           "aliases": [
             "turkish eggs"
@@ -1997,8 +1968,9 @@
           "id": "epoch",
           "name": "epoch",
           "aliases": [
-            "epoches"
-          ]
+            "epochs"
+          ],
+          "plural": "epochs"
         },
         {
           "id": "era",

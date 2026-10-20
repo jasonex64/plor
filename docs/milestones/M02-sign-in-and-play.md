@@ -65,6 +65,15 @@ Each criterion must be checkable with a command or other observable result.
 **2d: fuller answer lists for the playtest** (human, 2026-10-19: unaccepted answers are "incredibly frustrating"; "two different names for the same concept")
 - [ ] The 7 playtest puzzles (2026-10-26 to 11-01) get more accepted answers and more aliases (other names for the same thing). Host banks, host answers, prompts and every existing entry stay as they were (checked by script). The validator passes, and the human approves the lists before merge and republishes them.
 
+2d evidence (2026-10-19), against `85146b5`, the commit before the list changes:
+```text
+$ npm run content:additions-check -- 85146b5
+ADDITIONS ONLY against 85146b5: 756 new entries, 109 new aliases on existing entries
+$ npm run content:validate
+CONTENT OK content: 14 file(s)
+```
+Review: 8 blocking findings fixed. They were tamagoyaki (a kind of the host omelet), colour plurals that named other things, epoch and nudibranch plurals, Oreo as a second entry for cookies and cream, three "<kind> <listed>" pizza toppings, Caesar salad next to the general salad, Heads Up! (charades-like, host charades), and the `c-lb-r` ID for çılbır (now `cilbir`). Judgment calls are listed for the human in ROADMAP and the PR.
+
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
 **Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.

@@ -1475,8 +1475,9 @@
           "id": "nudibranch",
           "name": "nudibranch",
           "aliases": [
-            "nudibranches"
-          ]
+            "nudibranchs"
+          ],
+          "plural": "nudibranchs"
         },
         {
           "id": "conch",

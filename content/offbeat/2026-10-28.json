@@ -45,7 +45,8 @@
           "aliases": [
             "salad",
             "garden salad",
-            "green salads"
+            "green salads",
+            "Caesar salad"
           ]
         },
         {
@@ -1112,12 +1113,6 @@
           "plural": "egg salad"
         },
         {
-          "id": "caesar-salad",
-          "name": "Caesar salad",
-          "aliases": [],
-          "plural": "Caesar salad"
-        },
-        {
           "id": "donut",
           "name": "donut",
           "aliases": [
@@ -1967,20 +1962,6 @@
           "plural": "mussels"
         },
         {
-          "id": "green-olive",
-          "name": "green olive",
-          "aliases": [
-            "green olives"
-          ]
-        },
-        {
-          "id": "red-pepper",
-          "name": "red pepper",
-          "aliases": [
-            "red peppers"
-          ]
-        },
-        {
           "id": "pepperoncini",
           "name": "pepperoncini",
           "aliases": [
@@ -2010,12 +1991,6 @@
           "name": "parmesan",
           "aliases": [],
           "plural": "parmesan"
-        },
-        {
-          "id": "goat-cheese",
-          "name": "goat cheese",
-          "aliases": [],
-          "plural": "goat cheese"
         },
         {
           "id": "gorgonzola",
@@ -2362,12 +2337,6 @@
             "Werewolf"
           ],
           "plural": "Mafia"
-        },
-        {
-          "id": "heads-up",
-          "name": "Heads Up!",
-          "aliases": [],
-          "plural": "Heads Up!"
         },
         {
           "id": "would-you-rather",
