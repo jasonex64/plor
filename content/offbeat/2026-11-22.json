@@ -178,7 +178,6 @@
           "id": "green-salad",
           "name": "green salad",
           "aliases": [
-            "salad",
             "tossed salad"
           ],
           "plural": "green salad"
@@ -1180,6 +1179,20 @@
           ]
         },
         {
+          "id": "kid",
+          "name": "kid",
+          "aliases": [
+            "kids"
+          ]
+        },
+        {
+          "id": "tom",
+          "name": "tom",
+          "aliases": [
+            "toms"
+          ]
+        },
+        {
           "id": "cob",
           "name": "cob",
           "aliases": [
@@ -1244,17 +1257,10 @@
           "name": "pyramid",
           "aliases": [
             "square pyramid",
+            "tetrahedron",
+            "triangular pyramid",
             "pyramids"
           ]
-        },
-        {
-          "id": "tetrahedron",
-          "name": "tetrahedron",
-          "aliases": [
-            "triangular pyramid",
-            "tetrahedra"
-          ],
-          "plural": "tetrahedra"
         },
         {
           "id": "prism",
@@ -1264,18 +1270,12 @@
             "hexagonal prism",
             "pentagonal prism",
             "octagonal prism",
-            "prisms"
-          ]
-        },
-        {
-          "id": "cuboid",
-          "name": "cuboid",
-          "aliases": [
+            "cuboid",
             "rectangular prism",
             "box",
             "rectangular box",
             "rectangular cuboid",
-            "cuboids"
+            "prisms"
           ]
         },
         {
@@ -1356,13 +1356,6 @@
           ]
         },
         {
-          "id": "mobius-strip",
-          "name": "Möbius strip",
-          "aliases": [
-            "Möbius strips"
-          ]
-        },
-        {
           "id": "polyhedron",
           "name": "polyhedron",
           "aliases": [
@@ -1378,34 +1371,10 @@
           ]
         },
         {
-          "id": "helix",
-          "name": "helix",
-          "aliases": [
-            "spiral",
-            "helices"
-          ],
-          "plural": "helices"
-        },
-        {
-          "id": "klein-bottle",
-          "name": "Klein bottle",
-          "aliases": [
-            "Klein bottles"
-          ]
-        },
-        {
           "id": "bipyramid",
           "name": "bipyramid",
           "aliases": [
             "bipyramids"
-          ]
-        },
-        {
-          "id": "tesseract",
-          "name": "tesseract",
-          "aliases": [
-            "hypercube",
-            "tesseracts"
           ]
         },
         {
@@ -1423,8 +1392,8 @@
         "cylinder",
         "pyramid",
         "prism",
-        "cuboid",
-        "torus"
+        "torus",
+        "hemisphere"
       ],
       "host_answers": [
         "cone"
@@ -1779,13 +1748,6 @@
           "name": "ziggurat",
           "aliases": [
             "ziggurats"
-          ]
-        },
-        {
-          "id": "croat",
-          "name": "Croat",
-          "aliases": [
-            "Croats"
           ]
         },
         {

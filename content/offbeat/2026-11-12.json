@@ -2631,20 +2631,14 @@
           "aliases": [
             "brake",
             "brake pads",
-            "brake pedal"
-          ],
-          "plural": "brakes"
-        },
-        {
-          "id": "parking-brake",
-          "name": "parking brake",
-          "aliases": [
+            "brake pedal",
+            "parking brake",
             "handbrake",
             "hand brake",
             "emergency brake",
-            "e-brake",
-            "parking brakes"
-          ]
+            "e-brake"
+          ],
+          "plural": "brakes"
         },
         {
           "id": "gas-pedal",
@@ -2688,16 +2682,10 @@
           "aliases": [
             "car seat",
             "driver's seat",
-            "seats"
-          ]
-        },
-        {
-          "id": "backseat",
-          "name": "backseat",
-          "aliases": [
+            "backseat",
             "back seat",
             "rear seat",
-            "backseats"
+            "seats"
           ]
         },
         {

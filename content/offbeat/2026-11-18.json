@@ -579,9 +579,9 @@
           "id": "caterer",
           "name": "caterer",
           "aliases": [
-            "catering"
-          ],
-          "plural": "caterer"
+            "catering",
+            "caterers"
+          ]
         },
         {
           "id": "waiter",
@@ -713,12 +713,26 @@
         {
           "id": "electric-slide",
           "name": "Electric Slide",
-          "aliases": [
-            "Cha Cha Slide",
-            "YMCA",
-            "Macarena"
-          ],
+          "aliases": [],
           "plural": "Electric Slide"
+        },
+        {
+          "id": "cha-cha-slide",
+          "name": "Cha Cha Slide",
+          "aliases": [],
+          "plural": "Cha Cha Slide"
+        },
+        {
+          "id": "ymca",
+          "name": "YMCA",
+          "aliases": [],
+          "plural": "YMCA"
+        },
+        {
+          "id": "macarena",
+          "name": "Macarena",
+          "aliases": [],
+          "plural": "Macarena"
         },
         {
           "id": "kids",
@@ -1388,8 +1402,9 @@
         {
           "id": "notepad",
           "name": "notepad",
-          "aliases": [],
-          "plural": "notepad"
+          "aliases": [
+            "notepads"
+          ]
         },
         {
           "id": "oil-can",
@@ -2434,10 +2449,15 @@
           "id": "cheddar",
           "name": "cheddar",
           "aliases": [
-            "cheddar cheese",
-            "American cheese"
+            "cheddar cheese"
           ],
           "plural": "cheddar"
+        },
+        {
+          "id": "american-cheese",
+          "name": "American cheese",
+          "aliases": [],
+          "plural": "American cheese"
         },
         {
           "id": "cheetos",
@@ -3226,9 +3246,9 @@
           "id": "slingshot",
           "name": "slingshot",
           "aliases": [
-            "reverse bungee"
-          ],
-          "plural": "slingshot"
+            "reverse bungee",
+            "slingshots"
+          ]
         },
         {
           "id": "bungee-jumping",

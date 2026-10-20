@@ -3880,9 +3880,7 @@
             "gauze pad",
             "gauze pads",
             "sterile gauze",
-            "gauze roll",
-            "dressing",
-            "wound dressing"
+            "gauze roll"
           ],
           "plural": "gauze"
         },
@@ -4061,9 +4059,9 @@
           "name": "antihistamine",
           "aliases": [
             "Benadryl",
-            "allergy medicine"
-          ],
-          "plural": "antihistamine"
+            "allergy medicine",
+            "antihistamines"
+          ]
         },
         {
           "id": "hydrocortisone-cream",
@@ -4258,9 +4256,9 @@
           "id": "antacid",
           "name": "antacid",
           "aliases": [
-            "Tums"
-          ],
-          "plural": "antacid"
+            "Tums",
+            "antacids"
+          ]
         },
         {
           "id": "glucose-tablets",
@@ -4319,14 +4317,6 @@
             "eye pad",
             "eye patches"
           ]
-        },
-        {
-          "id": "non-stick-pads",
-          "name": "non-stick pads",
-          "aliases": [
-            "Telfa pads?"
-          ],
-          "plural": "non-stick pads"
         }
       ],
       "host_bank": [

@@ -249,9 +249,9 @@
           "name": "notepad",
           "aliases": [
             "scrap paper",
-            "paper"
-          ],
-          "plural": "notepad"
+            "paper",
+            "notepads"
+          ]
         },
         {
           "id": "chopsticks",
@@ -448,10 +448,17 @@
           "id": "hair-ties",
           "name": "hair ties",
           "aliases": [
-            "bobby pins",
             "hair tie"
           ],
           "plural": "hair ties"
+        },
+        {
+          "id": "bobby-pins",
+          "name": "bobby pins",
+          "aliases": [
+            "bobby pin"
+          ],
+          "plural": "bobby pins"
         },
         {
           "id": "nail-clippers",
@@ -717,9 +724,9 @@
           "id": "lollipop",
           "name": "lollipop",
           "aliases": [
-            "candy"
-          ],
-          "plural": "lollipop"
+            "candy",
+            "lollipops"
+          ]
         },
         {
           "id": "fortune-cookies",
@@ -1648,9 +1655,9 @@
           "id": "lamb",
           "name": "lamb",
           "aliases": [
-            "wool"
-          ],
-          "plural": "lamb"
+            "wool",
+            "lambs"
+          ]
         },
         {
           "id": "chick",
@@ -2017,9 +2024,9 @@
           "id": "whisper",
           "name": "whisper",
           "aliases": [
-            "soft voice"
-          ],
-          "plural": "whisper"
+            "soft voice",
+            "whispers"
+          ]
         },
         {
           "id": "petals",

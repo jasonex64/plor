@@ -86,22 +86,23 @@ Review: 8 blocking findings fixed. They were tamagoyaki (a kind of the host omel
 2e evidence (2026-10-19, Windows, Node 24.11.0):
 ```text
 $ npm run content:plurals
-PLURALS content: 2285 added. Review each one; set "plural" on an entry to override.
+PLURALS content: 2307 added (from freshly generated files, after the review fixes). Review each one; set "plural" on an entry to override.
   (every added line names a 2026-11-09..22 file; Claude read all of them. Wrong ones became overrides,
-   e.g. RVs, DJs, caimans, stomachs, mallei, maids of honor, birds of paradise, helices; mass nouns,
+   e.g. RVs, DJs, caimans, stomachs, mallei, maids of honor, birds of paradise, children; mass nouns,
    phrases and names have "plural" equal to their name)
 $ npm run content:validate
 CONTENT OK content: 28 file(s)
 $ npm run content:validate -- <scratch root holding only offbeat/2026-11-09..22.json>
 CONTENT OK <scratch root>: 14 file(s)
 $ node -e '<every prompt under content/offbeat, normalized; count repeats>'
-prompts checked: 196 unique; repeats: 0; new questions: 98; new entries: 6152; host answers: 107
+prompts checked: 196 unique; repeats: 0; new questions: 98; new entries: 6149; host answers: 107
 $ git diff --quiet -- content/offbeat && echo unchanged
 existing puzzle files unchanged
 $ npm test
  Test Files  15 passed (15)
       Tests  114 passed (114)
 ```
+Review (reviewer agent, fresh context, `eda83d9`): 7 blocking findings. Fixed: a leftover "Telfa pads?" alias; "dressing" as an alias of host gauze while dressings were listed; cowl and snood listed apart from host scarf; "<kind> <listed>" entries folded into the listed answer (back seat, parking brake, meatball sub, neo-soul, Alabama white sauce, pickled onions, spicy mayos, arm cuff, tetrahedron, cuboid) or the general alias removed (salad dressing, "salad", "peppers"); the tesseract (4D) removed; wrong plurals (pill bug, child, hippopotamus, rhinoceros) and 22 countable words marked "no plural". Two findings were kept with a reason and go to the human (ROADMAP: cheddar, Swiss and gorgonzola next to cheese; piercings next to ring). The non-blocking findings are in ROADMAP "Next revision"; Claude also fixed some of them before recording them, which is listed there.
 
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 

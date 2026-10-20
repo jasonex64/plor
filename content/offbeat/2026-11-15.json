@@ -748,21 +748,23 @@
           "name": "hippopotamus",
           "aliases": [
             "hippo",
+            "hippos",
             "pygmy hippo",
-            "hippos"
+            "hippopotamuses"
           ],
-          "plural": "hippos"
+          "plural": "hippopotamuses"
         },
         {
           "id": "rhinoceros",
           "name": "rhinoceros",
           "aliases": [
             "rhino",
+            "rhinos",
             "white rhino",
             "black rhino",
-            "rhinos"
+            "rhinoceroses"
           ],
-          "plural": "rhinos"
+          "plural": "rhinoceroses"
         },
         {
           "id": "cheetah",
@@ -1602,7 +1604,9 @@
           "name": "BBQ sauce",
           "aliases": [
             "barbecue sauce",
-            "barbeque sauce"
+            "barbeque sauce",
+            "Alabama white sauce",
+            "white BBQ sauce"
           ],
           "plural": "BBQ sauce"
         },
@@ -1921,14 +1925,6 @@
           "plural": "French dressing"
         },
         {
-          "id": "salad-dressing",
-          "name": "salad dressing",
-          "aliases": [
-            "dressing"
-          ],
-          "plural": "salad dressing"
-        },
-        {
           "id": "salad-cream",
           "name": "salad cream",
           "aliases": [],
@@ -2077,9 +2073,9 @@
           "id": "lime",
           "name": "lime",
           "aliases": [
-            "lime juice"
-          ],
-          "plural": "lime"
+            "lime juice",
+            "limes"
+          ]
         },
         {
           "id": "apple-sauce",
@@ -2132,14 +2128,6 @@
             "mambo sauce"
           ],
           "plural": "Mumbo sauce"
-        },
-        {
-          "id": "alabama-white-sauce",
-          "name": "Alabama white sauce",
-          "aliases": [
-            "white BBQ sauce"
-          ],
-          "plural": "Alabama white sauce"
         },
         {
           "id": "chocolate-syrup",
@@ -2326,9 +2314,9 @@
           "id": "pizza",
           "name": "pizza",
           "aliases": [
-            "leftover pizza"
-          ],
-          "plural": "pizza"
+            "leftover pizza",
+            "pizzas"
+          ]
         },
         {
           "id": "ketchup",
@@ -2482,8 +2470,9 @@
         {
           "id": "cucumber",
           "name": "cucumber",
-          "aliases": [],
-          "plural": "cucumber"
+          "aliases": [
+            "cucumbers"
+          ]
         },
         {
           "id": "bell-pepper",
@@ -2689,8 +2678,9 @@
         {
           "id": "pie",
           "name": "pie",
-          "aliases": [],
-          "plural": "pie"
+          "aliases": [
+            "pies"
+          ]
         },
         {
           "id": "baking-soda",
@@ -2797,14 +2787,16 @@
         {
           "id": "smoothie",
           "name": "smoothie",
-          "aliases": [],
-          "plural": "smoothie"
+          "aliases": [
+            "smoothies"
+          ]
         },
         {
           "id": "cheesecake",
           "name": "cheesecake",
-          "aliases": [],
-          "plural": "cheesecake"
+          "aliases": [
+            "cheesecakes"
+          ]
         },
         {
           "id": "sushi",
@@ -2815,8 +2807,9 @@
         {
           "id": "dip",
           "name": "dip",
-          "aliases": [],
-          "plural": "dip"
+          "aliases": [
+            "dips"
+          ]
         },
         {
           "id": "garlic",
@@ -3815,11 +3808,17 @@
           "id": "your-partner",
           "name": "your partner",
           "aliases": [
-            "a loved one",
-            "grandma's house",
-            "home"
+            "a loved one"
           ],
           "plural": "your partner"
+        },
+        {
+          "id": "home",
+          "name": "home",
+          "aliases": [
+            "grandma's house"
+          ],
+          "plural": "home"
         },
         {
           "id": "thanksgiving-dinner",

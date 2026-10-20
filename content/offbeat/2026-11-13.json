@@ -604,8 +604,9 @@
         {
           "id": "movie",
           "name": "movie",
-          "aliases": [],
-          "plural": "movie"
+          "aliases": [
+            "movies"
+          ]
         },
         {
           "id": "popcorn",
@@ -1076,11 +1077,11 @@
           ]
         },
         {
-          "id": "cheese-sandwich",
-          "name": "cheese sandwich",
+          "id": "cheese-and-pickle-sandwich",
+          "name": "cheese and pickle sandwich",
           "aliases": [
-            "cheese and pickle sandwich",
-            "cheese sandwiches"
+            "cheese and pickle",
+            "cheese and pickle sandwiches"
           ]
         },
         {
@@ -1255,16 +1256,10 @@
             "grinder",
             "Italian sub",
             "sub sandwich",
-            "subs"
-          ]
-        },
-        {
-          "id": "meatball-sandwich",
-          "name": "meatball sandwich",
-          "aliases": [
             "meatball sub",
+            "meatball sandwich",
             "meatball hero",
-            "meatball sandwiches"
+            "subs"
           ]
         },
         {
@@ -2063,6 +2058,35 @@
           ]
         },
         {
+          "id": "trapezium",
+          "name": "trapezium",
+          "aliases": [
+            "trapeziums"
+          ]
+        },
+        {
+          "id": "trapezoid",
+          "name": "trapezoid",
+          "aliases": [
+            "trapezoid bone",
+            "trapezoids"
+          ]
+        },
+        {
+          "id": "capitate",
+          "name": "capitate",
+          "aliases": [
+            "capitates"
+          ]
+        },
+        {
+          "id": "triquetrum",
+          "name": "triquetrum",
+          "aliases": [
+            "triquetrums"
+          ]
+        },
+        {
           "id": "metacarpal",
           "name": "metacarpal",
           "aliases": [
@@ -2275,6 +2299,9 @@
             "tennis bracelet",
             "friendship bracelet",
             "cuff bracelet",
+            "arm cuff",
+            "armlet",
+            "upper arm bracelet",
             "bracelets"
           ]
         },
@@ -2370,16 +2397,6 @@
           ]
         },
         {
-          "id": "arm-cuff",
-          "name": "arm cuff",
-          "aliases": [
-            "armlet",
-            "arm band",
-            "upper arm bracelet",
-            "arm cuffs"
-          ]
-        },
-        {
           "id": "charm",
           "name": "charm",
           "aliases": [
@@ -2460,12 +2477,7 @@
           "id": "1900s",
           "name": "1900s",
           "aliases": [
-            "the 1900s",
-            "00s",
-            "the 00s",
-            "aughts",
-            "the aughts",
-            "noughties"
+            "the 1900s"
           ],
           "plural": "1900s"
         },
@@ -2473,11 +2485,7 @@
           "id": "1910s",
           "name": "1910s",
           "aliases": [
-            "the 1910s",
-            "10s",
-            "the 10s",
-            "teens",
-            "the teens"
+            "the 1910s"
           ],
           "plural": "1910s"
         },

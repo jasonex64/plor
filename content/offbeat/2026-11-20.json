@@ -1493,7 +1493,9 @@
             "caramelized onions",
             "fried onions",
             "white onion",
-            "sautéed onions"
+            "sautéed onions",
+            "pickled onions",
+            "pickled red onions"
           ]
         },
         {
@@ -1549,7 +1551,9 @@
           "id": "mayonnaise",
           "name": "mayonnaise",
           "aliases": [
-            "mayo"
+            "mayo",
+            "chipotle mayo",
+            "sriracha mayo"
           ],
           "plural": "mayonnaise"
         },
@@ -1557,9 +1561,7 @@
           "id": "aioli",
           "name": "aioli",
           "aliases": [
-            "garlic aioli",
-            "chipotle mayo",
-            "sriracha mayo"
+            "garlic aioli"
           ],
           "plural": "aioli"
         },
@@ -1660,7 +1662,6 @@
           "id": "bell-peppers",
           "name": "bell peppers",
           "aliases": [
-            "peppers",
             "green peppers"
           ],
           "plural": "bell peppers"
@@ -1759,8 +1760,9 @@
         {
           "id": "cucumber",
           "name": "cucumber",
-          "aliases": [],
-          "plural": "cucumber"
+          "aliases": [
+            "cucumbers"
+          ]
         },
         {
           "id": "pico-de-gallo",
@@ -1908,14 +1910,6 @@
             "teriyaki sauce"
           ],
           "plural": "teriyaki"
-        },
-        {
-          "id": "pickled-onions",
-          "name": "pickled onions",
-          "aliases": [
-            "pickled red onions"
-          ],
-          "plural": "pickled onions"
         },
         {
           "id": "microgreens",
@@ -2701,9 +2695,9 @@
           "name": "heart",
           "aliases": [
             "my heart",
-            "your heart"
-          ],
-          "plural": "heart"
+            "your heart",
+            "hearts"
+          ]
         },
         {
           "id": "the-wicked-witch-of-the-west",

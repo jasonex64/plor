@@ -359,11 +359,23 @@
           "id": "jacket",
           "name": "jacket",
           "aliases": [
-            "hoodie",
-            "sweatshirt",
-            "sweater",
-            "jumper",
             "jackets"
+          ]
+        },
+        {
+          "id": "hoodie",
+          "name": "hoodie",
+          "aliases": [
+            "sweatshirt",
+            "hoodies"
+          ]
+        },
+        {
+          "id": "sweater",
+          "name": "sweater",
+          "aliases": [
+            "jumper",
+            "sweaters"
           ]
         },
         {
@@ -517,8 +529,14 @@
           "id": "recorder",
           "name": "recorder",
           "aliases": [
-            "flute",
             "recorders"
+          ]
+        },
+        {
+          "id": "flute",
+          "name": "flute",
+          "aliases": [
+            "flutes"
           ]
         },
         {
@@ -1314,10 +1332,10 @@
           "aliases": [
             "roly-poly",
             "woodlouse",
+            "woodlice",
             "isopod",
-            "woodlice"
-          ],
-          "plural": "woodlice"
+            "pill bugs"
+          ]
         },
         {
           "id": "beetle",
@@ -2368,9 +2386,9 @@
           "id": "city",
           "name": "city",
           "aliases": [
-            "traffic"
-          ],
-          "plural": "city"
+            "traffic",
+            "cities"
+          ]
         },
         {
           "id": "bus",
@@ -2874,7 +2892,10 @@
         {
           "id": "cocoa-krispies",
           "name": "Cocoa Krispies",
-          "aliases": [],
+          "aliases": [
+            "Coco Pops",
+            "Cocoa Pops"
+          ],
           "plural": "Cocoa Krispies"
         },
         {
@@ -3026,14 +3047,6 @@
           "name": "Crunchy Nut",
           "aliases": [],
           "plural": "Crunchy Nut"
-        },
-        {
-          "id": "coco-pops",
-          "name": "Coco Pops",
-          "aliases": [
-            "Cocoa Pops"
-          ],
-          "plural": "Coco Pops"
         },
         {
           "id": "honey-smacks",

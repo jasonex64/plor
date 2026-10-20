@@ -1517,7 +1517,8 @@
           "id": "soul",
           "name": "soul",
           "aliases": [
-            "soul music"
+            "soul music",
+            "neo-soul"
           ],
           "plural": "soul"
         },
@@ -1998,12 +1999,6 @@
           "name": "shoegaze",
           "aliases": [],
           "plural": "shoegaze"
-        },
-        {
-          "id": "neo-soul",
-          "name": "neo-soul",
-          "aliases": [],
-          "plural": "neo-soul"
         },
         {
           "id": "jungle",
@@ -3614,6 +3609,8 @@
           "aliases": [
             "infinity scarf",
             "wool scarf",
+            "cowl",
+            "snood",
             "scarves"
           ],
           "plural": "scarves"
@@ -3625,7 +3622,6 @@
             "neck gaiter",
             "buff",
             "gaiter",
-            "snood",
             "neck warmers"
           ]
         },
@@ -3841,13 +3837,6 @@
           "name": "crampons",
           "aliases": [
             "crampon"
-          ]
-        },
-        {
-          "id": "cowl",
-          "name": "cowl",
-          "aliases": [
-            "cowls"
           ]
         },
         {

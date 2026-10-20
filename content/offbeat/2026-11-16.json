@@ -87,7 +87,6 @@
           "name": "spring rider",
           "aliases": [
             "spring horse",
-            "rocking horse",
             "bouncy animal",
             "spring riders"
           ]
@@ -2274,9 +2273,9 @@
           "id": "juggler",
           "name": "juggler",
           "aliases": [
-            "juggling"
-          ],
-          "plural": "juggler"
+            "juggling",
+            "jugglers"
+          ]
         },
         {
           "id": "unicyclist",
@@ -2721,9 +2720,10 @@
           "name": "child",
           "aliases": [
             "kids",
+            "kid",
             "children"
           ],
-          "plural": "kids"
+          "plural": "children"
         },
         {
           "id": "giraffe",

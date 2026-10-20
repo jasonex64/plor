@@ -3123,8 +3123,9 @@
         {
           "id": "sundew",
           "name": "sundew",
-          "aliases": [],
-          "plural": "sundew"
+          "aliases": [
+            "sundews"
+          ]
         },
         {
           "id": "dough",
