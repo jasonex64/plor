@@ -151,6 +151,20 @@ Three host characters were proposed in chat (the Wind, a word-hoarding raven, an
 - Fits what's already drafted: signs wobble more higher up because the wind is stronger there, showing the rising difficulty.
 - Name, face and colours of the Wind are open (D3, D19). Text pairs checked at 4.5:1 or more as in Round 6 (the Wind's banner: 12.5:1).
 
+## Platform wireframes (human, 2026-10-20)
+The human chose to wireframe the whole platform now ("Yes, wireframe it now", relayed by the parent session), so that M06 (friends and groups), M09 (front page) and M11 (settings and profile) build to an agreed layout. These are rough layouts only, in grey; the final look (colours, art, animation) stays in M12. Plor's shell stays neutral, and each game brings its own stylised look (human's notes above). Canvas page "Wireframes · platform" (`docs/design/m12/W-platform.dc.html`).
+
+| Screen | For | What it holds |
+|---|---|---|
+| Home (front page) | M09 | Today's games: the Offbeat card (not played / playing / your result) and "coming soon" cards. The coming-soon cards exist **only in mockups**, never in the app: game 2 is after the MVP (ROADMAP), and CLAUDE.md says build for today. Below: friends today (M06), the leaderboard (M08), and comments and reactions (M07), with answers hidden until you've played |
+| Friends | M06 | Your friends and their status today; "Invite a friend" shares an invite link; friendship is mutual |
+| Groups | M06 | Your groups; create a group; join by invite link |
+| A group | M06, M07, M08 | The group's all-time leaderboard, today's board for the group, its own comments and reactions (after you've played), its invite link |
+| Live board | M06 | Today's game for friends or one group: status for everyone (not started, playing, finished); where each person ended only once you've finished. A slot for the game's own picture (Offbeat: the ridge) above a plain list that always works |
+| Profile | M08, M10, M11 | Avatar with the frame slot (M10), username, all-time points (M08), coins and collection (M10) |
+| Settings | M11 | Change username, basic preferences (which ones is D25), sign out, privacy policy, delete account |
+| Navigation | all | Bottom tabs in the draft (Home, Friends, Groups, Profile); a game opens full screen with a back button; settings from Profile |
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
@@ -176,6 +190,13 @@ Nothing here is decided until the human answers. Answers get recorded as "human,
 | D18 | The player's character | The draft uses a small mountain goat (no skin tones to choose; friends differ by scarf colour, a slot for M10 cosmetics) | |
 | D19 | The host's character | The draft used a raven circling above the ridge; Round 7 proposed the Wind, a word-hoarding raven or an old ram | The Wind: "Go with the Wind" (human, 2026-10-20). Its name and look are still open |
 | D20 | Pixel size, sprite sizes and animation timings | None chosen; human numbers (or the artist's), not set by the mockups | |
+| D21 | Navigation: bottom tabs, a top menu, or something else | Wireframes draw bottom tabs | |
+| D22 | Which tabs: Home, Friends, Groups, Profile; or Friends and Groups together as one | Wireframes draw four tabs | |
+| D23 | Where the live board lives: its own tab, inside each game, or on the friends and group pages | Wireframes reach it from the game card, Friends and each group | |
+| D24 | Home order: today's games first, or friends' activity first | Wireframes put games first | |
+| D25 | Which basic preferences settings offers | None chosen; the wireframe shows empty rows | |
+| D26 | Username changes (M11): how often, and what friends see after a change. Today M02 says the name "can't be changed later" | None chosen; any limit is a human number | |
+| D27 | What a "coming soon" card shows in mockups (a name, or just a shape) | Wireframes show a blank card | |
 
 ## Acceptance criteria
 For this draft (exploration):

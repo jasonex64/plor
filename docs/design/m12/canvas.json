@@ -11,6 +11,10 @@
   },
   "pages": [
     {
+      "id": "w1",
+      "name": "Wireframes · platform"
+    },
+    {
       "id": "r7",
       "name": "Round 7 · the Wind"
     },
@@ -191,6 +195,14 @@
       "h": 1000,
       "title": "Offbeat · the Wind as the host",
       "page": "r7"
+    },
+    "W-platform.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 3582,
+      "h": 1000,
+      "title": "Platform wireframes: home, friends, groups, live board, profile, settings",
+      "page": "w1"
     }
   },
   "order": [
@@ -212,7 +224,8 @@
     "R5-camera.dc.html",
     "R6-lowres.dc.html",
     "R7-third.dc.html",
-    "R8-wind.dc.html"
+    "R8-wind.dc.html",
+    "W-platform.dc.html"
   ],
   "notes": {
     "heading": {
@@ -334,6 +347,22 @@
       "fill": "orange",
       "page": "r7",
       "text": "The host is now the Wind: a cloud with a face that lives on the mountain. Its words are the common answers it whispers.\n\n1 · While you type, it drifts above, listening.\n2 · At the reveal it puffs a gust that carries its word on a banner. Different word: the gust passes you by.\n3 · Same word: the gust catches your sign like a sail and blows you off the ridge, softly into the clouds.\n\nA draft: the Wind’s name, face and colours are yours to choose."
+    },
+    "w1heading": {
+      "x": 0,
+      "y": -300,
+      "text": "Wireframes: the Plor shell around the games",
+      "kind": "title1",
+      "maxW": 3582,
+      "page": "w1"
+    },
+    "w1about": {
+      "x": 3662,
+      "y": 0,
+      "w": 400,
+      "fill": "orange",
+      "page": "w1",
+      "text": "Rough layouts only, in grey, so friends and groups (M06), the front page (M09) and settings and profile (M11) build to an agreed shape. The look comes later (M12).\n\nThe shell stays neutral; each game brings its own picture into the slots marked [game's own art].\n\n\"Coming soon\" cards exist only in these mockups, not in the app.\n\nOpen choices: D21 to D27 in the ticket (tabs, where the live board lives, home order, preferences, username changes)."
     }
   },
   "designSystems": []

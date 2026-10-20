@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Platform wireframes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1f1f1f}a:hover{color:#555555}
+.wf{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#1f1f1f}
+.col{display:flex;flex-direction:column;gap:16px}
+.lbl{font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#444444}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;background:#ffffff;border:2px solid #9a9a9a;overflow:hidden;display:flex;flex-direction:column}
+.main{flex:1;padding:18px 18px 12px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.h{font-weight:700;font-size:22px;margin:0}
+.sub{font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#444444;margin:4px 0 0}
+.box{border:2px solid #9a9a9a;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.fill{background:#ececec;border-color:#ececec}
+.dash{border-style:dashed}
+.row{display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid #d4d4d4;font-size:15px}
+.av{flex:none;width:32px;height:32px;border-radius:50%;background:#d4d4d4;border:2px solid #9a9a9a;box-sizing:border-box}
+.av.big{width:72px;height:72px;border-width:4px;border-style:dashed}
+.grow{flex:1}
+.pill{font-size:13px;border:1.5px solid #9a9a9a;border-radius:999px;padding:2px 8px;color:#444444;white-space:nowrap}
+.btn{min-height:48px;border:2px solid #1f1f1f;border-radius:10px;background:#1f1f1f;color:#ffffff;font:600 16px system-ui,sans-serif;width:100%}
+.btn2{min-height:48px;border:2px solid #1f1f1f;border-radius:10px;background:#ffffff;color:#1f1f1f;font:600 16px system-ui,sans-serif;width:100%}
+.ph-txt{font-size:14px;color:#555555;margin:0;line-height:1.4}
+.pic{background:#ececec;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#555555;font-size:14px;text-align:center;padding:8px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #9a9a9a;min-height:64px;flex:none}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:#555555;text-decoration:none;min-height:56px}
+.tab i{width:22px;height:22px;border-radius:6px;border:2px solid #9a9a9a;display:block}
+.tab.on{color:#1f1f1f;font-weight:700}
+.tab.on i{background:#1f1f1f;border-color:#1f1f1f}
+.note{font-size:12px;color:#555555}
+.map{width:420px;box-sizing:border-box;background:#ffffff;border:2px solid #9a9a9a;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;font-size:15px}
+.node{border:2px solid #1f1f1f;border-radius:10px;padding:8px 12px;font-weight:600;background:#ffffff}
+.node.soft{border-color:#9a9a9a;font-weight:500}
+.edge{color:#555555;font-size:13px;padding-left:14px}
+</style>
+</helmet>
+<div class="wf" style="width: 3582px; height: 1000px; box-sizing: border-box; padding: 48px; background: #f2f2f2; display: flex; gap: 48px">
+
+<!-- Home -->
+<div class="col">
+<div class="lbl">Home · front page (M09)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span class="h">Plor</span><span class="av" aria-label="Your profile"></span></div>
+<div class="sub">Today's games</div>
+<div class="box">
+<div class="pic" style="height: 96px">[Offbeat's own art]</div>
+<div style="display: flex; justify-content: space-between; align-items: center"><b>Offbeat</b><span class="pill">not played</span></div>
+<button class="btn" type="button">Play</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div class="box dash" style="height: 84px; justify-content: center; align-items: center"><span class="note">coming soon (mockup only)</span></div>
+<div class="box dash" style="height: 84px; justify-content: center; align-items: center"><span class="note">coming soon (mockup only)</span></div>
+</div>
+<div class="sub">Friends today (M06)</div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">finished</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">playing</span></div>
+<div class="sub">Leaderboard (M08)</div>
+<div class="row"><span style="width: 20px">1</span><span class="av"></span><span class="grow">[friend]</span><span>[pts]</span></div>
+<div class="sub">Comments (M07)</div>
+<p class="ph-txt">Hidden until you've played today's game.</p>
+</div>
+<nav class="tabs"><a href="#" class="tab on"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab"><i></i>Groups</a><a href="#" class="tab"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Friends -->
+<div class="col">
+<div class="lbl">Friends (M06)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span class="h">Friends</span></div>
+<button class="btn" type="button">Invite a friend (share link)</button>
+<p class="ph-txt">Friendship is mutual: they open your link and accept.</p>
+<div class="sub">Today</div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">finished</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">playing</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">not started</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">not started</span></div>
+<button class="btn2" type="button">Today's live board</button>
+</div>
+<nav class="tabs"><a href="#" class="tab"><i></i>Home</a><a href="#" class="tab on"><i></i>Friends</a><a href="#" class="tab"><i></i>Groups</a><a href="#" class="tab"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Groups -->
+<div class="col">
+<div class="lbl">Groups (M06)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span class="h">Groups</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button class="btn" type="button">Create a group</button>
+<button class="btn2" type="button">Join by link</button>
+</div>
+<div class="sub">Your groups</div>
+<div class="box"><div style="display: flex; justify-content: space-between"><b>[group name]</b><span class="pill">[n] members</span></div><p class="ph-txt">Today: [n] finished · you're [rank] all-time</p></div>
+<div class="box"><div style="display: flex; justify-content: space-between"><b>[group name]</b><span class="pill">[n] members</span></div><p class="ph-txt">Today: [n] finished · you're [rank] all-time</p></div>
+<div class="box dash"><p class="ph-txt">A group is a private leaderboard joined by invite link, with its own comments and reactions.</p></div>
+</div>
+<nav class="tabs"><a href="#" class="tab"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab on"><i></i>Groups</a><a href="#" class="tab"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- A group -->
+<div class="col">
+<div class="lbl">A group (M06 · M07 · M08)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span style="font-size: 15px">‹ Groups</span><span class="pill">invite link</span></div>
+<span class="h">[group name]</span>
+<div class="sub">Today's board</div>
+<div class="pic" style="height: 120px">[game's own picture, e.g. the ridge]<br>shown after you've played</div>
+<div class="sub">All-time leaderboard</div>
+<div class="row"><span style="width: 20px">1</span><span class="av"></span><span class="grow">[member]</span><span>[pts]</span></div>
+<div class="row"><span style="width: 20px">2</span><span class="av"></span><span class="grow">you</span><span>[pts]</span></div>
+<div class="row"><span style="width: 20px">3</span><span class="av"></span><span class="grow">[member]</span><span>[pts]</span></div>
+<div class="sub">Comments and reactions</div>
+<div class="box fill"><p class="ph-txt">[member]: [comment]</p><div style="display: flex; gap: 6px"><span class="pill">[reaction] [n]</span><span class="pill">[reaction] [n]</span></div></div>
+<div class="box"><span class="note">Write a comment…</span></div>
+</div>
+<nav class="tabs"><a href="#" class="tab"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab on"><i></i>Groups</a><a href="#" class="tab"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Live board -->
+<div class="col">
+<div class="lbl">Live board (M06)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span style="font-size: 15px">‹ Back</span><span class="pill">Friends ▾</span></div>
+<span class="h">Today · Offbeat</span>
+<div class="pic" style="height: 220px">[the game's own picture:<br>Offbeat shows everyone on the ridge]</div>
+<p class="ph-txt">Where each person ended shows once you've finished. Before that, only who's playing.</p>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">ended at 5</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">7 of 7</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">playing</span></div>
+<div class="row"><span class="av"></span><span class="grow">[friend]</span><span class="pill">not started</span></div>
+<p class="note">The plain list always works; the picture is the game's own (M12).</p>
+</div>
+<nav class="tabs"><a href="#" class="tab on"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab"><i></i>Groups</a><a href="#" class="tab"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Profile -->
+<div class="col">
+<div class="lbl">Profile (M08 · M10 · M11)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span class="h">Profile</span><span class="pill">settings</span></div>
+<div style="display: flex; align-items: center; gap: 14px">
+<span class="av big" aria-label="Avatar with frame slot"></span>
+<div><b style="font-size: 18px">[username]</b><p class="ph-txt">frame slot (M10)</p></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div class="box"><span class="note">All-time points (M08)</span><b>[pts]</b></div>
+<div class="box"><span class="note">Coins (M10)</span><b>[coins]</b></div>
+</div>
+<div class="sub">Collection (M10)</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<div class="pic" style="height: 64px">frame</div><div class="pic" style="height: 64px">frame</div><div class="pic" style="height: 64px">emote</div><div class="pic" style="height: 64px">border</div>
+</div>
+<button class="btn2" type="button">Spin (odds shown) · M10</button>
+</div>
+<nav class="tabs"><a href="#" class="tab"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab"><i></i>Groups</a><a href="#" class="tab on"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Settings -->
+<div class="col">
+<div class="lbl">Settings (M11)</div>
+<div class="ph">
+<div class="main">
+<div class="top"><span style="font-size: 15px">‹ Profile</span></div>
+<span class="h">Settings</span>
+<div class="sub">Account</div>
+<div class="row"><span class="grow">Username</span><span class="note">[username] · change ›</span></div>
+<div class="sub">Preferences (D25)</div>
+<div class="row"><span class="grow">[preference]</span><span class="pill">[on/off]</span></div>
+<div class="row"><span class="grow">[preference]</span><span class="pill">[on/off]</span></div>
+<div class="sub">More</div>
+<div class="row"><span class="grow">Privacy policy</span><span class="note">›</span></div>
+<div class="row"><span class="grow">Sign out</span></div>
+<div class="row" style="border-bottom: 0"><span class="grow" style="font-weight: 700">Delete account</span><span class="note">asks to confirm</span></div>
+</div>
+<nav class="tabs"><a href="#" class="tab"><i></i>Home</a><a href="#" class="tab"><i></i>Friends</a><a href="#" class="tab"><i></i>Groups</a><a href="#" class="tab on"><i></i>Profile</a></nav>
+</div>
+</div>
+
+<!-- Navigation map -->
+<div class="col">
+<div class="lbl">Navigation (draft, D21–D23)</div>
+<div class="map">
+<div class="node">Sign in → pick username (M02)</div>
+<div class="edge">then the bottom tabs:</div>
+<div class="node">Home</div>
+<div class="edge">→ a game, full screen, with a back button<br>→ that game's live board</div>
+<div class="node">Friends</div>
+<div class="edge">→ invite link · requests<br>→ today's live board (friends)</div>
+<div class="node">Groups</div>
+<div class="edge">→ create · join by link<br>→ a group: board, leaderboard, comments</div>
+<div class="node">Profile</div>
+<div class="edge">→ collection and spins (M10)<br>→ settings (M11)</div>
+<div class="node soft">Open from a shared link (M05): today's game, after sign-in</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3582,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
