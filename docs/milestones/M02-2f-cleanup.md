@@ -12,7 +12,7 @@ Fix the open ROADMAP "Next revision" items that are code or tests and need no hu
 ## Source
 - Each item's own text and citation in ROADMAP "Next revision" (copy it into the commit message).
 - DECISIONS.md: errors, logging, tests, database access (for every item); Game 1 and the answer model (validator items).
-- Supabase Auth docs pinned in SOURCES.md for A1 and A2. Whether SOURCES.md already pins the JWT signing keys page is *unverified*; if it doesn't, stop and ask before A1.
+- Supabase Auth docs pinned in SOURCES.md for A1 and A2. SOURCES.md does **not** pin the JWT signing keys page (checked 2026-10-20), so A1 starts by asking the human to approve that page as a source.
 
 ## Part A — before the playtest (2026-10-26)
 | # | Item (ROADMAP wording, shortened) | What breaks without it | Plan |
@@ -48,10 +48,10 @@ Fix the open ROADMAP "Next revision" items that are code or tests and need no hu
 ## Not in this ticket
 **Human decisions or actions** (each stays open in ROADMAP until the human answers):
 - **Before the playtest:** mail scanners use up the one-time sign-in link (6-digit code instead, or a confirm page?); this matters for playtesters on work or Outlook mail.
-- **Content, before each puzzle's day** (a puzzle can't change once its day starts): the 2d and 2e judgment calls, the M01 host-rule cases, possibly dominant host answers, days with no concrete question, the Kaskaskia wording (2026-11-08), completeness gaps, the UK list.
+- **Content, before each puzzle's day** (a puzzle can't change once its day starts): the 2d and 2e judgment calls, the 2e reviewer findings Claude kept (cheese kinds on 11-20 q3, piercings on 11-13 q5), the M01 host-rule cases, possibly dominant host answers (the M01 late questions and the 2e drafts), days with no concrete question, the Kaskaskia wording (2026-11-08), completeness gaps, the UK list.
 - Numbers: `scripts/status` fetch timeout; `pg` connection timeout and app rate limits (M11); host bank size (after the playtest).
 - Choices: one source for the Supabase CA (three uses today); local analytics on Windows (expose the Docker socket or disable `[analytics]`); strip zero-width characters in normalization or not; reference sources for concrete lists.
-- Actions: upgrade local Node; OK to delete the merged `m00-*` remote branches; local `plor_app` password (role change).
+- Actions: upgrade local Node; local `plor_app` password (role change).
 - Security changes: column-level grant on `missed_answer`; applying hosted Auth settings from the repo.
 
 **Waiting on something else:** the ESLint upgrade (upstream support); the `DATABASE_URL`-missing boot behavior on Vercel (needs an investigation ticket); sign-out scope (only if players complain); the remote-reset caveat in `roles.sql` (no procedure resets the remote); the deletion procedure (write it at the first request); the local `profile.db.test.ts` login as `supabase_admin` with an observed default password (local only; a docs change would make it fail loudly).
@@ -63,8 +63,8 @@ None. Items that need a number are listed above as human decisions.
 
 ## Plan
 1. The human approves this ticket and says whether to drop the *low* items.
-2. Part A on branch `m02-2f-cleanup`, PR, reviewer, merge before 2026-10-26.
-3. Part B on the same branch after the playtest, one commit per item (`M02 2f: <item> (removes: <what>)`), each ticking its ROADMAP item.
+2. Part A on the M02 branch, `m02-sign-in-and-play` (CLAUDE.md: one branch per milestone; none exists today, so create it), as its own PR: reviewer, merge before 2026-10-26.
+3. Part B on the same branch after the playtest, as a second PR, one commit per item (`M02 2f: <item> (removes: <what>)`), each ticking its ROADMAP item.
 4. Reviewer pass, PR, merge on the human's approval.
 
 ## Removes
