@@ -109,6 +109,8 @@ In this order; nothing is public until step 6 deploys the game.
 
 Done 2026-10-19: step 1 checked by Claude with `npx supabase migration list --linked` (all four migrations remote). Steps 2–5 were reported done by the human ("all done"; output not pasted, so the publish counts are unverified until the rehearsal run, which needs the 2026-10-20 puzzle). Step 6: PR #8 merged by Claude on the human's word (`42b8dc6`), after confirming that the migration was on staging and CI was green. About 40 s later `GET https://plor.app/api/run` answered 401 when signed out, and `npm run status -- https://plor.app` printed `UP https://plor.app (protocol 1)`.
 
+2c merged in PR #9 (`668fe7b`, merged by the human, 2026-10-19). After the deploy: `GET https://plor.app/privacy` → 200 with the approved text, and `npm run status -- https://plor.app` → `UP https://plor.app (protocol 1)`.
+
 ## Human setup for 2c
 1. **Forwarding for `privacy@plor.app`:** sign up at a forwarding service that Vercel's email guide names (ImprovMX or Forward Email), add `plor.app`, and forward `privacy@plor.app` to your own inbox. Then add the MX and TXT records it shows under Vercel → Domains → `plor.app`. Resend's sending records live on their own subdomain and don't collide (Vercel's guide). Send a test email to `privacy@plor.app`.
 2. **Read and approve the privacy page** on the PR's preview, before merge.
