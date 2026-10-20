@@ -152,7 +152,8 @@
           "aliases": [
             "puma",
             "mountain lion",
-            "cougars"
+            "cougars",
+            "panther"
           ]
         },
         {
@@ -187,7 +188,8 @@
           "name": "dog",
           "aliases": [
             "puppy",
-            "dogs"
+            "dogs",
+            "doggy"
           ]
         },
         {
@@ -439,7 +441,8 @@
           "id": "orangutan",
           "name": "orangutan",
           "aliases": [
-            "orangutans"
+            "orangutans",
+            "orangutang"
           ]
         },
         {
@@ -476,7 +479,9 @@
           "id": "pig",
           "name": "pig",
           "aliases": [
-            "pigs"
+            "pigs",
+            "hog",
+            "swine"
           ]
         },
         {
@@ -490,7 +495,8 @@
           "id": "porcupine",
           "name": "porcupine",
           "aliases": [
-            "porcupines"
+            "porcupines",
+            "porky"
           ]
         },
         {
@@ -661,7 +667,8 @@
           "id": "alligator",
           "name": "alligator",
           "aliases": [
-            "alligators"
+            "alligators",
+            "gator"
           ]
         },
         {
@@ -731,7 +738,8 @@
           "id": "crocodile",
           "name": "crocodile",
           "aliases": [
-            "crocodiles"
+            "crocodiles",
+            "croc"
           ]
         },
         {
@@ -869,7 +877,8 @@
           "id": "ladybug",
           "name": "ladybug",
           "aliases": [
-            "ladybugs"
+            "ladybugs",
+            "ladybird"
           ]
         },
         {
@@ -1084,6 +1093,507 @@
           "name": "worm",
           "aliases": [
             "worms"
+          ]
+        },
+        {
+          "id": "hare",
+          "name": "hare",
+          "aliases": [
+            "hares"
+          ]
+        },
+        {
+          "id": "pony",
+          "name": "pony",
+          "aliases": [
+            "ponies"
+          ]
+        },
+        {
+          "id": "calf",
+          "name": "calf",
+          "aliases": [
+            "calves"
+          ]
+        },
+        {
+          "id": "bull",
+          "name": "bull",
+          "aliases": [
+            "bulls"
+          ]
+        },
+        {
+          "id": "mule",
+          "name": "mule",
+          "aliases": [
+            "mules"
+          ]
+        },
+        {
+          "id": "boar",
+          "name": "boar",
+          "aliases": [
+            "wild boar",
+            "boars"
+          ]
+        },
+        {
+          "id": "rooster",
+          "name": "rooster",
+          "aliases": [
+            "roosters"
+          ]
+        },
+        {
+          "id": "capybara",
+          "name": "capybara",
+          "aliases": [
+            "capybaras"
+          ]
+        },
+        {
+          "id": "chinchilla",
+          "name": "chinchilla",
+          "aliases": [
+            "chinchillas"
+          ]
+        },
+        {
+          "id": "mongoose",
+          "name": "mongoose",
+          "aliases": [
+            "mongooses"
+          ]
+        },
+        {
+          "id": "tapir",
+          "name": "tapir",
+          "aliases": [
+            "tapirs"
+          ]
+        },
+        {
+          "id": "okapi",
+          "name": "okapi",
+          "aliases": [
+            "okapis"
+          ]
+        },
+        {
+          "id": "wildebeest",
+          "name": "wildebeest",
+          "aliases": [
+            "gnu"
+          ]
+        },
+        {
+          "id": "ibex",
+          "name": "ibex",
+          "aliases": [
+            "ibexes"
+          ]
+        },
+        {
+          "id": "groundhog",
+          "name": "groundhog",
+          "aliases": [
+            "woodchuck",
+            "groundhogs"
+          ]
+        },
+        {
+          "id": "marmot",
+          "name": "marmot",
+          "aliases": [
+            "marmots"
+          ]
+        },
+        {
+          "id": "prairie-dog",
+          "name": "prairie dog",
+          "aliases": [
+            "prairie dogs"
+          ]
+        },
+        {
+          "id": "shrew",
+          "name": "shrew",
+          "aliases": [
+            "shrews"
+          ]
+        },
+        {
+          "id": "vole",
+          "name": "vole",
+          "aliases": [
+            "voles"
+          ]
+        },
+        {
+          "id": "gibbon",
+          "name": "gibbon",
+          "aliases": [
+            "gibbons"
+          ]
+        },
+        {
+          "id": "mandrill",
+          "name": "mandrill",
+          "aliases": [
+            "mandrills"
+          ]
+        },
+        {
+          "id": "pangolin",
+          "name": "pangolin",
+          "aliases": [
+            "pangolins"
+          ]
+        },
+        {
+          "id": "kiwi",
+          "name": "kiwi",
+          "aliases": [
+            "kiwis"
+          ]
+        },
+        {
+          "id": "puffin",
+          "name": "puffin",
+          "aliases": [
+            "puffins"
+          ]
+        },
+        {
+          "id": "robin",
+          "name": "robin",
+          "aliases": [
+            "robins"
+          ]
+        },
+        {
+          "id": "sparrow",
+          "name": "sparrow",
+          "aliases": [
+            "sparrows"
+          ]
+        },
+        {
+          "id": "blue-jay",
+          "name": "blue jay",
+          "aliases": [
+            "blue jays"
+          ]
+        },
+        {
+          "id": "cardinal",
+          "name": "cardinal",
+          "aliases": [
+            "cardinals"
+          ]
+        },
+        {
+          "id": "seagull",
+          "name": "seagull",
+          "aliases": [
+            "gull",
+            "seagulls"
+          ]
+        },
+        {
+          "id": "heron",
+          "name": "heron",
+          "aliases": [
+            "herons"
+          ]
+        },
+        {
+          "id": "stork",
+          "name": "stork",
+          "aliases": [
+            "storks"
+          ]
+        },
+        {
+          "id": "crane",
+          "name": "crane",
+          "aliases": [
+            "cranes"
+          ]
+        },
+        {
+          "id": "toucan",
+          "name": "toucan",
+          "aliases": [
+            "toucans"
+          ]
+        },
+        {
+          "id": "macaw",
+          "name": "macaw",
+          "aliases": [
+            "macaws"
+          ]
+        },
+        {
+          "id": "cockatoo",
+          "name": "cockatoo",
+          "aliases": [
+            "cockatoos"
+          ]
+        },
+        {
+          "id": "parakeet",
+          "name": "parakeet",
+          "aliases": [
+            "budgie",
+            "parakeets"
+          ]
+        },
+        {
+          "id": "quail",
+          "name": "quail",
+          "aliases": [
+            "quails"
+          ]
+        },
+        {
+          "id": "pheasant",
+          "name": "pheasant",
+          "aliases": [
+            "pheasants"
+          ]
+        },
+        {
+          "id": "raven",
+          "name": "raven",
+          "aliases": [
+            "ravens"
+          ]
+        },
+        {
+          "id": "magpie",
+          "name": "magpie",
+          "aliases": [
+            "magpies"
+          ]
+        },
+        {
+          "id": "chameleon",
+          "name": "chameleon",
+          "aliases": [
+            "chameleons"
+          ]
+        },
+        {
+          "id": "komodo-dragon",
+          "name": "Komodo dragon",
+          "aliases": [
+            "Komodo dragons"
+          ]
+        },
+        {
+          "id": "python",
+          "name": "python",
+          "aliases": [
+            "pythons"
+          ]
+        },
+        {
+          "id": "boa-constrictor",
+          "name": "boa constrictor",
+          "aliases": [
+            "boa",
+            "boa constrictors"
+          ]
+        },
+        {
+          "id": "salamander",
+          "name": "salamander",
+          "aliases": [
+            "salamanders"
+          ]
+        },
+        {
+          "id": "newt",
+          "name": "newt",
+          "aliases": [
+            "newts"
+          ]
+        },
+        {
+          "id": "axolotl",
+          "name": "axolotl",
+          "aliases": [
+            "axolotls"
+          ]
+        },
+        {
+          "id": "cricket",
+          "name": "cricket",
+          "aliases": [
+            "crickets"
+          ]
+        },
+        {
+          "id": "cockroach",
+          "name": "cockroach",
+          "aliases": [
+            "roach",
+            "cockroaches"
+          ]
+        },
+        {
+          "id": "moth",
+          "name": "moth",
+          "aliases": [
+            "moths"
+          ]
+        },
+        {
+          "id": "firefly",
+          "name": "firefly",
+          "aliases": [
+            "lightning bug",
+            "fireflies"
+          ]
+        },
+        {
+          "id": "termite",
+          "name": "termite",
+          "aliases": [
+            "termites"
+          ]
+        },
+        {
+          "id": "flea",
+          "name": "flea",
+          "aliases": [
+            "fleas"
+          ]
+        },
+        {
+          "id": "tick",
+          "name": "tick",
+          "aliases": [
+            "ticks"
+          ]
+        },
+        {
+          "id": "centipede",
+          "name": "centipede",
+          "aliases": [
+            "centipedes"
+          ]
+        },
+        {
+          "id": "millipede",
+          "name": "millipede",
+          "aliases": [
+            "millipedes"
+          ]
+        },
+        {
+          "id": "praying-mantis",
+          "name": "praying mantis",
+          "aliases": [
+            "mantis"
+          ]
+        },
+        {
+          "id": "cicada",
+          "name": "cicada",
+          "aliases": [
+            "cicadas"
+          ]
+        },
+        {
+          "id": "piranha",
+          "name": "piranha",
+          "aliases": [
+            "piranhas"
+          ]
+        },
+        {
+          "id": "catfish",
+          "name": "catfish",
+          "aliases": []
+        },
+        {
+          "id": "trout",
+          "name": "trout",
+          "aliases": []
+        },
+        {
+          "id": "koi",
+          "name": "koi",
+          "aliases": [
+            "kois"
+          ]
+        },
+        {
+          "id": "carp",
+          "name": "carp",
+          "aliases": []
+        },
+        {
+          "id": "clownfish",
+          "name": "clownfish",
+          "aliases": []
+        },
+        {
+          "id": "swordfish",
+          "name": "swordfish",
+          "aliases": []
+        },
+        {
+          "id": "narwhal",
+          "name": "narwhal",
+          "aliases": [
+            "narwhals"
+          ]
+        },
+        {
+          "id": "beluga",
+          "name": "beluga",
+          "aliases": [
+            "belugas"
+          ]
+        },
+        {
+          "id": "seahorse",
+          "name": "seahorse",
+          "aliases": [
+            "seahorses"
+          ]
+        },
+        {
+          "id": "clam",
+          "name": "clam",
+          "aliases": [
+            "clams"
+          ]
+        },
+        {
+          "id": "oyster",
+          "name": "oyster",
+          "aliases": [
+            "oysters"
+          ]
+        },
+        {
+          "id": "sea-urchin",
+          "name": "sea urchin",
+          "aliases": [
+            "sea urchins"
+          ]
+        },
+        {
+          "id": "manta-ray",
+          "name": "manta ray",
+          "aliases": [
+            "manta rays"
           ]
         }
       ],
@@ -1559,7 +2069,8 @@
           "id": "play-video-games",
           "name": "play video games",
           "aliases": [
-            "gaming"
+            "gaming",
+            "play games"
           ],
           "plural": "play video games"
         },
@@ -1593,7 +2104,8 @@
           "id": "take-a-bath",
           "name": "take a bath",
           "aliases": [
-            "bath"
+            "bath",
+            "bubble bath"
           ],
           "plural": "take a bath"
         },
@@ -1620,7 +2132,10 @@
           "aliases": [
             "tv",
             "binge a show",
-            "television"
+            "television",
+            "watch Netflix",
+            "binge-watch",
+            "watch shows"
           ],
           "plural": "watch TV"
         },
@@ -1740,6 +2255,198 @@
             "hot cocoa"
           ],
           "plural": "drink hot cocoa"
+        },
+        {
+          "id": "sleep-in",
+          "name": "sleep in",
+          "aliases": [],
+          "plural": "sleep in"
+        },
+        {
+          "id": "do-homework",
+          "name": "do homework",
+          "aliases": [
+            "homework"
+          ],
+          "plural": "do homework"
+        },
+        {
+          "id": "study",
+          "name": "study",
+          "aliases": [],
+          "plural": "study"
+        },
+        {
+          "id": "do-laundry",
+          "name": "do laundry",
+          "aliases": [
+            "laundry"
+          ],
+          "plural": "do laundry"
+        },
+        {
+          "id": "organize",
+          "name": "organize",
+          "aliases": [],
+          "plural": "organize"
+        },
+        {
+          "id": "play-an-instrument",
+          "name": "play an instrument",
+          "aliases": [],
+          "plural": "play an instrument"
+        },
+        {
+          "id": "karaoke",
+          "name": "karaoke",
+          "aliases": [],
+          "plural": "karaoke"
+        },
+        {
+          "id": "scroll-on-your-phone",
+          "name": "scroll on your phone",
+          "aliases": [
+            "go on my phone",
+            "phone"
+          ],
+          "plural": "scroll on your phone"
+        },
+        {
+          "id": "build-with-legos",
+          "name": "build with Legos",
+          "aliases": [
+            "legos",
+            "lego"
+          ],
+          "plural": "build with Legos"
+        },
+        {
+          "id": "do-crafts",
+          "name": "do crafts",
+          "aliases": [
+            "crafts"
+          ],
+          "plural": "do crafts"
+        },
+        {
+          "id": "scrapbook",
+          "name": "scrapbook",
+          "aliases": [],
+          "plural": "scrapbook"
+        },
+        {
+          "id": "exercise",
+          "name": "exercise",
+          "aliases": [
+            "work out"
+          ],
+          "plural": "exercise"
+        },
+        {
+          "id": "go-to-the-gym",
+          "name": "go to the gym",
+          "aliases": [
+            "gym"
+          ],
+          "plural": "go to the gym"
+        },
+        {
+          "id": "go-to-a-cafe",
+          "name": "go to a cafe",
+          "aliases": [
+            "cafe"
+          ],
+          "plural": "go to a cafe"
+        },
+        {
+          "id": "go-to-the-library",
+          "name": "go to the library",
+          "aliases": [
+            "library"
+          ],
+          "plural": "go to the library"
+        },
+        {
+          "id": "play-in-the-rain",
+          "name": "play in the rain",
+          "aliases": [],
+          "plural": "play in the rain"
+        },
+        {
+          "id": "stay-in-bed",
+          "name": "stay in bed",
+          "aliases": [],
+          "plural": "stay in bed"
+        },
+        {
+          "id": "cuddle",
+          "name": "cuddle",
+          "aliases": [
+            "snuggle"
+          ],
+          "plural": "cuddle"
+        },
+        {
+          "id": "make-soup",
+          "name": "make soup",
+          "aliases": [
+            "soup"
+          ],
+          "plural": "make soup"
+        },
+        {
+          "id": "dance",
+          "name": "dance",
+          "aliases": [],
+          "plural": "dance"
+        },
+        {
+          "id": "meditate",
+          "name": "meditate",
+          "aliases": [],
+          "plural": "meditate"
+        },
+        {
+          "id": "do-nothing",
+          "name": "do nothing",
+          "aliases": [
+            "nothing"
+          ],
+          "plural": "do nothing"
+        },
+        {
+          "id": "video-chat",
+          "name": "video chat",
+          "aliases": [],
+          "plural": "video chat"
+        },
+        {
+          "id": "learn-something-new",
+          "name": "learn something new",
+          "aliases": [],
+          "plural": "learn something new"
+        },
+        {
+          "id": "sit-by-the-fire",
+          "name": "sit by the fire",
+          "aliases": [
+            "fireplace"
+          ],
+          "plural": "sit by the fire"
+        },
+        {
+          "id": "play-hide-and-seek",
+          "name": "play hide and seek",
+          "aliases": [
+            "hide and seek"
+          ],
+          "plural": "play hide and seek"
+        },
+        {
+          "id": "work",
+          "name": "work",
+          "aliases": [],
+          "plural": "work"
         }
       ],
       "host_bank": [
@@ -2258,6 +2965,113 @@
             "omelette",
             "omelets"
           ]
+        },
+        {
+          "id": "sunny-side-up",
+          "name": "sunny side up",
+          "aliases": [],
+          "plural": "sunny side up"
+        },
+        {
+          "id": "over-easy",
+          "name": "over easy",
+          "aliases": [],
+          "plural": "over easy"
+        },
+        {
+          "id": "over-medium",
+          "name": "over medium",
+          "aliases": [],
+          "plural": "over medium"
+        },
+        {
+          "id": "over-hard",
+          "name": "over hard",
+          "aliases": [],
+          "plural": "over hard"
+        },
+        {
+          "id": "basted",
+          "name": "basted",
+          "aliases": [],
+          "plural": "basted"
+        },
+        {
+          "id": "steamed",
+          "name": "steamed",
+          "aliases": [],
+          "plural": "steamed"
+        },
+        {
+          "id": "deviled-egg",
+          "name": "deviled egg",
+          "aliases": [
+            "deviled eggs"
+          ]
+        },
+        {
+          "id": "pickled-egg",
+          "name": "pickled egg",
+          "aliases": [
+            "pickled eggs"
+          ]
+        },
+        {
+          "id": "egg-in-a-hole",
+          "name": "egg in a hole",
+          "aliases": [
+            "egg in a basket",
+            "toad in the hole"
+          ],
+          "plural": "egg in a hole"
+        },
+        {
+          "id": "frittata",
+          "name": "frittata",
+          "aliases": [
+            "frittatas"
+          ]
+        },
+        {
+          "id": "quiche",
+          "name": "quiche",
+          "aliases": [
+            "quiches"
+          ]
+        },
+        {
+          "id": "eggs-benedict",
+          "name": "eggs Benedict",
+          "aliases": [],
+          "plural": "eggs Benedict"
+        },
+        {
+          "id": "sous-vide",
+          "name": "sous vide",
+          "aliases": [],
+          "plural": "sous vide"
+        },
+        {
+          "id": "microwaved",
+          "name": "microwaved",
+          "aliases": [
+            "microwave"
+          ],
+          "plural": "microwaved"
+        },
+        {
+          "id": "tamagoyaki",
+          "name": "tamagoyaki",
+          "aliases": [],
+          "plural": "tamagoyaki"
+        },
+        {
+          "id": "air-fried",
+          "name": "air fried",
+          "aliases": [
+            "air fryer"
+          ],
+          "plural": "air fried"
         }
       ],
       "host_bank": [

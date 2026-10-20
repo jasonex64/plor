@@ -1032,7 +1032,10 @@
         {
           "id": "corn",
           "name": "corn",
-          "aliases": [],
+          "aliases": [
+            "maize",
+            "sweet corn"
+          ],
           "plural": "corn"
         },
         {
@@ -1060,14 +1063,16 @@
           "name": "bell pepper",
           "aliases": [
             "pepper",
-            "bell peppers"
+            "bell peppers",
+            "capsicum"
           ]
         },
         {
           "id": "zucchini",
           "name": "zucchini",
           "aliases": [
-            "zucchinis"
+            "zucchinis",
+            "courgette"
           ]
         },
         {
@@ -1191,13 +1196,17 @@
         {
           "id": "arugula",
           "name": "arugula",
-          "aliases": [],
+          "aliases": [
+            "rocket"
+          ],
           "plural": "arugula"
         },
         {
           "id": "bok-choy",
           "name": "bok choy",
-          "aliases": [],
+          "aliases": [
+            "pak choi"
+          ],
           "plural": "bok choy"
         },
         {
@@ -1231,7 +1240,8 @@
           "name": "green onion",
           "aliases": [
             "scallion",
-            "green onions"
+            "green onions",
+            "spring onion"
           ]
         },
         {
@@ -1339,7 +1349,8 @@
           "id": "rutabaga",
           "name": "rutabaga",
           "aliases": [
-            "rutabagas"
+            "rutabagas",
+            "swede"
           ]
         },
         {
@@ -1373,6 +1384,103 @@
           "name": "choy sum",
           "aliases": [],
           "plural": "choy sum"
+        },
+        {
+          "id": "lima-bean",
+          "name": "lima bean",
+          "aliases": [
+            "lima beans"
+          ]
+        },
+        {
+          "id": "black-bean",
+          "name": "black bean",
+          "aliases": [
+            "black beans"
+          ]
+        },
+        {
+          "id": "kidney-bean",
+          "name": "kidney bean",
+          "aliases": [
+            "kidney beans"
+          ]
+        },
+        {
+          "id": "chickpea",
+          "name": "chickpea",
+          "aliases": [
+            "garbanzo bean",
+            "chickpeas",
+            "chick pea"
+          ]
+        },
+        {
+          "id": "lentil",
+          "name": "lentil",
+          "aliases": [
+            "lentils"
+          ]
+        },
+        {
+          "id": "romaine",
+          "name": "romaine",
+          "aliases": [
+            "romaines"
+          ]
+        },
+        {
+          "id": "swiss-chard",
+          "name": "Swiss chard",
+          "aliases": [
+            "chard"
+          ],
+          "plural": "Swiss chard"
+        },
+        {
+          "id": "mustard-greens",
+          "name": "mustard greens",
+          "aliases": [],
+          "plural": "mustard greens"
+        },
+        {
+          "id": "horseradish",
+          "name": "horseradish",
+          "aliases": [],
+          "plural": "horseradish"
+        },
+        {
+          "id": "ginger",
+          "name": "ginger",
+          "aliases": [],
+          "plural": "ginger"
+        },
+        {
+          "id": "rhubarb",
+          "name": "rhubarb",
+          "aliases": [
+            "rhubarbs"
+          ]
+        },
+        {
+          "id": "sorrel",
+          "name": "sorrel",
+          "aliases": [],
+          "plural": "sorrel"
+        },
+        {
+          "id": "salsify",
+          "name": "salsify",
+          "aliases": [
+            "salsifies"
+          ]
+        },
+        {
+          "id": "plantain",
+          "name": "plantain",
+          "aliases": [
+            "plantains"
+          ]
         }
       ],
       "host_bank": [
@@ -1394,13 +1502,18 @@
         {
           "id": "vanilla",
           "name": "vanilla",
-          "aliases": [],
+          "aliases": [
+            "French vanilla"
+          ],
           "plural": "vanilla"
         },
         {
           "id": "chocolate",
           "name": "chocolate",
-          "aliases": [],
+          "aliases": [
+            "chocolate fudge",
+            "double chocolate"
+          ],
           "plural": "chocolate"
         },
         {
@@ -1421,7 +1534,8 @@
           "id": "cookies-and-cream",
           "name": "cookies and cream",
           "aliases": [
-            "cookies n cream"
+            "cookies n cream",
+            "Oreo cookie"
           ],
           "plural": "cookies and cream"
         },
@@ -1547,7 +1661,8 @@
           "id": "green-tea",
           "name": "green tea",
           "aliases": [
-            "matcha"
+            "matcha",
+            "matcha green tea"
           ],
           "plural": "green tea"
         },
@@ -1734,6 +1849,162 @@
           "name": "cardamom",
           "aliases": [],
           "plural": "cardamom"
+        },
+        {
+          "id": "mint",
+          "name": "mint",
+          "aliases": [],
+          "plural": "mint"
+        },
+        {
+          "id": "cheesecake",
+          "name": "cheesecake",
+          "aliases": [],
+          "plural": "cheesecake"
+        },
+        {
+          "id": "blueberry",
+          "name": "blueberry",
+          "aliases": [],
+          "plural": "blueberry"
+        },
+        {
+          "id": "blackberry",
+          "name": "blackberry",
+          "aliases": [],
+          "plural": "blackberry"
+        },
+        {
+          "id": "orange",
+          "name": "orange",
+          "aliases": [],
+          "plural": "orange"
+        },
+        {
+          "id": "watermelon",
+          "name": "watermelon",
+          "aliases": [],
+          "plural": "watermelon"
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "bubblegum",
+          "name": "bubblegum",
+          "aliases": [],
+          "plural": "bubblegum"
+        },
+        {
+          "id": "superman",
+          "name": "Superman",
+          "aliases": [],
+          "plural": "Superman"
+        },
+        {
+          "id": "tutti-frutti",
+          "name": "tutti frutti",
+          "aliases": [],
+          "plural": "tutti frutti"
+        },
+        {
+          "id": "marshmallow",
+          "name": "marshmallow",
+          "aliases": [],
+          "plural": "marshmallow"
+        },
+        {
+          "id": "oreo",
+          "name": "Oreo",
+          "aliases": [],
+          "plural": "Oreo"
+        },
+        {
+          "id": "brownie",
+          "name": "brownie",
+          "aliases": [],
+          "plural": "brownie"
+        },
+        {
+          "id": "peanut-butter-cup",
+          "name": "peanut butter cup",
+          "aliases": [],
+          "plural": "peanut butter cup"
+        },
+        {
+          "id": "honey",
+          "name": "honey",
+          "aliases": [],
+          "plural": "honey"
+        },
+        {
+          "id": "lavender",
+          "name": "lavender",
+          "aliases": [],
+          "plural": "lavender"
+        },
+        {
+          "id": "almond",
+          "name": "almond",
+          "aliases": [],
+          "plural": "almond"
+        },
+        {
+          "id": "pineapple",
+          "name": "pineapple",
+          "aliases": [],
+          "plural": "pineapple"
+        },
+        {
+          "id": "passion-fruit",
+          "name": "passion fruit",
+          "aliases": [],
+          "plural": "passion fruit"
+        },
+        {
+          "id": "guava",
+          "name": "guava",
+          "aliases": [],
+          "plural": "guava"
+        },
+        {
+          "id": "espresso",
+          "name": "espresso",
+          "aliases": [],
+          "plural": "espresso"
+        },
+        {
+          "id": "mocha",
+          "name": "mocha",
+          "aliases": [],
+          "plural": "mocha"
+        },
+        {
+          "id": "tiramisu",
+          "name": "tiramisu",
+          "aliases": [],
+          "plural": "tiramisu"
+        },
+        {
+          "id": "licorice",
+          "name": "licorice",
+          "aliases": [],
+          "plural": "licorice"
+        },
+        {
+          "id": "root-beer",
+          "name": "root beer",
+          "aliases": [],
+          "plural": "root beer"
+        },
+        {
+          "id": "nutella",
+          "name": "Nutella",
+          "aliases": [],
+          "plural": "Nutella"
         }
       ],
       "host_bank": [
@@ -1765,7 +2036,9 @@
           "id": "invisibility",
           "name": "invisibility",
           "aliases": [
-            "invisible"
+            "invisible",
+            "turning invisible",
+            "being invisible"
           ],
           "plural": "invisibility"
         },
@@ -1797,7 +2070,8 @@
           "id": "mind-reading",
           "name": "mind reading",
           "aliases": [
-            "telepathy"
+            "telepathy",
+            "reading minds"
           ],
           "plural": "mind reading"
         },
@@ -1823,7 +2097,8 @@
           "id": "healing",
           "name": "healing",
           "aliases": [
-            "super healing"
+            "super healing",
+            "regeneration"
           ],
           "plural": "healing"
         },
@@ -1938,6 +2213,100 @@
             "luck"
           ],
           "plural": "super luck"
+        },
+        {
+          "id": "telekinesis",
+          "name": "telekinesis",
+          "aliases": [],
+          "plural": "telekinesis"
+        },
+        {
+          "id": "invincibility",
+          "name": "invincibility",
+          "aliases": [],
+          "plural": "invincibility"
+        },
+        {
+          "id": "seeing-the-future",
+          "name": "seeing the future",
+          "aliases": [
+            "precognition"
+          ],
+          "plural": "seeing the future"
+        },
+        {
+          "id": "walking-through-walls",
+          "name": "walking through walls",
+          "aliases": [
+            "phasing"
+          ],
+          "plural": "walking through walls"
+        },
+        {
+          "id": "duplication",
+          "name": "duplication",
+          "aliases": [
+            "cloning"
+          ],
+          "plural": "duplication"
+        },
+        {
+          "id": "growing-giant",
+          "name": "growing giant",
+          "aliases": [],
+          "plural": "growing giant"
+        },
+        {
+          "id": "magic",
+          "name": "magic",
+          "aliases": [],
+          "plural": "magic"
+        },
+        {
+          "id": "photographic-memory",
+          "name": "photographic memory",
+          "aliases": [],
+          "plural": "photographic memory"
+        },
+        {
+          "id": "speaking-every-language",
+          "name": "speaking every language",
+          "aliases": [],
+          "plural": "speaking every language"
+        },
+        {
+          "id": "immunity",
+          "name": "immunity",
+          "aliases": [],
+          "plural": "immunity"
+        },
+        {
+          "id": "copying-powers",
+          "name": "copying powers",
+          "aliases": [
+            "power absorption"
+          ],
+          "plural": "copying powers"
+        },
+        {
+          "id": "electricity-powers",
+          "name": "electricity powers",
+          "aliases": [
+            "lightning"
+          ],
+          "plural": "electricity powers"
+        },
+        {
+          "id": "water-powers",
+          "name": "water powers",
+          "aliases": [],
+          "plural": "water powers"
+        },
+        {
+          "id": "plant-powers",
+          "name": "plant powers",
+          "aliases": [],
+          "plural": "plant powers"
         }
       ],
       "host_bank": [
@@ -2101,6 +2470,156 @@
             "space station"
           ],
           "plural": "International Space Station"
+        },
+        {
+          "id": "star",
+          "name": "star",
+          "aliases": [
+            "stars"
+          ]
+        },
+        {
+          "id": "kuiper-belt",
+          "name": "Kuiper belt",
+          "aliases": [],
+          "plural": "Kuiper belt"
+        },
+        {
+          "id": "oort-cloud",
+          "name": "Oort cloud",
+          "aliases": [],
+          "plural": "Oort cloud"
+        },
+        {
+          "id": "meteor",
+          "name": "meteor",
+          "aliases": [
+            "meteors"
+          ]
+        },
+        {
+          "id": "meteoroid",
+          "name": "meteoroid",
+          "aliases": [
+            "meteoroids"
+          ]
+        },
+        {
+          "id": "meteorite",
+          "name": "meteorite",
+          "aliases": [
+            "meteorites"
+          ]
+        },
+        {
+          "id": "phobos",
+          "name": "Phobos",
+          "aliases": [],
+          "plural": "Phobos"
+        },
+        {
+          "id": "deimos",
+          "name": "Deimos",
+          "aliases": [],
+          "plural": "Deimos"
+        },
+        {
+          "id": "io",
+          "name": "Io",
+          "aliases": [],
+          "plural": "Io"
+        },
+        {
+          "id": "europa",
+          "name": "Europa",
+          "aliases": [],
+          "plural": "Europa"
+        },
+        {
+          "id": "ganymede",
+          "name": "Ganymede",
+          "aliases": [],
+          "plural": "Ganymede"
+        },
+        {
+          "id": "callisto",
+          "name": "Callisto",
+          "aliases": [],
+          "plural": "Callisto"
+        },
+        {
+          "id": "titan",
+          "name": "Titan",
+          "aliases": [],
+          "plural": "Titan"
+        },
+        {
+          "id": "enceladus",
+          "name": "Enceladus",
+          "aliases": [],
+          "plural": "Enceladus"
+        },
+        {
+          "id": "triton",
+          "name": "Triton",
+          "aliases": [],
+          "plural": "Triton"
+        },
+        {
+          "id": "charon",
+          "name": "Charon",
+          "aliases": [],
+          "plural": "Charon"
+        },
+        {
+          "id": "rings-of-saturn",
+          "name": "rings of Saturn",
+          "aliases": [
+            "saturn's rings"
+          ],
+          "plural": "rings of Saturn"
+        },
+        {
+          "id": "solar-wind",
+          "name": "solar wind",
+          "aliases": [],
+          "plural": "solar wind"
+        },
+        {
+          "id": "space-probe",
+          "name": "space probe",
+          "aliases": [
+            "space probes"
+          ]
+        },
+        {
+          "id": "astronaut",
+          "name": "astronaut",
+          "aliases": [
+            "astronauts"
+          ]
+        },
+        {
+          "id": "space-junk",
+          "name": "space junk",
+          "aliases": [],
+          "plural": "space junk"
+        },
+        {
+          "id": "hubble-space-telescope",
+          "name": "Hubble Space Telescope",
+          "aliases": [
+            "hubble"
+          ],
+          "plural": "Hubble Space Telescope"
+        },
+        {
+          "id": "rover",
+          "name": "rover",
+          "aliases": [
+            "Mars rover",
+            "rovers"
+          ]
         }
       ],
       "host_bank": [

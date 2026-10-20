@@ -64,7 +64,9 @@
           "id": "pancake",
           "name": "pancake",
           "aliases": [
-            "pancakes"
+            "pancakes",
+            "flapjack",
+            "hotcake"
           ]
         },
         {
@@ -103,7 +105,8 @@
           "id": "hash-browns",
           "name": "hash browns",
           "aliases": [
-            "hash brown"
+            "hash brown",
+            "hashbrowns"
           ],
           "plural": "hash browns"
         },
@@ -158,7 +161,10 @@
         {
           "id": "cereal",
           "name": "cereal",
-          "aliases": [],
+          "aliases": [
+            "cornflakes",
+            "Cheerios"
+          ],
           "plural": "cereal"
         },
         {
@@ -221,7 +227,9 @@
         {
           "id": "coffee",
           "name": "coffee",
-          "aliases": [],
+          "aliases": [
+            "cup of coffee"
+          ],
           "plural": "coffee"
         },
         {
@@ -511,6 +519,159 @@
           "name": "bagel and lox",
           "aliases": [],
           "plural": "bagel and lox"
+        },
+        {
+          "id": "poptart",
+          "name": "Pop-Tart",
+          "aliases": [
+            "Pop-Tarts"
+          ]
+        },
+        {
+          "id": "toaster-strudel",
+          "name": "toaster strudel",
+          "aliases": [
+            "toaster strudels"
+          ]
+        },
+        {
+          "id": "apple",
+          "name": "apple",
+          "aliases": [
+            "apples"
+          ]
+        },
+        {
+          "id": "berries",
+          "name": "berries",
+          "aliases": [
+            "berry"
+          ],
+          "plural": "berries"
+        },
+        {
+          "id": "grapefruit",
+          "name": "grapefruit",
+          "aliases": [
+            "grapefruits"
+          ]
+        },
+        {
+          "id": "cantaloupe",
+          "name": "cantaloupe",
+          "aliases": [],
+          "plural": "cantaloupe"
+        },
+        {
+          "id": "protein-shake",
+          "name": "protein shake",
+          "aliases": [],
+          "plural": "protein shake"
+        },
+        {
+          "id": "granola-bar",
+          "name": "granola bar",
+          "aliases": [
+            "granola bars"
+          ]
+        },
+        {
+          "id": "cream-of-wheat",
+          "name": "cream of wheat",
+          "aliases": [],
+          "plural": "cream of wheat"
+        },
+        {
+          "id": "hot-chocolate",
+          "name": "hot chocolate",
+          "aliases": [
+            "hot cocoa"
+          ],
+          "plural": "hot chocolate"
+        },
+        {
+          "id": "latte",
+          "name": "latte",
+          "aliases": [
+            "lattes"
+          ]
+        },
+        {
+          "id": "espresso",
+          "name": "espresso",
+          "aliases": [],
+          "plural": "espresso"
+        },
+        {
+          "id": "cappuccino",
+          "name": "cappuccino",
+          "aliases": [
+            "cappuccinos"
+          ]
+        },
+        {
+          "id": "energy-drink",
+          "name": "energy drink",
+          "aliases": [],
+          "plural": "energy drink"
+        },
+        {
+          "id": "water",
+          "name": "water",
+          "aliases": [],
+          "plural": "water"
+        },
+        {
+          "id": "leftovers",
+          "name": "leftovers",
+          "aliases": [],
+          "plural": "leftovers"
+        },
+        {
+          "id": "cold-pizza",
+          "name": "cold pizza",
+          "aliases": [],
+          "plural": "cold pizza"
+        },
+        {
+          "id": "danish",
+          "name": "danish",
+          "aliases": [
+            "danishes"
+          ]
+        },
+        {
+          "id": "coffee-cake",
+          "name": "coffee cake",
+          "aliases": [],
+          "plural": "coffee cake"
+        },
+        {
+          "id": "biscuit",
+          "name": "biscuit",
+          "aliases": [
+            "biscuits"
+          ]
+        },
+        {
+          "id": "corned-beef-hash",
+          "name": "corned beef hash",
+          "aliases": [
+            "hash"
+          ],
+          "plural": "corned beef hash"
+        },
+        {
+          "id": "pho",
+          "name": "pho",
+          "aliases": [],
+          "plural": "pho"
+        },
+        {
+          "id": "nasi-lemak",
+          "name": "nasi lemak",
+          "aliases": [],
+          "plural": "nasi lemak"
         }
       ],
       "host_bank": [
@@ -533,7 +694,8 @@
           "id": "toilet",
           "name": "toilet",
           "aliases": [
-            "toilets"
+            "toilets",
+            "commode"
           ]
         },
         {
@@ -575,14 +737,18 @@
         {
           "id": "toilet-paper",
           "name": "toilet paper",
-          "aliases": [],
+          "aliases": [
+            "TP",
+            "loo roll"
+          ],
           "plural": "toilet paper"
         },
         {
           "id": "toothbrush",
           "name": "toothbrush",
           "aliases": [
-            "toothbrushes"
+            "toothbrushes",
+            "electric toothbrush"
           ]
         },
         {
@@ -659,7 +825,9 @@
         {
           "id": "mouthwash",
           "name": "mouthwash",
-          "aliases": [],
+          "aliases": [
+            "Listerine"
+          ],
           "plural": "mouthwash"
         },
         {
@@ -742,7 +910,8 @@
           "name": "wastebasket",
           "aliases": [
             "trash can",
-            "wastebaskets"
+            "wastebaskets",
+            "garbage can"
           ]
         },
         {
@@ -816,6 +985,181 @@
             "cologne"
           ],
           "plural": "perfume"
+        },
+        {
+          "id": "sponge",
+          "name": "sponge",
+          "aliases": [
+            "sponges"
+          ]
+        },
+        {
+          "id": "bath-bomb",
+          "name": "bath bomb",
+          "aliases": [
+            "bath bombs"
+          ]
+        },
+        {
+          "id": "bubble-bath",
+          "name": "bubble bath",
+          "aliases": [],
+          "plural": "bubble bath"
+        },
+        {
+          "id": "shower-cap",
+          "name": "shower cap",
+          "aliases": [
+            "shower caps"
+          ]
+        },
+        {
+          "id": "hair-gel",
+          "name": "hair gel",
+          "aliases": [],
+          "plural": "hair gel"
+        },
+        {
+          "id": "hairspray",
+          "name": "hairspray",
+          "aliases": [],
+          "plural": "hairspray"
+        },
+        {
+          "id": "sunscreen",
+          "name": "sunscreen",
+          "aliases": [],
+          "plural": "sunscreen"
+        },
+        {
+          "id": "nail-polish",
+          "name": "nail polish",
+          "aliases": [],
+          "plural": "nail polish"
+        },
+        {
+          "id": "nail-file",
+          "name": "nail file",
+          "aliases": [
+            "nail files"
+          ]
+        },
+        {
+          "id": "retainer",
+          "name": "retainer",
+          "aliases": [
+            "retainers"
+          ]
+        },
+        {
+          "id": "tissues",
+          "name": "tissues",
+          "aliases": [
+            "tissue"
+          ],
+          "plural": "tissues"
+        },
+        {
+          "id": "magazine",
+          "name": "magazine",
+          "aliases": [
+            "magazines"
+          ]
+        },
+        {
+          "id": "laundry-hamper",
+          "name": "laundry hamper",
+          "aliases": [
+            "hamper"
+          ],
+          "plural": "laundry hamper"
+        },
+        {
+          "id": "toilet-cleaner",
+          "name": "toilet cleaner",
+          "aliases": [],
+          "plural": "toilet cleaner"
+        },
+        {
+          "id": "bleach",
+          "name": "bleach",
+          "aliases": [],
+          "plural": "bleach"
+        },
+        {
+          "id": "cleaning-spray",
+          "name": "cleaning spray",
+          "aliases": [],
+          "plural": "cleaning spray"
+        },
+        {
+          "id": "step-stool",
+          "name": "step stool",
+          "aliases": [
+            "step stools"
+          ]
+        },
+        {
+          "id": "nightlight",
+          "name": "nightlight",
+          "aliases": [
+            "nightlights"
+          ]
+        },
+        {
+          "id": "bathrobe",
+          "name": "bathrobe",
+          "aliases": [
+            "robe",
+            "bathrobes"
+          ]
+        },
+        {
+          "id": "slipper",
+          "name": "slipper",
+          "aliases": [
+            "slippers"
+          ]
+        },
+        {
+          "id": "faucet",
+          "name": "faucet",
+          "aliases": [
+            "faucets"
+          ]
+        },
+        {
+          "id": "drain",
+          "name": "drain",
+          "aliases": [
+            "drains"
+          ]
+        },
+        {
+          "id": "tile",
+          "name": "tile",
+          "aliases": [],
+          "plural": "tile"
+        },
+        {
+          "id": "bidet",
+          "name": "bidet",
+          "aliases": [
+            "bidets"
+          ]
+        },
+        {
+          "id": "mold",
+          "name": "mold",
+          "aliases": [],
+          "plural": "mold"
+        },
+        {
+          "id": "spider",
+          "name": "spider",
+          "aliases": [
+            "spiders"
+          ]
         }
       ],
       "host_bank": [
@@ -1098,6 +1442,156 @@
           "name": "Rummikub",
           "aliases": [],
           "plural": "Rummikub"
+        },
+        {
+          "id": "boggle",
+          "name": "Boggle",
+          "aliases": [],
+          "plural": "Boggle"
+        },
+        {
+          "id": "yahtzee",
+          "name": "Yahtzee",
+          "aliases": [],
+          "plural": "Yahtzee"
+        },
+        {
+          "id": "hungry-hungry-hippos",
+          "name": "Hungry Hungry Hippos",
+          "aliases": [],
+          "plural": "Hungry Hungry Hippos"
+        },
+        {
+          "id": "mastermind",
+          "name": "Mastermind",
+          "aliases": [],
+          "plural": "Mastermind"
+        },
+        {
+          "id": "cranium",
+          "name": "Cranium",
+          "aliases": [],
+          "plural": "Cranium"
+        },
+        {
+          "id": "blokus",
+          "name": "Blokus",
+          "aliases": [],
+          "plural": "Blokus"
+        },
+        {
+          "id": "7-wonders",
+          "name": "7 Wonders",
+          "aliases": [],
+          "plural": "7 Wonders"
+        },
+        {
+          "id": "terraforming-mars",
+          "name": "Terraforming Mars",
+          "aliases": [],
+          "plural": "Terraforming Mars"
+        },
+        {
+          "id": "gloomhaven",
+          "name": "Gloomhaven",
+          "aliases": [],
+          "plural": "Gloomhaven"
+        },
+        {
+          "id": "king-of-tokyo",
+          "name": "King of Tokyo",
+          "aliases": [],
+          "plural": "King of Tokyo"
+        },
+        {
+          "id": "axis-allies",
+          "name": "Axis & Allies",
+          "aliases": [],
+          "plural": "Axis & Allies"
+        },
+        {
+          "id": "diplomacy",
+          "name": "Diplomacy",
+          "aliases": [],
+          "plural": "Diplomacy"
+        },
+        {
+          "id": "labyrinth",
+          "name": "Labyrinth",
+          "aliases": [],
+          "plural": "Labyrinth"
+        },
+        {
+          "id": "kerplunk",
+          "name": "Kerplunk",
+          "aliases": [],
+          "plural": "Kerplunk"
+        },
+        {
+          "id": "dont-break-the-ice",
+          "name": "Don't Break the Ice",
+          "aliases": [],
+          "plural": "Don't Break the Ice"
+        },
+        {
+          "id": "payday",
+          "name": "Payday",
+          "aliases": [],
+          "plural": "Payday"
+        },
+        {
+          "id": "qwirkle",
+          "name": "Qwirkle",
+          "aliases": [],
+          "plural": "Qwirkle"
+        },
+        {
+          "id": "upwords",
+          "name": "Upwords",
+          "aliases": [],
+          "plural": "Upwords"
+        },
+        {
+          "id": "hive",
+          "name": "Hive",
+          "aliases": [],
+          "plural": "Hive"
+        },
+        {
+          "id": "quoridor",
+          "name": "Quoridor",
+          "aliases": [],
+          "plural": "Quoridor"
+        },
+        {
+          "id": "patchwork",
+          "name": "Patchwork",
+          "aliases": [],
+          "plural": "Patchwork"
+        },
+        {
+          "id": "everdell",
+          "name": "Everdell",
+          "aliases": [],
+          "plural": "Everdell"
+        },
+        {
+          "id": "cascadia",
+          "name": "Cascadia",
+          "aliases": [],
+          "plural": "Cascadia"
+        },
+        {
+          "id": "codenames",
+          "name": "Codenames",
+          "aliases": [],
+          "plural": "Codenames"
+        },
+        {
+          "id": "taboo",
+          "name": "Taboo",
+          "aliases": [],
+          "plural": "Taboo"
         }
       ],
       "host_bank": [
@@ -1132,7 +1626,9 @@
           "id": "popsicle",
           "name": "popsicle",
           "aliases": [
-            "popsicles"
+            "popsicles",
+            "ice pop",
+            "ice lolly"
           ]
         },
         {
@@ -1166,7 +1662,8 @@
           "aliases": [
             "slushy",
             "slurpee",
-            "slushies"
+            "slushies",
+            "Icee"
           ]
         },
         {
@@ -1275,7 +1772,9 @@
           "id": "soda",
           "name": "soda",
           "aliases": [
-            "pop"
+            "pop",
+            "soft drink",
+            "coke"
           ],
           "plural": "soda"
         },
@@ -1492,6 +1991,156 @@
           "name": "chè",
           "aliases": [],
           "plural": "chè"
+        },
+        {
+          "id": "cold-pizza",
+          "name": "cold pizza",
+          "aliases": [],
+          "plural": "cold pizza"
+        },
+        {
+          "id": "sushi",
+          "name": "sushi",
+          "aliases": [],
+          "plural": "sushi"
+        },
+        {
+          "id": "sashimi",
+          "name": "sashimi",
+          "aliases": [],
+          "plural": "sashimi"
+        },
+        {
+          "id": "pudding",
+          "name": "pudding",
+          "aliases": [],
+          "plural": "pudding"
+        },
+        {
+          "id": "jello",
+          "name": "Jell-O",
+          "aliases": [],
+          "plural": "Jell-O"
+        },
+        {
+          "id": "cheesecake",
+          "name": "cheesecake",
+          "aliases": [],
+          "plural": "cheesecake"
+        },
+        {
+          "id": "fruit",
+          "name": "fruit",
+          "aliases": [],
+          "plural": "fruit"
+        },
+        {
+          "id": "watermelon",
+          "name": "watermelon",
+          "aliases": [
+            "watermelons"
+          ]
+        },
+        {
+          "id": "cucumber",
+          "name": "cucumber",
+          "aliases": [
+            "cucumbers"
+          ]
+        },
+        {
+          "id": "cold-cuts",
+          "name": "cold cuts",
+          "aliases": [],
+          "plural": "cold cuts"
+        },
+        {
+          "id": "potato-salad",
+          "name": "potato salad",
+          "aliases": [],
+          "plural": "potato salad"
+        },
+        {
+          "id": "pasta-salad",
+          "name": "pasta salad",
+          "aliases": [],
+          "plural": "pasta salad"
+        },
+        {
+          "id": "coleslaw",
+          "name": "coleslaw",
+          "aliases": [],
+          "plural": "coleslaw"
+        },
+        {
+          "id": "milk",
+          "name": "milk",
+          "aliases": [],
+          "plural": "milk"
+        },
+        {
+          "id": "juice",
+          "name": "juice",
+          "aliases": [],
+          "plural": "juice"
+        },
+        {
+          "id": "beer",
+          "name": "beer",
+          "aliases": [],
+          "plural": "beer"
+        },
+        {
+          "id": "iced-latte",
+          "name": "iced latte",
+          "aliases": [
+            "iced lattes"
+          ]
+        },
+        {
+          "id": "frappuccino",
+          "name": "Frappuccino",
+          "aliases": [
+            "Frappuccinos"
+          ]
+        },
+        {
+          "id": "protein-shake",
+          "name": "protein shake",
+          "aliases": [],
+          "plural": "protein shake"
+        },
+        {
+          "id": "frozen-grape",
+          "name": "frozen grape",
+          "aliases": [
+            "frozen grapes"
+          ]
+        },
+        {
+          "id": "overnight-oats",
+          "name": "overnight oats",
+          "aliases": [],
+          "plural": "overnight oats"
+        },
+        {
+          "id": "kombucha",
+          "name": "kombucha",
+          "aliases": [],
+          "plural": "kombucha"
+        },
+        {
+          "id": "energy-drink",
+          "name": "energy drink",
+          "aliases": [],
+          "plural": "energy drink"
+        },
+        {
+          "id": "acai-bowl",
+          "name": "açaí bowl",
+          "aliases": [
+            "açaí bowls"
+          ]
         }
       ],
       "host_bank": [
@@ -1587,6 +2236,27 @@
           "name": "sea otter",
           "aliases": [
             "sea otters"
+          ]
+        },
+        {
+          "id": "dugong",
+          "name": "dugong",
+          "aliases": [
+            "dugongs"
+          ]
+        },
+        {
+          "id": "polar-bear",
+          "name": "polar bear",
+          "aliases": [
+            "polar bears"
+          ]
+        },
+        {
+          "id": "vaquita",
+          "name": "vaquita",
+          "aliases": [
+            "vaquitas"
           ]
         }
       ],
@@ -1771,7 +2441,9 @@
           "id": "clementine",
           "name": "clementine",
           "aliases": [
-            "clementines"
+            "clementines",
+            "cutie",
+            "Cuties"
           ]
         },
         {
@@ -1808,6 +2480,55 @@
           "name": "citron",
           "aliases": [
             "citrons"
+          ]
+        },
+        {
+          "id": "bergamot",
+          "name": "bergamot",
+          "aliases": [
+            "bergamots"
+          ]
+        },
+        {
+          "id": "calamansi",
+          "name": "calamansi",
+          "aliases": [
+            "calamansis"
+          ]
+        },
+        {
+          "id": "tangelo",
+          "name": "tangelo",
+          "aliases": [
+            "tangelos"
+          ]
+        },
+        {
+          "id": "satsuma",
+          "name": "satsuma",
+          "aliases": [
+            "satsumas"
+          ]
+        },
+        {
+          "id": "ugli-fruit",
+          "name": "ugli fruit",
+          "aliases": [
+            "ugli fruits"
+          ]
+        },
+        {
+          "id": "buddhas-hand",
+          "name": "Buddha's hand",
+          "aliases": [
+            "Buddha's hands"
+          ]
+        },
+        {
+          "id": "sudachi",
+          "name": "sudachi",
+          "aliases": [
+            "sudachis"
           ]
         }
       ],

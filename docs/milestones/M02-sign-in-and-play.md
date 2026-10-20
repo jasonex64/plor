@@ -62,6 +62,9 @@ Each criterion must be checkable with a command or other observable result.
   href="/privacy"
   ```
 
+**2d: fuller answer lists for the playtest** (human, 2026-10-19: unaccepted answers are "incredibly frustrating"; "two different names for the same concept")
+- [ ] The 7 playtest puzzles (2026-10-26 to 11-01) get more accepted answers and more aliases (other names for the same thing). Host banks, host answers, prompts and every existing entry stay as they were (checked by script). The validator passes, and the human approves the lists before merge and republishes them.
+
 **Where 2b stands (2026-10-19):** everything above except the staging run and the playtest is built and tested (Evidence → 2b). The CI `db` job passed on GitHub.
 
 **Where 2a stands:** the first criterion is shown on `/api/profile`, the first route that needs a signed-in player; `POST /run/start` gets the same check and test in 2b, when it exists.
