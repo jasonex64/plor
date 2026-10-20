@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The name as a monument</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&amp;family=Jost:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#062b8a}a:hover{color:#3a5aa8}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:#e6dbc7;font-family:Jost,Arial,sans-serif;color:#062b8a}
+.bd{font-family:'Bodoni Moda',Didot,serif;font-weight:500;letter-spacing:-0.04em;line-height:0.85;margin:0}
+.num{width:30px;height:34px;display:flex;align-items:center;justify-content:center;font:500 18px 'Bodoni Moda',Didot,serif}
+.sug{min-height:50px;border:0;border-bottom:1px solid #062b8a;background:none;text-align:left;padding:0;font:400 19px Jost,Arial,sans-serif;color:#062b8a;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph">
+<div class="bd" style="font-size: 128px; white-space: nowrap; margin: 8px 0 0 -8px">Offbeat</div>
+<div style="padding: 18px 26px 26px; display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div style="display: flex; gap: 4px; align-items: center" role="img" aria-label="Questions 1 to 3 survived, question 4 now">
+<span class="num" style="text-decoration: line-through">1</span><span class="num" style="text-decoration: line-through">2</span><span class="num" style="text-decoration: line-through">3</span><span class="num" style="background: #062b8a; color: #e6dbc7; border-radius: 50%; width: 34px">4</span><span class="num">5</span><span class="num">6</span><span class="num">7</span>
+</div>
+<h1 class="bd" style="font-size: 38px; line-height: 1; letter-spacing: -0.02em; font-style: italic">Name a kind of tree</h1>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-weight: 500">Your answer
+<input value="ma" style="min-height: 52px; border: 1.5px solid #062b8a; border-radius: 0; padding: 0 14px; font: 400 20px Jost, Arial, sans-serif; color: #062b8a; background: #e6dbc7">
+</label>
+<div style="display: flex; flex-direction: column">
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button">Mahogany</button>
+</div>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: 400 16px Jost, Arial, sans-serif; color: #062b8a; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+</div>
+
+<div class="ph">
+<div style="padding: 30px 26px 0; display: flex; justify-content: space-between; font-size: 15px; font-weight: 500"><span>2 November</span><span>plor.app</span></div>
+<div class="bd" style="font-size: 300px; line-height: 0.8; margin: 26px 0 0 -10px; letter-spacing: -0.06em">4<span style="font-style: italic; font-size: 160px">/7</span></div>
+<div style="padding: 10px 26px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 4px; align-items: center" role="img" aria-label="4 survived, caught on the 5th, 2 not reached">
+<span class="num" style="text-decoration: line-through">1</span><span class="num" style="text-decoration: line-through">2</span><span class="num" style="text-decoration: line-through">3</span><span class="num" style="text-decoration: line-through">4</span><span class="num" style="border: 1.5px solid #062b8a; border-radius: 50%; width: 34px">✕</span><span class="num">6</span><span class="num">7</span>
+</div>
+<div style="font-size: 17px">Caught by the host on the fifth.</div>
+</div>
+<div style="flex: 1"></div>
+<div style="background: #062b8a; color: #e6dbc7; padding: 20px 26px 26px; display: flex; flex-direction: column; gap: 14px">
+<div class="bd" style="font-size: 64px; white-space: nowrap; margin-left: -4px">Offbeat</div>
+<button type="button" style="min-height: 52px; border: 1.5px solid #e6dbc7; background: #062b8a; color: #e6dbc7; font: 500 17px Jost, Arial, sans-serif">Share</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

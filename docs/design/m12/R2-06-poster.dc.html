@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Loud and flat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2a1110}a:hover{color:#952625}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;font-family:Archivo,Arial,sans-serif;color:#2a1110}
+.cd{font-family:Archivo,Arial,sans-serif;font-weight:800;font-stretch:62%;text-transform:uppercase;line-height:0.86;letter-spacing:-0.01em;margin:0}
+.sug{min-height:52px;border:2px solid #2a1110;background:#e2dccf;text-align:left;padding:0 14px;font:600 18px Archivo,Arial,sans-serif;color:#2a1110;cursor:pointer}
+.pip{flex:1;height:30px;display:flex;align-items:center;justify-content:center;font:800 16px Archivo,Arial,sans-serif;font-stretch:62%}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph">
+<div style="background: #dc1928; color: #ffffff; padding: 26px 20px 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 4px" role="img" aria-label="Questions 1 to 3 survived, question 4 now">
+<span class="pip" style="background: #ffffff; color: #dc1928">1</span><span class="pip" style="background: #ffffff; color: #dc1928">2</span><span class="pip" style="background: #ffffff; color: #dc1928">3</span><span class="pip" style="background: #e0a912; color: #2a1110">4</span><span class="pip" style="border: 2px solid #ffffff">5</span><span class="pip" style="border: 2px solid #ffffff">6</span><span class="pip" style="border: 2px solid #ffffff">7</span>
+</div>
+<h1 class="cd" style="font-size: 104px">Name a kind of tree</h1>
+</div>
+<div style="background: #e2dccf; padding: 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-weight: 600">Your answer
+<input value="ma" style="min-height: 56px; border: 3px solid #2a1110; border-radius: 0; padding: 0 14px; font: 700 22px Archivo, Arial, sans-serif; color: #2a1110; background: #ffffff">
+</label>
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button">Mahogany</button>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: 600 16px Archivo, Arial, sans-serif; color: #2a1110; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+</div>
+
+<div class="ph" style="background: #e2dccf">
+<div style="background: #e0a912; margin: 22px 18px 0; padding: 22px 18px; display: flex; flex-direction: column; gap: 12px; transform: rotate(-2deg)">
+<div class="cd" style="font-size: 30px">Offbeat · Nov 2</div>
+<div class="cd" style="font-size: 200px; letter-spacing: -0.04em">4/7</div>
+<div style="display: flex; gap: 4px" role="img" aria-label="4 survived, caught on the 5th, 2 not reached">
+<span class="pip" style="background: #2a1110; color: #e0a912">1</span><span class="pip" style="background: #2a1110; color: #e0a912">2</span><span class="pip" style="background: #2a1110; color: #e0a912">3</span><span class="pip" style="background: #2a1110; color: #e0a912">4</span><span class="pip" style="background: #dc1928; color: #ffffff">✕ 5</span><span class="pip" style="border: 2px solid #2a1110">6</span><span class="pip" style="border: 2px solid #2a1110">7</span>
+</div>
+<div class="cd" style="font-size: 30px">Caught on 5 · plor.app</div>
+</div>
+<div style="flex: 1"></div>
+<div style="padding: 0 18px 24px">
+<button type="button" class="cd" style="width: 100%; min-height: 60px; border: 0; background: #dc1928; color: #ffffff; font-size: 30px">Share it</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

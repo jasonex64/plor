@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The well-kept board</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0d2a1c}a:hover{color:#5f6b64}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:min-content;gap:8px;padding:12px;background:#f7f7f7;font-family:'Schibsted Grotesk',Arial,sans-serif;color:#0d2a1c;align-content:start}
+.t{background:#ebebeb;border-radius:14px;padding:14px;box-sizing:border-box}
+.big{font-weight:800;letter-spacing:-0.05em;line-height:0.88}
+.sug{min-height:56px;border:0;border-radius:14px;background:#ebebeb;text-align:left;padding:0 14px;font:600 18px 'Schibsted Grotesk',Arial,sans-serif;color:#0d2a1c;cursor:pointer}
+.q{display:flex;flex-direction:column;justify-content:space-between;height:64px;font-weight:600;font-size:14px}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph">
+<div class="t" style="grid-column: span 3; font-weight: 800; font-size: 22px; letter-spacing: -0.03em">offbeat</div>
+<div class="t" style="grid-column: span 3; font-weight: 600; font-size: 14px; text-align: right">Mon 2 Nov</div>
+<div class="t" style="grid-column: span 6; background: #0d2a1c; color: #f7f7f7; padding: 18px 16px 22px">
+<div style="font-weight: 600; font-size: 14px; margin-bottom: 18px">Question 4 of 7</div>
+<h1 class="big" style="margin: 0; font-size: 54px">name a kind of tree</h1>
+</div>
+<div style="grid-column: span 6; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px" role="img" aria-label="Questions 1 to 3 survived, question 4 now">
+<span class="t q" style="padding: 8px">1<span>✓</span></span><span class="t q" style="padding: 8px">2<span>✓</span></span><span class="t q" style="padding: 8px">3<span>✓</span></span><span class="t q" style="padding: 8px; background: #f6e016">4<span>now</span></span><span class="t q" style="padding: 8px; background: #f7f7f7; border: 1.5px solid #ebebeb">5</span><span class="t q" style="padding: 8px; background: #f7f7f7; border: 1.5px solid #ebebeb">6</span><span class="t q" style="padding: 8px; background: #f7f7f7; border: 1.5px solid #ebebeb">7</span>
+</div>
+<label class="t" style="grid-column: span 6; display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px; background: #ffffff; border: 2px solid #0d2a1c">Your answer
+<input value="ma" style="border: 0; padding: 4px 0; font: 600 22px 'Schibsted Grotesk', Arial, sans-serif; color: #0d2a1c; background: none; outline: none">
+</label>
+<button class="sug" type="button" style="grid-column: span 3">Maple</button>
+<button class="sug" type="button" style="grid-column: span 3">Magnolia</button>
+<button class="sug" type="button" style="grid-column: span 3">Mahogany</button>
+<button class="sug" type="button" style="grid-column: span 3; background: #f7f7f7; border: 1.5px dashed #5f6b64; font-size: 15px">Not in the list? Send "ma"</button>
+</div>
+
+<div class="ph">
+<div class="t" style="grid-column: span 6; background: #f6e016; padding: 18px 16px">
+<div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 15px"><span>offbeat</span><span>2 Nov</span></div>
+<div class="big" style="font-size: 150px; margin-top: 20px">4/7</div>
+</div>
+<div style="grid-column: span 6; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px" role="img" aria-label="4 survived, caught on the 5th, 2 not reached">
+<span class="t q" style="padding: 8px">1<span>✓</span></span><span class="t q" style="padding: 8px">2<span>✓</span></span><span class="t q" style="padding: 8px">3<span>✓</span></span><span class="t q" style="padding: 8px">4<span>✓</span></span><span class="t q" style="padding: 8px; background: #0d2a1c; color: #f7f7f7">5<span>✕</span></span><span class="t q" style="padding: 8px; background: #f7f7f7; border: 1.5px solid #ebebeb">6</span><span class="t q" style="padding: 8px; background: #f7f7f7; border: 1.5px solid #ebebeb">7</span>
+</div>
+<div class="t" style="grid-column: span 4; font-weight: 800; font-size: 26px; letter-spacing: -0.03em; line-height: 1">caught on question 5</div>
+<div class="t" style="grid-column: span 2; font-weight: 600; font-size: 14px; display: flex; align-items: flex-end">plor.app</div>
+<div class="t" style="grid-column: span 6; font-size: 15px; line-height: 1.5; background: #ffffff">offbeat · 2 Nov<br>✓✓✓✓✕·· 4/7<br>plor.app</div>
+<button type="button" style="grid-column: span 6; min-height: 56px; border: 0; border-radius: 14px; background: #0d2a1c; color: #f7f7f7; font: 600 18px 'Schibsted Grotesk', Arial, sans-serif">Share</button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

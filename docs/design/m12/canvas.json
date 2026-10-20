@@ -2,19 +2,41 @@
   "v": 3,
   "createdOnFiles": { "v": 1, "at": "2026-10-19T12:00:00Z" },
   "title": "Plor + Offbeat look directions",
-  "launch": { "view": "canvas" },
-  "pages": [],
+  "launch": { "view": "canvas", "page": "r2" },
+  "pages": [
+    { "id": "r2", "name": "Round 2 · wide spread" },
+    { "id": "r1", "name": "Round 1 · three directions" }
+  ],
   "boards": {
-    "Main.dc.html": { "x": 0, "y": 0, "w": 3114, "h": 1000, "title": "A · Full scale (music)" },
-    "B.dc.html": { "x": 0, "y": 1120, "w": 3114, "h": 1000, "title": "B · Seven steps (plain)" },
-    "C.dc.html": { "x": 0, "y": 2240, "w": 3114, "h": 1000, "title": "C · Host chat (conversation)" }
+    "Main.dc.html": { "x": 0, "y": 0, "w": 3114, "h": 1000, "title": "A · Full scale (music)", "page": "r1" },
+    "B.dc.html": { "x": 0, "y": 1120, "w": 3114, "h": 1000, "title": "B · Seven steps (plain)", "page": "r1" },
+    "C.dc.html": { "x": 0, "y": 2240, "w": 3114, "h": 1000, "title": "C · Host chat (conversation)", "page": "r1" },
+    "R2-01-quiet.dc.html": { "x": 0, "y": 0, "w": 900, "h": 924, "title": "1 · Quiet instrument", "page": "r2" },
+    "R2-02-chapters.dc.html": { "x": 980, "y": 0, "w": 900, "h": 924, "title": "2 · Colour chapters", "page": "r2" },
+    "R2-03-motif.dc.html": { "x": 1960, "y": 0, "w": 900, "h": 924, "title": "3 · One motif", "page": "r2" },
+    "R2-04-borrowed.dc.html": { "x": 2940, "y": 0, "w": 900, "h": 924, "title": "4 · Dressed as a fight card", "page": "r2" },
+    "R2-05-object.dc.html": { "x": 3920, "y": 0, "w": 900, "h": 924, "title": "5 · The answer sheet", "page": "r2" },
+    "R2-06-poster.dc.html": { "x": 0, "y": 1044, "w": 900, "h": 924, "title": "6 · Loud and flat", "page": "r2" },
+    "R2-07-monument.dc.html": { "x": 980, "y": 1044, "w": 900, "h": 924, "title": "7 · The name as a monument", "page": "r2" },
+    "R2-08-tiles.dc.html": { "x": 1960, "y": 1044, "w": 900, "h": 924, "title": "8 · The well-kept board", "page": "r2" },
+    "R2-09-dark.dc.html": { "x": 2940, "y": 1044, "w": 900, "h": 924, "title": "9 · The dark room", "page": "r2" },
+    "R2-10-type.dc.html": { "x": 3920, "y": 1044, "w": 900, "h": 924, "title": "10 · Type and nothing else", "page": "r2" }
   },
-  "order": ["Main.dc.html", "B.dc.html", "C.dc.html"],
+  "order": [
+    "Main.dc.html", "B.dc.html", "C.dc.html",
+    "R2-01-quiet.dc.html", "R2-02-chapters.dc.html", "R2-03-motif.dc.html", "R2-04-borrowed.dc.html", "R2-05-object.dc.html",
+    "R2-06-poster.dc.html", "R2-07-monument.dc.html", "R2-08-tiles.dc.html", "R2-09-dark.dc.html", "R2-10-type.dc.html"
+  ],
   "notes": {
-    "heading": { "x": 0, "y": -300, "text": "Plor + Offbeat: three directions to compare", "kind": "title1", "maxW": 3114 },
+    "heading": { "x": 0, "y": -300, "text": "Plor + Offbeat: three directions to compare", "kind": "title1", "maxW": 3114, "page": "r1" },
     "about": {
-      "x": 3234, "y": 0, "w": 380, "fill": "orange",
+      "x": 3234, "y": 0, "w": 380, "fill": "orange", "page": "r1",
       "text": "Same 7 screens in each row: sign-in, home, question with autocomplete, safe answer, the moment you match the host, a full 7/7 run, and the share card.\n\nQuestions are the real 2026-11-02 puzzle. Host answers shown are stand-ins, not the real ones.\n\nColours, fonts and words like \"off-key\" are placeholders for the human to choose. Mix freely: e.g. B's layout with A's share card."
+    },
+    "r2heading": { "x": 0, "y": -300, "text": "Round 2: ten quick styles. Point at what you like", "kind": "title1", "maxW": 4820, "page": "r2" },
+    "r2about": {
+      "x": 4900, "y": 0, "w": 400, "fill": "orange", "page": "r2",
+      "text": "Each tile: the question screen and the share card, same content every time (question 4 of 7, caught on question 5).\n\nThe ten looks were dealt at random from a library of 20 researched art directions (the design-taste-frontend skill), each with its dealt font and colours. Nothing here is a recommendation.\n\nReact any way: \"I like 3's colours and 7's type\", \"hate all the dark ones\", or a comment on a tile."
     }
   },
   "designSystems": []

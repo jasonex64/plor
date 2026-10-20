@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dressed as a fight card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2436ff}a:hover{color:#050a5c}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;font-family:'EB Garamond',Georgia,serif;color:#0a0a0a;background:#ffffff}
+.bb{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;line-height:0.85;letter-spacing:-0.02em;margin:0}
+.rd{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font:400 18px 'Bebas Neue',Impact,sans-serif;box-sizing:border-box}
+.sug{min-height:52px;border:0;border-bottom:1px solid #d6d6d6;background:none;text-align:left;padding:0;font:500 21px 'EB Garamond',Georgia,serif;color:#0a0a0a;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph">
+<div style="background: #2436ff; color: #ffffff; padding: 28px 22px 18px; display: flex; flex-direction: column; gap: 6px">
+<div class="bb" style="font-size: 22px; letter-spacing: 0.04em">You vs the host · Round 4 of 7</div>
+<h1 class="bb" style="font-size: 76px">Name a kind of tree</h1>
+</div>
+<div style="display: flex; gap: 3px; padding: 10px 22px 0" role="img" aria-label="Rounds 1 to 3 won, round 4 now">
+<span class="rd" style="background: #0a0a0a; color: #ffffff">R1</span><span class="rd" style="background: #0a0a0a; color: #ffffff">R2</span><span class="rd" style="background: #0a0a0a; color: #ffffff">R3</span><span class="rd" style="background: #ff3b1f; color: #0a0a0a">Now</span><span class="rd" style="border: 1.5px solid #0a0a0a">R5</span><span class="rd" style="border: 1.5px solid #0a0a0a">R6</span><span class="rd" style="border: 1.5px solid #0a0a0a">R7</span>
+</div>
+<div style="padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 16px; font-style: italic">Your answer
+<input value="ma" style="min-height: 52px; border: 2px solid #0a0a0a; border-radius: 0; padding: 0 14px; font: 500 21px 'EB Garamond', Georgia, serif; color: #0a0a0a; background: #ffffff">
+</label>
+<div style="display: flex; flex-direction: column">
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button">Mahogany</button>
+</div>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: italic 400 17px 'EB Garamond', Georgia, serif; color: #2436ff; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+</div>
+
+<div class="ph" style="background: #0a0a0a; color: #ffffff">
+<div style="padding: 30px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+<div class="bb" style="font-size: 22px; letter-spacing: 0.06em">Offbeat · Nov 2 · Result</div>
+<div class="bb" style="font-size: 120px; letter-spacing: -0.04em">Went 4<br>rounds</div>
+<div style="background: #ff3b1f; color: #0a0a0a; padding: 12px 14px" class="bb"><span style="font-size: 40px">Stopped in round 5</span></div>
+<div style="display: flex; gap: 3px" role="img" aria-label="Rounds 1 to 4 won, stopped in round 5, rounds 6 and 7 not fought">
+<span class="rd" style="background: #ffffff; color: #0a0a0a">R1</span><span class="rd" style="background: #ffffff; color: #0a0a0a">R2</span><span class="rd" style="background: #ffffff; color: #0a0a0a">R3</span><span class="rd" style="background: #ffffff; color: #0a0a0a">R4</span><span class="rd" style="background: #ff3b1f; color: #0a0a0a">✕ R5</span><span class="rd" style="border: 1.5px solid #ffffff">R6</span><span class="rd" style="border: 1.5px solid #ffffff">R7</span>
+</div>
+<div style="font-size: 18px; font-style: italic">4/7 · plor.app</div>
+<div style="flex: 1"></div>
+<button type="button" style="min-height: 56px; border: 0; background: #2436ff; color: #ffffff; font: 400 26px 'Bebas Neue', Impact, sans-serif; letter-spacing: 0.04em">Share the card</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

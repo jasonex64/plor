@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Colour chapters</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1c1c1c}a:hover{color:#2c3620}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;font-family:'Source Serif 4',Georgia,serif;color:#1c1c1c}
+.disp{font-family:'Libre Franklin',Arial,sans-serif;font-weight:700;letter-spacing:-0.035em;line-height:0.92;margin:0}
+.sug{min-height:52px;border:0;border-top:1.5px solid #1c1c1c;background:none;text-align:left;padding:0 2px;font:600 19px 'Source Serif 4',Georgia,serif;color:#1c1c1c;cursor:pointer}
+.band{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:12px;font:700 15px 'Libre Franklin',Arial,sans-serif}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph" style="background: #d6c4b8">
+<div style="display: flex; height: 14px" role="img" aria-label="Chapters 1 to 3 done, chapter 4 now">
+<span style="flex: 1; background: #a6b3bc"></span><span style="flex: 1; background: #b7c8be"></span><span style="flex: 1; background: #a6b3bc"></span><span style="flex: 1; background: #1c1c1c"></span><span style="flex: 1; background: #e3e2da"></span><span style="flex: 1; background: #e3e2da"></span><span style="flex: 1; background: #e3e2da"></span>
+</div>
+<div style="padding: 40px 28px 28px; display: flex; flex-direction: column; gap: 20px; flex: 1">
+<div style="font: 700 15px 'Libre Franklin', Arial, sans-serif; letter-spacing: 0.02em">CHAPTER 4 OF 7</div>
+<h1 class="disp" style="font-size: 54px">NAME A KIND OF TREE</h1>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-weight: 600; margin-top: 8px">Your answer
+<input value="ma" style="min-height: 52px; border: 2px solid #1c1c1c; border-radius: 0; padding: 0 14px; font: 400 20px 'Source Serif 4', Georgia, serif; color: #1c1c1c; background: #e3e2da">
+</label>
+<div style="display: flex; flex-direction: column">
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button" style="border-bottom: 1.5px solid #1c1c1c">Mahogany</button>
+</div>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: italic 400 16px 'Source Serif 4', Georgia, serif; color: #1c1c1c; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+</div>
+
+<div class="ph" style="background: #e3e2da">
+<div style="padding: 32px 28px 0; display: flex; flex-direction: column; gap: 6px">
+<h2 class="disp" style="font-size: 40px">OFFBEAT</h2>
+<div style="font-size: 16px">2 November · caught in chapter 5</div>
+</div>
+<div style="display: flex; height: 420px; margin: 24px 0 0" role="img" aria-label="Chapters 1 to 4 survived, caught in chapter 5, chapters 6 and 7 not reached">
+<div class="band" style="background: #a6b3bc">1</div>
+<div class="band" style="background: #b7c8be">2</div>
+<div class="band" style="background: #a6b3bc">3</div>
+<div class="band" style="background: #d6c4b8">4</div>
+<div class="band" style="background: #2c3620; color: #e3e2da"><span style="font-size: 26px; margin-bottom: auto; margin-top: 16px">×</span>5</div>
+<div class="band" style="border-left: 1.5px dashed #38424a">6</div>
+<div class="band" style="border-left: 1.5px dashed #38424a; border-right: 1.5px dashed #38424a">7</div>
+</div>
+<div style="padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span class="disp" style="font-size: 48px">4/7</span><span style="font-size: 16px">plor.app</span>
+</div>
+<div style="flex: 1"></div>
+<button type="button" style="min-height: 52px; border: 0; background: #2c3620; color: #e3e2da; font: 700 17px 'Libre Franklin', Arial, sans-serif; letter-spacing: 0.02em">SHARE</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

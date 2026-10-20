@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>One motif</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0a0a0a}a:hover{color:#b0298f}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;font-family:'Bricolage Grotesque',system-ui,sans-serif;color:#0a0a0a}
+.track{position:relative;height:56px}
+.track .rule{position:absolute;left:0;right:0;top:36px;height:2px;background:#0a0a0a}
+.dot{position:absolute;width:18px;height:18px;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.sug{min-height:52px;border:0;border-radius:26px;background:#ffffff;text-align:left;padding:0 20px;font:500 18px 'Bricolage Grotesque',system-ui,sans-serif;color:#0a0a0a;cursor:pointer;display:flex;align-items:center;gap:12px}
+.sug::before{content:"";width:10px;height:10px;border-radius:50%;background:#0a0a0a}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph" style="background: #cbe4f2">
+<div style="position: absolute; width: 420px; height: 420px; border-radius: 50%; background: #b0298f; top: -250px; right: -190px" aria-hidden="true"></div>
+<div style="position: relative; padding: 28px 24px 24px; display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div style="font-size: 15px; font-weight: 500">Offbeat · 4 of 7</div>
+<div class="track" role="img" aria-label="Questions 1 to 3 survived, question 4 now">
+<div class="rule"></div>
+<span class="dot" style="left: 4px; top: 4px; background: #0a0a0a"></span>
+<span class="dot" style="left: 54px; top: 10px; background: #0a0a0a"></span>
+<span class="dot" style="left: 104px; top: 2px; background: #0a0a0a"></span>
+<span class="dot" style="left: 152px; top: 0; width: 24px; height: 24px; background: #b0298f; border: 3px solid #0a0a0a"></span>
+<span class="dot" style="left: 206px; top: 28px; background: #cbe4f2; border: 2px solid #0a0a0a"></span>
+<span class="dot" style="left: 256px; top: 28px; background: #cbe4f2; border: 2px solid #0a0a0a"></span>
+<span class="dot" style="left: 306px; top: 28px; background: #cbe4f2; border: 2px solid #0a0a0a"></span>
+</div>
+<h1 style="margin: 24px 0 0; font-weight: 600; font-size: 50px; line-height: 0.92; letter-spacing: -0.04em">Name a kind of tree</h1>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-weight: 500">Your answer
+<input value="ma" style="min-height: 56px; border: 2px solid #0a0a0a; border-radius: 28px; padding: 0 20px; font: 500 19px 'Bricolage Grotesque', system-ui, sans-serif; color: #0a0a0a; background: #ffffff">
+</label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button">Mahogany</button>
+</div>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: 500 16px 'Bricolage Grotesque', system-ui, sans-serif; color: #0a0a0a; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+</div>
+
+<div class="ph" style="background: #f1e3b5">
+<div style="padding: 36px 24px 24px; display: flex; flex-direction: column; gap: 20px; flex: 1">
+<div style="font-size: 16px; font-weight: 500">Offbeat · 2 Nov</div>
+<div style="font-weight: 600; font-size: 88px; line-height: 0.9; letter-spacing: -0.05em">4/7</div>
+<div style="font-size: 18px; line-height: 1.35">Off the beat four times. On the host's beat at question 5.</div>
+<div class="track" style="height: 90px; margin-top: 12px" role="img" aria-label="4 dots off the line, the 5th on the line marked with an x, 2 not reached">
+<div class="rule" style="top: 60px"></div>
+<span class="dot" style="left: 6px; top: 8px; width: 26px; height: 26px; background: #0a0a0a"></span>
+<span class="dot" style="left: 56px; top: 20px; width: 26px; height: 26px; background: #0a0a0a"></span>
+<span class="dot" style="left: 106px; top: 4px; width: 26px; height: 26px; background: #0a0a0a"></span>
+<span class="dot" style="left: 156px; top: 14px; width: 26px; height: 26px; background: #0a0a0a"></span>
+<span class="dot" style="left: 200px; top: 44px; width: 34px; height: 34px; background: #b0298f; color: #ffffff; font-size: 18px">×</span>
+<span class="dot" style="left: 256px; top: 50px; width: 22px; height: 22px; border: 2px dashed #0a0a0a"></span>
+<span class="dot" style="left: 306px; top: 50px; width: 22px; height: 22px; border: 2px dashed #0a0a0a"></span>
+</div>
+<div style="font-size: 16px">plor.app</div>
+<div style="flex: 1"></div>
+<button type="button" style="min-height: 56px; border: 0; border-radius: 28px; background: #b0298f; color: #ffffff; font: 600 18px 'Bricolage Grotesque', system-ui, sans-serif">Share</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

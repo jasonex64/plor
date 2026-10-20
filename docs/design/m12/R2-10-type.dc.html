@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type and nothing else</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Imbue:opsz,wght@10..100,400&amp;family=Albert+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#f1f1ef}a:hover{color:#8fa68e}
+.ph{width:390px;height:844px;box-sizing:border-box;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;padding:28px 24px 24px;gap:18px;background:#1c1c1c;font-family:'Albert Sans',Arial,sans-serif;color:#f1f1ef}
+.im{font-family:Imbue,Didot,serif;font-weight:400;text-transform:uppercase;line-height:0.9;letter-spacing:-0.01em;margin:0}
+.sug{min-height:50px;border:0;background:none;text-align:left;padding:0;font:400 22px 'Albert Sans',Arial,sans-serif;color:#f1f1ef;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 900px; height: 924px; box-sizing: border-box; padding: 40px; background: #e4e4e4; display: flex; gap: 40px">
+
+<div class="ph">
+<div style="display: flex; justify-content: space-between; font-size: 15px; color: #9a9b96"><span>Offbeat</span><span aria-label="Questions 1 to 3 survived, question 4 now">1 2 3 <b style="color: #f1f1ef; font-weight: 500; text-decoration: underline; text-underline-offset: 4px">4</b> 5 6 7</span></div>
+<h1 class="im" style="font-size: 104px; margin-top: 20px">Name a kind of tree</h1>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: #9a9b96">Your answer
+<input value="ma" style="min-height: 52px; border: 0; border-bottom: 1.5px solid #f1f1ef; padding: 0; font: 400 26px 'Albert Sans', Arial, sans-serif; color: #f1f1ef; background: none; outline: none">
+</label>
+<div style="display: flex; flex-direction: column">
+<button class="sug" type="button">Maple</button>
+<button class="sug" type="button">Magnolia</button>
+<button class="sug" type="button">Mahogany</button>
+</div>
+<button type="button" style="min-height: 44px; border: 0; background: none; padding: 0; text-align: left; font: 400 16px 'Albert Sans', Arial, sans-serif; color: #9a9b96; text-decoration: underline; text-underline-offset: 3px">Not in the list? Send "ma"</button>
+</div>
+
+<div class="ph" style="padding: 0">
+<div style="background: #c8c5ba; color: #1c1c1c; padding: 28px 24px 30px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; font-size: 15px"><span>Offbeat</span><span>2 November</span></div>
+<div class="im" style="font-size: 190px; margin-top: 14px">Four</div>
+<div class="im" style="font-size: 64px">of seven</div>
+<div style="font-size: 18px; margin-top: 10px">Caught by the host on the fifth.</div>
+<div style="font-size: 15px">plor.app</div>
+</div>
+<div style="padding: 24px; display: flex; flex-direction: column; gap: 12px; flex: 1">
+<div style="font-size: 15px; color: #9a9b96">As text</div>
+<div style="font-size: 17px; line-height: 1.5">Offbeat · 2 Nov<br>1 2 3 4 ✕ · · — 4/7<br>plor.app</div>
+<div style="flex: 1"></div>
+<button type="button" style="min-height: 52px; border: 0; border-radius: 2px; background: #8fa68e; color: #1c1c1c; font: 500 17px 'Albert Sans', Arial, sans-serif">Share</button>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":924}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
