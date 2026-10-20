@@ -63,7 +63,7 @@ Each criterion must be checkable with a command or other observable result.
   ```
 
 **2d: fuller answer lists for the playtest** (human, 2026-10-19: unaccepted answers are "incredibly frustrating"; "two different names for the same concept")
-- [ ] The 7 playtest puzzles (2026-10-26 to 11-01) get more accepted answers and more aliases (other names for the same thing). Host banks, host answers, prompts and every existing entry stay as they were (checked by script). The validator passes, and the human approves the lists before merge and republishes them.
+- [x] *(Merged in PR #11 on the human's "merge pr", 2026-10-19; the listed judgment calls were kept as drafted. Republished to staging by the human the same day ("done"; output not pasted, so the counts are unverified until the first playtest day shows the new answers).)* The 7 playtest puzzles (2026-10-26 to 11-01) get more accepted answers and more aliases (other names for the same thing). Host banks, host answers, prompts and every existing entry stay as they were (checked by script). The validator passes, and the human approves the lists before merge and republishes them.
 
 2d evidence (2026-10-19), against `85146b5`, the commit before the list changes:
 ```text
