@@ -22,7 +22,7 @@ Define a versioned file format for daily puzzles and a validator script that rej
   - [x] a host answer that isn't in the host bank
   - [x] a match group that references an entry that doesn't exist
   - [x] an entry with no plural alias where an inflection exists (the generated plurals are shown for human review, not trusted silently)
-  - [x] a duplicate date, or a chain whose length differs from "questions per chain". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
+  - [x] a duplicate date, or a day whose question count differs from "questions per day". *(Human, 2026-10-18: the path must match `content/<game_id>/<date>.json`, so two files can't claim one day. The duplicate-date check becomes a path-mismatch check with its own fixture.)*
   - [x] a question with no host answers *(human, 2026-10-18: the count varies by question, so the fixed-count check became "at least 1")*
 - [x] A valid fixture passes.
 - [x] 14 daily puzzles on consecutive dates, drafted by Claude and reviewed and approved by the host (human, 2026-10-18), pass the validator. Every day mixes concrete questions with a clear answer set (e.g. days of the month) and abstract ones (e.g. "something you'd bring to a potluck"). Each puzzle is one file holding the 7 questions for its date.
