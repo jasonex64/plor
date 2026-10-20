@@ -7,9 +7,13 @@
   "title": "Plor + Offbeat look directions",
   "launch": {
     "view": "canvas",
-    "page": "r3"
+    "page": "r4"
   },
   "pages": [
+    {
+      "id": "r4",
+      "name": "Round 4 · PixelLab art"
+    },
     {
       "id": "r3",
       "name": "Round 3 · the ridge"
@@ -135,6 +139,14 @@
       "h": 1000,
       "title": "Offbeat · the ridge (concept)",
       "page": "r3"
+    },
+    "R4-pixellab.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1680,
+      "h": 1340,
+      "title": "First PixelLab art: goat, trail, sign",
+      "page": "r4"
     }
   },
   "order": [
@@ -151,7 +163,8 @@
     "R2-08-tiles.dc.html",
     "R2-09-dark.dc.html",
     "R2-10-type.dc.html",
-    "R3-ridge.dc.html"
+    "R3-ridge.dc.html",
+    "R4-pixellab.dc.html"
   ],
   "notes": {
     "heading": {
@@ -201,6 +214,22 @@
       "fill": "orange",
       "page": "r3",
       "text": "Stop 4 while typing, a safe reveal, the fall at stop 5, the friends' ridge and the share card.\n\nThe pixel art is a placeholder drawn in code, only to show where art goes. The goat, the raven host, the clouds and the colours are all open choices (D17 to D20 in the ticket).\n\nNo suggestions while typing: the word paints onto the sign instead.\n\nHost answers are stand-ins, not the real ones. Friend names are placeholders."
+    },
+    "r4heading": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 4: real pixel art from PixelLab",
+      "kind": "title1",
+      "maxW": 1680,
+      "page": "r4"
+    },
+    "r4about": {
+      "x": 1760,
+      "y": 0,
+      "w": 400,
+      "fill": "orange",
+      "page": "r4",
+      "text": "First tries from PixelLab (trial plan, 7 generations so far). Pick a goat, a trail and a sign, or say what to change.\n\nNext, once you pick: the goat gets idle, hop and fall animations, and the trail gets a ledge that crumbles.\n\nThe word on the sign is page text in the pixel font, so any word fits. Sizes are a trial (64 px sprites), not a final choice (D20).\n\nTrail A is seen from behind, not from the side, so the 7 stops would need a different layout there."
     }
   },
   "designSystems": []

@@ -96,6 +96,24 @@ Everything below is a draft for the human to change; only the D16 choice itself 
 
 **Mockup:** the canvas page "Round 3 · the ridge" (`docs/design/m12/R3-ridge.dc.html`) shows stop 4 while typing, a safe reveal, the fall at stop 5, the friends' ridge and the share card. The pixel art there is a placeholder drawn in code, not a proposal for the final art. Colours borrow round 2's tile 4 (blue, red, black); the question uses tile 1's serif headline (Young Serif); the sign uses a pixel font (Pixelify Sans) like the Krillion screenshot. All are placeholders (D3, D4).
 
+## Round 4: first PixelLab art (2026-10-20)
+The human OK'd a first small set at 64×64 px sprites, about 11–12 generations (human, 2026-10-20: "sure, tryit"). 64 px is a trial size picked because it's PixelLab's cheapest unit (a 64×64, 8-frame animation is 1 generation, per the `animate_image` tool description), not a D20 answer. The account is on PixelLab's trial: 40 generations, one job at a time (`get_balance` and the rate-limit error, 2026-10-20).
+
+Shown on the canvas page "Round 4 · PixelLab art" (`docs/design/m12/R4-pixellab.dc.html`): three goats, two trail scenes, two blank signs, each sign also with a word painted on as page text in Pixelify Sans. The images live only in the Artifact's asset store, not in git, until the human approves each one.
+
+**Generated assets** (all PixelLab MCP, 2026-10-20, 1 generation each as charged):
+| Asset | Tool | Prompt (short) | Seed | Size | Artifact asset id | Status |
+|---|---|---|---|---|---|---|
+| Goat A | `create_image_pixen` | small white goat, grey horns, red scarf, side view | 11 | 64×64 | 6deb5d78520abc03f8b0250fbf31ed40 | shown, awaiting the human |
+| Goat B | `create_image_pixen` | fluffy cream goat kid, beard, red knitted scarf | 27 | 64×64 | c09018a1fd7a701021eb99f1a6335c60 | shown, awaiting the human |
+| Goat C | `create_image_pixen` | round goat, big curled horns, red scarf in the wind | 42 | 64×64 | 54e0c94cc83be8e6f8bd055d2f8d4e50 | shown, awaiting the human |
+| Trail A | `create_image_pixen` | trail along a cliff edge, cream path, navy rock, cloud sea | 5 | 384×192 | e9abbe06293193199389915da4036c4f | shown, awaiting the human. Came out seen from behind, not side on |
+| Trail B | `create_image_pixen` | ledge path along a cliff edge, clouds below, misty peaks | 19 | 384×192 | 3ee00aa86167b9ebccce82b094f7ef11 | shown, awaiting the human |
+| Sign A | `create_image_pixen` | blank cream board in a dark wooden frame on a post | 8 | 64×64 | 59fbcf478e7c81094a60e85d5017ead9 | shown, awaiting the human |
+| Sign B | `create_image_pixen` | blank weathered plank on a stake | 31 | 64×64 | 1bc9b29c6ffe52598d628dea7aa7a93a | shown, awaiting the human |
+
+Still to make once the human picks: the goat's idle (4 frames), hop (8) and fall (8) with `animate_image`, and a crumbling ledge (8 frames).
+
 ## Decisions (for the human)
 Nothing here is decided until the human answers. Answers get recorded as "human, <date>".
 
