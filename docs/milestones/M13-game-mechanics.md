@@ -32,6 +32,10 @@ No source sets a target catch rate. It's a human number (G3).
 | G5 | After a safe answer: a reveal moment with a "Next" tap, or straight on to the next question with the reveal above it? | |
 | G6 | Days while building: the `content-rehearsal` days locally and on staging, or put some of the 28 drafted days back on the calendar now (each one used now is one fewer for the closed beta)? | |
 | G7 | How fast a locked-in answer must show its result (a human number, set after the first measurement in 13c) | |
+| G8 | Letter schedule: on which questions the Wind steals a letter, and from which tier (draft A, B or C below, or another) | |
+| G9 | Fewest familiar answers a question may have left after its stolen letters (a human number; the daily letter picker enforces it) | |
+| G10 | What happens when the 20-second timer runs out: the run ends, or the question scores 0 and the run goes on | |
+| G11 | Typing a stolen letter: the key does nothing (and the box shakes), or the answer is refused on submit | |
 
 ## Design exploration (2026-10-21, not decided unless marked "human")
 The human's problem statement: the game gives the player "too much leeway". Suggestions while typing act as hints, only listed answers can be submitted, and surviving all 7 is too easy because the answer space isn't restricted. Measured: the 2026-10-26 questions have 1 host answer out of 226 animals, 1 of 201 countries and 1 of 50 US states (2 of 12 on the last question).
@@ -40,10 +44,27 @@ The human's answers so far:
 - **Typos:** "Auto-correct one typo" (human, 2026-10-21): text one typo away from an entry counts as that entry, using the existing typo rule (M02 Numbers), with no "did you mean" prompt.
 - **Reveal:** "After each question" (human, 2026-10-21), worded for a board, which is no longer the lead design.
 - **Ramp:** "make the mechanics more loose at the start, and then restrict more as time goes on to induce stress" (human, 2026-10-21).
-- **Off-list answers:** "there should be a timer, so free retries are allowed as the timer provides a sense of urgency" (human, 2026-10-21). What happens at time-out, and whether the timer shrinks, are open (the human had no preference).
+- **Off-list answers:** "there should be a timer, so free retries are allowed as the timer provides a sense of urgency" (human, 2026-10-21). **The timer is 20 seconds per question** (human, 2026-10-21: "make sure that we have a timer of 20 seconds"). What happens at time-out is G10.
 - **The share model** (a board of the top answers covering cₖ, a host catching tₖ): "does define what we want idealistically", but estimating shares by survey or from play over time is "just not feasible" (human, 2026-10-21).
 - **The goal:** "people feeling like they are in control/capable of putting 'quirky' answers to live so that they feel smart while simultaneously still feeling some sort of danger" (human, 2026-10-21).
-- **Lead idea:** the Wind steals letters. Each question bans one more visible letter; any valid answer without those letters is allowed; the host still catches the obvious answers; free typing with a timer. The human: "i like the first idea and would like to explore it more, but i need some real showing of … how we are able to properly take a large wordspace of answers" (2026-10-21).
+- **Decided: the Wind steals letters** (human, 2026-10-21: "we are going to steal letters from the players. maybe not one every round, but enough to create a sense of urgency"). Stolen letters are visible and stay gone for the rest of the run. Any valid answer without them is allowed, the host still catches the obvious answers, and typing is free with the timer. How many letters and which ones are G8 and G9; the draft is below.
+
+**Letter tiers** (measured 2026-10-21 on 15 WordNet categories; the median share of a category's answers that one stolen letter removes, as all answers / familiar answers; "familiar" means seen at least once in WordNet's tagged corpus, a rough measure):
+- **Heavy:** E 59%/44%, A 57%/44%, R 49%/34%, I 43%/34%, N 41%/28%, O 41%/28%, L 37%/27%, T 37%/33%, S 36%/22%.
+- **Medium:** C 30%/19%, P 22%/16%, H 22%/15%, U 21%/12%, B 20%/16%, D 19%/13%, M 18%/14%, G 17%/14%.
+- **Light** (10% or less, which a player would barely feel): F, Y, K, W, V, X, J, Z, Q.
+
+**Draft schedules** (simulated over 2,000 random days of 7 categories, with letters drawn at random within each tier):
+
+| Schedule | Letters gone by Q1–Q7 | Answers left, median | Familiar answers left, 10th percentile | Questions with no familiar answer |
+|---|---|---|---|---|
+| **A** (Claude's pick): medium at Q2, medium at Q4, heavy consonant at Q5, vowel at Q7; Q3 and Q6 are breathers | 0 1 1 2 3 3 4 | 100% 80% 80% 62% 36% 35% 18% | 14 12 11 9 6 6 3 | 0.0% |
+| **B:** one every round from Q2: light, medium, medium, heavy consonant, heavy consonant, vowel | 0 1 2 3 4 5 6 | 100% 92% 73% 56% 32% 18% 9% | 14 13 11 9 6 3 2 | 0.4% |
+| **C:** medium at Q3, heavy consonant at Q5, vowel at Q7 | 0 0 1 1 2 2 3 | 100% 100% 80% 80% 47% 47% 24% | 14 14 11 11 8 8 4 | 0.0% |
+
+Why A: it starts loose, tightens in steps with two pauses so a theft feels like an event, and ends with the hardest steal (a vowel) on the last question. B's last two questions sometimes leave almost nothing a player would know.
+
+**How each day's letters would be picked** (draft): a script, not a person, picks the letters for each tier the schedule names, the same for every player (DECISIONS.md: fixed sequence). It tries the tier's letters and keeps a choice only if every question from that point on still has at least G9 familiar answers left, so no question can become impossible. The host's answers for each question are then chosen from the obvious answers that still avoid the letters stolen by then; a host answer the player can't type would add no danger.
 
 Evidence so far (scratchpad runs, 2026-10-21):
 - **Banning letters on today's hand lists, most common letter first:**
@@ -103,6 +124,9 @@ After the MVP (human, 2026-10-20):
 | Host answers per question | Difficulty | Varies by question (DECISIONS.md, Game 1), unless G2 changes question 7 |
 | Target catch rate | Tuning (13d) | G3, open |
 | Answer response time | Smoothness (13c) | G7, open |
+| Time per question | The timer | 20 seconds (human, 2026-10-21) |
+| Letter schedule | Stolen letters per question | G8, open (draft A proposed) |
+| Fewest familiar answers left | The daily letter picker | G9, open |
 
 ## Plan
 One PR per sub-ticket, from the branch `m13-game-mechanics`.
