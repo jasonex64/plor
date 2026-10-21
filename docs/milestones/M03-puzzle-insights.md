@@ -31,7 +31,7 @@ A per-question report shows the human how each puzzle really plays, and lets goo
 - [x] *(The flow exists: `content:additions-check` (M02 2d), the validator, review, `content:publish`; first real use after the playtest.)* Adding a chosen miss to a future puzzle goes through `content:additions-check`, the validator and `content:publish` (D3).
 - [x] The page is reachable only by admins: signed-out → 401, signed in but not in `private.admin` → 403, admin → the report (route-level tests). The admin list can't be read or changed by `anon`, `authenticated` or a player (pgTAP).
 - [x] `plor_app` gets only the grants the report needs (pgTAP, extending `plor_app_role.test.sql`).
-- [ ] The M02 playtest findings are produced with it (the M02 criterion).
+- [ ] The M02 findings are produced with it (the M02 criterion): since 2026-10-20 from the 2g survey, scored through `buildInsights` (`docs/milestones/M02-2g-survey.md`).
 
 ## Out of scope
 The AI drafting itself (M04); per-player history; a public stats view ("12% picked lion" is after the MVP); the visual design (M12).
@@ -47,7 +47,7 @@ The AI drafting itself (M04); per-player history; a public stats view ("12% pick
 1. The human sets D1–D5 and the Numbers.
 2. Migration: `private.admin` and the grants the report needs (security change: shown to the human in the PR), plus pgTAP.
 3. The report's queries (pure aggregation, tested against the local stack with fixture runs of known catch rates), the admin-only route and the page.
-4. Run it on the staging playtest data from 2026-10-26; record the M02 findings.
+4. ~~Run it on the staging playtest data from 2026-10-26~~ Run `buildInsights` on the 2g survey answers (the playtest moved to M11, human 2026-10-20); record the M02 findings.
 5. Reviewer pass, PR, merge on the human's approval.
 
 ## Removes

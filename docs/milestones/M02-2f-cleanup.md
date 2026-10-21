@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** in review (Part A, PR open; the human accepted the code-guessing risk for the playtest and approved the texts, 2026-10-20; the staging check waits for the deploy). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
+**Status:** Part A done (PR #17, merged 2026-10-20; the human accepted the code-guessing risk and approved the texts). Part B is next: it no longer waits for a playtest, which moved to the MVP (human, 2026-10-20; `M02-2g-survey.md`). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
@@ -16,7 +16,7 @@ Fix the open ROADMAP "Next revision" items that are code or tests and need no hu
 - A2: `handleError` in `@supabase/auth-js` 2.118.0 (`src/lib/fetch.ts`): any 5xx from Auth, or a request that never got a response, becomes an `AuthRetryableFetchError` with no error code.
 - A3: Supabase passwordless email, "With OTP" (steps 1 and 2), and email templates, "Email prefetching" option 1 and the `{{ .Token }}` variable (SOURCES.md "Supabase email sign-in", re-read at `e854b84` because `7425d49` no longer resolves on GitHub, checked 2026-10-20).
 
-## Part A — before the playtest (2026-10-26)
+## Part A — before the playtest (was 2026-10-26)
 | # | Item (ROADMAP wording, shortened) | What breaks without it | Plan |
 |---|---|---|---|
 | A1 | `currentUserId` rethrows any `getClaims()` error as a 500 | A playtester who signs out on another device may see a 500 instead of the sign-in form, if tokens are HS256 | The human reads the project's signing algorithm in the Supabase dashboard and reports only its name. If HS256: treat a revoked session as signed out, with a route test. If asymmetric: close the item with that evidence. **Result (human, 2026-10-20):** the current key is ECC P-256 (`ES256`); the legacy HS256 secret is listed as "previously used" since the rotation on 2026-10-17. `getClaims` asks the Auth server (`getUser`) only for an `HS*` token or one with no `kid`; an `ES256` token is checked locally against the JWKS. Tokens refreshed since 2026-10-17 are signed with the new key (JWT Signing Keys, "Getting started" step 5); whether an older HS256 token is still unexpired depends on the hosted JWT expiry, which is *unverified*, but the 2026-10-26 playtesters sign in after the rotation. The local stack's JWKS lists one EC `ES256` key too (checked 2026-10-20). No code change: closed |
@@ -29,7 +29,7 @@ Fix the open ROADMAP "Next revision" items that are code or tests and need no hu
 - [x] The human approves the new player texts in `src/app/messages.ts`: `auth_unavailable` (A2), `otp_expired` and `code_invalid` (A3). *Approved by the human, 2026-10-20.*
 - [x] A3, security: the human decides on the code-guessing risk (Review, blocking finding 1) before the hosted templates are switched. *The human accepted the risk for the playtest, 2026-10-20 (DECISIONS.md log; revisit with M11's rate limits).*
 - [x] A3, local stack (`npm run test:db`): a new address and a returning address each sign in with the code from the email (each template's subject checked); a used code and a wrong code are refused with a 4xx; no email contains a link to `/auth/confirm`.
-- [ ] A3, staging: after the deploy and the template change, the human signs in on `plor.app` with an emailed code (human report).
+- [x] A3, staging: after the deploy and the template change, the human signs in on `plor.app` with an emailed code (human report). *Human, 2026-10-20: both templates updated, merged, "sign-in with codes worked".*
 - [x] `npm test`, `npm run lint`, `npx tsc --noEmit` and `npm run test:db` pass.
 
 **A3 hypotheses, written before the first local run:**
@@ -44,7 +44,7 @@ All three held on the first run (Evidence).
 2. **Magic link**: subject `Your Plor sign-in code`; the same body.
 3. Sign in on `plor.app` with a new address and a returning one, and report whether each code worked.
 
-## Part B — after the playtest, any order
+## Part B — any order (was "after the playtest"; the playtest moved to the MVP, 2026-10-20)
 | # | Item | What breaks without it | Plan |
 |---|---|---|---|
 | B1 | `startRun` maps any 23503 to `no_puzzle_today` | *Low*: a wrong 404 if the user foreign key ever fails | Check `err.constraint`; test both constraints |
@@ -74,7 +74,7 @@ All three held on the first run (Evidence).
 - *(Moved into Part A as A3 by the human, 2026-10-20: the 6-digit code.)*
 - **Security, found in A1:** the legacy HS256 secret is still trusted as "previously used". JWT Signing Keys, "Rotate and revoke": "Once all regularly valid JWTs have expired (or sooner) revoke the previously used key". Revoking it is the human's call (a dashboard action; the same page says revoking the legacy secret requires disabling the legacy `anon` and `service_role` keys first).
 - **Content, before each puzzle's day** (a puzzle can't change once its day starts): the 2d and 2e judgment calls, the 2e reviewer findings Claude kept (cheese kinds on 11-20 q3, piercings on 11-13 q5), the M01 host-rule cases, possibly dominant host answers (the M01 late questions and the 2e drafts), days with no concrete question, the Kaskaskia wording (2026-11-08), completeness gaps, the UK list.
-- Numbers: `scripts/status` fetch timeout; `pg` connection timeout and app rate limits (M11); host bank size (after the playtest).
+- Numbers: `scripts/status` fetch timeout; `pg` connection timeout and app rate limits (M11); host bank size (after the 2g survey).
 - Choices: one source for the Supabase CA (three uses today); local analytics on Windows (expose the Docker socket or disable `[analytics]`); strip zero-width characters in normalization or not; reference sources for concrete lists.
 - Actions: upgrade local Node; local `plor_app` password (role change).
 - Security changes: column-level grant on `missed_answer`; applying hosted Auth settings from the repo.
@@ -89,7 +89,7 @@ None. Items that need a number are listed above as human decisions.
 ## Plan
 1. ~~The human approves this ticket and says whether to drop the *low* items.~~ Done 2026-10-20: approved, *low* items kept, A3 added.
 2. Part A on the M02 branch, `m02-sign-in-and-play` (CLAUDE.md: one branch per milestone; none exists today, so create it), as its own PR: reviewer, merge before 2026-10-26.
-3. Part B on the same branch after the playtest, as a second PR, one commit per item (`M02 2f: <item> (removes: <what>)`), each ticking its ROADMAP item.
+3. Part B on the same branch (no longer after the playtest, which moved to the MVP), as a second PR, one commit per item (`M02 2f: <item> (removes: <what>)`), each ticking its ROADMAP item.
 4. Reviewer pass, PR, merge on the human's approval.
 
 ## Removes
@@ -140,7 +140,7 @@ Build, types, lint: `npm run build` → `✓ Compiled successfully`, routes incl
 
 The form in a browser (`npm run dev` on the local stack, a throwaway `@example.test` address, deleted afterwards): "Email me a sign-in code" → "Enter your code / We sent a sign-in code to …"; the Mailpit email had subject `Welcome to Plor: your sign-in code`, a 6-digit code and no `<a ` element; a wrong code showed "That code is wrong, expired or already used. Check the newest email, or reload to get a new code."; the right code went on to "Pick a username".
 
-Staging: waiting for the deploy and the hosted step above.
+Staging: the human updated both hosted templates, merged PR #17, and reported "sign-in with codes worked" (2026-10-20).
 
 ## Review
 Part A, reviewer agent on `aa086b5`, 2026-10-20.
