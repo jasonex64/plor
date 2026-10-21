@@ -11,7 +11,7 @@ Offbeat can be played every day, its open rules are settled, its questions catch
   - No day is on the calendar (M02 2g), so nothing can be played today.
   - Two scoring and host rules are still open ideas (ROADMAP, M08 row).
   - The survey found that 14 of 21 questions caught nobody (M02 2g, Findings), and no target catch rate exists to tune them against.
-  - The play screen has known rough spots: Enter does nothing on text that isn't in the list, a safe answer is one line of text above the next question, there's no progress or score during the run, and there's no warning before the midnight reset.
+  - The play screen has known rough spots: Enter does nothing on text that isn't in the list, a safe answer is one line of text above the next question, no points are shown during the run or on the result (it shows "Question n of 7" and survived counts only), and there's no warning before the midnight reset.
 
 ## Source
 - `docs/DECISIONS.md`, Game 1: sudden death, a fixed sequence of 7 independent questions, rising difficulty, scoring (k points for surviving question k), and the server as the only judge. Also its **Answer model**: entry IDs, the host bank is never sent to the client, nothing is guessed at runtime.
@@ -40,7 +40,7 @@ Each criterion must be checkable with a command or other observable result. Crit
 - [ ] **13c** The play loop on `src/app/game.tsx`:
   - [ ] Enter on text that names no entry shows a hint instead of doing nothing (ROADMAP item from the M02 2c review).
   - [ ] Every answer gets a reveal: your answer next to the host's, safe or caught, in the G5 flow.
-  - [ ] Progress is shown during the run: the question number out of 7 and the points so far (G1).
+  - [ ] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows.
   - [ ] The picking flow follows G4.
   - [ ] A countdown to the reset is shown, from the next reset instant the server computes in SQL next to `private.today()` (ROADMAP item from the M00 review). A run still open at the reset ends as abandoned with a clear message.
   - [ ] Time from "Lock in" to the result, measured on staging, is within G7, and a second tap can't send the answer twice.
