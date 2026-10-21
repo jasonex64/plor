@@ -1,6 +1,6 @@
 # M02 2g — Content survey instead of the live playtest
 
-**Status:** in review (scoring and findings; the human picks the content changes). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]"). The message and template are in this PR; the scoring script waits for the responses (build for today).
+**Status:** in review (scoring and findings, 2026-10-21; the human picks the content changes). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]").
 
 ## Goal
 Measure how the questions play (catch rate, host bank share, missing answers) from emailed answers, so the live playtest can wait for the finished design.
@@ -60,6 +60,8 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The game ends a run at the first match (DECISIONS.md, Game 1: sudden death) | The scorer counts everyone's answer to every question | The survey asked everyone to answer all 7 (`docs/survey/message.md`), so each question gets 7 answers instead of only the survivors'. Later questions therefore include people the game would have ended (e.g. 10-27: three people caught on Q4 or Q6 still count on Q7), which also affects the "breaks the shape" flags |
+| In the game the player picks an entry, helped by suggestions (`suggest.ts`) | Only an exact match after normalization counts; the rest are listed with what the box would offer | The scorer can't know which suggestion a person would have tapped, and the game never guesses (DECISIONS.md, answer model). The 7 answers the box would fix are named in finding 2 |
 
 ## Evidence
 **Responses (2026-10-21).** Read from the human's Google Sheet through the Drive connector (CSV export) and saved as `docs/survey/responses.csv`: 7 people × 3 sets, every prompt answered, no names.
@@ -74,17 +76,23 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 | Caught by the host | 3 | 3 | 4 | 10 of 110 (9%) |
 | Questions that caught nobody | 5 of 7 | 5 of 7 | 4 of 7 | 14 of 21 |
 
-1. **The host catches far fewer than intended.** The design wants a share that rises gently through the day (DECISIONS.md, Game 1); here 14 of 21 questions caught nobody, and the catches are scattered (Q7 zodiac 2 of 5, Q6 card rank 2 of 7, Q7 Chinese zodiac 2 of 6, single catches on Greek letter, reason for being late, pizza topping and colony). Two questions are flagged as breaking the rising shape: 10-27 Q7 (months, 0 of 6 after 2 of 7) and 10-28 Q5 (Scrabble letters, 0 of 7 after 1 of 5). People asked to avoid the host spread out widely: on 21 questions, the most common answer was given by at most 3 people (New Hampshire).
+1. **Most questions caught nobody: 14 of 21, and 10 of 110 entry answers overall.** DECISIONS.md (Game 1) sets no target rate: it says difficulty "rises gently through the day", "most players should usually finish", and catch rates are estimates. Its one worked figure is "1 of 12 zodiac signs catches about 1 player in 12"; by that reasoning, 10-26 Q7 (2 hosts of 12 signs) would catch about 1 in 6, and it caught 2 of 5. No other question has a stated estimate to compare with. The catches: Q7 zodiac 2 of 5, Q6 card rank 2 of 7, Q7 Chinese zodiac 2 of 6, and one each on Greek letter, reason for being late, pizza topping and colony. The report flags two questions as breaking the rising shape: 10-27 Q7 (months, 0 of 6 after 2 of 7) and 10-28 Q5 (Scrabble letters, 0 of 7 after 1 of 5). Both flags compare everyone's answers, including people the game would already have ended (Source diff). On every question, the most common answer was given by at most 3 people (New Hampshire).
 2. **A quarter of answers aren't in the lists (37 of 147).** The answer box would offer the right entry for 7 of them: "scrambled" and "poached"/"Poach" (the "... eggs" entries; "scrambled eggs" is the host, so that player would have been caught), "kwanza" (Kwanzaa), "Kakiguri" (kakigōri), "table cloth" (tablecloth), "Ispy" (I spy). The rest are candidates for the lists:
    - 10-26 animal: bearded dragon, liger, grizzly bear. Rainy day: swim in the rain, dance in the rain, build a fort, cook BBQ, "drink" (too vague; the box offers "drink hot cocoa").
    - 10-27 ocean: sunken treasure, cephalopod, "animal pee". Holiday: none beyond Kwanzaa's spelling. Late: car won't start, daylight saving started, bathroom. Country: "dijabouti" (Djibouti, two typos, so the box offers nothing).
-   - 10-28 potluck: sourdough bread. Pizza: Italian seasoning, "M&m". Indoor game: King's Cup, League of Legends, Minecraft, Mario Party, Munchkin: video, card and drinking games, the biggest gap (1 of 7 answers was in the list). Card: "4diamonds" (four of diamonds, written oddly).
+   - 10-28 potluck: sourdough bread. Pizza: Italian seasoning, "M&m". Indoor game: King's Cup, League of Legends, Minecraft, Mario Party, Munchkin (video, card and drinking games). Indoor games and 10-26's rainy-day activities are the two biggest gaps: 1 of 7 answers was in the list for each. Card: "4diamonds" (four of diamonds, written oddly).
 3. **Answers to the wrong question:** "rat" and "hare" for a Western zodiac sign, "aries" for a month, "maine" for the 13 colonies (correctly not in the list; Maine was part of Massachusetts). "hare" for the Chinese zodiac may deserve an alias of rabbit.
-4. **Host bank share** ranges from 0% to 86% elsewhere (Scrabble letters 86%, late 75%, pizza 60%), while the 12-item closed sets (zodiac, months, Chinese zodiac) are 100% because every entry is in their host bank. So people often name a typical answer and still miss the host: the banks are wider than the host answers.
+4. **Host bank share:** among questions with at least 5 entry answers, outside the 12-item closed sets, it ranges from 14% to 86% (Scrabble letters 86%, pizza 60%, card rank 57%). The 12-item closed sets (zodiac, months, Chinese zodiac) are 100% because every entry is in their host bank. Questions with too few entry answers range from 0% to 100% (rainy day: 100% from a single answer). Where the share is high and the catch rate low, people named a typical answer that wasn't the host's pick.
 
-*Interpretation, for the human:* the survey framing ("give an answer the host *didn't* pick") is the game's own, so the low catch rate probably says the host answers are too easy to avoid when people know the rule. With 7 people this is a hint, not a measurement.
+*Interpretation, for the human (not a finding):* the survey framing ("give an answer the host *didn't* pick") is the game's own, so the many zero-catch questions may mean the host answers are easy to avoid when people know the rule. With 7 people this is a hint, not a measurement.
 - Plan step 2: the human reported "deleted the puzzles" (2026-10-20) and merged PR #18. The query output wasn't pasted, so the row count is *unverified* beyond that report.
 
 ## Review
+Reviewer agent on `9eeb82e`, 2026-10-21.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. Finding 4's host-bank range left out rainy day's 100% (from one answer): restated by answer count.
+  2. "Indoor games, the biggest gap" ignored rainy day's equal gap: now named as a tie.
+  3. "The host catches far fewer than intended" stated a target no source gives: restated against what DECISIONS.md says, with its one worked figure (zodiac) compared.
+  4. The Source diff was empty although the scorer drops sudden death and counts only exact matches: both rows added.
+  5. The M03 Status line wasn't updated with its ROADMAP row: updated.
+- Deferred to ROADMAP "Next revision": misplaced line numbers in the scorer's errors after blank rows; duplicate (person, set) rows not refused; short rows accepted; a bare `"` in an unquoted field; no test for the "ends inside a quoted field" error.

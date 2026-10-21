@@ -1,6 +1,6 @@
 # M03 — Puzzle insights
 
-**Status:** in progress. Decisions D1–D5 and Numbers set by the human on 2026-10-19. Written now, during the M02 playtest wait, at the human's request ("1 and 2 in parallel", 2026-10-19), so the playtest findings can come out of it.
+**Status:** in review. Built and merged in PR #14; its last criterion, the M02 findings, was produced on 2026-10-21 by the 2g survey scoring through `buildInsights` (the live playtest it waited for moved to M11). Decisions D1–D5 and Numbers set by the human on 2026-10-19.
 
 ## Goal
 A per-question report shows the human how each puzzle really plays, and lets good unlisted answers be added to future puzzles before their day.
