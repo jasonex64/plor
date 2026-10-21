@@ -9,16 +9,16 @@ export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
-// "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M13-game-mechanics.md).
+// "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4;
 
 // Points for surviving each question, Q1 to Q7: they rise with each harder question in growing jumps, and a perfect
-// run is 1000, a round total future games can share (human, 2026-10-21; M13 G1). Replaces k points for question k.
+// run is 1000, a round total future games can share (human, 2026-10-21; M04 G1). Replaces k points for question k.
 export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
 
-// Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M13-game-mechanics.md, "Rules to build", rule 4):
-// the tier the Wind steals from at each question, or null for no theft. Tiers are the M13 ticket's measured grouping
+// Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 4):
+// the tier the Wind steals from at each question, or null for no theft. Tiers are the M04 ticket's measured grouping
 // (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels
 // E A I O.
 export const LETTER_TIERS = { medium: "cphubdmg", heavy_consonant: "rnlts", vowel: "eaio" } as const;

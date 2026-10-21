@@ -1,6 +1,6 @@
 // Typed answers and the host (DECISIONS.md: Answer model). Pure: the content decides. The player types free text
 // and the server alone turns it into an entry; the only runtime rule is the deterministic one-typo auto-correct
-// (human, 2026-10-21; docs/milestones/M13-game-mechanics.md, "Rules to build", rule 2).
+// (human, 2026-10-21; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 2).
 import { avoids, normalize, type Question } from "../content/puzzle.ts";
 import { TYPO_MAX_EDITS, TYPO_MIN_LETTERS } from "../config/tunables.ts";
 

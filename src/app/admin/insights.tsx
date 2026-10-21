@@ -2,7 +2,7 @@
 
 // The insights report for one day: per question, how many answered, how many the host caught, the share that was in
 // the host bank, the most common answers and the misses (docs/milestones/M03-puzzle-insights.md). Plain on purpose;
-// the look is M12's job.
+// the look is M07's job.
 import { useEffect, useState } from "react";
 import type { DayInsights, QuestionInsights } from "@/insights/report";
 import { ApiError, api } from "@/lib/api-client";

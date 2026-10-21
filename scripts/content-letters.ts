@@ -1,6 +1,6 @@
 // Picks the letters the Wind steals for each day that has none yet: `npm run content:letters [-- <root>]` (default
 // `content`). A stand-in until the daily letter picker exists, which waits for the answer database (human,
-// 2026-10-21; M13 "Rules to build", rule 6: "Claude picks them for the test days and the human reviews them").
+// 2026-10-21; M04 "Rules to build", rule 6: "Claude picks them for the test days and the human reviews them").
 // It follows schedule A (src/config/tunables.ts) and keeps only choices the validator accepts (checkStolenLetters):
 // every host answer stays typeable and every question keeps a safe answer. The order it tries each tier's letters in
 // depends on the date, so days differ; the result is deterministic, printed, and reviewed in the git diff.
