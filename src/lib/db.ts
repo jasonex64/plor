@@ -13,7 +13,7 @@ export type Db = Pool | PoolClient;
 
 let pool: Pool | undefined;
 
-// Pool sizes are node-postgres defaults until the M11 load test (human decision, 2026-10-17).
+// Pool sizes are node-postgres defaults until the M14 load test (human decision, 2026-10-17).
 export function getPool(): Pool {
   if (pool) return pool;
   pool = new Pool(poolConfig(readServerEnv()));

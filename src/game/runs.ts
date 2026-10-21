@@ -11,7 +11,7 @@ import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } f
 
 // "timed_out": the current question's 20 seconds ran out, which ends the run (M04 13c-2; the database decides). The
 // timer, not midnight, ends an unfinished run: a run started before midnight can be finished after it (human,
-// 2026-10-21; its score won't count for leaderboards, M10).
+// 2026-10-21; its score won't count for leaderboards, M08).
 export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
 
 // points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION).

@@ -1,13 +1,13 @@
-# M07 — Look and feel
+# M13 — Look and feel
 
-**Status:** planned, after the MVP (human, 2026-10-20: "the pixel-art look moves after the MVP too"; the MVP is M04, the game mechanics). L7 is answered by M04's G5 and L11 by M04's G6. Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
+**Status:** planned, after every functional milestone (human, 2026-10-21: "nothing visual comes until after things are functijnal"; before that, after the MVP, human, 2026-10-20). Numbered M07 until the reorder of 2026-10-21. L7 is answered by M04's G5 and L11 by M04's G6. Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
 
 ## Goal
-Give Offbeat's existing screens a finished, phone-first look with code-drawn pixel art and small animations, so the game feels good before any social feature is built on top of it.
+Give Offbeat's existing screens a finished, phone-first look with code-drawn pixel art and small animations, once every screen works.
 
 ## Who uses it / what breaks without it
 - Used by: every player, on every screen of the one game that exists today.
-- Breaks without it: the game plays on M02's plain functional UI. Share (M05) and the live board (M08) would have no look to build on and would be redone later. The human first moved this milestone ahead of the social features (human, 2026-10-20: "Polish the game first"), then moved the whole look, pixel art included, after the MVP, which is the game mechanics only (human, 2026-10-20: "the pixel-art look moves after the MVP too"; M04).
+- Breaks without it: the game plays on M02's plain functional UI. Every screen the functional milestones add (M05–M11) stays plain until this milestone. The human first moved this milestone ahead of the social features (human, 2026-10-20: "Polish the game first"), then moved the whole look, pixel art included, after the MVP, which is the game mechanics only (human, 2026-10-20: "the pixel-art look moves after the MVP too"; M04), and on 2026-10-21 after everything functional (human).
 
 ## Source
 No entry in `docs/SOURCES.md` covers visual design or accessibility yet, and only a human can add one (SOURCES.md, Rules). L10 asks for one. Until then, the work follows:
@@ -53,7 +53,7 @@ Only the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `
 | L8 | Pixel grid size, sprite sizes and animation timings (human numbers) | |
 | L9 | Smallest phone width to support (a human number) | |
 | L10 | Accessibility source: pin WCAG 2.2 in SOURCES.md (only a human adds a source). Contrast ratios and tap-target sizes come from it | |
-| L11 | Puzzles while building: preview with the `content-rehearsal` days locally, or put real days back on the calendar now. Each day published now is one fewer left for the beta (M11) | |
+| L11 | Puzzles while building: preview with the `content-rehearsal` days locally, or put real days back on the calendar now. Each day published now is one fewer left for the beta (M14) | |
 | L12 | Where a caught player lands, and how soft it feels (the draft: into the clouds, unhurt; closed draft D17, unanswered) | |
 | L13 | Add the Google sign-in branding guidelines to SOURCES.md (only a human adds a source) | |
 
@@ -63,8 +63,8 @@ Filled in once L1–L13 are answered. Each screen in Scope gets one criterion, c
 
 ## Out of scope
 - Free-text answers with no suggestions (closed draft D15; "semantic search"): this changes the answer model in DECISIONS.md. Later, by the human (2026-10-20).
-- The friends' ridge and live board (M08), the share card (M05), and points during the run (M10).
-- Navigation tabs, groups, settings, the front page, avatars and cosmetic frames: later, by the human (2026-10-20).
+- The friends' ridge and live board (M06), the share card (M05), and points during the run (M08).
+- Navigation tabs, settings, avatars and cosmetic frames: later, by the human (2026-10-20). Groups and the front page were too, until the human pulled them in as M09 and M10 (2026-10-21); their look then belongs here.
 - PixelLab assets (D14 above).
 
 ## Numbers
