@@ -56,7 +56,7 @@ All three held on the first run (Evidence).
 | B7 | `askHidden` never resolves if stdin closes | *Low*: publish hangs instead of failing | Reject on `close`; unit test |
 | B8 | `parseDatabaseUrl` message lists all three parts | *Low*: a misleading boot error | Name only the missing part; unit test |
 | B9 | `content:validate` silently skips non-`.json` files | A mistyped file name drops a day while CONTENT OK prints | Report any other file under the root as an error; fixture |
-| B10 | Plural check only goes singular → plural | An entry named in the plural passes without its singular | Check both directions; fixture |
+| B10 | Plural check only goes singular → plural | An entry named in the plural passes without its singular | Check both directions; fixture. **Blocked, for the human (2026-10-20):** hypothesis "a few dozen hits, mostly plural-only names" was disproved. `pluralize.singular` on every name in `content/` and `content-rehearsal/` flags **941** entries without their singular, nearly all wrong (Texas → Texa, Moldova → Moldovum, rhinoceros → rhinocero, ace of spades → ace of spade). A two-way check would need an override on most entries, which is a content format change. Options: drop the item, or a narrower rule the human picks |
 | B11 | Validator branches with no fixture | A regression in those rules passes CI | One fixture per branch (group key not in the bank, duplicate IDs, a name that normalizes to empty) |
 | B12 | No test that a refused day rolls back earlier days in the batch | A partial publish could go unnoticed | Test outside the outer rolled-back transaction |
 | B13 | `runs.db.test.ts` fixtures live outside a transaction | A crashed run blocks a later local publish | Wrap in a transaction or clean up in `finally`; test |
