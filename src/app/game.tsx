@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
+import { shareText } from "@/game/share";
 import { ApiError, api } from "@/lib/api-client";
 import { messageFor } from "./messages";
 
@@ -224,6 +225,7 @@ function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
       <p>
         You survived {survived} of {run.total} questions and scored {pointsText(run.points)}.
       </p>
+      <Share run={run} />
       <ol>
         {run.answered.map((a) => (
           <li key={a.index}>
@@ -234,5 +236,37 @@ function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
       </ol>
       <ResetCountdown msToReset={run.msToReset} onReset={onReset} />
     </div>
+  );
+}
+
+// Share (M05, S4): the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard
+// (MDN, Clipboard.writeText). The link is today's game at the site's root (S3), from the page's own origin so it's right
+// on any deployment. A cancelled sheet rejects with AbortError, which isn't a failure (MDN); anything else is shown.
+function Share({ run }: { run: RunState }) {
+  const [note, setNote] = useState<string | null>(null);
+
+  async function share() {
+    const text = shareText(run);
+    const url = `${window.location.origin}/`;
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share({ text, url });
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        setNote("Copied");
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setNote(`Couldn't share: ${String(err)}`);
+    }
+  }
+
+  return (
+    <p>
+      <button type="button" onClick={share}>
+        Share
+      </button>{" "}
+      {note && <span role="status">{note}</span>}
+    </p>
   );
 }
