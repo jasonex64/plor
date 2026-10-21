@@ -10,6 +10,7 @@ import { POST as nextRoute } from "@/app/api/run/next/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
@@ -160,11 +161,11 @@ describe("a run, step by step", () => {
         answer: { id: entryId, name: q.entries.find((e) => e.id === entryId)!.name },
         matched: false,
         hostAnswers: q.host_answers.map((id) => ({ id, name: q.entries.find((e) => e.id === id)!.name })),
-        points: 1,
+        points: POINTS_PER_QUESTION[0],
       },
     ]);
     // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
-    expect(body.run).toMatchObject({ status: "in_progress", question: null, msLeft: null, points: 1 });
+    expect(body.run).toMatchObject({ status: "in_progress", question: null, msLeft: null, points: POINTS_PER_QUESTION[0] });
     expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
   });
 
@@ -267,8 +268,8 @@ describe("other ways a run ends", () => {
     }
     expect(last!.body.run).toMatchObject({ status: "survived", question: null, next: null });
     expect(last!.body.run.answered).toHaveLength(puzzle.questions.length);
-    // k points for question k: 1 + 2 + ... + 7 (DECISIONS.md, Game 1).
-    expect(last!.body.run.points).toBe(28);
+    // A perfect run is 1000 (human, 2026-10-21; DECISIONS.md, Game 1).
+    expect(last!.body.run.points).toBe(1000);
     // The next midnight Pacific is ahead, and less than a day away, plus an hour on the day the clocks go back.
     expect(last!.body.run.msToReset).toBeGreaterThan(0);
     expect(last!.body.run.msToReset).toBeLessThanOrEqual(25 * 3600 * 1000);
