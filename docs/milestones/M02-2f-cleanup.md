@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** in review (Part B). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 dropped by the human (its hypothesis was disproved); B21 kept by the human as a narrowing, with the item left open for M04 (2026-10-20).
+**Status:** done (Part B merged in PR #19, 2026-10-20). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 dropped by the human (its hypothesis was disproved); B21 kept by the human as a narrowing, with the item left open for M04 (2026-10-20).
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.

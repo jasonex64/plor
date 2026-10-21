@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. 2f Part A (PR #17) is merged too. **The playtest moved to the MVP** (human, 2026-10-20; M11 closed beta, after M12): what is left is the emailed survey (`M02-2g-survey.md`), whose findings close the milestone, and 2f Part B.
+**Status:** done (closed in the roadmap reset, human, 2026-10-20: 2f and 2g are merged; the survey's open content choices moved to ROADMAP "Next revision", Content). History: 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. 2f Part A (PR #17) is merged too. **The playtest moved to the MVP** (human, 2026-10-20; M11 closed beta, after M12): what is left is the emailed survey (`M02-2g-survey.md`), whose findings close the milestone, and 2f Part B.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
