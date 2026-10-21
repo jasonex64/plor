@@ -24,7 +24,7 @@ Status: `planned` → `in progress` → `in review` → `done`. The table is in 
 | M06 | Friends and live board | Invite link and mutual friends; a live board (status for everyone, plus where each friend ended once you've finished); friends-only delivery; reconnects logged and counted. The "where everyone ended" picture follows the rule the human accepted on 2026-10-20 (closed draft D28): you are always shown, then a few named friends per place, then a count; tapping a place shows the list, and a plain list sits underneath. The per-place limit is a human number | planned | — |
 | M07 | Comments and reactions | On the day's game, friends only, visible after you've played, delete your own, report others | planned | — |
 | M08 | Points and friends leaderboard | Ledger written when a run ends (k points per survived question k), a one-time backfill from earlier runs, an all-time friends leaderboard equal to the ledger sum. *Decide before the ticket:* do the human's 2026-10-20 ideas, "exponential distance" between rounds and a last question that "blows 3 answers", change scoring (a DECISIONS.md change) or only the visuals? | planned | — |
-| M11 | Launch readiness and closed beta | Load test of the reset-time spike, including live connections; alerts, backups, a full privacy policy and terms, self-service account deletion; fresh puzzle days for the beta, drafted the M01 way; the closed beta, which is also the live playtest (human, 2026-10-20): is it fun, do players finish, and what are the real catch rates | planned | — |
+| M11 | Launch readiness and closed beta | Load test of the reset-time spike, including live connections; alerts, backups, a full privacy policy and terms, self-service account deletion; the 28 unscheduled days (off the calendar until the live test's dates are known, human, 2026-10-20) are re-dated for the beta after the Content review below, and any further days are drafted the M01 way; the closed beta, which is also the live playtest (human, 2026-10-20): is it fun, do players finish, and what are the real catch rates | planned | — |
 | — | **MVP line** | | | |
 
 Tickets get written when their milestone comes up, so they don't go stale.
@@ -32,15 +32,15 @@ Tickets get written when their milestone comes up, so they don't go stale.
 *Milestones were renumbered on 2026-10-19 (old → new: M03 → M05, M04 → M06, M05 → M07, M06 → M08, M07 → M11, M08 → M12). Applied migrations and finished tickets keep the old numbers; everything live uses the new ones.*
 
 ## Later (after the MVP)
-Recorded here so nothing the human asked for is lost; the full earlier text is in git at commit `4dc43a3`. Nothing here gets built before the MVP is done, and each item needs its own ticket.
-- **M04 AI puzzle drafting** (human, 2026-10-19): fully automatic daily puzzles built from M03's numbers, starting with one-click approval by the human. It moves puzzles from git files into the database (a DECISIONS.md change) and needs an API key kept only in Vercel. Claude's suggestion, not decided: an automatic gate against repeating a past prompt. Until M04, days are drafted the M01 way.
+Short summaries; the full earlier text and every decision in it are in git at commit `4dc43a3` (`git show 4dc43a3:docs/ROADMAP.md`). Nothing here gets built before the MVP is done, and each item needs its own ticket.
+- **M04 AI puzzle drafting** (human, 2026-10-19): fully automatic daily puzzles built from M03's numbers, starting with one-click approval by the human, and with the human able to veto once it's automatic. It moves puzzles from git files into the database (a DECISIONS.md change) and needs an API key kept only in Vercel. Claude's suggestion, not decided: an automatic gate against repeating a past prompt. Until M04, days are drafted the M01 way.
 - **Free-text answers / "semantic search"** (human, 2026-10-20, closed draft D15): no suggestions while typing; the server matches the typed text. This changes the answer model, so it needs a DECISIONS.md entry approved by the human before any code.
 - **Groups** (human, 2026-10-19): private leaderboards joined by invite link, with their own comments and reactions, and seeing the misses of friends and group members.
 - **M09 Front page** (human, 2026-10-19 and 10-20): the day's games, friends' scores, and a feed of comments and reactions that stays blurred until you've played.
 - **Average score** per game (human, 2026-10-20), shown only after a minimum number of played days (Claude's suggestion; the minimum is a human number).
-- **M10 Currency and cosmetics** (human, 2026-10-19 and 10-20): earn-only coins that can never be bought with real money or traded; spins with the odds shown; profile and comment frames; emotes.
+- **M10 Currency and cosmetics** (human, 2026-10-19 and 10-20): earn-only coins (from logging in, playing, doing well and commenting) that can never be bought with real money or traded; spins with the odds shown and no exact duplicates; profile and comment frames; emotes.
 - **More games** (human, 2026-10-19 and 10-20):
-  - game 2, a substring game inspired by JKLM;
+  - game 2, a substring game inspired by JKLM, which must never ask for something impossible or too hard like "iur" (human, 2026-10-20);
   - game 3, a word-guessing game under its own name and look (not Wordle's name or tiles);
   - game 4, a word chain;
   - game 5, anagrams, and game 6, a word hunt, both with a bonus letter.
@@ -53,7 +53,7 @@ Recorded here so nothing the human asked for is lost; the full earlier text is i
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side. Done items were removed in the roadmap reset (2026-10-20; they are in git at commit `4dc43a3`). Open items are grouped by where they belong.
 
 <!-- - [ ] <item> — found in M## (implementation | review) — <why it can wait> -->
-**The survey's main finding (M02 2g, for the human):** most questions caught nobody (14 of 21 questions, and 10 of 110 answers that named an entry), from 7 people. If real play agrees, the game has too little tension. Settle it as a content question before the beta; the details are in `docs/milestones/M02-2g-survey.md`, Findings.
+**The survey's main finding (M02 2g, for the human):** 14 of 21 questions caught nobody, and only 10 of 110 entry answers were caught, from 7 people. DECISIONS.md sets no target catch rate. For the human to weigh before the beta; the details are in `docs/milestones/M02-2g-survey.md`, Findings.
 
 **For M12 (the play screens):**
 - [ ] Show players a countdown to the reset: the server returns the next reset instant, computed in SQL alongside `private.today()`. A run started just before the reset is abandoned and scores 0 (Q4). Found in M00 (review 2). UX only, since abandoning can never beat dying.
@@ -93,6 +93,12 @@ These are non-blocking items found during work or review. Record each one here *
 **Later (after the MVP):**
 - [ ] *(Narrowed in M02 2f, B21, not closed: migration 20261021044659 makes today() day_of(statement_timestamp()). Measured: in one transaction now() stayed fixed across a 1.2 s sleep while statement_timestamp() moved. Still open (2f review): the guard runs per UPDATE but the change lands at COMMIT, so a publish whose day's UPDATE runs just before midnight and commits just after still changes a started day. A commit-time check would close it; the human kept the narrowing and set the full fix for when M04 automates publishing, 2026-10-20.)* `private.today()` uses `now()`, fixed when a transaction starts, so a `content:publish` transaction opened just before midnight could still update a puzzle whose day has just begun. Consider `statement_timestamp()` in `day_of`'s caller. Found in M02 (2b review). Milliseconds wide, and a human runs publish.
 - [ ] `scripts/survey-score.ts`: error line numbers are counted after blank rows are dropped, so they can name the wrong line; a duplicate (person, set) row is counted twice instead of refused; a row shorter than q7 is read as unanswered; a bare `"` inside an unquoted cell starts a quoted field; the "ends inside a quoted field" error has no test. Found in M02 (2g review). Google Sheets exports avoid all of these; a hand-edited CSV could hit them.
+
+**Roadmap reset review (2026-10-20), docs only:**
+- [ ] The M08 row asks whether the last question "blows 3 answers" changes scoring; on `4dc43a3` that was a host-answer-count (answer model) question, and only "exponential distance" had to be settled before M08. Found in the roadmap reset (review). Both stay listed as open.
+- [ ] Later's "Wait for beta data" is dated 2026-10-20, but streaks, answer stats, reminders, the admin UI, the global leaderboard (out of scope, human 2026-10-19), the native wrapper and comment moderation come from the 2026-10-19 list. Found in the roadmap reset (review). Attribution only.
+- [ ] Seeing friends' misses (human, 2026-10-19; M03 D4) sits under Groups in Later, though part of it is about friends. Found in the roadmap reset (review). It's out of the MVP either way.
+- [ ] The M02 ticket's "done" status line keeps the old "what is left is the emailed survey … and 2f Part B" sentence. Found in the roadmap reset (review). Cosmetic.
 
 **Housekeeping (pull in when the area is touched):**
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
