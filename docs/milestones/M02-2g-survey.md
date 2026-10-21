@@ -1,6 +1,6 @@
 # M02 2g — Content survey instead of the live playtest
 
-**Status:** in progress. Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]"). The message and template are in this PR; the scoring script waits for the responses (build for today).
+**Status:** in review (scoring and findings; the human picks the content changes). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]"). The message and template are in this PR; the scoring script waits for the responses (build for today).
 
 ## Goal
 Measure how the questions play (catch rate, host bank share, missing answers) from emailed answers, so the live playtest can wait for the finished design.
@@ -25,7 +25,7 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 - [x] A message the human can copy and paste, and a spreadsheet template (`docs/survey/message.md`, `docs/survey/responses-template.csv`).
 - [x] ROADMAP: the playtest moves to the MVP (M11, now after M12); M02 and M03 close on the survey findings; items that waited on "the playtest" point to the survey or the live test.
 - [x] The not-yet-started days are gone from the hosted `private.puzzle` (the human's query output from plan step 2: `0` rows after 2026-10-20). *Human, 2026-10-20: "deleted the puzzles" (query output not pasted).*
-- [ ] The responses come back, and a script scores them through `normalize`, `matchAnswer` and `buildInsights`: one report per surveyed day (catch rate, host bank share, top answers) plus the answers that matched no entry. Unit test on a small fixture.
+- [x] The responses come back, and a script scores them through `normalize`, `matchAnswer` and `buildInsights`: one report per surveyed day (catch rate, host bank share, top answers) plus the answers that matched no entry. Unit test on a small fixture. *`npm run survey:score -- docs/survey/responses.csv`; `scripts/survey-score.test.ts`.*
 - [ ] The findings are recorded in M02 and M03, and the human picks the content changes.
 
 ## Numbers
@@ -62,6 +62,27 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 |---|---|---|
 
 ## Evidence
+**Responses (2026-10-21).** Read from the human's Google Sheet through the Drive connector (CSV export) and saved as `docs/survey/responses.csv`: 7 people × 3 sets, every prompt answered, no names.
+
+**Scoring.** `scripts/survey-score.ts` (`npm run survey:score -- <csv>`): an answer counts only if it names an entry exactly after normalization, like Enter in the answer box. `matchAnswer` decides whether the host caught it, and `buildInsights` builds the insights page's report. Anything else is listed with what the answer box would have offered. To run under plain Node, `src/insights/report.ts` and `src/game/suggest.ts` now import their modules with relative `.ts` paths, like `puzzle.ts` and `db.ts` already did (B16's rule); the Next.js build still compiles. Checks: `tsc` and lint clean, `npm test` 139 passed (5 new), `npm run build` compiled.
+
+**Findings** (7 people, so every rate is rough; `INSIGHTS_MIN_PLAYERS` is 5 and several questions fall under it once off-list answers are removed):
+
+| | Set 1 (10-26) | Set 2 (10-27) | Set 3 (10-28) | All |
+|---|---|---|---|---|
+| Answers that named an entry | 35 of 49 | 39 of 49 | 36 of 49 | 110 of 147 (75%) |
+| Caught by the host | 3 | 3 | 4 | 10 of 110 (9%) |
+| Questions that caught nobody | 5 of 7 | 5 of 7 | 4 of 7 | 14 of 21 |
+
+1. **The host catches far fewer than intended.** The design wants a share that rises gently through the day (DECISIONS.md, Game 1); here 14 of 21 questions caught nobody, and the catches are scattered (Q7 zodiac 2 of 5, Q6 card rank 2 of 7, Q7 Chinese zodiac 2 of 6, single catches on Greek letter, reason for being late, pizza topping and colony). Two questions are flagged as breaking the rising shape: 10-27 Q7 (months, 0 of 6 after 2 of 7) and 10-28 Q5 (Scrabble letters, 0 of 7 after 1 of 5). People asked to avoid the host spread out widely: on 21 questions, the most common answer was given by at most 3 people (New Hampshire).
+2. **A quarter of answers aren't in the lists (37 of 147).** The answer box would offer the right entry for 7 of them: "scrambled" and "poached"/"Poach" (the "... eggs" entries; "scrambled eggs" is the host, so that player would have been caught), "kwanza" (Kwanzaa), "Kakiguri" (kakigōri), "table cloth" (tablecloth), "Ispy" (I spy). The rest are candidates for the lists:
+   - 10-26 animal: bearded dragon, liger, grizzly bear. Rainy day: swim in the rain, dance in the rain, build a fort, cook BBQ, "drink" (too vague; the box offers "drink hot cocoa").
+   - 10-27 ocean: sunken treasure, cephalopod, "animal pee". Holiday: none beyond Kwanzaa's spelling. Late: car won't start, daylight saving started, bathroom. Country: "dijabouti" (Djibouti, two typos, so the box offers nothing).
+   - 10-28 potluck: sourdough bread. Pizza: Italian seasoning, "M&m". Indoor game: King's Cup, League of Legends, Minecraft, Mario Party, Munchkin: video, card and drinking games, the biggest gap (1 of 7 answers was in the list). Card: "4diamonds" (four of diamonds, written oddly).
+3. **Answers to the wrong question:** "rat" and "hare" for a Western zodiac sign, "aries" for a month, "maine" for the 13 colonies (correctly not in the list; Maine was part of Massachusetts). "hare" for the Chinese zodiac may deserve an alias of rabbit.
+4. **Host bank share** ranges from 0% to 86% elsewhere (Scrabble letters 86%, late 75%, pizza 60%), while the 12-item closed sets (zodiac, months, Chinese zodiac) are 100% because every entry is in their host bank. So people often name a typical answer and still miss the host: the banks are wider than the host answers.
+
+*Interpretation, for the human:* the survey framing ("give an answer the host *didn't* pick") is the game's own, so the low catch rate probably says the host answers are too easy to avoid when people know the rule. With 7 people this is a hint, not a measurement.
 - Plan step 2: the human reported "deleted the puzzles" (2026-10-20) and merged PR #18. The query output wasn't pasted, so the row count is *unverified* beyond that report.
 
 ## Review

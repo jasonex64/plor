@@ -2,9 +2,9 @@
 // and misses, with no user IDs (D4), and returns per-question totals. Difficulty is the share of players a question's
 // host answers catch, and it should rise gently through the day (DECISIONS.md: Game 1); there is no stored target,
 // so each question is compared with the day's others (D2).
-import { normalize, type Puzzle } from "@/content/puzzle";
-import { INSIGHTS_MIN_PLAYERS, INSIGHTS_SHAPE_DROP_POINTS, INSIGHTS_TOP_ANSWERS } from "@/config/tunables";
-import { hostAnswers, named, type Named } from "@/game/payload";
+import { normalize, type Puzzle } from "../content/puzzle.ts";
+import { INSIGHTS_MIN_PLAYERS, INSIGHTS_SHAPE_DROP_POINTS, INSIGHTS_TOP_ANSWERS } from "../config/tunables.ts";
+import { hostAnswers, named, type Named } from "../game/payload.ts";
 
 export type AnswerRow = { question_idx: number; entry_id: string; matched: boolean };
 export type MissRow = { question_idx: number; typed: string };
