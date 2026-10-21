@@ -4,8 +4,8 @@
 // lines for next/headers and next/server (vitest hoists them per file).
 import { execSync } from "node:child_process";
 import { expect, vi } from "vitest";
-import { POST as sendLink } from "@/app/api/auth/email/route";
-import { GET as confirm } from "@/app/auth/confirm/route";
+import { POST as sendCode } from "@/app/api/auth/email/route";
+import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
 import { apiRequest, cookieJar } from "./request-scope";
 
 // The local stack's documented defaults (supabase.com/docs/guides/local-development/cli/getting-started).
@@ -30,31 +30,31 @@ async function inbox(email: string): Promise<MailSummary[]> {
   return (await response.json()).messages;
 }
 
-// Requests a link like the sign-in form does and returns the email that arrived.
-export async function requestLink(email: string): Promise<{ subject: string; link: string }> {
+// Requests a code like the sign-in form does and returns the email that arrived, with the code read from the
+// <strong> that supabase/templates/sign_in_code.html puts it in.
+export async function requestCode(email: string): Promise<{ subject: string; html: string; code: string }> {
   const before = (await inbox(email)).length;
-  const response = await sendLink(apiRequest("/api/auth/email", { method: "POST", body: { email } }));
+  const response = await sendCode(apiRequest("/api/auth/email", { method: "POST", body: { email } }));
   expect(response.status).toBe(200);
   await expect.poll(async () => (await inbox(email)).length).toBe(before + 1);
   const [newest] = await inbox(email);
   const message = await (await fetch(`${MAILPIT}/api/v1/message/${newest.ID}`)).json();
-  const href = /href="([^"]*\/auth\/confirm\?[^"]*)"/.exec(message.HTML)?.[1];
-  if (!href) throw new Error(`no /auth/confirm link in the email: ${message.HTML}`);
-  return { subject: newest.Subject, link: href.replaceAll("&amp;", "&") };
+  const code = /<strong>(\d+)<\/strong>/.exec(message.HTML)?.[1];
+  if (!code) throw new Error(`no code in the email: ${message.HTML}`);
+  return { subject: newest.Subject, html: message.HTML, code };
 }
 
-// Opens an emailed link and returns where it redirected.
-export async function openLink(link: string): Promise<string> {
-  const response = await confirm(new Request(link));
-  expect(response.status).toBe(307);
-  return response.headers.get("location")!;
+// Types a code into the sign-in form and returns the API's answer.
+export async function enterCode(email: string, code: string): Promise<{ status: number; body: unknown }> {
+  const response = await verifyCode(apiRequest("/api/auth/email/verify", { method: "POST", body: { email, code } }));
+  return { status: response.status, body: await response.json() };
 }
 
 // Signs in with a fresh jar and returns a copy of the session cookies, for switching players with useSession.
 export async function signIn(email: string): Promise<{ subject: string; session: Map<string, string> }> {
   cookieJar.clear();
-  const { subject, link } = await requestLink(email);
-  expect(await openLink(link)).toBe("/");
+  const { subject, code } = await requestCode(email);
+  expect(await enterCode(email, code)).toEqual({ status: 200, body: { ok: true } });
   return { subject, session: new Map(cookieJar) };
 }
 

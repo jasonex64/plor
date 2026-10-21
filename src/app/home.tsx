@@ -19,9 +19,10 @@ export function Home() {
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function loadMe() {
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
-  }, []);
+  }
+  useEffect(loadMe, []);
 
   if (loadError) return <p role="alert">{loadError}</p>;
   if (!me) return <p>Loading…</p>;
@@ -29,7 +30,7 @@ export function Home() {
     <>
       {redirectError && !me.signedIn && <p role="alert">{messageForRedirect(redirectError)}</p>}
       {!me.signedIn ? (
-        <SignIn />
+        <SignIn onSignedIn={loadMe} />
       ) : me.username === null ? (
         <PickUsername onDone={(username) => setMe({ signedIn: true, username })} />
       ) : (
@@ -39,13 +40,14 @@ export function Home() {
   );
 }
 
-function SignIn() {
+function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendLink(event: FormEvent) {
+  async function sendCode(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setError(null);
@@ -55,6 +57,20 @@ function SignIn() {
     } catch (err) {
       setError(errorText(err));
     } finally {
+      setBusy(false);
+    }
+  }
+
+  // The emailed code, not a link: mail scanners open links and use them up (docs/milestones/M02-2f-cleanup.md, A3).
+  async function verify(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/auth/email/verify", { method: "POST", body: { email: sentTo, code } });
+      onSignedIn();
+    } catch (err) {
+      setError(errorText(err));
       setBusy(false);
     }
   }
@@ -71,20 +87,35 @@ function SignIn() {
     }
   }
 
-  if (sentTo) return <p>Check {sentTo} for a sign-in link. You can open it on any device.</p>;
+  if (sentTo) {
+    return (
+      <form onSubmit={verify}>
+        <h2>Enter your code</h2>
+        <p>We sent a sign-in code to {sentTo}.</p>
+        <label>
+          Code
+          <input required inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} />
+        </label>
+        <button type="submit" disabled={busy}>
+          Sign in
+        </button>
+        {error && <p role="alert">{error}</p>}
+      </form>
+    );
+  }
   return (
     <section>
       <h2>Sign in to play</h2>
       <button type="button" onClick={google} disabled={busy}>
         Continue with Google
       </button>
-      <form onSubmit={sendLink}>
+      <form onSubmit={sendCode}>
         <label>
           Email
           <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <button type="submit" disabled={busy}>
-          Email me a sign-in link
+          Email me a sign-in code
         </button>
       </form>
       {error && <p role="alert">{error}</p>}

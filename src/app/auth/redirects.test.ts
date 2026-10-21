@@ -1,8 +1,6 @@
-// The email-link and Google callbacks before they reach Supabase: bad or crafted parameters go home with a
-// safe error code. The successful exchanges are in src/app/api/profile/route.db.test.ts.
+// The Google callback before it reaches Supabase: bad or crafted parameters go home with a safe error code.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET as callback } from "./callback/route";
-import { GET as confirm } from "./confirm/route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -18,18 +16,6 @@ function location(response: Response): string {
   expect(response.headers.get("cache-control")).toContain("no-store");
   return response.headers.get("location")!;
 }
-
-describe("/auth/confirm", () => {
-  it("sends a link without a token hash home with link_invalid", async () => {
-    expect(location(await confirm(new Request("http://127.0.0.1:3000/auth/confirm?type=email")))).toBe("/?error=link_invalid");
-  });
-
-  it("only accepts type=email, the type the template sends", async () => {
-    expect(location(await confirm(new Request("http://127.0.0.1:3000/auth/confirm?token_hash=x&type=recovery")))).toBe(
-      "/?error=link_invalid",
-    );
-  });
-});
 
 describe("/auth/callback", () => {
   it("passes a cancelled Google sign-in home as its error code", async () => {

@@ -4,7 +4,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as signOut } from "@/app/api/auth/sign-out/route";
 import { getPool } from "@/lib/db";
-import { openLink, requestLink, signIn, useLocalStack } from "@/test/local-stack";
+import { enterCode, requestCode, signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { GET as getProfile, POST as createProfile } from "./route";
 
@@ -14,8 +14,8 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 const RUN = Date.now().toString(36);
 const EMAIL_A = `${RUN}-a@example.test`;
 const EMAIL_B = `${RUN}-b@example.test`;
-const NEW_ADDRESS_SUBJECT = "Welcome to Plor: your sign-in link"; // supabase/config.toml, confirmation template
-const RETURNING_SUBJECT = "Your Plor sign-in link"; // supabase/config.toml, magic_link template
+const NEW_ADDRESS_SUBJECT = "Welcome to Plor: your sign-in code"; // supabase/config.toml, confirmation template
+const RETURNING_SUBJECT = "Your Plor sign-in code"; // supabase/config.toml, magic_link template
 
 beforeAll(useLocalStack);
 
@@ -35,20 +35,26 @@ async function pick(username: string) {
 }
 
 describe("sign-in and profile", () => {
-  let firstLink = "";
+  let firstCode = "";
 
-  it("signs a new address in from the emailed link, which comes from the confirmation template", async () => {
+  it("signs a new address in with the emailed code, which comes from the confirmation template", async () => {
     cookieJar.clear();
-    const { subject, link } = await requestLink(EMAIL_A);
+    const { subject, html, code } = await requestCode(EMAIL_A);
     expect(subject).toBe(NEW_ADDRESS_SUBJECT);
-    expect(await openLink(link)).toBe("/");
+    // No link at all: a mail scanner that opens links can't use the code up (M02 2f, A3).
+    expect(html).not.toMatch(/<a\s/i);
+    expect(await enterCode(EMAIL_A, code)).toEqual({ status: 200, body: { ok: true } });
     expect([...cookieJar.keys()].some((name) => name.startsWith("sb-"))).toBe(true);
     expect(await profile()).toEqual({ ok: true, signedIn: true, username: null });
-    firstLink = link;
+    firstCode = code;
   });
 
-  it("refuses a link that was already used", async () => {
-    expect(await openLink(firstLink)).toBe("/?error=otp_expired");
+  it("refuses a code that was already used", async () => {
+    const session = new Map(cookieJar);
+    cookieJar.clear();
+    expect(await enterCode(EMAIL_A, firstCode)).toEqual({ status: 403, body: { ok: false, error: "otp_expired" } });
+    expect(await profile()).toEqual({ ok: true, signedIn: false });
+    useSession(session);
   });
 
   it("creates the profile on the first username pick", async () => {
@@ -64,6 +70,14 @@ describe("sign-in and profile", () => {
   it("rejects a username outside the rules, with 400 username_invalid", async () => {
     expect(await pick(`B${RUN}`)).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
     expect(await pick("ab")).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
+  });
+
+  it("refuses a wrong code without using up the right one", async () => {
+    cookieJar.clear();
+    const { code } = await requestCode(EMAIL_B);
+    const wrong = code.replace(/\d$/, (digit) => String((Number(digit) + 1) % 10));
+    expect(await enterCode(EMAIL_B, wrong)).toEqual({ status: 403, body: { ok: false, error: "otp_expired" } });
+    expect(await enterCode(EMAIL_B, code)).toEqual({ status: 200, body: { ok: true } });
   });
 
   it("sends a returning player the magic-link template and keeps their one profile", async () => {

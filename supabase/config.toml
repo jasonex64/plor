@@ -243,16 +243,17 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# The sign-in link for the PKCE flow: a token hash sent to /auth/confirm
-# (supabase.com/docs/guides/auth/auth-email-passwordless). A new address gets the confirmation email and a
-# returning one the magic link, so both use it; the subjects differ so tests can tell them apart. The hosted project's templates get the same HTML (M02).
+# The 6-digit sign-in code, typed into the sign-in form (supabase.com/docs/guides/auth/auth-email-passwordless,
+# "With OTP"). No link: mail scanners open links and use them up (auth-email-templates, "Email prefetching"). A new
+# address gets the confirmation email and a returning one the magic link, so both use it; the subjects differ so
+# tests can tell them apart. The hosted project's templates get the same HTML (M02 2f).
 [auth.email.template.confirmation]
-subject = "Welcome to Plor: your sign-in link"
-content_path = "./supabase/templates/sign_in_link.html"
+subject = "Welcome to Plor: your sign-in code"
+content_path = "./supabase/templates/sign_in_code.html"
 
 [auth.email.template.magic_link]
-subject = "Your Plor sign-in link"
-content_path = "./supabase/templates/sign_in_link.html"
+subject = "Your Plor sign-in code"
+content_path = "./supabase/templates/sign_in_code.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
