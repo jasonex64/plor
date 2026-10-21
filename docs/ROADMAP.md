@@ -112,6 +112,14 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] M13 13c's abandon criterion: `game.tsx` already shows an abandoned message with a reload button, so the criterion should say what changes. Found in the M13 ticket review.
 - [ ] *Unverified:* whether a fast double tap on "Lock in" can send two requests before `disabled={busy}` applies, and whether the server rejects a second answer for the same index. Check in 13c. Found in the M13 ticket review.
 
+**M13 13c-1 review (2026-10-21):**
+- [ ] Off-list text on a run whose day has ended gets 409 `not_current_question` (`logMiss` filters on `private.today()`), while an entry gets `day_over`. Found in M13 13c-1 (review). The message says to reload, and the reload shows the abandoned run.
+- [ ] A miss request whose response is lost and is retried logs the miss twice. Found in M13 13c-1 (review). Only noise in the human's review list.
+- [ ] `/api/run/answer` puts no length limit on text before `resolveTyped`; the 40-character limit only applies on the miss path, through the DB check. Found in M13 13c-1 (review). `editDistanceAtMost` exits early on a length difference, so it's cheap.
+- [ ] The answer box is cleared after text that names no entry, so a player who made a two-letter typo retypes everything. Found in M13 13c-1 (review). UX; revisit with 13c-2's timer.
+- [ ] `send` in `game.tsx` is typed `AnswerResponse` but also used for `/api/run/start`, which has no `notInList`. Found in M13 13c-1 (review). Harmless at runtime.
+- [ ] Re-scoring the 2g survey now auto-corrects typos, so its recorded catch rates would change; note that wherever the survey numbers feed G3. Found in M13 13c-1 (review).
+
 **Housekeeping (pull in when the area is touched):**
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
 - [ ] `scripts/status.ts` has no explicit fetch timeout, so a hung server waits for undici's default. A timeout value is a human number. Found in M00 (implementation). An unreachable server already fails fast.
@@ -136,5 +144,5 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The import rule from 2f B16 (a test imports its module the way the module's own imports are written: `.ts` for files Node runs directly, extensionless for the Next.js app) isn't written in DECISIONS.md. Found in M02 (2f review). Docs only.
 - [ ] `askHidden` rejects on `end`, not `close`; a stdin destroyed without `end` would still hang. Found in M02 (2f review). A human types the password.
 - [ ] The B3 test in `route.db.test.ts` computes its expected day with the same subquery as the code. Found in M02 (2f review). It still failed on the old code; a fixed expected date would be stronger.
-- [ ] The B4 test in `suggest.test.ts` sits between the "boundary itself" comment and the test that comment describes. Found in M02 (2f review). Cosmetic.
+- [x] *(Closed in M13 13c-1: `suggest.test.ts` was deleted; the B4 test now sits in `matching.test.ts` under its own name.)* The B4 test in `suggest.test.ts` sits between the "boundary itself" comment and the test that comment describes. Found in M02 (2f review). Cosmetic.
 - [ ] A checked-out `pg` client has no `error` listener: pg-pool 3.14.0 removes its idle listener on checkout (`index.js`, `_acquireClient`), and `withTransaction` doesn't add one. The routes use `pool.query`, which adds its own listener (pg-pool `index.js:463`); the only checkout is `withTransaction`, used by `content:publish`, so no app route is affected today (2f review). When the B18 test ended a backend mid-transaction, the client emitted "Connection terminated unexpectedly" with no listener, which Vitest reported as an unhandled error; in a Node process an unhandled `error` event throws. What node-postgres's docs advise is *unverified*. Found in M02 (2f, B18). Needs a source (node-postgres pooling docs) before a fix.

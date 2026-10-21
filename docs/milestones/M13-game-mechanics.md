@@ -116,9 +116,9 @@ Evidence so far (scratchpad runs, 2026-10-21):
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
 - [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
-- [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser), and the server matches typed text in the order of "Rules to build", rule 2 (steps 2 and 4's stolen-letter parts come with 13c-3). Unit tests cover: exact before typo (moose with a host mouse is safe), no typo onto a name needing a stolen letter, a match-group member is caught, and off-list text is a free retry that's logged as a miss.
+- [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [ ] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21). An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests use a fixed clock to cover an answer just before and just after the deadline.
-- [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture.
+- [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
@@ -181,12 +181,19 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Rules to build, rule 2: refuse text with a stolen letter (step 2), and typos only onto names that avoid stolen letters (step 4) | 13c-1 builds rule 2 without the stolen-letter parts | There are no stolen letters until 13c-3, which adds both parts and their tests |
+| M02 2g survey ticket (lines 64, 69): the scorer counts only an exact match, "the game never guesses" | `survey:score` now reads text with `resolveTyped`, auto-correcting one typo | The scorer's purpose is to score "the way the game scores play", and the game now auto-corrects (human, 2026-10-21). Re-scoring changes the recorded numbers (e.g. "Texsa" becomes Texas, caught) |
+| The 13c-1 criterion as merged in PR #22: "checked … by `check:client-bundle`" | Checked by `payload.test.ts` and a browser request | `check:client-bundle` scans only for secrets and server env values, so it can't detect an answer list |
+| Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading, marked unconfirmed in the ticket and in DECISIONS.md until the human confirms |
 
 ## Evidence
 **13c-1 free typing** (branch `m13-game-mechanics`, 2026-10-21, Windows, local stack):
 - `npx vitest run src/game/matching.test.ts src/game/payload.test.ts scripts/survey-score.test.ts src/app/api/run/routes.test.ts`: 4 files, 31 tests passed. They cover exact before typo ("moose" with a host "mouse" is moose and safe), one typo of 4+ letters, no typo under 4 letters or with spaces counted, two entries a typo away naming none, and the payload being only `{ index, prompt }`.
 - `npm test -- --exclude ".claude/**"`: 18 files, 135 tests passed. `npx eslint .`: no output.
-- `npm run test:db -- --exclude ".claude/**"`: 8 files, 55 tests passed. These include off-list text being a 200 `notInList: true` free retry logged as one miss, and text over 40 characters being a 400 `text_invalid` with nothing logged.
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 55 tests passed, rerun after the review fixes with a different puzzle published locally for today. They include:
+  - off-list text being a 200 `notInList: true` free retry, logged as one miss;
+  - text over 40 characters being a 400 `text_invalid` with nothing logged;
+  - off-list text for a later question being a 409 `not_current_question`.
 - **In the browser** (`next dev` on the local stack, a local test account, the 2026-10-20 rehearsal questions loaded locally as 2026-10-21):
   - `GET /api/run` returned the question as `{"index":0,"prompt":"Name a sport"}`.
   - "quidditchball" + Enter showed "isn't in our list. Try another answer."
@@ -194,5 +201,12 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
   - The local database then held the miss `0|quidditchball` and the answer `0|soccer|f`.
 
 ## Review
+**13c-1** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - The deleted miss test's `not_current_question` case had no replacement: added to the free-retry db test.
+  - The 13c-1 criterion was ticked while it named a stolen-letter test: that test moved to 13c-3's criterion, and the reason the check changed from `check:client-bundle` is recorded.
+  - The Source diff was empty: four rows added.
+  - DECISIONS.md stated the two-entries-a-typo-away rule as settled: marked unconfirmed.
+  - A ROADMAP item named the deleted `suggest.test.ts`: closed.
+  - Found while fixing: two db tests typed today's names into yesterday's run, which only worked while both days held the same puzzle. They now type from yesterday's puzzle.
+- Deferred to ROADMAP "Next revision": six items under "M13 13c-1 review".
