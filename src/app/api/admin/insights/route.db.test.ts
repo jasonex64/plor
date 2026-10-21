@@ -102,6 +102,14 @@ describe("GET /api/admin/insights", () => {
     expect(response.status).toBe(400);
   });
 
+  it("refuses a well-formed date that names no real day with 400, not a 500 from Postgres (M02 2f, B2)", async () => {
+    for (const date of ["2026-02-30", "2026-13-01"]) {
+      const response = await GET(apiRequest(`/api/admin/insights?date=${date}`, { method: "GET" }));
+      expect(await response.json()).toEqual({ ok: false, error: "bad_request" });
+      expect(response.status).toBe(400);
+    }
+  });
+
   it("has no report, and no entry in the day list, for a published day that hasn't started", async () => {
     const response = await GET(apiRequest(`/api/admin/insights?date=${tomorrow}`, { method: "GET" }));
     expect(response.status).toBe(404);
