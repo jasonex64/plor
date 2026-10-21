@@ -1,6 +1,6 @@
 # M02 — Sign-in and playable game
 
-**Status:** in progress. 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. What is left is the playtest, 2026-10-26 to 2026-11-01; its findings close the milestone. 2f (cleanup of the code items in ROADMAP "Next revision") is its own ticket, `M02-2f-cleanup.md`, waiting for the human's approval.
+**Status:** in progress. 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. 2f Part A (PR #17) is merged too. **The playtest moved to the MVP** (human, 2026-10-20; M11 closed beta, after M12): what is left is the emailed survey (`M02-2g-survey.md`), whose findings close the milestone, and 2f Part B.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -45,7 +45,7 @@ Each criterion must be checkable with a command or other observable result.
 - [x] `npm run test:db` runs in CI against a started Supabase stack (ROADMAP item).
 - [x] UI: autocomplete over the question's accepted bank that submits entry IDs; one question at a time; a result screen. It works on a phone-width screen.
 - [x] On staging, a real signed-in run is played start to finish, with evidence (the human's run plus `run_event` rows queried as `plor_app`'s grants allow, or through an admin path).
-- [ ] **The playtest runs** and its findings are recorded: the catch rate per question, the share of typed answers that fell in the host bank, the logged misses, and whether it's fun. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
+- [ ] **The calibration findings are recorded** *(changed by the human, 2026-10-20: from the 2g survey instead of a live playtest; "whether it's fun" moved to the M11 live test)*: the catch rate per question, the share of answers that fell in the host bank, and the answers that matched no entry. Then a human decides on the open ROADMAP items about the host bank size and dominant host answers.
 
 **2c: privacy page and Google branding** (D5, human 2026-10-19)
 - [x] `https://plor.app/privacy` is public and linked from the page footer, which shows in every state (signed out and signed in). *(Wording updated 2026-10-20; the link moved into one footer in 2c.)* *(Text approved by the human on the PR #9 preview, 2026-10-19: "looks okay".)* Its text was approved by the human before merge, and it states only what the code and the services do (Evidence).
@@ -189,18 +189,18 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Username rules | Profile creation | 3–20 characters, `a-z 0-9 _`, unique ignoring case (human, 2026-10-18) |
 | Maximum length of logged typed text | Not-in-list logging | 40 characters; longer input is rejected and **not** logged (human, 2026-10-18) |
 | Rate limit on answer and not-in-list requests | Abuse control | Deferred to M11: none at app level in M02; sign-in plus Supabase Auth limits only (human, 2026-10-18) |
-| Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18) |
+| Playtest size | Playtest | The human plus a few friends, 7 days (human, 2026-10-18). *Superseded 2026-10-20: the survey (2g) uses the same people; the live test is M11's.* |
 | "Did you mean" | Answer box suggestions | One typo forgiven (a letter missing, extra, wrong, or two neighbours swapped), only for text of 4+ letters (human, 2026-10-19); `src/config/tunables.ts` |
 | Google sign-in data | Privacy page | Checked by the human in Supabase → Users, 2026-10-19: a Google user stores a name and an avatar URL (first reported blank, then corrected by the human) |
 | Privacy page facts | 2c | Contact `privacy@plor.app`; minimum age 13 (not directed at children under 13); says now that answers may be used, without email or username, to improve puzzles, including with AI tools (all human, 2026-10-19) |
 | Rehearsal day | The staging run before the playtest | 2026-10-20, using the 2026-11-08 questions, in `content-rehearsal/` (human, 2026-10-19); plus 2026-10-19 with the 2026-11-07 questions, so the human could rehearse the same day (human, 2026-10-19: "can i just do it now") |
-| Playtest dates | Re-dating the puzzles (D2) | First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
+| Playtest dates | Re-dating the puzzles (D2) | *Superseded 2026-10-20 (2g D3): the days are off the calendar until the live test.* First day **2026-10-26** (human, 2026-10-19: "a week from now"), so 7 days run 2026-10-26 to 2026-11-01 Pacific. The 14 puzzles become 2026-10-26 to 2026-11-08. The last playtest day, 2026-11-01, is the day DST ends in `America/Los_Angeles`. |
 
 ## Plan
 1. Pin sources for magic link (Supabase email OTP and its sending limits) and Google OAuth with `@supabase/ssr`. The human sets up the Google OAuth client and any email provider.
 2. 2a: auth with `@supabase/ssr`, a profile migration and grants, and sign-in pages.
 3. 2b: migrations (`private.puzzle`, `today()`, `run`, `run_event`, the status view, the misses log, grants), then `content:publish`, matching, route handlers, the UI, and test:db in CI.
-4. Deploy, play on staging, playtest, record the findings.
+4. Deploy, play on staging, ~~playtest~~ survey (2g), record the findings.
 
 ## Removes
 - `private.puzzle` columns with no reader (ROADMAP: `format` stored twice, `content_hash`, `published_at`), unless a caller appears.
