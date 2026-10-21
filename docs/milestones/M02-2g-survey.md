@@ -1,6 +1,6 @@
 # M02 2g — Content survey instead of the live playtest
 
-**Status:** in review (scoring and findings, 2026-10-21; the human picks the content changes). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]").
+**Status:** done (scored and merged in PR #20; the content changes the human picks are in ROADMAP "Next revision", Content, since the roadmap reset of 2026-10-20). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]").
 
 ## Goal
 Measure how the questions play (catch rate, host bank share, missing answers) from emailed answers, so the live playtest can wait for the finished design.
