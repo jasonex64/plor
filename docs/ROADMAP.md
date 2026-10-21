@@ -144,6 +144,9 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `openNext` and `answer()` pick the latest run by date, not the run `todaysState` shows; it matters only with today's run plus an unfinished earlier one. Found in M13 13c-4 (review).
 - [ ] `private.next_reset` names 'America/Los_Angeles' again instead of deriving it from `day_of`. Found in M13 13c-4 (review). One zone string in two SQL functions.
 
+**M13 G1 review (2026-10-21):**
+- [ ] `POINTS_PER_QUESTION`'s length isn't tied to `QUESTIONS_PER_DAY`: a different question count would give undefined points. Found in M13 G1 (review). The validator enforces 7 questions today.
+
 **Housekeeping (pull in when the area is touched):**
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
 - [ ] `scripts/status.ts` has no explicit fetch timeout, so a hung server waits for undici's default. A timeout value is a human number. Found in M00 (implementation). An unreachable server already fails fast.
