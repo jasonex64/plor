@@ -1,18 +1,13 @@
 // What the client may see of a puzzle (DECISIONS.md: Game 1, "Server is authoritative"; Answer model).
-// Before a question is answered: its prompt and the accepted bank only, in an order that ignores the host bank,
-// so nothing marks a host answer. After it is answered: the host answer(s) too.
+// Before a question is answered: its prompt only. The answer list stays on the server, since showing it was a
+// free hint (human, 2026-10-21). After it is answered: the player's entry and the host answer(s).
 import type { Entry, Puzzle, Question } from "@/content/puzzle";
 
-export type PublicEntry = { id: string; name: string; aliases: string[] };
-export type PublicQuestion = { index: number; prompt: string; entries: PublicEntry[] };
+export type PublicQuestion = { index: number; prompt: string };
 export type Named = { id: string; name: string };
 
 export function publicQuestion(puzzle: Puzzle, index: number): PublicQuestion {
-  const question = puzzle.questions[index];
-  const entries = question.entries
-    .map(({ id, name, aliases }) => ({ id, name, aliases }))
-    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  return { index, prompt: question.prompt, entries };
+  return { index, prompt: puzzle.questions[index].prompt };
 }
 
 export function hostAnswers(question: Question): Named[] {

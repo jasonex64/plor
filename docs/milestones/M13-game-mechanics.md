@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** planned (draft ticket for the human's approval, 2026-10-20). Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
+**Status:** in progress: 13c-1 (free typing) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -45,7 +45,7 @@ The answer lists stay the hand-made content lists for now. Where answers come fr
    1. Normalize the typed text as content is normalized (DECISIONS.md).
    2. Text containing a stolen letter is refused with no penalty. The client can't type one (rule 4), so this only catches a bypassed client.
    3. An exact match with an entry's name or alias gives that entry.
-   4. Otherwise, text of 4 or more letters that is one typo from a name that avoids every stolen letter (M02 Numbers; G12) gives that entry.
+   4. Otherwise, text of 4 or more letters that is one typo from a name that avoids every stolen letter (M02 Numbers; G12) gives that entry, but only when exactly one entry is that close. When two are ("mose" is one letter from both moose and mouse), the text names no entry, because picking one would be the server guessing. That last part is Claude's reading, to confirm.
    5. Otherwise, the reply is "not in our list, try again", with no penalty: free retries against the timer (human, 2026-10-21). The text is logged as a miss for the human, as today (human, 2026-10-18).
    
    The entry is caught if it is a host answer or in a host answer's match group (DECISIONS.md, match groups), and safe otherwise.
@@ -116,12 +116,12 @@ Evidence so far (scratchpad runs, 2026-10-21):
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
 - [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
-- [ ] **13c-1 Free typing:** the client receives no answer list (checked in the served payload and by `check:client-bundle`), and the server matches typed text in the order of "Rules to build", rule 2. Unit tests cover: exact before typo (moose with a host mouse is safe), no typo onto a name needing a stolen letter, a match-group member is caught, and off-list text is a free retry that's logged as a miss.
+- [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser), and the server matches typed text in the order of "Rules to build", rule 2 (steps 2 and 4's stolen-letter parts come with 13c-3). Unit tests cover: exact before typo (moose with a host mouse is safe), no typo onto a name needing a stolen letter, a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [ ] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21). An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests use a fixed clock to cover an answer just before and just after the deadline.
 - [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture.
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
-  - [ ] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review).
+  - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
   - [ ] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
   - [ ] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows.
   - [ ] A countdown to the reset is shown, from the next reset instant the server computes in SQL next to `private.today()` (ROADMAP item from the M00 review). A run still open at the reset ends as abandoned with a clear message.
@@ -183,6 +183,15 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 |---|---|---|
 
 ## Evidence
+**13c-1 free typing** (branch `m13-game-mechanics`, 2026-10-21, Windows, local stack):
+- `npx vitest run src/game/matching.test.ts src/game/payload.test.ts scripts/survey-score.test.ts src/app/api/run/routes.test.ts`: 4 files, 31 tests passed. They cover exact before typo ("moose" with a host "mouse" is moose and safe), one typo of 4+ letters, no typo under 4 letters or with spaces counted, two entries a typo away naming none, and the payload being only `{ index, prompt }`.
+- `npm test -- --exclude ".claude/**"`: 18 files, 135 tests passed. `npx eslint .`: no output.
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 55 tests passed. These include off-list text being a 200 `notInList: true` free retry logged as one miss, and text over 40 characters being a 400 `text_invalid` with nothing logged.
+- **In the browser** (`next dev` on the local stack, a local test account, the 2026-10-20 rehearsal questions loaded locally as 2026-10-21):
+  - `GET /api/run` returned the question as `{"index":0,"prompt":"Name a sport"}`.
+  - "quidditchball" + Enter showed "isn't in our list. Try another answer."
+  - "socer" + Enter showed "Safe! You said soccer; the host said tennis." and question 2.
+  - The local database then held the miss `0|quidditchball` and the answer `0|soccer|f`.
 
 ## Review
 - Blocking findings and how each was fixed:

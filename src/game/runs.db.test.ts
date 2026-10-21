@@ -6,7 +6,6 @@ import { DatabaseError, Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as missRoute } from "@/app/api/run/miss/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, type Puzzle, type Question } from "@/content/puzzle";
@@ -53,8 +52,9 @@ async function call(response: Promise<Response>) {
 }
 const state = () => call(stateRoute(apiRequest("/api/run", { method: "GET" })));
 const start = () => call(startRoute(apiRequest("/api/run/start", { method: "POST" })));
-const answer = (index: number, entryId: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, entryId } })));
-const miss = (index: number, text: string) => call(missRoute(apiRequest("/api/run/miss", { method: "POST", body: { index, text } })));
+const answerText = (index: number, text: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, text } })));
+// Types the entry's name, as a player would.
+const answer = (index: number, entryId: string) => answerText(index, puzzle.questions[index].entries.find((e) => e.id === entryId)!.name);
 
 async function newPlayer(name: string): Promise<{ userId: string; session: Map<string, string> }> {
   const { session } = await signIn(`${RUN}-${name}@example.test`);
@@ -109,8 +109,8 @@ describe("a run, step by step", () => {
     expect(body.run.answered).toEqual([]);
   });
 
-  it("rejects an entry that isn't in the question's accepted bank", async () => {
-    expect(await answer(0, "not-an-entry")).toEqual({ status: 400, body: { ok: false, error: "invalid_entry" } });
+  it("refuses empty text with 400", async () => {
+    expect(await answerText(0, "   ")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
   });
 
   it("refuses to skip ahead", async () => {
@@ -122,6 +122,7 @@ describe("a run, step by step", () => {
     const entryId = safeEntry(q);
     const { status, body } = await answer(0, entryId);
     expect(status).toBe(200);
+    expect(body.notInList).toBe(false);
     expect(body.run.answered).toEqual([
       {
         index: 0,
@@ -161,12 +162,14 @@ describe("a run, step by step", () => {
     expect(results.find((r) => r.status === 409)!.body.error).toBe("already_answered");
   });
 
-  it("logs a miss for the current question at no cost, and rejects (without logging) more than 40 characters", async () => {
+  it("treats text that names no entry as a free retry logged as a miss, and rejects (without logging) more than 40 characters", async () => {
     const count = async () =>
       (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
-    expect(await miss(3, "  a thing nobody listed  ")).toEqual({ status: 200, body: { ok: true } });
-    expect(await miss(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
-    expect(await miss(5, "later question")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
+    const retry = await answerText(3, "  a thing nobody listed  ");
+    expect(retry.status).toBe(200);
+    expect(retry.body).toMatchObject({ ok: true, notInList: true, run: { status: "in_progress", question: { index: 3 } } });
+    expect(retry.body.run.answered).toHaveLength(3);
+    expect(await answerText(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
     expect(await count()).toBe(1);
     const { rows } = await getPool().query<{ typed: string }>("select typed from private.missed_answer where user_id = $1", [player.userId]);
     expect(rows[0].typed).toBe("a thing nobody listed");

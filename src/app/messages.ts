@@ -25,7 +25,6 @@ const MESSAGES: Record<string, string> = {
   run_over: "This run is already over.",
   out_of_order: "That question isn't the current one. Reload the page.",
   already_answered: "You already answered that question. Reload the page.",
-  invalid_entry: "Pick an answer from the list.",
   not_current_question: "That question isn't the current one. Reload the page.",
   // The 40-character limit is the database's check (M02 ticket, Numbers).
   text_invalid: "That's too long to send. Try a shorter answer.",
