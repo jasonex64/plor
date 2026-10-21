@@ -10,7 +10,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Merged today:** M05 Share (#30), the first reorder (#31).
 
 ## Waiting on the human
-- Nothing for M06 yet. For M12: whether usernames can change, and how often. Claude explained the tradeoffs on 2026-10-21 and suggested a limit of once a month (a human number).
+- Nothing for M06 yet. For M07: the display name's length and characters. For M12: whether usernames can change, and how often. Claude explained the tradeoffs on 2026-10-21 and suggested a limit of once a month (a human number).
 
 ## Next step
 After #32 merges: draft `docs/milestones/M06-puzzle-entry.md` for approval. The human has approved puzzles moving from files into the database and the admin page writing them (2026-10-21: "yes thats fine and admincan write changes thats fine"). The ticket still has to propose the exact grants and the DECISIONS.md changes (Puzzle content format, Content publishing role) for the human to check.
