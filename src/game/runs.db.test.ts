@@ -169,7 +169,13 @@ describe("a run, step by step", () => {
   });
 
   it("refuses an answer before Next, then Next opens question 2 with its own 20 seconds, once", async () => {
+    const misses = async () =>
+      (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
+    const before = await misses();
     expect(await answer(1, safeEntry(puzzle, 1))).toEqual({ status: 409, body: { ok: false, error: "not_open" } });
+    // Text that names nothing is refused too, and nothing is logged for a question the player hasn't seen.
+    expect(await answerText(1, "zzz zzz")).toEqual({ status: 409, body: { ok: false, error: "not_open" } });
+    expect(await misses()).toBe(before);
     const { status, body } = await next();
     expect(status).toBe(200);
     expect(body.run.question).toEqual(publicQuestion(puzzle, 1));
@@ -287,7 +293,7 @@ describe("other ways a run ends", () => {
     expect((await next()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 
-  it("shows a retried answer to yesterday's run left at its reveal as that reveal, and offers today's puzzle (2b review)", async () => {
+  it("shows a retried answer to yesterday's run left at its reveal as that reveal, and resumes it on reload (2b review; G13)", async () => {
     const player = await newPlayer("r");
     useSession(player.session);
     const entryId = safeEntry(yesterdayPuzzle, 0);
@@ -303,8 +309,9 @@ describe("other ways a run ends", () => {
     const retry = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(retry.status).toBe(200);
     expect(retry.body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null, next: { steals: yesterdayPuzzle.questions[1].steals ?? null } });
-    // A run waiting at a reveal has no clock, so an earlier day's one doesn't hold today's puzzle back.
-    expect((await state()).body.run).toMatchObject({ date: today, status: "not_started" });
+    // "Resume yesterday's run" (human, 2026-10-21): a reload shows yesterday's reveal, and Next goes on with it.
+    expect((await state()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null });
+    expect((await next()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 
   it("needs a username before a run can start", async () => {

@@ -115,13 +115,14 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Pr
   return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset });
 }
 
-// The player's run whose question clock is running, if any (after midnight it can be yesterday's: G13), otherwise
-// today's puzzle. A run left waiting at a reveal has no clock, so an earlier day's one doesn't hold today's puzzle back.
+// The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a
+// reveal or with a question in play: it's finished first, then today's puzzle shows (G13; human, 2026-10-21: "Resume
+// yesterday's run").
 export async function todaysState(db: Db, userId: string): Promise<RunState> {
   const { rows } = await db.query<{ date: string; content: Puzzle }>(
     `select s.puzzle_date::text as date, p.content
      from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
-     where s.user_id = $1 and s.game_id = $2 and s.status = 'in_progress' and s.deadline is not null
+     where s.user_id = $1 and s.game_id = $2 and s.status = 'in_progress'
      order by s.puzzle_date desc limit 1`,
     [userId, GAME_ID],
   );
@@ -171,12 +172,16 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   // A stolen letter can't be typed in the answer box (G11), so text with one comes from a bypassed client. Letters
   // count only on the question in play: checking another index would let a client probe the letters of questions
   // it hasn't reached, and a run that has ended answers with its own errors below.
-  const { rows: current } = await db.query<{ status: RunStatus; answered: number }>(
-    `select status, answered from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
+  const { rows: current } = await db.query<{ status: RunStatus; answered: number; started: boolean }>(
+    `select status, answered, deadline is not null as started
+     from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
     [userId, GAME_ID, date],
   );
-  const inPlay = current[0]?.status === "in_progress" && current[0].answered === index;
-  const stolen = inPlay ? stolenLetters(puzzle, index) : [];
+  const isCurrent = current[0]?.status === "in_progress" && current[0].answered === index;
+  // At the reveal the next question isn't open yet: no answer and no miss before Next, so its list can't be probed
+  // and no miss is logged for a question the player hasn't seen (13c-4 review). The trigger also refuses (OB006).
+  if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
+  const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
   const entryId = resolveTyped(puzzle.questions[index], typed, stolen);
   if (!entryId) {

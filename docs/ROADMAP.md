@@ -138,6 +138,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The medium tier's letters (C P H U B D M G) come from the ticket's measured grouping, which the human approved by choosing schedule A; one explicit confirmation of the letters would settle it. Found in M13 13c-3 (review).
 - [ ] **Release step:** the timer migration (`20261021081057_question_timer.sql`) is merged but not applied to the hosted database (a human step, `npx supabase db push`); it must be applied before any day is published there. *Unverified* whether it already is. Found in M13 13c-3.
 
+**M13 13c-4 review (2026-10-21):**
+- [ ] `openNext` doesn't map OB002, so an answer committing between its read of `answered` and its insert (e.g. Next from a second tab while a question is in play) is a 500. Found in M13 13c-4 (review). The UI disables Next while busy; ROADMAP's "never 500" for concurrent requests applies.
+- [ ] Next on a run whose question 1 timed out says `no_reveal` rather than `run_over`. Found in M13 13c-4 (review). Wording only.
+- [ ] `openNext` and `answer()` pick the latest run by date, not the run `todaysState` shows; it matters only with today's run plus an unfinished earlier one. Found in M13 13c-4 (review).
+- [ ] `private.next_reset` names 'America/Los_Angeles' again instead of deriving it from `day_of`. Found in M13 13c-4 (review). One zone string in two SQL functions.
+
 **Housekeeping (pull in when the area is touched):**
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
 - [ ] `scripts/status.ts` has no explicit fetch timeout, so a hung server waits for undici's default. A timeout value is a human number. Found in M00 (implementation). An unreachable server already fails fast.
