@@ -63,7 +63,7 @@ All three held on the first run (Evidence).
 | B14 | No test for an earlier "too few" question not flagging a later one | *Low*: a small branch | Add the test |
 | B15 | `route.db.test.ts` says "known catch rates" | *Low*: wording | Rename the test |
 | B16 | Test imports with and without `.ts` | Two ways to do one thing | Use `.ts` everywhere (runtime already does). **Done as (2026-10-20):** `.ts` on relative imports in `scripts/` and in tests of the `src` modules Node runs directly (`puzzle.ts`, `db.ts`, `env.ts`), matching those files. The Next.js app's extensionless `@/` imports stay: the item is about these tests, and Next.js bundles the app |
-| B17 | `content:plurals` reformats the whole file | Noisy diffs on hand-formatted files | Write only when something changed, keeping 2-space JSON |
+| B17 | `content:plurals` reformats the whole file | Noisy diffs on hand-formatted files | Write only when something changed, keeping 2-space JSON. **Closed without code (2026-10-20):** both halves were already true (`if (changed)`, `JSON.stringify(…, null, 2)`), every content file already matches that format byte for byte, and a run added nothing and changed no file |
 | B18 | `withTransaction` rollback-failure branch has no test | *Low*: hard to trigger | Test with a client whose rollback throws |
 | B19 | Bundle check scans only `.next/static` | A secret in prerendered HTML or RSC payloads wouldn't be caught | Also scan `.next/server/app`; prove it with a planted string |
 | B20 | CI actions pinned to tags, not SHAs | A moved tag could change what CI runs | Pin each action to its commit SHA, with the tag in a comment |
