@@ -7,7 +7,7 @@ const MESSAGES: Record<string, string> = {
   over_request_rate_limit: "Too many attempts. Wait a while and try again.",
   otp_expired: "That code is wrong, expired or already used. Check the newest email, or reload to get a new code.",
   code_invalid: "Enter the code from the email.",
-  // Supabase Auth itself failed (docs/milestones/M02-2f-cleanup.md, A2); the wording is the human's to approve.
+  // Supabase Auth itself failed (docs/milestones/M02-2f-cleanup.md, A2). Wording approved by the human, 2026-10-20.
   auth_unavailable: "Sign-in isn't working on our side right now. Try again in a few minutes.",
   link_invalid: "That sign-in link isn't valid. Ask for a new one.",
   access_denied: "Google sign-in was cancelled.",
