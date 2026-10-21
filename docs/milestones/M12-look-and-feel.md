@@ -1,13 +1,13 @@
 # M12 — Look and feel
 
-**Status:** planned (draft ticket for the human's approval, 2026-10-20). It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
+**Status:** planned, after the MVP (human, 2026-10-20: "the pixel-art look moves after the MVP too"; the MVP is M13, the game mechanics). L7 is answered by M13's G5 and L11 by M13's G6. Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
 
 ## Goal
 Give Offbeat's existing screens a finished, phone-first look with code-drawn pixel art and small animations, so the game feels good before any social feature is built on top of it.
 
 ## Who uses it / what breaks without it
 - Used by: every player, on every screen of the one game that exists today.
-- Breaks without it: the game plays on M02's plain functional UI. Share (M05) and the live board (M06) would have no look to build on and would be redone later. The human moved this milestone ahead of the social features in the roadmap reset (human, 2026-10-20: "Polish the game first"), and wants pixel art in the MVP (human, 2026-10-20).
+- Breaks without it: the game plays on M02's plain functional UI. Share (M05) and the live board (M06) would have no look to build on and would be redone later. The human first moved this milestone ahead of the social features (human, 2026-10-20: "Polish the game first"), then moved the whole look, pixel art included, after the MVP, which is the game mechanics only (human, 2026-10-20: "the pixel-art look moves after the MVP too"; M13).
 
 ## Source
 No entry in `docs/SOURCES.md` covers visual design or accessibility yet, and only a human can add one (SOURCES.md, Rules). L10 asks for one. Until then, the work follows:
@@ -49,7 +49,7 @@ Only the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `
 | L4 | Fonts: Young Serif headline and Source Serif 4 body, a pixel font for the sign, or the phone's system font | |
 | L5 | Light, dark, or follow the phone's setting | |
 | L6 | Words for the moments: safe, blown off, full run | |
-| L7 | Safe answer: its own moment with a "Next" tap, or straight on to the next question | |
+| L7 | Safe answer: its own moment with a "Next" tap, or straight on to the next question | Answered by M13's G5 (a game-flow rule) |
 | L8 | Pixel grid size, sprite sizes and animation timings (human numbers) | |
 | L9 | Smallest phone width to support (a human number) | |
 | L10 | Accessibility source: pin WCAG 2.2 in SOURCES.md (only a human adds a source). Contrast ratios and tap-target sizes come from it | |
