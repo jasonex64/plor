@@ -57,6 +57,20 @@ Evidence so far (scratchpad runs, 2026-10-21):
   - *English labels and aliases:* 19 of 226, and dog, cat and lion are missing.
   
   Per CLAUDE.md this is a stop-and-re-plan point.
+- **WordNet 3.0 as a large answer source** (the human approved the download, 2026-10-21: nltk 3.10.3 and the 10.8 MB `wordnet.zip`, kept in the session scratchpad). Hypothesis, written before running: it holds most of today's 226 animals, including dog, cat and lion, and keeps more answers than the hand list after every letter ban. **Confirmed.**
+  - Coverage: 4,016 animal synsets; 223 of 226 hand entries found (missed: clouded leopard, koi, clownfish).
+  - Letter ramp, all WordNet vs the hand list: no A 1,794 vs 102; no AE 671 vs 45; no AER 408 vs 33; no AERO 157 vs 12; no AEROL 104 vs 9; no AEROLI 38 vs 2.
+  - Other categories (synsets; after banning E, then E A, then E A O): fruit 320 → 130/41/16; vegetable 175 → 66/20/6; musical instrument 163 → 85/25/8; sport 176 → 87/54/32; tool 347 → 96/33/16; country 227 → 145/28/14; occupation 283 → 91/42/15; dish 315 → 121/50/12; furniture 198 → 62/21/7; vehicle 527 → 250/67/35; emotion 129 → 58/27/15; body part 1,791 → 645/247/119; game 193 → 94/40/17; color 91 → 31/14/7.
+  - Quality: WordNet includes odd senses and old words (homo, biddy, moo-cow, dun and buckskin as horses), which would be accepted as valid. It has no entries for abstract prompts such as "something to do on a rainy day".
+- **Meaning-based checking with WordNet** ("semantic search", asked for by the human, 2026-10-21). Each typed word is checked for whether it means a kind of animal:
+  - Accepted: narwhal, puppies (plurals handled), puma, cougar and mountain lion (one synonym group, so aliases come for free), tyrannosaurus, axolotl, cheetah.
+  - Rejected: zoo, unicorn, teddy bear, mermaid.
+  - Unknown: t rex, clownfish, koi, doggo (newer words and slang).
+  - Quirks: "dragon" is accepted through its flying-lizard sense, "human" is accepted, and "painter" (an old name for the cougar) would match a cougar host.
+  - WordNet's license and a SOURCES.md entry are *unverified* and need the human.
+- **Other semantic options, not run:**
+  - *Word embeddings*, with acceptance when a similarity score is close enough to the category: fuzzy, needs a downloaded model and a human-set threshold, and a weak signal for abstract prompts.
+  - *An AI judge at answer time* (e.g. Claude: "is X a valid answer to this prompt?"): covers abstract prompts and slang. Its first verdict for each answer can be cached so every player gets the same one. But it costs money per new answer, adds delay, can be talked into a "yes" by typed instructions, needs an API key kept only in Vercel, and breaks DECISIONS.md's "nothing is guessed at runtime", which is a human decision.
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
