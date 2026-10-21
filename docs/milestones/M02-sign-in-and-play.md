@@ -1,6 +1,14 @@
 # M02 — Sign-in and playable game
 
-**Status:** done (closed in the roadmap reset, human, 2026-10-20: 2f and 2g are merged; the survey's open content choices moved to ROADMAP "Next revision", Content). History: 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. 2f Part A (PR #17) is merged too. **The playtest moved to the MVP** (human, 2026-10-20; M11 closed beta, after M12): what is left is the emailed survey (`M02-2g-survey.md`), whose findings close the milestone, and 2f Part B.
+**Status:** done (closed in the roadmap reset, human, 2026-10-20: 2f and 2g are merged; the survey's open content choices moved to ROADMAP "Next revision", Content). History: 2a (PR #6), the rename (PR #7), 2b (PR #8), 2c (PRs #9 and #10), 2d (PR #11) and 2e (PRs #13 and #15) are merged and live on `plor.app`. 2f Part A (PR #17) is merged too. **The playtest moved to the MVP** (human, 2026-10-20; M11 closed beta, after M12). Its follow-ups (2f, 2g) are merged.
+
+> **Since this ticket (2026-10-21 docs audit):**
+> - Answers are typed text read by the server: the autocomplete, entry IDs sent by the client, "Did you mean" (`src/game/suggest.ts`) and `POST /api/run/miss` are gone, and one typo is auto-corrected (DECISIONS.md Answer model and Log 2026-10-21; `resolveTyped` in `src/game/matching.ts`).
+> - `matchAnswer` returns only `matched | not_matched`; there is no `invalid_entry`.
+> - There is no `409 day_over` and no `abandoned` status: a run started before midnight can be finished after it, and runs end died, survived or timed_out (DECISIONS.md Log 2026-10-21; migration `20261021081057_question_timer.sql`).
+> - Email sign-in sends a 6-digit code: `supabase/templates/sign_in_code.html` replaced `sign_in_link.html`, and `/auth/confirm` is gone (DECISIONS.md Sign-in and Log 2026-10-20; `M02-2f-cleanup.md`).
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
 
 ## Goal
 A signed-in player can play today's Offbeat puzzle end to end on staging, with every answer checked by the server, and the human can run an internal playtest that measures how the questions really play.
@@ -311,7 +319,7 @@ $ npm run status -- https://plor.app
 UP https://plor.app (protocol 1)
 ```
 
-**Open:** the domain redirect runs the wrong way (`plor.app` → `www`, while setup step 3 asks for `www` → `plor.app`). Supabase allows only `https://plor.app/auth/callback`, and the Google route builds the return URL from the page's Origin, so Google sign-in started on `www` would not come back signed in (expected from the code; not yet tried). Fix: make `plor.app` the primary domain in Vercel.
+**Open:** the domain redirect runs the wrong way (`plor.app` → `www`, while setup step 3 asks for `www` → `plor.app`). Supabase allows only `https://plor.app/auth/callback`, and the Google route builds the return URL from the page's Origin, so Google sign-in started on `www` would not come back signed in (expected from the code; not yet tried). Fix: make `plor.app` the primary domain in Vercel. *(Resolved: www → plor.app 308, see D3 above.)*
 
 
 ### Staging run (rehearsal, 2026-10-19)

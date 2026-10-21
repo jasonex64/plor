@@ -2,6 +2,14 @@
 
 **Status:** done (scored and merged in PR #20; the content changes the human picks are in ROADMAP "Next revision", Content, since the roadmap reset of 2026-10-20). Asked for by the human on 2026-10-20 ("draft a message i can copypaste as well as a spreadsheet template … adjust roadmaps accordingly … we can delay/postpone those [puzzles]").
 
+> **Since this ticket (2026-10-21 docs audit):**
+> - `docs/survey/message.md` is deleted; the set dates it gave are in D4 (sets 1–3 = 2026-10-26, 10-27, 10-28).
+> - `src/game/suggest.ts` is gone, and `scripts/survey-score.ts` now reads answers with `resolveTyped` (exact name or alias, else one typo auto-corrected), so re-scoring would change Findings 1 and 2, which are the 2026-10-21 scoring by exact match.
+> - Set 3's day, 2026-10-28, is parked in `content-parked/`, so `npm run survey:score` fails on that set with a missing file (ROADMAP "Next revision").
+> - The live playtest is the closed beta in launch (now M15), after the look and feel (now M14), not D1's M11 and M12.
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
+
 ## Goal
 Measure how the questions play (catch rate, host bank share, missing answers) from emailed answers, so the live playtest can wait for the finished design.
 

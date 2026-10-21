@@ -1,13 +1,13 @@
-# M13 — Look and feel
+# M14 — Look and feel
 
-**Status:** planned, after every functional milestone (human, 2026-10-21: "nothing visual comes until after things are functijnal"; before that, after the MVP, human, 2026-10-20). Numbered M07 until the reorder of 2026-10-21. L7 is answered by M04's G5 and L11 by M04's G6. Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
+**Status:** planned, after every functional milestone (human, 2026-10-21: "nothing visual comes until after things are functijnal"; before that, after the MVP, human, 2026-10-20). Numbered M07, then M13, before the renumbering of 2026-10-21. L7 is answered by M04's G5. L11 is still open (M04's G6 is open and moved to M13 answer lists). Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
 
 ## Goal
-Give Offbeat's existing screens a finished, phone-first look with code-drawn pixel art and small animations, once every screen works.
+Give every Offbeat screen a finished, phone-first look with code-drawn pixel art and small animations, once every screen works.
 
 ## Who uses it / what breaks without it
-- Used by: every player, on every screen of the one game that exists today.
-- Breaks without it: the game plays on M02's plain functional UI. Every screen the functional milestones add (M05–M11) stays plain until this milestone. The human first moved this milestone ahead of the social features (human, 2026-10-20: "Polish the game first"), then moved the whole look, pixel art included, after the MVP, which is the game mechanics only (human, 2026-10-20: "the pixel-art look moves after the MVP too"; M04), and on 2026-10-21 after everything functional (human).
+- Used by: every player, on every screen: the game's screens today and every screen the functional milestones M06–M12 add.
+- Breaks without it: the game plays on M02's plain functional UI. Every screen the functional milestones add (M06–M12) stays plain until this milestone. The human first moved this milestone ahead of the social features (human, 2026-10-20: "Polish the game first"), then moved the whole look, pixel art included, after the MVP, which is the game mechanics only (human, 2026-10-20: "the pixel-art look moves after the MVP too"; M04), and on 2026-10-21 after everything functional (human).
 
 ## Source
 No entry in `docs/SOURCES.md` covers visual design or accessibility yet, and only a human can add one (SOURCES.md, Rules). L10 asks for one. Until then, the work follows:
@@ -15,15 +15,16 @@ No entry in `docs/SOURCES.md` covers visual design or accessibility yet, and onl
 - The Google sign-in branding guidelines (Google Identity docs) for the "Continue with Google" button: not in SOURCES.md, so they need to be added and read before the sign-in screen is restyled (L13).
 
 ## Scope
-Only the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `privacy/`):
+The look comes after every functional milestone (human, 2026-10-21), so the scope is the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `privacy/`) plus every screen M06–M12 add:
 1. Sign-in (Google and email code; the privacy link; the intro that Google's brand check needs, M02 2c).
 2. Pick a username.
 3. Signed-in home and start.
-4. Question: typing, "did you mean" and "Not in the list? Send" (the M02 answer model is unchanged; see Out of scope).
-5. Safe reveal.
+4. Question (built in M04): the typed answer box with no list, the 20-second countdown, the stolen-letters line and the blocked-key message ("The Wind took X"), and the "isn't in our list" retry.
+5. Reveal: the points and the next steal, with Next.
 6. Caught: the Wind blows the player off the ridge.
-7. Full-run result.
-8. Errors, loading and the abandoned-run message.
+7. Result: caught, time's up or survived; the reset countdown; the Share button (M05) and its placeholder symbols (ROADMAP Next revision).
+8. Errors and loading.
+9. Every screen added by M07 friends and live board, M08 comments and reactions, M09 points and friends leaderboard, M10 groups, M11 home screen and M12 account.
 
 ## Carried over from the closed M12 draft (PR #12) (the human's decisions, 2026-10-20)
 - **Concept (D16):** "Go with the trail along a cliff edge: friends fall off at the stop where they got caught."
@@ -53,18 +54,20 @@ Only the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `
 | L8 | Pixel grid size, sprite sizes and animation timings (human numbers) | |
 | L9 | Smallest phone width to support (a human number) | |
 | L10 | Accessibility source: pin WCAG 2.2 in SOURCES.md (only a human adds a source). Contrast ratios and tap-target sizes come from it | |
-| L11 | Puzzles while building: preview with the `content-rehearsal` days locally, or put real days back on the calendar now. Each day published now is one fewer left for the beta (M14) | |
+| L11 | Puzzles while building: preview with the `content-rehearsal` days locally, or put real days back on the calendar now. Each day published now is one fewer left for the beta (M15) | |
 | L12 | Where a caught player lands, and how soft it feels (the draft: into the clouds, unhurt; closed draft D17, unanswered) | |
 | L13 | Add the Google sign-in branding guidelines to SOURCES.md (only a human adds a source) | |
+| L14 | The look of the Wind stealing a letter (Q2, Q4, Q5, Q7). Added 2026-10-21 docs audit | |
+| L15 | A time's-up moment: its words and look (L6 lists only safe, blown off and full run). Added 2026-10-21 docs audit | |
 
 ## Acceptance criteria
-Filled in once L1–L13 are answered. Each screen in Scope gets one criterion, checked with screenshots at the L9 width.
+Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, checked with screenshots at the L9 width.
 - [ ]
 
 ## Out of scope
-- Free-text answers with no suggestions (closed draft D15; "semantic search"): this changes the answer model in DECISIONS.md. Later, by the human (2026-10-20).
-- The friends' ridge and live board (M06), the share card (M05), and points during the run (M08).
-- Navigation tabs, settings, avatars and cosmetic frames: later, by the human (2026-10-20). Groups and the front page were too, until the human pulled them in as M09 and M10 (2026-10-21); their look then belongs here.
+- Building the features themselves: free-text answers and points during the run were built in M04; the friends, comments, points, groups, home screen and account features are built in M07–M12. This milestone only gives their screens the look.
+- Navigation tabs, settings, avatars and cosmetic frames: later, by the human (2026-10-20). Groups and the home screen were too, until the human pulled them in as M10 and M11 (2026-10-21); their look belongs here.
+- The admin pages (insights, M03; puzzle entry, M06): Claude's draft, an open question for the human (ROADMAP Next revision, For M14).
 - PixelLab assets (D14 above).
 
 ## Numbers
@@ -75,7 +78,7 @@ Filled in once L1–L13 are answered. Each screen in Scope gets one criterion, c
 | Contrast ratios, tap-target size | Accessibility | L10, open |
 
 ## Plan
-1. The human answers L1–L13.
+1. The human answers L1–L15.
 2. Draw the stops, the character, the Wind and the clouds as code (no image files from outside the repo).
 3. Apply the look screen by screen, in the order of Scope, one PR each.
 

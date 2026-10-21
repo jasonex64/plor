@@ -2,6 +2,13 @@
 
 **Status:** done (merged in PR #4, 2026-10-18)
 
+> **Since this ticket (2026-10-21 docs audit):**
+> - The content format is 2 (format 1 plus `steals` per question); the validator refuses any `format` other than 2 (`src/content/puzzle.ts`; DECISIONS.md Puzzle content format).
+> - Source diff "Players submit entry IDs from autocomplete, so aliases only help search" ended in M04 13c-1: players type free text, and names and aliases decide matching (exact, else one typo; `resolveTyped` in `src/game/matching.ts`; DECISIONS.md Answer model).
+> - The 14 drafts (2026-12-11 to 12-24) were re-dated in M02 (`content/offbeat/` starts at 2026-10-26), and 7 days plus the 2026-10-19 rehearsal day are parked in `content-parked/` (ROADMAP "Next revision", Parked days).
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
+
 ## Goal
 Define a versioned file format for daily puzzles and a validator script that rejects any puzzle breaking the answer model, then seed 14 real daily puzzles (7 independent questions per date).
 

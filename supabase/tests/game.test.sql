@@ -149,7 +149,7 @@ select ok(not has_table_privilege('plor_app', 'private.puzzle', 'insert'), 'plor
 select ok(not has_table_privilege('plor_publisher', t, 'select, insert, update, delete, truncate'), t || ': plor_publisher has no access')
   from unnest(array['private.run', 'private.run_event', 'private.missed_answer']) as t;
 
--- §7: account deletion (M11) cascades through runs, answers and misses even though nobody holds DELETE.
+-- §7: account deletion (M12) cascades through runs, answers and misses even though nobody holds DELETE.
 delete from auth.users where id = '00000000-0000-0000-0000-0000000000a1';
 select is((select count(*)::int from private.run where user_id = '00000000-0000-0000-0000-0000000000a1')
         + (select count(*)::int from private.run_event where user_id = '00000000-0000-0000-0000-0000000000a1')
