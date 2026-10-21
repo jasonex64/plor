@@ -47,9 +47,17 @@ Add a rule here only after an agent has actually made that mistake. Rules for pr
 2. The ticket's **Source diff** is filled in, and every deviation from the source has a reason.
 3. The `reviewer` agent has reviewed the diff. It runs in a fresh context and did not write the code.
 4. Only **blocking** findings get fixed now. Everything else is recorded under "Next revision" in ROADMAP.md *before* anything is done about it.
-5. Scraps are removed, the ticket status is updated and the roadmap is updated.
+5. Scraps are removed.
 
-Commits: `M##: <what changed> (removes: <what>)`. Use one branch per milestone and delete it after merge.
+**Every PR**, not just a milestone's last one, updates its ticket's **Status** line and its ROADMAP row in the same PR, before it is merged. *(Added after the M02 ticket and ROADMAP row fell three PRs behind, 2026-10-20.)*
+
+Commits: `M##: <what changed> (removes: <what>)`.
+
+Branches and PRs:
+- **One branch per milestone.** Before starting, run `git branch -a`. If a branch for this milestone already exists, check it out and continue there. Never create a second one.
+- **One PR per sub-ticket** (2a, 2b, …), opened from the milestone branch.
+- **Merge or close the open PR before starting the next sub-ticket.** Delete the branch once the milestone is merged.
+- *(Added 2026-10-20, after M02 2e was done on new `claude/…` branches and its evidence was stranded on the old `m02-sign-in-and-play` branch.)*
 
 ## Agent setup
 - Run the orchestration (main session: planning, milestones, integrating review) at **high** effort.

@@ -91,11 +91,9 @@ $ npx supabase db push --include-roles      -> created riff_app (roles.sql), app
 $ npm run test:sql (local)                  -> Tests=9, Result: PASS
 $ (human) psql \password riff_app as postgres, verify-full with supabase/certs/prod-ca-2021.crt
 $ (human) psql as riff_app.<ref> via the transaction pooler :6543, verify-full -> current_user = riff_app (1 row)
-```
 $ npx supabase test db --linked (after the approved fix: set local role postgres + search_path) -> Files=1, Tests=9, Result: PASS
 ```
 Getting the staging run to work took 3 disproved hypotheses, each stopped and re-planned with the human: (1) search_path alone failed because there was no USAGE on `extensions`; (2) the role switch alone failed because of the search_path; (3) schema-qualified calls failed because pgTAP internals call `_set` unqualified. Diagnosed with a temporary notice-only query, since deleted.
-```
 
 Vercel staging deploy (2026-10-18). Preview `riff-git-m00-foundations-sixfour.vercel.app`, behind Vercel Authentication; env `DATABASE_URL` uses riff_app on :6543, plus `DATABASE_CA_CERT`; `vercel.json` pins nextjs and iad1:
 ```
@@ -105,7 +103,7 @@ $ npm run -s status -- https://riff-git-m00-foundations-sixfour.vercel.app
 ```
 Before the env vars were set, the build failed with "No Output Directory named public": the Framework Preset had been auto-detected as Other from the docs-only `main`. Fixed by `vercel.json`.
 
-Still needed: a Vercel staging deploy, with `npm run status` UP and DOWN against its URL and the debug procedure followed once there, plus a CI run.
+*(An earlier "still needed" line here asked for a staging deploy and a CI run. Both happened: the staging deploy is above, the production check below, and CI ran on PR #1. Removed 2026-10-20.)*
 
 Production after merge (2026-10-18), on `main` at `b4bbee2`:
 ```
@@ -121,7 +119,7 @@ $ (human) Vercel Logs                                                           
 - Blocking findings and how each was fixed:
   1. **TLS bypass through URL params.** pg's connection-string parser lets `?ssl=0`, `?ssl=true`, `?sslnegotiation` or `?host=` override TLS or the host. Reproduced with pg's own `Client`. **Fixed:** pg now gets explicit fields (`poolConfig`), any query param is rejected, and there are tests for each param plus a pg-parser test. A mutation check (reverting to a connectionString) fails 2 tests.
   2. **CI didn't scan every push**, contrary to DECISIONS.md. **Fixed:** `on: push` now covers all branches.
-  3. **Acceptance criteria are still open** (CI run, staging status UP/DOWN through Vercel Authentication, the debug procedure on staging). These are human steps and decisions, not code. Still open.
+  3. **Acceptance criteria are still open** (CI run, staging status UP/DOWN through Vercel Authentication, the debug procedure on staging). These are human steps and decisions, not code. Still open. *(Later done: all three criteria are ticked above with their evidence; noted 2026-10-20.)*
   4. **No record that the exposed `postgres` master password was rotated.** **Done:** the human reported resetting it in the Supabase dashboard on 2026-10-18. It's stored only in their password manager, and nothing in the app uses it. (`.env.local` has pointed only at the local stack since 2026-10-17, which Claude checked by host.)
 - **CI first run on PR #1 (2026-10-18), 2 failures, both fixed:**
   - `check`: `npm ci` EUSAGE, "Missing: @emnapi/runtime@1.11.3 / @emnapi/core@1.11.3 from lock file". Reproduced in a `node:24` container with the old lock (exit 1). The lock was rewritten in the container, after which `npm run lockfile -- check` gives exit 0. Windows `npm ci` leaves that lock unchanged.
