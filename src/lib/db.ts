@@ -3,10 +3,8 @@
 // SET, and schema-qualified table names (supabase.com/docs/guides/database/connecting-to-postgres).
 import { attachDatabasePool } from "@vercel/functions";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
-// Relative .ts imports, like src/content/puzzle.ts: scripts/content-publish.ts runs this module under plain Node,
-// which doesn't know the "@/" alias.
-import { readServerEnv, type ServerEnv } from "../config/env.ts";
-import { log } from "./log.ts";
+import { readServerEnv, type ServerEnv } from "@/config/env";
+import { log } from "@/lib/log";
 
 // Either the pool or one transaction's client: single statements can run on both.
 export type Db = Pool | PoolClient;
@@ -28,28 +26,4 @@ export function getPool(): Pool {
 // and those can override `ssl` and `host` (M00 review 3). Remote hosts always verify against the CA.
 export function poolConfig(env: Pick<ServerEnv, "database" | "databaseCaCert">): PoolConfig {
   return { ...env.database, ssl: env.databaseCaCert ? { ca: env.databaseCaCert } : false };
-}
-
-// All statements of a transaction must run on one client, never pool.query
-// (node-postgres.com/features/transactions). Errors roll back and rethrow.
-export async function withTransaction<T>(db: Pool, fn: (client: PoolClient) => Promise<T>): Promise<T> {
-  const client = await db.connect();
-  let broken: Error | undefined;
-  try {
-    await client.query("BEGIN");
-    const result = await fn(client);
-    await client.query("COMMIT");
-    return result;
-  } catch (err) {
-    try {
-      await client.query("ROLLBACK");
-    } catch (rollbackErr) {
-      // The connection itself is unusable; destroy it instead of returning it to the pool.
-      broken = rollbackErr as Error;
-      log.error("rollback failed; destroying client", { error: String(rollbackErr) });
-    }
-    throw err;
-  } finally {
-    client.release(broken);
-  }
 }

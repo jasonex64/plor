@@ -74,7 +74,8 @@ function isTextList(v: unknown): v is string[] {
   return Array.isArray(v) && v.every(isText);
 }
 
-function isCalendarDate(v: unknown): v is string {
+// YYYY-MM-DD naming a real day: the pattern alone lets 2026-02-30 through, which Postgres refuses as a 500 (M02 2f, B2).
+export function isCalendarDate(v: unknown): v is string {
   if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
   const d = new Date(`${v}T00:00:00Z`);
   return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
@@ -201,11 +202,18 @@ export function checkPuzzleFile(file: string, text: string): string[] {
   // The path is the puzzle's identity, so two files can never claim the same day (human, 2026-10-18).
   const expected = `${puzzle.game_id}/${puzzle.date}.json`;
   if (file !== expected) out.push(`${file}: path must be ${expected} to match its game_id and date`);
+  return [...out, ...checkPuzzle(file, puzzle)];
+}
+
+// The content rules for a parsed puzzle, wherever it came from: a file, or a drafted day whose host answers an admin
+// changed before approving it (docs/milestones/M06-puzzle-entry.md). `where` prefixes each message.
+export function checkPuzzle(where: string, puzzle: Puzzle): string[] {
+  const out: string[] = [];
   if (puzzle.questions.length !== QUESTIONS_PER_DAY) {
-    out.push(`${file}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
+    out.push(`${where}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
   }
-  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q)));
-  if (puzzle.questions.length === QUESTIONS_PER_DAY) out.push(...checkStolenLetters(file, puzzle));
+  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${where} q${i + 1}`, q)));
+  if (puzzle.questions.length === QUESTIONS_PER_DAY) out.push(...checkStolenLetters(where, puzzle));
   return out;
 }
 

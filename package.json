@@ -17,7 +17,6 @@
     "content:validate": "node scripts/content-validate.ts",
     "content:plurals": "node scripts/content-plurals.ts",
     "content:letters": "node scripts/content-letters.ts",
-    "content:publish": "node scripts/content-publish.ts",
     "content:additions-check": "node scripts/content-additions-check.ts",
     "survey:score": "node scripts/survey-score.ts"
   },

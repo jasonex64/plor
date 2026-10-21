@@ -65,7 +65,7 @@ enabled = true
 schema_paths = []
 
 [db.seed]
-# Off: puzzles are loaded with `npm run content:publish`, and the template's ./seed.sql never existed (M02).
+# Off: puzzles get in through the admin page (M06), and the template's ./seed.sql never existed (M02).
 enabled = false
 
 [db.network_restrictions]

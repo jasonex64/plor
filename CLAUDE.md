@@ -9,7 +9,7 @@ Every session starts with no memory of earlier ones. Everything the next session
 - **Last thing:** before a session ends, or hands work to another agent, rewrite `docs/HANDOFF.md` and commit it on the branch you worked on. Say where things stand, what's half done, what waits on the human, anything left running, and the next step. Keep it short; history belongs in git.
 
 ## Before writing code
-1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval.
+1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The one exception is drafting a day's puzzle, which follows DECISIONS.md, "Puzzle drafting".
 2. **Say where we are.** Give the current milestone, its status and what comes next, taken from `docs/ROADMAP.md`.
 3. **Anchor to the source.** Read the cited sections in `docs/SOURCES.md` and name the sections you are following. If no source covers the work, stop and ask. Don't fill the gap from memory.
 4. **Justify it.** The ticket must answer *Who uses this?* and *What breaks without it?* If the answer is "nothing yet", don't build it.

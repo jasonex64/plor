@@ -32,6 +32,12 @@ const MESSAGES: Record<string, string> = {
   text_invalid: "That's too long to send. Try a shorter answer.",
   admins_only: "This page is for admins only.",
   not_available: "There's no report for that day yet.",
+  // Puzzle entry (docs/milestones/M06-puzzle-entry.md).
+  questions_invalid: "Fill in all 7 questions.",
+  day_past: "That day is over.",
+  puzzle_started: "That day has started, so its puzzle can't change.",
+  no_draft: "There's no drafted puzzle for that day yet.",
+  puzzle_invalid: "The puzzle breaks a content rule. See the problems listed.",
 };
 
 export function messageFor(code: string): string {

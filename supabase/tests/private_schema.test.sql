@@ -36,17 +36,16 @@ select is(
    where p.pronamespace = 'private'::regnamespace and has_function_privilege(r.role, p.oid, 'execute')),
   null, 'anon, authenticated and service_role cannot execute any private function');
 
--- RLS is the backstop behind the grants: on for every table, with policies only for plor_app, plus
--- plor_publisher's on private.puzzle (DECISIONS.md: Row-level security in `private`, Content publishing role).
+-- RLS is the backstop behind the grants: on for every table, with policies only for plor_app
+-- (DECISIONS.md: Row-level security in `private`).
 select is(
   (select array_agg(c.oid::regclass::text order by 1) from pg_class c
    where c.relnamespace = 'private'::regnamespace and c.relkind in ('r', 'p') and not c.relrowsecurity),
   null, 'every private table has RLS enabled');
 select is(
   (select array_agg(format('%s on %s.%s for %s', policyname, schemaname, tablename, array_to_string(roles, ',')) order by 1)
-   from pg_policies where schemaname = 'private' and roles <> '{plor_app}'
-     and not (tablename = 'puzzle' and roles = '{plor_publisher}')),
-  null, 'every private policy applies to plor_app only, or to plor_publisher on puzzle');
+   from pg_policies where schemaname = 'private' and roles <> '{plor_app}'),
+  null, 'every private policy applies to plor_app only');
 
 select * from finish();
 rollback;

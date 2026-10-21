@@ -39,7 +39,7 @@ select ok(has_table_privilege('plor_app', 'private.profile', 'insert'), 'plor_ap
 select ok(not has_table_privilege('plor_app', 'private.profile', 'update, delete, truncate, references, trigger'),
   'plor_app cannot change, delete, truncate, reference or trigger on profiles');
 
--- M02 2b and M03: everything plor_app and plor_publisher may do in `private`, listed exactly (M02 ticket: "only the
+-- M02 2b, M03 and M06: everything plor_app may do in `private`, listed exactly (M02 ticket: "only the
 -- grants these routes need"). A new grant has to be added here on purpose.
 create function pg_temp.grants(who text) returns text[] language sql return (
   select array_agg(g order by g) from (
@@ -55,12 +55,15 @@ create function pg_temp.grants(who text) returns text[] language sql return (
   ) as held);
 select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
+  -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
+  'private.approve_puzzle(uuid,jsonb) execute',
   'private.day_of(timestamp with time zone) execute',
   'private.missed_answer insert', 'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
   'private.profile insert', 'private.profile select',
   'private.puzzle select',
+  'private.puzzle_questions select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it
   -- was opened with Next (13c-4).
   'private.question_deadline(timestamp with time zone) execute',
@@ -69,11 +72,9 @@ select is(pg_temp.grants('plor_app'), array[
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
+  'private.save_questions(uuid,text,date,text[]) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');
-select is(pg_temp.grants('plor_publisher'), array[
-  'private.day_of(timestamp with time zone) execute',
-  'private.puzzle insert', 'private.puzzle select', 'private.puzzle update',
-  'private.today() execute'], 'plor_publisher holds exactly what content:publish needs');
+select ok(not exists (select from pg_roles where rolname = 'plor_publisher'), 'plor_publisher is gone (M06: puzzles get in through the admin page)');
 
 select * from finish();
 rollback;

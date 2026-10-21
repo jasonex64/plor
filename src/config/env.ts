@@ -24,11 +24,10 @@ export type ServerEnv = {
   databaseCaCert: string | null;
 };
 
-export const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]"]);
+const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]"]);
 
-// The one parser for Postgres URLs, used by the app (DATABASE_URL) and by `npm run content:publish`. The password
-// may be empty here; each caller decides whether it must be there or must not be (content:publish asks for it).
-export function parseDatabaseUrl(raw: string, name: string): DbConnection {
+// The parser for DATABASE_URL.
+function parseDatabaseUrl(raw: string, name: string): DbConnection {
   let url: URL;
   try {
     url = new URL(raw);
@@ -51,8 +50,7 @@ export function parseDatabaseUrl(raw: string, name: string): DbConnection {
     password: decodeURIComponent(url.password),
     database: decodeURIComponent(url.pathname.slice(1)),
   };
-  // Each message names only the missing part (M02 2f, B8). The password is checked by the caller: content:publish
-  // asks for it instead.
+  // Each message names only the missing part (M02 2f, B8). The caller checks the password.
   if (!database.user) throw new Error(`${name} must include a user`);
   if (!database.database) throw new Error(`${name} must include a database name`);
   return database;
@@ -60,7 +58,7 @@ export function parseDatabaseUrl(raw: string, name: string): DbConnection {
 
 export function readServerEnv(source: Record<string, string | undefined> = process.env): ServerEnv {
   const raw = source.DATABASE_URL;
-  if (!raw) throw new Error("DATABASE_URL is not set (see docs/milestones/M00-foundations.md)");
+  if (!raw) throw new Error("DATABASE_URL is not set (see docs/DECISIONS.md, Database access from route handlers)");
   const database = parseDatabaseUrl(raw, "DATABASE_URL");
   if (!database.password) throw new Error("DATABASE_URL must include a password");
 
