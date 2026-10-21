@@ -43,9 +43,10 @@ export function suggest(entries: PublicEntry[], typed: string): Suggestions {
   const matches = entries.filter((e) => texts(e).some((t) => t.startsWith(query) || t.includes(` ${query}`)));
   const exact = entries.find((e) => texts(e).includes(query)) ?? null;
   // Typos only when nothing starts with the text, and only for longer text: one change to a short word lands on
-  // many other words (human, 2026-10-19; src/config/tunables.ts).
+  // many other words (human, 2026-10-19; src/config/tunables.ts). The rule counts letters, so spaces don't count
+  // (M02 2f, B4).
   const typos =
-    matches.length === 0 && query.length >= SUGGEST_MIN_LETTERS_FOR_TYPOS
+    matches.length === 0 && query.replaceAll(" ", "").length >= SUGGEST_MIN_LETTERS_FOR_TYPOS
       ? entries.filter((e) => texts(e).some((t) => editDistanceAtMost(query, t, SUGGEST_MAX_TYPOS)))
       : [];
   return { matches, typos, exact };
