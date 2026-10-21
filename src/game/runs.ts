@@ -13,27 +13,35 @@ import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } f
 // 2026-10-21; its score won't count for leaderboards, M08).
 export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
 
-export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[] };
+// points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: k points for question k).
+export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[]; points: number };
 
 export type RunState = {
   date: string;
   status: RunStatus;
   total: number;
   answered: AnsweredQuestion[];
-  // The next question while the run is in progress, otherwise null.
+  // The question in play, otherwise null (also while the reveal waits for Next).
   question: PublicQuestion | null;
   // Milliseconds left on that question's timer, measured by the database when this state was read; null when
   // there is no question. The client counts down from it, and the database stays the judge.
   msLeft: number | null;
+  // While the reveal waits for Next (G5): the letter the Wind steals at the next question, or null for none.
+  next: { steals: string | null } | null;
+  // Points so far: the sum over answered questions.
+  points: number;
+  // Milliseconds until the next reset at midnight Pacific (private.next_reset), for the countdown.
+  msToReset: number;
 };
 
 type StoredEvent = { question_idx: number; entry_id: string; matched: boolean };
 
-// The SQLSTATEs raised by the answer trigger (supabase/migrations/20261019074108_create_game_tables.sql, as changed by
-// 20261021081057_question_timer.sql).
+// The SQLSTATEs raised by the answer and Next triggers (supabase/migrations/20261019074108_create_game_tables.sql, as
+// changed by 20261021081057_question_timer.sql and 20261021084917_reveal_next_and_reset.sql).
 const OUT_OF_ORDER = "OB002";
 const RUN_OVER = "OB003";
 const TIME_UP = "OB005";
+const NOT_OPEN = "OB006";
 
 async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle }> {
   const { rows } = await db.query<{ date: string; content: Puzzle | null }>(
@@ -55,7 +63,14 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-function buildState(date: string, puzzle: Puzzle, status: RunStatus, stored: StoredEvent[], msLeft: number | null): RunState {
+// k points for surviving question k, counted from 1 (DECISIONS.md, Game 1; human-accepted 2026-10-17).
+function pointsFor(index: number): number {
+  return index + 1;
+}
+
+type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
+
+function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock): RunState {
   const answered = stored.map((e) => {
     const question = puzzle.questions[e.question_idx];
     return {
@@ -64,28 +79,49 @@ function buildState(date: string, puzzle: Puzzle, status: RunStatus, stored: Sto
       answer: named(question, e.entry_id),
       matched: e.matched,
       hostAnswers: hostAnswers(question),
+      points: e.matched ? 0 : pointsFor(e.question_idx),
     };
   });
-  const question = status === "in_progress" ? publicQuestion(puzzle, stored.length) : null;
-  return { date, status, total: puzzle.questions.length, answered, question, msLeft: question ? msLeft : null };
+  const status = clock.status ?? "not_started";
+  // In progress with no deadline: the reveal is waiting for Next (the database gives no clock until it's tapped).
+  const waiting = status === "in_progress" && clock.msLeft === null;
+  const question = status === "in_progress" && !waiting ? publicQuestion(puzzle, stored.length) : null;
+  return {
+    date,
+    status,
+    total: puzzle.questions.length,
+    answered,
+    question,
+    msLeft: question ? clock.msLeft : null,
+    next: waiting ? { steals: puzzle.questions[stored.length].steals ?? null } : null,
+    points: answered.reduce((sum, a) => sum + a.points, 0),
+    msToReset: clock.msToReset,
+  };
 }
 
 async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Promise<RunState> {
-  const { rows } = await db.query<{ status: RunStatus; ms_left: number }>(
-    `select status, greatest(0, floor(extract(epoch from deadline - statement_timestamp()) * 1000))::int as ms_left
-     from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
+  // One statement, so the time left and the time to the reset are measured at the same instant.
+  const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number }>(
+    `select s.status,
+            case when s.deadline is null then null
+                 else greatest(0, floor(extract(epoch from s.deadline - statement_timestamp()) * 1000))::int end as ms_left,
+            floor(extract(epoch from private.next_reset() - statement_timestamp()) * 1000)::int as ms_to_reset
+     from (select 1) as one
+     left join private.run_status s on s.user_id = $1 and s.game_id = $2 and s.puzzle_date = $3::date`,
     [userId, GAME_ID, date],
   );
-  if (rows.length === 0) return buildState(date, puzzle, "not_started", [], null);
-  return buildState(date, puzzle, rows[0].status, await events(db, userId, date), rows[0].ms_left);
+  const { status, ms_left, ms_to_reset } = rows[0];
+  const stored = status === null ? [] : await events(db, userId, date);
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset });
 }
 
-// The player's run still in progress, if any (after midnight it can be yesterday's), otherwise today's puzzle.
+// The player's run whose question clock is running, if any (after midnight it can be yesterday's: G13), otherwise
+// today's puzzle. A run left waiting at a reveal has no clock, so an earlier day's one doesn't hold today's puzzle back.
 export async function todaysState(db: Db, userId: string): Promise<RunState> {
   const { rows } = await db.query<{ date: string; content: Puzzle }>(
     `select s.puzzle_date::text as date, p.content
      from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
-     where s.user_id = $1 and s.game_id = $2 and s.status = 'in_progress'
+     where s.user_id = $1 and s.game_id = $2 and s.status = 'in_progress' and s.deadline is not null
      order by s.puzzle_date desc limit 1`,
     [userId, GAME_ID],
   );
@@ -168,6 +204,8 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
     if (!(err instanceof DatabaseError)) throw err;
     // Too late for this question: the run has ended, and the state says so (rule 3; the trigger decides).
     if (err.code === TIME_UP) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
+    // The question hasn't been opened with Next: the client is behind, and a reload shows the reveal.
+    if (err.code === NOT_OPEN) throw new AppError("not_open", 409);
     // A concurrent request may have answered this index between our read and our insert (ROADMAP: never 500).
     if (err.code === "23505" || err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
       if (await settledAnswer(db, userId, date, index, entryId)) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
@@ -176,6 +214,34 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
     throw err;
   }
   return { run: await stateOf(db, userId, date, puzzle), notInList: false };
+}
+
+// Opens the next question of the player's latest run when they tap Next after a reveal (G5). Tapping again returns
+// the same state; the database refuses a run that has ended (run_over) and Next before the first answer.
+export async function openNext(db: Db, userId: string): Promise<RunState> {
+  const { rows } = await db.query<{ date: string; answered: number; content: Puzzle }>(
+    `select s.puzzle_date::text as date, s.answered, p.content
+     from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
+     where s.user_id = $1 and s.game_id = $2
+     order by s.puzzle_date desc limit 1`,
+    [userId, GAME_ID],
+  );
+  if (rows.length === 0) throw new AppError("no_run", 404);
+  const { date, answered, content: puzzle } = rows[0];
+  try {
+    await db.query(
+      `insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)
+       on conflict (user_id, game_id, puzzle_date, question_idx) do nothing`,
+      [userId, GAME_ID, date, answered],
+    );
+  } catch (err) {
+    if (!(err instanceof DatabaseError)) throw err;
+    if (err.code === RUN_OVER) throw new AppError("run_over", 409);
+    // question_idx must be over 0: Start opens question 1, so Next before the first answer has nothing to open.
+    if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("no_reveal", 409);
+    throw err;
+  }
+  return stateOf(db, userId, date, puzzle);
 }
 
 // True if this index already holds this entry; 409 if it holds another; false if it is unanswered.

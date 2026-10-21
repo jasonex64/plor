@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(39);
+select plan(44);
 
 -- Real puzzles and runs may exist for the days used here (staging during the playtest). The whole file runs in
 -- one transaction that is rolled back, so clearing them changes nothing outside the test (2b review).
@@ -70,6 +70,21 @@ select is((select status from private.run_status where user_id = '00000000-0000-
 select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
                    values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 0, 'y', false)$$,
   'OB002', null, 'an answered question cannot be answered again');
+-- M13 13c-4: after an answer, the reveal waits for Next; question 2 opens with a question_open row.
+select is((select deadline from private.run_status where user_id = '00000000-0000-0000-0000-0000000000a1'), null,
+  'a run at the reveal has no deadline');
+select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
+                   values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 1, 'host', true)$$,
+  'OB006', null, 'question 2 cannot be answered before Next opens it');
+select throws_ok($$insert into private.question_open (user_id, game_id, puzzle_date, question_idx)
+                   values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 0)$$,
+  'OB002', null, 'Next cannot open question 1 again: Start opened it, and it is answered');
+select throws_ok($$insert into private.question_open (user_id, game_id, puzzle_date, question_idx)
+                   values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 2)$$,
+  'OB002', null, 'Next opens only the question after the last answer');
+select lives_ok($$insert into private.question_open (user_id, game_id, puzzle_date, question_idx)
+                  values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 1)$$,
+  'Next opens question 2');
 select lives_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
                   values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 1, 'host', true)$$,
   'question 2 is answered with a match');
@@ -85,7 +100,10 @@ select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date,
 
 insert into private.run (user_id, game_id, puzzle_date) values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today());
 insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values
-  ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 0, 'x', false),
+  ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 0, 'x', false);
+insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values
+  ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 1);
+insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values
   ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 1, 'y', false);
 select is((select status from private.run_status where user_id = '00000000-0000-0000-0000-0000000000a3' and puzzle_date = private.today()),
   'survived', 'a run that answered every question without a match survived');

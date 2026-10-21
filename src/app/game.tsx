@@ -1,7 +1,8 @@
 "use client";
 
 // Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
-// text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, and a result screen.
+// text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, a reveal after each
+// answer that waits for Next, points as you go, and a result screen with the time to the next puzzle.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
@@ -42,7 +43,6 @@ export function Game() {
   }
 
   if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
-  const last = run.answered[run.answered.length - 1];
   return (
     <section>
       {run.status === "not_started" && (
@@ -55,63 +55,99 @@ export function Game() {
           </button>
         </>
       )}
+      {run.status === "in_progress" && run.next && (
+        <Reveal run={run} busy={busy} onNext={() => send("/api/run/next")} />
+      )}
       {run.status === "in_progress" && run.question && (
         <>
-          {last && <LastResult answered={last} />}
           {/* Keyed by each state the server sends, so a retry restarts the count from the server's own time left. */}
           <Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={load} />
           <Question
             key={run.question.index}
             question={run.question}
             total={run.total}
+            points={run.points}
             busy={busy}
             onAnswer={async (text) => (await send("/api/run/answer", { index: run.question!.index, text }))?.notInList ?? false}
           />
         </>
       )}
-      {(run.status === "died" || run.status === "survived" || run.status === "timed_out") && <Result run={run} />}
+      {(run.status === "died" || run.status === "survived" || run.status === "timed_out") && <Result run={run} onReset={load} />}
       {error && <p role="alert">{error}</p>}
     </section>
   );
 }
 
-// Seconds left on the current question, counted down from what the server measured. At zero it asks the server
-// again, which decides whether time is up (rule 3); the count itself is only a display.
-function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
-  const [left, setLeft] = useState(msLeft);
+// Milliseconds left, counted down from what the server measured, waking only when the shown whole second changes,
+// so it needs no refresh rate of its own. At zero it calls onZero once.
+function useCountdown(ms: number, onZero: () => void): number {
+  const [left, setLeft] = useState(ms);
   useEffect(() => {
-    const end = performance.now() + msLeft;
+    const end = performance.now() + ms;
     let timer: ReturnType<typeof setTimeout>;
-    // Wakes when the shown whole second changes, so the countdown needs no refresh rate of its own.
     function tick() {
       const remaining = Math.max(0, end - performance.now());
       setLeft(remaining);
-      if (remaining === 0) onTimeUp();
+      if (remaining === 0) onZero();
       else timer = setTimeout(tick, remaining % 1000 || 1000);
     }
     tick();
     return () => clearTimeout(timer);
-  }, [msLeft, onTimeUp]);
-  const seconds = Math.ceil(left / 1000);
+  }, [ms, onZero]);
+  return left;
+}
+
+// Seconds left on the current question. At zero it asks the server again, which decides whether time is up
+// (rule 3); the count itself is only a display.
+function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
+  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   return <p role="timer">{seconds === 1 ? "1 second left" : `${seconds} seconds left`}</p>;
 }
 
-function LastResult({ answered }: { answered: RunState["answered"][number] }) {
+// Time to the next puzzle at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review).
+function ResetCountdown({ msToReset, onReset }: { msToReset: number; onReset: () => void }) {
+  const total = Math.ceil(useCountdown(msToReset, onReset) / 1000);
+  const two = (n: number) => String(n).padStart(2, "0");
   return (
-    <p>
-      Safe! You said {answered.answer.name}; the host said {answered.hostAnswers.map((h) => h.name).join(", ")}.
+    <p role="timer">
+      Next puzzle in {Math.floor(total / 3600)}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
     </p>
+  );
+}
+
+const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
+
+// After a safe answer (G5): your answer next to the host's, the points it earned, and the letter the Wind steals at
+// the next question. The next question and its 20 seconds start on Next.
+function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
+  const last = run.answered[run.answered.length - 1];
+  return (
+    <div>
+      <h2>Safe!</h2>
+      <p>
+        You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
+      </p>
+      <p>
+        +{pointsText(last.points)} · {pointsText(run.points)} so far
+      </p>
+      {run.next!.steals && <p>Next, the Wind steals {run.next!.steals.toUpperCase()}.</p>}
+      <button type="button" autoFocus disabled={busy} onClick={onNext}>
+        Next
+      </button>
+    </div>
   );
 }
 
 function Question({
   question,
   total,
+  points,
   busy,
   onAnswer,
 }: {
   question: PublicQuestion;
   total: number;
+  points: number;
   busy: boolean;
   // Resolves true when the text named no entry (the player tries again).
   onAnswer: (text: string) => Promise<boolean>;
@@ -143,7 +179,7 @@ function Question({
   return (
     <div>
       <p>
-        Question {question.index + 1} of {total}
+        Question {question.index + 1} of {total} · {pointsText(points)} so far
       </p>
       <h2>{question.prompt}</h2>
       {question.stolen.length > 0 && (
@@ -174,7 +210,7 @@ function Question({
   );
 }
 
-function Result({ run }: { run: RunState }) {
+function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
   const survived = run.answered.filter((a) => !a.matched).length;
   return (
     <div>
@@ -186,16 +222,17 @@ function Result({ run }: { run: RunState }) {
             : `Caught on question ${run.answered.length}`}
       </h2>
       <p>
-        You survived {survived} of {run.total} questions. Come back tomorrow for a new puzzle.
+        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}.
       </p>
       <ol>
         {run.answered.map((a) => (
           <li key={a.index}>
             {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? " (caught)" : " (safe)"}
+            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)})`}
           </li>
         ))}
       </ol>
+      <ResetCountdown msToReset={run.msToReset} onReset={onReset} />
     </div>
   );
 }
