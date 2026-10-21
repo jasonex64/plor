@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** Part A done (PR #17, merged 2026-10-20; the human accepted the code-guessing risk and approved the texts). Part B is next: it no longer waits for a playtest, which moved to the MVP (human, 2026-10-20; `M02-2g-survey.md`). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
+**Status:** in review (Part B). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 blocked on the human (its hypothesis was disproved); B21 needs the human's approval of the approach in the PR.
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
@@ -141,6 +141,43 @@ Build, types, lint: `npm run build` → `✓ Compiled successfully`, routes incl
 The form in a browser (`npm run dev` on the local stack, a throwaway `@example.test` address, deleted afterwards): "Email me a sign-in code" → "Enter your code / We sent a sign-in code to …"; the Mailpit email had subject `Welcome to Plor: your sign-in code`, a 6-digit code and no `<a ` element; a wrong code showed "That code is wrong, expired or already used. Check the newest email, or reload to get a new code."; the right code went on to "Pick a username".
 
 Staging: the human updated both hosted templates, merged PR #17, and reported "sign-in with codes worked" (2026-10-20).
+
+**Part B, 2026-10-20, local stack.** Each fix's test was also run against the old code and failed there (shown per item in its commit message).
+
+All checks after the last commit:
+```
+npx tsc --noEmit                                   → no output
+npm run lint                                       → no output
+npm test -- --exclude ".claude/**"                 → Test Files 18 passed (18), Tests 134 passed (134)
+npm run test:db -- --exclude ".claude/**"          → Test Files 8 passed (8), Tests 55 passed (55)
+npx supabase test db                               → Files=4, Tests=75, Result: PASS
+npm run content:validate                           → CONTENT OK content: 28 file(s)
+npm run content:validate -- content-rehearsal      → CONTENT OK content-rehearsal: 2 file(s)
+npm run build                                      → ✓ Compiled successfully
+npm run check:client-bundle                        → CLIENT BUNDLE OK: 47 files, 5 patterns, 3 env values
+```
+Per item:
+- B1: the puzzle foreign key gives `404 no_puzzle_today`; the user foreign key (`run_user_id_fkey`) stays a `DatabaseError` (two db tests in rolled-back transactions).
+- B2: `?date=2026-02-30` and `2026-13-01` give 400; before the fix the test got `"error": "internal"`.
+- B3: with today's puzzle deleted in a rolled-back transaction, the default report is the newest earlier day; before the fix it threw `not_available`.
+- B4: "ca t" (4 characters, 3 letters) gets no typo suggestions; the test failed before.
+- B5: signed in on the local stack in the browser pane: `document.querySelectorAll("footer").length` → 1, plus one `section[aria-label="Account"]`. (Curl can't see the signed-in view, which is drawn in the browser.)
+- B6: the database check accepts lengths `USERNAME_MIN_LENGTH` and `USERNAME_MAX_LENGTH` and refuses one less and one more (4 db tests); the message is built from the same constants.
+- B7: input that ends before Enter rejects; without the `end` listener the test timed out after 5 s.
+- B8: three messages, one per missing part, each matched exactly.
+- B9: fixture `not-json` (a `.jsno` day) gives one error; the old validator passed it.
+- B10: blocked, see the Part B table.
+- B11: four new fixtures, each with exactly its own error.
+- B12: a batch with a new past day and a changed started day, run through `withTransaction` with real commits, leaves the past day absent; publishing without a transaction left 2026-09-20 behind and failed the test (that row was deleted afterwards).
+- B13: closed: Vitest ran `afterAll` after `beforeAll` threw (throwaway probe).
+- B14: fails if the `!earlier.tooFew` guard is removed.
+- B15: closed: already renamed in `e44774a`.
+- B16: `.ts` on relative imports in the tests of Node-run modules.
+- B17: closed: `npm run content:plurals` on both roots added 0 and changed no file.
+- B18: the callback ends its own backend; the original error is rethrown and "rollback failed; destroying client" is logged. Without the inner catch, the caller got the rollback's error instead. Found on the way: checked-out clients have no `error` listener (ROADMAP).
+- B19: a planted `sb_secret_` in `.next/server/app/*.html` → `LEAK … exit 1`; the same string in a server `.js` there → not flagged.
+- B20: SHAs from `gh api` (checkout v7 = v7.0.1 `3d3c42e…`, setup-node v7 = v7.1.0 `949feb2…`, gitleaks-action v3 = v3.0.0 `e0c47f4…`); CI runs on the PR.
+- B21: hypothesis measured first: in one transaction, `now()` didn't move across a 1.2 s sleep while `statement_timestamp()` moved 1.2 s. Migration `20261021044659`; the pgTAP check fails on the old definition.
 
 ## Review
 Part A, reviewer agent on `aa086b5`, 2026-10-20.
