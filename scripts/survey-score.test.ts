@@ -44,19 +44,19 @@ describe("scoreSet", () => {
   );
   const { insights, unmatched } = scoreSet("2026-10-26", day, responses);
 
-  it("counts an exact entry, after normalization, and whether the host caught it", () => {
+  it("reads typed text the way the game does, and counts whether the host caught it", () => {
     const q = (n: number) => insights.questions[n - 1];
-    expect([q(2).answered, q(2).caught]).toEqual([2, 1]); // TEXAS caught; Massachusetts not; Texsa not an entry
+    // TEXAS caught; Massachusetts not; Texsa is one typo from Texas, so it's Texas and caught (human, 2026-10-21)
+    expect([q(2).answered, q(2).caught]).toEqual([3, 2]);
     expect([q(4).answered, q(4).caught]).toEqual([2, 1]);
     expect([q(7).answered, q(7).caught]).toEqual([2, 2]); // both zodiac hosts
   });
 
-  it("lists what isn't an entry, with what the answer box would offer, and never guesses", () => {
+  it("lists the text that names no entry", () => {
     expect(unmatched).toEqual([
-      { question: 2, typed: "Texsa", suggestions: ["Texas"] },
-      { question: 4, typed: "the letter b", suggestions: [] },
-      { question: 7, typed: "hare", suggestions: [] },
+      { question: 4, typed: "the letter b" },
+      { question: 7, typed: "hare" },
     ]);
-    expect(insights.questions[1].misses).toEqual([{ text: "Texsa", count: 1 }]);
+    expect(insights.questions[1].misses).toEqual([]);
   });
 });

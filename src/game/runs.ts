@@ -5,7 +5,7 @@ import { DatabaseError } from "pg";
 import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
-import { matchAnswer } from "./matching";
+import { matchAnswer, resolveTyped } from "./matching";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
 
 // "abandoned" reaches the client only for a run from a day that has ended, e.g. a retried answer after midnight.
@@ -99,10 +99,12 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
   return todaysState(db, userId);
 }
 
-// Answers one question of the player's latest run. A retry with the same entry returns the stored result; a
-// different entry for an answered question is 409 already_answered (§5). If the day has ended since the run
-// started, the run_event trigger refuses the insert with day_over.
-export async function answer(db: Db, userId: string, index: number, entryId: string): Promise<RunState> {
+// Answers one question of the player's latest run with typed text, which the server turns into an entry
+// (matching.ts, resolveTyped). Text that names no entry is logged as a miss and costs nothing: the player tries
+// again (human, 2026-10-21). A retry naming the same entry returns the stored result; a different entry for an
+// answered question is 409 already_answered (§5). If the day has ended since the run started, the run_event
+// trigger refuses the insert with day_over.
+export async function answer(db: Db, userId: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean }> {
   const { rows } = await db.query<{ date: string; content: Puzzle }>(
     `select r.puzzle_date::text as date, p.content
      from private.run r join private.puzzle p on p.game_id = r.game_id and p.puzzle_date = r.puzzle_date
@@ -114,11 +116,15 @@ export async function answer(db: Db, userId: string, index: number, entryId: str
   const { date, content: puzzle } = rows[0];
   if (index >= puzzle.questions.length) throw new AppError("bad_request", 400, "no such question");
 
+  const entryId = resolveTyped(puzzle.questions[index], typed);
+  if (!entryId) {
+    await logMiss(db, userId, index, typed);
+    return { run: await stateOf(db, userId, date, puzzle), notInList: true };
+  }
   const settled = await settledAnswer(db, userId, date, index, entryId);
-  if (settled) return stateOf(db, userId, date, puzzle);
+  if (settled) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
 
   const result = matchAnswer(puzzle.questions[index], entryId);
-  if (result === "invalid_entry") throw new AppError("invalid_entry", 400);
   try {
     await db.query(
       `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
@@ -130,12 +136,12 @@ export async function answer(db: Db, userId: string, index: number, entryId: str
     if (err.code === DAY_OVER) throw new AppError("day_over", 409);
     // A concurrent request may have answered this index between our read and our insert (ROADMAP: never 500).
     if (err.code === "23505" || err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
-      if (await settledAnswer(db, userId, date, index, entryId)) return stateOf(db, userId, date, puzzle);
+      if (await settledAnswer(db, userId, date, index, entryId)) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
       throw new AppError(err.code === RUN_OVER ? "run_over" : "out_of_order", 409);
     }
     throw err;
   }
-  return stateOf(db, userId, date, puzzle);
+  return { run: await stateOf(db, userId, date, puzzle), notInList: false };
 }
 
 // True if this index already holds this entry; 409 if it holds another; false if it is unanswered.
@@ -146,7 +152,7 @@ async function settledAnswer(db: Db, userId: string, date: string, index: number
   return true;
 }
 
-// Logs text that matched no entry for the question the player is on, at no cost to the run (human, 2026-10-18).
+// Logs typed text that named no entry for the question the player is on, at no cost to the run (human, 2026-10-18).
 // The table's check allows 1 to 40 characters; longer text is rejected and nothing is stored.
 export async function logMiss(db: Db, userId: string, index: number, typed: string): Promise<void> {
   let rowCount: number | null;

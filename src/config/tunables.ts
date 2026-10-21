@@ -8,10 +8,10 @@ export const QUESTIONS_PER_DAY = 7;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 
-// "Did you mean" in the answer box: one typo forgiven, only for text of 4+ letters (human, 2026-10-19;
-// docs/milestones/M02-sign-in-and-play.md, Numbers).
-export const SUGGEST_MAX_TYPOS = 1;
-export const SUGGEST_MIN_LETTERS_FOR_TYPOS = 4;
+// Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
+// "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M13-game-mechanics.md).
+export const TYPO_MAX_EDITS = 1;
+export const TYPO_MIN_LETTERS = 4;
 
 // Puzzle insights report (human, 2026-10-19; docs/milestones/M03-puzzle-insights.md, Numbers).
 // A question's catch rate counts once this many players answered it; fewer is shown as "too few".

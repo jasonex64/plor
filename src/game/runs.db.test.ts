@@ -6,7 +6,6 @@ import { DatabaseError, Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
-import { POST as missRoute } from "@/app/api/run/miss/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, type Puzzle, type Question } from "@/content/puzzle";
@@ -25,6 +24,7 @@ const created: { date: string }[] = [];
 let today = "";
 let yesterday = "";
 let puzzle: Puzzle;
+let yesterdayPuzzle: Puzzle;
 
 // A real puzzle file under another date: its content is valid format 1 and has QUESTIONS_PER_DAY questions.
 function fixture(date: string): Puzzle {
@@ -53,8 +53,11 @@ async function call(response: Promise<Response>) {
 }
 const state = () => call(stateRoute(apiRequest("/api/run", { method: "GET" })));
 const start = () => call(startRoute(apiRequest("/api/run/start", { method: "POST" })));
-const answer = (index: number, entryId: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, entryId } })));
-const miss = (index: number, text: string) => call(missRoute(apiRequest("/api/run/miss", { method: "POST", body: { index, text } })));
+const answerText = (index: number, text: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, text } })));
+// Types the entry's name, as a player would. The name comes from the puzzle of the run being answered: today's,
+// or yesterday's for a run from a day that has ended (the two can differ on a local stack with published days).
+const nameIn = (p: Puzzle, index: number, entryId: string) => p.questions[index].entries.find((e) => e.id === entryId)!.name;
+const answer = (index: number, entryId: string) => answerText(index, nameIn(puzzle, index, entryId));
 
 async function newPlayer(name: string): Promise<{ userId: string; session: Map<string, string> }> {
   const { session } = await signIn(`${RUN}-${name}@example.test`);
@@ -71,7 +74,7 @@ beforeAll(async () => {
   );
   ({ today, yesterday } = rows[0]);
   puzzle = await ensurePuzzle(today);
-  await ensurePuzzle(yesterday);
+  yesterdayPuzzle = await ensurePuzzle(yesterday);
 });
 
 afterAll(async () => {
@@ -109,8 +112,8 @@ describe("a run, step by step", () => {
     expect(body.run.answered).toEqual([]);
   });
 
-  it("rejects an entry that isn't in the question's accepted bank", async () => {
-    expect(await answer(0, "not-an-entry")).toEqual({ status: 400, body: { ok: false, error: "invalid_entry" } });
+  it("refuses empty text with 400", async () => {
+    expect(await answerText(0, "   ")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
   });
 
   it("refuses to skip ahead", async () => {
@@ -122,6 +125,7 @@ describe("a run, step by step", () => {
     const entryId = safeEntry(q);
     const { status, body } = await answer(0, entryId);
     expect(status).toBe(200);
+    expect(body.notInList).toBe(false);
     expect(body.run.answered).toEqual([
       {
         index: 0,
@@ -161,12 +165,15 @@ describe("a run, step by step", () => {
     expect(results.find((r) => r.status === 409)!.body.error).toBe("already_answered");
   });
 
-  it("logs a miss for the current question at no cost, and rejects (without logging) more than 40 characters", async () => {
+  it("treats text that names no entry as a free retry logged as a miss, and rejects (without logging) more than 40 characters", async () => {
     const count = async () =>
       (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
-    expect(await miss(3, "  a thing nobody listed  ")).toEqual({ status: 200, body: { ok: true } });
-    expect(await miss(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
-    expect(await miss(5, "later question")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
+    const retry = await answerText(3, "  a thing nobody listed  ");
+    expect(retry.status).toBe(200);
+    expect(retry.body).toMatchObject({ ok: true, notInList: true, run: { status: "in_progress", question: { index: 3 } } });
+    expect(retry.body.run.answered).toHaveLength(3);
+    expect(await answerText(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
+    expect(await answerText(5, "later question")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
     expect(await count()).toBe(1);
     const { rows } = await getPool().query<{ typed: string }>("select typed from private.missed_answer where user_id = $1", [player.userId]);
     expect(rows[0].typed).toBe("a thing nobody listed");
@@ -199,13 +206,14 @@ describe("other ways a run ends", () => {
     useSession(player.session);
     // A run started yesterday, as if the player had started just before midnight.
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
-    expect(await answer(0, safeEntry(puzzle.questions[0]))).toEqual({ status: 409, body: { ok: false, error: "day_over" } });
+    const entryId = safeEntry(yesterdayPuzzle.questions[0]);
+    expect(await answerText(0, nameIn(yesterdayPuzzle, 0, entryId))).toEqual({ status: 409, body: { ok: false, error: "day_over" } });
   });
 
   it("shows a retried answer from a day that has ended as an abandoned run, not a blank state (2b review)", async () => {
     const player = await newPlayer("r");
     useSession(player.session);
-    const entryId = safeEntry(puzzle.questions[0]);
+    const entryId = safeEntry(yesterdayPuzzle.questions[0]);
     // Yesterday's run with its first answer stored, as if answered just before midnight. The trigger rightly refuses
     // that insert today, so it goes in with triggers off for this one local superuser session.
     const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -224,7 +232,7 @@ describe("other ways a run ends", () => {
     } finally {
       await admin.end();
     }
-    const retry = await answer(0, entryId);
+    const retry = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(retry.status).toBe(200);
     expect(retry.body.run).toMatchObject({ date: yesterday, status: "abandoned", question: null });
   });

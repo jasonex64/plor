@@ -26,12 +26,9 @@ describe("publicQuestion", () => {
     });
   });
 
-  it("carries only the prompt and the accepted bank's ids, names and aliases", () => {
+  it("carries only the prompt, never the answer list (human, 2026-10-21)", () => {
     const q = publicQuestion(puzzle, 0);
-    expect(Object.keys(q).sort()).toEqual(["entries", "index", "prompt"]);
-    for (const entry of q.entries) expect(Object.keys(entry).sort()).toEqual(["aliases", "id", "name"]);
-    expect(JSON.stringify(q)).not.toMatch(/host|match_group|plural/);
-    expect(q.entries).toHaveLength(puzzle.questions[0].entries.length);
+    expect(q).toEqual({ index: 0, prompt: puzzle.questions[0].prompt });
   });
 });
 

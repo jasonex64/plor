@@ -7,7 +7,7 @@ import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { matchAnswer } from "./matching";
-import { answer, logMiss, startRun, todaysState } from "./runs";
+import { answer, startRun, todaysState } from "./runs";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -45,10 +45,10 @@ describe("a run as plor_app", () => {
       expect((await todaysState(client, userId)).status).toBe("not_started");
       expect((await startRun(client, userId)).status).toBe("in_progress");
       const q = puzzle.questions[0];
-      const safe = q.entries.map((e) => e.id).find((id) => matchAnswer(q, id) === "not_matched")!;
-      const after = await answer(client, userId, 0, safe);
-      expect(after.answered).toHaveLength(1);
-      await logMiss(client, userId, 1, "something unlisted");
+      const safe = q.entries.find((e) => matchAnswer(q, e.id) === "not_matched")!;
+      const after = await answer(client, userId, 0, safe.name);
+      expect(after.run.answered).toHaveLength(1);
+      expect((await answer(client, userId, 1, "something unlisted")).notInList).toBe(true);
       expect((await todaysState(client, userId)).question?.index).toBe(1);
     });
   });

@@ -1,15 +1,15 @@
 "use client";
 
-// Today's Offbeat run: one question at a time, answers picked from the question's accepted bank by entry ID,
-// a no-penalty "not in our list yet" for anything else, and a result screen (M02 ticket, UI criterion).
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+// Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
+// text; human, 2026-10-21), a free retry for text that names no entry, and a result screen.
+import { useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
-import type { PublicEntry, PublicQuestion } from "@/game/payload";
-import { suggest } from "@/game/suggest";
+import type { PublicQuestion } from "@/game/payload";
 import { ApiError, api } from "@/lib/api-client";
 import { messageFor } from "./messages";
 
 type RunResponse = { run: RunState };
+type AnswerResponse = { run: RunState; notInList: boolean };
 
 function errorText(err: unknown): string {
   return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
@@ -24,13 +24,16 @@ export function Game() {
     api<RunResponse>("/api/run", { method: "GET" }).then((r) => setRun(r.run), (err) => setError(errorText(err)));
   }, []);
 
-  async function send(path: string, body?: unknown) {
+  async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
     setError(null);
     try {
-      setRun((await api<RunResponse>(path, { method: "POST", body })).run);
+      const response = await api<AnswerResponse>(path, { method: "POST", body });
+      setRun(response.run);
+      return response;
     } catch (err) {
       setError(errorText(err));
+      return null;
     } finally {
       setBusy(false);
     }
@@ -58,7 +61,7 @@ export function Game() {
             question={run.question}
             total={run.total}
             busy={busy}
-            onAnswer={(entryId) => send("/api/run/answer", { index: run.question!.index, entryId })}
+            onAnswer={async (text) => (await send("/api/run/answer", { index: run.question!.index, text }))?.notInList ?? false}
           />
         </>
       )}
@@ -90,28 +93,20 @@ function Question({
   question: PublicQuestion;
   total: number;
   busy: boolean;
-  onAnswer: (entryId: string) => void;
+  // Resolves true when the text named no entry (the player tries again).
+  onAnswer: (text: string) => Promise<boolean>;
 }) {
   const [typed, setTyped] = useState("");
-  const [picked, setPicked] = useState<PublicEntry | null>(null);
-  const [missNote, setMissNote] = useState<string | null>(null);
-  const { matches, typos, exact } = useMemo(() => suggest(question.entries, typed), [question.entries, typed]);
+  const [notInList, setNotInList] = useState<string | null>(null);
 
-  // Enter picks an entry the text names exactly (still confirmed with "Lock in"), and never sends a miss: during
-  // the rehearsal, Enter on "passport" logged it as not in the list (human, 2026-10-19).
-  function pickExact(event: FormEvent) {
+  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight.
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    if (exact) setPicked(exact);
-  }
-
-  async function reportMiss() {
-    setMissNote(null);
-    try {
-      await api("/api/run/miss", { method: "POST", body: { index: question.index, text: typed } });
-      setMissNote(`"${typed.trim()}" is not in our list yet. Try another answer.`);
+    const text = typed.trim();
+    if (text === "" || busy) return;
+    if (await onAnswer(text)) {
+      setNotInList(text);
       setTyped("");
-    } catch (err) {
-      setMissNote(errorText(err));
     }
   }
 
@@ -121,52 +116,27 @@ function Question({
         Question {question.index + 1} of {total}
       </p>
       <h2>{question.prompt}</h2>
-      {picked ? (
-        <>
-          <p>Your answer: {picked.name}</p>
-          <button type="button" disabled={busy} onClick={() => onAnswer(picked.id)}>
-            Lock in {picked.name}
-          </button>
-          <button type="button" disabled={busy} onClick={() => setPicked(null)}>
-            Change it
-          </button>
-        </>
-      ) : (
-        <form onSubmit={pickExact}>
-          <label>
-            Your answer
-            <input
-              value={typed}
-              autoComplete="off"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              onChange={(e) => {
-                setTyped(e.target.value);
-                setMissNote(null);
-              }}
-            />
-          </label>
-          {typos.length > 0 && <p>Did you mean:</p>}
-          {matches.length + typos.length > 0 && (
-            <ul className="suggestions">
-              {[...matches, ...typos].map((entry) => (
-                <li key={entry.id}>
-                  <button type="button" onClick={() => setPicked(entry)}>
-                    {entry.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {typed.trim() !== "" && !exact && (
-            <button type="button" disabled={busy} onClick={reportMiss}>
-              Not in the list? Send &quot;{typed.trim()}&quot;
-            </button>
-          )}
-          {missNote && <p role="status">{missNote}</p>}
-        </form>
-      )}
+      <form onSubmit={submit}>
+        <label>
+          Your answer
+          <input
+            value={typed}
+            autoFocus
+            autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(e) => {
+              setTyped(e.target.value);
+              setNotInList(null);
+            }}
+          />
+        </label>
+        <button type="submit" disabled={busy || typed.trim() === ""}>
+          Answer
+        </button>
+        {notInList && <p role="status">&quot;{notInList}&quot; isn&apos;t in our list. Try another answer.</p>}
+      </form>
     </div>
   );
 }

@@ -3,7 +3,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { POST as answer } from "./answer/route";
-import { POST as miss } from "./miss/route";
 import { GET as state } from "./route";
 import { POST as start } from "./start/route";
 
@@ -22,8 +21,7 @@ describe("run routes, signed out", () => {
   it.each([
     ["POST /api/run/start", () => start(apiRequest("/api/run/start", { method: "POST" }))],
     ["GET /api/run", () => state(apiRequest("/api/run", { method: "GET" }))],
-    ["POST /api/run/answer", () => answer(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, entryId: "x" } }))],
-    ["POST /api/run/miss", () => miss(apiRequest("/api/run/miss", { method: "POST", body: { index: 0, text: "x" } }))],
+    ["POST /api/run/answer", () => answer(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: "x" } }))],
   ])("%s answers 401 not_signed_in", async (_, call) => {
     const response = await call();
     expect(response.status).toBe(401);

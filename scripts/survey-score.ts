@@ -1,14 +1,12 @@
 // Scores the emailed survey (docs/milestones/M02-2g-survey.md) the way the game scores play:
-// `npm run survey:score -- <responses.csv>`. Each typed answer counts only if it names an entry exactly after the
-// authoring normalization, like Enter in the answer box (src/game/suggest.ts); then matchAnswer decides whether the
-// host caught it and buildInsights builds the same per-question report as the insights page (M03). Anything else is
-// listed with what the answer box would have suggested, for the human to judge: the game never guesses, so neither
-// does this.
+// `npm run survey:score -- <responses.csv>`. Each typed answer becomes an entry the way the game reads typed text
+// (resolveTyped: an exact name or alias, else one typo; docs/milestones/M13-game-mechanics.md); then matchAnswer
+// decides whether the host caught it and buildInsights builds the same per-question report as the insights page
+// (M03). Text that names no entry is listed for the human to judge.
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
-import { matchAnswer } from "../src/game/matching.ts";
-import { suggest } from "../src/game/suggest.ts";
+import { matchAnswer, resolveTyped } from "../src/game/matching.ts";
 import { buildInsights, type AnswerRow, type DayInsights, type MissRow } from "../src/insights/report.ts";
 
 // The puzzle each survey set asked, as in docs/survey/message.md (ticket D4).
@@ -16,7 +14,7 @@ export const SET_DATES: Record<string, string> = { "1": "2026-10-26", "2": "2026
 const HEADER = ["person", "set", "q1", "q2", "q3", "q4", "q5", "q6", "q7"];
 
 export type Response = { person: string; set: string; answers: string[] };
-export type Unmatched = { question: number; typed: string; suggestions: string[] };
+export type Unmatched = { question: number; typed: string };
 
 // RFC 4180 rows: commas inside double quotes, "" for a quote. Line ends may be \r\n or \n.
 export function parseCsv(text: string): string[][] {
@@ -72,7 +70,7 @@ export function readResponses(text: string): Response[] {
     });
 }
 
-// One day's report from the responses to its set: exact entries become answers, the rest become misses.
+// One day's report from the responses to its set: text that names an entry becomes an answer, the rest a miss.
 export function scoreSet(date: string, puzzle: Puzzle, responses: Response[]): { insights: DayInsights; unmatched: Unmatched[] } {
   const answers: AnswerRow[] = [];
   const misses: MissRow[] = [];
@@ -81,13 +79,13 @@ export function scoreSet(date: string, puzzle: Puzzle, responses: Response[]): {
     puzzle.questions.forEach((question, index) => {
       const typed = response.answers[index] ?? "";
       if (typed === "") return;
-      const { exact, matches, typos } = suggest(question.entries, typed);
-      if (exact) {
-        answers.push({ question_idx: index, entry_id: exact.id, matched: matchAnswer(question, exact.id) === "matched" });
+      const entryId = resolveTyped(question, typed);
+      if (entryId) {
+        answers.push({ question_idx: index, entry_id: entryId, matched: matchAnswer(question, entryId) === "matched" });
         return;
       }
       misses.push({ question_idx: index, typed });
-      unmatched.push({ question: index + 1, typed, suggestions: [...matches, ...typos].map((e) => e.name) });
+      unmatched.push({ question: index + 1, typed });
     });
   }
   return { insights: buildInsights(date, true, puzzle, answers, misses), unmatched };
@@ -114,7 +112,7 @@ function main() {
       );
     }
     for (const u of unmatched) {
-      console.log(`  not in list: Q${u.question} "${u.typed}"${u.suggestions.length ? ` (the box would offer: ${u.suggestions.slice(0, 5).join(", ")})` : ""}`);
+      console.log(`  not in list: Q${u.question} "${u.typed}"`);
     }
   }
 }
