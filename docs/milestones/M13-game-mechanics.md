@@ -45,7 +45,7 @@ The answer lists stay the hand-made content lists for now. Where answers come fr
    1. Normalize the typed text as content is normalized (DECISIONS.md).
    2. Text containing a stolen letter is refused with no penalty. The client can't type one (rule 4), so this only catches a bypassed client.
    3. An exact match with an entry's name or alias gives that entry.
-   4. Otherwise, text of 4 or more letters that is one typo from a name that avoids every stolen letter (M02 Numbers; G12) gives that entry, but only when exactly one entry is that close. When two are ("mose" is one letter from both moose and mouse), the text names no entry, because picking one would be the server guessing. That last part is Claude's reading, to confirm.
+   4. Otherwise, text of 4 or more letters that is one typo from a name that avoids every stolen letter (M02 Numbers; G12) gives that entry, but only when exactly one entry is that close. When two are ("mose" is one letter from both moose and mouse), the text names no entry, because picking one would be the server guessing (confirmed by the human, 2026-10-21: "The two-entries typo rule is fine as built").
    5. Otherwise, the reply is "not in our list, try again", with no penalty: free retries against the timer (human, 2026-10-21). The text is logged as a miss for the human, as today (human, 2026-10-18).
    
    The entry is caught if it is a host answer or in a host answer's match group (DECISIONS.md, match groups), and safe otherwise.
@@ -184,7 +184,7 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rules to build, rule 2: refuse text with a stolen letter (step 2), and typos only onto names that avoid stolen letters (step 4) | 13c-1 builds rule 2 without the stolen-letter parts | There are no stolen letters until 13c-3, which adds both parts and their tests |
 | M02 2g survey ticket (lines 64, 69): the scorer counts only an exact match, "the game never guesses" | `survey:score` now reads text with `resolveTyped`, auto-correcting one typo | The scorer's purpose is to score "the way the game scores play", and the game now auto-corrects (human, 2026-10-21). Re-scoring changes the recorded numbers (e.g. "Texsa" becomes Texas, caught) |
 | The 13c-1 criterion as merged in PR #22: "checked … by `check:client-bundle`" | Checked by `payload.test.ts` and a browser request | `check:client-bundle` scans only for secrets and server env values, so it can't detect an answer list |
-| Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading, marked unconfirmed in the ticket and in DECISIONS.md until the human confirms |
+| Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading at first; confirmed by the human, 2026-10-21 |
 
 ## Evidence
 **13c-1 free typing** (branch `m13-game-mechanics`, 2026-10-21, Windows, local stack):
