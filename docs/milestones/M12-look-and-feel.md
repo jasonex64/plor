@@ -1,6 +1,6 @@
 # M12 — Look and feel
 
-**Status:** planned (draft ticket for the human's approval, 2026-10-20). It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
+**Status:** planned, after the MVP (human, 2026-10-20: "the pixel-art look moves after the MVP too"; the MVP is M13, the game mechanics). L11 is answered by M13's G6. Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
 
 ## Goal
 Give Offbeat's existing screens a finished, phone-first look with code-drawn pixel art and small animations, so the game feels good before any social feature is built on top of it.

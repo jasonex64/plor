@@ -7,8 +7,8 @@ This is a daily game platform, named **Plor** (human, 2026-10-18; at `plor.app`)
 
 **Game 1: Don't Match the Host** (named Offbeat, `game_id` `offbeat`). Each day has 7 fixed, independent questions that mix concrete and abstract (e.g. "Name a day of the month", "Name something you'd bring to a potluck"). The player names an answer and must avoid the host's secret answers, which catch a slowly rising share of players through the day. Niche answers are a fair escape, and some days are harder than others. Matching ends the run, and the score is the number of questions survived. See DECISIONS.md for the answer model.
 
-## Focus (roadmap reset, human, 2026-10-20)
-The MVP is the original plan of 2026-10-17: one game, played daily and made as nice as possible, then share, friends and a live board, comments and reactions, points and a friends leaderboard, and a closed beta. Everything else goes under **Later**, and nothing moves out of Later unless the human pulls it in with a ticket. The game's look comes first ("Polish the game first", human, 2026-10-20), with pixel art in the MVP (human, 2026-10-20).
+## Focus (human, 2026-10-20)
+**The MVP is the game mechanics only (M13):** "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after" (human, 2026-10-20). That includes the sign-in page and the pixel-art look ("Yes, the pixel-art look moves after the MVP too", human, 2026-10-20). After the MVP, the milestones from the original plan of 2026-10-17 follow in the table's order: the look, share, friends and a live board, comments and reactions, points and a friends leaderboard, and a closed beta. Everything else goes under **Later**, and nothing moves forward unless the human pulls it in with a ticket.
 
 ## Milestones
 Status: `planned` → `in progress` → `in review` → `done`. The table is in the order of work; milestone numbers are kept so nothing renumbers.
@@ -19,13 +19,14 @@ Status: `planned` → `in progress` → `in review` → `done`. The table is in 
 | M01 | Puzzle content and validator | Content file format, a validator that enforces the answer model, 14 real daily puzzles (7 questions per date) | done | `docs/milestones/M01-puzzle-content.md` |
 | M02 | Sign-in and playable game | Sign-in by emailed code or Google; profile; runs pinned to the Pacific-midnight day; server-checked answers stored as run events; autocomplete that sends entry IDs; sudden death; result screen; privacy page. The cleanup (2f) and the emailed content survey (2g) are merged; the survey's open content choices moved to "Content" under Next revision | done (closed in the roadmap reset, 2026-10-20) | `docs/milestones/M02-sign-in-and-play.md` |
 | M03 | Puzzle insights | An admin report per question: catch rate, share of answers in the host bank, logged misses. Built in PR #14; no further work in the MVP | done (closed in the roadmap reset, 2026-10-20) | `docs/milestones/M03-puzzle-insights.md` |
-| M12 | Look and feel | A finished, phone-first look for the screens that exist today (sign-in, question, safe, caught, result), with code-drawn pixel art: the ridge, the player's character and the Wind as the host (the human's decisions, carried over from the closed draft PR #12) | planned (**next**; draft ticket waiting for the human's answers to L1–L11) | `docs/milestones/M12-look-and-feel.md` |
+| M13 | Game mechanics: working and smooth | Settle the open rules (scoring, the last question, a target catch rate, the picking and reveal flow); get days playable again; a smooth play loop (Enter hint, a reveal after each answer, progress and points during the run, a countdown to the reset, a fast answer response, points on the result); tune the questions to the target; full runs on staging | planned (**next**; draft ticket waiting for the human's answers to G1–G7) | `docs/milestones/M13-game-mechanics.md` |
+| — | **MVP line** | | | |
+| M12 | Look and feel | A finished, phone-first look with code-drawn pixel art: the ridge, the player's character and the Wind as the host (the human's decisions, carried over from the closed draft PR #12). Moved after the MVP (human, 2026-10-20) | planned (draft ticket; its questions L1–L13 wait until after the MVP) | `docs/milestones/M12-look-and-feel.md` |
 | M05 | Share | Spoiler-free share text whose link opens today's game | planned | — |
 | M06 | Friends and live board | Invite link and mutual friends; a live board (status for everyone, plus where each friend ended once you've finished); friends-only delivery; reconnects logged and counted. The "where everyone ended" picture follows the rule the human accepted on 2026-10-20 (closed draft D28): you are always shown, then a few named friends per place, then a count; tapping a place shows the list, and a plain list sits underneath. The per-place limit is a human number | planned | — |
 | M07 | Comments and reactions | On the day's game, friends only, visible after you've played, delete your own, report others | planned | — |
-| M08 | Points and friends leaderboard | Ledger written when a run ends (k points per survived question k), a one-time backfill from earlier runs, an all-time friends leaderboard equal to the ledger sum. *Decide before the ticket:* do the human's 2026-10-20 ideas, "exponential distance" between rounds and a last question that "blows 3 answers", change scoring (a DECISIONS.md change) or only the visuals? | planned | — |
+| M08 | Points and friends leaderboard | Ledger written when a run ends (k points per survived question k), a one-time backfill from earlier runs, an all-time friends leaderboard equal to the ledger sum. The scoring rule and the last question's host answers are settled first in M13 (G1, G2) | planned | — |
 | M11 | Launch readiness and closed beta | Load test of the reset-time spike, including live connections; alerts, backups, a full privacy policy and terms, self-service account deletion; the 28 unscheduled days (off the calendar until the live test's dates are known, human, 2026-10-20) are re-dated for the beta after the Content review below, and any further days are drafted the M01 way; the closed beta, which is also the live playtest (human, 2026-10-20): is it fun, do players finish, and what are the real catch rates | planned | — |
-| — | **MVP line** | | | |
 
 Tickets get written when their milestone comes up, so they don't go stale.
 
@@ -53,11 +54,13 @@ Short summaries; the full earlier text and every decision in it are in git at co
 These are non-blocking items found during work or review. Record each one here **before** acting on it. Items get pulled into a milestone on purpose; nobody fixes them on the side. Done items were removed in the roadmap reset (2026-10-20; they are in git at commit `4dc43a3`). Open items are grouped by where they belong.
 
 <!-- - [ ] <item> — found in M## (implementation | review) — <why it can wait> -->
-**The survey's main finding (M02 2g, for the human):** 14 of 21 questions caught nobody, and only 10 of 110 entry answers were caught, from 7 people. DECISIONS.md sets no target catch rate. For the human to weigh before the beta; the details are in `docs/milestones/M02-2g-survey.md`, Findings.
+**The survey's main finding (M02 2g, for the human):** 14 of 21 questions caught nobody, and only 10 of 110 entry answers were caught, from 7 people. DECISIONS.md sets no target catch rate. The target catch rate is M13's G3, and the tuning is M13 13d; the details are in `docs/milestones/M02-2g-survey.md`, Findings.
 
-**For M12 (the play screens):**
+**For M13 (the play screen; both are 13c criteria):**
 - [ ] Show players a countdown to the reset: the server returns the next reset instant, computed in SQL alongside `private.today()`. A run started just before the reset is abandoned and scores 0 (Q4). Found in M00 (review 2). UX only, since abandoning can never beat dying.
 - [ ] Enter in the answer box does nothing when the text names no entry exactly, with no hint to the player. Found in M02 (2c review). By design (no accidental misses); a hint is UX polish.
+
+**For M12 (sign-in and home, after the MVP):**
 - [ ] The home page intro says "daily word games" (plural) and "keep your results", while there is one game and no history view yet. Found in M02 (2c review of the intro). Accurate enough for Google's review; revisit the copy in M09/M12.
 - [ ] The code form has no way back to fix a mistyped email (only a reload), and a pasted "123 456" keeps its space. Found in M02 (2f review). UX only; the error message says to reload.
 
