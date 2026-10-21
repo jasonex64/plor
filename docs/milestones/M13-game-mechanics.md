@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: 13c-1 (free typing) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
+**Status:** in progress: 13c-1 (free typing) merged in PR #23; 13c-2 (the timer) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -36,6 +36,7 @@ No source sets a target catch rate. It's a human number (G3).
 | G9 | Fewest familiar safe answers a question may have left after its stolen letters and its host answers (a human number; the daily letter picker enforces it) | Open; needed only for the picker, which waits for the answer database (human, 2026-10-21: "we can focus on the database and how to get answers later") |
 | G10 | What happens when the 20-second timer runs out: the run ends, or the question scores 0 and the run goes on | The run ends (human, 2026-10-21) |
 | G11 | Typing a stolen letter: the key does nothing (and the box shakes), or the answer is refused on submit | The key does nothing (human, 2026-10-21) |
+| G13 | A run whose 20 seconds would end after midnight: the day ends it, or it goes on? | It goes on: "they get to play the puzzle but their score doesn't contribute to leaderboard" (human, 2026-10-21). The timer, not midnight, ends an unfinished run; M08 leaves such a run out of the leaderboard |
 | G12 | One-typo auto-correct and stolen letters: may a typo land on a name that needs a stolen letter ("hors" → horse with E stolen)? | No: auto-correct lands only on names that avoid every stolen letter (human, 2026-10-21) |
 
 ## Rules to build (13c), from the human's decisions of 2026-10-21
@@ -49,7 +50,7 @@ The answer lists stay the hand-made content lists for now. Where answers come fr
    5. Otherwise, the reply is "not in our list, try again", with no penalty: free retries against the timer (human, 2026-10-21). The text is logged as a miss for the human, as today (human, 2026-10-18).
    
    The entry is caught if it is a host answer or in a host answer's match group (DECISIONS.md, match groups), and safe otherwise.
-3. **The 20-second timer** (human, 2026-10-21). The server records when each question starts, which is when the player taps Start or Next. An answer after the 20 seconds, or no answer by then, ends the run (G10). The client counts down from the deadline the server sends. A refresh doesn't restart the clock, and network delay counts against the player, since a grace period would be a number no one has set.
+3. **The 20-second timer** (human, 2026-10-21). The server records when each question starts, which is when the player taps Start or Next. An answer after the 20 seconds, or no answer by then, ends the run (G10). The client counts down from the deadline the server sends. A refresh doesn't restart the clock, and network delay counts against the player, since a grace period would be a number no one has set. Midnight doesn't end a run (G13): a run started before it can be finished after it.
 4. **Stolen letters, schedule A** (G8): the Wind steals one letter at Q2 (medium tier), Q4 (medium), Q5 (heavy consonant: R, N, L, T or S) and Q7 (vowel: E, A, I or O). Stolen letters are shown and stay gone for the rest of the run (the lead idea the human chose). In the answer box, a stolen letter's key does nothing, and the box shakes (G11).
 5. **Reveal, then "Next"** (G5): after each answer, show your answer next to the host's, safe or caught, and the letter the Wind steals for the next question, if any. The next question and its 20 seconds start on "Next".
 6. **Letters live in each day's content file**, the same for every player (DECISIONS.md: fixed sequence). Until the picker exists, Claude picks them for the test days and the human reviews them. The validator refuses a day that:
@@ -64,7 +65,7 @@ The human's answers so far:
 - **Typos:** "Auto-correct one typo" (human, 2026-10-21): text one typo away from an entry counts as that entry, using the existing typo rule (M02 Numbers), with no "did you mean" prompt.
 - **Reveal:** "After each question" (human, 2026-10-21), worded for a board, which is no longer the lead design; then "Reveal, then 'Next'" (G5).
 - **Ramp:** "make the mechanics more loose at the start, and then restrict more as time goes on to induce stress" (human, 2026-10-21).
-- **Off-list answers:** "there should be a timer, so free retries are allowed as the timer provides a sense of urgency" (human, 2026-10-21). **The timer is 20 seconds** (human, 2026-10-21: "make sure that we have a timer of 20 seconds"). That it runs per question and doesn't shrink is Claude's reading, to confirm. At time-out the run ends (G10).
+- **Off-list answers:** "there should be a timer, so free retries are allowed as the timer provides a sense of urgency" (human, 2026-10-21). **The timer is 20 seconds** (human, 2026-10-21: "make sure that we have a timer of 20 seconds"). Per question, a fresh 20 seconds each time, never shrinking (confirmed by the human, 2026-10-21: "Yes, 20 s per question"). At time-out the run ends (G10).
 - **The share model** (a board of the top answers covering cₖ, a host catching tₖ): "does define what we want idealistically", but estimating shares by survey or from play over time is "just not feasible" (human, 2026-10-21).
 - **The goal:** "people feeling like they are in control/capable of putting 'quirky' answers to live so that they feel smart while simultaneously still feeling some sort of danger" (human, 2026-10-21).
 - **Decided: the Wind steals letters** (human, 2026-10-21: "we are going to steal letters from the players. maybe not one every round, but enough to create a sense of urgency"). Stolen letters are visible and stay gone for the rest of the run, as in the lead idea the human chose ("i like the first idea", 2026-10-21). The built rules are in "Rules to build (13c)" above.
@@ -117,7 +118,7 @@ Evidence so far (scratchpad runs, 2026-10-21):
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
 - [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
-- [ ] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21). An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests use a fixed clock to cover an answer just before and just after the deadline.
+- [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
@@ -181,6 +182,10 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Rule 3: a question starts on Start or Next | Until 13c-4, a question after the first starts when the previous answer is stored | "Next" is 13c-4; it will move the start to the tap |
+| DECISIONS.md, Q4 (M00, human 2026-10-17): a run started just before the reset is abandoned and scores 0 | No run is abandoned. The timer ends unfinished runs, and a run started before midnight can be finished after it | The human's G13 answer, 2026-10-21. DECISIONS.md is updated, and the leaderboard part waits for M08 |
+| The 13c-2 criterion: "DB tests use a fixed clock" | They move the run's stored times back | Postgres's clock can't be set for a test; the deadline is derived from the stored times, so moving them back is the same thing |
+| DECISIONS.md Config: tunables live in `tunables.ts` | The 20 seconds lives in SQL (`private.question_deadline`) | The database is the judge of the deadline, and the client only shows the time left the server measured, so TypeScript never needs the number. One place, not two |
 | Rules to build, rule 2: refuse text with a stolen letter (step 2), and typos only onto names that avoid stolen letters (step 4) | 13c-1 builds rule 2 without the stolen-letter parts | There are no stolen letters until 13c-3, which adds both parts and their tests |
 | M02 2g survey ticket (lines 64, 69): the scorer counts only an exact match, "the game never guesses" | `survey:score` now reads text with `resolveTyped`, auto-correcting one typo | The scorer's purpose is to score "the way the game scores play", and the game now auto-corrects (human, 2026-10-21). Re-scoring changes the recorded numbers (e.g. "Texsa" becomes Texas, caught) |
 | The 13c-1 criterion as merged in PR #22: "checked … by `check:client-bundle`" | Checked by `payload.test.ts` and a browser request | `check:client-bundle` scans only for secrets and server env values, so it can't detect an answer list |
@@ -200,7 +205,26 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
   - "socer" + Enter showed "Safe! You said soccer; the host said tennis." and question 2.
   - The local database then held the miss `0|quidditchball` and the answer `0|soccer|f`.
 
+**13c-2 the timer** (branch `m13-game-mechanics`, 2026-10-21, local stack):
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 60 tests passed, rerun after the review fixes. Besides the two midnight tests (yesterday's run goes on and is shown instead of today's puzzle; a retried answer to yesterday's timed-out run shows its ending), the five new timer tests:
+  - 20 seconds from Start, and a refresh keeps the same deadline;
+  - an answer 18 seconds in counts, and the next question gets its own 20 seconds;
+  - an answer after 21 seconds ends the run as `timed_out`, with no answer stored;
+  - no answer by the deadline shows `timed_out` without a write;
+  - off-list text after the deadline shows the ending instead of a 409.
+- `npx supabase test db`: 4 files, 77 tests passed, rerun after the review fixes. They include plor_app's exact grant list with execute on `private.question_deadline`; an answer to a run started before the reset living after it; and an answer 21 seconds in throwing OB005, with the run `timed_out`.
+- `npm test -- --exclude ".claude/**"`: 18 files, 135 passed. `npx eslint .`: clean.
+- **In the browser:** Start showed "18 seconds left" three seconds in. "socer" + Enter showed question 2 at "19 seconds left". After 20 seconds with no answer, the screen read "Time's up on question 2 / You survived 1 of 7 questions".
+
 ## Review
+**13c-2** (reviewer agent, 2026-10-21; no way to beat the timer was found):
+- Blocking findings and how each was fixed:
+  - The plor_app grant was waiting for approval: the human approved it, and DECISIONS.md records that.
+  - The countdown's 200 ms tick had no origin: it now wakes when the shown second changes, so no number is needed. "1 seconds" became "1 second" in the same line.
+  - 'timed_out' ranked above 'abandoned' had made "abandoned runs score 0" nearly unreachable, with no rule for midnight: the human answered G13. The timer, not midnight, ends a run, 'abandoned' and OB001 are removed, and new SQL and db tests cover it.
+  - The ticket still said 20 seconds per question was "to confirm": the human confirmed it.
+- Deferred to ROADMAP "Next revision": items under "M13 13c-2 review".
+
 **13c-1** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
   - The deleted miss test's `not_current_question` case had no replacement: added to the free-retry db test.

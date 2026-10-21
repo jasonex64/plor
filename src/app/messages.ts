@@ -21,7 +21,6 @@ const MESSAGES: Record<string, string> = {
   no_profile: "Pick a username before you play.",
   no_puzzle_today: "There's no puzzle today yet. Check back later.",
   no_run: "Start today's puzzle first.",
-  day_over: "That day's puzzle has ended. Reload the page for today's.",
   run_over: "This run is already over.",
   out_of_order: "That question isn't the current one. Reload the page.",
   already_answered: "You already answered that question. Reload the page.",

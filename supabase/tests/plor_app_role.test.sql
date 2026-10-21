@@ -59,6 +59,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.missed_answer insert', 'private.missed_answer select',
   'private.profile insert', 'private.profile select',
   'private.puzzle select',
+  -- The status view and the answer trigger compute each question's deadline as plor_app (M13 13c-2).
+  'private.question_deadline(timestamp with time zone) execute',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',

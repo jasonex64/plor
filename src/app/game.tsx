@@ -1,8 +1,8 @@
 "use client";
 
 // Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
-// text; human, 2026-10-21), a free retry for text that names no entry, and a result screen.
-import { useEffect, useState, type FormEvent } from "react";
+// text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, and a result screen.
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
 import { ApiError, api } from "@/lib/api-client";
@@ -20,9 +20,11 @@ export function Game() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
+  // Stable, so the countdown below doesn't restart when this component re-renders.
+  const load = useCallback(() => {
     api<RunResponse>("/api/run", { method: "GET" }).then((r) => setRun(r.run), (err) => setError(errorText(err)));
   }, []);
+  useEffect(load, [load]);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -56,6 +58,8 @@ export function Game() {
       {run.status === "in_progress" && run.question && (
         <>
           {last && <LastResult answered={last} />}
+          {/* Keyed by each state the server sends, so a retry restarts the count from the server's own time left. */}
+          <Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={load} />
           <Question
             key={run.question.index}
             question={run.question}
@@ -65,15 +69,31 @@ export function Game() {
           />
         </>
       )}
-      {(run.status === "died" || run.status === "survived") && <Result run={run} />}
-      {run.status === "abandoned" && (
-        <p role="alert">
-          That run was from {run.date}, which has ended. <button type="button" onClick={() => window.location.reload()}>Load today&apos;s puzzle</button>
-        </p>
-      )}
+      {(run.status === "died" || run.status === "survived" || run.status === "timed_out") && <Result run={run} />}
       {error && <p role="alert">{error}</p>}
     </section>
   );
+}
+
+// Seconds left on the current question, counted down from what the server measured. At zero it asks the server
+// again, which decides whether time is up (rule 3); the count itself is only a display.
+function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
+  const [left, setLeft] = useState(msLeft);
+  useEffect(() => {
+    const end = performance.now() + msLeft;
+    let timer: ReturnType<typeof setTimeout>;
+    // Wakes when the shown whole second changes, so the countdown needs no refresh rate of its own.
+    function tick() {
+      const remaining = Math.max(0, end - performance.now());
+      setLeft(remaining);
+      if (remaining === 0) onTimeUp();
+      else timer = setTimeout(tick, remaining % 1000 || 1000);
+    }
+    tick();
+    return () => clearTimeout(timer);
+  }, [msLeft, onTimeUp]);
+  const seconds = Math.ceil(left / 1000);
+  return <p role="timer">{seconds === 1 ? "1 second left" : `${seconds} seconds left`}</p>;
 }
 
 function LastResult({ answered }: { answered: RunState["answered"][number] }) {
@@ -145,7 +165,13 @@ function Result({ run }: { run: RunState }) {
   const survived = run.answered.filter((a) => !a.matched).length;
   return (
     <div>
-      <h2>{run.status === "survived" ? `You survived all ${run.total}!` : `Caught on question ${run.answered.length}`}</h2>
+      <h2>
+        {run.status === "survived"
+          ? `You survived all ${run.total}!`
+          : run.status === "timed_out"
+            ? `Time's up on question ${run.answered.length + 1}`
+            : `Caught on question ${run.answered.length}`}
+      </h2>
       <p>
         You survived {survived} of {run.total} questions. Come back tomorrow for a new puzzle.
       </p>

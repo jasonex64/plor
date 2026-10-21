@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(37);
+select plan(39);
 
 -- Real puzzles and runs may exist for the days used here (staging during the playtest). The whole file runs in
 -- one transaction that is rolled back, so clearing them changes nothing outside the test (2b review).
@@ -93,13 +93,22 @@ select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date,
                    values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 2, 'z', false)$$,
   'OB003', null, 'nothing can be answered after the last question');
 
--- Yesterday's run: the day is over.
+-- M13 13c-2: 20 seconds per question, and the timer, not midnight, ends an unfinished run (human, 2026-10-21).
+-- Yesterday's run started just now, as if just before midnight: it can still be answered.
 insert into private.run (user_id, game_id, puzzle_date) values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today() - 1);
-select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
-                   values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today() - 1, 0, 'x', false)$$,
-  'OB001', null, 'an answer after the reset is day_over, raised by the trigger');
+select lives_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
+                  values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today() - 1, 0, 'x', false)$$,
+  'a run started before the reset can be answered after it');
 select is((select status from private.run_status where user_id = '00000000-0000-0000-0000-0000000000a3' and puzzle_date = private.today() - 1),
-  'abandoned', 'an unfinished run from an earlier day is abandoned');
+  'in_progress', 'it is still in progress while its question has time left');
+-- A run whose current question started 21 seconds ago.
+insert into private.run (user_id, game_id, puzzle_date, started_at)
+  values ('00000000-0000-0000-0000-0000000000a2', 'offbeat', private.today() + 1, statement_timestamp() - interval '21 seconds');
+select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
+                   values ('00000000-0000-0000-0000-0000000000a2', 'offbeat', private.today() + 1, 0, 'x', false)$$,
+  'OB005', null, 'an answer after the question''s 20 seconds is time_up, raised by the trigger');
+select is((select status from private.run_status where user_id = '00000000-0000-0000-0000-0000000000a2' and puzzle_date = private.today() + 1),
+  'timed_out', 'a run whose question ran out of time is timed out');
 
 -- Logged misses: 1 to 40 characters, already trimmed.
 select lives_ok($$insert into private.missed_answer (user_id, game_id, puzzle_date, question_idx, typed)
