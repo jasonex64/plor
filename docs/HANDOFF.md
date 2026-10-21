@@ -5,12 +5,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 **Updated:** 2026-10-21, by the session that closed M05, ran the docs audit and merged #32.
 
 ## Where things stand
-- **Milestone:** M06, Puzzle entry. Ticket drafted (`docs/milestones/M06-puzzle-entry.md`), waiting for the human's approval.
+- **Milestone:** M06, Puzzle entry. Ticket redrafted after the human's answers (`docs/milestones/M06-puzzle-entry.md`), waiting for approval and Q1.
 - **Branch:** `m06-puzzle-entry`. Its first PR, #32, holds the docs audit (MVP redefined, puzzle entry inserted, milestones renumbered M07–M15, docs cleaned up). Merged on green CI (human, 2026-10-21: "manual is fine", summary "looks fine").
 - **Merged today:** M05 Share (#30), the first reorder (#31).
 
 ## Waiting on the human
-- M06: decisions P1–P4 and the number of upcoming days the list shows (ticket). For M07: the display name's length and characters. For M12: whether usernames can change, and how often. Claude explained the tradeoffs on 2026-10-21 and suggested a limit of once a month (a human number).
+- M06: approval of the redrafted ticket, and Q1 (where the human writes the questions). For M07: the display name's length and characters. For M12: whether usernames can change, and how often. Claude explained the tradeoffs on 2026-10-21 and suggested a limit of once a month (a human number).
 
 ## Next step
 Once the human approves the M06 ticket: build it in the order of its Plan, on `m06-puzzle-entry`.
