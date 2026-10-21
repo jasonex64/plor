@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-02",
   "questions": [
@@ -86,7 +86,8 @@
         "horse"
       ],
       "host_answers": [],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "m"
     },
     {
       "prompt": "Name an African mammal",
@@ -178,7 +179,8 @@
         "green",
         "yellow"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "c"
     },
     {
       "prompt": "Name a planet",
@@ -241,13 +243,10 @@
         "mercury"
       ],
       "host_answers": [
-        "mars",
-        "jupiter",
-        "saturn",
-        "earth",
         "venus"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "t"
     },
     {
       "prompt": "Name a month",
@@ -344,10 +343,6 @@
       ],
       "host_answers": [
         "january",
-        "february",
-        "march",
-        "april",
-        "may",
         "june"
       ],
       "match_groups": {}
@@ -444,14 +439,10 @@
       ],
       "host_answers": [
         "aries",
-        "taurus",
-        "gemini",
-        "cancer",
-        "leo",
-        "virgo",
         "libra"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "o"
     }
   ]
 }

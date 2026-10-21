@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-02",
   "questions": [
@@ -1024,7 +1024,8 @@
       "host_answers": [
         "owl"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "d"
     },
     {
       "prompt": "Name something that flies",
@@ -1530,7 +1531,8 @@
       "host_answers": [
         "maple"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "b"
     },
     {
       "prompt": "Name a kind of pasta",
@@ -1699,7 +1701,8 @@
       "host_answers": [
         "penne"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "l"
     },
     {
       "prompt": "Name a kind of nut",
@@ -2022,7 +2025,8 @@
       "host_answers": [
         "rain"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "o"
     }
   ]
 }

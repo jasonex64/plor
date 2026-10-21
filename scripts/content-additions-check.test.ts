@@ -3,7 +3,7 @@ import type { Puzzle } from "../src/content/puzzle.ts";
 import { compareAdditions } from "./content-additions-check.ts";
 
 const before: Puzzle = {
-  format: 1,
+  format: 2,
   game_id: "offbeat",
   date: "2026-10-26",
   questions: [

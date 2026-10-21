@@ -118,6 +118,16 @@ function Question({
 }) {
   const [typed, setTyped] = useState("");
   const [notInList, setNotInList] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState<string | null>(null);
+
+  // A stolen letter's key does nothing (G11, human, 2026-10-21). Filtering the value, not the key press, also
+  // covers paste and phone keyboards; accented letters count as their plain letter, as the server compares them.
+  function change(value: string) {
+    const kept = [...value].filter((ch) => !question.stolen.includes(ch.toLowerCase().normalize("NFKD").replace(/\p{M}/gu, "")));
+    setBlocked(kept.length < [...value].length ? [...value].find((ch) => !kept.includes(ch))!.toUpperCase() : null);
+    setTyped(kept.join(""));
+    setNotInList(null);
+  }
 
   // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight.
   async function submit(event: FormEvent) {
@@ -136,6 +146,11 @@ function Question({
         Question {question.index + 1} of {total}
       </p>
       <h2>{question.prompt}</h2>
+      {question.stolen.length > 0 && (
+        <p>
+          The Wind has taken: <strong>{question.stolen.map((l) => l.toUpperCase()).join(" ")}</strong>
+        </p>
+      )}
       <form onSubmit={submit}>
         <label>
           Your answer
@@ -146,15 +161,13 @@ function Question({
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            onChange={(e) => {
-              setTyped(e.target.value);
-              setNotInList(null);
-            }}
+            onChange={(e) => change(e.target.value)}
           />
         </label>
         <button type="submit" disabled={busy || typed.trim() === ""}>
           Answer
         </button>
+        {blocked && <p role="status">The Wind took {blocked}. Try a word without it.</p>}
         {notInList && <p role="status">&quot;{notInList}&quot; isn&apos;t in our list. Try another answer.</p>}
       </form>
     </div>

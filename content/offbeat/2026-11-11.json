@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-11",
   "questions": [
@@ -1476,7 +1476,8 @@
       "host_answers": [
         "make-the-bed"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name something people do to relax",
@@ -2624,7 +2625,8 @@
       "host_answers": [
         "abraham-lincoln"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name something that's sticky",
@@ -3149,7 +3151,8 @@
       "host_answers": [
         "honey"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "s"
     },
     {
       "prompt": "Name a state in New England",
@@ -3469,7 +3472,8 @@
       "host_answers": [
         "tornado"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "e"
     }
   ]
 }

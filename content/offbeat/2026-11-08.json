@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-08",
   "questions": [
@@ -742,7 +742,8 @@
       "host_answers": [
         "waffle"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name a state that's entirely east of the Mississippi River",
@@ -1239,7 +1240,8 @@
       "host_answers": [
         "cowboy-hat"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name an herb",
@@ -1441,7 +1443,8 @@
       "host_answers": [
         "basil"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "t"
     },
     {
       "prompt": "Name a piece of bedroom furniture",
@@ -1783,7 +1786,8 @@
       "host_answers": [
         "sneakers"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "i"
     }
   ]
 }

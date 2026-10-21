@@ -1,13 +1,14 @@
 // What the client may see of a puzzle (DECISIONS.md: Game 1, "Server is authoritative"; Answer model).
-// Before a question is answered: its prompt only. The answer list stays on the server, since showing it was a
+// Before a question is answered: its prompt and the stolen letters only. The answer list stays on the server, since showing it was a
 // free hint (human, 2026-10-21). After it is answered: the player's entry and the host answer(s).
-import type { Entry, Puzzle, Question } from "@/content/puzzle";
+import { stolenLetters, type Entry, type Puzzle, type Question } from "@/content/puzzle";
 
-export type PublicQuestion = { index: number; prompt: string };
+// stolen: the letters the Wind has taken by this question, which the answer box refuses (M13 13c-3).
+export type PublicQuestion = { index: number; prompt: string; stolen: string[] };
 export type Named = { id: string; name: string };
 
 export function publicQuestion(puzzle: Puzzle, index: number): PublicQuestion {
-  return { index, prompt: puzzle.questions[index].prompt };
+  return { index, prompt: puzzle.questions[index].prompt, stolen: stolenLetters(puzzle, index) };
 }
 
 export function hostAnswers(question: Question): Named[] {

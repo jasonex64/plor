@@ -13,6 +13,13 @@ export const USERNAME_MAX_LENGTH = 20;
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4;
 
+// Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M13-game-mechanics.md, "Rules to build", rule 4):
+// the tier the Wind steals from at each question, or null for no theft. Tiers are the M13 ticket's measured grouping
+// (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels
+// E A I O.
+export const LETTER_TIERS = { medium: "cphubdmg", heavy_consonant: "rnlts", vowel: "eaio" } as const;
+export const LETTER_SCHEDULE: (keyof typeof LETTER_TIERS | null)[] = [null, "medium", null, "medium", "heavy_consonant", null, "vowel"];
+
 // Puzzle insights report (human, 2026-10-19; docs/milestones/M03-puzzle-insights.md, Numbers).
 // A question's catch rate counts once this many players answered it; fewer is shown as "too few".
 export const INSIGHTS_MIN_PLAYERS = 5;

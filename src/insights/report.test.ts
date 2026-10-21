@@ -7,7 +7,7 @@ function question(prompt: string, ids: string[], host: string[], bank: string[])
 }
 const animals = ["dog", "cat", "axolotl", "lion", "owl", "yak", "emu"];
 const puzzle: Puzzle = {
-  format: 1,
+  format: 2,
   game_id: "offbeat",
   date: "2026-10-26",
   questions: [

@@ -79,7 +79,8 @@ export function scoreSet(date: string, puzzle: Puzzle, responses: Response[]): {
     puzzle.questions.forEach((question, index) => {
       const typed = response.answers[index] ?? "";
       if (typed === "") return;
-      const entryId = resolveTyped(question, typed);
+      // The survey asked without stolen letters, so none apply.
+      const entryId = resolveTyped(question, typed, []);
       if (entryId) {
         answers.push({ question_idx: index, entry_id: entryId, matched: matchAnswer(question, entryId) === "matched" });
         return;

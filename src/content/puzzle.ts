@@ -1,8 +1,8 @@
-// Puzzle content format 1 and its validator (DECISIONS.md: Puzzle content format, Answer model;
+// Puzzle content format 2 and its validator (DECISIONS.md: Puzzle content format, Answer model;
 // M00-data-design.md §4). Hand-written checks, no schema library (human, 2026-10-18). The M02 server
 // imports this same module, so content is checked one way.
 import pluralize from "pluralize";
-import { QUESTIONS_PER_DAY } from "../config/tunables.ts";
+import { LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY } from "../config/tunables.ts";
 
 // Permanent: stored with every run and ledger row (DECISIONS.md: Game 1).
 export const GAME_ID = "offbeat";
@@ -14,8 +14,21 @@ export type Question = {
   host_bank: string[];
   host_answers: string[];
   match_groups: Record<string, string[]>;
+  // The letter the Wind steals at this question (format 2; M13 13c-3). It stays gone for the rest of the run.
+  steals?: string;
 };
-export type Puzzle = { format: 1; game_id: typeof GAME_ID; date: string; questions: Question[] };
+export type Puzzle = { format: 2; game_id: typeof GAME_ID; date: string; questions: Question[] };
+
+// The letters gone by question `index`: every letter stolen at it or before it.
+export function stolenLetters(puzzle: Puzzle, index: number): string[] {
+  return puzzle.questions.slice(0, index + 1).flatMap((q) => (q.steals ? [q.steals] : []));
+}
+
+// Whether a name can be typed without the stolen letters, compared after normalization.
+export function avoids(name: string, stolen: string[]): boolean {
+  const text = normalize(name);
+  return !stolen.some((letter) => text.includes(letter));
+}
 
 // Authoring-time normalization (human-approved format, 2026-10-18; SOURCES.md: Unicode normalization).
 // Lowercase first: lowercasing can produce combining marks (e.g. U+0130), which NFKD + \p{M} then remove.
@@ -84,8 +97,9 @@ function checkQuestion(errors: string[], where: string, v: unknown) {
     errors.push(`${where}: must be an object`);
     return;
   }
-  checkKeys(errors, where, v, ["prompt", "entries", "host_bank", "host_answers", "match_groups"]);
+  checkKeys(errors, where, v, ["prompt", "entries", "host_bank", "host_answers", "match_groups"], ["steals"]);
   if ("prompt" in v && !isText(v.prompt)) errors.push(`${where}: "prompt" must be a non-empty string`);
+  if ("steals" in v && (typeof v.steals !== "string" || !/^[a-z]$/.test(v.steals))) errors.push(`${where}: "steals" must be one lower-case letter a-z`);
   if ("entries" in v) {
     if (!Array.isArray(v.entries)) errors.push(`${where}: "entries" must be a list`);
     else v.entries.forEach((entry, i) => checkEntry(errors, `${where} entries[${i}]`, entry));
@@ -112,7 +126,7 @@ export function parsePuzzle(file: string, text: string): { puzzle: Puzzle; error
   if (!isObject(data)) return { puzzle: null, errors: [`${file}: must be a JSON object`] };
   const errors: string[] = [];
   checkKeys(errors, file, data, ["format", "game_id", "date", "questions"]);
-  if ("format" in data && data.format !== 1) errors.push(`${file}: "format" must be 1`);
+  if ("format" in data && data.format !== 2) errors.push(`${file}: "format" must be 2`);
   if ("game_id" in data && data.game_id !== GAME_ID) errors.push(`${file}: "game_id" must be "${GAME_ID}"`);
   if ("date" in data && !isCalendarDate(data.date)) errors.push(`${file}: "date" must be a calendar date YYYY-MM-DD`);
   if ("questions" in data) {
@@ -191,5 +205,36 @@ export function checkPuzzleFile(file: string, text: string): string[] {
     out.push(`${file}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
   }
   puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${file} q${i + 1}`, q)));
+  if (puzzle.questions.length === QUESTIONS_PER_DAY) out.push(...checkStolenLetters(file, puzzle));
+  return out;
+}
+
+// M13 "Rules to build", rule 6: the letters follow schedule A, and stealing them never makes a question pointless
+// (a host answer nobody can type adds no danger) or impossible (no safe answer left to type).
+export function checkStolenLetters(file: string, puzzle: Puzzle): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  puzzle.questions.forEach((q, i) => {
+    const where = `${file} q${i + 1}`;
+    const tier = LETTER_SCHEDULE[i];
+    if (tier === null && q.steals) out.push(`${where}: steals "${q.steals}", but schedule A steals nothing at question ${i + 1}`);
+    if (tier !== null && !q.steals) out.push(`${where}: schedule A steals a ${tier.replace("_", " ")} letter here, and "steals" is missing`);
+    if (tier !== null && q.steals && !LETTER_TIERS[tier].includes(q.steals)) {
+      out.push(`${where}: steals "${q.steals}", which is not a ${tier.replace("_", " ")} letter (${LETTER_TIERS[tier]})`);
+    }
+    if (q.steals && seen.has(q.steals)) out.push(`${where}: steals "${q.steals}", which an earlier question already stole`);
+    if (q.steals) seen.add(q.steals);
+    const stolen = stolenLetters(puzzle, i);
+    if (stolen.length === 0) return;
+    const typeable = (e: Entry) => [e.name, ...e.aliases].some((n) => avoids(n, stolen));
+    for (const id of q.host_answers) {
+      const host = q.entries.find((e) => e.id === id);
+      if (host && !typeable(host)) out.push(`${where} entry "${id}": host answer can't be typed without ${stolen.join(", ").toUpperCase()}`);
+    }
+    const caught = new Set(q.host_answers.flatMap((id) => [id, ...(q.match_groups[id] ?? [])]));
+    if (!q.entries.some((e) => !caught.has(e.id) && typeable(e))) {
+      out.push(`${where}: no safe answer can be typed without ${stolen.join(", ").toUpperCase()}`);
+    }
+  });
   return out;
 }

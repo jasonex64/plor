@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-21",
   "questions": [
@@ -1548,7 +1548,8 @@
       "host_answers": [
         "tango"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "b"
     },
     {
       "prompt": "Name something that's soft",
@@ -2816,7 +2817,8 @@
       "host_answers": [
         "poseidon"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "m"
     },
     {
       "prompt": "Name something you'd see in a hospital",
@@ -3637,7 +3639,8 @@
       "host_answers": [
         "wheelchair"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "s"
     },
     {
       "prompt": "Name a punctuation mark",
@@ -3915,7 +3918,8 @@
       "host_answers": [
         "smell"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "e"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-10-27",
   "questions": [
@@ -1885,7 +1885,8 @@
       "host_answers": [
         "shark"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "g"
     },
     {
       "prompt": "Name a holiday",
@@ -3063,7 +3064,8 @@
       "host_answers": [
         "traffic"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name a frozen treat",
@@ -3349,7 +3351,8 @@
       "host_answers": [
         "ice-cream"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "n"
     },
     {
       "prompt": "Name a card rank (ace, two through ten, jack, queen or king)",
@@ -3590,7 +3593,8 @@
         "december",
         "july"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "i"
     }
   ]
 }

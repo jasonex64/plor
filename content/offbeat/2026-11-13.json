@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-13",
   "questions": [
@@ -1050,7 +1050,8 @@
       "host_answers": [
         "alligator"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a kind of sandwich",
@@ -2238,7 +2239,8 @@
       "host_answers": [
         "rib"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "d"
     },
     {
       "prompt": "Name a piece of jewelry",
@@ -2468,7 +2470,8 @@
       "host_answers": [
         "necklace"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "n"
     },
     {
       "prompt": "Name a decade of the 20th century (the 1900s to the 1990s)",
@@ -3220,7 +3223,8 @@
       "host_answers": [
         "fire"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "i"
     }
   ]
 }

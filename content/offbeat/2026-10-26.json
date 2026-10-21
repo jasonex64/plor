@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-10-26",
   "questions": [
@@ -2025,7 +2025,8 @@
       "host_answers": [
         "texas"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "h"
     },
     {
       "prompt": "Name something to do on a rainy day",
@@ -2685,7 +2686,8 @@
       "host_answers": [
         "a"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a letter of the Greek alphabet",
@@ -2895,7 +2897,8 @@
       "host_answers": [
         "alpha"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "n"
     },
     {
       "prompt": "Name a way to cook an egg",
@@ -3181,7 +3184,8 @@
         "leo",
         "scorpio"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

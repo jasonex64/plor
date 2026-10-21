@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-09",
   "questions": [
@@ -1574,7 +1574,8 @@
       "host_answers": [
         "triceratops"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "h"
     },
     {
       "prompt": "Name something people often lose",
@@ -2510,7 +2511,8 @@
       "host_answers": [
         "italy"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "b"
     },
     {
       "prompt": "Name a kind of soup",
@@ -3140,7 +3142,8 @@
       "host_answers": [
         "french-onion-soup"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "l"
     },
     {
       "prompt": "Name a day of the week",
@@ -3286,7 +3289,8 @@
       "host_answers": [
         "queen"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

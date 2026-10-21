@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-22",
   "questions": [
@@ -891,7 +891,8 @@
       "host_answers": [
         "dusting"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name an animal with a three-letter name",
@@ -1398,7 +1399,8 @@
       "host_answers": [
         "cone"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "h"
     },
     {
       "prompt": "Name a word that rhymes with \"cat\"",
@@ -1785,7 +1787,8 @@
       "host_answers": [
         "mat"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "s"
     },
     {
       "prompt": "Name one of the Great Lakes",
@@ -1923,7 +1926,8 @@
         "comet",
         "blitzen"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }
