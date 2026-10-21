@@ -58,19 +58,26 @@ export async function publish(client: PoolClient, puzzles: Puzzle[]): Promise<Pu
   return summary;
 }
 
-async function askHidden(prompt: string): Promise<string> {
-  if (!process.stdin.isTTY) throw new Error("content:publish asks for the password, so it needs an interactive terminal");
-  process.stdout.write(prompt);
-  process.stdin.setRawMode(true);
-  process.stdin.setEncoding("utf8");
-  process.stdin.resume();
+// Reads a password without echoing it. The streams are arguments so the test can drive it; main passes
+// process.stdin and process.stdout. Input that ends before Enter rejects instead of waiting forever (M02 2f, B7).
+export async function askHidden(prompt: string, input: NodeJS.ReadStream, output: NodeJS.WriteStream): Promise<string> {
+  if (!input.isTTY) throw new Error("content:publish asks for the password, so it needs an interactive terminal");
+  output.write(prompt);
+  input.setRawMode(true);
+  input.setEncoding("utf8");
+  input.resume();
   return new Promise((resolve, reject) => {
     let value = "";
     const done = () => {
-      process.stdin.setRawMode(false);
-      process.stdin.pause();
-      process.stdin.off("data", onData);
-      process.stdout.write("\n");
+      input.setRawMode(false);
+      input.pause();
+      input.off("data", onData);
+      input.off("end", onEnd);
+      output.write("\n");
+    };
+    const onEnd = () => {
+      done();
+      reject(new Error("the input ended before the password was entered"));
     };
     const onData = (chunk: string) => {
       for (const ch of chunk) {
@@ -87,7 +94,8 @@ async function askHidden(prompt: string): Promise<string> {
         value = ch === "\u007f" || ch === "\b" ? value.slice(0, -1) : value + ch;
       }
     };
-    process.stdin.on("data", onData);
+    input.on("data", onData);
+    input.on("end", onEnd);
   });
 }
 
@@ -109,7 +117,7 @@ async function main() {
   for (const line of gaps) console.error(line);
   if (gaps.length) throw new Error("the puzzle dates have gaps; nothing was published");
 
-  const password = await askHidden(`Password for ${target.user}@${target.host}: `);
+  const password = await askHidden(`Password for ${target.user}@${target.host}: `, process.stdin, process.stdout);
   const pool = new Pool({ ...target, password, max: 1, ssl: local ? false : { ca: readFileSync(CA_FILE, "utf8") } });
   try {
     const summary = await withTransaction(pool, (client) => publish(client, puzzles));
