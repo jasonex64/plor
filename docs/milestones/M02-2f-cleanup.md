@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** in review (Part B). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 blocked on the human (its hypothesis was disproved); B21 needs the human's approval of the approach in the PR.
+**Status:** in review (Part B). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 dropped by the human (its hypothesis was disproved); B21 kept by the human as a narrowing, with the item left open for M04 (2026-10-20).
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
@@ -182,7 +182,7 @@ Per item:
 ## Review
 Part B, reviewer agent on the branch at `2f Part B: evidence`, 2026-10-20.
 - Blocking findings and how each was fixed:
-  1. **B21 doesn't close the hazard (open, for the human).** The guard runs when a day's UPDATE runs, but the change becomes visible at COMMIT. `publish()` sends one upsert per day and commits after the last, so an upsert at 23:59:59.6 passes and a COMMIT at 00:00:00.2 still changes a started day. `statement_timestamp()` narrows the window from BEGIN–COMMIT to that statement–COMMIT, which for a publish is about the same few round trips. The ticket's hypothesis was stated too broadly, and the experiment only showed the weaker premise (now() freezes). The human had approved B21 on Claude's overstated summary, so the question goes back to them. The migration comment and ROADMAP now state the remaining window, and the item stays open.
+  1. **B21 doesn't close the hazard (open, for the human).** The guard runs when a day's UPDATE runs, but the change becomes visible at COMMIT. `publish()` sends one upsert per day and commits after the last, so an upsert at 23:59:59.6 passes and a COMMIT at 00:00:00.2 still changes a started day. `statement_timestamp()` narrows the window from BEGIN–COMMIT to that statement–COMMIT, which for a publish is about the same few round trips. The ticket's hypothesis was stated too broadly, and the experiment only showed the weaker premise (now() freezes). The human had approved B21 on Claude's overstated summary, so the question went back to them. **Decided by the human, 2026-10-20, with the corrected picture: keep the change as a narrowing and leave the item open; the full fix (a commit-time check) comes when M04 automates publishing.** The migration comment and ROADMAP state the remaining window.
 - Deferred to ROADMAP "Next revision": `?date=0000-01-01` still a 500; `.next/server/pages/404.html` and `500.html` not scanned; the pg `error`-listener item's wording (routes use `pool.query`, which listens; only `withTransaction`, used by `content:publish`, checks out); the B16 rule unwritten in DECISIONS.md; B7 listens for `end`, not `close`; the B3 test computes its expected day with the code's own subquery; the B4 test sits between a comment and the test it describes; the 2g docs commits ride in the Part B PR.
 
 Part A, reviewer agent on `aa086b5`, 2026-10-20.
