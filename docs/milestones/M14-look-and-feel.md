@@ -24,7 +24,8 @@ The look comes after every functional milestone (human, 2026-10-21), so the scop
 6. Caught: the Wind blows the player off the ridge.
 7. Result: caught, time's up or survived; the reset countdown; the Share button (M05) and its placeholder symbols (ROADMAP Next revision).
 8. Errors and loading.
-9. Every screen added by M07 friends and live board, M08 comments and reactions, M09 points and friends leaderboard, M10 groups, M11 home screen and M12 account.
+9. The admin pages (insights, M03; puzzle entry, M06): "everything should look nice eventually" (human, 2026-10-21).
+10. Every screen added by M07 friends and live board, M08 comments and reactions, M09 points and friends leaderboard, M10 groups, M11 home screen and M12 account.
 
 ## Carried over from the closed M12 draft (PR #12) (the human's decisions, 2026-10-20)
 - **Concept (D16):** "Go with the trail along a cliff edge: friends fall off at the stop where they got caught."
@@ -67,7 +68,6 @@ Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, c
 ## Out of scope
 - Building the features themselves: free-text answers and points during the run were built in M04; the friends, comments, points, groups, home screen and account features are built in M07–M12. This milestone only gives their screens the look.
 - Navigation tabs, settings, avatars and cosmetic frames: later, by the human (2026-10-20). Groups and the home screen were too, until the human pulled them in as M10 and M11 (2026-10-21); their look belongs here.
-- The admin pages (insights, M03; puzzle entry, M06): Claude's draft, an open question for the human (ROADMAP Next revision, For M14).
 - PixelLab assets (D14 above).
 
 ## Numbers

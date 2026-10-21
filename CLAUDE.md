@@ -1,7 +1,12 @@
 # Agent Rules
 
 This file is kept short on purpose. Read all of it before every task, and open the linked docs when a step tells you to.
-Add a rule here only after an agent has actually made that mistake. Rules for problems nobody has hit yet are bloat too.
+Add a rule here only after an agent has actually made that mistake, or when the human asks for one. Rules for problems nobody has hit yet are bloat too.
+
+## Sessions are independent
+Every session starts with no memory of earlier ones. Everything the next session needs is in the repo. *(Human, 2026-10-21.)*
+- **First thing:** read `docs/HANDOFF.md`, then run `git branch -a` and `gh pr list`. If a milestone branch or PR is open, read `docs/HANDOFF.md` on that branch too; the most recently updated one wins.
+- **Last thing:** before a session ends, or hands work to another agent, rewrite `docs/HANDOFF.md` and commit it on the branch you worked on. Say where things stand, what's half done, what waits on the human, anything left running, and the next step. Keep it short; history belongs in git.
 
 ## Before writing code
 1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval.
@@ -67,7 +72,11 @@ Branches and PRs:
 | File | Purpose |
 |---|---|
 | `docs/ROADMAP.md` | Milestone order and status, plus deferred "Next revision" items |
-| `docs/milestones/` | One ticket per milestone (copy `_TEMPLATE.md`) |
+| `docs/HANDOFF.md` | Where the last session stopped: read first, rewritten last |
+| `docs/milestones/` | One ticket per milestone, plus a file per large sub-ticket (copy `_TEMPLATE.md`) |
 | `docs/SOURCES.md` | The only authoritative sources |
 | `docs/DECISIONS.md` | The single chosen way for each concern, plus the hard-to-reverse designs |
 | `.claude/agents/reviewer.md` | Independent milestone reviewer |
+| `AGENTS.md` | The Next.js rule that `next dev` writes: read the bundled Next.js docs before writing Next.js code. Imported below so every session loads it |
+
+@AGENTS.md
