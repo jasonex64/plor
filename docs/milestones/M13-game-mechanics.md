@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: the play loop (13c-1 to 13c-4) is merged (PRs #23 to #27), and G1 (1000-point scoring) is in review, 2026-10-21. Nothing is published for now (Claude's reading of the human's content statement; G6 is open). Open: G3 (tuned together later), G6, 13b, 13d (content, deferred) and 13e.
+**Status:** done (closed 2026-10-21 at the human's request: "fix roadmap/scheudling so that we can get ready to clear out this milestone and start the next"). The play loop is merged (PRs #23 to #28). What was deferred moved to M14 (answer lists and content) or M11 (publishing); see the criteria below and ROADMAP.
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -116,20 +116,20 @@ Evidence so far (scratchpad runs, 2026-10-21):
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
-- [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points were first shown with DECISIONS.md's old rule while G1 was open, at the human's request; G1 is now answered (1000 for a perfect run).
+- [x] **13a** *(G6, which days to play, moved to M14 with the content; every other G is answered.)* The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points were first shown with DECISIONS.md's old rule while G1 was open, at the human's request; G1 is now answered (1000 for a perfect run).
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [x] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
-- [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result). *The staging part is deferred: Claude's reading of the human's "dont worry about pushing it or making it public. full fleshout of the app comes first" (2026-10-21), since staging isn't public either; to confirm.*
+- [ ] **13b** *(Moved: playing on staging goes to M11 with publishing; the days to play are G6, in M14. Locally, a day plays from start to finish: 13c-1 to 13c-4 browser evidence.)* A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result). *The staging part is deferred: Claude's reading of the human's "dont worry about pushing it or making it public. full fleshout of the app comes first" (2026-10-21), since staging isn't public either; to confirm.*
 - [x] **13c-4 The rest of the play loop** on `src/app/game.tsx` (except the answer-time measurement, which waits for G7):
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
   - [x] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
   - [x] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows. First built with the old k points for question k while G1 was open; G1 since changed it to 25 to 350 (1000 for a perfect run).
   - [x] A countdown to the reset is shown on the result screen, from the next reset instant the server computes in SQL next to `private.today()` (`private.next_reset`; ROADMAP item from the M00 review). Since G13, the reset no longer ends a run.
-  - [ ] Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
+  - [x] *(No speed target: G7, human, 2026-10-21. A second Enter can't send twice: `busy` blocks it, and the server's idempotent answer path returns the stored result.)* Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
   - [x] The result screen shows the run's points (G1), and each question's.
-- [ ] **13d** *(Deferred, human 2026-10-21: content and publishing wait until the app is fleshed out.)* The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
-- [ ] **13e** *(Locally for now; staging is deferred with publishing, human 2026-10-21.)* Full runs cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
+- [ ] **13d** *(Moved to M14: content tuning waits until the app is fleshed out, human 2026-10-21.)* The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
+- [x] **13e** *(Locally, by the db tests below; on staging moves to M11 with publishing.)* Full runs cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
 
 ## Out of scope
 After the MVP (human, 2026-10-20):
@@ -197,6 +197,12 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading at first; confirmed by the human, 2026-10-21 |
 
 ## Evidence
+**13e full runs, locally** (branch `m13-game-mechanics`, 2026-10-21): `npm run test:db -- --exclude ".claude/**" src/game/runs.db.test.ts`: 71 tests passed. They cover, through the routes against the local database:
+- a full 7-of-7 run scoring 1000;
+- a catch on every question number, each ending the run there with the points before it (7 tests, added to close M13);
+- a time-out with and without an answer;
+- an off-list retry;
+- a refresh keeping the same deadline.
 **G1 scoring, 25 to 350, 1000 for a perfect run** (branch `m13-game-mechanics`, 2026-10-21, local stack):
 - `npm test -- --exclude ".claude/**"`: 19 files, 147 tests passed. `npx eslint .`: clean.
 - `npm run test:db -- --exclude ".claude/**"`: 8 files, 64 tests passed, including a full 7-of-7 run scoring 1000.

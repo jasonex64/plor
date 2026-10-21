@@ -257,6 +257,21 @@ describe("a run, step by step", () => {
 });
 
 describe("other ways a run ends", () => {
+  // M13 13e: a catch on every question number ends the run there, with the points of the questions before it.
+  it.each([0, 1, 2, 3, 4, 5, 6])("ends the run when the host catches question %i (0-based), keeping the points before it", async (caughtAt) => {
+    const player = await newPlayer(`c${caughtAt}`);
+    useSession(player.session);
+    await start();
+    for (let i = 0; i < caughtAt; i++) {
+      await answer(i, safeEntry(puzzle, i));
+      await next();
+    }
+    const { body } = await answer(caughtAt, puzzle.questions[caughtAt].host_answers[0]);
+    expect(body.run).toMatchObject({ status: "died", question: null, next: null });
+    expect(body.run.answered).toHaveLength(caughtAt + 1);
+    expect(body.run.points).toBe(POINTS_PER_QUESTION.slice(0, caughtAt).reduce((sum, p) => sum + p, 0));
+  });
+
   it("survives when every question is answered without a match", async () => {
     const player = await newPlayer("s");
     useSession(player.session);
