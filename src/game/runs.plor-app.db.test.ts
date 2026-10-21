@@ -48,7 +48,7 @@ describe("a run as plor_app", () => {
       const safe = q.entries.find((e) => matchAnswer(q, e.id) === "not_matched")!;
       const after = await answer(client, userId, 0, safe.name);
       expect(after.run.answered).toHaveLength(1);
-      expect((await answer(client, userId, 1, "something unlisted")).notInList).toBe(true);
+      expect((await answer(client, userId, 1, "zzz zzz")).notInList).toBe(true);
       expect((await todaysState(client, userId)).question?.index).toBe(1);
     });
   });

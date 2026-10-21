@@ -191,7 +191,9 @@ describe("a run, step by step", () => {
   it("treats text that names no entry as a free retry logged as a miss, and rejects (without logging) more than 40 characters", async () => {
     const count = async () =>
       (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
-    const retry = await answerText(3, "  a thing nobody listed  ");
+    // Z is in no stolen-letter tier (tunables.ts), so this text is typeable on any day (13c-3: an H in "thing" was
+    // stolen by the CI fixture day).
+    const retry = await answerText(3, "  zzz zzz  ");
     expect(retry.status).toBe(200);
     expect(retry.body).toMatchObject({ ok: true, notInList: true, run: { status: "in_progress", question: { index: 3 } } });
     expect(retry.body.run.answered).toHaveLength(3);
@@ -201,7 +203,7 @@ describe("a run, step by step", () => {
     expect(await answerText(5, later)).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
     expect(await count()).toBe(1);
     const { rows } = await getPool().query<{ typed: string }>("select typed from private.missed_answer where user_id = $1", [player.userId]);
-    expect(rows[0].typed).toBe("a thing nobody listed");
+    expect(rows[0].typed).toBe("zzz zzz");
     expect((await state()).body.run).toMatchObject({ status: "in_progress", question: { index: 3 } });
   });
 
