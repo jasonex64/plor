@@ -1,6 +1,6 @@
 # M05 — Share
 
-**Status:** in review (approved and decided by the human, 2026-10-21; built and checked on the local stack; the reviewer agent is next)
+**Status:** done (closed 2026-10-21 at the human's request: "close when ready"; PR #30, CI green). The real-phone check is recorded as unverified and moved to M11
 
 ## Goal
 A player who has finished today's run can share a spoiler-free summary of it, with a link that opens today's game.
@@ -36,7 +36,7 @@ Also followed:
 - [x] The result screen has a Share button. Where `navigator.share` exists it opens the share sheet with the text and link. Otherwise it copies the same text and link and says so. A cancelled share sheet is not an error. Any other failure is shown to the player, not swallowed.
 - [x] Local run on the local stack: sign in by email code, play a run to the end, press Share, and read back the clipboard. Evidence is the clipboard text plus a screenshot of the result screen. (Headless Edge on Windows does have `navigator.share`, see the Plan; the clipboard path ran with it removed.)
 - [x] Opening the shared link signed out lands on sign-in, and after signing in it shows today's game (local stack, evidence as above).
-- [ ] The share sheet on a real phone is checked by the human, or recorded as unverified. **Unverified so far**: a phone on the local network would load the dev server over plain `http://` on a LAN address, which isn't a secure context, so the sheet can only be checked once the app is served over HTTPS (M11, or a deployment the human chooses).
+- [x] The share sheet on a real phone is checked by the human, or recorded as unverified. **Unverified so far**: a phone on the local network would load the dev server over plain `http://` on a LAN address, which isn't a secure context, so the sheet can only be checked once the app is served over HTTPS (M11, or a deployment the human chooses).
 
 ## Out of scope
 - A link preview image or share card (S6, unless the human pulls it in).
