@@ -70,11 +70,6 @@ export function Game() {
         </>
       )}
       {(run.status === "died" || run.status === "survived" || run.status === "timed_out") && <Result run={run} />}
-      {run.status === "abandoned" && (
-        <p role="alert">
-          That run was from {run.date}, which has ended. <button type="button" onClick={() => window.location.reload()}>Load today&apos;s puzzle</button>
-        </p>
-      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );
@@ -86,17 +81,19 @@ function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void 
   const [left, setLeft] = useState(msLeft);
   useEffect(() => {
     const end = performance.now() + msLeft;
-    const timer = setInterval(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    // Wakes when the shown whole second changes, so the countdown needs no refresh rate of its own.
+    function tick() {
       const remaining = Math.max(0, end - performance.now());
       setLeft(remaining);
-      if (remaining === 0) {
-        clearInterval(timer);
-        onTimeUp();
-      }
-    }, 200);
-    return () => clearInterval(timer);
+      if (remaining === 0) onTimeUp();
+      else timer = setTimeout(tick, remaining % 1000 || 1000);
+    }
+    tick();
+    return () => clearTimeout(timer);
   }, [msLeft, onTimeUp]);
-  return <p role="timer">{Math.ceil(left / 1000)} seconds left</p>;
+  const seconds = Math.ceil(left / 1000);
+  return <p role="timer">{seconds === 1 ? "1 second left" : `${seconds} seconds left`}</p>;
 }
 
 function LastResult({ answered }: { answered: RunState["answered"][number] }) {

@@ -2,7 +2,7 @@
 // tables and their triggers, and route handlers called the way the browser calls them.
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { DatabaseError, Pool, type PoolClient } from "pg";
+import { DatabaseError, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -204,40 +204,43 @@ describe("other ways a run ends", () => {
     expect(last!.body.run.answered).toHaveLength(puzzle.questions.length);
   });
 
-  it("refuses an answer to a run from a day that has ended, with 409 day_over from the trigger", async () => {
+  // A run started before midnight can be finished after it (human, 2026-10-21); the timer, not the day, ends it.
+  it("lets a run started before midnight go on after it, and shows it instead of today's puzzle", async () => {
     const player = await newPlayer("d");
     useSession(player.session);
-    // A run started yesterday, as if the player had started just before midnight.
-    await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
+    // Yesterday's run, started a few seconds ago, as if the player had started just before midnight.
+    await getPool().query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, $2, $3::date, now() - interval '5 seconds')", [
+      player.userId,
+      GAME_ID,
+      yesterday,
+    ]);
+    expect((await state()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 0 } });
     const entryId = safeEntry(yesterdayPuzzle.questions[0]);
-    expect(await answerText(0, nameIn(yesterdayPuzzle, 0, entryId))).toEqual({ status: 409, body: { ok: false, error: "day_over" } });
+    const { status, body } = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
+    expect(status).toBe(200);
+    expect(body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 
-  it("shows a retried answer from a day that has ended as an abandoned run, not a blank state (2b review)", async () => {
+  it("shows a retried answer to yesterday's run whose time ran out as its ending, not a blank state (2b review)", async () => {
     const player = await newPlayer("r");
     useSession(player.session);
     const entryId = safeEntry(yesterdayPuzzle.questions[0]);
-    // Yesterday's run with its first answer stored, as if answered just before midnight. The trigger rightly refuses
-    // that insert today, so it goes in with triggers off for this one local superuser session.
-    const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
-    try {
-      const client = await admin.connect();
-      try {
-        await client.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
-        await client.query("set session_replication_role = replica");
-        await client.query(
-          "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
-          [player.userId, GAME_ID, yesterday, entryId],
-        );
-      } finally {
-        client.release();
-      }
-    } finally {
-      await admin.end();
-    }
+    // Yesterday's run with its first answer stored, then aged past the second question's 20 seconds.
+    const db = getPool();
+    await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
+    await db.query("insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)", [
+      player.userId,
+      GAME_ID,
+      yesterday,
+      entryId,
+    ]);
+    await db.query("update private.run set started_at = started_at - interval '1 minute' where user_id = $1", [player.userId]);
+    await db.query("update private.run_event set created_at = created_at - interval '1 minute' where user_id = $1", [player.userId]);
     const retry = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(retry.status).toBe(200);
-    expect(retry.body.run).toMatchObject({ date: yesterday, status: "abandoned", question: null });
+    expect(retry.body.run).toMatchObject({ date: yesterday, status: "timed_out", question: null });
+    // Nothing is in progress any more, so the player is offered today's puzzle.
+    expect((await state()).body.run).toMatchObject({ date: today, status: "not_started" });
   });
 
   it("needs a username before a run can start", async () => {
