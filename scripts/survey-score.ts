@@ -1,6 +1,6 @@
 // Scores the emailed survey (docs/milestones/M02-2g-survey.md) the way the game scores play:
 // `npm run survey:score -- <responses.csv>`. Each typed answer becomes an entry the way the game reads typed text
-// (resolveTyped: an exact name or alias, else one typo; docs/milestones/M13-game-mechanics.md); then matchAnswer
+// (resolveTyped: an exact name or alias, else one typo; docs/milestones/M04-game-mechanics.md); then matchAnswer
 // decides whether the host caught it and buildInsights builds the same per-question report as the insights page
 // (M03). Text that names no entry is listed for the human to judge.
 import { readFileSync } from "node:fs";

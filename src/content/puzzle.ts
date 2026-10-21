@@ -14,7 +14,7 @@ export type Question = {
   host_bank: string[];
   host_answers: string[];
   match_groups: Record<string, string[]>;
-  // The letter the Wind steals at this question (format 2; M13 13c-3). It stays gone for the rest of the run.
+  // The letter the Wind steals at this question (format 2; M04 13c-3). It stays gone for the rest of the run.
   steals?: string;
 };
 export type Puzzle = { format: 2; game_id: typeof GAME_ID; date: string; questions: Question[] };
@@ -209,7 +209,7 @@ export function checkPuzzleFile(file: string, text: string): string[] {
   return out;
 }
 
-// M13 "Rules to build", rule 6: the letters follow schedule A, and stealing them never makes a question pointless
+// M04 "Rules to build", rule 6: the letters follow schedule A, and stealing them never makes a question pointless
 // (a host answer nobody can type adds no danger) or impossible (no safe answer left to type).
 export function checkStolenLetters(file: string, puzzle: Puzzle): string[] {
   const out: string[] = [];

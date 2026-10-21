@@ -70,7 +70,7 @@ select is((select status from private.run_status where user_id = '00000000-0000-
 select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
                    values ('00000000-0000-0000-0000-0000000000a1', 'offbeat', private.today(), 0, 'y', false)$$,
   'OB002', null, 'an answered question cannot be answered again');
--- M13 13c-4: after an answer, the reveal waits for Next; question 2 opens with a question_open row.
+-- M04 13c-4: after an answer, the reveal waits for Next; question 2 opens with a question_open row.
 select is((select deadline from private.run_status where user_id = '00000000-0000-0000-0000-0000000000a1'), null,
   'a run at the reveal has no deadline');
 select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
@@ -111,7 +111,7 @@ select throws_ok($$insert into private.run_event (user_id, game_id, puzzle_date,
                    values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today(), 2, 'z', false)$$,
   'OB003', null, 'nothing can be answered after the last question');
 
--- M13 13c-2: 20 seconds per question, and the timer, not midnight, ends an unfinished run (human, 2026-10-21).
+-- M04 13c-2: 20 seconds per question, and the timer, not midnight, ends an unfinished run (human, 2026-10-21).
 -- Yesterday's run started just now, as if just before midnight: it can still be answered.
 insert into private.run (user_id, game_id, puzzle_date) values ('00000000-0000-0000-0000-0000000000a3', 'offbeat', private.today() - 1);
 select lives_ok($$insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)

@@ -27,7 +27,7 @@ const EXPECTED: Record<string, string> = {
   "host-bank-duplicate": `${FILE} q1 entry "lion": listed twice in host_bank`,
   "host-answer-duplicate": `${FILE} q1 entry "eagle": listed twice in host_answers`,
   "name-normalizes-empty": `${FILE} q1 entry "salmon": "!!!" is empty after normalization`,
-  // M13 13c-3: stolen letters, schedule A ("Rules to build", rule 6).
+  // M04 13c-3: stolen letters, schedule A ("Rules to build", rule 6).
   "steals-off-schedule": `${FILE} q3: steals "x", but schedule A steals nothing at question 3`,
   "steals-missing": `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`,
   "steals-wrong-tier": `${FILE} q5: steals "x", which is not a heavy consonant letter (rnlts)`,

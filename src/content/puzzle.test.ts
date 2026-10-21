@@ -62,7 +62,7 @@ describe("parsePuzzle (shape of untrusted files)", () => {
     ]);
   });
 
-  it("rejects a stolen letter that isn't one lower-case letter (M13 13c-3)", () => {
+  it("rejects a stolen letter that isn't one lower-case letter (M04 13c-3)", () => {
     const question = { prompt: "Name a pet", entries: [], host_bank: [], host_answers: [], match_groups: {} };
     for (const steals of ["E", "ab", "é", 5]) {
       expect(errorsOf({ ...top, questions: [{ ...question, steals }] })).toEqual([`${file} q1: "steals" must be one lower-case letter a-z`]);

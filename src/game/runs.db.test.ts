@@ -43,7 +43,7 @@ async function ensurePuzzle(date: string): Promise<Puzzle> {
   return fixture(date);
 }
 
-// A name or alias of the entry that a player can type at that question, past the stolen letters (M13 13c-3).
+// A name or alias of the entry that a player can type at that question, past the stolen letters (M04 13c-3).
 function typeableName(p: Puzzle, index: number, entryId: string): string | undefined {
   const entry = p.questions[index].entries.find((e) => e.id === entryId)!;
   return [entry.name, ...entry.aliases].find((n) => avoids(n, stolenLetters(p, index)));
@@ -188,7 +188,7 @@ describe("a run, step by step", () => {
     expect((await next()).body.run.question).toEqual(publicQuestion(puzzle, 1));
   });
 
-  // M13 13c-3: the answer box can't type a stolen letter (G11), so the server refuses text with one from a bypassed
+  // M04 13c-3: the answer box can't type a stolen letter (G11), so the server refuses text with one from a bypassed
   // client, at no cost: nothing stored, nothing logged, the same question.
   it("refuses text with a stolen letter with 400, and the question stays", async () => {
     const letter = puzzle.questions[1].steals!;
@@ -257,6 +257,21 @@ describe("a run, step by step", () => {
 });
 
 describe("other ways a run ends", () => {
+  // M04 13e: a catch on every question number ends the run there, with the points of the questions before it.
+  it.each([0, 1, 2, 3, 4, 5, 6])("ends the run when the host catches question %i (0-based), keeping the points before it", async (caughtAt) => {
+    const player = await newPlayer(`c${caughtAt}`);
+    useSession(player.session);
+    await start();
+    for (let i = 0; i < caughtAt; i++) {
+      await answer(i, safeEntry(puzzle, i));
+      await next();
+    }
+    const { body } = await answer(caughtAt, puzzle.questions[caughtAt].host_answers[0]);
+    expect(body.run).toMatchObject({ status: "died", question: null, next: null });
+    expect(body.run.answered).toHaveLength(caughtAt + 1);
+    expect(body.run.points).toBe(POINTS_PER_QUESTION.slice(0, caughtAt).reduce((sum, p) => sum + p, 0));
+  });
+
   it("survives when every question is answered without a match", async () => {
     const player = await newPlayer("s");
     useSession(player.session);
@@ -323,7 +338,7 @@ describe("other ways a run ends", () => {
 
 // B1 (M02 2f): a run has two foreign keys, and only the one to private.puzzle means "nothing published today".
 // Each case runs on its own client inside a transaction that is rolled back, so the shared fixtures stay as they were.
-// M13 13c-2: 20 seconds per question (human, 2026-10-21). Time passing is simulated by moving the run's stored
+// M04 13c-2: 20 seconds per question (human, 2026-10-21). Time passing is simulated by moving the run's stored
 // times back: a question starts at the last answer's created_at, or the run's started_at (the timer migration).
 describe("the 20-second timer", () => {
   async function ageRun(userId: string, seconds: number) {

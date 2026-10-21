@@ -3,7 +3,7 @@
 // free hint (human, 2026-10-21). After it is answered: the player's entry and the host answer(s).
 import { stolenLetters, type Entry, type Puzzle, type Question } from "@/content/puzzle";
 
-// stolen: the letters the Wind has taken by this question, which the answer box refuses (M13 13c-3).
+// stolen: the letters the Wind has taken by this question, which the answer box refuses (M04 13c-3).
 export type PublicQuestion = { index: number; prompt: string; stolen: string[] };
 export type Named = { id: string; name: string };
 
