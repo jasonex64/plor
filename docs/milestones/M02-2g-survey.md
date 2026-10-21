@@ -24,7 +24,7 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 ## Acceptance criteria
 - [x] A message the human can copy and paste, and a spreadsheet template (`docs/survey/message.md`, `docs/survey/responses-template.csv`).
 - [x] ROADMAP: the playtest moves to the MVP (M11, now after M12); M02 and M03 close on the survey findings; items that waited on "the playtest" point to the survey or the live test.
-- [ ] The not-yet-started days are gone from the hosted `private.puzzle` (the human's query output from plan step 2: `0` rows after 2026-10-20).
+- [x] The not-yet-started days are gone from the hosted `private.puzzle` (the human's query output from plan step 2: `0` rows after 2026-10-20). *Human, 2026-10-20: "deleted the puzzles" (query output not pasted).*
 - [ ] The responses come back, and a script scores them through `normalize`, `matchAnswer` and `buildInsights`: one report per surveyed day (catch rate, host bank share, top answers) plus the answers that matched no entry. Unit test on a small fixture.
 - [ ] The findings are recorded in M02 and M03, and the human picks the content changes.
 
@@ -62,6 +62,7 @@ Measure how the questions play (catch rate, host bank share, missing answers) fr
 |---|---|---|
 
 ## Evidence
+- Plan step 2: the human reported "deleted the puzzles" (2026-10-20) and merged PR #18. The query output wasn't pasted, so the row count is *unverified* beyond that report.
 
 ## Review
 - Blocking findings and how each was fixed:
