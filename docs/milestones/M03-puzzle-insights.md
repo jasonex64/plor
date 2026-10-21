@@ -1,6 +1,6 @@
 # M03 — Puzzle insights
 
-**Status:** in progress. Decisions D1–D5 and Numbers set by the human on 2026-10-19. Written now, during the M02 playtest wait, at the human's request ("1 and 2 in parallel", 2026-10-19), so the playtest findings can come out of it.
+**Status:** in review. Built and merged in PR #14; its last criterion, the M02 findings, was produced on 2026-10-21 by the 2g survey scoring through `buildInsights` (the live playtest it waited for moved to M11). Decisions D1–D5 and Numbers set by the human on 2026-10-19.
 
 ## Goal
 A per-question report shows the human how each puzzle really plays, and lets good unlisted answers be added to future puzzles before their day.
@@ -31,7 +31,7 @@ A per-question report shows the human how each puzzle really plays, and lets goo
 - [x] *(The flow exists: `content:additions-check` (M02 2d), the validator, review, `content:publish`; first real use after the playtest.)* Adding a chosen miss to a future puzzle goes through `content:additions-check`, the validator and `content:publish` (D3).
 - [x] The page is reachable only by admins: signed-out → 401, signed in but not in `private.admin` → 403, admin → the report (route-level tests). The admin list can't be read or changed by `anon`, `authenticated` or a player (pgTAP).
 - [x] `plor_app` gets only the grants the report needs (pgTAP, extending `plor_app_role.test.sql`).
-- [ ] The M02 findings are produced with it (the M02 criterion): since 2026-10-20 from the 2g survey, scored through `buildInsights` (`docs/milestones/M02-2g-survey.md`).
+- [x] The M02 findings are produced with it (the M02 criterion): since 2026-10-20 from the 2g survey, scored through `buildInsights` (`docs/milestones/M02-2g-survey.md`). *Done 2026-10-21: `npm run survey:score` builds each day's report with `buildInsights`; findings in the 2g ticket.*
 
 ## Out of scope
 The AI drafting itself (M04); per-player history; a public stats view ("12% picked lion" is after the MVP); the visual design (M12).

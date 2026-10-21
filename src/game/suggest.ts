@@ -1,8 +1,8 @@
 // What the answer box offers as the player types. Only suggestions: the player still taps an entry, and the server
 // still receives an exact entry ID (DECISIONS.md: Answer model). Every comparison uses the normalization the
 // content was authored with.
-import { normalize } from "@/content/puzzle";
-import { SUGGEST_MAX_TYPOS, SUGGEST_MIN_LETTERS_FOR_TYPOS } from "@/config/tunables";
+import { normalize } from "../content/puzzle.ts";
+import { SUGGEST_MAX_TYPOS, SUGGEST_MIN_LETTERS_FOR_TYPOS } from "../config/tunables.ts";
 import type { PublicEntry } from "./payload";
 
 export type Suggestions = {
