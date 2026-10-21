@@ -13,7 +13,7 @@ This is a daily game platform, named **Plor** (human, 2026-10-18; at `plor.app`)
 **M04 is done (2026-10-21), and with it the MVP as defined above.** Next is M05, Share (human, 2026-10-21: "M05 Share"). Claude proposed M06 (answer lists and content) first, because free typing and stolen letters only feel fair when fair answers are accepted; it's drafted right after M05, and the order after M05 is the human's call.
 
 ## Milestones
-Status: `planned` → `in progress` → `in review` → `done`. The table is in the order of work; milestone numbers are kept so nothing renumbers.
+Status: `planned` → `in progress` → `in review` → `done`. The table is in the order of work, and since 2026-10-21 the numbers follow it (see the renumbering note under the table).
 
 | # | Milestone | Scope | Status | Ticket |
 |---|---|---|---|---|
@@ -164,7 +164,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `supabase/roles.sql`: a remote schema-only reset would keep `plor_app` (roles are cluster-level), so `create_profile` would then fail with "role riff_app does not exist". No procedure resets the remote database (DECISIONS.md forbids scripting `db reset --linked`). Found in M02 (rename review). A local reset recreates the cluster and works.
 - [ ] plor_app's SELECT on `private.missed_answer` covers `user_id` too; a column-level grant would enforce D4 in the database. Found in M03 (review). plor_app already reads `user_id` from `run` and `run_event`, so nothing new is exposed.
 - [ ] SOURCES.md rows pinned at supabase/supabase `7425d49` (SSR auth, email sending, Google sign-in, redirect URLs) name a commit that no longer resolves on GitHub (`gh api .../commits/7425d49`: 422, 2026-10-20). The email sign-in row was re-read at `e854b84` in 2f; the others need re-pinning, which only a human can approve. Found in M02 (2f).
-- [ ] Vitest also collects tests under `.claude/worktrees/` (the M07 worktree), so `npm test` and `npm run test:db` run that branch's copies too, and its db tests race this checkout's on the one local stack. 2f ran both with `--exclude ".claude/**"`. Exclude it in `vitest.config.ts`. Found in M02 (2f).
+- [ ] Vitest also collects tests under `.claude/worktrees/` (then the M12 worktree, since removed), so `npm test` and `npm run test:db` run that branch's copies too, and its db tests race this checkout's on the one local stack. 2f ran both with `--exclude ".claude/**"`. Exclude it in `vitest.config.ts`. Found in M02 (2f).
 - [ ] `authFailure`'s comment (src/lib/auth.ts) and the 2f ticket say "any 5xx" becomes `AuthRetryableFetchError`, but auth-js 2.118.0 only does that for 500–504, 520–530 and status 0 (`NETWORK_ERROR_CODES`). Any other 5xx still shows "internal". Found in M02 (2f review). It's still loud.
 - [ ] DECISIONS.md Sign-in says both methods use "the PKCE flow"; `verifyOtp` with an email and code doesn't involve PKCE. Found in M02 (2f review). Docs only.
 - [ ] The A1 closure above says `getClaims` calls Auth only for HS tokens; it also does for a token with no `kid`, or when WebCrypto is missing (GoTrueClient.ts). Found in M02 (2f review). The conclusion holds.

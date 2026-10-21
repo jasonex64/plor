@@ -25,7 +25,7 @@ Only the screens that exist today (`src/app/page.tsx`, `home.tsx`, `game.tsx`, `
 7. Full-run result.
 8. Errors, loading and the abandoned-run message.
 
-## Carried over from the closed M07 draft (the human's decisions, 2026-10-20)
+## Carried over from the closed M12 draft (PR #12) (the human's decisions, 2026-10-20)
 - **Concept (D16):** "Go with the trail along a cliff edge: friends fall off at the stop where they got caught."
 - **Camera:** 3rd person, behind the player's character, with the path winding away up the ridge.
 - **The host is the Wind (D19):** "Go with the Wind." Its name and look are still open (L2).

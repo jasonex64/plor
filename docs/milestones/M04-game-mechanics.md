@@ -137,7 +137,7 @@ After the MVP (human, 2026-10-20):
 - The look and pixel art (M07).
 - Share (M05), friends and the live board (M08), comments (M09), the points ledger and leaderboard (M10), and launch (M11).
 - "Semantic search" and an AI judge (the judge plan was stopped by the human, 2026-10-21). Free typing itself is in (rule 1).
-- AI puzzle drafting (AI drafting).
+- AI puzzle drafting (Later, unnumbered).
 
 Later, by the human (2026-10-21: "we can focus on the database and how to get answers later"):
 - Where answers come from (WordNet or another large source, its license and its SOURCES.md entry).
@@ -174,7 +174,7 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 - The one-line "Safe! You said …" (`LastResult` in `src/app/game.tsx`), replaced by the reveal.
 - The answer list in the question payload (`src/game/payload.ts`), the suggestions and "did you mean" (`src/game/suggest.ts` and its use in `game.tsx`), the "Not in the list? Send" button and `/api/run/miss` (off-list text is logged by the answer route instead), and the "Lock in / Change it" step (13c-1).
 - Entry IDs from the client in `/api/run/answer` (13c-1; DECISIONS.md, Answer model).
-- The "For M07 (the play screens)" group in ROADMAP "Next revision": its play-screen items move here, and its sign-in items go after the MVP.
+- The "For M12 (the play screens)" group (as it was named then) in ROADMAP "Next revision": its play-screen items move here, and its sign-in items go after the MVP.
 
 ---
 *Fill in the sections below at the end.*
