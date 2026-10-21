@@ -93,7 +93,7 @@ describe("a run, step by step", () => {
     useSession(player.session);
     expect(await state()).toEqual({
       status: 200,
-      body: { ok: true, run: { date: today, status: "not_started", total: puzzle.questions.length, answered: [], question: null } },
+      body: { ok: true, run: { date: today, status: "not_started", total: puzzle.questions.length, answered: [], question: null, msLeft: null } },
     });
   });
 
@@ -103,7 +103,10 @@ describe("a run, step by step", () => {
     expect(first.body.run).toMatchObject({ date: today, status: "in_progress", answered: [] });
     // The question is exactly the public view of question 1: nothing about the host is added on the way out.
     expect(first.body.run.question).toEqual(publicQuestion(puzzle, 0));
-    expect(await start()).toEqual(first);
+    // Starting again is the same run: everything matches except the time left, which has only gone down.
+    const again = await start();
+    expect({ ...again, body: { ...again.body, run: { ...again.body.run, msLeft: 0 } } }).toEqual({ ...first, body: { ...first.body, run: { ...first.body.run, msLeft: 0 } } });
+    expect(again.body.run.msLeft).toBeLessThanOrEqual(first.body.run.msLeft);
   });
 
   it("never sends host data for a question that hasn't been answered", async () => {
@@ -245,6 +248,73 @@ describe("other ways a run ends", () => {
 
 // B1 (M02 2f): a run has two foreign keys, and only the one to private.puzzle means "nothing published today".
 // Each case runs on its own client inside a transaction that is rolled back, so the shared fixtures stay as they were.
+// M13 13c-2: 20 seconds per question (human, 2026-10-21). Time passing is simulated by moving the run's stored
+// times back: a question starts at the last answer's created_at, or the run's started_at (the timer migration).
+describe("the 20-second timer", () => {
+  async function ageRun(userId: string, seconds: number) {
+    const db = getPool();
+    await db.query("update private.run set started_at = started_at - make_interval(secs => $2) where user_id = $1 and puzzle_date = $3::date", [userId, seconds, today]);
+    await db.query("update private.run_event set created_at = created_at - make_interval(secs => $2) where user_id = $1 and puzzle_date = $3::date", [userId, seconds, today]);
+  }
+  const events = async (userId: string) =>
+    (await getPool().query<{ n: number }>("select count(*)::int as n from private.run_event where user_id = $1", [userId])).rows[0].n;
+
+  it("gives the question 20 seconds from Start, and a refresh keeps the same deadline", async () => {
+    const player = await newPlayer("t1");
+    useSession(player.session);
+    const { body } = await start();
+    expect(body.run.msLeft).toBeGreaterThan(19_000);
+    expect(body.run.msLeft).toBeLessThanOrEqual(20_000);
+    await ageRun(player.userId, 5);
+    const after = (await state()).body.run;
+    expect(after.status).toBe("in_progress");
+    expect(after.msLeft).toBeGreaterThan(14_000);
+    expect(after.msLeft).toBeLessThanOrEqual(15_000);
+  });
+
+  it("counts an answer just before the deadline, and the next question gets its own 20 seconds", async () => {
+    const player = await newPlayer("t2");
+    useSession(player.session);
+    await start();
+    await ageRun(player.userId, 18);
+    const { status, body } = await answer(0, safeEntry(puzzle.questions[0]));
+    expect(status).toBe(200);
+    expect(body.run).toMatchObject({ status: "in_progress", question: { index: 1 } });
+    expect(body.run.msLeft).toBeGreaterThan(19_000);
+  });
+
+  it("ends the run when an answer comes after the deadline, and stores nothing for it", async () => {
+    const player = await newPlayer("t3");
+    useSession(player.session);
+    await start();
+    await answer(0, safeEntry(puzzle.questions[0]));
+    await ageRun(player.userId, 21);
+    const { status, body } = await answer(1, safeEntry(puzzle.questions[1]));
+    expect(status).toBe(200);
+    expect(body.run).toMatchObject({ status: "timed_out", question: null, msLeft: null });
+    expect(body.run.answered).toHaveLength(1);
+    expect(await events(player.userId)).toBe(1);
+  });
+
+  it("shows a run whose time ran out with no answer as timed out, without a write", async () => {
+    const player = await newPlayer("t4");
+    useSession(player.session);
+    await start();
+    await ageRun(player.userId, 21);
+    expect((await state()).body.run).toMatchObject({ status: "timed_out", answered: [], question: null });
+  });
+
+  it("shows the ending, not a 409, for text that names no entry after the deadline", async () => {
+    const player = await newPlayer("t5");
+    useSession(player.session);
+    await start();
+    await ageRun(player.userId, 21);
+    const { status, body } = await answerText(0, "a thing nobody listed");
+    expect(status).toBe(200);
+    expect(body).toMatchObject({ notInList: false, run: { status: "timed_out" } });
+  });
+});
+
 describe("startRun's foreign keys", () => {
   async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {
     const client = await getPool().connect();

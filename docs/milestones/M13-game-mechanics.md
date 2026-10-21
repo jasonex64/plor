@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: 13c-1 (free typing) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
+**Status:** in progress: 13c-1 (free typing) merged in PR #23; 13c-2 (the timer) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -117,7 +117,7 @@ Evidence so far (scratchpad runs, 2026-10-21):
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
 - [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
-- [ ] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21). An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests use a fixed clock to cover an answer just before and just after the deadline.
+- [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
@@ -181,6 +181,9 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Rule 3: a question starts on Start or Next | Until 13c-4, a question after the first starts when the previous answer is stored | "Next" is 13c-4; it will move the start to the tap |
+| The 13c-2 criterion: "DB tests use a fixed clock" | They move the run's stored times back | Postgres's clock can't be set for a test; the deadline is derived from the stored times, so moving them back is the same thing |
+| DECISIONS.md Config: tunables live in `tunables.ts` | The 20 seconds lives in SQL (`private.question_deadline`) | The database is the judge of the deadline, and the client only shows the time left the server measured, so TypeScript never needs the number. One place, not two |
 | Rules to build, rule 2: refuse text with a stolen letter (step 2), and typos only onto names that avoid stolen letters (step 4) | 13c-1 builds rule 2 without the stolen-letter parts | There are no stolen letters until 13c-3, which adds both parts and their tests |
 | M02 2g survey ticket (lines 64, 69): the scorer counts only an exact match, "the game never guesses" | `survey:score` now reads text with `resolveTyped`, auto-correcting one typo | The scorer's purpose is to score "the way the game scores play", and the game now auto-corrects (human, 2026-10-21). Re-scoring changes the recorded numbers (e.g. "Texsa" becomes Texas, caught) |
 | The 13c-1 criterion as merged in PR #22: "checked … by `check:client-bundle`" | Checked by `payload.test.ts` and a browser request | `check:client-bundle` scans only for secrets and server env values, so it can't detect an answer list |
@@ -199,6 +202,17 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
   - "quidditchball" + Enter showed "isn't in our list. Try another answer."
   - "socer" + Enter showed "Safe! You said soccer; the host said tennis." and question 2.
   - The local database then held the miss `0|quidditchball` and the answer `0|soccer|f`.
+
+**13c-2 the timer** (branch `m13-game-mechanics`, 2026-10-21, local stack):
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 60 tests passed. The five new timer tests:
+  - 20 seconds from Start, and a refresh keeps the same deadline;
+  - an answer 18 seconds in counts, and the next question gets its own 20 seconds;
+  - an answer after 21 seconds ends the run as `timed_out`, with no answer stored;
+  - no answer by the deadline shows `timed_out` without a write;
+  - off-list text after the deadline shows the ending instead of a 409.
+- `npx supabase test db`: 4 files, 75 tests passed, with plor_app's exact grant list now including execute on `private.question_deadline`.
+- `npm test -- --exclude ".claude/**"`: 18 files, 135 passed. `npx eslint .`: clean.
+- **In the browser:** Start showed "18 seconds left" three seconds in. "socer" + Enter showed question 2 at "19 seconds left". After 20 seconds with no answer, the screen read "Time's up on question 2 / You survived 1 of 7 questions".
 
 ## Review
 **13c-1** (reviewer agent, 2026-10-21):

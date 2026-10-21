@@ -9,7 +9,8 @@ import { matchAnswer, resolveTyped } from "./matching";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
 
 // "abandoned" reaches the client only for a run from a day that has ended, e.g. a retried answer after midnight.
-export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "abandoned";
+// "timed_out": the current question's 20 seconds ran out, which ends the run (M13 13c-2; the database decides).
+export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out" | "abandoned";
 
 export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[] };
 
@@ -20,6 +21,9 @@ export type RunState = {
   answered: AnsweredQuestion[];
   // The next question while the run is in progress, otherwise null.
   question: PublicQuestion | null;
+  // Milliseconds left on that question's timer, measured by the database when this state was read; null when
+  // there is no question. The client counts down from it, and the database stays the judge.
+  msLeft: number | null;
 };
 
 type StoredEvent = { question_idx: number; entry_id: string; matched: boolean };
@@ -28,6 +32,7 @@ type StoredEvent = { question_idx: number; entry_id: string; matched: boolean };
 const DAY_OVER = "OB001";
 const OUT_OF_ORDER = "OB002";
 const RUN_OVER = "OB003";
+const TIME_UP = "OB005";
 
 async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle }> {
   const { rows } = await db.query<{ date: string; content: Puzzle | null }>(
@@ -49,7 +54,7 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-function buildState(date: string, puzzle: Puzzle, status: RunStatus, stored: StoredEvent[]): RunState {
+function buildState(date: string, puzzle: Puzzle, status: RunStatus, stored: StoredEvent[], msLeft: number | null): RunState {
   const answered = stored.map((e) => {
     const question = puzzle.questions[e.question_idx];
     return {
@@ -61,16 +66,17 @@ function buildState(date: string, puzzle: Puzzle, status: RunStatus, stored: Sto
     };
   });
   const question = status === "in_progress" ? publicQuestion(puzzle, stored.length) : null;
-  return { date, status, total: puzzle.questions.length, answered, question };
+  return { date, status, total: puzzle.questions.length, answered, question, msLeft: question ? msLeft : null };
 }
 
 async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Promise<RunState> {
-  const { rows } = await db.query<{ status: RunStatus }>(
-    `select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
+  const { rows } = await db.query<{ status: RunStatus; ms_left: number }>(
+    `select status, greatest(0, floor(extract(epoch from deadline - statement_timestamp()) * 1000))::int as ms_left
+     from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
     [userId, GAME_ID, date],
   );
-  if (rows.length === 0) return buildState(date, puzzle, "not_started", []);
-  return buildState(date, puzzle, rows[0].status, await events(db, userId, date));
+  if (rows.length === 0) return buildState(date, puzzle, "not_started", [], null);
+  return buildState(date, puzzle, rows[0].status, await events(db, userId, date), rows[0].ms_left);
 }
 
 export async function todaysState(db: Db, userId: string): Promise<RunState> {
@@ -118,7 +124,14 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
 
   const entryId = resolveTyped(puzzle.questions[index], typed);
   if (!entryId) {
-    await logMiss(db, userId, index, typed);
+    try {
+      await logMiss(db, userId, index, typed);
+    } catch (err) {
+      // logMiss only logs for a run in progress; one whose time ran out shows its ending instead of a 409.
+      const run = await stateOf(db, userId, date, puzzle);
+      if (err instanceof AppError && err.code === "not_current_question" && run.status === "timed_out") return { run, notInList: false };
+      throw err;
+    }
     return { run: await stateOf(db, userId, date, puzzle), notInList: true };
   }
   const settled = await settledAnswer(db, userId, date, index, entryId);
@@ -134,6 +147,8 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
     if (err.code === DAY_OVER) throw new AppError("day_over", 409);
+    // Too late for this question: the run has ended, and the state says so (rule 3; the trigger decides).
+    if (err.code === TIME_UP) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
     // A concurrent request may have answered this index between our read and our insert (ROADMAP: never 500).
     if (err.code === "23505" || err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
       if (await settledAnswer(db, userId, date, index, entryId)) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
