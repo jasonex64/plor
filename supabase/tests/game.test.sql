@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(37);
 
 -- Real puzzles and runs may exist for the days used here (staging during the playtest). The whole file runs in
 -- one transaction that is rolled back, so clearing them changes nothing outside the test (2b review).
@@ -26,7 +26,12 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a3', 'g3@example.test');
 
 -- §8
-select is(private.today(), private.day_of(now()), 'today() is day_of(now())');
+select is(private.today(), private.day_of(statement_timestamp()), 'today() is day_of(statement_timestamp())');
+-- M02 2f, B21: this file runs in one transaction and can't cross a real midnight, so only the definition tells the
+-- two clocks apart. now() would freeze "today" at the transaction's start.
+select ok(pg_get_functiondef('private.today()'::regprocedure) like '%statement_timestamp()%'
+          and pg_get_functiondef('private.today()'::regprocedure) not like '%now()%',
+          'today() reads the statement''s clock, not the transaction''s');
 -- The two ends of the 25-hour day when DST ends, as src/game/day.db.test.ts derives them from Node's ICU tz data
 -- (that test also asserts these exact instants). Here they check this database's own tz data, including on
 -- staging via `supabase test db --linked` (ROADMAP: verify Supabase has current tzdata).

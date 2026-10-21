@@ -2,22 +2,31 @@
 // Prints one line per error naming the file, question and entry, and exits 1 on any error, or when no
 // puzzle file is found, so a wrong root can't pass silently (M01 ticket).
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { checkPuzzleFile } from "../src/content/puzzle.ts";
 
-// Paths relative to `root`, with "/" separators, sorted so output is stable. Throws if `root` is missing.
-export function listPuzzleFiles(root: string): string[] {
-  return readdirSync(root, { recursive: true, encoding: "utf8" })
-    .map((p) => p.replaceAll("\\", "/"))
-    .filter((p) => p.endsWith(".json"))
+// Every file (not directory) under `root`, relative to it, with "/" separators, sorted so output is stable.
+// Throws if `root` is missing.
+function listFiles(root: string): string[] {
+  return readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((d) => d.isFile())
+    .map((d) => relative(root, join(d.parentPath, d.name)).replaceAll("\\", "/"))
     .sort();
 }
 
+export function listPuzzleFiles(root: string): string[] {
+  return listFiles(root).filter((p) => p.endsWith(".json"));
+}
+
 export function validateRoot(root: string): { files: number; errors: string[] } {
-  const files = listPuzzleFiles(root);
-  if (files.length === 0) return { files: 0, errors: [`${root}: no puzzle files found`] };
-  const errors = files.flatMap((file) => checkPuzzleFile(file, readFileSync(join(root, file), "utf8")));
+  const all = listFiles(root);
+  const files = all.filter((p) => p.endsWith(".json"));
+  // Anything else under the root is an error, so a mistyped file name can't drop a day while CONTENT OK prints
+  // (M02 2f, B9).
+  const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle`);
+  if (files.length === 0) return { files: 0, errors: [...strays, `${root}: no puzzle files found`] };
+  const errors = [...strays, ...files.flatMap((file) => checkPuzzleFile(file, readFileSync(join(root, file), "utf8")))];
   return { files: files.length, errors };
 }
 

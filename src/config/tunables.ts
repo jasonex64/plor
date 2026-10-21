@@ -3,6 +3,11 @@
 // Origin: human, 2026-10-18 (docs/milestones/M01-puzzle-content.md, Numbers).
 export const QUESTIONS_PER_DAY = 7;
 
+// Username length (human, 2026-10-18; docs/milestones/M02-sign-in-and-play.md, Numbers). The database's check
+// constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).
+export const USERNAME_MIN_LENGTH = 3;
+export const USERNAME_MAX_LENGTH = 20;
+
 // "Did you mean" in the answer box: one typo forgiven, only for text of 4+ letters (human, 2026-10-19;
 // docs/milestones/M02-sign-in-and-play.md, Numbers).
 export const SUGGEST_MAX_TYPOS = 1;

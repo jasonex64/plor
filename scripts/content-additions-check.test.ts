@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Puzzle } from "../src/content/puzzle";
-import { compareAdditions } from "./content-additions-check";
+import type { Puzzle } from "../src/content/puzzle.ts";
+import { compareAdditions } from "./content-additions-check.ts";
 
 const before: Puzzle = {
   format: 1,

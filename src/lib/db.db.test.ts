@@ -1,8 +1,8 @@
 // Needs the local Supabase stack (`npx supabase start`); run with `npm run test:db`.
 // Uses the local database's documented default URL (supabase.com/docs/guides/local-development/cli/getting-started).
 import { Pool } from "pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { withTransaction } from "./db";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { withTransaction } from "./db.ts";
 
 // One connection so the temp table (session-scoped) is visible to every transaction in this file.
 const pool = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -54,5 +54,31 @@ describe("withTransaction", () => {
   it("returns the client to the pool after both outcomes", async () => {
     expect(pool.totalCount).toBe(1);
     expect(pool.idleCount).toBe(1);
+  });
+});
+
+// B18 (M02 2f): when ROLLBACK itself fails, the caller still gets the callback's error, and the failed rollback is
+// logged. The callback ends its own backend, so the failure is real; a separate pool keeps the temp table's
+// connection alive. (Whether the client is destroyed isn't checked: pg-pool 3.14.0 also drops a client that can no
+// longer query, so the pool count is 0 either way.)
+// The dropped socket also emits "error" on the checked-out client, which pg-pool 3.14.0 leaves without a listener
+// (index.js, _acquireClient); the test records that event and checks it (ROADMAP item from 2f).
+describe("withTransaction when the rollback fails", () => {
+  it("rethrows the callback's error and logs the failed rollback", async () => {
+    const doomed = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const clientErrors: Error[] = [];
+    try {
+      const failure = withTransaction(doomed, (c) => {
+        c.on("error", (err: Error) => clientErrors.push(err));
+        return c.query("select pg_terminate_backend(pg_backend_pid())");
+      });
+      await expect(failure).rejects.toThrow(/terminating connection/);
+      expect(logged.mock.calls.map((call) => JSON.parse(call[0]).msg)).toContain("rollback failed; destroying client");
+      expect(clientErrors.map((e) => e.message)).toContain("Connection terminated unexpectedly");
+    } finally {
+      logged.mockRestore();
+      await doomed.end();
+    }
   });
 });

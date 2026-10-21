@@ -1,7 +1,8 @@
 // The run routes end to end against the local stack (run with `npm run test:db`): real sign-in, the real game
 // tables and their triggers, and route handlers called the way the browser calls them.
+import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { Pool } from "pg";
+import { DatabaseError, Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -13,6 +14,7 @@ import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
 import { matchAnswer } from "./matching";
+import { startRun } from "./runs";
 import { publicQuestion } from "./payload";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -230,5 +232,37 @@ describe("other ways a run ends", () => {
   it("needs a username before a run can start", async () => {
     useSession((await signIn(`${RUN}-n@example.test`)).session);
     expect(await start()).toEqual({ status: 409, body: { ok: false, error: "no_profile" } });
+  });
+});
+
+// B1 (M02 2f): a run has two foreign keys, and only the one to private.puzzle means "nothing published today".
+// Each case runs on its own client inside a transaction that is rolled back, so the shared fixtures stay as they were.
+describe("startRun's foreign keys", () => {
+  async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {
+    const client = await getPool().connect();
+    try {
+      await client.query("begin");
+      await fn(client);
+    } finally {
+      await client.query("rollback");
+      client.release();
+    }
+  }
+
+  it("maps the puzzle foreign key to 404 no_puzzle_today", async () => {
+    const { userId } = await newPlayer("f");
+    await inRolledBackTransaction(async (client) => {
+      await client.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+      await client.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+      await expect(startRun(client, userId)).rejects.toMatchObject({ code: "no_puzzle_today", status: 404 });
+    });
+  });
+
+  it("leaves the user foreign key as the database error, a 500 at the route", async () => {
+    await inRolledBackTransaction(async (client) => {
+      const failure = startRun(client, randomUUID());
+      await expect(failure).rejects.toBeInstanceOf(DatabaseError);
+      await expect(failure).rejects.toMatchObject({ code: "23503", constraint: "run_user_id_fkey" });
+    });
   });
 });

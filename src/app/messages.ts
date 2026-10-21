@@ -1,3 +1,5 @@
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
   email_invalid: "That doesn't look like an email address.",
@@ -13,7 +15,7 @@ const MESSAGES: Record<string, string> = {
   access_denied: "Google sign-in was cancelled.",
   not_signed_in: "You're signed out. Please sign in again.",
   // The rules themselves are enforced by the database (docs/milestones/M02-sign-in-and-play.md, Numbers).
-  username_invalid: "Usernames are 3 to 20 characters: lower-case letters, digits and _.",
+  username_invalid: `Usernames are ${USERNAME_MIN_LENGTH} to ${USERNAME_MAX_LENGTH} characters: lower-case letters, digits and _.`,
   username_taken: "That username is taken. Try another.",
   profile_exists: "You already have a username.",
   no_profile: "Pick a username before you play.",

@@ -88,8 +88,11 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
       [userId, GAME_ID],
     );
   } catch (err) {
-    // The foreign key to private.puzzle: nothing is published for today.
-    if (err instanceof DatabaseError && err.code === "23503") throw new AppError("no_puzzle_today", 404);
+    // The foreign key to private.puzzle: nothing is published for today. The run's other foreign key, to
+    // auth.users, raises 23503 too and stays a 500 (M02 2f, B1).
+    if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "run_game_id_puzzle_date_fkey") {
+      throw new AppError("no_puzzle_today", 404);
+    }
     throw err;
   }
   // Read back as "today" again: if midnight passed since the insert, the player sees the new day (not started).

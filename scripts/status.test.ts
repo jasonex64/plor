@@ -1,7 +1,7 @@
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
-import { checkStatus } from "./status";
+import { checkStatus } from "./status.ts";
 
 // A real HTTP server per case: the status script's whole job is talking HTTP, so nothing is mocked.
 let server: Server | undefined;

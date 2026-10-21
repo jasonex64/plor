@@ -61,6 +61,15 @@ describe("buildInsights", () => {
     expect(day.questions.map((q) => q.breaksShape)).toEqual([false, false, true, false]);
   });
 
+  it("doesn't let an earlier question with too few players flag a later one (M02 2f, B14)", () => {
+    // Q1: 4 players, all caught (100%, too few). Q2: 10 players, 2 caught (20%), 80 points lower but not flagged.
+    const day = buildInsights("d", true, puzzle, [...answers(0, 4, 4, "dog", ["cat"]), ...answers(1, 10, 2, "cat", ["yak"])], []);
+    expect(day.questions.slice(0, 2).map((q) => [q.tooFew, q.breaksShape])).toEqual([
+      [true, false],
+      [false, false],
+    ]);
+  });
+
   it("counts a dip of exactly 10 points, and not 9", () => {
     const at = (laterCaught: number) =>
       buildInsights("d", true, puzzle, [...answers(0, 10, 4, "dog", ["cat"]), ...answers(1, 10, laterCaught, "cat", ["yak"])], []).questions[1].breaksShape;

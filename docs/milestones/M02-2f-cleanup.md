@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** Part A done (PR #17, merged 2026-10-20; the human accepted the code-guessing risk and approved the texts). Part B is next: it no longer waits for a playtest, which moved to the MVP (human, 2026-10-20; `M02-2g-survey.md`). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
+**Status:** in review (Part B). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 dropped by the human (its hypothesis was disproved); B21 kept by the human as a narrowing, with the item left open for M04 (2026-10-20).
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
@@ -56,14 +56,14 @@ All three held on the first run (Evidence).
 | B7 | `askHidden` never resolves if stdin closes | *Low*: publish hangs instead of failing | Reject on `close`; unit test |
 | B8 | `parseDatabaseUrl` message lists all three parts | *Low*: a misleading boot error | Name only the missing part; unit test |
 | B9 | `content:validate` silently skips non-`.json` files | A mistyped file name drops a day while CONTENT OK prints | Report any other file under the root as an error; fixture |
-| B10 | Plural check only goes singular → plural | An entry named in the plural passes without its singular | Check both directions; fixture |
+| B10 | Plural check only goes singular → plural | An entry named in the plural passes without its singular | Check both directions; fixture. **Blocked, for the human (2026-10-20):** hypothesis "a few dozen hits, mostly plural-only names" was disproved. `pluralize.singular` on every name in `content/` and `content-rehearsal/` flags **941** entries without their singular, nearly all wrong (Texas → Texa, Moldova → Moldovum, rhinoceros → rhinocero, ace of spades → ace of spade). A two-way check would need an override on most entries, which is a content format change. Options: drop the item, or a narrower rule the human picks. **Dropped by the human, 2026-10-20** |
 | B11 | Validator branches with no fixture | A regression in those rules passes CI | One fixture per branch (group key not in the bank, duplicate IDs, a name that normalizes to empty) |
 | B12 | No test that a refused day rolls back earlier days in the batch | A partial publish could go unnoticed | Test outside the outer rolled-back transaction |
-| B13 | `runs.db.test.ts` fixtures live outside a transaction | A crashed run blocks a later local publish | Wrap in a transaction or clean up in `finally`; test |
+| B13 | `runs.db.test.ts` fixtures live outside a transaction | A crashed run blocks a later local publish | Wrap in a transaction or clean up in `finally`; test. **Closed without code (2026-10-20):** hypothesis "Vitest runs `afterAll` even when `beforeAll` throws" held (a throwaway test printed both hooks), so the existing `afterAll` cleanup already covers failing tests. Only a killed process leaves fixtures; a transaction can't wrap route calls on other connections, and a `finally` doesn't run either. Recovery: `npx supabase db reset` (local only) |
 | B14 | No test for an earlier "too few" question not flagging a later one | *Low*: a small branch | Add the test |
 | B15 | `route.db.test.ts` says "known catch rates" | *Low*: wording | Rename the test |
-| B16 | Test imports with and without `.ts` | Two ways to do one thing | Use `.ts` everywhere (runtime already does) |
-| B17 | `content:plurals` reformats the whole file | Noisy diffs on hand-formatted files | Write only when something changed, keeping 2-space JSON |
+| B16 | Test imports with and without `.ts` | Two ways to do one thing | Use `.ts` everywhere (runtime already does). **Done as (2026-10-20):** `.ts` on relative imports in `scripts/` and in tests of the `src` modules Node runs directly (`puzzle.ts`, `db.ts`, `env.ts`), matching those files. The Next.js app's extensionless `@/` imports stay: the item is about these tests, and Next.js bundles the app |
+| B17 | `content:plurals` reformats the whole file | Noisy diffs on hand-formatted files | Write only when something changed, keeping 2-space JSON. **Closed without code (2026-10-20):** both halves were already true (`if (changed)`, `JSON.stringify(…, null, 2)`), every content file already matches that format byte for byte, and a run added nothing and changed no file |
 | B18 | `withTransaction` rollback-failure branch has no test | *Low*: hard to trigger | Test with a client whose rollback throws |
 | B19 | Bundle check scans only `.next/static` | A secret in prerendered HTML or RSC payloads wouldn't be caught | Also scan `.next/server/app`; prove it with a planted string |
 | B20 | CI actions pinned to tags, not SHAs | A moved tag could change what CI runs | Pin each action to its commit SHA, with the tag in a comment |
@@ -142,7 +142,49 @@ The form in a browser (`npm run dev` on the local stack, a throwaway `@example.t
 
 Staging: the human updated both hosted templates, merged PR #17, and reported "sign-in with codes worked" (2026-10-20).
 
+**Part B, 2026-10-20, local stack.** Each fix's test was also run against the old code and failed there (shown per item in its commit message).
+
+All checks after the last commit:
+```
+npx tsc --noEmit                                   → no output
+npm run lint                                       → no output
+npm test -- --exclude ".claude/**"                 → Test Files 18 passed (18), Tests 134 passed (134)
+npm run test:db -- --exclude ".claude/**"          → Test Files 8 passed (8), Tests 55 passed (55)
+npx supabase test db                               → Files=4, Tests=75, Result: PASS
+npm run content:validate                           → CONTENT OK content: 28 file(s)
+npm run content:validate -- content-rehearsal      → CONTENT OK content-rehearsal: 2 file(s)
+npm run build                                      → ✓ Compiled successfully
+npm run check:client-bundle                        → CLIENT BUNDLE OK: 47 files, 5 patterns, 3 env values
+```
+Per item:
+- B1: the puzzle foreign key gives `404 no_puzzle_today`; the user foreign key (`run_user_id_fkey`) stays a `DatabaseError` (two db tests in rolled-back transactions).
+- B2: `?date=2026-02-30` and `2026-13-01` give 400; before the fix the test got `"error": "internal"`.
+- B3: with today's puzzle deleted in a rolled-back transaction, the default report is the newest earlier day; before the fix it threw `not_available`.
+- B4: "ca t" (4 characters, 3 letters) gets no typo suggestions; the test failed before.
+- B5: signed in on the local stack in the browser pane: `document.querySelectorAll("footer").length` → 1, plus one `section[aria-label="Account"]`. (Curl can't see the signed-in view, which is drawn in the browser.)
+- B6: the database check accepts lengths `USERNAME_MIN_LENGTH` and `USERNAME_MAX_LENGTH` and refuses one less and one more (4 db tests); the message is built from the same constants.
+- B7: input that ends before Enter rejects; without the `end` listener the test timed out after 5 s.
+- B8: three messages, one per missing part, each matched exactly.
+- B9: fixture `not-json` (a `.jsno` day) gives one error; the old validator passed it.
+- B10: blocked, see the Part B table.
+- B11: four new fixtures, each with exactly its own error.
+- B12: a batch with a new past day and a changed started day, run through `withTransaction` with real commits, leaves the past day absent; publishing without a transaction left 2026-09-20 behind and failed the test (that row was deleted afterwards).
+- B13: closed: Vitest ran `afterAll` after `beforeAll` threw (throwaway probe).
+- B14: fails if the `!earlier.tooFew` guard is removed.
+- B15: closed: already renamed in `e44774a`.
+- B16: `.ts` on relative imports in the tests of Node-run modules.
+- B17: closed: `npm run content:plurals` on both roots added 0 and changed no file.
+- B18: the callback ends its own backend; the original error is rethrown and "rollback failed; destroying client" is logged. Without the inner catch, the caller got the rollback's error instead. Found on the way: checked-out clients have no `error` listener (ROADMAP).
+- B19: a planted `sb_secret_` in `.next/server/app/*.html` → `LEAK … exit 1`; the same string in a server `.js` there → not flagged.
+- B20: SHAs from `gh api` (checkout v7 = v7.0.1 `3d3c42e…`, setup-node v7 = v7.1.0 `949feb2…`, gitleaks-action v3 = v3.0.0 `e0c47f4…`); CI runs on the PR.
+- B21: hypothesis measured first: in one transaction, `now()` didn't move across a 1.2 s sleep while `statement_timestamp()` moved 1.2 s. Migration `20261021044659`; the pgTAP check fails on the old definition.
+
 ## Review
+Part B, reviewer agent on the branch at `2f Part B: evidence`, 2026-10-20.
+- Blocking findings and how each was fixed:
+  1. **B21 doesn't close the hazard (open, for the human).** The guard runs when a day's UPDATE runs, but the change becomes visible at COMMIT. `publish()` sends one upsert per day and commits after the last, so an upsert at 23:59:59.6 passes and a COMMIT at 00:00:00.2 still changes a started day. `statement_timestamp()` narrows the window from BEGIN–COMMIT to that statement–COMMIT, which for a publish is about the same few round trips. The ticket's hypothesis was stated too broadly, and the experiment only showed the weaker premise (now() freezes). The human had approved B21 on Claude's overstated summary, so the question went back to them. **Decided by the human, 2026-10-20, with the corrected picture: keep the change as a narrowing and leave the item open; the full fix (a commit-time check) comes when M04 automates publishing.** The migration comment and ROADMAP state the remaining window.
+- Deferred to ROADMAP "Next revision": `?date=0000-01-01` still a 500; `.next/server/pages/404.html` and `500.html` not scanned; the pg `error`-listener item's wording (routes use `pool.query`, which listens; only `withTransaction`, used by `content:publish`, checks out); the B16 rule unwritten in DECISIONS.md; B7 listens for `end`, not `close`; the B3 test computes its expected day with the code's own subquery; the B4 test sits between a comment and the test it describes; the 2g docs commits ride in the Part B PR.
+
 Part A, reviewer agent on `aa086b5`, 2026-10-20.
 - Blocking findings and how each was fixed:
   1. **Guessing the code (security; open, for the human).** `/api/auth/email/verify` accepts a 6-digit code for any address, valid for an hour, and a wrong guess doesn't use it up (hypothesis 3). The route calls `verifyOtp` from the server, so Supabase's per-IP verification limit (`token_verifications`, "per IP address") counts Vercel's IP rather than the guesser's. A flood of guesses could also use up that shared limit and lock every player out. The old `/auth/confirm` took an unguessable token hash, so this path is new. Whether Auth also limits attempts per address is *unverified*. Not fixed: **the human accepted the risk for the playtest (2026-10-20)**; recorded in DECISIONS.md and in ROADMAP for M11.

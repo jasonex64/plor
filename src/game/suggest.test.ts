@@ -46,6 +46,11 @@ describe("suggest", () => {
   });
 
   // The boundary itself (2c review): 4 letters is the first length that gets typo suggestions.
+  it("doesn't count spaces as letters (M02 2f, B4)", () => {
+    // "ca t" is 4 characters but 3 letters, and one edit from "cat".
+    expect(suggest(entries, "ca t").typos).toEqual([]);
+  });
+
   it("offers typo suggestions from exactly 4 letters", () => {
     expect(ids(suggest(entries, "carz").typos)).toEqual(["car"]);
   });
