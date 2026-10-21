@@ -28,7 +28,7 @@ No source sets a target catch rate. It's a human number (G3).
 | G1 | Scoring: keep k points for surviving question k (DECISIONS.md, human-accepted 2026-10-17), or the human's "exponential distance" idea (2026-10-20)? A change is a DECISIONS.md change | 25, 50, 75, 100, 150, 250, 350; a perfect run is 1000 (human, 2026-10-21: points rise in "increasingly bigger jumps" for "a sense of excitement and urgency", and the total is a round number so every game's perfect run can be standardized; the human chose these values) |
 | G2 | Last question: does the Wind always "blow 3 answers" on question 7 (human idea, 2026-10-20), or does the host-answer count keep varying by question (DECISIONS.md, Game 1)? | Varies by question: the human said to keep the 3 answers "only if it doesn't limit design for removing prompts" (2026-10-21), and Claude's reading is that it does. Every host answer must stay typeable after Q7's vowel is stolen, so more hosts only add constraints; three Q7s with 2 host answers (Chinese zodiac, fairy tale, breakfast cereal) are among the parked days no letters fit (13c-3), though single-host Q7s failed too |
 | G3 | Target catch rate for each of the 7 questions, or a rule for how it rises (a human number) | "Challenging", tuned together with the human, not set yet (human, 2026-10-21: "we can adjust it together, but we want it to be challenging") |
-| G4 | Picking an answer: keep today's two steps (pick, then "Lock in"), or one tap? | Superseded by free typing: Enter sends the typed text, with no list to pick from and no "Lock in" (Claude's reading of the human's 2026-10-21 decisions below; to confirm) |
+| G4 | Picking an answer: keep today's two steps (pick, then "Lock in"), or one tap? | Superseded by free typing: Enter sends the typed text, with no list to pick from and no "Lock in" (confirmed by the human, 2026-10-21: "Yes, Enter sends") |
 | G5 | After a safe answer: a reveal moment with a "Next" tap, or straight on to the next question with the reveal above it? | Reveal, then "Next" (human, 2026-10-21) |
 | G6 | Days while building: the `content-rehearsal` days locally and on staging, or put some of the 28 drafted days back on the calendar now (each one used now is one fewer for the closed beta)? | Open: the human answered "not sure what u mean" (2026-10-21). Claude's reading of the human's content statement ("dont worry about pushing it or making it public. full fleshout of the app comes first"): no days go on a calendar for now, and building uses the `content-rehearsal` day on the local stack. Which days to use later is still to choose |
 | G7 | How fast a locked-in answer must show its result (a human number, set after the first measurement in 13c) | No target for now (human, 2026-10-21: "No target for now") |
@@ -116,20 +116,20 @@ Evidence so far (scratchpad runs, 2026-10-21):
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
-- [x] **13a** *(G6, which days to play, moved to M14 with the content; every other G is answered.)* The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points were first shown with DECISIONS.md's old rule while G1 was open, at the human's request; G1 is now answered (1000 for a perfect run).
+- [x] **13a** *(G3, the target difficulty, and G6, which days to play, moved to M14 with the content. The other G decisions are answered by the human, G4 confirmed 2026-10-21; G9 waits for M14's letter picker.)* The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points were first shown with DECISIONS.md's old rule while G1 was open, at the human's request; G1 is now answered (1000 for a perfect run).
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [x] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
-- [ ] **13b** *(Moved: playing on staging goes to M11 with publishing; the days to play are G6, in M14. Locally, a day plays from start to finish: 13c-1 to 13c-4 browser evidence.)* A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result). *The staging part is deferred: Claude's reading of the human's "dont worry about pushing it or making it public. full fleshout of the app comes first" (2026-10-21), since staging isn't public either; to confirm.*
+- [x] **13b** *(Staging moved to M11, human 2026-10-21: "Yes, move to M11". Locally done: a full day played start to finish on the running server, with its rows and the result screen; see Evidence, "Full local runs".)* A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [x] **13c-4 The rest of the play loop** on `src/app/game.tsx` (except the answer-time measurement, which waits for G7):
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
   - [x] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
   - [x] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows. First built with the old k points for question k while G1 was open; G1 since changed it to 25 to 350 (1000 for a perfect run).
   - [x] A countdown to the reset is shown on the result screen, from the next reset instant the server computes in SQL next to `private.today()` (`private.next_reset`; ROADMAP item from the M00 review). Since G13, the reset no longer ends a run.
-  - [x] *(No speed target: G7, human, 2026-10-21. A second Enter can't send twice: `busy` blocks it, and the server's idempotent answer path returns the stored result.)* Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
+  - [x] *(The speed part is dropped: no target, G7, human 2026-10-21; nothing was measured. The double-send part holds: `busy` blocks a second Enter (`src/app/game.tsx`), and the db tests "returns the stored result for a retry…" and "gives two concurrent identical answers the same result" pass; see Evidence.)* Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
   - [x] The result screen shows the run's points (G1), and each question's.
 - [ ] **13d** *(Moved to M14: content tuning waits until the app is fleshed out, human 2026-10-21.)* The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
-- [x] **13e** *(Locally, by the db tests below; on staging moves to M11 with publishing.)* Full runs cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
+- [x] **13e** *(Locally: `npm run status` against the running local server, the runs' rows and the db tests; see Evidence, "Full local runs". On staging: moved to M11, human 2026-10-21.)* Full runs cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
 
 ## Out of scope
 After the MVP (human, 2026-10-20):
@@ -149,7 +149,7 @@ Later, by the human (2026-10-21: "we can focus on the database and how to get an
 | Questions per day | Run length, progress | 7 (human, 2026-10-18; M02 Numbers) |
 | Points per question | Score during the run and at the end | 25, 50, 75, 100, 150, 250, 350, perfect run 1000 (G1, human, 2026-10-21) |
 | Host answers per question | Difficulty | Varies by question (DECISIONS.md, Game 1; G2, human, 2026-10-21) |
-| Target catch rate | Tuning (13d) | G3, open |
+| Target catch rate | Tuning (13d) | G3: "challenging", tuned together in M14 |
 | Answer response time | Smoothness (13c) | No target for now (G7, human, 2026-10-21) |
 | Time per question | The timer | 20 seconds (human, 2026-10-21) |
 | Letter schedule | Stolen letters per question | Schedule A: one at Q2 (medium), Q4 (medium), Q5 (heavy consonant), Q7 (vowel) (G8, human, 2026-10-21) |
@@ -168,7 +168,7 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
    
    Before measuring the answer time, write down the expected time, why, and what result would disprove it.
 4. **13d:** tune the scheduled days to G3, and publish them with `content:publish` (the human runs it).
-5. **13e:** full runs on staging, with evidence.
+5. **13e:** full runs, with evidence (locally; staging moved to M11).
 
 ## Removes
 - The one-line "Safe! You said …" (`LastResult` in `src/app/game.tsx`), replaced by the reveal.
@@ -197,12 +197,26 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading at first; confirmed by the human, 2026-10-21 |
 
 ## Evidence
-**13e full runs, locally** (branch `m13-game-mechanics`, 2026-10-21): `npm run test:db -- --exclude ".claude/**" src/game/runs.db.test.ts`: 71 tests passed. They cover, through the routes against the local database:
+**Full local runs** (13b, 13e; 2026-10-21, `next dev` and the local stack):
+- `npm run status -- http://localhost:3000`: `UP http://localhost:3000 (protocol 3)`.
+- **The human's own run** (local account jason@example.test, today's local test day, the 2026-11-08 questions) survived 7 of 7. Its rows (`private.run_event` joined to `private.question_open`; times Pacific):
+  - q1 pickleball, answered 02:39:24 (started by Start);
+  - q2 bacon, opened 02:39:27, answered 02:39:32;
+  - q3 delaware, opened 02:39:35, answered 02:39:45;
+  - q4 fedora, opened 02:39:47, answered 02:39:49;
+  - q5 rosemary, opened 02:39:50, answered 02:39:59;
+  - q6 mirror, opened 02:40:00, answered 02:40:04;
+  - q7 high-heels, opened 02:40:06, answered 02:40:23.
+
+  Each answer came within its question's 20 seconds of Next, and all were safe.
+- **The same answers on the browser pane's test account**, through the running server's routes: points went 25, 75, 150, 250, 400, 650, then 1000; each Next gave `msLeft` 19996; the status ended `survived`. The result screen (screenshot taken in the browser pane) read "You survived all 7! / You survived 7 of 7 questions and scored 1000 points", with each question and its points, and "Next puzzle in 21:14:18".
+- `npm run test:db -- --exclude ".claude/**" src/game/runs.db.test.ts`: 8 files, 71 tests passed (the path argument and `test:db`'s own `.db.test` filter combine, so all db files run). They cover, through the routes against the local database:
 - a full 7-of-7 run scoring 1000;
 - a catch on every question number, each ending the run there with the points before it (7 tests, added to close M13);
 - a time-out with and without an answer;
 - an off-list retry;
-- a refresh keeping the same deadline.
+- a refresh keeping the same deadline;
+- a second identical answer, sequential or concurrent, returning the stored result.
 **G1 scoring, 25 to 350, 1000 for a perfect run** (branch `m13-game-mechanics`, 2026-10-21, local stack):
 - `npm test -- --exclude ".claude/**"`: 19 files, 147 tests passed. `npx eslint .`: clean.
 - `npm run test:db -- --exclude ".claude/**"`: 8 files, 64 tests passed, including a full 7-of-7 run scoring 1000.
@@ -268,6 +282,17 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
   - The stolen-letter refusal used the question index the client sent, so a bypassed client could probe the letters of later questions (400 for a letter still to come, 409 otherwise), and ended runs answered 400 instead of their own errors. A db test input had been changed to dodge it. Now letters count only on the question in play, and the test sends a later question's own letters and expects 409.
   - A dev server was left running: it's kept on purpose, because the human is playing the game on `localhost:3000`; stopped when the human is done.
 - Deferred to ROADMAP "Next revision": items under "M13 13c-3 review".
+
+**M13 close-out** (reviewer agent, 2026-10-21):
+- Blocking findings and how each was fixed:
+  - 13a claimed "every other G is answered" while G3 was open and G4 unconfirmed: G3 moved to M14, and the human confirmed G4.
+  - 13b's staging move rested on Claude's reading: the human confirmed "Yes, move to M11". Its local part claimed a full day from runs that stopped at question 2: the human's own 7-of-7 run and a pane run to the result screen are now the evidence.
+  - 13e swapped in db tests for `npm run status` plus rows: `npm run status` against the running local server and the runs' rows are now recorded.
+  - The G7 sub-item was ticked as if measured: the speed part is marked dropped, and the double-send part has its evidence.
+  - Work "moved to M11" wasn't in M11's row: added (staging runs and the hosted database migrations).
+  - M14 was placed above the MVP line as if decided, and the human then chose M05 as next: M05 is next, and M14 sits after it below the line.
+  - The local dev server was left running: the human chose "Stop it", and it's stopped.
+- Deferred to ROADMAP "Next revision": none new. Its pointers to "13b"/"13d" now point at M14 and M11.
 
 **G1 and the human's answers** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
