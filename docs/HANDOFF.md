@@ -22,5 +22,9 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 Finish M06's end-to-end check, close M06, then draft the M07 ticket (friends and live board, with the display name).
 
 ## Local state
-- The local Supabase stack is running, with migration `20261021232903_puzzle_entry.sql` applied (`supabase migration up`; the local data was kept). Docker Desktop is running. No dev server is running.
-- The local database has no admin rows yet. It still has today's (2026-10-21) hand-loaded puzzle, with 2 runs.
+- On the machine M06 was built on: the local Supabase stack is stopped (data kept), with migration `20261021232903_puzzle_entry.sql` applied. Docker Desktop may still be open. No dev server is running. No admin rows exist yet. Today's (2026-10-21) hand-loaded puzzle has 2 runs.
+- **On any other machine** (the human plans to continue at home):
+  1. `git fetch` and `git checkout m06-puzzle-entry`, or `main` once PR #33 is merged.
+  2. `npm ci` and `npx supabase start`. Then `npx supabase migration up`, which keeps existing local data; a fresh stack applies every migration anyway.
+  3. `npm run dev`, sign in at `http://localhost:3000` with an email code (read it in Mailpit at `http://127.0.0.1:54324`), and pick a username.
+  4. Make that account an admin. A session does this: insert its user ID into `private.admin` on the local database.
