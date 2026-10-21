@@ -22,6 +22,11 @@ const EXPECTED: Record<string, string> = {
   "question-count": `${FILE}: has 6 questions, expected 7`,
   "no-host-answers": `${FILE} q2: has no host answers`,
   "duplicate-entry-id": `${FILE} q2 entry "lion": ID used by more than one entry`,
+  // M02 2f, B11: rules that had no fixture.
+  "match-group-key-unknown": `${FILE} q1 entry "tiger": match group key is not in the accepted bank`,
+  "host-bank-duplicate": `${FILE} q1 entry "lion": listed twice in host_bank`,
+  "host-answer-duplicate": `${FILE} q1 entry "eagle": listed twice in host_answers`,
+  "name-normalizes-empty": `${FILE} q1 entry "salmon": "!!!" is empty after normalization`,
   // M02 2f, B9: a mistyped extension used to be skipped silently.
   "not-json": "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",
 };
