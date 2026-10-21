@@ -33,6 +33,31 @@ No source sets a target catch rate. It's a human number (G3).
 | G6 | Days while building: the `content-rehearsal` days locally and on staging, or put some of the 28 drafted days back on the calendar now (each one used now is one fewer for the closed beta)? | |
 | G7 | How fast a locked-in answer must show its result (a human number, set after the first measurement in 13c) | |
 
+## Design exploration (2026-10-21, not decided unless marked "human")
+The human's problem statement: the game gives the player "too much leeway". Suggestions while typing act as hints, only listed answers can be submitted, and surviving all 7 is too easy because the answer space isn't restricted. Measured: the 2026-10-26 questions have 1 host answer out of 226 animals, 1 of 201 countries and 1 of 50 US states (2 of 12 on the last question).
+
+The human's answers so far:
+- **Typos:** "Auto-correct one typo" (human, 2026-10-21): text one typo away from an entry counts as that entry, using the existing typo rule (M02 Numbers), with no "did you mean" prompt.
+- **Reveal:** "After each question" (human, 2026-10-21), worded for a board, which is no longer the lead design.
+- **Ramp:** "make the mechanics more loose at the start, and then restrict more as time goes on to induce stress" (human, 2026-10-21).
+- **Off-list answers:** "there should be a timer, so free retries are allowed as the timer provides a sense of urgency" (human, 2026-10-21). What happens at time-out, and whether the timer shrinks, are open (the human had no preference).
+- **The share model** (a board of the top answers covering cₖ, a host catching tₖ): "does define what we want idealistically", but estimating shares by survey or from play over time is "just not feasible" (human, 2026-10-21).
+- **The goal:** "people feeling like they are in control/capable of putting 'quirky' answers to live so that they feel smart while simultaneously still feeling some sort of danger" (human, 2026-10-21).
+- **Lead idea:** the Wind steals letters. Each question bans one more visible letter; any valid answer without those letters is allowed; the host still catches the obvious answers; free typing with a timer. The human: "i like the first idea and would like to explore it more, but i need some real showing of … how we are able to properly take a large wordspace of answers" (2026-10-21).
+
+Evidence so far (scratchpad runs, 2026-10-21):
+- **Banning letters on today's hand lists, most common letter first:**
+  - animals: 226 → 102 → 45 → 33 → 12;
+  - US states: 50 → 14 → 3 → 0;
+  - rainy-day activities: 53 → 16 → 7 → 2 → 0.
+  
+  So small or closed sets die fast; letters must be chosen per question, and a question must never reach 0.
+- **Wikidata as a large answer source:** disproved twice.
+  - *Taxon common names* (fame of 15 or more wiki languages): 1,975 animals, but only 14 of today's 226 entries, plus odd names ("split", "kihikihi").
+  - *English labels and aliases:* 19 of 226, and dog, cat and lion are missing.
+  
+  Per CLAUDE.md this is a stop-and-re-plan point.
+
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
 - [ ] **13a** G1–G7 are answered here, and any rule change is written in DECISIONS.md.
