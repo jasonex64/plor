@@ -179,13 +179,14 @@ function SignedIn({ username, onSignedOut }: { username: string; onSignedOut: ()
   return (
     <>
       <Game />
-      <footer>
+      {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
+      <section aria-label="Account">
         <p>Signed in as {username}.</p>
         <button type="button" onClick={signOut}>
           Sign out
         </button>
         {error && <p role="alert">{error}</p>}
-      </footer>
+      </section>
     </>
   );
 }
