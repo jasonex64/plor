@@ -1,9 +1,9 @@
 import { authFailure, createAuthClient } from "@/lib/auth";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 
-// Sends a magic link (supabase.com/docs/guides/auth/auth-email-passwordless). A new address signs up on its
-// first link, which is the default (shouldCreateUser). The link itself comes from the email template, which
-// points at /auth/confirm with a token hash (same page, PKCE flow), so no redirect URL is passed here.
+// Emails a 6-digit sign-in code (supabase.com/docs/guides/auth/auth-email-passwordless, "With OTP", step 1); the
+// player types it in and /api/auth/email/verify checks it. A new address signs up on its first code, which is the
+// default (shouldCreateUser). The email template carries the code and no link, so no redirect URL is passed here.
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const { email } = await readJsonObject(request);

@@ -5,7 +5,10 @@ const MESSAGES: Record<string, string> = {
   email_address_not_authorized: "Sign-in emails can't be sent to this address yet.",
   over_email_send_rate_limit: "Too many sign-in emails were sent. Wait a while and try again.",
   over_request_rate_limit: "Too many attempts. Wait a while and try again.",
-  otp_expired: "That sign-in link has expired or was already used. Ask for a new one.",
+  otp_expired: "That code is wrong, expired or already used. Check the newest email, or reload to get a new code.",
+  code_invalid: "Enter the code from the email.",
+  // Supabase Auth itself failed (docs/milestones/M02-2f-cleanup.md, A2). Wording approved by the human, 2026-10-20.
+  auth_unavailable: "Sign-in isn't working on our side right now. Try again in a few minutes.",
   link_invalid: "That sign-in link isn't valid. Ask for a new one.",
   access_denied: "Google sign-in was cancelled.",
   not_signed_in: "You're signed out. Please sign in again.",

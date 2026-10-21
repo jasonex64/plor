@@ -2,11 +2,12 @@
 // (supabase.com/docs/guides/auth/server-side/creating-a-client; examples/auth/nextjs/lib/supabase/server.ts).
 // Every auth call runs on the server; the browser only ever holds the session cookies.
 import { createServerClient } from "@supabase/ssr";
-import type { AuthError, SupabaseClient } from "@supabase/supabase-js";
+import { isAuthRetryableFetchError, type AuthError, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { readServerEnv } from "@/config/env";
 import { AppError } from "@/lib/http";
+import { log } from "@/lib/log";
 
 // A new client per request: it reads that request's cookies (same guide, "Do I need to create a new client
 // for every route?"). Route handlers can write cookies, so unlike the guide's Server Component client there is
@@ -38,16 +39,23 @@ export async function requireUserId(supabase: SupabaseClient): Promise<string> {
   return userId;
 }
 
-// Supabase Auth reports a problem with the request itself (a bad email, a used link, a rate limit) as a 4xx with
-// a stable code, which the client shows to the player. Anything else is ours or theirs and stays a 500.
+// Supabase Auth reports a problem with the request itself (a bad email, a used code, a rate limit) as a 4xx with
+// a stable code, which the client shows to the player. When Auth itself fails (any 5xx, or no response at all),
+// supabase-js throws AuthRetryableFetchError (@supabase/auth-js 2.118.0, src/lib/fetch.ts handleError): the player
+// is told it's on our side, and the cause is logged here because the route wrapper doesn't log an AppError
+// (docs/milestones/M02-2f-cleanup.md, A2). Anything else stays a 500.
 export function authFailure(error: AuthError): Error {
+  if (isAuthRetryableFetchError(error)) {
+    log.error("supabase auth unavailable", { error: error.message, status: error.status });
+    return new AppError("auth_unavailable", 503, error.message);
+  }
   if (error.code && error.status !== undefined && error.status >= 400 && error.status < 500) {
     return new AppError(error.code, error.status, error.message);
   }
   return error;
 }
 
-// Where the email-link and Google callbacks land: home, with an error code the page turns into a message.
+// Where the Google callback lands: home, with an error code the page turns into a message.
 // Only a plain code survives, since the query string is something anyone can craft.
 // The Location is relative on purpose: Next.js builds request.url with "localhost" whatever the Host header says
 // (observed on `next start -H 127.0.0.1`, 2026-10-18), so an absolute URL from it sent the browser to another
