@@ -1,6 +1,13 @@
 # M00 — Stack comparison
 
-**Status:** proposal waiting on a human decision. Nothing in this file goes into DECISIONS.md or SOURCES.md until a human picks a stack.
+**Status:** decided 2026-10-17: Stack A (DECISIONS.md Log)
+
+> **Since this ticket (2026-10-21 docs audit):**
+> - The "Still open after choosing A" items are decided in DECISIONS.md "Current" (route handlers, Vercel `iad1`, Vitest plus pgTAP, the `log` module, the `AppError` wrapper, Postgres 17).
+> - SOURCES.md, not the "Proposed SOURCES.md entries" table below, is the pinned list; the anonymous-auth row was never added, since sign-in is required before play (DECISIONS.md Player identity).
+> - "M07" in "How A meets R2" and its two UNVERIFIED Broadcast questions meant the live-board milestone; that is M07 (friends and live board) today too, and the design and questions still stand for it.
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
 Research was done on 2026-10-17 using official docs, release pages and pricing pages only. Anything marked **UNVERIFIED** could not be confirmed from those pages.
 
 ## Requirements that test the stack

@@ -2,6 +2,13 @@
 
 **Status:** done (Part B merged in PR #19, 2026-10-20). Part A done (PR #17, merged 2026-10-20). Part B: 17 items fixed, 3 closed with evidence and no code (B13, B15, B17), and B10 dropped by the human (its hypothesis was disproved); B21 kept by the human as a narrowing, with the item left open for M04 (2026-10-20).
 
+> **Since this ticket (2026-10-21 docs audit):**
+> - A2's "any 5xx … becomes an `AuthRetryableFetchError`" is inaccurate: auth-js 2.118.0 does that only for 500–504, 520–530 and status 0 (ROADMAP "Next revision"; the same claim is in `src/lib/auth.ts`).
+> - App rate limits (here "M11") and the code-guessing risk's revisit are in launch, now M15; the not-in-list route they named is gone (ROADMAP "Next revision").
+> - "Future milestones": the reset countdown and the points formula are built and decided in M04 (`private.next_reset`; DECISIONS.md Scoring); a hint when Enter matches no entry no longer applies, since answers are typed text (DECISIONS.md Answer model); realtime RLS goes with friends and live board (now M07), points (now M09), home page copy with the home screen (now M11). B21 stays open in ROADMAP "Next revision".
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
+
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
 

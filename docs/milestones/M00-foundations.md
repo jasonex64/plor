@@ -2,6 +2,12 @@
 
 **Status:** done (2026-10-18). Merged via PR #1 (`8ed6945`) and follow-up PR #2 (`b4bbee2`).
 
+> **Since this ticket (2026-10-21 docs audit):**
+> - Production is public: M02 (D3, `M02-sign-in-and-play.md`) set Deployment Protection so only previews stay behind Vercel Authentication. The game is served at `https://plor.app`, and `npm run status -- https://plor.app` reaches it, so the "script can't reach staging" deviation below no longer applies.
+> - The app role is `plor_app` and the project `plor-staging` (renamed from `riff_app` / `riff-staging` in M02, migration `20261019070813_rename_riff_app_to_plor_app.sql`; DECISIONS.md Regions).
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
+
 **Outcome:** Next.js 16 on Vercel (`iad1`) talks to Supabase Postgres 17 (`us-east-1`) as the least-privileged `riff_app` role, through the Supavisor transaction pooler with verify-full TLS. CI runs lint, tests, build and gitleaks on every push. Every staging and production secret lives only in Vercel and the human's password manager; `.env.local` points at the local stack only. The full record is in Evidence and Review below.
 
 ## Goal

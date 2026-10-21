@@ -2,6 +2,14 @@
 
 **Status:** done (closed in the roadmap reset, 2026-10-20; no further work in the MVP). Built and merged in PR #14; its last criterion, the M02 findings, was produced on 2026-10-21 by the 2g survey scoring through `buildInsights` (the live playtest it waited for moved to M11). Decisions D1–D5 and Numbers set by the human on 2026-10-19.
 
+> **Since this ticket (2026-10-21 docs audit):**
+> - No run is "abandoned" any more: a run started before midnight can be finished after it, and run status is in_progress, died, survived or timed_out (DECISIONS.md Log 2026-10-21; migration `20261021081057_question_timer.sql`).
+> - AI puzzle drafting (here "M04") has no milestone: it is under ROADMAP "Later"; M04 became game mechanics.
+> - Seeing friends' and group members' misses (D4's "M06/M07") is in Groups, now M10 (ROADMAP).
+> - The live playtest is the closed beta in launch, now M15 (not M11); the visual design is now M14 (not M12).
+>
+> Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.
+
 ## Goal
 A per-question report shows the human how each puzzle really plays, and lets good unlisted answers be added to future puzzles before their day.
 

@@ -40,7 +40,7 @@ select is((select data_type || '/' || udt_name from information_schema.columns
            where table_schema = 'private' and table_name = 'profile' and column_name = 'username'),
   'USER-DEFINED/citext', 'username is citext');
 
--- Account deletion (M11) relies on this cascade even though plor_app has no DELETE.
+-- Account deletion (M12) relies on this cascade even though plor_app has no DELETE.
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000a';
 select is((select count(*)::int from private.profile where user_id = '00000000-0000-0000-0000-00000000000a'), 0,
   'deleting the auth user deletes the profile');

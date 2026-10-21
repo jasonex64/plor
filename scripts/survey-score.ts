@@ -9,7 +9,7 @@ import { parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
 import { matchAnswer, resolveTyped } from "../src/game/matching.ts";
 import { buildInsights, type AnswerRow, type DayInsights, type MissRow } from "../src/insights/report.ts";
 
-// The puzzle each survey set asked, as in docs/survey/message.md (ticket D4).
+// The puzzle each survey set asked, as in docs/milestones/M02-2g-survey.md, D4.
 export const SET_DATES: Record<string, string> = { "1": "2026-10-26", "2": "2026-10-27", "3": "2026-10-28" };
 const HEADER = ["person", "set", "q1", "q2", "q3", "q4", "q5", "q6", "q7"];
 
