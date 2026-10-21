@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-10-29",
   "questions": [
@@ -1494,7 +1494,8 @@
       "host_answers": [
         "broccoli"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name an ice cream flavor",
@@ -2315,7 +2316,8 @@
       "host_answers": [
         "invisibility"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "h"
     },
     {
       "prompt": "Name something in our solar system",
@@ -2629,7 +2631,8 @@
       "host_answers": [
         "mars"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "l"
     },
     {
       "prompt": "Name a US coin or bill",
@@ -2862,7 +2865,8 @@
         "c",
         "g"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "e"
     }
   ]
 }

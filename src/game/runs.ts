@@ -2,7 +2,7 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { matchAnswer, resolveTyped } from "./matching";
@@ -132,7 +132,10 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   const { date, content: puzzle } = rows[0];
   if (index >= puzzle.questions.length) throw new AppError("bad_request", 400, "no such question");
 
-  const entryId = resolveTyped(puzzle.questions[index], typed);
+  // A stolen letter can't be typed in the answer box (G11), so text with one comes from a bypassed client.
+  const stolen = stolenLetters(puzzle, index);
+  if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+  const entryId = resolveTyped(puzzle.questions[index], typed, stolen);
   if (!entryId) {
     try {
       await logMiss(db, userId, date, index, typed);

@@ -74,34 +74,41 @@ describe("resolveTyped", () => {
   };
 
   it("finds an entry by its name or an alias, after normalization", () => {
-    expect(resolveTyped(animals, "  Mouse ")).toBe("mouse");
-    expect(resolveTyped(animals, "MICE")).toBe("mouse");
-    expect(resolveTyped(animals, "house cat")).toBe("cat");
+    expect(resolveTyped(animals, "  Mouse ", [])).toBe("mouse");
+    expect(resolveTyped(animals, "MICE", [])).toBe("mouse");
+    expect(resolveTyped(animals, "house cat", [])).toBe("cat");
   });
 
   // Rules to build, rule 2: exact before typo. "moose" is one letter from the host "mouse" and must stay moose.
   it("prefers an exact name to a typo of another entry", () => {
-    expect(resolveTyped(animals, "moose")).toBe("moose");
-    expect(matchAnswer(animals, resolveTyped(animals, "moose")!)).toBe("not_matched");
+    expect(resolveTyped(animals, "moose", [])).toBe("moose");
+    expect(matchAnswer(animals, resolveTyped(animals, "moose", [])!)).toBe("not_matched");
   });
 
   it("auto-corrects one typo of 4+ letters to the only entry that close (human, 2026-10-21)", () => {
-    expect(resolveTyped(animals, "passprt")).toBe("passport");
-    expect(resolveTyped(animals, "carz")).toBe("car");
+    expect(resolveTyped(animals, "passprt", [])).toBe("passport");
+    expect(resolveTyped(animals, "carz", [])).toBe("car");
+  });
+
+  // G12 (human, 2026-10-21): a typo never lands on a name that needs a stolen letter. "passprt" is one typo from
+  // "passport", which needs the stolen O.
+  it("doesn't auto-correct onto a name that needs a stolen letter", () => {
+    expect(resolveTyped(animals, "passprt", ["o"])).toBeNull();
+    expect(resolveTyped(animals, "passprt", ["e"])).toBe("passport");
   });
 
   it("names no entry when two are one typo away, instead of guessing", () => {
     // "mose" is one letter short of both "mouse" and "moose".
-    expect(resolveTyped(animals, "mose")).toBeNull();
+    expect(resolveTyped(animals, "mose", [])).toBeNull();
   });
 
   it("doesn't auto-correct text under 4 letters, and doesn't count spaces as letters (M02 2f, B4)", () => {
-    expect(resolveTyped(animals, "cst")).toBeNull();
-    expect(resolveTyped(animals, "ca t")).toBeNull();
+    expect(resolveTyped(animals, "cst", [])).toBeNull();
+    expect(resolveTyped(animals, "ca t", [])).toBeNull();
   });
 
   it("names no entry for text that is in no list, or empty", () => {
-    expect(resolveTyped(animals, "unicorn")).toBeNull();
-    expect(resolveTyped(animals, "   ")).toBeNull();
+    expect(resolveTyped(animals, "unicorn", [])).toBeNull();
+    expect(resolveTyped(animals, "   ", [])).toBeNull();
   });
 });

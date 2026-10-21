@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-20",
   "questions": [
@@ -1358,7 +1358,8 @@
       "host_answers": [
         "silk"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a burger topping",
@@ -2365,7 +2366,8 @@
       "host_answers": [
         "persian"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "d"
     },
     {
       "prompt": "Name something that melts",
@@ -2802,7 +2804,8 @@
       "host_answers": [
         "chocolate"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "s"
     },
     {
       "prompt": "Name a letter used in Roman numerals",
@@ -3713,7 +3716,8 @@
         "taj-mahal",
         "colosseum"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "o"
     }
   ]
 }

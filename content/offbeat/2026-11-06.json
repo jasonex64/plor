@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-06",
   "questions": [
@@ -1190,7 +1190,8 @@
       "host_answers": [
         "honda"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "m"
     },
     {
       "prompt": "Name a dessert you'd bring to a potluck",
@@ -1811,7 +1812,8 @@
       "host_answers": [
         "stop-sign"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "d"
     },
     {
       "prompt": "Name a body part you have two of",
@@ -2004,7 +2006,8 @@
       "host_answers": [
         "ear"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "t"
     },
     {
       "prompt": "Name a kind of apple",
@@ -2295,7 +2298,8 @@
       "host_answers": [
         "blue-whale"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "i"
     }
   ]
 }

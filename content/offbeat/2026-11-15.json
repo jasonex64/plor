@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-15",
   "questions": [
@@ -1514,7 +1514,8 @@
       "host_answers": [
         "zebra"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "m"
     },
     {
       "prompt": "Name a condiment",
@@ -2873,7 +2874,8 @@
       "host_answers": [
         "butter"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "g"
     },
     {
       "prompt": "Name a play by Shakespeare",
@@ -3159,7 +3161,8 @@
       "host_answers": [
         "macbeth"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "n"
     },
     {
       "prompt": "Name a number on a clock face",
@@ -3934,7 +3937,8 @@
         "coffee",
         "rain"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

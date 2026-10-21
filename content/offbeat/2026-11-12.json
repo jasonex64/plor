@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-12",
   "questions": [
@@ -1615,7 +1615,8 @@
       "host_answers": [
         "mermaid"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a kind of candy",
@@ -3356,7 +3357,8 @@
       "host_answers": [
         "steering-wheel"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "b"
     },
     {
       "prompt": "Name a Canadian province or territory",
@@ -3488,7 +3490,8 @@
       "host_answers": [
         "quebec"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "r"
     },
     {
       "prompt": "Name a sound an animal makes",
@@ -3948,7 +3951,8 @@
       "host_answers": [
         "7"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

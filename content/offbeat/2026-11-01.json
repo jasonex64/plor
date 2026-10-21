@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-01",
   "questions": [
@@ -989,7 +989,8 @@
       "host_answers": [
         "green"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a mammal that mostly eats meat",
@@ -1559,7 +1560,8 @@
       "host_answers": [
         "omelet"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "b"
     },
     {
       "prompt": "Name a baked dessert made with fruit",
@@ -1822,7 +1824,8 @@
       "host_answers": [
         "apple-pie"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "t"
     },
     {
       "prompt": "Name a unit of time",
@@ -2521,7 +2524,8 @@
       "host_answers": [
         "fork"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

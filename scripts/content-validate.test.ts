@@ -27,6 +27,13 @@ const EXPECTED: Record<string, string> = {
   "host-bank-duplicate": `${FILE} q1 entry "lion": listed twice in host_bank`,
   "host-answer-duplicate": `${FILE} q1 entry "eagle": listed twice in host_answers`,
   "name-normalizes-empty": `${FILE} q1 entry "salmon": "!!!" is empty after normalization`,
+  // M13 13c-3: stolen letters, schedule A ("Rules to build", rule 6).
+  "steals-off-schedule": `${FILE} q3: steals "x", but schedule A steals nothing at question 3`,
+  "steals-missing": `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`,
+  "steals-wrong-tier": `${FILE} q5: steals "x", which is not a heavy consonant letter (rnlts)`,
+  "steals-repeated": `${FILE} q4: steals "m", which an earlier question already stole`,
+  "host-untypeable": `${FILE} q6 entry "march": host answer can't be typed without M, C, T`,
+  "no-safe-answer": `${FILE} q4: no safe answer can be typed without M, P`,
   // M02 2f, B9: a mistyped extension used to be skipped silently.
   "not-json": "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",
 };

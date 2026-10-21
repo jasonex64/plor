@@ -1,7 +1,7 @@
 // Typed answers and the host (DECISIONS.md: Answer model). Pure: the content decides. The player types free text
 // and the server alone turns it into an entry; the only runtime rule is the deterministic one-typo auto-correct
 // (human, 2026-10-21; docs/milestones/M13-game-mechanics.md, "Rules to build", rule 2).
-import { normalize, type Question } from "../content/puzzle.ts";
+import { avoids, normalize, type Question } from "../content/puzzle.ts";
 import { TYPO_MAX_EDITS, TYPO_MIN_LETTERS } from "../config/tunables.ts";
 
 export type MatchResult = "matched" | "not_matched";
@@ -34,18 +34,21 @@ export function editDistanceAtMost(a: string, b: string, max: number): boolean {
   return rows[a.length][b.length] <= max;
 }
 
-// The entry the typed text names, or null when it names none ("not in our list, try again"). An exact name or
-// alias wins before any typo, so "moose" is never read as a typo of "mouse"; the validator guarantees no two
-// entries share a normalized name. A typo counts only for text of 4+ letters (spaces aren't letters, M02 2f B4),
-// and only when exactly one entry is that close: when two are, the server would be guessing which one the
-// player meant.
-export function resolveTyped(question: Question, typed: string): string | null {
+// The entry the typed text names, or null when it names none ("not in our list, try again"). The caller has
+// already refused text with a stolen letter. An exact name or alias wins before any typo, so "moose" is never read
+// as a typo of "mouse"; the validator guarantees no two entries share a normalized name. A typo counts only for
+// text of 4+ letters (spaces aren't letters, M02 2f B4), only onto a name that avoids every stolen letter (G12:
+// "hors" is not horse once E is gone), and only when exactly one entry is that close: when two are, the server
+// would be guessing which one the player meant.
+export function resolveTyped(question: Question, typed: string, stolen: string[]): string | null {
   const query = normalize(typed);
   if (!query) return null;
   const texts = (names: string[]) => names.map(normalize);
   const exact = question.entries.find((e) => texts([e.name, ...e.aliases]).includes(query));
   if (exact) return exact.id;
   if (query.replaceAll(" ", "").length < TYPO_MIN_LETTERS) return null;
-  const near = question.entries.filter((e) => texts([e.name, ...e.aliases]).some((t) => editDistanceAtMost(query, t, TYPO_MAX_EDITS)));
+  const near = question.entries.filter((e) =>
+    texts([e.name, ...e.aliases]).some((t) => avoids(t, stolen) && editDistanceAtMost(query, t, TYPO_MAX_EDITS)),
+  );
   return near.length === 1 ? near[0].id : null;
 }

@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-04",
   "questions": [
@@ -790,7 +790,8 @@
       "host_answers": [
         "poodle"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "g"
     },
     {
       "prompt": "Name a kind of cheese",
@@ -1418,7 +1419,8 @@
       "host_answers": [
         "cinnamon"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name a school subject",
@@ -1736,7 +1738,8 @@
       "host_answers": [
         "history"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "l"
     },
     {
       "prompt": "Name a planet or a dwarf planet",
@@ -2061,7 +2064,8 @@
       "host_answers": [
         "kitchen"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

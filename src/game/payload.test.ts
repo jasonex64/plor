@@ -26,9 +26,12 @@ describe("publicQuestion", () => {
     });
   });
 
-  it("carries only the prompt, never the answer list (human, 2026-10-21)", () => {
-    const q = publicQuestion(puzzle, 0);
-    expect(q).toEqual({ index: 0, prompt: puzzle.questions[0].prompt });
+  it("carries only the prompt and the stolen letters, never the answer list (human, 2026-10-21)", () => {
+    expect(publicQuestion(puzzle, 0)).toEqual({ index: 0, prompt: puzzle.questions[0].prompt, stolen: [] });
+    // Letters stay gone: by the last question, every letter stolen on the way (schedule A: q2, q4, q5, q7).
+    const letters = [1, 3, 4, 6].map((i) => puzzle.questions[i].steals);
+    expect(publicQuestion(puzzle, 6).stolen).toEqual(letters);
+    expect(publicQuestion(puzzle, 2).stolen).toEqual(letters.slice(0, 1));
   });
 });
 

@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-14",
   "questions": [
@@ -1396,7 +1396,8 @@
       "host_answers": [
         "snickerdoodle"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name a music genre",
@@ -2586,7 +2587,8 @@
       "host_answers": [
         "yosemite"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "c"
     },
     {
       "prompt": "Name something you'd take camping",
@@ -3486,7 +3488,8 @@
       "host_answers": [
         "sleeping-bag"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "l"
     },
     {
       "prompt": "Name a color on a classic Rubik's Cube",
@@ -3891,7 +3894,8 @@
         "scarf",
         "mittens"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "e"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: 13c-1 (free typing) merged in PR #23; 13c-2 (the timer) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
+**Status:** in progress: 13c-1 (free typing) merged in PR #23 and 13c-2 (the timer) in PR #24; 13c-3 (stolen letters) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -119,7 +119,7 @@ Each criterion must be checkable with a command or other observable result. Crit
 - [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
-- [ ] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
+- [x] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
 - [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
@@ -182,6 +182,9 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| G11's chosen option: the key does nothing, "the box shakes and the stolen letter flashes" | The key does nothing, and "The Wind took P. Try a word without it." shows under the box | A shake or flash needs a duration, a number nobody has set; the look is M12. The message gives the same feedback with no number |
+| Rule 6: the validator refuses a day that breaks the rules; Claude picks letters for the test days | `npm run content:letters` picks them by searching each tier in a date-seeded order; 7 content days and the rehearsal 2026-10-19 day, which no letters fit, moved to `content-parked/` | The human chose to swap the failing questions, then said to "build the app first" (2026-10-21), so they're parked unchanged until that content work; nothing was deleted |
+| DECISIONS.md, Puzzle content format: format 1 | Format 2: each question may carry `steals` (one letter), set on the questions schedule A names | Rule 6 puts the letters in each day's file; a new version so old and new files can't be confused (Hard to reverse) |
 | Rule 3: a question starts on Start or Next | Until 13c-4, a question after the first starts when the previous answer is stored | "Next" is 13c-4; it will move the start to the tap |
 | DECISIONS.md, Q4 (M00, human 2026-10-17): a run started just before the reset is abandoned and scores 0 | No run is abandoned. The timer ends unfinished runs, and a run started before midnight can be finished after it | The human's G13 answer, 2026-10-21. DECISIONS.md is updated, and the leaderboard part waits for M08 |
 | The 13c-2 criterion: "DB tests use a fixed clock" | They move the run's stored times back | Postgres's clock can't be set for a test; the deadline is derived from the stored times, so moving them back is the same thing |
@@ -192,6 +195,20 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading at first; confirmed by the human, 2026-10-21 |
 
 ## Evidence
+**13c-3 stolen letters** (branch `m13-game-mechanics`, 2026-10-21, local stack):
+- `npm test -- --exclude ".claude/**"`: 19 files, 146 tests passed. They include:
+  - one fixture per new validator rule (off schedule, missing, wrong tier, repeated, host untypeable, no safe answer);
+  - the `steals` shape check;
+  - `content:letters` being deterministic, valid, and null when nothing fits;
+  - the payload carrying the stolen letters;
+  - a typo never landing on a name that needs a stolen letter (G12).
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 61 tests passed, including text with a stolen letter getting a 400 `stolen_letter`, with nothing logged and the same question. `npx supabase test db`: PASS. `npx eslint .`: clean.
+- `npm run content:validate` (21 files) and `-- content-rehearsal` (1 file): CONTENT OK.
+- **In the browser:**
+  - Question 2 showed "The Wind has taken: P".
+  - Typing "pancakes" left "ancakes", with "The Wind took P. Try a word without it."
+  - A reload kept the countdown (6 seconds left).
+  - A dev-server cache of a half-edited file gave a 500 until the dev server was restarted; the source was correct.
 **13c-1 free typing** (branch `m13-game-mechanics`, 2026-10-21, Windows, local stack):
 - `npx vitest run src/game/matching.test.ts src/game/payload.test.ts scripts/survey-score.test.ts src/app/api/run/routes.test.ts`: 4 files, 31 tests passed. They cover exact before typo ("moose" with a host "mouse" is moose and safe), one typo of 4+ letters, no typo under 4 letters or with spaces counted, two entries a typo away naming none, and the payload being only `{ index, prompt }`.
 - `npm test -- --exclude ".claude/**"`: 18 files, 135 tests passed. `npx eslint .`: no output.

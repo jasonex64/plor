@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-05",
   "questions": [
@@ -724,7 +724,8 @@
       "host_answers": [
         "bicycle"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name something in outer space",
@@ -1187,7 +1188,8 @@
       "host_answers": [
         "coin"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "u"
     },
     {
       "prompt": "Name a shape",
@@ -1375,7 +1377,8 @@
       "host_answers": [
         "triangle"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "s"
     },
     {
       "prompt": "Name a member of the cat family",
@@ -1642,7 +1645,8 @@
       "host_answers": [
         "cash"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "a"
     }
   ]
 }

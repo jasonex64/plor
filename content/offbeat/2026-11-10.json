@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "game_id": "offbeat",
   "date": "2026-11-10",
   "questions": [
@@ -1873,7 +1873,8 @@
       "host_answers": [
         "salmon"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "p"
     },
     {
       "prompt": "Name a hobby",
@@ -3186,7 +3187,8 @@
       "host_answers": [
         "austin"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "h"
     },
     {
       "prompt": "Name something with stripes",
@@ -3789,7 +3791,8 @@
       "host_answers": [
         "tiger"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "n"
     },
     {
       "prompt": "Name a continent",
@@ -4333,7 +4336,8 @@
         "gauze",
         "tweezers"
       ],
-      "match_groups": {}
+      "match_groups": {},
+      "steals": "o"
     }
   ]
 }

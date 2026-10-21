@@ -8,7 +8,7 @@ import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { GAME_ID, type Puzzle, type Question } from "@/content/puzzle";
+import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
@@ -41,8 +41,16 @@ async function ensurePuzzle(date: string): Promise<Puzzle> {
   return fixture(date);
 }
 
-function safeEntry(q: Question): string {
-  const id = q.entries.map((e) => e.id).find((entryId) => matchAnswer(q, entryId) === "not_matched");
+// A name or alias of the entry that a player can type at that question, past the stolen letters (M13 13c-3).
+function typeableName(p: Puzzle, index: number, entryId: string): string | undefined {
+  const entry = p.questions[index].entries.find((e) => e.id === entryId)!;
+  return [entry.name, ...entry.aliases].find((n) => avoids(n, stolenLetters(p, index)));
+}
+
+// An entry the host doesn't catch, that can be typed at that question.
+function safeEntry(p: Puzzle, index: number): string {
+  const q = p.questions[index];
+  const id = q.entries.map((e) => e.id).find((entryId) => matchAnswer(q, entryId) === "not_matched" && typeableName(p, index, entryId));
   if (!id) throw new Error(`no safe answer for "${q.prompt}"`);
   return id;
 }
@@ -54,9 +62,9 @@ async function call(response: Promise<Response>) {
 const state = () => call(stateRoute(apiRequest("/api/run", { method: "GET" })));
 const start = () => call(startRoute(apiRequest("/api/run/start", { method: "POST" })));
 const answerText = (index: number, text: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, text } })));
-// Types the entry's name, as a player would. The name comes from the puzzle of the run being answered: today's,
+// Types a name of the entry, as a player would. The name comes from the puzzle of the run being answered: today's,
 // or yesterday's for a run from a day that has ended (the two can differ on a local stack with published days).
-const nameIn = (p: Puzzle, index: number, entryId: string) => p.questions[index].entries.find((e) => e.id === entryId)!.name;
+const nameIn = (p: Puzzle, index: number, entryId: string) => typeableName(p, index, entryId)!;
 const answer = (index: number, entryId: string) => answerText(index, nameIn(puzzle, index, entryId));
 
 async function newPlayer(name: string): Promise<{ userId: string; session: Map<string, string> }> {
@@ -120,12 +128,12 @@ describe("a run, step by step", () => {
   });
 
   it("refuses to skip ahead", async () => {
-    expect(await answer(1, safeEntry(puzzle.questions[1]))).toEqual({ status: 409, body: { ok: false, error: "out_of_order" } });
+    expect(await answer(1, safeEntry(puzzle, 1))).toEqual({ status: 409, body: { ok: false, error: "out_of_order" } });
   });
 
   it("answers a question, reveals its host answers and serves the next question", async () => {
     const q = puzzle.questions[0];
-    const entryId = safeEntry(q);
+    const entryId = safeEntry(puzzle, 0);
     const { status, body } = await answer(0, entryId);
     expect(status).toBe(200);
     expect(body.notInList).toBe(false);
@@ -143,17 +151,29 @@ describe("a run, step by step", () => {
     expect(JSON.stringify(body.run.question)).not.toMatch(/host/);
   });
 
+  // M13 13c-3: the answer box can't type a stolen letter (G11), so the server refuses text with one from a bypassed
+  // client, at no cost: nothing stored, nothing logged, the same question.
+  it("refuses text with a stolen letter with 400, and the question stays", async () => {
+    const letter = puzzle.questions[1].steals!;
+    const misses = async () =>
+      (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
+    const before = await misses();
+    expect(await answerText(1, `zz${letter.toUpperCase()}zz`)).toEqual({ status: 400, body: { ok: false, error: "stolen_letter" } });
+    expect(await misses()).toBe(before);
+    expect((await state()).body.run).toMatchObject({ status: "in_progress", question: { index: 1, stolen: [letter] } });
+  });
+
   it("returns the stored result for a retry, and 409 already_answered for a different entry", async () => {
     const q = puzzle.questions[0];
-    const again = await answer(0, safeEntry(q));
+    const again = await answer(0, safeEntry(puzzle, 0));
     expect(again.status).toBe(200);
     expect(again.body.run.answered).toHaveLength(1);
-    const other = q.entries.map((e) => e.id).find((id) => id !== safeEntry(q))!;
+    const other = q.entries.map((e) => e.id).find((id) => id !== safeEntry(puzzle, 0))!;
     expect(await answer(0, other)).toEqual({ status: 409, body: { ok: false, error: "already_answered" } });
   });
 
   it("gives two concurrent identical answers the same result, never a 500 (ROADMAP item)", async () => {
-    const entryId = safeEntry(puzzle.questions[1]);
+    const entryId = safeEntry(puzzle, 1);
     const results = await Promise.all([answer(1, entryId), answer(1, entryId)]);
     for (const r of results) expect([200, 409]).toContain(r.status);
     expect(results.some((r) => r.status === 200)).toBe(true);
@@ -162,7 +182,7 @@ describe("a run, step by step", () => {
 
   it("lets one of two concurrent different answers win and refuses the other with 409, never a 500", async () => {
     const q = puzzle.questions[2];
-    const safe = q.entries.map((e) => e.id).filter((id) => matchAnswer(q, id) === "not_matched");
+    const safe = q.entries.map((e) => e.id).filter((id) => matchAnswer(q, id) === "not_matched" && typeableName(puzzle, 2, id));
     const results = await Promise.all([answer(2, safe[0]), answer(2, safe[1])]);
     expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
     expect(results.find((r) => r.status === 409)!.body.error).toBe("already_answered");
@@ -176,7 +196,7 @@ describe("a run, step by step", () => {
     expect(retry.body).toMatchObject({ ok: true, notInList: true, run: { status: "in_progress", question: { index: 3 } } });
     expect(retry.body.run.answered).toHaveLength(3);
     expect(await answerText(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
-    expect(await answerText(5, "later question")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
+    expect(await answerText(5, "zzzz")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
     expect(await count()).toBe(1);
     const { rows } = await getPool().query<{ typed: string }>("select typed from private.missed_answer where user_id = $1", [player.userId]);
     expect(rows[0].typed).toBe("a thing nobody listed");
@@ -189,7 +209,7 @@ describe("a run, step by step", () => {
     expect(body.run.status).toBe("died");
     expect(body.run.question).toBeNull();
     expect(body.run.answered[3]).toMatchObject({ matched: true, answer: { id: q.host_answers[0] } });
-    expect(await answer(4, safeEntry(puzzle.questions[4]))).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
+    expect(await answer(4, safeEntry(puzzle, 4))).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
   });
 });
 
@@ -199,7 +219,7 @@ describe("other ways a run ends", () => {
     useSession(player.session);
     await start();
     let last;
-    for (let i = 0; i < puzzle.questions.length; i++) last = await answer(i, safeEntry(puzzle.questions[i]));
+    for (let i = 0; i < puzzle.questions.length; i++) last = await answer(i, safeEntry(puzzle, i));
     expect(last!.body.run).toMatchObject({ status: "survived", question: null });
     expect(last!.body.run.answered).toHaveLength(puzzle.questions.length);
   });
@@ -215,7 +235,7 @@ describe("other ways a run ends", () => {
       yesterday,
     ]);
     expect((await state()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 0 } });
-    const entryId = safeEntry(yesterdayPuzzle.questions[0]);
+    const entryId = safeEntry(yesterdayPuzzle, 0);
     const { status, body } = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(status).toBe(200);
     expect(body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
@@ -224,7 +244,7 @@ describe("other ways a run ends", () => {
   it("shows a retried answer to yesterday's run whose time ran out as its ending, not a blank state (2b review)", async () => {
     const player = await newPlayer("r");
     useSession(player.session);
-    const entryId = safeEntry(yesterdayPuzzle.questions[0]);
+    const entryId = safeEntry(yesterdayPuzzle, 0);
     // Yesterday's run with its first answer stored, then aged past the second question's 20 seconds.
     const db = getPool();
     await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
@@ -280,7 +300,7 @@ describe("the 20-second timer", () => {
     useSession(player.session);
     await start();
     await ageRun(player.userId, 18);
-    const { status, body } = await answer(0, safeEntry(puzzle.questions[0]));
+    const { status, body } = await answer(0, safeEntry(puzzle, 0));
     expect(status).toBe(200);
     expect(body.run).toMatchObject({ status: "in_progress", question: { index: 1 } });
     expect(body.run.msLeft).toBeGreaterThan(19_000);
@@ -290,9 +310,9 @@ describe("the 20-second timer", () => {
     const player = await newPlayer("t3");
     useSession(player.session);
     await start();
-    await answer(0, safeEntry(puzzle.questions[0]));
+    await answer(0, safeEntry(puzzle, 0));
     await ageRun(player.userId, 21);
-    const { status, body } = await answer(1, safeEntry(puzzle.questions[1]));
+    const { status, body } = await answer(1, safeEntry(puzzle, 1));
     expect(status).toBe(200);
     expect(body.run).toMatchObject({ status: "timed_out", question: null, msLeft: null });
     expect(body.run.answered).toHaveLength(1);

@@ -24,7 +24,7 @@ describe("expectedPlural", () => {
 describe("parsePuzzle (shape of untrusted files)", () => {
   const file = "offbeat/2026-11-02.json";
   const errorsOf = (value: unknown) => parsePuzzle(file, JSON.stringify(value)).errors;
-  const top = { format: 1, game_id: "offbeat", date: "2026-11-02", questions: [] };
+  const top = { format: 2, game_id: "offbeat", date: "2026-11-02", questions: [] };
 
   it("rejects text that is not JSON", () => {
     expect(parsePuzzle(file, "{").errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
@@ -35,7 +35,7 @@ describe("parsePuzzle (shape of untrusted files)", () => {
       `${file}: missing "format"`,
       `${file}: unknown field "version"`,
     ]);
-    expect(errorsOf({ ...top, format: 2 })).toEqual([`${file}: "format" must be 1`]);
+    expect(errorsOf({ ...top, format: 1 })).toEqual([`${file}: "format" must be 2`]);
   });
 
   it("rejects an unknown game and an impossible date", () => {
@@ -60,5 +60,12 @@ describe("parsePuzzle (shape of untrusted files)", () => {
       `${file} q1: "host_answers" must be a list of entry IDs`,
       `${file} q1: "match_groups" must map a host answer ID to a list of entry IDs`,
     ]);
+  });
+
+  it("rejects a stolen letter that isn't one lower-case letter (M13 13c-3)", () => {
+    const question = { prompt: "Name a pet", entries: [], host_bank: [], host_answers: [], match_groups: {} };
+    for (const steals of ["E", "ab", "é", 5]) {
+      expect(errorsOf({ ...top, questions: [{ ...question, steals }] })).toEqual([`${file} q1: "steals" must be one lower-case letter a-z`]);
+    }
   });
 });
