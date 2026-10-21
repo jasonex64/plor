@@ -132,8 +132,15 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   const { date, content: puzzle } = rows[0];
   if (index >= puzzle.questions.length) throw new AppError("bad_request", 400, "no such question");
 
-  // A stolen letter can't be typed in the answer box (G11), so text with one comes from a bypassed client.
-  const stolen = stolenLetters(puzzle, index);
+  // A stolen letter can't be typed in the answer box (G11), so text with one comes from a bypassed client. Letters
+  // count only on the question in play: checking another index would let a client probe the letters of questions
+  // it hasn't reached, and a run that has ended answers with its own errors below.
+  const { rows: current } = await db.query<{ status: RunStatus; answered: number }>(
+    `select status, answered from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
+    [userId, GAME_ID, date],
+  );
+  const inPlay = current[0]?.status === "in_progress" && current[0].answered === index;
+  const stolen = inPlay ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
   const entryId = resolveTyped(puzzle.questions[index], typed, stolen);
   if (!entryId) {

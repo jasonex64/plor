@@ -26,7 +26,7 @@ let yesterday = "";
 let puzzle: Puzzle;
 let yesterdayPuzzle: Puzzle;
 
-// A real puzzle file under another date: its content is valid format 1 and has QUESTIONS_PER_DAY questions.
+// A real puzzle file under another date: its content is valid format 2 and has QUESTIONS_PER_DAY questions.
 function fixture(date: string): Puzzle {
   return { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date };
 }
@@ -196,7 +196,9 @@ describe("a run, step by step", () => {
     expect(retry.body).toMatchObject({ ok: true, notInList: true, run: { status: "in_progress", question: { index: 3 } } });
     expect(retry.body.run.answered).toHaveLength(3);
     expect(await answerText(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
-    expect(await answerText(5, "zzzz")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
+    // A later question answers 409 whatever letters it will steal, so its letters can't be probed (13c-3 review).
+    const later = `${puzzle.questions[4].steals}${puzzle.questions[6].steals} later`;
+    expect(await answerText(5, later)).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
     expect(await count()).toBe(1);
     const { rows } = await getPool().query<{ typed: string }>("select typed from private.missed_answer where user_id = $1", [player.userId]);
     expect(rows[0].typed).toBe("a thing nobody listed");

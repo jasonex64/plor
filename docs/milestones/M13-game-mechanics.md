@@ -184,6 +184,7 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 |---|---|---|
 | G11's chosen option: the key does nothing, "the box shakes and the stolen letter flashes" | The key does nothing, and "The Wind took P. Try a word without it." shows under the box | A shake or flash needs a duration, a number nobody has set; the look is M12. The message gives the same feedback with no number |
 | Rule 6: the validator refuses a day that breaks the rules; Claude picks letters for the test days | `npm run content:letters` picks them by searching each tier in a date-seeded order; 7 content days and the rehearsal 2026-10-19 day, which no letters fit, moved to `content-parked/` | The human chose to swap the failing questions, then said to "build the app first" (2026-10-21), so they're parked unchanged until that content work; nothing was deleted |
+| (no source) | A day may not steal the same letter twice | A repeat would steal nothing; it follows from "one more letter" in the lead idea, but no source states it |
 | DECISIONS.md, Puzzle content format: format 1 | Format 2: each question may carry `steals` (one letter), set on the questions schedule A names | Rule 6 puts the letters in each day's file; a new version so old and new files can't be confused (Hard to reverse) |
 | Rule 3: a question starts on Start or Next | Until 13c-4, a question after the first starts when the previous answer is stored | "Next" is 13c-4; it will move the start to the tap |
 | DECISIONS.md, Q4 (M00, human 2026-10-17): a run started just before the reset is abandoned and scores 0 | No run is abandoned. The timer ends unfinished runs, and a run started before midnight can be finished after it | The human's G13 answer, 2026-10-21. DECISIONS.md is updated, and the leaderboard part waits for M08 |
@@ -234,6 +235,12 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 - **In the browser:** Start showed "18 seconds left" three seconds in. "socer" + Enter showed question 2 at "19 seconds left". After 20 seconds with no answer, the screen read "Time's up on question 2 / You survived 1 of 7 questions".
 
 ## Review
+**13c-3** (reviewer agent, 2026-10-21):
+- Blocking findings and how each was fixed:
+  - The stolen-letter refusal used the question index the client sent, so a bypassed client could probe the letters of later questions (400 for a letter still to come, 409 otherwise), and ended runs answered 400 instead of their own errors. A db test input had been changed to dodge it. Now letters count only on the question in play, and the test sends a later question's own letters and expects 409.
+  - A dev server was left running: it's kept on purpose, because the human is playing the game on `localhost:3000`; stopped when the human is done.
+- Deferred to ROADMAP "Next revision": items under "M13 13c-3 review".
+
 **13c-2** (reviewer agent, 2026-10-21; no way to beat the timer was found):
 - Blocking findings and how each was fixed:
   - The plor_app grant was waiting for approval: the human approved it, and DECISIONS.md records that.

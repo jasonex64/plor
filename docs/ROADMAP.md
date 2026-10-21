@@ -80,7 +80,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Measure in the M02 2g survey (then the M11 live test) whether each question's host bank holds the answers players actually give, then decide a host bank size guideline (a human number). Found in M01 (planning, human 2026-10-18: "No fixed size yet"). M01 only checks that the bank covers the host answers.
 
 **Content (for the human, before days go back on the calendar):**
-- [ ] **Parked days** (M13 13c-3, 2026-10-21): no stolen letters from schedule A fit one question of 2026-10-28 (Chinese zodiac), 10-30 (Winter Olympic sport), 10-31 (country in South America), 11-03 (berry), 11-07 and rehearsal 10-19 (common pet), 11-17 (fairy tale) and 11-19 (breakfast cereal). They're in `content-parked/` unchanged. The human chose to swap those questions for bigger open categories, then said to build the app first. Found in M13 13c-3.
+- [ ] **Parked days** (M13 13c-3, 2026-10-21): no stolen letters from schedule A fit one question of 2026-10-28 (Chinese zodiac), 10-30 (Winter Olympic sport), 10-31 (country in South America), 11-03 (berry), 11-07 and rehearsal 10-19 (common pet), 11-17 (fairy tale) and 11-19 (breakfast cereal). They're in `content-parked/`, changed only from format 1 to 2 (no letters, so the validator refuses them until they get some). Parking leaves gaps in `content/`, so `content:publish` on `content` refuses ("the puzzle dates have gaps") until the days are re-dated (13b/13d). The human chose to swap those questions for bigger open categories, then said to build the app first. Found in M13 13c-3.
 - [ ] Late draft questions with one dominant host answer (citrus: orange, pet: dog, room: kitchen, shoe: sneakers) may catch far more than a gentle share. Measure in the M02 2g survey. Found in M01 (review 2).
 - [ ] Some draft days may have no concrete question (a closed answer set), e.g. 2026-11-02, 11-03, 11-07 (drafted as 12-18, 12-19, 12-23; re-dated in M02), depending on whether "a kind of nut" or "a coffee drink" counts as concrete. Needs a human reading of "concrete". Found in M01 (review 2).
 - [ ] 2026-11-08 (drafted as 12-24) q3 "entirely east of the Mississippi River": Kaskaskia, Illinois lies west of today's channel, so "entirely" is arguable for Illinois. Soften the prompt or accept it. Found in M01 (review 2). Content only, editable before its day.
@@ -130,6 +130,13 @@ These are non-blocking items found during work or review. Record each one here *
 
 **M13 13c-3 (2026-10-21):**
 - [ ] `npm run survey:score` reads set 3's day from `content/offbeat/2026-10-28.json`, which is now parked in `content-parked/`, so re-scoring the survey fails with a missing file (loudly). Found in M13 13c-3. The survey is finished; fix it if it's ever re-run.
+
+**M13 13c-3 review (2026-10-21):**
+- [ ] `PROTOCOL_VERSION` stays 2, so a 13c-2 client against a 13c-3 server neither shows nor blocks stolen letters and only gets 400s, instead of a loud `client_outdated`. Found in M13 13c-3 (review). Matters only while an older client is deployed; bump to 3 with the next API change.
+- [ ] Stored `private.puzzle.content` is used as a format-2 `Puzzle` with no format check, so a format-1 row would play with no letters and no error. Found in M13 13c-3 (review). No format-1 day is on any calendar (staging *unverified*); check before 13b publishes.
+- [ ] The answer box's filter normalizes one character at a time, so a ligature ("ﬁ") passes it and the server then refuses it; the blocked message shows the raw character ("É"), not the plain letter; the filter has no unit test. Found in M13 13c-3 (review). Confusing at worst, never a way around the letters.
+- [ ] The medium tier's letters (C P H U B D M G) come from the ticket's measured grouping, which the human approved by choosing schedule A; one explicit confirmation of the letters would settle it. Found in M13 13c-3 (review).
+- [ ] **Release step:** the timer migration (`20261021081057_question_timer.sql`) is merged but not applied to the hosted database (a human step, `npx supabase db push`); it must be applied before any day is published there. *Unverified* whether it already is. Found in M13 13c-3.
 
 **Housekeeping (pull in when the area is touched):**
 - [ ] `eslint@9` (from the template's `^9` range) prints "no longer supported". Move to a supported ESLint once `eslint-config-next` supports it. Found in M00 (implementation). Lint works today.
