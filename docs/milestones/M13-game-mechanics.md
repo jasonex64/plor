@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: 13c-1 (free typing) merged in PR #23 and 13c-2 (the timer) in PR #24; 13c-3 (stolen letters) in review, 2026-10-21. The ticket (PR #22) was merged on 2026-10-21. Since the human's decision of 2026-10-20 this is the only MVP milestone: "only things that are about making the game mechanics work, and are smooth, should be on the MVP right now. everything else comes after".
+**Status:** in progress: 13c-1 (free typing), 13c-2 (the timer) and 13c-3 (stolen letters) merged (PRs #23 to #26); 13c-4 (reveal and Next, points, reset countdown) in review, 2026-10-21. Open: G1, G2, G3, G6, G7, G9; 13b, 13d and 13e.
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -116,18 +116,18 @@ Evidence so far (scratchpad runs, 2026-10-21):
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
-- [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G1 before points are shown; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it.
+- [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points are shown with DECISIONS.md's existing rule while G1 is open, at the human's request ("build 13c-4: … points during the run and on the result", 2026-10-21); G1 can still change the rule.
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [x] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
 - [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
-- [ ] **13c-4 The rest of the play loop** on `src/app/game.tsx`:
+- [x] **13c-4 The rest of the play loop** on `src/app/game.tsx` (except the answer-time measurement, which waits for G7):
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
-  - [ ] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
-  - [ ] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows.
-  - [ ] A countdown to the reset is shown, from the next reset instant the server computes in SQL next to `private.today()` (ROADMAP item from the M00 review). A run still open at the reset ends as abandoned with a clear message.
+  - [x] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
+  - [x] The points so far are shown during the run (G1), next to the "Question n of 7" that `game.tsx` already shows. Built with DECISIONS.md's existing k points for question k, since G1 (whether to change it) is still open.
+  - [x] A countdown to the reset is shown on the result screen, from the next reset instant the server computes in SQL next to `private.today()` (`private.next_reset`; ROADMAP item from the M00 review). Since G13, the reset no longer ends a run.
   - [ ] Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
-  - [ ] The result screen shows the run's points (G1).
+  - [x] The result screen shows the run's points (G1), and each question's.
 - [ ] **13d** The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
 - [ ] **13e** Full runs on staging cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
 
@@ -186,8 +186,9 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rule 6: the validator refuses a day that breaks the rules; Claude picks letters for the test days | `npm run content:letters` picks them by searching each tier in a date-seeded order; 7 content days and the rehearsal 2026-10-19 day, which no letters fit, moved to `content-parked/` | The human chose to swap the failing questions, then said to "build the app first" (2026-10-21), so they're parked unchanged until that content work; nothing was deleted |
 | (no source) | A day may not steal the same letter twice | A repeat would steal nothing; it follows from "one more letter" in the lead idea, but no source states it |
 | DECISIONS.md, Puzzle content format: format 1 | Format 2: each question may carry `steals` (one letter), set on the questions schedule A names | Rule 6 puts the letters in each day's file; a new version so old and new files can't be confused (Hard to reverse) |
-| Rule 3: a question starts on Start or Next | Until 13c-4, a question after the first starts when the previous answer is stored | "Next" is 13c-4; it will move the start to the tap |
-| DECISIONS.md, Q4 (M00, human 2026-10-17): a run started just before the reset is abandoned and scores 0 | No run is abandoned. The timer ends unfinished runs, and a run started before midnight can be finished after it | The human's G13 answer, 2026-10-21. DECISIONS.md is updated, and the leaderboard part waits for M08 |
+| Rule 3: a question starts on Start or Next | Built in 13c-4: question 1 on Start, the rest on Next (`private.question_open`) | 13c-2 briefly started it at the previous answer, before Next existed |
+| Rule 5 (reveal, then Next) with G13 (a run started before midnight can be finished) | A run left at a reveal has no clock and stays in progress; a reload shows it, even on a later day, until it's finished | Waiting at a reveal must not time out; Claude first had today's puzzle win over an earlier day's reveal, and the human chose "Resume yesterday's run" (2026-10-21). How such a run scores is for M08 (ROADMAP) |
+| DECISIONS.md, Q4 (M00, human 2026-10-17): a run started just before the reset is abandoned and scores 0 | No run is abandoned. A run ends with a catch, its last question or a timed-out question; one left at a reveal stays in progress; a run started before midnight can be finished after it | The human's G13 answer, 2026-10-21. DECISIONS.md is updated, and the leaderboard part waits for M08 |
 | The 13c-2 criterion: "DB tests use a fixed clock" | They move the run's stored times back | Postgres's clock can't be set for a test; the deadline is derived from the stored times, so moving them back is the same thing |
 | DECISIONS.md Config: tunables live in `tunables.ts` | The 20 seconds lives in SQL (`private.question_deadline`) | The database is the judge of the deadline, and the client only shows the time left the server measured, so TypeScript never needs the number. One place, not two |
 | Rules to build, rule 2: refuse text with a stolen letter (step 2), and typos only onto names that avoid stolen letters (step 4) | 13c-1 builds rule 2 without the stolen-letter parts | There are no stolen letters until 13c-3, which adds both parts and their tests |
@@ -196,6 +197,23 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
 | Rules to build, rule 2.4: two entries a typo away name none | Built that way | Claude's reading at first; confirmed by the human, 2026-10-21 |
 
 ## Evidence
+**13c-4 reveal, Next, points, reset countdown** (branch `m13-game-mechanics`, 2026-10-21, local stack):
+- `npm run test:db -- --exclude ".claude/**"`: 8 files, 64 tests passed. They include:
+  - the reveal (no question, no clock, the next letter, +1 point);
+  - an answer before Next refused with 409 `not_open`;
+  - Next opening question 2 at about 20 seconds, and a second tap changing nothing;
+  - a minute at the reveal still being in progress;
+  - Next before the first answer refused (`no_reveal`) and after the run ended refused (`run_over`);
+  - a full 7-of-7 run scoring 28 points, with the reset ahead and at most 25 hours away;
+  - yesterday's run left at its reveal resumed on reload, and Next going on with it;
+  - text for an unopened question refused with `not_open`, with nothing logged;
+  - as plor_app: start, answer, Next, miss.
+- `npx supabase test db`: 4 files, 82 tests, PASS. They include the deadline being null at a reveal, an answer before Next being OB006, Next opening only the question after the last answer, and plor_app's exact grants.
+- `npm test -- --exclude ".claude/**"`: 19 files, 147 tests passed (the Next route refuses a signed-out player). `npx eslint .`: clean.
+- **In the browser:**
+  - "soccer" showed "Safe! You said soccer; the host said tennis. +1 point · 1 point so far. Next, the Wind steals P." and a Next button.
+  - Next showed "20 seconds left", "Question 2 of 7 · 1 point so far" and "The Wind has taken: P".
+  - "waffle" (the host) showed "Caught on question 2 / You survived 1 of 7 questions and scored 1 point", each question with its points, and "Next puzzle in 22:02:03" at 01:58 Pacific.
 **13c-3 stolen letters** (branch `m13-game-mechanics`, 2026-10-21, local stack):
 - `npm test -- --exclude ".claude/**"`: 19 files, 146 tests passed. They include:
   - one fixture per new validator rule (off schedule, missing, wrong tier, repeated, host untypeable, no safe answer);
@@ -240,6 +258,15 @@ One PR per sub-ticket, from the branch `m13-game-mechanics`.
   - The stolen-letter refusal used the question index the client sent, so a bypassed client could probe the letters of later questions (400 for a letter still to come, 409 otherwise), and ended runs answered 400 instead of their own errors. A db test input had been changed to dodge it. Now letters count only on the question in play, and the test sends a later question's own letters and expects 409.
   - A dev server was left running: it's kept on purpose, because the human is playing the game on `localhost:3000`; stopped when the human is done.
 - Deferred to ROADMAP "Next revision": items under "M13 13c-3 review".
+
+**13c-4** (reviewer agent, 2026-10-21):
+- Blocking findings and how each was fixed:
+  - At the reveal, text that names nothing for the unopened question was logged as a miss (a probe of its list before seeing it): the answer path now refuses any text for a question not opened with Next (409 `not_open`) before resolving it, and a db test checks nothing is logged.
+  - DECISIONS.md still said the timer ends every unfinished run: corrected (a run left at a reveal stays in progress).
+  - Today's puzzle winning over an earlier day's reveal narrowed G13 without the human: the human chose "Resume yesterday's run"; `todaysState` shows any run in progress, and the 2b-review test resumes yesterday's run.
+  - Points were shown while 13a said "G1 before points": 13a now records the human's request for points with the existing rule.
+  - The plor_app grants were waiting for approval: the human approved them ("Approve them").
+- Deferred to ROADMAP "Next revision": items under "M13 13c-4 review".
 
 **13c-2** (reviewer agent, 2026-10-21; no way to beat the timer was found):
 - Blocking findings and how each was fixed:

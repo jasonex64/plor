@@ -6,6 +6,7 @@ import { DatabaseError, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
+import { POST as nextRoute } from "@/app/api/run/next/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
@@ -61,6 +62,7 @@ async function call(response: Promise<Response>) {
 }
 const state = () => call(stateRoute(apiRequest("/api/run", { method: "GET" })));
 const start = () => call(startRoute(apiRequest("/api/run/start", { method: "POST" })));
+const next = () => call(nextRoute(apiRequest("/api/run/next", { method: "POST" })));
 const answerText = (index: number, text: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, text } })));
 // Types a name of the entry, as a player would. The name comes from the puzzle of the run being answered: today's,
 // or yesterday's for a run from a day that has ended (the two can differ on a local stack with published days).
@@ -101,7 +103,20 @@ describe("a run, step by step", () => {
     useSession(player.session);
     expect(await state()).toEqual({
       status: 200,
-      body: { ok: true, run: { date: today, status: "not_started", total: puzzle.questions.length, answered: [], question: null, msLeft: null } },
+      body: {
+        ok: true,
+        run: {
+          date: today,
+          status: "not_started",
+          total: puzzle.questions.length,
+          answered: [],
+          question: null,
+          msLeft: null,
+          next: null,
+          points: 0,
+          msToReset: expect.any(Number),
+        },
+      },
     });
   });
 
@@ -111,9 +126,10 @@ describe("a run, step by step", () => {
     expect(first.body.run).toMatchObject({ date: today, status: "in_progress", answered: [] });
     // The question is exactly the public view of question 1: nothing about the host is added on the way out.
     expect(first.body.run.question).toEqual(publicQuestion(puzzle, 0));
-    // Starting again is the same run: everything matches except the time left, which has only gone down.
+    // Starting again is the same run: everything matches except the clocks, which have only gone down.
     const again = await start();
-    expect({ ...again, body: { ...again.body, run: { ...again.body.run, msLeft: 0 } } }).toEqual({ ...first, body: { ...first.body, run: { ...first.body.run, msLeft: 0 } } });
+    const clocksOff = (r: typeof first) => ({ ...r, body: { ...r.body, run: { ...r.body.run, msLeft: 0, msToReset: 0 } } });
+    expect(clocksOff(again)).toEqual(clocksOff(first));
     expect(again.body.run.msLeft).toBeLessThanOrEqual(first.body.run.msLeft);
   });
 
@@ -131,7 +147,7 @@ describe("a run, step by step", () => {
     expect(await answer(1, safeEntry(puzzle, 1))).toEqual({ status: 409, body: { ok: false, error: "out_of_order" } });
   });
 
-  it("answers a question, reveals its host answers and serves the next question", async () => {
+  it("answers a question, reveals its host answers and points, and waits for Next (G5)", async () => {
     const q = puzzle.questions[0];
     const entryId = safeEntry(puzzle, 0);
     const { status, body } = await answer(0, entryId);
@@ -144,11 +160,31 @@ describe("a run, step by step", () => {
         answer: { id: entryId, name: q.entries.find((e) => e.id === entryId)!.name },
         matched: false,
         hostAnswers: q.host_answers.map((id) => ({ id, name: q.entries.find((e) => e.id === id)!.name })),
+        points: 1,
       },
     ]);
+    // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
+    expect(body.run).toMatchObject({ status: "in_progress", question: null, msLeft: null, points: 1 });
+    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
+  });
+
+  it("refuses an answer before Next, then Next opens question 2 with its own 20 seconds, once", async () => {
+    const misses = async () =>
+      (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
+    const before = await misses();
+    expect(await answer(1, safeEntry(puzzle, 1))).toEqual({ status: 409, body: { ok: false, error: "not_open" } });
+    // Text that names nothing is refused too, and nothing is logged for a question the player hasn't seen.
+    expect(await answerText(1, "zzz zzz")).toEqual({ status: 409, body: { ok: false, error: "not_open" } });
+    expect(await misses()).toBe(before);
+    const { status, body } = await next();
+    expect(status).toBe(200);
     expect(body.run.question).toEqual(publicQuestion(puzzle, 1));
+    expect(body.run.next).toBeNull();
+    expect(body.run.msLeft).toBeGreaterThan(19_000);
+    expect(body.run.msLeft).toBeLessThanOrEqual(20_000);
     // Only question 1's host answers are in the response; question 2's are not marked anywhere.
     expect(JSON.stringify(body.run.question)).not.toMatch(/host/);
+    expect((await next()).body.run.question).toEqual(publicQuestion(puzzle, 1));
   });
 
   // M13 13c-3: the answer box can't type a stolen letter (G11), so the server refuses text with one from a bypassed
@@ -181,6 +217,7 @@ describe("a run, step by step", () => {
   });
 
   it("lets one of two concurrent different answers win and refuses the other with 409, never a 500", async () => {
+    await next();
     const q = puzzle.questions[2];
     const safe = q.entries.map((e) => e.id).filter((id) => matchAnswer(q, id) === "not_matched" && typeableName(puzzle, 2, id));
     const results = await Promise.all([answer(2, safe[0]), answer(2, safe[1])]);
@@ -189,6 +226,7 @@ describe("a run, step by step", () => {
   });
 
   it("treats text that names no entry as a free retry logged as a miss, and rejects (without logging) more than 40 characters", async () => {
+    await next();
     const count = async () =>
       (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer where user_id = $1", [player.userId])).rows[0].n;
     // Z is in no stolen-letter tier (tunables.ts), so this text is typeable on any day (13c-3: an H in "thing" was
@@ -223,9 +261,18 @@ describe("other ways a run ends", () => {
     useSession(player.session);
     await start();
     let last;
-    for (let i = 0; i < puzzle.questions.length; i++) last = await answer(i, safeEntry(puzzle, i));
-    expect(last!.body.run).toMatchObject({ status: "survived", question: null });
+    for (let i = 0; i < puzzle.questions.length; i++) {
+      if (i > 0) await next();
+      last = await answer(i, safeEntry(puzzle, i));
+    }
+    expect(last!.body.run).toMatchObject({ status: "survived", question: null, next: null });
     expect(last!.body.run.answered).toHaveLength(puzzle.questions.length);
+    // k points for question k: 1 + 2 + ... + 7 (DECISIONS.md, Game 1).
+    expect(last!.body.run.points).toBe(28);
+    // The next midnight Pacific is ahead, and less than a day away, plus an hour on the day the clocks go back.
+    expect(last!.body.run.msToReset).toBeGreaterThan(0);
+    expect(last!.body.run.msToReset).toBeLessThanOrEqual(25 * 3600 * 1000);
+    expect(await next()).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
   });
 
   // A run started before midnight can be finished after it (human, 2026-10-21); the timer, not the day, ends it.
@@ -242,14 +289,15 @@ describe("other ways a run ends", () => {
     const entryId = safeEntry(yesterdayPuzzle, 0);
     const { status, body } = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(status).toBe(200);
-    expect(body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
+    expect(body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null });
+    expect((await next()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 
-  it("shows a retried answer to yesterday's run whose time ran out as its ending, not a blank state (2b review)", async () => {
+  it("shows a retried answer to yesterday's run left at its reveal as that reveal, and resumes it on reload (2b review; G13)", async () => {
     const player = await newPlayer("r");
     useSession(player.session);
     const entryId = safeEntry(yesterdayPuzzle, 0);
-    // Yesterday's run with its first answer stored, then aged past the second question's 20 seconds.
+    // Yesterday's run with its first answer stored, as if left at the reveal before midnight.
     const db = getPool();
     await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [player.userId, GAME_ID, yesterday]);
     await db.query("insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)", [
@@ -258,13 +306,12 @@ describe("other ways a run ends", () => {
       yesterday,
       entryId,
     ]);
-    await db.query("update private.run set started_at = started_at - interval '1 minute' where user_id = $1", [player.userId]);
-    await db.query("update private.run_event set created_at = created_at - interval '1 minute' where user_id = $1", [player.userId]);
     const retry = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(retry.status).toBe(200);
-    expect(retry.body.run).toMatchObject({ date: yesterday, status: "timed_out", question: null });
-    // Nothing is in progress any more, so the player is offered today's puzzle.
-    expect((await state()).body.run).toMatchObject({ date: today, status: "not_started" });
+    expect(retry.body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null, next: { steals: yesterdayPuzzle.questions[1].steals ?? null } });
+    // "Resume yesterday's run" (human, 2026-10-21): a reload shows yesterday's reveal, and Next goes on with it.
+    expect((await state()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null });
+    expect((await next()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 
   it("needs a username before a run can start", async () => {
@@ -282,6 +329,7 @@ describe("the 20-second timer", () => {
     const db = getPool();
     await db.query("update private.run set started_at = started_at - make_interval(secs => $2) where user_id = $1 and puzzle_date = $3::date", [userId, seconds, today]);
     await db.query("update private.run_event set created_at = created_at - make_interval(secs => $2) where user_id = $1 and puzzle_date = $3::date", [userId, seconds, today]);
+    await db.query("update private.question_open set opened_at = opened_at - make_interval(secs => $2) where user_id = $1 and puzzle_date = $3::date", [userId, seconds, today]);
   }
   const events = async (userId: string) =>
     (await getPool().query<{ n: number }>("select count(*)::int as n from private.run_event where user_id = $1", [userId])).rows[0].n;
@@ -299,15 +347,31 @@ describe("the 20-second timer", () => {
     expect(after.msLeft).toBeLessThanOrEqual(15_000);
   });
 
-  it("counts an answer just before the deadline, and the next question gets its own 20 seconds", async () => {
+  it("counts an answer just before the deadline, and the next question gets its own 20 seconds after Next", async () => {
     const player = await newPlayer("t2");
     useSession(player.session);
     await start();
     await ageRun(player.userId, 18);
     const { status, body } = await answer(0, safeEntry(puzzle, 0));
     expect(status).toBe(200);
-    expect(body.run).toMatchObject({ status: "in_progress", question: { index: 1 } });
-    expect(body.run.msLeft).toBeGreaterThan(19_000);
+    expect(body.run).toMatchObject({ status: "in_progress", question: null, msLeft: null });
+    expect((await next()).body.run.msLeft).toBeGreaterThan(19_000);
+  });
+
+  it("gives the reveal no clock: a minute at it is still in progress", async () => {
+    const player = await newPlayer("t6");
+    useSession(player.session);
+    await start();
+    await answer(0, safeEntry(puzzle, 0));
+    await ageRun(player.userId, 60);
+    expect((await state()).body.run).toMatchObject({ status: "in_progress", question: null, next: { steals: puzzle.questions[1].steals ?? null } });
+  });
+
+  it("refuses Next before the first answer", async () => {
+    const player = await newPlayer("t7");
+    useSession(player.session);
+    await start();
+    expect(await next()).toEqual({ status: 409, body: { ok: false, error: "no_reveal" } });
   });
 
   it("ends the run when an answer comes after the deadline, and stores nothing for it", async () => {
@@ -315,6 +379,7 @@ describe("the 20-second timer", () => {
     useSession(player.session);
     await start();
     await answer(0, safeEntry(puzzle, 0));
+    await next();
     await ageRun(player.userId, 21);
     const { status, body } = await answer(1, safeEntry(puzzle, 1));
     expect(status).toBe(200);

@@ -57,10 +57,15 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   'private.day_of(timestamp with time zone) execute',
   'private.missed_answer insert', 'private.missed_answer select',
+  -- The reset countdown (M13 13c-4).
+  'private.next_reset() execute',
   'private.profile insert', 'private.profile select',
   'private.puzzle select',
-  -- The status view and the answer trigger compute each question's deadline as plor_app (M13 13c-2).
+  -- The status view and the answer trigger compute each question's deadline as plor_app (M13 13c-2), from when it
+  -- was opened with Next (13c-4).
   'private.question_deadline(timestamp with time zone) execute',
+  'private.question_open insert', 'private.question_open select',
+  'private.question_started_at(uuid,text,date,integer) execute',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
