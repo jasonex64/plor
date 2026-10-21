@@ -13,6 +13,10 @@ export const USERNAME_MAX_LENGTH = 20;
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4;
 
+// Points for surviving each question, Q1 to Q7: they rise with each harder question in growing jumps, and a perfect
+// run is 1000, a round total future games can share (human, 2026-10-21; M13 G1). Replaces k points for question k.
+export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
+
 // Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M13-game-mechanics.md, "Rules to build", rule 4):
 // the tier the Wind steals from at each question, or null for no theft. Tiers are the M13 ticket's measured grouping
 // (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels

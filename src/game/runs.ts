@@ -4,6 +4,7 @@
 import { DatabaseError } from "pg";
 import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
+import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 import { matchAnswer, resolveTyped } from "./matching";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
@@ -13,7 +14,7 @@ import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } f
 // 2026-10-21; its score won't count for leaderboards, M08).
 export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
 
-// points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: k points for question k).
+// points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION).
 export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[]; points: number };
 
 export type RunState = {
@@ -63,11 +64,6 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-// k points for surviving question k, counted from 1 (DECISIONS.md, Game 1; human-accepted 2026-10-17).
-function pointsFor(index: number): number {
-  return index + 1;
-}
-
 type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
 
 function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock): RunState {
@@ -79,7 +75,7 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
       answer: named(question, e.entry_id),
       matched: e.matched,
       hostAnswers: hostAnswers(question),
-      points: e.matched ? 0 : pointsFor(e.question_idx),
+      points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
     };
   });
   const status = clock.status ?? "not_started";

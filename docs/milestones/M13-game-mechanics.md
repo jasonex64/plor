@@ -1,6 +1,6 @@
 # M13 — Game mechanics: working and smooth
 
-**Status:** in progress: 13c-1 (free typing), 13c-2 (the timer) and 13c-3 (stolen letters) merged (PRs #23 to #26); 13c-4 (reveal and Next, points, reset countdown) in review, 2026-10-21. Open: G1, G2, G3, G6, G7, G9; 13b, 13d and 13e.
+**Status:** in progress: the play loop (13c-1 to 13c-4) is merged (PRs #23 to #27), and G1 (1000-point scoring) is in review, 2026-10-21. Nothing is published (G6). Open: G3 (tuned together later), 13d (content, deferred) and 13e (full local runs).
 
 ## Goal
 Offbeat can be played every day, its open rules are settled, its questions catch players at the rate the human sets, and one run feels smooth from the first question to the result.
@@ -25,15 +25,15 @@ No source sets a target catch rate. It's a human number (G3).
 ## Decisions needed before any code
 | # | Decision | Answer (origin) |
 |---|---|---|
-| G1 | Scoring: keep k points for surviving question k (DECISIONS.md, human-accepted 2026-10-17), or the human's "exponential distance" idea (2026-10-20)? A change is a DECISIONS.md change | |
-| G2 | Last question: does the Wind always "blow 3 answers" on question 7 (human idea, 2026-10-20), or does the host-answer count keep varying by question (DECISIONS.md, Game 1)? | |
-| G3 | Target catch rate for each of the 7 questions, or a rule for how it rises (a human number) | |
+| G1 | Scoring: keep k points for surviving question k (DECISIONS.md, human-accepted 2026-10-17), or the human's "exponential distance" idea (2026-10-20)? A change is a DECISIONS.md change | 25, 50, 75, 100, 150, 250, 350; a perfect run is 1000 (human, 2026-10-21: points rise in "increasingly bigger jumps" for "a sense of excitement and urgency", and the total is a round number so every game's perfect run can be standardized; the human chose these values) |
+| G2 | Last question: does the Wind always "blow 3 answers" on question 7 (human idea, 2026-10-20), or does the host-answer count keep varying by question (DECISIONS.md, Game 1)? | Varies by question (human, 2026-10-21: keep the 3 answers "only if it doesn't limit design for removing prompts"). It does: every host answer must stay typeable after Q7's vowel is stolen, and the fairy tale and breakfast cereal days already fail with 2 host answers on Q7 (13c-3) |
+| G3 | Target catch rate for each of the 7 questions, or a rule for how it rises (a human number) | "Challenging", tuned together with the human, not set yet (human, 2026-10-21: "we can adjust it together, but we want it to be challenging") |
 | G4 | Picking an answer: keep today's two steps (pick, then "Lock in"), or one tap? | Superseded by free typing: Enter sends the typed text, with no list to pick from and no "Lock in" (Claude's reading of the human's 2026-10-21 decisions below; to confirm) |
 | G5 | After a safe answer: a reveal moment with a "Next" tap, or straight on to the next question with the reveal above it? | Reveal, then "Next" (human, 2026-10-21) |
-| G6 | Days while building: the `content-rehearsal` days locally and on staging, or put some of the 28 drafted days back on the calendar now (each one used now is one fewer for the closed beta)? | |
-| G7 | How fast a locked-in answer must show its result (a human number, set after the first measurement in 13c) | |
+| G6 | Days while building: the `content-rehearsal` days locally and on staging, or put some of the 28 drafted days back on the calendar now (each one used now is one fewer for the closed beta)? | Local only: nothing is published and there is no deadline; the app is fleshed out first (human, 2026-10-21: "dont worry about pushing it or making it public. full fleshout of the app comes first") |
+| G7 | How fast a locked-in answer must show its result (a human number, set after the first measurement in 13c) | No target for now; revisit only if it feels slow (human, 2026-10-21) |
 | G8 | Letter schedule: on which questions the Wind steals a letter, and from which tier (draft A, B or C below, or another) | A (human, 2026-10-21) |
-| G9 | Fewest familiar safe answers a question may have left after its stolen letters and its host answers (a human number; the daily letter picker enforces it) | Open; needed only for the picker, which waits for the answer database (human, 2026-10-21: "we can focus on the database and how to get answers later") |
+| G9 | Fewest familiar safe answers a question may have left after its stolen letters and its host answers (a human number; the daily letter picker enforces it) | Not needed yet: only an automatic letter picker needs it, and that waits for the answer database (human, 2026-10-21). Today the validator only requires at least one safe answer left |
 | G10 | What happens when the 20-second timer runs out: the run ends, or the question scores 0 and the run goes on | The run ends (human, 2026-10-21) |
 | G11 | Typing a stolen letter: the key does nothing (and the box shakes), or the answer is refused on submit | The key does nothing (human, 2026-10-21) |
 | G13 | A run whose 20 seconds would end after midnight: the day ends it, or it goes on? | It goes on: "they get to play the puzzle but their score doesn't contribute to leaderboard" (human, 2026-10-21). The timer, not midnight, ends an unfinished run; M08 leaves such a run out of the leaderboard |
@@ -116,11 +116,11 @@ Evidence so far (scratchpad runs, 2026-10-21):
 
 ## Acceptance criteria
 Each criterion must be checkable with a command or other observable result. Criteria that depend on a decision get their final wording once it's answered.
-- [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points are shown with DECISIONS.md's existing rule while G1 is open, at the human's request ("build 13c-4: … points during the run and on the result", 2026-10-21); G1 can still change the rule.
+- [ ] **13a** The G decisions each sub-ticket depends on are answered here before its code (G4, G5, G8, G10, G11 and G12 before 13c; G3 and G6 before 13d), and each rule change is written in DECISIONS.md in the PR that builds it. Points were first shown with DECISIONS.md's old rule while G1 was open, at the human's request; G1 is now answered (1000 for a perfect run).
 - [x] **13c-1 Free typing:** the client receives no answer list (checked in the served payload: `payload.test.ts` and a request from the browser; the criterion first said "by `check:client-bundle`", but that script only scans for secrets and server env values, so it can't see an answer list), and the server matches typed text in the order of "Rules to build", rule 2, without its stolen-letter parts (steps 2 and 4), which come with 13c-3. Unit tests cover: exact before typo (moose with a host mouse is safe), a match-group member is caught, and off-list text is a free retry that's logged as a miss.
 - [x] **13c-2 Timer:** each question gives 20 seconds from Start or Next (human, 2026-10-21); until 13c-4 adds Next, from the previous answer. An answer after the deadline, or none, ends the run (G10), and a refresh keeps the same deadline. DB tests cover an answer just before and just after the deadline. They move the run's stored times back instead of fixing the clock: Postgres's clock can't be set, and the deadline is computed from those times.
 - [x] **13c-3 Stolen letters:** schedule A's letters come from the day's content and show in the play screen, and a stolen letter's key does nothing (G11). The server refuses text with a stolen letter. The validator refuses a day that breaks rule 6, and each refusal has a fixture. A unit test shows a typo never lands on a name needing a stolen letter (G12; moved here from 13c-1, which has no letters yet).
-- [ ] **13b** A day can be played from start to finish, both locally and on staging, using the days G6 chooses (evidence: the run's rows and a screenshot of the result).
+- [x] **13b** A day can be played from start to finish locally (G6: nothing is published; staging is deferred with publishing). Evidence: the browser runs in 13c-1 to 13c-4.
 - [x] **13c-4 The rest of the play loop** on `src/app/game.tsx` (except the answer-time measurement, which waits for G7):
   - [x] Enter on text that isn't in the list says so ("not in our list, try again") instead of doing nothing (ROADMAP item from the M02 2c review). *Done in 13c-1.*
   - [x] Every answer gets a reveal, then "Next" (G5): your answer next to the host's, safe or caught, and the next stolen letter.
@@ -128,8 +128,8 @@ Each criterion must be checkable with a command or other observable result. Crit
   - [x] A countdown to the reset is shown on the result screen, from the next reset instant the server computes in SQL next to `private.today()` (`private.next_reset`; ROADMAP item from the M00 review). Since G13, the reset no longer ends a run.
   - [ ] Time from Enter to the result, measured on staging, is within G7, and a second Enter can't send the answer twice.
   - [x] The result screen shows the run's points (G1), and each question's.
-- [ ] **13d** The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
-- [ ] **13e** Full runs on staging cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
+- [ ] **13d** *(Deferred, human 2026-10-21: content and publishing wait until the app is fleshed out.)* The questions on the days G6 schedules are tuned to G3: host answers and host banks adjusted using the survey findings and the M03 report. The human makes the content calls in ROADMAP "Next revision", Content. The M01 validator passes.
+- [ ] **13e** *(Locally for now; staging is deferred with publishing, human 2026-10-21.)* Full runs cover a full 7-of-7 run, a catch on every question number, a time-out, an off-list retry, and a refresh in the middle of a run that resumes it with the same deadline (evidence: `npm run status` plus the runs' rows). Tests cover every new rule from G1, G2, the timer, the letters and the countdown.
 
 ## Out of scope
 After the MVP (human, 2026-10-20):
@@ -147,10 +147,10 @@ Later, by the human (2026-10-21: "we can focus on the database and how to get an
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
 | Questions per day | Run length, progress | 7 (human, 2026-10-18; M02 Numbers) |
-| Points per question | Score during the run and at the end | k for question k (DECISIONS.md, Game 1, human-accepted 2026-10-17), unless G1 changes it |
-| Host answers per question | Difficulty | Varies by question (DECISIONS.md, Game 1), unless G2 changes question 7 |
+| Points per question | Score during the run and at the end | 25, 50, 75, 100, 150, 250, 350, perfect run 1000 (G1, human, 2026-10-21) |
+| Host answers per question | Difficulty | Varies by question (DECISIONS.md, Game 1; G2, human, 2026-10-21) |
 | Target catch rate | Tuning (13d) | G3, open |
-| Answer response time | Smoothness (13c) | G7, open |
+| Answer response time | Smoothness (13c) | No target for now (G7, human, 2026-10-21) |
 | Time per question | The timer | 20 seconds (human, 2026-10-21) |
 | Letter schedule | Stolen letters per question | Schedule A: one at Q2 (medium), Q4 (medium), Q5 (heavy consonant), Q7 (vowel) (G8, human, 2026-10-21) |
 | Fewest familiar safe answers left | The daily letter picker (later) | G9, open |
