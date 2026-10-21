@@ -4,7 +4,8 @@ import { AppError, checkProtocol, handle } from "@/lib/http";
 import { dayInsights, isAdmin, reportDays } from "@/insights/queries";
 
 // The puzzle insights report, for admins only (docs/milestones/M03-puzzle-insights.md, D1): signed out → 401,
-// signed in but not in private.admin → 403. `?date=YYYY-MM-DD` picks a day; the default is today.
+// signed in but not in private.admin → 403. `?date=YYYY-MM-DD` picks a day; the default is the newest
+// day with a puzzle (today if it has one).
 export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());

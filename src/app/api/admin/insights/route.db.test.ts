@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
+import { dayInsights } from "@/insights/queries";
 import { apiRequest } from "@/test/request-scope";
 import { GET } from "./route";
 
@@ -116,5 +117,34 @@ describe("GET /api/admin/insights", () => {
     expect(await response.json()).toEqual({ ok: false, error: "not_available" });
     const days = (await (await report()).json()).days;
     expect(days).not.toContain(tomorrow);
+  });
+});
+
+// B3 (M02 2f): with no puzzle today, the default report is the last finished day, so the page and its day list stay
+// reachable. Runs on its own client in a transaction that is rolled back, so the shared fixtures stay as they were.
+describe("dayInsights with no date, when today has no puzzle", () => {
+  it("reports the newest published day before today", async () => {
+    const client = await getPool().connect();
+    try {
+      await client.query("begin");
+      await client.query("delete from private.run where game_id = $1 and puzzle_date = private.today()", [GAME_ID]);
+      await client.query("delete from private.puzzle where game_id = $1 and puzzle_date = private.today()", [GAME_ID]);
+      const earlier = (await client.query<{ day: string }>("select (private.today() - 3)::text as day")).rows[0].day;
+      await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3) on conflict do nothing", [
+        GAME_ID,
+        earlier,
+        { ...puzzle, date: earlier },
+      ]);
+      const newest = (
+        await client.query<{ day: string }>(
+          "select max(puzzle_date)::text as day from private.puzzle where game_id = $1 and puzzle_date < private.today()",
+          [GAME_ID],
+        )
+      ).rows[0].day;
+      expect(await dayInsights(client, null)).toMatchObject({ date: newest, finished: true });
+    } finally {
+      await client.query("rollback");
+      client.release();
+    }
   });
 });
