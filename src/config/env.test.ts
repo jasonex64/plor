@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readServerEnv } from "./env";
+import { readServerEnv } from "./env.ts";
 
 const PEM = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----";
 const REMOTE = "postgresql://plor_app.ref:pw@aws-0-us-east-1.pooler.supabase.com:6543/postgres";

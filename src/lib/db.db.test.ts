@@ -2,7 +2,7 @@
 // Uses the local database's documented default URL (supabase.com/docs/guides/local-development/cli/getting-started).
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { withTransaction } from "./db";
+import { withTransaction } from "./db.ts";
 
 // One connection so the temp table (session-scoped) is visible to every transaction in this file.
 const pool = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });

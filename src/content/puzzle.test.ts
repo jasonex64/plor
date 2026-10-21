@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { expectedPlural, normalize, parsePuzzle } from "./puzzle";
+import { expectedPlural, normalize, parsePuzzle } from "./puzzle.ts";
 
 describe("normalize", () => {
   it.each([

@@ -2,8 +2,8 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:f
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { addPlurals } from "./content-plurals";
-import { validateRoot } from "./content-validate";
+import { addPlurals } from "./content-plurals.ts";
+import { validateRoot } from "./content-validate.ts";
 
 const FIXTURES = join(import.meta.dirname, "fixtures", "content");
 const FILE = "offbeat/2026-11-02.json";

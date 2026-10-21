@@ -1,6 +1,6 @@
 import { Client } from "pg";
 import { describe, expect, it } from "vitest";
-import { poolConfig } from "./db";
+import { poolConfig } from "./db.ts";
 
 // Feeds our config through pg's real parameter resolution (what a pooled client actually uses),
 // so a regression back to `connectionString` or a dropped CA shows up here. No network.

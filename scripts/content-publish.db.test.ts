@@ -4,9 +4,9 @@
 import { readFileSync } from "node:fs";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
-import type { Puzzle } from "../src/content/puzzle";
-import { withTransaction } from "../src/lib/db";
-import { publish } from "./content-publish";
+import type { Puzzle } from "../src/content/puzzle.ts";
+import { withTransaction } from "../src/lib/db.ts";
+import { publish } from "./content-publish.ts";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 const base: Puzzle = JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8"));

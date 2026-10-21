@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { validateRoot } from "./content-validate";
+import { validateRoot } from "./content-validate.ts";
 
 // Each failing fixture is the valid one with a single rule broken (M01 ticket: one fixture per rule).
 const FIXTURES = join(import.meta.dirname, "fixtures", "content");

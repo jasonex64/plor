@@ -1,6 +1,6 @@
 import { PassThrough } from "node:stream";
 import { describe, expect, it } from "vitest";
-import { askHidden, dateGaps } from "./content-publish";
+import { askHidden, dateGaps } from "./content-publish.ts";
 
 describe("dateGaps", () => {
   it("accepts consecutive dates in any order, across a month end", () => {
