@@ -1,6 +1,6 @@
 # M02 2f — Cleanup of the code items in "Next revision"
 
-**Status:** in review (Part A). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
+**Status:** in review (Part A; blocked on a human security decision, see Review). Drafted by Claude on 2026-10-20 at the human's request ("fix the open next revision items"). **Approved by the human on 2026-10-20**, keeping the *low* items, with A3 (the 6-digit email code) added to Part A. Part A is on branch `m02-sign-in-and-play`. Nothing here needs a new number.
 
 ## Goal
 Fix the open ROADMAP "Next revision" items that are code or tests and need no human decision, so the list holds only real decisions and future-milestone work.
@@ -25,7 +25,9 @@ Fix the open ROADMAP "Next revision" items that are code or tests and need no hu
 
 ### Acceptance criteria (Part A)
 - [x] A1 closed in ROADMAP with the human's report and the `getClaims` reading above.
-- [x] A2: a unit test shows an `AuthRetryableFetchError` becomes `503 auth_unavailable` and a 4xx Auth error keeps its own code; the human approves the message text in the PR.
+- [x] A2: a unit test shows an `AuthRetryableFetchError` becomes `503 auth_unavailable` and a 4xx Auth error keeps its own code.
+- [ ] The human approves the new player texts in `src/app/messages.ts`: `auth_unavailable` (A2), `otp_expired` and `code_invalid` (A3).
+- [ ] A3, security: the human decides on the code-guessing risk (Review, blocking finding 1) before the hosted templates are switched.
 - [x] A3, local stack (`npm run test:db`): a new address and a returning address each sign in with the code from the email (each template's subject checked); a used code and a wrong code are refused with a 4xx; no email contains a link to `/auth/confirm`.
 - [ ] A3, staging: after the deploy and the template change, the human signs in on `plor.app` with an emailed code (human report).
 - [x] `npm test`, `npm run lint`, `npx tsc --noEmit` and `npm run test:db` pass.
@@ -141,5 +143,8 @@ The form in a browser (`npm run dev` on the local stack, a throwaway `@example.t
 Staging: waiting for the deploy and the hosted step above.
 
 ## Review
+Part A, reviewer agent on `aa086b5`, 2026-10-20.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. **Guessing the code (security; open, for the human).** `/api/auth/email/verify` accepts a 6-digit code for any address, valid for an hour, and a wrong guess doesn't use it up (hypothesis 3). The route calls `verifyOtp` from the server, so Supabase's per-IP verification limit (`token_verifications`, "per IP address") counts Vercel's IP rather than the guesser's. A flood of guesses could also use up that shared limit and lock every player out. The old `/auth/confirm` took an unguessable token hash, so this path is new. Whether Auth also limits attempts per address is *unverified*. Not fixed: a security change, and any attempt limit needs a human number.
+  2. The A2 criterion was ticked while the text approval was still pending. Fixed: the approval is now its own unticked criterion, and it covers the A3 texts too.
+- Deferred to ROADMAP "Next revision": "any 5xx" in `authFailure`'s comment (only 500–504, 520–530 and status 0); "PKCE flow" in the DECISIONS Sign-in row also covers the email code, which doesn't use PKCE; the ROADMAP A1 closure leaves out the no-`kid` and no-WebCrypto cases; the M02 ticket's setup steps still name `sign_in_link.html` and `/auth/confirm`; no tests for the verify route's two 400 branches; the code form has no way back to fix a mistyped email, and a pasted "123 456" isn't stripped.
