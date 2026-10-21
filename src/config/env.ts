@@ -51,7 +51,10 @@ export function parseDatabaseUrl(raw: string, name: string): DbConnection {
     password: decodeURIComponent(url.password),
     database: decodeURIComponent(url.pathname.slice(1)),
   };
-  if (!database.user || !database.database) throw new Error(`${name} must include a user, a password and a database name`);
+  // Each message names only the missing part (M02 2f, B8). The password is checked by the caller: content:publish
+  // asks for it instead.
+  if (!database.user) throw new Error(`${name} must include a user`);
+  if (!database.database) throw new Error(`${name} must include a database name`);
   return database;
 }
 
@@ -59,7 +62,7 @@ export function readServerEnv(source: Record<string, string | undefined> = proce
   const raw = source.DATABASE_URL;
   if (!raw) throw new Error("DATABASE_URL is not set (see docs/milestones/M00-foundations.md)");
   const database = parseDatabaseUrl(raw, "DATABASE_URL");
-  if (!database.password) throw new Error("DATABASE_URL must include a user, a password and a database name");
+  if (!database.password) throw new Error("DATABASE_URL must include a password");
 
   const supabase = readSupabaseAuthEnv(source);
   if (LOCAL_HOSTS.has(database.host)) return { database, supabase, databaseCaCert: null };

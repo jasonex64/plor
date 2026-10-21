@@ -31,8 +31,10 @@ describe("readServerEnv", () => {
     expect(() => readServerEnv({ DATABASE_URL: "postgresql://u:p@127.0.0.1/postgres" })).toThrow(/explicit port/);
   });
 
-  it("requires a password", () => {
-    expect(() => readServerEnv({ DATABASE_URL: "postgresql://u@127.0.0.1:54322/postgres" })).toThrow(/password/);
+  it("names only the missing part: user, database name or password (M02 2f, B8)", () => {
+    expect(() => readServerEnv({ DATABASE_URL: "postgresql://:p@127.0.0.1:54322/postgres" })).toThrow(/^DATABASE_URL must include a user$/);
+    expect(() => readServerEnv({ DATABASE_URL: "postgresql://u:p@127.0.0.1:54322/" })).toThrow(/^DATABASE_URL must include a database name$/);
+    expect(() => readServerEnv({ DATABASE_URL: "postgresql://u@127.0.0.1:54322/postgres" })).toThrow(/^DATABASE_URL must include a password$/);
   });
 
   it("parses the local stack without a CA", () => {
