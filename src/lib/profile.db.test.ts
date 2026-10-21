@@ -5,6 +5,7 @@
 import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
 import { createProfile, getUsername } from "./profile";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -42,6 +43,23 @@ describe("private.profile as plor_app", () => {
       await expect(client.query("update private.profile set username = 'other' where user_id = $1", [userId])).rejects.toThrow(
         /permission denied for table profile/,
       );
+    });
+  });
+});
+
+// The length in the player's message comes from tunables.ts; the database's check constraint must agree with it at
+// both ends (M02 2f, B6). Each insert gets its own transaction, because a refused insert aborts it.
+describe("the username length rule", () => {
+  it.each([
+    [USERNAME_MIN_LENGTH - 1, false],
+    [USERNAME_MIN_LENGTH, true],
+    [USERNAME_MAX_LENGTH, true],
+    [USERNAME_MAX_LENGTH + 1, false],
+  ])("%i characters accepted: %s", async (length, accepted) => {
+    await asPlorApp(async (client, userId) => {
+      const insert = createProfile(client, userId, "a".repeat(length));
+      if (accepted) await expect(insert).resolves.toBeUndefined();
+      else await expect(insert).rejects.toMatchObject({ code: "username_invalid", status: 400 });
     });
   });
 });
