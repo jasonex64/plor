@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
 - **M09, Points and friends leaderboard,** is in progress on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`). Every decision (D1–D11) and number (N1–N5) is the human's, 2026-10-22, including the rarity bonus and its Hard-to-reverse ledger change, which DECISIONS.md and `M00-data-design.md` §6 hold.
-  - **9a, the ledger and scoring** (`private.points_ledger`; `src/game/scoring.ts`; `settleRuns` in `src/game/ledger.ts`; the estimated bonus on the reveal and result screens), is reviewed and in its PR. Merging waits for the human's OK. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M09.
+  - **9a, the ledger and scoring** (`private.points_ledger`; `src/game/scoring.ts`; `settleRuns` in `src/game/ledger.ts`; the estimated bonus on the reveal and result screens), is reviewed and in PR #45. Merging waits for the human's OK. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M09.
   - **9b, the leaderboard,** is next. Until it ships, no request writes ledger rows: `settleRuns` has no caller outside its tests.
 - PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 

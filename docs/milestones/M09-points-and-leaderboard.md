@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** in progress: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is in review (its PR); 9b, the leaderboard, is next.
+**Status:** in progress: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is in review (PR #45); 9b, the leaderboard, is next.
 
 ## Goal
 Each finished run's points, the question ladder plus a rarity bonus, go into an append-only ledger. Each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
