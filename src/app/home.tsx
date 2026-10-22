@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { ApiError, api } from "@/lib/api-client";
+import { Board } from "./board";
 import { Game } from "./game";
 import { messageFor, messageForRedirect } from "./messages";
 
@@ -211,6 +212,7 @@ function SignedIn({
   return (
     <>
       <Game />
+      <Board username={username} />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
       <section aria-label="Account">
         <p>Signed in as {username}.</p>

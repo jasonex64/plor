@@ -1,7 +1,6 @@
 // The run routes end to end against the local stack (run with `npm run test:db`): real sign-in, the real game
 // tables and their triggers, and route handlers called the way the browser calls them.
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
 import { DatabaseError, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
@@ -9,10 +8,11 @@ import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as nextRoute } from "@/app/api/run/next/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
+import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { matchAnswer } from "./matching";
 import { startRun } from "./runs";
@@ -22,40 +22,10 @@ vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextH
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
-const created: { date: string }[] = [];
 let today = "";
 let yesterday = "";
 let puzzle: Puzzle;
 let yesterdayPuzzle: Puzzle;
-
-// A real puzzle file under another date: its content is valid format 2 and has QUESTIONS_PER_DAY questions.
-function fixture(date: string): Puzzle {
-  return { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date };
-}
-
-// Uses the puzzle already published for a day, or adds the fixture (removed again in afterAll).
-async function ensurePuzzle(date: string): Promise<Puzzle> {
-  const db = getPool();
-  const { rows } = await db.query<{ content: Puzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
-  if (rows.length) return rows[0].content;
-  await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, date, fixture(date)]);
-  created.push({ date });
-  return fixture(date);
-}
-
-// A name or alias of the entry that a player can type at that question, past the stolen letters (M04 13c-3).
-function typeableName(p: Puzzle, index: number, entryId: string): string | undefined {
-  const entry = p.questions[index].entries.find((e) => e.id === entryId)!;
-  return [entry.name, ...entry.aliases].find((n) => avoids(n, stolenLetters(p, index)));
-}
-
-// An entry the host doesn't catch, that can be typed at that question.
-function safeEntry(p: Puzzle, index: number): string {
-  const q = p.questions[index];
-  const id = q.entries.map((e) => e.id).find((entryId) => matchAnswer(q, entryId) === "not_matched" && typeableName(p, index, entryId));
-  if (!id) throw new Error(`no safe answer for "${q.prompt}"`);
-  return id;
-}
 
 async function call(response: Promise<Response>) {
   const r = await response;
@@ -92,7 +62,7 @@ afterAll(async () => {
   const db = getPool();
   // Deleting the auth users cascades to profiles, runs, answers and misses; then the fixture puzzles go.
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  for (const { date } of created) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
+  await removeCreatedPuzzles();
   await db.end();
 });
 

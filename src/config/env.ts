@@ -16,8 +16,9 @@ export type SupabaseAuthEnv = {
 
 export type ServerEnv = {
   database: DbConnection;
-  // Supabase Auth, used only by server code (route handlers and the proxy). No browser client exists,
-  // so neither value needs the NEXT_PUBLIC_ prefix that would inline it into the client bundle.
+  // Supabase Auth, used by server code (route handlers and the proxy). The browser's Realtime-only client (M07 D5)
+  // gets both values at runtime from /api/realtime/session, so neither needs the NEXT_PUBLIC_ prefix that would
+  // inline it into the client bundle.
   supabase: SupabaseAuthEnv;
   // Required for any non-local database: Supabase recommends verify-full against its own CA
   // (supabase.com/docs/guides/platform/ssl-enforcement). Null only for the local stack.

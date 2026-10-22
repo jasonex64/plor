@@ -16,7 +16,7 @@ Sources: Supabase docs (keys and RLS, Realtime) and PostgreSQL 17 (`ddl-priv`), 
 
 ## 2. Network messages
 - **HTTP API:** each request sends an `x-protocol: <int>` header. A mismatch gets `409 client_outdated`, and the client reloads loudly. The version is bumped only for breaking API changes, not on every deploy. It is 3 today (`src/lib/protocol.ts`: 2 for typed answers, 3 for the reveal and Next).
-- **Realtime payloads:** `{ v: <int>, type, ... }`. If `v` is unknown, the client logs an error and refetches the board over HTTP. *(Not built yet: it comes with the live board, M07.)*
+- **Realtime payloads:** `{ v: <int>, type, ... }`. If `v` is unknown, the client logs an error and refetches the board over HTTP. Built in M07 7c: `src/app/board.tsx`, payload `v` 1.
 - **Questions are served one at a time.** The response to an answer is the run after it: that question's result and host answers (the reveal). The next question comes from `POST /api/run/next`, when the player taps Next (`src/game/runs.ts`, `openNext`; `src/app/api/run/next/route.ts`).
 
 ## 3. Player identity

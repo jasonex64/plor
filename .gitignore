@@ -18,6 +18,9 @@ supabase/.branches/
 # test and tool output
 coverage/
 .vercel/
+# Playwright (M07)
+test-results/
+playwright-report/
 
 # OS noise
 .DS_Store

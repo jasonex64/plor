@@ -1,6 +1,6 @@
 # M07 — Friends and live board
 
-**Status:** in progress. Every decision is answered (D1–D7, human, 2026-10-21). Plan step 1 is done, and both hypotheses held. 7a, the display name, is merged (PR #35). 7b, invite links and friends, is built and in its PR. 7c, the live board, is next.
+**Status:** in progress. Every decision is answered (D1–D7, human, 2026-10-21). Plan step 1 is done, and both hypotheses held. 7a (PR #35) and 7b (PR #36) are merged. 7c, the live board, is built and in its PR. 7d, where everyone ended, is next.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -65,7 +65,7 @@ Built as four sub-tickets, one PR each, in this order:
 ## Acceptance criteria
 - [x] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown (from 7b, the first place others see players). Route and database tests.
 - [x] **7b** Friends see each other's display name, or the username if there is none (carried from 7a). Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
-- [ ] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
+- [x] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
 - [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
 - [x] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy. See Evidence.
 
@@ -104,6 +104,12 @@ Built as four sub-tickets, one PR each, in this order:
 ## Source diff
 | Source (or ticket) says | We built | Why different |
 |---|---|---|
+| 7c: "a browser Supabase client used only for Realtime" (D5) | `@supabase/realtime-js` alone, not supabase-js. Its URL, publishable key and token come at runtime from `/api/realtime/session`, not from public env vars | It's only Realtime. Nothing new goes into the bundle, and `check:client-bundle` stays as it was |
+| 7c: friends' updates go to friends' boards | Each update also goes to the player's own board | That's how the page learns the player's own run has ended, which is when friends' outcomes may be shown |
+| 7c: "a friend's answer reaches the viewer's open page" | Starting, answering and Next are sent live. Running out of time isn't: nothing is written when time runs out (the database judges it on read), so that friend shows "on question k" until the board is next fetched | Nothing to trigger on. Flagged in ROADMAP "Next revision" |
+| D5: "Allow public access" off locally and on the hosted project | Off only on the hosted project (the human). Locally it stays on | The CLI's `supabase/config.toml` `[realtime]` has no such setting (CLI 2.121.0). Locally, a signed-out public subscriber to `board:<A>` received only a public control message, never the private board send (2026-10-22). Every board send is private |
+| D6: a send inside the answer's transaction | A failed send is a Postgres WARNING, and the row stays stale until the next load or reconnect | `realtime.send` catches its own errors. The human chose a stale row over failing the answer (2026-10-22) |
+| 7c evidence: "a log line from a forced disconnect" | The disconnect is a restart of the local Realtime container | Browser offline emulation left the Realtime socket open, in two clean tries. A restart is what a Realtime deploy does to players |
 | D1: "trimmed" | The route trims and composes NFC; the database refuses any name not in NFC | `[[:alpha:]]` refuses a combining accent, so the route's NFC step is what lets an accent typed as two code points through at all. The database's NFC check refuses look-alike compatibility forms that `[[:alpha:]]` accepts, such as the Angstrom sign U+212B (NFC makes it Å), so one name has one stored spelling |
 | 7a: clear the name | `null` clears it; an empty string is refused (400) | One way to clear, so an empty Save is a mistake that gets reported, not a silent clear |
 
@@ -163,6 +169,36 @@ Built as four sub-tickets, one PR each, in this order:
   - a throwaway local player's link shows "Add Zoë Check as a friend?", the display name only, after the review fix below.
   - Add wasn't pressed on the human's account. The throwaway player was deleted afterwards, leaving 0 friendships.
 
+**7c Live board** (2026-10-22, local stack with Realtime; migration `20261022073610_live_board.sql` applied):
+- **Database:** `npm run test:sql`: 7 files, 124 tests, `Result: PASS`. `live_board.test.sql` (11 tests) checks:
+  - start, answer and Next each send to the friend's board and the player's own board, never a stranger's;
+  - every message is private;
+  - the payload is `{v: 1, type, username, gameId, puzzleDate, state, question}`;
+  - a caught run is sent as `finished`, with nothing naming the answer or the catch;
+  - the only policy on `realtime.messages` is the own-board read policy.
+  - Also read: `realtime.send` turns its own failures into a WARNING (its source on the local stack). A failed send never fails the answer, and the row stays stale until the next load or reconnect (accepted by the human, 2026-10-22).
+  - **The policy itself:** acting as `authenticated` with friend f's JWT claims, as Realtime checks a join, f reads 0 of the player's board messages and 4 of their own. With the policy loosened to `using (true)`, `npm run test:sql` gave `Result: FAIL`. It was restored, and the run passed.
+- **Routes:** `npx vitest run src/app/api/board`: 8 passed. Covered:
+  - board states: not started; playing on question 1; finished with nothing about how, and no host answer anywhere in the response while the viewer hasn't finished;
+  - once the viewer has finished: `{result: "caught", question: 1, answer}`;
+  - `reason=reconnect` logs exactly one `board refetch after reconnect` line;
+  - the session route gives the URL, a publishable key, the player's own ID and a live token;
+  - 401 when signed out.
+  - `npm run test:db`: 9 files, 93 passed (the run fixtures moved to `src/test/puzzles.ts`).
+- **Two browsers:** `npm run test:e2e`: 2 passed (21 s).
+  - Two players sign in with emailed codes and become friends through the invite page. The watcher's page goes from "hasn't played yet" to "on question 1" to "finished (you'll see how once you finish)" with no reload, and never shows the host answer.
+  - A restart of Realtime makes the page refetch with `reason=reconnect`. The dev server logged `{"level":"info","msg":"board refetch after reconnect",…}`.
+- **A bug the test found:**
+  - the first join went out before the token was set, so the own-board policy refused it as Unauthorized until the rejoin;
+  - `board.tsx` now sets the token before joining, and the next run had no Unauthorized lines.
+- **Two experiments failed, then a re-plan:** browser offline emulation, twice, didn't drop the socket. Hypothesis for the re-plan: restarting Realtime drops it and the page reconnects. It held. A restart takes about 2 s locally.
+- **Unit and build:**
+  - `npm test`: 24 files, 180 passed;
+  - `npm run build` lists `/api/board` and `/api/realtime/session`;
+  - `npm run check:client-bundle`: OK, 60 files, with no key or URL in the bundle;
+  - `npx tsc --noEmit` and `npm run lint`: clean.
+- **CI:** the `db` job now starts Realtime, and a new `e2e` job runs Playwright. Both are first shown working in this PR's CI.
+
 ## Review
 **7a** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
@@ -172,6 +208,16 @@ Built as four sub-tickets, one PR each, in this order:
   - **The ROADMAP row and HANDOFF were stale.** Updated.
 - Also fixed, because it was small and in this change: a test title claimed more than the test checked.
 - Deferred to ROADMAP "Next revision": non-ASCII digits and letters such as ª pass the D1 rule.
+
+**7c** (reviewer agent, 2026-10-22):
+- Blocking findings and how each was fixed:
+  - **Nothing tested what the own-board policy does,** only its name. `live_board.test.sql` now reads as `authenticated` with a user's claims and topic: 0 rows from another's board, 4 from their own. It fails when the policy is loosened.
+  - **A change between the first load and the join was lost.** The first SUBSCRIBED now refetches the board too.
+  - **A failed send was silent,** and the comment claimed a refetch covered it. The human accepted a stale row over failing the answer (2026-10-22), and the comment and Evidence now say so.
+  - **"Allow public access" wasn't off locally,** although DECISIONS said it was. The CLI has no setting for it. A local experiment showed a public subscriber gets no private board send. DECISIONS and the Source diff now say so.
+  - **`HEARTBEAT_MS` was a number outside `tunables.ts`.** It's gone: the page reads the client's own `heartbeatIntervalMs`.
+- Also fixed, because they were small and in this change: the first e2e test's title, and a spurious console error on unmount.
+- Deferred to ROADMAP "Next revision": seven items under "From M07".
 
 **7b** (reviewer agent, 2026-10-22):
 - Blocking findings and how each was fixed:
