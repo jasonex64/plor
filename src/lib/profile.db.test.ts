@@ -5,8 +5,8 @@
 import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
-import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
-import { createProfile, getUsername } from "./profile";
+import { DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+import { createProfile, getProfile, setDisplayName } from "./profile";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -33,7 +33,24 @@ describe("private.profile as plor_app", () => {
   it("creates and reads a profile", async () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
-      expect(await getUsername(client, userId)).toBe("plor_app_probe");
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null });
+    });
+  });
+
+  it("sets, changes and clears the display name (M07 7a)", async () => {
+    await asPlorApp(async (client, userId) => {
+      await createProfile(client, userId, "plor_app_probe");
+      await setDisplayName(client, userId, "Zoë");
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: "Zoë" });
+      await setDisplayName(client, userId, null);
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null });
+      await expect(setDisplayName(client, userId, "Zoe 😀")).rejects.toMatchObject({ code: "display_name_invalid", status: 400 });
+    });
+  });
+
+  it("refuses a display name before the profile exists, with 409 no_profile", async () => {
+    await asPlorApp(async (client, userId) => {
+      await expect(setDisplayName(client, userId, "Zoë")).rejects.toMatchObject({ code: "no_profile", status: 409 });
     });
   });
 
@@ -60,6 +77,21 @@ describe("the username length rule", () => {
       const insert = createProfile(client, userId, "a".repeat(length));
       if (accepted) await expect(insert).resolves.toBeUndefined();
       else await expect(insert).rejects.toMatchObject({ code: "username_invalid", status: 400 });
+    });
+  });
+});
+
+// The display name's maximum (M07 D1) agrees with the constraint, the same way.
+describe("the display name length rule", () => {
+  it.each([
+    [DISPLAY_NAME_MAX_LENGTH, true],
+    [DISPLAY_NAME_MAX_LENGTH + 1, false],
+  ])("%i characters accepted: %s", async (length, accepted) => {
+    await asPlorApp(async (client, userId) => {
+      await createProfile(client, userId, "plor_app_probe");
+      const update = setDisplayName(client, userId, "a".repeat(length));
+      if (accepted) await expect(update).resolves.toBeUndefined();
+      else await expect(update).rejects.toMatchObject({ code: "display_name_invalid", status: 400 });
     });
   });
 });

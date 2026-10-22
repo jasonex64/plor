@@ -1,4 +1,4 @@
-import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+import { DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
 
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
@@ -19,6 +19,8 @@ const MESSAGES: Record<string, string> = {
   username_taken: "That username is taken. Try another.",
   profile_exists: "You already have a username.",
   no_profile: "Pick a username before you play.",
+  // The rules are the database's check (docs/milestones/M07-friends-and-live-board.md, D1).
+  display_name_invalid: `Display names are 1 to ${DISPLAY_NAME_MAX_LENGTH} characters: letters, digits, single spaces and ' . _ -`,
   no_puzzle_today: "There's no puzzle today yet. Check back later.",
   no_run: "Start today's puzzle first.",
   run_over: "This run is already over.",

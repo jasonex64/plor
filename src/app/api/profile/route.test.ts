@@ -2,6 +2,7 @@
 // network call. The signed-in paths are in route.db.test.ts.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
+import { POST as setDisplayName } from "./display-name/route";
 import { GET, POST } from "./route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -18,6 +19,12 @@ beforeEach(() => {
 describe("/api/profile", () => {
   it("refuses a signed-out player with 401 not_signed_in", async () => {
     const response = await POST(apiRequest("/api/profile", { method: "POST", body: { username: "abc" } }));
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
+  });
+
+  it("refuses a signed-out display name change with 401 not_signed_in (M07 7a)", async () => {
+    const response = await setDisplayName(apiRequest("/api/profile/display-name", { method: "POST", body: { displayName: "Zoë" } }));
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
   });

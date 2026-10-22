@@ -37,7 +37,7 @@ select ok(has_table_privilege('plor_app', 'private.profile', 'select'), 'plor_ap
 select ok(has_table_privilege('plor_app', 'private.profile', 'insert'), 'plor_app can create profiles');
 -- A comma list is true when any one privilege is held, so this asserts none of them is.
 select ok(not has_table_privilege('plor_app', 'private.profile', 'update, delete, truncate, references, trigger'),
-  'plor_app cannot change, delete, truncate, reference or trigger on profiles');
+  'plor_app cannot change whole rows of, delete, truncate, reference or trigger on profiles');
 
 -- M02 2b, M03 and M06: everything plor_app may do in `private`, listed exactly (M02 ticket: "only the
 -- grants these routes need"). A new grant has to be added here on purpose.
@@ -52,6 +52,14 @@ create function pg_temp.grants(who text) returns text[] language sql return (
     select format('%s execute', f.oid::regprocedure)
     from pg_proc f
     where f.pronamespace = 'private'::regnamespace and has_function_privilege(who, f.oid, 'execute')
+    union all
+    -- Column grants (M07 7a), which has_table_privilege doesn't see.
+    select format('%s.%s %s', c.oid::regclass, a.attname, p.priv)
+    from pg_class c
+    join pg_attribute a on a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+    cross join (values ('select'), ('insert'), ('update'), ('references')) as p(priv)
+    where c.relnamespace = 'private'::regnamespace and c.relkind in ('r', 'v', 'm', 'p', 'f')
+      and has_column_privilege(who, c.oid, a.attnum, p.priv) and not has_table_privilege(who, c.oid, p.priv)
   ) as held);
 select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
@@ -62,6 +70,8 @@ select is(pg_temp.grants('plor_app'), array[
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
   'private.profile insert', 'private.profile select',
+  -- The display name is the one column a player changes (M07 7a).
+  'private.profile.display_name update',
   'private.puzzle select',
   'private.puzzle_questions select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it
