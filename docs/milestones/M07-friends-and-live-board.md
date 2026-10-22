@@ -3,7 +3,7 @@
 | **1 to 24 characters: letters (accents OK), digits, spaces and ' - . _; no emoji** (human, 2026-10-21, chose Claude's suggestion) |
 # M07 — Friends and live board
 
-**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Next is plan step 1, the two experiments.
+**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Plan step 1 done (both hypotheses held); 7a next.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -70,7 +70,7 @@ Built as four sub-tickets, one PR each, in this order:
 - [ ] **7b** Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
 - [ ] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
 - [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
-- [ ] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy.
+- [x] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy. See Evidence.
 
 ## Out of scope
 - Groups (M10), comments and reactions (M08), points and the leaderboard (M09).
@@ -109,6 +109,17 @@ Built as four sub-tickets, one PR each, in this order:
 |---|---|---|
 
 ## Evidence
+**Plan step 1, both hypotheses held** (2026-10-21, local stack, supabase-js 2.118.0). A scratch script made two throwaway users, A and B, and a temporary SELECT policy `realtime.topic() = 'board:' || auth.uid()::text` on broadcast. It sent with `realtime.send(payload, event, topic, true)` over psql, then dropped the policy and deleted the users (0 left afterwards). Output:
+- **Send on commit:**
+  - A probe sent inside a transaction: 0 messages arrived during the 3 s before COMMIT. The probe arrived 0.01 s after COMMIT (9.44 s, then 9.45 s).
+  - A probe followed by ROLLBACK never arrived (checked for 4 s after).
+- **Topic policy:**
+  - A and B each got `SUBSCRIBED` on their own board.
+  - B joining `board:<A>` got `CHANNEL_ERROR Unauthorized: You do not have permissions to read from this Channel topic`, and received 0 messages.
+  - A message to `board:<B>` reached B and not A.
+- **Also seen:**
+  - `realtime.send` adds an `id` field to the payload.
+  - A refused join is retried about every 6 s, forever. So the client must only ever join its own board.
 
 ## Review
 - Blocking findings and how each was fixed:
