@@ -1,6 +1,6 @@
 # M07 — Friends and live board
 
-**Status:** done (2026-10-22). 7a (PR #35), 7b (PR #36) and 7c (PR #37) are merged. 7d, where everyone ended, is the milestone's last PR. Every decision was answered by the human (D1–D7, 2026-10-21).
+**Status:** done (2026-10-22). 7a (PR #35), 7b (PR #36) and 7c (PR #37) are merged. 7d, where everyone ended, is the milestone's last PR (#38). Every decision was answered by the human (D1–D7, 2026-10-21).
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -227,7 +227,7 @@ Built as four sub-tickets, one PR each, in this order:
 **7d and the milestone's close** (reviewer agent, 2026-10-22):
 - Blocking findings: none in the code. Two conditions for closing, both now met: this 7d review entry, and the handoff matching the local stack, which is stopped at the end of the session.
 - Also taken, because it was one test: two friends who ran out of time on different questions share one row (`ended.test.ts`, now 5 tests).
-- Deferred to ROADMAP "Next revision": four items under "From M07".
+- Deferred to ROADMAP "Next revision": three items under "From M07". A fourth, the PR number missing from the ROADMAP row, is fixed.
 
 **7c** (reviewer agent, 2026-10-22):
 - Blocking findings and how each was fixed:
