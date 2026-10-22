@@ -5,6 +5,7 @@ import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { named } from "@/game/payload";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
+import { NO_REACTIONS, runReactions, type Reactions } from "@/reactions/reactions";
 
 // How a friend's run ended, given only once the viewer's own run is over (no spoilers: DECISIONS.md, Game 1).
 // question is 1-based, as players count.
@@ -18,10 +19,13 @@ export type BoardFriend = {
   // While playing: the question they're on, 1-based.
   question: number | null;
   ended: Ended | null;
+  // Reactions on their run today (M08 8b), once the viewer's own run is over and the friend has a run.
+  reactions: Reactions | null;
 };
 
-// mine: how the viewer's own run ended, once it has (M07 7d places the viewer among their friends).
-export type Board = { date: string; finished: boolean; mine: Ended | null; friends: BoardFriend[] };
+// mine: how the viewer's own run ended, once it has (M07 7d places the viewer among their friends). reactionsOnMine:
+// friends' reactions on it, from then on too (M08 8b).
+export type Board = { date: string; finished: boolean; mine: Ended | null; reactionsOnMine: Reactions | null; friends: BoardFriend[] };
 
 const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 
@@ -61,11 +65,14 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
     );
     for (const e of events) caught.set(e.user_id, e);
   }
+  // Reactions wait for the viewer's run to end too: a reaction on how a friend's run ended says something about it.
+  const reactions = finished ? await runReactions(db, viewerId, date, rows.map((r) => r.user_id)) : new Map<string, Reactions>();
 
   return {
     date,
     finished,
     mine: finished && content ? ended(viewer!, caught.get(viewerId), content) : null,
+    reactionsOnMine: finished ? (reactions.get(viewerId) ?? NO_REACTIONS) : null,
     friends: friends
       .map((f): BoardFriend => {
         const state = f.status === null ? "not_started" : FINISHED.includes(f.status) ? "finished" : "playing";
@@ -75,6 +82,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
           state,
           question: state === "playing" ? f.answered! + 1 : null,
           ended: finished && state === "finished" ? ended(f, caught.get(f.user_id), content!) : null,
+          reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name) || a.username.localeCompare(b.username)),

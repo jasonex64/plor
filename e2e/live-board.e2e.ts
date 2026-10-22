@@ -106,12 +106,35 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await watcher.getByRole("button", { name: "Start today's puzzle" }).click();
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
-  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
+  // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
+  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}" 👍😂😮😢❤️`);
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   await expect(place).toHaveCount(1);
   await expect(place.locator("summary")).toHaveText(`Caught on question 1: You, ${playerName}`);
   await place.locator("summary").click();
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
+
+  // The watcher reacts to the friend's run by tapping (M08 8b): another emoji replaces the first, and the same one
+  // again removes it. The player sees it on their own run after a reload (reactions arrive live with 8d).
+  const thumbs = row.getByRole("button", { name: "👍" });
+  const heart = row.getByRole("button", { name: "❤️" });
+  await thumbs.click();
+  await expect(thumbs).toHaveAttribute("aria-pressed", "true");
+  await expect(thumbs).toHaveText("👍 1");
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await expect(heart).toHaveText("❤️ 1");
+  await expect(thumbs).toHaveAttribute("aria-pressed", "false");
+  await expect(thumbs).toHaveText("👍");
+  await player.reload();
+  await expect(player.getByText("Reactions on your run: ❤️ 1")).toBeVisible();
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
+  await expect(heart).toHaveText("❤️");
+  await player.reload();
+  // Wait for the board itself, not its "Loading…".
+  await expect(player.getByRole("region", { name: "Where everyone ended" })).toBeVisible();
+  await expect(player.getByText("Reactions on your run")).toHaveCount(0);
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted

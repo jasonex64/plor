@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is next.
+**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is in review (its PR); 8c, reports, is next.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
@@ -75,11 +75,11 @@ After playing the day's game, players can comment on it and react, seen only by 
 - [x] **8a** A player sees their own comments and their friends' for today, and no one else's. Route tests use three players: a friend, a non-friend, and a friend of a friend.
 - [x] **8a** Comments over 280 characters (D1), or empty, are refused with 400.
 - [ ] Delete works only on your own comment; on anyone else's it's refused (**8a**, done). Report works only on someone else's, and the comment disappears for the reporter.
-- [ ] Reactions go on comments and on friends' runs (D2), from 👍 😂 😮 😢 ❤️ (D3): one per player per target, replaced or removed by tapping. You can't react to a run before your own run is over.
-- [ ] Past days' threads can be browsed by date, read-only: posting or reacting on a past day is refused (D6). (**8a**: browsing and the posting refusal are done; reacting comes with 8b.)
+- [x] **8b** Reactions go on comments and on friends' runs (D2), from 👍 😂 😮 😢 ❤️ (D3): one per player per target, replaced or removed by tapping. You can't react to a run before your own run is over.
+- [x] Past days' threads can be browsed by date, read-only: posting or reacting on a past day is refused (D6). (**8a**: browsing and the posting refusal; **8b**: the reacting refusal.)
 - [ ] Admins see open reports and can delete the comment. Non-admins get 403.
 - [ ] New comments and reactions reach friends' open pages without a reload, with no comment text in the Realtime payload (an e2e test with two browsers).
-- [ ] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades. (**8a**: done for `private.comment`; reactions and reports come with 8b and 8c.)
+- [ ] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades. (**8a**: done for `private.comment`; **8b**: done for `private.reaction`; reports come with 8c.)
 
 ## Out of scope
 - Replies, editing, mentions, images and links shown as previews.
@@ -118,6 +118,14 @@ Nothing, because this adds a new feature.
 | Shown "with … the time" | The time as hour and minute in the player's own locale | **8a.** The ticket doesn't say how; the look is M14 |
 | D6: "a past day's thread shows whether or not you played it, since a day that's over can't be spoiled" | Shown if you never played that day or your run that day is over; hidden while your run that day is still going | **8a review.** A run started before midnight can be played to its end after it (DECISIONS.md, Game 1, Timer), and one waiting at a reveal stays in progress, so its day isn't over for that player. Without this, a player could read friends' comments about answers they hadn't given yet. The human's answer still holds for every other case |
 | — (not in the ticket) | The game tells the page when today's run is over (`onOver`), and the comments reload then | **8a.** Without it, today's thread stays hidden after the run ends until a reload. 8d's live updates don't cover the player's own run ending |
+| Data: `reaction(user_id, game_id, puzzle_date, target, emoji, created_at)`, "where the target is either a comment or a friend's run that day" | The target is two columns, `comment_id` and `run_user_id`, exactly one set (`reaction_one_target`). Foreign keys, all cascading: to the reactor's run that day, to the comment *with its day* (a new unique `comment_id_day` on `private.comment`), and to the friend's run that day. Checks: the emoji is in the set, and no reaction on your own run. One per player per target is two partial unique indexes | **8b.** The database then holds "only a player who played the day reacts", "on the comment's own day" and "one per target", like 8a's comment-to-run key |
+| "Changing it replaces the old one" | A change deletes the old reaction and inserts the new one in one transaction. It's the app's first transaction; the route's checks run in the delete's statement, and the insert checks the day again | **8b.** D8 granted plor_app read, insert and delete on reactions, not update. This keeps to the approved grants instead of asking for a new one |
+| "Seen only by their friends" (Goal); reactions aren't covered in more detail | You see your own reactions and your friends', so the counts differ between viewers: a friend of a friend's reaction isn't counted for you | **8b.** Claude's reading, the same rule as comments (8a) |
+| "You can't react to a run before your own run is over" | Nor see reactions on runs (friends' or your own) before then: the board gives `reactions: null` until your run is over, like how a friend's run ended | **8b.** A 😂 on a friend's run says something about how it ended (DECISIONS.md, Game 1: no spoilers) |
+| Reactions on "friends' runs" (D2) | On any friend's run that day, finished or not; a friend with no run is 404 `run_not_found`. Your own run, a non-friend's or an unknown player's is 404 `not_friends` | **8b.** The ticket doesn't say whether the friend must have finished. Claude took the reading with no extra rule; *for the human to confirm* |
+| Reactions on comments (D2) | On any comment you can see, your own included | **8b.** The ticket doesn't say. Chat apps usually allow it; *for the human to confirm* |
+| Past days are read-only (D6) | Removing a reaction on a past day is refused too (409 `day_past`), unlike deleting your own comment | **8b.** Removing is part of reacting, and a read-only day has no buttons. Deleting a comment stays allowed on any day (D4) |
+| Each reaction "from a small fixed set" | Shown as a count per emoji plus your own pick (pressed); who reacted isn't shown | **8b.** The ticket doesn't say how; the look is M14 |
 
 ## Evidence
 **8a** (local stack, 2026-10-22, after the review fix):
@@ -141,6 +149,25 @@ Nothing, because this adds a new feature.
   - "Later day" goes back to today.
   - Posting and deleting through the page were not clicked (*unverified* in a browser; the routes are tested above, and 8d's e2e covers the page).
 
+**8b** (local stack, 2026-10-22):
+- `npm run test:sql`: `reactions.test.sql ....... ok`, `plor_app_role.test.sql ... ok`, `Files=9, Tests=146`, `Result: PASS`.
+  - The first file checks a reaction on a comment and on a run; one per player per target (23505 for both); the set (👎, and ❤ without U+FE0F, rejected); one target only; no reaction on your own run; the reactor's run and the friend's run (23503); the comment's own day (23503); and the cascades from a comment, a run's owner and the reactor.
+  - The second lists `private.reaction delete, insert, select` among plor_app's exact grants. Both failed before the migration. One pgTAP case was itself wrong at first (a second reaction on the same comment hit 23505 before 23503) and now uses another player.
+- `npm run test:db`: `Tests  112 passed (112)`. `src/app/api/reactions/route.db.test.ts` signs in four real players (A; B, A's friend; C, no one's friend; D, B's friend only), adds E (A's friend, no run), and checks:
+  - A's reactions get 409 `not_finished` before A starts and mid-run, and A's board has `reactionsOnMine: null` and `reactions: null` on every friend then;
+  - A sets 👍 on B's comment, replaces it with ❤️, removes it with `null`, and removing again is still 200;
+  - each of the five `REACTIONS` is accepted, so the tunable and the database agree; 👎, ❤ without U+FE0F, a missing or non-string emoji, a malformed target and a non-date are 400;
+  - on B's run, A sees only A's ❤️ (D's 😂 is hidden: D isn't A's friend), B sees 😂 and ❤️ on their own run, and D sees only D's 😂;
+  - on B's comment, B sees 👍 1 and 😮 2 (from A, B and D); A sees only 😮 2;
+  - 404 `comment_not_found` on C's comment and on a missing one; 404 `not_friends` on C's run, A's own and an unknown username; 404 `run_not_found` on E, whose board row has `reactions: null`;
+  - deleting B's comment deletes its reactions;
+  - yesterday's thread shows B's 😢 to A, read-only; reacting or removing on yesterday is 409 `day_past`; tomorrow is 400.
+  - `src/app/api/board/route.db.test.ts` now also expects `reactions: null` on a friend's row while the viewer hasn't finished (it failed on the new field first).
+- `npm test`: `Tests  189 passed (189)`, which includes `src/app/api/reactions/route.test.ts` (401 signed out).
+- `npm run test:e2e`: `2 passed (19.7s)`. `e2e/live-board.e2e.ts` now expects the five reaction buttons on the friend's row once the watcher has finished, and none before. The watcher then taps 👍 (pressed, "👍 1"), ❤️ (replaces it) and ❤️ again (removes it). The player sees "Reactions on your run: ❤️ 1" after a reload, and nothing once it's removed.
+- `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`, with `ƒ /api/reactions`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 60 files, 5 patterns, 3 env values`.
+- Reactions on comments weren't tapped in a browser (*unverified* there). The route tests cover them, and comment rows use the same `src/app/reactions.tsx` that the e2e test taps on the board.
+
 ## Review
 **8a** (the `reviewer` agent, fresh context, 2026-10-22):
 - Blocking findings and how each was fixed:
@@ -148,3 +175,8 @@ Nothing, because this adds a new feature.
   - **Evidence empty; `docs/HANDOFF.md` stale.** Both are filled in with this PR.
   - **A stray `.claude/launch.json`** from a browser check. Removed, and the dev server was stopped.
 - Deferred to ROADMAP "Next revision" (From M08): the missing cascade index, a NUL character giving 500, the uncommented 18-digit ID limit, a past-day non-friend test, stale responses when browsing quickly, and the e2e reconnect test's slow-start timeout.
+
+**8b** (the `reviewer` agent, fresh context, 2026-10-22; it re-ran every check above and got the same results):
+- One blocking finding: **`docs/HANDOFF.md` was stale** (it still said 8b wasn't started). It's rewritten in this PR, and it lists the two Source diff readings for the human to confirm.
+- It found the no-spoiler rule, friends-only counts, the transaction's checks and grants, the migration's keys and the two changed tests correct.
+- Deferred to ROADMAP "Next revision" (From M08): a concurrent replace giving 500, `rollback` hiding the original error, the reactor-run cascade index, reaction buttons after a live "started" update, a friend-of-a-friend comment 404 test, and a leftover `.claude/worktrees/m03-puzzle-insights` folder.
