@@ -990,7 +990,7 @@
         "green"
       ],
       "match_groups": {},
-      "steals": "u"
+      "steals": "b"
     },
     {
       "prompt": "Name a mammal that mostly eats meat",
@@ -1561,7 +1561,7 @@
         "omelet"
       ],
       "match_groups": {},
-      "steals": "b"
+      "steals": "d"
     },
     {
       "prompt": "Name a baked dessert made with fruit",

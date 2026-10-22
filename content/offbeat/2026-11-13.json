@@ -2471,7 +2471,7 @@
         "necklace"
       ],
       "match_groups": {},
-      "steals": "n"
+      "steals": "t"
     },
     {
       "prompt": "Name a decade of the 20th century (the 1900s to the 1990s)",
@@ -3224,7 +3224,7 @@
         "fire"
       ],
       "match_groups": {},
-      "steals": "i"
+      "steals": "o"
     }
   ]
 }

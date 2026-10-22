@@ -6,6 +6,8 @@ export class ApiError extends Error {
   constructor(
     readonly code: string,
     readonly status: number,
+    // Each problem a route listed with the error, e.g. the content rules a puzzle broke (M06).
+    readonly problems: string[] = [],
   ) {
     super(code);
   }
@@ -24,5 +26,5 @@ export async function api<T>(path: string, init: { method: "GET" | "POST"; body?
     window.alert("Plor was updated. The page will reload.");
     window.location.reload();
   }
-  throw new ApiError(String(json.error), response.status);
+  throw new ApiError(String(json.error), response.status, Array.isArray(json.problems) ? json.problems.map(String) : []);
 }

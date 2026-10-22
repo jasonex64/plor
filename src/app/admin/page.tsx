@@ -13,7 +13,7 @@ export default function AdminPage() {
       </Suspense>
       <footer>
         <p>
-          <Link href="/">Back to Plor</Link>
+          <Link href="/admin/puzzles">Puzzles</Link> · <Link href="/">Back to Plor</Link>
         </p>
       </footer>
     </main>

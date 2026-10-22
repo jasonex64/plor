@@ -2,19 +2,21 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-21, by the session that closed M05, ran the docs audit and merged #32.
+**Updated:** 2026-10-21, by the session that closed M06.
 
 ## Where things stand
-- **Milestone:** M06, Puzzle entry (`docs/ROADMAP.md`). No ticket yet.
-- **Branch:** `m06-puzzle-entry`. Its first PR, #32, holds the docs audit (MVP redefined, puzzle entry inserted, milestones renumbered M07–M15, docs cleaned up). Merged on green CI (human, 2026-10-21: "manual is fine", summary "looks fine").
-- **Merged today:** M05 Share (#30), the first reorder (#31).
+- **M06, Puzzle entry, is done.** PR #33 merges on green CI (human, 2026-10-21: "just merge", which also OKs its CLAUDE.md "Puzzle drafting" exception). The human waived playing the end-to-end day.
+- **The first drafted day, 2026-10-22,** is PR #34 (branch `content-2026-10-22`). It merges after #33. It is approved on the local database only.
+- **New rule (human):** a host answer's name must avoid the stolen letters (DECISIONS.md Log). Drafted days were fixed to match, and 2026-11-05 is parked (M06 ticket, Evidence).
 
 ## Waiting on the human
-- Nothing for M06 yet. For M12: whether usernames can change, and how often. Claude explained the tradeoffs on 2026-10-21 and suggested a limit of once a month (a human number).
+- **M07** needs the display name's maximum length and allowed characters, and the per-place limit on the "where everyone ended" picture.
+- **M12** needs to know whether usernames can change, and how often (Claude suggested once a month).
+- Three drafted days repeat categories of 2026-10-22: car brand (11-06), state capitals (11-10) and tea (11-16). The human may want new questions for them.
 
 ## Next step
-After #32 merges: draft `docs/milestones/M06-puzzle-entry.md` for approval. The human has approved puzzles moving from files into the database and the admin page writing them (2026-10-21: "yes thats fine and admincan write changes thats fine"). The ticket still has to propose the exact grants and the DECISIONS.md changes (Puzzle content format, Content publishing role) for the human to check.
+Draft the M07 ticket (friends and live board, with the display name) for the human's approval, on a new `m07-…` branch.
 
 ## Local state
-- Nothing left running. Docker Desktop may still be open on the human's machine. The local Supabase stack is stopped, and its data is kept.
-- The local database has a puzzle for 2026-10-21, loaded by hand by an earlier session. No content file covers any date before 2026-10-26.
+- The local Supabase stack holds `jasonex64` as an admin and the approved 2026-10-22 day.
+- To run it on another machine: `npm ci`, `npx supabase start`, `npx supabase migration up`, then `npm run dev`. Sign-in codes are in Mailpit at `http://127.0.0.1:54324`. A session adds an admin by inserting the user ID into `private.admin` locally.

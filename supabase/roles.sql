@@ -10,14 +10,22 @@
 -- 20261019070813_rename_riff_app_to_plor_app.sql then renames it. A database that already has
 -- either name is left alone, so this never creates a second login next to plor_app.
 --
--- plor_publisher: the only role `npm run content:publish` connects as (DECISIONS.md: Content publishing role).
--- Same rules: no password here, the human sets it with psql `\password plor_publisher`.
+-- plor_publisher: created only because the applied migration 20261019074108_create_game_tables.sql grants to it and
+-- can't be edited. Migration 20261021232903_puzzle_entry.sql drops it again: puzzles now get in through the admin
+-- page alone (docs/milestones/M06-puzzle-entry.md).
 do $$
+declare
+  dropped boolean := false;
 begin
   if not exists (select from pg_roles where rolname in ('riff_app', 'plor_app')) then
     create role riff_app login noinherit;
   end if;
-  if not exists (select from pg_roles where rolname = 'plor_publisher') then
+  -- Only while 20261021232903 hasn't run: afterwards a push with --include-roles would bring the dropped role back.
+  -- The migrations table may not exist yet on a fresh database, so it's read through dynamic SQL.
+  if to_regclass('supabase_migrations.schema_migrations') is not null then
+    execute $q$select exists (select from supabase_migrations.schema_migrations where version = '20261021232903')$q$ into dropped;
+  end if;
+  if not dropped and not exists (select from pg_roles where rolname = 'plor_publisher') then
     create role plor_publisher login noinherit;
   end if;
 end
