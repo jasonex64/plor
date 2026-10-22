@@ -23,8 +23,10 @@ function shiftDay(date: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-// runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it).
-export function Comments({ username, runOver }: { username: string; runOver: boolean }) {
+// runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
+// that goes up when comments or reactions changed for the player's friends or on another of their tabs (8d, from the
+// board's channel), so the day shown is fetched again.
+export function Comments({ username, runOver, nudge }: { username: string; runOver: boolean; nudge: number }) {
   // null shows today, whose date comes from the server (the day boundary is the server's: DECISIONS.md, Day boundary).
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
@@ -43,8 +45,9 @@ export function Comments({ username, runOver }: { username: string; runOver: boo
       (err) => setError(errorText(err)),
     );
   }, [date]);
-  // runOver is a dependency so today's thread loads again when the run ends.
-  useEffect(load, [load, runOver]);
+  // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
+  // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
+  useEffect(load, [load, runOver, nudge]);
 
   async function run(action: () => Promise<unknown>) {
     setBusy(true);

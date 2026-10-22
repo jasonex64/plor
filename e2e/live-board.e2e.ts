@@ -1,7 +1,8 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
 // with emailed codes, become friends through an invite link, and one sees the other's run change without reloading.
-// Reactions (M08 8b) and reports (8c) are checked on the same pages once both have played. A second test restarts
-// Realtime and checks that the page refetches the board with reason=reconnect.
+// Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked on the same pages once
+// both have played. A second test restarts Realtime and checks that the page refetches the board with
+// reason=reconnect.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
@@ -73,6 +74,13 @@ async function openBoard(page: Page): Promise<void> {
 test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const watcher = await (await browser.newContext()).newPage();
   const player = await (await browser.newContext()).newPage();
+  // Every frame either page receives from Realtime, to check what a payload holds (M08 8d).
+  const frames: string[] = [];
+  for (const page of [watcher, player]) {
+    page.on("websocket", (ws) => {
+      if (ws.url().includes("/realtime/v1")) ws.on("framereceived", (f) => void frames.push(String(f.payload)));
+    });
+  }
   const watcherName = `w${RUN}`;
   const playerName = `p${RUN}`;
 
@@ -116,7 +124,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
 
   // The watcher reacts to the friend's run by tapping (M08 8b): another emoji replaces the first, and the same one
-  // again removes it. The player sees it on their own run after a reload (reactions arrive live with 8d).
+  // again removes it. The player's page shows each change without a reload (8d).
   const thumbs = row.getByRole("button", { name: "👍" });
   const heart = row.getByRole("button", { name: "❤️" });
   await thumbs.click();
@@ -127,25 +135,24 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(heart).toHaveText("❤️ 1");
   await expect(thumbs).toHaveAttribute("aria-pressed", "false");
   await expect(thumbs).toHaveText("👍");
-  await player.reload();
   await expect(player.getByText("Reactions on your run: ❤️ 1")).toBeVisible();
   await heart.click();
   await expect(heart).toHaveAttribute("aria-pressed", "false");
   await expect(heart).toHaveText("❤️");
-  await player.reload();
-  // Wait for the board itself, not its "Loading…".
-  await expect(player.getByRole("region", { name: "Where everyone ended" })).toBeVisible();
   await expect(player.getByText("Reactions on your run")).toHaveCount(0);
 
-  // The player comments; the watcher reports it, and it's gone for the watcher at once (M08 8c, D5). Made an admin,
-  // the watcher finds it on the reported-comments page and deletes it, and then it's gone for the player too.
+  // The player comments, and it reaches the watcher's open page; the watcher's reaction on it reaches the player's
+  // (8d). Then the watcher reports it, and it's gone for the watcher at once (8c, D5). Made an admin, the watcher
+  // finds it on the reported-comments page and deletes it, and the player's open page loses it too.
   const body = `report me ${RUN}`;
   await player.getByLabel("Comment", { exact: true }).fill(body);
   await player.getByRole("button", { name: "Post" }).click();
   const playerComment = player.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
   await expect(playerComment).toBeVisible();
-  await watcher.reload();
   const watcherComment = watcher.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
+  await expect(watcherComment).toBeVisible();
+  await watcherComment.getByRole("button", { name: "😂" }).click();
+  await expect(playerComment.getByRole("button", { name: "😂" })).toHaveText("😂 1");
   await watcherComment.getByRole("button", { name: "Report" }).click();
   await expect(watcher.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
@@ -155,8 +162,13 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(reported).toContainText("1 report, first");
   await reported.getByRole("button", { name: "Delete comment" }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();
-  await player.reload();
   await expect(player.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
+
+  // Every change came over Realtime as a nudge, and no frame either page received holds the comment's text.
+  const received = frames.join("\n");
+  expect(received).toContain("comments_changed");
+  expect(received).toContain("run_reactions_changed");
+  expect(received).not.toContain(body);
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted
