@@ -124,6 +124,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await watcher.getByRole("button", { name: "Answer" }).click();
   // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
+  // The friends leaderboard (M09 9b) lists both with no points yet, since today's count once the day is over (D9).
+  // Tied on 0, they go by name: the player's "p…" before the watcher's "w…".
+  await expect(watcher.getByRole("region", { name: "Friends leaderboard" }).getByRole("listitem")).toHaveText([
+    `${playerName}: 0 points`,
+    `${watcherName} (you): 0 points`,
+  ]);
   // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
   await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}" 👍😂😮😢❤️`);
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
