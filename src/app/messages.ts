@@ -30,6 +30,8 @@ const MESSAGES: Record<string, string> = {
   comment_invalid: `Comments are 1 to ${COMMENT_MAX_LENGTH} characters.`,
   not_finished: "Finish today's puzzle first.",
   comment_not_found: "That comment is already gone.",
+  // Reports (docs/milestones/M08-comments-and-reactions.md, 8c).
+  report_own: "That's your own comment. You can delete it instead.",
   // Reactions (docs/milestones/M08-comments-and-reactions.md, 8b).
   run_not_found: "That friend hasn't played today yet.",
   no_puzzle_today: "There's no puzzle today yet. Check back later.",

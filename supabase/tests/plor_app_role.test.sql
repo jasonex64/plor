@@ -67,6 +67,9 @@ select is(pg_temp.grants('plor_app'), array[
   'private.approve_puzzle(uuid,jsonb) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
   'private.comment delete', 'private.comment insert', 'private.comment select',
+  -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
+  -- reads them all. Deleting the comment removes its reports (cascade), so none is deleted directly.
+  'private.comment_report insert', 'private.comment_report select',
   'private.day_of(timestamp with time zone) execute',
   -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
   'private.friend_invite insert', 'private.friend_invite select',

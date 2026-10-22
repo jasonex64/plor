@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is merged (PR #40, 2026-10-22); 8c, reports, is next.
+**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is merged (PR #40, 2026-10-22); 8c, reports, is in review (its PR); 8d, live updates, is next.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
@@ -74,12 +74,12 @@ After playing the day's game, players can comment on it and react, seen only by 
 - [x] **8a** Posting is refused before your run today is over, and so is reading today's thread. Route tests check that no comment text reaches a player who hasn't finished.
 - [x] **8a** A player sees their own comments and their friends' for today, and no one else's. Route tests use three players: a friend, a non-friend, and a friend of a friend.
 - [x] **8a** Comments over 280 characters (D1), or empty, are refused with 400.
-- [ ] Delete works only on your own comment; on anyone else's it's refused (**8a**, done). Report works only on someone else's, and the comment disappears for the reporter.
+- [x] Delete works only on your own comment; on anyone else's it's refused (**8a**). Report works only on someone else's, and the comment disappears for the reporter (**8c**).
 - [x] **8b** Reactions go on comments and on friends' runs (D2), from 👍 😂 😮 😢 ❤️ (D3): one per player per target, replaced or removed by tapping. You can't react to a run before your own run is over.
 - [x] Past days' threads can be browsed by date, read-only: posting or reacting on a past day is refused (D6). (**8a**: browsing and the posting refusal; **8b**: the reacting refusal.)
-- [ ] Admins see open reports and can delete the comment. Non-admins get 403.
+- [x] **8c** Admins see open reports and can delete the comment. Non-admins get 403.
 - [ ] New comments and reactions reach friends' open pages without a reload, with no comment text in the Realtime payload (an e2e test with two browsers).
-- [ ] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades. (**8a**: done for `private.comment`; **8b**: done for `private.reaction`; reports come with 8c.)
+- [x] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades (**8a** `private.comment`, **8b** `private.reaction`, **8c** `private.comment_report`).
 
 ## Out of scope
 - Replies, editing, mentions, images and links shown as previews.
@@ -126,6 +126,14 @@ Nothing, because this adds a new feature.
 | Reactions on comments (D2) | On any comment you can see, your own included | **8b.** The ticket doesn't say. Chat apps usually allow it; confirmed by the human (2026-10-22: "sure keep both") |
 | Past days are read-only (D6) | Removing a reaction on a past day is refused too (409 `day_past`), unlike deleting your own comment | **8b.** Removing is part of reacting, and a read-only day has no buttons. Deleting a comment stays allowed on any day (D4) |
 | Each reaction "from a small fixed set" | Shown as a count per emoji plus your own pick (pressed); who reacted isn't shown | **8b.** The ticket doesn't say how; the look is M14 |
+| Data: `comment_report(comment_id, reporter_id, created_at)` | Those columns, one per player per comment (the primary key), cascading from the comment and from the reporter's account. "Not your own comment" is the route's check only | **8c.** The database can't check the comment's author without a trigger; the route test covers it |
+| D8: plor_app reads reports "for admins only through the routes" | The thread also reads the viewer's *own* reports, to hide those comments from them. No grant beyond D8's (select, insert) | **8c.** D5's "hidden for the reporter at once" can't be done without it, and the query reads only rows whose reporter is the signed-in player. *For the human to confirm*, since it's wider than D8's wording (8c review) |
+| "Report works only on someone else's" | Your own comment is 409 `report_own`; a comment you can't see (not a friend's, or its day's thread not open to you) is 404 `comment_not_found`, the same as a missing one. Reporting again is 200 and adds nothing | **8c.** Like deleting (8a), it doesn't tell a player whether a comment they can't see exists |
+| Past days are read-only (D6) | Reporting works on any day whose thread you can read | **8c.** Claude's reading: D6 stops talking on past days, and a report is moderation. A comment can be noticed after its day |
+| Admins "see open reports" (D5) | Every comment with a report is listed, oldest first report first, with its day, author, text, how many reported it and when first. Reporters aren't named. A report stays open until an admin deletes the comment: there's no "keep it" button | **8c.** D5 gives admins only Delete, and D8 gives plor_app no update or delete on reports. *For the human:* closing a report without deleting the comment would need one of those, a security change |
+| Admins "can delete the comment" (D5) | Only a reported comment; anything else is 404. It goes for everyone, with its reports and reactions (D4) | **8c.** The admin route is for reported comments; least privilege |
+| "A new section of the admin pages" | A page, `/admin/reports` ("Reported comments"), linked from the other two admin pages | **8c.** Each admin page so far is one task |
+| — (not in the ticket) | Report needs one tap and no confirmation | **8c.** The look and its safeguards are M14; the comment is only hidden for the reporter, and an admin decides |
 
 ## Evidence
 **8a** (local stack, 2026-10-22, after the review fix):
@@ -167,6 +175,23 @@ Nothing, because this adds a new feature.
 - `npm run test:e2e`: `2 passed (19.7s)`. `e2e/live-board.e2e.ts` now expects the five reaction buttons on the friend's row once the watcher has finished, and none before. The watcher then taps 👍 (pressed, "👍 1"), ❤️ (replaces it) and ❤️ again (removes it). The player sees "Reactions on your run: ❤️ 1" after a reload, and nothing once it's removed.
 - `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`, with `ƒ /api/reactions`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 60 files, 5 patterns, 3 env values`.
 - Reactions on comments weren't tapped in a browser (*unverified* there). The route tests cover them, and comment rows use the same `src/app/reactions.tsx` that the e2e test taps on the board.
+**8c** (local stack, 2026-10-22):
+- `npm run test:sql`: `comment_reports.test.sql .. ok`, `plor_app_role.test.sql .... ok`, `Files=10, Tests=152`, `Result: PASS`.
+  - The first file checks one report per player per comment (23505), the comment foreign key (23503), and the cascades from the comment and the reporter's account.
+  - The second lists `private.comment_report insert, select` among plor_app's exact grants. Both failed before the migration (3 of 6, and the grants list).
+- `npm run test:db`: `Tests  121 passed (121)` before the review; `src/app/api/admin/reports/route.db.test.ts` (its 11 tests) again after the review's added cases. That file signs in five real players (A; B, A's friend; C, no one's friend; D, B's friend only; X, an admin) and checks:
+  - A's report on B's comment is 404 before A plays, with no report stored;
+  - A reporting A's own comment is 409 `report_own`; C's, D's (a friend of a friend's) and a missing one are 404; a malformed ID is 400;
+  - after A reports B's comment it's gone from A's thread at once, and still in B's; reporting again is 200 with still one report; D reports it too;
+  - A (not an admin) gets 403 `admins_only` on the list and on delete, and nothing is deleted;
+  - X sees one row: B's comment with `reports: 2`;
+  - X deleting C's unreported comment, a missing one or the same one twice is 404, a malformed ID 400; deleting B's removes it for B, with its reports and D's reaction, and the list is empty;
+  - A's report is 404 mid-run too, and on yesterday while A's run that day waits at a reveal (8c review). Changing the past-day rule in `reportComment` to "always visible" made that test fail (200), and it passed again once restored;
+  - A reports B's comment on yesterday, which A never played, and it's gone from A's yesterday thread.
+- `npm test`: `Tests  192 passed (192)`: 401 signed out on `POST /api/comments/report`, `GET /api/admin/reports` and `POST /api/admin/reports/delete`.
+- `npm run test:e2e`: `2 passed (21.3s)`. In `e2e/live-board.e2e.ts` the player posts a comment; the watcher taps Report and sees "No comments yet."; made an admin, the watcher finds it on `/admin/reports` ("1 report, first …"), taps "Delete comment" and sees "No reported comments."; the player's page, reloaded, shows "No comments yet.".
+  - One earlier e2e run logged a 500 from `getBoard` ("died with no matched event") although both tests passed; the next run didn't. Claude's hypothesis (*unverified*): a board refetch from a still-open page ran while the cleanup deleted the test users, between `getBoard`'s two queries. It's in ROADMAP "Next revision".
+- `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`, with `○ /admin/reports`, `ƒ /api/admin/reports`, `ƒ /api/admin/reports/delete` and `/api/comments/report` built. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
 
 ## Review
 **8a** (the `reviewer` agent, fresh context, 2026-10-22):
@@ -180,3 +205,9 @@ Nothing, because this adds a new feature.
 - One blocking finding: **`docs/HANDOFF.md` was stale** (it still said 8b wasn't started). It's rewritten in this PR. It listed the two Source diff readings for the human, who kept both (2026-10-22).
 - It found the no-spoiler rule, friends-only counts, the transaction's checks and grants, the migration's keys and the two changed tests correct.
 - Deferred to ROADMAP "Next revision" (From M08): a concurrent replace giving 500, `rollback` hiding the original error, the reactor-run cascade index, reaction buttons after a live "started" update, a friend-of-a-friend comment 404 test, and a leftover `.claude/worktrees/m03-puzzle-insights` folder.
+
+**8c** (the `reviewer` agent, fresh context, 2026-10-22; it re-ran the checks and got the same results):
+- Blocking findings and how each was fixed:
+  - **The thread reads every player's own reports, wider than D8's "for admins only".** A Source diff row now says so, flagged for the human, and the DECISIONS.md Log row no longer credits that wording to the human.
+  - **Reporting mid-run, and on a past day whose run is still going, was untested.** Both cases are in the route test now; the second was shown to catch a looser rule.
+- Deferred to ROADMAP "Next revision" (From M08): the visibility rule written twice (`getThread` and `reportComment`), a report racing a delete giving 500, reacting to a comment you reported, the admin list's busy state clearing before it reloads, and no record of which admin deleted a comment.

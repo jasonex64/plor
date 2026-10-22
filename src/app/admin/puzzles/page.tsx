@@ -13,7 +13,7 @@ export default function PuzzlesPage() {
       </Suspense>
       <footer>
         <p>
-          <Link href="/admin">Puzzle insights</Link> · <Link href="/">Back to Plor</Link>
+          <Link href="/admin">Puzzle insights</Link> · <Link href="/admin/reports">Reported comments</Link> · <Link href="/">Back to Plor</Link>
         </p>
       </footer>
     </main>
