@@ -11,9 +11,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   - 8d (live updates over the board topic, and the two-browser e2e test) is not started.
 
 ## Waiting on the human
-- **8c, two questions** (ticket, Source diff):
-  - the thread reads each player's own reports to hide what they reported, which D5 needs but is wider than D8's "admins only" wording (no new grant);
-  - reports can't be closed without deleting the comment. A "keep it" button would need an update or delete grant on reports, a security change.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
