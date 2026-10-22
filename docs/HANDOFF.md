@@ -8,7 +8,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M08, Comments and reactions,** is in review on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
   - **8a, comments,** is merged (PR #39), and **8b, reactions,** too (PR #40).
   - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is merged (PR #41, on all-green CI). The human allowed that merge without them, that one time (2026-10-22); from 8d on, merging waits for the human's OK again. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
-  - **8d, live updates** (comment and reaction changes nudge the actor's and friends' `board:<id>` topics with no text; the page refetches), is reviewed (no blocking findings) and in its PR, the milestone's last. Merging waits for the human's OK. After it merges, mark M08 done (ticket Status, ROADMAP row) and delete the branch (CLAUDE.md, Branches and PRs).
+  - **8d, live updates** (comment and reaction changes nudge the actor's and friends' `board:<id>` topics with no text; the page refetches), is reviewed (no blocking findings) and in PR #43, the milestone's last. Merging waits for the human's OK. After it merges, mark M08 done (ticket Status, ROADMAP row) and delete the branch (CLAUDE.md, Branches and PRs).
 
 ## Waiting on the human
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
