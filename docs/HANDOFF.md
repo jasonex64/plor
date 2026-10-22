@@ -10,7 +10,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 
 ## Waiting on the human
-- **M09, D1–D7** (ticket, Decisions): a run still going when its day ends; a run that ran out of time; what writes the row for a run with no ending answer; who's on the leaderboard and its order; today's points before you've finished; where it's shown; and the security change for `private.points_ledger`.
+- **M09, D1** (ticket, Decisions): whether a run finished after midnight counts. The human questioned their 2026-10-21 rule; Claude proposed counting every run whenever it's finished, and a never-finished run counting nothing. D2–D7 are answered as suggested (2026-10-22).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -22,7 +22,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once the human has answered D1–D7, record the answers in the M09 ticket (and update Claude's design and the acceptance criteria to match), then build 9a, the ledger, on branch `m09-points-and-leaderboard`, tests first. ROADMAP "Next revision", From M08, has the deferred M08 items.
+Once the human has answered D1, record the answers in the M09 ticket (and update Claude's design and the acceptance criteria to match), then build 9a, the ledger, on branch `m09-points-and-leaderboard`, tests first. ROADMAP "Next revision", From M08, has the deferred M08 items.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
