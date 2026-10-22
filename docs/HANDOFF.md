@@ -5,7 +5,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 **Updated:** 2026-10-22, by the session that built and merged M08 8b and 8c, then drafted the M16 ticket on branch `m16-game-2`. For M08, the handoff on `m08-comments-and-reactions` wins if it is newer: when the M16 draft was written, uncommitted 8d-looking edits to `e2e/live-board.e2e.ts` were appearing in the main checkout, so another session may have started 8d (*unverified*).
 
 ## Where things stand
-- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in a draft PR from `m16-game-2`. It is docs only and comes after launch; its questions S1–S14 wait on the human. Don't build on it before the MVP is done.
+- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in a draft PR from `m16-game-2`. It is docs only and comes after launch. The human answered S1–S14 on 2026-10-22; the name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
   - **8a, comments,** is merged (PR #39), and **8b, reactions,** too (PR #40). The branch stays for 8d.
   - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is merged (PR #41, on all-green CI). The human allowed that merge without them, that one time (2026-10-22); from 8d on, merging waits for the human's OK again. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
