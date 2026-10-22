@@ -4,7 +4,8 @@
 // channel on the player's own topic, `board:<user id>`. The browser's only Supabase connection is this Realtime one
 // (M07 D5). Payloads say only playing or finished; how a friend's run ended comes from the HTTP board once the
 // player's own run is over, so nothing reaches the page early. So do reactions on runs (M08 8b), which the player can
-// add to friends' runs from then on.
+// add to friends' runs from then on. The same channel carries nudges that comments or reactions changed (8d), with no
+// content: the page refetches over HTTP, which decides what the player may see.
 import { RealtimeClient } from "@supabase/realtime-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
@@ -21,11 +22,16 @@ const PAYLOAD_VERSION = 1;
 
 type StatusMessage = { v: number; username: string; puzzleDate: string; state: "playing" | "finished"; question: number | null };
 
+// A comment or reaction changed on that day (supabase/migrations/20261022095828_live_comments.sql).
+type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string };
+
 function errorText(err: unknown): string {
   return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
 }
 
-export function Board({ username }: { username: string }) {
+// onCommentsChanged: the comments thread should be fetched again. It must keep one identity, since the channel is
+// rebuilt when it changes.
+export function Board({ username, onCommentsChanged }: { username: string; onCommentsChanged: () => void }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -80,8 +86,12 @@ export function Board({ username }: { username: string }) {
       client
         .channel(`board:${first.userId}`, { config: { private: true } })
         .on("broadcast", { event: "friend_status" }, ({ payload }) => onStatus(payload as StatusMessage))
+        .on("broadcast", { event: "comments_changed" }, ({ payload }) => onChanged(payload as ChangedMessage))
+        .on("broadcast", { event: "run_reactions_changed" }, ({ payload }) => onChanged(payload as ChangedMessage))
         .subscribe((status, err) => {
           if (status === "SUBSCRIBED") {
+            // Comments may have changed while the channel was down too.
+            if (!joined || interrupted) onCommentsChanged();
             if (!joined) load();
             else if (interrupted) load("reconnect");
             joined = true;
@@ -92,6 +102,22 @@ export function Board({ username }: { username: string }) {
           }
         });
     })().catch((err) => setError(errorText(err)));
+
+    function onChanged(message: ChangedMessage) {
+      if (message.v !== PAYLOAD_VERSION) {
+        console.error("board message with unknown version", message.v);
+        load();
+        onCommentsChanged();
+        return;
+      }
+      if (message.type === "comments_changed") {
+        onCommentsChanged();
+        return;
+      }
+      // Reactions on runs are shown only once the player's own run today is over (src/friends/board.ts).
+      const current = boardRef.current;
+      if (current?.finished && message.puzzleDate === current.date) load();
+    }
 
     function onStatus(message: StatusMessage) {
       const current = boardRef.current;
@@ -126,7 +152,7 @@ export function Board({ username }: { username: string }) {
         client.disconnect();
       }
     };
-  }, [load, username]);
+  }, [load, username, onCommentsChanged]);
 
   async function react(friend: string, emoji: Emoji | null) {
     setBusy(true);
