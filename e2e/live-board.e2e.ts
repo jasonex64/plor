@@ -13,10 +13,14 @@ const MAILPIT = "http://127.0.0.1:54324";
 const RUN = Date.now().toString(36);
 let createdPuzzle: string | null = null;
 let hostAnswer = "";
+let safeAnswer = "";
 
 test.beforeAll(async () => {
   // Today's puzzle, or a fixture under today's date (removed in afterAll), as in src/test/puzzles.ts.
-  const { rows } = await DB.query<{ today: string; content: { questions: { host_answers: string[]; entries: { id: string; name: string }[] }[] } | null }>(
+  const { rows } = await DB.query<{
+    today: string;
+    content: { questions: { host_answers: string[]; match_groups: Record<string, string[]>; entries: { id: string; name: string }[] }[] } | null;
+  }>(
     "select private.today()::text as today, (select content from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()) as content",
   );
   let content = rows[0].content;
@@ -28,6 +32,9 @@ test.beforeAll(async () => {
   // Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
   const q = content!.questions[0];
   hostAnswer = q.entries.find((e) => e.id === q.host_answers[0])!.name;
+  // An answer the host doesn't catch: not a host answer, and not grouped with one.
+  const caught = new Set([...q.host_answers, ...q.host_answers.flatMap((h) => q.match_groups[h] ?? [])]);
+  safeAnswer = q.entries.find((e) => !caught.has(e.id))!.name;
 });
 
 test.afterAll(async () => {
@@ -115,6 +122,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await watcher.getByRole("button", { name: "Start today's puzzle" }).click();
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
+  // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
+  await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
   // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
   await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}" 👍😂😮😢❤️`);
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
@@ -169,6 +178,19 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   expect(received).toContain("comments_changed");
   expect(received).toContain("run_reactions_changed");
   expect(received).not.toContain(body);
+});
+
+// After a safe answer, the reveal shows the points it earned and its estimated rarity bonus (M09 9a). The number
+// itself is the route test's (src/game/runs.db.test.ts); this checks the reveal shows it.
+test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "s");
+  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByLabel("Your answer").fill(safeAnswer);
+  await page.getByRole("button", { name: "Answer" }).click();
+  await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
+  await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted

@@ -2,12 +2,14 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8b, 8c and 8d and marked M08 done; then, on branch `m16-game-2`, by the session that drafted M16 and merged `main` into it.
+**Updated:** 2026-10-22, by the session that built M09 9a; then, on branch `m16-game-2`, by the session that drafted M16 and merged `main` into it. That merge brought in PR #45 already merged, so the 9a line below that says merging waits is behind.
 
 ## Where things stand
-- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in draft PR #42 from `m16-game-2`. It is docs only and comes after launch. The human answered S1–S14 on 2026-10-22; the name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
-- **No milestone branch is open for M09.** PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
+- **M09, Points and friends leaderboard,** is in progress on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`). Every decision (D1–D11) and number (N1–N5) is the human's, 2026-10-22, including the rarity bonus and its Hard-to-reverse ledger change, which DECISIONS.md and `M00-data-design.md` §6 hold.
+  - **9a, the ledger and scoring** (`private.points_ledger`; `src/game/scoring.ts`; `settleRuns` in `src/game/ledger.ts`; the estimated bonus on the reveal and result screens), is reviewed and in PR #45. Merging waits for the human's OK. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M09.
+  - **9b, the leaderboard,** is next. Until it ships, no request writes ledger rows: `settleRuns` has no caller outside its tests.
+- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in PR #42 from `m16-game-2`. It is docs only and comes after launch. The human answered S1–S14 on 2026-10-22; the name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
@@ -21,11 +23,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Start M09 (Points and friends leaderboard; ROADMAP) on a new branch: read its row and DECISIONS.md, Points ledger and `M00-data-design.md` §6, and draft its ticket from `docs/milestones/_TEMPLATE.md` for the human, since it has none yet. ROADMAP "Next revision", From M08, has the deferred items, including one about reaction buttons after a live "started" update.
+Once 9a's PR is merged, build 9b on the same branch, tests first: a leaderboard route that settles the players it shows (`settleRuns`) and sums their ledger rows (you and your friends, highest first, ties by name, D4), and a "Friends leaderboard" section on the home page under "Friends today" (D6), with an e2e or browser check. Today's points can't appear before the day closes (D9), so D5 holds without extra code.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
-  - every migration up to `20261022095828_live_comments.sql` (M08's last);
+  - every migration up to `20261022105344_points_ledger.sql`;
   - `jasonex64` as an admin, who hasn't played 2026-10-22 locally (8b's checks didn't use that account);
   - the approved 2026-10-22 day.
 - No dev server is left running.

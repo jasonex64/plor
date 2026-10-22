@@ -121,8 +121,9 @@ function ResetCountdown({ msToReset, onReset }: { msToReset: number; onReset: ()
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
-// After a safe answer (G5): your answer next to the host's, the points it earned, and the letter the Wind steals at
-// the next question. The next question and its 20 seconds start on Next.
+// After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
+// from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
+// steals at the next question. The next question and its 20 seconds start on Next.
 function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
   const last = run.answered[run.answered.length - 1];
   return (
@@ -132,7 +133,7 @@ function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: (
         You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
       </p>
       <p>
-        +{pointsText(last.points)} · {pointsText(run.points)} so far
+        +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
       </p>
       {run.next!.steals && <p>Next, the Wind steals {run.next!.steals.toUpperCase()}.</p>}
       <button type="button" autoFocus disabled={busy} onClick={onNext}>
@@ -226,14 +227,15 @@ function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
             : `Caught on question ${run.answered.length}`}
       </h2>
       <p>
-        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}.
+        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}, plus a rarity bonus of about{" "}
+        {run.bonus}. The final bonus is worked out once the day is over.
       </p>
       <Share run={run} />
       <ol>
         {run.answered.map((a) => (
           <li key={a.index}>
             {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)})`}
+            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`}
           </li>
         ))}
       </ol>
