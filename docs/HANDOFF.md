@@ -6,10 +6,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
-- **M09, Points and friends leaderboard:** the ticket is on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`), not yet in a PR, with every decision answered (D1–D7, 2026-10-22). D1 changed a standing rule: every finished run now counts, even one finished after midnight; DECISIONS.md, the ROADMAP row and `M00-data-design.md` §6 are updated to match. No code yet.
+- **M09, Points and friends leaderboard:** the ticket is on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`), not yet in a PR, D1–D7 answered (2026-10-22); D1 changed a standing rule (every finished run counts, even one finished after midnight), and DECISIONS.md, the ROADMAP row and `M00-data-design.md` §6 say so. The human then added a **rarity bonus** (2026-10-22); the ticket proposes its design, including a Hard-to-reverse change to the ledger (written once the day closes), with D8–D11 and numbers N1–N5 open. DECISIONS.md and §6 aren't changed for the bonus until the human approves. No code yet.
 - PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 
 ## Waiting on the human
+- **M09 rarity bonus** (ticket, Decisions D8–D11 and Numbers N1–N5): late answers and the bonus (leaning "no bonus after midnight", per answer or per run), the ledger change, what closes a day (no scheduler exists; the human chooses), where the expected popularity comes from, and five numbers.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -21,7 +22,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Build 9a, the ledger, on branch `m09-points-and-leaderboard`, tests first (ticket, Plan). ROADMAP "Next revision", From M08, has the deferred M08 items.
+Once the human has answered D8–D11 and given N1–N5: record them in the M09 ticket, update DECISIONS.md (Points ledger; Game 1: Scoring) and `M00-data-design.md` §6 with the approved text, then build 9a on branch `m09-points-and-leaderboard`, tests first (ticket, Plan). ROADMAP "Next revision", From M08, has the deferred M08 items.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
