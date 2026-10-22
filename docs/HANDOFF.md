@@ -9,7 +9,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M08, Comments and reactions:** the ticket is drafted on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`). No code and no PR yet.
 
 ## Waiting on the human
-- **M08 D1–D8** in the ticket: comment length, what reactions attach to, the reaction set, delete, reports, which days, rate limit, and the security change for the new tables.
+- **M08 D4–D7** in the ticket: what deleting and reporting do, which days are shown, and a rate limit. D1, D2, D3 and D8 are answered.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -21,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once D1–D8 are answered, record them in the M08 ticket, finish its acceptance criteria, then build 8a (comments) on `m08-comments-and-reactions`.
+Once D4–D7 are answered, record them in the M08 ticket, finish its acceptance criteria, then build 8a (comments) on `m08-comments-and-reactions`.
 
 ## Local state
 - The local Supabase stack (stopped, data kept), Realtime included, holds:

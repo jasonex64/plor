@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** planned: ticket drafted 2026-10-22, waiting for the human's answers to D1–D8 below. No code until they're answered.
+**Status:** planned: ticket drafted 2026-10-22, D1, D2, D3 and D8 answered (human, 2026-10-22); D4–D7 wait for the human. No code until they're answered.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
@@ -50,14 +50,14 @@ After playing the day's game, players can comment on it and react, seen only by 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| D1 | **Comment length** (a human number) | 280 characters | |
-| D2 | **What reactions attach to.** (a) Comments, like a chat. (b) A friend's run on the board, like a "nice!" on "survived". (c) Both. | (a). It's the one people expect from "comments and reactions". (b) could come with the home screen feed (M11) | |
-| D3 | **The reaction set** (fixed, small) | 👍 😂 😮 😢 ❤️ | |
+| D1 | **Comment length** (a human number) | 280 characters || **280 characters** (human, 2026-10-22: "take reccomendation for now") |
+| D2 | **What reactions attach to.** (a) Comments, like a chat. (b) A friend's run on the board, like a "nice!" on "survived". (c) Both. | (a). It's the one people expect from "comments and reactions". (b) could come with the home screen feed (M11) || **(c) Both**: on comments and on friends' runs (human, 2026-10-22) |
+| D3 | **The reaction set** (fixed, small) | 👍 😂 😮 😢 ❤️ || **👍 😂 😮 😢 ❤️** for now; custom or different reactions later (human, 2026-10-22: "take reccomendation for now but add custom/different reactions down the line"); ROADMAP Later |
 | D4 | **Deleting your own comment** | Gone for everyone, and not kept. Its reactions and reports go with it | |
 | D5 | **What a report does** | Stored, and hidden for the reporter at once. Admins see open reports on the admin pages and can delete the comment. Nothing is hidden automatically, since that would need a threshold (a human number) | |
 | D6 | **Days other than today** | Only today's thread is shown in M08. Older threads stay stored for later (home screen, M11) | |
 | D7 | **Rate limit on posting** (a human number, or none) | None in M08: only friends see comments, and they can report. Revisit with beta data (M15) | |
-| D8 | **Security change:** three new tables, and plor_app may: read and insert comments and delete its own (the route checks the owner); read, insert and delete reactions; insert reports; and, for admins only through the routes, read reports | Approve, recorded in DECISIONS.md like M07's | |
+| D8 | **Security change:** three new tables, and plor_app may: read and insert comments and delete its own (the route checks the owner); read, insert and delete reactions; insert reports; and, for admins only through the routes, read reports | Approve, recorded in DECISIONS.md like M07's || **Approved** (human, 2026-10-22). Recorded in DECISIONS.md when 8a's migration lands |
 
 ## Source
 - `docs/ROADMAP.md`: the Product section and the M08 row.
@@ -90,8 +90,8 @@ After playing the day's game, players can comment on it and react, seen only by 
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
-| Comment length | Posting | D1, *open* |
-| Reaction set | Reactions | D3, *open* |
+| Comment length: 280 characters | Posting | D1, human, 2026-10-22 |
+| Reaction set: 👍 😂 😮 😢 ❤️ | Reactions | D3, human, 2026-10-22 |
 
 ## Plan
 1. The human answers D1–D8. Claude records the answers and finishes the acceptance criteria.
