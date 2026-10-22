@@ -8,7 +8,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
   - **8a, comments,** is merged (PR #39). The branch stays for 8d.
   - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is merged (PR #40, on all-green CI, with the human's OK). The human kept both of its readings: reactions on a friend's run still in play, and on your own comment. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
-  - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is reviewed and in its PR. The human allowed merging it on all-green CI without them, this one time (2026-10-22). The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
+  - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is reviewed and in PR #41. The human allowed merging it on all-green CI without them, this one time (2026-10-22). The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
   - 8d (live updates over the board topic, and the two-browser e2e test) is not started.
 
 ## Waiting on the human
