@@ -17,10 +17,13 @@ function errorText(err: unknown): string {
   return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
 }
 
-export function Game() {
+// onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a).
+export function Game({ onOver }: { onOver: (over: boolean) => void }) {
   const [run, setRun] = useState<RunState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
+  useEffect(() => onOver(over), [onOver, over]);
 
   // Stable, so the countdown below doesn't restart when this component re-renders.
   const load = useCallback(() => {
@@ -73,7 +76,7 @@ export function Game() {
           />
         </>
       )}
-      {(run.status === "died" || run.status === "survived" || run.status === "timed_out") && <Result run={run} onReset={load} />}
+      {over && <Result run={run} onReset={load} />}
       {error && <p role="alert">{error}</p>}
     </section>
   );

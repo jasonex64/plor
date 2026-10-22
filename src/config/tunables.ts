@@ -17,6 +17,10 @@ export const DISPLAY_NAME_MAX_LENGTH = 24;
 // 22 characters; the friends route test issues a real code through it.
 export const INVITE_CODE_BYTES = 16;
 
+// Comment length (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md, D1). The database's check
+// constraint comment_body_format enforces it; the comments route test posts both lengths through it.
+export const COMMENT_MAX_LENGTH = 280;
+
 // "Where everyone ended": how many friends are named per place before "+ k more" (human, 2026-10-21;
 // docs/milestones/M07-friends-and-live-board.md, D2).
 export const FRIENDS_PER_PLACE = 3;
