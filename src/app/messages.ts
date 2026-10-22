@@ -21,6 +21,11 @@ const MESSAGES: Record<string, string> = {
   no_profile: "Pick a username before you play.",
   // The rules are the database's check (docs/milestones/M07-friends-and-live-board.md, D1).
   display_name_invalid: `Display names are 1 to ${DISPLAY_NAME_MAX_LENGTH} characters: letters, digits, single spaces and ' . _ -`,
+  // Invite links and friends (docs/milestones/M07-friends-and-live-board.md, 7b).
+  invite_invalid: "That invite link doesn't work. Ask your friend for their current link.",
+  invite_own: "That's your own invite link. Send it to a friend.",
+  already_friends: "You're already friends.",
+  not_friends: "You aren't friends with that player.",
   no_puzzle_today: "There's no puzzle today yet. Check back later.",
   no_run: "Start today's puzzle first.",
   run_over: "This run is already over.",

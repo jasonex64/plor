@@ -1,9 +1,6 @@
-| **Yes, in M07** (human, 2026-10-21) |
-| **3** (human, 2026-10-21) |
-| **1 to 24 characters: letters (accents OK), digits, spaces and ' - . _; no emoji** (human, 2026-10-21, chose Claude's suggestion) |
 # M07 — Friends and live board
 
-**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Plan step 1 done (both hypotheses held). 7a, the display name, is built (its PR); 7b next.
+**Status:** in progress. Every decision is answered (D1–D7, human, 2026-10-21). Plan step 1 is done, and both hypotheses held. 7a, the display name, is merged (PR #35). 7b, invite links and friends, is built and in its PR. 7c, the live board, is next.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -67,7 +64,7 @@ Built as four sub-tickets, one PR each, in this order:
 
 ## Acceptance criteria
 - [x] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown (from 7b, the first place others see players). Route and database tests.
-- [ ] **7b** Friends see each other's display name, or the username if there is none (carried from 7a). Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
+- [x] **7b** Friends see each other's display name, or the username if there is none (carried from 7a). Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
 - [ ] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
 - [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
 - [x] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy. See Evidence.
@@ -140,6 +137,32 @@ Built as four sub-tickets, one PR each, in this order:
 - **Build:** `npm run build` lists `/api/profile/display-name`. `npm run check:client-bundle`: OK, 54 files. `npx tsc --noEmit` and `npm run lint`: clean.
 - **In the browser** (dev server, local stack): the account section shows the Display name field and Save, with no Clear while no name is set. Saving wasn't tried there, because the signed-in account was the human's own; the route tests cover it.
 
+**7b Invite links and friends** (2026-10-22, local stack; migration `20261022070948_friends.sql` applied):
+- **Database:** `npm run test:sql`: 6 files, 113 tests, `Result: PASS`.
+  - `friends.test.sql` checks:
+    - codes: the format (22 base64url characters), one per player, and none shared;
+    - pairs: stored smaller ID first, once, never with yourself, and only for existing users;
+    - both cascades on account deletion.
+  - `plor_app_role.test.sql`'s exact list gains the six new grants: invite select, insert and update of `code` only; friendship select, insert and delete.
+- **Routes, two real players:** `npx vitest run src/app/api/friends/route.db.test.ts`: 8 passed. Covered:
+  - a code is made once and then returned the same;
+  - the preview shows the inviter's display name (7a's check);
+  - adding makes both players friends, each seeing the other's display name, or the username when there is none;
+  - refused: a second add with 409 `already_friends`, your own link with 409 `invite_own`, and no username with 409 `no_profile`;
+  - after a reset, the old code gets 404 `invite_invalid`, and so does a malformed one;
+  - remove works both ways, then 404 `not_friends`.
+  - `npm run test:db`: 8 files, 87 passed.
+- **Unit:** `npm test`: 23 files, 178 passed. Covered:
+  - codes are 22 base64url characters and differ each time;
+  - malformed codes get 404;
+  - all five routes give 401 when signed out.
+- **Build:** `npm run build` lists the five `/api/friends` routes and `/invite/[code]`. The first build failed: `params` read outside Suspense is runtime data under Cache Components. Fixed by reading it inside the boundary (bundled `08-caching.md`). `npm run check:client-bundle`: OK, 59 files. `npx tsc --noEmit` and `npm run lint`: clean.
+- **In the browser** (dev server, signed in as the human's own local account, read-only):
+  - the home page shows Friends: "No friends yet…" and "Make my invite link";
+  - `/invite/<unknown code>` shows "That invite link doesn't work…";
+  - a throwaway local player's link shows "Add Zoë Check as a friend?", the display name only, after the review fix below.
+  - Add wasn't pressed on the human's account. The throwaway player was deleted afterwards, leaving 0 friendships.
+
 ## Review
 **7a** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
@@ -149,3 +172,12 @@ Built as four sub-tickets, one PR each, in this order:
   - **The ROADMAP row and HANDOFF were stale.** Updated.
 - Also fixed, because it was small and in this change: a test title claimed more than the test checked.
 - Deferred to ROADMAP "Next revision": non-ASCII digits and letters such as ª pass the D1 rule.
+
+**7b** (reviewer agent, 2026-10-22):
+- Blocking findings and how each was fixed:
+  - **Friends were shown as "name (username)",** against the display name being "shown instead of the username". They're now shown by name only. The API still returns the username, which identifies a friend for Remove.
+  - **The privacy text said friends see the display name or the username.** In fact friends, and anyone signed in who opens the invite link, receive both. The text now says so.
+  - **A remembered invite could send "/" back to it.** That happened when a Google sign-in was cancelled and the invite was then accepted by email. The invite page now clears the remembered code when it handles the invite.
+  - **The invite code's size lived outside `tunables.ts`,** and its 22-character pattern was written out twice in TypeScript. `INVITE_CODE_BYTES` is now in `tunables.ts`, and one shared pattern (`src/friends/invite-code.ts`) is derived from it.
+- Also fixed: three stray table rows at the top of this ticket, left by an earlier edit.
+- Deferred to ROADMAP "Next revision": three items under "From M07".

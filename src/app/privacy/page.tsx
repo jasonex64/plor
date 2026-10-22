@@ -29,6 +29,10 @@ export default function Privacy() {
           characters) so we can add it.
         </li>
         <li>
+          <strong>Your friends:</strong> who you are friends with, and your invite link. Your friends, and anyone
+          signed in who opens your invite link, can see your username and your display name if you set one.
+        </li>
+        <li>
           <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
           cookies.
         </li>

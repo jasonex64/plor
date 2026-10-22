@@ -66,6 +66,10 @@ select is(pg_temp.grants('plor_app'), array[
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
   'private.day_of(timestamp with time zone) execute',
+  -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
+  'private.friend_invite insert', 'private.friend_invite select',
+  'private.friend_invite.code update',
+  'private.friendship delete', 'private.friendship insert', 'private.friendship select',
   'private.missed_answer insert', 'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
