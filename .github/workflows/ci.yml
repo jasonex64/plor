@@ -45,11 +45,35 @@ jobs:
       - run: npm ci
       # The stack prints a table of its local keys on stdout, so stdout is dropped (CLAUDE.md: Secrets never leave
       # their home). A word filter missed the "Publishable" row on the first run. Errors go to stderr and still
-      # fail the step.
+      # fail the step. Realtime runs too: the live board's trigger sends to realtime.messages, whose daily
+      # partitions the Realtime service creates (M07 7c).
       - name: Start the local Supabase stack
-        run: npx supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
+        run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
       - run: npm run test:sql
       - run: npm run test:db
+
+  # Two real browsers against the local stack and the dev server (M07 D7: Playwright): the live board end to end.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+          cache: npm
+      - run: npm ci
+      - name: Start the local Supabase stack
+        run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
+      # The dev server reads .env.local. The publishable key comes from the running stack and is masked, never
+      # printed; the other two values are the local stack's documented defaults.
+      - name: Point the app at the local stack
+        run: |
+          key=$(npx supabase status -o env 2>/dev/null | sed -n 's/^PUBLISHABLE_KEY="\{0,1\}\([^"]*\)"\{0,1\}$/\1/p')
+          test -n "$key"
+          echo "::add-mask::$key"
+          printf 'DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_PUBLISHABLE_KEY=%s\n' "$key" > .env.local
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
 
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
   # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a

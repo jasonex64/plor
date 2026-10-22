@@ -18,9 +18,11 @@
     "content:plurals": "node scripts/content-plurals.ts",
     "content:letters": "node scripts/content-letters.ts",
     "content:additions-check": "node scripts/content-additions-check.ts",
-    "survey:score": "node scripts/survey-score.ts"
+    "survey:score": "node scripts/survey-score.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@supabase/realtime-js": "2.118.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "@vercel/functions": "3.10.1",
@@ -31,6 +33,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@types/node": "^24",
     "@types/pg": "8.23.1",
     "@types/pluralize": "0.0.33",
