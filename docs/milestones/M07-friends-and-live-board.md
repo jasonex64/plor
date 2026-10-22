@@ -1,6 +1,6 @@
 # M07 — Friends and live board
 
-**Status:** in progress. Every decision is answered (D1–D7, human, 2026-10-21). Plan step 1 is done, and both hypotheses held. 7a (PR #35) and 7b (PR #36) are merged. 7c, the live board, is built and in its PR. 7d, where everyone ended, is next.
+**Status:** done (2026-10-22). 7a (PR #35), 7b (PR #36) and 7c (PR #37) are merged. 7d, where everyone ended, is the milestone's last PR (#38). Every decision was answered by the human (D1–D7, 2026-10-21).
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -66,7 +66,7 @@ Built as four sub-tickets, one PR each, in this order:
 - [x] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown (from 7b, the first place others see players). Route and database tests.
 - [x] **7b** Friends see each other's display name, or the username if there is none (carried from 7a). Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
 - [x] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
-- [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
+- [x] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
 - [x] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy. See Evidence.
 
 ## Out of scope
@@ -104,6 +104,7 @@ Built as four sub-tickets, one PR each, in this order:
 ## Source diff
 | Source (or ticket) says | We built | Why different |
 |---|---|---|
+| 7d: "one row per place: each question, plus survived and ran out of time" | A row only for places where the player or a friend ended. Ran out of time is one row, whichever question it was on | Empty rows add nothing to a plain list. Running out of time is told apart from being caught, not by question, as the ticket's three kinds of place |
 | 7c: "a browser Supabase client used only for Realtime" (D5) | `@supabase/realtime-js` alone, not supabase-js. Its URL, publishable key and token come at runtime from `/api/realtime/session`, not from public env vars | It's only Realtime. Nothing new goes into the bundle, and `check:client-bundle` stays as it was |
 | 7c: friends' updates go to friends' boards | Each update also goes to the player's own board | That's how the page learns the player's own run has ended, which is when friends' outcomes may be shown |
 | 7c: "a friend's answer reaches the viewer's open page" | Starting, answering and Next are sent live. Running out of time isn't: nothing is written when time runs out (the database judges it on read), so that friend shows "on question k" until the board is next fetched | Nothing to trigger on. Flagged in ROADMAP "Next revision" |
@@ -199,6 +200,20 @@ Built as four sub-tickets, one PR each, in this order:
   - `npx tsc --noEmit` and `npm run lint`: clean.
 - **CI:** the `db` job now starts Realtime, and a new `e2e` job runs Playwright. Both are first shown working in this PR's CI.
 
+**7d Where everyone ended** (2026-10-22, local stack):
+- **Unit:** `src/friends/ended.test.ts`, 5 tests (the fifth added after review). They check:
+  - the player is always shown, even alone;
+  - places come in play order: caught on each question, then ran out of time, then survived;
+  - `FRIENDS_PER_PLACE` (3, D2, now in `tunables.ts`) are named, the rest counted, and everyone kept for the full list;
+  - unfinished friends are left out.
+  - `npm test`: 25 files, 185 passed.
+- **Routes:** `getBoard` now gives the viewer's own ending, `mine`. It is `null` before the viewer finishes, and `{caught, question 1, answer}` after (`src/app/api/board/route.db.test.ts`). `npm run test:db`: 9 files, 93 passed.
+- **Two browsers:** `npm run test:e2e`: 2 passed (24 s).
+  - After the watcher is caught too, the friend's row reads `caught on question 1 by "egg roll"`.
+  - "Where everyone ended" has one place, `Caught on question 1: You, <friend>`, and opening it lists `You` and the friend.
+  - The first run failed: the friend-row locator also matched the picture's inner list. The locator now reads only the plain list; the app was unchanged.
+- **Build:** `npm run build` and `npm run check:client-bundle` (OK, 60 files); `npx tsc --noEmit` and `npm run lint`: clean.
+
 ## Review
 **7a** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
@@ -208,6 +223,11 @@ Built as four sub-tickets, one PR each, in this order:
   - **The ROADMAP row and HANDOFF were stale.** Updated.
 - Also fixed, because it was small and in this change: a test title claimed more than the test checked.
 - Deferred to ROADMAP "Next revision": non-ASCII digits and letters such as ª pass the D1 rule.
+
+**7d and the milestone's close** (reviewer agent, 2026-10-22):
+- Blocking findings: none in the code. Two conditions for closing, both now met: this 7d review entry, and the handoff matching the local stack, which is stopped at the end of the session.
+- Also taken, because it was one test: two friends who ran out of time on different questions share one row (`ended.test.ts`, now 5 tests).
+- Deferred to ROADMAP "Next revision": three items under "From M07". A fourth, the PR number missing from the ROADMAP row, is fixed.
 
 **7c** (reviewer agent, 2026-10-22):
 - Blocking findings and how each was fixed:

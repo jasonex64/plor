@@ -17,6 +17,10 @@ export const DISPLAY_NAME_MAX_LENGTH = 24;
 // 22 characters; the friends route test issues a real code through it.
 export const INVITE_CODE_BYTES = 16;
 
+// "Where everyone ended": how many friends are named per place before "+ k more" (human, 2026-10-21;
+// docs/milestones/M07-friends-and-live-board.md, D2).
+export const FRIENDS_PER_PLACE = 3;
+
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
 // "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;

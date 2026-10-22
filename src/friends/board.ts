@@ -20,7 +20,8 @@ export type BoardFriend = {
   ended: Ended | null;
 };
 
-export type Board = { date: string; finished: boolean; friends: BoardFriend[] };
+// mine: how the viewer's own run ended, once it has (M07 7d places the viewer among their friends).
+export type Board = { date: string; finished: boolean; mine: Ended | null; friends: BoardFriend[] };
 
 const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 
@@ -50,13 +51,13 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   const finished = viewer?.status != null && FINISHED.includes(viewer.status);
   const friends = rows.filter((r) => r.user_id !== viewerId);
 
-  // What each caught friend typed, read only when the viewer may see it.
+  // What each caught player typed, the viewer included, read only once the viewer may see it.
   const caught = new Map<string, { question_idx: number; entry_id: string }>();
   if (finished && content) {
     const { rows: events } = await db.query<{ user_id: string; question_idx: number; entry_id: string }>(
       `select user_id, question_idx, entry_id from private.run_event
        where game_id = $1 and puzzle_date = $2::date and matched and user_id = any($3::uuid[])`,
-      [GAME_ID, date, friends.map((f) => f.user_id)],
+      [GAME_ID, date, rows.map((r) => r.user_id)],
     );
     for (const e of events) caught.set(e.user_id, e);
   }
@@ -64,6 +65,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   return {
     date,
     finished,
+    mine: finished && content ? ended(viewer!, caught.get(viewerId), content) : null,
     friends: friends
       .map((f): BoardFriend => {
         const state = f.status === null ? "not_started" : FINISHED.includes(f.status) ? "finished" : "playing";

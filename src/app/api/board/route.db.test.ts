@@ -71,6 +71,7 @@ describe("the live board over HTTP", () => {
     useSession(players.b.session);
     expect(await board()).toMatchObject({
       finished: false,
+      mine: null,
       friends: [{ username: players.a.username, name: players.a.username, state: "not_started", question: null, ended: null }],
     });
   });
@@ -92,7 +93,10 @@ describe("the live board over HTTP", () => {
   it("shows how a friend's run ended once the viewer has finished", async () => {
     useSession(players.b.session);
     await playAndGetCaught();
-    expect((await board()).friends[0].ended).toEqual({ result: "caught", question: 1, answer: hostName() });
+    const after = await board();
+    expect(after.friends[0].ended).toEqual({ result: "caught", question: 1, answer: hostName() });
+    // The viewer's own ending, which 7d places among the friends'.
+    expect(after.mine).toEqual({ result: "caught", question: 1, answer: hostName() });
     useSession(players.a.session);
     expect(await board()).toMatchObject({ finished: true, friends: [{ username: players.b.username, ended: { result: "caught", question: 1 } }] });
   });
