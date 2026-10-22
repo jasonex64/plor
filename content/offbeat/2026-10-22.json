@@ -1,0 +1,4405 @@
+{
+  "format": 2,
+  "game_id": "offbeat",
+  "date": "2026-10-22",
+  "questions": [
+    {
+      "prompt": "Name a Chinese food",
+      "entries": [
+        {
+          "id": "fried-rice",
+          "name": "fried rice",
+          "aliases": [],
+          "plural": "fried rice"
+        },
+        {
+          "id": "lo-mein",
+          "name": "lo mein",
+          "aliases": [
+            "lomein"
+          ],
+          "plural": "lo mein"
+        },
+        {
+          "id": "chow-mein",
+          "name": "chow mein",
+          "aliases": [
+            "chowmein"
+          ],
+          "plural": "chow mein"
+        },
+        {
+          "id": "chop-suey",
+          "name": "chop suey",
+          "aliases": [],
+          "plural": "chop suey"
+        },
+        {
+          "id": "egg-roll",
+          "name": "egg roll",
+          "aliases": [
+            "egg rolls"
+          ]
+        },
+        {
+          "id": "spring-roll",
+          "name": "spring roll",
+          "aliases": [
+            "spring rolls"
+          ]
+        },
+        {
+          "id": "dumpling",
+          "name": "dumpling",
+          "aliases": [
+            "jiaozi",
+            "dumplings"
+          ]
+        },
+        {
+          "id": "potsticker",
+          "name": "potsticker",
+          "aliases": [
+            "pot sticker",
+            "guotie",
+            "fried dumpling",
+            "potstickers"
+          ]
+        },
+        {
+          "id": "wonton",
+          "name": "wonton",
+          "aliases": [
+            "won ton",
+            "fried wonton",
+            "wontons"
+          ]
+        },
+        {
+          "id": "wonton-soup",
+          "name": "wonton soup",
+          "aliases": [
+            "wonton noodle soup"
+          ],
+          "plural": "wonton soup"
+        },
+        {
+          "id": "egg-drop-soup",
+          "name": "egg drop soup",
+          "aliases": [],
+          "plural": "egg drop soup"
+        },
+        {
+          "id": "hot-and-sour-soup",
+          "name": "hot and sour soup",
+          "aliases": [],
+          "plural": "hot and sour soup"
+        },
+        {
+          "id": "crab-rangoon",
+          "name": "crab rangoon",
+          "aliases": [
+            "cream cheese wonton",
+            "crab rangoons"
+          ]
+        },
+        {
+          "id": "orange-chicken",
+          "name": "orange chicken",
+          "aliases": [],
+          "plural": "orange chicken"
+        },
+        {
+          "id": "general-tsos-chicken",
+          "name": "General Tso's chicken",
+          "aliases": [
+            "General Tso",
+            "General Tao's chicken",
+            "General Gau's chicken"
+          ],
+          "plural": "General Tso's chicken"
+        },
+        {
+          "id": "sesame-chicken",
+          "name": "sesame chicken",
+          "aliases": [],
+          "plural": "sesame chicken"
+        },
+        {
+          "id": "kung-pao-chicken",
+          "name": "kung pao chicken",
+          "aliases": [
+            "kung pao",
+            "gong bao chicken",
+            "kung po chicken"
+          ],
+          "plural": "kung pao chicken"
+        },
+        {
+          "id": "sweet-and-sour-chicken",
+          "name": "sweet and sour chicken",
+          "aliases": [
+            "sweet and sour",
+            "sweet and sour pork"
+          ],
+          "plural": "sweet and sour chicken"
+        },
+        {
+          "id": "lemon-chicken",
+          "name": "lemon chicken",
+          "aliases": [],
+          "plural": "lemon chicken"
+        },
+        {
+          "id": "cashew-chicken",
+          "name": "cashew chicken",
+          "aliases": [],
+          "plural": "cashew chicken"
+        },
+        {
+          "id": "honey-walnut-shrimp",
+          "name": "honey walnut shrimp",
+          "aliases": [
+            "walnut shrimp"
+          ],
+          "plural": "honey walnut shrimp"
+        },
+        {
+          "id": "salt-and-pepper-shrimp",
+          "name": "salt and pepper shrimp",
+          "aliases": [],
+          "plural": "salt and pepper shrimp"
+        },
+        {
+          "id": "beef-and-broccoli",
+          "name": "beef and broccoli",
+          "aliases": [
+            "broccoli beef",
+            "beef with broccoli"
+          ],
+          "plural": "beef and broccoli"
+        },
+        {
+          "id": "mongolian-beef",
+          "name": "Mongolian beef",
+          "aliases": [],
+          "plural": "Mongolian beef"
+        },
+        {
+          "id": "pepper-steak",
+          "name": "pepper steak",
+          "aliases": [],
+          "plural": "pepper steak"
+        },
+        {
+          "id": "moo-shu-pork",
+          "name": "moo shu pork",
+          "aliases": [
+            "moo shu",
+            "mu shu pork",
+            "mu shu"
+          ],
+          "plural": "moo shu pork"
+        },
+        {
+          "id": "moo-goo-gai-pan",
+          "name": "moo goo gai pan",
+          "aliases": [],
+          "plural": "moo goo gai pan"
+        },
+        {
+          "id": "egg-foo-young",
+          "name": "egg foo young",
+          "aliases": [
+            "egg foo yung",
+            "egg fu yung",
+            "egg foo yong"
+          ],
+          "plural": "egg foo young"
+        },
+        {
+          "id": "chow-fun",
+          "name": "chow fun",
+          "aliases": [
+            "beef chow fun",
+            "ho fun"
+          ],
+          "plural": "chow fun"
+        },
+        {
+          "id": "dan-dan-noodles",
+          "name": "dan dan noodles",
+          "aliases": [
+            "dandan noodles",
+            "dan dan mian"
+          ],
+          "plural": "dan dan noodles"
+        },
+        {
+          "id": "singapore-noodles",
+          "name": "Singapore noodles",
+          "aliases": [],
+          "plural": "Singapore noodles"
+        },
+        {
+          "id": "beef-noodle-soup",
+          "name": "beef noodle soup",
+          "aliases": [
+            "niu rou mian",
+            "Lanzhou noodles"
+          ],
+          "plural": "beef noodle soup"
+        },
+        {
+          "id": "peking-duck",
+          "name": "Peking duck",
+          "aliases": [
+            "Beijing duck"
+          ],
+          "plural": "Peking duck"
+        },
+        {
+          "id": "char-siu",
+          "name": "char siu",
+          "aliases": [
+            "barbecue pork",
+            "BBQ pork",
+            "cha siu"
+          ],
+          "plural": "char siu"
+        },
+        {
+          "id": "bao",
+          "name": "bao",
+          "aliases": [
+            "bao bun",
+            "baozi",
+            "steamed bun",
+            "pork bun",
+            "char siu bao",
+            "baos"
+          ]
+        },
+        {
+          "id": "xiaolongbao",
+          "name": "xiaolongbao",
+          "aliases": [
+            "xiao long bao",
+            "soup dumpling",
+            "XLB"
+          ],
+          "plural": "xiaolongbao"
+        },
+        {
+          "id": "har-gow",
+          "name": "har gow",
+          "aliases": [
+            "har gau"
+          ],
+          "plural": "har gow"
+        },
+        {
+          "id": "siu-mai",
+          "name": "siu mai",
+          "aliases": [
+            "shumai",
+            "shu mai",
+            "siomai"
+          ],
+          "plural": "siu mai"
+        },
+        {
+          "id": "dim-sum",
+          "name": "dim sum",
+          "aliases": [],
+          "plural": "dim sum"
+        },
+        {
+          "id": "turnip-cake",
+          "name": "turnip cake",
+          "aliases": [
+            "radish cake",
+            "lo bak go",
+            "turnip cakes"
+          ]
+        },
+        {
+          "id": "cheung-fun",
+          "name": "cheung fun",
+          "aliases": [
+            "rice noodle roll"
+          ],
+          "plural": "cheung fun"
+        },
+        {
+          "id": "congee",
+          "name": "congee",
+          "aliases": [
+            "jook",
+            "rice porridge"
+          ],
+          "plural": "congee"
+        },
+        {
+          "id": "hot-pot",
+          "name": "hot pot",
+          "aliases": [
+            "hotpot"
+          ],
+          "plural": "hot pot"
+        },
+        {
+          "id": "mapo-tofu",
+          "name": "mapo tofu",
+          "aliases": [],
+          "plural": "mapo tofu"
+        },
+        {
+          "id": "twice-cooked-pork",
+          "name": "twice-cooked pork",
+          "aliases": [],
+          "plural": "twice-cooked pork"
+        },
+        {
+          "id": "red-braised-pork",
+          "name": "red braised pork",
+          "aliases": [
+            "hong shao rou"
+          ],
+          "plural": "red braised pork"
+        },
+        {
+          "id": "lions-head-meatballs",
+          "name": "lion's head meatballs",
+          "aliases": [
+            "lion's head"
+          ],
+          "plural": "lion's head meatballs"
+        },
+        {
+          "id": "scallion-pancake",
+          "name": "scallion pancake",
+          "aliases": [
+            "green onion pancake",
+            "cong you bing",
+            "scallion pancakes"
+          ]
+        },
+        {
+          "id": "sesame-ball",
+          "name": "sesame ball",
+          "aliases": [
+            "jian dui",
+            "sesame balls"
+          ]
+        },
+        {
+          "id": "egg-tart",
+          "name": "egg tart",
+          "aliases": [
+            "dan tat",
+            "egg tarts"
+          ]
+        },
+        {
+          "id": "mooncake",
+          "name": "mooncake",
+          "aliases": [
+            "mooncakes"
+          ]
+        },
+        {
+          "id": "fortune-cookie",
+          "name": "fortune cookie",
+          "aliases": [
+            "fortune cookies"
+          ]
+        },
+        {
+          "id": "zongzi",
+          "name": "zongzi",
+          "aliases": [
+            "sticky rice dumpling",
+            "joong"
+          ],
+          "plural": "zongzi"
+        },
+        {
+          "id": "lo-mai-gai",
+          "name": "lo mai gai",
+          "aliases": [],
+          "plural": "lo mai gai"
+        },
+        {
+          "id": "tea-egg",
+          "name": "tea egg",
+          "aliases": [
+            "tea eggs"
+          ]
+        },
+        {
+          "id": "century-egg",
+          "name": "century egg",
+          "aliases": [
+            "thousand-year egg",
+            "preserved egg",
+            "century eggs"
+          ]
+        },
+        {
+          "id": "lap-cheong",
+          "name": "lap cheong",
+          "aliases": [
+            "Chinese sausage"
+          ],
+          "plural": "lap cheong"
+        },
+        {
+          "id": "jianbing",
+          "name": "jianbing",
+          "aliases": [],
+          "plural": "jianbing"
+        },
+        {
+          "id": "roujiamo",
+          "name": "roujiamo",
+          "aliases": [
+            "rou jia mo",
+            "Chinese hamburger"
+          ],
+          "plural": "roujiamo"
+        },
+        {
+          "id": "pineapple-bun",
+          "name": "pineapple bun",
+          "aliases": [
+            "bolo bao",
+            "pineapple buns"
+          ]
+        },
+        {
+          "id": "gai-lan",
+          "name": "gai lan",
+          "aliases": [
+            "Chinese broccoli"
+          ],
+          "plural": "gai lan"
+        },
+        {
+          "id": "bok-choy",
+          "name": "bok choy",
+          "aliases": [
+            "bok choi",
+            "pak choi"
+          ],
+          "plural": "bok choy"
+        }
+      ],
+      "host_bank": [
+        "fried-rice",
+        "orange-chicken",
+        "lo-mein",
+        "egg-roll",
+        "general-tsos-chicken",
+        "dumpling",
+        "chow-mein"
+      ],
+      "host_answers": [
+        "egg-roll"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a dessert",
+      "entries": [
+        {
+          "id": "brownie",
+          "name": "brownie",
+          "aliases": [
+            "brownies"
+          ]
+        },
+        {
+          "id": "cookie",
+          "name": "cookie",
+          "aliases": [
+            "cookies"
+          ]
+        },
+        {
+          "id": "cupcake",
+          "name": "cupcake",
+          "aliases": [
+            "cupcakes"
+          ]
+        },
+        {
+          "id": "cake",
+          "name": "cake",
+          "aliases": [
+            "cakes"
+          ]
+        },
+        {
+          "id": "cheesecake",
+          "name": "cheesecake",
+          "aliases": [
+            "cheesecakes"
+          ]
+        },
+        {
+          "id": "banana-bread",
+          "name": "banana bread",
+          "aliases": [],
+          "plural": "banana bread"
+        },
+        {
+          "id": "pumpkin-bread",
+          "name": "pumpkin bread",
+          "aliases": [],
+          "plural": "pumpkin bread"
+        },
+        {
+          "id": "zucchini-bread",
+          "name": "zucchini bread",
+          "aliases": [],
+          "plural": "zucchini bread"
+        },
+        {
+          "id": "apple-pie",
+          "name": "apple pie",
+          "aliases": [
+            "apple pies"
+          ]
+        },
+        {
+          "id": "cherry-pie",
+          "name": "cherry pie",
+          "aliases": [
+            "cherry pies"
+          ]
+        },
+        {
+          "id": "blueberry-pie",
+          "name": "blueberry pie",
+          "aliases": [
+            "blueberry pies"
+          ]
+        },
+        {
+          "id": "peach-pie",
+          "name": "peach pie",
+          "aliases": [
+            "peach pies"
+          ]
+        },
+        {
+          "id": "pumpkin-pie",
+          "name": "pumpkin pie",
+          "aliases": [
+            "pumpkin pies"
+          ]
+        },
+        {
+          "id": "pecan-pie",
+          "name": "pecan pie",
+          "aliases": [
+            "pecan pies"
+          ]
+        },
+        {
+          "id": "blackberry-pie",
+          "name": "blackberry pie",
+          "aliases": [
+            "blackberry pies"
+          ]
+        },
+        {
+          "id": "raspberry-pie",
+          "name": "raspberry pie",
+          "aliases": [
+            "raspberry pies"
+          ]
+        },
+        {
+          "id": "mixed-berry-pie",
+          "name": "mixed berry pie",
+          "aliases": [
+            "mixed berry pies"
+          ]
+        },
+        {
+          "id": "key-lime-pie",
+          "name": "key lime pie",
+          "aliases": [
+            "key lime pies"
+          ]
+        },
+        {
+          "id": "lemon-bar",
+          "name": "lemon bar",
+          "aliases": [
+            "lemon bars"
+          ]
+        },
+        {
+          "id": "apple-crisp",
+          "name": "apple crisp",
+          "aliases": [],
+          "plural": "apple crisp"
+        },
+        {
+          "id": "peach-cobbler",
+          "name": "peach cobbler",
+          "aliases": [],
+          "plural": "peach cobbler"
+        },
+        {
+          "id": "blackberry-cobbler",
+          "name": "blackberry cobbler",
+          "aliases": [],
+          "plural": "blackberry cobbler"
+        },
+        {
+          "id": "blueberry-cobbler",
+          "name": "blueberry cobbler",
+          "aliases": [],
+          "plural": "blueberry cobbler"
+        },
+        {
+          "id": "apple-crumble",
+          "name": "apple crumble",
+          "aliases": [],
+          "plural": "apple crumble"
+        },
+        {
+          "id": "fruit-tart",
+          "name": "fruit tart",
+          "aliases": [
+            "fruit tarts"
+          ]
+        },
+        {
+          "id": "blueberry-muffin",
+          "name": "blueberry muffin",
+          "aliases": [
+            "blueberry muffins"
+          ]
+        },
+        {
+          "id": "banana-pudding",
+          "name": "banana pudding",
+          "aliases": [],
+          "plural": "banana pudding"
+        },
+        {
+          "id": "fudge",
+          "name": "fudge",
+          "aliases": [],
+          "plural": "fudge"
+        },
+        {
+          "id": "tiramisu",
+          "name": "tiramisu",
+          "aliases": [],
+          "plural": "tiramisu"
+        },
+        {
+          "id": "jell-o",
+          "name": "Jell-O",
+          "aliases": [
+            "gelatin"
+          ],
+          "plural": "Jell-O"
+        },
+        {
+          "id": "rice-krispie-treat",
+          "name": "rice krispie treat",
+          "aliases": [
+            "rice crispy treat",
+            "rice krispie treats"
+          ]
+        },
+        {
+          "id": "baklava",
+          "name": "baklava",
+          "aliases": [],
+          "plural": "baklava"
+        },
+        {
+          "id": "flan",
+          "name": "flan",
+          "aliases": [
+            "flans",
+            "creme caramel"
+          ]
+        },
+        {
+          "id": "tres-leches",
+          "name": "tres leches",
+          "aliases": [],
+          "plural": "tres leches"
+        },
+        {
+          "id": "mochi",
+          "name": "mochi",
+          "aliases": [],
+          "plural": "mochi"
+        },
+        {
+          "id": "brigadeiro",
+          "name": "brigadeiro",
+          "aliases": [
+            "brigadeiros"
+          ]
+        },
+        {
+          "id": "churro",
+          "name": "churro",
+          "aliases": [
+            "churros"
+          ]
+        },
+        {
+          "id": "mango-sticky-rice",
+          "name": "mango sticky rice",
+          "aliases": [],
+          "plural": "mango sticky rice"
+        },
+        {
+          "id": "rice-pudding",
+          "name": "rice pudding",
+          "aliases": [],
+          "plural": "rice pudding"
+        },
+        {
+          "id": "gulab-jamun",
+          "name": "gulab jamun",
+          "aliases": [],
+          "plural": "gulab jamun"
+        },
+        {
+          "id": "alfajores",
+          "name": "alfajores",
+          "aliases": [],
+          "plural": "alfajores"
+        },
+        {
+          "id": "cannoli",
+          "name": "cannoli",
+          "aliases": [],
+          "plural": "cannoli"
+        },
+        {
+          "id": "nanaimo-bar",
+          "name": "Nanaimo bar",
+          "aliases": [
+            "Nanaimo bars"
+          ]
+        },
+        {
+          "id": "pavlova",
+          "name": "pavlova",
+          "aliases": []
+        },
+        {
+          "id": "sticky-toffee-pudding",
+          "name": "sticky toffee pudding",
+          "aliases": [],
+          "plural": "sticky toffee pudding"
+        },
+        {
+          "id": "bread-pudding",
+          "name": "bread pudding",
+          "aliases": [],
+          "plural": "bread pudding"
+        },
+        {
+          "id": "mooncake",
+          "name": "mooncake",
+          "aliases": [
+            "mooncakes"
+          ]
+        },
+        {
+          "id": "egg-tart",
+          "name": "egg tart",
+          "aliases": [
+            "pastel de nata",
+            "egg tarts"
+          ]
+        },
+        {
+          "id": "lamington",
+          "name": "lamington",
+          "aliases": [
+            "lamingtons"
+          ]
+        },
+        {
+          "id": "halva",
+          "name": "halva",
+          "aliases": [],
+          "plural": "halva"
+        },
+        {
+          "id": "rugelach",
+          "name": "rugelach",
+          "aliases": [],
+          "plural": "rugelach"
+        },
+        {
+          "id": "macaron",
+          "name": "macaron",
+          "aliases": [
+            "macarons"
+          ]
+        },
+        {
+          "id": "madeleine",
+          "name": "madeleine",
+          "aliases": [
+            "madeleines"
+          ]
+        },
+        {
+          "id": "creme-brulee",
+          "name": "crème brûlée",
+          "aliases": [
+            "crème brûlées"
+          ]
+        },
+        {
+          "id": "eclair",
+          "name": "éclair",
+          "aliases": [
+            "éclairs"
+          ]
+        },
+        {
+          "id": "cream-puff",
+          "name": "cream puff",
+          "aliases": [
+            "profiterole",
+            "cream puffs"
+          ]
+        },
+        {
+          "id": "ice-cream",
+          "name": "ice cream",
+          "aliases": [],
+          "plural": "ice cream"
+        },
+        {
+          "id": "gelato",
+          "name": "gelato",
+          "aliases": [],
+          "plural": "gelato"
+        },
+        {
+          "id": "sorbet",
+          "name": "sorbet",
+          "aliases": [],
+          "plural": "sorbet"
+        },
+        {
+          "id": "frozen-yogurt",
+          "name": "frozen yogurt",
+          "aliases": [
+            "froyo"
+          ],
+          "plural": "frozen yogurt"
+        },
+        {
+          "id": "sundae",
+          "name": "sundae",
+          "aliases": [
+            "sundaes"
+          ]
+        },
+        {
+          "id": "banana-split",
+          "name": "banana split",
+          "aliases": [
+            "banana splits"
+          ]
+        },
+        {
+          "id": "milkshake",
+          "name": "milkshake",
+          "aliases": [
+            "shake",
+            "milkshakes"
+          ]
+        },
+        {
+          "id": "popsicle",
+          "name": "popsicle",
+          "aliases": [
+            "ice pop",
+            "popsicles"
+          ]
+        },
+        {
+          "id": "snow-cone",
+          "name": "snow cone",
+          "aliases": [
+            "snow cones"
+          ]
+        },
+        {
+          "id": "shaved-ice",
+          "name": "shaved ice",
+          "aliases": [],
+          "plural": "shaved ice"
+        },
+        {
+          "id": "donut",
+          "name": "donut",
+          "aliases": [
+            "doughnut",
+            "donuts"
+          ]
+        },
+        {
+          "id": "custard",
+          "name": "custard",
+          "aliases": [],
+          "plural": "custard"
+        },
+        {
+          "id": "mousse",
+          "name": "mousse",
+          "aliases": [
+            "chocolate mousse"
+          ],
+          "plural": "mousse"
+        },
+        {
+          "id": "panna-cotta",
+          "name": "panna cotta",
+          "aliases": [],
+          "plural": "panna cotta"
+        },
+        {
+          "id": "trifle",
+          "name": "trifle",
+          "aliases": [
+            "trifles"
+          ]
+        },
+        {
+          "id": "parfait",
+          "name": "parfait",
+          "aliases": [
+            "parfaits"
+          ]
+        },
+        {
+          "id": "crepe",
+          "name": "crepe",
+          "aliases": [
+            "crepes"
+          ]
+        },
+        {
+          "id": "smore",
+          "name": "s'more",
+          "aliases": [
+            "s'mores"
+          ]
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [
+            "candy floss"
+          ],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "caramel-apple",
+          "name": "caramel apple",
+          "aliases": [
+            "candy apple",
+            "caramel apples"
+          ]
+        },
+        {
+          "id": "whoopie-pie",
+          "name": "whoopie pie",
+          "aliases": [
+            "whoopie pies"
+          ]
+        },
+        {
+          "id": "ice-cream-sandwich",
+          "name": "ice cream sandwich",
+          "aliases": [
+            "ice cream sandwiches"
+          ]
+        },
+        {
+          "id": "beignet",
+          "name": "beignet",
+          "aliases": [
+            "beignets"
+          ]
+        },
+        {
+          "id": "cinnamon-roll",
+          "name": "cinnamon roll",
+          "aliases": [
+            "cinnamon rolls"
+          ]
+        },
+        {
+          "id": "strudel",
+          "name": "strudel",
+          "aliases": [
+            "apple strudel",
+            "strudels"
+          ]
+        },
+        {
+          "id": "shortbread",
+          "name": "shortbread",
+          "aliases": [],
+          "plural": "shortbread"
+        },
+        {
+          "id": "biscotti",
+          "name": "biscotti",
+          "aliases": [],
+          "plural": "biscotti"
+        },
+        {
+          "id": "snickerdoodle",
+          "name": "snickerdoodle",
+          "aliases": [
+            "snickerdoodles"
+          ]
+        },
+        {
+          "id": "gingerbread",
+          "name": "gingerbread",
+          "aliases": [],
+          "plural": "gingerbread"
+        },
+        {
+          "id": "baked-alaska",
+          "name": "baked Alaska",
+          "aliases": [],
+          "plural": "baked Alaska"
+        },
+        {
+          "id": "bananas-foster",
+          "name": "bananas Foster",
+          "aliases": [],
+          "plural": "bananas Foster"
+        },
+        {
+          "id": "eton-mess",
+          "name": "Eton mess",
+          "aliases": [],
+          "plural": "Eton mess"
+        },
+        {
+          "id": "affogato",
+          "name": "affogato",
+          "aliases": [],
+          "plural": "affogato"
+        },
+        {
+          "id": "kulfi",
+          "name": "kulfi",
+          "aliases": [],
+          "plural": "kulfi"
+        },
+        {
+          "id": "knafeh",
+          "name": "knafeh",
+          "aliases": [
+            "kunafa",
+            "kanafeh"
+          ],
+          "plural": "knafeh"
+        },
+        {
+          "id": "halo-halo",
+          "name": "halo-halo",
+          "aliases": [],
+          "plural": "halo-halo"
+        },
+        {
+          "id": "sweet-potato-pie",
+          "name": "sweet potato pie",
+          "aliases": [],
+          "plural": "sweet potato pie"
+        },
+        {
+          "id": "banana-cream-pie",
+          "name": "banana cream pie",
+          "aliases": [],
+          "plural": "banana cream pie"
+        },
+        {
+          "id": "boston-cream-pie",
+          "name": "Boston cream pie",
+          "aliases": [],
+          "plural": "Boston cream pie"
+        },
+        {
+          "id": "chocolate",
+          "name": "chocolate",
+          "aliases": [],
+          "plural": "chocolate"
+        }
+      ],
+      "host_bank": [
+        "ice-cream",
+        "cake",
+        "brownie",
+        "cookie",
+        "cheesecake",
+        "apple-pie",
+        "cupcake"
+      ],
+      "host_answers": [
+        "brownie"
+      ],
+      "match_groups": {},
+      "steals": "h"
+    },
+    {
+      "prompt": "Name a League of Legends character",
+      "entries": [
+        {
+          "id": "aatrox",
+          "name": "Aatrox",
+          "aliases": [],
+          "plural": "Aatrox"
+        },
+        {
+          "id": "ahri",
+          "name": "Ahri",
+          "aliases": [],
+          "plural": "Ahri"
+        },
+        {
+          "id": "akali",
+          "name": "Akali",
+          "aliases": [],
+          "plural": "Akali"
+        },
+        {
+          "id": "akshan",
+          "name": "Akshan",
+          "aliases": [],
+          "plural": "Akshan"
+        },
+        {
+          "id": "alistar",
+          "name": "Alistar",
+          "aliases": [],
+          "plural": "Alistar"
+        },
+        {
+          "id": "ambessa",
+          "name": "Ambessa",
+          "aliases": [],
+          "plural": "Ambessa"
+        },
+        {
+          "id": "amumu",
+          "name": "Amumu",
+          "aliases": [],
+          "plural": "Amumu"
+        },
+        {
+          "id": "anivia",
+          "name": "Anivia",
+          "aliases": [],
+          "plural": "Anivia"
+        },
+        {
+          "id": "annie",
+          "name": "Annie",
+          "aliases": [],
+          "plural": "Annie"
+        },
+        {
+          "id": "aphelios",
+          "name": "Aphelios",
+          "aliases": [],
+          "plural": "Aphelios"
+        },
+        {
+          "id": "ashe",
+          "name": "Ashe",
+          "aliases": [],
+          "plural": "Ashe"
+        },
+        {
+          "id": "aurelion-sol",
+          "name": "Aurelion Sol",
+          "aliases": [
+            "Asol"
+          ],
+          "plural": "Aurelion Sol"
+        },
+        {
+          "id": "aurora",
+          "name": "Aurora",
+          "aliases": [],
+          "plural": "Aurora"
+        },
+        {
+          "id": "azir",
+          "name": "Azir",
+          "aliases": [],
+          "plural": "Azir"
+        },
+        {
+          "id": "bard",
+          "name": "Bard",
+          "aliases": [],
+          "plural": "Bard"
+        },
+        {
+          "id": "belveth",
+          "name": "Bel'Veth",
+          "aliases": [],
+          "plural": "Bel'Veth"
+        },
+        {
+          "id": "blitzcrank",
+          "name": "Blitzcrank",
+          "aliases": [
+            "Blitz"
+          ],
+          "plural": "Blitzcrank"
+        },
+        {
+          "id": "brand",
+          "name": "Brand",
+          "aliases": [],
+          "plural": "Brand"
+        },
+        {
+          "id": "braum",
+          "name": "Braum",
+          "aliases": [],
+          "plural": "Braum"
+        },
+        {
+          "id": "briar",
+          "name": "Briar",
+          "aliases": [],
+          "plural": "Briar"
+        },
+        {
+          "id": "caitlyn",
+          "name": "Caitlyn",
+          "aliases": [
+            "Cait"
+          ],
+          "plural": "Caitlyn"
+        },
+        {
+          "id": "camille",
+          "name": "Camille",
+          "aliases": [],
+          "plural": "Camille"
+        },
+        {
+          "id": "cassiopeia",
+          "name": "Cassiopeia",
+          "aliases": [
+            "Cass"
+          ],
+          "plural": "Cassiopeia"
+        },
+        {
+          "id": "chogath",
+          "name": "Cho'Gath",
+          "aliases": [
+            "Cho"
+          ],
+          "plural": "Cho'Gath"
+        },
+        {
+          "id": "corki",
+          "name": "Corki",
+          "aliases": [],
+          "plural": "Corki"
+        },
+        {
+          "id": "darius",
+          "name": "Darius",
+          "aliases": [],
+          "plural": "Darius"
+        },
+        {
+          "id": "diana",
+          "name": "Diana",
+          "aliases": [],
+          "plural": "Diana"
+        },
+        {
+          "id": "dr-mundo",
+          "name": "Dr. Mundo",
+          "aliases": [
+            "Mundo",
+            "Doctor Mundo"
+          ],
+          "plural": "Dr. Mundo"
+        },
+        {
+          "id": "draven",
+          "name": "Draven",
+          "aliases": [],
+          "plural": "Draven"
+        },
+        {
+          "id": "ekko",
+          "name": "Ekko",
+          "aliases": [],
+          "plural": "Ekko"
+        },
+        {
+          "id": "elise",
+          "name": "Elise",
+          "aliases": [],
+          "plural": "Elise"
+        },
+        {
+          "id": "evelynn",
+          "name": "Evelynn",
+          "aliases": [
+            "Eve"
+          ],
+          "plural": "Evelynn"
+        },
+        {
+          "id": "ezreal",
+          "name": "Ezreal",
+          "aliases": [
+            "Ez"
+          ],
+          "plural": "Ezreal"
+        },
+        {
+          "id": "fiddlesticks",
+          "name": "Fiddlesticks",
+          "aliases": [
+            "Fiddle"
+          ],
+          "plural": "Fiddlesticks"
+        },
+        {
+          "id": "fiora",
+          "name": "Fiora",
+          "aliases": [],
+          "plural": "Fiora"
+        },
+        {
+          "id": "fizz",
+          "name": "Fizz",
+          "aliases": [],
+          "plural": "Fizz"
+        },
+        {
+          "id": "galio",
+          "name": "Galio",
+          "aliases": [],
+          "plural": "Galio"
+        },
+        {
+          "id": "gangplank",
+          "name": "Gangplank",
+          "aliases": [
+            "GP"
+          ],
+          "plural": "Gangplank"
+        },
+        {
+          "id": "garen",
+          "name": "Garen",
+          "aliases": [],
+          "plural": "Garen"
+        },
+        {
+          "id": "gnar",
+          "name": "Gnar",
+          "aliases": [],
+          "plural": "Gnar"
+        },
+        {
+          "id": "gragas",
+          "name": "Gragas",
+          "aliases": [],
+          "plural": "Gragas"
+        },
+        {
+          "id": "graves",
+          "name": "Graves",
+          "aliases": [],
+          "plural": "Graves"
+        },
+        {
+          "id": "gwen",
+          "name": "Gwen",
+          "aliases": [],
+          "plural": "Gwen"
+        },
+        {
+          "id": "hecarim",
+          "name": "Hecarim",
+          "aliases": [],
+          "plural": "Hecarim"
+        },
+        {
+          "id": "heimerdinger",
+          "name": "Heimerdinger",
+          "aliases": [
+            "Heimer"
+          ],
+          "plural": "Heimerdinger"
+        },
+        {
+          "id": "hwei",
+          "name": "Hwei",
+          "aliases": [],
+          "plural": "Hwei"
+        },
+        {
+          "id": "illaoi",
+          "name": "Illaoi",
+          "aliases": [],
+          "plural": "Illaoi"
+        },
+        {
+          "id": "irelia",
+          "name": "Irelia",
+          "aliases": [],
+          "plural": "Irelia"
+        },
+        {
+          "id": "ivern",
+          "name": "Ivern",
+          "aliases": [],
+          "plural": "Ivern"
+        },
+        {
+          "id": "janna",
+          "name": "Janna",
+          "aliases": [],
+          "plural": "Janna"
+        },
+        {
+          "id": "jarvan-iv",
+          "name": "Jarvan IV",
+          "aliases": [
+            "Jarvan",
+            "J4"
+          ],
+          "plural": "Jarvan IV"
+        },
+        {
+          "id": "jax",
+          "name": "Jax",
+          "aliases": [],
+          "plural": "Jax"
+        },
+        {
+          "id": "jayce",
+          "name": "Jayce",
+          "aliases": [],
+          "plural": "Jayce"
+        },
+        {
+          "id": "jhin",
+          "name": "Jhin",
+          "aliases": [],
+          "plural": "Jhin"
+        },
+        {
+          "id": "jinx",
+          "name": "Jinx",
+          "aliases": [],
+          "plural": "Jinx"
+        },
+        {
+          "id": "ksante",
+          "name": "K'Sante",
+          "aliases": [],
+          "plural": "K'Sante"
+        },
+        {
+          "id": "kaisa",
+          "name": "Kai'Sa",
+          "aliases": [],
+          "plural": "Kai'Sa"
+        },
+        {
+          "id": "kalista",
+          "name": "Kalista",
+          "aliases": [],
+          "plural": "Kalista"
+        },
+        {
+          "id": "karma",
+          "name": "Karma",
+          "aliases": [],
+          "plural": "Karma"
+        },
+        {
+          "id": "karthus",
+          "name": "Karthus",
+          "aliases": [],
+          "plural": "Karthus"
+        },
+        {
+          "id": "kassadin",
+          "name": "Kassadin",
+          "aliases": [
+            "Kass"
+          ],
+          "plural": "Kassadin"
+        },
+        {
+          "id": "katarina",
+          "name": "Katarina",
+          "aliases": [
+            "Kat"
+          ],
+          "plural": "Katarina"
+        },
+        {
+          "id": "kayle",
+          "name": "Kayle",
+          "aliases": [],
+          "plural": "Kayle"
+        },
+        {
+          "id": "kayn",
+          "name": "Kayn",
+          "aliases": [],
+          "plural": "Kayn"
+        },
+        {
+          "id": "kennen",
+          "name": "Kennen",
+          "aliases": [],
+          "plural": "Kennen"
+        },
+        {
+          "id": "khazix",
+          "name": "Kha'Zix",
+          "aliases": [
+            "Kha"
+          ],
+          "plural": "Kha'Zix"
+        },
+        {
+          "id": "kindred",
+          "name": "Kindred",
+          "aliases": [],
+          "plural": "Kindred"
+        },
+        {
+          "id": "kled",
+          "name": "Kled",
+          "aliases": [],
+          "plural": "Kled"
+        },
+        {
+          "id": "kogmaw",
+          "name": "Kog'Maw",
+          "aliases": [
+            "Kog"
+          ],
+          "plural": "Kog'Maw"
+        },
+        {
+          "id": "leblanc",
+          "name": "LeBlanc",
+          "aliases": [],
+          "plural": "LeBlanc"
+        },
+        {
+          "id": "lee-sin",
+          "name": "Lee Sin",
+          "aliases": [
+            "Lee"
+          ],
+          "plural": "Lee Sin"
+        },
+        {
+          "id": "leona",
+          "name": "Leona",
+          "aliases": [],
+          "plural": "Leona"
+        },
+        {
+          "id": "lillia",
+          "name": "Lillia",
+          "aliases": [],
+          "plural": "Lillia"
+        },
+        {
+          "id": "lissandra",
+          "name": "Lissandra",
+          "aliases": [],
+          "plural": "Lissandra"
+        },
+        {
+          "id": "lucian",
+          "name": "Lucian",
+          "aliases": [],
+          "plural": "Lucian"
+        },
+        {
+          "id": "lulu",
+          "name": "Lulu",
+          "aliases": [],
+          "plural": "Lulu"
+        },
+        {
+          "id": "lux",
+          "name": "Lux",
+          "aliases": [],
+          "plural": "Lux"
+        },
+        {
+          "id": "malphite",
+          "name": "Malphite",
+          "aliases": [],
+          "plural": "Malphite"
+        },
+        {
+          "id": "malzahar",
+          "name": "Malzahar",
+          "aliases": [],
+          "plural": "Malzahar"
+        },
+        {
+          "id": "maokai",
+          "name": "Maokai",
+          "aliases": [],
+          "plural": "Maokai"
+        },
+        {
+          "id": "master-yi",
+          "name": "Master Yi",
+          "aliases": [
+            "Yi"
+          ],
+          "plural": "Master Yi"
+        },
+        {
+          "id": "mel",
+          "name": "Mel",
+          "aliases": [],
+          "plural": "Mel"
+        },
+        {
+          "id": "milio",
+          "name": "Milio",
+          "aliases": [],
+          "plural": "Milio"
+        },
+        {
+          "id": "miss-fortune",
+          "name": "Miss Fortune",
+          "aliases": [
+            "MF"
+          ],
+          "plural": "Miss Fortune"
+        },
+        {
+          "id": "mordekaiser",
+          "name": "Mordekaiser",
+          "aliases": [
+            "Mord"
+          ],
+          "plural": "Mordekaiser"
+        },
+        {
+          "id": "morgana",
+          "name": "Morgana",
+          "aliases": [],
+          "plural": "Morgana"
+        },
+        {
+          "id": "naafiri",
+          "name": "Naafiri",
+          "aliases": [],
+          "plural": "Naafiri"
+        },
+        {
+          "id": "nami",
+          "name": "Nami",
+          "aliases": [],
+          "plural": "Nami"
+        },
+        {
+          "id": "nasus",
+          "name": "Nasus",
+          "aliases": [],
+          "plural": "Nasus"
+        },
+        {
+          "id": "nautilus",
+          "name": "Nautilus",
+          "aliases": [],
+          "plural": "Nautilus"
+        },
+        {
+          "id": "neeko",
+          "name": "Neeko",
+          "aliases": [],
+          "plural": "Neeko"
+        },
+        {
+          "id": "nidalee",
+          "name": "Nidalee",
+          "aliases": [],
+          "plural": "Nidalee"
+        },
+        {
+          "id": "nilah",
+          "name": "Nilah",
+          "aliases": [],
+          "plural": "Nilah"
+        },
+        {
+          "id": "nocturne",
+          "name": "Nocturne",
+          "aliases": [],
+          "plural": "Nocturne"
+        },
+        {
+          "id": "nunu-willump",
+          "name": "Nunu & Willump",
+          "aliases": [
+            "Nunu",
+            "Nunu and Willump"
+          ],
+          "plural": "Nunu & Willump"
+        },
+        {
+          "id": "olaf",
+          "name": "Olaf",
+          "aliases": [],
+          "plural": "Olaf"
+        },
+        {
+          "id": "orianna",
+          "name": "Orianna",
+          "aliases": [],
+          "plural": "Orianna"
+        },
+        {
+          "id": "ornn",
+          "name": "Ornn",
+          "aliases": [],
+          "plural": "Ornn"
+        },
+        {
+          "id": "pantheon",
+          "name": "Pantheon",
+          "aliases": [],
+          "plural": "Pantheon"
+        },
+        {
+          "id": "poppy",
+          "name": "Poppy",
+          "aliases": [],
+          "plural": "Poppy"
+        },
+        {
+          "id": "pyke",
+          "name": "Pyke",
+          "aliases": [],
+          "plural": "Pyke"
+        },
+        {
+          "id": "qiyana",
+          "name": "Qiyana",
+          "aliases": [],
+          "plural": "Qiyana"
+        },
+        {
+          "id": "quinn",
+          "name": "Quinn",
+          "aliases": [],
+          "plural": "Quinn"
+        },
+        {
+          "id": "rakan",
+          "name": "Rakan",
+          "aliases": [],
+          "plural": "Rakan"
+        },
+        {
+          "id": "rammus",
+          "name": "Rammus",
+          "aliases": [],
+          "plural": "Rammus"
+        },
+        {
+          "id": "reksai",
+          "name": "Rek'Sai",
+          "aliases": [],
+          "plural": "Rek'Sai"
+        },
+        {
+          "id": "rell",
+          "name": "Rell",
+          "aliases": [],
+          "plural": "Rell"
+        },
+        {
+          "id": "renata-glasc",
+          "name": "Renata Glasc",
+          "aliases": [
+            "Renata"
+          ],
+          "plural": "Renata Glasc"
+        },
+        {
+          "id": "renekton",
+          "name": "Renekton",
+          "aliases": [],
+          "plural": "Renekton"
+        },
+        {
+          "id": "rengar",
+          "name": "Rengar",
+          "aliases": [],
+          "plural": "Rengar"
+        },
+        {
+          "id": "riven",
+          "name": "Riven",
+          "aliases": [],
+          "plural": "Riven"
+        },
+        {
+          "id": "rumble",
+          "name": "Rumble",
+          "aliases": [],
+          "plural": "Rumble"
+        },
+        {
+          "id": "ryze",
+          "name": "Ryze",
+          "aliases": [],
+          "plural": "Ryze"
+        },
+        {
+          "id": "samira",
+          "name": "Samira",
+          "aliases": [],
+          "plural": "Samira"
+        },
+        {
+          "id": "sejuani",
+          "name": "Sejuani",
+          "aliases": [],
+          "plural": "Sejuani"
+        },
+        {
+          "id": "senna",
+          "name": "Senna",
+          "aliases": [],
+          "plural": "Senna"
+        },
+        {
+          "id": "seraphine",
+          "name": "Seraphine",
+          "aliases": [],
+          "plural": "Seraphine"
+        },
+        {
+          "id": "sett",
+          "name": "Sett",
+          "aliases": [],
+          "plural": "Sett"
+        },
+        {
+          "id": "shaco",
+          "name": "Shaco",
+          "aliases": [],
+          "plural": "Shaco"
+        },
+        {
+          "id": "shen",
+          "name": "Shen",
+          "aliases": [],
+          "plural": "Shen"
+        },
+        {
+          "id": "shyvana",
+          "name": "Shyvana",
+          "aliases": [],
+          "plural": "Shyvana"
+        },
+        {
+          "id": "singed",
+          "name": "Singed",
+          "aliases": [],
+          "plural": "Singed"
+        },
+        {
+          "id": "sion",
+          "name": "Sion",
+          "aliases": [],
+          "plural": "Sion"
+        },
+        {
+          "id": "sivir",
+          "name": "Sivir",
+          "aliases": [],
+          "plural": "Sivir"
+        },
+        {
+          "id": "skarner",
+          "name": "Skarner",
+          "aliases": [],
+          "plural": "Skarner"
+        },
+        {
+          "id": "smolder",
+          "name": "Smolder",
+          "aliases": [],
+          "plural": "Smolder"
+        },
+        {
+          "id": "sona",
+          "name": "Sona",
+          "aliases": [],
+          "plural": "Sona"
+        },
+        {
+          "id": "soraka",
+          "name": "Soraka",
+          "aliases": [],
+          "plural": "Soraka"
+        },
+        {
+          "id": "swain",
+          "name": "Swain",
+          "aliases": [],
+          "plural": "Swain"
+        },
+        {
+          "id": "sylas",
+          "name": "Sylas",
+          "aliases": [],
+          "plural": "Sylas"
+        },
+        {
+          "id": "syndra",
+          "name": "Syndra",
+          "aliases": [],
+          "plural": "Syndra"
+        },
+        {
+          "id": "tahm-kench",
+          "name": "Tahm Kench",
+          "aliases": [
+            "Tahm"
+          ],
+          "plural": "Tahm Kench"
+        },
+        {
+          "id": "taliyah",
+          "name": "Taliyah",
+          "aliases": [],
+          "plural": "Taliyah"
+        },
+        {
+          "id": "talon",
+          "name": "Talon",
+          "aliases": [],
+          "plural": "Talon"
+        },
+        {
+          "id": "taric",
+          "name": "Taric",
+          "aliases": [],
+          "plural": "Taric"
+        },
+        {
+          "id": "teemo",
+          "name": "Teemo",
+          "aliases": [],
+          "plural": "Teemo"
+        },
+        {
+          "id": "thresh",
+          "name": "Thresh",
+          "aliases": [],
+          "plural": "Thresh"
+        },
+        {
+          "id": "tristana",
+          "name": "Tristana",
+          "aliases": [
+            "Trist"
+          ],
+          "plural": "Tristana"
+        },
+        {
+          "id": "trundle",
+          "name": "Trundle",
+          "aliases": [],
+          "plural": "Trundle"
+        },
+        {
+          "id": "tryndamere",
+          "name": "Tryndamere",
+          "aliases": [
+            "Trynd"
+          ],
+          "plural": "Tryndamere"
+        },
+        {
+          "id": "twisted-fate",
+          "name": "Twisted Fate",
+          "aliases": [
+            "TF"
+          ],
+          "plural": "Twisted Fate"
+        },
+        {
+          "id": "twitch",
+          "name": "Twitch",
+          "aliases": [],
+          "plural": "Twitch"
+        },
+        {
+          "id": "udyr",
+          "name": "Udyr",
+          "aliases": [],
+          "plural": "Udyr"
+        },
+        {
+          "id": "urgot",
+          "name": "Urgot",
+          "aliases": [],
+          "plural": "Urgot"
+        },
+        {
+          "id": "varus",
+          "name": "Varus",
+          "aliases": [],
+          "plural": "Varus"
+        },
+        {
+          "id": "vayne",
+          "name": "Vayne",
+          "aliases": [],
+          "plural": "Vayne"
+        },
+        {
+          "id": "veigar",
+          "name": "Veigar",
+          "aliases": [],
+          "plural": "Veigar"
+        },
+        {
+          "id": "velkoz",
+          "name": "Vel'Koz",
+          "aliases": [],
+          "plural": "Vel'Koz"
+        },
+        {
+          "id": "vex",
+          "name": "Vex",
+          "aliases": [],
+          "plural": "Vex"
+        },
+        {
+          "id": "vi",
+          "name": "Vi",
+          "aliases": [],
+          "plural": "Vi"
+        },
+        {
+          "id": "viego",
+          "name": "Viego",
+          "aliases": [],
+          "plural": "Viego"
+        },
+        {
+          "id": "viktor",
+          "name": "Viktor",
+          "aliases": [],
+          "plural": "Viktor"
+        },
+        {
+          "id": "vladimir",
+          "name": "Vladimir",
+          "aliases": [
+            "Vlad"
+          ],
+          "plural": "Vladimir"
+        },
+        {
+          "id": "volibear",
+          "name": "Volibear",
+          "aliases": [
+            "Voli"
+          ],
+          "plural": "Volibear"
+        },
+        {
+          "id": "warwick",
+          "name": "Warwick",
+          "aliases": [
+            "WW"
+          ],
+          "plural": "Warwick"
+        },
+        {
+          "id": "wukong",
+          "name": "Wukong",
+          "aliases": [
+            "Monkey King"
+          ],
+          "plural": "Wukong"
+        },
+        {
+          "id": "xayah",
+          "name": "Xayah",
+          "aliases": [],
+          "plural": "Xayah"
+        },
+        {
+          "id": "xerath",
+          "name": "Xerath",
+          "aliases": [],
+          "plural": "Xerath"
+        },
+        {
+          "id": "xin-zhao",
+          "name": "Xin Zhao",
+          "aliases": [
+            "Xin"
+          ],
+          "plural": "Xin Zhao"
+        },
+        {
+          "id": "yasuo",
+          "name": "Yasuo",
+          "aliases": [],
+          "plural": "Yasuo"
+        },
+        {
+          "id": "yone",
+          "name": "Yone",
+          "aliases": [],
+          "plural": "Yone"
+        },
+        {
+          "id": "yorick",
+          "name": "Yorick",
+          "aliases": [],
+          "plural": "Yorick"
+        },
+        {
+          "id": "yunara",
+          "name": "Yunara",
+          "aliases": [],
+          "plural": "Yunara"
+        },
+        {
+          "id": "yuumi",
+          "name": "Yuumi",
+          "aliases": [],
+          "plural": "Yuumi"
+        },
+        {
+          "id": "zac",
+          "name": "Zac",
+          "aliases": [],
+          "plural": "Zac"
+        },
+        {
+          "id": "zed",
+          "name": "Zed",
+          "aliases": [],
+          "plural": "Zed"
+        },
+        {
+          "id": "zeri",
+          "name": "Zeri",
+          "aliases": [],
+          "plural": "Zeri"
+        },
+        {
+          "id": "ziggs",
+          "name": "Ziggs",
+          "aliases": [],
+          "plural": "Ziggs"
+        },
+        {
+          "id": "zilean",
+          "name": "Zilean",
+          "aliases": [],
+          "plural": "Zilean"
+        },
+        {
+          "id": "zoe",
+          "name": "Zoe",
+          "aliases": [],
+          "plural": "Zoe"
+        },
+        {
+          "id": "zyra",
+          "name": "Zyra",
+          "aliases": [],
+          "plural": "Zyra"
+        }
+      ],
+      "host_bank": [
+        "jinx",
+        "teemo",
+        "yasuo",
+        "ahri",
+        "lux",
+        "garen",
+        "ezreal"
+      ],
+      "host_answers": [
+        "jinx"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a capital city in America",
+      "entries": [
+        {
+          "id": "montgomery",
+          "name": "Montgomery",
+          "aliases": [],
+          "plural": "Montgomery"
+        },
+        {
+          "id": "juneau",
+          "name": "Juneau",
+          "aliases": [],
+          "plural": "Juneau"
+        },
+        {
+          "id": "phoenix",
+          "name": "Phoenix",
+          "aliases": [],
+          "plural": "Phoenix"
+        },
+        {
+          "id": "little-rock",
+          "name": "Little Rock",
+          "aliases": [],
+          "plural": "Little Rock"
+        },
+        {
+          "id": "sacramento",
+          "name": "Sacramento",
+          "aliases": [],
+          "plural": "Sacramento"
+        },
+        {
+          "id": "denver",
+          "name": "Denver",
+          "aliases": [],
+          "plural": "Denver"
+        },
+        {
+          "id": "hartford",
+          "name": "Hartford",
+          "aliases": [],
+          "plural": "Hartford"
+        },
+        {
+          "id": "dover",
+          "name": "Dover",
+          "aliases": [],
+          "plural": "Dover"
+        },
+        {
+          "id": "tallahassee",
+          "name": "Tallahassee",
+          "aliases": [],
+          "plural": "Tallahassee"
+        },
+        {
+          "id": "atlanta",
+          "name": "Atlanta",
+          "aliases": [],
+          "plural": "Atlanta"
+        },
+        {
+          "id": "honolulu",
+          "name": "Honolulu",
+          "aliases": [],
+          "plural": "Honolulu"
+        },
+        {
+          "id": "boise",
+          "name": "Boise",
+          "aliases": [],
+          "plural": "Boise"
+        },
+        {
+          "id": "springfield",
+          "name": "Springfield",
+          "aliases": [],
+          "plural": "Springfield"
+        },
+        {
+          "id": "indianapolis",
+          "name": "Indianapolis",
+          "aliases": [
+            "Indy"
+          ],
+          "plural": "Indianapolis"
+        },
+        {
+          "id": "des-moines",
+          "name": "Des Moines",
+          "aliases": [],
+          "plural": "Des Moines"
+        },
+        {
+          "id": "topeka",
+          "name": "Topeka",
+          "aliases": [],
+          "plural": "Topeka"
+        },
+        {
+          "id": "frankfort",
+          "name": "Frankfort",
+          "aliases": [],
+          "plural": "Frankfort"
+        },
+        {
+          "id": "baton-rouge",
+          "name": "Baton Rouge",
+          "aliases": [],
+          "plural": "Baton Rouge"
+        },
+        {
+          "id": "augusta",
+          "name": "Augusta",
+          "aliases": [],
+          "plural": "Augusta"
+        },
+        {
+          "id": "annapolis",
+          "name": "Annapolis",
+          "aliases": [],
+          "plural": "Annapolis"
+        },
+        {
+          "id": "boston",
+          "name": "Boston",
+          "aliases": [],
+          "plural": "Boston"
+        },
+        {
+          "id": "lansing",
+          "name": "Lansing",
+          "aliases": [],
+          "plural": "Lansing"
+        },
+        {
+          "id": "saint-paul",
+          "name": "Saint Paul",
+          "aliases": [
+            "St. Paul"
+          ],
+          "plural": "Saint Paul"
+        },
+        {
+          "id": "jackson",
+          "name": "Jackson",
+          "aliases": [],
+          "plural": "Jackson"
+        },
+        {
+          "id": "jefferson-city",
+          "name": "Jefferson City",
+          "aliases": [],
+          "plural": "Jefferson City"
+        },
+        {
+          "id": "helena",
+          "name": "Helena",
+          "aliases": [],
+          "plural": "Helena"
+        },
+        {
+          "id": "lincoln",
+          "name": "Lincoln",
+          "aliases": [],
+          "plural": "Lincoln"
+        },
+        {
+          "id": "carson-city",
+          "name": "Carson City",
+          "aliases": [],
+          "plural": "Carson City"
+        },
+        {
+          "id": "concord",
+          "name": "Concord",
+          "aliases": [],
+          "plural": "Concord"
+        },
+        {
+          "id": "trenton",
+          "name": "Trenton",
+          "aliases": [],
+          "plural": "Trenton"
+        },
+        {
+          "id": "santa-fe",
+          "name": "Santa Fe",
+          "aliases": [],
+          "plural": "Santa Fe"
+        },
+        {
+          "id": "albany",
+          "name": "Albany",
+          "aliases": [],
+          "plural": "Albany"
+        },
+        {
+          "id": "raleigh",
+          "name": "Raleigh",
+          "aliases": [],
+          "plural": "Raleigh"
+        },
+        {
+          "id": "bismarck",
+          "name": "Bismarck",
+          "aliases": [],
+          "plural": "Bismarck"
+        },
+        {
+          "id": "columbus",
+          "name": "Columbus",
+          "aliases": [],
+          "plural": "Columbus"
+        },
+        {
+          "id": "oklahoma-city",
+          "name": "Oklahoma City",
+          "aliases": [
+            "OKC"
+          ],
+          "plural": "Oklahoma City"
+        },
+        {
+          "id": "salem",
+          "name": "Salem",
+          "aliases": [],
+          "plural": "Salem"
+        },
+        {
+          "id": "harrisburg",
+          "name": "Harrisburg",
+          "aliases": [],
+          "plural": "Harrisburg"
+        },
+        {
+          "id": "providence",
+          "name": "Providence",
+          "aliases": [],
+          "plural": "Providence"
+        },
+        {
+          "id": "columbia",
+          "name": "Columbia",
+          "aliases": [],
+          "plural": "Columbia"
+        },
+        {
+          "id": "pierre",
+          "name": "Pierre",
+          "aliases": [],
+          "plural": "Pierre"
+        },
+        {
+          "id": "nashville",
+          "name": "Nashville",
+          "aliases": [],
+          "plural": "Nashville"
+        },
+        {
+          "id": "austin",
+          "name": "Austin",
+          "aliases": [],
+          "plural": "Austin"
+        },
+        {
+          "id": "salt-lake-city",
+          "name": "Salt Lake City",
+          "aliases": [
+            "SLC"
+          ],
+          "plural": "Salt Lake City"
+        },
+        {
+          "id": "montpelier",
+          "name": "Montpelier",
+          "aliases": [],
+          "plural": "Montpelier"
+        },
+        {
+          "id": "richmond",
+          "name": "Richmond",
+          "aliases": [],
+          "plural": "Richmond"
+        },
+        {
+          "id": "olympia",
+          "name": "Olympia",
+          "aliases": [],
+          "plural": "Olympia"
+        },
+        {
+          "id": "charleston",
+          "name": "Charleston",
+          "aliases": [],
+          "plural": "Charleston"
+        },
+        {
+          "id": "madison",
+          "name": "Madison",
+          "aliases": [],
+          "plural": "Madison"
+        },
+        {
+          "id": "cheyenne",
+          "name": "Cheyenne",
+          "aliases": [],
+          "plural": "Cheyenne"
+        },
+        {
+          "id": "washington-dc",
+          "name": "Washington, D.C.",
+          "aliases": [
+            "DC",
+            "Washington",
+            "District of Columbia"
+          ],
+          "plural": "Washington, D.C."
+        }
+      ],
+      "host_bank": [
+        "washington-dc",
+        "austin",
+        "sacramento",
+        "albany",
+        "boston",
+        "denver",
+        "atlanta"
+      ],
+      "host_answers": [
+        "austin"
+      ],
+      "match_groups": {},
+      "steals": "b"
+    },
+    {
+      "prompt": "Name a car brand",
+      "entries": [
+        {
+          "id": "toyota",
+          "name": "Toyota",
+          "aliases": [],
+          "plural": "Toyota"
+        },
+        {
+          "id": "honda",
+          "name": "Honda",
+          "aliases": [],
+          "plural": "Honda"
+        },
+        {
+          "id": "ford",
+          "name": "Ford",
+          "aliases": [],
+          "plural": "Ford"
+        },
+        {
+          "id": "chevrolet",
+          "name": "Chevrolet",
+          "aliases": [
+            "Chevy"
+          ],
+          "plural": "Chevrolet"
+        },
+        {
+          "id": "tesla",
+          "name": "Tesla",
+          "aliases": [],
+          "plural": "Tesla"
+        },
+        {
+          "id": "bmw",
+          "name": "BMW",
+          "aliases": [],
+          "plural": "BMW"
+        },
+        {
+          "id": "mercedes-benz",
+          "name": "Mercedes-Benz",
+          "aliases": [
+            "Mercedes"
+          ],
+          "plural": "Mercedes-Benz"
+        },
+        {
+          "id": "audi",
+          "name": "Audi",
+          "aliases": [],
+          "plural": "Audi"
+        },
+        {
+          "id": "volkswagen",
+          "name": "Volkswagen",
+          "aliases": [
+            "VW"
+          ],
+          "plural": "Volkswagen"
+        },
+        {
+          "id": "nissan",
+          "name": "Nissan",
+          "aliases": [],
+          "plural": "Nissan"
+        },
+        {
+          "id": "hyundai",
+          "name": "Hyundai",
+          "aliases": [],
+          "plural": "Hyundai"
+        },
+        {
+          "id": "kia",
+          "name": "Kia",
+          "aliases": [],
+          "plural": "Kia"
+        },
+        {
+          "id": "subaru",
+          "name": "Subaru",
+          "aliases": [],
+          "plural": "Subaru"
+        },
+        {
+          "id": "mazda",
+          "name": "Mazda",
+          "aliases": [],
+          "plural": "Mazda"
+        },
+        {
+          "id": "jeep",
+          "name": "Jeep",
+          "aliases": [],
+          "plural": "Jeep"
+        },
+        {
+          "id": "dodge",
+          "name": "Dodge",
+          "aliases": [],
+          "plural": "Dodge"
+        },
+        {
+          "id": "ram",
+          "name": "Ram",
+          "aliases": [],
+          "plural": "Ram"
+        },
+        {
+          "id": "gmc",
+          "name": "GMC",
+          "aliases": [],
+          "plural": "GMC"
+        },
+        {
+          "id": "cadillac",
+          "name": "Cadillac",
+          "aliases": [],
+          "plural": "Cadillac"
+        },
+        {
+          "id": "buick",
+          "name": "Buick",
+          "aliases": [],
+          "plural": "Buick"
+        },
+        {
+          "id": "lincoln",
+          "name": "Lincoln",
+          "aliases": [],
+          "plural": "Lincoln"
+        },
+        {
+          "id": "chrysler",
+          "name": "Chrysler",
+          "aliases": [],
+          "plural": "Chrysler"
+        },
+        {
+          "id": "lexus",
+          "name": "Lexus",
+          "aliases": [],
+          "plural": "Lexus"
+        },
+        {
+          "id": "acura",
+          "name": "Acura",
+          "aliases": [],
+          "plural": "Acura"
+        },
+        {
+          "id": "infiniti",
+          "name": "Infiniti",
+          "aliases": [],
+          "plural": "Infiniti"
+        },
+        {
+          "id": "volvo",
+          "name": "Volvo",
+          "aliases": [],
+          "plural": "Volvo"
+        },
+        {
+          "id": "porsche",
+          "name": "Porsche",
+          "aliases": [],
+          "plural": "Porsche"
+        },
+        {
+          "id": "ferrari",
+          "name": "Ferrari",
+          "aliases": [],
+          "plural": "Ferrari"
+        },
+        {
+          "id": "lamborghini",
+          "name": "Lamborghini",
+          "aliases": [],
+          "plural": "Lamborghini"
+        },
+        {
+          "id": "maserati",
+          "name": "Maserati",
+          "aliases": [],
+          "plural": "Maserati"
+        },
+        {
+          "id": "jaguar",
+          "name": "Jaguar",
+          "aliases": [],
+          "plural": "Jaguar"
+        },
+        {
+          "id": "land-rover",
+          "name": "Land Rover",
+          "aliases": [],
+          "plural": "Land Rover"
+        },
+        {
+          "id": "mini",
+          "name": "Mini",
+          "aliases": [],
+          "plural": "Mini"
+        },
+        {
+          "id": "fiat",
+          "name": "Fiat",
+          "aliases": [],
+          "plural": "Fiat"
+        },
+        {
+          "id": "alfa-romeo",
+          "name": "Alfa Romeo",
+          "aliases": [],
+          "plural": "Alfa Romeo"
+        },
+        {
+          "id": "bentley",
+          "name": "Bentley",
+          "aliases": [],
+          "plural": "Bentley"
+        },
+        {
+          "id": "rolls-royce",
+          "name": "Rolls-Royce",
+          "aliases": [],
+          "plural": "Rolls-Royce"
+        },
+        {
+          "id": "aston-martin",
+          "name": "Aston Martin",
+          "aliases": [],
+          "plural": "Aston Martin"
+        },
+        {
+          "id": "mclaren",
+          "name": "McLaren",
+          "aliases": [],
+          "plural": "McLaren"
+        },
+        {
+          "id": "bugatti",
+          "name": "Bugatti",
+          "aliases": [],
+          "plural": "Bugatti"
+        },
+        {
+          "id": "mitsubishi",
+          "name": "Mitsubishi",
+          "aliases": [],
+          "plural": "Mitsubishi"
+        },
+        {
+          "id": "genesis",
+          "name": "Genesis",
+          "aliases": [],
+          "plural": "Genesis"
+        },
+        {
+          "id": "rivian",
+          "name": "Rivian",
+          "aliases": [],
+          "plural": "Rivian"
+        },
+        {
+          "id": "lucid",
+          "name": "Lucid",
+          "aliases": [],
+          "plural": "Lucid"
+        },
+        {
+          "id": "polestar",
+          "name": "Polestar",
+          "aliases": [],
+          "plural": "Polestar"
+        },
+        {
+          "id": "tata",
+          "name": "Tata",
+          "aliases": [],
+          "plural": "Tata"
+        },
+        {
+          "id": "byd",
+          "name": "BYD",
+          "aliases": [],
+          "plural": "BYD"
+        },
+        {
+          "id": "geely",
+          "name": "Geely",
+          "aliases": [],
+          "plural": "Geely"
+        },
+        {
+          "id": "nio",
+          "name": "NIO",
+          "aliases": [],
+          "plural": "NIO"
+        },
+        {
+          "id": "skoda",
+          "name": "Škoda",
+          "aliases": [],
+          "plural": "Škoda"
+        },
+        {
+          "id": "seat",
+          "name": "SEAT",
+          "aliases": [],
+          "plural": "SEAT"
+        },
+        {
+          "id": "renault",
+          "name": "Renault",
+          "aliases": [],
+          "plural": "Renault"
+        },
+        {
+          "id": "peugeot",
+          "name": "Peugeot",
+          "aliases": [],
+          "plural": "Peugeot"
+        },
+        {
+          "id": "citroen",
+          "name": "Citroën",
+          "aliases": [],
+          "plural": "Citroën"
+        },
+        {
+          "id": "opel",
+          "name": "Opel",
+          "aliases": [],
+          "plural": "Opel"
+        },
+        {
+          "id": "dacia",
+          "name": "Dacia",
+          "aliases": [],
+          "plural": "Dacia"
+        },
+        {
+          "id": "lada",
+          "name": "Lada",
+          "aliases": [],
+          "plural": "Lada"
+        },
+        {
+          "id": "proton",
+          "name": "Proton",
+          "aliases": [],
+          "plural": "Proton"
+        },
+        {
+          "id": "mahindra",
+          "name": "Mahindra",
+          "aliases": [],
+          "plural": "Mahindra"
+        },
+        {
+          "id": "maruti-suzuki",
+          "name": "Maruti Suzuki",
+          "aliases": [
+            "Maruti"
+          ],
+          "plural": "Maruti Suzuki"
+        },
+        {
+          "id": "suzuki",
+          "name": "Suzuki",
+          "aliases": [],
+          "plural": "Suzuki"
+        },
+        {
+          "id": "lancia",
+          "name": "Lancia",
+          "aliases": [],
+          "plural": "Lancia"
+        },
+        {
+          "id": "isuzu",
+          "name": "Isuzu",
+          "aliases": [],
+          "plural": "Isuzu"
+        },
+        {
+          "id": "daihatsu",
+          "name": "Daihatsu",
+          "aliases": [],
+          "plural": "Daihatsu"
+        },
+        {
+          "id": "lotus",
+          "name": "Lotus",
+          "aliases": [],
+          "plural": "Lotus"
+        },
+        {
+          "id": "pagani",
+          "name": "Pagani",
+          "aliases": [],
+          "plural": "Pagani"
+        },
+        {
+          "id": "koenigsegg",
+          "name": "Koenigsegg",
+          "aliases": [],
+          "plural": "Koenigsegg"
+        },
+        {
+          "id": "xpeng",
+          "name": "Xpeng",
+          "aliases": [],
+          "plural": "Xpeng"
+        }
+      ],
+      "host_bank": [
+        "honda",
+        "toyota",
+        "ford",
+        "tesla",
+        "chevrolet",
+        "bmw"
+      ],
+      "host_answers": [
+        "toyota"
+      ],
+      "match_groups": {},
+      "steals": "n"
+    },
+    {
+      "prompt": "Name a type of tea",
+      "entries": [
+        {
+          "id": "chamomile",
+          "name": "chamomile",
+          "aliases": [
+            "chamomile tea",
+            "camomile",
+            "camomile tea"
+          ],
+          "plural": "chamomile"
+        },
+        {
+          "id": "green-tea",
+          "name": "green tea",
+          "aliases": [
+            "sencha",
+            "gunpowder tea"
+          ],
+          "plural": "green tea"
+        },
+        {
+          "id": "matcha",
+          "name": "matcha",
+          "aliases": [
+            "matcha latte"
+          ],
+          "plural": "matcha"
+        },
+        {
+          "id": "genmaicha",
+          "name": "genmaicha",
+          "aliases": [],
+          "plural": "genmaicha"
+        },
+        {
+          "id": "gyokuro",
+          "name": "gyokuro",
+          "aliases": [],
+          "plural": "gyokuro"
+        },
+        {
+          "id": "jasmine-tea",
+          "name": "jasmine tea",
+          "aliases": [
+            "jasmine"
+          ],
+          "plural": "jasmine tea"
+        },
+        {
+          "id": "black-tea",
+          "name": "black tea",
+          "aliases": [],
+          "plural": "black tea"
+        },
+        {
+          "id": "english-breakfast",
+          "name": "English Breakfast",
+          "aliases": [
+            "English Breakfast tea",
+            "breakfast tea",
+            "builder's tea"
+          ],
+          "plural": "English Breakfast"
+        },
+        {
+          "id": "irish-breakfast",
+          "name": "Irish Breakfast",
+          "aliases": [
+            "Irish Breakfast tea"
+          ],
+          "plural": "Irish Breakfast"
+        },
+        {
+          "id": "earl-grey",
+          "name": "Earl Grey",
+          "aliases": [
+            "Earl Grey tea"
+          ],
+          "plural": "Earl Grey"
+        },
+        {
+          "id": "lady-grey",
+          "name": "Lady Grey",
+          "aliases": [],
+          "plural": "Lady Grey"
+        },
+        {
+          "id": "darjeeling",
+          "name": "Darjeeling",
+          "aliases": [],
+          "plural": "Darjeeling"
+        },
+        {
+          "id": "assam",
+          "name": "Assam",
+          "aliases": [],
+          "plural": "Assam"
+        },
+        {
+          "id": "ceylon",
+          "name": "Ceylon",
+          "aliases": [
+            "Ceylon tea"
+          ],
+          "plural": "Ceylon"
+        },
+        {
+          "id": "keemun",
+          "name": "Keemun",
+          "aliases": [],
+          "plural": "Keemun"
+        },
+        {
+          "id": "lapsang-souchong",
+          "name": "Lapsang souchong",
+          "aliases": [
+            "lapsang"
+          ],
+          "plural": "Lapsang souchong"
+        },
+        {
+          "id": "oolong",
+          "name": "oolong",
+          "aliases": [
+            "oolong tea"
+          ],
+          "plural": "oolong"
+        },
+        {
+          "id": "white-tea",
+          "name": "white tea",
+          "aliases": [
+            "silver needle"
+          ],
+          "plural": "white tea"
+        },
+        {
+          "id": "yellow-tea",
+          "name": "yellow tea",
+          "aliases": [],
+          "plural": "yellow tea"
+        },
+        {
+          "id": "pu-erh",
+          "name": "pu-erh",
+          "aliases": [
+            "pu'er"
+          ],
+          "plural": "pu-erh"
+        },
+        {
+          "id": "rooibos",
+          "name": "rooibos",
+          "aliases": [
+            "red bush",
+            "redbush"
+          ],
+          "plural": "rooibos"
+        },
+        {
+          "id": "honeybush",
+          "name": "honeybush",
+          "aliases": [],
+          "plural": "honeybush"
+        },
+        {
+          "id": "peppermint-tea",
+          "name": "peppermint tea",
+          "aliases": [
+            "peppermint",
+            "mint tea",
+            "mint",
+            "spearmint",
+            "Moroccan mint tea"
+          ],
+          "plural": "peppermint tea"
+        },
+        {
+          "id": "hibiscus",
+          "name": "hibiscus",
+          "aliases": [
+            "hibiscus tea"
+          ],
+          "plural": "hibiscus"
+        },
+        {
+          "id": "ginger-tea",
+          "name": "ginger tea",
+          "aliases": [
+            "ginger",
+            "lemon and ginger"
+          ],
+          "plural": "ginger tea"
+        },
+        {
+          "id": "lemon-tea",
+          "name": "lemon tea",
+          "aliases": [],
+          "plural": "lemon tea"
+        },
+        {
+          "id": "lemongrass-tea",
+          "name": "lemongrass tea",
+          "aliases": [
+            "lemongrass"
+          ],
+          "plural": "lemongrass tea"
+        },
+        {
+          "id": "lemon-balm",
+          "name": "lemon balm",
+          "aliases": [],
+          "plural": "lemon balm"
+        },
+        {
+          "id": "lavender-tea",
+          "name": "lavender tea",
+          "aliases": [
+            "lavender"
+          ],
+          "plural": "lavender tea"
+        },
+        {
+          "id": "herbal-tea",
+          "name": "herbal tea",
+          "aliases": [
+            "tisane",
+            "herbal",
+            "herbal infusion"
+          ],
+          "plural": "herbal tea"
+        },
+        {
+          "id": "fruit-tea",
+          "name": "fruit tea",
+          "aliases": [
+            "fruit infusion",
+            "berry tea"
+          ],
+          "plural": "fruit tea"
+        },
+        {
+          "id": "chai",
+          "name": "chai",
+          "aliases": [
+            "masala chai",
+            "chai tea",
+            "chai latte"
+          ],
+          "plural": "chai"
+        },
+        {
+          "id": "bubble-tea",
+          "name": "bubble tea",
+          "aliases": [
+            "boba",
+            "boba tea",
+            "pearl milk tea"
+          ],
+          "plural": "bubble tea"
+        },
+        {
+          "id": "milk-tea",
+          "name": "milk tea",
+          "aliases": [],
+          "plural": "milk tea"
+        },
+        {
+          "id": "thai-tea",
+          "name": "Thai tea",
+          "aliases": [
+            "Thai iced tea"
+          ],
+          "plural": "Thai tea"
+        },
+        {
+          "id": "iced-tea",
+          "name": "iced tea",
+          "aliases": [],
+          "plural": "iced tea"
+        },
+        {
+          "id": "sweet-tea",
+          "name": "sweet tea",
+          "aliases": [],
+          "plural": "sweet tea"
+        },
+        {
+          "id": "kombucha",
+          "name": "kombucha",
+          "aliases": [],
+          "plural": "kombucha"
+        },
+        {
+          "id": "yerba-mate",
+          "name": "yerba mate",
+          "aliases": [
+            "mate"
+          ],
+          "plural": "yerba mate"
+        },
+        {
+          "id": "barley-tea",
+          "name": "barley tea",
+          "aliases": [
+            "mugicha"
+          ],
+          "plural": "barley tea"
+        },
+        {
+          "id": "butter-tea",
+          "name": "butter tea",
+          "aliases": [
+            "po cha"
+          ],
+          "plural": "butter tea"
+        },
+        {
+          "id": "london-fog",
+          "name": "London Fog",
+          "aliases": [],
+          "plural": "London Fog"
+        },
+        {
+          "id": "echinacea-tea",
+          "name": "echinacea tea",
+          "aliases": [
+            "echinacea"
+          ],
+          "plural": "echinacea tea"
+        },
+        {
+          "id": "nettle-tea",
+          "name": "nettle tea",
+          "aliases": [
+            "nettle"
+          ],
+          "plural": "nettle tea"
+        },
+        {
+          "id": "dandelion-tea",
+          "name": "dandelion tea",
+          "aliases": [
+            "dandelion"
+          ],
+          "plural": "dandelion tea"
+        },
+        {
+          "id": "rosehip-tea",
+          "name": "rosehip tea",
+          "aliases": [
+            "rosehip"
+          ],
+          "plural": "rosehip tea"
+        },
+        {
+          "id": "elderflower-tea",
+          "name": "elderflower tea",
+          "aliases": [
+            "elderflower"
+          ],
+          "plural": "elderflower tea"
+        },
+        {
+          "id": "turmeric-tea",
+          "name": "turmeric tea",
+          "aliases": [
+            "golden milk",
+            "turmeric"
+          ],
+          "plural": "turmeric tea"
+        },
+        {
+          "id": "chrysanthemum-tea",
+          "name": "chrysanthemum tea",
+          "aliases": [
+            "chrysanthemum"
+          ],
+          "plural": "chrysanthemum tea"
+        },
+        {
+          "id": "ginseng-tea",
+          "name": "ginseng tea",
+          "aliases": [
+            "ginseng"
+          ],
+          "plural": "ginseng tea"
+        },
+        {
+          "id": "tulsi",
+          "name": "tulsi",
+          "aliases": [
+            "holy basil"
+          ],
+          "plural": "tulsi"
+        },
+        {
+          "id": "cinnamon-tea",
+          "name": "cinnamon tea",
+          "aliases": [
+            "cinnamon"
+          ],
+          "plural": "cinnamon tea"
+        },
+        {
+          "id": "rose-tea",
+          "name": "rose tea",
+          "aliases": [],
+          "plural": "rose tea"
+        },
+        {
+          "id": "licorice-tea",
+          "name": "licorice tea",
+          "aliases": [],
+          "plural": "licorice tea"
+        },
+        {
+          "id": "arnold-palmer",
+          "name": "Arnold Palmer",
+          "aliases": [],
+          "plural": "Arnold Palmer"
+        },
+        {
+          "id": "hojicha",
+          "name": "hojicha",
+          "aliases": [],
+          "plural": "hojicha"
+        },
+        {
+          "id": "russian-caravan",
+          "name": "Russian Caravan",
+          "aliases": [],
+          "plural": "Russian Caravan"
+        },
+        {
+          "id": "lipton",
+          "name": "Lipton",
+          "aliases": [],
+          "plural": "Lipton"
+        },
+        {
+          "id": "yorkshire-tea",
+          "name": "Yorkshire Tea",
+          "aliases": [],
+          "plural": "Yorkshire Tea"
+        },
+        {
+          "id": "pg-tips",
+          "name": "PG Tips",
+          "aliases": [],
+          "plural": "PG Tips"
+        },
+        {
+          "id": "tetley",
+          "name": "Tetley",
+          "aliases": [],
+          "plural": "Tetley"
+        }
+      ],
+      "host_bank": [
+        "chamomile",
+        "green-tea",
+        "black-tea",
+        "earl-grey",
+        "peppermint-tea",
+        "chai",
+        "iced-tea",
+        "sweet-tea"
+      ],
+      "host_answers": [
+        "chamomile",
+        "earl-grey"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name an animal with 4 legs",
+      "entries": [
+        {
+          "id": "aardvark",
+          "name": "aardvark",
+          "aliases": [
+            "aardvarks"
+          ]
+        },
+        {
+          "id": "alpaca",
+          "name": "alpaca",
+          "aliases": [
+            "alpacas"
+          ]
+        },
+        {
+          "id": "anteater",
+          "name": "anteater",
+          "aliases": [
+            "anteaters"
+          ]
+        },
+        {
+          "id": "antelope",
+          "name": "antelope",
+          "aliases": [
+            "antelopes"
+          ]
+        },
+        {
+          "id": "armadillo",
+          "name": "armadillo",
+          "aliases": [
+            "armadillos"
+          ]
+        },
+        {
+          "id": "badger",
+          "name": "badger",
+          "aliases": [
+            "badgers"
+          ]
+        },
+        {
+          "id": "bear",
+          "name": "bear",
+          "aliases": [
+            "bears"
+          ]
+        },
+        {
+          "id": "beaver",
+          "name": "beaver",
+          "aliases": [
+            "beavers"
+          ]
+        },
+        {
+          "id": "bison",
+          "name": "bison",
+          "aliases": [],
+          "plural": "bison"
+        },
+        {
+          "id": "bobcat",
+          "name": "bobcat",
+          "aliases": [
+            "bobcats"
+          ]
+        },
+        {
+          "id": "buffalo",
+          "name": "buffalo",
+          "aliases": []
+        },
+        {
+          "id": "camel",
+          "name": "camel",
+          "aliases": [
+            "camels"
+          ]
+        },
+        {
+          "id": "caracal",
+          "name": "caracal",
+          "aliases": [
+            "caracals"
+          ]
+        },
+        {
+          "id": "cat",
+          "name": "cat",
+          "aliases": [
+            "house cat",
+            "kitten",
+            "cats"
+          ]
+        },
+        {
+          "id": "cheetah",
+          "name": "cheetah",
+          "aliases": [
+            "cheetahs"
+          ]
+        },
+        {
+          "id": "chipmunk",
+          "name": "chipmunk",
+          "aliases": [
+            "chipmunks"
+          ]
+        },
+        {
+          "id": "clouded-leopard",
+          "name": "clouded leopard",
+          "aliases": [
+            "clouded leopards"
+          ]
+        },
+        {
+          "id": "cougar",
+          "name": "cougar",
+          "aliases": [
+            "puma",
+            "mountain lion",
+            "cougars",
+            "panther"
+          ]
+        },
+        {
+          "id": "cow",
+          "name": "cow",
+          "aliases": [
+            "cows"
+          ]
+        },
+        {
+          "id": "coyote",
+          "name": "coyote",
+          "aliases": [
+            "coyotes"
+          ]
+        },
+        {
+          "id": "deer",
+          "name": "deer",
+          "aliases": [],
+          "plural": "deer"
+        },
+        {
+          "id": "dingo",
+          "name": "dingo",
+          "aliases": [
+            "dingoes"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "puppy",
+            "dogs",
+            "doggy"
+          ]
+        },
+        {
+          "id": "donkey",
+          "name": "donkey",
+          "aliases": [
+            "donkeys"
+          ]
+        },
+        {
+          "id": "elephant",
+          "name": "elephant",
+          "aliases": [
+            "elephants"
+          ]
+        },
+        {
+          "id": "elk",
+          "name": "elk",
+          "aliases": []
+        },
+        {
+          "id": "ferret",
+          "name": "ferret",
+          "aliases": [
+            "ferrets"
+          ]
+        },
+        {
+          "id": "fox",
+          "name": "fox",
+          "aliases": [
+            "foxes"
+          ]
+        },
+        {
+          "id": "gazelle",
+          "name": "gazelle",
+          "aliases": [
+            "gazelles"
+          ]
+        },
+        {
+          "id": "gerbil",
+          "name": "gerbil",
+          "aliases": [
+            "gerbils"
+          ]
+        },
+        {
+          "id": "giraffe",
+          "name": "giraffe",
+          "aliases": [
+            "giraffes"
+          ]
+        },
+        {
+          "id": "goat",
+          "name": "goat",
+          "aliases": [
+            "goats"
+          ]
+        },
+        {
+          "id": "guinea-pig",
+          "name": "guinea pig",
+          "aliases": [
+            "guinea pigs"
+          ]
+        },
+        {
+          "id": "hamster",
+          "name": "hamster",
+          "aliases": [
+            "hamsters"
+          ]
+        },
+        {
+          "id": "hedgehog",
+          "name": "hedgehog",
+          "aliases": [
+            "hedgehogs"
+          ]
+        },
+        {
+          "id": "hippopotamus",
+          "name": "hippopotamus",
+          "aliases": [
+            "hippo",
+            "hippopotamuses"
+          ]
+        },
+        {
+          "id": "horse",
+          "name": "horse",
+          "aliases": [
+            "horses"
+          ]
+        },
+        {
+          "id": "hyena",
+          "name": "hyena",
+          "aliases": [
+            "hyenas"
+          ]
+        },
+        {
+          "id": "jackal",
+          "name": "jackal",
+          "aliases": [
+            "jackals"
+          ]
+        },
+        {
+          "id": "jaguar",
+          "name": "jaguar",
+          "aliases": [
+            "jaguars"
+          ]
+        },
+        {
+          "id": "koala",
+          "name": "koala",
+          "aliases": [
+            "koala bear",
+            "koalas"
+          ]
+        },
+        {
+          "id": "leopard",
+          "name": "leopard",
+          "aliases": [
+            "leopards"
+          ]
+        },
+        {
+          "id": "lion",
+          "name": "lion",
+          "aliases": [
+            "lions"
+          ]
+        },
+        {
+          "id": "llama",
+          "name": "llama",
+          "aliases": [
+            "llamas"
+          ]
+        },
+        {
+          "id": "lynx",
+          "name": "lynx",
+          "aliases": [
+            "lynxes"
+          ]
+        },
+        {
+          "id": "meerkat",
+          "name": "meerkat",
+          "aliases": [
+            "meerkats"
+          ]
+        },
+        {
+          "id": "mink",
+          "name": "mink",
+          "aliases": [
+            "minks"
+          ]
+        },
+        {
+          "id": "mole",
+          "name": "mole",
+          "aliases": [
+            "moles"
+          ]
+        },
+        {
+          "id": "moose",
+          "name": "moose",
+          "aliases": [],
+          "plural": "moose"
+        },
+        {
+          "id": "mouse",
+          "name": "mouse",
+          "aliases": [
+            "mice"
+          ]
+        },
+        {
+          "id": "ocelot",
+          "name": "ocelot",
+          "aliases": [
+            "ocelots"
+          ]
+        },
+        {
+          "id": "opossum",
+          "name": "opossum",
+          "aliases": [
+            "possum",
+            "opossums"
+          ]
+        },
+        {
+          "id": "otter",
+          "name": "otter",
+          "aliases": [
+            "otters"
+          ]
+        },
+        {
+          "id": "ox",
+          "name": "ox",
+          "aliases": [
+            "oxen"
+          ]
+        },
+        {
+          "id": "panda",
+          "name": "panda",
+          "aliases": [
+            "giant panda",
+            "pandas"
+          ]
+        },
+        {
+          "id": "pig",
+          "name": "pig",
+          "aliases": [
+            "pigs",
+            "hog",
+            "swine"
+          ]
+        },
+        {
+          "id": "platypus",
+          "name": "platypus",
+          "aliases": [
+            "platypuses"
+          ]
+        },
+        {
+          "id": "porcupine",
+          "name": "porcupine",
+          "aliases": [
+            "porcupines",
+            "porky"
+          ]
+        },
+        {
+          "id": "rabbit",
+          "name": "rabbit",
+          "aliases": [
+            "bunny",
+            "rabbits"
+          ]
+        },
+        {
+          "id": "raccoon",
+          "name": "raccoon",
+          "aliases": [
+            "raccoons"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "reindeer",
+          "name": "reindeer",
+          "aliases": [
+            "caribou"
+          ],
+          "plural": "reindeer"
+        },
+        {
+          "id": "rhinoceros",
+          "name": "rhinoceros",
+          "aliases": [
+            "rhino"
+          ]
+        },
+        {
+          "id": "serval",
+          "name": "serval",
+          "aliases": [
+            "servals"
+          ]
+        },
+        {
+          "id": "sheep",
+          "name": "sheep",
+          "aliases": [
+            "lamb"
+          ],
+          "plural": "sheep"
+        },
+        {
+          "id": "skunk",
+          "name": "skunk",
+          "aliases": [
+            "skunks"
+          ]
+        },
+        {
+          "id": "sloth",
+          "name": "sloth",
+          "aliases": [
+            "sloths"
+          ]
+        },
+        {
+          "id": "snow-leopard",
+          "name": "snow leopard",
+          "aliases": [
+            "snow leopards"
+          ]
+        },
+        {
+          "id": "squirrel",
+          "name": "squirrel",
+          "aliases": [
+            "squirrels"
+          ]
+        },
+        {
+          "id": "tiger",
+          "name": "tiger",
+          "aliases": [
+            "tigers"
+          ]
+        },
+        {
+          "id": "warthog",
+          "name": "warthog",
+          "aliases": [
+            "warthogs"
+          ]
+        },
+        {
+          "id": "weasel",
+          "name": "weasel",
+          "aliases": [
+            "weasels"
+          ]
+        },
+        {
+          "id": "wolf",
+          "name": "wolf",
+          "aliases": [
+            "wolves"
+          ]
+        },
+        {
+          "id": "wolverine",
+          "name": "wolverine",
+          "aliases": [
+            "wolverines"
+          ]
+        },
+        {
+          "id": "wombat",
+          "name": "wombat",
+          "aliases": [
+            "wombats"
+          ]
+        },
+        {
+          "id": "yak",
+          "name": "yak",
+          "aliases": [
+            "yaks"
+          ]
+        },
+        {
+          "id": "zebra",
+          "name": "zebra",
+          "aliases": [
+            "zebras"
+          ]
+        },
+        {
+          "id": "alligator",
+          "name": "alligator",
+          "aliases": [
+            "alligators",
+            "gator"
+          ]
+        },
+        {
+          "id": "crocodile",
+          "name": "crocodile",
+          "aliases": [
+            "crocodiles",
+            "croc"
+          ]
+        },
+        {
+          "id": "frog",
+          "name": "frog",
+          "aliases": [
+            "frogs"
+          ]
+        },
+        {
+          "id": "gecko",
+          "name": "gecko",
+          "aliases": [
+            "geckos"
+          ]
+        },
+        {
+          "id": "iguana",
+          "name": "iguana",
+          "aliases": [
+            "iguanas"
+          ]
+        },
+        {
+          "id": "lizard",
+          "name": "lizard",
+          "aliases": [
+            "lizards"
+          ]
+        },
+        {
+          "id": "toad",
+          "name": "toad",
+          "aliases": [
+            "toads"
+          ]
+        },
+        {
+          "id": "tortoise",
+          "name": "tortoise",
+          "aliases": [
+            "tortoises"
+          ]
+        },
+        {
+          "id": "turtle",
+          "name": "turtle",
+          "aliases": [
+            "turtles"
+          ]
+        },
+        {
+          "id": "hare",
+          "name": "hare",
+          "aliases": [
+            "hares"
+          ]
+        },
+        {
+          "id": "pony",
+          "name": "pony",
+          "aliases": [
+            "ponies"
+          ]
+        },
+        {
+          "id": "calf",
+          "name": "calf",
+          "aliases": [
+            "calves"
+          ]
+        },
+        {
+          "id": "bull",
+          "name": "bull",
+          "aliases": [
+            "bulls"
+          ]
+        },
+        {
+          "id": "mule",
+          "name": "mule",
+          "aliases": [
+            "mules"
+          ]
+        },
+        {
+          "id": "boar",
+          "name": "boar",
+          "aliases": [
+            "wild boar",
+            "boars"
+          ]
+        },
+        {
+          "id": "capybara",
+          "name": "capybara",
+          "aliases": [
+            "capybaras"
+          ]
+        },
+        {
+          "id": "chinchilla",
+          "name": "chinchilla",
+          "aliases": [
+            "chinchillas"
+          ]
+        },
+        {
+          "id": "mongoose",
+          "name": "mongoose",
+          "aliases": [
+            "mongooses"
+          ]
+        },
+        {
+          "id": "tapir",
+          "name": "tapir",
+          "aliases": [
+            "tapirs"
+          ]
+        },
+        {
+          "id": "okapi",
+          "name": "okapi",
+          "aliases": [
+            "okapis"
+          ]
+        },
+        {
+          "id": "wildebeest",
+          "name": "wildebeest",
+          "aliases": [
+            "gnu"
+          ]
+        },
+        {
+          "id": "ibex",
+          "name": "ibex",
+          "aliases": [
+            "ibexes"
+          ]
+        },
+        {
+          "id": "groundhog",
+          "name": "groundhog",
+          "aliases": [
+            "woodchuck",
+            "groundhogs"
+          ]
+        },
+        {
+          "id": "marmot",
+          "name": "marmot",
+          "aliases": [
+            "marmots"
+          ]
+        },
+        {
+          "id": "prairie-dog",
+          "name": "prairie dog",
+          "aliases": [
+            "prairie dogs"
+          ]
+        },
+        {
+          "id": "shrew",
+          "name": "shrew",
+          "aliases": [
+            "shrews"
+          ]
+        },
+        {
+          "id": "vole",
+          "name": "vole",
+          "aliases": [
+            "voles"
+          ]
+        },
+        {
+          "id": "pangolin",
+          "name": "pangolin",
+          "aliases": [
+            "pangolins"
+          ]
+        },
+        {
+          "id": "chameleon",
+          "name": "chameleon",
+          "aliases": [
+            "chameleons"
+          ]
+        },
+        {
+          "id": "komodo-dragon",
+          "name": "Komodo dragon",
+          "aliases": [
+            "Komodo dragons"
+          ]
+        },
+        {
+          "id": "salamander",
+          "name": "salamander",
+          "aliases": [
+            "salamanders"
+          ]
+        },
+        {
+          "id": "newt",
+          "name": "newt",
+          "aliases": [
+            "newts"
+          ]
+        },
+        {
+          "id": "axolotl",
+          "name": "axolotl",
+          "aliases": [
+            "axolotls"
+          ]
+        },
+        {
+          "id": "caiman",
+          "name": "caiman",
+          "aliases": [],
+          "plural": "caiman"
+        },
+        {
+          "id": "gila-monster",
+          "name": "gila monster",
+          "aliases": [
+            "gila monsters"
+          ]
+        },
+        {
+          "id": "bearded-dragon",
+          "name": "bearded dragon",
+          "aliases": [
+            "bearded dragons"
+          ]
+        },
+        {
+          "id": "tasmanian-devil",
+          "name": "Tasmanian devil",
+          "aliases": [
+            "Tasmanian devils"
+          ]
+        },
+        {
+          "id": "echidna",
+          "name": "echidna",
+          "aliases": [
+            "echidnas"
+          ]
+        },
+        {
+          "id": "stoat",
+          "name": "stoat",
+          "aliases": [
+            "ermine",
+            "stoats"
+          ]
+        },
+        {
+          "id": "marten",
+          "name": "marten",
+          "aliases": [
+            "martens"
+          ]
+        },
+        {
+          "id": "impala",
+          "name": "impala",
+          "aliases": [
+            "impalas"
+          ]
+        },
+        {
+          "id": "aardwolf",
+          "name": "aardwolf",
+          "aliases": [
+            "aardwolves"
+          ]
+        },
+        {
+          "id": "dromedary",
+          "name": "dromedary",
+          "aliases": [
+            "dromedaries"
+          ]
+        }
+      ],
+      "host_bank": [
+        "dog",
+        "cat",
+        "horse",
+        "elephant",
+        "lion",
+        "cow",
+        "tiger"
+      ],
+      "host_answers": [
+        "dog"
+      ],
+      "match_groups": {},
+      "steals": "a"
+    }
+  ]
+}
