@@ -2626,7 +2626,7 @@
         "abraham-lincoln"
       ],
       "match_groups": {},
-      "steals": "u"
+      "steals": "g"
     },
     {
       "prompt": "Name something that's sticky",
@@ -3152,7 +3152,7 @@
         "honey"
       ],
       "match_groups": {},
-      "steals": "s"
+      "steals": "l"
     },
     {
       "prompt": "Name a state in New England",

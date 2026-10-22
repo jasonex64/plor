@@ -1469,7 +1469,7 @@
         "level"
       ],
       "host_answers": [
-        "screwdriver"
+        "pliers"
       ],
       "match_groups": {},
       "steals": "c"
@@ -2282,7 +2282,7 @@
         "chicago-bears"
       ],
       "host_answers": [
-        "green-bay-packers"
+        "new-england-patriots"
       ],
       "match_groups": {},
       "steals": "h"
@@ -3418,8 +3418,8 @@
         "swing-ride"
       ],
       "host_answers": [
-        "carousel",
-        "bumper-cars"
+        "drop-tower",
+        "swing-ride"
       ],
       "match_groups": {},
       "steals": "a"

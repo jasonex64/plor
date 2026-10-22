@@ -3486,7 +3486,7 @@
         "cooler"
       ],
       "host_answers": [
-        "sleeping-bag"
+        "tent"
       ],
       "match_groups": {},
       "steals": "l"
@@ -3891,8 +3891,7 @@
         "jacket"
       ],
       "host_answers": [
-        "scarf",
-        "mittens"
+        "boots"
       ],
       "match_groups": {},
       "steals": "e"
