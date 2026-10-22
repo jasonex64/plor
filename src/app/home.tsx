@@ -10,6 +10,7 @@ import { ApiError, api } from "@/lib/api-client";
 import { Board } from "./board";
 import { Comments } from "./comments";
 import { Game } from "./game";
+import { Leaderboard } from "./leaderboard";
 import { messageFor, messageForRedirect } from "./messages";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null; displayName: string | null };
@@ -218,6 +219,7 @@ function SignedIn({
     <>
       <Game onOver={setRunOver} />
       <Board username={username} onCommentsChanged={nudgeComments} />
+      <Leaderboard />
       <Comments username={username} runOver={runOver} nudge={commentsNudge} />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
       <section aria-label="Account">
