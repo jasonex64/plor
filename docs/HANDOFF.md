@@ -2,13 +2,15 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8b, 8c and 8d and marked M08 done.
+**Updated:** 2026-10-22, by the session that finished M08 and drafted the M09 ticket.
 
 ## Where things stand
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
-- **No milestone branch is open for M09.** PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
+- **M09, Points and friends leaderboard:** Claude's draft ticket is on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`), not yet in a PR. No code yet.
+- PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 
 ## Waiting on the human
+- **M09, D1–D7** (ticket, Decisions): a run still going when its day ends; a run that ran out of time; what writes the row for a run with no ending answer; who's on the leaderboard and its order; today's points before you've finished; where it's shown; and the security change for `private.points_ledger`.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -20,7 +22,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Start M09 (Points and friends leaderboard; ROADMAP) on a new branch: read its row and DECISIONS.md, Points ledger and `M00-data-design.md` §6, and draft its ticket from `docs/milestones/_TEMPLATE.md` for the human, since it has none yet. ROADMAP "Next revision", From M08, has the deferred items, including one about reaction buttons after a live "started" update.
+Once the human has answered D1–D7, record the answers in the M09 ticket (and update Claude's design and the acceptance criteria to match), then build 9a, the ledger, on branch `m09-points-and-leaderboard`, tests first. ROADMAP "Next revision", From M08, has the deferred M08 items.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
