@@ -65,6 +65,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
+  -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
+  'private.comment delete', 'private.comment insert', 'private.comment select',
   'private.day_of(timestamp with time zone) execute',
   -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
   'private.friend_invite insert', 'private.friend_invite select',

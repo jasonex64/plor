@@ -1,4 +1,4 @@
-import { DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+import { COMMENT_MAX_LENGTH, DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
 
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
@@ -26,6 +26,10 @@ const MESSAGES: Record<string, string> = {
   invite_own: "That's your own invite link. Send it to a friend.",
   already_friends: "You're already friends.",
   not_friends: "You aren't friends with that player.",
+  // Comments (docs/milestones/M08-comments-and-reactions.md, 8a). The length is the database's check (D1).
+  comment_invalid: `Comments are 1 to ${COMMENT_MAX_LENGTH} characters.`,
+  not_finished: "Finish today's puzzle first.",
+  comment_not_found: "That comment is already gone.",
   no_puzzle_today: "There's no puzzle today yet. Check back later.",
   no_run: "Start today's puzzle first.",
   run_over: "This run is already over.",

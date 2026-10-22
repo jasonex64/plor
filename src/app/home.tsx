@@ -8,6 +8,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { ApiError, api } from "@/lib/api-client";
 import { Board } from "./board";
+import { Comments } from "./comments";
 import { Game } from "./game";
 import { messageFor, messageForRedirect } from "./messages";
 
@@ -199,6 +200,7 @@ function SignedIn({
   onSignedOut: () => void;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [runOver, setRunOver] = useState(false);
 
   async function signOut() {
     try {
@@ -211,8 +213,9 @@ function SignedIn({
 
   return (
     <>
-      <Game />
+      <Game onOver={setRunOver} />
       <Board username={username} />
+      <Comments username={username} runOver={runOver} />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
       <section aria-label="Account">
         <p>Signed in as {username}.</p>
