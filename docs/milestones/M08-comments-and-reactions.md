@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is merged (PR #40, 2026-10-22); 8c, reports, is merged (PR #41, 2026-10-22); 8d, live updates, is next.
+**Status:** in review: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is merged (PR #40, 2026-10-22); 8c, reports, is merged (PR #41, 2026-10-22); 8d, live updates, is in review (its PR), the milestone's last.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
@@ -78,7 +78,7 @@ After playing the day's game, players can comment on it and react, seen only by 
 - [x] **8b** Reactions go on comments and on friends' runs (D2), from 👍 😂 😮 😢 ❤️ (D3): one per player per target, replaced or removed by tapping. You can't react to a run before your own run is over.
 - [x] Past days' threads can be browsed by date, read-only: posting or reacting on a past day is refused (D6). (**8a**: browsing and the posting refusal; **8b**: the reacting refusal.)
 - [x] **8c** Admins see open reports and can delete the comment. Non-admins get 403.
-- [ ] New comments and reactions reach friends' open pages without a reload, with no comment text in the Realtime payload (an e2e test with two browsers).
+- [x] **8d** New comments and reactions reach friends' open pages without a reload, with no comment text in the Realtime payload (an e2e test with two browsers).
 - [x] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades (**8a** `private.comment`, **8b** `private.reaction`, **8c** `private.comment_report`).
 
 ## Out of scope
@@ -133,6 +133,11 @@ Nothing, because this adds a new feature.
 | Admins "see open reports" (D5) | Every comment with a report is listed, oldest first report first, with its day, author, text, how many reported it and when first. Reporters aren't named. A report stays open until an admin deletes the comment: there's no "keep it" button | **8c.** D5 gives admins only Delete, and D8 gives plor_app no update or delete on reports. Closing a report without deleting the comment would need one of those, a security change; the human kept it this way (2026-10-22: "reports close only when the comment is deleted") |
 | Admins "can delete the comment" (D5) | Only a reported comment; anything else is 404. It goes for everyone, with its reports and reactions (D4) | **8c.** The admin route is for reported comments; least privilege |
 | "A new section of the admin pages" | A page, `/admin/reports` ("Reported comments"), linked from the other two admin pages | **8c.** Each admin page so far is one task |
+| "New comments and reactions arrive … over the existing `board:<viewer_id>` topic, as a nudge to refetch the thread" | Two events on that topic, each `{v: 1, type, gameId, puzzleDate}`: `comments_changed` (a comment, or a reaction on one; the thread refetches) and `run_reactions_changed` (a reaction on a run; the board refetches, once the player's run is over) | **8d.** Reactions on runs are shown on the board, not in the thread (8b) |
+| (Sending) | A trigger on `private.comment` and `private.reaction` sends to the topic of the player who made the change and of each of their friends, inside the writing transaction, like the board's sends (M07 D6) | **8d.** Those are everyone who can see the change (8a, 8b). Deleting a comment also deletes its reactions, and each sends a nudge too: one refetch per nudge |
+| (Receiving) | The comments section refetches the day it shows on any `comments_changed`, whatever day the nudge names; it also refetches each time the channel joins or rejoins | **8d.** One request, and nudges are rare. A nudge sent while the channel is down is missed, as for the board (M07 7c) |
+| — (not in the ticket) | Reports send nothing; an admin's deletion sends like any comment deletion | **8d.** A report changes only the reporter's own view, and their page reloads itself |
+| "An e2e test with two browsers" | The existing two-browser test in `e2e/live-board.e2e.ts` now checks reactions and comments arriving live instead of after a reload, and records every Realtime frame both pages receive | **8d.** That test already has two friends who have both finished, which this needs. A new file would repeat its setup |
 | — (not in the ticket) | Report needs one tap and no confirmation | **8c.** The look and its safeguards are M14; the comment is only hidden for the reporter, and an admin decides |
 
 ## Evidence
@@ -193,6 +198,19 @@ Nothing, because this adds a new feature.
   - One earlier e2e run logged a 500 from `getBoard` ("died with no matched event") although both tests passed; the next run didn't. Claude's hypothesis (*unverified*): a board refetch from a still-open page ran while the cleanup deleted the test users, between `getBoard`'s two queries. It's in ROADMAP "Next revision".
 - `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`, with `○ /admin/reports`, `ƒ /api/admin/reports`, `ƒ /api/admin/reports/delete` and `/api/comments/report` built. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
 
+**8d** (local stack, 2026-10-22):
+- `npm run test:sql`: `live_comments.test.sql .... ok`, `Files=11, Tests=162`, `Result: PASS`. The file checks:
+  - a new comment sends exactly `{v: 1, type: "comments_changed", gameId, puzzleDate}` to the friend's topic, and one to the author's own, and nothing to a stranger's;
+  - a reaction on a comment sends `comments_changed`, a reaction on a run sends `run_reactions_changed` (and not `comments_changed`), and removing one and deleting the comment send too;
+  - no message holds the comment's text, and every message is private.
+  - Before the migration, 7 of its 10 failed (the other three pass trivially when nothing is sent).
+- `npm run test:e2e`: `2 passed (25.0s)`, run straight after `npm run build`, with no route error in the log.
+  - In `e2e/live-board.e2e.ts`, without any reload: the watcher's ❤️ on the player's run shows as "Reactions on your run: ❤️ 1" on the player's page, and goes when removed; the player's comment appears on the watcher's page; the watcher's 😂 on it shows "😂 1" on the player's; after the admin deletes it, the player's page shows "No comments yet.".
+  - Every Realtime frame both pages received includes `comments_changed` and `run_reactions_changed`, and none holds the comment's text.
+  - Before the page changes, it failed at the first live step ("Reactions on your run: ❤️ 1" not found).
+- `npm test`: `Tests  192 passed (192)`. `npm run test:db`: `Tests  121 passed (121)` (the app's writes still work with the new triggers).
+- `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
+
 ## Review
 **8a** (the `reviewer` agent, fresh context, 2026-10-22):
 - Blocking findings and how each was fixed:
@@ -211,3 +229,8 @@ Nothing, because this adds a new feature.
   - **The thread reads every player's own reports, wider than D8's "for admins only".** A Source diff row now says so, flagged for the human, and the DECISIONS.md Log row no longer credits that wording to the human.
   - **Reporting mid-run, and on a past day whose run is still going, was untested.** Both cases are in the route test now; the second was shown to catch a looser rule.
 - Deferred to ROADMAP "Next revision" (From M08): the visibility rule written twice (`getThread` and `reportComment`), a report racing a delete giving 500, reacting to a comment you reported, the admin list's busy state clearing before it reloads, and no record of which admin deleted a comment.
+
+**8d** (the `reviewer` agent, fresh context, 2026-10-22; it re-ran the SQL, unit and e2e checks and got the same results):
+- No blocking findings. It found the payloads (no text, no names or IDs), the recipients (the actor and their friends: everyone who can see the change), the trigger function's safety, the client's stable callback and refetch rules, and the e2e frame check correct, and judged "no new security change" accurate.
+- It pointed out the ticket's Status still said "in progress" while the ROADMAP row said "in review"; both say "in review" now.
+- Deferred to ROADMAP "Next revision" (From M08): a looser count in the comment-deletion SQL check, the reconnect e2e not checking the comments refetch, out-of-order thread responses (now more likely), friends missing a nudge when an account's deletion cascade removes friendships first, and no unit test for the board's new message branch.
