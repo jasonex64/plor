@@ -1,9 +1,11 @@
 "use client";
 
-// Sign-in, then picking a username, then the game. Every step goes through the API;
-// errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
-import { useSearchParams } from "next/navigation";
+// Sign-in, then picking a username, then the game, or on an invite link (/invite/<code>) the friend request. Every
+// step goes through the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { INVITE_CODE } from "@/friends/invite-code";
 import { ApiError, api } from "@/lib/api-client";
 import { Game } from "./game";
 import { messageFor, messageForRedirect } from "./messages";
@@ -14,8 +16,13 @@ function errorText(err: unknown): string {
   return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
 }
 
-export function Home() {
+// Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
+// while signed out is remembered for that round trip in this tab's sessionStorage (M07 7b).
+const PENDING_INVITE = "plor.pendingInvite";
+
+export function Home({ invite }: { invite?: string }) {
   const redirectError = useSearchParams().get("error");
+  const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -24,15 +31,31 @@ export function Home() {
   }
   useEffect(loadMe, []);
 
+  // Back from Google with an invite pending: go back to its page. Storage that can't be read holds nothing, because
+  // the write before leaving for Google would have failed and been shown to the player.
+  useEffect(() => {
+    if (invite || !me?.signedIn) return;
+    let pending: string | null;
+    try {
+      pending = window.sessionStorage.getItem(PENDING_INVITE);
+      window.sessionStorage.removeItem(PENDING_INVITE);
+    } catch {
+      return;
+    }
+    if (pending && INVITE_CODE.test(pending)) router.replace(`/invite/${pending}`);
+  }, [invite, me, router]);
+
   if (loadError) return <p role="alert">{loadError}</p>;
   if (!me) return <p>Loading…</p>;
   return (
     <>
       {redirectError && !me.signedIn && <p role="alert">{messageForRedirect(redirectError)}</p>}
       {!me.signedIn ? (
-        <SignIn onSignedIn={loadMe} />
+        <SignIn invite={invite} onSignedIn={loadMe} />
       ) : me.username === null ? (
         <PickUsername onDone={(username) => setMe({ signedIn: true, username, displayName: null })} />
+      ) : invite ? (
+        <AcceptInvite code={invite} />
       ) : (
         <SignedIn username={me.username} displayName={me.displayName} onSignedOut={() => setMe({ signedIn: false })} />
       )}
@@ -40,7 +63,7 @@ export function Home() {
   );
 }
 
-function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
+function SignIn({ invite, onSignedIn }: { invite?: string; onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -80,6 +103,7 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
     setError(null);
     try {
       const { url } = await api<{ url: string }>("/api/auth/google", { method: "POST" });
+      if (invite) window.sessionStorage.setItem(PENDING_INVITE, invite);
       window.location.assign(url);
     } catch (err) {
       setError(errorText(err));
@@ -191,6 +215,7 @@ function SignedIn({
       <section aria-label="Account">
         <p>Signed in as {username}.</p>
         <DisplayName initial={displayName} />
+        <Friends />
         <button type="button" onClick={signOut}>
           Sign out
         </button>
@@ -242,5 +267,147 @@ function DisplayName({ initial }: { initial: string | null }) {
       )}
       {error && <p role="alert">{error}</p>}
     </form>
+  );
+}
+
+// name is the display name if set, else the username: shown instead of the username (M07 7a; ROADMAP M07 row).
+type Friend = { username: string; name: string };
+
+// Friends, with Remove (M07 D4), and the player's own invite link (7b).
+function Friends() {
+  const [state, setState] = useState<{ inviteCode: string | null; friends: Friend[] } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  function load() {
+    api<{ inviteCode: string | null; friends: Friend[] }>("/api/friends", { method: "GET" }).then(setState, (err) =>
+      setError(errorText(err)),
+    );
+  }
+  useEffect(load, []);
+
+  async function run(action: () => Promise<void>) {
+    setBusy(true);
+    setError(null);
+    setCopied(false);
+    try {
+      await action();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const issue = (reset: boolean) =>
+    run(async () => {
+      const { inviteCode } = await api<{ inviteCode: string }>("/api/friends/invite", { method: "POST", body: { reset } });
+      setState((s) => s && { ...s, inviteCode });
+    });
+  const removeFriend = (username: string) =>
+    run(async () => {
+      await api("/api/friends/remove", { method: "POST", body: { username } });
+      load();
+    });
+  const link = state?.inviteCode ? `${window.location.origin}/invite/${state.inviteCode}` : null;
+
+  return (
+    <section aria-label="Friends">
+      <h2>Friends</h2>
+      {state && state.friends.length === 0 && <p>No friends yet. Send someone your invite link.</p>}
+      {state && state.friends.length > 0 && (
+        <ul>
+          {state.friends.map((f) => (
+            <li key={f.username}>
+              {f.name}{" "}
+              <button type="button" disabled={busy} onClick={() => void removeFriend(f.username)}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {state && link && (
+        <p>
+          Your invite link: <code>{link}</code>{" "}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await navigator.clipboard.writeText(link);
+                setCopied(true);
+              })
+            }
+          >
+            Copy
+          </button>{" "}
+          <button type="button" disabled={busy} onClick={() => void issue(true)}>
+            Reset link
+          </button>
+          {copied && " Copied."}
+        </p>
+      )}
+      {state && !link && (
+        <button type="button" disabled={busy} onClick={() => void issue(false)}>
+          Make my invite link
+        </button>
+      )}
+      {!state && !error && <p>Loading…</p>}
+      {error && <p role="alert">{error}</p>}
+    </section>
+  );
+}
+
+// What an invite link opens, once signed in with a username (M07 7b).
+function AcceptInvite({ code }: { code: string }) {
+  const [inviter, setInviter] = useState<Friend | null>(null);
+  const [added, setAdded] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // This invite is handled here, so a code remembered for a Google round trip that was cancelled is spent now;
+    // otherwise the next visit to "/" would send the player back to this page (see Home). Unreadable storage holds
+    // nothing to clear.
+    try {
+      window.sessionStorage.removeItem(PENDING_INVITE);
+    } catch {}
+    api<{ inviter: Friend }>(`/api/friends/preview?code=${encodeURIComponent(code)}`, { method: "GET" }).then(
+      (r) => setInviter(r.inviter),
+      (err) => setError(errorText(err)),
+    );
+  }, [code]);
+
+  async function addFriend() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/friends/add", { method: "POST", body: { code } });
+      setAdded(true);
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section aria-label="Invite">
+      {inviter && !added && (
+        <>
+          <h2>Add {inviter.name} as a friend?</h2>
+          <button type="button" disabled={busy} onClick={() => void addFriend()}>
+            Add friend
+          </button>
+        </>
+      )}
+      {inviter && added && <h2>You and {inviter.name} are now friends.</h2>}
+      {error && <p role="alert">{error}</p>}
+      <p>
+        <Link href="/">Go to today&apos;s puzzle</Link>
+      </p>
+    </section>
   );
 }

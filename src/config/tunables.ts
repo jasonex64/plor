@@ -12,6 +12,11 @@ export const USERNAME_MAX_LENGTH = 20;
 // constraint profile_display_name_format enforces it; src/lib/profile.db.test.ts checks the two agree.
 export const DISPLAY_NAME_MAX_LENGTH = 24;
 
+// Invite code size: 16 random bytes, written as 22 base64url characters (human, 2026-10-21;
+// docs/milestones/M07-friends-and-live-board.md, D3). The database's check friend_invite_code_format holds the same
+// 22 characters; the friends route test issues a real code through it.
+export const INVITE_CODE_BYTES = 16;
+
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
 // "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;
