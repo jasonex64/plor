@@ -87,7 +87,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(player.getByRole("heading", { name: `You and ${watcherName} are now friends.` })).toBeVisible();
 
   await openBoard(watcher);
-  const row = watcher.getByRole("region", { name: "Friends today" }).getByRole("listitem").filter({ hasText: playerName });
+  // The plain list of friends, not the lists inside "where everyone ended".
+  const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
   await expect(row).toHaveText(`${playerName}: hasn't played yet`);
 
   // The player starts and is caught on question 1; the watcher's page changes without a reload.
@@ -99,6 +100,18 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // The watcher hasn't played, so how the run ended stays hidden.
   await expect(row).toHaveText(`${playerName}: finished (you'll see how once you finish)`);
   await expect(row).not.toContainText(hostAnswer);
+
+  // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
+  // (7d): the watcher first, then the friend, with the full list behind the row.
+  await watcher.getByRole("button", { name: "Start today's puzzle" }).click();
+  await watcher.getByLabel("Your answer").fill(hostAnswer);
+  await watcher.getByRole("button", { name: "Answer" }).click();
+  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
+  const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
+  await expect(place).toHaveCount(1);
+  await expect(place.locator("summary")).toHaveText(`Caught on question 1: You, ${playerName}`);
+  await place.locator("summary").click();
+  await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted

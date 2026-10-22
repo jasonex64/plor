@@ -6,7 +6,8 @@
 // player's own run is over, so nothing reaches the page early.
 import { RealtimeClient } from "@supabase/realtime-js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Board as BoardData, BoardFriend } from "@/friends/board";
+import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
+import { placeRows, type Place } from "@/friends/ended";
 import { ApiError, api } from "@/lib/api-client";
 import { messageFor } from "./messages";
 
@@ -126,6 +127,7 @@ export function Board({ username }: { username: string }) {
   return (
     <section aria-label="Friends today">
       <h2>Friends today</h2>
+      {board?.mine && <WhereEveryoneEnded mine={board.mine} friends={board.friends} />}
       {board && board.friends.length === 0 && <p>Add friends to see their runs here.</p>}
       {board && board.friends.length > 0 && (
         <ul>
@@ -149,4 +151,38 @@ function describe(f: BoardFriend): string {
   if (f.state === "playing") return `on question ${f.question}`;
   if (f.state === "finished") return "finished (you'll see how once you finish)";
   return "hasn't played yet";
+}
+
+function placeLabel(place: Place): string {
+  if (place.kind === "caught") return `Caught on question ${place.question}`;
+  if (place.kind === "timed_out") return "Ran out of time";
+  return "Survived";
+}
+
+// "Where everyone ended" (M07 7d): one row per place, the player first, up to FRIENDS_PER_PLACE friends by name, then
+// a count. Each row opens to its full list: a native <details>, so it works by tap and keyboard with no state.
+function WhereEveryoneEnded({ mine, friends }: { mine: Ended; friends: BoardFriend[] }) {
+  return (
+    <section aria-label="Where everyone ended">
+      <h3>Where everyone ended</h3>
+      <ul>
+        {placeRows(mine, friends).map((row) => (
+          <li key={placeLabel(row.place)}>
+            <details>
+              <summary>
+                {placeLabel(row.place)}: {[...(row.you ? ["You"] : []), ...row.named.map((p) => p.name)].join(", ")}
+                {row.more > 0 && ` + ${row.more} more`}
+              </summary>
+              <ul>
+                {row.you && <li>You</li>}
+                {row.everyone.map((p) => (
+                  <li key={p.username}>{p.name}</li>
+                ))}
+              </ul>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
