@@ -6,11 +6,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
-- **M09, Points and friends leaderboard:** the ticket is on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`), not yet in a PR, D1–D7 answered (2026-10-22); D1 changed a standing rule (every finished run counts, even one finished after midnight), and DECISIONS.md, the ROADMAP row and `M00-data-design.md` §6 say so. The human then added a **rarity bonus** (2026-10-22); its design is approved (D8–D11), including the Hard-to-reverse change to the ledger (one row once the day closes; a day closes at midnight and the first leaderboard read settles it, no scheduler), and DECISIONS.md and `M00-data-design.md` §6 say so. The five numbers N1–N5 are still open. No code yet.
+- **M09, Points and friends leaderboard:** the ticket is on branch `m09-points-and-leaderboard` (`docs/milestones/M09-points-and-leaderboard.md`), not yet in a PR, D1–D7 answered (2026-10-22); D1 changed a standing rule (every finished run counts, even one finished after midnight), and DECISIONS.md, the ROADMAP row and `M00-data-design.md` §6 say so. The human then added a **rarity bonus** (2026-10-22); its design is approved (D8–D11), including the Hard-to-reverse change to the ledger (one row once the day closes; a day closes at midnight and the first leaderboard read settles it, no scheduler), and DECISIONS.md and `M00-data-design.md` §6 say so. The numbers N1–N5 are given too (2026-10-22), with a worked example in the ticket. No code yet.
 - PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 
 ## Waiting on the human
-- **M09 numbers N1–N5** (ticket, Numbers): how strongly the expectation weighs against real counts; rarity to bonus points; the perfect-run bonus cap; the minimum players before real counts matter; the expected share of host-bank answers. The human said they'll give them next (2026-10-22).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -22,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once the human has given N1–N5: record them in the M09 ticket's Numbers and in `src/config/tunables.ts` with their origin when building, then build 9a on branch `m09-points-and-leaderboard`, tests first (ticket, Plan). ROADMAP "Next revision", From M08, has the deferred M08 items.
+Build 9a (the ledger and scoring; ticket, Plan), putting N1–N5 into `src/config/tunables.ts` with their origin, then 9b on branch `m09-points-and-leaderboard`, tests first (ticket, Plan). ROADMAP "Next revision", From M08, has the deferred M08 items.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:

@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** planned: every decision answered (D1–D11, human, 2026-10-22), including the rarity bonus's design and its Hard-to-reverse change to the ledger. The five numbers N1–N5 wait on the human; no code until they're given.
+**Status:** planned: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is next.
 
 ## Goal
 Each finished run's points, the question ladder plus a rarity bonus, go into an append-only ledger. Each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
@@ -45,6 +45,13 @@ What the human decided, from their notes:
   - the run's bonus is the sum over its survived answers, cut to one less than the points of the first question it didn't survive (so a run caught on question 4, worth 150, gets at most 99), or to the perfect-run cap (N3);
   - **provisional** (shown on the reveal and the result screen): the same steps with *n* and *c* as 0, so the expectation alone;
   - **final:** the counts are the day's answers recorded **before its midnight**. So the final bonus depends only on stored answers, not on when it's computed, and a run finished after midnight neither changes them nor, under D8 (c), earns a bonus for its late answers.
+- **The numbers, put together** (N1–N5, human, 2026-10-22), for one question on one day:
+  - expected share *e*: a host-bank answer gets 50% ÷ (answers in the host bank); any other listed answer gets 50% ÷ (the other listed answers). When every listed answer is in the host bank (a 12-sign zodiac, say), each gets 1 ÷ (listed answers), since there's no "other" group to share the rest. *That last rule is Claude's reading; no number is involved*;
+  - blended share *s* = (10 × *e* + *c*) ÷ (10 + *n*) once *n* ≥ 5, otherwise *s* = *e*;
+  - the answer's bonus = the question's points × 0.5 × (1 − *s* ÷ 20%), never below 0, rounded down;
+  - the run's bonus is the sum, cut to one less than the first missed question's points, and to 500 for a perfect run. With "up to half", the sum never goes past either cap, so getting further always wins without any cutting. The caps stay as a guard in case the numbers change;
+  - *worked example:* question 1, "Name an animal", is worth 25 with 6 host-bank animals and 220 others. "dog" (host bank) is provisionally +7 (*e* ≈ 8.3%), "axolotl" +12 (*e* ≈ 0.23%). After a day where 20 players answered, 8 of them dog and 1 axolotl: dog *s* ≈ 29%, so +0; axolotl *s* ≈ 3.4%, so +10.
+- **Changing the numbers later:** they live in `src/config/tunables.ts` with their origin, like every tunable (DECISIONS.md, Config and tunables), so a change is one edit and a deploy. The ledger is append-only, so rows already written keep the bonus they got; days settled after the change use the new numbers. Re-scoring past days would be a decision of its own.
 - **When the row is written** (D9, D10): once the run is finished and its day is closed. The settling function from D3 writes it; what closes a day is D10.
 - **The leaderboard:** you and your friends, ranked by all-time total, highest first, ties alphabetically (D4), as a plain section on the home page (D6). Under D9 (a) today's points only arrive once the day closes, so D5's "not before you've finished" holds automatically.
 - **Existing runs** get their rows the first time they're settled, with the final bonus computed from their stored answers (D3; §6, Backfill).
@@ -80,7 +87,6 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 - If D10 is (b): a source for the scheduler, added to SOURCES.md by the human first.
 
 ## Acceptance criteria
-*(They get exact values once N1–N5 are given.)*
 - [ ] `private.points_ledger` exists as D9 says. pgTAP checks plor_app's exact grants (select, insert), that plor_app can't update or delete it, that a second row for the same run is refused, `bonus` between 0 and `points`, and the account cascade.
 - [ ] The ladder part is right for each kind of run: caught on question 4 (150), survived (1000 before the bonus), ran out of time on question 3 (75, D2), and finished after midnight (D8).
 - [ ] The final bonus matches a hand-worked example, from stored answers: a rare and a common answer on a day above the minimum (N4), and the same on a day below it, where only the expectation counts.
@@ -105,15 +111,15 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 |---|---|---|
 | Points per question: 25, 50, 75, 100, 150, 250, 350 | The ladder | Human, 2026-10-21 (M04 G1; `POINTS_PER_QUESTION`) |
 | The day ends at midnight `America/Los_Angeles` | Which answers count toward a day's final counts; when a day closes (D10) | Human, 2026-10-17 (§8; `private.day_of`) |
-| N1: how strongly the expectation weighs against a day's real counts (W, in players) | The blended share | **Blank: ask the human** |
-| N2: the formula from an answer's blended share to bonus points, or the bonus per tier | Each answer's bonus | **Blank: ask the human** |
-| N3: the bonus cap on a perfect run | The cap when no question was missed | **Blank: ask the human** |
-| N4: the minimum number of players who answered a question before its real counts matter | The blended share | **Blank: ask the human** |
-| N5 (only if D11 is (b)): the expected share of players who give a host-bank answer | Splitting the expectation between "common" and "uncommon" | **Blank: ask the human** |
+| N1: how strongly the expectation weighs against a day's real counts (W, in players) | The blended share | **10 players** (human, 2026-10-22: "yeah common answers can still earn something otherwise it's fine", taking Claude's suggested numbers with the zero line moved from 10% to 20%) |
+| N2: the formula from an answer's blended share to bonus points | Each answer's bonus | **Up to half the question's points, shrinking to 0 at a 20% share**: bonus = question's points × 0.5 × (1 − share ÷ 20%), never below 0, rounded down (human, 2026-10-22: "yeah common answers can still earn something otherwise it's fine", taking Claude's suggested numbers with the zero line moved from 10% to 20%) |
+| N3: the bonus cap on a perfect run | The cap when no question was missed | **500** (half of 1000, which N2 gives anyway) (human, 2026-10-22: "yeah common answers can still earn something otherwise it's fine", taking Claude's suggested numbers with the zero line moved from 10% to 20%) |
+| N4: the minimum number of players who answered a question before its real counts matter | The blended share | **5 players**, the same as the insights report's "too few" (`INSIGHTS_MIN_PLAYERS`, M03) (human, 2026-10-22: "yeah common answers can still earn something otherwise it's fine", taking Claude's suggested numbers with the zero line moved from 10% to 20%) |
+| N5: the expected share of players who give a host-bank answer | Splitting the expectation between "common" and "uncommon" (D11) | **50%**, the middle of the M02 survey's measured 14% to 86% on open questions (`M02-2g-survey.md`, finding 4) (human, 2026-10-22: "yeah common answers can still earn something otherwise it's fine", taking Claude's suggested numbers with the zero line moved from 10% to 20%) |
 
 ## Plan
 1. ~~The human answers D1–D7.~~ Done, 2026-10-22.
-2. ~~The human answers D8–D11.~~ Done, 2026-10-22, and DECISIONS.md (Points ledger; Game 1: Scoring; Log) and §6 updated. The human gives N1–N5.
+2. ~~The human answers D8–D11 and gives N1–N5.~~ Done, 2026-10-22, and DECISIONS.md (Points ledger; Game 1: Scoring; Log) and §6 updated.
 3. **9a, the ledger and scoring:** the table and grants (D7, D9), the ladder (D1, D2, D8), the rarity bonus and its cap, provisional and final (D11, N1–N5), and settling (D3, D10), with pgTAP and route tests first, including the hand-worked examples.
 4. **9b, the leaderboard:** the route and the home-page section (D4–D6), route tests first, plus a browser or e2e check.
 5. Each sub-ticket gets its own PR and a reviewer pass.
