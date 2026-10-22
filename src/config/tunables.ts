@@ -35,9 +35,24 @@ export const FRIENDS_PER_PLACE = 3;
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4;
 
-// Points for surviving each question, Q1 to Q7: they rise with each harder question in growing jumps, and a perfect
-// run is 1000, a round total future games can share (human, 2026-10-21; M04 G1). Replaces k points for question k.
+// Points for surviving each question, Q1 to Q7 (the ladder): they rise with each harder question in growing jumps, to
+// 1000 for all seven (human, 2026-10-21; M04 G1). Replaces k points for question k. The rarity bonus comes on top.
 export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
+
+// The rarity bonus (human, 2026-10-22; docs/milestones/M09-points-and-leaderboard.md, Numbers N1–N5). Changing one
+// changes days settled afterwards; ledger rows already written keep their bonus.
+// N5: the share of players expected to give a host-bank answer; the host bank is the "common" tier (D11).
+export const HOST_BANK_EXPECTED_SHARE = 0.5;
+// N1: the expectation weighs as this many players against a day's real counts.
+export const RARITY_EXPECTATION_WEIGHT = 10;
+// N4: a question's real counts are used once at least this many players answered it (as INSIGHTS_MIN_PLAYERS).
+export const RARITY_MIN_PLAYERS = 5;
+// N2: an answer earns up to this fraction of its question's points, shrinking to 0 at RARITY_ZERO_SHARE of players.
+// Up to half keeps the human's rule without the cap ever cutting: getting further always beats rarer answers.
+export const RARITY_BONUS_FRACTION = 0.5;
+export const RARITY_ZERO_SHARE = 0.2;
+// N3: the most bonus a perfect run can earn (a missed question caps the others).
+export const PERFECT_RUN_BONUS_CAP = 500;
 
 // Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 4):
 // the tier the Wind steals from at each question, or null for no theft. Tiers are the M04 ticket's measured grouping

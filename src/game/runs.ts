@@ -8,14 +8,16 @@ import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 import { matchAnswer, resolveTyped } from "./matching";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
+import { scoreRun } from "./scoring";
 
 // "timed_out": the current question's 20 seconds ran out, which ends the run (M04 13c-2; the database decides). The
 // timer, not midnight, ends an unfinished run: a run started before midnight can be finished after it (human,
-// 2026-10-21; its score won't count for leaderboards, M09).
+// 2026-10-21; its points count, but its answers after midnight earn no rarity bonus: M09 D1, D8).
 export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
 
-// points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION).
-export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[]; points: number };
+// points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION). bonus: its
+// provisional rarity bonus, from the expectation alone; the final one comes once the day is over (M09).
+export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[]; points: number; bonus: number };
 
 export type RunState = {
   date: string;
@@ -29,13 +31,15 @@ export type RunState = {
   msLeft: number | null;
   // While the reveal waits for Next (G5): the letter the Wind steals at the next question, or null for none.
   next: { steals: string | null } | null;
-  // Points so far: the sum over answered questions.
+  // Points so far: the sum over answered questions, and the provisional rarity bonus so far (capped, M09).
   points: number;
+  bonus: number;
   // Milliseconds until the next reset at midnight Pacific (private.next_reset), for the countdown.
   msToReset: number;
 };
 
-type StoredEvent = { question_idx: number; entry_id: string; matched: boolean };
+// in_day: given before the run's day ended at midnight (M09 D8).
+type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
 // The SQLSTATEs raised by the answer and Next triggers (supabase/migrations/20261019074108_create_game_tables.sql, as
 // changed by 20261021081057_question_timer.sql and 20261021084917_reveal_next_and_reset.sql).
@@ -57,7 +61,7 @@ async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle }> {
 
 async function events(db: Db, userId: string, date: string): Promise<StoredEvent[]> {
   const { rows } = await db.query<StoredEvent>(
-    `select question_idx, entry_id, matched from private.run_event
+    `select question_idx, entry_id, matched, private.day_of(created_at) = puzzle_date as in_day from private.run_event
      where user_id = $1 and game_id = $2 and puzzle_date = $3::date order by question_idx`,
     [userId, GAME_ID, date],
   );
@@ -67,7 +71,12 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
 type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
 
 function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock): RunState {
-  const answered = stored.map((e) => {
+  const score = scoreRun(
+    puzzle,
+    stored.map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day })),
+    null,
+  );
+  const answered = stored.map((e, i) => {
     const question = puzzle.questions[e.question_idx];
     return {
       index: e.question_idx,
@@ -76,6 +85,7 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
       matched: e.matched,
       hostAnswers: hostAnswers(question),
       points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
+      bonus: score.bonuses[i],
     };
   });
   const status = clock.status ?? "not_started";
@@ -91,6 +101,7 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
     msLeft: question ? clock.msLeft : null,
     next: waiting ? { steals: puzzle.questions[stored.length].steals ?? null } : null,
     points: answered.reduce((sum, a) => sum + a.points, 0),
+    bonus: score.bonus,
     msToReset: clock.msToReset,
   };
 }

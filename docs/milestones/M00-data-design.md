@@ -72,29 +72,29 @@ private.question_open(
 - **Retries are safe.** Resubmitting text that names the same entry returns the stored result. A different entry for an index that's already answered gets `409 already_answered`. Tapping Next twice returns the same run.
 - **Order is enforced** in one transaction: `question_idx` must equal the number of existing events (`OB002 out_of_order`), and nothing is accepted after a matched event or the last question (`OB003 run_over`). The same rules apply to `question_open`.
 
-## 6. Points ledger (written from M09, when the leaderboard is built)
+## 6. Points ledger (written from M09, when the leaderboard is built; settled by the M09 ticket, 2026-10-22)
 ```
 private.points_ledger(
   id bigint generated always as identity primary key,
   user_id uuid → auth.users on delete cascade,
   game_id text, puzzle_date date,
-  points integer not null check (points >= 0),
+  points integer not null check (points >= 0),   -- the ladder plus the final rarity bonus
+  bonus integer not null check (bonus between 0 and points),
   created_at timestamptz not null default now(),
   unique (user_id, game_id, puzzle_date)
 )
 ```
 *Not built yet.* This is the design for the points milestone (M09).
-- **Formula** (human, 2026-10-21, M04 G1; DECISIONS.md, Game 1: Scoring): surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 points (`POINTS_PER_QUESTION` in `src/config/tunables.ts`). A run's score is the sum for the questions it survived, so a perfect run scores 1000. It replaced *k* points for question *k* (Q3, accepted by a human on 2026-10-17).
+- **Rarity bonus** (human, 2026-10-22, M09; DECISIONS.md, Game 1: Scoring): each survived answer before the day's midnight also earns a bonus, bigger the rarer the answer was that day, capped below the points of the first question the run didn't survive. `points` holds the total, `bonus` the bonus part. The exact numbers are in the M09 ticket.
+- **Formula** (human, 2026-10-21, M04 G1; DECISIONS.md, Game 1: Scoring): surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 points (`POINTS_PER_QUESTION` in `src/config/tunables.ts`). A run's ladder points are the sum for the questions it survived (1000 for a perfect run), and the rarity bonus comes on top. It replaced *k* points for question *k* (Q3, accepted by a human on 2026-10-17).
   *Example:* a player who dies on Q4 has survived Q1–Q3, so they score 25 + 50 + 75 = 150.
-- **Leaderboard rule:** a run finished after its day ended (started before midnight) doesn't count for the leaderboard (human, 2026-10-21; DECISIONS.md, Game 1: Timer).
-- **Open, to settle with the M09 ticket** (DECISIONS.md, Game 1):
-  - how a run left at a reveal scores, since it never ends on its own;
-  - whether a timed-out run scores the questions it survived, like a caught run (Claude's reading of "the run ends", not yet settled).
-- **When it's written:** in the **same transaction** as the run's ending event (the death or the last survived answer). The unique constraint means a retry can never award points twice.
-- **Backfill when M09 ships** *(fixes review 2, BLOCKING 3)*:
-  1. **Deploy the write path first.** From then on, every run that ends writes its own ledger row.
-  2. **Then run `npm run ledger:backfill`.** It reads `private.run_status` for runs that `died` or `survived`, skipping `in_progress`; whether `timed_out` runs are read too depends on the open question below. It scores them with **the same TypeScript scoring function** the write path uses, and inserts with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`. That makes a rerun a no-op instead of a failure, and it overlaps safely with the live write path.
-  3. **Evidence:** run it twice. The second run inserts 0 rows, and the ledger sum equals the recomputed score for every finished run.
+- **Which runs count** (human, 2026-10-22, M09 D1 and D2):
+  - every finished run, for the day it was played, even one finished after midnight (this replaced 2026-10-21's "doesn't count for the leaderboard");
+  - a run that ran out of time scores the questions it survived, like a caught run;
+  - a run left at a reveal counts once the player comes back and finishes it; one never finished counts nothing.
+- **When it's written** (human, 2026-10-22, M09 D3, D9, D10): once the run is finished **and its day is closed**, since the final bonus needs the day's counts. A day closes at its midnight Pacific; there's no scheduler. One settling function writes a row for each such run that has none, inserting with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`, so a retry or rerun never awards points twice. The leaderboard calls it for the players it shows just before it sums. The final bonus uses only answers recorded before the day's midnight, so when settling runs doesn't change the result.
+- **Backfill** *(fixes review 2, BLOCKING 3)*: settling is the backfill. A run from before M09 gets its row, rarity bonus included, the first time a leaderboard shows its player, computed from its stored answers, so there's no separate `ledger:backfill` script (M09 D3).
+  - **Evidence:** settle every player twice. The second time writes 0 rows, and the ledger sum equals the recomputed score for every finished run.
 - The leaderboard is `SUM(points)` over the ledger.
 
 ## 7. Append-only enforcement (`run`, `run_event`, `points_ledger`)

@@ -78,6 +78,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.missed_answer insert', 'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
+  -- The points ledger (M09 9a, D7): append-only, written by settling and read by the leaderboard.
+  'private.points_ledger insert', 'private.points_ledger select',
   'private.profile insert', 'private.profile select',
   -- The display name is the one column a player changes (M07 7a).
   'private.profile.display_name update',
