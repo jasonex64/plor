@@ -218,7 +218,9 @@ export function checkPuzzle(where: string, puzzle: Puzzle): string[] {
 }
 
 // M04 "Rules to build", rule 6: the letters follow schedule A, and stealing them never makes a question pointless
-// (a host answer nobody can type adds no danger) or impossible (no safe answer left to type).
+// (a host answer nobody can type adds no danger) or impossible (no safe answer left to type). A host answer's name
+// must avoid the stolen letters, not just one of its aliases: "chamomile" passed through "camomile", yet players type
+// the name (human, 2026-10-21, M06: "make sure the letter overlap doesnt happen again").
 export function checkStolenLetters(file: string, puzzle: Puzzle): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
@@ -237,7 +239,9 @@ export function checkStolenLetters(file: string, puzzle: Puzzle): string[] {
     const typeable = (e: Entry) => [e.name, ...e.aliases].some((n) => avoids(n, stolen));
     for (const id of q.host_answers) {
       const host = q.entries.find((e) => e.id === id);
-      if (host && !typeable(host)) out.push(`${where} entry "${id}": host answer can't be typed without ${stolen.join(", ").toUpperCase()}`);
+      if (host && !avoids(host.name, stolen)) {
+        out.push(`${where} entry "${id}": host answer's name "${host.name}" can't be typed without ${stolen.join(", ").toUpperCase()}`);
+      }
     }
     const caught = new Set(q.host_answers.flatMap((id) => [id, ...(q.match_groups[id] ?? [])]));
     if (!q.entries.some((e) => !caught.has(e.id) && typeable(e))) {

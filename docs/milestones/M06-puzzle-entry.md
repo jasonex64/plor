@@ -1,6 +1,6 @@
 # M06 — Puzzle entry
 
-**Status:** in progress: built and tested (2026-10-21); the end-to-end check waits for the human to write a day's questions on the local admin page. Q1 was answered by the human on 2026-10-21, and Claude read that as approval to start and said so.
+**Status:** done (PR #33, 2026-10-21). The end-to-end check ran up to approval: the human wrote 2026-10-22's questions, a session drafted them (PR #34), and the day was approved locally. The human waived playing it ("no need for playtest just merge"). A late addition, also from the human: a host answer's name must avoid the stolen letters. Q1 was answered by the human on 2026-10-21, and Claude read that as approval to start and said so.
 
 ## Goal
 The human writes only a day's 7 questions; a Claude session generates the answers and suggests the host's answers; the human reviews and approves the day on an admin page, and players get it that day.
@@ -75,7 +75,8 @@ The human writes only a day's 7 questions; a Claude session generates the answer
 - [x] **Approve checks the same rules.** Changed host answers are re-checked with `src/content/puzzle.ts`, including the stolen letters. An error is shown next to its question, and nothing is saved (unit and route tests).
 - [x] **A started day can't change.** Approving a day that has started is refused with a clear message (database test; OB004).
 - [x] **Write access is only the guarded doors.** pgTAP checks `plor_app`'s exact grants: it can't insert or update `private.puzzle` or the saved questions directly, and both functions refuse a non-admin.
-- [ ] **End to end, locally.** The human gives 7 questions, and a session drafts the day and opens the PR. On the local stack, the admin approves it on the page and a second, non-admin account plays it to the result screen. Evidence: the PR, the saved row, and the run's rows.
+- [x] **End to end, locally.** The human gives 7 questions, and a session drafts the day and opens the PR. On the local stack, the admin approves it on the page ~~and a second, non-admin account plays it to the result screen~~ (playing waived by the human, 2026-10-21: "no need for playtest just merge"). Evidence: the PR, the saved row ~~, and the run's rows~~.
+- [x] **Host answers avoid the stolen letters by name** (added by the human, 2026-10-21: a host answer containing a letter stolen by then is pointless, "make sure the letter overlap doesnt happen again"). The validator, the letter picker and Approve all refuse a host answer whose name uses a letter stolen at or before its question, even when an alias avoids it. A fixture covers it.
 - [x] **Removes:**
   - `scripts/content-publish.ts`, its tests and its `package.json` entry;
   - the `plor_publisher` login, its grants and its policies (a migration; a security change, covered by the approval above);
@@ -123,6 +124,7 @@ See the last acceptance criterion.
 | Next.js `outputFileTracingIncludes` (next.config.js, "output") | The folder is also written out in full where it's read (`join(process.cwd(), "content", "offbeat")`) | With a path built from a variable, `next build` warned that it would trace the whole project into the server bundle (observed 2026-10-21). With the literal path the warning is gone, and the traces hold the 21 drafted files and no source, docs or env files |
 | PostgreSQL 17, SECURITY DEFINER functions | `search_path = ''`, every name schema-qualified, `revoke ... from public`, execute granted to `plor_app` only | As the docs advise |
 | Ticket: questions saved with a PUT | A POST | The client's one API helper speaks GET and POST only (DECISIONS.md: one way); a second verb would need a change there for no gain |
+| M04 rule 6: a host answer must stay typeable (any name or alias avoiding the stolen letters counted) | Its **name** must avoid them | The human's rule (2026-10-21). "Chamomile" passed through "camomile", and 21 hosts on drafted days passed the same way (e.g. "Massachusetts" through "MA") |
 | Ticket: pgTAP checks the functions as `plor_app` | pgTAP calls them as the test's own role; `plor_app`'s rights are checked by its exact grant list | Locally, the test role can't `SET ROLE plor_app` ("permission denied to set role", observed). The functions check the admin whoever calls them, so the behaviour is the same |
 
 ## Evidence
@@ -148,7 +150,21 @@ See the last acceptance criterion.
 - **Two hypotheses disproved and re-planned:**
   - the test role can't switch to `plor_app` (see Source diff);
   - a variable folder path traced the whole project (see Source diff).
-- **End to end:** *not done yet.* Today's local puzzle has runs, so a day can't be approved for today. The check is planned for tomorrow's date: the human writes the questions, a session drafts them, and the human approves and plays.
+- **End to end** (2026-10-21, local stack):
+  - The human saved 7 questions for 2026-10-22 on `/admin/puzzles` and pasted "Copy for Claude" to a session. With the human's OK, the session fixed their spelling, saved them again, drafted `content/offbeat/2026-10-22.json` and opened PR #34. The checks gave `PLURALS content: 42 added`, then `offbeat/2026-10-22.json: q2 H, q4 B, q5 N, q7 A`, then `CONTENT OK content: 22 file(s)`.
+  - Approve on the page wrote the day. `private.puzzle` for 2026-10-22 held the hosts egg-roll, brownie, jinx, austin, toyota, earl-grey and dog, with letters h, b, n and a on Q2, Q4, Q5 and Q7.
+  - Playing the day was waived by the human.
+- **Host names avoid stolen letters:** the new fixture `host-name-stolen` fails with exactly its error. `npx vitest run scripts/content-validate.test.ts scripts/content-letters.test.ts src/content`: 3 files, 44 passed. `npm test`: 20 files, 156 passed. `npm run lint` and `npx tsc --noEmit`: clean.
+  - Under the new rule, 21 hosts on 12 drafted days failed. `content:letters` re-picked the letters for 5 of them (11-01, 11-09, 11-11, 11-12, 11-13). 2026-10-22 already passed.
+  - Where no letters fit, the old letters were kept and each blocked host was swapped for the next host-bank answer that avoids them:
+    - 10-26: q5 alpha → beta
+    - 11-14: q5 sleeping bag → tent; q7 scarf, mittens → boots (hat avoids the letters too, but beanie, a kind of hat, is listed)
+    - 11-15: q3 mustard → ketchup; q5 Macbeth → Othello; q7 rain → cookies
+    - 11-18: q2 screwdriver → pliers (hammer avoids C too, but mallet is listed); q4 Green Bay Packers → New England Patriots; q7 carousel, bumper cars → drop tower, swing ride
+    - 11-21: q6 question mark → period; q7 smell → touch
+    - 11-20: q7 drops Colosseum, keeping Big Ben and Taj Mahal
+  - 11-05 fits neither way: every host-bank answer to its Q7 (wallet) uses P, U, S or A. It is parked in `content-parked/`, as M04 did with days no letters fit.
+  - Afterwards: `CONTENT OK content: 20 file(s)`. `npm run test:db`: 7 files, 72 passed.
 
 ## Review
 **M06 build** (reviewer agent, 2026-10-21):
@@ -162,3 +178,9 @@ See the last acceptance criterion.
   - a route test for a started day (409 `puzzle_started`);
   - the approval test now picks a drafted day this database hasn't approved, so approving days locally won't break it.
 - Deferred to ROADMAP "Next revision": four items under "From M06 (puzzle entry)".
+
+**Host names avoid stolen letters** (reviewer agent, 2026-10-21):
+- Blocking, fixed: two host swaps broke the one-level rule (a general answer is never a host when its kinds are listed). 11-14 q7 "hat" sat next to "beanie", and 11-18 q2 "hammer" next to "mallet". They are now "boots" alone and "pliers".
+- Also taken, because the change made it stale: `content-letters.ts`'s header now says host names avoid the stolen letters.
+- Deferred to ROADMAP "Next revision": the weaker Q7s on the repaired days.
+- The repair method (new letters, else a host swap within the bank, else park) is Claude's. The human asked for the rule, not the method, and is told in the PR.

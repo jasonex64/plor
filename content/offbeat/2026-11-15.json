@@ -2154,7 +2154,7 @@
         "ranch"
       ],
       "host_answers": [
-        "mustard"
+        "ketchup"
       ],
       "match_groups": {}
     },
@@ -3159,7 +3159,7 @@
         "the-tempest"
       ],
       "host_answers": [
-        "macbeth"
+        "othello"
       ],
       "match_groups": {},
       "steals": "n"
@@ -3935,7 +3935,7 @@
       ],
       "host_answers": [
         "coffee",
-        "rain"
+        "cookies"
       ],
       "match_groups": {},
       "steals": "a"

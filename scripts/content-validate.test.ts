@@ -32,7 +32,9 @@ const EXPECTED: Record<string, string> = {
   "steals-missing": `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`,
   "steals-wrong-tier": `${FILE} q5: steals "x", which is not a heavy consonant letter (rnlts)`,
   "steals-repeated": `${FILE} q4: steals "m", which an earlier question already stole`,
-  "host-untypeable": `${FILE} q6 entry "march": host answer can't be typed without M, C, T`,
+  "host-untypeable": `${FILE} q6 entry "march": host answer's name "March" can't be typed without M, C, T`,
+  // M06: an alias that avoids the letters no longer saves a host answer whose name uses them.
+  "host-name-stolen": `${FILE} q4 entry "red": host answer's name "crimson" can't be typed without M, C`,
   "no-safe-answer": `${FILE} q4: no safe answer can be typed without M, P`,
   // M02 2f, B9: a mistyped extension used to be skipped silently.
   "not-json": "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",

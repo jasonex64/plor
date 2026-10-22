@@ -1575,7 +1575,7 @@
         "triceratops"
       ],
       "match_groups": {},
-      "steals": "h"
+      "steals": "b"
     },
     {
       "prompt": "Name something people often lose",
@@ -2512,7 +2512,7 @@
         "italy"
       ],
       "match_groups": {},
-      "steals": "b"
+      "steals": "m"
     },
     {
       "prompt": "Name a kind of soup",

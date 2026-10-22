@@ -1616,7 +1616,7 @@
         "mermaid"
       ],
       "match_groups": {},
-      "steals": "u"
+      "steals": "p"
     },
     {
       "prompt": "Name a kind of candy",
@@ -3358,7 +3358,7 @@
         "steering-wheel"
       ],
       "match_groups": {},
-      "steals": "b"
+      "steals": "d"
     },
     {
       "prompt": "Name a Canadian province or territory",

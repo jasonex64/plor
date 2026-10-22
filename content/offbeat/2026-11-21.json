@@ -3852,7 +3852,7 @@
         "quotation-marks"
       ],
       "host_answers": [
-        "question-mark"
+        "period"
       ],
       "match_groups": {}
     },
@@ -3916,7 +3916,7 @@
         "touch"
       ],
       "host_answers": [
-        "smell"
+        "touch"
       ],
       "match_groups": {},
       "steals": "e"
