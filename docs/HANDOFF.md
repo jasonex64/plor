@@ -6,10 +6,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand
 - **M07, Friends and live board, is done and merged** (PRs #35–#38); its branch is deleted.
-- **M08, Comments and reactions:** the ticket is drafted on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`). No code and no PR yet.
+- **M08, Comments and reactions:** the ticket is approved, with every decision answered, on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`). No code and no PR yet.
 
 ## Waiting on the human
-- **M08 D4–D7** in the ticket: what deleting and reporting do, which days are shown, and a rate limit. D1, D2, D3 and D8 are answered.
+- **M08 D6** is answered ("browse back"). Claude read it as past days read-only, shown whether or not you played them; the human may change that.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -21,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once D4–D7 are answered, record them in the M08 ticket, finish its acceptance criteria, then build 8a (comments) on `m08-comments-and-reactions`.
+Build 8a (comments: post, read, delete, the finished-first rule, browsing past days) on `m08-comments-and-reactions`, following the ticket. Its migration records D8's approval in DECISIONS.md.
 
 ## Local state
 - The local Supabase stack (stopped, data kept), Realtime included, holds:

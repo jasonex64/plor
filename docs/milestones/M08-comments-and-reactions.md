@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** planned: ticket drafted 2026-10-22, D1, D2, D3 and D8 answered (human, 2026-10-22); D4–D7 wait for the human. No code until they're answered.
+**Status:** planned: ticket drafted 2026-10-22, every decision answered (D1–D8, human, 2026-10-22); D6's read-only reading is Claude's and open to change. 8a next.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
@@ -23,8 +23,9 @@ After playing the day's game, players can comment on it and react, seen only by 
   - you see your own comments and your friends';
   - friends are mutual, but two of your friends who aren't friends with each other don't see each other's comments.
 - **When:**
-  - the thread is hidden until your own run today is over, because comments talk about answers;
-  - you can post only after that, for the same reason.
+  - today's thread is hidden until your own run today is over, because comments talk about answers;
+  - you can post and react only after that, for the same reason;
+  - past days can be browsed read-only (D6).
 - **Comments:**
   - plain text, one level (no replies);
   - shown with the display name (M07 7a) and the time, oldest first.
@@ -34,7 +35,7 @@ After playing the day's game, players can comment on it and react, seen only by 
 - **Report others:**
   - stores a report (who, which comment, when), and the comment disappears for the reporter at once;
   - an admin sees open reports on a new section of the admin pages and can delete the comment (D5).
-- **Reactions:** what they attach to is D2. Either way:
+- **Reactions** go on comments and on friends' runs (D2). For each:
   - one reaction per player per thing, from a small fixed set (D3);
   - changing it replaces the old one, and tapping it again removes it.
 - **Live:**
@@ -43,7 +44,7 @@ After playing the day's game, players can comment on it and react, seen only by 
   - No new security change is needed for this part: the own-board policy already covers it.
 - **Data, as tables in `private` with plor_app-only policies (DECISIONS.md: Row-level security in `private`):**
   - `comment(id, user_id, game_id, puzzle_date, body, created_at)`;
-  - `reaction(...)`, its shape set by D2;
+  - `reaction(user_id, game_id, puzzle_date, target, emoji, created_at)`, where the target is either a comment or a friend's run that day (D2), with one reaction per player per target;
   - `comment_report(comment_id, reporter_id, created_at)`.
   - They are written through route handlers that check the session and that the player has finished the day. Account deletion cascades.
 
@@ -53,10 +54,10 @@ After playing the day's game, players can comment on it and react, seen only by 
 | D1 | **Comment length** (a human number) | 280 characters || **280 characters** (human, 2026-10-22: "take reccomendation for now") |
 | D2 | **What reactions attach to.** (a) Comments, like a chat. (b) A friend's run on the board, like a "nice!" on "survived". (c) Both. | (a). It's the one people expect from "comments and reactions". (b) could come with the home screen feed (M11) || **(c) Both**: on comments and on friends' runs (human, 2026-10-22) |
 | D3 | **The reaction set** (fixed, small) | 👍 😂 😮 😢 ❤️ || **👍 😂 😮 😢 ❤️** for now; custom or different reactions later (human, 2026-10-22: "take reccomendation for now but add custom/different reactions down the line"); ROADMAP Later |
-| D4 | **Deleting your own comment** | Gone for everyone, and not kept. Its reactions and reports go with it | |
-| D5 | **What a report does** | Stored, and hidden for the reporter at once. Admins see open reports on the admin pages and can delete the comment. Nothing is hidden automatically, since that would need a threshold (a human number) | |
-| D6 | **Days other than today** | Only today's thread is shown in M08. Older threads stay stored for later (home screen, M11) | |
-| D7 | **Rate limit on posting** (a human number, or none) | None in M08: only friends see comments, and they can report. Revisit with beta data (M15) | |
+| D4 | **Deleting your own comment** | Gone for everyone, and not kept. Its reactions and reports go with it || **As suggested:** gone for everyone, not kept (human, 2026-10-22) |
+| D5 | **What a report does** | Stored, and hidden for the reporter at once. Admins see open reports on the admin pages and can delete the comment. Nothing is hidden automatically, since that would need a threshold (a human number) || **As suggested:** hidden for the reporter, listed for admins to delete, no automatic hiding (human, 2026-10-22) |
+| D6 | **Days other than today** | Only today's thread is shown in M08. Older threads stay stored for later (home screen, M11) || **Browse back** (human, 2026-10-22: "Let them browse back"). Claude's reading, for the human to change: past days are read-only (no new comments or reactions), and a past day's thread shows whether or not you played it, since a day that's over can't be spoiled |
+| D7 | **Rate limit on posting** (a human number, or none) | None in M08: only friends see comments, and they can report. Revisit with beta data (M15) || **No limit for now** (human, 2026-10-22) |
 | D8 | **Security change:** three new tables, and plor_app may: read and insert comments and delete its own (the route checks the owner); read, insert and delete reactions; insert reports; and, for admins only through the routes, read reports | Approve, recorded in DECISIONS.md like M07's || **Approved** (human, 2026-10-22). Recorded in DECISIONS.md when 8a's migration lands |
 
 ## Source
@@ -70,12 +71,12 @@ After playing the day's game, players can comment on it and react, seen only by 
 - `docs/SOURCES.md`: PostgreSQL 17 (constraints, cascades), Supabase Realtime (pinned).
 
 ## Acceptance criteria
-*(To be finished once D1–D8 are answered.)*
 - [ ] Posting is refused before your run today is over, and so is reading today's thread. Route tests check that no comment text reaches a player who hasn't finished.
 - [ ] A player sees their own comments and their friends' for today, and no one else's. Route tests use three players: a friend, a non-friend, and a friend of a friend.
-- [ ] Comments over D1's length, or empty, are refused with 400.
+- [ ] Comments over 280 characters (D1), or empty, are refused with 400.
 - [ ] Delete works only on your own comment; on anyone else's it's refused. Report works only on someone else's, and the comment disappears for the reporter.
-- [ ] Reactions follow D2 and D3: one per player per thing, replaced or removed by tapping.
+- [ ] Reactions go on comments and on friends' runs (D2), from 👍 😂 😮 😢 ❤️ (D3): one per player per target, replaced or removed by tapping. You can't react to a run before your own run is over.
+- [ ] Past days' threads can be browsed by date, read-only: posting or reacting on a past day is refused (D6).
 - [ ] Admins see open reports and can delete the comment. Non-admins get 403.
 - [ ] New comments and reactions reach friends' open pages without a reload, with no comment text in the Realtime payload (an e2e test with two browsers).
 - [ ] pgTAP checks plor_app's exact grants on the new tables, and the account-deletion cascades.
@@ -94,15 +95,15 @@ After playing the day's game, players can comment on it and react, seen only by 
 | Reaction set: 👍 😂 😮 😢 ❤️ | Reactions | D3, human, 2026-10-22 |
 
 ## Plan
-1. The human answers D1–D8. Claude records the answers and finishes the acceptance criteria.
-2. 8a: comments (post, read, delete), with the finished-first rule.
-3. 8b: reactions.
+1. ~~The human answers D1–D8.~~ Done, 2026-10-22.
+2. 8a: comments (post, read, delete) with the finished-first rule, and browsing past days (D6).
+3. 8b: reactions on comments and on runs.
 4. 8c: reports, and the admin section.
 5. 8d: live updates over the board topic, and the e2e test.
 6. Each sub-ticket gets its own PR, tests first, and a reviewer pass.
 
 ## Removes
-Nothing, because this adds a new feature. If D6 is "today only", nothing older is shown, so there's no archive view to remove later.
+Nothing, because this adds a new feature.
 
 ---
 *Fill in the sections below at the end.*
