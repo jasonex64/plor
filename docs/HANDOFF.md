@@ -6,11 +6,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
-  - **8a, comments** (post, read, delete your own; hidden until your run that day is over; past days browsable read-only), is built and reviewed. It's PR #39, which merges only on all-green CI and the human's say-so.
+  - **8a, comments** (post, read, delete your own; hidden until your run that day is over; past days browsable read-only), is merged (PR #39, on all-green CI, with the human's OK). The branch stays for 8b–8d.
   - 8b (reactions), 8c (reports and the admin list) and 8d (live updates and e2e) are not started.
 
 ## Waiting on the human
-- **Merging PR #39 (8a)** (CI green first).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -22,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once PR #39 is merged: build 8b (reactions on comments and on friends' runs, D2 and D3) on the same branch, tests first. Its migration adds the reaction table and its grants, approved under D8; add a DECISIONS.md Log row like 8a's. Reacting on a past day is refused (D6), and so is reacting while your run that day is still going (8a's Source diff).
+Build 8b (reactions on comments and on friends' runs, D2 and D3) on the same branch, tests first. Its migration adds the reaction table and its grants, approved under D8; add a DECISIONS.md Log row like 8a's. Reacting on a past day is refused (D6), and so is reacting while your run that day is still going (8a's Source diff).
 
 ## Local state
 - The local Supabase stack (stopped, data kept), Realtime included, holds:
