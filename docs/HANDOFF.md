@@ -2,19 +2,16 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8b and 8c.
+**Updated:** 2026-10-22, by the session that built and merged M08 8b and 8c, then drafted the M16 ticket on branch `m16-game-2`. For M08, the handoff on `m08-comments-and-reactions` wins if it is newer: when the M16 draft was written, uncommitted 8d-looking edits to `e2e/live-board.e2e.ts` were appearing in the main checkout, so another session may have started 8d (*unverified*).
 
 ## Where things stand
+- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in a draft PR from `m16-game-2`. It is docs only and comes after launch; its questions S1–S14 wait on the human. Don't build on it before the MVP is done.
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
-  - **8a, comments,** is merged (PR #39). The branch stays for 8d.
-  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is merged (PR #40, on all-green CI, with the human's OK). The human kept both of its readings: reactions on a friend's run still in play, and on your own comment. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
-  - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is reviewed and in PR #41. The human allowed merging it on all-green CI without them, this one time (2026-10-22). The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
+  - **8a, comments,** is merged (PR #39), and **8b, reactions,** too (PR #40). The branch stays for 8d.
+  - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is merged (PR #41, on all-green CI). The human allowed that merge without them, that one time (2026-10-22); from 8d on, merging waits for the human's OK again. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
   - 8d (live updates over the board topic, and the two-browser e2e test) is not started.
 
 ## Waiting on the human
-- **8c, two questions** (ticket, Source diff):
-  - the thread reads each player's own reports to hide what they reported, which D5 needs but is wider than D8's "admins only" wording (no new grant);
-  - reports can't be closed without deleting the comment. A "keep it" button would need an update or delete grant on reports, a security change.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
