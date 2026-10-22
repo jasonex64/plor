@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** planned: Claude's draft. D2–D7 are answered (human, 2026-10-22); D1 waits on the human.
+**Status:** planned: every decision answered (D1–D7, human, 2026-10-22). 9a, the ledger, is next.
 
 ## Goal
 Each finished run's points go into an append-only ledger, and each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
@@ -15,7 +15,7 @@ Each finished run's points go into an append-only ledger, and each player sees a
   - M10 and M11 have no scores to show.
 - **The human's words:**
   - "Points and an all-time friends leaderboard" (ROADMAP, Product);
-  - midnight: "they get to play the puzzle but their score doesn't contribute to leaderboard" (2026-10-21; DECISIONS.md, Game 1: Timer).
+  - midnight: "a run's points count whenever it's finished, for its own day, and a run that's never finished counts nothing" (2026-10-22, D1), replacing "their score doesn't contribute to leaderboard" (2026-10-21).
 
 ## Claude's design (for the human to approve)
 - **The ledger** is `M00-data-design.md` §6 as approved (2026-10-17):
@@ -23,19 +23,22 @@ Each finished run's points go into an append-only ledger, and each player sees a
   - one row per run, unique per (user, game, day), points ≥ 0;
   - append-only: plor_app may only read and insert (§7);
   - deleting the account cascades.
-- **What a run scores:** the formula is the one already in use: surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 (`POINTS_PER_QUESTION`, human, 2026-10-21). D1 and D2 settle the cases the formula doesn't cover.
-- **When the row is written:**
-  - §6 writes it in the same transaction as the run's ending answer: the catch, or the last safe answer.
-  - Two kinds of run have no such answer: a run that ran out of time, and a run left at a reveal, which never ends by itself. D3 settles them.
+- **What a run scores:** the formula already in use: surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 (`POINTS_PER_QUESTION`, human, 2026-10-21).
+  - Every finished run counts, for the day it was played, even if it finished after midnight (D1).
+  - A run that ran out of time scores the questions it survived (D2).
+  - A run left at a reveal counts once the player comes back and finishes it; one never finished counts nothing (D1).
+- **When the row is written** (D3): one settling function writes a row for each finished run without one.
+  - The ending answer (the catch, or the last safe answer) calls it in the same transaction, as §6 says.
+  - The leaderboard calls it for the players it shows just before it sums. That writes the rows for runs that ran out of time, which have no ending answer, and for runs from before M09.
 - **The leaderboard:** you and your friends, ranked by all-time total, highest first (D4). It's shown as a plain section on the home page (D6); the look is M14.
-- **Existing runs** get their rows when M09 ships, and a rerun adds nothing (§6, Backfill).
+- **Existing runs** get their rows the first time a leaderboard shows their player, and settling again adds nothing (D3; §6, Backfill).
 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| D1 | **A run still going when its day ends.** This covers a run started before midnight, and one left at a reveal (it stays in progress until Next). (a) It scores 0: only a run that ends before its day ends counts. (b) It scores the questions it survived before the day ended, and what happens after midnight doesn't count | (a). It's your words read as written ("their score doesn't contribute"), and it's one simple rule. The cost: someone who closes the tab at the reveal after question 6 gets 0, not 650. If that feels harsh, pick (b) | **Open.** The human questioned the 2026-10-21 rule itself (2026-10-22: "i dont see why we're prioritizing the high-consistency by instantly disqualifying people's scores if they start a run and finish after midnight"). Claude proposed (c): a run's points count whenever it's finished, for its own day, and a run never finished counts nothing. Waiting on the human's confirmation |
+| D1 | **A run still going when its day ends.** This covers a run started before midnight, and one left at a reveal (it stays in progress until Next). (a) It scores 0: only a run that ends before its day ends counts. (b) It scores the questions it survived before the day ended. (c) It counts whenever it's finished, for its own day | Claude first suggested (a), from the human's 2026-10-21 words, then (c) once the human questioned that rule | **(c)** (human, 2026-10-22: "a run's points count whenever it's finished, for its own day, and a run that's never finished counts nothing"). It replaces the 2026-10-21 rule (DECISIONS.md, Game 1: Timer; Log) |
 | D2 | **A run that ran out of time.** (a) It scores the questions it survived, like a caught run. (b) It scores 0 | (a). Running out of time ends the run like a catch, and DECISIONS.md, Game 1 already reads it that way, pending this ticket | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
-| D3 | **What writes the row for a run with no ending answer** (ran out of time; and, under D1 (b), a day that ended). (a) **Settle when read:** before the leaderboard is computed, rows are written for the shown players' runs that can no longer change; the ending answer calls the same function. (b) **A scheduled job** (Vercel Cron or Postgres `pg_cron`) writes them a while after each one ends | (a). It needs no new kind of infrastructure, no schedule (a number you'd have to pick) and no secret for a job's route. It also does the backfill: old runs get their rows the first time anyone's leaderboard shows them, so §6's separate `ledger:backfill` script isn't needed. The cost: a write happens inside a read, and a row's `created_at` is when it was settled, not when the run ended | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
+| D3 | **What writes the row for a run with no ending answer** (ran out of time). (a) **Settle when read:** before the leaderboard is computed, rows are written for the shown players' runs that can no longer change; the ending answer calls the same function. (b) **A scheduled job** (Vercel Cron or Postgres `pg_cron`) writes them a while after each one ends | (a). It needs no new kind of infrastructure, no schedule (a number you'd have to pick) and no secret for a job's route. It also does the backfill: old runs get their rows the first time anyone's leaderboard shows them, so §6's separate `ledger:backfill` script isn't needed. The cost: a write happens inside a read, and a row's `created_at` is when it was settled, not when the run ended | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D4 | **Who's on the leaderboard, and how it's ordered** | You and your friends, not friends of friends (like comments, M08). All-time total, highest first; ties alphabetically by name. A friend with no points shows 0 | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D5 | **Today's points before you've finished today** | Left out of everyone's totals until your own run today is over, then included. Otherwise a friend's total going up by 150 says they were caught on question 4 (DECISIONS.md, Game 1: no spoilers). The live board already shows "on question 3" then "finished" (ROADMAP "Next revision" has that for you), so you may prefer to include them | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D6 | **Where it's shown** | A "Friends leaderboard" section on the home page, under "Friends today". The home screen is reworked in M11 | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
@@ -47,13 +50,11 @@ Each finished run's points go into an append-only ledger, and each player sees a
 - `docs/milestones/M00-data-design.md`: §5 (runs, `run_status`), §6 (the ledger, the formula, backfill), §7 (append-only grants), §8 (the day boundary).
 - `docs/milestones/M04-game-mechanics.md`, G1: the points formula.
 - `docs/SOURCES.md`: PostgreSQL 17 (constraints, `INSERT … ON CONFLICT DO NOTHING`, transactions).
-- If D3 is (b): a source for the scheduler (Vercel Cron or Supabase `pg_cron`) has to be added to SOURCES.md by the human first.
 
 ## Acceptance criteria
-*(Written for Claude's suggestions; they change with the answers.)*
 - [ ] `private.points_ledger` exists as in §6. pgTAP checks plor_app's exact grants (select, insert), that plor_app can't update or delete it, that a second row for the same run is refused, and the account cascade.
-- [ ] A run's row holds the right points. A route or database test covers each case: caught on question 4 (150), survived (1000), ran out of time on question 3 (75, D2), still at a reveal when its day ended (D1), and started before midnight but finished after (D1).
-- [ ] No row is written for a run whose points can still change, and writing again never adds a second row or changes one (D3).
+- [ ] A run's row holds the right points. A route or database test covers each case: caught on question 4 (150), survived (1000), ran out of time on question 3 (75, D2), and started before midnight but finished after (counts, D1).
+- [ ] No row is written for a run still in progress, including one left at a reveal past its day (D1), and settling again never adds a second row or changes one (D3).
 - [ ] Runs from before M09 get their rows. Evidence: settling twice, where the second time writes 0 rows, and the ledger sum equals the recomputed score for every finished run (§6, Backfill).
 - [ ] The leaderboard shows the viewer and their friends only, ordered as D4 says, with each total equal to that player's ledger sum. Route tests use a friend, a non-friend and a friend of a friend.
 - [ ] Today's points stay out of the totals until the viewer's own run today is over (D5). A route test checks before and after.
@@ -70,17 +71,16 @@ Each finished run's points go into an append-only ledger, and each player sees a
 | Value | Used for | Origin |
 |---|---|---|
 | Points per question: 25, 50, 75, 100, 150, 250, 350 | Each run's points | Human, 2026-10-21 (M04 G1; `POINTS_PER_QUESTION`) |
-| The day ends at midnight `America/Los_Angeles` | Whether a run ended within its day (D1) | Human, 2026-10-17 (§8; `private.day_of`) |
-| *Only if D3 is (b):* how often the job runs | Settling runs with no ending answer | **Blank: ask** |
 
 ## Plan
-1. The human answers D1–D7.
-2. **9a, the ledger:** the table and grants, the scoring of every kind of run (D1, D2), the write path (D3) and the backfill, with pgTAP and route tests first.
+1. ~~The human answers D1–D7.~~ Done, 2026-10-22.
+2. **9a, the ledger:** the table and grants (D7), the scoring of every kind of run (D1, D2), and the settling function called by the ending answer (D3), with pgTAP and route tests first.
 3. **9b, the leaderboard:** the route and the home-page section (D4–D6), route tests first, plus a browser or e2e check.
 4. Each sub-ticket gets its own PR and a reviewer pass.
 
 ## Removes
-- If D3 is (a): §6's planned `npm run ledger:backfill` script is never built, because settling does the backfill. §6 and DECISIONS.md, Points ledger, are updated to say how rows for runs with no ending answer are written.
+- §6's planned `npm run ledger:backfill` script is never built, because settling does the backfill (D3). §6 and DECISIONS.md (Points ledger; Game 1: Timer and Scoring) were updated with the answers, 2026-10-22.
+- The 2026-10-21 rule that a run finished after midnight doesn't count (D1).
 - No existing code is removed, because this adds a new feature.
 
 ---
