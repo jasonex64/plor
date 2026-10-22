@@ -3,7 +3,8 @@
 // Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): the player's own and their
 // friends', oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at
 // a time, read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can
-// be changed only where posting can. Plain UI; the look is M14.
+// be changed only where posting can. Other players' comments can be reported on any day shown, which hides them
+// from the reporter (8c, D5). Plain UI; the look is M14.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Comment, Thread } from "@/comments/comments";
 import { ApiError, api } from "@/lib/api-client";
@@ -97,6 +98,7 @@ export function Comments({ username, runOver }: { username: string; runOver: boo
               mine={c.username === username}
               busy={busy}
               onDelete={() => run(() => api("/api/comments/delete", { method: "POST", body: { id: c.id } }))}
+              onReport={() => run(() => api("/api/comments/report", { method: "POST", body: { id: c.id } }))}
               onReact={
                 thread.canPost
                   ? (emoji) => run(() => api("/api/reactions", { method: "POST", body: { date: thread.date, target: { type: "comment", id: c.id }, emoji } }))
@@ -128,12 +130,14 @@ function CommentItem({
   mine,
   busy,
   onDelete,
+  onReport,
   onReact,
 }: {
   comment: Comment;
   mine: boolean;
   busy: boolean;
   onDelete: () => void;
+  onReport: () => void;
   onReact?: (emoji: Emoji | null) => void;
 }) {
   return (
@@ -141,9 +145,13 @@ function CommentItem({
       <strong>{comment.name}</strong> <time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
       <p>{comment.body}</p>
       <Reactions reactions={comment.reactions} busy={busy} onReact={onReact} />{" "}
-      {mine && (
+      {mine ? (
         <button type="button" disabled={busy} onClick={onDelete}>
           Delete
+        </button>
+      ) : (
+        <button type="button" disabled={busy} onClick={onReport}>
+          Report
         </button>
       )}
     </li>

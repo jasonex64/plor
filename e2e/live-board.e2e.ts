@@ -1,6 +1,7 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
 // with emailed codes, become friends through an invite link, and one sees the other's run change without reloading.
-// A second test restarts Realtime and checks that the page refetches the board with reason=reconnect.
+// Reactions (M08 8b) and reports (8c) are checked on the same pages once both have played. A second test restarts
+// Realtime and checks that the page refetches the board with reason=reconnect.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
@@ -135,6 +136,27 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Wait for the board itself, not its "Loading…".
   await expect(player.getByRole("region", { name: "Where everyone ended" })).toBeVisible();
   await expect(player.getByText("Reactions on your run")).toHaveCount(0);
+
+  // The player comments; the watcher reports it, and it's gone for the watcher at once (M08 8c, D5). Made an admin,
+  // the watcher finds it on the reported-comments page and deletes it, and then it's gone for the player too.
+  const body = `report me ${RUN}`;
+  await player.getByLabel("Comment", { exact: true }).fill(body);
+  await player.getByRole("button", { name: "Post" }).click();
+  const playerComment = player.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
+  await expect(playerComment).toBeVisible();
+  await watcher.reload();
+  const watcherComment = watcher.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
+  await watcherComment.getByRole("button", { name: "Report" }).click();
+  await expect(watcher.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
+  await watcher.goto("/admin/reports");
+  const reported = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: body });
+  await expect(reported).toContainText(`${playerName} (${playerName}) on `);
+  await expect(reported).toContainText("1 report, first");
+  await reported.getByRole("button", { name: "Delete comment" }).click();
+  await expect(watcher.getByText("No reported comments.")).toBeVisible();
+  await player.reload();
+  await expect(player.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted
