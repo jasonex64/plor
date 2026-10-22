@@ -85,6 +85,9 @@ select is(pg_temp.grants('plor_app'), array[
   'private.question_deadline(timestamp with time zone) execute',
   'private.question_open insert', 'private.question_open select',
   'private.question_started_at(uuid,text,date,integer) execute',
+  -- Reactions (M08 8b, D8): read, react, and remove or replace your own (no update: a replace is a delete and an
+  -- insert; the route scopes both to the signed-in player).
+  'private.reaction delete', 'private.reaction insert', 'private.reaction select',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',

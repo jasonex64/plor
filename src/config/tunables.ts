@@ -21,6 +21,11 @@ export const INVITE_CODE_BYTES = 16;
 // constraint comment_body_format enforces it; the comments route test posts both lengths through it.
 export const COMMENT_MAX_LENGTH = 280;
 
+// The reaction set, in the order the page shows it (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md,
+// D3). The database's check constraint reaction_emoji holds the same five; the reactions route test sends each one
+// through it.
+export const REACTIONS = ["👍", "😂", "😮", "😢", "❤️"] as const;
+
 // "Where everyone ended": how many friends are named per place before "+ k more" (human, 2026-10-21;
 // docs/milestones/M07-friends-and-live-board.md, D2).
 export const FRIENDS_PER_PLACE = 3;

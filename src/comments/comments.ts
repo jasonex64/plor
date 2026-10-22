@@ -6,10 +6,11 @@ import { GAME_ID } from "@/content/puzzle";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { NO_REACTIONS, commentReactions, type Reactions } from "@/reactions/reactions";
 
 // username identifies the author (the page offers Delete on the viewer's own); name is the display name if set,
-// else the username (M07 7a).
-export type Comment = { id: string; username: string; name: string; body: string; createdAt: string };
+// else the username (M07 7a). reactions are the viewer's own and their friends' (8b).
+export type Comment = { id: string; username: string; name: string; body: string; createdAt: string; reactions: Reactions };
 
 // comments is null while the thread is hidden from the viewer. canPost: the day is today and the viewer's run
 // is over.
@@ -57,7 +58,8 @@ export async function getThread(db: Db, viewerId: string, date: string | null): 
      order by c.created_at, c.id`,
     [viewerId, GAME_ID, day[0].date],
   );
-  return { date: day[0].date, canPost: today, comments: rows.map(toComment) };
+  const reactions = await commentReactions(db, viewerId, rows.map((r) => r.id));
+  return { date: day[0].date, canPost: today, comments: rows.map((r) => toComment(r, reactions.get(r.id) ?? NO_REACTIONS)) };
 }
 
 // Posts to today's thread. The page names the day it shows, so a page left open past midnight can't post to the
@@ -89,7 +91,7 @@ export async function postComment(db: Db, userId: string, date: string, body: st
     throw err;
   }
   const row = rows[0];
-  if (row.id !== null) return toComment(row);
+  if (row.id !== null) return toComment(row, NO_REACTIONS);
   if (row.past) throw new AppError("day_past", 409);
   if (date !== row.today) throw new AppError("bad_request", 400, "date");
   throw new AppError("not_finished", 409);
@@ -102,6 +104,6 @@ export async function deleteComment(db: Db, userId: string, id: string): Promise
   if (rowCount === 0) throw new AppError("comment_not_found", 404);
 }
 
-function toComment(r: Row): Comment {
-  return { id: r.id, username: r.username, name: r.name, body: r.body, createdAt: r.created_at.toISOString() };
+function toComment(r: Row, reactions: Reactions): Comment {
+  return { id: r.id, username: r.username, name: r.name, body: r.body, createdAt: r.created_at.toISOString(), reactions };
 }

@@ -2,15 +2,16 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8a.
+**Updated:** 2026-10-22, by the session that built M08 8b.
 
 ## Where things stand
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
-  - **8a, comments** (post, read, delete your own; hidden until your run that day is over; past days browsable read-only), is built and reviewed. It's PR #39, which merges only on all-green CI and the human's say-so.
-  - 8b (reactions), 8c (reports and the admin list) and 8d (live updates and e2e) are not started.
+  - **8a, comments,** is merged (PR #39).
+  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is built, reviewed and in PR #40, waiting on the human. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
+  - 8c (reports and the admin list) and 8d (live updates and the e2e test) are not started.
 
 ## Waiting on the human
-- **Merging PR #39 (8a)** (CI green first).
+- **PR #40:** merge once CI is all green and the human says so. The human kept both of 8b's readings (2026-10-22): reactions on a friend's run still in play, and on your own comment.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -22,14 +23,16 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once PR #39 is merged: build 8b (reactions on comments and on friends' runs, D2 and D3) on the same branch, tests first. Its migration adds the reaction table and its grants, approved under D8; add a DECISIONS.md Log row like 8a's. Reacting on a past day is refused (D6), and so is reacting while your run that day is still going (8a's Source diff).
+Once 8b is merged, build 8c on the same branch, tests first: `private.comment_report`, plor_app insert, and admin-only reads through the routes (D5, D8), with a DECISIONS.md Log row like 8a's and 8b's. A report hides the comment for the reporter at once; admins see open reports on the admin pages (401 signed out, 403 not admin, as in M03 D1) and can delete the comment.
 
 ## Local state
-- The local Supabase stack (stopped, data kept), Realtime included, holds:
-  - every migration up to `20261022083943_comments.sql`;
-  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally;
+- The local Supabase stack is running, Realtime included, and holds:
+  - every migration up to `20261022090540_reactions.sql`;
+  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally (8b's checks didn't use that account);
   - the approved 2026-10-22 day.
+- No dev server is left running.
 - `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile (ROADMAP, From M08).
+- The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
   1. `npm ci`, then `npx supabase start`, then `npx supabase migration up`, then `npm run dev`.
   2. Sign in with a code from Mailpit at `http://127.0.0.1:54324`.

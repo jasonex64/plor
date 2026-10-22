@@ -3,13 +3,16 @@
 // The live board (docs/milestones/M07-friends-and-live-board.md, 7c): friends' runs today, updated over a Realtime
 // channel on the player's own topic, `board:<user id>`. The browser's only Supabase connection is this Realtime one
 // (M07 D5). Payloads say only playing or finished; how a friend's run ended comes from the HTTP board once the
-// player's own run is over, so nothing reaches the page early.
+// player's own run is over, so nothing reaches the page early. So do reactions on runs (M08 8b), which the player can
+// add to friends' runs from then on.
 import { RealtimeClient } from "@supabase/realtime-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
 import { ApiError, api } from "@/lib/api-client";
+import type { Emoji } from "@/reactions/reactions";
 import { messageFor } from "./messages";
+import { Reactions } from "./reactions";
 
 type Session = { url: string; publishableKey: string; userId: string; accessToken: string; expiresAt: number };
 
@@ -25,6 +28,7 @@ function errorText(err: unknown): string {
 export function Board({ username }: { username: string }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   // The channel's message handler lives as long as the channel, so it reads the latest board through a ref.
   const boardRef = useRef<BoardData | null>(null);
   useEffect(() => {
@@ -124,16 +128,35 @@ export function Board({ username }: { username: string }) {
     };
   }, [load, username]);
 
+  async function react(friend: string, emoji: Emoji | null) {
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/reactions", { method: "POST", body: { date: board!.date, target: { type: "run", username: friend }, emoji } });
+      load();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section aria-label="Friends today">
       <h2>Friends today</h2>
       {board?.mine && <WhereEveryoneEnded mine={board.mine} friends={board.friends} />}
+      {board?.reactionsOnMine && board.reactionsOnMine.counts.length > 0 && (
+        <p>
+          Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
+        </p>
+      )}
       {board && board.friends.length === 0 && <p>Add friends to see their runs here.</p>}
       {board && board.friends.length > 0 && (
         <ul>
           {board.friends.map((f) => (
             <li key={f.username}>
-              {f.name}: {describe(f)}
+              {f.name}: {describe(f)}{" "}
+              {f.reactions && <Reactions reactions={f.reactions} busy={busy} onReact={(emoji) => void react(f.username, emoji)} />}
             </li>
           ))}
         </ul>

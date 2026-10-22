@@ -9,6 +9,7 @@ const friend = (name: string, ended: Ended | null): BoardFriend => ({
   state: ended ? "finished" : "playing",
   question: ended ? null : 2,
   ended,
+  reactions: null,
 });
 const person = (name: string) => ({ username: name.toLowerCase(), name });
 const caught = (question: number): Ended => ({ result: "caught", question, answer: "x" });

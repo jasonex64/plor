@@ -85,7 +85,15 @@ describe("the live board over HTTP", () => {
     await playAndGetCaught();
     useSession(players.b.session);
     const seen = await board();
-    expect(seen.friends[0]).toEqual({ username: players.a.username, name: players.a.username, state: "finished", question: null, ended: null });
+    expect(seen.friends[0]).toEqual({
+      username: players.a.username,
+      name: players.a.username,
+      state: "finished",
+      question: null,
+      ended: null,
+      // Reactions on runs wait for the viewer's run too (M08 8b).
+      reactions: null,
+    });
     // No spoiler anywhere in what the viewer receives.
     expect(JSON.stringify(seen)).not.toContain(hostName());
   });
