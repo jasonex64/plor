@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** in review: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is merged (PR #40, 2026-10-22); 8c, reports, is merged (PR #41, 2026-10-22); 8d, live updates, is in review (PR #43), the milestone's last.
+**Status:** done (2026-10-22). 8a (PR #39), 8b (PR #40), 8c (PR #41) and 8d (PR #43) are merged, each on all-green CI with the human's OK. Every decision was answered by the human (D1–D8, 2026-10-22), as were the readings marked for them in the Source diff.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.
