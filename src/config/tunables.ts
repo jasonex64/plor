@@ -8,6 +8,10 @@ export const QUESTIONS_PER_DAY = 7;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 
+// Display name length (human, 2026-10-21; docs/milestones/M07-friends-and-live-board.md, D1). The database's check
+// constraint profile_display_name_format enforces it; src/lib/profile.db.test.ts checks the two agree.
+export const DISPLAY_NAME_MAX_LENGTH = 24;
+
 // Typo auto-correct on typed answers: one typo forgiven, only for text of 4+ letters (human, 2026-10-19, for
 // "did you mean"; auto-correct instead of a prompt, human, 2026-10-21; docs/milestones/M04-game-mechanics.md).
 export const TYPO_MAX_EDITS = 1;

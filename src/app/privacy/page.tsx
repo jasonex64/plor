@@ -19,7 +19,7 @@ export default function Privacy() {
       <h2>What we keep</h2>
       <ul>
         <li>
-          <strong>Your account:</strong> your email address, and the username you pick. If you sign in with Google,
+          <strong>Your account:</strong> your email address, the username you pick, and your display name if you set one. If you sign in with Google,
           Google also shares your name, and your profile picture if you have one; they are stored with your
           account. Plor doesn&apos;t show or use them.
         </li>

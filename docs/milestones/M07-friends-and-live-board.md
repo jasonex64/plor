@@ -3,7 +3,7 @@
 | **1 to 24 characters: letters (accents OK), digits, spaces and ' - . _; no emoji** (human, 2026-10-21, chose Claude's suggestion) |
 # M07 — Friends and live board
 
-**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Plan step 1 done (both hypotheses held); 7a next.
+**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Plan step 1 done (both hypotheses held). 7a, the display name, is built (its PR); 7b next.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -66,8 +66,8 @@ Built as four sub-tickets, one PR each, in this order:
 - Installed `@supabase/realtime-js` 2.118.0 (`node_modules`): the reconnect and heartbeat defaults. It's not in SOURCES.md; adding it is the human's call.
 
 ## Acceptance criteria
-- [ ] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown. Route and database tests.
-- [ ] **7b** Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
+- [x] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown (from 7b, the first place others see players). Route and database tests.
+- [ ] **7b** Friends see each other's display name, or the username if there is none (carried from 7a). Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
 - [ ] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
 - [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
 - [x] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy. See Evidence.
@@ -107,6 +107,8 @@ Built as four sub-tickets, one PR each, in this order:
 ## Source diff
 | Source (or ticket) says | We built | Why different |
 |---|---|---|
+| D1: "trimmed" | The route trims and composes NFC; the database refuses any name not in NFC | `[[:alpha:]]` refuses a combining accent, so the route's NFC step is what lets an accent typed as two code points through at all. The database's NFC check refuses look-alike compatibility forms that `[[:alpha:]]` accepts, such as the Angstrom sign U+212B (NFC makes it Å), so one name has one stored spelling |
+| 7a: clear the name | `null` clears it; an empty string is refused (400) | One way to clear, so an empty Save is a mistake that gets reported, not a silent clear |
 
 ## Evidence
 **Plan step 1, both hypotheses held** (2026-10-21, local stack, supabase-js 2.118.0). A scratch script made two throwaway users, A and B, and a temporary SELECT policy `realtime.topic() = 'board:' || auth.uid()::text` on broadcast. It sent with `realtime.send(payload, event, topic, true)` over psql, then dropped the policy and deleted the users (0 left afterwards). Output:
@@ -121,6 +123,29 @@ Built as four sub-tickets, one PR each, in this order:
   - `realtime.send` adds an `id` field to the payload.
   - A refused join is retried about every 6 s, forever. So the client must only ever join its own board.
 
+**7a Display name** (2026-10-21, local stack; migration `20261022064011_display_name.sql` applied with `supabase migration up`):
+- **Database:** `npm run test:sql`: 5 files, 101 tests, `Result: PASS`.
+  - `profile.test.sql` covers the D1 rules:
+    - accepted: accents, apostrophe and hyphen; other scripts, a dot and an underscore; 24 characters; two players with the same name;
+    - refused: 25 characters, empty, a leading space, a double space, an emoji, and text not in NFC ("Ångström" spelled with the Angstrom sign U+212B, next to the composed Å it should be, which is accepted).
+  - `plor_app_role.test.sql`'s exact grant list now includes column grants, and shows the one new grant, `private.profile.display_name update`.
+- **Before the rule, an experiment.** `[[:alpha:]]` accepted Zoë, José, Łukasz, 名前 and fullwidth Ａ and refused 😀 (local database: ICU, en_US.UTF-8). Whether the hosted database behaves the same is *unverified*.
+- **Routes and plor_app:** `npm run test:db`: 7 files, 79 passed. Covered:
+  - set (trimmed), change, clear, and the profile showing the name;
+  - 400 `display_name_invalid` for empty, emoji, 25 characters, a double space, and a number;
+  - 409 `no_profile` before a username exists;
+  - plor_app can change only that column;
+  - the 24/25 limit matches `DISPLAY_NAME_MAX_LENGTH`.
+- **Unit:** `npm test`: 21 files, 164 passed. Covered: `readDisplayName` (trim, NFC, refusals) and 401 signed out.
+- **Build:** `npm run build` lists `/api/profile/display-name`. `npm run check:client-bundle`: OK, 54 files. `npx tsc --noEmit` and `npm run lint`: clean.
+- **In the browser** (dev server, local stack): the account section shows the Display name field and Save, with no Clear while no name is set. Saving wasn't tried there, because the signed-in account was the human's own; the route tests cover it.
+
 ## Review
+**7a** (reviewer agent, 2026-10-21):
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **The NFC test didn't test NFC.** Its value held a control character, and a combining accent is refused by `[[:alpha:]]` before NFC anyway. It now uses the Angstrom sign U+212B, which passes the character rule and fails only NFC, next to the composed Å as a control.
+  - **The Source diff gave the wrong reason for NFC.** Corrected.
+  - **The new column grant and update policy had no recorded human approval.** The human approved them on 2026-10-22, recorded in the DECISIONS.md Log.
+  - **The ROADMAP row and HANDOFF were stale.** Updated.
+- Also fixed, because it was small and in this change: a test title claimed more than the test checked.
+- Deferred to ROADMAP "Next revision": non-ASCII digits and letters such as ª pass the D1 rule.

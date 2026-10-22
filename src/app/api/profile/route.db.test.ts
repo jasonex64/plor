@@ -6,6 +6,7 @@ import { POST as signOut } from "@/app/api/auth/sign-out/route";
 import { getPool } from "@/lib/db";
 import { enterCode, requestCode, signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest, cookieJar } from "@/test/request-scope";
+import { POST as setDisplayName } from "./display-name/route";
 import { GET as getProfile, POST as createProfile } from "./route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -29,6 +30,11 @@ async function profile() {
   return (await getProfile(apiRequest("/api/profile", { method: "GET" }))).json();
 }
 
+async function rename(displayName: unknown) {
+  const response = await setDisplayName(apiRequest("/api/profile/display-name", { method: "POST", body: { displayName } }));
+  return { status: response.status, body: await response.json() };
+}
+
 async function pick(username: string) {
   const response = await createProfile(apiRequest("/api/profile", { method: "POST", body: { username } }));
   return { status: response.status, body: await response.json() };
@@ -45,7 +51,7 @@ describe("sign-in and profile", () => {
     expect(html).not.toMatch(/<a\s/i);
     expect(await enterCode(EMAIL_A, code)).toEqual({ status: 200, body: { ok: true } });
     expect([...cookieJar.keys()].some((name) => name.startsWith("sb-"))).toBe(true);
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null, displayName: null });
     firstCode = code;
   });
 
@@ -59,12 +65,30 @@ describe("sign-in and profile", () => {
 
   it("creates the profile on the first username pick", async () => {
     expect(await pick(`a${RUN}`)).toEqual({ status: 201, body: { ok: true, username: `a${RUN}` } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}` });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: null });
+  });
+
+  it("sets, changes and clears the display name (M07 7a)", async () => {
+    expect(await rename("  Zoë Ann ")).toEqual({ status: 200, body: { ok: true, displayName: "Zoë Ann" } });
+    expect(await rename("Zed")).toEqual({ status: 200, body: { ok: true, displayName: "Zed" } });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: "Zed" });
+    expect(await rename(null)).toEqual({ status: 200, body: { ok: true, displayName: null } });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: null });
+  });
+
+  it("rejects a display name outside the rules, with 400 display_name_invalid", async () => {
+    for (const name of ["", "Zoe 😀", "a".repeat(25), "Zoe  Ann", 7]) {
+      expect(await rename(name)).toEqual({ status: 400, body: { ok: false, error: "display_name_invalid" } });
+    }
   });
 
   it("rejects a username another player has, with 409 username_taken", async () => {
     await signIn(EMAIL_B);
     expect(await pick(`a${RUN}`)).toEqual({ status: 409, body: { ok: false, error: "username_taken" } });
+  });
+
+  it("refuses a display name before a username is picked, with 409 no_profile", async () => {
+    expect(await rename("Bea")).toEqual({ status: 409, body: { ok: false, error: "no_profile" } });
   });
 
   it("rejects a username outside the rules, with 400 username_invalid", async () => {
