@@ -78,22 +78,22 @@ private.points_ledger(
   id bigint generated always as identity primary key,
   user_id uuid → auth.users on delete cascade,
   game_id text, puzzle_date date,
-  points integer not null check (points >= 0),
+  points integer not null check (points >= 0),   -- the ladder plus the final rarity bonus
+  bonus integer not null check (bonus between 0 and points),
   created_at timestamptz not null default now(),
   unique (user_id, game_id, puzzle_date)
 )
 ```
 *Not built yet.* This is the design for the points milestone (M09).
-- **Formula** (human, 2026-10-21, M04 G1; DECISIONS.md, Game 1: Scoring): surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 points (`POINTS_PER_QUESTION` in `src/config/tunables.ts`). A run's score is the sum for the questions it survived, so a perfect run scores 1000. It replaced *k* points for question *k* (Q3, accepted by a human on 2026-10-17).
+- **Rarity bonus** (human, 2026-10-22, M09; DECISIONS.md, Game 1: Scoring): each survived answer before the day's midnight also earns a bonus, bigger the rarer the answer was that day, capped below the points of the first question the run didn't survive. `points` holds the total, `bonus` the bonus part. The exact numbers are in the M09 ticket.
+- **Formula** (human, 2026-10-21, M04 G1; DECISIONS.md, Game 1: Scoring): surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 points (`POINTS_PER_QUESTION` in `src/config/tunables.ts`). A run's ladder points are the sum for the questions it survived (1000 for a perfect run), and the rarity bonus comes on top. It replaced *k* points for question *k* (Q3, accepted by a human on 2026-10-17).
   *Example:* a player who dies on Q4 has survived Q1–Q3, so they score 25 + 50 + 75 = 150.
 - **Which runs count** (human, 2026-10-22, M09 D1 and D2):
   - every finished run, for the day it was played, even one finished after midnight (this replaced 2026-10-21's "doesn't count for the leaderboard");
   - a run that ran out of time scores the questions it survived, like a caught run;
   - a run left at a reveal counts once the player comes back and finishes it; one never finished counts nothing.
-- **When it's written** (human, 2026-10-22, M09 D3): one settling function writes a row for each finished run that has none, scoring it with the same TypeScript function the result screen uses, and inserting with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`, so a retry or rerun never awards points twice.
-  - The ending answer (the catch or the last safe answer) calls it in the same transaction.
-  - The leaderboard calls it for the players it shows just before it sums, which writes the rows for runs that ran out of time (they have no ending answer).
-- **Backfill** *(fixes review 2, BLOCKING 3)*: settling is the backfill. A run from before M09 gets its row the first time a leaderboard shows its player, so there's no separate `ledger:backfill` script (M09 D3).
+- **When it's written** (human, 2026-10-22, M09 D3, D9, D10): once the run is finished **and its day is closed**, since the final bonus needs the day's counts. A day closes at its midnight Pacific; there's no scheduler. One settling function writes a row for each such run that has none, inserting with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`, so a retry or rerun never awards points twice. The leaderboard calls it for the players it shows just before it sums. The final bonus uses only answers recorded before the day's midnight, so when settling runs doesn't change the result.
+- **Backfill** *(fixes review 2, BLOCKING 3)*: settling is the backfill. A run from before M09 gets its row, rarity bonus included, the first time a leaderboard shows its player, computed from its stored answers, so there's no separate `ledger:backfill` script (M09 D3).
   - **Evidence:** settle every player twice. The second time writes 0 rows, and the ledger sum equals the recomputed score for every finished run.
 - The leaderboard is `SUM(points)` over the ledger.
 

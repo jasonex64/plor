@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** planned. D1–D7 are answered (human, 2026-10-22). The human then added a rarity bonus (2026-10-22). Its design is proposed below for review, with D9–D11 and five numbers open (D8 is answered). No code until those are answered.
+**Status:** planned: every decision answered (D1–D11, human, 2026-10-22), including the rarity bonus's design and its Hard-to-reverse change to the ledger. The five numbers N1–N5 wait on the human; no code until they're given.
 
 ## Goal
 Each finished run's points, the question ladder plus a rarity bonus, go into an append-only ledger. Each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
@@ -31,8 +31,8 @@ What the human decided, from their notes:
 - **1000 is no longer the maximum.** Comparing games will use daily percentiles (the draft M16 ticket, "Comparing games", PR #42, not merged). M09 builds none of that.
 - **Earlier runs** get the rarity bonus too, computed from their stored answers.
 
-## Claude's design (for the human to approve)
-- **The ledger** is `M00-data-design.md` §6 (approved 2026-10-17), changed as D9 proposes:
+## Design (Claude's, approved by the human, 2026-10-22)
+- **The ledger** is `M00-data-design.md` §6 (approved 2026-10-17), changed by D9:
   - `private.points_ledger(id, user_id, game_id, puzzle_date, points, bonus, created_at)`;
   - one row per run, unique per (user, game, day); `points` is the run's total (ladder plus bonus) and `bonus` the bonus part, so the result screen and M16's percentiles can show both;
   - append-only: plor_app may only read and insert (§7, D7); deleting the account cascades.
@@ -49,11 +49,11 @@ What the human decided, from their notes:
 - **The leaderboard:** you and your friends, ranked by all-time total, highest first, ties alphabetically (D4), as a plain section on the home page (D6). Under D9 (a) today's points only arrive once the day closes, so D5's "not before you've finished" holds automatically.
 - **Existing runs** get their rows the first time they're settled, with the final bonus computed from their stored answers (D3; §6, Backfill).
 
-### Proposed change to a "Hard to reverse" decision (for the human's review)
-DECISIONS.md, Points ledger, today says the row is "Written when a run ends (from M09), append-only … with the ending answer, or, for a run that ran out of time …, when the leaderboard settles it". Under D9 (a) it would read:
+### The change to a "Hard to reverse" decision (approved by the human as D9, 2026-10-22; DECISIONS.md and §6 now hold it)
+DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09), append-only … with the ending answer, or, for a run that ran out of time …, when the leaderboard settles it". It now reads:
 > One row per run, written once the run is finished **and its day is closed** (D10), holding the run's total (`points`: the question ladder plus the final rarity bonus) and the bonus part (`bonus`). Append-only; unique per (user, game, day); the leaderboard is the sum of `points`. The final bonus uses only answers recorded before the day's midnight, so it doesn't depend on when it's computed.
 
-`M00-data-design.md` §6 changes the same way: the ending answer no longer writes the row, because the final bonus isn't known yet. "1000 for a perfect run" leaves DECISIONS.md, Game 1: Scoring, which then points to the bonus.
+`M00-data-design.md` §6 changed the same way: the ending answer no longer writes the row, because the final bonus isn't known yet. "1000 for a perfect run" left DECISIONS.md, Game 1: Scoring, which now describes the bonus.
 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
@@ -66,9 +66,9 @@ DECISIONS.md, Points ledger, today says the row is "Written when a run ends (fro
 | D6 | **Where it's shown** | A "Friends leaderboard" section on the home page, under "Friends today". The home screen is reworked in M11 | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D7 | **Security change:** a new table, `private.points_ledger`. plor_app may read and insert only (no update or delete), with one policy per command. The routes read only the viewer's and their friends' rows | Approve. It's the grant set §7 approved in the data design (2026-10-17); this records it as M09's change in DECISIONS.md, like M07's and M08's | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D8 | **Runs finished after midnight: count or not?** In chat (D1) the human chose "count whenever finished"; their notes, written the same day, say "runs finished after their day ended still don't count for the leaderboard", and list D1 and D2 as still open. (a) Keep D1 (c): they count, with the final bonus from the closed day's counts. (b) Go back to 2026-10-21: they don't count. (c) **The human's middle ground** (2026-10-22: "late runs can count but they wont earn the rarity bonus"): they count for the ladder, without the bonus. Applied either (c1) **per answer**: answers given before midnight keep their bonus, answers after it earn none; or (c2) **per run**: a run finished after midnight gets no bonus at all | (c1). It keeps the human's middle ground, and it's fairer at the edge: someone who starts at 11:58 and answers six questions before midnight keeps those six bonuses. It's also the same line the final counts already use (answers before midnight). (c2) is easier to say in one sentence ("finish before midnight to get the bonus") | **(c1), per answer** (human, 2026-10-22: "Per answer: answers before midnight keep their rarity bonus, answers after midnight earn none"). Late runs still count for the ladder (D1) |
-| D9 | **Hard to reverse: when the ledger row is written.** (a) **One row per run, once the run is finished and its day is closed**, holding the total and the bonus part (the proposed text above). (b) **Two rows per run:** the ladder points when the run ends, and the bonus once the day closes; unique per (run, kind) | (a). One row, one rule, and no spoiler question (D5): today's scores reach the leaderboard the morning after. The cost: your own points join the leaderboard only after midnight, though the result screen shows them, with the provisional bonus, at once. (b) shows the ladder points sooner, at the price of two kinds of row ||
-| D10 | **What closes a day.** DECISIONS.md has no way to run scheduled jobs (the data design says "There's still no closing job"), so Claude doesn't pick one. (a) **No scheduler:** a day counts as closed from its midnight Pacific, and the first leaderboard read after that settles its runs (D3's mechanism). (b) **A scheduled job** after each midnight, either Vercel Cron (calls a route; needs a secret and a schedule) or Supabase `pg_cron` (runs in the database; an extension to enable). Either one is a new mechanism and needs a source in SOURCES.md | (a) needs nothing new: since the final counts use only answers from before midnight, it doesn't matter when settling runs. (b) gives fixed-time writes, if something will need them (a daily notification, say). *The human to choose* ||
-| D11 | **Where the expected popularity comes from in M09.** (a) **Flat:** every listed answer equally likely; no content change, but the provisional bonus is then the same for every answer to a question. (b) **The host bank as the "common" tier:** each day's content already has a host bank, the few most common answers, so those are "common" and the rest "uncommon"; no content change, and one more number (N5). (c) **A tier per entry** (common, uncommon, rare), set when drafting and approved on the admin page: content format 3, which is Hard to reverse, plus admin-page and drafting changes | (b) for M09: it gives a real provisional bonus from data that's already drafted and reviewed, with no format change. (c) can follow as its own ticket once the bonus has been seen in play; past days' picks (M03) can replace tiers later still ||
+| D9 | **Hard to reverse: when the ledger row is written.** (a) **One row per run, once the run is finished and its day is closed**, holding the total and the bonus part (the proposed text above). (b) **Two rows per run:** the ladder points when the run ends, and the bonus once the day closes; unique per (run, kind) | (a). One row, one rule, and no spoiler question (D5): today's scores reach the leaderboard the morning after. The cost: your own points join the leaderboard only after midnight, though the result screen shows them, with the provisional bonus, at once. (b) shows the ladder points sooner, at the price of two kinds of row | **(a)** (human, 2026-10-22: "Take Claude's suggestions for M09 D9 (one ledger row once the day closes), D10 (no scheduler: the day closes at midnight and the first leaderboard read settles it) and D11 (host bank as the common tier)"). DECISIONS.md, Points ledger and §6 now say so |
+| D10 | **What closes a day.** DECISIONS.md has no way to run scheduled jobs (the data design says "There's still no closing job"), so Claude doesn't pick one. (a) **No scheduler:** a day counts as closed from its midnight Pacific, and the first leaderboard read after that settles its runs (D3's mechanism). (b) **A scheduled job** after each midnight, either Vercel Cron (calls a route; needs a secret and a schedule) or Supabase `pg_cron` (runs in the database; an extension to enable). Either one is a new mechanism and needs a source in SOURCES.md | (a) needs nothing new: since the final counts use only answers from before midnight, it doesn't matter when settling runs. (b) gives fixed-time writes, if something will need them (a daily notification, say). *The human to choose* | **(a)**, no scheduler (human, 2026-10-22: "Take Claude's suggestions for M09 D9 (one ledger row once the day closes), D10 (no scheduler: the day closes at midnight and the first leaderboard read settles it) and D11 (host bank as the common tier)") |
+| D11 | **Where the expected popularity comes from in M09.** (a) **Flat:** every listed answer equally likely; no content change, but the provisional bonus is then the same for every answer to a question. (b) **The host bank as the "common" tier:** each day's content already has a host bank, the few most common answers, so those are "common" and the rest "uncommon"; no content change, and one more number (N5). (c) **A tier per entry** (common, uncommon, rare), set when drafting and approved on the admin page: content format 3, which is Hard to reverse, plus admin-page and drafting changes | (b) for M09: it gives a real provisional bonus from data that's already drafted and reviewed, with no format change. (c) can follow as its own ticket once the bonus has been seen in play; past days' picks (M03) can replace tiers later still | **(b)** (human, 2026-10-22: "Take Claude's suggestions for M09 D9 (one ledger row once the day closes), D10 (no scheduler: the day closes at midnight and the first leaderboard read settles it) and D11 (host bank as the common tier)"). Needs N5 |
 
 ## Source
 - `docs/ROADMAP.md`: Product and the M09 row.
@@ -80,7 +80,7 @@ DECISIONS.md, Points ledger, today says the row is "Written when a run ends (fro
 - If D10 is (b): a source for the scheduler, added to SOURCES.md by the human first.
 
 ## Acceptance criteria
-*(Draft: they follow Claude's suggestions for D8–D11 and get exact values once N1–N5 are given.)*
+*(They get exact values once N1–N5 are given.)*
 - [ ] `private.points_ledger` exists as D9 says. pgTAP checks plor_app's exact grants (select, insert), that plor_app can't update or delete it, that a second row for the same run is refused, `bonus` between 0 and `points`, and the account cascade.
 - [ ] The ladder part is right for each kind of run: caught on question 4 (150), survived (1000 before the bonus), ran out of time on question 3 (75, D2), and finished after midnight (D8).
 - [ ] The final bonus matches a hand-worked example, from stored answers: a rare and a common answer on a day above the minimum (N4), and the same on a day below it, where only the expectation counts.
@@ -97,7 +97,7 @@ DECISIONS.md, Points ledger, today says the row is "Written when a run ends (fro
 - Group leaderboards (M10) and the home screen (M11).
 - Weekly or daily leaderboards, streaks and badges.
 - Daily percentiles and comparing games (M16).
-- Per-entry tiers (content format 3) and expectations from past days' picks, unless D11 says otherwise.
+- Per-entry tiers (content format 3) and expectations from past days' picks (D11: the host bank is the common tier for now).
 - The look (M14).
 
 ## Numbers
@@ -113,14 +113,14 @@ DECISIONS.md, Points ledger, today says the row is "Written when a run ends (fro
 
 ## Plan
 1. ~~The human answers D1–D7.~~ Done, 2026-10-22.
-2. The human answers D9–D11 (D8 done, 2026-10-22) and gives N1–N5. Claude then updates DECISIONS.md (Points ledger; Game 1: Scoring) and §6 with the approved text, before any code.
+2. ~~The human answers D8–D11.~~ Done, 2026-10-22, and DECISIONS.md (Points ledger; Game 1: Scoring; Log) and §6 updated. The human gives N1–N5.
 3. **9a, the ledger and scoring:** the table and grants (D7, D9), the ladder (D1, D2, D8), the rarity bonus and its cap, provisional and final (D11, N1–N5), and settling (D3, D10), with pgTAP and route tests first, including the hand-worked examples.
 4. **9b, the leaderboard:** the route and the home-page section (D4–D6), route tests first, plus a browser or e2e check.
 5. Each sub-ticket gets its own PR and a reviewer pass.
 
 ## Removes
 - §6's planned `npm run ledger:backfill` script is never built, because settling does the backfill (D3).
-- Under D9 (a): the ending answer writing the ledger row (§6, "When it's written").
+- The ending answer writing the ledger row (§6, "When it's written"; D9).
 - "1000 for a perfect run" as the maximum (DECISIONS.md, Game 1: Scoring; the comment on `POINTS_PER_QUESTION`).
 - The 2026-10-21 rule that a run finished after midnight doesn't count (D1, D8).
 - No existing code is removed, because this adds a new feature.
