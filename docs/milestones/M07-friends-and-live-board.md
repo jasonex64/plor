@@ -1,6 +1,9 @@
+| **Yes, in M07** (human, 2026-10-21) |
+| **3** (human, 2026-10-21) |
+| **1 to 24 characters: letters (accents OK), digits, spaces and ' - . _; no emoji** (human, 2026-10-21, chose Claude's suggestion) |
 # M07 — Friends and live board
 
-**Status:** planned: ticket drafted 2026-10-21, waiting for the human's answers to D1–D7 below. No code until they're answered.
+**Status:** planned: ticket drafted 2026-10-21, D1, D2 and D4 answered; waiting for the human on D3, D5, D6 and D7. No code until they're answered.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -64,7 +67,7 @@ Built as four sub-tickets, one PR each, in this order:
 
 ## Acceptance criteria
 - [ ] **7a** A player sets, changes and clears a display name within D1's rules; anything else gets 400. Others see it instead of the username wherever a player is shown. Route and database tests.
-- [ ] **7b** Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. *(Plus Remove, if D4 says so.)*
+- [ ] **7b** Opening a valid invite link and pressing Add makes both players friends. Adding yourself, an existing friend, or a reset or unknown code is refused clearly. Resetting stops the old code. pgTAP checks `plor_app`'s exact grants on the new tables. A player can remove a friend, which removes the friendship both ways (D4).
 - [ ] **7c** The board lists each friend's status. A friend's answer reaches the viewer's open page without a reload. Before the viewer finishes, the payload never holds how a friend's run ended (a route test inspects it). A user can't join another user's board topic (a policy test). A reconnect refetches over HTTP and logs `reason=reconnect`. Evidence: the Playwright two-client test, and a log line from a forced disconnect.
 - [ ] **7d** After your run: rows per place, you shown, up to D2 named friends, "+ k more", a full list on tap, and a plain list underneath (unit tests on the grouping).
 - [ ] **Hypothesis checks recorded** (plan step 1): send-on-commit, and the topic policy.
@@ -79,8 +82,8 @@ Built as four sub-tickets, one PR each, in this order:
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
-| Display name length and characters | 7a | D1, *open* |
-| Named friends per place | 7d | D2, *open* |
+| Display name: 1 to 24 characters; letters, digits, spaces and ' - . _ | 7a | D1, human, 2026-10-21 |
+| Named friends per place: 3 | 7d | D2, human, 2026-10-21 |
 | Invite code length | 7b | D3, *open* |
 | Reconnect 1, 2, 5, then 10 s; heartbeat 25 s; join timeout 10 s | 7c | realtime-js 2.118.0 defaults, not changed (installed source, read 2026-10-21) |
 | Realtime plan limits | Fan-out sizing | Supabase Realtime `/limits` (read 2026-10-21) |
