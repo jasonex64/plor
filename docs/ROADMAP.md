@@ -54,6 +54,7 @@ Status: `planned` → `in progress` → `in review` → `done`. The table is in 
 | M13 | Answer lists and content | Free typing and stolen letters push players to quirky answers, and hand lists reject many fair ones ("not in our list"). A large answer source per category (WordNet held 223 of a day's 226 animals, M04; its license and a SOURCES.md entry come first, by the human), typed answers checked against it, an automatic daily letter picker, the 9 parked days (`content-parked/`), which days to play (M04 G6; the 28 drafted days were to be re-dated for the beta, human, 2026-10-20, which M06's form may replace), and difficulty tuned together with the human ("challenging", M04 G3) | planned | — |
 | M14 | Look and feel | A finished, phone-first look with code-drawn pixel art: the ridge, the player's character and the Wind as the host (the human's decisions, from the closed draft PR #12) | planned (draft ticket; its questions wait until the functional milestones are done) | `docs/milestones/M14-look-and-feel.md` |
 | M15 | Launch readiness and closed beta | Load test of the reset-time spike, including live connections; alerts, backups, a full privacy policy and terms; staging runs and applying pending migrations to the hosted database (human, 2026-10-21); the closed beta, which is also the live playtest (human, 2026-10-20): is it fun, do players finish, and what are the real catch rates; the share's day number ("Offbeat #n"), counted from the beta's first day (human, 2026-10-21, M05 S2), and a check of the share sheet on a real phone over HTTPS (M05) | planned | — |
+| M16 | Game 2: the substring game | Plor's second daily game, inspired by JKLM: type a word containing the day's few letters ("cks") before time runs out, never an impossible substring like "iur" (human, 2026-10-19 and 10-20); the shared licensed dictionary; the platform/game split ("at game 2"); its own leaderboard and the overall one | planned (draft ticket, 2026-10-22; S1–S14 answered by the human the same day, the name, the word list and S15–S19 still open; code waits until after launch) | `docs/milestones/M16-game-2-substrings.md` |
 
 Tickets get written when their milestone comes up, so they don't go stale.
 
@@ -69,7 +70,7 @@ Each item needs its own ticket. Earlier, longer text is in git at commit `4dc43a
   - spins with the odds shown and no exact duplicates;
   - profile and comment frames, and emotes.
 - **More games** (human, 2026-10-19 and 10-20):
-  - game 2, a substring game inspired by JKLM, which must never ask for something impossible or too hard like "iur";
+  - game 2, a substring game inspired by JKLM, which must never ask for something impossible or too hard like "iur" (now M16, draft ticket);
   - game 3, a word-guessing game under its own name and look (not Wordle's name or tiles);
   - game 4, a word chain;
   - game 5, anagrams, and game 6, a word hunt, both with a bonus letter.

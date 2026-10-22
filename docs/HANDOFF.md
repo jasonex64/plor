@@ -2,13 +2,13 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M09 and marked it done.
+**Updated:** 2026-10-22, by the session that built M09 and marked it done; then, on branch `m16-game-2`, by the session that drafted M16 and merged `main` into it.
 
 ## Where things stand
 - **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
 - **M09, Points and friends leaderboard, is done** (PRs #45 and #46; ticket `docs/milestones/M09-points-and-leaderboard.md`). Every finished run is scored into `private.points_ledger` (the ladder plus the rarity bonus) once its day closes, when a leaderboard first shows its player; the home page has the friends leaderboard. Its branch `m09-points-and-leaderboard` is deleted. The reviewers' deferred items are in ROADMAP "Next revision", From M09.
 - **No milestone branch is open for M10.**
-- PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
+- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in PR #42 from `m16-game-2`. It is docs only and comes after launch. The human answered S1–S14 on 2026-10-22; the name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
