@@ -10,6 +10,7 @@ import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
+import { answerBonus, expectedShare } from "./scoring";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
@@ -85,6 +86,7 @@ describe("a run, step by step", () => {
           msLeft: null,
           next: null,
           points: 0,
+          bonus: 0,
           msToReset: expect.any(Number),
         },
       },
@@ -132,10 +134,18 @@ describe("a run, step by step", () => {
         matched: false,
         hostAnswers: q.host_answers.map((id) => ({ id, name: q.entries.find((e) => e.id === id)!.name })),
         points: POINTS_PER_QUESTION[0],
+        // The provisional rarity bonus (M09): the expectation alone, as src/game/scoring.test.ts works out by hand.
+        bonus: answerBonus(0, expectedShare(q, entryId)),
       },
     ]);
     // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
-    expect(body.run).toMatchObject({ status: "in_progress", question: null, msLeft: null, points: POINTS_PER_QUESTION[0] });
+    expect(body.run).toMatchObject({
+      status: "in_progress",
+      question: null,
+      msLeft: null,
+      points: POINTS_PER_QUESTION[0],
+      bonus: answerBonus(0, expectedShare(q, entryId)),
+    });
     expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
   });
 

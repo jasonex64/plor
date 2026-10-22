@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** planned: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is next.
+**Status:** in progress: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is in review (its PR); 9b, the leaderboard, is next.
 
 ## Goal
 Each finished run's points, the question ladder plus a rarity bonus, go into an append-only ledger. Each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
@@ -87,14 +87,14 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 - If D10 is (b): a source for the scheduler, added to SOURCES.md by the human first.
 
 ## Acceptance criteria
-- [ ] `private.points_ledger` exists as D9 says. pgTAP checks plor_app's exact grants (select, insert), that plor_app can't update or delete it, that a second row for the same run is refused, `bonus` between 0 and `points`, and the account cascade.
-- [ ] The ladder part is right for each kind of run: caught on question 4 (150), survived (1000 before the bonus), ran out of time on question 3 (75, D2), and finished after midnight (D8).
-- [ ] The final bonus matches a hand-worked example, from stored answers: a rare and a common answer on a day above the minimum (N4), and the same on a day below it, where only the expectation counts.
-- [ ] The cap holds: a run caught on question k never gets a bonus of k's points or more, and a perfect run never exceeds N3. A test also checks the human's rule directly: across many simulated runs, every run that got further outranks every run that didn't.
-- [ ] Answers recorded after the day's midnight don't change that day's final counts, and earn no bonus themselves (D8).
-- [ ] The provisional bonus shows on the reveal and the result screen, from the expectation alone (D11).
-- [ ] No row is written before the run is finished and its day closed (D9, D10), and settling again never adds a second row or changes one.
-- [ ] Runs from before M09 get their rows with the bonus. Evidence: settling twice, where the second time writes 0 rows, and every row equals the recomputed score.
+- [x] **9a** `private.points_ledger` exists as D9 says. pgTAP checks plor_app's exact grants (select, insert), that plor_app can't update or delete it, that a second row for the same run is refused, `bonus` between 0 and `points`, and the account cascade.
+- [x] **9a** The ladder part is right for each kind of run: caught on question 4 (150), survived (1000 before the bonus), ran out of time on question 3 (75, D2), and finished after midnight (D8).
+- [x] **9a** The final bonus matches a hand-worked example, from stored answers: a rare and a common answer on a day above the minimum (N4), and the same on a day below it, where only the expectation counts.
+- [x] **9a** The cap holds: a run caught on question k never gets a bonus of k's points or more, and a perfect run never exceeds N3. A test also checks the human's rule directly: across many simulated runs, every run that got further outranks every run that didn't.
+- [x] **9a** Answers recorded after the day's midnight don't change that day's final counts, and earn no bonus themselves (D8).
+- [x] **9a** The provisional bonus shows on the reveal and the result screen, from the expectation alone (D11).
+- [x] **9a** No row is written before the run is finished and its day closed (D9, D10), and settling again never adds a second row or changes one.
+- [ ] Runs from before M09 get their rows with the bonus. Evidence: settling twice, where the second time writes 0 rows, and every row equals the recomputed score. (**9a**: settling does it, shown on a fixture day; the leaderboard that calls it for real players comes with 9b.)
 - [ ] The leaderboard shows the viewer and their friends only, ordered as D4 says, with each total equal to that player's ledger sum. Route tests use a friend, a non-friend and a friend of a friend.
 - [ ] Signed out gets 401.
 - [ ] The home page shows the leaderboard (D6), checked in the e2e test or a browser.
@@ -137,9 +137,41 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| §6: `user_id uuid → auth.users on delete cascade` | A foreign key to the player's run that day, `(user_id, game_id, puzzle_date) → private.run`, cascading | **9a.** Stricter: a ledger row can only exist for a real run. The account cascade still holds, through the run (pgTAP) |
+| D3, D9, D10: the leaderboard settles the players it shows | `settleRuns` exists and is tested in 9a; its caller, the leaderboard route, is 9b | **9a.** The ticket's plan splits the ledger (9a) from the leaderboard (9b); until 9b, no request writes ledger rows |
+| "A day closes at its midnight Pacific" (D10) | A day is closed when `puzzle_date < private.today()`; an answer counts toward its day when `private.day_of(created_at) = puzzle_date` | **9a.** Both use the one definition of the day (§8), so settling and counting agree with the reset |
+| The provisional bonus is shown "right away" | The reveal says "rarity bonus +N (estimate)", and the result screen "plus a rarity bonus of about N. The final bonus is worked out once the day is over." Each safe answer in the result list shows its bonus too. A bonus of 0 is shown as +0 | **9a.** The ticket doesn't say how; the look is M14. Showing +0 tells the player their answer was a common one |
+| Tests (DECISIONS.md, Test runner) | `src/game/ledger.db.test.ts` builds a closed past day in a rolled-back transaction, as the local superuser, with the answer triggers switched off (`session_replication_role`) only while inserting it, then settles as plor_app with them on | **9a.** A closed day's answers need times in the past, which the triggers refuse by design. The thing under test (settling) runs with every trigger and grant in force |
 
 ## Evidence
+**9a** (local stack, 2026-10-22):
+- `npm run test:sql`: `points_ledger.test.sql .... ok`, `plor_app_role.test.sql .... ok`, `Files=12, Tests=172`, `Result: PASS`.
+  - The first file checks a row with its total and bonus, one row per run (23505), a row needs its run (23503), points and bonus never negative and the bonus never more than the total (23514), plor_app can't update, delete or truncate, and the account cascade.
+  - The second lists `private.points_ledger insert, select` among plor_app's exact grants. Both failed before the migration (the table missing; the grants list).
+- `npx vitest run src/game/scoring.test.ts`: `Tests  12 passed (12)`. It checks, by hand-worked numbers:
+  - expected shares: dog 1/12, aardvark 0.5/220, a zodiac sign 1/12 (every sign in the host bank);
+  - the blend: the expectation alone below 5 answers; (10 × 1/12 + 8) / 30 = 29.4% for dog after 20;
+  - the ticket's example: dog +7 then +0, aardvark +12, a single answer's final +10; half the points at a share of 0, nothing at 20% or more;
+  - the cap: 99 after 3 survived, 24 after none, 500 for a perfect run, and a sum over the cap is cut;
+  - the human's rule for every k from 0 to 7: the most a run surviving k can earn stays under the cap, and under the least a run surviving k + 1 earns;
+  - a run's score with no counts, with an answer after midnight (ladder yes, bonus no), and with counts on one question and too few on another.
+- `npm run test:db`: `Tests  123 passed (123)`. `src/game/ledger.db.test.ts` builds a closed day (2001-02-03) with 20 players on question 1 (8 dog, one each of 4 other animals and 8 more) and settles six players as plor_app:
+  - A, caught on question 4: **185** (ladder 150, bonus 35: dog 0 at a 29.4% share, california 14 and watch-a-movie 21 from the expectation, since only 4 and 2 players answered those);
+  - C, out of time on question 3: **99** (75, bonus 24: aardvark 10 at a 3.41% share, ohio 14);
+  - E, started at 23:59:40 and finished after midnight: **85** (75, bonus 10: alpaca before midnight 10, florida after it 0). E's late florida also stays out of question 2's count: counting it would make 5 answers there, and A's california would earn 9, not 14;
+  - B, perfect: ladder 1000 plus a bonus;
+  - D, waiting at a reveal: no row; F, caught today: no row;
+  - A's second closed day (2001-02-05), where only A answered dog: **32** (25, bonus 7 from the expectation, as fewer than 5 answered). Scoring every run with one day's counts, on purpose, made this test fail; restored, it passed (9a review);
+  - 5 rows written, then 0 on a second settle, with the rows unchanged. A player with no runs, or none at all: 0.
+  - `src/game/runs.db.test.ts` now expects the run state's `bonus` (0 before starting; the expected-share bonus after a safe answer).
+- `npm test`: `Tests  204 passed (204)`.
+- `npm run test:e2e`: `3 passed (24.8s)`. The watcher, caught on question 1, sees "You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.". A new test gives a safe answer to today's question 1 and sees the reveal line "+25 points, rarity bonus +N (estimate) · 25 points so far" (9a review).
+- `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
 
 ## Review
+**9a** (the `reviewer` agent, fresh context, 2026-10-22; it recomputed every hand-worked number and re-ran the checks):
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **Settling across more than one closed day was untested,** though one settle must handle every past day a player has (the backfill). A's second day is in the test now, and scoring with the wrong day's counts was shown to fail it.
+  - **The reveal's bonus line was ticked without evidence.** A new e2e test shows it after a safe answer.
+- It found the formula, the numbers' origins, settling's rules, the migration and grants, the provisional wiring and the test approach correct.
+- Deferred to ROADMAP "Next revision" (From M09): a weak `select, insert` privilege check in pgTAP, the perfect run's bonus not pinned, the "many simulated runs" wording, §6's text drifting from the built table, an answer committed just after midnight missing an early settle, and the result line's wording for a bonus of 0 or a late run.
