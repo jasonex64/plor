@@ -1,6 +1,6 @@
 # M09 — Points and friends leaderboard
 
-**Status:** in progress: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is in review (PR #45); 9b, the leaderboard, is next.
+**Status:** in review: every decision answered (D1–D11) and every number given (N1–N5), human, 2026-10-22. 9a, the ledger and scoring, is merged (PR #45, 2026-10-22); 9b, the leaderboard, is in review (PR #46), the milestone's last.
 
 ## Goal
 Each finished run's points, the question ladder plus a rarity bonus, go into an append-only ledger. Each player sees an all-time leaderboard of themselves and their friends, equal to the ledger's sum.
@@ -69,7 +69,7 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 | D2 | **A run that ran out of time.** (a) It scores the questions it survived, like a caught run. (b) It scores 0 | (a). Running out of time ends the run like a catch, and DECISIONS.md, Game 1 already reads it that way, pending this ticket | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D3 | **What writes the row for a run with no ending answer** (ran out of time). (a) **Settle when read:** before the leaderboard is computed, rows are written for the shown players' runs that can no longer change; the ending answer calls the same function. (b) **A scheduled job** (Vercel Cron or Postgres `pg_cron`) writes them a while after each one ends | (a). It needs no new kind of infrastructure, no schedule (a number you'd have to pick) and no secret for a job's route. It also does the backfill: old runs get their rows the first time anyone's leaderboard shows them, so §6's separate `ledger:backfill` script isn't needed. The cost: a write happens inside a read, and a row's `created_at` is when it was settled, not when the run ended | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine"). With the rarity bonus, "can no longer change" also needs the day closed (D9, D10) |
 | D4 | **Who's on the leaderboard, and how it's ordered** | You and your friends, not friends of friends (like comments, M08). All-time total, highest first; ties alphabetically by name. A friend with no points shows 0 | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
-| D5 | **Today's points before you've finished today** | Left out of everyone's totals until your own run today is over, then included. Otherwise a friend's total going up by 150 says they were caught on question 4 (DECISIONS.md, Game 1: no spoilers). The live board already shows "on question 3" then "finished" (ROADMAP "Next revision" has that for you), so you may prefer to include them | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine"). Under D9 (a) it holds automatically: nothing of today reaches the leaderboard before the day closes |
+| D5 | **Today's points before you've finished today** | Left out of everyone's totals until your own run today is over, then included. Otherwise a friend's total going up by 150 says they were caught on question 4 (DECISIONS.md, Game 1: no spoilers). The live board already shows "on question 3" then "finished" (ROADMAP "Next revision" has that for you), so you may prefer to include them | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine"). Under D9 (a) today's points can't reach the leaderboard before the day closes; a closed day the viewer is still playing needed one more rule (Source diff, 9b review) |
 | D6 | **Where it's shown** | A "Friends leaderboard" section on the home page, under "Friends today". The home screen is reworked in M11 | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D7 | **Security change:** a new table, `private.points_ledger`. plor_app may read and insert only (no update or delete), with one policy per command. The routes read only the viewer's and their friends' rows | Approve. It's the grant set §7 approved in the data design (2026-10-17); this records it as M09's change in DECISIONS.md, like M07's and M08's | **As suggested** (human, 2026-10-22: "otherwise the rest of the suggestions seem fine") |
 | D8 | **Runs finished after midnight: count or not?** In chat (D1) the human chose "count whenever finished"; their notes, written the same day, say "runs finished after their day ended still don't count for the leaderboard", and list D1 and D2 as still open. (a) Keep D1 (c): they count, with the final bonus from the closed day's counts. (b) Go back to 2026-10-21: they don't count. (c) **The human's middle ground** (2026-10-22: "late runs can count but they wont earn the rarity bonus"): they count for the ladder, without the bonus. Applied either (c1) **per answer**: answers given before midnight keep their bonus, answers after it earn none; or (c2) **per run**: a run finished after midnight gets no bonus at all | (c1). It keeps the human's middle ground, and it's fairer at the edge: someone who starts at 11:58 and answers six questions before midnight keeps those six bonuses. It's also the same line the final counts already use (answers before midnight). (c2) is easier to say in one sentence ("finish before midnight to get the bonus") | **(c1), per answer** (human, 2026-10-22: "Per answer: answers before midnight keep their rarity bonus, answers after midnight earn none"). Late runs still count for the ladder (D1) |
@@ -94,10 +94,10 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 - [x] **9a** Answers recorded after the day's midnight don't change that day's final counts, and earn no bonus themselves (D8).
 - [x] **9a** The provisional bonus shows on the reveal and the result screen, from the expectation alone (D11).
 - [x] **9a** No row is written before the run is finished and its day closed (D9, D10), and settling again never adds a second row or changes one.
-- [ ] Runs from before M09 get their rows with the bonus. Evidence: settling twice, where the second time writes 0 rows, and every row equals the recomputed score. (**9a**: settling does it, shown on a fixture day; the leaderboard that calls it for real players comes with 9b.)
-- [ ] The leaderboard shows the viewer and their friends only, ordered as D4 says, with each total equal to that player's ledger sum. Route tests use a friend, a non-friend and a friend of a friend.
-- [ ] Signed out gets 401.
-- [ ] The home page shows the leaderboard (D6), checked in the e2e test or a browser.
+- [x] Runs from before M09 get their rows with the bonus. Evidence: settling twice, where the second time writes 0 rows, and every row equals the recomputed score. (**9a**: settling, shown on two fixture days; **9b**: the leaderboard settles the players it shows, shown with real players' runs from yesterday.)
+- [x] **9b** The leaderboard shows the viewer and their friends only, ordered as D4 says, with each total equal to that player's ledger sum. Route tests use a friend, a non-friend and a friend of a friend.
+- [x] **9b** Signed out gets 401.
+- [x] **9b** The home page shows the leaderboard (D6), checked in the e2e test or a browser.
 
 ## Out of scope
 - Group leaderboards (M10) and the home screen (M11).
@@ -141,6 +141,10 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 | D3, D9, D10: the leaderboard settles the players it shows | `settleRuns` exists and is tested in 9a; its caller, the leaderboard route, is 9b | **9a.** The ticket's plan splits the ledger (9a) from the leaderboard (9b); until 9b, no request writes ledger rows |
 | "A day closes at its midnight Pacific" (D10) | A day is closed when `puzzle_date < private.today()`; an answer counts toward its day when `private.day_of(created_at) = puzzle_date` | **9a.** Both use the one definition of the day (§8), so settling and counting agree with the reset |
 | The provisional bonus is shown "right away" | The reveal says "rarity bonus +N (estimate)", and the result screen "plus a rarity bonus of about N. The final bonus is worked out once the day is over." Each safe answer in the result list shows its bonus too. A bonus of 0 is shown as +0 | **9a.** The ticket doesn't say how; the look is M14. Showing +0 tells the player their answer was a common one |
+| D4: "ties alphabetically by name" | By name with `localeCompare`, then by username, so two friends with the same display name keep a stable order | **9b.** Display names needn't be unique (M07 7a) |
+| D6: a plain section on the home page | "Friends leaderboard", under "Friends today": each player's name, "(you)" for the viewer, and their all-time points, with the note "A day's points count once that day is over." It loads once when the page opens | **9b.** Points change only when a day closes (D9), so nothing on the page can change them while it's open |
+| D5: today's points stay out until your run today is over | A closed day's points stay out of every total, the viewer's included, while the viewer's own run that day is still in progress | **9b review.** A run can be finished after midnight (DECISIONS.md, Game 1: Timer), so a closed day can still be in play for the viewer, and a friend's total going up would show how far the friend got. The same rule as M08 8a's past-day thread; D5's purpose, applied to the case its wording ("today") didn't name |
+| D3: "before the leaderboard is computed, rows are written for the shown players' runs that can no longer change" | Each leaderboard read calls `settleRuns` for the viewer and their friends, inside the request | **9b.** As decided. A friend's finished runs on closed days are settled by whoever's leaderboard shows them first |
 | Tests (DECISIONS.md, Test runner) | `src/game/ledger.db.test.ts` builds a closed past day in a rolled-back transaction, as the local superuser, with the answer triggers switched off (`session_replication_role`) only while inserting it, then settles as plor_app with them on | **9a.** A closed day's answers need times in the past, which the triggers refuse by design. The thing under test (settling) runs with every trigger and grant in force |
 
 ## Evidence
@@ -168,6 +172,18 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
 - `npm run test:e2e`: `3 passed (24.8s)`. The watcher, caught on question 1, sees "You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.". A new test gives a safe answer to today's question 1 and sees the reveal line "+25 points, rarity bonus +N (estimate) · 25 points so far" (9a review).
 - `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
 
+**9b** (local stack, 2026-10-22):
+- `npm run test:db`: `Tests  129 passed (129)`. `src/app/api/leaderboard/route.db.test.ts` signs in five real players (A; B and E, A's friends; C, no one's friend; D, B's friend only). Their runs from yesterday are written directly and answered today, so they earn no bonus (D8) and each total is its ladder: A 25, B 75, C 25, E 25; D didn't play. It checks:
+  - before A's leaderboard is read, A, B and E have no ledger rows; reading it returns B 75, A 25 (you), E 25: highest first, and A before E in their tie by name;
+  - reading it settled exactly A's, B's and E's runs (3 rows); C, not shown, has none; A's run today (one safe answer, 25 so far, still going) adds nothing (D9);
+  - reading it again returns the same and writes nothing;
+  - B sees B 75 (you), A 25, D 0: their own friends, and a friend with no points shows 0;
+  - D, waiting at a reveal in yesterday's run, sees B 0 and D 0: yesterday stays out while D's run that day is going; once D is caught on question 2, B 75 and D 25 (9b review; it failed first, showing B 75);
+  - with A's display name set to "Zed", A shows as Zed and moves after E in the tie.
+- `npm test`: `Tests  205 passed (205)`, with `src/app/api/leaderboard/route.test.ts` (401 signed out).
+- `npm run test:e2e`: `3 passed (26.2s)`. After both players are caught today, the watcher's "Friends leaderboard" lists the player then the watcher, both "0 points" (tied, by name).
+- `npm run test:sql`: `Files=12, Tests=172`, `Result: PASS`. `npm run lint`: no problems. `npx tsc --noEmit`: no errors. `npm run build`: `✓ Compiled successfully`, with `ƒ /api/leaderboard`. `npm run check:client-bundle`: `CLIENT BUNDLE OK: 67 files, 5 patterns, 3 env values`.
+
 ## Review
 **9a** (the `reviewer` agent, fresh context, 2026-10-22; it recomputed every hand-worked number and re-ran the checks):
 - Blocking findings and how each was fixed:
@@ -175,3 +191,10 @@ DECISIONS.md, Points ledger, said the row is "Written when a run ends (from M09)
   - **The reveal's bonus line was ticked without evidence.** A new e2e test shows it after a safe answer.
 - It found the formula, the numbers' origins, settling's rules, the migration and grants, the provisional wiring and the test approach correct.
 - Deferred to ROADMAP "Next revision" (From M09): a weak `select, insert` privilege check in pgTAP, the perfect run's bonus not pinned, the "many simulated runs" wording, §6's text drifting from the built table, an answer committed just after midnight missing an early settle, and the result line's wording for a bonus of 0 or a late run.
+
+**9b** (the `reviewer` agent, fresh context, 2026-10-22; it re-ran every check):
+- Blocking finding and its fix:
+  - **A closed day's points reached a viewer still playing that day's run** (started before midnight, or left at a reveal), so a friend's total showed how far the friend got. Fixed in `getLeaderboard`: those days stay out of every total until the viewer's run that day is over. A new route test failed first, then passed. It's recorded in the Source diff as D5's purpose applied to a case its wording didn't name.
+- It found who's shown, the totals, the order, settling exactly the shown players, the route's 401 and the yesterday fixtures correct.
+- Deferred to ROADMAP "Next revision" (From M09): a third copy of the viewer-and-friends query, two test gaps (a friend of a friend's runs never settled; totals checked against the ladder, not read from the ledger), the e2e only showing 0 points, settling IDs without a profile, and no test running the whole leaderboard read as plor_app.
+
