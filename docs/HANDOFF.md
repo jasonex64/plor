@@ -2,16 +2,14 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that closed M06 and built M07.
+**Updated:** 2026-10-22, by the session that closed M06, built M07 and drafted M08.
 
 ## Where things stand
-- **M07, Friends and live board, is done:**
-  - 7a display name (PR #35), 7b invite links and friends (#36) and 7c live board (#37) are merged;
-  - 7d, where everyone ended, is the last PR, and it merges on green CI.
-  - Once it's merged, delete the branch `m07-friends-and-live-board` (CLAUDE.md, Branches and PRs).
-- **Next milestone: M08, Comments and reactions** (ROADMAP). It has no ticket yet.
+- **M07, Friends and live board, is done and merged** (PRs #35–#38); its branch is deleted.
+- **M08, Comments and reactions:** the ticket is drafted on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`). No code and no PR yet.
 
 ## Waiting on the human
+- **M08 D1–D8** in the ticket: comment length, what reactions attach to, the reaction set, delete, reports, which days, rate limit, and the security change for the new tables.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -23,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Draft the M08 ticket (comments and reactions: friends only, visible after you've played, delete your own, report others) for the human's approval, on a new `m08-…` branch.
+Once D1–D8 are answered, record them in the M08 ticket, finish its acceptance criteria, then build 8a (comments) on `m08-comments-and-reactions`.
 
 ## Local state
 - The local Supabase stack (stopped, data kept), Realtime included, holds:
