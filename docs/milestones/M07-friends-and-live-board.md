@@ -3,7 +3,7 @@
 | **1 to 24 characters: letters (accents OK), digits, spaces and ' - . _; no emoji** (human, 2026-10-21, chose Claude's suggestion) |
 # M07 — Friends and live board
 
-**Status:** planned: ticket drafted 2026-10-21, D1, D2 and D4 answered; waiting for the human on D3, D5, D6 and D7. No code until they're answered.
+**Status:** planned: ticket drafted 2026-10-21, every decision answered (D1–D7, human, 2026-10-21). Next is plan step 1, the two experiments.
 
 ## Goal
 Players add friends by an invite link, set an optional display name, and see their friends' runs for today update live, with "where everyone ended" once they've finished.
@@ -53,11 +53,11 @@ Built as four sub-tickets, one PR each, in this order:
 |---|---|---|---|
 | D1 | **Display name:** maximum length, and which characters are allowed (a human number) | 1 to 24 characters, any letters (including accents), digits, spaces and `' - . _`; trimmed, and no leading, trailing or double spaces; no emoji for now | **As suggested** (human, 2026-10-21) |
 | D2 | **How many named friends per place** in "where everyone ended", before "+ k more" (a human number) | 3 | **3** (human, 2026-10-21) |
-| D3 | **Invite code length** (a security number) | 16 random bytes (128 bits), written as 22 URL-safe characters | |
+| D3 | **Invite code length** (a security number) | 16 random bytes (128 bits), written as 22 URL-safe characters | **22 characters for M07** (human, 2026-10-21: "otherwise looks ok"). The human wants shorter links eventually ("22 is hella long"), and players choosing their own in settings, after the MVP: ROADMAP Later |
 | D4 | **Removing a friend:** in M07, or later? | In M07: a Remove button on the friends list. Without it, an add by mistake or an unwanted friend can't be undone, and the board shows them forever | **Yes, in M07** (human, 2026-10-21) |
-| D5 | **Browser connection to Supabase (security change).** The board needs the browser to join Realtime with the player's own session. Today there is no browser Supabase client, and the project URL and publishable key are server-only (DECISIONS.md: Sign-in). | Create a browser client used **only for Realtime**. The URL and publishable key become public (they're designed to be). The browser gets the player's access token from a new route and passes it with `setAuth`. A `realtime.messages` SELECT policy lets a user join only `board:<their own id>`, and there is no INSERT policy, so browsers can't send. "Allow public access" is turned off in the Supabase Realtime settings, locally and on the hosted project (the human does the hosted one). | |
-| D6 | **How the server sends board updates (security change).** (a) A guarded database function calls `realtime.send()` once per friend inside the answer's transaction; no new secret is needed. (b) The REST batch endpoint, with one call for all friends; it needs a Supabase secret key in Vercel. | (a). It adds no secret and keeps everything in the one database connection. Whether it sends only on commit is *unverified*; step 1 of the plan tests it, and if it sends before commit, stop and re-plan | |
-| D7 | **The two-client test tool** (DECISIONS.md, Test runner: "M07 needs two real clients") | Playwright, run against the local stack: two players sign in, become friends, and one sees the other's answer arrive live. Needs a DECISIONS row and a SOURCES entry (the human's OK) | |
+| D5 | **Browser connection to Supabase (security change).** The board needs the browser to join Realtime with the player's own session. Today there is no browser Supabase client, and the project URL and publishable key are server-only (DECISIONS.md: Sign-in). | Create a browser client used **only for Realtime**. The URL and publishable key become public (they're designed to be). The browser gets the player's access token from a new route and passes it with `setAuth`. A `realtime.messages` SELECT policy lets a user join only `board:<their own id>`, and there is no INSERT policy, so browsers can't send. "Allow public access" is turned off in the Supabase Realtime settings, locally and on the hosted project (the human does the hosted one). | **As suggested** (human, 2026-10-21: "otherwise looks ok"). Security change, recorded in DECISIONS.md |
+| D6 | **How the server sends board updates (security change).** (a) A guarded database function calls `realtime.send()` once per friend inside the answer's transaction; no new secret is needed. (b) The REST batch endpoint, with one call for all friends; it needs a Supabase secret key in Vercel. | (a). It adds no secret and keeps everything in the one database connection. Whether it sends only on commit is *unverified*; step 1 of the plan tests it, and if it sends before commit, stop and re-plan | **(a), as suggested** (human, 2026-10-21: "otherwise looks ok"), if plan step 1 confirms send-on-commit. Security change, recorded in DECISIONS.md |
+| D7 | **The two-client test tool** (DECISIONS.md, Test runner: "M07 needs two real clients") | Playwright, run against the local stack: two players sign in, become friends, and one sees the other's answer arrive live. Needs a DECISIONS row and a SOURCES entry (the human's OK) | **Playwright** (human, 2026-10-21: "install plawright"). It's installed with 7c, its first test (CLAUDE.md: build for today), and the SOURCES entry gets the installed version then |
 
 ## Source
 - `docs/DECISIONS.md`: Real-time transport, Row-level security in `private`, App database role, Sign-in, Game 1 (server is authoritative), Test runner, Logging.
@@ -84,7 +84,7 @@ Built as four sub-tickets, one PR each, in this order:
 |---|---|---|
 | Display name: 1 to 24 characters; letters, digits, spaces and ' - . _ | 7a | D1, human, 2026-10-21 |
 | Named friends per place: 3 | 7d | D2, human, 2026-10-21 |
-| Invite code length | 7b | D3, *open* |
+| Invite code: 16 random bytes, 22 URL-safe characters | 7b | D3, human, 2026-10-21 |
 | Reconnect 1, 2, 5, then 10 s; heartbeat 25 s; join timeout 10 s | 7c | realtime-js 2.118.0 defaults, not changed (installed source, read 2026-10-21) |
 | Realtime plan limits | Fan-out sizing | Supabase Realtime `/limits` (read 2026-10-21) |
 
