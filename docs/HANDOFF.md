@@ -2,16 +2,15 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8b.
+**Updated:** 2026-10-22, by the session that built and merged M08 8b.
 
 ## Where things stand
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
-  - **8a, comments,** is merged (PR #39).
-  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is built, reviewed and in PR #40, waiting on the human. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
+  - **8a, comments,** is merged (PR #39). The branch stays for 8c and 8d.
+  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is merged (PR #40, on all-green CI, with the human's OK). The human kept both of its readings: reactions on a friend's run still in play, and on your own comment. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
   - 8c (reports and the admin list) and 8d (live updates and the e2e test) are not started.
 
 ## Waiting on the human
-- **PR #40:** merge once CI is all green and the human says so. The human kept both of 8b's readings (2026-10-22): reactions on a friend's run still in play, and on your own comment.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -23,7 +22,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once 8b is merged, build 8c on the same branch, tests first: `private.comment_report`, plor_app insert, and admin-only reads through the routes (D5, D8), with a DECISIONS.md Log row like 8a's and 8b's. A report hides the comment for the reporter at once; admins see open reports on the admin pages (401 signed out, 403 not admin, as in M03 D1) and can delete the comment.
+Build 8c on the same branch, tests first: `private.comment_report`, plor_app insert, and admin-only reads through the routes (D5, D8), with a DECISIONS.md Log row like 8a's and 8b's. A report hides the comment for the reporter at once; admins see open reports on the admin pages (401 signed out, 403 not admin, as in M03 D1) and can delete the comment.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
