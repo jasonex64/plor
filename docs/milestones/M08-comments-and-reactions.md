@@ -1,6 +1,6 @@
 # M08 — Comments and reactions
 
-**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is in review (its PR); 8c, reports, is next.
+**Status:** in progress: every decision answered (D1–D8, human, 2026-10-22). 8a, comments, is merged (PR #39, 2026-10-22); 8b, reactions, is in review (PR #40); 8c, reports, is next.
 
 ## Goal
 After playing the day's game, players can comment on it and react, seen only by their friends. They can delete their own comments and report anyone else's.

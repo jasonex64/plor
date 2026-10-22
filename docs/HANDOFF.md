@@ -7,14 +7,14 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M08, Comments and reactions,** is in progress on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
   - **8a, comments,** is merged (PR #39).
-  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is built, reviewed and in a PR waiting on the human. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
+  - **8b, reactions** (on comments and on friends' runs; one per player per target; shown and allowed only once your run that day is over; past days read-only), is built, reviewed and in PR #40, waiting on the human. The reviewer's one blocking finding was this handoff; the rest is in ROADMAP "Next revision", From M08.
   - 8c (reports and the admin list) and 8d (live updates and the e2e test) are not started.
 
 ## Waiting on the human
 - **8b, two readings to confirm before its PR merges** (ticket, Source diff, rows marked *for the human to confirm*):
   - a friend's run can get reactions while it's still being played (Claude added no "must have finished" rule);
   - you can react to your own comment.
-- **8b's PR:** merge once CI is all green and the human says so.
+- **PR #40:** merge once CI is all green and the human says so.
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
