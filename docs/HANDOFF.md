@@ -2,13 +2,11 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M08 8b, 8c and 8d.
+**Updated:** 2026-10-22, by the session that built M08 8b, 8c and 8d and marked M08 done.
 
 ## Where things stand
-- **M08, Comments and reactions,** is in review on branch `m08-comments-and-reactions` (`docs/milestones/M08-comments-and-reactions.md`).
-  - **8a, comments,** is merged (PR #39), and **8b, reactions,** too (PR #40).
-  - **8c, reports** (report a friend's comment, hidden for you at once; admins list reported comments on `/admin/reports` and delete them), is merged (PR #41, on all-green CI). The human allowed that merge without them, that one time (2026-10-22); from 8d on, merging waits for the human's OK again. The reviewer's two blocking findings are fixed; the rest is in ROADMAP "Next revision", From M08.
-  - **8d, live updates** (comment and reaction changes nudge the actor's and friends' `board:<id>` topics with no text; the page refetches), is reviewed (no blocking findings) and in PR #43, the milestone's last. Merging waits for the human's OK. After it merges, mark M08 done (ticket Status, ROADMAP row) and delete the branch (CLAUDE.md, Branches and PRs).
+- **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
+- **No milestone branch is open for M09.** PR #42 (`m16-game-2`, "M16: draft game 2 ticket") is open from another session; this one didn't touch it.
 
 ## Waiting on the human
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
@@ -22,11 +20,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
 
 ## Next step
-Once 8d is merged and M08 marked done, start M09 (Points and friends leaderboard; ROADMAP) on a new branch: read its row and DECISIONS.md, Points ledger and `M00-data-design.md` §6, and draft its ticket from `docs/milestones/_TEMPLATE.md` for the human, since it has none yet. ROADMAP "Next revision", From M08, has the deferred items, including one about reaction buttons after a live "started" update.
+Start M09 (Points and friends leaderboard; ROADMAP) on a new branch: read its row and DECISIONS.md, Points ledger and `M00-data-design.md` §6, and draft its ticket from `docs/milestones/_TEMPLATE.md` for the human, since it has none yet. ROADMAP "Next revision", From M08, has the deferred items, including one about reaction buttons after a live "started" update.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
-  - every migration up to `20261022095828_live_comments.sql`;
+  - every migration up to `20261022095828_live_comments.sql` (M08's last);
   - `jasonex64` as an admin, who hasn't played 2026-10-22 locally (8b's checks didn't use that account);
   - the approved 2026-10-22 day.
 - No dev server is left running.
