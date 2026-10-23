@@ -9,11 +9,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   - M10 moved the board's Realtime channel into `useBoardChannel` (`src/app/board-channel.ts`), and `seesCommentSql` in `src/friends/circle.ts` decides who sees a comment, friends thread or group. M11's feed builds on both.
 - **M11, Home screen, is in progress** (`docs/milestones/M11-home-screen.md`, branch `m11-home-screen`). The ticket is merged (PR #53); every decision is answered (H1–H8 and the minimum of 5, 2026-10-22).
   - **11a is merged** (PR #54): the streak (`src/game/streak.ts`) and each answer's share in the run state, and yesterday's board (`GET /api/leaderboard/yesterday`), in plain UI that 11c moves into the game card.
-  - **11b is in review** (PR #55): the home page's feed (`GET /api/feed`, `src/comments/feed.ts`), replacing the home Comments section for today; names and counts only before the run is over. The reviewer found nothing blocking in the code. It merges on all-green CI with the human's OK.
+  - **11b is merged** (PR #55): the home page's feed (`GET /api/feed`, `src/comments/feed.ts`), replacing the home Comments section for today; names and counts only before the run is over.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge PR #55 (11b)** once CI is green.
 - **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
@@ -26,7 +25,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once 11b is merged: build 11c, the layout (H1: the game card at the top with the streak, result and yesterday's board; the feed; then the rest) and the H6 fixes, on `m11-home-screen`. ROADMAP "Next revision", For M11, lists what 11c takes in, including the preview wording's test.
+Build 11c, the layout (H1: the game card at the top with the streak, result and yesterday's board; the feed; then the rest) and the H6 fixes, on `m11-home-screen`. ROADMAP "Next revision", For M11, lists what 11c takes in, including the preview wording's test.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
