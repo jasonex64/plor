@@ -52,3 +52,25 @@ test("the account page holds the account, and the home page links to it", async 
   await expect(reloaded.getByText(`Username: ad${RUN}`)).toBeVisible();
   await expect(reloaded.getByText(/^You can change it again on /)).toBeVisible();
 });
+
+// Deleting the account (12c, A4): the button waits for the player's own username, and deleting signs them out.
+test("a player deletes their account from the account page", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "dx");
+  await page.goto("/account");
+  const account = page.getByRole("region", { name: "Your account" });
+  const button = account.getByRole("button", { name: "Delete my account" });
+  await expect(button).toBeDisabled();
+  await account.getByLabel(/Type your username/).fill(`other${RUN}`);
+  await expect(button).toBeDisabled();
+  await account.getByLabel(/Type your username/).fill(`dx${RUN}`);
+  await expect(button).toBeEnabled();
+  await button.click();
+
+  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  const { rows } = await DB.query("select from auth.users where email = $1", [`${RUN}-dx@example.test`]);
+  expect(rows).toHaveLength(0);
+});

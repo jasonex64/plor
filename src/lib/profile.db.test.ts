@@ -77,6 +77,15 @@ describe("private.profile as plor_app", () => {
       });
     }
   });
+
+  // M12 12c, A10: the insert grant names the user ID and username only, so a new profile can't set its change time.
+  it("creates a profile naming only its user ID and username", async () => {
+    await asPlorApp(async (client, userId) => {
+      await expect(
+        client.query("insert into private.profile (user_id, username, username_changed_at) values ($1, 'plor_app_probe', now())", [userId]),
+      ).rejects.toThrow(/permission denied for table profile/);
+    });
+  });
 });
 
 // The length in the player's message comes from tunables.ts; the database's check constraint must agree with it at

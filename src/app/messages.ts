@@ -29,6 +29,7 @@ const MESSAGES: Record<string, string> = {
   username_taken: "That username is taken. Try another.",
   username_change_too_soon: `You changed your username less than ${USERNAME_CHANGE_DAYS} days ago.`,
   profile_exists: "You already have a username.",
+  username_mismatch: "That isn't your username. Type it exactly to delete your account.",
   no_profile: "Pick a username before you play.",
   // The rules are the database's check (docs/milestones/M07-friends-and-live-board.md, D1).
   display_name_invalid: `Display names are 1 to ${DISPLAY_NAME_MAX_LENGTH} characters: letters, digits, single spaces and ' . _ -`,
