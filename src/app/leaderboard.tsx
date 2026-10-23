@@ -1,8 +1,8 @@
 "use client";
 
-// The weekly friends leaderboard (docs/milestones/M10-groups.md, 10a; M09 9b): the player and their friends, highest
-// total first, this week and last week below it (W1). A day's points arrive once that day is over (M09 D9), so
-// loading it once is enough. Plain UI; the look is M14.
+// A weekly leaderboard (docs/milestones/M10-groups.md, 10a and 10c; M09 9b): the player and their friends, or a
+// group's members, highest total first, this week and last week below it (W1). A day's points arrive once that day is
+// over (M09 D9), so loading it once is enough. Plain UI; the look is M14.
 import { useEffect, useState } from "react";
 import type { Leaderboard as Board, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
@@ -13,17 +13,18 @@ function monday(from: string): string {
   return new Date(`${from}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
-export function Leaderboard() {
+// title names the board (its heading and region); path is the API route that returns it.
+export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [board, setBoard] = useState<Board | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api<Board>("/api/leaderboard", { method: "GET" }).then(setBoard, (err) => setError(errorText(err)));
-  }, []);
+    api<Board>(path, { method: "GET" }).then(setBoard, (err) => setError(errorText(err)));
+  }, [path]);
 
   return (
-    <section aria-label="Friends leaderboard">
-      <h2>Friends leaderboard</h2>
+    <section aria-label={title}>
+      <h2>{title}</h2>
       <p>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
       {board && (
         <>

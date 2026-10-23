@@ -235,7 +235,7 @@ function SignedIn({
     <>
       <Game onOver={setRunOver} />
       <Board username={username} onCommentsChanged={nudgeComments} />
-      <Leaderboard />
+      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
       <Comments username={username} runOver={runOver} nudge={commentsNudge} />
       <Groups />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
