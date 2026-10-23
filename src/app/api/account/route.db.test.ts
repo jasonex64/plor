@@ -78,7 +78,10 @@ describe("the account page's data", () => {
     useSession(session);
     expect((await createProfile(apiRequest("/api/profile", { method: "POST", body: { username } }))).status).toBe(201);
     userId = (await getPool().query<{ id: string }>("select id from auth.users where email = $1", [email])).rows[0].id;
-    expect(await call()).toEqual({ status: 200, body: { ok: true, account: { username, displayName: null, allTimePoints: 0 } } });
+    expect(await call()).toEqual({
+      status: 200,
+      body: { ok: true, account: { username, displayName: null, usernameChangeableAt: null, allTimePoints: 0 } },
+    });
   });
 
   it("sums every week's ledger rows, settling a finished run on a closed day first, and not today's (M09 D3, D9)", async () => {

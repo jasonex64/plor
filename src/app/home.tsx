@@ -146,6 +146,18 @@ function SignIn({ returnTo, onSignedIn }: { returnTo?: string; onSignedIn: () =>
         </label>
         <button type="submit" disabled={busy}>
           Sign in
+        </button>{" "}
+        {/* Back to the email step, to fix a mistyped address (docs/milestones/M12-account.md, A6). */}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            setSentTo(null);
+            setCode("");
+            setError(null);
+          }}
+        >
+          Use a different email
         </button>
         {error && <p role="alert">{error}</p>}
       </form>

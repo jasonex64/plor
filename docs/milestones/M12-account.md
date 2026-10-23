@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** in progress. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). 12c waits on the Supabase Auth "managing users" source, which the human adds. The ticket is merged (PR #57). 12a is in review (PR #58).
+**Status:** in progress. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). 12c waits on the Supabase Auth "managing users" source, which the human adds. The ticket is merged (PR #57). 12a is merged (PR #58, on all-green CI with the human's OK). 12b is in review (a PR from `m12-account`).
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.
@@ -45,7 +45,11 @@ A player can see and manage their own account in one place: their username (and 
 ## Acceptance criteria
 - [x] **12a** `GET /api/account` returns the signed-in player's username, display name and all-time points: the sum of their ledger rows after settling their finished runs on closed days (M09 D3, D10; Design review, 2). A route db test (`src/app/api/account/route.db.test.ts`) shows a total across weeks equal to the ledger sum, a finished run on a closed day settled first, and today's run not counted before the day closes (M09 D9); a signed-out player gets 401.
 - [x] **12a** `/account` (A1) shows the username, the all-time total, the display name form, the friends list with the invite link, and Sign out; the home page's Account section is a link to it and Sign out, with the display name, friends and invite link gone from the home page (moved, not copied). Opened signed out, `/account` shows sign-in first. e2e: a player opens the account page from the home page, sees their username and 0 points, sets a display name there, and the home page shows only the link and Sign out.
-- [ ] **12b–12c** Criteria written when each starts.
+- [x] **12b** Sign out ends only this device's session (A3): `signOut({ scope: "local" })`; a route db test signs one player in twice (two sessions), signs one out, and Auth still holds the other session.
+- [x] **12b** The code form (A6): a "Use a different email" button goes back to the email step, and a code typed or pasted with spaces ("123 456") signs in, the route removing the spaces before Auth checks it (a route db test with a real emailed code).
+- [x] **12b** The database keeps the username rule (A2; pgTAP, `supabase/tests/profile.test.sql`): `plor_app` may update `username` and nothing new besides; a change sets `username_changed_at`; a second change within 30 days of the last is refused (`OB011`); the first change after picking one is allowed at once (A2's reason: a wrong pick at sign-up can be fixed); the format and uniqueness rules still hold, and the old name is free at once.
+- [x] **12b** `POST /api/profile/username` changes the signed-in player's username (route db test): the new name is shown, the old one can be taken by another player, a taken or invalid name gets 409 `username_taken` or 400 `username_invalid`, and a second change within 30 days gets 409 `username_change_too_soon`; `GET /api/account` gives the date the next change is allowed, and the account page shows it (e2e: change the name on the account page, see it, and see when it can change again).
+- [ ] **12c** Criteria written when it starts, once the Supabase Auth source is in SOURCES.md.
 
 ## Out of scope
 - Friend requests by username, blocking (ROADMAP Later).
@@ -66,7 +70,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 
 ## Removes
 - **12a:** the display name, friends and invite link sections from the home page (moved, not copied, into `src/app/account.tsx`); the home page's own sign-out code, now `SignOut`, shared with the account page; the second `Friend` type in `src/app/home.tsx` (it uses `src/friends/friends.ts`'s); `SignedIn`'s unused `displayName` prop, and `displayName` in `GET /api/profile`'s answer and the home page's `Me`, which nothing read once the account page reads it from `GET /api/account` (no protocol bump: a field nobody reads, M00-data-design §2).
-- **12b:** the global sign-out; the code form's dead end.
+- **12b:** the global sign-out; the code form's dead end and its refusal of a spaced code; the profile test's "cannot change a profile", whose premise A2 changed (now a test of what `plor_app` may and may not change); ROADMAP "Next revision", For M12's sign-out and code-form items.
 - **12c:** the privacy page's "email us to delete" as the only way; the handoff's hand-run deletion.
 
 ---
@@ -76,6 +80,8 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Source says | We built | Why different |
 |---|---|---|
 | **12a** | None: built as A1 and the criteria say | — |
+| 12b criterion 1: "the other still reads `GET /api/profile` as signed in" | The test counts the player's sessions in `auth.sessions`: 2, then 1 | **12b.** An access token stays valid until it expires whatever the scope (the server checks its signature), so reading as signed in couldn't tell local from global; the session rows can (the global sign-out leaves 0) |
+| A2: "once every 30 days" | `USERNAME_CHANGE_DAYS` in `src/config/tunables.ts` for the message and the next-change date, mirroring the trigger's 30 days | **12b.** The database enforces it; the client needs it for its text, as for the username's length (M02 2f, B6) |
 
 ## Evidence
 **12a** (2026-10-23, on the local stack; no migration):
@@ -84,8 +90,24 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - **After the review:** `npx vitest run src/app/api/profile src/app/api/account` → `Tests 20 passed (20)`: the profile test reads the display name back through `GET /api/account` now that `GET /api/profile` no longer returns it.
 - **Everything else:** `npm test` → `Test Files 37 passed (37)`, `Tests 235 passed (235)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 23 passed (23)`, `Tests 172 passed (172)`; `npm run test:sql` → `Result: PASS`; `npm run test:e2e` → `8 passed (57.9s)`.
 
+**12b** (2026-10-23, on the local stack, migration `20261023083041_username_change.sql` applied):
+- **Sign-out** (criterion 1): `npx vitest run src/app/api/auth/sign-out/route.db.test.ts` → `Tests 1 passed (1)`; with `signOut()`'s default scope it fails (`expected +0 to be 1`).
+- **The code form** (criterion 2): `npx vitest run src/app/api/auth/email/verify/route.db.test.ts` → `Tests 1 passed (1)` with a real code sent as " 123 456 "; with only `trim()` it fails (403 from Auth). `npx playwright test e2e/account.e2e.ts` → `1 passed`, with "Use a different email" going back to the email step.
+- **The database rule** (criterion 3): `npx supabase test db supabase/tests/profile.test.sql supabase/tests/plor_app_role.test.sql supabase/tests/private_schema.test.sql` → `Result: PASS` (35 profile checks: the first change at once and stamped, the old name free, a second within 30 days refused with OB011, one a second short of 30 days refused, one a second past allowed, the format and uniqueness rules; the grant list with `private.profile.username update`). As plor_app, `npx vitest run src/lib/profile.db.test.ts` → `Tests 11 passed (11)`: it changes the username once through the trigger, and can't write `username_changed_at`, `created_at` or `user_id`; and `USERNAME_CHANGE_DAYS` agrees with the trigger a second either side. With the trigger set to 1 day (after the review), both the pgTAP check and that test fail.
+- **The route and page** (criterion 4): `npx vitest run src/app/api/profile` → `Tests 22 passed (22)`, with `username/route.db.test.ts`'s five (a change at once with the next date 30 days on, the old name taken by another player at once, a second change refused with `username_change_too_soon`, a taken or invalid name refused and the next change still free) and the 401; `e2e/account.e2e.ts` changes the username on the account page and reads "You can change it again on …".
+- **Everything else:** `npm test` → `Test Files 37 passed (37)`, `Tests 236 passed (236)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 26 passed (26)`, `Tests 180 passed (180)` (rerun after the review fixes); `npm run test:sql` → `Result: PASS`; `npm run test:e2e` → `8 passed (50.7s)`. The profile and account route tests gained `usernameChangeableAt` in their exact shapes: a new field, nothing loosened.
+
 ## Review
 **12a** (reviewer, fresh context, 2026-10-23): no correctness or security bug found; the moved components match the removed ones line for line, and `allTimePoints` needs no M09 D5 exclusion (it sums only the viewer's own rows, and an in-progress day has none).
 - Blocking findings and how each was fixed: the handoff was behind (rewritten); `GET /api/profile` still returned `displayName`, which nothing read any more (removed, with the profile test reading it back through `GET /api/account`).
 - Deferred to ROADMAP "Next revision", For M12: Google sign-in from `/account` signed out comes back to `/`, not `/account`.
 - Not deferred, under "Keep only what someone will act on": the e2e doesn't assert the account page's Sign out button and Friends region (moved JSX, unchanged); `no_profile` from `GET /api/account` has no test (one plain branch); `getPool()` called twice in the route.
+
+**12b** (reviewer, fresh context, 2026-10-23): plor_app gained only the username update, and nothing it can do gets round the 30-day rule.
+- Blocking findings and how each was fixed:
+  - **The trigger ran with its owner's rights for a false reason:** column privileges are checked against the columns an UPDATE names, so the stamp needs no more than plor_app's grant (the reviewer showed it as plor_app). It now runs with the caller's rights; the migration comment and the DECISIONS.md row say so. Less privilege than the human approved, for the human to see in this PR.
+  - **Nothing pinned the 30 days from below,** so the trigger could have said 1 day with every test passing: pgTAP now refuses a change a second short of 30 days, and a db test ties `USERNAME_CHANGE_DAYS` to the trigger; both fail with the trigger set to 1 day.
+  - **The handoff was behind:** rewritten in this PR.
+- Deferred to ROADMAP "Next revision": actions that name a player by username can hit the wrong one when a page is stale across a rename and the old name's reuse (Correctness); plor_app's table-wide insert on `private.profile` lets it set `username_changed_at` when creating a profile, which can't get round the rule (For the human, since closing it is a grant change).
+- Not deferred, under "Keep only what someone will act on": renaming to your current name answers 200 without using up the change; a case-only change would count as one, which the lower-case format rule rules out.
+

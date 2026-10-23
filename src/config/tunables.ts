@@ -7,6 +7,10 @@ export const QUESTIONS_PER_DAY = 7;
 // constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
+// A username changes at most once every this many days, the first change at once (human, 2026-10-23,
+// docs/milestones/M12-account.md, A2). The trigger in supabase/migrations/20261023083041_username_change.sql enforces
+// the same 30: supabase/tests/profile.test.sql checks it on both sides, and src/lib/profile.db.test.ts that the two agree.
+export const USERNAME_CHANGE_DAYS = 30;
 
 // Display name length (human, 2026-10-21; docs/milestones/M07-friends-and-live-board.md, D1). The database's check
 // constraint profile_display_name_format enforces it; src/lib/profile.db.test.ts checks the two agree.

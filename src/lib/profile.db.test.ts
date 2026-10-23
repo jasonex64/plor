@@ -5,8 +5,8 @@
 import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
-import { DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
-import { createProfile, getProfile, setDisplayName } from "./profile";
+import { DISPLAY_NAME_MAX_LENGTH, USERNAME_CHANGE_DAYS, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+import { changeUsername, createProfile, getProfile, setDisplayName } from "./profile";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -33,7 +33,7 @@ describe("private.profile as plor_app", () => {
   it("creates and reads a profile", async () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null });
     });
   });
 
@@ -41,9 +41,9 @@ describe("private.profile as plor_app", () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
       await setDisplayName(client, userId, "Zoë");
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: "Zoë" });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: "Zoë", usernameChangeableAt: null });
       await setDisplayName(client, userId, null);
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null });
       await expect(setDisplayName(client, userId, "Zoe 😀")).rejects.toMatchObject({ code: "display_name_invalid", status: 400 });
     });
   });
@@ -54,18 +54,60 @@ describe("private.profile as plor_app", () => {
     });
   });
 
-  it("cannot change a profile", async () => {
+  // Since M12 12b (A2, a security change) plor_app may change the username, and only through the trigger's rule; the
+  // change time and the rest of the row are still out of its reach.
+  it("changes the username once, through the trigger's rule, and nothing else of a profile", async () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
-      await expect(client.query("update private.profile set username = 'other' where user_id = $1", [userId])).rejects.toThrow(
-        /permission denied for table profile/,
-      );
+      await changeUsername(client, userId, "plor_app_probe2");
+      const changed = await getProfile(client, userId);
+      expect(changed?.username).toBe("plor_app_probe2");
+      expect(changed?.usernameChangeableAt).not.toBeNull();
+      await expect(changeUsername(client, userId, "plor_app_probe3")).rejects.toMatchObject({
+        code: "username_change_too_soon",
+        status: 409,
+      });
     });
+    for (const column of ["username_changed_at = null", "created_at = now()", "user_id = gen_random_uuid()"]) {
+      await asPlorApp(async (client, userId) => {
+        await createProfile(client, userId, "plor_app_probe");
+        await expect(client.query(`update private.profile set ${column} where user_id = $1`, [userId])).rejects.toThrow(
+          /permission denied for table profile/,
+        );
+      });
+    }
   });
 });
 
 // The length in the player's message comes from tunables.ts; the database's check constraint must agree with it at
 // both ends (M02 2f, B6). Each insert gets its own transaction, because a refused insert aborts it.
+// The days in the player's message and next-change date come from tunables.ts; the trigger's interval must agree with
+// it at both ends (M12 12b, A2; as the length rule below, M02 2f, B6). Backdating the last change needs the superuser,
+// so the test steps out of plor_app for it and back in to change.
+describe("the username change interval", () => {
+  it(`refuses a change a second short of ${USERNAME_CHANGE_DAYS} days after the last, and allows one a second past`, async () => {
+    await asPlorApp(async (client, userId) => {
+      await createProfile(client, userId, "plor_app_probe");
+      await changeUsername(client, userId, "plor_app_probe2");
+      async function lastChangedAgo(seconds: number) {
+        await client.query("reset role");
+        await client.query(
+          "update private.profile set username_changed_at = statement_timestamp() - make_interval(secs => $2) where user_id = $1",
+          [userId, seconds],
+        );
+        await client.query("set local role plor_app");
+      }
+      const days = USERNAME_CHANGE_DAYS * 24 * 60 * 60;
+      await lastChangedAgo(days - 1);
+      await client.query("savepoint short");
+      await expect(changeUsername(client, userId, "plor_app_probe3")).rejects.toMatchObject({ code: "username_change_too_soon" });
+      await client.query("rollback to savepoint short");
+      await lastChangedAgo(days + 1);
+      await expect(changeUsername(client, userId, "plor_app_probe3")).resolves.toBeUndefined();
+    });
+  });
+});
+
 describe("the username length rule", () => {
   it.each([
     [USERNAME_MIN_LENGTH - 1, false],

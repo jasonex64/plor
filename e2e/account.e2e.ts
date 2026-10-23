@@ -16,6 +16,11 @@ test("the account page holds the account, and the home page links to it", async 
   const signedOut = await (await browser.newContext()).newPage();
   await signedOut.goto("/account");
   await expect(signedOut.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  // A mistyped email can be fixed from the code form (12b, A6).
+  await signedOut.getByLabel("Email").fill(`${RUN}-typo@example.test`);
+  await signedOut.getByRole("button", { name: "Email me a sign-in code" }).click();
+  await signedOut.getByRole("button", { name: "Use a different email" }).click();
+  await expect(signedOut.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
 
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
@@ -38,5 +43,12 @@ test("the account page holds the account, and the home page links to it", async 
   await expect(account.getByRole("button", { name: "Clear" })).toBeVisible();
   // Reloaded, the page reads the saved name back.
   await page.reload();
-  await expect(page.getByRole("region", { name: "Your account" }).getByLabel(/Display name/)).toHaveValue("Ace");
+  const reloaded = page.getByRole("region", { name: "Your account" });
+  await expect(reloaded.getByLabel(/Display name/)).toHaveValue("Ace");
+
+  // The username changes once, and the page says when it can change again (12b, A2).
+  await reloaded.getByLabel("New username").fill(`ad${RUN}`);
+  await reloaded.getByRole("button", { name: "Change username" }).click();
+  await expect(reloaded.getByText(`Username: ad${RUN}`)).toBeVisible();
+  await expect(reloaded.getByText(/^You can change it again on /)).toBeVisible();
 });

@@ -2,25 +2,27 @@
 
 // The player's account (docs/milestones/M12-account.md, 12a; A1): their username and all-time points, the display
 // name others see (M07 7a), their friends and invite link (M07 7b), and Sign out. Moved off the home page, which is
-// about the day (M11 H1). Plain UI; the look is M14.
+// about the day (M11 H1). The username can change once every 30 days (12b, A2). Plain UI; the look is M14.
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 
-type AccountData = { username: string; displayName: string | null; allTimePoints: number };
+// usernameChangeableAt: when the username may change again, or null if it may now.
+type AccountData = { username: string; displayName: string | null; usernameChangeableAt: string | null; allTimePoints: number };
 
 export function Account({ onSignedOut }: { onSignedOut: () => void }) {
   const [account, setAccount] = useState<AccountData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function load() {
     api<{ account: AccountData }>("/api/account", { method: "GET" }).then(
       (r) => setAccount(r.account),
       (err) => setError(errorText(err)),
     );
-  }, []);
+  }
+  useEffect(load, []);
 
   return (
     <section aria-label="Your account">
@@ -28,6 +30,7 @@ export function Account({ onSignedOut }: { onSignedOut: () => void }) {
       {account && (
         <>
           <p>Username: {account.username}</p>
+          <Username changeableAt={account.usernameChangeableAt} onChanged={load} />
           <p>All-time points: {account.allTimePoints === 1 ? "1 point" : `${account.allTimePoints} points`}</p>
           <DisplayName initial={account.displayName} />
           <Friends />
@@ -40,6 +43,48 @@ export function Account({ onSignedOut }: { onSignedOut: () => void }) {
         <Link href="/">Go to today&apos;s puzzle</Link>
       </p>
     </section>
+  );
+}
+
+// Changing the username (A2): once every 30 days, the first change at once. The database decides; the page says when
+// the next change is allowed, and shows the refusal if it's tried earlier.
+function Username({ changeableAt, onChanged }: { changeableAt: string | null; onChanged: () => void }) {
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function change(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/profile/username", { method: "POST", body: { username: draft } });
+      setDraft("");
+      onChanged();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={change}>
+      <label>
+        New username
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} autoComplete="off" />
+      </label>
+      <button type="submit" disabled={busy}>
+        Change username
+      </button>
+      {changeableAt && (
+        <p>
+          You can change it again on{" "}
+          {new Date(changeableAt).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}.
+        </p>
+      )}
+      {error && <p role="alert">{error}</p>}
+    </form>
   );
 }
 
