@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and every number below wait on the human. No code before they're answered.
+**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1 is answered, (a) (human, 2026-10-23); L2–L4, every number below and Vercel's request headers source wait on the human. No code before they're answered.
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send.
@@ -26,7 +26,7 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
   - (b) **Forward each player's IP to Auth** with the `Sb-Forwarded-For` header, so Auth's own limits count each player. Supabase supports this only with a **secret API key** in the app, and IP forwarding switched on in the dashboard. A secret key can do anything (CLAUDE.md, Least privilege; M12 A7 turned it down for the same reason). It also limits nothing per email address, so guessing one player's code from many addresses stays open.
   - (c) **Vercel Firewall rate-limit rules** on `/api/auth/*`, set in the Vercel dashboard. They aren't in the repo or tests, and Vercel's firewall docs aren't in SOURCES.md.
 
-  **Claude's suggestion:** (a), and raise Auth's limits.
+  **Claude's suggestion:** (a), and raise Auth's limits. **Answer: (a)** (human, 2026-10-23: "12e L1: (a), our own limits in Postgres with no secret key").
 - **L2 — what a refused request gets.** 429 `too_many_attempts`, and the form says to wait, or to ask for a new code. Each refusal is logged through the one logger with its kind and a hash of the key (never the email itself), so a flood shows in the Vercel logs (CLAUDE.md: retries and limits are logged and counted).
 - **L3 — session refreshes.** The proxy refreshes sessions from the server too, so 150 per 5 minutes is shared by every signed-in player. Raising that limit in the hosted Auth settings (a number) is part of this ticket. Whether the beta's size comes near it is for the M15 load test.
 - **L4 — where it goes.** Claude suggests 12e, before 12d: it closes a security hole that is now readable in a public repo, and 12d is three game fixes. Or after 12d, as M12's last sub-ticket.
