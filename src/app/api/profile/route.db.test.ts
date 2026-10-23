@@ -2,6 +2,7 @@
 // `npm run test:db`): the real Auth server sends the email, the local Mailpit inbox receives it, and the
 // route handlers run with a cookie jar standing in for the browser. Only Next.js's request scope is faked.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { GET as getAccount } from "@/app/api/account/route";
 import { POST as signOut } from "@/app/api/auth/sign-out/route";
 import { getPool } from "@/lib/db";
 import { enterCode, requestCode, signIn, useLocalStack, useSession } from "@/test/local-stack";
@@ -30,6 +31,11 @@ async function profile() {
   return (await getProfile(apiRequest("/api/profile", { method: "GET" }))).json();
 }
 
+// The display name as stored, read where the client reads it: the account page (M12 12a).
+async function storedDisplayName() {
+  return (await (await getAccount(apiRequest("/api/account", { method: "GET" }))).json()).account.displayName;
+}
+
 async function rename(displayName: unknown) {
   const response = await setDisplayName(apiRequest("/api/profile/display-name", { method: "POST", body: { displayName } }));
   return { status: response.status, body: await response.json() };
@@ -51,7 +57,7 @@ describe("sign-in and profile", () => {
     expect(html).not.toMatch(/<a\s/i);
     expect(await enterCode(EMAIL_A, code)).toEqual({ status: 200, body: { ok: true } });
     expect([...cookieJar.keys()].some((name) => name.startsWith("sb-"))).toBe(true);
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null, displayName: null });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null });
     firstCode = code;
   });
 
@@ -65,15 +71,16 @@ describe("sign-in and profile", () => {
 
   it("creates the profile on the first username pick", async () => {
     expect(await pick(`a${RUN}`)).toEqual({ status: 201, body: { ok: true, username: `a${RUN}` } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: null });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}` });
+    expect(await storedDisplayName()).toBeNull();
   });
 
   it("sets, changes and clears the display name (M07 7a)", async () => {
     expect(await rename("  Zoë Ann ")).toEqual({ status: 200, body: { ok: true, displayName: "Zoë Ann" } });
     expect(await rename("Zed")).toEqual({ status: 200, body: { ok: true, displayName: "Zed" } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: "Zed" });
+    expect(await storedDisplayName()).toBe("Zed");
     expect(await rename(null)).toEqual({ status: 200, body: { ok: true, displayName: null } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, displayName: null });
+    expect(await storedDisplayName()).toBeNull();
   });
 
   it("rejects a display name outside the rules, with 400 display_name_invalid", async () => {

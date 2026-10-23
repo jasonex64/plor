@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** planned. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). 12c waits on the Supabase Auth "managing users" source, which the human adds. 12a is next.
+**Status:** in progress. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). 12c waits on the Supabase Auth "managing users" source, which the human adds. The ticket is merged (PR #57). 12a is in review (a PR from `m12-account`).
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.
@@ -43,8 +43,8 @@ A player can see and manage their own account in one place: their username (and 
 - The human's decisions: ROADMAP "Design review", 2 (the all-time total); M07 (invite links, display names), M09 (the ledger), M10 G6 (handover) for the rules reused.
 
 ## Acceptance criteria
-- [ ] **12a** `GET /api/account` returns the signed-in player's username, display name and all-time points: the sum of their ledger rows after settling their finished runs on closed days (M09 D3, D10; Design review, 2). A route db test (`src/app/api/account/route.db.test.ts`) shows a total across weeks equal to the ledger sum, a finished run on a closed day settled first, and today's run not counted before the day closes (M09 D9); a signed-out player gets 401.
-- [ ] **12a** `/account` (A1) shows the username, the all-time total, the display name form, the friends list with the invite link, and Sign out; the home page's Account section is a link to it and Sign out, with the display name, friends and invite link gone from the home page (moved, not copied). Opened signed out, `/account` shows sign-in first. e2e: a player opens the account page from the home page, sees their username and 0 points, sets a display name there, and the home page shows only the link and Sign out.
+- [x] **12a** `GET /api/account` returns the signed-in player's username, display name and all-time points: the sum of their ledger rows after settling their finished runs on closed days (M09 D3, D10; Design review, 2). A route db test (`src/app/api/account/route.db.test.ts`) shows a total across weeks equal to the ledger sum, a finished run on a closed day settled first, and today's run not counted before the day closes (M09 D9); a signed-out player gets 401.
+- [x] **12a** `/account` (A1) shows the username, the all-time total, the display name form, the friends list with the invite link, and Sign out; the home page's Account section is a link to it and Sign out, with the display name, friends and invite link gone from the home page (moved, not copied). Opened signed out, `/account` shows sign-in first. e2e: a player opens the account page from the home page, sees their username and 0 points, sets a display name there, and the home page shows only the link and Sign out.
 - [ ] **12b–12c** Criteria written when each starts.
 
 ## Out of scope
@@ -65,7 +65,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 2. **12a** the account page; **12b** sign-in fixes and the username; **12c** deletion. One PR per sub-ticket from `m12-account`.
 
 ## Removes
-- **12a:** the display name, friends and invite link sections from the home page (moved, not copied).
+- **12a:** the display name, friends and invite link sections from the home page (moved, not copied, into `src/app/account.tsx`); the home page's own sign-out code, now `SignOut`, shared with the account page; the second `Friend` type in `src/app/home.tsx` (it uses `src/friends/friends.ts`'s); `SignedIn`'s unused `displayName` prop, and `displayName` in `GET /api/profile`'s answer and the home page's `Me`, which nothing read once the account page reads it from `GET /api/account` (no protocol bump: a field nobody reads, M00-data-design §2).
 - **12b:** the global sign-out; the code form's dead end.
 - **12c:** the privacy page's "email us to delete" as the only way; the handoff's hand-run deletion.
 
@@ -75,9 +75,17 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| **12a** | None: built as A1 and the criteria say | — |
 
 ## Evidence
+**12a** (2026-10-23, on the local stack; no migration):
+- **The account data** (criterion 1): `npx vitest run src/app/api/account` → `Tests 3 passed (3)`: a new player has 0; with ledger rows of 1000 and 100 on two earlier days, yesterday's unsettled run that survived question 1 and today's the same, the total is 1125 and yesterday's row is written (2 rows before, 3 after, still 3 on a second read); signed out, 401.
+- **The page** (criterion 2): `npx playwright test e2e/account.e2e.ts` → `1 passed`: signed out, `/account` shows sign-in; signed in, the home page's Account section has the link and Sign out and no display name or friends; the account page shows `Username: ac…`, `All-time points: 0 points` and Make my invite link, saves a display name and reads it back after a reload. `live-board.e2e.ts` now makes its invite link on the account page.
+- **After the review:** `npx vitest run src/app/api/profile src/app/api/account` → `Tests 20 passed (20)`: the profile test reads the display name back through `GET /api/account` now that `GET /api/profile` no longer returns it.
+- **Everything else:** `npm test` → `Test Files 37 passed (37)`, `Tests 235 passed (235)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 23 passed (23)`, `Tests 172 passed (172)`; `npm run test:sql` → `Result: PASS`; `npm run test:e2e` → `8 passed (57.9s)`.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**12a** (reviewer, fresh context, 2026-10-23): no correctness or security bug found; the moved components match the removed ones line for line, and `allTimePoints` needs no M09 D5 exclusion (it sums only the viewer's own rows, and an in-progress day has none).
+- Blocking findings and how each was fixed: the handoff was behind (rewritten); `GET /api/profile` still returned `displayName`, which nothing read any more (removed, with the profile test reading it back through `GET /api/account`).
+- Deferred to ROADMAP "Next revision", For M12: Google sign-in from `/account` signed out comes back to `/`, not `/account`.
+- Not deferred, under "Keep only what someone will act on": the e2e doesn't assert the account page's Sign out button and Friends region (moved JSX, unchanged); `no_profile` from `GET /api/account` has no test (one plain branch); `getPool()` called twice in the route.
