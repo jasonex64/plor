@@ -11,7 +11,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **M12: A1–A8, the username interval, and the Supabase Auth source for A7** (the ticket's decision table, Numbers and Source).
+- **M12: merge PR #57** (M11 done, the M12 ticket with A1–A8 answered) before 12a starts, and **add the Supabase Auth "managing users" source** to SOURCES.md before 12c (A7).
 - **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
@@ -23,7 +23,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once the human answers M12's decisions: write the answers into the ticket with their origins, write 12a's acceptance criteria, merge the draft PR on green CI with the human's OK, then build 12a on `m12-account` (read `node_modules/next/dist/docs/` first, AGENTS.md).
+Once PR #57 is merged: build 12a (its criteria are in the ticket) on `m12-account` (read `node_modules/next/dist/docs/` first, AGENTS.md).
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:

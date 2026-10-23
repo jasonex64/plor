@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** planned. Drafted 2026-10-23 for the human to approve: A1–A8 and the numbers wait on the human, and no code is written before they're answered.
+**Status:** planned. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). 12c waits on the Supabase Auth "managing users" source, which the human adds. 12a is next.
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.
@@ -26,14 +26,14 @@ A player can see and manage their own account in one place: their username (and 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| A1 | **Where account settings live.** (a) A page, `/account`, linked from the home page. (b) Stay on the home page, below Groups | (a). The home page is about today (M11 H1); settings are visited rarely, and the delete button shouldn't sit under the day's game | |
-| A2 | **Changing your username.** (a) Never. (b) **Once every 30 days**, the old one free for anyone at once. (c) Any time | (b). A wrong pick at sign-up can be fixed, and a limit stops someone cycling names to confuse friends. Little depends on the username: friends and group members see the display name when there is one, invite codes are random (M07), and comments and boards store the user ID, not the name. Changing it needs an update grant on the username column: a security change (DECISIONS.md, Log) | |
-| A3 | **Sign-out scope.** Supabase's default ends the player's sessions on every device (`signOut()`'s `global`). (a) **This device only** (`local`). (b) Every device, as now. (c) Both, as two buttons | (a), with (c)'s second button "Sign out everywhere" only if the human wants it now. Signing out of a shared computer shouldn't sign you out of your phone | |
-| A4 | **Confirming a deletion.** (a) **Type your username** to enable the button. (b) A plain "Are you sure?" dialog. (c) An emailed code, like sign-in | (a). It can't be clicked by accident, and it needs no email round trip. (c) proves it's you, but the session already does | |
-| A5 | **What deletion removes.** Everything tied to the account, by the cascades from `auth.users` (M00 data design §7, verified): profile, runs, answers, misses, ledger rows, comments (both threads) with their reactions and reports, your reactions and reports, friendships, invite codes and group memberships. A group you created passes to its longest-standing member, and a group you were the last member of is deleted (M10 G6). Your answers go with your runs, so the admin's puzzle insights for past days recount without them | As written. Other players' points don't change: a closed day's bonuses are already in their ledger rows (M09 D9) | |
-| A6 | **The code form's fixes** (ROADMAP "Next revision", For M12): a "Use a different email" link back from the code form, and spaces stripped from a pasted code ("123 456") | Both | |
-| A7 | **How the deletion runs (security change).** Deleting a Supabase user takes either (a) **a database function** run by `plor_app` that deletes the caller's own `auth.users` row, with its owner's rights, after leaving their groups through the same path as `leaveGroup`; or (b) Supabase's Admin API (`auth.admin.deleteUser`), which needs the secret key in Vercel | (a). It adds no secret, and `plor_app` can only ever delete the signed-in player (the function takes no user ID from the caller's input: the route passes the verified one). (b) puts a key that can do anything into the app (CLAUDE.md, Least privilege). Whether Supabase supports deleting from `auth.users` by SQL is *unverified*: the Auth docs on managing users aren't in SOURCES.md, so that page needs adding (only a human adds sources) | |
-| A8 | **The privacy page** after 12c | Say that you can delete your account yourself on the account page, and keep the email address for anything else | |
+| A1 | **Where account settings live.** (a) A page, `/account`, linked from the home page. (b) Stay on the home page, below Groups | (a). The home page is about today (M11 H1); settings are visited rarely, and the delete button shouldn't sit under the day's game | **(a)** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A2 | **Changing your username.** (a) Never. (b) **Once every 30 days**, the old one free for anyone at once. (c) Any time | (b). A wrong pick at sign-up can be fixed, and a limit stops someone cycling names to confuse friends. Little depends on the username: friends and group members see the display name when there is one, invite codes are random (M07), and comments and boards store the user ID, not the name. Changing it needs an update grant on the username column: a security change (DECISIONS.md, Log) | **(b), once every 30 days** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A3 | **Sign-out scope.** Supabase's default ends the player's sessions on every device (`signOut()`'s `global`). (a) **This device only** (`local`). (b) Every device, as now. (c) Both, as two buttons | (a), with (c)'s second button "Sign out everywhere" only if the human wants it now. Signing out of a shared computer shouldn't sign you out of your phone | **(a), this device only**, with no "Sign out everywhere" button for now (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A4 | **Confirming a deletion.** (a) **Type your username** to enable the button. (b) A plain "Are you sure?" dialog. (c) An emailed code, like sign-in | (a). It can't be clicked by accident, and it needs no email round trip. (c) proves it's you, but the session already does | **(a)** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A5 | **What deletion removes.** Everything tied to the account, by the cascades from `auth.users` (M00 data design §7, verified): profile, runs, answers, misses, ledger rows, comments (both threads) with their reactions and reports, your reactions and reports, friendships, invite codes and group memberships. A group you created passes to its longest-standing member, and a group you were the last member of is deleted (M10 G6). Your answers go with your runs, so the admin's puzzle insights for past days recount without them | As written. Other players' points don't change: a closed day's bonuses are already in their ledger rows (M09 D9) | **As written** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A6 | **The code form's fixes** (ROADMAP "Next revision", For M12): a "Use a different email" link back from the code form, and spaces stripped from a pasted code ("123 456") | Both | **Both** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A7 | **How the deletion runs (security change).** Deleting a Supabase user takes either (a) **a database function** run by `plor_app` that deletes the caller's own `auth.users` row, with its owner's rights, after leaving their groups through the same path as `leaveGroup`; or (b) Supabase's Admin API (`auth.admin.deleteUser`), which needs the secret key in Vercel | (a). It adds no secret, and `plor_app` can only ever delete the signed-in player (the function takes no user ID from the caller's input: the route passes the verified one). (b) puts a key that can do anything into the app (CLAUDE.md, Least privilege). Whether Supabase supports deleting from `auth.users` by SQL is *unverified*: the Auth docs on managing users aren't in SOURCES.md, so that page needs adding (only a human adds sources) | **(a), a database function**; the human adds the Supabase Auth "managing users" source before 12c (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
+| A8 | **The privacy page** after 12c | Say that you can delete your account yourself on the account page, and keep the email address for anything else | **As suggested** (human, 2026-10-23: "Accept Claude's suggestions for M12: A1 to A8 as suggested") |
 
 ## Source
 - Supabase client (supabase-js, SOURCES.md): `auth.signOut({ scope })` for A3.
@@ -43,7 +43,9 @@ A player can see and manage their own account in one place: their username (and 
 - The human's decisions: ROADMAP "Design review", 2 (the all-time total); M07 (invite links, display names), M09 (the ledger), M10 G6 (handover) for the rules reused.
 
 ## Acceptance criteria
-Written when each sub-ticket starts, from the answers above.
+- [ ] **12a** `GET /api/account` returns the signed-in player's username, display name and all-time points: the sum of their ledger rows after settling their finished runs on closed days (M09 D3, D10; Design review, 2). A route db test (`src/app/api/account/route.db.test.ts`) shows a total across weeks equal to the ledger sum, a finished run on a closed day settled first, and today's run not counted before the day closes (M09 D9); a signed-out player gets 401.
+- [ ] **12a** `/account` (A1) shows the username, the all-time total, the display name form, the friends list with the invite link, and Sign out; the home page's Account section is a link to it and Sign out, with the display name, friends and invite link gone from the home page (moved, not copied). Opened signed out, `/account` shows sign-in first. e2e: a player opens the account page from the home page, sees their username and 0 points, sets a display name there, and the home page shows only the link and Sign out.
+- [ ] **12b–12c** Criteria written when each starts.
 
 ## Out of scope
 - Friend requests by username, blocking (ROADMAP Later).
@@ -55,11 +57,11 @@ Written when each sub-ticket starts, from the answers above.
 Every value this milestone needs, and where it comes from. A blank origin means stop and ask.
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
-| How often a username can change | A2 | Claude's suggestion: once every 30 days. *The human's number* |
+| How often a username can change | A2 | **Once every 30 days** (human, 2026-10-23: "a username can change once every 30 days") |
 | Username rules: 3 to 20 characters, the existing format | A2 | M02 (`USERNAME_MIN_LENGTH`, the profile's check) |
 
 ## Plan
-1. The human answers A1–A8 and the username interval, and adds the Supabase Auth "managing users" source for A7.
+1. ~~The human answers A1–A8 and the username interval~~ (done, 2026-10-23), and adds the Supabase Auth "managing users" source for A7 (before 12c).
 2. **12a** the account page; **12b** sign-in fixes and the username; **12c** deletion. One PR per sub-ticket from `m12-account`.
 
 ## Removes
