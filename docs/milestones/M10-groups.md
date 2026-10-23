@@ -1,6 +1,6 @@
 # M10 — Groups
 
-**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is merged (PR #50, on all-green CI with the human's OK). 10c is next.
+**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is merged (PR #50, on all-green CI with the human's OK). 10c is in review (a PR from `m10-groups`). 10d is next.
 
 ## Goal
 Players make named groups that others join by invite link. Each group has a weekly leaderboard and one shared comment thread per day. First (10a), the friends leaderboard becomes weekly, and the code friends and groups will share is cleaned up.
@@ -61,7 +61,11 @@ Players make named groups that others join by invite link. Each group has a week
 - [x] **10b** The routes, against the local stack (`src/app/api/groups/route.db.test.ts`): create (the creator is the first member), list, a group's page data for members only (anyone else gets 404), preview and join by invite link, rename, reset the link (the old one stops working), remove, leave with the creator handover, and delete; a member who isn't the creator gets 403 for each creator power; a full group, an 11th group, an invalid name and joining twice get their errors; under concurrent requests, a creator and the next member leaving at once don't deadlock, and only one of three joins fills a group's last place.
 - [x] **10b** Every group route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
 - [x] **10b** The pages (`e2e/groups.e2e.ts`): one player creates a group in the home page's Groups section and copies its link from the group page; a second player opens the link signed out, signs in, picks a username, joins, and sees both members on the group page.
-- [ ] **10c–10d** Criteria written when each starts.
+- [x] **10c** `GET /api/groups/leaderboard?id=<id>` returns the group's weekly board, this week and last, in the same shape as `/api/leaderboard` (W1 (a)), over the group's current members, whether or not they are the viewer's friends (G2, G3): a route db test (`src/app/api/groups/leaderboard/route.db.test.ts`) shows a member who isn't the viewer's friend with their points, leaves out a friend of the viewer's who isn't a member, drops a member once removed, and gives a non-member and a malformed ID the group page's `404 group_not_found`; the viewer's friends board still shows the friend and not the member (G2).
+- [x] **10c** The weekly board is computed once: the friends and group boards call the same function in `src/friends/leaderboard.ts` with a different set of players (from `src/friends/circle.ts`), so settling (M09 D3, D10), the Monday weeks and the D5 exclusion are the same code, and the existing leaderboard tests pass unchanged.
+- [x] **10c** The route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
+- [x] **10c** The page (`e2e/groups.e2e.ts`): the group page shows the group's leaderboard, with both members in this week's list.
+- [ ] **10d** Criteria written when it starts.
 
 ## Out of scope
 - Seeing friends' and group members' misses (ROADMAP Later; Design review, 4).
@@ -88,7 +92,8 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Removes
 - **10a:** the all-time sum in `getLeaderboard`, its `leaderboard` response field and the "All-time points" copy (protocol 3 → 4, since the response changed shape: M00-data-design.md §2); the two extra copies of the friends list query and the four of the comment-visibility predicate (`getThread`, `reportComment`, `setReaction`'s comment target, reactions' `SEEN`) and `setReaction`'s friend-run check; the plain `release()` and the unguarded rollback in `setReaction`; ROADMAP "Next revision"'s three For M10 items.
 - **10b:** the seven copies of `errorText` in the client components (`board`, `comments`, `game`, `home`, `leaderboard`, and the admin `insights`, `puzzles` and `reports` pages), now one in `src/app/messages.ts`, which `groups.tsx` would have made eight; the e2e sign-in helpers moved out of `live-board.e2e.ts` into `e2e/players.ts` rather than copied; `Home`'s `invite` prop (now `view`, which also carries a group's link and page) and `AcceptInvite`'s own clearing of the remembered invite (`Home` spends it for both kinds of link).
-- **10c–10d:** nothing expected; new feature.
+- **10c:** nothing; a new route over the 10a board, which takes its set of players instead of always reading the friends circle, and `Leaderboard`'s fixed friends path and heading, now props. No protocol bump: no existing response changes shape (M00-data-design.md §2).
+- **10d:** nothing expected; new feature.
 
 ---
 *Fill in the sections below at the end.*
@@ -146,6 +151,22 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - **The pages** (criterion 5): `npx playwright test e2e/groups.e2e.ts` → `ok 1 … a group is made on the home page and joined by its link`.
 - **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 223 passed (223)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 16 passed (16)`, `Tests 143 passed (143)`; `npm run test:e2e` → `4 passed (35.4s)` (all rerun after the review fix).
 
+**10c** (2026-10-22, a Thursday, on the local stack; no migration):
+- **Who the group board shows** (criterion 1) and **D5 on it** (criterion 2): `npx vitest run src/app/api/groups/leaderboard/route.db.test.ts --reporter=verbose`
+  ```
+  ✓ … signs in four players; A makes a group that B joins, and A and C are friends
+  ✓ … shows the group's members, friends or not, and no one else (G2, G3)
+  ✓ … leaves out a day while the viewer's own run that day is still going (M09 D5), as the friends board does
+  ✓ … leaves the friends board friends-only: A's shows C and not B (G2)
+  ✓ … refuses anyone who isn't a member, and an ID that isn't a group, with the group page's 404
+  ✓ … drops a member once the creator removes them (G6)
+  ```
+  The D5 case wasn't planned: the first run expected B to see their own 1000, and got 0, because B's Monday run, written with no answers, is still in progress. That is D5 holding on the group board, so the test now says so.
+- **One board** (criterion 2): `getLeaderboard` and `getGroupLeaderboard` both call `weeklyBoard` in `src/friends/leaderboard.ts`, with `circleSql` or `groupCircleSql` from `src/friends/circle.ts`; `src/app/api/leaderboard/route.db.test.ts` and `src/friends/leaderboard.test.ts` weren't edited and pass (`npm run test:db`, `npm test` below).
+- **Signed out** (criterion 3): `npx vitest run src/app/api/groups/route.test.ts` → `Tests 11 passed (11)`.
+- **The page** (criterion 4): `npm run test:e2e` → `4 passed (33.3s)`, with `e2e/groups.e2e.ts` reading `ga… : 0 points` and `gb… (you): 0 points` in the group leaderboard's This week.
+- **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 224 passed (224)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 17 passed (17)`, `Tests 149 passed (149)`. `npm run test:sql` not rerun: no SQL changed.
+
 ## Review
 **10a** (reviewer, fresh context, 2026-10-22): no blocking finding in the code.
 - Blocking findings and how each was fixed: the empty Evidence (filled above) and a handoff that still said 10a waited on W1 (rewritten).
@@ -157,3 +178,8 @@ Every value this milestone needs, and where it comes from. A blank origin means 
   - **The handoff, ROADMAP row and this Status line were behind the work:** updated in this PR.
 - Deferred to ROADMAP "Next revision": the account-deletion ordering (For M12) and a join racing the group's deletion, which gets a 500 instead of `invite_invalid` (Correctness).
 - Not deferred, under "Keep only what someone will act on": the migration's stated reason for owner's rights was wrong (corrected: the handover sets `creator_id`); an invite code collision on create (16 random bytes); `Home` now spends a remembered invite once signed in rather than when the invite renders (nothing a player sees changes); the Google round trip through a group's link has no automated test, like M07's.
+
+**10c** (reviewer, fresh context, 2026-10-22): no blocking finding in the code.
+- Blocking findings and how each was fixed: the Status line, the ROADMAP row and the handoff were still at "10c next" (updated in this PR).
+- Deferred to ROADMAP "Next revision", For the human: a member's whole week counts on a group's board, even days before they joined.
+- Not deferred, under "Keep only what someone will act on": the page's reload of the board after a removal (its `key` is the member list) has no e2e test, and a stale row would last only until a reload; the members and the sums are read in two queries, so a removal between them shows the removed member once (milliseconds, like 10a's midnight case).

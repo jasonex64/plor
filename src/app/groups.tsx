@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
+import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
 
 type GroupSummary = { id: string; name: string };
@@ -81,7 +82,8 @@ export function Groups() {
   );
 }
 
-// A group's page: members, the invite link every member can share, and the creator's powers (G1, G6).
+// A group's page: members, the invite link every member can share, the creator's powers (G1, G6), and the group's
+// weekly leaderboard (10c).
 export function GroupPage({ id }: { id: string }) {
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
@@ -136,81 +138,91 @@ export function GroupPage({ id }: { id: string }) {
 
   const link = group ? `${window.location.origin}/groups/join/${group.inviteCode}` : null;
   return (
-    <section aria-label="Group">
-      {group && link && (
-        <>
-          <h2>{group.name}</h2>
-          {group.creator && (
-            <form onSubmit={rename}>
-              <label>
-                Group name
-                <input value={draft} onChange={(e) => setDraft(e.target.value)} />
-              </label>
-              <button type="submit" disabled={busy}>
-                Rename
+    <>
+      <section aria-label="Group">
+        {group && link && (
+          <>
+            <h2>{group.name}</h2>
+            {group.creator && (
+              <form onSubmit={rename}>
+                <label>
+                  Group name
+                  <input value={draft} onChange={(e) => setDraft(e.target.value)} />
+                </label>
+                <button type="submit" disabled={busy}>
+                  Rename
+                </button>
+              </form>
+            )}
+            <h3>Members</h3>
+            <ul>
+              {group.members.map((m) => (
+                <li key={m.username}>
+                  {m.name}
+                  {m.creator && " (creator)"}
+                  {group.creator && !m.creator && (
+                    <>
+                      {" "}
+                      <button type="button" disabled={busy} onClick={() => removeMember(m.username)}>
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p>
+              Invite link: <code>{link}</code>{" "}
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  act(async () => {
+                    await navigator.clipboard.writeText(link);
+                    setCopied(true);
+                  })
+                }
+              >
+                Copy
               </button>
-            </form>
-          )}
-          <h3>Members</h3>
-          <ul>
-            {group.members.map((m) => (
-              <li key={m.username}>
-                {m.name}
-                {m.creator && " (creator)"}
-                {group.creator && !m.creator && (
-                  <>
-                    {" "}
-                    <button type="button" disabled={busy} onClick={() => removeMember(m.username)}>
-                      Remove
-                    </button>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-          <p>
-            Invite link: <code>{link}</code>{" "}
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() =>
-                act(async () => {
-                  await navigator.clipboard.writeText(link);
-                  setCopied(true);
-                })
-              }
-            >
-              Copy
+              {group.creator && (
+                <>
+                  {" "}
+                  <button type="button" disabled={busy} onClick={resetLink}>
+                    Reset link
+                  </button>
+                </>
+              )}
+              {copied && " Copied."}
+            </p>
+            <button type="button" disabled={busy} onClick={leave}>
+              Leave group
             </button>
             {group.creator && (
               <>
                 {" "}
-                <button type="button" disabled={busy} onClick={resetLink}>
-                  Reset link
+                <button type="button" disabled={busy} onClick={deleteGroup}>
+                  Delete group
                 </button>
               </>
             )}
-            {copied && " Copied."}
-          </p>
-          <button type="button" disabled={busy} onClick={leave}>
-            Leave group
-          </button>
-          {group.creator && (
-            <>
-              {" "}
-              <button type="button" disabled={busy} onClick={deleteGroup}>
-                Delete group
-              </button>
-            </>
-          )}
-        </>
+          </>
+        )}
+        {!group && !error && <p>Loading…</p>}
+        {error && <p role="alert">{error}</p>}
+        <p>
+          <Link href="/">Go to today&apos;s puzzle</Link>
+        </p>
+      </section>
+      {/* Shown once the page proves membership, and reloaded when the members change (a removal). */}
+      {group && (
+        <Leaderboard
+          key={group.members.map((m) => m.username).join(" ")}
+          title="Group leaderboard"
+          path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
+        />
       )}
-      {!group && !error && <p>Loading…</p>}
-      {error && <p role="alert">{error}</p>}
-      <p>
-        <Link href="/">Go to today&apos;s puzzle</Link>
-      </p>
-    </section>
+    </>
   );
 }
 

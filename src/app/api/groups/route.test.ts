@@ -7,6 +7,7 @@ import { POST as del } from "./delete/route";
 import { GET as detail } from "./detail/route";
 import { POST as invite } from "./invite/route";
 import { POST as join } from "./join/route";
+import { GET as leaderboard } from "./leaderboard/route";
 import { POST as leave } from "./leave/route";
 import { GET as preview } from "./preview/route";
 import { POST as remove } from "./remove/route";
@@ -27,11 +28,12 @@ beforeEach(() => {
 const CODE = "abcdefghijklmnopqrst-_";
 const ID = "00000000-0000-0000-0000-000000000001";
 
-describe("/api/groups routes (M10 10b)", () => {
+describe("/api/groups routes (M10 10b, 10c)", () => {
   it.each([
     ["GET /api/groups", () => groups(apiRequest("/api/groups", { method: "GET" }))],
     ["POST /api/groups/create", () => create(apiRequest("/api/groups/create", { method: "POST", body: { name: "Club" } }))],
     ["GET /api/groups/detail", () => detail(apiRequest(`/api/groups/detail?id=${ID}`, { method: "GET" }))],
+    ["GET /api/groups/leaderboard", () => leaderboard(apiRequest(`/api/groups/leaderboard?id=${ID}`, { method: "GET" }))],
     ["GET /api/groups/preview", () => preview(apiRequest(`/api/groups/preview?code=${CODE}`, { method: "GET" }))],
     ["POST /api/groups/join", () => join(apiRequest("/api/groups/join", { method: "POST", body: { code: CODE } }))],
     ["POST /api/groups/leave", () => leave(apiRequest("/api/groups/leave", { method: "POST", body: { id: ID } }))],

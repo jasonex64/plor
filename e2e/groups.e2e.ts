@@ -1,6 +1,6 @@
-// Groups with two real browsers (docs/milestones/M10-groups.md, 10b; G7): one player creates a group in the home
-// page's Groups section and copies its invite link from the group's page; a second opens the link signed out, signs
-// in, picks a username, joins, and lands on the group's page with both members listed.
+// Groups with two real browsers (docs/milestones/M10-groups.md, 10b and 10c; G7): one player creates a group in the
+// home page's Groups section and copies its invite link from the group's page; a second opens the link signed out,
+// signs in, picks a username, joins, and lands on the group's page with both members listed and on its leaderboard.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -36,6 +36,9 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await expect(joiner).toHaveURL(groupUrl);
   const members = joiner.getByRole("region", { name: "Group" }).getByRole("listitem");
   await expect(members).toHaveText([`ga${RUN} (creator)`, `gb${RUN}`]);
+  // Neither has points this week: a tie, by name, with the viewer marked (10c).
+  const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
+  await expect(board.getByRole("listitem")).toHaveText([`ga${RUN}: 0 points`, `gb${RUN} (you): 0 points`]);
 
   // The group is on the creator's home page too.
   await creator.goto("/");

@@ -2,17 +2,20 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M10 10b on `m10-groups`.
+**Updated:** 2026-10-22, by the session that built M10 10c on `m10-groups`.
 
 ## Where things stand
 - **M08, Comments and reactions, and M09, Points and friends leaderboard, are done** (tickets in `docs/milestones/`). Their branches are deleted.
 - **M10, Groups, is in progress** (`docs/milestones/M10-groups.md`, branch `m10-groups`).
   - **10a is merged** (PR #49): the weekly friends board.
   - **G1–G11 and the numbers are answered** (human, 2026-10-22: Claude's suggestions; 50 members, 10 groups, the display name rule).
-  - **10b is merged** (PR #50): groups with invite links, the creator's powers and handover, the Groups section, `/groups/<id>` and `/groups/join/<code>`. It's a security change, recorded in DECISIONS.md. The reviewer's deadlock finding is fixed and tested.
+  - **10b is merged** (PR #50): groups with invite links, the creator's powers and handover, the Groups section, `/groups/<id>` and `/groups/join/<code>`. It's a security change, recorded in DECISIONS.md.
+  - **10c is in review** (a PR from `m10-groups`): each group's weekly board on `/groups/<id>`, from `GET /api/groups/leaderboard?id=`, the same code as the friends board (`weeklyBoard` in `src/friends/leaderboard.ts`). The reviewer found nothing blocking in the code. It merges on all-green CI with the human's OK.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
+- **Merge 10c's PR** once CI is green.
+- **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
@@ -23,7 +26,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Write 10c's acceptance criteria in the ticket (the group's weekly board, the same as 10a's over the group's members, on `/groups/<id>`) and build it on `m10-groups`. `src/friends/circle.ts` is where a group becomes one more circle.
+Once 10c is merged: write 10d's acceptance criteria in the ticket (the group thread: one per group per day, M08's rules, live nudges; G4, G5, and G9's `group_id` on `private.comment`) and build it on `m10-groups`. `seesAuthorSql` in `src/friends/circle.ts` and the live comments migration (`20261022095828_live_comments.sql`) are where it starts.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:

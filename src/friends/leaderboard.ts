@@ -1,14 +1,16 @@
-// The weekly friends leaderboard (docs/milestones/M10-groups.md, 10a; ROADMAP "Design review", 2): the viewer and
-// their friends, not friends of friends (M09 D4), each with the sum of their ledger rows this week, Monday to Sunday by
-// puzzle day, and last week's below it (W1): a day's points arrive only once it closes (M09 D9), so Sunday's land
-// after Monday's reset. The players shown are settled first, so their finished runs on closed days have their rows
-// (M09 D3, D10). A closed day also stays out of every total while the viewer's own run that day is still going, since
-// a run can be finished after midnight (DECISIONS.md, Game 1: Timer): otherwise a friend's total would tell the viewer
-// how far the friend got on questions the viewer hasn't answered (M09 D5; 9b review, like M08 8a's past-day thread).
+// The weekly leaderboards (docs/milestones/M10-groups.md, 10a and 10c; ROADMAP "Design review", 2): the viewer and
+// their friends, not friends of friends (M09 D4), or a group's members (10c), each with the sum of their ledger rows
+// this week, Monday to Sunday by puzzle day, and last week's below it (W1): a day's points arrive only once it closes
+// (M09 D9), so Sunday's land after Monday's reset. The players shown are settled first, so their finished runs on
+// closed days have their rows (M09 D3, D10). A closed day also stays out of every total while the viewer's own run
+// that day is still going, since a run can be finished after midnight (DECISIONS.md, Game 1: Timer): otherwise a
+// friend's total would tell the viewer how far the friend got on questions the viewer hasn't answered (M09 D5; 9b
+// review, like M08 8a's past-day thread).
 import { GAME_ID } from "@/content/puzzle";
 import { settleRuns } from "@/game/ledger";
 import type { Db } from "@/lib/db";
-import { circleSql } from "./circle";
+import { AppError } from "@/lib/http";
+import { circleSql, groupCircleSql } from "./circle";
 
 // name is the display name if set, else the username (M07 7a); you marks the viewer.
 export type LeaderboardEntry = { username: string; name: string; points: number; you: boolean };
@@ -40,10 +42,25 @@ function ranked(rows: Row[], viewerId: string, points: (r: Row) => number): Lead
 }
 
 export async function getLeaderboard(db: Db, viewerId: string): Promise<Leaderboard> {
+  // Never null: the friends circle always holds the viewer.
+  return (await weeklyBoard(db, viewerId, circleSql("$1"), [viewerId]))!;
+}
+
+// A group's board, for its members only; anyone else gets the group page's 404 (10b).
+export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: string): Promise<Leaderboard> {
+  const board = await weeklyBoard(db, viewerId, groupCircleSql("$1", "$2"), [viewerId, groupId]);
+  if (!board) throw new AppError("group_not_found", 404);
+  return board;
+}
+
+// players is SQL listing the user_ids shown, with its own parameters; null when it lists no one. A player's whole
+// week counts, however recently they became a friend or joined.
+async function weeklyBoard(db: Db, viewerId: string, players: string, params: unknown[]): Promise<Leaderboard | null> {
   const { rows: people } = await db.query<{ user_id: string; today: string }>(
-    `select c.user_id::text, private.today()::text as today from (${circleSql("$1")}) c`,
-    [viewerId],
+    `select c.user_id::text, private.today()::text as today from (${players}) c`,
+    params,
   );
+  if (people.length === 0) return null;
   const ids = people.map((p) => p.user_id);
   const thisWeek = weekStart(people[0].today);
   const lastWeek = daysBefore(thisWeek, 7);

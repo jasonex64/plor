@@ -19,3 +19,11 @@ export function circleSql(viewer: string): string {
      union all
      select case when f.user_a = ${viewer}::uuid then f.user_b else f.user_a end from private.friendship f where ${viewer}::uuid in (f.user_a, f.user_b)`;
 }
+
+// A group's members, one user_id per row, or none when the viewer isn't one of them (M10 G3): members see each
+// other's weekly points whether or not they are friends (G2).
+export function groupCircleSql(viewer: string, group: string): string {
+  return `select m.user_id from private.group_member m
+     where m.group_id = ${group}::uuid
+       and exists (select from private.group_member v where v.group_id = ${group}::uuid and v.user_id = ${viewer}::uuid)`;
+}
