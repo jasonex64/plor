@@ -25,5 +25,5 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
 // (node_modules/next/dist/docs/01-app/01-getting-started/08-caching.md, runtime APIs).
 async function InviteHome({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  return <Home invite={code} />;
+  return <Home view={{ kind: "invite", code }} />;
 }

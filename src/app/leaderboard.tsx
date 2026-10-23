@@ -5,12 +5,8 @@
 // loading it once is enough. Plain UI; the look is M14.
 import { useEffect, useState } from "react";
 import type { Leaderboard as Board, Week } from "@/friends/leaderboard";
-import { ApiError, api } from "@/lib/api-client";
-import { messageFor } from "./messages";
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
+import { api } from "@/lib/api-client";
+import { errorText } from "./messages";
 
 // "Mon, Oct 19". The date is a calendar date; read in UTC so the label can't shift by a day (as src/game/share.ts).
 function monday(from: string): string {

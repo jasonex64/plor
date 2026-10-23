@@ -1,6 +1,6 @@
 # M10 — Groups
 
-**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). The group decisions (G1–G11) and numbers wait on the human before 10b.
+**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions); 10b is being built on `m10-groups`.
 
 ## Goal
 Players make named groups that others join by invite link. Each group has a weekly leaderboard and one shared comment thread per day. First (10a), the friends leaderboard becomes weekly, and the code friends and groups will share is cleaned up.
@@ -31,17 +31,17 @@ Players make named groups that others join by invite link. Each group has a week
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
 | W1 | **Sunday's points.** A day's points reach the ledger only once it closes (M09 D9), so Sunday's arrive after Monday's reset, when "this week" has moved on. (a) Show this week, and below it last week's final standings, so Sunday counts and each week has a final result. (b) This week only: Sunday's points never show on a board. (c) A rolling 7 days, no reset | (a). It keeps Monday as the reset and gives every week a finished table | **(a)** (human, 2026-10-22: "W1 (a): show this week, and below it last week's final standings. Build 10a.") |
-| G1 | **What a group is** | A name, a creator and members. Every member sees the group's invite link and can share it, like a group chat link. Only the creator renames the group, resets its link, removes members or deletes it | *open* |
-| G2 | **Groups and friends** | Joining a group doesn't make you friends with its members; the friends board and thread stay friends-only | *open* |
-| G3 | **What members who aren't friends see of each other** | Name (display name or username), weekly points, and comments and reactions in the group's thread. Not the live board, and not how a run ended (that stays with friends) | *open* |
-| G4 | **The group thread** | One per group per day. Seen only by current members, and hidden until your own run that day is over (M08). A comment posted there is only there. Delete your own, report others (to the same admin page), reactions on comments; no reactions on runs (G3). Past days browsable read-only, like M08 D6 | *open* |
-| G5 | **Live updates** | The group thread is live like the friends thread: a trigger sends `comments_changed` with the group's ID to each member's existing `board:<id>` topic, and the page refetches. No new topic or policy | *open* |
-| G6 | **Leaving and removal** | A member can leave any time; the creator can remove members. A member who leaves or is removed loses the group's thread, and their comments in it are deleted (they cascade from the membership). When the creator leaves or deletes their account, the longest-standing member becomes creator; when the last member leaves, the group is deleted | *open* |
-| G7 | **Where it shows** | A plain "Groups" section on the home page listing your groups, with Create; a page per group at `/groups/<id>` with its board and thread; the invite link at `/groups/join/<code>`, signed in first like M07's. M11 reworks the home screen | *open* |
-| G8 | **Invite code** | 16 random bytes, 22 URL-safe characters, as M07 D3 (human, 2026-10-21), in a separate table from friend invites | *open* |
-| G9 | **Data** | `private.player_group(id, name, creator_id, invite_code, created_at)`, `private.group_member(group_id, user_id, joined_at)`, and a nullable `group_id` on `private.comment` (null is the friends thread), so reactions and reports keep working unchanged. Not Hard to reverse beyond a normal migration | *open* |
-| G10 | **Security change** | plor_app may read, insert, update (name, invite code and creator only) and delete groups, and read, insert and delete memberships, with one plor_app policy per command; the routes scope every change to the signed-in player and the creator's powers. Recorded in DECISIONS.md like M07–M09 | *open* |
-| G11 | **The numbers** below | Claude's suggestions are marked as such; each is the human's call | *open* |
+| G1 | **What a group is** | A name, a creator and members. Every member sees the group's invite link and can share it, like a group chat link. Only the creator renames the group, resets its link, removes members or deletes it | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G2 | **Groups and friends** | Joining a group doesn't make you friends with its members; the friends board and thread stay friends-only | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G3 | **What members who aren't friends see of each other** | Name (display name or username), weekly points, and comments and reactions in the group's thread. Not the live board, and not how a run ended (that stays with friends) | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G4 | **The group thread** | One per group per day. Seen only by current members, and hidden until your own run that day is over (M08). A comment posted there is only there. Delete your own, report others (to the same admin page), reactions on comments; no reactions on runs (G3). Past days browsable read-only, like M08 D6 | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G5 | **Live updates** | The group thread is live like the friends thread: a trigger sends `comments_changed` with the group's ID to each member's existing `board:<id>` topic, and the page refetches. No new topic or policy | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G6 | **Leaving and removal** | A member can leave any time; the creator can remove members. A member who leaves or is removed loses the group's thread, and their comments in it are deleted (they cascade from the membership). When the creator leaves or deletes their account, the longest-standing member becomes creator; when the last member leaves, the group is deleted | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G7 | **Where it shows** | A plain "Groups" section on the home page listing your groups, with Create; a page per group at `/groups/<id>` with its board and thread; the invite link at `/groups/join/<code>`, signed in first like M07's. M11 reworks the home screen | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G8 | **Invite code** | 16 random bytes, 22 URL-safe characters, as M07 D3 (human, 2026-10-21), in a separate table from friend invites | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G9 | **Data** | `private.player_group(id, name, creator_id, invite_code, created_at)`, `private.group_member(group_id, user_id, joined_at)`, and a nullable `group_id` on `private.comment` (null is the friends thread), so reactions and reports keep working unchanged. Not Hard to reverse beyond a normal migration | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G10 | **Security change** | plor_app may read, insert, update (name, invite code and creator only) and delete groups, and read, insert and delete memberships, with one plor_app policy per command; the routes scope every change to the signed-in player and the creator's powers. Recorded in DECISIONS.md like M07–M09 | **Claude's suggestion** (human, 2026-10-22: "Accept all") |
+| G11 | **The numbers** below | Claude's suggestions are marked as such; each is the human's call | **Claude's suggestions**: 50 members, 10 groups, the display name rule (human, 2026-10-22) |
 
 ## Source
 - PostgreSQL 17 (SOURCES.md): aggregate `FILTER` for the two weekly sums (10a); constraints, cascades, row security (10b–10d). 10a computes the week's Monday in TypeScript, so `date_trunc` isn't used.
@@ -56,7 +56,12 @@ Players make named groups that others join by invite link. Each group has a week
 - [x] **10a** The circle query and the comment-visibility predicate each exist once in TypeScript (`grep` for `private.friendship` in `src` finds only `src/friends/circle.ts` and the friendship writes), and the existing board, friends, leaderboard, comments and reactions tests pass unchanged.
 - [x] **10a** A unit test where the rollback throws gets the original error, the rollback's is logged, and the client is destroyed (`release(true)`); with a working rollback it goes back to the pool. Both tests fail on the old code.
 - [x] **10a** The page shows both weeks; the e2e test reads this week's list.
-- [ ] **10b–10d** Criteria written once G1–G11 are answered.
+- [ ] **10b** The database keeps the group rules (pgTAP, `supabase/tests/groups.test.sql`): a name follows the display name rule (G11); an invite code is 22 base64url characters and unique (G8); a group's creator is always one of its members; the 51st member and a player's 11th group are refused (G11); when the creator leaves, or their account is deleted, the longest-standing member becomes creator; when the last member leaves, the group is deleted; deleting a group deletes its memberships (G6).
+- [ ] **10b** `plor_app` holds exactly the new grants (G10): `supabase/tests/plor_app_role.test.sql` lists them, and `private_schema.test.sql` still passes (RLS on, plor_app-only policies).
+- [ ] **10b** The routes, against the local stack (`src/app/api/groups/route.db.test.ts`): create (the creator is the first member), list, a group's page data for members only (anyone else gets 404), preview and join by invite link, rename, reset the link (the old one stops working), remove, leave with the creator handover, and delete; a member who isn't the creator gets 403 for each creator power; a full group, an 11th group, an invalid name and joining twice get their errors.
+- [ ] **10b** Every group route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
+- [ ] **10b** The pages (`e2e/groups.e2e.ts`): one player creates a group in the home page's Groups section and copies its link from the group page; a second player opens the link signed out, signs in, picks a username, joins, and sees both members on the group page.
+- [ ] **10c–10d** Criteria written when each starts.
 
 ## Out of scope
 - Seeing friends' and group members' misses (ROADMAP Later; Design review, 4).
@@ -69,10 +74,10 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
 | Week starts Monday, by puzzle day (Pacific) | 10a, 10c | human, 2026-10-22, Design review, 2 (Claude's suggestion of a Monday reset, accepted) |
-| Invite code: 16 random bytes | 10b | M07 D3 (human, 2026-10-21); reuse for groups is G8, open |
-| Group name: length and characters | 10b | *open*; Claude suggests the display name rule, 1 to 24 characters (M07 D1) |
-| Members per group | 10b | *open*; Claude suggests 50, so a comment's live fan-out stays small |
-| Groups per player | 10b | *open*; Claude suggests 10 |
+| Invite code: 16 random bytes | 10b | M07 D3 (human, 2026-10-21); reused for groups (G8, human, 2026-10-22) |
+| Group name: the display name rule, 1 to 24 characters (M07 D1) | 10b | human, 2026-10-22 (G11, Claude's suggestion) |
+| Members per group: 50 | 10b | human, 2026-10-22 (G11, Claude's suggestion, so a comment's live fan-out stays small) |
+| Groups per player: 10 | 10b | human, 2026-10-22 (G11, Claude's suggestion) |
 
 ## Plan
 1. **10a** (after W1): weekly board, the two shared queries, `setReaction`. One PR from `m10-groups`.
@@ -82,7 +87,8 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 
 ## Removes
 - **10a:** the all-time sum in `getLeaderboard`, its `leaderboard` response field and the "All-time points" copy (protocol 3 → 4, since the response changed shape: M00-data-design.md §2); the two extra copies of the friends list query and the four of the comment-visibility predicate (`getThread`, `reportComment`, `setReaction`'s comment target, reactions' `SEEN`) and `setReaction`'s friend-run check; the plain `release()` and the unguarded rollback in `setReaction`; ROADMAP "Next revision"'s three For M10 items.
-- **10b–10d:** nothing expected; new feature.
+- **10b:** the seven copies of `errorText` in the client components (`board`, `comments`, `game`, `home`, `leaderboard`, and the admin `insights`, `puzzles` and `reports` pages), now one in `src/app/messages.ts`, which `groups.tsx` would have made eight; the e2e sign-in helpers moved out of `live-board.e2e.ts` into `e2e/players.ts` rather than copied; `Home`'s `invite` prop (now `view`, which also carries a group's link and page) and `AcceptInvite`'s own clearing of the remembered invite (`Home` spends it for both kinds of link).
+- **10c–10d:** nothing expected; new feature.
 
 ---
 *Fill in the sections below at the end.*
@@ -93,6 +99,11 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Ticket (Claude's draft): release with `release(err)` | `release(true)` when the rollback failed, `release(false)` otherwise | **10a.** node-postgres documents `release(destroy?: boolean)`; passing an Error isn't documented. A failed statement whose rollback worked leaves a clean connection, so only a failed rollback destroys it |
 | Ticket: W1 (a) "last week's final standings" | Shown as "Last week", not "final" | **10a.** A run started last Sunday before midnight can still be finished and count for that day (M09 D1), so last week's totals can still grow. Rare, but "final" would be untrue |
 | Ticket: one circle query | One in TypeScript (`src/friends/circle.ts`); the SQL that sends live updates to friends (`20261022073610_live_board.sql`, `20261022095828_live_comments.sql`) keeps its own | **10a.** Applied migrations are never edited (DECISIONS.md, Database migrations). 10d's group nudges will touch that SQL anyway |
+| G10: plor_app may update a group's name, invite code and creator | Name and invite code only | **10b.** The creator changes only by handover, which a trigger running as its owner does (G6), so plor_app never needs it: least privilege |
+| G9: a nullable `group_id` on `private.comment` | Not added yet | **10b.** Nothing reads or writes it until the group thread (10d), which adds it (CLAUDE.md, Build for today) |
+| G6: the handover and the empty group's deletion | Database triggers with their owner's rights, and a deferred foreign key from the group to its creator's membership | **10b.** Deleting an account removes memberships as Auth's role, which can't touch `private`, so a route can't do it; the database keeps the rule on every path |
+| G11: the display name rule for group names | `player_group_name_format` repeats `profile_display_name_format`'s check, with a pointer to it | **10b.** Applied migrations are never edited, so one shared check would mean replacing the profile's constraint as well, a second change with no other caller |
+| M07 7b: an invite link opened signed out survives the Google round trip | Both kinds of invite link do; a group's page (`/groups/<id>`) opened signed out returns to `/` after Google | **10b.** Only links that need to be accepted were remembered in M07; a member reaches their group from the home page's Groups section |
 
 ## Evidence
 **10a** (2026-10-22, a Thursday, on the local stack):
@@ -111,6 +122,26 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - **One copy** (criterion 3): `grep -rn "private.friendship" src --include=*.ts | grep -v "\.test\.ts"` finds `src/friends/circle.ts:8` and `:20` and the friendship writes `src/friends/friends.ts:61` (insert) and `:77` (delete), nothing else. The board, friends, comments and reactions tests weren't edited and pass (next line).
 - **Everything else:** `npm test` → `Test Files 32 passed (32)`, `Tests 213 passed (213)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 14 passed (14)`, `Tests 130 passed (130)`; `npm run test:sql` → `Files=12, Tests=172 … Result: PASS`.
 - **The page** (criterion 5): `npm run test:e2e` → `3 passed (26.9s)`, reading this week's list inside the friends leaderboard. The run before it, straight after `supabase start`, failed once in "a reconnect refetches the board" and passed alone (`1 passed (15.2s)`): the known slow first compile (HANDOFF, Local state), in a test that doesn't read the leaderboard.
+
+**10b** (2026-10-22, on the local stack, migration `20261023050925_groups.sql` applied):
+- **Database rules** (criterion 1): `npx supabase test db supabase/tests/groups.test.sql` → `Files=1, Tests=25 … Result: PASS` (the name rule, the code's shape and uniqueness, the creator always a member, the 51st member and an 11th group refused, the handover on leaving and on account deletion, the last member deleting the group, a group's deletion removing its memberships).
+- **Grants** (criterion 2): `npm run test:sql` → `Files=13, Tests=197 … Result: PASS`, with the eight new grants listed in `plor_app_role.test.sql` and `private_schema.test.sql` unchanged. As plor_app itself: `npx vitest run src/groups/groups.plor-app.db.test.ts` → `✓ creates, joins, renames, resets, removes, hands over and deletes as plor_app`, including `set constraints all immediate` (what a commit checks) after the handover.
+- **Routes** (criterion 3): `npx vitest run src/app/api/groups/route.db.test.ts --reporter=verbose`
+  ```
+  ✓ … signs in four players, three of them with usernames
+  ✓ … creates a group with its creator as the only member, and checks the name rule (G1, G11)
+  ✓ … shows a group only to its members (G3)
+  ✓ … joins by invite link, once, and only with a username (G1, G7)
+  ✓ … refuses the creator's powers to other members (G1)
+  ✓ … lets the creator rename the group and reset its link, which stops the old one working
+  ✓ … lets the creator remove a member, who loses the group (G6)
+  ✓ … hands the group to the longest-standing member when the creator leaves (G6)
+  ✓ … refuses the 51st member and a player's 11th group (G11)
+  ✓ … deletes a group for every member, and the last member leaving deletes it too (G1, G6)
+  ```
+- **Signed out** (criterion 4): `npx vitest run src/app/api/groups/route.test.ts` → `Tests 10 passed (10)`.
+- **The pages** (criterion 5): `npx playwright test e2e/groups.e2e.ts` → `ok 1 … a group is made on the home page and joined by its link`.
+- **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 223 passed (223)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 16 passed (16)`, `Tests 141 passed (141)`; `npm run test:e2e` → `4 passed (37.2s)`.
 
 ## Review
 **10a** (reviewer, fresh context, 2026-10-22): no blocking finding in the code.

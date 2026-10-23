@@ -5,8 +5,8 @@
 // the look is M14's job.
 import { useEffect, useState } from "react";
 import type { DayInsights, QuestionInsights } from "@/insights/report";
-import { ApiError, api } from "@/lib/api-client";
-import { messageFor } from "../messages";
+import { api } from "@/lib/api-client";
+import { errorText } from "../messages";
 
 type InsightsResponse = { days: string[]; report: DayInsights };
 
@@ -24,7 +24,7 @@ export function Insights() {
         setData(r);
         setError(null);
       },
-      (err) => setError(err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`),
+      (err) => setError(errorText(err)),
     );
   }, [date]);
 

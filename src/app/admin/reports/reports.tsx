@@ -4,12 +4,8 @@
 // first report first, and Delete, which removes it for everyone. Plain on purpose; the look is M14's job.
 import { useCallback, useEffect, useState } from "react";
 import type { ReportedComment } from "@/admin/reports";
-import { ApiError, api } from "@/lib/api-client";
-import { messageFor } from "../../messages";
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
+import { api } from "@/lib/api-client";
+import { errorText } from "../../messages";
 
 export function Reports() {
   const [reports, setReports] = useState<ReportedComment[] | null>(null);

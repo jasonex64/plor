@@ -7,14 +7,10 @@
 // from the reporter (8c, D5). Plain UI; the look is M14.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Comment, Thread } from "@/comments/comments";
-import { ApiError, api } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import type { Emoji } from "@/reactions/reactions";
-import { messageFor } from "./messages";
+import { errorText } from "./messages";
 import { Reactions } from "./reactions";
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
 
 // The calendar day before or after a YYYY-MM-DD date.
 function shiftDay(date: string, days: number): string {

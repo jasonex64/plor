@@ -75,9 +75,14 @@ select is(pg_temp.grants('plor_app'), array[
   'private.friend_invite insert', 'private.friend_invite select',
   'private.friend_invite.code update',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
+  -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
+  'private.group_member delete', 'private.group_member insert', 'private.group_member select',
   'private.missed_answer insert', 'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
+  -- A group is created, read and deleted; its creator renames it and resets its link (M10 10b, G10).
+  'private.player_group delete', 'private.player_group insert', 'private.player_group select',
+  'private.player_group.invite_code update', 'private.player_group.name update',
   -- The points ledger (M09 9a, D7): append-only, written by settling and read by the leaderboard.
   'private.points_ledger insert', 'private.points_ledger select',
   'private.profile insert', 'private.profile select',

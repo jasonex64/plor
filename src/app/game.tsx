@@ -7,15 +7,11 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
 import { shareText } from "@/game/share";
-import { ApiError, api } from "@/lib/api-client";
-import { messageFor } from "./messages";
+import { api } from "@/lib/api-client";
+import { errorText } from "./messages";
 
 type RunResponse = { run: RunState };
 type AnswerResponse = { run: RunState; notInList: boolean };
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
 
 // onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a).
 export function Game({ onOver }: { onOver: (over: boolean) => void }) {

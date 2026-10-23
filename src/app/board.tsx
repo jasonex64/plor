@@ -10,9 +10,9 @@ import { RealtimeClient } from "@supabase/realtime-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
-import { ApiError, api } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import type { Emoji } from "@/reactions/reactions";
-import { messageFor } from "./messages";
+import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
 type Session = { url: string; publishableKey: string; userId: string; accessToken: string; expiresAt: number };
@@ -24,10 +24,6 @@ type StatusMessage = { v: number; username: string; puzzleDate: string; state: "
 
 // A comment or reaction changed on that day (supabase/migrations/20261022095828_live_comments.sql).
 type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string };
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
 
 // onCommentsChanged: the comments thread should be fetched again. It must keep one identity, since the channel is
 // rebuilt when it changes.

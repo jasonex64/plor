@@ -8,13 +8,9 @@ import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import { copyForClaude } from "@/admin/puzzle-entry";
 import type { DayView, QuestionView } from "@/admin/puzzles";
 import { ApiError, api } from "@/lib/api-client";
-import { messageFor } from "../../messages";
+import { errorText } from "../../messages";
 
 type DaysResponse = { today: string; days: DayView[] };
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
 
 export function Puzzles() {
   const [data, setData] = useState<DaysResponse | null>(null);
