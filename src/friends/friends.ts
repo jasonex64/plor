@@ -5,6 +5,7 @@ import { DatabaseError } from "pg";
 import { INVITE_CODE_BYTES } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { circleSql } from "./circle";
 import { INVITE_CODE } from "./invite-code";
 
 // A player as the API gives them: the username, which identifies them (removing a friend names it), and the name
@@ -83,9 +84,9 @@ export async function removeFriend(db: Db, userId: string, friendUsername: strin
 export async function listFriends(db: Db, userId: string): Promise<Friend[]> {
   const { rows } = await db.query<Friend>(
     `select p.username, coalesce(p.display_name, p.username::text) as name
-     from private.friendship f
-     join private.profile p on p.user_id = case when f.user_a = $1 then f.user_b else f.user_a end
-     where $1 in (f.user_a, f.user_b)
+     from (${circleSql("$1")}) c
+     join private.profile p on p.user_id = c.user_id
+     where c.user_id <> $1
      order by lower(coalesce(p.display_name, p.username::text)), p.username`,
     [userId],
   );

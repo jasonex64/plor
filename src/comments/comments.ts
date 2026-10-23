@@ -4,6 +4,7 @@
 // A comment the viewer reported is hidden from them (8c, D5).
 import { DatabaseError } from "pg";
 import { GAME_ID } from "@/content/puzzle";
+import { seesAuthorSql } from "@/friends/circle";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -54,8 +55,7 @@ export async function getThread(db: Db, viewerId: string, date: string | null): 
      from private.comment c
      join private.profile p on p.user_id = c.user_id
      where c.game_id = $2 and c.puzzle_date = $3::date
-       and (c.user_id = $1 or exists (
-         select from private.friendship f where f.user_a = least($1::uuid, c.user_id) and f.user_b = greatest($1::uuid, c.user_id)))
+       and ${seesAuthorSql("$1", "c.user_id")}
        and not exists (select from private.comment_report r where r.comment_id = c.id and r.reporter_id = $1)
      order by c.created_at, c.id`,
     [viewerId, GAME_ID, day[0].date],
@@ -117,9 +117,7 @@ export async function reportComment(db: Db, userId: string, id: string): Promise
                    else s.status is null or s.status = any($3::text[]) end as visible
        from private.comment c
        left join private.run_status s on s.user_id = $1 and s.game_id = c.game_id and s.puzzle_date = c.puzzle_date
-       where c.id = $2
-         and (c.user_id = $1 or exists (
-           select from private.friendship f where f.user_a = least($1::uuid, c.user_id) and f.user_b = greatest($1::uuid, c.user_id)))
+       where c.id = $2 and ${seesAuthorSql("$1", "c.user_id")}
      ), added as (
        insert into private.comment_report (comment_id, reporter_id)
        select id, $1 from target where not own and visible

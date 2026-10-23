@@ -6,6 +6,7 @@ import { named } from "@/game/payload";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, runReactions, type Reactions } from "@/reactions/reactions";
+import { circleSql } from "./circle";
 
 // How a friend's run ended, given only once the viewer's own run is over (no spoilers: DECISIONS.md, Game 1).
 // question is 1-based, as players count.
@@ -40,11 +41,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   const { date, content } = today[0];
   // The viewer and each friend, with today's run status if they started one.
   const { rows } = await db.query<Row>(
-    `with people as (
-       select $1::uuid as user_id
-       union all
-       select case when f.user_a = $1 then f.user_b else f.user_a end from private.friendship f where $1 in (f.user_a, f.user_b)
-     )
+    `with people as (${circleSql("$1")})
      select p.user_id, pr.username::text as username, coalesce(pr.display_name, pr.username::text) as name, s.status, s.answered
      from people p
      join private.profile pr on pr.user_id = p.user_id
