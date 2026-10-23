@@ -1,6 +1,6 @@
 # M10 — Groups
 
-**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions); 10b is being built on `m10-groups`.
+**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is built and reviewed, in review as a PR from `m10-groups`.
 
 ## Goal
 Players make named groups that others join by invite link. Each group has a weekly leaderboard and one shared comment thread per day. First (10a), the friends leaderboard becomes weekly, and the code friends and groups will share is cleaned up.
@@ -56,11 +56,11 @@ Players make named groups that others join by invite link. Each group has a week
 - [x] **10a** The circle query and the comment-visibility predicate each exist once in TypeScript (`grep` for `private.friendship` in `src` finds only `src/friends/circle.ts` and the friendship writes), and the existing board, friends, leaderboard, comments and reactions tests pass unchanged.
 - [x] **10a** A unit test where the rollback throws gets the original error, the rollback's is logged, and the client is destroyed (`release(true)`); with a working rollback it goes back to the pool. Both tests fail on the old code.
 - [x] **10a** The page shows both weeks; the e2e test reads this week's list.
-- [ ] **10b** The database keeps the group rules (pgTAP, `supabase/tests/groups.test.sql`): a name follows the display name rule (G11); an invite code is 22 base64url characters and unique (G8); a group's creator is always one of its members; the 51st member and a player's 11th group are refused (G11); when the creator leaves, or their account is deleted, the longest-standing member becomes creator; when the last member leaves, the group is deleted; deleting a group deletes its memberships (G6).
-- [ ] **10b** `plor_app` holds exactly the new grants (G10): `supabase/tests/plor_app_role.test.sql` lists them, and `private_schema.test.sql` still passes (RLS on, plor_app-only policies).
-- [ ] **10b** The routes, against the local stack (`src/app/api/groups/route.db.test.ts`): create (the creator is the first member), list, a group's page data for members only (anyone else gets 404), preview and join by invite link, rename, reset the link (the old one stops working), remove, leave with the creator handover, and delete; a member who isn't the creator gets 403 for each creator power; a full group, an 11th group, an invalid name and joining twice get their errors.
-- [ ] **10b** Every group route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
-- [ ] **10b** The pages (`e2e/groups.e2e.ts`): one player creates a group in the home page's Groups section and copies its link from the group page; a second player opens the link signed out, signs in, picks a username, joins, and sees both members on the group page.
+- [x] **10b** The database keeps the group rules (pgTAP, `supabase/tests/groups.test.sql`): a name follows the display name rule (G11); an invite code is 22 base64url characters and unique (G8); a group's creator is always one of its members; the 51st member and a player's 11th group are refused (G11); when the creator leaves, or their account is deleted, the longest-standing member becomes creator; when the last member leaves, the group is deleted; deleting a group deletes its memberships (G6).
+- [x] **10b** `plor_app` holds exactly the new grants (G10): `supabase/tests/plor_app_role.test.sql` lists them, and `private_schema.test.sql` still passes (RLS on, plor_app-only policies).
+- [x] **10b** The routes, against the local stack (`src/app/api/groups/route.db.test.ts`): create (the creator is the first member), list, a group's page data for members only (anyone else gets 404), preview and join by invite link, rename, reset the link (the old one stops working), remove, leave with the creator handover, and delete; a member who isn't the creator gets 403 for each creator power; a full group, an 11th group, an invalid name and joining twice get their errors; under concurrent requests, a creator and the next member leaving at once don't deadlock, and only one of three joins fills a group's last place.
+- [x] **10b** Every group route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
+- [x] **10b** The pages (`e2e/groups.e2e.ts`): one player creates a group in the home page's Groups section and copies its link from the group page; a second player opens the link signed out, signs in, picks a username, joins, and sees both members on the group page.
 - [ ] **10c–10d** Criteria written when each starts.
 
 ## Out of scope
@@ -101,7 +101,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | Ticket: one circle query | One in TypeScript (`src/friends/circle.ts`); the SQL that sends live updates to friends (`20261022073610_live_board.sql`, `20261022095828_live_comments.sql`) keeps its own | **10a.** Applied migrations are never edited (DECISIONS.md, Database migrations). 10d's group nudges will touch that SQL anyway |
 | G10: plor_app may update a group's name, invite code and creator | Name and invite code only | **10b.** The creator changes only by handover, which a trigger running as its owner does (G6), so plor_app never needs it: least privilege |
 | G9: a nullable `group_id` on `private.comment` | Not added yet | **10b.** Nothing reads or writes it until the group thread (10d), which adds it (CLAUDE.md, Build for today) |
-| G6: the handover and the empty group's deletion | Database triggers with their owner's rights, and a deferred foreign key from the group to its creator's membership | **10b.** Deleting an account removes memberships as Auth's role, which can't touch `private`, so a route can't do it; the database keeps the rule on every path |
+| G6: the handover and the empty group's deletion | Database triggers with their owner's rights, and a deferred foreign key from the group to its creator's membership | **10b.** The rule holds on every path that removes a membership, deleting an account included, which no route sees; the handover sets `creator_id`, which plor_app may not (G10 row above), so the triggers run as their owner |
 | G11: the display name rule for group names | `player_group_name_format` repeats `profile_display_name_format`'s check, with a pointer to it | **10b.** Applied migrations are never edited, so one shared check would mean replacing the profile's constraint as well, a second change with no other caller |
 | M07 7b: an invite link opened signed out survives the Google round trip | Both kinds of invite link do; a group's page (`/groups/<id>`) opened signed out returns to `/` after Google | **10b.** Only links that need to be accepted were remembered in M07; a member reaches their group from the home page's Groups section |
 
@@ -138,12 +138,22 @@ Every value this milestone needs, and where it comes from. A blank origin means 
   ✓ … hands the group to the longest-standing member when the creator leaves (G6)
   ✓ … refuses the 51st member and a player's 11th group (G11)
   ✓ … deletes a group for every member, and the last member leaving deletes it too (G1, G6)
+  ✓ … groups under concurrent requests > lets the creator and the next member leave at once, ten times over, with no deadlock (G6)
+  ✓ … groups under concurrent requests > lets only one of three joins into a group of 49 through (G11)
   ```
+  The deadlock test fails on the code before the review fix (`error: deadlock detected`, the leave statement), and passed three runs in a row after it.
 - **Signed out** (criterion 4): `npx vitest run src/app/api/groups/route.test.ts` → `Tests 10 passed (10)`.
 - **The pages** (criterion 5): `npx playwright test e2e/groups.e2e.ts` → `ok 1 … a group is made on the home page and joined by its link`.
-- **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 223 passed (223)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 16 passed (16)`, `Tests 141 passed (141)`; `npm run test:e2e` → `4 passed (37.2s)`.
+- **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 223 passed (223)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 16 passed (16)`, `Tests 143 passed (143)`; `npm run test:e2e` → `4 passed (35.4s)` (all rerun after the review fix).
 
 ## Review
 **10a** (reviewer, fresh context, 2026-10-22): no blocking finding in the code.
 - Blocking findings and how each was fixed: the empty Evidence (filled above) and a handoff that still said 10a waited on W1 (rewritten).
 - Not deferred, under "Keep only what someone will act on" (ROADMAP "Next revision"): the Monday branch of the route test hasn't run yet (CI on a Monday runs it); the week unit test's time-change case can't fail (the criterion now says so); `private.today()` and the sums are read in two queries, so a request across midnight could label the weeks from the old day (milliseconds, cosmetic); the week titles' "en-US" dates (the look, M14).
+
+**10b** (reviewer, fresh context, 2026-10-22):
+- Blocking findings and how each was fixed:
+  - **A deadlock when the creator and the member they hand the group to leave at once** (reproduced by the reviewer with two connections). A delete locks its membership row before the guard trigger locks the group, and the creator's handover then waits at commit on that member's row. Fixed: the leave and remove statements lock the group first (`LOCK_GROUP` in `src/groups/groups.ts`), with a two-connection test that failed before the fix. Deleting an account still takes the locks the other way round: ROADMAP "Next revision", For M12.
+  - **The handoff, ROADMAP row and this Status line were behind the work:** updated in this PR.
+- Deferred to ROADMAP "Next revision": the account-deletion ordering (For M12) and a join racing the group's deletion, which gets a 500 instead of `invite_invalid` (Correctness).
+- Not deferred, under "Keep only what someone will act on": the migration's stated reason for owner's rights was wrong (corrected: the handover sets `creator_id`); an invite code collision on create (16 random bytes); `Home` now spends a remembered invite once signed in rather than when the invite renders (nothing a player sees changes); the Google round trip through a group's link has no automated test, like M07's.

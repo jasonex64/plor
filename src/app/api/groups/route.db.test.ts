@@ -3,6 +3,7 @@
 // (docs/milestones/M10-groups.md, 10b).
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { GROUP_MAX_MEMBERS, GROUP_NAME_MAX_LENGTH, GROUPS_PER_PLAYER } from "@/config/tunables";
+import { createGroup, joinGroup, leaveGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
@@ -203,5 +204,48 @@ describe("groups", () => {
     expect((await call(leave, "/api/groups/leave", "POST", { id: longName })).status).toBe(200);
     const { rows } = await getPool().query("select count(*)::int as n from private.player_group where id = $1", [longName]);
     expect(rows[0].n).toBe(0);
+  });
+});
+
+// Two connections at once (CLAUDE.md, Testing: concurrency). Players without sign-ins call the group functions the
+// routes call; only memberships matter here.
+describe("groups under concurrent requests", () => {
+  async function players(n: number): Promise<string[]> {
+    const { rows } = await getPool().query<{ id: string }>(
+      `insert into auth.users (id, email) select gen_random_uuid(), $1 || gen_random_uuid() || '@example.test' from generate_series(1, $2::int)
+       returning id`,
+      [`${RUN}-c`, n],
+    );
+    return rows.map((r) => r.id);
+  }
+  async function groupOf(ids: string[]): Promise<{ id: string; code: string }> {
+    const { id } = await createGroup(getPool(), ids[0], "Race");
+    const { rows } = await getPool().query("select invite_code from private.player_group where id = $1", [id]);
+    for (const other of ids.slice(1)) await joinGroup(getPool(), other, rows[0].invite_code);
+    return { id, code: rows[0].invite_code };
+  }
+
+  // Each leave locks the group before its membership, so the creator's handover never waits on a membership another
+  // leave already holds (the 10b review reproduced a deadlock when they were taken the other way round).
+  it("lets the creator and the next member leave at once, ten times over, with no deadlock (G6)", async () => {
+    for (let i = 0; i < 10; i++) {
+      const [a, b, c] = await players(3);
+      const two = await groupOf([a, b]);
+      expect(await Promise.all([leaveGroup(getPool(), a, two.id), leaveGroup(getPool(), b, two.id)])).toEqual([undefined, undefined]);
+      expect((await getPool().query("select count(*)::int as n from private.player_group where id = $1", [two.id])).rows[0].n).toBe(0);
+
+      const three = await groupOf([a, b, c]);
+      await Promise.all([leaveGroup(getPool(), a, three.id), leaveGroup(getPool(), b, three.id)]);
+      const { rows } = await getPool().query("select creator_id from private.player_group where id = $1", [three.id]);
+      expect(rows).toEqual([{ creator_id: c }]);
+    }
+  });
+
+  it(`lets only one of three joins into a group of ${GROUP_MAX_MEMBERS - 1} through (G11)`, async () => {
+    const ids = await players(GROUP_MAX_MEMBERS - 1 + 3);
+    const { code } = await groupOf(ids.slice(0, GROUP_MAX_MEMBERS - 1));
+    const results = await Promise.allSettled(ids.slice(GROUP_MAX_MEMBERS - 1).map((id) => joinGroup(getPool(), id, code)));
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    expect(results.filter((r) => r.status === "rejected").map((r) => (r as PromiseRejectedResult).reason.code)).toEqual(["group_full", "group_full"]);
   });
 });

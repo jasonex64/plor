@@ -35,10 +35,13 @@ create index group_member_user_id on private.group_member (user_id);
 alter table private.player_group add constraint player_group_creator_is_member
   foreign key (id, creator_id) references private.group_member (group_id, user_id) deferrable initially deferred;
 
--- Before a membership is added or removed, the group's row is locked, so joins and leaves of one group run one at a
+-- Before a membership is added or removed, the group's row is locked, so changes to one group's members run one at a
 -- time: the member count can't pass the cap, and two members leaving at once can't both hand the group to each
--- other. A join also locks the joining player's profile, so their group count can't pass the cap either. Runs with
--- its owner's rights because deleting an account removes memberships as Auth's role, not plor_app (G6).
+-- other. A join also locks the joining player's profile, so their group count can't pass the cap either. A delete has
+-- already locked its membership row by the time this runs, so the app's leave and remove statements lock the group
+-- first (src/groups/groups.ts, LOCK_GROUP); otherwise a creator's handover can deadlock with the member it hands the
+-- group to leaving at the same moment. Deleting an account (Auth's cascade) still takes them the other way round, so
+-- it can deadlock with a leave in the same group, which aborts one of them (40P01): ROADMAP, Next revision, For M12.
 create function private.group_member_guard() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -63,7 +66,9 @@ create trigger group_member_guard before insert or delete on private.group_membe
   for each row execute function private.group_member_guard();
 
 -- After a member leaves, is removed or deletes their account: the last member's group is deleted, and a creator's
--- group passes to the longest-standing member (G6). When the group itself was deleted, both find nothing to do.
+-- group passes to the longest-standing member (G6). When the group itself was deleted, both find nothing to do. Runs
+-- with its owner's rights because it sets creator_id, which plor_app may not (G10, Source diff); the guard above runs
+-- the same way so both act alike whoever deletes the membership.
 create function private.group_member_left() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin

@@ -90,9 +90,18 @@ export async function joinGroup(db: Db, userId: string, code: string): Promise<G
   }
 }
 
+// Locks the group before the membership a statement deletes. A membership row is locked only when it is deleted,
+// after the join with this has run, so the group always comes first; otherwise a creator handing the group to a
+// member who is leaving at the same moment deadlocks with them (10b review: the handover's commit waits on that
+// member's row while they wait on the group).
+const LOCK_GROUP = "with locked as materialized (select id from private.player_group where id = $2 for update)";
+
 // Any member may leave; a creator who leaves hands the group on, and the last member deletes it (G6, in the database).
 export async function leaveGroup(db: Db, userId: string, groupId: string): Promise<void> {
-  const { rowCount } = await db.query("delete from private.group_member where group_id = $2 and user_id = $1", [userId, groupId]);
+  const { rowCount } = await db.query(
+    `${LOCK_GROUP} delete from private.group_member m using locked where m.group_id = locked.id and m.user_id = $1`,
+    [userId, groupId],
+  );
   if (rowCount === 0) throw new AppError("group_not_found", 404);
 }
 
@@ -133,8 +142,8 @@ export async function resetGroupInvite(db: Db, userId: string, groupId: string):
 export async function removeMember(db: Db, userId: string, groupId: string, username: string): Promise<void> {
   await checkCreator(db, userId, groupId);
   const { rowCount } = await db.query(
-    `delete from private.group_member m using private.profile p, private.player_group g
-     where g.id = $2 and g.creator_id = $1 and m.group_id = g.id and p.username = $3 and m.user_id = p.user_id and m.user_id <> $1`,
+    `${LOCK_GROUP} delete from private.group_member m using locked, private.profile p, private.player_group g
+     where g.id = locked.id and g.creator_id = $1 and m.group_id = g.id and p.username = $3 and m.user_id = p.user_id and m.user_id <> $1`,
     [userId, groupId, username],
   );
   if (rowCount === 0) throw new AppError("member_not_found", 404);
