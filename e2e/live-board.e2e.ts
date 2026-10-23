@@ -127,14 +127,14 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const body = `report me ${RUN}`;
   await player.getByLabel("Comment", { exact: true }).fill(body);
   await player.getByRole("button", { name: "Post" }).click();
-  const playerComment = player.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
+  const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(playerComment).toBeVisible();
-  const watcherComment = watcher.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body });
+  const watcherComment = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(watcherComment).toBeVisible();
   await watcherComment.getByRole("button", { name: "😂" }).click();
   await expect(playerComment.getByRole("button", { name: "😂" })).toHaveText("😂 1");
   await watcherComment.getByRole("button", { name: "Report" }).click();
-  await expect(watcher.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
+  await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
   await watcher.goto("/admin/reports");
   const reported = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: body });
@@ -142,7 +142,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(reported).toContainText("1 report, first");
   await reported.getByRole("button", { name: "Delete comment" }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();
-  await expect(player.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
+  await expect(player.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
 
   // Every change came over Realtime as a nudge, and no frame either page received holds the comment's text.
   const received = frames.join("\n");
