@@ -15,7 +15,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **To build 12c on the Mac: install Docker** (the local Supabase stack runs in it); see Local state.
 - **New questions for the repeated categories** (human, 2026-10-23: "new categories"). Each repeats a 2026-10-22 question: 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck; 10-22 Q2 is a dessert), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants): check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*). "Allow public access" is already off in the hosted Realtime settings (human, 2026-10-23: "done").
 - **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac checkout; delete it on the machine that has it (human OK, 2026-10-23).
@@ -26,7 +25,10 @@ Write 12c's acceptance criteria (A4, A5, A7–A10, and ROADMAP "Next revision", 
 
 ## Local state
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`. Its git uses the macOS keychain for GitHub (the human allowed it, 2026-10-23).
-- **The Mac can't run the app or the database tests yet** (checked 2026-10-23): no Docker (`docker` not found), no `node_modules`, no `.env.local`. Installing Docker is the human's; then the steps below. The earlier machine's stack held every migration up to `20261023083041_username_change.sql`, `jasonex64` as an admin, and the approved 2026-10-22 day.
+- **The Mac is set up** (2026-10-23): `npm ci` done; Docker Desktop is running; the local Supabase stack is **left running** with every migration up to `20261023083041_username_change.sql`; `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Evidence on a fresh stack: `npm test` 236 passed, `supabase test db` 220 PASS, `npm run test:db` 180 passed.
+  - Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`. OrbStack is also installed and unused.
+  - This stack is fresh: no admin and no approved day yet (the earlier machine's held `jasonex64` as an admin and the approved 2026-10-22 day). Playwright's Chromium isn't installed here yet (`npx playwright install chromium`).
+  - npm skipped two install scripts not covered by `allowScripts` (`fsevents`, `unrs-resolver`); every suite above passed without them.
 - `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
 - The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
