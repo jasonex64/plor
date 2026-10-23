@@ -11,11 +11,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   - **G1–G11 and the numbers are answered** (human, 2026-10-22: Claude's suggestions; 50 members, 10 groups, the display name rule).
   - **10b is merged** (PR #50): groups with invite links, the creator's powers and handover, the Groups section, `/groups/<id>` and `/groups/join/<code>`. It's a security change, recorded in DECISIONS.md.
   - **10c is merged** (PR #51): each group's weekly board on `/groups/<id>`, from `GET /api/groups/leaderboard?id=`, the same code as the friends board (`weeklyBoard` in `src/friends/leaderboard.ts`).
-  - **10d is in review** (a PR from `m10-groups`), the last sub-ticket: each group's comment thread per day on `/groups/<id>`, live. `private.comment.group_id` (migration `20261023060640_group_thread.sql`), `seesCommentSql` in `src/friends/circle.ts`, `?group=` on `/api/comments`, and the Realtime channel moved into `useBoardChannel` (`src/app/board-channel.ts`). The reviewer's blocking findings (missing evidence) are fixed. It merges on all-green CI with the human's OK.
+  - **10d is in review** (PR #52), the last sub-ticket: each group's comment thread per day on `/groups/<id>`, live. `private.comment.group_id` (migration `20261023060640_group_thread.sql`), `seesCommentSql` in `src/friends/circle.ts`, `?group=` on `/api/comments`, and the Realtime channel moved into `useBoardChannel` (`src/app/board-channel.ts`). The reviewer's blocking findings (missing evidence) are fixed. It merges on all-green CI with the human's OK.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge 10d's PR** once CI is green. That finishes M10.
+- **Merge PR #52 (10d)** once CI is green. That finishes M10.
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
