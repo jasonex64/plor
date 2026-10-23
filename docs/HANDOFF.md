@@ -7,11 +7,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M08, M09 and M10 (Groups) are done** (tickets in `docs/milestones/`; M10's last PR was #52). Their branches are deleted.
   - M10 moved the board's Realtime channel into `useBoardChannel` (`src/app/board-channel.ts`), and `seesCommentSql` in `src/friends/circle.ts` decides who sees a comment, friends thread or group. M11's feed builds on both.
-- **M11, Home screen, has a draft ticket** (`docs/milestones/M11-home-screen.md`) in a PR from `m11-home-screen`, docs only. No code until the human answers H1–H6 and the minimum.
+- **M11, Home screen, has its ticket** (`docs/milestones/M11-home-screen.md`) in PR #53 from `m11-home-screen`, docs only. Every decision is answered (H1–H8 and the minimum of 5, 2026-10-22).
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **M11: H6 and the minimum for answer shares.** H1–H5, H7 and H8 are answered (H1 changed by the human after a mockup shown in chat, 2026-10-22).
+- **Merge PR #53** (M10 done, the M11 ticket) once CI is green, before 11a starts (CLAUDE.md: merge the open PR before the next sub-ticket).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
@@ -23,7 +23,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once the human answers the M11 decisions: write their answers into the ticket (with origins), update the ROADMAP row, merge the draft PR on green CI with the human's OK, then build 11a on `m11-home-screen` (read `node_modules/next/dist/docs/` first, AGENTS.md).
+Once PR #53 is merged: build 11a on `m11-home-screen` (read `node_modules/next/dist/docs/` first, AGENTS.md).
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
