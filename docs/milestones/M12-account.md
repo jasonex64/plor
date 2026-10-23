@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** in progress. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). The ticket is merged (PR #57). 12a is merged (PR #58, on all-green CI with the human's OK). 12b is merged (PR #59, on all-green CI, the human approving its security change with the caller's-rights trigger). The Supabase user management source is in SOURCES.md (2026-10-23, the human's OK). A9 and A10 answered (human, 2026-10-23). 12c is built and in review on `m12-account`; 12d (the three fixes the human decided) comes after it.
+**Status:** in progress. Drafted 2026-10-23; A1–A8 and the username interval answered by the human, 2026-10-23 (Claude's suggestions). The ticket is merged (PR #57). 12a is merged (PR #58, on all-green CI with the human's OK). 12b is merged (PR #59, on all-green CI, the human approving its security change with the caller's-rights trigger). The Supabase user management source is in SOURCES.md (2026-10-23, the human's OK). A9 and A10 answered (human, 2026-10-23). 12c is built and in review (PR #60); 12d (the three fixes the human decided) comes after it.
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.

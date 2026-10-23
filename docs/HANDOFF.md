@@ -8,19 +8,19 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
 - **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). A1–A10 are answered (human, 2026-10-23).
   - **12a and 12b are merged** (PRs #58 and #59).
-  - **12c is built and in review** (a PR from `m12-account`): `/account`'s Delete account (type your username, then the button), `POST /api/account/delete`, and migration `20261023200556_account_deletion.sql`: `private.delete_account` leaves each group first and then deletes the `auth.users` row (a security change: `plor_app` may execute it); run-key indexes on comments and reactions; `plor_app`'s profile insert narrowed to `(user_id, username)` (A10, a security change). The privacy page says you can delete your account yourself. The reviewer's two blocking findings (this handoff and the ROADMAP row) are fixed; its others are in ROADMAP "Next revision", For M12. It merges on all-green CI with the human's OK.
+  - **12c is built and in review** (PR #60): `/account`'s Delete account (type your username, then the button), `POST /api/account/delete`, and migration `20261023200556_account_deletion.sql`: `private.delete_account` leaves each group first and then deletes the `auth.users` row (a security change: `plor_app` may execute it); run-key indexes on comments and reactions; `plor_app`'s profile insert narrowed to `(user_id, username)` (A10, a security change). The privacy page says you can delete your account yourself. The reviewer's two blocking findings (this handoff and the ROADMAP row) are fixed; its others are in ROADMAP "Next revision", For M12. It merges on all-green CI with the human's OK.
   - **12d** comes next: the three fixes the human decided on 2026-10-23 (ROADMAP "Next revision", "Decided by the human"). Its criteria and open details are settled with the human when it starts.
 - **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge the 12c PR** once CI is green. It carries two security changes (DECISIONS.md Log, 2026-10-23) and one Source diff row to judge: a player who signed in but never picked a username can't delete themselves (they hold only Auth's user row).
+- **Merge PR #60 (12c)** once CI is green. It carries two security changes (DECISIONS.md Log, 2026-10-23) and one Source diff row to judge: a player who signed in but never picked a username can't delete themselves (they hold only Auth's user row).
 - **New questions for the repeated categories** (human, 2026-10-23: "new categories"): 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants): check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*), and that the hosted `postgres` role may delete from `auth.users` inside `delete_account` (12c; *unverified*: it does locally). "Allow public access" is already off in the hosted Realtime settings (human, 2026-10-23).
 - **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it (human OK, 2026-10-23).
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once the 12c PR is merged: start 12d on `m12-account`. Draft its criteria and ask the human the open details first (what the live board shows a friend before you finish; whether a member's join day counts on a group board; what the comment-deletion record stores and who reads it).
+Once PR #60 is merged: start 12d on `m12-account`. Draft its criteria and ask the human the open details first (what the live board shows a friend before you finish; whether a member's join day counts on a group board; what the comment-deletion record stores and who reads it).
 
 ## Local state
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub.
