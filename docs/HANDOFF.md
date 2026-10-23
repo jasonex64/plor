@@ -2,22 +2,18 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-23, by the session that finished M10 and built M11 (11a–11c), on `m11-home-screen`.
+**Updated:** 2026-10-23, by the session that finished M10 and M11 and drafted M12, on `m12-account`.
 
 ## Where things stand
-- **M08, M09 and M10 (Groups) are done** (tickets in `docs/milestones/`; M10's last PR was #52). Their branches are deleted.
-  - M10 moved the board's Realtime channel into `useBoardChannel` (`src/app/board-channel.ts`), and `seesCommentSql` in `src/friends/circle.ts` decides who sees a comment, friends thread or group. M11's feed builds on both.
-- **M11, Home screen, is in progress** (`docs/milestones/M11-home-screen.md`, branch `m11-home-screen`). The ticket is merged (PR #53); every decision is answered (H1–H8 and the minimum of 5, 2026-10-22).
-  - **11a is merged** (PR #54): the streak (`src/game/streak.ts`) and each answer's share in the run state, and yesterday's board (`GET /api/leaderboard/yesterday`), in plain UI that 11c moves into the game card.
-  - **11b is merged** (PR #55): the home page's feed (`GET /api/feed`, `src/comments/feed.ts`), replacing the home Comments section for today; names and counts only before the run is over.
-  - **11c is in review** (PR #56), the last sub-ticket: the home page in H1's order with the Offbeat card on top; `latestOnly` (`src/lib/latest.ts`) for overlapping loads; every section but a game in play moves to the new day at midnight, on the home page and a group's page; "Live updates paused, reconnecting…" while Realtime is down; the intro copy. The reviewer's blocking findings are fixed. It merges on all-green CI with the human's OK, which finishes M11.
+- **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
+  - M11 made the home page the Offbeat card (streak, game, yesterday's standings), the feed (`src/comments/feed.ts`), friends today, the friends leaderboard, groups and account. `latestOnly` (`src/lib/latest.ts`) guards overlapping loads, and the page moves to the new day at midnight except a game in play.
+- **M12, Account, has a draft ticket** (`docs/milestones/M12-account.md`) in a PR from `m12-account`, docs only. No code until the human answers A1–A8 and the username interval, and adds the Supabase Auth "managing users" source A7 needs.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge PR #56 (11c)** once CI is green. That finishes M11.
+- **M12: A1–A8, the username interval, and the Supabase Auth source for A7** (the ticket's decision table, Numbers and Source).
 - **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
-- **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
   - check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*).
@@ -27,7 +23,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once 11c is merged: mark M11 done (ticket Status, ROADMAP row) and delete `m11-home-screen`. Then the next milestone is M12, Account: draft its ticket from its ROADMAP row and the "For M12" items, for the human to approve before any code. Its open question is whether usernames can change, and how often.
+Once the human answers M12's decisions: write the answers into the ticket with their origins, write 12a's acceptance criteria, merge the draft PR on green CI with the human's OK, then build 12a on `m12-account` (read `node_modules/next/dist/docs/` first, AGENTS.md).
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
