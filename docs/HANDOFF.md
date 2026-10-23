@@ -9,11 +9,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M10, Groups, is in progress** (`docs/milestones/M10-groups.md`, branch `m10-groups`).
   - **10a is merged** (PR #49): the weekly friends board.
   - **G1–G11 and the numbers are answered** (human, 2026-10-22: Claude's suggestions; 50 members, 10 groups, the display name rule).
-  - **10b is built, reviewed and in a PR** from `m10-groups` (number in the ticket's Status line): groups with invite links, the creator's powers and handover, the Groups section, `/groups/<id>` and `/groups/join/<code>`. It's a security change, recorded in DECISIONS.md. The reviewer's deadlock finding is fixed and tested.
+  - **10b is built, reviewed and in PR #50**: groups with invite links, the creator's powers and handover, the Groups section, `/groups/<id>` and `/groups/join/<code>`. It's a security change, recorded in DECISIONS.md. The reviewer's deadlock finding is fixed and tested.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **M10 10b:** merging its PR once CI is green (memory: merge only on all-green CI).
+- **M10 10b:** merging PR #50 once CI is green (memory: merge only on all-green CI).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
