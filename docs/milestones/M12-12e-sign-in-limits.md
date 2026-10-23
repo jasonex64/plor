@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1 is answered, (a) (human, 2026-10-23); L2–L4, every number below and Vercel's request headers source wait on the human. No code before they're answered.
+**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is drafted below and waits for the human's OK in SOURCES.md; then the criteria are written and 12e is built, before 12d. No code before they're answered.
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send.
@@ -27,23 +27,25 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
   - (c) **Vercel Firewall rate-limit rules** on `/api/auth/*`, set in the Vercel dashboard. They aren't in the repo or tests, and Vercel's firewall docs aren't in SOURCES.md.
 
   **Claude's suggestion:** (a), and raise Auth's limits. **Answer: (a)** (human, 2026-10-23: "12e L1: (a), our own limits in Postgres with no secret key").
-- **L2 — what a refused request gets.** 429 `too_many_attempts`, and the form says to wait, or to ask for a new code. Each refusal is logged through the one logger with its kind and a hash of the key (never the email itself), so a flood shows in the Vercel logs (CLAUDE.md: retries and limits are logged and counted).
-- **L3 — session refreshes.** The proxy refreshes sessions from the server too, so 150 per 5 minutes is shared by every signed-in player. Raising that limit in the hosted Auth settings (a number) is part of this ticket. Whether the beta's size comes near it is for the M15 load test.
-- **L4 — where it goes.** Claude suggests 12e, before 12d: it closes a security hole that is now readable in a public repo, and 12d is three game fixes. Or after 12d, as M12's last sub-ticket.
+- **L2 — what a refused request gets.** 429 `too_many_attempts`, and the form says to wait, or to ask for a new code. Each refusal is logged through the one logger with its kind and a hash of the key (never the email itself), so a flood shows in the Vercel logs (CLAUDE.md: retries and limits are logged and counted). **Answer: as suggested** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
+- **L3 — session refreshes.** The proxy refreshes sessions from the server too, so 150 per 5 minutes is shared by every signed-in player. Raising that limit in the hosted Auth settings (a number) is part of this ticket. Whether the beta's size comes near it is for the M15 load test. **Answer: part of 12e, with N6** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
+- **L4 — where it goes.** Claude suggests 12e, before 12d: it closes a security hole that is now readable in a public repo, and 12d is three game fixes. Or after 12d, as M12's last sub-ticket. **Answer: before 12d** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
 
-## Numbers (all human numbers; none is picked here)
-| Value | Used for | Origin |
-|---|---|---|
-| Code emails per player IP, and the window | Sending (L1 a) | *the human* |
-| Code emails per email address, and the window | Sending (L1 a) | *the human* (Auth already allows 1 per 60 s per address) |
-| Code checks per player IP, and the window | Checking (L1 a) | *the human* |
-| Wrong codes per email address before a new code is needed | Checking (L1 a) | *the human* |
-| Auth's hosted limits for sign-ins, verifications and token refreshes | L1 a, L3 (the dashboard's Rate Limits page) | *the human*; today the defaults: 30, 30 and 150 per 5 minutes |
+## Numbers
+| # | Value | Used for | Origin |
+|---|---|---|---|
+| N1 | Code emails per player IP: **5 per hour** | Sending (L1 a) | human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested". Claude's reason: Resend's free plan sends 100 a day (SOURCES.md), and 5 covers a household on one connection or a few mistyped addresses |
+| N2 | Code emails per email address: **5 per hour** | Sending (L1 a) | Same answer. Auth's own 1 per 60 s per address stays underneath |
+| N3 | Code checks per player IP: **30 per 5 minutes** | Checking (L1 a) | Same answer. Auth's default per-IP verification limit (SOURCES.md, `/rate-limits`), applied to each player |
+| N4 | Wrong codes per email address before a new code is needed: **5** | Checking (L1 a) | Same answer. With N2, at most 25 guesses an hour at a 1-in-a-million code |
+| N5 | Auth's hosted limits on sign-ins and on verifications: **300 per 5 minutes each** | L1 a (the dashboard's Rate Limits page) | Same answer: 10× the defaults of 30; M15's load test sets the real size |
+| N6 | Auth's hosted limit on token refreshes: **1,500 per 5 minutes** | L3 (the same page) | Same answer: 10× the default of 150 |
 
 ## Source
 - SOURCES.md, Supabase email sending and Auth limits (`/rate-limits` at `07e69b9`): the per-IP token buckets, the defaults, "IP address forwarding" (`Sb-Forwarded-For`, a secret API key only, off by default).
 - SOURCES.md, Supabase email sign-in: one code per address per 60 s; codes last 1 hour.
-- SOURCES.md, Vercel functions package (`@vercel/functions`): `ipAddress()` is in the package, but the row lists only `attachDatabasePool`. **Missing, for the human to add:** Vercel's request headers page (whether `x-forwarded-for` and `x-real-ip` are set by Vercel and can't be spoofed). L1 (a) waits on it.
+- SOURCES.md, Vercel functions package (`@vercel/functions` 3.10.1): `ipAddress()`, which reads `x-real-ip` (installed `headers.js`).
+- **Drafted for the human's OK** (not yet in SOURCES.md): Vercel request headers, https://vercel.com/docs/headers/request-headers, last updated 2025-12-13, accessed 2026-10-23. `x-forwarded-for` is "the public IP address of the client"; Vercel overwrites it and "do[es] not forward external IPs", a restriction "in place to prevent IP spoofing"; `x-real-ip` and `x-vercel-forwarded-for` are identical to it. A proxy in front of Vercel could overwrite `x-forwarded-for`; Plor has none. Draft row: `| Vercel request headers (M12 12e) | https://vercel.com/docs/headers/request-headers (\`x-forwarded-for\`, \`x-real-ip\`, \`x-vercel-forwarded-for\`) | last updated 2025-12-13, accessed 2026-10-23 (added by the human's OK, <date>) | The client IP a function sees: set by Vercel, overwritten so a client can't spoof it, and the same in all three headers |`. L1 (a) waits on it.
 - DECISIONS.md: Sign-in, Logging, Error handling, Row-level security in `private`, App database role; the Log entry accepting the risk for the playtest (2026-10-20).
 - `docs/milestones/M02-2f-cleanup.md`, Review, blocking finding 1 (the guessing risk).
 
