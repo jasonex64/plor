@@ -50,6 +50,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   await watcher.goto("/");
   await signInAndPick(watcher, "w");
+  // The invite link is on the account page (M12 12a).
+  await watcher.getByRole("link", { name: "Your account" }).click();
   await watcher.getByRole("button", { name: "Make my invite link" }).click();
   const link = await watcher.locator("code").filter({ hasText: "/invite/" }).textContent();
 

@@ -3,13 +3,14 @@ import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { createProfile, getProfile } from "@/lib/profile";
 
-// Who is signed in, whether they have picked a username yet, and their display name if they set one (M07 7a).
+// Who is signed in, and whether they have picked a username yet. The display name is read on the account page
+// (GET /api/account, M12 12a).
 export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await currentUserId(await createAuthClient());
   if (!userId) return Response.json({ ok: true, signedIn: false });
   const profile = await getProfile(getPool(), userId);
-  return Response.json({ ok: true, signedIn: true, username: profile?.username ?? null, displayName: profile?.displayName ?? null });
+  return Response.json({ ok: true, signedIn: true, username: profile?.username ?? null });
 });
 
 // Creates the profile once, after the first sign-in (M00 data design §3). The user comes from the verified

@@ -77,3 +77,14 @@ export async function dayCounts(db: Db, dates: string[]): Promise<Map<string, Da
   }
   return counts;
 }
+
+// A player's all-time points: the sum of their ledger rows, once their finished runs on closed days are settled
+// (docs/milestones/M12-account.md, 12a; ROADMAP "Design review", 2). Today's run counts once the day closes (M09 D9).
+export async function allTimePoints(db: Db, userId: string): Promise<number> {
+  await settleRuns(db, [userId]);
+  const { rows } = await db.query<{ total: number }>(
+    "select coalesce(sum(points), 0)::int as total from private.points_ledger where user_id = $1 and game_id = $2",
+    [userId, GAME_ID],
+  );
+  return rows[0].total;
+}
