@@ -5,7 +5,7 @@
 // (M10 10d, G5). The browser's only Supabase connection is this Realtime one (M07 D5). Shared by the home page's board
 // and a group's page, so each opens the channel the same way.
 import { RealtimeClient } from "@supabase/realtime-js";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
 
 type Session = { url: string; publishableKey: string; userId: string; accessToken: string; expiresAt: number };
@@ -28,7 +28,8 @@ export function changesThread(message: ChangedMessage, thread: "feed" | { group:
 }
 
 // joined: the channel joined, the first time or after an interruption, when messages may have been missed, so the
-// page refetches. The handlers may change between renders; the channel stays open for the component's life.
+// page refetches. failed: the channel couldn't be opened, or a fresh token couldn't be fetched. The handlers may change
+// between renders; the channel stays open for the component's life.
 export type BoardChannelHandlers = {
   joined: (reason: "first" | "reconnect") => void;
   status?: (message: StatusMessage) => void;
@@ -36,8 +37,11 @@ export type BoardChannelHandlers = {
   failed: (err: unknown) => void;
 };
 
-export function useBoardChannel(handlers: BoardChannelHandlers): void {
+// Returns paused: the channel is down (it dropped, or its join failed) and realtime-js is retrying, so the page shows
+// that live updates are paused until it's joined (docs/milestones/M11-home-screen.md, H6: "fail loudly").
+export function useBoardChannel(handlers: BoardChannelHandlers): { paused: boolean } {
   const ref = useRef(handlers);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
     ref.current = handlers;
   });
@@ -47,9 +51,16 @@ export function useBoardChannel(handlers: BoardChannelHandlers): void {
     let client: RealtimeClient | null = null;
     // realtime-js asks for the token on every heartbeat (RealtimeClient.ts: the 'sent' heartbeat calls setAuth). A
     // fresh one is fetched once the current one would expire before the next heartbeat; otherwise it is reused.
+    // A failed fetch is shown (H6, "fail loudly"). realtime-js catches the rethrow and goes on with the old token
+    // (RealtimeClient._performAuth), so the channel runs until the server refuses that token, and then shows paused.
     async function token(): Promise<string> {
       if (!session || Date.now() >= session.expiresAt * 1000 - client!.heartbeatIntervalMs) {
-        session = await api<Session>("/api/realtime/session", { method: "GET" });
+        try {
+          session = await api<Session>("/api/realtime/session", { method: "GET" });
+        } catch (err) {
+          ref.current.failed(err);
+          throw err;
+        }
       }
       return session.accessToken;
     }
@@ -84,8 +95,10 @@ export function useBoardChannel(handlers: BoardChannelHandlers): void {
             else if (interrupted) ref.current.joined("reconnect");
             joined = true;
             interrupted = false;
+            setPaused(false);
           } else if (!cancelled) {
             interrupted = true;
+            setPaused(true);
             console.error("board channel", status, err?.message);
           }
         });
@@ -99,4 +112,8 @@ export function useBoardChannel(handlers: BoardChannelHandlers): void {
       }
     };
   }, []);
+  return { paused };
 }
+
+// What a page shows while its live updates are paused.
+export const PAUSED_TEXT = "Live updates paused, reconnecting…";

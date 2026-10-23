@@ -8,7 +8,7 @@ export default function JoinGroupPage({ params }: { params: Promise<{ code: stri
   return (
     <main>
       <h1>Plor</h1>
-      <p>You were invited to a group on Plor, a small site for daily word games. Everyone gets the same puzzle each day.</p>
+      <p>You were invited to a group on Plor, a small site with a daily word game. Everyone gets the same puzzle each day.</p>
       <Suspense fallback={<p>Loading…</p>}>
         <JoinHome params={params} />
       </Suspense>

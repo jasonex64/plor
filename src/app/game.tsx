@@ -14,8 +14,11 @@ import { errorText } from "./messages";
 type RunResponse = { run: RunState };
 type AnswerResponse = { run: RunState; notInList: boolean };
 
-// onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a).
-export function Game({ onOver }: { onOver: (over: boolean) => void }) {
+// onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a). onDayOver is
+// called at the reset, midnight Pacific, so the page can move to the new day (docs/milestones/M11-home-screen.md, H6);
+// inPlay says a question or a reveal is in play then, so this game is left alone: a run started before midnight is
+// played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
+export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void }) {
   const [run, setRun] = useState<RunState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -27,6 +30,13 @@ export function Game({ onOver }: { onOver: (over: boolean) => void }) {
     api<RunResponse>("/api/run", { method: "GET" }).then((r) => setRun(r.run), (err) => setError(errorText(err)));
   }, []);
   useEffect(load, [load]);
+  // Each state carries the time to the reset as the server measured it, so the timer starts again from each one, with
+  // whether that state is in play.
+  useEffect(() => {
+    if (!run) return;
+    const timer = setTimeout(() => onDayOver(run.status === "in_progress"), run.msToReset);
+    return () => clearTimeout(timer);
+  }, [run, onDayOver]);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -74,7 +84,7 @@ export function Game({ onOver }: { onOver: (over: boolean) => void }) {
           />
         </>
       )}
-      {over && <Result run={run} onReset={load} />}
+      {over && <Result run={run} />}
       {error && <p role="alert">{error}</p>}
     </section>
   );
@@ -106,9 +116,12 @@ function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void 
   return <p role="timer">{seconds === 1 ? "1 second left" : `${seconds} seconds left`}</p>;
 }
 
+// Nothing to do at zero: Game's own timer moves the page to the new day.
+const NOTHING = () => {};
+
 // Time to the next puzzle at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review).
-function ResetCountdown({ msToReset, onReset }: { msToReset: number; onReset: () => void }) {
-  const total = Math.ceil(useCountdown(msToReset, onReset) / 1000);
+function ResetCountdown({ msToReset }: { msToReset: number }) {
+  const total = Math.ceil(useCountdown(msToReset, NOTHING) / 1000);
   const two = (n: number) => String(n).padStart(2, "0");
   return (
     <p role="timer">
@@ -219,7 +232,7 @@ function Question({
   );
 }
 
-function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
+function Result({ run }: { run: RunState }) {
   const survived = run.answered.filter((a) => !a.matched).length;
   return (
     <div>
@@ -243,7 +256,7 @@ function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
           </li>
         ))}
       </ol>
-      <ResetCountdown msToReset={run.msToReset} onReset={onReset} />
+      <ResetCountdown msToReset={run.msToReset} />
     </div>
   );
 }

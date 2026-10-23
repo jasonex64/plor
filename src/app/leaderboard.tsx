@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
+import { latestOnly } from "@/lib/latest";
 import { errorText } from "./messages";
 
 // "Mon, Oct 19". The date is a calendar date; read in UTC so the label can't shift by a day (as src/game/share.ts).
@@ -46,6 +47,8 @@ export function Yesterday() {
   const [group, setGroup] = useState<string | null>(null);
   const [day, setDay] = useState<Day | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Chips can be tapped faster than the answers come back: only the newest choice's answer is shown (M11 H6).
+  const [latest] = useState(latestOnly);
 
   useEffect(() => {
     api<{ groups: { id: string; name: string }[] }>("/api/groups", { method: "GET" }).then(
@@ -55,15 +58,19 @@ export function Yesterday() {
   }, []);
   useEffect(() => {
     const path = group === null ? "/api/leaderboard/yesterday" : `/api/leaderboard/yesterday?group=${encodeURIComponent(group)}`;
-    api<{ day: Day }>(path, { method: "GET" }).then(
-      (r) => setDay(r.day),
+    latest(
+      api<{ day: Day }>(path, { method: "GET" }),
+      (r) => {
+        setDay(r.day);
+        setError(null);
+      },
       (err) => setError(errorText(err)),
     );
-  }, [group]);
+  }, [group, latest]);
 
   return (
     <section aria-label="Yesterday">
-      <h2>Yesterday</h2>
+      <h3>Yesterday</h3>
       <p>
         {[{ id: null, name: "Friends" }, ...groups].map((g) => (
           <button key={g.id ?? "friends"} type="button" aria-pressed={group === g.id} onClick={() => setGroup(g.id)}>

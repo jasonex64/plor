@@ -173,5 +173,44 @@ test("a reconnect refetches the board", async ({ browser }) => {
   await openBoard(page);
   const refetch = page.waitForRequest((r) => r.url().includes("/api/board?reason=reconnect"));
   execSync("docker restart supabase_realtime_plor", { stdio: "ignore" });
+  // While the channel is down, the page says so (M11 H6), and stops saying so once it's back.
+  const paused = page.getByRole("region", { name: "Friends today" }).getByText("Live updates paused, reconnecting…");
+  await expect(paused).toBeVisible();
   await refetch;
+  await expect(paused).toBeHidden();
+});
+
+// At midnight Pacific every section of an open home page starts again from the server's new day (M11 H6), not only
+// the game. The browser's clock is moved past the reset, at most 25 hours away (a day with a time change), so the page's
+// reset timer fires; each section then loads again.
+test("the reset reloads every section of the home page", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.clock.install();
+  await page.goto("/");
+  await signInAndPick(page, "m");
+  await openBoard(page);
+  await expect(page.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
+  const reloads = ["/api/run", "/api/feed", "/api/board", "/api/leaderboard", "/api/leaderboard/yesterday"].map((path) =>
+    page.waitForRequest((r) => new URL(r.url()).pathname === path),
+  );
+  await page.clock.fastForward("25:00:00");
+  await Promise.all(reloads);
+});
+
+// A question in play at midnight isn't interrupted (M11 H6; M04 G13): the run goes on to its end, so what the player
+// has typed stays, while the rest of the page moves to the new day.
+test("the reset leaves a question in play alone", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.clock.install();
+  await page.goto("/");
+  await signInAndPick(page, "q");
+  await openBoard(page);
+  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByLabel("Your answer").fill("half typ");
+  // Only the reset loads yesterday's standings again, so once that answers, the page has moved to the new day.
+  const moved = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/leaderboard/yesterday");
+  await page.clock.fastForward("25:00:00");
+  await moved;
+  await expect(page.getByRole("region", { name: "Yesterday" }).getByRole("listitem")).toHaveCount(1);
+  await expect(page.getByLabel("Your answer")).toHaveValue("half typ");
 });

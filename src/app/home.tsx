@@ -5,7 +5,7 @@
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useState, type FormEvent } from "react";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
 import { Board } from "./board";
@@ -207,6 +207,29 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
   );
 }
 
+// Offbeat's card (H1): the streak, the game or your result, and yesterday's standings. It's one card because there's
+// one game; a second game's card goes beside it, and the swipe between them with it (H8).
+// day and gameDay key what starts again at the reset (SignedIn).
+function GameCard({
+  day,
+  gameDay,
+  onOver,
+  onDayOver,
+}: {
+  day: number;
+  gameDay: number;
+  onOver: (over: boolean) => void;
+  onDayOver: (inPlay: boolean) => void;
+}) {
+  return (
+    <section aria-label="Offbeat">
+      <h2>Offbeat</h2>
+      <Game key={gameDay} onOver={onOver} onDayOver={onDayOver} />
+      <Yesterday key={day} />
+    </section>
+  );
+}
+
 function SignedIn({
   username,
   displayName,
@@ -221,6 +244,14 @@ function SignedIn({
   // Counts the board channel's nudges that comments changed (M08 8d).
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
+  // Count resets: at midnight Pacific every section that shows a day starts again, from the server's new day (M11 H6),
+  // except a game in play, which goes on to its end (gameDay).
+  const [day, setDay] = useState(0);
+  const [gameDay, setGameDay] = useState(0);
+  const nextDay = useCallback((inPlay: boolean) => {
+    setDay((d) => d + 1);
+    if (!inPlay) setGameDay((d) => d + 1);
+  }, []);
 
   async function signOut() {
     try {
@@ -233,11 +264,14 @@ function SignedIn({
 
   return (
     <>
-      <Game onOver={setRunOver} />
-      <Board username={username} onCommentsChanged={nudgeComments} />
-      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
-      <Yesterday />
-      <Comments username={username} runOver={runOver} nudge={commentsNudge} />
+      {/* The order is H1's (docs/milestones/M11-home-screen.md): the game card, the feed, friends today, this week,
+          groups, account. */}
+      <GameCard day={day} gameDay={gameDay} onOver={setRunOver} onDayOver={nextDay} />
+      <Fragment key={day}>
+        <Comments username={username} runOver={runOver} nudge={commentsNudge} />
+        <Board username={username} onCommentsChanged={nudgeComments} />
+        <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
+      </Fragment>
       <Groups />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
       <section aria-label="Account">

@@ -53,6 +53,17 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await creator.goto("/");
   await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
 
+  // The home page's layout before playing (M11 H1): the game card first, with Start and yesterday's standings, a chip
+  // per group (H7); then the feed, with nothing to read yet; then the rest, in H1's order.
+  const sections = () => creator.locator("main > section").evaluateAll((all) => all.map((s) => s.getAttribute("aria-label")));
+  await expect.poll(sections).toEqual(["Offbeat", "Feed", "Friends today", "Friends leaderboard", "Groups", "Account"]);
+  const card = creator.getByRole("region", { name: "Offbeat" });
+  await expect(card.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
+  await expect(card.getByRole("region", { name: "Yesterday" }).getByRole("button")).toHaveText(["Friends", "Book Club"]);
+  const creatorFeed = creator.getByRole("region", { name: "Feed" });
+  await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
+  await expect(creatorFeed.getByText("Finish today's puzzle to read them and join in.")).toBeVisible();
+
   // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
   // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group
   // (M11 11b).
@@ -63,6 +74,9 @@ test("a group is made on the home page and joined by its link", async ({ browser
     await page.getByRole("button", { name: "Answer" }).click();
     await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
+  // After playing, the result is in the card, and the order is the same.
+  await expect(card.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
+  await expect.poll(sections).toEqual(["Offbeat", "Feed", "Friends today", "Friends leaderboard", "Groups", "Account"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
   async function openLive(url: string) {
@@ -100,4 +114,20 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await joiner.getByRole("button", { name: "Post" }).click();
   await refetch;
   await expect(feed.getByRole("listitem").filter({ hasText: second })).toContainText("Book Club");
+});
+
+// A group's page left open past midnight moves to the new day too (M11 H6): its board and thread start again, and the
+// page asks for the time to the next reset. The browser's clock is moved past the reset, as the home page's test does.
+// Only the remount loads the board, and only the new day loads the group's details again.
+test("the reset reloads a group's page", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.clock.install();
+  await page.goto("/");
+  await signInAndPick(page, "gr");
+  await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Night Owls");
+  await page.getByRole("button", { name: "Create group" }).click();
+  await expect(page.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" })).toBeVisible();
+  const reloads = ["/api/groups/detail", "/api/groups/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
+  await page.clock.fastForward("25:00:00");
+  await Promise.all(reloads);
 });

@@ -135,6 +135,14 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
   };
 }
 
+// Milliseconds to the next reset, for a page with no run state of its own: a group's (M11 H6).
+export async function msToReset(db: Db): Promise<number> {
+  const { rows } = await db.query<{ ms: number }>(
+    "select floor(extract(epoch from private.next_reset() - statement_timestamp()) * 1000)::int as ms",
+  );
+  return rows[0].ms;
+}
+
 async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Promise<RunState> {
   // One statement, so the time left and the time to the reset are measured at the same instant.
   const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number }>(

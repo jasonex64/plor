@@ -8,7 +8,7 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
   return (
     <main>
       <h1>Plor</h1>
-      <p>A friend invited you to Plor, a small site for daily word games where friends see each other&apos;s runs.</p>
+      <p>A friend invited you to Plor, a small site with a daily word game where friends see each other&apos;s runs.</p>
       <Suspense fallback={<p>Loading…</p>}>
         <InviteHome params={params} />
       </Suspense>

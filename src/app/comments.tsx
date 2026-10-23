@@ -13,6 +13,7 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import type { Comment, Thread } from "@/comments/comments";
 import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import { api } from "@/lib/api-client";
+import { latestOnly } from "@/lib/latest";
 import type { Emoji } from "@/reactions/reactions";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
@@ -36,6 +37,8 @@ export function Comments({ username, runOver, nudge, group }: { username: string
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Loads overlap (nudges, "Earlier day", the run ending): only the newest answer is shown (M11 H6).
+  const [latest] = useState(latestOnly);
 
   const load = useCallback(() => {
     const shown = (t: Thread | Feed) => {
@@ -45,14 +48,14 @@ export function Comments({ username, runOver, nudge, group }: { username: string
     };
     const failed = (err: unknown) => setError(errorText(err));
     if (!group && date === null) {
-      api<{ feed: Feed }>("/api/feed", { method: "GET" }).then((r) => shown(r.feed), failed);
+      latest(api<{ feed: Feed }>("/api/feed", { method: "GET" }), (r) => shown(r.feed), failed);
       return;
     }
     const query = new URLSearchParams();
     if (date) query.set("date", date);
     if (group) query.set("group", group);
-    api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }).then((r) => shown(r.thread), failed);
-  }, [date, group]);
+    latest(api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }), (r) => shown(r.thread), failed);
+  }, [date, group, latest]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
   useEffect(load, [load, runOver, nudge]);
