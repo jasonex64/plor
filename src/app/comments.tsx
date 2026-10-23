@@ -4,7 +4,8 @@
 // friends', oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at
 // a time, read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can
 // be changed only where posting can. Other players' comments can be reported on any day shown, which hides them
-// from the reporter (8c, D5). Plain UI; the look is M14.
+// from the reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4).
+// Plain UI; the look is M14.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Comment, Thread } from "@/comments/comments";
 import { api } from "@/lib/api-client";
@@ -20,9 +21,10 @@ function shiftDay(date: string, days: number): string {
 }
 
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
-// that goes up when comments or reactions changed for the player's friends or on another of their tabs (8d, from the
-// board's channel), so the day shown is fetched again.
-export function Comments({ username, runOver, nudge }: { username: string; runOver: boolean; nudge: number }) {
+// that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
+// src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
+// friends thread.
+export function Comments({ username, runOver, nudge, group }: { username: string; runOver: boolean; nudge: number; group?: string }) {
   // null shows today, whose date comes from the server (the day boundary is the server's: DECISIONS.md, Day boundary).
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
@@ -32,7 +34,10 @@ export function Comments({ username, runOver, nudge }: { username: string; runOv
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    api<{ thread: Thread }>(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" }).then(
+    const query = new URLSearchParams();
+    if (date) query.set("date", date);
+    if (group) query.set("group", group);
+    api<{ thread: Thread }>(query.size ? `/api/comments?${query}` : "/api/comments", { method: "GET" }).then(
       (r) => {
         setThread(r.thread);
         if (date === null) setToday(r.thread.date);
@@ -40,7 +45,7 @@ export function Comments({ username, runOver, nudge }: { username: string; runOv
       },
       (err) => setError(errorText(err)),
     );
-  }, [date]);
+  }, [date, group]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
   useEffect(load, [load, runOver, nudge]);
@@ -62,7 +67,7 @@ export function Comments({ username, runOver, nudge }: { username: string; runOv
     event.preventDefault();
     if (!thread) return;
     void run(async () => {
-      await api("/api/comments", { method: "POST", body: { date: thread.date, body: draft } });
+      await api("/api/comments", { method: "POST", body: { date: thread.date, body: draft, group } });
       setDraft("");
     });
   }
@@ -85,7 +90,9 @@ export function Comments({ username, runOver, nudge }: { username: string; runOv
         </p>
       )}
       {thread && thread.comments === null && (
-        <p>Finish {isToday ? "today's" : "that day's"} puzzle to see your friends&apos; comments.</p>
+        <p>
+          Finish {isToday ? "today's" : "that day's"} puzzle to see {group ? "the group's" : "your friends'"} comments.
+        </p>
       )}
       {thread?.comments && thread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
       {thread?.comments && thread.comments.length > 0 && (

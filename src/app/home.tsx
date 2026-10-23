@@ -74,7 +74,7 @@ export function Home({ view }: { view?: View }) {
       ) : view?.kind === "joinGroup" ? (
         <JoinGroup code={view.code} />
       ) : view?.kind === "group" ? (
-        <GroupPage id={view.id} />
+        <GroupPage id={view.id} username={me.username} />
       ) : (
         <SignedIn username={me.username} displayName={me.displayName} onSignedOut={() => setMe({ signedIn: false })} />
       )}
