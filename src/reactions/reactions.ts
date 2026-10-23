@@ -4,10 +4,12 @@
 import type { Pool } from "pg";
 import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/content/puzzle";
+import { friendsSql, seesAuthorSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
+import { log } from "@/lib/log";
 
 export type Emoji = (typeof REACTIONS)[number];
 
@@ -42,6 +44,7 @@ export function readTarget(input: unknown): Target {
 // replace deletes the old one and inserts the new one.
 export async function setReaction(pool: Pool, userId: string, date: string, target: Target, emoji: Emoji | null): Promise<void> {
   const client = await pool.connect();
+  let broken = false;
   try {
     await client.query("begin");
     // The day, the finished run and the target are checked in the statement that deletes, so midnight can't fall
@@ -61,15 +64,12 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
        ), target as (
          select c.id as comment_id, null::uuid as run_user_id, true as played
          from private.comment c
-         where c.id = $4::bigint and c.game_id = $2 and c.puzzle_date = $3::date
-           and (c.user_id = $1 or exists (
-             select from private.friendship f where f.user_a = least($1::uuid, c.user_id) and f.user_b = greatest($1::uuid, c.user_id)))
+         where c.id = $4::bigint and c.game_id = $2 and c.puzzle_date = $3::date and ${seesAuthorSql("$1", "c.user_id")}
          union all
          select null, p.user_id,
                 exists (select from private.run r where r.user_id = p.user_id and r.game_id = $2 and r.puzzle_date = $3::date)
          from private.profile p
-         where p.username = $5
-           and exists (select from private.friendship f where f.user_a = least($1::uuid, p.user_id) and f.user_b = greatest($1::uuid, p.user_id))
+         where p.username = $5 and ${friendsSql("$1", "p.user_id")}
        ), removed as (
          delete from private.reaction r using day, target t
          where day.today = $3::date and day.status = any($6::text[]) and t.played
@@ -100,18 +100,24 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
     }
     await client.query("commit");
   } catch (err) {
-    await client.query("rollback");
+    // A rollback that fails too leaves the connection in an unknown state: it's logged and the client destroyed rather
+    // than returned to the pool (node-postgres, Pool: release(true)), and the original error is the one thrown.
+    try {
+      await client.query("rollback");
+    } catch (rollbackErr) {
+      broken = true;
+      log.error("rollback failed", { error: String(rollbackErr) });
+    }
     throw err;
   } finally {
-    client.release();
+    client.release(broken);
   }
 }
 
 type CountRow = { target: string; emoji: Emoji; count: number; mine: boolean };
 
 // Only the viewer's own reactions and their friends' count.
-const SEEN = `(r.user_id = $1 or exists (
-  select from private.friendship f where f.user_a = least($1::uuid, r.user_id) and f.user_b = greatest($1::uuid, r.user_id)))`;
+const SEEN = seesAuthorSql("$1", "r.user_id");
 
 // Reactions on each of these comments, by comment ID.
 export async function commentReactions(db: Db, viewerId: string, commentIds: string[]): Promise<Map<string, Reactions>> {
