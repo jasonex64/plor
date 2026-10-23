@@ -17,6 +17,13 @@ export const DISPLAY_NAME_MAX_LENGTH = 24;
 // 22 characters; the friends route test issues a real code through it.
 export const INVITE_CODE_BYTES = 16;
 
+// Groups (human, 2026-10-22; docs/milestones/M10-groups.md, G11): a name follows the display name rule, up to 24
+// characters; 50 members per group and 10 groups per player. The database judges all three (player_group_name_format
+// and private.group_member_guard); the groups route test sends each limit through it.
+export const GROUP_NAME_MAX_LENGTH = 24;
+export const GROUP_MAX_MEMBERS = 50;
+export const GROUPS_PER_PLAYER = 10;
+
 // Comment length (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md, D1). The database's check
 // constraint comment_body_format enforces it; the comments route test posts both lengths through it.
 export const COMMENT_MAX_LENGTH = 280;

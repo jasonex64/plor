@@ -1,4 +1,13 @@
-import { COMMENT_MAX_LENGTH, DISPLAY_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
+import {
+  COMMENT_MAX_LENGTH,
+  DISPLAY_NAME_MAX_LENGTH,
+  GROUP_MAX_MEMBERS,
+  GROUP_NAME_MAX_LENGTH,
+  GROUPS_PER_PLAYER,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+} from "@/config/tunables";
+import { ApiError } from "@/lib/api-client";
 
 // What the player reads for each error code the API or the sign-in redirects can return.
 const MESSAGES: Record<string, string> = {
@@ -26,6 +35,14 @@ const MESSAGES: Record<string, string> = {
   invite_own: "That's your own invite link. Send it to a friend.",
   already_friends: "You're already friends.",
   not_friends: "You aren't friends with that player.",
+  // Groups (docs/milestones/M10-groups.md, 10b). The name rule and the caps are the database's (G11).
+  group_name_invalid: `Group names are 1 to ${GROUP_NAME_MAX_LENGTH} characters: letters, digits, single spaces and ' . _ -`,
+  group_not_found: "That group doesn't exist, or you aren't in it.",
+  not_creator: "Only the group's creator can do that.",
+  already_member: "You're already in this group.",
+  group_full: `That group is full: groups have up to ${GROUP_MAX_MEMBERS} players.`,
+  too_many_groups: `You're in ${GROUPS_PER_PLAYER} groups, the most you can be in. Leave one first.`,
+  member_not_found: "That player isn't in this group.",
   // Comments (docs/milestones/M08-comments-and-reactions.md, 8a). The length is the database's check (D1).
   comment_invalid: `Comments are 1 to ${COMMENT_MAX_LENGTH} characters.`,
   not_finished: "Finish today's puzzle first.",
@@ -62,4 +79,9 @@ export function messageFor(code: string): string {
 // A code from the address bar can be made up by anyone, so only known ones are shown.
 export function messageForRedirect(code: string): string {
   return MESSAGES[code] ?? "Sign-in didn't work. Try again.";
+}
+
+// What the page shows for a failed API call: the message for its code, or the unexpected error itself.
+export function errorText(err: unknown): string {
+  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
 }

@@ -1,29 +1,37 @@
 "use client";
 
-// Sign-in, then picking a username, then the game, or on an invite link (/invite/<code>) the friend request. Every
-// step goes through the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
+// Sign-in, then picking a username, then the game; or, on an invite link (/invite/<code>), the friend request; on a
+// group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
+// the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { INVITE_CODE } from "@/friends/invite-code";
-import { ApiError, api } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import { Board } from "./board";
 import { Comments } from "./comments";
 import { Game } from "./game";
+import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard } from "./leaderboard";
-import { messageFor, messageForRedirect } from "./messages";
+import { errorText, messageForRedirect } from "./messages";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null; displayName: string | null };
 
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? messageFor(err.code) : `Something went wrong: ${String(err)}`;
-}
+// What a page other than "/" shows once the player is signed in with a username.
+export type View = { kind: "invite"; code: string } | { kind: "joinGroup"; code: string } | { kind: "group"; id: string };
 
 // Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
-// while signed out is remembered for that round trip in this tab's sessionStorage (M07 7b).
+// while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
+// path (M07 7b; M10 10b).
 const PENDING_INVITE = "plor.pendingInvite";
+const INVITE_PATH = /^\/(?:invite|groups\/join)\/(.+)$/;
 
-export function Home({ invite }: { invite?: string }) {
+function invitePath(view?: View): string | undefined {
+  if (view?.kind === "invite") return `/invite/${view.code}`;
+  if (view?.kind === "joinGroup") return `/groups/join/${view.code}`;
+}
+
+export function Home({ view }: { view?: View }) {
   const redirectError = useSearchParams().get("error");
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
@@ -34,10 +42,13 @@ export function Home({ invite }: { invite?: string }) {
   }
   useEffect(loadMe, []);
 
-  // Back from Google with an invite pending: go back to its page. Storage that can't be read holds nothing, because
-  // the write before leaving for Google would have failed and been shown to the player.
+  // Back from Google with an invite pending: go back to its page. On an invite page the remembered one is spent, so
+  // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
+  // "/". Storage that can't be read holds nothing, because the write before leaving for Google would have failed and
+  // been shown to the player.
+  const onInvite = invitePath(view) !== undefined;
   useEffect(() => {
-    if (invite || !me?.signedIn) return;
+    if (!me?.signedIn) return;
     let pending: string | null;
     try {
       pending = window.sessionStorage.getItem(PENDING_INVITE);
@@ -45,8 +56,9 @@ export function Home({ invite }: { invite?: string }) {
     } catch {
       return;
     }
-    if (pending && INVITE_CODE.test(pending)) router.replace(`/invite/${pending}`);
-  }, [invite, me, router]);
+    const code = pending && !onInvite ? INVITE_PATH.exec(pending)?.[1] : undefined;
+    if (pending && code && INVITE_CODE.test(code)) router.replace(pending);
+  }, [onInvite, me, router]);
 
   if (loadError) return <p role="alert">{loadError}</p>;
   if (!me) return <p>Loading…</p>;
@@ -54,11 +66,15 @@ export function Home({ invite }: { invite?: string }) {
     <>
       {redirectError && !me.signedIn && <p role="alert">{messageForRedirect(redirectError)}</p>}
       {!me.signedIn ? (
-        <SignIn invite={invite} onSignedIn={loadMe} />
+        <SignIn returnTo={invitePath(view)} onSignedIn={loadMe} />
       ) : me.username === null ? (
         <PickUsername onDone={(username) => setMe({ signedIn: true, username, displayName: null })} />
-      ) : invite ? (
-        <AcceptInvite code={invite} />
+      ) : view?.kind === "invite" ? (
+        <AcceptInvite code={view.code} />
+      ) : view?.kind === "joinGroup" ? (
+        <JoinGroup code={view.code} />
+      ) : view?.kind === "group" ? (
+        <GroupPage id={view.id} />
       ) : (
         <SignedIn username={me.username} displayName={me.displayName} onSignedOut={() => setMe({ signedIn: false })} />
       )}
@@ -66,7 +82,7 @@ export function Home({ invite }: { invite?: string }) {
   );
 }
 
-function SignIn({ invite, onSignedIn }: { invite?: string; onSignedIn: () => void }) {
+function SignIn({ returnTo, onSignedIn }: { returnTo?: string; onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -106,7 +122,7 @@ function SignIn({ invite, onSignedIn }: { invite?: string; onSignedIn: () => voi
     setError(null);
     try {
       const { url } = await api<{ url: string }>("/api/auth/google", { method: "POST" });
-      if (invite) window.sessionStorage.setItem(PENDING_INVITE, invite);
+      if (returnTo) window.sessionStorage.setItem(PENDING_INVITE, returnTo);
       window.location.assign(url);
     } catch (err) {
       setError(errorText(err));
@@ -221,6 +237,7 @@ function SignedIn({
       <Board username={username} onCommentsChanged={nudgeComments} />
       <Leaderboard />
       <Comments username={username} runOver={runOver} nudge={commentsNudge} />
+      <Groups />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
       <section aria-label="Account">
         <p>Signed in as {username}.</p>
@@ -378,12 +395,6 @@ function AcceptInvite({ code }: { code: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // This invite is handled here, so a code remembered for a Google round trip that was cancelled is spent now;
-    // otherwise the next visit to "/" would send the player back to this page (see Home). Unreadable storage holds
-    // nothing to clear.
-    try {
-      window.sessionStorage.removeItem(PENDING_INVITE);
-    } catch {}
     api<{ inviter: Friend }>(`/api/friends/preview?code=${encodeURIComponent(code)}`, { method: "GET" }).then(
       (r) => setInviter(r.inviter),
       (err) => setError(errorText(err)),

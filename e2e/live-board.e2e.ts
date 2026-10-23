@@ -7,10 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
-const MAILPIT = "http://127.0.0.1:54324";
-const RUN = Date.now().toString(36);
 let createdPuzzle: string | null = null;
 let hostAnswer = "";
 let safeAnswer = "";
@@ -42,31 +41,6 @@ test.afterAll(async () => {
   if (createdPuzzle) await DB.query("delete from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [createdPuzzle]);
   await DB.end();
 });
-
-async function emailedCode(email: string): Promise<string> {
-  let code: string | undefined;
-  await expect
-    .poll(async () => {
-      const list = await (await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`)).json();
-      if (!list.messages?.length) return false;
-      const message = await (await fetch(`${MAILPIT}/api/v1/message/${list.messages[0].ID}`)).json();
-      code = /<strong>(\d+)<\/strong>/.exec(message.HTML)?.[1];
-      return Boolean(code);
-    })
-    .toBe(true);
-  return code!;
-}
-
-// Signs in on the page it's on (home or an invite link) and picks a username.
-async function signInAndPick(page: Page, name: string): Promise<void> {
-  const email = `${RUN}-${name}@example.test`;
-  await page.getByLabel("Email").fill(email);
-  await page.getByRole("button", { name: "Email me a sign-in code" }).click();
-  await page.getByLabel("Code").fill(await emailedCode(email));
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await page.getByLabel("Username").fill(`${name}${RUN}`);
-  await page.getByRole("button", { name: "Save" }).click();
-}
 
 // Opens the home page and waits until its board channel has joined (Realtime replies ok to the join).
 async function openBoard(page: Page): Promise<void> {
