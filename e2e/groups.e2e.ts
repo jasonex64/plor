@@ -43,7 +43,7 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await signInAndPick(joiner, "gb");
   await joiner.getByRole("button", { name: "Join group" }).click();
   await expect(joiner).toHaveURL(groupUrl);
-  const members = joiner.getByRole("region", { name: "Group" }).getByRole("listitem");
+  const members = joiner.getByRole("region", { name: "Group", exact: true }).getByRole("listitem");
   await expect(members).toHaveText([`ga${RUN} (creator)`, `gb${RUN}`]);
   // Neither has points this week: a tie, by name, with the viewer marked (10c).
   const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
