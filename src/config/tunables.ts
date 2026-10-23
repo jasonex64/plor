@@ -61,6 +61,10 @@ export const RARITY_ZERO_SHARE = 0.2;
 // N3: the most bonus a perfect run can earn (a missed question caps the others).
 export const PERFECT_RUN_BONUS_CAP = 500;
 
+// How many players gave each of your answers (docs/milestones/M11-home-screen.md, H5, Numbers): a question's share
+// shows once at least this many players answered it; fewer is "too few players yet" (human, 2026-10-22).
+export const ANSWER_SHARE_MIN_PLAYERS = 5;
+
 // Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 4):
 // the tier the Wind steals from at each question, or null for no theft. Tiers are the M04 ticket's measured grouping
 // (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels

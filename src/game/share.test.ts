@@ -15,6 +15,7 @@ function answered(index: number, matched: boolean): AnsweredQuestion {
     hostAnswers: [{ id: `host${index}`, name: `hostanswer${index}` }],
     points: 0,
     bonus: 0,
+    share: null,
   };
 }
 
@@ -30,6 +31,7 @@ function finished(status: RunState["status"], outcomes: boolean[]): RunState {
     points: 0,
     bonus: 0,
     msToReset: 0,
+    streak: 0,
   };
 }
 

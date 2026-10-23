@@ -1,6 +1,6 @@
 # M11 — Home screen
 
-**Status:** planned. Drafted 2026-10-22; H1–H8 and the minimum answered by the human, 2026-10-22 (H1 changed by them after a mockup in chat). 11a is next.
+**Status:** planned. Drafted 2026-10-22; H1–H8 and the minimum answered by the human, 2026-10-22 (H1 changed by them after a mockup in chat). The ticket is merged (PR #53). 11a is in review (a PR from `m11-home-screen`).
 
 ## Goal
 The home page becomes the place a player opens every day: today's game with their streak, how many players gave each of their answers, a feed of today's comments from friends and groups that stays blurred until they've played, and the boards, in one plain layout (the look is M14).
@@ -42,9 +42,10 @@ The home page becomes the place a player opens every day: today's game with thei
 - The human's decisions: ROADMAP "Design review", 4; the M04 (countdown), M08 (thread rules, D5, D6), M09 (counts, D8, N4) and M10 (G4, G5) tickets for the rules reused.
 
 ## Acceptance criteria
-- [ ] **11a** `GET /api/profile` (or the route H1 settles on) returns the current streak (H4): a route db test with runs on chosen days shows played today, played yesterday but not yet today, a gap, an unfinished run counting, and a day with no puzzle not breaking it.
-- [ ] **11a** Yesterday's leaderboard (H7): the points of yesterday, a closed day, for the viewer and their friends, or for one of the viewer's groups, through the 10a/10c board code over that one day; a route db test shows friends by default, a group's members when asked, and a non-member's 404.
-- [ ] **11a** The result screen's data has each answer's share (H5) from the day's counts before midnight, and "too few" below the minimum: a route db test with players above and below the minimum on a question, and a late answer after midnight left out (M09 D8).
+- [x] **11a** `GET /api/run` returns the current streak in the run state (H4): a db test (`src/game/streak.db.test.ts`) with runs on chosen days shows played today, played yesterday but not yet today, a gap, an unfinished run counting, and a day with no puzzle not breaking it.
+- [x] **11a** Yesterday's leaderboard (H7), `GET /api/leaderboard/yesterday[?group=<id>]`: the points of yesterday, a closed day, for the viewer and their friends, or for one of the viewer's groups, through the 10a/10c board code over that one day; a route db test shows friends by default, a group's members when asked, a non-member's 404, and the M09 D5 exclusion; a signed-out player gets 401.
+- [x] **11a** The result screen's data has each answer's share (H5) from the day's counts before midnight, and "too few" below the minimum: a db test (`src/game/shares.db.test.ts`) with players above and below the minimum on a question, no share while the run goes on, and a late answer after midnight left out (M09 D8).
+- [x] **11a** The page shows them, in plain UI until 11c places them (e2e: the streak above the game, "too few players yet" beside an answer, and yesterday's friends standings with the Friends chip pressed).
 - [ ] **11b** `GET /api/feed` returns today's comments from the friends thread and every group the viewer is in, each with its thread, oldest first, with reactions, through `seesCommentSql` (M10 10d): a route db test shows a friend's comment, a group member's who isn't a friend, nothing from a group the viewer isn't in, and, before the viewer's run is over, names and counts only with no comment text anywhere in the response (H3).
 - [ ] **11b** The feed reloads on a nudge for the friends thread or any of the viewer's groups (unit test of the rule, as `changesThread`), and the e2e test sees a group member's comment arrive on the other member's home page.
 - [ ] **11c** The home page follows H1 before and after playing (e2e: the game card first, with Start before and the result after, and yesterday's board with a chip per group), with the intro copy fixed.
@@ -72,7 +73,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Removes
 - **11b** (under H2 (a)): the home page's friends Comments section as a separate list, folded into the feed.
 - **11c:** the home page intro's wrong copy; the three For M11 items H6 takes in.
-- **11a:** nothing; new reads.
+- **11a:** the day's count query inside `settleRuns`, now `dayCounts` in `src/game/ledger.ts`, which the shares share rather than copy; the copies of `FINISHED` in `src/comments/comments.ts` and `src/reactions/reactions.ts` (one, exported from `src/game/runs.ts`, which needed it too); `weeklyBoard`'s own sum query, now `totals` over date ranges, which yesterday's board shares.
 
 ---
 *Fill in the sections below at the end.*
@@ -80,9 +81,21 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 11a criterion: the streak from `GET /api/profile` "or the route H1 settles on" | In the run state, `GET /api/run` | **11a.** H1 puts the streak on the game card, and starting a run reloads the run state, so the streak goes up at once; the profile loads once per page |
+| H5: "12% gave this" | A share under 1% reads "under 1% gave this" | **11a.** On a big day, an answer under 0.5% (1 of 300) would round to "0%" though the player gave it. A late answer, after midnight, has a share of 0 and reads the same: ROADMAP "Next revision", For M11 |
+| Criteria 1 and 3: "a route db test" | Db tests of `getStreak` and `todaysState`, the function `GET /api/run` returns, in rolled-back transactions; the route-level `runs.db.test.ts` checks the new fields' shape (`streak: 0`, `share: null`) | **11a.** The cases need runs and answers on chosen past days and times, which the routes can't make (the answer triggers refuse past times), so they're written directly, as the ledger test does (M09). Reworded when ticked; recorded here after the review |
+| Source: PostgreSQL window functions for the streak | A `max` over the days with a puzzle the player didn't play, then a `count` after it | **11a.** One aggregate does it; no window function was needed |
 
 ## Evidence
+**11a** (2026-10-23, on the local stack; no migration):
+- **Streak** (criterion 1): `npx vitest run src/game/streak.db.test.ts` → `Tests 1 passed (1)`: 6 for every day with a puzzle back from today, past the day with none; 5 before playing today; 2 after a missed day; 1 when yesterday was missed; 0 with no runs. Every run there is unanswered, so unfinished runs count.
+- **Yesterday's board** (criterion 2): `npx vitest run src/app/api/leaderboard --reporter=verbose` → `Tests 14 passed (14)`, with `yesterday/route.db.test.ts`'s five (friends by default and yesterday only, a group's members, the 404s, the D5 exclusion) and the 401 case; the friends and group board tests weren't edited and pass.
+- **Shares** (criterion 3): `npx vitest run src/game/shares.db.test.ts` → `Tests 2 passed (2)`: with 4 players on question 1, no share; with 5, 0.8 for the answer 4 gave and 0.2 for the host's; none for question 2 (1 player) or while a run goes on; an answer after the day's midnight not counted.
+- **The page** (criterion 4): `npx playwright test e2e/live-board.e2e.ts -g "spoiler"` → `1 passed (17.5s)`.
+- **Everything else:** `npm test` → `Test Files 34 passed (34)`, `Tests 229 passed (229)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 21 passed (21)`, `Tests 166 passed (166)`; `npm run test:sql` → `Result: PASS`; `npm run test:e2e` → `4 passed (44.0s)`. `src/game/runs.db.test.ts` gained `streak: 0` and `share: null` in its two exact-shape expectations, and `share.test.ts` the same in its fixture: new fields, nothing loosened.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**11a** (reviewer, fresh context, 2026-10-23): no correctness or privacy bug found in the code.
+- Blocking findings and how each was fixed: the ROADMAP row and the handoff were behind (updated in this PR); criteria 1 and 3 were narrowed from route tests to function tests when ticked, without a record (a Source diff row now says why).
+- Deferred to ROADMAP "Next revision": the share differencing (For the human); a late answer's "under 1%" and yesterday's chips racing and keeping an old error (For M11, which 11c's out-of-order fix covers); `dayCounts` on every finished player's run-state read (For M15, the load test).
+- Not deferred, under "Keep only what someone will act on": `getStreak` adds one small query per run-state read (one puzzle row per day, by the run's primary key).

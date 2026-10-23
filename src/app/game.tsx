@@ -2,7 +2,8 @@
 
 // Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
 // text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, a reveal after each
-// answer that waits for Next, points as you go, and a result screen with the time to the next puzzle.
+// answer that waits for Next, points as you go, and a result screen with the time to the next puzzle. Above it, the
+// player's streak, and on the result screen how many players gave each answer (docs/milestones/M11-home-screen.md, 11a).
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
@@ -45,6 +46,7 @@ export function Game({ onOver }: { onOver: (over: boolean) => void }) {
   if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
   return (
     <section>
+      <p>Streak: {run.streak === 1 ? "1 day" : `${run.streak} days`} played in a row</p>
       {run.status === "not_started" && (
         <>
           <p>
@@ -116,6 +118,12 @@ function ResetCountdown({ msToReset, onReset }: { msToReset: number; onReset: ()
 }
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
+
+// How many of the question's players gave this answer so far (M11 H5). Under 1% doesn't round to a misleading 0%.
+function givenText(share: number | null): string {
+  if (share === null) return "too few players yet";
+  return share < 0.01 ? "under 1% gave this" : `${Math.round(share * 100)}% gave this`;
+}
 
 // After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
 // from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
@@ -231,7 +239,7 @@ function Result({ run, onReset }: { run: RunState; onReset: () => void }) {
         {run.answered.map((a) => (
           <li key={a.index}>
             {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`}
+            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
           </li>
         ))}
       </ol>

@@ -6,7 +6,7 @@ import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/content/puzzle";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
-import type { RunStatus } from "@/game/runs";
+import { FINISHED } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";
@@ -20,8 +20,6 @@ export type Reactions = { counts: { emoji: Emoji; count: number }[]; mine: Emoji
 export type Target = { type: "comment"; id: string } | { type: "run"; username: string };
 
 export const NO_REACTIONS: Reactions = { counts: [], mine: null };
-
-const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 
 // null removes the player's reaction; the page sends it when they tap the one they already chose.
 export function readEmoji(input: unknown): Emoji | null {

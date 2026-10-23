@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { GET as leaderboard } from "./route";
+import { GET as yesterday } from "./yesterday/route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -15,9 +16,12 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-describe("GET /api/leaderboard (M09 9b)", () => {
-  it("refuses a signed-out player with 401 not_signed_in", async () => {
-    const response = await leaderboard(apiRequest("/api/leaderboard", { method: "GET" }));
+describe("GET /api/leaderboard (M09 9b) and /api/leaderboard/yesterday (M11 11a)", () => {
+  it.each([
+    ["GET /api/leaderboard", () => leaderboard(apiRequest("/api/leaderboard", { method: "GET" }))],
+    ["GET /api/leaderboard/yesterday", () => yesterday(apiRequest("/api/leaderboard/yesterday", { method: "GET" }))],
+  ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
+    const response = await call();
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
   });

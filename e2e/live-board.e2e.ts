@@ -81,6 +81,14 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await watcher.getByRole("button", { name: "Answer" }).click();
   // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
+  // Above the game, the streak: today is the watcher's first day (M11 H4). Beside the one answer, its share: two players
+  // answered question 1, under the minimum of 5 (H5).
+  await expect(watcher.getByText("Streak: 1 day played in a row")).toBeVisible();
+  await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
+  // Yesterday's standings, friends by default (H7): neither played yesterday.
+  const yesterday = watcher.getByRole("region", { name: "Yesterday" });
+  await expect(yesterday.getByRole("button", { name: "Friends" })).toHaveAttribute("aria-pressed", "true");
+  await expect(yesterday.getByRole("listitem")).toHaveText([`${playerName}: 0 points`, `${watcherName} (you): 0 points`]);
   // The friends leaderboard (M09 9b; weekly since M10 10a) lists both with no points yet this week, since today's
   // count once the day is over (D9). Tied on 0, they go by name: the player's "p…" before the watcher's "w…".
   await expect(watcher.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem")).toHaveText([

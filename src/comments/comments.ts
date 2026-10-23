@@ -6,7 +6,7 @@
 import { DatabaseError } from "pg";
 import { GAME_ID } from "@/content/puzzle";
 import { memberSql, seesCommentSql } from "@/friends/circle";
-import type { RunStatus } from "@/game/runs";
+import { FINISHED, type RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { NO_REACTIONS, commentReactions, type Reactions } from "@/reactions/reactions";
@@ -18,8 +18,6 @@ export type Comment = { id: string; username: string; name: string; body: string
 // comments is null while the thread is hidden from the viewer. canPost: the day is today and the viewer's run
 // is over.
 export type Thread = { date: string; canPost: boolean; comments: Comment[] | null };
-
-const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 
 // The text as sent by the browser, trimmed, the form the database requires. Anything that isn't text gets 400.
 export function readCommentBody(input: unknown): string {

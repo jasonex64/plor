@@ -28,14 +28,7 @@ export async function settleRuns(db: Db, userIds: string[]): Promise<number> {
     "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])",
     [GAME_ID, dates],
   );
-  // Every player's answers on those days before midnight, by question and entry: the day's counts.
-  const { rows: tallies } = await db.query<{ date: string; question_idx: number; entry_id: string; n: number }>(
-    `select puzzle_date::text as date, question_idx, entry_id, count(*)::int as n
-     from private.run_event
-     where game_id = $1 and puzzle_date = any($2::date[]) and private.day_of(created_at) = puzzle_date
-     group by puzzle_date, question_idx, entry_id`,
-    [GAME_ID, dates],
-  );
+  const counts = await dayCounts(db, dates);
   const { rows: events } = await db.query<EventRow>(
     `select e.user_id::text, e.puzzle_date::text as date, e.question_idx, e.entry_id, e.matched,
             private.day_of(e.created_at) = e.puzzle_date as in_day
@@ -45,15 +38,6 @@ export async function settleRuns(db: Db, userIds: string[]): Promise<number> {
      order by e.question_idx`,
     [GAME_ID, runs.map((r) => r.user_id), runs.map((r) => r.date)],
   );
-
-  const counts = new Map<string, DayCounts>(dates.map((date) => [date, new Map()]));
-  for (const t of tallies) {
-    const day = counts.get(t.date)!;
-    const question = day.get(t.question_idx) ?? { answered: 0, byEntry: new Map<string, number>() };
-    question.answered += t.n;
-    question.byEntry.set(t.entry_id, t.n);
-    day.set(t.question_idx, question);
-  }
 
   const scored = runs.map((r) => {
     const puzzle = puzzles.find((p) => p.date === r.date)!.content;
@@ -71,4 +55,25 @@ export async function settleRuns(db: Db, userIds: string[]): Promise<number> {
     [GAME_ID, scored.map((s) => s.user_id), scored.map((s) => s.date), scored.map((s) => s.points), scored.map((s) => s.bonus)],
   );
   return rowCount!;
+}
+
+// Every player's answers on these days before their midnight, by question and entry: the counts the final bonus uses
+// (M09 D8), and the shares on the result screen (docs/milestones/M11-home-screen.md, H5). Today's grow until midnight.
+export async function dayCounts(db: Db, dates: string[]): Promise<Map<string, DayCounts>> {
+  const { rows: tallies } = await db.query<{ date: string; question_idx: number; entry_id: string; n: number }>(
+    `select puzzle_date::text as date, question_idx, entry_id, count(*)::int as n
+     from private.run_event
+     where game_id = $1 and puzzle_date = any($2::date[]) and private.day_of(created_at) = puzzle_date
+     group by puzzle_date, question_idx, entry_id`,
+    [GAME_ID, dates],
+  );
+  const counts = new Map<string, DayCounts>(dates.map((date) => [date, new Map()]));
+  for (const t of tallies) {
+    const day = counts.get(t.date)!;
+    const question = day.get(t.question_idx) ?? { answered: 0, byEntry: new Map<string, number>() };
+    question.answered += t.n;
+    question.byEntry.set(t.entry_id, t.n);
+    day.set(t.question_idx, question);
+  }
+  return counts;
 }
