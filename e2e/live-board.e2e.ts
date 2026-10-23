@@ -6,39 +6,22 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { RUN, signInAndPick } from "./players";
+import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
-let createdPuzzle: string | null = null;
+let puzzle: TodayPuzzle;
 let hostAnswer = "";
 let safeAnswer = "";
 
 test.beforeAll(async () => {
-  // Today's puzzle, or a fixture under today's date (removed in afterAll), as in src/test/puzzles.ts.
-  const { rows } = await DB.query<{
-    today: string;
-    content: { questions: { host_answers: string[]; match_groups: Record<string, string[]>; entries: { id: string; name: string }[] }[] } | null;
-  }>(
-    "select private.today()::text as today, (select content from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()) as content",
-  );
-  let content = rows[0].content;
-  if (!content) {
-    content = { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date: rows[0].today };
-    await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [rows[0].today, content]);
-    createdPuzzle = rows[0].today;
-  }
-  // Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
-  const q = content!.questions[0];
-  hostAnswer = q.entries.find((e) => e.id === q.host_answers[0])!.name;
-  // An answer the host doesn't catch: not a host answer, and not grouped with one.
-  const caught = new Set([...q.host_answers, ...q.host_answers.flatMap((h) => q.match_groups[h] ?? [])]);
-  safeAnswer = q.entries.find((e) => !caught.has(e.id))!.name;
+  puzzle = await todayPuzzle(DB);
+  ({ hostAnswer, safeAnswer } = puzzle);
 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  if (createdPuzzle) await DB.query("delete from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date", [createdPuzzle]);
+  await removePuzzle(DB, puzzle);
   await DB.end();
 });
 

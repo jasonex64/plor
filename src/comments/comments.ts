@@ -1,10 +1,11 @@
 // Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): seen by the author and their
 // friends; a day's thread only once the viewer's own run that day is over, since comments talk about answers; past
 // days read-only, and shown even if the viewer never played them (D6). The length rule is the database's check (D1).
-// A comment the viewer reported is hidden from them (8c, D5).
+// A comment the viewer reported is hidden from them (8c, D5). Each group has its own thread per day, which its members
+// share, with the same rules (docs/milestones/M10-groups.md, 10d; G4).
 import { DatabaseError } from "pg";
 import { GAME_ID } from "@/content/puzzle";
-import { seesAuthorSql } from "@/friends/circle";
+import { memberSql, seesCommentSql } from "@/friends/circle";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -34,15 +35,21 @@ export function readCommentId(input: unknown): string {
 
 type Row = { id: string; username: string; name: string; body: string; created_at: Date };
 
-// A day's thread, oldest first. date is a calendar date (the route checks it); none means today.
-export async function getThread(db: Db, viewerId: string, date: string | null): Promise<Thread> {
-  const { rows: day } = await db.query<{ date: string; today: boolean; future: boolean; status: RunStatus | null }>(
+// True when the thread is the friends thread (the parameter is null) or a group the player ($1) is in.
+const inThreadSql = (group: string) => `(${group}::uuid is null or ${memberSql("$1", `${group}::uuid`)})`;
+
+// A day's thread, oldest first: the friends thread, or a group's (its ID, which the route checks). date is a
+// calendar date (the route checks it); none means today. A group the viewer isn't in is the group page's 404.
+export async function getThread(db: Db, viewerId: string, date: string | null, group: string | null): Promise<Thread> {
+  const { rows: day } = await db.query<{ date: string; today: boolean; future: boolean; status: RunStatus | null; member: boolean }>(
     `select d::text as date, d = private.today() as today, d > private.today() as future,
-            (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = d) as status
+            (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = d) as status,
+            ${inThreadSql("$4")} as member
      from (select coalesce($3::date, private.today()) as d) as day`,
-    [viewerId, GAME_ID, date],
+    [viewerId, GAME_ID, date, group],
   );
-  const { today, future, status } = day[0];
+  const { today, future, status, member } = day[0];
+  if (!member) throw new AppError("group_not_found", 404);
   if (future) throw new AppError("bad_request", 400, "date");
   const finished = status !== null && FINISHED.includes(status);
   // Today's thread waits for the viewer's run to end. So does a past day's while the viewer's run that day is still
@@ -54,46 +61,52 @@ export async function getThread(db: Db, viewerId: string, date: string | null): 
     `select c.id::text as id, p.username::text as username, coalesce(p.display_name, p.username::text) as name, c.body, c.created_at
      from private.comment c
      join private.profile p on p.user_id = c.user_id
-     where c.game_id = $2 and c.puzzle_date = $3::date
-       and ${seesAuthorSql("$1", "c.user_id")}
+     where c.game_id = $2 and c.puzzle_date = $3::date and c.group_id is not distinct from $4::uuid
+       and ${seesCommentSql("$1", "c")}
        and not exists (select from private.comment_report r where r.comment_id = c.id and r.reporter_id = $1)
      order by c.created_at, c.id`,
-    [viewerId, GAME_ID, day[0].date],
+    [viewerId, GAME_ID, day[0].date, group],
   );
   const reactions = await commentReactions(db, viewerId, rows.map((r) => r.id));
   return { date: day[0].date, canPost: today, comments: rows.map((r) => toComment(r, reactions.get(r.id) ?? NO_REACTIONS)) };
 }
 
-// Posts to today's thread. The page names the day it shows, so a page left open past midnight can't post to the
-// new day by mistake. The day and the finished run are checked in the insert itself, so midnight can't slip between
-// a check and the write.
-export async function postComment(db: Db, userId: string, date: string, body: string): Promise<Comment> {
-  let rows: (Row & { today: string; past: boolean })[];
+// Posts to today's thread: the friends thread, or a group's (its ID, which the route checks). The page names the day
+// it shows, so a page left open past midnight can't post to the new day by mistake. The day, the finished run and the
+// membership are checked in the insert itself, so midnight can't slip between a check and the write; a member removed
+// in between fails the database's membership check (G4).
+export async function postComment(db: Db, userId: string, date: string, body: string, group: string | null): Promise<Comment> {
+  let rows: (Row & { today: string; past: boolean; member: boolean })[];
   try {
-    ({ rows } = await db.query<Row & { today: string; past: boolean }>(
+    ({ rows } = await db.query<Row & { today: string; past: boolean; member: boolean }>(
       `with day as (
          select private.today() as today,
-                (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = private.today()) as status
+                (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = private.today()) as status,
+                ${inThreadSql("$6")} as member
        ), added as (
-         insert into private.comment (user_id, game_id, puzzle_date, body)
-         select $1, $2, day.today, $4 from day where day.today = $3::date and day.status = any($5::text[])
+         insert into private.comment (user_id, game_id, puzzle_date, body, group_id)
+         select $1, $2, day.today, $4, $6::uuid from day where day.member and day.today = $3::date and day.status = any($5::text[])
          returning id, user_id, body, created_at
        )
-       select day.today::text as today, $3::date < day.today as past, a.id::text as id, p.username::text as username,
+       select day.today::text as today, $3::date < day.today as past, day.member, a.id::text as id, p.username::text as username,
               coalesce(p.display_name, p.username::text) as name, a.body, a.created_at
        from day
        left join added a on true
        left join private.profile p on p.user_id = a.user_id`,
-      [userId, GAME_ID, date, body, FINISHED],
+      [userId, GAME_ID, date, body, FINISHED, group],
     ));
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "23514" && err.constraint === "comment_body_format") {
       throw new AppError("comment_invalid", 400);
     }
+    if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "comment_group_member") {
+      throw new AppError("group_not_found", 404);
+    }
     throw err;
   }
   const row = rows[0];
   if (row.id !== null) return toComment(row, NO_REACTIONS);
+  if (!row.member) throw new AppError("group_not_found", 404);
   if (row.past) throw new AppError("day_past", 409);
   if (date !== row.today) throw new AppError("bad_request", 400, "date");
   throw new AppError("not_finished", 409);
@@ -106,9 +119,10 @@ export async function deleteComment(db: Db, userId: string, id: string): Promise
   if (rowCount === 0) throw new AppError("comment_not_found", 404);
 }
 
-// Reports someone else's comment that the player can see now: a friend's, on a day whose thread is open to them (as
-// in getThread). It's hidden from them at once, and listed for admins (D5). Reporting it again changes nothing.
-// Reporting works on past days too: D6 makes them read-only for talking, and a report isn't talking.
+// Reports someone else's comment that the player can see now: a friend's, or one in a group they're in, on a day whose
+// thread is open to them (as in getThread). It's hidden from them at once, and listed for admins (D5). Reporting it
+// again changes nothing. Reporting works on past days too: D6 makes them read-only for talking, and a report isn't
+// talking.
 export async function reportComment(db: Db, userId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ own: boolean; visible: boolean }>(
     `with target as (
@@ -117,7 +131,7 @@ export async function reportComment(db: Db, userId: string, id: string): Promise
                    else s.status is null or s.status = any($3::text[]) end as visible
        from private.comment c
        left join private.run_status s on s.user_id = $1 and s.game_id = c.game_id and s.puzzle_date = c.puzzle_date
-       where c.id = $2 and ${seesAuthorSql("$1", "c.user_id")}
+       where c.id = $2 and ${seesCommentSql("$1", "c")}
      ), added as (
        insert into private.comment_report (comment_id, reporter_id)
        select id, $1 from target where not own and visible

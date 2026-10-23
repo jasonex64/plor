@@ -1,10 +1,10 @@
 // Reactions on comments and on friends' runs (docs/milestones/M08-comments-and-reactions.md, 8b; D2, D3): one per
 // player per target, from a fixed set. Like comments, a player reacts only on today, once their own run is over (D6),
-// and sees only their own reactions and their friends'.
+// and sees only their own reactions and their friends', or on a group's comment its members' (M10 10d, G4).
 import type { Pool } from "pg";
 import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/content/puzzle";
-import { friendsSql, seesAuthorSql } from "@/friends/circle";
+import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
@@ -48,8 +48,8 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
   try {
     await client.query("begin");
     // The day, the finished run and the target are checked in the statement that deletes, so midnight can't fall
-    // between a check and the delete. The target is a comment the player can see (their own or a friend's) or the run
-    // of a friend, on that day.
+    // between a check and the delete. The target is a comment the player can see (their own or a friend's, or one in a
+    // group they're in) or the run of a friend, on that day.
     const { rows } = await client.query<{
       today: string;
       past: boolean;
@@ -64,7 +64,7 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
        ), target as (
          select c.id as comment_id, null::uuid as run_user_id, true as played
          from private.comment c
-         where c.id = $4::bigint and c.game_id = $2 and c.puzzle_date = $3::date and ${seesAuthorSql("$1", "c.user_id")}
+         where c.id = $4::bigint and c.game_id = $2 and c.puzzle_date = $3::date and ${seesCommentSql("$1", "c")}
          union all
          select null, p.user_id,
                 exists (select from private.run r where r.user_id = p.user_id and r.game_id = $2 and r.puzzle_date = $3::date)
@@ -116,27 +116,24 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
 
 type CountRow = { target: string; emoji: Emoji; count: number; mine: boolean };
 
-// Only the viewer's own reactions and their friends' count.
-const SEEN = seesAuthorSql("$1", "r.user_id");
-
 // Reactions on each of these comments, by comment ID.
 export async function commentReactions(db: Db, viewerId: string, commentIds: string[]): Promise<Map<string, Reactions>> {
   const { rows } = await db.query<CountRow>(
     `select r.comment_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine
-     from private.reaction r
-     where r.comment_id = any($2::bigint[]) and ${SEEN}
+     from private.reaction r join private.comment c on c.id = r.comment_id
+     where r.comment_id = any($2::bigint[]) and ${seesCommentReactionSql("$1", "c", "r.user_id")}
      group by r.comment_id, r.emoji`,
     [viewerId, commentIds],
   );
   return summarize(rows);
 }
 
-// Reactions on each of these players' runs on a day, by user ID.
+// Reactions on each of these players' runs on a day, by user ID: only the viewer's own and their friends' count.
 export async function runReactions(db: Db, viewerId: string, date: string, userIds: string[]): Promise<Map<string, Reactions>> {
   const { rows } = await db.query<CountRow>(
     `select r.run_user_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine
      from private.reaction r
-     where r.run_user_id = any($4::uuid[]) and r.game_id = $2 and r.puzzle_date = $3::date and ${SEEN}
+     where r.run_user_id = any($4::uuid[]) and r.game_id = $2 and r.puzzle_date = $3::date and ${seesAuthorSql("$1", "r.user_id")}
      group by r.run_user_id, r.emoji`,
     [viewerId, GAME_ID, date, userIds],
   );

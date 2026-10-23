@@ -5,8 +5,10 @@
 // handling). The look is M14's.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
+import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
 
@@ -82,14 +84,26 @@ export function Groups() {
   );
 }
 
-// A group's page: members, the invite link every member can share, the creator's powers (G1, G6), and the group's
-// weekly leaderboard (10c).
-export function GroupPage({ id }: { id: string }) {
+// A group's page: members, the invite link every member can share, the creator's powers (G1, G6), the group's weekly
+// leaderboard (10c) and its thread, live (10d; G4, G5). username is the signed-in player's.
+export function GroupPage({ id, username }: { id: string; username: string }) {
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
   const [draft, setDraft] = useState("");
   const [copied, setCopied] = useState(false);
   const { busy, error, setError, run } = useAction();
+  // Counts nudges that this group's thread changed; the page has no game, so the thread opens once loaded after the
+  // player's run is over.
+  const [threadNudge, setThreadNudge] = useState(0);
+  const nudgeThread = useCallback(() => setThreadNudge((n) => n + 1), []);
+  useBoardChannel({
+    joined: nudgeThread,
+    changed: (message) => {
+      if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
+      if (changesThread(message, id)) nudgeThread();
+    },
+    failed: (err) => setError(errorText(err)),
+  });
 
   function load() {
     api<{ group: Group }>(`/api/groups/detail?id=${encodeURIComponent(id)}`, { method: "GET" }).then(
@@ -222,6 +236,7 @@ export function GroupPage({ id }: { id: string }) {
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
         />
       )}
+      {group && <Comments username={username} runOver={false} nudge={threadNudge} group={id} />}
     </>
   );
 }

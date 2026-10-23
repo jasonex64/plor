@@ -1,6 +1,6 @@
 # M10 — Groups
 
-**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is merged (PR #50, on all-green CI with the human's OK). 10c is in review (PR #51). 10d is next.
+**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is merged (PR #50, on all-green CI with the human's OK). 10c is merged (PR #51, on all-green CI with the human's OK). 10d, the last sub-ticket, is in review (PR #52).
 
 ## Goal
 Players make named groups that others join by invite link. Each group has a weekly leaderboard and one shared comment thread per day. First (10a), the friends leaderboard becomes weekly, and the code friends and groups will share is cleaned up.
@@ -65,7 +65,11 @@ Players make named groups that others join by invite link. Each group has a week
 - [x] **10c** The weekly board is computed once: the friends and group boards call the same function in `src/friends/leaderboard.ts` with a different set of players (from `src/friends/circle.ts`), so settling (M09 D3, D10), the Monday weeks and the D5 exclusion are the same code, and the existing leaderboard tests pass unchanged.
 - [x] **10c** The route refuses a signed-out player with 401 (`src/app/api/groups/route.test.ts`).
 - [x] **10c** The page (`e2e/groups.e2e.ts`): the group page shows the group's leaderboard, with both members in this week's list.
-- [ ] **10d** Criteria written when it starts.
+- [x] **10d** The database keeps the thread's rules (pgTAP, `supabase/tests/group_thread.test.sql`): a comment with a `group_id` needs its author to be a member of that group (G4); removing or leaving deletes the member's comments in it, with the reactions and reports on them, and deleting the group deletes its thread (G6); a comment without one is the friends thread, unchanged (G9).
+- [x] **10d** One predicate decides which comments a viewer may see: a friends-thread comment by the viewer or a friend (M08), or a group comment if the viewer is a current member of its group (G4). It's `seesCommentSql` in `src/friends/circle.ts`, beside `seesCommentReactionSql` for whose reactions on a comment count, and the thread, reactions and reports all use them (`grep` finds `seesAuthorSql` only in `circle.ts` and run reactions).
+- [x] **10d** The routes, against the local stack (`src/app/api/comments/group.db.test.ts`): `GET /api/comments?group=<id>` and posting with `group` give members one shared thread per day, hidden until the viewer's own run that day is over, past days read-only (G4, M08 D6); members who aren't friends see each other's comments; a group comment never appears in the friends thread or in another group's, and a friends-thread comment never in a group's; a non-member and a malformed ID get `404 group_not_found`; a member can delete their own, report another's (hidden from them, listed for admins) and react, and the counts on a group comment are its members' reactions; a removed member's comments and reactions leave the thread. The existing comments and reactions tests pass unchanged.
+- [x] **10d** Live (G5): a group comment, or a reaction on one, sends `comments_changed` with the group's ID to each member's `board:<id>` topic and to no one else, and a friends-thread change still reaches the author and their friends with no group ID (pgTAP on `realtime.messages`); the group page refetches its thread on a nudge for its group, and the home page's friends thread ignores nudges for groups (`changesThread` in `src/app/board-channel.ts`, which both pages use, unit tested in `src/app/board-channel.test.ts`).
+- [x] **10d** The page (`e2e/groups.e2e.ts`): after both finish today's puzzle, one member's comment on the group page reaches the other member's open group page live, and isn't in the friends thread.
 
 ## Out of scope
 - Seeing friends' and group members' misses (ROADMAP Later; Design review, 4).
@@ -93,7 +97,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - **10a:** the all-time sum in `getLeaderboard`, its `leaderboard` response field and the "All-time points" copy (protocol 3 → 4, since the response changed shape: M00-data-design.md §2); the two extra copies of the friends list query and the four of the comment-visibility predicate (`getThread`, `reportComment`, `setReaction`'s comment target, reactions' `SEEN`) and `setReaction`'s friend-run check; the plain `release()` and the unguarded rollback in `setReaction`; ROADMAP "Next revision"'s three For M10 items.
 - **10b:** the seven copies of `errorText` in the client components (`board`, `comments`, `game`, `home`, `leaderboard`, and the admin `insights`, `puzzles` and `reports` pages), now one in `src/app/messages.ts`, which `groups.tsx` would have made eight; the e2e sign-in helpers moved out of `live-board.e2e.ts` into `e2e/players.ts` rather than copied; `Home`'s `invite` prop (now `view`, which also carries a group's link and page) and `AcceptInvite`'s own clearing of the remembered invite (`Home` spends it for both kinds of link).
 - **10c:** nothing; a new route over the 10a board, which takes its set of players instead of always reading the friends circle, and `Leaderboard`'s fixed friends path and heading, now props. No protocol bump: no existing response changes shape (M00-data-design.md §2).
-- **10d:** nothing expected; new feature.
+- **10d:** the Realtime channel code inside `Board`, now `useBoardChannel` in `src/app/board-channel.ts`, which the group page shares rather than copies, and `Board`'s `boardRef` (the hook hands the handlers the latest state); the "today's puzzle" setup inside `live-board.e2e.ts`, now `e2e/puzzle.ts`, shared with `groups.e2e.ts`; `reactions.ts`'s `SEEN` constant (one use left, inlined); `groupCircleSql`'s own membership subquery (now `memberSql`); the nudge each reaction sent when its comment's deletion removed it (the comment's own nudge already reaches everyone who saw it).
 
 ---
 *Fill in the sections below at the end.*
@@ -109,6 +113,9 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 | G6: the handover and the empty group's deletion | Database triggers with their owner's rights, and a deferred foreign key from the group to its creator's membership | **10b.** The rule holds on every path that removes a membership, deleting an account included, which no route sees; the handover sets `creator_id`, which plor_app may not (G10 row above), so the triggers run as their owner |
 | G11: the display name rule for group names | `player_group_name_format` repeats `profile_display_name_format`'s check, with a pointer to it | **10b.** Applied migrations are never edited, so one shared check would mean replacing the profile's constraint as well, a second change with no other caller |
 | M07 7b: an invite link opened signed out survives the Google round trip | Both kinds of invite link do; a group's page (`/groups/<id>`) opened signed out returns to `/` after Google | **10b.** Only links that need to be accepted were remembered in M07; a member reaches their group from the home page's Groups section |
+| G4: reactions on comments in the group thread | The counts on a group comment are its current members' reactions. A removed member's reactions on others' comments stay stored but stop counting | **10d.** A reaction belongs to its reactor's run (M08 8b), not to a membership, so it doesn't cascade when they leave; "seen only by current members" (G4) is applied when counting instead |
+| G5: `comments_changed` with the group's ID | `groupId` is in the payload only for a group's nudge; a friends-thread payload is unchanged | **10d.** M08's payload test passes unchanged, and a page from before 10d treats a group nudge as a friends one, one extra refetch |
+| G7: a page per group with its board and thread | The group page has no game, so its thread is told "run over" only by loading: after finishing today on the home page, it opens when the group page is opened or nudged | **10d.** The game lives on the home page (G7: "M11 reworks the home screen") |
 
 ## Evidence
 **10a** (2026-10-22, a Thursday, on the local stack):
@@ -167,6 +174,27 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - **The page** (criterion 4): `npm run test:e2e` → `4 passed (33.3s)`, with `e2e/groups.e2e.ts` reading `ga… : 0 points` and `gb… (you): 0 points` in the group leaderboard's This week.
 - **Everything else:** `npm test` → `Test Files 33 passed (33)`, `Tests 224 passed (224)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 17 passed (17)`, `Tests 149 passed (149)`. `npm run test:sql` not rerun: no SQL changed.
 
+**10d** (2026-10-22, on the local stack, migration `20261023060640_group_thread.sql` applied):
+- **Database rules and nudges** (criteria 1 and 4): `npx supabase test db supabase/tests/group_thread.test.sql` → `Files=1, Tests=14 … Result: PASS` (only a member writes in the thread; a group comment and a reaction on one nudge each member with the group's ID and not the author's friend outside it; a friends-thread comment nudges friends with no group ID and not a member who isn't a friend; deleting a group comment nudges each member once, its reactions adding nothing; leaving deletes the member's comments there with their reactions and reports; deleting the group deletes its thread and leaves the friends thread). `live_comments.test.sql`, `comments.test.sql` and `reactions.test.sql` pass unchanged.
+- **One predicate** (criterion 2): `grep -rn "seesAuthorSql\|seesCommentSql\|seesCommentReactionSql" src --include=*.ts | grep -v "\.test\.ts"` finds `seesAuthorSql` only in `src/friends/circle.ts` and run reactions (`src/reactions/reactions.ts:136`); the thread (`comments.ts:65`), reports (`:134`) and reaction targets (`reactions.ts:67`) use `seesCommentSql`, and comment reaction counts (`reactions.ts:124`) `seesCommentReactionSql`.
+- **Routes** (criterion 3): `npx vitest run src/app/api/comments/group.db.test.ts --reporter=verbose`
+  ```
+  ✓ … signs in three players; A makes Club, which B joins, and Other; A and C are friends
+  ✓ … hides today's group thread, and refuses a post to it, until the member's run is over (G4, M08)
+  ✓ … gives the members one shared thread, apart from the friends thread and other groups' (G4, G9)
+  ✓ … refuses a non-member and an ID that isn't a group with the group page's 404
+  ✓ … keeps past days read-only (M08 D6)
+  ✓ … counts members' reactions on a group comment, and refuses a non-member's (G4)
+  ✓ … lets a member report another's comment, hiding it from them alone, and refuses a non-member (M08 D5)
+  ✓ … lets a member delete their own group comment, for everyone, and no one else's (M08 D4)
+  ✓ … takes a removed member's comments and reactions out of the thread (G6)
+  ```
+  The report test also finds the reported group comment in `listReports`, the admins' list (8c). With `getThread`'s `c.group_id is not distinct from $4` removed, 5 of the 8 fail (before the delete test was added) (`Tests 5 failed | 3 passed (8)`). The existing comments, reactions, board, leaderboard and groups route tests weren't edited and pass (`Tests 69 passed (69)` before the new file; `npm run test:db` below).
+- **Which page a nudge reloads** (criterion 4): `npx vitest run src/app/board-channel.test.ts` → `Tests 4 passed (4)`: the friends thread reloads for friends nudges and not a group's; a group's page for its own and not the friends thread's or another group's; neither for run reactions; both for an unknown payload version.
+- **Live on the page** (criteria 4 and 5): `npm run test:e2e` → `4 passed (38.6s)`, with `e2e/groups.e2e.ts` showing the joiner's comment on the creator's open group page and not in the joiner's friends thread. With the group page ignoring nudges for its group, that test fails at the creator's page (`toBeVisible() failed`), so the comment arrives by the nudge, not a reload.
+- **Everything else** (rerun after the review fixes): `npm test` → `Test Files 34 passed (34)`, `Tests 228 passed (228)`; `npm run lint` clean; `npx tsc --noEmit -p .` clean; `npm run test:db` → `Test Files 18 passed (18)`, `Tests 158 passed (158)`; `npm run test:sql` (before the review fixes, which changed no SQL) → `Files=14, Tests=211 … Result: PASS`. The reconnect e2e logs one `board channel CHANNEL_ERROR socket closed: 1012` per page still open when Realtime restarts, as before.
+- **CI fix:** PR #52's first e2e run failed in `groups.e2e.ts`: `getByRole("region", { name: "Group" })` matches by substring, so once the board had loaded it also took the "Group leaderboard" region's rows (`locator resolved to 6 elements`: 2 members, 2 per week). A race since 10c that a slow runner exposed; the locator is now `exact: true`, and `npx playwright test e2e/groups.e2e.ts` → `1 passed (18.8s)`.
+
 ## Review
 **10a** (reviewer, fresh context, 2026-10-22): no blocking finding in the code.
 - Blocking findings and how each was fixed: the empty Evidence (filled above) and a handoff that still said 10a waited on W1 (rewritten).
@@ -183,3 +211,11 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 - Blocking findings and how each was fixed: the Status line, the ROADMAP row and the handoff were still at "10c next" (updated in this PR).
 - Deferred to ROADMAP "Next revision", For the human: a member's whole week counts on a group's board, even days before they joined.
 - Not deferred, under "Keep only what someone will act on": the page's reload of the board after a removal (its `key` is the member list) has no e2e test, and a stale row would last only until a reload; the members and the sums are read in two queries, so a removal between them shows the removed member once (milliseconds, like 10a's midnight case).
+
+**10d** (reviewer, fresh context, 2026-10-22): no correctness or security bug found, and no path that shows a group comment outside its group or a friends-thread comment in a group (thread, posts, reactions and their counts, reports, run reactions, the nudges' recipients).
+- Blocking findings and how each was fixed:
+  - **Criterion 3's delete and admin-listing clauses had no test:** the route test now deletes a member's own group comment (and refuses another member's), and finds a reported group comment in `listReports`.
+  - **Criterion 4's "the home page ignores group nudges" had no test:** the rule is now one function, `changesThread` in `src/app/board-channel.ts`, used by both pages, with a unit test.
+  - **The Status line, the ROADMAP row and the handoff were still at "10d next":** updated in this PR.
+- Deferred to ROADMAP "Next revision" (Correctness): a member leaving while a reaction on one of their group comments is being replaced may deadlock and give one of them a 500 (worked out from the lock order, not reproduced; M08 has the same pattern between deleting a comment and replacing a reaction on it).
+- Not deferred, under "Keep only what someone will act on": the member who leaves gets no nudge, so their open group page shows the thread until its next load (a 404); the admin reports page doesn't say which thread a comment is in (nothing needs it yet); two run-state messages arriving before a re-render can overwrite each other on the board, as before the refactor.
