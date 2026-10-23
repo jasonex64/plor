@@ -22,6 +22,7 @@ A player can see and manage their own account in one place: their username (and 
 - **12a, the account page:** `/account`, linked from the home page's Account section, which shrinks to that link and Sign out. On the page: your username, your display name (moved from the home page), your friends and invite link (moved too), your all-time points, Sign out, and (12c) Delete account.
 - **12b, sign-in and username:** the sign-out scope (A3), the code form's fixes (A6), and changing a username if A2 allows it.
 - **12c, deleting your account:** a button on the account page that, after a confirmation (A4), deletes everything (A5), leaving each group first so a creator's group is handed on and no deadlock can happen.
+- **12d, the fixes the human decided on 2026-10-23** (ROADMAP "Next revision", "Decided by the human"; placed here by the human, 2026-10-23: "after 12d", answering "As 12d after 12c"): the live board hides a friend's progress until you've finished (M07), a record of which admin deleted which comment (M08), and a group's weekly board counting only the days after a member joined (M10). Not account work, but each closes a finished milestone's review finding before the MVP line. Its criteria and open details (what the board shows before you finish; whether the join day counts; what the record stores and who reads it) are settled with the human when it starts.
 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
@@ -68,7 +69,7 @@ Every value this milestone needs, and where it comes from. A blank origin means 
 
 ## Plan
 1. ~~The human answers A1–A8 and the username interval, and adds the Supabase Auth "managing users" source for A7~~ (done, 2026-10-23); and A9 and A10 (done, 2026-10-23).
-2. **12a** the account page; **12b** sign-in fixes and the username; **12c** deletion. One PR per sub-ticket from `m12-account`.
+2. **12a** the account page; **12b** sign-in fixes and the username; **12c** deletion; **12d** the decided fixes. One PR per sub-ticket from `m12-account`.
 
 ## Removes
 - **12a:** the display name, friends and invite link sections from the home page (moved, not copied, into `src/app/account.tsx`); the home page's own sign-out code, now `SignOut`, shared with the account page; the second `Friend` type in `src/app/home.tsx` (it uses `src/friends/friends.ts`'s); `SignedIn`'s unused `displayName` prop, and `displayName` in `GET /api/profile`'s answer and the home page's `Me`, which nothing read once the account page reads it from `GET /api/account` (no protocol bump: a field nobody reads, M00-data-design §2).
