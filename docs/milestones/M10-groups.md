@@ -1,6 +1,6 @@
 # M10 — Groups
 
-**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is built and reviewed, in review as PR #50.
+**Status:** in progress. 10a is merged (PR #49, on all-green CI with the human's OK; W1 answered by the human, 2026-10-22). G1–G11 and the numbers are answered (human, 2026-10-22: Claude's suggestions). 10b is merged (PR #50, on all-green CI with the human's OK). 10c is next.
 
 ## Goal
 Players make named groups that others join by invite link. Each group has a weekly leaderboard and one shared comment thread per day. First (10a), the friends leaderboard becomes weekly, and the code friends and groups will share is cleaned up.
