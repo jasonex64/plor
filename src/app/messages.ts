@@ -4,6 +4,7 @@ import {
   GROUP_MAX_MEMBERS,
   GROUP_NAME_MAX_LENGTH,
   GROUPS_PER_PLAYER,
+  USERNAME_CHANGE_DAYS,
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
 } from "@/config/tunables";
@@ -26,6 +27,7 @@ const MESSAGES: Record<string, string> = {
   // The rules themselves are enforced by the database (docs/milestones/M02-sign-in-and-play.md, Numbers).
   username_invalid: `Usernames are ${USERNAME_MIN_LENGTH} to ${USERNAME_MAX_LENGTH} characters: lower-case letters, digits and _.`,
   username_taken: "That username is taken. Try another.",
+  username_change_too_soon: `You changed your username less than ${USERNAME_CHANGE_DAYS} days ago.`,
   profile_exists: "You already have a username.",
   no_profile: "Pick a username before you play.",
   // The rules are the database's check (docs/milestones/M07-friends-and-live-board.md, D1).

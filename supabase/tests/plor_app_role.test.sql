@@ -86,8 +86,9 @@ select is(pg_temp.grants('plor_app'), array[
   -- The points ledger (M09 9a, D7): append-only, written by settling and read by the leaderboard.
   'private.points_ledger insert', 'private.points_ledger select',
   'private.profile insert', 'private.profile select',
-  -- The display name is the one column a player changes (M07 7a).
-  'private.profile.display_name update',
+  -- The display name (M07 7a) and the username (M12 12b, A2: once every 30 days, a trigger's rule) are the columns a
+  -- player changes.
+  'private.profile.display_name update', 'private.profile.username update',
   'private.puzzle select',
   'private.puzzle_questions select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it

@@ -5,7 +5,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(35);
 
 select has_table('private', 'profile', 'private.profile exists');
 select ok((select relrowsecurity from pg_class where oid = 'private.profile'::regclass), 'RLS is enabled');
@@ -52,6 +52,28 @@ select throws_ok($$update private.profile set display_name = U&'\212Bngstr\00F6m
 select lives_ok($$update private.profile set display_name = 'Sam' where user_id in ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000a')$$,
   'two players may share a display name');
 
+-- M12 12b: a username changes at most once every 30 days, the first change at once (docs/milestones/M12-account.md, A2).
+select is((select username_changed_at from private.profile where user_id = '00000000-0000-0000-0000-00000000000b'), null,
+  'a username that has never changed has no change time');
+select lives_ok($$update private.profile set username = 'b_new' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
+  'the first change is allowed at once, so a wrong pick at sign-up can be fixed');
+select isnt((select username_changed_at from private.profile where user_id = '00000000-0000-0000-0000-00000000000b'), null,
+  'a change records when it happened');
+select lives_ok($$insert into private.profile (user_id, username) values ('00000000-0000-0000-0000-00000000000c', 'abcdefghij0123456789')$$,
+  'the old username is free for anyone at once');
+select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
+  'OB011', null, 'a second change within 30 days of the last is refused');
+update private.profile set username_changed_at = now() - interval '29 days 23:59:59' where user_id = '00000000-0000-0000-0000-00000000000b';
+select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
+  'OB011', null, 'a change a second short of 30 days after the last is refused');
+update private.profile set username_changed_at = now() - interval '30 days 1 second' where user_id = '00000000-0000-0000-0000-00000000000b';
+select lives_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
+  'a change more than 30 days after the last is allowed');
+select throws_ok($$update private.profile set username = 'Bad' where user_id = '00000000-0000-0000-0000-00000000000c'$$,
+  '23514', null, 'a change still follows the format rule');
+select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000c'$$,
+  '23505', null, 'a change to a taken username is refused');
+
 -- The column type keeps uniqueness case-insensitive even if the format rule is ever relaxed.
 select is((select data_type || '/' || udt_name from information_schema.columns
            where table_schema = 'private' and table_name = 'profile' and column_name = 'username'),
@@ -64,7 +86,7 @@ select is((select count(*)::int from private.profile where user_id = '00000000-0
 -- Only this test's users: the table may already hold real profiles (staging) or test:db leftovers (M02 review).
 select is((select count(*)::int from private.profile where user_id in (
     '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c')),
-  1, 'other profiles are untouched');
+  2, 'other profiles are untouched (b, and c from the username change tests)');
 
 select * from finish();
 rollback;

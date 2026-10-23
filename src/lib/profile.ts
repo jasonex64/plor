@@ -2,16 +2,25 @@
 // (supabase/migrations/20261018105903_create_profile.sql), so the database is the one place that enforces them.
 import { DatabaseError } from "pg";
 import type { Db } from "@/lib/db";
+import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 
-export type Profile = { username: string; displayName: string | null };
+// usernameChangeableAt: when the username may next change, or null if it may now (M12 A2: once every 30 days, the
+// first change at once).
+export type Profile = { username: string; displayName: string | null; usernameChangeableAt: string | null };
 
 export async function getProfile(db: Db, userId: string): Promise<Profile | null> {
-  const { rows } = await db.query<Profile>(
-    "select username, display_name as \"displayName\" from private.profile where user_id = $1",
-    [userId],
+  // The trigger (supabase/migrations/20261023083041_username_change.sql) refuses a change before this time.
+  const { rows } = await db.query<{ username: string; displayName: string | null; changeable: Date | null }>(
+    `select username, display_name as "displayName",
+            case when username_changed_at + make_interval(days => $2) > statement_timestamp()
+                 then username_changed_at + make_interval(days => $2) end as changeable
+     from private.profile where user_id = $1`,
+    [userId, USERNAME_CHANGE_DAYS],
   );
-  return rows[0] ?? null;
+  if (!rows[0]) return null;
+  const { changeable, ...rest } = rows[0];
+  return { ...rest, usernameChangeableAt: changeable?.toISOString() ?? null };
 }
 
 export async function createProfile(db: Db, userId: string, username: string): Promise<void> {
@@ -40,6 +49,17 @@ export async function setDisplayName(db: Db, userId: string, displayName: string
   }
 }
 
+// Changes the signed-in player's username (docs/milestones/M12-account.md, 12b; A2). The database checks the format,
+// that it's free, and that the last change was over 30 days ago.
+export async function changeUsername(db: Db, userId: string, username: string): Promise<void> {
+  try {
+    const { rowCount } = await db.query("update private.profile set username = $2 where user_id = $1", [userId, username]);
+    if (rowCount === 0) throw new AppError("no_profile", 409);
+  } catch (err) {
+    throw profileError(err);
+  }
+}
+
 // Maps the constraint a rejected write broke to the player-facing error; anything else is rethrown as is.
 function profileError(err: unknown): unknown {
   if (!(err instanceof DatabaseError)) return err;
@@ -47,5 +67,6 @@ function profileError(err: unknown): unknown {
   if (err.code === "23514" && err.constraint === "profile_display_name_format") return new AppError("display_name_invalid", 400);
   if (err.code === "23505" && err.constraint === "profile_username_key") return new AppError("username_taken", 409);
   if (err.code === "23505" && err.constraint === "profile_pkey") return new AppError("profile_exists", 409);
+  if (err.code === "OB011") return new AppError("username_change_too_soon", 409);
   return err;
 }
