@@ -12,7 +12,7 @@ import { Board } from "./board";
 import { Comments } from "./comments";
 import { Game } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
-import { Leaderboard } from "./leaderboard";
+import { Leaderboard, Yesterday } from "./leaderboard";
 import { errorText, messageForRedirect } from "./messages";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null; displayName: string | null };
@@ -236,6 +236,7 @@ function SignedIn({
       <Game onOver={setRunOver} />
       <Board username={username} onCommentsChanged={nudgeComments} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
+      <Yesterday />
       <Comments username={username} runOver={runOver} nudge={commentsNudge} />
       <Groups />
       {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}

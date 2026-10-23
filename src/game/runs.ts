@@ -4,11 +4,13 @@
 import { DatabaseError } from "pg";
 import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
-import { POINTS_PER_QUESTION } from "@/config/tunables";
+import { ANSWER_SHARE_MIN_PLAYERS, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 import { matchAnswer, resolveTyped } from "./matching";
+import { dayCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
-import { scoreRun } from "./scoring";
+import { scoreRun, type DayCounts } from "./scoring";
+import { getStreak } from "./streak";
 
 // "timed_out": the current question's 20 seconds ran out, which ends the run (M04 13c-2; the database decides). The
 // timer, not midnight, ends an unfinished run: a run started before midnight can be finished after it (human,
@@ -16,8 +18,20 @@ import { scoreRun } from "./scoring";
 export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
 
 // points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION). bonus: its
-// provisional rarity bonus, from the expectation alone; the final one comes once the day is over (M09).
-export type AnsweredQuestion = { index: number; prompt: string; answer: Named; matched: boolean; hostAnswers: Named[]; points: number; bonus: number };
+// provisional rarity bonus, from the expectation alone; the final one comes once the day is over (M09). share: once the
+// run is over, the fraction of the players who answered this question before the day's midnight who gave this answer,
+// from the counts the bonus uses (docs/milestones/M11-home-screen.md, H5); null while the run goes on, or while fewer
+// than ANSWER_SHARE_MIN_PLAYERS have answered it, so a share can't give away one player's answer.
+export type AnsweredQuestion = {
+  index: number;
+  prompt: string;
+  answer: Named;
+  matched: boolean;
+  hostAnswers: Named[];
+  points: number;
+  bonus: number;
+  share: number | null;
+};
 
 export type RunState = {
   date: string;
@@ -36,6 +50,8 @@ export type RunState = {
   bonus: number;
   // Milliseconds until the next reset at midnight Pacific (private.next_reset), for the countdown.
   msToReset: number;
+  // Days played in a row (src/game/streak.ts; M11 H4).
+  streak: number;
 };
 
 // in_day: given before the run's day ended at midnight (M09 D8).
@@ -70,7 +86,18 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
 
 type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
 
-function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock): RunState {
+// The states of a run that's over, which open the day's thread and reactions (M08) and the shares (M11 H5).
+export const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
+
+// The share of the question's players who gave this entry, or null below the minimum (H5).
+function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
+  const question = counts?.get(index);
+  if (!question || question.answered < ANSWER_SHARE_MIN_PLAYERS) return null;
+  return (question.byEntry.get(entryId) ?? 0) / question.answered;
+}
+
+// counts: the day's counts once the run is over, otherwise null.
+function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock, counts: DayCounts | null, streak: number): RunState {
   const score = scoreRun(
     puzzle,
     stored.map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day })),
@@ -86,6 +113,7 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
       hostAnswers: hostAnswers(question),
       points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
       bonus: score.bonuses[i],
+      share: shareOf(counts, e.question_idx, e.entry_id),
     };
   });
   const status = clock.status ?? "not_started";
@@ -103,6 +131,7 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
     points: answered.reduce((sum, a) => sum + a.points, 0),
     bonus: score.bonus,
     msToReset: clock.msToReset,
+    streak,
   };
 }
 
@@ -119,7 +148,8 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Pr
   );
   const { status, ms_left, ms_to_reset } = rows[0];
   const stored = status === null ? [] : await events(db, userId, date);
-  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset });
+  const counts = status !== null && FINISHED.includes(status) ? (await dayCounts(db, [date])).get(date)! : null;
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, await getStreak(db, userId));
 }
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a

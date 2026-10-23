@@ -88,6 +88,8 @@ describe("a run, step by step", () => {
           points: 0,
           bonus: 0,
           msToReset: expect.any(Number),
+          // A new player who hasn't started today has played no day yet (M11 H4).
+          streak: 0,
         },
       },
     });
@@ -136,6 +138,8 @@ describe("a run, step by step", () => {
         points: POINTS_PER_QUESTION[0],
         // The provisional rarity bonus (M09): the expectation alone, as src/game/scoring.test.ts works out by hand.
         bonus: answerBonus(0, expectedShare(q, entryId)),
+        // No share while the run goes on (M11 H5).
+        share: null,
       },
     ]);
     // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
