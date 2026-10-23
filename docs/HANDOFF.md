@@ -6,12 +6,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand
 - **M08, Comments and reactions, and M09, Points and friends leaderboard, are done** (tickets in `docs/milestones/`). Their branches are deleted.
-- **Design review (docs only), on `design-review-2026-10-22`, PR open.** Claude reviewed Plor against other daily games and social apps, and the human decided: the host anticipates the dodge (M13), weekly leaderboards instead of all-time (M10), anonymous play first (M15), plus answer stats and a streak (M11). ROADMAP "Design review" has each decision with the human's words. The same PR cut "Next revision" from 129 entries to the ones someone will act on; the old list is in git at `c9d2733`.
+- **Design review (docs only), on `design-review-2026-10-22`, PR #48.** Claude reviewed Plor against other daily games and social apps, and the human decided: the host anticipates the dodge (M13), weekly leaderboards instead of all-time (M10), anonymous play first (M15), plus answer stats and a streak (M11). ROADMAP "Design review" has each decision with the human's words. The same PR cut "Next revision" from 129 entries to the ones someone will act on; the old list is in git at `c9d2733`.
 - **No milestone branch is open for M10.**
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merging the design review PR** (merge only on all-green CI).
+- **Merging PR #48, the design review** (merge only on all-green CI).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
