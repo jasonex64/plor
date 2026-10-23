@@ -84,6 +84,9 @@ describe("groups", () => {
 
     const page = await call(detail, `/api/groups/detail?id=${club}`, "GET");
     expect(page.status).toBe(200);
+    // The time to the reset, when the page moves to the new day (M11 H6): within the next 25 hours (a time change).
+    expect(page.body.msToReset).toBeGreaterThan(0);
+    expect(page.body.msToReset).toBeLessThanOrEqual(25 * 60 * 60 * 1000);
     code = page.body.group.inviteCode;
     expect(code).toMatch(/^[A-Za-z0-9_-]{22}$/);
     expect(page.body.group).toEqual({ id: club, name: "Book Club", inviteCode: code, creator: true, members: [member(A, true)] });

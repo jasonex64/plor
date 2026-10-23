@@ -9,8 +9,9 @@ import { useCallback, useEffect, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
 import { api } from "@/lib/api-client";
+import { latestOnly } from "@/lib/latest";
 import type { Emoji } from "@/reactions/reactions";
-import { PAYLOAD_VERSION, changesThread, useBoardChannel, type ChangedMessage, type StatusMessage } from "./board-channel";
+import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel, type ChangedMessage, type StatusMessage } from "./board-channel";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
@@ -20,19 +21,25 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Refetches overlap (nudges, a reconnect, a reaction): only the newest answer is shown (M11 H6).
+  const [latest] = useState(latestOnly);
 
-  const load = useCallback((reason?: "reconnect") => {
-    api<{ board: BoardData }>(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" }).then(
-      (r) => {
-        setBoard(r.board);
-        setError(null);
-      },
-      (err) => setError(errorText(err)),
-    );
-  }, []);
+  const load = useCallback(
+    (reason?: "reconnect") => {
+      latest(
+        api<{ board: BoardData }>(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" }),
+        (r) => {
+          setBoard(r.board);
+          setError(null);
+        },
+        (err) => setError(errorText(err)),
+      );
+    },
+    [latest],
+  );
   useEffect(load, [load]);
 
-  useBoardChannel({
+  const { paused } = useBoardChannel({
     // Comments may have changed while the channel was down too.
     joined: (reason) => {
       onCommentsChanged();
@@ -93,6 +100,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
   return (
     <section aria-label="Friends today">
       <h2>Friends today</h2>
+      {paused && <p role="status">{PAUSED_TEXT}</p>}
       {board?.mine && <WhereEveryoneEnded mine={board.mine} friends={board.friends} />}
       {board?.reactionsOnMine && board.reactionsOnMine.counts.length > 0 && (
         <p>

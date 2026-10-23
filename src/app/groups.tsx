@@ -7,7 +7,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
-import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { latestOnly } from "@/lib/latest";
+import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
@@ -96,7 +97,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
   // player's run is over.
   const [threadNudge, setThreadNudge] = useState(0);
   const nudgeThread = useCallback(() => setThreadNudge((n) => n + 1), []);
-  useBoardChannel({
+  const { paused } = useBoardChannel({
     joined: nudgeThread,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
@@ -105,16 +106,29 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
     failed: (err) => setError(errorText(err)),
   });
 
+  // A reload after a removal can overlap the first load: only the newest answer is shown (M11 H6).
+  const [latest] = useState(latestOnly);
+  // The time to the reset, from the last load, and a count of resets: the thread and the board start again at midnight
+  // Pacific, from the server's new day (M11 H6).
+  const [msToReset, setMsToReset] = useState<number | null>(null);
+  const [day, setDay] = useState(0);
   function load() {
-    api<{ group: Group }>(`/api/groups/detail?id=${encodeURIComponent(id)}`, { method: "GET" }).then(
+    latest(
+      api<{ group: Group; msToReset: number }>(`/api/groups/detail?id=${encodeURIComponent(id)}`, { method: "GET" }),
       (r) => {
         setGroup(r.group);
         setDraft(r.group.name);
+        setMsToReset(r.msToReset);
       },
       (err) => setError(errorText(err)),
     );
   }
-  useEffect(load, [id, setError]);
+  useEffect(load, [id, setError, latest, day]);
+  useEffect(() => {
+    if (msToReset === null) return;
+    const timer = setTimeout(() => setDay((d) => d + 1), msToReset);
+    return () => clearTimeout(timer);
+  }, [msToReset]);
 
   const act = (action: () => Promise<void>) => {
     setCopied(false);
@@ -154,6 +168,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
   return (
     <>
       <section aria-label="Group">
+        {paused && <p role="status">{PAUSED_TEXT}</p>}
         {group && link && (
           <>
             <h2>{group.name}</h2>
@@ -231,12 +246,12 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
       {/* Shown once the page proves membership, and reloaded when the members change (a removal). */}
       {group && (
         <Leaderboard
-          key={group.members.map((m) => m.username).join(" ")}
+          key={`${day} ${group.members.map((m) => m.username).join(" ")}`}
           title="Group leaderboard"
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
         />
       )}
-      {group && <Comments username={username} runOver={false} nudge={threadNudge} group={id} />}
+      {group && <Comments key={day} username={username} runOver={false} nudge={threadNudge} group={id} />}
     </>
   );
 }
