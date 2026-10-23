@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
   - M11 made the home page the Offbeat card (streak, game, yesterday's standings), the feed (`src/comments/feed.ts`), friends today, the friends leaderboard, groups and account. `latestOnly` (`src/lib/latest.ts`) guards overlapping loads, and the page moves to the new day at midnight except a game in play.
-- **M12, Account, has a draft ticket** (`docs/milestones/M12-account.md`) in a PR from `m12-account`, docs only. No code until the human answers A1–A8 and the username interval, and adds the Supabase Auth "managing users" source A7 needs.
+- **M12, Account, has a draft ticket** (`docs/milestones/M12-account.md`) in PR #57 from `m12-account`, docs only. No code until the human answers A1–A8 and the username interval, and adds the Supabase Auth "managing users" source A7 needs.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
