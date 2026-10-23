@@ -23,7 +23,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 Once PR #60 is merged: start 12d on `m12-account`. Draft its criteria and ask the human the open details first (what the live board shows a friend before you finish; whether a member's join day counts on a group board; what the comment-deletion record stores and who reads it).
 
 ## Local state
-- The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub.
+- The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to `jasonex64 <jasonex64@gmail.com>`, as on the other machine: commits before 2026-10-23's `6aa3fa6` inclusive (from `4f17304`) carry the unset default `jason@jasons-MacBook-Air.local`, which Vercel blocked from deploying (PR #60).
 - The local Supabase stack is **left running** in Docker Desktop with every migration up to `20261023200556_account_deletion.sql`. It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
 - A fresh checkout needs `npx next typegen` (or a build or dev run) before `npx tsc --noEmit -p .`, or `LayoutProps` is missing.
