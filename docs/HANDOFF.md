@@ -11,7 +11,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **M11: H6, H7 (whose yesterday board), H8 (swipe now or with game 2) and the minimum for answer shares;** the human asked for a visual mockup of the home screen before saying yes (one was shown in chat, 2026-10-22). H2–H5 are answered and H1 was changed by the human.
+- **M11: H6 and the minimum for answer shares.** H1–H5, H7 and H8 are answered (H1 changed by the human after a mockup shown in chat, 2026-10-22).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
