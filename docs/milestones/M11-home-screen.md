@@ -1,6 +1,6 @@
 # M11 — Home screen
 
-**Status:** in progress. Drafted 2026-10-22; H1–H8 and the minimum answered by the human, 2026-10-22 (H1 changed by them after a mockup in chat). The ticket is merged (PR #53). 11a is merged (PR #54, on all-green CI with the human's OK). 11b is merged (PR #55, on all-green CI with the human's OK, after they tried it locally). 11c, the last sub-ticket, is in review (a PR from `m11-home-screen`).
+**Status:** in progress. Drafted 2026-10-22; H1–H8 and the minimum answered by the human, 2026-10-22 (H1 changed by them after a mockup in chat). The ticket is merged (PR #53). 11a is merged (PR #54, on all-green CI with the human's OK). 11b is merged (PR #55, on all-green CI with the human's OK, after they tried it locally). 11c, the last sub-ticket, is in review (PR #56).
 
 ## Goal
 The home page becomes the place a player opens every day: today's game with their streak, how many players gave each of their answers, a feed of today's comments from friends and groups that stays blurred until they've played, and the boards, in one plain layout (the look is M14).

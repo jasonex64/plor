@@ -10,11 +10,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M11, Home screen, is in progress** (`docs/milestones/M11-home-screen.md`, branch `m11-home-screen`). The ticket is merged (PR #53); every decision is answered (H1–H8 and the minimum of 5, 2026-10-22).
   - **11a is merged** (PR #54): the streak (`src/game/streak.ts`) and each answer's share in the run state, and yesterday's board (`GET /api/leaderboard/yesterday`), in plain UI that 11c moves into the game card.
   - **11b is merged** (PR #55): the home page's feed (`GET /api/feed`, `src/comments/feed.ts`), replacing the home Comments section for today; names and counts only before the run is over.
-  - **11c is in review** (a PR from `m11-home-screen`), the last sub-ticket: the home page in H1's order with the Offbeat card on top; `latestOnly` (`src/lib/latest.ts`) for overlapping loads; every section but a game in play moves to the new day at midnight, on the home page and a group's page; "Live updates paused, reconnecting…" while Realtime is down; the intro copy. The reviewer's blocking findings are fixed. It merges on all-green CI with the human's OK, which finishes M11.
+  - **11c is in review** (PR #56), the last sub-ticket: the home page in H1's order with the Offbeat card on top; `latestOnly` (`src/lib/latest.ts`) for overlapping loads; every section but a game in play moves to the new day at midnight, on the home page and a group's page; "Live updates paused, reconnecting…" while Realtime is down; the intro copy. The reviewer's blocking findings are fixed. It merges on all-green CI with the human's OK, which finishes M11.
 - **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge 11c's PR** once CI is green. That finishes M11.
+- **Merge PR #56 (11c)** once CI is green. That finishes M11.
 - **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
 - **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
