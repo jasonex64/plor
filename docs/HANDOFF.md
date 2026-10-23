@@ -2,35 +2,35 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-22, by the session that built M09 and marked it done; then, on branch `m16-game-2`, by the session that drafted M16 and merged `main` into it.
+**Updated:** 2026-10-22, by the session that ran the design review on branch `design-review-2026-10-22`.
 
 ## Where things stand
-- **M08, Comments and reactions, is done** (PRs #39, #40, #41 and #43; ticket `docs/milestones/M08-comments-and-reactions.md`). Its branch `m08-comments-and-reactions` is deleted, as CLAUDE.md says once a milestone is merged. The reviewers' deferred items are in ROADMAP "Next revision", From M08.
-- **M09, Points and friends leaderboard, is done** (PRs #45 and #46; ticket `docs/milestones/M09-points-and-leaderboard.md`). Every finished run is scored into `private.points_ledger` (the ladder plus the rarity bonus) once its day closes, when a leaderboard first shows its player; the home page has the friends leaderboard. Its branch `m09-points-and-leaderboard` is deleted. The reviewers' deferred items are in ROADMAP "Next revision", From M09.
+- **M08, Comments and reactions, and M09, Points and friends leaderboard, are done** (tickets in `docs/milestones/`). Their branches are deleted.
+- **Design review (docs only), on `design-review-2026-10-22`, PR #48.** Claude reviewed Plor against other daily games and social apps, and the human decided: the host anticipates the dodge (M13), weekly leaderboards instead of all-time (M10), anonymous play first (M15), plus answer stats and a streak (M11). ROADMAP "Design review" has each decision with the human's words. The same PR cut "Next revision" from 129 entries to the ones someone will act on; the old list is in git at `c9d2733`.
 - **No milestone branch is open for M10.**
-- **M16, Game 2 (the substring game),** has a draft ticket (`docs/milestones/M16-game-2-substrings.md`) in PR #42 from `m16-game-2`. It is docs only and comes after launch. The human answered S1–S14 on 2026-10-22; the name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
+- **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
 
 ## Waiting on the human
+- **Merging PR #48, the design review** (merge only on all-green CI).
 - **M12:** whether usernames can change, and how often (Claude suggested once a month).
 - **Before plor.app gets M07 and M08** (`db push`, M15 or when the human wants):
   - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
   - check that `[[:alpha:]]` behaves the same there for display names (M07 7a, *unverified*).
-- **The live board shows which question caught a friend** before you've finished, through "on question 3" then "finished", though never the answer. It's in the approved design; ROADMAP "Next revision" has it for the human.
 - **Before approving the later drafted days,** note:
   - three repeat 2026-10-22's categories: car brand (11-06), state capitals (11-10) and tea (11-16);
   - several had a host swapped under the host-name rule (M06 ticket, Evidence).
-- **Superpowers:** the human asked about the plugin. Its install card was shown in chat; whether it was installed is unknown.
+- ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-M10, Groups (ROADMAP), has no ticket yet, so draft one from `docs/milestones/_TEMPLATE.md` for the human on a new branch. ROADMAP "Next revision" has the deferred M08 and M09 items; one (the shared viewer-and-friends query) fits M10.
+Once the design review PR is merged: draft the M10 (Groups) ticket from `docs/milestones/_TEMPLATE.md` on a new branch `m10-groups`. It must take in Design review 2 (weekly boards for friends and groups; how Sunday's points show once they settle after the Monday reset) and 4 (one shared thread per group per day; misses are out), and the "For M10" items in Next revision. Claude's draft decisions from the review, for the ticket: what a group is (name, creator, members, invite link of 16 random bytes as M07); what members who aren't friends see; G7 lifecycle (rename, reset link, remove, leave, delete, the creator leaving); the human numbers (members per group, groups per player, name length and characters); the security change for the new tables.
 
 ## Local state
 - The local Supabase stack is running, Realtime included, and holds:
   - every migration up to `20261022105344_points_ledger.sql`;
-  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally (8b's checks didn't use that account);
+  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally;
   - the approved 2026-10-22 day.
 - No dev server is left running.
-- `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile (ROADMAP, From M08).
+- `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
 - The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
   1. `npm ci`, then `npx supabase start`, then `npx supabase migration up`, then `npm run dev`.

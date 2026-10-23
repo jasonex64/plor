@@ -5,7 +5,7 @@
 > **Since this ticket (2026-10-21 docs audit):**
 > - No run is "abandoned" any more: a run started before midnight can be finished after it, and run status is in_progress, died, survived or timed_out (DECISIONS.md Log 2026-10-21; migration `20261021081057_question_timer.sql`).
 > - AI puzzle drafting (here "M04") has no milestone: it is under ROADMAP "Later"; M04 became game mechanics.
-> - Seeing friends' and group members' misses (D4's "M06/M07") is in Groups, now M10 (ROADMAP).
+> - Seeing friends' and group members' misses (D4's "M06/M07") was in Groups (M10), and moved to ROADMAP Later on 2026-10-22 (Design review, 4).
 > - The live playtest is the closed beta in launch, now M15 (not M11); the visual design is now M14 (not M12).
 >
 > Milestone numbers here are the ones in use when it was written; ROADMAP.md has today's.

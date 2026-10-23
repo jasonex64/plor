@@ -20,7 +20,7 @@ Sources: Supabase docs (keys and RLS, Realtime) and PostgreSQL 17 (`ddl-priv`), 
 - **Questions are served one at a time.** The response to an answer is the run after it: that question's result and host answers (the reveal). The next question comes from `POST /api/run/next`, when the player taps Next (`src/game/runs.ts`, `openNext`; `src/app/api/run/next/route.ts`).
 
 ## 3. Player identity
-- **You must sign in before playing.** A human decided this on 2026-10-17 (Q2). There are no anonymous users, no guest runs and no account linking.
+- **You must sign in before playing.** A human decided this on 2026-10-17 (Q2). There are no anonymous users, no guest runs and no account linking. The human approved anonymous play for M15 (2026-10-22, ROADMAP "Design review", 3); this stands until the M15 ticket changes it.
 - **ID:** the Supabase `auth.users.id` (UUID).
 - **Profile:** `private.profile(user_id uuid pk → auth.users on delete cascade, username citext unique not null, created_at)`. It's created at first sign-in, before the first run; starting a run without one gets `409 no_profile` (`src/app/api/run/start/route.ts`).
 - **Sign-in method:** a 6-digit code sent by email, and Google, both through Supabase Auth (decided in M02; the code replaced the magic link on 2026-10-20; DECISIONS.md: Sign-in).
@@ -72,19 +72,18 @@ private.question_open(
 - **Retries are safe.** Resubmitting text that names the same entry returns the stored result. A different entry for an index that's already answered gets `409 already_answered`. Tapping Next twice returns the same run.
 - **Order is enforced** in one transaction: `question_idx` must equal the number of existing events (`OB002 out_of_order`), and nothing is accepted after a matched event or the last question (`OB003 run_over`). The same rules apply to `question_open`.
 
-## 6. Points ledger (written from M09, when the leaderboard is built; settled by the M09 ticket, 2026-10-22)
+## 6. Points ledger (built in M09, `20261022105344_points_ledger.sql`)
 ```
 private.points_ledger(
   id bigint generated always as identity primary key,
-  user_id uuid → auth.users on delete cascade,
-  game_id text, puzzle_date date,
+  user_id uuid not null, game_id text not null, puzzle_date date not null,
+  foreign key (user_id, game_id, puzzle_date) → private.run on delete cascade,   -- one row per run
   points integer not null check (points >= 0),   -- the ladder plus the final rarity bonus
-  bonus integer not null check (bonus between 0 and points),
+  bonus integer not null, constraint points_ledger_bonus check (bonus between 0 and points),
   created_at timestamptz not null default now(),
   unique (user_id, game_id, puzzle_date)
 )
 ```
-*Not built yet.* This is the design for the points milestone (M09).
 - **Rarity bonus** (human, 2026-10-22, M09; DECISIONS.md, Game 1: Scoring): each survived answer before the day's midnight also earns a bonus, bigger the rarer the answer was that day, capped below the points of the first question the run didn't survive. `points` holds the total, `bonus` the bonus part. The exact numbers are in the M09 ticket.
 - **Formula** (human, 2026-10-21, M04 G1; DECISIONS.md, Game 1: Scoring): surviving questions 1 to 7 earns 25, 50, 75, 100, 150, 250 and 350 points (`POINTS_PER_QUESTION` in `src/config/tunables.ts`). A run's ladder points are the sum for the questions it survived (1000 for a perfect run), and the rarity bonus comes on top. It replaced *k* points for question *k* (Q3, accepted by a human on 2026-10-17).
   *Example:* a player who dies on Q4 has survived Q1–Q3, so they score 25 + 50 + 75 = 150.
@@ -92,15 +91,15 @@ private.points_ledger(
   - every finished run, for the day it was played, even one finished after midnight (this replaced 2026-10-21's "doesn't count for the leaderboard");
   - a run that ran out of time scores the questions it survived, like a caught run;
   - a run left at a reveal counts once the player comes back and finishes it; one never finished counts nothing.
-- **When it's written** (human, 2026-10-22, M09 D3, D9, D10): once the run is finished **and its day is closed**, since the final bonus needs the day's counts. A day closes at its midnight Pacific; there's no scheduler. One settling function writes a row for each such run that has none, inserting with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`, so a retry or rerun never awards points twice. The leaderboard calls it for the players it shows just before it sums. The final bonus uses only answers recorded before the day's midnight, so when settling runs doesn't change the result.
+- **When it's written** (human, 2026-10-22, M09 D3, D9, D10): once the run is finished **and its day is closed**, since the final bonus needs the day's counts. A day closes at its midnight Pacific; there's no scheduler. One settling function writes a row for each such run that has none, inserting with `ON CONFLICT (user_id, game_id, puzzle_date) DO NOTHING`, so a retry or rerun never awards points twice. The leaderboard calls it for the players it shows just before it sums. The final bonus uses only answers recorded before the day's midnight, so when settling runs doesn't change the result, except for one window: an answer's `created_at` is its transaction's start, so an answer begun just before midnight and committed just after an early settle misses that settle's counts (ROADMAP "Next revision", Correctness).
 - **Backfill** *(fixes review 2, BLOCKING 3)*: settling is the backfill. A run from before M09 gets its row, rarity bonus included, the first time a leaderboard shows its player, computed from its stored answers, so there's no separate `ledger:backfill` script (M09 D3).
   - **Evidence:** settle every player twice. The second time writes 0 rows, and the ledger sum equals the recomputed score for every finished run.
-- The leaderboard is `SUM(points)` over the ledger.
+- The leaderboard is `SUM(points)` over the ledger: all time in M09, the current week from M10 (human, 2026-10-22, ROADMAP "Design review").
 
 ## 7. Append-only enforcement (`run`, `run_event`, `points_ledger`)
 - `REVOKE ALL` on these tables from `anon`, `authenticated` and `service_role`, then `GRANT SELECT, INSERT` to `plor_app` only (plus `USAGE` on schema `private`). This removes UPDATE, DELETE and TRUNCATE (PG17 lists TRUNCATE as its own privilege). `plor_app` doesn't bypass RLS and is bound by grants. *(Changed 2026-10-17: was `service_role`, before the app role existed.)* `question_open` follows the same rule; `missed_answer` gets INSERT, plus SELECT for the admin insights (`20261019074108_create_game_tables.sql`, `20261021084917_reveal_next_and_reset.sql`, `20261020061754_create_admin_and_insight_grants.sql`).
 - pgTAP tests check that `anon`, `authenticated` and `service_role` hold no privilege on any `private` table or view (`supabase/tests/private_schema.test.sql`), that `plor_app` holds exactly its listed grants (`plor_app_role.test.sql`), and that `plor_app` can't update, delete or truncate the game tables (`game.test.sql`).
-- **Account deletion (M12)** relies on `on delete cascade` from `auth.users`. This is **verified**: deleting the auth user removes the profile (`supabase/tests/profile.test.sql`) and the runs, answers and misses (`supabase/tests/game.test.sql`), even though nobody holds DELETE.
+- **Account deletion (M12)** relies on `on delete cascade` from `auth.users`. This is **verified**: deleting the auth user removes the profile (`supabase/tests/profile.test.sql`), the runs, answers and misses (`supabase/tests/game.test.sql`) and, through the run, the ledger rows (`supabase/tests/points_ledger.test.sql`), even though nobody holds DELETE.
 
 ## 8. Day boundary
 **Decided (Q1, by a human on 2026-10-17):** one **global** reset at **midnight Pacific time, following daylight saving** (`America/Los_Angeles`). That's 08:00 UTC in winter (PST) and 07:00 UTC in summer (PDT).
