@@ -19,10 +19,12 @@ export type StatusMessage = { v: number; username: string; puzzleDate: string; s
 // (supabase/migrations/20261023060640_group_thread.sql).
 export type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string; groupId?: string };
 
-// Whether a nudge means this thread should be fetched again: a group's (its ID), or the friends thread (none). An
-// unknown payload version reloads every thread (M00 data design §2).
-export function changesThread(message: ChangedMessage, group?: string): boolean {
-  return message.v !== PAYLOAD_VERSION || (message.type === "comments_changed" && message.groupId === group);
+// Whether a nudge means this list should be fetched again: a group's thread (its ID) for that group's nudges, or the
+// home page's feed for the friends thread's and every group's (docs/milestones/M11-home-screen.md, 11b). An unknown
+// payload version reloads both (M00 data design §2).
+export function changesThread(message: ChangedMessage, thread: "feed" | { group: string }): boolean {
+  if (message.v !== PAYLOAD_VERSION) return true;
+  return message.type === "comments_changed" && (thread === "feed" || message.groupId === thread.group);
 }
 
 // joined: the channel joined, the first time or after an interruption, when messages may have been missed, so the

@@ -100,7 +100,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
     joined: nudgeThread,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
-      if (changesThread(message, id)) nudgeThread();
+      if (changesThread(message, { group: id })) nudgeThread();
     },
     failed: (err) => setError(errorText(err)),
   });

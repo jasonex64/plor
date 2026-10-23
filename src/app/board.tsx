@@ -14,7 +14,8 @@ import { PAYLOAD_VERSION, changesThread, useBoardChannel, type ChangedMessage, t
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
-// onCommentsChanged: the friends thread should be fetched again. A group's thread has its own page (M10 10d).
+// onCommentsChanged: the home page's feed should be fetched again: the friends thread or one of the player's groups
+// changed (M11 11b).
 export function Board({ username, onCommentsChanged }: { username: string; onCommentsChanged: () => void }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +44,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
   });
 
   function onChanged(message: ChangedMessage) {
-    if (changesThread(message)) onCommentsChanged();
+    if (changesThread(message, "feed")) onCommentsChanged();
     if (message.v !== PAYLOAD_VERSION) {
       console.error("board message with unknown version", message.v);
       load();

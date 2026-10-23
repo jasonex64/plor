@@ -31,7 +31,7 @@ export function readCommentId(input: unknown): string {
   return input;
 }
 
-type Row = { id: string; username: string; name: string; body: string; created_at: Date };
+export type CommentRow = { id: string; username: string; name: string; body: string; created_at: Date };
 
 // True when the thread is the friends thread (the parameter is null) or a group the player ($1) is in.
 const inThreadSql = (group: string) => `(${group}::uuid is null or ${memberSql("$1", `${group}::uuid`)})`;
@@ -55,7 +55,7 @@ export async function getThread(db: Db, viewerId: string, date: string | null, g
   // past day the viewer never played is shown (D6).
   if (today ? !finished : status !== null && !finished) return { date: day[0].date, canPost: false, comments: null };
 
-  const { rows } = await db.query<Row>(
+  const { rows } = await db.query<CommentRow>(
     `select c.id::text as id, p.username::text as username, coalesce(p.display_name, p.username::text) as name, c.body, c.created_at
      from private.comment c
      join private.profile p on p.user_id = c.user_id
@@ -74,9 +74,9 @@ export async function getThread(db: Db, viewerId: string, date: string | null, g
 // membership are checked in the insert itself, so midnight can't slip between a check and the write; a member removed
 // in between fails the database's membership check (G4).
 export async function postComment(db: Db, userId: string, date: string, body: string, group: string | null): Promise<Comment> {
-  let rows: (Row & { today: string; past: boolean; member: boolean })[];
+  let rows: (CommentRow & { today: string; past: boolean; member: boolean })[];
   try {
-    ({ rows } = await db.query<Row & { today: string; past: boolean; member: boolean }>(
+    ({ rows } = await db.query<CommentRow & { today: string; past: boolean; member: boolean }>(
       `with day as (
          select private.today() as today,
                 (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = private.today()) as status,
@@ -143,6 +143,6 @@ export async function reportComment(db: Db, userId: string, id: string): Promise
   if (rows[0].own) throw new AppError("report_own", 409);
 }
 
-function toComment(r: Row, reactions: Reactions): Comment {
+export function toComment(r: CommentRow, reactions: Reactions): Comment {
   return { id: r.id, username: r.username, name: r.name, body: r.body, createdAt: r.created_at.toISOString(), reactions };
 }

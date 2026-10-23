@@ -4,10 +4,14 @@
 // friends', oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at
 // a time, read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can
 // be changed only where posting can. Other players' comments can be reported on any day shown, which hides them
-// from the reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4).
-// Plain UI; the look is M14.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+// from the reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4). On
+// the home page, today is the feed: the friends thread's and the player's groups' comments in one list, each labelled,
+// with only who commented and how many reactions until the run is over (docs/milestones/M11-home-screen.md, 11b; H2,
+// H3); earlier days are the friends thread. Plain UI; the look is M14.
+import Link from "next/link";
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
+import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import { api } from "@/lib/api-client";
 import type { Emoji } from "@/reactions/reactions";
 import { errorText } from "./messages";
@@ -23,28 +27,31 @@ function shiftDay(date: string, days: number): string {
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
-// friends thread.
+// home page's feed.
 export function Comments({ username, runOver, nudge, group }: { username: string; runOver: boolean; nudge: number; group?: string }) {
   // null shows today, whose date comes from the server (the day boundary is the server's: DECISIONS.md, Day boundary).
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
-  const [thread, setThread] = useState<Thread | null>(null);
+  const [thread, setThread] = useState<Thread | Feed | null>(null);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
+    const shown = (t: Thread | Feed) => {
+      setThread(t);
+      if (date === null) setToday(t.date);
+      setError(null);
+    };
+    const failed = (err: unknown) => setError(errorText(err));
+    if (!group && date === null) {
+      api<{ feed: Feed }>("/api/feed", { method: "GET" }).then((r) => shown(r.feed), failed);
+      return;
+    }
     const query = new URLSearchParams();
     if (date) query.set("date", date);
     if (group) query.set("group", group);
-    api<{ thread: Thread }>(query.size ? `/api/comments?${query}` : "/api/comments", { method: "GET" }).then(
-      (r) => {
-        setThread(r.thread);
-        if (date === null) setToday(r.thread.date);
-        setError(null);
-      },
-      (err) => setError(errorText(err)),
-    );
+    api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }).then((r) => shown(r.thread), failed);
   }, [date, group]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
@@ -74,9 +81,13 @@ export function Comments({ username, runOver, nudge, group }: { username: string
 
   const shown = thread?.date ?? null;
   const isToday = shown !== null && shown === today;
+  const preview = thread && "preview" in thread ? thread.preview : null;
   return (
-    <section aria-label="Comments">
-      <h2>Comments{shown && !isToday && ` on ${shown}`}</h2>
+    <section aria-label={group ? "Comments" : "Feed"}>
+      <h2>
+        {group ? "Comments" : isToday || !shown ? "Feed" : "Friends' comments"}
+        {shown && !isToday && ` on ${shown}`}
+      </h2>
       {shown && (
         <p>
           <button type="button" onClick={() => setDate(shiftDay(shown, -1))}>
@@ -89,7 +100,8 @@ export function Comments({ username, runOver, nudge, group }: { username: string
           )}
         </p>
       )}
-      {thread && thread.comments === null && (
+      {preview && <Preview preview={preview} />}
+      {thread && thread.comments === null && !preview && (
         <p>
           Finish {isToday ? "today's" : "that day's"} puzzle to see {group ? "the group's" : "your friends'"} comments.
         </p>
@@ -101,6 +113,7 @@ export function Comments({ username, runOver, nudge, group }: { username: string
             <CommentItem
               key={c.id}
               comment={c}
+              label={"group" in c ? <ThreadLabel comment={c as FeedComment} /> : undefined}
               mine={c.username === username}
               busy={busy}
               onDelete={() => run(() => api("/api/comments/delete", { method: "POST", body: { id: c.id } }))}
@@ -131,8 +144,35 @@ export function Comments({ username, runOver, nudge, group }: { username: string
   );
 }
 
+// "Sam, Lee and 3 others commented · 7 reactions", and nothing a player could read before finishing (H3).
+function Preview({ preview }: { preview: FeedPreview }) {
+  const named = preview.friends.slice(0, 2);
+  const more = preview.friends.length - named.length + preview.others;
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const who =
+    named.length === 0 ? plural(more, "player", "players") : more === 0 ? named.join(" and ") : `${named.join(", ")} and ${plural(more, "other", "others")}`;
+  return (
+    <>
+      {named.length + more > 0 ? (
+        <p>
+          {who} commented · {plural(preview.reactions, "reaction", "reactions")}
+        </p>
+      ) : (
+        <p>No comments yet.</p>
+      )}
+      <p>Finish today&apos;s puzzle to read them and join in.</p>
+    </>
+  );
+}
+
+// Which thread a feed comment is in: the friends thread, or a group's, linking to its page.
+function ThreadLabel({ comment }: { comment: FeedComment }) {
+  return comment.group ? <Link href={`/groups/${comment.group.id}`}>{comment.group.name}</Link> : <>Friends</>;
+}
+
 function CommentItem({
   comment,
+  label,
   mine,
   busy,
   onDelete,
@@ -140,6 +180,7 @@ function CommentItem({
   onReact,
 }: {
   comment: Comment;
+  label?: ReactNode;
   mine: boolean;
   busy: boolean;
   onDelete: () => void;
@@ -148,7 +189,7 @@ function CommentItem({
 }) {
   return (
     <li>
-      <strong>{comment.name}</strong> <time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
+      <strong>{comment.name}</strong> {label && <>· {label} </>}<time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
       <p>{comment.body}</p>
       <Reactions reactions={comment.reactions} busy={busy} onReact={onReact} />{" "}
       {mine ? (

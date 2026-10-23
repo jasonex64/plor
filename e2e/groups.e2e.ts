@@ -54,7 +54,8 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
 
   // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
-  // page without a reload (G5), and the joiner's friends thread on the home page doesn't have it (G4).
+  // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group
+  // (M11 11b).
   for (const page of [creator, joiner]) {
     await page.goto("/");
     await page.getByRole("button", { name: "Start today's puzzle" }).click();
@@ -62,11 +63,18 @@ test("a group is made on the home page and joined by its link", async ({ browser
     await page.getByRole("button", { name: "Answer" }).click();
     await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
-  const joined = creator.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1")).then((ws) =>
-    ws.waitForEvent("framereceived", { predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:") }),
-  );
-  await creator.goto(groupUrl);
-  await joined;
+  // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
+  // returns the channel's socket.
+  async function openLive(url: string) {
+    const socket = creator.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1"));
+    await creator.goto(url);
+    const ws = await socket;
+    await ws.waitForEvent("framereceived", {
+      predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:"),
+    });
+    return ws;
+  }
+  await openLive(groupUrl);
   const creatorThread = creator.getByRole("region", { name: "Comments" });
   await expect(creatorThread.getByText("No comments yet.")).toBeVisible();
 
@@ -77,6 +85,19 @@ test("a group is made on the home page and joined by its link", async ({ browser
   await expect(joiner.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body })).toBeVisible();
   await expect(creatorThread.getByRole("listitem").filter({ hasText: body })).toBeVisible();
 
-  await joiner.goto("/");
-  await expect(joiner.getByRole("region", { name: "Comments" }).getByText("No comments yet.")).toBeVisible();
+  const ws = await openLive("/");
+  const feed = creator.getByRole("region", { name: "Feed" });
+  await expect(feed.getByRole("listitem").filter({ hasText: body })).toContainText("Book Club");
+  // The page loads the feed a few times as it starts (mount, join, the run's state), so one of those could land after
+  // the post. Only a request made after the group's nudge arrives shows the nudge reloads the feed.
+  let nudged = false;
+  ws.on("framereceived", (f) => {
+    if (String(f.payload).includes("comments_changed")) nudged = true;
+  });
+  const refetch = creator.waitForRequest((r) => nudged && r.url().includes("/api/feed"));
+  const second = `home too ${RUN}`;
+  await joiner.getByLabel("Comment", { exact: true }).fill(second);
+  await joiner.getByRole("button", { name: "Post" }).click();
+  await refetch;
+  await expect(feed.getByRole("listitem").filter({ hasText: second })).toContainText("Book Club");
 });
