@@ -68,6 +68,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
+  -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
+  'private.base_lookup(uuid,text) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
   'private.clear_auth_attempts(text,text) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).

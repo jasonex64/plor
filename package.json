@@ -18,6 +18,7 @@
     "content:plurals": "node scripts/content-plurals.ts",
     "content:letters": "node scripts/content-letters.ts",
     "content:additions-check": "node scripts/content-additions-check.ts",
+    "base": "node --env-file-if-exists=.env.local scripts/base.ts",
     "survey:score": "node scripts/survey-score.ts",
     "test:e2e": "playwright test"
   },

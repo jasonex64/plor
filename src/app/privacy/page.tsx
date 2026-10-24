@@ -88,6 +88,23 @@ export default function Privacy() {
       <h2>Children</h2>
       <p>Plor is not for children under 13. If you are under 13, please don&apos;t sign up.</p>
 
+      {/* Credits for the answer database's sources (docs/milestones/M13-13a-the-base.md; SOURCES.md, M13 D2): CC BY
+          asks for attribution; CC0 asks for none, and Plor names those sources anyway. A source is listed once
+          its data is in the game: Catalogue of Life joins when it's used. */}
+      <h2>Data sources</h2>
+      <p>The answers Plor accepts are built partly from these open data sets:</p>
+      <ul>
+        <li>
+          <a href="https://www.wikidata.org/">Wikidata</a> (CC0).
+        </li>
+        <li>
+          <a href="https://github.com/globalwordnet/english-wordnet">Open English WordNet</a>, 2025 Edition, adapted: Plor normalizes its words and links them to the other sets (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
+        </li>
+        <li>
+          <a href="https://fdc.nal.usda.gov/">USDA FoodData Central</a>, SR Legacy (CC0).
+        </li>
+      </ul>
+
       <h2>Changes</h2>
       <p>If this page changes, the date at the top changes too.</p>
 

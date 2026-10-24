@@ -1,0 +1,9 @@
+{
+  "set": "usda-cheese",
+  "source": "usda",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:51:17.574Z",
+  "method": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip: food.csv and food_category.csv, \"Cheese, <kind>\" in Dairy and Egg Products, matched to oewn-cheese",
+  "items": 31,
+  "sha256": "333c4ee2cc170ec88b167caf179c9d3b59de90f47fd84765d1e0596ad494eed7"
+}

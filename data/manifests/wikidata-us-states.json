@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-us-states",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:07:49.927Z",
+  "method": "SPARQL: instances of U.S. state (P31 Q35657)",
+  "items": 51,
+  "sha256": "ba1b45b63baf6eb27f01c04603d64d464eb1119977d9721e491452ca850c7de4"
+}

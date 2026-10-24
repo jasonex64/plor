@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-fruit",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:08:01.594Z",
+  "method": "SPARQL: everything that is an instance or subclass (P31|P279) of a subclass of fruit (P279* Q1364), with its parents in that tree",
+  "items": 3004,
+  "sha256": "f2060e6f1fb32a8130dab7d7dcbec109d3822cda30e99515894dd57d1f4f48e4"
+}

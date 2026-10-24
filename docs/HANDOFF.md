@@ -2,39 +2,41 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that reviewed the MVP, built M12 12f and M15 15b (the zod advisory), and rewrote M13's ticket with the human's answers, on the Windows machine.
+**Updated:** 2026-10-24, by the session that reviewed the MVP, built M12 12f and M15 15b, drafted M13 with the human's guided answers, and built M13 13a-1, on the Windows machine.
 
 ## Where things stand
-- **The MVP (M00–M12) is done,** with 12f's review fixes merged (PR #67).
-- **M15 15b, the zod advisory, is merged** (PR #69). An npm override forces zod to `^4.6.6`, because `@vercel/cli-config` pins 4.1.11; remove it once that pin goes (ROADMAP Housekeeping).
-  - Dependabot alert #1 was still `open` right after the merge, which is likely GitHub's rescan lag (*unverified*). Check with `gh api repos/jasonex64/plor/dependabot/alerts/1 --jq .state`.
-- **Dependabot security updates are on for the repo** (DECISIONS.md Log, 2026-10-24). Their PRs run CI and merge only with the human's OK, and they're the lockfile rule's one exception.
-- **The order from here is M13, then M14, then M15** (ROADMAP, Focus, human 2026-10-23). plor.app needn't be playable before launch, so:
-  - no admin is set up and no day is approved there;
-  - PR #68 (copied days to fill empty dates) was closed unmerged.
-- **M13's ticket is a draft** (`docs/milestones/M13-answer-lists-and-content.md`), on branch `m13-answer-lists-and-content` in PR #61.
-  - It was rewritten 2026-10-24 around "the answer database": things, aliases, facts, categories as recipes, a frozen copy per day, auto-accepted misses with an audit page, pooled rarity, and a question bank. The human's answers to four rounds of guided questions are quoted in it.
-  - Every decision, number and source is answered (human, 2026-10-24). The sources are Wikidata, Open English WordNet, Catalogue of Life and USDA FoodData Central, now in SOURCES.md. Nicknames come from the AI and players; traits are AI-filed and audited; sources come in as reviewed snapshots.
-  - The CLAUDE.md rule "Ask before designing" is on this branch too, and reaches `main` with PR #61.
-- **The private-drafts ticket moved to M15** as `docs/milestones/M15-15a-private-drafts.md` (its P4 answered (b)). M15 also takes the beta's days, which days to play and the parked days.
-- **M14:** Claude suggested a split for its ticket: 14a structure and UX (navigation tabs, flows), 14b the visual system, 14c the art. It's in the ROADMAP row, not yet a ticket.
-- **The repo is public.** Its protections are on (DECISIONS.md Log, 2026-10-24). The drafts in `content/` stay public until 15a.
-- **M16, Game 2,** has a draft ticket (branch `m16-game-2`), for after launch.
+- **The MVP (M00–M12) is done.** The order from here is M13, then M14, then M15 (ROADMAP, Focus). plor.app needn't be playable before launch, so no admin and no day are set up there.
+- **M13 is in progress** on `m13-answer-lists-and-content`. The ticket is `docs/milestones/M13-answer-lists-and-content.md` ("the answer database"), with every decision, number and source answered by the human, 2026-10-24.
+  - **13a-1, the base, is built and reviewed,** in PR #70 (`docs/milestones/M13-13a-the-base.md`). It holds:
+    - the tables, guarded functions and pgTAP;
+    - `npm run base -- fetch|load|review`;
+    - `/admin/base`;
+    - credits on the privacy page.
+
+    The human approved its security change (DECISIONS.md Log, 2026-10-24), and PR #70 merges itself by GitHub auto-merge once every required check passes. If it hasn't merged, read its failing check.
+  - **13a-2 is next:**
+    - format 3, with frozen lists read from the base "as of" approval instead of copied per day (the human asked about database size; the 89.9 MB measurement and this design are in the ticket);
+    - the game engine reading the frozen lists from indexed tables (pg_trgm and fuzzystrmatch are available locally);
+    - the drafting script, and the T1 test day played end to end;
+    - the matching items;
+    - the two 13a-2 notes in the ticket's Review: display names after a merge, and a name on one tree line resolving to its highest member.
+- **M15 15b (zod) is merged** (PR #69). Dependabot alert #1 was still `open` hours after the merge, though the dependency graph lists zod 4.6.7 (`gh api repos/jasonex64/plor/dependency-graph/sbom`). Why is *unverified*: check it, and if it stays open, dismiss it as fixed with that evidence.
+- **Dependabot security updates are on** for the repo. Their PRs merge only with the human's OK.
+- **M15 15a** (private drafts) and **M14's suggested split** are drafted (ROADMAP rows); **M16** waits for after launch.
 
 ## Waiting on the human
-- **15a's P1–P3 and P5** (when M15 starts).
-- **New questions for the repeated categories** (11-06 Q2 and Q3, 11-10 Q4, 11-16 Q4): with M15's drafting now.
-- **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it.
-- ROADMAP "Next revision", For the human, has the rest.
+- **The import review's flags** (ROADMAP Next revision, For M13): the fruit tree's protected-origin products, country codes as aliases, and a Wikidata error on two elements. Curate, or accept.
+- 15a's P1–P3 and P5, when M15 starts. The four replacement questions (11-06, 11-10, 11-16) go with M15's drafting.
+- The leftover `.claude/worktrees/m03-puzzle-insights` folder isn't on the Mac; delete it on the machine that has it.
 
 ## Next step
-1. Confirm alert #1 closed.
-2. Write 13a's criteria (ask guided questions first where the human's intent is needed, CLAUDE.md), then build it on this branch, starting with animals (the ticket's Plan).
+1. Confirm PR #70 merged. The branch stays: M13 continues on it. Merge `main` into it first.
+2. Then build 13a-2 on this branch as its own PR, starting from the ticket's criteria.
 
-Until the human asks, there are no content days, staging or `db push`.
+Ask guided questions first wherever the human's intent is needed (CLAUDE.md, "Ask before designing"). Until the human asks, there are no content days, staging or `db push`.
 
 ## Local state
-- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running, and no temporary test files are left.
+- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024095732_answer_base.sql`, and the answer database loaded from the snapshots. `.env.local` points at it. **The snapshots** (about 16 MB in `data/snapshots/`, gitignored) are what `npm run base -- load` reads. A machine without them runs `npm run base -- fetch <set>` first; the committed manifests in `data/manifests/` record what each one was. Load order: wikidata-animals, wikidata-dog-breeds, oewn-animals, the others, then usda-cheese after oewn-cheese. The animal load needs `node --max-old-space-size=4096` (run the script directly, as in the ticket's Evidence). No dev server is left running, and no temporary test files are left.
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
 - The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.

@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-animals",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:25:29.716Z",
+  "method": "SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under Q729 with an English common name, plus their ancestors up to it",
+  "items": 70899,
+  "sha256": "84b50438107df3894feff521a1f2eb4a501b4490d375f231a947040ed32e52ea"
+}
