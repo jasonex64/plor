@@ -10,7 +10,9 @@ import type { Db } from "../lib/db.ts";
 export type Candidate = { alias: string; thing_id: string; caught: boolean; ancestors: string[] };
 export type Resolved = { thingId: string; caught: boolean };
 
-// The letters an alias may hold: what the base's normalized names use, plus whatever the player typed.
+// The characters a typo edit may insert or substitute: plain letters, digits and space, plus whatever the player
+// typed. A normalized alias can hold others ("ø", "&"), which a typo reaches only if the player typed them
+// (ROADMAP Next revision, 13a-2 review).
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789 ";
 
 // Every text one edit from `text`: a letter missing, extra or wrong, or two neighbours swapped (optimal string

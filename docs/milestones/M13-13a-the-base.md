@@ -3,7 +3,7 @@
 **Status:** in progress (2026-10-24).
 - T1 was approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
 - **13a-1 is done:** merged in PR #70 by GitHub auto-merge, which waits for every required check, with the human's approval of its security change (human, 2026-10-24: "I approve 13a-1's security change (new answer-database tables; plor_app may only run the admin lookup). Merge PR #70 once every CI check is green").
-- **13a-2 is built and reviewed,** in its own PR. It holds format 3, the engine on the base and the drafting script, with 13a-3 folded in, since CI needs the T1 draft once the old drafts are gone. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24: private.resolve_answer and private.thing_names).
+- **13a-2 is built, reviewed, and its blocking findings fixed** (Review), in PR #71. It holds format 3, the engine on the base and the drafting script, with 13a-3 folded in, since CI needs the T1 draft once the old drafts are gone. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24: private.resolve_answer and private.thing_names, and approve_puzzle rewritten).
 
 ## Goal
 One complete day, built from the answer database by a Claude session, approved on the admin page and played end to end on the local stack.
@@ -248,7 +248,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
 
 **13a-2 (2026-10-24, local stack):**
 - **Format 3 and the engine,** on the fixture base and day (`src/test/answer-fixture.ts`):
-  - `npm test` → 34 files passed, including:
+  - `npm test` → 35 files passed (204 tests), including:
     - `matching.test.ts`: one-edit texts, the shared-name pick, answers among candidates;
     - `scoring.test.ts`: hand-worked bonuses (cat 9, kiwi 4, green 6; with counts, cat 5);
     - `content-validate.test.ts`: 14 format-3 rules;
@@ -258,7 +258,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
     - `matching.db.test.ts`: exact and scientific names, a catch under "bear", "aardvark" at two ranks, "robin", typos (one answer, two answers, under 4 letters, digits, past a stolen letter), and an alias added after approval;
     - `ledger.db.test.ts`: hand-worked points: A 150 + 0, A's second day 25 + 9, B 1000 + 67, C and E 75 + 8.
   - `npm run test:sql` → `Result: PASS`, including `answer_engine.test.sql` (IDs given, a merge's display name, resolving as of approval) and `puzzle_entry.test.sql` (approval against the base, OB009).
-  - `npm run test:e2e` → 11 passed, on the fixture day.
+  - `npm run test:e2e` → 13 passed, on the fixture day, including `approve-and-play.e2e.ts`: an admin approves a fixture draft on `/admin/puzzles` (stored with `approved_at` and its member counts), and a player survives all 7 questions past the stolen letters.
 - **The T1 day with the real data.** `npm run draft` wrote `content/offbeat/2026-10-24.json`, with letters Q2 M, Q4 C, Q5 T and Q7 E.
   - Getting there, the draft refused "dog" and "cat": each names several members. It also refused "China", which names no country (below). And no letters fit until question 5's hosts were narrowed to Brie.
   - An admin approved it on `/admin/puzzles`. The member counts were 56,787, 193, 2,999, 928, 48, 118 and 50.
@@ -283,7 +283,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
   - "adapted" in the CC BY 4.0 credit for WordNet;
   - two stale comments in scripts/base.ts;
   - the USDA descriptors, dropped with the human's OK.
-- **For 13a-2:** a WordNet animal merged into a Wikidata thing keeps that thing's name, which can be scientific; the frozen day needs a display-name rule. Also, a typed name on several members of one tree line resolves to the highest (Evidence).
+- **For 13a-2 (done there):** a WordNet animal merged into a Wikidata thing keeps that thing's name, which can be scientific; the frozen day needs a display-name rule. Also, a typed name on several members of one tree line resolves to the highest (Evidence).
 - **Deferred to ROADMAP "Next revision":**
   - a final slice that comes back exactly full;
   - slicing a live index;
@@ -291,3 +291,25 @@ Seven concrete categories that use every source, in an order that rises roughly 
   - fruit items left with no parent;
   - the membership walk written three times;
   - the fruit and country flags.
+
+**13a-2:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24.
+- **Blocking findings and how each was fixed:**
+  - *`private.approve_puzzle`, a security-definer function, used a temp table,* which a caller's session could have created first in `pg_temp`. The members are now held in an array variable.
+  - *The SQL tests missed cases:*
+    - a `member_of` question;
+    - the root's exclusion (checked by a name the root didn't hold);
+    - a membership added after approval.
+
+    `answer_engine.test.sql` now covers all three (plan 14).
+  - *No committed test approved a day on `/admin/puzzles` or played all 7 questions.* `e2e/approve-and-play.e2e.ts` does both, on the fixture.
+  - *The Status line, HANDOFF, the ROADMAP row and this section said "reviewed" before the review was recorded.* All updated, with the DECISIONS.md Log row naming the `approve_puzzle` rewrite.
+- **Deferred to ROADMAP "Next revision"** (For M13):
+  - `pickAnswer` on a kind_of cycle;
+  - typo edits only insert plain letters;
+  - an import racing an approval;
+  - the tree walks, written in more places;
+  - names falling back to IDs;
+  - the drafting script's name resolution, untested;
+  - the OB009 message split on "; ";
+  - fixture things left in the local base;
+  - old-format content failing loudly.

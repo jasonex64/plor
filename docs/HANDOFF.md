@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
   - **13a-1** (the base, imports, admin lookup, credits) is merged (PR #70).
-  - **13a-2 is built and reviewed,** in its PR, with 13a-3 folded in. It holds:
+  - **13a-2 is built, reviewed and its blocking findings fixed,** in PR #71, with 13a-3 folded in. It holds:
     - format 3: a day names categories and is resolved as of its approval;
     - the game engine on the base;
     - deterministic thing IDs;
@@ -23,12 +23,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   - "dog" is in the base twice: WordNet's links Wikidata's concept, not the taxon;
   - "China" is missing as an alias;
   - the bonus is near its maximum in huge categories;
-  - for the human before M15's push: the hosted format-1 days.
+  - for the human before M15's push: the hosted format-1 days;
+  - from the 13a-2 review: matching edge cases, approval against a moving base, the walks in more places, and smaller test gaps.
 - **M15 15b (zod) is merged.** Dependabot alert #1 still showed `open` after the merge. Check it, and dismiss it as fixed if it stays.
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13a-2's PR:** approve its security change and the merge.
+- **PR #71 (13a-2):** approve its security change (`plor_app` may run `private.resolve_answer` and `private.thing_names`; `approve_puzzle` rewritten) and the merge.
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 

@@ -153,6 +153,7 @@ declare
   pattern text;
   hosts uuid[];
   bank uuid[];
+  member_ids uuid[];
   members int;
   problems text[] := '{}';
 begin
@@ -176,13 +177,13 @@ begin
     end if;
     select coalesce(array_agg(x::uuid), '{}') into hosts from jsonb_array_elements_text(q -> 'host_answers') as x;
     select coalesce(array_agg(x::uuid), '{}') into bank from jsonb_array_elements_text(q -> 'host_bank') as x;
-    create temp table if not exists approve_member (id uuid primary key) on commit drop;
-    truncate approve_member;
-    insert into approve_member select private.category_members(cat.key);
-    members := (select count(*) from approve_member);
+    -- In a variable, not a temp table: a security-definer function must not touch a relation the caller's session
+    -- could have created first in pg_temp (PostgreSQL 17, "Writing SECURITY DEFINER Functions Safely"; 13a-2 review).
+    member_ids := array(select private.category_members(cat.key));
+    members := cardinality(member_ids);
     problems := problems || array(
       select format('question %s: host bank entry %s is not a %s', i + 1, b, cat.key)
-      from unnest(bank) as b where b not in (select id from approve_member));
+      from unnest(bank) as b where b <> all (member_ids));
     problems := problems || array(
       select format('question %s: host answer %s is not in the host bank', i + 1, h) from unnest(hosts) as h where h <> all (bank));
     -- What the host catches: the host answers and everything under them.
@@ -192,7 +193,7 @@ begin
         union
         select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of'
       )
-      select from approve_member m join private.thing_alias a on a.thing_id = m.id
+      select from unnest(member_ids) as m(id) join private.thing_alias a on a.thing_id = m.id
       where m.id not in (select id from caught) and (pattern is null or a.alias !~ pattern)
     ) then
       problems := problems || format('question %s: no answer the host doesn''t catch can be typed without %s', i + 1, stolen);
