@@ -22,7 +22,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   1. make your account an admin: insert its user ID into `private.admin` in the hosted SQL editor;
   2. approve the drafted days on `/admin/puzzles`;
   3. decide what fills the days with no puzzle.
-- **Product questions from the review** (ROADMAP, "From the MVP review"): should the result's Share carry the sharer's invite link?
 - **13a's P1–P5** (`docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`).
 - **New questions for the repeated categories:** 11-06 Q2 and Q3, 11-10 Q4, 11-16 Q4. The human types the new prompts on the admin page; a drafting session follows DECISIONS.md, "Puzzle drafting".
 - **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it.

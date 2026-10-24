@@ -64,7 +64,7 @@ A player can find how to add a friend from the home page, a day with no puzzle d
 
 ## Out of scope
 These go to ROADMAP "Next revision" or to the human:
-- **Putting the player's invite link in the result's Share.** Share is the one thing players send out, and today it opens the site's front page (M05 S3). Making it a friend invite is a product decision for the human.
+- **Putting the player's invite link in the result's Share.** Share is the one thing players send out, and it opens the site's front page (M05 S3). **Decided: it stays that way** (human, 2026-10-23: "share should not include invite link").
 - **Content and admin on plor.app (the human):**
   - make an admin;
   - approve days;

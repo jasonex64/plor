@@ -126,7 +126,6 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The privacy page says sign-in counts are deleted "the next time anyone signs in"; in fact code-email rows go on the next code request and code-check rows on the next check, and stay if no one makes another. Found in M12 12e (review). Approximately right.
 
 **From the MVP review (M12 12f, 2026-10-23):**
-- [ ] **For the human:** the result's Share opens the site's front page (M05 S3), so the one thing players send out never adds a friend. Whether it should carry the sharer's invite link is a product decision. Found in the MVP review.
 - [ ] **For the human:** plor.app can't be played until an account is made admin and days are approved on `/admin/puzzles`; no day is drafted for 2026-10-23 to 10-25, and 9 are parked (For M13). A day with no puzzle neither counts nor breaks the streak (`src/game/streak.ts`), and since 12f the page shows it and moves on at midnight. Found in the MVP review.
 - [ ] Yesterday's board lists a player who joined today with 0 points for a day they couldn't play. Found in the MVP review.
 - [ ] "Earlier day" in the feed pages back with no lower bound, through empty days before the player joined or before launch (`src/app/comments.tsx`). Found in the MVP review.
