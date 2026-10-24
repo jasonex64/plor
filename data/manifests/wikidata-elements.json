@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-elements",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:07:51.723Z",
+  "method": "SPARQL: chemical elements (P31 Q11344) with an atomic number (P1086) of at most 118",
+  "items": 119,
+  "sha256": "b39dc4f980a14cc75b99f5127ce357810641388f74884f4152eff575f758e5d4"
+}

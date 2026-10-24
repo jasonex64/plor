@@ -13,7 +13,8 @@ export default function AdminPage() {
       </Suspense>
       <footer>
         <p>
-          <Link href="/admin/puzzles">Puzzles</Link> · <Link href="/admin/reports">Reported comments</Link> · <Link href="/">Back to Plor</Link>
+          <Link href="/admin/puzzles">Puzzles</Link> · <Link href="/admin/reports">Reported comments</Link> ·{" "}
+          <Link href="/admin/base">Answer database</Link> · <Link href="/">Back to Plor</Link>
         </p>
       </footer>
     </main>

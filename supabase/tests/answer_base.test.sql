@@ -5,7 +5,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(16);
+select plan(19);
 
 -- A small tree in a test source's IDs: animal > bear > polar bear, panda; animal > fish; food > fruit and vegetable,
 -- with tomato under both (human, 2026-10-24: "Accept in both"); a cycle a <-> b, as a messy source might have.
@@ -54,6 +54,15 @@ select private.import_source('wikidata', 'test-4', '[
 ]'::jsonb);
 select private.define_category('un_country', 'country', 'wikidata', 'cC', 'cU');
 select is(pg_temp.members('un_country'), array['France'], 'member_of keeps only members');
+
+-- Another source: same_as links an entry to an existing thing; a "source:id" ref names another source's thing.
+select is(private.import_source('usda', 'test-5', '[
+  {"id": "u1", "name": "tomatoes, raw", "aliases": [{"alias": "tomatoes", "kind": "plural"}], "same_as": "wikidata:tT"},
+  {"id": "u2", "name": "plantain", "aliases": [{"alias": "plantain", "kind": "name"}], "kind_of": ["wikidata:tR"]}
+]'::jsonb), '{"things": 1, "aliases": 2, "facts": 1}'::jsonb, 'same_as adds no thing; a cross-source ref is a fact');
+select is(pg_temp.members('fruit'), array['plantain', 'tomato'], 'the other source''s fruit joins the category');
+select throws_ok($$ select private.import_source('usda', 'test-6', '[{"id": "u3", "name": "x", "aliases": [], "same_as": "wikidata:none"}]') $$,
+  'P0001', null, 'same_as must name a known thing');
 
 -- The admin lookup: admins only, by exact alias, with the categories a thing falls in.
 create function pg_temp.u(n int) returns uuid language sql immutable

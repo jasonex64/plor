@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-dog-breeds",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:07:59.240Z",
+  "method": "SPARQL: instances of dog breed (P31 Q39367), each under dog breed and under the domestic dog taxon",
+  "items": 927,
+  "sha256": "76fd408521e8f7baa0fb86becb69cf72f8c68d3fd7978985ab086c2644a74faa"
+}

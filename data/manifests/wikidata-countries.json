@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-countries",
+  "source": "wikidata",
+  "snapshot": "2026-10-24",
+  "retrieved_at": "2026-10-24T10:07:57.370Z",
+  "method": "SPARQL: sovereign states (P31 Q3624078), not dissolved (no P576), with a UN membership (P463 Q1065) that has no end time (P582)",
+  "items": 195,
+  "sha256": "ad5aa1eb244697fb27cc763d803bfdb5874a524837d55f57cdaa714ecd4dcef5"
+}

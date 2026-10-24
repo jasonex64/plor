@@ -81,10 +81,22 @@ alter table private.base_log enable row level security;
 revoke all on table private.thing, private.thing_source, private.thing_alias, private.fact, private.category,
   private.base_log from public, anon, authenticated, service_role;
 
--- Loads one source's snapshot: each item is {id, name, aliases: [{alias, kind}], kind_of: [ids], member_of: [ids]},
--- with ids in that source. Things already linked to the same source ID are kept (and keep their name); new aliases
--- and facts are added. Every kind_of or member_of id must name a thing of that source, in this snapshot or an earlier
--- one, or nothing is loaded. Run by the import scripts as the owner (scripts/base.ts); no role is granted it.
+-- A thing by a reference: "source:id" names another source's entry, a bare id one of p_source's. null if unknown.
+create function private.thing_by_ref(p_source text, p_ref text) returns uuid
+  language sql stable set search_path = ''
+as $$
+  select s.thing_id from private.thing_source s
+  where (position(':' in p_ref) > 0 and s.source = split_part(p_ref, ':', 1) and s.source_id = substr(p_ref, position(':' in p_ref) + 1))
+     or (position(':' in p_ref) = 0 and s.source = p_source and s.source_id = p_ref);
+$$;
+revoke all on function private.thing_by_ref(text, text) from public, anon, authenticated, service_role;
+
+-- Loads one source's snapshot: each item is {id, name, aliases: [{alias, kind}], kind_of: [refs], member_of: [refs],
+-- same_as?: ref}, where a ref is an id in this source or "source:id" in another (thing_by_ref). An item with same_as
+-- is linked to that existing thing instead of becoming a new one (the same cheese in WordNet and USDA). Things
+-- already linked to the same source ID are kept, with their name; new aliases and facts are added. Every ref must
+-- name a known thing, from this snapshot or an earlier import, or nothing is loaded. Run by the import scripts as the
+-- owner (scripts/base.ts); no role is granted it.
 create function private.import_source(p_source text, p_snapshot text, p_items jsonb) returns jsonb
   language plpgsql set search_path = ''
 as $$
@@ -95,14 +107,22 @@ declare
   new_facts int;
   unknown text;
 begin
-  -- New source IDs get a new thing. "materialized" makes each random ID once, for both inserts.
+  select string_agg(distinct i->>'same_as', ', ') into unknown
+  from jsonb_array_elements(p_items) as i
+  where i ? 'same_as' and private.thing_by_ref(p_source, i->>'same_as') is null;
+  if unknown is not null then
+    raise exception 'import_source: same_as refs unknown: %', left(unknown, 500);
+  end if;
+
+  -- New source IDs get a new thing, or the same_as one. "materialized" makes each random ID once, for both inserts.
   with item as materialized (
-    select distinct on (i->>'id') i->>'id' as source_id, i->>'name' as name from jsonb_array_elements(p_items) as i
+    select distinct on (i->>'id') i->>'id' as source_id, i->>'name' as name, private.thing_by_ref(p_source, i->>'same_as') as same
+    from jsonb_array_elements(p_items) as i
   ), fresh as materialized (
-    select gen_random_uuid() as thing_id, n.source_id, n.name from item n
+    select coalesce(n.same, gen_random_uuid()) as thing_id, n.source_id, n.name, n.same is null as is_new from item n
     where not exists (select from private.thing_source s where s.source = p_source and s.source_id = n.source_id)
   ), made as (
-    insert into private.thing (id, name) select thing_id, name from fresh returning id
+    insert into private.thing (id, name) select thing_id, name from fresh where is_new returning id
   ), linked as (
     insert into private.thing_source (source, source_id, thing_id) select p_source, source_id, thing_id from fresh
   )
@@ -120,19 +140,18 @@ begin
   from jsonb_array_elements(p_items) as i
   cross join (values ('kind_of'), ('member_of')) as t(trait)
   cross join jsonb_array_elements_text(coalesce(i->t.trait, '[]')) as v
-  where not exists (select from private.thing_source s where s.source = p_source and s.source_id = v);
+  where private.thing_by_ref(p_source, v) is null;
   if unknown is not null then
-    raise exception 'import_source: % ids not in this source: %', p_source, left(unknown, 500);
+    raise exception 'import_source: refs unknown: %', left(unknown, 500);
   end if;
 
   insert into private.fact (thing_id, trait, value_thing, origin, source_ref)
-  select s.thing_id, t.trait, sv.thing_id, 'source', ref
+  select s.thing_id, t.trait, private.thing_by_ref(p_source, v), 'source', ref
   from jsonb_array_elements(p_items) as i
   join private.thing_source s on s.source = p_source and s.source_id = i->>'id'
   cross join (values ('kind_of'), ('member_of')) as t(trait)
   cross join jsonb_array_elements_text(coalesce(i->t.trait, '[]')) as v
-  join private.thing_source sv on sv.source = p_source and sv.source_id = v
-  where sv.thing_id <> s.thing_id
+  where private.thing_by_ref(p_source, v) <> s.thing_id
   on conflict (thing_id, trait, value_thing) do nothing;
   get diagnostics new_facts = row_count;
 
@@ -151,8 +170,8 @@ create function private.define_category(p_key text, p_name text, p_source text, 
   language plpgsql set search_path = ''
 as $$
 declare
-  root_id uuid := (select thing_id from private.thing_source where source = p_source and source_id = p_root);
-  member_id uuid := (select thing_id from private.thing_source where source = p_source and source_id = p_member_of);
+  root_id uuid := private.thing_by_ref(p_source, p_root);
+  member_id uuid := private.thing_by_ref(p_source, p_member_of);
 begin
   if root_id is null or (p_member_of is not null and member_id is null) then
     raise exception 'define_category %: % or % is not a % thing', p_key, p_root, p_member_of, p_source;

@@ -25,3 +25,6 @@ playwright-report/
 # OS noise
 .DS_Store
 Thumbs.db
+
+# Answer database snapshots (M13 13a): raw source pulls, rebuilt with `npm run base -- fetch`; their manifests are committed
+data/snapshots/
