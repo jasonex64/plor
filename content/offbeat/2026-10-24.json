@@ -1,0 +1,3958 @@
+{
+  "format": 2,
+  "game_id": "offbeat",
+  "date": "2026-10-24",
+  "questions": [
+    {
+      "prompt": "Name something you'd see in a city",
+      "entries": [
+        {
+          "id": "skyscraper",
+          "name": "skyscraper",
+          "aliases": [
+            "tall building",
+            "high-rise",
+            "skyscrapers"
+          ]
+        },
+        {
+          "id": "building",
+          "name": "building",
+          "aliases": [
+            "buildings"
+          ]
+        },
+        {
+          "id": "taxi",
+          "name": "taxi",
+          "aliases": [
+            "cab",
+            "taxicab",
+            "yellow cab",
+            "taxis"
+          ]
+        },
+        {
+          "id": "rideshare",
+          "name": "rideshare",
+          "aliases": [
+            "Uber",
+            "Lyft",
+            "rideshares"
+          ]
+        },
+        {
+          "id": "car",
+          "name": "car",
+          "aliases": [
+            "cars"
+          ]
+        },
+        {
+          "id": "traffic",
+          "name": "traffic",
+          "aliases": [
+            "traffic jam"
+          ],
+          "plural": "traffic"
+        },
+        {
+          "id": "bus",
+          "name": "bus",
+          "aliases": [
+            "city bus",
+            "double-decker bus",
+            "buses"
+          ]
+        },
+        {
+          "id": "subway",
+          "name": "subway",
+          "aliases": [
+            "metro",
+            "underground",
+            "tube",
+            "subway station",
+            "subways"
+          ]
+        },
+        {
+          "id": "train",
+          "name": "train",
+          "aliases": [
+            "elevated train",
+            "the L",
+            "trains"
+          ]
+        },
+        {
+          "id": "tram",
+          "name": "tram",
+          "aliases": [
+            "streetcar",
+            "trolley",
+            "light rail",
+            "trams"
+          ]
+        },
+        {
+          "id": "bicycle",
+          "name": "bicycle",
+          "aliases": [
+            "bike",
+            "bicycles"
+          ]
+        },
+        {
+          "id": "bike-lane",
+          "name": "bike lane",
+          "aliases": [
+            "bike lanes"
+          ]
+        },
+        {
+          "id": "scooter",
+          "name": "scooter",
+          "aliases": [
+            "e-scooter",
+            "electric scooter",
+            "scooters"
+          ]
+        },
+        {
+          "id": "motorcycle",
+          "name": "motorcycle",
+          "aliases": [
+            "motorbike",
+            "motorcycles"
+          ]
+        },
+        {
+          "id": "person",
+          "name": "person",
+          "aliases": [
+            "crowd",
+            "crowds",
+            "pedestrian",
+            "pedestrians",
+            "people"
+          ],
+          "plural": "people"
+        },
+        {
+          "id": "police-officer",
+          "name": "police officer",
+          "aliases": [
+            "cop",
+            "police",
+            "policeman",
+            "police officers"
+          ]
+        },
+        {
+          "id": "police-car",
+          "name": "police car",
+          "aliases": [
+            "cop car",
+            "police cars"
+          ]
+        },
+        {
+          "id": "ambulance",
+          "name": "ambulance",
+          "aliases": [
+            "ambulances"
+          ]
+        },
+        {
+          "id": "fire-truck",
+          "name": "fire truck",
+          "aliases": [
+            "fire engine",
+            "fire trucks"
+          ]
+        },
+        {
+          "id": "traffic-light",
+          "name": "traffic light",
+          "aliases": [
+            "stoplight",
+            "traffic signal",
+            "stop light",
+            "traffic lights"
+          ]
+        },
+        {
+          "id": "stop-sign",
+          "name": "stop sign",
+          "aliases": [
+            "stop signs"
+          ]
+        },
+        {
+          "id": "crosswalk",
+          "name": "crosswalk",
+          "aliases": [
+            "zebra crossing",
+            "pedestrian crossing",
+            "crosswalks"
+          ]
+        },
+        {
+          "id": "sidewalk",
+          "name": "sidewalk",
+          "aliases": [
+            "pavement",
+            "sidewalks"
+          ]
+        },
+        {
+          "id": "street",
+          "name": "street",
+          "aliases": [
+            "road",
+            "streets"
+          ]
+        },
+        {
+          "id": "streetlight",
+          "name": "streetlight",
+          "aliases": [
+            "street lamp",
+            "lamppost",
+            "lamp post",
+            "streetlights"
+          ]
+        },
+        {
+          "id": "billboard",
+          "name": "billboard",
+          "aliases": [
+            "advertisement",
+            "ad",
+            "billboards"
+          ]
+        },
+        {
+          "id": "neon-sign",
+          "name": "neon sign",
+          "aliases": [
+            "neon signs"
+          ]
+        },
+        {
+          "id": "street-sign",
+          "name": "street sign",
+          "aliases": [
+            "street signs"
+          ]
+        },
+        {
+          "id": "store",
+          "name": "store",
+          "aliases": [
+            "shop",
+            "stores"
+          ]
+        },
+        {
+          "id": "restaurant",
+          "name": "restaurant",
+          "aliases": [
+            "restaurants"
+          ]
+        },
+        {
+          "id": "cafe",
+          "name": "café",
+          "aliases": [
+            "coffee shop"
+          ]
+        },
+        {
+          "id": "bar",
+          "name": "bar",
+          "aliases": [
+            "pub",
+            "bars"
+          ]
+        },
+        {
+          "id": "hotel",
+          "name": "hotel",
+          "aliases": [
+            "hotels"
+          ]
+        },
+        {
+          "id": "apartment",
+          "name": "apartment",
+          "aliases": [
+            "apartment block",
+            "block of flats",
+            "flats",
+            "apartments"
+          ]
+        },
+        {
+          "id": "office",
+          "name": "office",
+          "aliases": [
+            "office tower",
+            "office block",
+            "offices"
+          ]
+        },
+        {
+          "id": "bank",
+          "name": "bank",
+          "aliases": [
+            "banks"
+          ]
+        },
+        {
+          "id": "hospital",
+          "name": "hospital",
+          "aliases": [
+            "hospitals"
+          ]
+        },
+        {
+          "id": "school",
+          "name": "school",
+          "aliases": [
+            "schools"
+          ]
+        },
+        {
+          "id": "university",
+          "name": "university",
+          "aliases": [
+            "college",
+            "universities"
+          ]
+        },
+        {
+          "id": "library",
+          "name": "library",
+          "aliases": [
+            "libraries"
+          ]
+        },
+        {
+          "id": "museum",
+          "name": "museum",
+          "aliases": [
+            "museums"
+          ]
+        },
+        {
+          "id": "theater",
+          "name": "theater",
+          "aliases": [
+            "theatre",
+            "theaters"
+          ]
+        },
+        {
+          "id": "movie-theater",
+          "name": "movie theater",
+          "aliases": [
+            "cinema",
+            "movie theaters"
+          ]
+        },
+        {
+          "id": "stadium",
+          "name": "stadium",
+          "aliases": [
+            "arena",
+            "stadiums"
+          ]
+        },
+        {
+          "id": "park",
+          "name": "park",
+          "aliases": [
+            "city park",
+            "parks"
+          ]
+        },
+        {
+          "id": "playground",
+          "name": "playground",
+          "aliases": [
+            "playgrounds"
+          ]
+        },
+        {
+          "id": "skate-park",
+          "name": "skate park",
+          "aliases": [
+            "skate parks"
+          ]
+        },
+        {
+          "id": "fountain",
+          "name": "fountain",
+          "aliases": [
+            "fountains"
+          ]
+        },
+        {
+          "id": "statue",
+          "name": "statue",
+          "aliases": [
+            "statues"
+          ]
+        },
+        {
+          "id": "monument",
+          "name": "monument",
+          "aliases": [
+            "monuments"
+          ]
+        },
+        {
+          "id": "bridge",
+          "name": "bridge",
+          "aliases": [
+            "bridges"
+          ]
+        },
+        {
+          "id": "river",
+          "name": "river",
+          "aliases": [
+            "rivers"
+          ]
+        },
+        {
+          "id": "church",
+          "name": "church",
+          "aliases": [
+            "churches"
+          ]
+        },
+        {
+          "id": "cathedral",
+          "name": "cathedral",
+          "aliases": [
+            "cathedrals"
+          ]
+        },
+        {
+          "id": "mosque",
+          "name": "mosque",
+          "aliases": [
+            "mosques"
+          ]
+        },
+        {
+          "id": "synagogue",
+          "name": "synagogue",
+          "aliases": [
+            "synagogues"
+          ]
+        },
+        {
+          "id": "temple",
+          "name": "temple",
+          "aliases": [
+            "temples"
+          ]
+        },
+        {
+          "id": "city-hall",
+          "name": "city hall",
+          "aliases": [
+            "town hall",
+            "city halls"
+          ]
+        },
+        {
+          "id": "courthouse",
+          "name": "courthouse",
+          "aliases": [
+            "courthouses"
+          ]
+        },
+        {
+          "id": "post-office",
+          "name": "post office",
+          "aliases": [
+            "post offices"
+          ]
+        },
+        {
+          "id": "fire-station",
+          "name": "fire station",
+          "aliases": [
+            "fire stations"
+          ]
+        },
+        {
+          "id": "police-station",
+          "name": "police station",
+          "aliases": [
+            "police stations"
+          ]
+        },
+        {
+          "id": "train-station",
+          "name": "train station",
+          "aliases": [
+            "railway station",
+            "train stations"
+          ]
+        },
+        {
+          "id": "airport",
+          "name": "airport",
+          "aliases": [
+            "airports"
+          ]
+        },
+        {
+          "id": "parking-lot",
+          "name": "parking lot",
+          "aliases": [
+            "car park",
+            "parking lots"
+          ]
+        },
+        {
+          "id": "parking-garage",
+          "name": "parking garage",
+          "aliases": [
+            "parking structure",
+            "parking garages"
+          ]
+        },
+        {
+          "id": "parking-meter",
+          "name": "parking meter",
+          "aliases": [
+            "parking meters"
+          ]
+        },
+        {
+          "id": "gas-station",
+          "name": "gas station",
+          "aliases": [
+            "petrol station",
+            "gas stations"
+          ]
+        },
+        {
+          "id": "mall",
+          "name": "mall",
+          "aliases": [
+            "shopping mall",
+            "shopping center",
+            "malls"
+          ]
+        },
+        {
+          "id": "market",
+          "name": "market",
+          "aliases": [
+            "farmers market",
+            "street market",
+            "markets"
+          ]
+        },
+        {
+          "id": "food-truck",
+          "name": "food truck",
+          "aliases": [
+            "food trucks"
+          ]
+        },
+        {
+          "id": "street-vendor",
+          "name": "street vendor",
+          "aliases": [
+            "hot dog stand",
+            "hot dog cart",
+            "vendor",
+            "street vendors"
+          ]
+        },
+        {
+          "id": "newsstand",
+          "name": "newsstand",
+          "aliases": [
+            "news stand",
+            "newspaper stand",
+            "newsstands"
+          ]
+        },
+        {
+          "id": "pigeon",
+          "name": "pigeon",
+          "aliases": [
+            "pigeons"
+          ]
+        },
+        {
+          "id": "rat",
+          "name": "rat",
+          "aliases": [
+            "rats"
+          ]
+        },
+        {
+          "id": "dog",
+          "name": "dog",
+          "aliases": [
+            "dogs"
+          ]
+        },
+        {
+          "id": "dog-walker",
+          "name": "dog walker",
+          "aliases": [
+            "dog walkers"
+          ]
+        },
+        {
+          "id": "jogger",
+          "name": "jogger",
+          "aliases": [
+            "runner",
+            "joggers"
+          ]
+        },
+        {
+          "id": "cyclist",
+          "name": "cyclist",
+          "aliases": [
+            "cyclists"
+          ]
+        },
+        {
+          "id": "trash",
+          "name": "trash",
+          "aliases": [
+            "litter",
+            "garbage"
+          ],
+          "plural": "trash"
+        },
+        {
+          "id": "trash-can",
+          "name": "trash can",
+          "aliases": [
+            "garbage can",
+            "litter bin",
+            "trash cans"
+          ]
+        },
+        {
+          "id": "graffiti",
+          "name": "graffiti",
+          "aliases": [],
+          "plural": "graffiti"
+        },
+        {
+          "id": "mural",
+          "name": "mural",
+          "aliases": [
+            "street art",
+            "murals"
+          ]
+        },
+        {
+          "id": "street-performer",
+          "name": "street performer",
+          "aliases": [
+            "busker",
+            "street performers"
+          ]
+        },
+        {
+          "id": "tourist",
+          "name": "tourist",
+          "aliases": [
+            "tourists"
+          ]
+        },
+        {
+          "id": "construction-site",
+          "name": "construction site",
+          "aliases": [
+            "construction",
+            "roadwork",
+            "roadworks",
+            "construction sites"
+          ]
+        },
+        {
+          "id": "crane",
+          "name": "crane",
+          "aliases": [
+            "cranes"
+          ]
+        },
+        {
+          "id": "smog",
+          "name": "smog",
+          "aliases": [
+            "pollution",
+            "air pollution"
+          ],
+          "plural": "smog"
+        },
+        {
+          "id": "skyline",
+          "name": "skyline",
+          "aliases": [
+            "skylines"
+          ]
+        },
+        {
+          "id": "tower",
+          "name": "tower",
+          "aliases": [
+            "TV tower",
+            "towers"
+          ]
+        },
+        {
+          "id": "bus-stop",
+          "name": "bus stop",
+          "aliases": [
+            "bus stops"
+          ]
+        },
+        {
+          "id": "bench",
+          "name": "bench",
+          "aliases": [
+            "park bench",
+            "benches"
+          ]
+        },
+        {
+          "id": "fire-hydrant",
+          "name": "fire hydrant",
+          "aliases": [
+            "hydrant",
+            "fire hydrants"
+          ]
+        },
+        {
+          "id": "manhole-cover",
+          "name": "manhole cover",
+          "aliases": [
+            "manhole",
+            "manhole covers"
+          ]
+        },
+        {
+          "id": "pothole",
+          "name": "pothole",
+          "aliases": [
+            "potholes"
+          ]
+        },
+        {
+          "id": "mailbox",
+          "name": "mailbox",
+          "aliases": [
+            "postbox",
+            "post box",
+            "mailboxes"
+          ]
+        },
+        {
+          "id": "phone-booth",
+          "name": "phone booth",
+          "aliases": [
+            "telephone booth",
+            "phone box",
+            "phone booths"
+          ]
+        },
+        {
+          "id": "atm",
+          "name": "ATM",
+          "aliases": [
+            "cash machine",
+            "ATMs"
+          ],
+          "plural": "ATMs"
+        },
+        {
+          "id": "delivery-truck",
+          "name": "delivery truck",
+          "aliases": [
+            "van",
+            "delivery trucks"
+          ]
+        },
+        {
+          "id": "city-lights",
+          "name": "city lights",
+          "aliases": [
+            "lights"
+          ]
+        },
+        {
+          "id": "zoo",
+          "name": "zoo",
+          "aliases": [
+            "zoos"
+          ]
+        },
+        {
+          "id": "aquarium",
+          "name": "aquarium",
+          "aliases": [
+            "aquariums"
+          ]
+        },
+        {
+          "id": "parade",
+          "name": "parade",
+          "aliases": [
+            "parades"
+          ]
+        },
+        {
+          "id": "siren",
+          "name": "siren",
+          "aliases": [
+            "sirens"
+          ]
+        },
+        {
+          "id": "honking",
+          "name": "honking",
+          "aliases": [
+            "car horns",
+            "horn"
+          ],
+          "plural": "honking"
+        },
+        {
+          "id": "noise",
+          "name": "noise",
+          "aliases": [],
+          "plural": "noise"
+        },
+        {
+          "id": "businessperson",
+          "name": "businessperson",
+          "aliases": [
+            "business people",
+            "businessman",
+            "businesswoman",
+            "businesspeople"
+          ]
+        },
+        {
+          "id": "plaza",
+          "name": "plaza",
+          "aliases": [
+            "square",
+            "town square",
+            "plazas"
+          ]
+        },
+        {
+          "id": "alley",
+          "name": "alley",
+          "aliases": [
+            "alleyway",
+            "alleys"
+          ]
+        },
+        {
+          "id": "fire-escape",
+          "name": "fire escape",
+          "aliases": [
+            "fire escapes"
+          ]
+        },
+        {
+          "id": "rooftop",
+          "name": "rooftop",
+          "aliases": [
+            "roof",
+            "rooftops"
+          ]
+        },
+        {
+          "id": "water-tower",
+          "name": "water tower",
+          "aliases": [
+            "water towers"
+          ]
+        },
+        {
+          "id": "ferry",
+          "name": "ferry",
+          "aliases": [
+            "ferries"
+          ]
+        },
+        {
+          "id": "harbor",
+          "name": "harbor",
+          "aliases": [
+            "port",
+            "docks",
+            "harbors"
+          ]
+        },
+        {
+          "id": "ferris-wheel",
+          "name": "Ferris wheel",
+          "aliases": [
+            "Ferris wheels"
+          ]
+        },
+        {
+          "id": "street-food",
+          "name": "street food",
+          "aliases": [],
+          "plural": "street food"
+        },
+        {
+          "id": "pizzeria",
+          "name": "pizzeria",
+          "aliases": [
+            "pizza place",
+            "pizzerias"
+          ]
+        },
+        {
+          "id": "bodega",
+          "name": "bodega",
+          "aliases": [
+            "corner store",
+            "convenience store",
+            "bodegas"
+          ]
+        },
+        {
+          "id": "laundromat",
+          "name": "laundromat",
+          "aliases": [
+            "laundromats"
+          ]
+        },
+        {
+          "id": "gym",
+          "name": "gym",
+          "aliases": [
+            "gyms"
+          ]
+        },
+        {
+          "id": "nightclub",
+          "name": "nightclub",
+          "aliases": [
+            "club",
+            "nightclubs"
+          ]
+        },
+        {
+          "id": "casino",
+          "name": "casino",
+          "aliases": [
+            "casinos"
+          ]
+        },
+        {
+          "id": "concert-hall",
+          "name": "concert hall",
+          "aliases": [
+            "concert halls"
+          ]
+        },
+        {
+          "id": "opera-house",
+          "name": "opera house",
+          "aliases": [
+            "opera houses"
+          ]
+        },
+        {
+          "id": "convention-center",
+          "name": "convention center",
+          "aliases": [
+            "convention centers"
+          ]
+        }
+      ],
+      "host_bank": [
+        "taxi",
+        "building",
+        "car",
+        "person",
+        "skyscraper",
+        "traffic-light",
+        "bus",
+        "pigeon"
+      ],
+      "host_answers": [
+        "taxi"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a mythical creature",
+      "entries": [
+        {
+          "id": "dragon",
+          "name": "dragon",
+          "aliases": [
+            "Chinese dragon",
+            "dragons"
+          ]
+        },
+        {
+          "id": "wyvern",
+          "name": "wyvern",
+          "aliases": [
+            "wyverns"
+          ]
+        },
+        {
+          "id": "unicorn",
+          "name": "unicorn",
+          "aliases": [
+            "unicorns"
+          ]
+        },
+        {
+          "id": "mermaid",
+          "name": "mermaid",
+          "aliases": [
+            "merman",
+            "merfolk",
+            "mermen",
+            "mer-people",
+            "mermaids"
+          ]
+        },
+        {
+          "id": "siren",
+          "name": "siren",
+          "aliases": [
+            "sirens"
+          ]
+        },
+        {
+          "id": "selkie",
+          "name": "selkie",
+          "aliases": [
+            "selkies"
+          ]
+        },
+        {
+          "id": "phoenix",
+          "name": "phoenix",
+          "aliases": [
+            "phoenixes"
+          ],
+          "plural": "phoenixes"
+        },
+        {
+          "id": "griffin",
+          "name": "griffin",
+          "aliases": [
+            "gryphon",
+            "griffon",
+            "griffins"
+          ]
+        },
+        {
+          "id": "hippogriff",
+          "name": "hippogriff",
+          "aliases": [
+            "hippogryph",
+            "hippogriffs"
+          ]
+        },
+        {
+          "id": "centaur",
+          "name": "centaur",
+          "aliases": [
+            "centaurs"
+          ]
+        },
+        {
+          "id": "bigfoot",
+          "name": "Bigfoot",
+          "aliases": [
+            "Sasquatch"
+          ],
+          "plural": "Bigfoot"
+        },
+        {
+          "id": "yeti",
+          "name": "Yeti",
+          "aliases": [
+            "Abominable Snowman",
+            "Yetis"
+          ]
+        },
+        {
+          "id": "loch-ness-monster",
+          "name": "Loch Ness Monster",
+          "aliases": [
+            "Nessie"
+          ],
+          "plural": "Loch Ness Monster"
+        },
+        {
+          "id": "kraken",
+          "name": "kraken",
+          "aliases": [
+            "krakens"
+          ]
+        },
+        {
+          "id": "sea-serpent",
+          "name": "sea serpent",
+          "aliases": [
+            "sea monster",
+            "sea serpents"
+          ]
+        },
+        {
+          "id": "leviathan",
+          "name": "leviathan",
+          "aliases": [
+            "leviathans"
+          ]
+        },
+        {
+          "id": "pegasus",
+          "name": "Pegasus",
+          "aliases": [
+            "winged horse"
+          ],
+          "plural": "Pegasus"
+        },
+        {
+          "id": "minotaur",
+          "name": "minotaur",
+          "aliases": [
+            "minotaurs"
+          ]
+        },
+        {
+          "id": "medusa",
+          "name": "Medusa",
+          "aliases": [
+            "gorgon"
+          ],
+          "plural": "Medusa"
+        },
+        {
+          "id": "cyclops",
+          "name": "cyclops",
+          "aliases": [
+            "cyclopes"
+          ],
+          "plural": "cyclopes"
+        },
+        {
+          "id": "hydra",
+          "name": "hydra",
+          "aliases": [
+            "hydras"
+          ]
+        },
+        {
+          "id": "cerberus",
+          "name": "Cerberus",
+          "aliases": [
+            "three-headed dog"
+          ],
+          "plural": "Cerberus"
+        },
+        {
+          "id": "chimera",
+          "name": "chimera",
+          "aliases": [
+            "chimeras"
+          ]
+        },
+        {
+          "id": "basilisk",
+          "name": "basilisk",
+          "aliases": [
+            "basilisks"
+          ]
+        },
+        {
+          "id": "cockatrice",
+          "name": "cockatrice",
+          "aliases": [
+            "cockatrices"
+          ]
+        },
+        {
+          "id": "manticore",
+          "name": "manticore",
+          "aliases": [
+            "manticores"
+          ]
+        },
+        {
+          "id": "sphinx",
+          "name": "sphinx",
+          "aliases": [
+            "sphinxes"
+          ]
+        },
+        {
+          "id": "harpy",
+          "name": "harpy",
+          "aliases": [
+            "harpies"
+          ]
+        },
+        {
+          "id": "satyr",
+          "name": "satyr",
+          "aliases": [
+            "faun",
+            "satyrs"
+          ]
+        },
+        {
+          "id": "nymph",
+          "name": "nymph",
+          "aliases": [
+            "dryad",
+            "naiad",
+            "nymphs"
+          ]
+        },
+        {
+          "id": "fairy",
+          "name": "fairy",
+          "aliases": [
+            "faerie",
+            "fae",
+            "tooth fairy",
+            "fairies"
+          ]
+        },
+        {
+          "id": "pixie",
+          "name": "pixie",
+          "aliases": [
+            "pixies"
+          ]
+        },
+        {
+          "id": "sprite",
+          "name": "sprite",
+          "aliases": [
+            "sprites"
+          ]
+        },
+        {
+          "id": "elf",
+          "name": "elf",
+          "aliases": [
+            "elves"
+          ],
+          "plural": "elves"
+        },
+        {
+          "id": "dwarf",
+          "name": "dwarf",
+          "aliases": [
+            "dwarves"
+          ]
+        },
+        {
+          "id": "gnome",
+          "name": "gnome",
+          "aliases": [
+            "gnomes"
+          ]
+        },
+        {
+          "id": "goblin",
+          "name": "goblin",
+          "aliases": [
+            "hobgoblin",
+            "goblins"
+          ]
+        },
+        {
+          "id": "troll",
+          "name": "troll",
+          "aliases": [
+            "trolls"
+          ]
+        },
+        {
+          "id": "ogre",
+          "name": "ogre",
+          "aliases": [
+            "ogres"
+          ]
+        },
+        {
+          "id": "giant",
+          "name": "giant",
+          "aliases": [
+            "giants"
+          ]
+        },
+        {
+          "id": "leprechaun",
+          "name": "leprechaun",
+          "aliases": [
+            "leprechauns"
+          ]
+        },
+        {
+          "id": "banshee",
+          "name": "banshee",
+          "aliases": [
+            "banshees"
+          ]
+        },
+        {
+          "id": "vampire",
+          "name": "vampire",
+          "aliases": [
+            "vampires"
+          ]
+        },
+        {
+          "id": "werewolf",
+          "name": "werewolf",
+          "aliases": [
+            "werewolves"
+          ],
+          "plural": "werewolves"
+        },
+        {
+          "id": "zombie",
+          "name": "zombie",
+          "aliases": [
+            "zombies"
+          ]
+        },
+        {
+          "id": "ghost",
+          "name": "ghost",
+          "aliases": [
+            "spirit",
+            "specter",
+            "spectre",
+            "ghosts"
+          ]
+        },
+        {
+          "id": "poltergeist",
+          "name": "poltergeist",
+          "aliases": [
+            "poltergeists"
+          ]
+        },
+        {
+          "id": "ghoul",
+          "name": "ghoul",
+          "aliases": [
+            "ghouls"
+          ]
+        },
+        {
+          "id": "mummy",
+          "name": "mummy",
+          "aliases": [
+            "mummies"
+          ]
+        },
+        {
+          "id": "genie",
+          "name": "genie",
+          "aliases": [
+            "djinn",
+            "jinn",
+            "djinni",
+            "genies"
+          ]
+        },
+        {
+          "id": "golem",
+          "name": "golem",
+          "aliases": [
+            "golems"
+          ]
+        },
+        {
+          "id": "gargoyle",
+          "name": "gargoyle",
+          "aliases": [
+            "gargoyles"
+          ]
+        },
+        {
+          "id": "imp",
+          "name": "imp",
+          "aliases": [
+            "imps"
+          ]
+        },
+        {
+          "id": "demon",
+          "name": "demon",
+          "aliases": [
+            "demons"
+          ]
+        },
+        {
+          "id": "angel",
+          "name": "angel",
+          "aliases": [
+            "angels"
+          ]
+        },
+        {
+          "id": "kitsune",
+          "name": "kitsune",
+          "aliases": [],
+          "plural": "kitsune"
+        },
+        {
+          "id": "kappa",
+          "name": "kappa",
+          "aliases": [
+            "kappas"
+          ]
+        },
+        {
+          "id": "tengu",
+          "name": "tengu",
+          "aliases": [],
+          "plural": "tengu"
+        },
+        {
+          "id": "oni",
+          "name": "oni",
+          "aliases": [],
+          "plural": "oni"
+        },
+        {
+          "id": "qilin",
+          "name": "qilin",
+          "aliases": [
+            "kirin"
+          ],
+          "plural": "qilin"
+        },
+        {
+          "id": "thunderbird",
+          "name": "thunderbird",
+          "aliases": [
+            "thunderbirds"
+          ]
+        },
+        {
+          "id": "roc",
+          "name": "roc",
+          "aliases": [
+            "rocs"
+          ]
+        },
+        {
+          "id": "wendigo",
+          "name": "wendigo",
+          "aliases": [
+            "wendigos"
+          ]
+        },
+        {
+          "id": "chupacabra",
+          "name": "chupacabra",
+          "aliases": [
+            "chupacabras"
+          ]
+        },
+        {
+          "id": "mothman",
+          "name": "Mothman",
+          "aliases": [],
+          "plural": "Mothman"
+        },
+        {
+          "id": "jersey-devil",
+          "name": "Jersey Devil",
+          "aliases": [],
+          "plural": "Jersey Devil"
+        },
+        {
+          "id": "jackalope",
+          "name": "jackalope",
+          "aliases": [
+            "jackalopes"
+          ]
+        },
+        {
+          "id": "kelpie",
+          "name": "kelpie",
+          "aliases": [
+            "kelpies"
+          ]
+        },
+        {
+          "id": "naga",
+          "name": "naga",
+          "aliases": [
+            "nagas"
+          ]
+        },
+        {
+          "id": "garuda",
+          "name": "garuda",
+          "aliases": [
+            "garudas"
+          ]
+        },
+        {
+          "id": "bunyip",
+          "name": "bunyip",
+          "aliases": [
+            "bunyips"
+          ]
+        },
+        {
+          "id": "sleipnir",
+          "name": "Sleipnir",
+          "aliases": [],
+          "plural": "Sleipnir"
+        },
+        {
+          "id": "fenrir",
+          "name": "Fenrir",
+          "aliases": [],
+          "plural": "Fenrir"
+        },
+        {
+          "id": "valkyrie",
+          "name": "valkyrie",
+          "aliases": [
+            "valkyries"
+          ]
+        },
+        {
+          "id": "boogeyman",
+          "name": "boogeyman",
+          "aliases": [
+            "bogeyman",
+            "boogie man",
+            "boogeymen"
+          ]
+        },
+        {
+          "id": "krampus",
+          "name": "Krampus",
+          "aliases": [],
+          "plural": "Krampus"
+        },
+        {
+          "id": "yokai",
+          "name": "yokai",
+          "aliases": [],
+          "plural": "yokai"
+        },
+        {
+          "id": "quetzalcoatl",
+          "name": "Quetzalcoatl",
+          "aliases": [
+            "feathered serpent"
+          ],
+          "plural": "Quetzalcoatl"
+        },
+        {
+          "id": "shapeshifter",
+          "name": "shapeshifter",
+          "aliases": [
+            "skinwalker",
+            "shapeshifters"
+          ]
+        },
+        {
+          "id": "changeling",
+          "name": "changeling",
+          "aliases": [
+            "changelings"
+          ]
+        },
+        {
+          "id": "wraith",
+          "name": "wraith",
+          "aliases": [
+            "wraiths"
+          ]
+        }
+      ],
+      "host_bank": [
+        "mermaid",
+        "dragon",
+        "unicorn",
+        "phoenix",
+        "griffin",
+        "centaur",
+        "bigfoot",
+        "pegasus"
+      ],
+      "host_answers": [
+        "mermaid"
+      ],
+      "match_groups": {},
+      "steals": "p"
+    },
+    {
+      "prompt": "Name a kind of candy",
+      "entries": [
+        {
+          "id": "m-and-ms",
+          "name": "M&M's",
+          "aliases": [
+            "M and Ms",
+            "M&M",
+            "peanut M&M's"
+          ],
+          "plural": "M&M's"
+        },
+        {
+          "id": "snickers",
+          "name": "Snickers",
+          "aliases": [
+            "Snickers bar"
+          ],
+          "plural": "Snickers"
+        },
+        {
+          "id": "skittles",
+          "name": "Skittles",
+          "aliases": [
+            "Sour Skittles",
+            "Tropical Skittles",
+            "Skittle"
+          ],
+          "plural": "Skittles"
+        },
+        {
+          "id": "reeses-peanut-butter-cups",
+          "name": "Reese's Peanut Butter Cups",
+          "aliases": [
+            "Reese's cups",
+            "Reese's",
+            "peanut butter cups",
+            "Reese's cup"
+          ],
+          "plural": "Reese's Peanut Butter Cups"
+        },
+        {
+          "id": "reeses-pieces",
+          "name": "Reese's Pieces",
+          "aliases": [],
+          "plural": "Reese's Pieces"
+        },
+        {
+          "id": "kit-kat",
+          "name": "Kit Kat",
+          "aliases": [
+            "Kit Kat bar"
+          ],
+          "plural": "Kit Kat"
+        },
+        {
+          "id": "twix",
+          "name": "Twix",
+          "aliases": [],
+          "plural": "Twix"
+        },
+        {
+          "id": "milky-way",
+          "name": "Milky Way",
+          "aliases": [],
+          "plural": "Milky Way"
+        },
+        {
+          "id": "3-musketeers",
+          "name": "3 Musketeers",
+          "aliases": [
+            "Three Musketeers"
+          ],
+          "plural": "3 Musketeers"
+        },
+        {
+          "id": "butterfinger",
+          "name": "Butterfinger",
+          "aliases": [],
+          "plural": "Butterfinger"
+        },
+        {
+          "id": "baby-ruth",
+          "name": "Baby Ruth",
+          "aliases": [],
+          "plural": "Baby Ruth"
+        },
+        {
+          "id": "almond-joy",
+          "name": "Almond Joy",
+          "aliases": [],
+          "plural": "Almond Joy"
+        },
+        {
+          "id": "mounds",
+          "name": "Mounds",
+          "aliases": [],
+          "plural": "Mounds"
+        },
+        {
+          "id": "hersheys-bar",
+          "name": "Hershey's bar",
+          "aliases": [
+            "Hershey bar",
+            "Hershey's",
+            "Hershey's chocolate"
+          ],
+          "plural": "Hershey's bar"
+        },
+        {
+          "id": "hersheys-kisses",
+          "name": "Hershey's Kisses",
+          "aliases": [
+            "Hershey Kisses",
+            "Kisses"
+          ],
+          "plural": "Hershey's Kisses"
+        },
+        {
+          "id": "nestle-crunch",
+          "name": "Nestlé Crunch",
+          "aliases": [
+            "Crunch bar",
+            "Crunch"
+          ],
+          "plural": "Nestlé Crunch"
+        },
+        {
+          "id": "100-grand",
+          "name": "100 Grand",
+          "aliases": [],
+          "plural": "100 Grand"
+        },
+        {
+          "id": "payday",
+          "name": "PayDay",
+          "aliases": [],
+          "plural": "PayDay"
+        },
+        {
+          "id": "heath-bar",
+          "name": "Heath bar",
+          "aliases": [
+            "Heath"
+          ],
+          "plural": "Heath bar"
+        },
+        {
+          "id": "whoppers",
+          "name": "Whoppers",
+          "aliases": [],
+          "plural": "Whoppers"
+        },
+        {
+          "id": "milk-duds",
+          "name": "Milk Duds",
+          "aliases": [],
+          "plural": "Milk Duds"
+        },
+        {
+          "id": "rolo",
+          "name": "Rolo",
+          "aliases": [
+            "Rolos"
+          ],
+          "plural": "Rolo"
+        },
+        {
+          "id": "york-peppermint-pattie",
+          "name": "York Peppermint Pattie",
+          "aliases": [
+            "peppermint patty",
+            "York"
+          ],
+          "plural": "York Peppermint Pattie"
+        },
+        {
+          "id": "junior-mints",
+          "name": "Junior Mints",
+          "aliases": [],
+          "plural": "Junior Mints"
+        },
+        {
+          "id": "andes-mints",
+          "name": "Andes mints",
+          "aliases": [
+            "Andes"
+          ],
+          "plural": "Andes mints"
+        },
+        {
+          "id": "toblerone",
+          "name": "Toblerone",
+          "aliases": [],
+          "plural": "Toblerone"
+        },
+        {
+          "id": "ferrero-rocher",
+          "name": "Ferrero Rocher",
+          "aliases": [],
+          "plural": "Ferrero Rocher"
+        },
+        {
+          "id": "lindor",
+          "name": "Lindor",
+          "aliases": [
+            "Lindt",
+            "Lindt truffles"
+          ],
+          "plural": "Lindor"
+        },
+        {
+          "id": "cadbury-dairy-milk",
+          "name": "Cadbury Dairy Milk",
+          "aliases": [
+            "Dairy Milk",
+            "Cadbury"
+          ],
+          "plural": "Cadbury Dairy Milk"
+        },
+        {
+          "id": "cadbury-creme-egg",
+          "name": "Cadbury Creme Egg",
+          "aliases": [
+            "Creme Egg",
+            "Cadbury egg"
+          ],
+          "plural": "Cadbury Creme Egg"
+        },
+        {
+          "id": "cadbury-mini-eggs",
+          "name": "Cadbury Mini Eggs",
+          "aliases": [
+            "Mini Eggs"
+          ],
+          "plural": "Cadbury Mini Eggs"
+        },
+        {
+          "id": "mars-bar",
+          "name": "Mars bar",
+          "aliases": [
+            "Mars"
+          ],
+          "plural": "Mars bar"
+        },
+        {
+          "id": "bounty",
+          "name": "Bounty",
+          "aliases": [],
+          "plural": "Bounty"
+        },
+        {
+          "id": "galaxy",
+          "name": "Galaxy",
+          "aliases": [],
+          "plural": "Galaxy"
+        },
+        {
+          "id": "maltesers",
+          "name": "Maltesers",
+          "aliases": [],
+          "plural": "Maltesers"
+        },
+        {
+          "id": "aero",
+          "name": "Aero",
+          "aliases": [],
+          "plural": "Aero"
+        },
+        {
+          "id": "crunchie",
+          "name": "Crunchie",
+          "aliases": [],
+          "plural": "Crunchie"
+        },
+        {
+          "id": "flake",
+          "name": "Flake",
+          "aliases": [],
+          "plural": "Flake"
+        },
+        {
+          "id": "wispa",
+          "name": "Wispa",
+          "aliases": [],
+          "plural": "Wispa"
+        },
+        {
+          "id": "smarties",
+          "name": "Smarties",
+          "aliases": [],
+          "plural": "Smarties"
+        },
+        {
+          "id": "kinder-bueno",
+          "name": "Kinder Bueno",
+          "aliases": [
+            "Bueno"
+          ],
+          "plural": "Kinder Bueno"
+        },
+        {
+          "id": "kinder-surprise",
+          "name": "Kinder Surprise",
+          "aliases": [
+            "Kinder egg",
+            "Kinder Joy"
+          ],
+          "plural": "Kinder Surprise"
+        },
+        {
+          "id": "starburst",
+          "name": "Starburst",
+          "aliases": [
+            "Opal Fruits"
+          ],
+          "plural": "Starburst"
+        },
+        {
+          "id": "jolly-rancher",
+          "name": "Jolly Rancher",
+          "aliases": [
+            "Jolly Ranchers"
+          ],
+          "plural": "Jolly Rancher"
+        },
+        {
+          "id": "life-savers",
+          "name": "Life Savers",
+          "aliases": [
+            "Lifesavers"
+          ],
+          "plural": "Life Savers"
+        },
+        {
+          "id": "werthers-original",
+          "name": "Werther's Original",
+          "aliases": [
+            "Werther's"
+          ],
+          "plural": "Werther's Original"
+        },
+        {
+          "id": "tootsie-roll",
+          "name": "Tootsie Roll",
+          "aliases": [
+            "Tootsie Rolls"
+          ],
+          "plural": "Tootsie Roll"
+        },
+        {
+          "id": "tootsie-pop",
+          "name": "Tootsie Pop",
+          "aliases": [],
+          "plural": "Tootsie Pop"
+        },
+        {
+          "id": "dum-dums",
+          "name": "Dum Dums",
+          "aliases": [],
+          "plural": "Dum Dums"
+        },
+        {
+          "id": "blow-pop",
+          "name": "Blow Pop",
+          "aliases": [],
+          "plural": "Blow Pop"
+        },
+        {
+          "id": "warheads",
+          "name": "Warheads",
+          "aliases": [],
+          "plural": "Warheads"
+        },
+        {
+          "id": "sour-patch-kids",
+          "name": "Sour Patch Kids",
+          "aliases": [],
+          "plural": "Sour Patch Kids"
+        },
+        {
+          "id": "sour-punch",
+          "name": "Sour Punch",
+          "aliases": [],
+          "plural": "Sour Punch"
+        },
+        {
+          "id": "swedish-fish",
+          "name": "Swedish Fish",
+          "aliases": [],
+          "plural": "Swedish Fish"
+        },
+        {
+          "id": "gummy-bears",
+          "name": "gummy bears",
+          "aliases": [
+            "gummi bears",
+            "gummy bear",
+            "Haribo",
+            "Goldbears"
+          ],
+          "plural": "gummy bears"
+        },
+        {
+          "id": "gummy-worms",
+          "name": "gummy worms",
+          "aliases": [
+            "gummy worm"
+          ],
+          "plural": "gummy worms"
+        },
+        {
+          "id": "nerds",
+          "name": "Nerds",
+          "aliases": [
+            "Nerds Rope"
+          ],
+          "plural": "Nerds"
+        },
+        {
+          "id": "laffy-taffy",
+          "name": "Laffy Taffy",
+          "aliases": [],
+          "plural": "Laffy Taffy"
+        },
+        {
+          "id": "saltwater-taffy",
+          "name": "saltwater taffy",
+          "aliases": [
+            "taffy"
+          ],
+          "plural": "saltwater taffy"
+        },
+        {
+          "id": "airheads",
+          "name": "Airheads",
+          "aliases": [],
+          "plural": "Airheads"
+        },
+        {
+          "id": "now-and-later",
+          "name": "Now and Later",
+          "aliases": [],
+          "plural": "Now and Later"
+        },
+        {
+          "id": "mike-and-ike",
+          "name": "Mike and Ike",
+          "aliases": [],
+          "plural": "Mike and Ike"
+        },
+        {
+          "id": "hot-tamales",
+          "name": "Hot Tamales",
+          "aliases": [],
+          "plural": "Hot Tamales"
+        },
+        {
+          "id": "red-hots",
+          "name": "Red Hots",
+          "aliases": [],
+          "plural": "Red Hots"
+        },
+        {
+          "id": "twizzlers",
+          "name": "Twizzlers",
+          "aliases": [],
+          "plural": "Twizzlers"
+        },
+        {
+          "id": "red-vines",
+          "name": "Red Vines",
+          "aliases": [],
+          "plural": "Red Vines"
+        },
+        {
+          "id": "licorice",
+          "name": "licorice",
+          "aliases": [
+            "liquorice",
+            "black licorice"
+          ],
+          "plural": "licorice"
+        },
+        {
+          "id": "good-and-plenty",
+          "name": "Good & Plenty",
+          "aliases": [],
+          "plural": "Good & Plenty"
+        },
+        {
+          "id": "jelly-beans",
+          "name": "jelly beans",
+          "aliases": [
+            "jelly bean",
+            "Jelly Belly"
+          ],
+          "plural": "jelly beans"
+        },
+        {
+          "id": "candy-corn",
+          "name": "candy corn",
+          "aliases": [],
+          "plural": "candy corn"
+        },
+        {
+          "id": "peeps",
+          "name": "Peeps",
+          "aliases": [],
+          "plural": "Peeps"
+        },
+        {
+          "id": "pez",
+          "name": "Pez",
+          "aliases": [],
+          "plural": "Pez"
+        },
+        {
+          "id": "fun-dip",
+          "name": "Fun Dip",
+          "aliases": [],
+          "plural": "Fun Dip"
+        },
+        {
+          "id": "pixy-stix",
+          "name": "Pixy Stix",
+          "aliases": [],
+          "plural": "Pixy Stix"
+        },
+        {
+          "id": "ring-pop",
+          "name": "Ring Pop",
+          "aliases": [],
+          "plural": "Ring Pop"
+        },
+        {
+          "id": "push-pop",
+          "name": "Push Pop",
+          "aliases": [],
+          "plural": "Push Pop"
+        },
+        {
+          "id": "pop-rocks",
+          "name": "Pop Rocks",
+          "aliases": [],
+          "plural": "Pop Rocks"
+        },
+        {
+          "id": "bottle-caps",
+          "name": "Bottle Caps",
+          "aliases": [],
+          "plural": "Bottle Caps"
+        },
+        {
+          "id": "lemonheads",
+          "name": "Lemonheads",
+          "aliases": [],
+          "plural": "Lemonheads"
+        },
+        {
+          "id": "atomic-fireball",
+          "name": "Atomic Fireball",
+          "aliases": [
+            "Fireballs"
+          ],
+          "plural": "Atomic Fireball"
+        },
+        {
+          "id": "jawbreaker",
+          "name": "jawbreaker",
+          "aliases": [
+            "gobstopper",
+            "Everlasting Gobstopper",
+            "jawbreakers"
+          ]
+        },
+        {
+          "id": "rock-candy",
+          "name": "rock candy",
+          "aliases": [],
+          "plural": "rock candy"
+        },
+        {
+          "id": "cotton-candy",
+          "name": "cotton candy",
+          "aliases": [
+            "candy floss",
+            "fairy floss"
+          ],
+          "plural": "cotton candy"
+        },
+        {
+          "id": "candy-cane",
+          "name": "candy cane",
+          "aliases": [
+            "candy canes"
+          ]
+        },
+        {
+          "id": "lollipop",
+          "name": "lollipop",
+          "aliases": [
+            "lolly",
+            "sucker",
+            "lollipops"
+          ]
+        },
+        {
+          "id": "chupa-chups",
+          "name": "Chupa Chups",
+          "aliases": [],
+          "plural": "Chupa Chups"
+        },
+        {
+          "id": "bubble-gum",
+          "name": "bubble gum",
+          "aliases": [
+            "bubblegum",
+            "Bazooka",
+            "Hubba Bubba",
+            "gum"
+          ],
+          "plural": "bubble gum"
+        },
+        {
+          "id": "caramel",
+          "name": "caramel",
+          "aliases": [
+            "caramels"
+          ],
+          "plural": "caramel"
+        },
+        {
+          "id": "toffee",
+          "name": "toffee",
+          "aliases": [],
+          "plural": "toffee"
+        },
+        {
+          "id": "butterscotch",
+          "name": "butterscotch",
+          "aliases": [],
+          "plural": "butterscotch"
+        },
+        {
+          "id": "fudge",
+          "name": "fudge",
+          "aliases": [],
+          "plural": "fudge"
+        },
+        {
+          "id": "nougat",
+          "name": "nougat",
+          "aliases": [],
+          "plural": "nougat"
+        },
+        {
+          "id": "truffle",
+          "name": "truffle",
+          "aliases": [
+            "chocolate truffle",
+            "truffles"
+          ]
+        },
+        {
+          "id": "bonbon",
+          "name": "bonbon",
+          "aliases": [
+            "bon bon",
+            "bonbons"
+          ]
+        },
+        {
+          "id": "praline",
+          "name": "praline",
+          "aliases": [
+            "pralines"
+          ]
+        },
+        {
+          "id": "turkish-delight",
+          "name": "Turkish delight",
+          "aliases": [
+            "lokum"
+          ],
+          "plural": "Turkish delight"
+        },
+        {
+          "id": "marzipan",
+          "name": "marzipan",
+          "aliases": [],
+          "plural": "marzipan"
+        },
+        {
+          "id": "peanut-brittle",
+          "name": "peanut brittle",
+          "aliases": [
+            "brittle"
+          ],
+          "plural": "peanut brittle"
+        },
+        {
+          "id": "raisinets",
+          "name": "Raisinets",
+          "aliases": [],
+          "plural": "Raisinets"
+        },
+        {
+          "id": "goobers",
+          "name": "Goobers",
+          "aliases": [],
+          "plural": "Goobers"
+        },
+        {
+          "id": "dots",
+          "name": "Dots",
+          "aliases": [],
+          "plural": "Dots"
+        },
+        {
+          "id": "gumdrops",
+          "name": "gumdrops",
+          "aliases": [
+            "gumdrop"
+          ],
+          "plural": "gumdrops"
+        },
+        {
+          "id": "mentos",
+          "name": "Mentos",
+          "aliases": [],
+          "plural": "Mentos"
+        },
+        {
+          "id": "tic-tacs",
+          "name": "Tic Tacs",
+          "aliases": [
+            "Tic Tac"
+          ],
+          "plural": "Tic Tacs"
+        },
+        {
+          "id": "altoids",
+          "name": "Altoids",
+          "aliases": [],
+          "plural": "Altoids"
+        },
+        {
+          "id": "peppermint",
+          "name": "peppermint",
+          "aliases": [
+            "mint",
+            "mints",
+            "peppermints"
+          ]
+        },
+        {
+          "id": "necco-wafers",
+          "name": "Necco wafers",
+          "aliases": [
+            "Necco"
+          ],
+          "plural": "Necco wafers"
+        },
+        {
+          "id": "hi-chew",
+          "name": "Hi-Chew",
+          "aliases": [],
+          "plural": "Hi-Chew"
+        },
+        {
+          "id": "white-rabbit",
+          "name": "White Rabbit",
+          "aliases": [],
+          "plural": "White Rabbit"
+        },
+        {
+          "id": "pocky",
+          "name": "Pocky",
+          "aliases": [],
+          "plural": "Pocky"
+        },
+        {
+          "id": "chocolate",
+          "name": "chocolate",
+          "aliases": [
+            "chocolate bar",
+            "candy bar"
+          ],
+          "plural": "chocolate"
+        },
+        {
+          "id": "gelt",
+          "name": "gelt",
+          "aliases": [
+            "chocolate coins",
+            "chocolate gold coins"
+          ],
+          "plural": "gelt"
+        },
+        {
+          "id": "charleston-chew",
+          "name": "Charleston Chew",
+          "aliases": [],
+          "plural": "Charleston Chew"
+        },
+        {
+          "id": "sugar-daddy",
+          "name": "Sugar Daddy",
+          "aliases": [],
+          "plural": "Sugar Daddy"
+        },
+        {
+          "id": "whatchamacallit",
+          "name": "Whatchamacallit",
+          "aliases": [],
+          "plural": "Whatchamacallit"
+        },
+        {
+          "id": "take-5",
+          "name": "Take 5",
+          "aliases": [],
+          "plural": "Take 5"
+        },
+        {
+          "id": "oh-henry",
+          "name": "Oh Henry!",
+          "aliases": [],
+          "plural": "Oh Henry!"
+        },
+        {
+          "id": "chunky",
+          "name": "Chunky",
+          "aliases": [],
+          "plural": "Chunky"
+        },
+        {
+          "id": "mr-goodbar",
+          "name": "Mr. Goodbar",
+          "aliases": [],
+          "plural": "Mr. Goodbar"
+        },
+        {
+          "id": "sixlets",
+          "name": "Sixlets",
+          "aliases": [],
+          "plural": "Sixlets"
+        },
+        {
+          "id": "zagnut",
+          "name": "Zagnut",
+          "aliases": [],
+          "plural": "Zagnut"
+        },
+        {
+          "id": "chuckles",
+          "name": "Chuckles",
+          "aliases": [],
+          "plural": "Chuckles"
+        },
+        {
+          "id": "trolli",
+          "name": "Trolli",
+          "aliases": [],
+          "plural": "Trolli"
+        },
+        {
+          "id": "mamba",
+          "name": "Mamba",
+          "aliases": [],
+          "plural": "Mamba"
+        },
+        {
+          "id": "bit-o-honey",
+          "name": "Bit-O-Honey",
+          "aliases": [],
+          "plural": "Bit-O-Honey"
+        },
+        {
+          "id": "abba-zaba",
+          "name": "Abba-Zaba",
+          "aliases": [],
+          "plural": "Abba-Zaba"
+        },
+        {
+          "id": "boston-baked-beans",
+          "name": "Boston Baked Beans",
+          "aliases": [],
+          "plural": "Boston Baked Beans"
+        },
+        {
+          "id": "cow-tales",
+          "name": "Cow Tales",
+          "aliases": [],
+          "plural": "Cow Tales"
+        },
+        {
+          "id": "gushers",
+          "name": "Gushers",
+          "aliases": [
+            "Fruit Gushers"
+          ],
+          "plural": "Gushers"
+        },
+        {
+          "id": "wine-gums",
+          "name": "wine gums",
+          "aliases": [
+            "wine gum"
+          ],
+          "plural": "wine gums"
+        },
+        {
+          "id": "jelly-babies",
+          "name": "Jelly Babies",
+          "aliases": [
+            "jelly baby"
+          ],
+          "plural": "Jelly Babies"
+        },
+        {
+          "id": "fruit-pastilles",
+          "name": "Fruit Pastilles",
+          "aliases": [],
+          "plural": "Fruit Pastilles"
+        }
+      ],
+      "host_bank": [
+        "skittles",
+        "m-and-ms",
+        "snickers",
+        "reeses-peanut-butter-cups",
+        "kit-kat",
+        "twix",
+        "starburst",
+        "gummy-bears"
+      ],
+      "host_answers": [
+        "skittles"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a part of a car",
+      "entries": [
+        {
+          "id": "engine",
+          "name": "engine",
+          "aliases": [
+            "motor",
+            "engines"
+          ]
+        },
+        {
+          "id": "tire",
+          "name": "tire",
+          "aliases": [
+            "tyre",
+            "spare tire",
+            "spare",
+            "tires"
+          ]
+        },
+        {
+          "id": "wheel",
+          "name": "wheel",
+          "aliases": [
+            "rim",
+            "rims",
+            "wheels"
+          ]
+        },
+        {
+          "id": "hubcap",
+          "name": "hubcap",
+          "aliases": [
+            "wheel cover",
+            "hubcaps"
+          ]
+        },
+        {
+          "id": "lug-nut",
+          "name": "lug nut",
+          "aliases": [
+            "lug nuts"
+          ]
+        },
+        {
+          "id": "steering-wheel",
+          "name": "steering wheel",
+          "aliases": [
+            "steering wheels"
+          ]
+        },
+        {
+          "id": "steering-column",
+          "name": "steering column",
+          "aliases": [
+            "steering columns"
+          ]
+        },
+        {
+          "id": "power-steering",
+          "name": "power steering",
+          "aliases": [],
+          "plural": "power steering"
+        },
+        {
+          "id": "brakes",
+          "name": "brakes",
+          "aliases": [
+            "brake",
+            "brake pads",
+            "brake pedal",
+            "parking brake",
+            "handbrake",
+            "hand brake",
+            "emergency brake",
+            "e-brake"
+          ],
+          "plural": "brakes"
+        },
+        {
+          "id": "gas-pedal",
+          "name": "gas pedal",
+          "aliases": [
+            "accelerator",
+            "accelerator pedal",
+            "gas pedals"
+          ]
+        },
+        {
+          "id": "clutch",
+          "name": "clutch",
+          "aliases": [
+            "clutch pedal",
+            "clutches"
+          ]
+        },
+        {
+          "id": "gearshift",
+          "name": "gearshift",
+          "aliases": [
+            "gear stick",
+            "shifter",
+            "gear lever",
+            "stick shift",
+            "gearshifts"
+          ]
+        },
+        {
+          "id": "transmission",
+          "name": "transmission",
+          "aliases": [
+            "gearbox",
+            "transmissions"
+          ]
+        },
+        {
+          "id": "seat",
+          "name": "seat",
+          "aliases": [
+            "car seat",
+            "driver's seat",
+            "backseat",
+            "back seat",
+            "rear seat",
+            "seats"
+          ]
+        },
+        {
+          "id": "seatbelt",
+          "name": "seatbelt",
+          "aliases": [
+            "seat belt",
+            "seatbelts"
+          ]
+        },
+        {
+          "id": "airbag",
+          "name": "airbag",
+          "aliases": [
+            "air bag",
+            "airbags"
+          ]
+        },
+        {
+          "id": "dashboard",
+          "name": "dashboard",
+          "aliases": [
+            "dash",
+            "dashboards"
+          ]
+        },
+        {
+          "id": "speedometer",
+          "name": "speedometer",
+          "aliases": [
+            "speedometers"
+          ]
+        },
+        {
+          "id": "odometer",
+          "name": "odometer",
+          "aliases": [
+            "odometers"
+          ]
+        },
+        {
+          "id": "tachometer",
+          "name": "tachometer",
+          "aliases": [
+            "rev counter",
+            "tachometers"
+          ]
+        },
+        {
+          "id": "fuel-gauge",
+          "name": "fuel gauge",
+          "aliases": [
+            "gas gauge",
+            "fuel gauges"
+          ]
+        },
+        {
+          "id": "glove-box",
+          "name": "glove box",
+          "aliases": [
+            "glove compartment",
+            "glovebox",
+            "glove boxes"
+          ]
+        },
+        {
+          "id": "cup-holder",
+          "name": "cup holder",
+          "aliases": [
+            "cup holders"
+          ]
+        },
+        {
+          "id": "radio",
+          "name": "radio",
+          "aliases": [
+            "stereo",
+            "car stereo",
+            "infotainment system",
+            "radios"
+          ]
+        },
+        {
+          "id": "gps",
+          "name": "GPS",
+          "aliases": [
+            "navigation system",
+            "sat nav",
+            "navigation"
+          ],
+          "plural": "GPS"
+        },
+        {
+          "id": "horn",
+          "name": "horn",
+          "aliases": [
+            "horns"
+          ]
+        },
+        {
+          "id": "headlight",
+          "name": "headlight",
+          "aliases": [
+            "headlamp",
+            "headlights"
+          ]
+        },
+        {
+          "id": "taillight",
+          "name": "taillight",
+          "aliases": [
+            "tail light",
+            "brake light",
+            "taillights"
+          ]
+        },
+        {
+          "id": "turn-signal",
+          "name": "turn signal",
+          "aliases": [
+            "blinker",
+            "indicator",
+            "turn signals"
+          ]
+        },
+        {
+          "id": "dome-light",
+          "name": "dome light",
+          "aliases": [
+            "interior light",
+            "dome lights"
+          ]
+        },
+        {
+          "id": "windshield",
+          "name": "windshield",
+          "aliases": [
+            "windscreen",
+            "front window",
+            "windshields"
+          ]
+        },
+        {
+          "id": "windshield-wiper",
+          "name": "windshield wiper",
+          "aliases": [
+            "wipers",
+            "wiper",
+            "windscreen wiper",
+            "windshield wipers"
+          ]
+        },
+        {
+          "id": "wiper-fluid",
+          "name": "wiper fluid",
+          "aliases": [
+            "washer fluid"
+          ],
+          "plural": "wiper fluid"
+        },
+        {
+          "id": "rearview-mirror",
+          "name": "rearview mirror",
+          "aliases": [
+            "rear view mirror",
+            "rearview mirrors"
+          ]
+        },
+        {
+          "id": "side-mirror",
+          "name": "side mirror",
+          "aliases": [
+            "wing mirror",
+            "side-view mirror",
+            "side mirrors"
+          ]
+        },
+        {
+          "id": "window",
+          "name": "window",
+          "aliases": [
+            "car window",
+            "windows"
+          ]
+        },
+        {
+          "id": "sunroof",
+          "name": "sunroof",
+          "aliases": [
+            "moonroof",
+            "sunroofs"
+          ]
+        },
+        {
+          "id": "door",
+          "name": "door",
+          "aliases": [
+            "car door",
+            "doors"
+          ]
+        },
+        {
+          "id": "door-handle",
+          "name": "door handle",
+          "aliases": [
+            "door handles"
+          ]
+        },
+        {
+          "id": "trunk",
+          "name": "trunk",
+          "aliases": [
+            "boot",
+            "trunks"
+          ]
+        },
+        {
+          "id": "hood",
+          "name": "hood",
+          "aliases": [
+            "bonnet",
+            "hoods"
+          ]
+        },
+        {
+          "id": "hood-ornament",
+          "name": "hood ornament",
+          "aliases": [
+            "hood ornaments"
+          ]
+        },
+        {
+          "id": "bumper",
+          "name": "bumper",
+          "aliases": [
+            "bumpers"
+          ]
+        },
+        {
+          "id": "fender",
+          "name": "fender",
+          "aliases": [
+            "fenders"
+          ]
+        },
+        {
+          "id": "grille",
+          "name": "grille",
+          "aliases": [
+            "grill",
+            "grilles"
+          ]
+        },
+        {
+          "id": "license-plate",
+          "name": "license plate",
+          "aliases": [
+            "number plate",
+            "licence plate",
+            "license plates"
+          ]
+        },
+        {
+          "id": "exhaust-pipe",
+          "name": "exhaust pipe",
+          "aliases": [
+            "tailpipe",
+            "exhaust",
+            "exhaust pipes"
+          ]
+        },
+        {
+          "id": "muffler",
+          "name": "muffler",
+          "aliases": [
+            "silencer",
+            "mufflers"
+          ]
+        },
+        {
+          "id": "catalytic-converter",
+          "name": "catalytic converter",
+          "aliases": [
+            "catalytic converters"
+          ]
+        },
+        {
+          "id": "battery",
+          "name": "battery",
+          "aliases": [
+            "car battery",
+            "batteries"
+          ]
+        },
+        {
+          "id": "alternator",
+          "name": "alternator",
+          "aliases": [
+            "alternators"
+          ]
+        },
+        {
+          "id": "starter",
+          "name": "starter",
+          "aliases": [
+            "starter motor",
+            "starters"
+          ]
+        },
+        {
+          "id": "radiator",
+          "name": "radiator",
+          "aliases": [
+            "radiators"
+          ]
+        },
+        {
+          "id": "coolant",
+          "name": "coolant",
+          "aliases": [
+            "antifreeze"
+          ],
+          "plural": "coolant"
+        },
+        {
+          "id": "spark-plug",
+          "name": "spark plug",
+          "aliases": [
+            "spark plugs"
+          ]
+        },
+        {
+          "id": "gas-tank",
+          "name": "gas tank",
+          "aliases": [
+            "fuel tank",
+            "petrol tank",
+            "gas tanks"
+          ]
+        },
+        {
+          "id": "gas-cap",
+          "name": "gas cap",
+          "aliases": [
+            "fuel cap",
+            "gas caps"
+          ]
+        },
+        {
+          "id": "fuel-pump",
+          "name": "fuel pump",
+          "aliases": [
+            "fuel pumps"
+          ]
+        },
+        {
+          "id": "fuel-injector",
+          "name": "fuel injector",
+          "aliases": [
+            "fuel injectors"
+          ]
+        },
+        {
+          "id": "carburetor",
+          "name": "carburetor",
+          "aliases": [
+            "carburettor",
+            "carburetors"
+          ]
+        },
+        {
+          "id": "oil-filter",
+          "name": "oil filter",
+          "aliases": [
+            "oil filters"
+          ]
+        },
+        {
+          "id": "air-filter",
+          "name": "air filter",
+          "aliases": [
+            "air filters"
+          ]
+        },
+        {
+          "id": "oil",
+          "name": "oil",
+          "aliases": [
+            "motor oil",
+            "engine oil"
+          ],
+          "plural": "oil"
+        },
+        {
+          "id": "oil-pan",
+          "name": "oil pan",
+          "aliases": [
+            "oil pans"
+          ]
+        },
+        {
+          "id": "dipstick",
+          "name": "dipstick",
+          "aliases": [
+            "dipsticks"
+          ]
+        },
+        {
+          "id": "water-pump",
+          "name": "water pump",
+          "aliases": [
+            "water pumps"
+          ]
+        },
+        {
+          "id": "thermostat",
+          "name": "thermostat",
+          "aliases": [
+            "thermostats"
+          ]
+        },
+        {
+          "id": "fuse-box",
+          "name": "fuse box",
+          "aliases": [
+            "fuse boxes"
+          ]
+        },
+        {
+          "id": "suspension",
+          "name": "suspension",
+          "aliases": [
+            "suspensions"
+          ]
+        },
+        {
+          "id": "shock-absorber",
+          "name": "shock absorber",
+          "aliases": [
+            "shocks",
+            "shock",
+            "struts",
+            "shock absorbers"
+          ]
+        },
+        {
+          "id": "axle",
+          "name": "axle",
+          "aliases": [
+            "axles"
+          ]
+        },
+        {
+          "id": "driveshaft",
+          "name": "driveshaft",
+          "aliases": [
+            "drive shaft",
+            "driveshafts"
+          ]
+        },
+        {
+          "id": "differential",
+          "name": "differential",
+          "aliases": [
+            "differentials"
+          ]
+        },
+        {
+          "id": "chassis",
+          "name": "chassis",
+          "aliases": [
+            "frame"
+          ],
+          "plural": "chassis"
+        },
+        {
+          "id": "roof",
+          "name": "roof",
+          "aliases": [
+            "roofs"
+          ]
+        },
+        {
+          "id": "roof-rack",
+          "name": "roof rack",
+          "aliases": [
+            "roof racks"
+          ]
+        },
+        {
+          "id": "spoiler",
+          "name": "spoiler",
+          "aliases": [
+            "spoilers"
+          ]
+        },
+        {
+          "id": "antenna",
+          "name": "antenna",
+          "aliases": [
+            "aerial",
+            "antennas"
+          ]
+        },
+        {
+          "id": "running-board",
+          "name": "running board",
+          "aliases": [
+            "running boards"
+          ]
+        },
+        {
+          "id": "tow-hitch",
+          "name": "tow hitch",
+          "aliases": [
+            "trailer hitch",
+            "hitch",
+            "tow hitches"
+          ]
+        },
+        {
+          "id": "car-key",
+          "name": "car key",
+          "aliases": [
+            "key",
+            "key fob",
+            "keys",
+            "car keys"
+          ]
+        },
+        {
+          "id": "ignition",
+          "name": "ignition",
+          "aliases": [
+            "ignitions"
+          ]
+        },
+        {
+          "id": "piston",
+          "name": "piston",
+          "aliases": [
+            "pistons"
+          ]
+        },
+        {
+          "id": "cylinder",
+          "name": "cylinder",
+          "aliases": [
+            "cylinders"
+          ]
+        },
+        {
+          "id": "crankshaft",
+          "name": "crankshaft",
+          "aliases": [
+            "crankshafts"
+          ]
+        },
+        {
+          "id": "camshaft",
+          "name": "camshaft",
+          "aliases": [
+            "camshafts"
+          ]
+        },
+        {
+          "id": "timing-belt",
+          "name": "timing belt",
+          "aliases": [
+            "timing belts"
+          ]
+        },
+        {
+          "id": "serpentine-belt",
+          "name": "serpentine belt",
+          "aliases": [
+            "fan belt",
+            "serpentine belts"
+          ]
+        },
+        {
+          "id": "turbocharger",
+          "name": "turbocharger",
+          "aliases": [
+            "turbo",
+            "turbochargers"
+          ]
+        },
+        {
+          "id": "mud-flap",
+          "name": "mud flap",
+          "aliases": [
+            "mudguard",
+            "mud flaps"
+          ]
+        },
+        {
+          "id": "floor-mat",
+          "name": "floor mat",
+          "aliases": [
+            "floor mats"
+          ]
+        },
+        {
+          "id": "headrest",
+          "name": "headrest",
+          "aliases": [
+            "headrests"
+          ]
+        },
+        {
+          "id": "armrest",
+          "name": "armrest",
+          "aliases": [
+            "armrests"
+          ]
+        },
+        {
+          "id": "air-conditioning",
+          "name": "air conditioning",
+          "aliases": [
+            "AC"
+          ],
+          "plural": "air conditioning"
+        },
+        {
+          "id": "heater",
+          "name": "heater",
+          "aliases": [
+            "heaters"
+          ]
+        },
+        {
+          "id": "cruise-control",
+          "name": "cruise control",
+          "aliases": [],
+          "plural": "cruise control"
+        },
+        {
+          "id": "backup-camera",
+          "name": "backup camera",
+          "aliases": [
+            "rear camera",
+            "reversing camera",
+            "backup cameras"
+          ]
+        },
+        {
+          "id": "cigarette-lighter",
+          "name": "cigarette lighter",
+          "aliases": [
+            "lighter",
+            "12-volt socket",
+            "cigarette lighters"
+          ]
+        }
+      ],
+      "host_bank": [
+        "steering-wheel",
+        "engine",
+        "tire",
+        "wheel",
+        "seat",
+        "door",
+        "brakes",
+        "windshield"
+      ],
+      "host_answers": [
+        "steering-wheel"
+      ],
+      "match_groups": {},
+      "steals": "d"
+    },
+    {
+      "prompt": "Name a Canadian province or territory",
+      "entries": [
+        {
+          "id": "ontario",
+          "name": "Ontario",
+          "aliases": [
+            "ON"
+          ],
+          "plural": "Ontario"
+        },
+        {
+          "id": "quebec",
+          "name": "Quebec",
+          "aliases": [
+            "QC"
+          ],
+          "plural": "Quebec"
+        },
+        {
+          "id": "british-columbia",
+          "name": "British Columbia",
+          "aliases": [
+            "BC"
+          ],
+          "plural": "British Columbia"
+        },
+        {
+          "id": "alberta",
+          "name": "Alberta",
+          "aliases": [
+            "AB"
+          ],
+          "plural": "Alberta"
+        },
+        {
+          "id": "manitoba",
+          "name": "Manitoba",
+          "aliases": [
+            "MB"
+          ],
+          "plural": "Manitoba"
+        },
+        {
+          "id": "saskatchewan",
+          "name": "Saskatchewan",
+          "aliases": [
+            "SK"
+          ],
+          "plural": "Saskatchewan"
+        },
+        {
+          "id": "nova-scotia",
+          "name": "Nova Scotia",
+          "aliases": [
+            "NS"
+          ],
+          "plural": "Nova Scotia"
+        },
+        {
+          "id": "new-brunswick",
+          "name": "New Brunswick",
+          "aliases": [
+            "NB"
+          ],
+          "plural": "New Brunswick"
+        },
+        {
+          "id": "newfoundland-and-labrador",
+          "name": "Newfoundland and Labrador",
+          "aliases": [
+            "Newfoundland",
+            "Labrador",
+            "NL"
+          ],
+          "plural": "Newfoundland and Labrador"
+        },
+        {
+          "id": "prince-edward-island",
+          "name": "Prince Edward Island",
+          "aliases": [
+            "PEI"
+          ],
+          "plural": "Prince Edward Island"
+        },
+        {
+          "id": "yukon",
+          "name": "Yukon",
+          "aliases": [
+            "Yukon Territory",
+            "YT"
+          ],
+          "plural": "Yukon"
+        },
+        {
+          "id": "northwest-territories",
+          "name": "Northwest Territories",
+          "aliases": [
+            "NWT",
+            "NT"
+          ],
+          "plural": "Northwest Territories"
+        },
+        {
+          "id": "nunavut",
+          "name": "Nunavut",
+          "aliases": [
+            "NU"
+          ],
+          "plural": "Nunavut"
+        }
+      ],
+      "host_bank": [
+        "quebec",
+        "ontario",
+        "british-columbia",
+        "alberta",
+        "manitoba",
+        "saskatchewan",
+        "nova-scotia",
+        "new-brunswick",
+        "newfoundland-and-labrador",
+        "prince-edward-island",
+        "yukon",
+        "northwest-territories",
+        "nunavut"
+      ],
+      "host_answers": [
+        "quebec"
+      ],
+      "match_groups": {},
+      "steals": "r"
+    },
+    {
+      "prompt": "Name a sound an animal makes",
+      "entries": [
+        {
+          "id": "moo",
+          "name": "moo",
+          "aliases": [
+            "mooing"
+          ],
+          "plural": "moo"
+        },
+        {
+          "id": "oink",
+          "name": "oink",
+          "aliases": [
+            "oink oink"
+          ],
+          "plural": "oink"
+        },
+        {
+          "id": "woof",
+          "name": "woof",
+          "aliases": [
+            "bark",
+            "arf",
+            "ruff",
+            "bow-wow",
+            "barking",
+            "woof woof"
+          ],
+          "plural": "woof"
+        },
+        {
+          "id": "meow",
+          "name": "meow",
+          "aliases": [
+            "miaow",
+            "mew",
+            "meowing"
+          ],
+          "plural": "meow"
+        },
+        {
+          "id": "purr",
+          "name": "purr",
+          "aliases": [
+            "purring"
+          ],
+          "plural": "purr"
+        },
+        {
+          "id": "hiss",
+          "name": "hiss",
+          "aliases": [
+            "hissing"
+          ],
+          "plural": "hiss"
+        },
+        {
+          "id": "roar",
+          "name": "roar",
+          "aliases": [
+            "roaring"
+          ],
+          "plural": "roar"
+        },
+        {
+          "id": "growl",
+          "name": "growl",
+          "aliases": [
+            "grr",
+            "growling"
+          ],
+          "plural": "growl"
+        },
+        {
+          "id": "howl",
+          "name": "howl",
+          "aliases": [
+            "howling",
+            "awoo"
+          ],
+          "plural": "howl"
+        },
+        {
+          "id": "quack",
+          "name": "quack",
+          "aliases": [
+            "quacking",
+            "quack quack"
+          ],
+          "plural": "quack"
+        },
+        {
+          "id": "baa",
+          "name": "baa",
+          "aliases": [
+            "bleat",
+            "maa",
+            "baaing"
+          ],
+          "plural": "baa"
+        },
+        {
+          "id": "neigh",
+          "name": "neigh",
+          "aliases": [
+            "whinny",
+            "nicker"
+          ],
+          "plural": "neigh"
+        },
+        {
+          "id": "cluck",
+          "name": "cluck",
+          "aliases": [
+            "bawk",
+            "cackle",
+            "clucking"
+          ],
+          "plural": "cluck"
+        },
+        {
+          "id": "cock-a-doodle-doo",
+          "name": "cock-a-doodle-doo",
+          "aliases": [
+            "crow",
+            "crowing"
+          ],
+          "plural": "cock-a-doodle-doo"
+        },
+        {
+          "id": "gobble",
+          "name": "gobble",
+          "aliases": [
+            "gobble gobble"
+          ],
+          "plural": "gobble"
+        },
+        {
+          "id": "honk",
+          "name": "honk",
+          "aliases": [
+            "honking"
+          ],
+          "plural": "honk"
+        },
+        {
+          "id": "hoot",
+          "name": "hoot",
+          "aliases": [
+            "hoo",
+            "hooting"
+          ],
+          "plural": "hoot"
+        },
+        {
+          "id": "tweet",
+          "name": "tweet",
+          "aliases": [
+            "chirp",
+            "cheep",
+            "peep",
+            "chirping",
+            "tweeting"
+          ],
+          "plural": "tweet"
+        },
+        {
+          "id": "caw",
+          "name": "caw",
+          "aliases": [
+            "cawing"
+          ],
+          "plural": "caw"
+        },
+        {
+          "id": "coo",
+          "name": "coo",
+          "aliases": [
+            "cooing"
+          ],
+          "plural": "coo"
+        },
+        {
+          "id": "squawk",
+          "name": "squawk",
+          "aliases": [],
+          "plural": "squawk"
+        },
+        {
+          "id": "squeak",
+          "name": "squeak",
+          "aliases": [
+            "squeaking"
+          ],
+          "plural": "squeak"
+        },
+        {
+          "id": "squeal",
+          "name": "squeal",
+          "aliases": [],
+          "plural": "squeal"
+        },
+        {
+          "id": "buzz",
+          "name": "buzz",
+          "aliases": [
+            "buzzing",
+            "bzz"
+          ],
+          "plural": "buzz"
+        },
+        {
+          "id": "ribbit",
+          "name": "ribbit",
+          "aliases": [
+            "croak",
+            "croaking"
+          ],
+          "plural": "ribbit"
+        },
+        {
+          "id": "hee-haw",
+          "name": "hee-haw",
+          "aliases": [
+            "bray",
+            "braying"
+          ],
+          "plural": "hee-haw"
+        },
+        {
+          "id": "snort",
+          "name": "snort",
+          "aliases": [],
+          "plural": "snort"
+        },
+        {
+          "id": "grunt",
+          "name": "grunt",
+          "aliases": [],
+          "plural": "grunt"
+        },
+        {
+          "id": "trumpet",
+          "name": "trumpet",
+          "aliases": [
+            "trumpeting"
+          ],
+          "plural": "trumpet"
+        },
+        {
+          "id": "chatter",
+          "name": "chatter",
+          "aliases": [
+            "chattering"
+          ],
+          "plural": "chatter"
+        },
+        {
+          "id": "bellow",
+          "name": "bellow",
+          "aliases": [],
+          "plural": "bellow"
+        },
+        {
+          "id": "yelp",
+          "name": "yelp",
+          "aliases": [
+            "yip",
+            "yap"
+          ],
+          "plural": "yelp"
+        },
+        {
+          "id": "whine",
+          "name": "whine",
+          "aliases": [
+            "whimper"
+          ],
+          "plural": "whine"
+        },
+        {
+          "id": "click",
+          "name": "click",
+          "aliases": [
+            "clicking"
+          ],
+          "plural": "click"
+        },
+        {
+          "id": "whistle",
+          "name": "whistle",
+          "aliases": [],
+          "plural": "whistle"
+        },
+        {
+          "id": "bugle",
+          "name": "bugle",
+          "aliases": [
+            "bugling"
+          ],
+          "plural": "bugle"
+        },
+        {
+          "id": "rattle",
+          "name": "rattle",
+          "aliases": [],
+          "plural": "rattle"
+        },
+        {
+          "id": "screech",
+          "name": "screech",
+          "aliases": [],
+          "plural": "screech"
+        },
+        {
+          "id": "song",
+          "name": "song",
+          "aliases": [
+            "birdsong",
+            "singing"
+          ],
+          "plural": "song"
+        },
+        {
+          "id": "hum",
+          "name": "hum",
+          "aliases": [],
+          "plural": "hum"
+        },
+        {
+          "id": "chitter",
+          "name": "chitter",
+          "aliases": [],
+          "plural": "chitter"
+        },
+        {
+          "id": "snarl",
+          "name": "snarl",
+          "aliases": [],
+          "plural": "snarl"
+        }
+      ],
+      "host_bank": [
+        "moo",
+        "woof",
+        "meow",
+        "oink",
+        "quack",
+        "roar",
+        "neigh",
+        "baa"
+      ],
+      "host_answers": [
+        "moo"
+      ],
+      "match_groups": {}
+    },
+    {
+      "prompt": "Name a whole number from 1 to 10",
+      "entries": [
+        {
+          "id": "1",
+          "name": "1",
+          "aliases": [
+            "one"
+          ],
+          "plural": "1"
+        },
+        {
+          "id": "2",
+          "name": "2",
+          "aliases": [
+            "two"
+          ],
+          "plural": "2"
+        },
+        {
+          "id": "3",
+          "name": "3",
+          "aliases": [
+            "three"
+          ],
+          "plural": "3"
+        },
+        {
+          "id": "4",
+          "name": "4",
+          "aliases": [
+            "four"
+          ],
+          "plural": "4"
+        },
+        {
+          "id": "5",
+          "name": "5",
+          "aliases": [
+            "five"
+          ],
+          "plural": "5"
+        },
+        {
+          "id": "6",
+          "name": "6",
+          "aliases": [
+            "six"
+          ],
+          "plural": "6"
+        },
+        {
+          "id": "7",
+          "name": "7",
+          "aliases": [
+            "seven"
+          ],
+          "plural": "7"
+        },
+        {
+          "id": "8",
+          "name": "8",
+          "aliases": [
+            "eight"
+          ],
+          "plural": "8"
+        },
+        {
+          "id": "9",
+          "name": "9",
+          "aliases": [
+            "nine"
+          ],
+          "plural": "9"
+        },
+        {
+          "id": "10",
+          "name": "10",
+          "aliases": [
+            "ten"
+          ],
+          "plural": "10"
+        }
+      ],
+      "host_bank": [
+        "7",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "8",
+        "9",
+        "10"
+      ],
+      "host_answers": [
+        "7"
+      ],
+      "match_groups": {},
+      "steals": "a"
+    }
+  ]
+}
