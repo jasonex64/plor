@@ -2,32 +2,43 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that merged M12's last sub-tickets (12e and 12d) and added four sources, on the Windows machine.
+**Updated:** 2026-10-23 (Pacific), by the session that reviewed the MVP and built M12 12f, on the Windows machine.
 
 ## Where things stand
-- **M08 to M12 are done**, so the MVP (M00–M12) is built. Tickets are in `docs/milestones/`. M12's sub-tickets went in PRs #58, #59, #60, #62 and #63, the last two merged on green CI with the human's approval, 2026-10-24.
-  - Key 12e and 12d facts not in the code: L5 (code emails can still be used up from a few IPs) is accepted for the closed beta only, with a CAPTCHA to decide before launch (ROADMAP For M15). The board's `friend_status` payload is `v` 2 and the protocol 5.
-  - `m12-account` is merged (PR #64) and deleted.
-- **The hosted database is up to date** (human, 2026-10-24: `npx.cmd supabase db push` of the 21 pending migrations, M03 to 12d). Until then it had only the first 4 (to M02's game tables), so plor.app answered `500 internal` on sign-in (since 12e) and on everything signed in from M03 on. After the push, a wrong-code probe of `POST /api/auth/email/verify` answers `403 otp_expired`.
-  - Checked before the push, in the SQL editor: no format-1 day but 2026-10-19 and 10-20 (past, one run each); `plor_publisher` held only what the M06 migration revokes; `[[:alpha:]]` accepts accented, Greek and Chinese letters and refuses emoji, ctype `en_US.UTF-8`, as locally; `postgres` may delete from `auth.users` and bypasses RLS.
-  - `npx.cmd supabase test db --linked` failed 4 files. Three were test bugs seen only remotely, fixed in PR #65: `puzzle_entry.test.sql` lacked the preamble, `live_board.test.sql` used `reset role`, and `profile.test.sql` timed its 30-day boundary with `now()`. The fourth is Realtime: every `realtime.send` warned "no partition of relation messages", because a client connecting over WebSocket creates `realtime.messages`' daily partitions and none had connected (SOURCES.md, Supabase Realtime `/broadcast`). After the human signed in on plor.app, the hosted database held `messages_2026_10_23` to `messages_2026_10_27`, and the rerun with PR #65's fixes passed: `Files=17, Tests=269`, `Result: PASS` (human, 2026-10-24).
-  - plor.app has no admin and no approved day yet: it works, but has no puzzle until one is approved on `/admin/puzzles`.
-- **The repo is public** (human, 2026-10-23: "i intend to make it PUBLIC"). Its full history has no secrets (gitleaks, DECISIONS.md Log), and CI is safe for strangers' PRs. The settings it calls for and the public puzzle drafts wait on the human (ROADMAP "Next revision", For the human).
+- **M12 is in review again, for 12f, the MVP review fixes** (`docs/milestones/M12-12f-review-fixes.md`, on branch `m12-account`, with its PR open). The human asked Claude to review plor.app against the MVP, then said "draft and execute" (2026-10-23). 12f:
+  - puts the invite link on the home page's board, without Reset;
+  - makes a day with no puzzle show the streak and a countdown, and move on at midnight (protocol 6);
+  - asks before Leave group, Remove member and Remove friend;
+  - fixes the username copy and lower-casing, labels the feed's box "Comment to your friends", and adds groups to the privacy page.
+
+  Locally, every suite passes and the reviewer's blocking findings are fixed. CI and the merge wait (memory rule: merge only on all-green CI, with the human's OK).
+- **M00 to M11 and M12 12a to 12e are done.** The hosted database has every migration to 12d, and its pgTAP run passed (`Files=17, Tests=269`, human, 2026-10-24).
+- **plor.app can't be played yet.** It has no admin and no approved day. No day is drafted for 2026-10-23 to 10-25, and 9 days are parked (ROADMAP, "From the MVP review" and For M13). Until 12f deploys, a signed-in player on a day with no puzzle sees only "There's no puzzle today yet" and the page doesn't move on at midnight.
+- **The repo is public.** Its protections are on (DECISIONS.md Log, 2026-10-24). The public puzzle drafts wait on 13a.
 - **M13 13a** (puzzle drafts out of the public repo) is a draft ticket in PR #61 from `m13-answer-lists-and-content`, with P1–P5 for the human.
-- **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch.
+- **M16, Game 2,** has a draft ticket (branch `m16-game-2`), docs only, for after launch.
 
 ## Waiting on the human
-- **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
-- **The public repo:** its protections are on, `main` included (DECISIONS.md Log, 2026-10-24); left: the public puzzle drafts (13a) and, optionally, Actions approval for every outside contributor (ROADMAP, For the human).
-- **New questions for the repeated categories** (human, 2026-10-23: "new categories"; Claude suggested replacements in the session, for the human to pick): 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.
-- **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it (human OK, 2026-10-23).
+- **12f's PR:** approve the merge once CI is green.
+- **Making plor.app playable:**
+  1. make your account an admin: insert its user ID into `private.admin` in the hosted SQL editor;
+  2. approve the drafted days on `/admin/puzzles`;
+  3. decide what fills the days with no puzzle.
+- **Product questions from the review** (ROADMAP, "From the MVP review"): should the result's Share carry the sharer's invite link?
+- **13a's P1–P5** (`docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`).
+- **New questions for the repeated categories:** 11-06 Q2 and Q3, 11-10 Q4, 11-16 Q4. The human types the new prompts on the admin page; a drafting session follows DECISIONS.md, "Puzzle drafting".
+- **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it.
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-The MVP line is reached; what comes next is the human's call. Until the human asks, there are no content days, staging or `db push` (the human: build the app first). The candidates in ROADMAP order: M13 (answer lists and content), which starts with 13a's P1–P5 (PR #61); M14 (look and feel); M15 (launch readiness, which takes the pending migrations to the hosted database). Repo auto-merge is on (human, 2026-10-24), so a PR can be set to merge itself when its checks pass.
+1. Merge 12f's PR on green CI with the human's OK.
+2. Set M12's Status and its ROADMAP row to done, and delete `m12-account`.
+3. The rest is the human's call. In ROADMAP order: M13 (answer lists and content, starting with 13a's P1–P5, PR #61), M14 (look and feel), M15 (launch readiness).
+
+Until the human asks, there are no content days, staging or `db push`.
 
 ## Local state
-- **This session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m12-account` (switch to `main` once the branch is deleted), committing as `jasonex64 <jasonex64@gmail.com>`. Its local stack runs in Docker Desktop (started by this session) with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running.
+- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m12-account`, committing as `jasonex64 <jasonex64@gmail.com>`. Switch to `main` once 12f's PR is merged and the branch deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running, and no temporary test files are left.
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
 - The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.

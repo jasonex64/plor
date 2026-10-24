@@ -42,7 +42,7 @@ async function asPlorApp(fn: (client: PoolClient, userId: string, puzzle: Puzzle
 describe("a run as plor_app", () => {
   it("starts, answers, opens the next question, logs a miss and reads the state", async () => {
     await asPlorApp(async (client, userId, puzzle) => {
-      expect((await todaysState(client, userId)).status).toBe("not_started");
+      expect((await todaysState(client, userId))!.status).toBe("not_started");
       expect((await startRun(client, userId)).status).toBe("in_progress");
       const q = puzzle.questions[0];
       const safe = q.entries.find((e) => matchAnswer(q, e.id) === "not_matched")!;
@@ -50,7 +50,7 @@ describe("a run as plor_app", () => {
       expect(after.run.answered).toHaveLength(1);
       expect((await openNext(client, userId)).question?.index).toBe(1);
       expect((await answer(client, userId, 1, "zzz zzz")).notInList).toBe(true);
-      expect((await todaysState(client, userId)).question?.index).toBe(1);
+      expect((await todaysState(client, userId))!.question?.index).toBe(1);
     });
   });
 

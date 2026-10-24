@@ -146,16 +146,22 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
       const { inviteCode } = await api<{ inviteCode: string }>("/api/groups/invite", { method: "POST", body: { id } });
       setGroup((g) => g && { ...g, inviteCode });
     });
-  const removeMember = (username: string) =>
+  // Leaving or removing deletes that member's comments in the group (G6), so both ask first, like Delete
+  // (docs/milestones/M12-12f-review-fixes.md, F3).
+  const removeMember = (member: Member) => {
+    if (!window.confirm(`Remove ${member.name} from ${group?.name}? Their comments in it are deleted.`)) return;
     act(async () => {
-      await api("/api/groups/remove", { method: "POST", body: { id, username } });
+      await api("/api/groups/remove", { method: "POST", body: { id, username: member.username } });
       load();
     });
-  const leave = () =>
+  };
+  const leave = () => {
+    if (!window.confirm(`Leave ${group?.name}? Your comments in it are deleted.`)) return;
     act(async () => {
       await api("/api/groups/leave", { method: "POST", body: { id } });
       router.push("/");
     });
+  };
   const deleteGroup = () => {
     if (!window.confirm(`Delete ${group?.name} for everyone in it?`)) return;
     act(async () => {
@@ -192,7 +198,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
                   {group.creator && !m.creator && (
                     <>
                       {" "}
-                      <button type="button" disabled={busy} onClick={() => removeMember(m.username)}>
+                      <button type="button" disabled={busy} onClick={() => removeMember(m)}>
                         Remove
                       </button>
                     </>
