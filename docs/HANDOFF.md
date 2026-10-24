@@ -2,21 +2,18 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that merged 12e and built 12d (the decided fixes), on `m12-account`, on the Windows machine.
+**Updated:** 2026-10-24, by the session that merged M12's last sub-tickets (12e and 12d), on the Windows machine.
 
 ## Where things stand
-- **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
-- **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). A1–A10 are answered (human, 2026-10-23).
-  - **12a and 12b are merged** (PRs #58 and #59).
-  - **12c is merged** (PR #60, merged by the human 2026-10-24 while its `db` and `e2e` checks were still running; the same code passed both on the earlier commit).
-  - **12e, sign-in code limits, is merged** (PR #62, on green CI with the human's approval, 2026-10-24). **L5** is accepted for the closed beta, with a CAPTCHA decided before launch (DECISIONS.md Log, ROADMAP For M15).
-  - **12d, the decided fixes, is built and in review** (`docs/milestones/M12-12d-decided-fixes.md`; D1–D3 answered by the human, 2026-10-24): the live board shows only "started" until you've finished (protocol 5, `friend_status` v 2), a record of each admin's comment deletion (`private.comment_deletion` and `private.delete_reported_comment`, a security change) listed on `/admin/reports`, and group boards counting a member from the day they joined. Migrations `20261024031116_board_hides_progress.sql` and `20261024031547_comment_deletion_record.sql`. In review as PR #63; the reviewer's two blocking findings are fixed.
-  - With 12d merged, M12 is done: its last steps are the M12 ticket's Status and the ROADMAP row.
+- **M08 to M12 are done**, so the MVP (M00–M12) is built. Tickets are in `docs/milestones/`. M12's sub-tickets went in PRs #58, #59, #60, #62 and #63, the last two merged on green CI with the human's approval, 2026-10-24.
+  - Key 12e and 12d facts not in the code: L5 (code emails can still be used up from a few IPs) is accepted for the closed beta only, with a CAPTCHA to decide before launch (ROADMAP For M15). The board's `friend_status` payload is `v` 2 and the protocol 5.
+  - **This handoff's own PR** (M12 done, from `m12-account`) is the last one from that branch: once it's merged, delete `m12-account` locally and on GitHub (CLAUDE.md, Branches).
 - **The repo is public** (human, 2026-10-23: "i intend to make it PUBLIC"). Its full history has no secrets (gitleaks, DECISIONS.md Log), and CI is safe for strangers' PRs. The settings it calls for and the public puzzle drafts wait on the human (ROADMAP "Next revision", For the human).
-- **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch. Don't build on it before the MVP is done.
+- **M13 13a** (puzzle drafts out of the public repo) is a draft ticket in PR #61 from `m13-answer-lists-and-content`, with P1–P5 for the human.
+- **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch.
 
 ## Waiting on the human
-- **12d:** review and merge PR #63 (a security change: a new table and a function `plor_app` may execute; DECISIONS.md Log, 2026-10-24), and check the privacy page's new "Deleted comments" line (12d Source diff).
+- **Merge this handoff's PR** (M12 done) on green CI, then `m12-account` is deleted.
 - **12e:** in Supabase's dashboard, Authentication → Rate Limits: sign-ups and sign-ins 300, token verifications 300, token refreshes 1,500 per 5 minutes (N5, N6).
 - **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
 - **The public repo:** turn on the GitHub and Vercel settings listed in ROADMAP "Next revision", For the human, and decide about the public puzzle drafts.
@@ -27,10 +24,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once 12d's PR is merged: mark M12 done (its ticket's Status, the ROADMAP row, delete `m12-account`). M12 is the last milestone before the MVP line; what comes after is the human's call (M13 waits on 13a's P1–P5). Repo auto-merge is on (human, 2026-10-24), so a PR can be set to merge itself when its checks pass.
+The MVP line is reached; what comes next is the human's call. Until the human asks, there are no content days, staging or `db push` (the human: build the app first). The candidates in ROADMAP order: M13 (answer lists and content), which starts with 13a's P1–P5 (PR #61); M14 (look and feel); M15 (launch readiness, which takes the pending migrations to the hosted database). Repo auto-merge is on (human, 2026-10-24), so a PR can be set to merge itself when its checks pass.
 
 ## Local state
-- **This session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m12-account`, committing as `jasonex64 <jasonex64@gmail.com>`. Its local stack runs in Docker Desktop (started by this session) with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running.
+- **This session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m12-account` (switch to `main` once the branch is deleted), committing as `jasonex64 <jasonex64@gmail.com>`. Its local stack runs in Docker Desktop (started by this session) with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running.
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
 - The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
