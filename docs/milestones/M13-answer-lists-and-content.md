@@ -111,7 +111,7 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 | D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | **(a), start fresh** (human, 2026-10-24: "Start fresh (Recommended)") |
 
 ## Sub-tickets (Claude's order, each its own PR on this branch)
-- **13a, the base.** It also includes:
+- **13a, the base** (its own file, `docs/milestones/M13-13a-the-base.md`, with criteria from the human's answers, 2026-10-24). It also includes:
   - snapshot import scripts for the D2 sources, with a reviewed summary of each pull;
   - a credits line for the CC BY sources, placed in 13a.
   - Things, aliases, facts, the "kind of" tree, categories as recipes, and the audit log (D1, D3, D6), with tables and functions, pgTAP and grants.

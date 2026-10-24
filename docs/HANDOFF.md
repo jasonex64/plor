@@ -29,7 +29,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Next step
 1. Confirm alert #1 closed.
-2. Write 13a's criteria (ask guided questions first where the human's intent is needed, CLAUDE.md), then build it on this branch, starting with animals (the ticket's Plan).
+2. 13a's criteria are written (`docs/milestones/M13-13a-the-base.md`, from two rounds of the human's answers, 2026-10-24). The test day's 7 categories (T1) wait on the human's OK. Then build 13a on this branch, starting with animals, as its own PR.
 
 Until the human asks, there are no content days, staging or `db push`.
 
