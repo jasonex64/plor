@@ -21,6 +21,7 @@ import {
   type ChangedMessage,
   type StatusMessage,
 } from "./board-channel";
+import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
@@ -117,7 +118,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
           Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
         </p>
       )}
-      {board && board.friends.length === 0 && <p>Add friends to see their runs here.</p>}
+      {board && board.friends.length === 0 && <p>Send a friend your invite link to see their runs here.</p>}
       {board && board.friends.length > 0 && (
         <ul>
           {board.friends.map((f) => (
@@ -130,6 +131,8 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
       )}
       {!board && !error && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
+      {/* Adding a friend starts here, not only on the account page (docs/milestones/M12-12f-review-fixes.md, F1). */}
+      <InviteLink canReset={false} />
     </section>
   );
 }

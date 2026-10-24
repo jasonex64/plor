@@ -55,10 +55,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   await watcher.goto("/");
   await signInAndPick(watcher, "w");
-  // The invite link is on the account page (M12 12a).
-  await watcher.getByRole("link", { name: "Your account" }).click();
-  await watcher.getByRole("button", { name: "Make my invite link" }).click();
-  const link = await watcher.locator("code").filter({ hasText: "/invite/" }).textContent();
+  // The invite link is on the home page's board (M12 12f, F1) as well as the account page (12a).
+  const invite = watcher.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
+  await invite.getByRole("button", { name: "Make my invite link" }).click();
+  const link = await invite.locator("code").textContent();
 
   await player.goto(new URL(link!).pathname);
   await signInAndPick(player, "p");
@@ -139,7 +139,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // (8d). Then the watcher reports it, and it's gone for the watcher at once (8c, D5). Made an admin, the watcher
   // finds it on the reported-comments page and deletes it, and the player's open page loses it too.
   const body = `report me ${RUN}`;
-  await player.getByLabel("Comment", { exact: true }).fill(body);
+  await player.getByLabel("Comment to your friends").fill(body);
   await player.getByRole("button", { name: "Post" }).click();
   const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(playerComment).toBeVisible();

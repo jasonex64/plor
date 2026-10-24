@@ -33,6 +33,12 @@ export default function Privacy() {
           signed in who opens your invite link, can see your username and your display name if you set one.
         </li>
         <li>
+          <strong>Your groups:</strong> which groups you are in, and the comments and reactions you post in them.
+          Everyone in a group, friends or not, can see your username and display name, your points for the week, and
+          your comments and reactions in that group. Anyone signed in who opens a group&apos;s invite link sees its
+          name.
+        </li>
+        <li>
           <strong>Deleted comments:</strong> if an admin deletes one of your comments after it was reported, we keep
           its text, and which admin deleted it, until you delete your account.
         </li>

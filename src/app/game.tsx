@@ -10,8 +10,11 @@ import type { PublicQuestion } from "@/game/payload";
 import { shareText } from "@/game/share";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
+import { shareLink } from "./share";
 
-type RunResponse = { run: RunState };
+// run is null on a day with no puzzle, with the streak and the time to the reset (M12 12f, F2).
+type RunResponse = { run: RunState } | { run: null; msToReset: number; streak: number };
+type NoPuzzle = { msToReset: number; streak: number };
 type AnswerResponse = { run: RunState; notInList: boolean };
 
 // onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a). onDayOver is
@@ -20,6 +23,7 @@ type AnswerResponse = { run: RunState; notInList: boolean };
 // played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
 export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void }) {
   const [run, setRun] = useState<RunState | null>(null);
+  const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
@@ -27,16 +31,20 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
 
   // Stable, so the countdown below doesn't restart when this component re-renders.
   const load = useCallback(() => {
-    api<RunResponse>("/api/run", { method: "GET" }).then((r) => setRun(r.run), (err) => setError(errorText(err)));
+    api<RunResponse>("/api/run", { method: "GET" }).then(
+      (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset, streak: r.streak })),
+      (err) => setError(errorText(err)),
+    );
   }, []);
   useEffect(load, [load]);
   // Each state carries the time to the reset as the server measured it, so the timer starts again from each one, with
   // whether that state is in play.
   useEffect(() => {
-    if (!run) return;
-    const timer = setTimeout(() => onDayOver(run.status === "in_progress"), run.msToReset);
+    const msToReset = run?.msToReset ?? noPuzzle?.msToReset;
+    if (msToReset === undefined) return;
+    const timer = setTimeout(() => onDayOver(run?.status === "in_progress"), msToReset);
     return () => clearTimeout(timer);
-  }, [run, onDayOver]);
+  }, [run, noPuzzle, onDayOver]);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -53,10 +61,19 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
     }
   }
 
+  if (noPuzzle) {
+    return (
+      <section>
+        <Streak days={noPuzzle.streak} />
+        <p>There&apos;s no puzzle today.</p>
+        <ResetCountdown label="A new day starts in" msToReset={noPuzzle.msToReset} />
+      </section>
+    );
+  }
   if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
   return (
     <section>
-      <p>Streak: {run.streak === 1 ? "1 day" : `${run.streak} days`} played in a row</p>
+      <Streak days={run.streak} />
       {run.status === "not_started" && (
         <>
           <p>
@@ -119,13 +136,18 @@ function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void 
 // Nothing to do at zero: Game's own timer moves the page to the new day.
 const NOTHING = () => {};
 
-// Time to the next puzzle at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review).
-function ResetCountdown({ msToReset }: { msToReset: number }) {
+function Streak({ days }: { days: number }) {
+  return <p>Streak: {days === 1 ? "1 day" : `${days} days`} played in a row</p>;
+}
+
+// Time to the next reset at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review). label
+// says what comes then: the next puzzle after a run, only a new day when today has none, since tomorrow may not either.
+function ResetCountdown({ label, msToReset }: { label: string; msToReset: number }) {
   const total = Math.ceil(useCountdown(msToReset, NOTHING) / 1000);
   const two = (n: number) => String(n).padStart(2, "0");
   return (
     <p role="timer">
-      Next puzzle in {Math.floor(total / 3600)}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
+      {label} {Math.floor(total / 3600)}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
     </p>
   );
 }
@@ -256,29 +278,20 @@ function Result({ run }: { run: RunState }) {
           </li>
         ))}
       </ol>
-      <ResetCountdown msToReset={run.msToReset} />
+      <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
     </div>
   );
 }
 
-// Share (M05, S4): the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard
-// (MDN, Clipboard.writeText). The link is today's game at the site's root (S3), from the page's own origin so it's right
-// on any deployment. A cancelled sheet rejects with AbortError, which isn't a failure (MDN); anything else is shown.
+// Share (M05, S4), by the share sheet or the clipboard (src/app/share.ts). The link is today's game at the site's root
+// (S3), from the page's own origin so it's right on any deployment.
 function Share({ run }: { run: RunState }) {
   const [note, setNote] = useState<string | null>(null);
 
   async function share() {
-    const text = shareText(run);
-    const url = `${window.location.origin}/`;
     try {
-      if (typeof navigator.share === "function") {
-        await navigator.share({ text, url });
-      } else {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setNote("Copied");
-      }
+      if (await shareLink(shareText(run), `${window.location.origin}/`)) setNote("Copied");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
       setNote(`Couldn't share: ${String(err)}`);
     }
   }
