@@ -13,7 +13,11 @@ No installed copy of zod has the memory bug in GHSA-mrhx-c7xc-m3w5, and future s
     - `@vercel/functions@3.10.1` → `@vercel/oidc@4.0.1` → `@vercel/cli-config@0.3.1` (runtime; `@vercel/functions` is how `src/lib/db.ts` registers the pool);
     - `eslint-config-next@16.4.2` → `eslint-plugin-react-hooks@7.1.1` (dev only).
   - **No upstream fix.** `@vercel/cli-config`'s latest release, 0.3.3, still pins `zod` to exactly `4.1.11` (`npm view @vercel/cli-config@latest dependencies.zod`, 2026-10-24), so updating Vercel's packages doesn't fix it.
-  - **Reachability.** `cli-config` uses zod to parse Vercel CLI config files, not request input, so a player likely can't reach the bug. That's Claude's reading of the package's code, *unverified*. The human chose to fix it rather than dismiss it.
+  - **Reachability.** The reviewer checked statically (2026-10-24):
+    - `@vercel/functions`' root entry, the only part `src` imports, requires none of `oidc` or `cli-config`;
+    - only the `@vercel/functions/oidc` subpath does.
+
+    So the app very likely never loads zod at runtime. And `cli-config` uses zod to parse Vercel CLI config files, not request input. Whether zod is ever loaded at runtime stays *unverified*, since no running app was traced. The human chose to fix it rather than dismiss it.
 
 ## Source
 - **npm package.json `overrides`** (SOURCES.md, added 2026-10-24): replacing "a dependency with a known security issue", in the root `package.json` only, with a semver range for "a minimum patched release".
@@ -53,6 +57,7 @@ No installed copy of zod has the memory bug in GHSA-mrhx-c7xc-m3w5, and future s
 
 ## Removes
 - `zod@4.1.11` from the lockfile.
+- **The override itself, later:** remove it once `@vercel/cli-config` stops pinning `zod@4.1.11` (ROADMAP Next revision). Until then it also holds zod below 5.0.0.
 - Nothing else: this adds one override and changes no code. DECISIONS.md's lockfile rule gains one exception and keeps its one way for everything else.
 
 ---
@@ -90,5 +95,13 @@ No installed copy of zod has the memory bug in GHSA-mrhx-c7xc-m3w5, and future s
 - **Alert #1 closing:** after the merge (pending).
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent reviewed the diff in a fresh context, 2026-10-24.
+- **Blocking findings and how each was fixed:**
+  - *The branch's HANDOFF.md was stale:* rewritten for 15b, the Dependabot setting and the alert check.
+  - *The commit prefix `M15 15b:` against `M15: 15b,`:* not changed. The repo uses both forms (`M12 12d:` in 195be55, `M12 12e:` in 6d7b65d and b5c96b3), and renaming would need a force-push of the PR branch.
+- **Taken now, though not blocking:**
+  - when to remove the override (Removes; ROADMAP Next revision);
+  - the static reachability check (Who uses it);
+  - a DECISIONS.md Log line for the repo setting.
+- **Deferred to ROADMAP "Next revision":** removing the override once `@vercel/cli-config` stops pinning zod.
+- **Closed:** if zod is ever added as a direct dependency, the unscoped override makes `npm install` fail with EOVERRIDE until the two specs agree. That failure is loud, and there's no such dependency today.
