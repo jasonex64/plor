@@ -84,3 +84,18 @@ export const INSIGHTS_MIN_PLAYERS = 5;
 export const INSIGHTS_SHAPE_DROP_POINTS = 10;
 // How many of a question's most common answers the report lists.
 export const INSIGHTS_TOP_ANSWERS = 5;
+
+// Sign-in code limits (human, 2026-10-23; docs/milestones/M12-12e-sign-in-limits.md, N1–N4), counted per hashed key
+// by private.take_auth_attempt. A code lasts an hour (SOURCES.md, Supabase email sign-in), so the checks per address
+// are counted over the same hour, and sending a new code clears them.
+export const AUTH_LIMITS = {
+  // N1: code emails per player IP.
+  send_ip: { limit: 5, windowSeconds: 60 * 60 },
+  // N2: code emails per email address.
+  send_email: { limit: 5, windowSeconds: 60 * 60 },
+  // N3: code checks per player IP.
+  check_ip: { limit: 30, windowSeconds: 5 * 60 },
+  // N4: wrong codes per address before a new code is needed; a check is counted before Auth says whether it's right.
+  check_email: { limit: 5, windowSeconds: 60 * 60 },
+} as const;
+

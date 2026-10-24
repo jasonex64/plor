@@ -3,7 +3,7 @@
 // does. Opened signed out, it asks for sign-in first.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { RUN, signInAndPick, forwardPlayerIp } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -14,6 +14,7 @@ test.afterAll(async () => {
 
 test("the account page holds the account, and the home page links to it", async ({ browser }) => {
   const signedOut = await (await browser.newContext()).newPage();
+  await forwardPlayerIp(signedOut, `${RUN}-typo@example.test`);
   await signedOut.goto("/account");
   await expect(signedOut.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
   // A mistyped email can be fixed from the code form (12b, A6).

@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <main>
       <h1>Plor privacy policy</h1>
-      <p>Last updated: 2026-10-23</p>
+      <p>Last updated: 2026-10-24</p>
       <p>
         Plor (plor.app) is a small daily word game. This page says what we keep about you, why, and how to have it
         deleted. Questions: <a href="mailto:privacy@plor.app">privacy@plor.app</a>.
@@ -35,6 +35,11 @@ export default function Privacy() {
         <li>
           <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
           cookies.
+        </li>
+        <li>
+          <strong>Sign-in attempts:</strong> to stop anyone guessing sign-in codes or flooding sign-in, we count recent
+          attempts by a scrambled form of your IP address and email address, never the addresses themselves. An
+          attempt stops counting after an hour or less, and is deleted the next time anyone signs in after that.
         </li>
         <li>
           <strong>Technical logs:</strong> our providers keep logs, which can include your email address, your IP

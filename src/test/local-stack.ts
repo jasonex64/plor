@@ -3,6 +3,7 @@
 // cookie jar from request-scope.ts standing in for the browser. Each test file still declares its own vi.mock
 // lines for next/headers and next/server (vitest hoists them per file).
 import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { expect, vi } from "vitest";
 import { POST as sendCode } from "@/app/api/auth/email/route";
 import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
@@ -30,11 +31,18 @@ async function inbox(email: string): Promise<MailSummary[]> {
   return (await response.json()).messages;
 }
 
+// A player IP of its own for each test address, so the sign-in limits (M12 12e) count each test player apart, as they
+// would count players on different connections. 10.0.0.0/8 is private: no real player has one.
+export function ipFor(email: string): string {
+  const [a, b, c] = createHash("sha256").update(email).digest();
+  return `10.${a}.${b}.${c}`;
+}
+
 // Requests a code like the sign-in form does and returns the email that arrived, with the code read from the
 // <strong> that supabase/templates/sign_in_code.html puts it in.
 export async function requestCode(email: string): Promise<{ subject: string; html: string; code: string }> {
   const before = (await inbox(email)).length;
-  const response = await sendCode(apiRequest("/api/auth/email", { method: "POST", body: { email } }));
+  const response = await sendCode(apiRequest("/api/auth/email", { method: "POST", body: { email }, ip: ipFor(email) }));
   expect(response.status).toBe(200);
   await expect.poll(async () => (await inbox(email)).length).toBe(before + 1);
   const [newest] = await inbox(email);
@@ -46,7 +54,7 @@ export async function requestCode(email: string): Promise<{ subject: string; htm
 
 // Types a code into the sign-in form and returns the API's answer.
 export async function enterCode(email: string, code: string): Promise<{ status: number; body: unknown }> {
-  const response = await verifyCode(apiRequest("/api/auth/email/verify", { method: "POST", body: { email, code } }));
+  const response = await verifyCode(apiRequest("/api/auth/email/verify", { method: "POST", body: { email, code }, ip: ipFor(email) }));
   return { status: response.status, body: await response.json() };
 }
 
