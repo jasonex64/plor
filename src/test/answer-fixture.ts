@@ -2,7 +2,7 @@
 // into the base through private.import_source, with the IDs every import computes (src/content/thing-id.ts), and a day
 // that asks them. Shared by the database tests (src/test/puzzles.ts) and the e2e tests (e2e/puzzle.ts), so it takes the
 // database client it's given. Its categories and source IDs start with "fixture", apart from any real data.
-import type { ApprovedPuzzle, ApprovedQuestion } from "../content/puzzle.ts";
+import type { ApprovedPuzzle, ApprovedQuestion, Puzzle } from "../content/puzzle.ts";
 import { normalize } from "../content/puzzle.ts";
 import { thingId } from "../content/thing-id.ts";
 
@@ -176,3 +176,22 @@ export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle {
 
 // Whether a day is the fixture's (its categories are the fixture's), so a test never plays someone's real day.
 export const isFixtureDay = (p: { questions: { category: string }[] }) => p.questions.every((q, i) => q.category === FIXTURE[i]?.key);
+
+// The fixture day as a drafting session would write it: before approval adds approved_at and each question's root,
+// member_of and member count.
+export function fixtureDraft(date: string): Puzzle {
+  const day = fixtureDay(date, date);
+  return {
+    format: day.format,
+    game_id: day.game_id,
+    date: day.date,
+    questions: day.questions.map((q) => ({
+      prompt: q.prompt,
+      category: q.category,
+      host_bank: q.host_bank,
+      host_answers: q.host_answers,
+      levels: q.levels,
+      ...(q.steals ? { steals: q.steals } : {}),
+    })),
+  };
+}

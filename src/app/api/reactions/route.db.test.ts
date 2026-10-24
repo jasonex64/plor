@@ -7,10 +7,10 @@ import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { REACTIONS } from "@/config/tunables";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeCreatedPuzzles } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as boardRoute } from "../board/route";
 import { POST as deleteRoute } from "../comments/delete/route";
@@ -31,7 +31,7 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `r${k}${RUN}`
 const e = { username: `re${RUN}`, userId: "" };
 let today = "";
 let yesterday = "";
-let puzzle: Puzzle;
+let puzzle: ApprovedPuzzle;
 // Comment IDs by author.
 const commentOf: Record<string, string> = {};
 
@@ -52,13 +52,11 @@ const board = async () => (await call(boardRoute(apiRequest("/api/board", { meth
 const reactionsOnRun = async (username: string) => (await board()).friends.find((f: { username: string }) => f.username === username).reactions;
 const none = { counts: [], mine: null };
 
-// Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
-const hostName = () => puzzle.questions[0].entries.find((x) => x.id === puzzle.questions[0].host_answers[0])!.name;
 async function start() {
   expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
 }
 async function getCaught() {
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName() } })));
+  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
   expect(r.body.run.status).toBe("died");
 }
 // As whoever is signed in now.

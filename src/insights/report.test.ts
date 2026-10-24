@@ -1,15 +1,19 @@
 import { describe, expect, it } from "vitest";
-import type { Puzzle, Question } from "@/content/puzzle";
-import { buildInsights, type AnswerRow } from "./report";
+import type { ApprovedPuzzle, ApprovedQuestion } from "@/content/puzzle";
+import { buildInsights, type AnswerRow, type MissRow } from "./report";
 
-function question(prompt: string, ids: string[], host: string[], bank: string[]): Question {
-  return { prompt, entries: ids.map((id) => ({ id, name: id, aliases: [] })), host_bank: bank, host_answers: host, match_groups: {} };
+function question(prompt: string, ids: string[], host: string[], bank: string[]): ApprovedQuestion {
+  return { prompt, category: "animal", host_bank: bank, host_answers: host, levels: {}, root: "root", member_of: null, members: ids.length };
 }
 const animals = ["dog", "cat", "axolotl", "lion", "owl", "yak", "emu"];
-const puzzle: Puzzle = {
-  format: 2,
+// Each animal's main name is its ID here.
+const NAMES = new Map(animals.map((a) => [a, a]));
+const build = (date: string, finished: boolean, p: ApprovedPuzzle, a: AnswerRow[], m: MissRow[]) => buildInsights(date, finished, p, a, m, NAMES);
+const puzzle: ApprovedPuzzle = {
+  format: 3,
   game_id: "offbeat",
   date: "2026-10-26",
+  approved_at: "2026-10-25T00:00:00Z",
   questions: [
     question("Q1", animals, ["dog"], ["dog", "cat"]),
     question("Q2", animals, ["cat"], ["cat", "dog"]),
@@ -33,7 +37,7 @@ const rows = [
 ];
 
 describe("buildInsights", () => {
-  const day = buildInsights("2026-10-26", true, puzzle, rows, []);
+  const day = build("2026-10-26", true, puzzle, rows, []);
 
   it("counts answers, catches and the catch rate per question", () => {
     expect(day.questions.map((q) => [q.answered, q.caught, q.catchRate])).toEqual([
@@ -63,7 +67,7 @@ describe("buildInsights", () => {
 
   it("doesn't let an earlier question with too few players flag a later one (M02 2f, B14)", () => {
     // Q1: 4 players, all caught (100%, too few). Q2: 10 players, 2 caught (20%), 80 points lower but not flagged.
-    const day = buildInsights("d", true, puzzle, [...answers(0, 4, 4, "dog", ["cat"]), ...answers(1, 10, 2, "cat", ["yak"])], []);
+    const day = build("d", true, puzzle, [...answers(0, 4, 4, "dog", ["cat"]), ...answers(1, 10, 2, "cat", ["yak"])], []);
     expect(day.questions.slice(0, 2).map((q) => [q.tooFew, q.breaksShape])).toEqual([
       [true, false],
       [false, false],
@@ -72,19 +76,19 @@ describe("buildInsights", () => {
 
   it("counts a dip of exactly 10 points, and not 9", () => {
     const at = (laterCaught: number) =>
-      buildInsights("d", true, puzzle, [...answers(0, 10, 4, "dog", ["cat"]), ...answers(1, 10, laterCaught, "cat", ["yak"])], []).questions[1].breaksShape;
+      build("d", true, puzzle, [...answers(0, 10, 4, "dog", ["cat"]), ...answers(1, 10, laterCaught, "cat", ["yak"])], []).questions[1].breaksShape;
     expect(at(3)).toBe(true); // 40% → 30%
     expect(at(4)).toBe(false); // 40% → 40%
     // 30% → 20% is 9.999… in floating point; the comparison must be exact.
-    const exact = buildInsights("d", true, puzzle, [...answers(0, 10, 3, "dog", ["cat"]), ...answers(1, 10, 2, "cat", ["yak"])], []);
+    const exact = build("d", true, puzzle, [...answers(0, 10, 3, "dog", ["cat"]), ...answers(1, 10, 2, "cat", ["yak"])], []);
     expect(exact.questions[1].breaksShape).toBe(true);
-    const nine = buildInsights("d", true, puzzle, [...answers(0, 100, 40, "dog", ["cat"]), ...answers(1, 100, 31, "cat", ["yak"])], []);
+    const nine = build("d", true, puzzle, [...answers(0, 100, 40, "dog", ["cat"]), ...answers(1, 100, 31, "cat", ["yak"])], []);
     expect(nine.questions[1].breaksShape).toBe(false); // 40% → 31%
   });
 
   it("lists the 5 most common answers, ties by name", () => {
     const spread = ["cat", "cat", "axolotl", "axolotl", "lion", "owl", "yak", "emu"].map((id) => ({ question_idx: 0, entry_id: id, matched: false }));
-    const top = buildInsights("d", true, puzzle, spread, []).questions[0].topAnswers;
+    const top = build("d", true, puzzle, spread, []).questions[0].topAnswers;
     expect(top.map((t) => [t.answer.id, t.count])).toEqual([
       ["axolotl", 2],
       ["cat", 2],
@@ -102,14 +106,14 @@ describe("buildInsights", () => {
       { question_idx: 0, typed: "Pokémon" },
       { question_idx: 1, typed: "okapi" },
     ];
-    expect(buildInsights("d", true, puzzle, [], misses).questions[0].misses).toEqual([
+    expect(build("d", true, puzzle, [], misses).questions[0].misses).toEqual([
       { text: "okapi", count: 3 },
       { text: "Pokémon", count: 1 },
     ]);
   });
 
   it("reports a question nobody answered without a rate", () => {
-    const empty = buildInsights("d", false, puzzle, [], []);
+    const empty = build("d", false, puzzle, [], []);
     expect(empty.questions[0]).toMatchObject({ answered: 0, catchRate: null, hostBankShare: null, tooFew: true, breaksShape: false });
     expect(empty.finished).toBe(false);
   });

@@ -8,11 +8,11 @@ import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as react } from "@/app/api/reactions/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { type Puzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeCreatedPuzzles } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as feedRoute } from "./route";
 
@@ -31,7 +31,7 @@ const F = player("ff");
 const G = player("fg");
 const O = player("fo");
 let today = "";
-let puzzle: Puzzle;
+let puzzle: ApprovedPuzzle;
 let club = "";
 
 async function call(route: (r: Request) => Promise<Response>, path: string, method: "GET" | "POST", body?: unknown) {
@@ -51,8 +51,7 @@ type FeedComment = {
 // Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
 async function finishToday() {
   expect((await call(startRoute, "/api/run/start", "POST")).status).toBe(200);
-  const q = puzzle.questions[0];
-  const text = q.entries.find((e) => e.id === q.host_answers[0])!.name;
+  const text = hostName(puzzle, 0);
   expect((await call(answerRoute, "/api/run/answer", "POST", { index: 0, text })).body.run.status).toBe("died");
 }
 

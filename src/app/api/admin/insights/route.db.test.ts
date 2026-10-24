@@ -1,13 +1,13 @@
 // The insights route against the local stack (`npm run test:db`): a signed-in player who isn't an admin gets 403, an
 // admin gets the day's report, and the report names no player. Other local runs for today may exist, so the counts
 // are checked as lower bounds here; the exact maths is in src/insights/report.test.ts.
-import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { dayInsights } from "@/insights/queries";
+import { ensureFixtureBase, fixture, safeEntries } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET } from "./route";
 
@@ -16,7 +16,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 
 const RUN = Date.now().toString(36);
 let today = "";
-let puzzle: Puzzle;
+let puzzle: ApprovedPuzzle;
 let tomorrow = "";
 let createdPuzzle = false;
 let createdTomorrow = false;
@@ -33,20 +33,22 @@ beforeAll(async () => {
   // A published day that hasn't started: its host answers must stay out of the report (D5; M03 review).
   const ahead = await db.query("select 1 from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, tomorrow]);
   if (!ahead.rows.length) {
-    const future = { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date: tomorrow };
+    await ensureFixtureBase();
+    const future = fixture(tomorrow);
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, tomorrow, future]);
     createdTomorrow = true;
   }
-  const existing = await db.query<{ content: Puzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+  const existing = await db.query<{ content: ApprovedPuzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
   if (existing.rows.length) puzzle = existing.rows[0].content;
   else {
-    puzzle = { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date: today };
+    await ensureFixtureBase();
+    puzzle = fixture(today);
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, today, puzzle]);
     createdPuzzle = true;
   }
   // Six fixture players on question 1: two give the host answer, four give an entry outside the host bank.
   const q = puzzle.questions[0];
-  const outside = q.entries.find((e) => !q.host_bank.includes(e.id))!.id;
+  const outside = safeEntries(puzzle, 0).find((id) => !q.host_bank.includes(id))!;
   for (let i = 0; i < 6; i++) {
     const id = randomUUID();
     fixturePlayers.push(id);

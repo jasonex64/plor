@@ -8,11 +8,11 @@ import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as nextRoute } from "@/app/api/run/next/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";
+import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as leaderboardRoute } from "./route";
 
@@ -28,8 +28,8 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `l${k}${RUN}`
 >;
 let today = "";
 let yesterday = "";
-let puzzle: Puzzle;
-let puzzleYesterday: Puzzle;
+let puzzle: ApprovedPuzzle;
+let puzzleYesterday: ApprovedPuzzle;
 // The week holding yesterday, and the other one.
 let yWeek: "thisWeek" | "lastWeek";
 let otherWeek: "thisWeek" | "lastWeek";
@@ -117,8 +117,7 @@ describe("the friends leaderboard", () => {
   it("A plays today and survives question 1, which can't count before the day closes (D9)", async () => {
     useSession(players.a.session);
     expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
-    const q = puzzle.questions[0];
-    const typed = q.entries.find((e) => e.id === safeEntry(puzzle, 0))!.name;
+    const typed = typeableName(puzzle, 0, safeEntry(puzzle, 0))!;
     expect((await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: typed } })))).body.run.points).toBe(25);
     expect((await call(nextRoute(apiRequest("/api/run/next", { method: "POST" })))).status).toBe(200);
   });

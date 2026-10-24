@@ -6,7 +6,10 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
 import { GAME_ID } from "@/content/puzzle";
-import { fixture } from "@/test/puzzles";
+import { fixtureDay } from "@/test/answer-fixture";
+
+// The streak reads only which days have a puzzle, so the fixture day needs no answer database here.
+const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
 import { getStreak } from "./streak";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });

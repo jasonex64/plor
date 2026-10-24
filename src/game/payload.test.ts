@@ -1,32 +1,29 @@
 // Nothing in an unanswered question's payload may depend on the host bank or host answers (DECISIONS.md:
 // Game 1, "Server is authoritative"). The check: change only the host data, and the payload must not change.
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { Puzzle } from "@/content/puzzle";
-import { hostAnswers, publicQuestion } from "./payload";
+import type { ApprovedPuzzle } from "@/content/puzzle";
+import { fixtureDay, fixtureId } from "@/test/answer-fixture";
+import { hostAnswers, named, publicQuestion } from "./payload";
 
-const puzzle: Puzzle = JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8"));
+const puzzle = fixtureDay("2026-11-02", "2026-11-01T00:00:00Z");
 
-// The same puzzle with the host bank and host answers moved to other entries, and a match group added.
-function withOtherHosts(p: Puzzle): Puzzle {
+// The same puzzle with the host bank and host answers moved to other members.
+function withOtherHosts(p: ApprovedPuzzle): ApprovedPuzzle {
   return {
     ...p,
-    questions: p.questions.map((q) => {
-      const others = q.entries.map((e) => e.id).filter((id) => !q.host_bank.includes(id));
-      return { ...q, host_bank: others.slice(0, q.host_bank.length), host_answers: [others[0]], match_groups: { [others[0]]: [others[1]] } };
-    }),
+    questions: p.questions.map((q, i) => ({ ...q, host_bank: [fixtureId(i, "x"), fixtureId(i, "y")], host_answers: [fixtureId(i, "x")] })),
   };
 }
 
 describe("publicQuestion", () => {
-  it("is identical whatever the host bank, host answers and match groups are", () => {
+  it("is identical whatever the host bank and host answers are", () => {
     const moved = withOtherHosts(puzzle);
     puzzle.questions.forEach((_, i) => {
       expect(JSON.stringify(publicQuestion(moved, i))).toBe(JSON.stringify(publicQuestion(puzzle, i)));
     });
   });
 
-  it("carries only the prompt and the stolen letters, never the answer list (human, 2026-10-21)", () => {
+  it("carries only the prompt and the stolen letters, never the answers (human, 2026-10-21)", () => {
     expect(publicQuestion(puzzle, 0)).toEqual({ index: 0, prompt: puzzle.questions[0].prompt, stolen: [] });
     // Letters stay gone: by the last question, every letter stolen on the way (schedule A: q2, q4, q5, q7).
     const letters = [1, 3, 4, 6].map((i) => puzzle.questions[i].steals);
@@ -35,9 +32,13 @@ describe("publicQuestion", () => {
   });
 });
 
-describe("hostAnswers", () => {
-  it("names the host answers, for a question that has been answered", () => {
+describe("hostAnswers and named", () => {
+  it("name the host answers by their main names, for a question that has been answered", () => {
     const q = puzzle.questions[0];
-    expect(hostAnswers(q).map((h) => h.id)).toEqual(q.host_answers);
+    expect(hostAnswers(q, new Map([[q.host_answers[0], "bear"]]))).toEqual([{ id: q.host_answers[0], name: "bear" }]);
+  });
+
+  it("refuse a thing with no name rather than show nothing", () => {
+    expect(() => named(new Map(), "missing")).toThrow("thing missing has no name");
   });
 });

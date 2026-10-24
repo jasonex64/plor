@@ -3,7 +3,7 @@
 // test does, and answered today, so they earn no rarity bonus (M09 D8) and each total is its ladder.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";
@@ -27,7 +27,7 @@ async function call() {
 const ledgerRows = async () => (await getPool().query("select from private.points_ledger where user_id = $1", [userId])).rows.length;
 
 // A run on that day: safe on question 1, then caught by the host on question 2, so its ladder is question 1's points.
-async function survivedOne(date: string, puzzle: Puzzle) {
+async function survivedOne(date: string, puzzle: ApprovedPuzzle) {
   const db = getPool();
   await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [userId, GAME_ID, date]);
   await db.query(

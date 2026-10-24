@@ -6,10 +6,10 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import type { Puzzle } from "@/content/puzzle";
+import type { ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeCreatedPuzzles } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as sessionRoute } from "../realtime/session/route";
 import { GET as boardRoute } from "./route";
@@ -25,7 +25,7 @@ const players: Record<"a" | "b" | "c", Player> = {
   b: { username: `bb${RUN}`, userId: "", session: new Map() },
   c: { username: `bc${RUN}`, userId: "", session: new Map() },
 };
-let puzzle: Puzzle;
+let puzzle: ApprovedPuzzle;
 
 async function call(response: Promise<Response>) {
   const r = await response;
@@ -33,12 +33,10 @@ async function call(response: Promise<Response>) {
 }
 const board = async (reason?: string) =>
   (await call(boardRoute(apiRequest(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" })))).body.board;
-// Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
-const hostName = () => puzzle.questions[0].entries.find((e) => e.id === puzzle.questions[0].host_answers[0])!.name;
 // Plays as whoever is signed in now, and gets caught on question 1.
 async function playAndGetCaught() {
   expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName() } })));
+  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
   expect(r.body.run.status).toBe("died");
 }
 
@@ -99,16 +97,16 @@ describe("the live board over HTTP", () => {
     const seen = await board();
     expect(seen.friends[0]).toEqual(started);
     // No spoiler anywhere in what the viewer receives.
-    expect(JSON.stringify(seen)).not.toContain(hostName());
+    expect(JSON.stringify(seen)).not.toContain(hostName(puzzle, 0));
   });
 
   it("shows how a friend's run ended once the viewer has finished", async () => {
     useSession(players.b.session);
     await playAndGetCaught();
     const after = await board();
-    expect(after.friends[0].ended).toEqual({ result: "caught", question: 1, answer: hostName() });
+    expect(after.friends[0].ended).toEqual({ result: "caught", question: 1, answer: hostName(puzzle, 0) });
     // The viewer's own ending, which 7d places among the friends'.
-    expect(after.mine).toEqual({ result: "caught", question: 1, answer: hostName() });
+    expect(after.mine).toEqual({ result: "caught", question: 1, answer: hostName(puzzle, 0) });
     useSession(players.a.session);
     expect(await board()).toMatchObject({ finished: true, friends: [{ username: players.b.username, ended: { result: "caught", question: 1 } }] });
   });

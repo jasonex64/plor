@@ -6,10 +6,10 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as reportRoute } from "../../comments/report/route";
 import { GET as threadRoute, POST as postRoute } from "../../comments/route";
@@ -29,8 +29,8 @@ const players = Object.fromEntries(keys.map((k) => [k, { username: `p${k}${RUN}`
 >;
 let today = "";
 let yesterday = "";
-let puzzle: Puzzle;
-let puzzleYesterday: Puzzle;
+let puzzle: ApprovedPuzzle;
+let puzzleYesterday: ApprovedPuzzle;
 // Comment IDs by author.
 const commentOf: Record<string, string> = {};
 
@@ -48,13 +48,11 @@ const bodies = async (date?: string) =>
 const ok = { status: 200, body: { ok: true } };
 const notFound = { status: 404, body: { ok: false, error: "comment_not_found" } };
 
-// Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
-const hostName = () => puzzle.questions[0].entries.find((e) => e.id === puzzle.questions[0].host_answers[0])!.name;
 async function start() {
   expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
 }
 async function getCaught() {
-  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName() } })));
+  const r = await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
   expect(r.body.run.status).toBe("died");
 }
 // As whoever is signed in now.

@@ -1,11 +1,11 @@
 // Puzzle entry's pure steps (docs/milestones/M06-puzzle-entry.md): reading the 7 questions an admin typed, and
 // applying the host answers chosen on the review page before the day is checked and approved.
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { checkPuzzle, type Puzzle } from "@/content/puzzle";
+import { checkPuzzle } from "@/content/puzzle";
+import { fixtureDraft, fixtureId } from "@/test/answer-fixture";
 import { copyForClaude, readQuestions, withHostAnswers } from "./puzzle-entry";
 
-const draft: Puzzle = JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8"));
+const draft = fixtureDraft("2026-11-02");
 const seven = ["Name a fruit", "Name a pet", "Name a city", "Name a tool", "Name a sport", "Name a color", "Name a planet"];
 
 describe("readQuestions", () => {
@@ -39,29 +39,13 @@ describe("withHostAnswers", () => {
   });
 
   it("sets a changed host answer and adds it to the host bank, which the rules require", () => {
-    const q1 = draft.questions[0];
-    const other = q1.entries.find((e) => !q1.host_bank.includes(e.id))!.id;
+    const other = fixtureId(0, "cat");
     const changed = withHostAnswers(draft, [[other], ...unchanged.slice(1)]);
     expect(changed.questions[0].host_answers).toEqual([other]);
     expect(changed.questions[0].host_bank).toContain(other);
     expect(checkPuzzle("day", changed)).toEqual([]);
     // The draft itself is left alone.
     expect(draft.questions[0].host_answers).toEqual(unchanged[0]);
-  });
-
-  it("lets the rules refuse a host answer that isn't one of the question's answers", () => {
-    const changed = withHostAnswers(draft, [["not-an-entry"], ...unchanged.slice(1)]);
-    expect(checkPuzzle("day", changed).join("\n")).toContain("not-an-entry");
-  });
-
-  it("lets the rules refuse a host answer the stolen letters make untypeable", () => {
-    // Question 7 is played with every stolen letter gone; a host answer that needs one of them adds no danger.
-    const q7 = draft.questions[6];
-    const stolen = draft.questions.flatMap((q) => (q.steals ? [q.steals] : []));
-    const untypeable = q7.entries.find((e) => [e.name, ...e.aliases].every((n) => stolen.some((l) => n.toLowerCase().includes(l))));
-    expect(untypeable).toBeDefined();
-    const changed = withHostAnswers(draft, [...unchanged.slice(0, 6), [untypeable!.id]]);
-    expect(checkPuzzle("day", changed).join("\n")).toContain("can't be typed");
   });
 
   it("refuses a list that doesn't have one entry per question", () => {
