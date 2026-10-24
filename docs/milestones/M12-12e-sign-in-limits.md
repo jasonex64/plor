@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** in review (2026-10-24): built on `m12-account`, reviewed, blocking findings 2–4 fixed. L5 (review finding 1: code emails can still be used up for everyone) waits on the human. After the merge the human sets Auth's hosted limits (N5, N6).
+**Status:** in review (2026-10-24, PR #62): built on `m12-account`, reviewed, blocking findings 2–4 fixed. L5 (review finding 1: code emails can still be used up for everyone) waits on the human. After the merge the human sets Auth's hosted limits (N5, N6).
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send. *(As built, guessing and code checks are closed, and so is one address flooding sign-in. Using up the code emails from many addresses is still open: L5.)*
