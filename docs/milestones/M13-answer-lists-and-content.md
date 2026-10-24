@@ -1,9 +1,9 @@
 # M13 — The answer database
 
-**Status:** planned: draft ticket for the human's approval, 2026-10-24.
+**Status:** planned (2026-10-24).
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
-- **Waiting on the human:** D1–D8 and the numbers, and the sources for SOURCES.md (D2).
-- **No code before then.**
+- **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
+- **Waiting:** only D2, the sources, which Claude is researching for the human's OK. No code before they're in SOURCES.md.
 
 ## Goal
 One growing database of things, their names and the facts about them. It decides which answers each question accepts, learns from what players type, and measures how rare each answer really is, so that an AI can later draft whole days that the human approves in under a minute.
@@ -29,7 +29,7 @@ One growing database of things, their names and the facts about them. It decides
 | How many players | "A share of players" |
 | Question mix | "Mostly concrete" |
 | Other games | Word games (game 2) keep their own dictionary, but "i could see offbeat's database being used for a future game that i develop later as well" |
-| Rarity | Pooled per category, recent days weighted, "if it's not too difficult to implement and interferes with other aspects of design. but this seems most ideal" |
+| Rarity | Pooled per category, recent days weighted, "if it's not too difficult to implement and interferes with other aspects of design. but this seems most ideal". Later, once the pooling across a category's questions was explained: "All history equal" (D5) |
 | New questions from traits | "Yes, combine traits" (e.g. animal + lives in Africa) |
 | Player stats from history | Low priority; "specifically answer trends and firsts and records" are worth keeping possible |
 | Whose truth | "Technically correct" (a spider isn't an insect) |
@@ -82,10 +82,10 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 - **An alias** is a miss one typo away from nothing that names a known thing ("hippo"). It joins the same flow as an alias.
 
 **How rarity works (D5).**
-- Each answer's expected share for a question comes from its category's pooled history: every day the category or its question was asked, recent days weighted more.
+- Each answer's expected share for a question comes from its category's pooled history: every day the category or its question was asked, all counted equally (D5).
 - The AI's first guess is used until enough players have answered.
 - The provisional and final bonus then work as in M09.
-- The host anticipating the dodge (Design review, 1) uses the same numbers: the host may pick a popular answer that isn't the most common one, from a given question on (D5).
+- The host anticipating the dodge (Design review, 1) uses the same numbers. When a question's plain host answers can't reach its catch target, the drafting AI adds a popular dodge, so dodges get likelier toward Q7 (D5).
 
 **What it makes possible later.** These aren't M13 scope; they need nothing more than the history above:
 - **Firsts and records:** the earliest answer per thing per category.
@@ -95,14 +95,14 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| D1 | **Where the database lives.** (a) **Postgres tables in `private`**, read and written only through guarded functions, as puzzles are (M06); the admin pages audit and edit it. (b) Files in the repo, changed by pull requests | (a). Auto-accepting misses (the human's rule) has to write while players play, and files can't. New tables, functions and `plor_app` grants are a security change, recorded in DECISIONS.md when built | |
-| D2 | **The sources** (the human adds each to SOURCES.md). (a) **Wikidata** for facts and traits (taxonomy, where things live, colors, counts); its license and how to pull a subset are read before it's proposed (*unverified*). (b) **WordNet** for the "kind of" tree of everyday nouns and their synonyms (aliases); its license is *unverified* too. (c) Both | (c), (a) for facts and (b) for everyday words. Only the subsets the categories need are imported, by a script whose output is reviewed. Claude reads each license and brings the SOURCES.md rows for the human's OK | |
-| D3 | **Hard to reverse: permanent thing IDs and content format 3.** Each thing gets a permanent ID that answers, history and days refer to forever. Format 3 is the day's frozen copy keyed by thing IDs, with expected shares and the question's category recipe. (a) **IDs owned by Plor** (a random ID per thing), each linked to its source's own ID where there is one. (b) The source's IDs as ours | (a). A thing that's in no source (a curated or player-added answer) still needs an ID, and a source can change or merge its IDs | |
-| D4 | **Auto-accepting a miss.** (a) **Accepted once the share of distinct players who typed it, among the players who answered that category's questions, reaches X%, and at least M players typed it**, counted across days, from the next day on, unless the facts reject it (then audit only). (b) Per day: X% of one day's players | (a). Pooling across days lets a small beta reach the share. The minimum M stops one player out of one counting as 100%. X and M are human numbers | |
-| D5 | **Rarity from play, with recency.** (a) **Pooled per category and weighted by age:** an answer given *h* days ago counts half as much as one today (a half-life *h*), blended with the AI's first guess until enough players have answered (M09 N1's role). The host may pick a dodge from question *q* on. (b) Pooled, unweighted. (c) Per day only, as now | (a), as the human asked, provided it's simple. It is: one weighted count per answer per category. *h* and *q* are human numbers, and the AI's first-guess shares per level (common, uncommon, rare) replace N5 | |
-| D6 | **Leniency.** (a) **Lenient aliases, typo rule unchanged:** nicknames, brand-for-generic and slang as aliases (from the sources, the AI and players); still one typo for 4+ letters, with two-entry ties a retry. (b) Also widen the typo rule | (a). It's "very lenient" through data, which is easy. A wider typo rule is the hard part the human said to skip if hard | |
-| D7 | **The question bank's repeat gap and themes.** (a) **A question may repeat once 30 days have passed since its last use** ("About a month"), and themes are tags on questions. (b) Another gap | (a), if "about a month" means 30 days: a human number to confirm | |
-| D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | |
+| D1 | **Where the database lives.** (a) **Postgres tables in `private`**, read and written only through guarded functions, as puzzles are (M06); the admin pages audit and edit it. (b) Files in the repo, changed by pull requests | (a). Auto-accepting misses (the human's rule) has to write while players play, and files can't. New tables, functions and `plor_app` grants are a security change, recorded in DECISIONS.md when built | **(a), the database** (human, 2026-10-24: "Database (Recommended)", after Claude laid out both sides). Security change: the tables, functions and grants are proposed in 13a and recorded in DECISIONS.md |
+| D2 | **The sources** (the human adds each to SOURCES.md). (a) **Wikidata** for facts and traits (taxonomy, where things live, colors, counts); its license and how to pull a subset are read before it's proposed (*unverified*). (b) **WordNet** for the "kind of" tree of everyday nouns and their synonyms (aliases); its license is *unverified* too. (c) Both | (c), (a) for facts and (b) for everyday words. Only the subsets the categories need are imported, by a script whose output is reviewed. Claude reads each license and brings the SOURCES.md rows for the human's OK | **Research first** (human, 2026-10-24: "yes both and others too feel free to do as much research as u want"). Claude compares Wikidata, WordNet and other candidates (licenses, coverage, how to pull subsets) and brings SOURCES.md rows for the human's OK. Pending |
+| D3 | **Hard to reverse: permanent thing IDs and content format 3.** Each thing gets a permanent ID that answers, history and days refer to forever. Format 3 is the day's frozen copy keyed by thing IDs, with expected shares and the question's category recipe. (a) **IDs owned by Plor** (a random ID per thing), each linked to its source's own ID where there is one. (b) The source's IDs as ours | (a). A thing that's in no source (a curated or player-added answer) still needs an ID, and a source can change or merge its IDs | **(a), Plor's own IDs** (human, 2026-10-24: "Plor's own IDs (Recommended)") |
+| D4 | **Auto-accepting a miss.** (a) **Accepted once the share of distinct players who typed it, among the players who answered that category's questions, reaches X%, and at least M players typed it**, counted across days, from the next day on, unless the facts reject it (then audit only). (b) Per day: X% of one day's players | (a). Pooling across days lets a small beta reach the share. The minimum M stops one player out of one counting as 100%. X and M are human numbers | **(a), with X = 1% and M = 3** (human, 2026-10-24: "1%", "3 players") |
+| D5 | **Rarity from play, with recency.** (a) **Pooled per category and weighted by age:** an answer given *h* days ago counts half as much as one today (a half-life *h*), blended with the AI's first guess until enough players have answered (M09 N1's role). The host may pick a dodge from question *q* on. (b) Pooled, unweighted. (c) Per day only, as now | (a), as the human asked, provided it's simple. It is: one weighted count per answer per category. *h* and *q* are human numbers, and the AI's first-guess shares per level (common, uncommon, rare) replace N5 | **Pooled per category with no fading:** every answer ever counts the same (human, 2026-10-24: "All history equal", after asking what fading meant). So (b), which drops *h*. The AI's first guesses are **40% / 40% / 20%** of players giving some common / uncommon / rare answer ("40 / 40 / 20"). **Dodges are tied to difficulty:** the drafting AI picks a popular dodge when the plain answers can't reach a question's catch target, so dodges get likelier toward Q7 and vary day to day (human: "random", then "Random, later more likely", then "Tied to difficulty (Recommended)"). So *q* isn't needed |
+| D6 | **Leniency.** (a) **Lenient aliases, typo rule unchanged:** nicknames, brand-for-generic and slang as aliases (from the sources, the AI and players); still one typo for 4+ letters, with two-entry ties a retry. (b) Also widen the typo rule | (a). It's "very lenient" through data, which is easy. A wider typo rule is the hard part the human said to skip if hard | **(a)** (human, 2026-10-24: "Lenient aliases, 1 typo (Recommended)") |
+| D7 | **The question bank's repeat gap and themes.** (a) **A question may repeat once 30 days have passed since its last use** ("About a month"), and themes are tags on questions. (b) Another gap | (a), if "about a month" means 30 days: a human number to confirm | **At least 30 days between uses** of a question; the AI may wait longer (human, 2026-10-24: "not saying it should be EXACTLY 30 days just at least 30 days"). Themes are tags |
+| D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | **(a), start fresh** (human, 2026-10-24: "Start fresh (Recommended)") |
 
 ## Sub-tickets (Claude's order, each its own PR on this branch)
 - **13a, the base.**
@@ -111,14 +111,14 @@ The database has five parts. Each day takes a frozen copy when it's approved.
   - Approval freezes format 3 into a day, and matching runs on it.
   - The Next revision matching items for M13: plural aliases, digits, zero-width characters.
 - **13b, learning from misses** (D4): the facts check, the auto-accept rule with its share and minimum, and the audit page with undo.
-- **13c, rarity and the host** (D5): pooled, weighted shares in the bonus; the dodging host; the letter picker keeping enough familiar answers safe (M04 G9).
+- **13c, rarity and the host** (D5): pooled shares in the bonus; the dodging host; the letter picker keeping enough familiar answers safe (M04 G9).
 - **13d, the question bank and tuning** (D7, M04 G3): questions with recipes, themes and the repeat gap; difficulty tuned with the human toward a target catch rate per question.
 
 ## Acceptance criteria
 Each sub-ticket's criteria are written before its code, once D1–D8 are answered. They'll cover:
 - **13a:** a category recipe returns the source's members, with the import reviewed in the diff; a day approved in format 3 plays end to end (db tests and e2e); the grants (pgTAP).
 - **13b:** a miss reaching the threshold is a member the next day, not today; a fact-rejected miss never is; an undo removes it from later days only (db tests).
-- **13c:** the bonus uses the weighted pooled share, the host picks a dodge only from question *q*, and the picker refuses a day below G9 (unit and db tests).
+- **13c:** the bonus uses the pooled share, a dodge is picked only when the plain host answers miss the question's target, and the picker refuses a day leaving fewer than 3 familiar answers (unit and db tests).
 - **13d:** a question isn't offered again within the gap; the sample days meet the catch-rate targets (recorded table).
 
 ## Out of scope
@@ -128,21 +128,19 @@ Each sub-ticket's criteria are written before its code, once D1–D8 are answere
 - **Game 2's dictionary** (M16): word games keep their own (human, 2026-10-24).
 
 ## Numbers
-None is set. Each is the human's, asked with its decision.
-
 | Value | Used for | Origin |
 |---|---|---|
-| X, the share of a category's players who must type a miss | Auto-accept (D4) | For the human |
-| M, the fewest distinct players for an auto-accept | Auto-accept (D4) | For the human |
-| *h*, the half-life of an answer's weight in days | Rarity (D5) | For the human |
-| *q*, the first question where the host may pick a dodge | The host (D5) | For the human |
-| The AI's first-guess share per level (common, uncommon, rare) | Rarity before data (D5; replaces N5) | For the human |
-| The repeat gap: 30 days? | The question bank (D7) | The human: "About a month", to confirm |
-| Target catch rate per question, Q1–Q7 | Tuning (13d) | M04 G3, for the human |
-| Fewest familiar safe answers after stolen letters | The letter picker (13c) | M04 G9, for the human |
+| X = **1%** of the players who answered the category's questions | Auto-accept (D4) | Human, 2026-10-24: "1%" |
+| M = **3** distinct players at least | Auto-accept (D4) | Human, 2026-10-24: "3 players" |
+| No fading: every answer counts equally | Rarity (D5) | Human, 2026-10-24: "All history equal" |
+| AI first guesses: **40% / 40% / 20%** of players give some common / uncommon / rare answer | Rarity before data (D5; replaces N5's 50% for the host bank) | Human, 2026-10-24: "40 / 40 / 20" |
+| Dodge picks: no odds of their own, used when needed to reach a question's catch target | The host (D5) | Human, 2026-10-24: "Tied to difficulty (Recommended)" |
+| Repeat gap: **at least 30 days** | The question bank (D7) | Human, 2026-10-24: "just at least 30 days" |
+| Target catch rate per question, Q1–Q7: **3, 5, 7, 10, 13, 16, 20** caught per 100 players ("Gentle"; about 45% finish all 7, by Claude's multiplication) | Tuning (13d) | Human, 2026-10-24: "Gentle: 3→20%, ~45% finish". It changes DECISIONS.md, Game 1's "most players should usually finish". 13d records the change there when it's built |
+| Fewest familiar (common or uncommon) answers still typeable after stolen letters: **3** | The letter picker (13c; M04 G9) | Human, 2026-10-24: "3" |
 
 ## Plan
-1. The human answers D1–D8 and the numbers. Claude reads the D2 licenses and brings the SOURCES.md rows for the human's OK.
+1. ~~The human answers D1–D8 and the numbers.~~ Done 2026-10-24, except D2. Claude researches the sources and brings the SOURCES.md rows for the human's OK.
 2. **13a** with one category end to end: animals, the one M04 measured.
    - *Hypothesis:* the source's animal subtree holds at least the 223 of 226 animals M04 counted.
    - *Disproved* if it holds fewer, which would mean M04 measured a different version.
