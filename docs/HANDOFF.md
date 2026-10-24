@@ -14,8 +14,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch.
 
 ## Waiting on the human
-- **Fix plor.app:** `npx supabase migration list --linked` to see what the hosted database has, the checks below ("Before plor.app gets M07 and later" and ROADMAP For M15's pending-migrations item), then `npx supabase db push` and `npx supabase test db --linked`. Each prompts for the database password, which stays with the human.
-- **Secret scanning:** GitHub's is on (human, 2026-10-24) beside gitleaks; whether it replaces gitleaks is the human's call (DECISIONS.md, Secret scanning).
+- **Fix plor.app:** `npx.cmd supabase migration list --linked` (on Windows PowerShell, `npx.cmd`: the execution policy blocks `npx.ps1`) to see what the hosted database has, the checks below ("Before plor.app gets M07 and later" and ROADMAP For M15's pending-migrations item), then `npx supabase db push` and `npx supabase test db --linked`. Each prompts for the database password, which stays with the human.
 - **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
 - **The public repo:** turn on the GitHub and Vercel settings listed in ROADMAP "Next revision", For the human, and decide about the public puzzle drafts.
 - **New questions for the repeated categories** (human, 2026-10-23: "new categories"; Claude suggested replacements in the session, for the human to pick): 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.

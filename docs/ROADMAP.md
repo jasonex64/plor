@@ -104,7 +104,7 @@ These are non-blocking items found during work or review. Record each one here *
 <!-- - [ ] <item> — found in M## (implementation | review) — <why it can wait> -->
 **For the human:**
 - [ ] **The repo is public now** (human, 2026-10-23: "i intend to make it PUBLIC"). GitHub and Vercel settings that only the human can change, all free for a public repo (checked 2026-10-23 with `gh api`):
-  - *(2026-10-24, human: GitHub secret scanning is on, and Vercel's Git Fork Protection is on. Still off, read with `gh api` the same day: push protection, Dependabot alerts, private vulnerability reporting; `main` has no ruleset.)*
+  - *(2026-10-24, human: GitHub secret scanning, push protection and Dependabot alerts are on, kept beside gitleaks (DECISIONS.md Log), and Vercel's Git Fork Protection is on. Still off, read with `gh api` the same day: private vulnerability reporting; `main` has no ruleset or branch protection; Actions asks first-time contributors only.)*
   - GitHub secret scanning and push protection were off. Push protection refuses a secret before it lands, which CI's gitleaks can't (it runs after the push). Adding it is a second secret scanner next to gitleaks, so it needs a DECISIONS.md entry (CLAUDE.md, "One way to do each thing").
   - Dependabot alerts are off, and so is private vulnerability reporting (the way a stranger reports a security hole without posting it publicly).
   - `main` has no branch protection and no ruleset: anyone with push access can force-push or delete it. A ruleset that blocks force-pushes and deletion, and requires a PR with the CI checks, is free on a public repo.
