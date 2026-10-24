@@ -457,7 +457,7 @@ async function fetchSet(set: string, def: SetDef): Promise<void> {
 }
 
 // The local stack only: DATABASE_URL must point at this machine (13a, "Local only").
-async function localClient(): Promise<pg.Client> {
+export async function localClient(): Promise<pg.Client> {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set (npm run base reads .env.local)");
   const host = new URL(url).hostname;

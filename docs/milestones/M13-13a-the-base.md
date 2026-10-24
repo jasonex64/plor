@@ -3,7 +3,7 @@
 **Status:** in progress (2026-10-24).
 - T1 was approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
 - **13a-1 is done:** merged in PR #70 by GitHub auto-merge, which waits for every required check, with the human's approval of its security change (human, 2026-10-24: "I approve 13a-1's security change (new answer-database tables; plor_app may only run the admin lookup). Merge PR #70 once every CI check is green").
-- 13a-2 comes next, on this branch, as its own PR.
+- **13a-2 is built and reviewed,** in its own PR. It holds format 3, the engine on the base and the drafting script, with 13a-3 folded in, since CI needs the T1 draft once the old drafts are gone. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24: private.resolve_answer and private.thing_names).
 
 ## Goal
 One complete day, built from the answer database by a Claude session, approved on the admin page and played end to end on the local stack.
@@ -98,6 +98,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
 | Scientific names as answers | "Yes, they count (Recommended)" |
 | The reveal's "You said ___" | The thing's main name ("yes" to Claude's suggestion) |
 | A stolen letter and an alias that avoids it ("Ursus maritimus" when P is gone) | "Yes: letters limit typing (Recommended)": today's rule, unchanged |
+| Thing IDs across databases | "Same everywhere (Recommended)": computed from the source entry (RFC 4122 version 5), so a drafted day holds on every database with the same snapshots (refines M13 D3) |
 
 **Claude's design:**
 - **No per-day copy** (the human asked about database size, 2026-10-24). A format-3 day stores, per question:
@@ -122,46 +123,46 @@ Seven concrete categories that use every source, in an order that rises roughly 
 - **Caught:** the answer is a host answer, or has one among its ancestors (human: "bear covers polar bear"). Match groups go: the tree replaces them.
 - **Format 2 is retired** (M13 D8): its validator rules, `content:plurals`, the per-day lists, and the format-2 fixtures. The tests get a small base fixture and a format-3 day.
 - **13a-2** is the format, the engine (runs, matching, payload, scoring, ledger, board, insights) and the admin puzzles page on it, with the tests rebuilt.
-- **13a-3** is:
+- **13a-3,** folded into 13a-2's PR (CI validates the drafted days, and the T1 draft is the only one left), is:
   - the drafting script;
   - format 3's draft validator and letter picker;
   - the T1 day drafted, approved and played (e2e);
   - the matching items (digits, zero-width characters).
 
 ## Acceptance criteria
-- [ ] **The tables** in `private`: things (a random permanent ID, its name), aliases (with their kind and origin), facts (thing, trait, value, origin, source reference, when), categories (a recipe over facts, or a kept member list), and a log of every addition.
+- [x] **The tables** in `private`: things (a random permanent ID, its name), aliases (with their kind and origin), facts (thing, trait, value, origin, source reference, when), categories (a recipe over facts, or a kept member list), and a log of every addition.
   - Writes go only through guarded functions.
   - `plor_app` gets only what the admin browse needs.
   - pgTAP checks the exact grants.
   - It's a security change, proposed in this sub-ticket's PR and recorded in DECISIONS.md.
-- [ ] **Import scripts,** one per source, through the task runner (CLAUDE.md: repeated procedures are scripts). Each one:
+- [x] **Import scripts,** one per source, through the task runner (CLAUDE.md: repeated procedures are scripts). Each one:
   - pulls only the needed subset, within the SPARQL limits;
   - keeps the raw snapshot outside git (gitignored);
   - commits a manifest: source, version or snapshot date, query, counts and checksum;
   - prints the review summary: counts per category, 20 random samples, and flags.
 
   Loaded into the local stack only.
-- [ ] **Category recipes** return the T1 lists. The closed lists match their expected counts: 193 countries, 118 elements, 50 states. Tomato is a member of both fruit and vegetable (db test).
-- [ ] **Animals end to end, first.** The animal category holds at least the 223 of 226 animals M04 counted.
+- [x] **Category recipes** return the T1 lists. The closed lists match their expected counts: 193 countries, 118 elements, 50 states. Tomato is a member of both fruit and vegetable (db test).
+- [x] **Animals end to end, first.** The animal category holds at least the 223 of 226 animals M04 counted.
   - *Hypothesis:* it does.
   - *Disproved* if it doesn't, which would mean M04 measured a different source version.
   - The one-typo rule's tie rate over the animal list is measured and recorded. With thousands of entries, more typos may land between two entries.
-- [ ] **Content format 3** (Hard to reverse; DECISIONS.md updated in the same PR):
+- [x] **Content format 3** (Hard to reverse; DECISIONS.md updated in the same PR):
   - every entry's ID is its thing's permanent ID;
   - each question names its category recipe;
   - each entry carries its popularity level (common, uncommon, rare), set by the drafting session's first guess, used by the bonus in 13c;
   - the validator checks format 3;
   - format 2 is retired (D8).
-- [ ] **Drafting from the database:** a script turns 7 questions into a format-3 draft, building each list from its category with aliases, the host bank, host answers, letters (schedule A, the existing picker) and levels. DECISIONS.md, "Puzzle drafting" is rewritten for it. The T1 day is drafted with it.
-- [ ] **Approval and play:**
+- [x] **Drafting from the database:** a script turns 7 questions into a format-3 draft, building each list from its category with aliases, the host bank, host answers, letters (schedule A, the existing picker) and levels. DECISIONS.md, "Puzzle drafting" is rewritten for it. The T1 day is drafted with it.
+- [x] **Approval and play:**
   - the T1 day is approved on `/admin/puzzles`;
   - its frozen copy is in `private.puzzle`;
   - a run plays all 7 questions on the local stack, with typed answers matched by their aliases (e2e);
   - answers are stored by thing ID.
-- [ ] **Admin search and browse:** an admin looks up a thing by name or alias and sees its names, aliases, facts and categories (e2e). A non-admin gets 403.
-- [ ] **Credits:** the privacy page has a "Data sources" section crediting the CC BY sources, and names Wikidata and USDA.
-- [ ] **The M13 matching items:** a plural alias without its synonym, digits under the typo rule, and zero-width characters stripped by normalization. Each has a test.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql` and `npm run test:e2e` pass, and so does CI.
+- [x] **Admin search and browse:** an admin looks up a thing by name or alias and sees its names, aliases, facts and categories (e2e). A non-admin gets 403.
+- [x] **Credits:** the privacy page has a "Data sources" section crediting the CC BY sources, and names Wikidata and USDA.
+- [x] **The M13 matching items:** a plural alias without its synonym, digits under the typo rule, and zero-width characters stripped by normalization. Each has a test.
+- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql` and `npm run test:e2e` pass, and so does CI. (Local: pass; CI: pending on the PR.)
 
 ## Out of scope
 - Learning from misses, the audit page and undo: 13b.
@@ -198,6 +199,8 @@ Seven concrete categories that use every source, in an order that rises roughly 
 | T1, Q1 (animal): "Catalogue of Life tree, with Wikidata's English common names" | Wikidata's parent-taxon tree and common names, merged with Open English WordNet's animal tree. Catalogue of Life isn't used yet | Wikidata alone held 84 of the 226 old animals; with WordNet, 224. Catalogue of Life's role is the tie-breaker when sources disagree, which comes with 13b's facts rule. Approved by the human, 2026-10-24: "Approve as built (Recommended)" |
 | T1, Q3 (fruit): "Open English WordNet and Wikidata" | Wikidata alone | Its tree holds tomato under fruit, the "accept in both" case. Approved by the human with the row above |
 | Wikidata (SOURCES.md): SPARQL queries within 60 s | The large sets are read with bd:slice, the query service's index slicing | One query over the animal tree, or over any high group, times out. bd:slice isn't named in the SOURCES.md pages (*unverified* as a documented feature); it worked on 2026-10-24 |
+| M13 D3: "IDs owned by Plor (a random ID per thing)" | Computed from the source entry (RFC 4122 version 5) | The human's refinement, 2026-10-24: "Same everywhere (Recommended)" |
+| The 13a design: 13a-3 as its own PR | Folded into 13a-2's PR | CI validates the drafted days; once format 2 is retired, the T1 draft is the only one |
 | USDA FoodData Central: SR Legacy food descriptions | Only the first part of "Cheese, <kind>, …", without a note in parentheses, and not the nine descriptions in `USDA_NOT_KINDS` | The rest of a description is a variant (low fat, shredded), not a kind (human, 2026-10-24: "Keep real kinds only (Recommended)") |
 
 ## Evidence
@@ -242,6 +245,30 @@ Seven concrete categories that use every source, in an order that rises roughly 
   - `src/app/api/admin/base/route.db.test.ts` → 4 passed;
   - `npx playwright test e2e/admin-base.e2e.ts` → 1 passed;
   - `npx tsc --noEmit -p .` and `npm run lint` clean.
+
+**13a-2 (2026-10-24, local stack):**
+- **Format 3 and the engine,** on the fixture base and day (`src/test/answer-fixture.ts`):
+  - `npm test` → 34 files passed, including:
+    - `matching.test.ts`: one-edit texts, the shared-name pick, answers among candidates;
+    - `scoring.test.ts`: hand-worked bonuses (cat 9, kiwi 4, green 6; with counts, cat 5);
+    - `content-validate.test.ts`: 14 format-3 rules;
+    - `draft.test.ts`: the letter picker.
+  - `npm run test:db` → all files passed, including:
+    - `runs.db.test.ts`, 34 tests on the new engine;
+    - `matching.db.test.ts`: exact and scientific names, a catch under "bear", "aardvark" at two ranks, "robin", typos (one answer, two answers, under 4 letters, digits, past a stolen letter), and an alias added after approval;
+    - `ledger.db.test.ts`: hand-worked points: A 150 + 0, A's second day 25 + 9, B 1000 + 67, C and E 75 + 8.
+  - `npm run test:sql` → `Result: PASS`, including `answer_engine.test.sql` (IDs given, a merge's display name, resolving as of approval) and `puzzle_entry.test.sql` (approval against the base, OB009).
+  - `npm run test:e2e` → 11 passed, on the fixture day.
+- **The T1 day with the real data.** `npm run draft` wrote `content/offbeat/2026-10-24.json`, with letters Q2 M, Q4 C, Q5 T and Q7 E.
+  - Getting there, the draft refused "dog" and "cat": each names several members. It also refused "China", which names no country (below). And no letters fit until question 5's hosts were narrowed to Brie.
+  - An admin approved it on `/admin/puzzles`. The member counts were 56,787, 193, 2,999, 928, 48, 118 and 50.
+  - A player survived all 7: "aardvrk" read as Aardvark (a typo), "kiwi" shown as kiwifruit, then Kenya, Shiba Inu, Gouda, neon and Hawaii, past the stolen letters. 1000 points, with a provisional bonus of about 479.
+  - Recorded by a temporary Playwright script on the local stack, deleted after.
+- **Found while drafting,** for Next revision:
+  - WordNet's "dog" (linked to Wikidata's concept Q144) didn't merge with Wikidata's dog taxon (Q26972265), so "dog" names two members.
+  - "China" isn't an alias of the People's Republic of China.
+  - Plurals of proper names come in as aliases ("peoples republic of chinas").
+  - In a category of 56,787, every answer outside the host bank earns near the full provisional bonus, which 13c's levels address.
 
 ## Review
 **13a-1:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24.

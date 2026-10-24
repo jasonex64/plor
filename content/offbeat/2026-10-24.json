@@ -1,0 +1,175 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-10-24",
+  "questions": [
+    {
+      "prompt": "Name an animal",
+      "category": "animal",
+      "host_bank": [
+        "b09d10e2-458c-557b-9e66-92836482b320",
+        "a679a5fa-4853-5efd-ad69-b61d42cf3316",
+        "ef3f4406-79be-5917-a19a-3493fb37970f",
+        "9e9502af-18d9-59a7-8a8c-5d101f144b64",
+        "56f36c47-5cf5-50fe-9fcc-8d86c862a683",
+        "935549ff-3df2-5606-b917-c19978ca944c"
+      ],
+      "host_answers": [
+        "b09d10e2-458c-557b-9e66-92836482b320"
+      ],
+      "levels": {
+        "4ac8266b-610b-5db4-89ea-cda5ff931431": "uncommon",
+        "fddfcf3b-6ad3-5450-8f05-7af376290090": "uncommon",
+        "d817d9f0-4d80-5d52-a447-784eb320bd46": "uncommon",
+        "78b1baf1-cba5-54b7-bc70-d1baefe84dc7": "uncommon",
+        "b09d10e2-458c-557b-9e66-92836482b320": "common",
+        "a679a5fa-4853-5efd-ad69-b61d42cf3316": "common",
+        "ef3f4406-79be-5917-a19a-3493fb37970f": "common",
+        "9e9502af-18d9-59a7-8a8c-5d101f144b64": "common",
+        "56f36c47-5cf5-50fe-9fcc-8d86c862a683": "common",
+        "935549ff-3df2-5606-b917-c19978ca944c": "common"
+      }
+    },
+    {
+      "prompt": "Name a country",
+      "category": "country",
+      "host_bank": [
+        "fb02ee1a-8ec8-5129-8711-7fac332db70b",
+        "0a448995-f3ac-56bc-bf81-b40afa5beb09",
+        "6140e61b-7f58-5c36-a474-d56afefb08c5",
+        "f5092cd0-4541-5e26-8100-d2a06bc3cb6e",
+        "2e972203-6a56-5c8c-badf-81bfaa841cdf",
+        "d5f76f27-c55d-54eb-b2ae-c9b26d948b2e"
+      ],
+      "host_answers": [
+        "0a448995-f3ac-56bc-bf81-b40afa5beb09"
+      ],
+      "levels": {
+        "fb02ee1a-8ec8-5129-8711-7fac332db70b": "common",
+        "0a448995-f3ac-56bc-bf81-b40afa5beb09": "common",
+        "6140e61b-7f58-5c36-a474-d56afefb08c5": "common",
+        "f5092cd0-4541-5e26-8100-d2a06bc3cb6e": "common",
+        "2e972203-6a56-5c8c-badf-81bfaa841cdf": "common",
+        "d5f76f27-c55d-54eb-b2ae-c9b26d948b2e": "common"
+      },
+      "steals": "m"
+    },
+    {
+      "prompt": "Name a fruit",
+      "category": "fruit",
+      "host_bank": [
+        "4a78bfb1-1a51-5c63-8287-0f1d16fd8ce6",
+        "08988403-f7eb-51d2-99f2-43011464b900",
+        "980f5682-149b-50ec-a64c-08997137b72b",
+        "34691b2e-4eb5-588d-bfcd-f6f9502c87b6",
+        "e80bab96-3653-57ac-a741-f4232c0cd5ca"
+      ],
+      "host_answers": [
+        "08988403-f7eb-51d2-99f2-43011464b900"
+      ],
+      "levels": {
+        "4a78bfb1-1a51-5c63-8287-0f1d16fd8ce6": "common",
+        "08988403-f7eb-51d2-99f2-43011464b900": "common",
+        "980f5682-149b-50ec-a64c-08997137b72b": "common",
+        "34691b2e-4eb5-588d-bfcd-f6f9502c87b6": "common",
+        "e80bab96-3653-57ac-a741-f4232c0cd5ca": "common"
+      }
+    },
+    {
+      "prompt": "Name a dog breed",
+      "category": "dog_breed",
+      "host_bank": [
+        "64c8bcd2-660f-5a8e-b36f-aa03b8a0ca64",
+        "a914a081-7485-5df2-8d21-611dc50f56d4",
+        "adce6a9d-9994-537c-9fe4-502935e05cf4",
+        "1e589dce-ade6-58f4-8860-d4bf4e7b1960",
+        "8d65a3e2-7c5c-547d-9715-8e460b4fc681",
+        "540419fe-af28-5e20-b106-4a9316e0df4a"
+      ],
+      "host_answers": [
+        "8d65a3e2-7c5c-547d-9715-8e460b4fc681",
+        "540419fe-af28-5e20-b106-4a9316e0df4a"
+      ],
+      "levels": {
+        "64c8bcd2-660f-5a8e-b36f-aa03b8a0ca64": "common",
+        "a914a081-7485-5df2-8d21-611dc50f56d4": "common",
+        "adce6a9d-9994-537c-9fe4-502935e05cf4": "common",
+        "1e589dce-ade6-58f4-8860-d4bf4e7b1960": "common",
+        "8d65a3e2-7c5c-547d-9715-8e460b4fc681": "common",
+        "540419fe-af28-5e20-b106-4a9316e0df4a": "common"
+      },
+      "steals": "c"
+    },
+    {
+      "prompt": "Name a kind of cheese",
+      "category": "cheese",
+      "host_bank": [
+        "e4e106c3-ec37-53b3-80c0-f62e989c20a5",
+        "03616c7a-a3f4-55bd-981e-e931b2e9fdf7",
+        "78185956-a929-50dc-837f-67dcb66d3465",
+        "fdec4b60-99ec-5312-b50d-684377399926",
+        "e45e5fc3-2f75-50e0-be38-1f5fd9690bc2"
+      ],
+      "host_answers": [
+        "e45e5fc3-2f75-50e0-be38-1f5fd9690bc2"
+      ],
+      "levels": {
+        "e4e106c3-ec37-53b3-80c0-f62e989c20a5": "common",
+        "03616c7a-a3f4-55bd-981e-e931b2e9fdf7": "common",
+        "78185956-a929-50dc-837f-67dcb66d3465": "common",
+        "fdec4b60-99ec-5312-b50d-684377399926": "common",
+        "e45e5fc3-2f75-50e0-be38-1f5fd9690bc2": "common"
+      },
+      "steals": "t"
+    },
+    {
+      "prompt": "Name a chemical element",
+      "category": "chemical_element",
+      "host_bank": [
+        "30989263-827f-55f1-aadc-309c38787a40",
+        "d0a9e901-a57b-5456-a603-cbfdd452a470",
+        "2b40f21b-8873-505c-a541-302f4ecd13ac",
+        "5d6ed9f5-f757-5c3d-9859-5799085151fa",
+        "0dba307e-36ab-51b7-960e-a999c0935393",
+        "e6277b0e-a3ea-5cec-8583-b2927e944c37"
+      ],
+      "host_answers": [
+        "30989263-827f-55f1-aadc-309c38787a40",
+        "5d6ed9f5-f757-5c3d-9859-5799085151fa"
+      ],
+      "levels": {
+        "30989263-827f-55f1-aadc-309c38787a40": "common",
+        "d0a9e901-a57b-5456-a603-cbfdd452a470": "common",
+        "2b40f21b-8873-505c-a541-302f4ecd13ac": "common",
+        "5d6ed9f5-f757-5c3d-9859-5799085151fa": "common",
+        "0dba307e-36ab-51b7-960e-a999c0935393": "common",
+        "e6277b0e-a3ea-5cec-8583-b2927e944c37": "common"
+      }
+    },
+    {
+      "prompt": "Name a US state",
+      "category": "us_state",
+      "host_bank": [
+        "31f8a7f4-a249-5342-819e-8b8ac1c589b7",
+        "e698fbd1-742b-53b9-8ae7-1d7dcc296b32",
+        "7703e635-6fcc-50b4-ace8-0458fc53d73f",
+        "bbb4b92b-0118-519c-b6a3-ad0df2354d88",
+        "04b2a17e-1f92-5098-8bf6-56258f41548c",
+        "56479399-f6ae-5dad-bcf0-8e3abe303cb4"
+      ],
+      "host_answers": [
+        "04b2a17e-1f92-5098-8bf6-56258f41548c",
+        "56479399-f6ae-5dad-bcf0-8e3abe303cb4"
+      ],
+      "levels": {
+        "31f8a7f4-a249-5342-819e-8b8ac1c589b7": "common",
+        "e698fbd1-742b-53b9-8ae7-1d7dcc296b32": "common",
+        "7703e635-6fcc-50b4-ace8-0458fc53d73f": "common",
+        "bbb4b92b-0118-519c-b6a3-ad0df2354d88": "common",
+        "04b2a17e-1f92-5098-8bf6-56258f41548c": "common",
+        "56479399-f6ae-5dad-bcf0-8e3abe303cb4": "common"
+      },
+      "steals": "e"
+    }
+  ]
+}

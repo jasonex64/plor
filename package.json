@@ -16,6 +16,7 @@
     "lockfile": "node scripts/lockfile.ts",
     "content:validate": "node scripts/content-validate.ts",
     "base": "node --env-file-if-exists=.env.local scripts/base.ts",
+    "draft": "node --env-file-if-exists=.env.local scripts/draft.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

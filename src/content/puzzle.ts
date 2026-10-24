@@ -48,6 +48,8 @@ export function normalize(text: string): string {
     .toLowerCase()
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
+    // Format characters (\p{Cf}, e.g. a zero-width space pasted with a name) are dropped (ROADMAP Next revision, M13).
+    .replace(/\p{Cf}/gu, "")
     .replace(/\p{P}/gu, "")
     .replace(/\s+/g, " ")
     .trim();

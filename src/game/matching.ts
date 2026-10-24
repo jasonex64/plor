@@ -85,7 +85,8 @@ async function candidates(db: Db, gameId: string, date: string, index: number, t
 
 // The answer the typed text names, or null when it names none ("not in our list, try again"). The caller has
 // already refused text with a stolen letter. An exact name or alias wins before any typo, so "moose" is never read as
-// a typo of "mouse". A typo counts only for text of 4+ letters (spaces aren't letters, M02 2f B4), only onto a name
+// a typo of "mouse". A typo counts only for text of 4+ letters (spaces and digits aren't letters: M02 2f B4; ROADMAP
+// Next revision, M13), only onto a name
 // that avoids every stolen letter (G12: "hors" is not horse once E is gone), and only when exactly one answer is that
 // close (answersAmong): when two are, the server would be guessing which one the player meant.
 export async function resolveTyped(db: Db, puzzle: ApprovedPuzzle, index: number, typed: string, stolen: string[]): Promise<Resolved | null> {
@@ -94,7 +95,7 @@ export async function resolveTyped(db: Db, puzzle: ApprovedPuzzle, index: number
   const levels = puzzle.questions[index].levels;
   const exact = await candidates(db, puzzle.game_id, puzzle.date, index, [query]);
   if (exact.length) return pickAnswer(exact, levels);
-  if (query.replaceAll(" ", "").length < TYPO_MIN_LETTERS) return null;
+  if (query.replace(/[^\p{L}]/gu, "").length < TYPO_MIN_LETTERS) return null;
   const near = (await candidates(db, puzzle.game_id, puzzle.date, index, withinTypo(query))).filter((c) => avoids(c.alias, stolen));
   return answersAmong(near) === 1 ? pickAnswer(near, levels) : null;
 }

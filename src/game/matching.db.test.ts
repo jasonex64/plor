@@ -58,6 +58,8 @@ describe("resolveTyped", () => {
 
   it("fixes no typo of fewer than four letters, and none onto a name with a stolen letter", async () => {
     expect(await resolve(0, "dgo")).toBeNull();
+    // Digits aren't letters: "dog1" is one edit from "dog", but has 3 letters.
+    expect(await resolve(0, "dog1")).toBeNull();
     // "kiwi" at question 2, where C is stolen, is one typo from "kiwis"; "cherr" is one typo from "cherry", which has a C.
     expect(await resolve(1, "kiwiz", ["c"])).toEqual({ thingId: fixtureId(1, "kiwi"), caught: false });
     expect(await resolve(1, "herry", ["c"])).toBeNull();

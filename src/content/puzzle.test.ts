@@ -9,6 +9,7 @@ describe("normalize", () => {
     ["İbis", "ibis"], // lowercasing U+0130 yields a combining mark, which is stripped
     ["ＬＩＯＮ", "lion"], // fullwidth forms fold under NFKD
     ["...", ""],
+    ["li​on‍", "lion"], // format characters (zero-width space, zero-width joiner) are dropped
   ])("%j -> %j", (input, output) => {
     expect(normalize(input)).toBe(output);
   });
