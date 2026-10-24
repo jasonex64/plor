@@ -1,6 +1,6 @@
 # M12 12d — The decided fixes
 
-**Status:** in review (2026-10-24): built on `m12-account`; D1–D3 answered by the human.
+**Status:** in review (2026-10-24, PR #63): built on `m12-account`, reviewed, blocking findings fixed; D1–D3 answered by the human.
 
 ## Goal
 Three review findings from finished milestones are closed before the MVP line, as the human decided on 2026-10-23: the live board shows nothing about a friend's progress until you've finished, every admin deletion of a comment leaves a record, and a group's boards count a member only from the day they joined.
