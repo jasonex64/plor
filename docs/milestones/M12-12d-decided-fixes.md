@@ -1,6 +1,6 @@
 # M12 12d — The decided fixes
 
-**Status:** in review (2026-10-24, PR #63): built on `m12-account`, reviewed, blocking findings fixed; D1–D3 answered by the human.
+**Status:** done (2026-10-24): merged in PR #63 on green CI, with the human's approval of its security change and the privacy page line (2026-10-24: "Yes, merge PR #63 once every CI check is SUCCESS; I approve its security change (the comment-deletion record function) and the privacy page line").
 
 ## Goal
 Three review findings from finished milestones are closed before the MVP line, as the human decided on 2026-10-23: the live board shows nothing about a friend's progress until you've finished, every admin deletion of a comment leaves a record, and a group's boards count a member only from the day they joined.
@@ -77,7 +77,7 @@ None new. The list shows every record (no limit): the beta is small, and a page 
 | M00 data design §2: payloads are `{ v, type, ... }`, one version | `friend_status` is `v` 2 (`STATUS_VERSION`); the comment and reaction nudges stay `v` 1 (`PAYLOAD_VERSION`) | Only `friend_status` changed shape. Bumping every payload would have changed the live-comments triggers for nothing; `type` already tells them apart. M00 §2 now says so |
 | Settled decision: "admins see it as a list on the existing admin page" | The list is on `/admin/reports`, under the reported comments | The admin area has three pages (`/admin`, `/admin/puzzles`, `/admin/reports`); the reports page is where an admin deletes, so the record sits next to the action |
 | D3 (a): "a member counts in yesterday's group standings only if they joined on or before yesterday's puzzle day" | A member who joined today is still listed, with 0 of yesterday's points | The weekly boards list a later member with what they scored since, and the decision is about the points (the reason given: "points they won outside the group"); one rule for all three boards |
-| The ticket's design: no change to the privacy page | The privacy page says an admin-deleted comment's text, and which admin deleted it, is kept until you delete your account | The record is new data kept about a player, and the page lists what is kept (M02, M12 A8). For the human to check in this PR |
+| The ticket's design: no change to the privacy page | The privacy page says an admin-deleted comment's text, and which admin deleted it, is kept until you delete your account | The record is new data kept about a player, and the page lists what is kept (M02, M12 A8). Approved by the human (2026-10-24, with the merge) |
 | M07 7c's board text "finished (you'll see how once you finish)" | Removed | A friend's `finished` now reaches only a player who has finished, whose page refetches how it ended, so the text can't show |
 
 ## Evidence

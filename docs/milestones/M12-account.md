@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** in progress. 12a, 12b and 12c are merged (PRs #58, #59 and #60; the human approved 12c's two security changes and merged it, 2026-10-24). 12e (sign-in code limits, `docs/milestones/M12-12e-sign-in-limits.md`) is merged (PR #62, 2026-10-24). 12d (`docs/milestones/M12-12d-decided-fixes.md`) is in review (PR #63), D1–D3 answered by the human (2026-10-24); with it merged, M12 is done.
+**Status:** done (2026-10-24). 12a, 12b, 12c, 12e and 12d are merged (PRs #58, #59, #60, #62 and #63), each with the human's approval of its security changes; the ticket was PR #57.
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.
