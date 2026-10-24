@@ -17,6 +17,8 @@ const MESSAGES: Record<string, string> = {
   email_address_not_authorized: "Sign-in emails can't be sent to this address yet.",
   over_email_send_rate_limit: "Too many sign-in emails were sent. Wait a while and try again.",
   over_request_rate_limit: "Too many attempts. Wait a while and try again.",
+  // Our own sign-in limits (docs/milestones/M12-12e-sign-in-limits.md, L2).
+  too_many_attempts: "Too many sign-in attempts. Wait a while, or ask for a new code.",
   otp_expired: "That code is wrong, expired or already used. Check the newest email, or reload to get a new code.",
   code_invalid: "Enter the code from the email.",
   // Supabase Auth itself failed (docs/milestones/M02-2f-cleanup.md, A2). Wording approved by the human, 2026-10-20.

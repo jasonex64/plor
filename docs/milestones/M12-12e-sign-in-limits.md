@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is in SOURCES.md (human, 2026-10-23: "OK: add the Vercel request headers row to SOURCES.md"). Next: write the criteria and build 12e, before 12d, once PR #60 (12c) is merged (CLAUDE.md: merge the open PR before the next sub-ticket). No code before they're answered.
+**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is in SOURCES.md (human, 2026-10-23: "OK: add the Vercel request headers row to SOURCES.md"). Built and in review on `m12-account` (2026-10-24); after it merges, the human sets Auth's hosted limits (N5, N6). No code before they're answered.
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send.
@@ -50,12 +50,14 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
 - `docs/milestones/M02-2f-cleanup.md`, Review, blocking finding 1 (the guessing risk).
 
 ## Acceptance criteria
-Written once L1–L4 and the numbers are answered. With L1 (a) they will cover:
-- the table, function and grants (pgTAP);
-- each limit refusing exactly one attempt past its number, and allowing again after its window (db tests at both edges, as M02 2f B6 does for lengths);
-- a new code resetting the wrong-code count;
-- the 429 and its log line (route db test);
-- a flood from one address leaving another address able to sign in (route db test with two forwarded IPs).
+- [x] **The database counts attempts** (pgTAP, `supabase/tests/auth_attempt.test.sql`): `private.auth_attempt (kind, key, at)` keeps only hashed keys. `private.take_auth_attempt(kind, key, limit, window)` runs with its owner's rights, an empty `search_path` and a per-key lock. It allows exactly `limit` attempts in `window` and refuses the next, without recording a refusal. It allows again once the oldest attempt is older than `window`, and clears that kind's expired rows as it goes. `private.clear_auth_attempts(kind, key)` empties one key. `plor_app` may execute both functions and gains nothing else (the grant list).
+- [x] **Sending a code** (`POST /api/auth/email`; route db test): from one player IP, the first N1 (5) code requests in an hour reach Auth and the next gets 429 `too_many_attempts` without reaching it. To one address, the first N2 (5) do and the next gets the same 429. A refusal for one IP leaves another IP free. A sent code resets the address's code checks.
+- [x] **Checking a code** (`POST /api/auth/email/verify`; route db test): from one player IP, N3 (30) checks in 5 minutes reach Auth and the next gets 429. For one address, after N4 (5) wrong codes the next check gets 429 even with the right code. A new code then signs in.
+- [x] **The player's IP** is the first entry of `x-forwarded-for`, which Vercel sets and overwrites (SOURCES.md, Vercel request headers) and `next dev` fills in from the connection (Next.js 16.4.2 `base-server.js`). A request without it is a logged 500, not a shared key (route test).
+- [x] **Each refusal is logged** at warn level with its kind and the first 8 characters of the hashed key, never the email or IP (route db test reads the log line).
+- [x] **The form says what to do** (`too_many_attempts`: wait a while, or ask for a new code), and e2e sign-ins still pass, each player on its own forwarded IP.
+- [x] **The privacy page** says sign-in keeps a scrambled form of your IP address and email for about an hour to stop abuse, and its date changes.
+- [ ] **The hosted limits** (N5, N6) are set by the human in Supabase's dashboard after the merge (Evidence: the human's word, or a screenshot of the Rate Limits page).
 
 ## Out of scope
 - Limits on game requests (`/api/run/answer`): the same ROADMAP item, but not sign-in; it stays with M15's load test.
@@ -69,7 +71,7 @@ Written once L1–L4 and the numbers are answered. With L1 (a) they will cover:
 4. The human raises Auth's hosted limits (L1 a, L3) after it merges.
 
 ## Removes
-- The DECISIONS.md Log's playtest-only acceptance of the guessing risk, replaced by this sub-ticket's entry.
+- The DECISIONS.md Log's playtest-only acceptance of the guessing risk: the 2026-10-24 entry replaces it (the Log keeps both).
 - ROADMAP "Next revision", For M15: the email-code verify route's half of the rate-limit item.
 
 ---
@@ -78,8 +80,25 @@ Written once L1–L4 and the numbers are answered. With L1 (a) they will cover:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| L1 (a): "`ipAddress()` from `@vercel/functions`" | `clientIp` reads `x-forwarded-for`'s first entry | `ipAddress()` reads `x-real-ip`, which `next dev` never sets, so local sign-in and the e2e suite would have no IP. Vercel's docs say the two headers are identical and both overwritten (SOURCES.md, Vercel request headers), and `next dev` fills `x-forwarded-for` from the connection (Next.js 16.4.2, `server/base-server.js:567`; observed: a request with no header was keyed by `::1`) |
+| N4: "wrong codes per address" | Every check per address is counted, before Auth says whether it's right | Auth's answer comes after the check, and counting first means a 6th guess never reaches Auth. A right code ends the sign-in, so in practice only wrong codes are ever counted toward the limit |
+| Plan: keys hashed | SHA-256 without a salt | A salt is a new secret (CLAUDE.md, Security). An IPv4 hash can be reversed by trying all addresses, but the hash only lives about an hour and only in our database; the privacy page calls it scrambled, not anonymous |
 
 ## Evidence
+**2026-10-24, on the Mac's local stack, migration `20261024000629_auth_attempts.sql` applied:**
+- **Plan step 2, the hypothesis** (a scratch script, one throwaway user, 0 left afterwards): 25 wrong codes each got `403 otp_expired` (the same answer as an expired code), then the right code signed in. So Auth has no per-address cap up to 25, and N4 is the only one.
+- **The database** (criterion 1): `npx supabase test db supabase/tests/auth_attempt.test.sql supabase/tests/plor_app_role.test.sql supabase/tests/private_schema.test.sql` → `Files=3, Tests=39`, `Result: PASS`. Its 15 checks: both functions' rights and `search_path`; `plor_app`'s execute only; a raw IP and an unknown kind refused; 3 of a limit of 3 allowed and the 4th refused and not recorded; another key apart; an attempt a window old no longer counting and cleared; another key's expired rows cleared; clearing one key only.
+- **The routes** (criteria 2–5): `npx vitest run src/app/api/auth/email --reporter=verbose` → `Tests 7 passed (7)`:
+  - N1: with 4 already counted, the 5th code from one IP was sent and the 6th refused (429, no email), and another IP still got one.
+  - N2: with 4 counted for an address, the 5th was sent and the 6th, from another IP and in capitals, was refused (1 email).
+  - L2: the refusal's log line has `kind: send_email` and the key's first 8 hex characters, and contains neither the address nor the IP.
+  - No `x-forwarded-for`: 500.
+  - N4: 5 wrong codes got 403, the right code then got 429, and a new code 1.1 s later signed in.
+  - N3: with 29 checks counted for an IP, the 30th reached Auth (403) and the 31st got 429.
+- **The checks catch a missing limit:** with the per-address check taken out of the verify route, the N4 test failed (`Tests 1 failed | 2 passed`); restored.
+- **Without a forwarded IP on `next dev`** (criterion 4): `curl -X POST localhost:3000/api/auth/email` with no `x-forwarded-for` → `{"ok":true} HTTP 200`, and the stored key's prefix `eff8e7ca` is the hash of `::1`. The row was deleted after.
+- **Everything else:** `npm run lint` clean (after renaming the e2e helper `usePlayerIp`, which the React hooks rule took for a hook, to `forwardPlayerIp`); `npx tsc --noEmit -p .` clean; `npm test` → `Tests 236 passed (236)`; `npm run test:sql` → `Files=16, Tests=257`, `Result: PASS`; `npm run test:db` → `Test Files 29 passed (29)`, `Tests 198 passed (198)`; `npm run test:e2e` → `9 passed (20.2s)`, each player on its own forwarded IP.
+- **Criterion 8 waits on the human:** in the Supabase dashboard, Authentication → Rate Limits, set sign-ups and sign-ins to 300 and token verifications to 300 per 5 minutes (N5), and token refreshes to 1,500 per 5 minutes (N6).
 
 ## Review
 - Blocking findings and how each was fixed:

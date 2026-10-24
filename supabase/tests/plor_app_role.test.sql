@@ -68,6 +68,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
+  -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
+  'private.clear_auth_attempts(text,text) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
   'private.comment delete', 'private.comment insert', 'private.comment select',
   -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
@@ -109,6 +111,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
   'private.save_questions(uuid,text,date,text[]) execute',
+  'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');
 select ok(not exists (select from pg_roles where rolname = 'plor_publisher'), 'plor_publisher is gone (M06: puzzles get in through the admin page)');
 
