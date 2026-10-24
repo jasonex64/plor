@@ -1,6 +1,6 @@
 // Reports end to end against the local stack (run with `npm run test:db`): real players sign in with emailed codes,
 // play today's puzzle, and report comments through the route; an admin lists open reports and deletes the comment
-// (docs/milestones/M08-comments-and-reactions.md, 8c; D5). A is the reporter; B is A's friend; C is no one's friend;
+// (docs/milestones/M08-comments-and-reactions.md, 8c; D5), which leaves a record of who deleted it (M12 12d). A is the reporter; B is A's friend; C is no one's friend;
 // D is B's friend but not A's; X is an admin who hasn't played.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
@@ -70,6 +70,10 @@ async function befriend(x: Player, y: Player) {
     x.userId,
     y.userId,
   ]);
+}
+async function recordCount(id: string): Promise<number> {
+  const { rows } = await getPool().query<{ n: number }>("select count(*)::int as n from private.comment_deletion where comment_id = $1", [id]);
+  return rows[0].n;
 }
 async function reportCount(id: string): Promise<number> {
   const { rows } = await getPool().query<{ n: number }>("select count(*)::int as n from private.comment_report where comment_id = $1", [id]);
@@ -160,6 +164,7 @@ describe("reporting comments, and the admins' list", () => {
     expect(await list()).toEqual(forbidden);
     expect(await remove(commentOf.b)).toEqual(forbidden);
     expect(await reportCount(commentOf.b)).toBe(2);
+    expect(await recordCount(commentOf.b)).toBe(0);
   });
 
   it("lists open reports for an admin, one row per comment with its count", async () => {
@@ -180,9 +185,16 @@ describe("reporting comments, and the admins' list", () => {
     expect(await remove(commentOf.c)).toEqual(notFound);
     expect(await remove("999999999999")).toEqual(notFound);
     expect(await remove("not an id")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await recordCount(commentOf.c)).toBe(0);
     expect(await remove(commentOf.b)).toEqual(ok);
     expect(await remove(commentOf.b)).toEqual(notFound);
-    expect((await list()).body.reports.filter((x: { username: string }) => x.username.endsWith(RUN))).toEqual([]);
+    // One record, with the admin, the author and the text (12d), listed for admins.
+    expect(await recordCount(commentOf.b)).toBe(1);
+    const after = (await list()).body;
+    expect(after.reports.filter((x: { username: string }) => x.username.endsWith(RUN))).toEqual([]);
+    expect(after.deletions.filter((x: { author: string }) => x.author.endsWith(RUN))).toEqual([
+      { id: commentOf.b, deletedAt: expect.any(String), admin: players.x.username, author: players.b.username, body: "hello from b" },
+    ]);
     expect(await reportCount(commentOf.b)).toBe(0);
     const { rows } = await getPool().query("select from private.reaction where comment_id = $1", [commentOf.b]);
     expect(rows).toHaveLength(0);

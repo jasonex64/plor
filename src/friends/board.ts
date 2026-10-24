@@ -1,6 +1,9 @@
 // The live board (docs/milestones/M07-friends-and-live-board.md, 7c): each friend's run today, and how it ended
-// once the viewer's own run is over. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql);
-// this is the full picture the page loads first and refetches after a reconnect.
+// once the viewer's own run is over. Until then, only whether each friend has started (M12 12d,
+// docs/milestones/M12-12d-decided-fixes.md): a friend's question, or that they've finished, would tell the viewer
+// which one caught them. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql, and
+// since 12d 20261024031116_board_hides_progress.sql); this is the full picture the page loads first and refetches
+// after a reconnect.
 import { GAME_ID, type Puzzle } from "@/content/puzzle";
 import { named } from "@/game/payload";
 import type { RunStatus } from "@/game/runs";
@@ -16,8 +19,9 @@ export type BoardFriend = {
   username: string;
   // The display name if set, else the username (M07 7a).
   name: string;
-  state: "not_started" | "playing" | "finished";
-  // While playing: the question they're on, 1-based.
+  // started: before the viewer has finished, for any friend with a run today (12d). playing and finished come after.
+  state: "not_started" | "started" | "playing" | "finished";
+  // While playing, once the viewer has finished: the question they're on, 1-based.
   question: number | null;
   ended: Ended | null;
   // Reactions on their run today (M08 8b), once the viewer's own run is over and the friend has a run.
@@ -72,13 +76,13 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
     reactionsOnMine: finished ? (reactions.get(viewerId) ?? NO_REACTIONS) : null,
     friends: friends
       .map((f): BoardFriend => {
-        const state = f.status === null ? "not_started" : FINISHED.includes(f.status) ? "finished" : "playing";
+        const state = f.status === null ? "not_started" : !finished ? "started" : FINISHED.includes(f.status) ? "finished" : "playing";
         return {
           username: f.username,
           name: f.name,
           state,
           question: state === "playing" ? f.answered! + 1 : null,
-          ended: finished && state === "finished" ? ended(f, caught.get(f.user_id), content!) : null,
+          ended: state === "finished" ? ended(f, caught.get(f.user_id), content!) : null,
           reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
         };
       })

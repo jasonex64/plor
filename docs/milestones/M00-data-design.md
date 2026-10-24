@@ -15,8 +15,8 @@ Sources: Supabase docs (keys and RLS, Realtime) and PostgreSQL 17 (`ddl-priv`), 
 - Tests run against a fresh local database (`supabase db reset`, then pgTAP), and CI does the same. Constraints, grants and RLS get pgTAP tests. Application logic is tested in TypeScript.
 
 ## 2. Network messages
-- **HTTP API:** each request sends an `x-protocol: <int>` header. A mismatch gets `409 client_outdated`, and the client reloads loudly. The version is bumped only for breaking API changes, not on every deploy. It is 4 today (`src/lib/protocol.ts`: 2 for typed answers, 3 for the reveal and Next, 4 for the weekly leaderboard).
-- **Realtime payloads:** `{ v: <int>, type, ... }`. If `v` is unknown, the client logs an error and refetches the board over HTTP. Built in M07 7c: `src/app/board.tsx`, payload `v` 1.
+- **HTTP API:** each request sends an `x-protocol: <int>` header. A mismatch gets `409 client_outdated`, and the client reloads loudly. The version is bumped only for breaking API changes, not on every deploy. It is 5 today (`src/lib/protocol.ts`: 2 for typed answers, 3 for the reveal and Next, 4 for the weekly leaderboard, 5 for the board's `started`).
+- **Realtime payloads:** `{ v: <int>, type, ... }`. If `v` is unknown, the client logs an error and refetches the board over HTTP. Built in M07 7c: `src/app/board.tsx`, payload `v` 1. Since M12 12d a friend's run state (`friend_status`) is `v` 2, for `started`; the comment and reaction nudges stay `v` 1 (`src/app/board-channel.ts`).
 - **Questions are served one at a time.** The response to an answer is the run after it: that question's result and host answers (the reveal). The next question comes from `POST /api/run/next`, when the player taps Next (`src/game/runs.ts`, `openNext`; `src/app/api/run/next/route.ts`).
 
 ## 3. Player identity

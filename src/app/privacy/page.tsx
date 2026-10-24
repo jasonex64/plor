@@ -33,6 +33,10 @@ export default function Privacy() {
           signed in who opens your invite link, can see your username and your display name if you set one.
         </li>
         <li>
+          <strong>Deleted comments:</strong> if an admin deletes one of your comments after it was reported, we keep
+          its text, and which admin deleted it, until you delete your account.
+        </li>
+        <li>
           <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
           cookies.
         </li>
