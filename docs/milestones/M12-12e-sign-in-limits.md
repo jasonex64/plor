@@ -1,9 +1,9 @@
 # M12 12e — Sign-in code limits
 
-**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is in SOURCES.md (human, 2026-10-23: "OK: add the Vercel request headers row to SOURCES.md"). Built and in review on `m12-account` (2026-10-24); after it merges, the human sets Auth's hosted limits (N5, N6). No code before they're answered.
+**Status:** in review (2026-10-24): built on `m12-account`, reviewed, blocking findings 2–4 fixed. L5 (review finding 1: code emails can still be used up for everyone) waits on the human. After the merge the human sets Auth's hosted limits (N5, N6).
 
 ## Goal
-No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send.
+No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send. *(As built, guessing and code checks are closed, and so is one address flooding sign-in. Using up the code emails from many addresses is still open: L5.)*
 
 ## Who uses it / what breaks without it
 - **Used by:** every player signing in by email code, and the human, whose closed beta (M15) is the first time strangers can reach sign-in.
@@ -29,6 +29,13 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
   **Claude's suggestion:** (a), and raise Auth's limits. **Answer: (a)** (human, 2026-10-23: "12e L1: (a), our own limits in Postgres with no secret key").
 - **L2 — what a refused request gets.** 429 `too_many_attempts`, and the form says to wait, or to ask for a new code. Each refusal is logged through the one logger with its kind and a hash of the key (never the email itself), so a flood shows in the Vercel logs (CLAUDE.md: retries and limits are logged and counted). **Answer: as suggested** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
 - **L3 — session refreshes.** The proxy refreshes sessions from the server too, so 150 per 5 minutes is shared by every signed-in player. Raising that limit in the hosted Auth settings (a number) is part of this ticket. Whether the beta's size comes near it is for the M15 load test. **Answer: part of 12e, with N6** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
+- **L5 — the code emails can still be used up (review, 2026-10-24; for the human).** Auth sends at most 30 emails an hour for the whole project with custom SMTP (SOURCES.md, Supabase email sending, "custom SMTP starts at 30 per hour"), and Resend's free plan 100 a day. N1 lets each IP send 5 an hour, so about six addresses can use up the hour for everyone, and one address can use up Resend's day in 20 hours. With IPv6 one person may hold many addresses (whether Vercel serves IPv6 is *unverified*). Options:
+  - (a) Accept it for the closed beta, in writing, and revisit before launch (M15).
+  - (b) Count IPv6 by its /64 prefix. It narrows the gap but doesn't close it; the prefix length is a human number.
+  - (c) A CAPTCHA on sending a code. Supabase Auth supports one, but it's a new third party and a new source, which is a ticket of its own.
+  - (d) Raise the caps: Auth's hourly email limit in the dashboard and a paid Resend plan. That costs money and only moves the line.
+
+  **Claude's suggestion:** (a) for the beta, with (c) decided before launch.
 - **L4 — where it goes.** Claude suggests 12e, before 12d: it closes a security hole that is now readable in a public repo, and 12d is three game fixes. Or after 12d, as M12's last sub-ticket. **Answer: before 12d** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
 
 ## Numbers
@@ -81,6 +88,7 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
 | Source says | We built | Why different |
 |---|---|---|
 | L1 (a): "`ipAddress()` from `@vercel/functions`" | `clientIp` reads `x-forwarded-for`'s first entry | `ipAddress()` reads `x-real-ip`, which `next dev` never sets, so local sign-in and the e2e suite would have no IP. Vercel's docs say the two headers are identical and both overwritten (SOURCES.md, Vercel request headers), and `next dev` fills `x-forwarded-for` from the connection (Next.js 16.4.2, `server/base-server.js:567`; observed: a request with no header was keyed by `::1`) |
+| N1: "code emails per player IP"; N2: "code emails per email address" | N2 counts codes Auth actually sent: the address's count is taken first and given back when Auth refuses or the IP is over its limit. N1 counts every request that reached Auth, whatever Auth answered | **Review finding 2.** Counting before Auth answered let a double tap, or a send Auth refused, use up a player's count, and let someone who knows an address lock its owner out. N1 still counts refusals, because each one spends Auth's shared per-IP bucket. A request refused for its address never reaches Auth, so it doesn't count against the IP |
 | N4: "wrong codes per address" | Every check per address is counted, before Auth says whether it's right | Auth's answer comes after the check, and counting first means a 6th guess never reaches Auth. A right code ends the sign-in, so in practice only wrong codes are ever counted toward the limit |
 | Plan: keys hashed | SHA-256 without a salt | A salt is a new secret (CLAUDE.md, Security). An IPv4 hash can be reversed by trying all addresses, but the hash only lives about an hour and only in our database; the privacy page calls it scrambled, not anonymous |
 
@@ -98,8 +106,22 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
 - **The checks catch a missing limit:** with the per-address check taken out of the verify route, the N4 test failed (`Tests 1 failed | 2 passed`); restored.
 - **Without a forwarded IP on `next dev`** (criterion 4): `curl -X POST localhost:3000/api/auth/email` with no `x-forwarded-for` → `{"ok":true} HTTP 200`, and the stored key's prefix `eff8e7ca` is the hash of `::1`. The row was deleted after.
 - **Everything else:** `npm run lint` clean (after renaming the e2e helper `usePlayerIp`, which the React hooks rule took for a hook, to `forwardPlayerIp`); `npx tsc --noEmit -p .` clean; `npm test` → `Tests 236 passed (236)`; `npm run test:sql` → `Files=16, Tests=257`, `Result: PASS`; `npm run test:db` → `Test Files 29 passed (29)`, `Tests 198 passed (198)`; `npm run test:e2e` → `9 passed (20.2s)`, each player on its own forwarded IP.
+- **After the review** (migration `20261024001501_auth_attempt_give_back.sql`):
+  - `npx vitest run src/app/api/auth/email src/lib/auth-limits.db.test.ts --reporter=verbose` → `Tests 10 passed`. Added: a second tap within Auth's wait got Auth's own 429 (`over_email_send_rate_limit`), and the address held 1 count while the IP held 2. A request refused for its address left its IP at 0.
+  - **Concurrency:** 20 connections took one key at once with a limit of 3, and exactly 3 were allowed and 3 rows stored. With the advisory lock taken out of the local function, the same test let 15, 20 and 20 through on three runs. With the lock restored, it passed.
+- **Full suites after the review:** `npm run lint` and `npx tsc --noEmit -p .` clean; `npm test` → `Tests 236 passed (236)`; `npm run test:sql` → `Files=16, Tests=257`, `Result: PASS`; `npm run test:db` → `Test Files 30 passed (30)`, `Tests 201 passed (201)`; `npm run test:e2e` → `9 passed (17.7s)`.
 - **Criterion 8 waits on the human:** in the Supabase dashboard, Authentication → Rate Limits, set sign-ups and sign-ins to 300 and token verifications to 300 per 5 minutes (N5), and token refreshes to 1,500 per 5 minutes (N6).
 
 ## Review
+**12e** (reviewer, fresh context, 2026-10-24). The counting is sound: the hashed keys, the email key, the per-key lock and the grants all held. It tried case, whitespace and Unicode forms of an address against the local GoTrue v2.197.0: upper and lower case get the same answer, and the odd forms are refused with 422, so `emailKey` can't be dodged. It also checked that Vercel's header can't be spoofed.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. **The code emails can still be used up from a few addresses**, and the Goal claimed otherwise. Not fixable without the human: it's L5, and the Goal now says what's open.
+  2. **N1 and N2 counted requests, not emails.** A double tap, or a send Auth refused, used up the address's count. Fixed with the give-back (Source diff), with two new route tests.
+  3. **The per-key lock had no test.** Added `src/lib/auth-limits.db.test.ts`; without the lock it fails.
+  4. **The Status line and the handoff were stale.** Both rewritten.
+- Deferred to ROADMAP "Next revision", For M12:
+  - other test files leave their sign-in counts behind;
+  - N4's "25 guesses an hour" is really up to 30;
+  - players behind one shared connection share N1;
+  - the missing-IP test doesn't read its log line;
+  - the privacy page's "next time anyone signs in" is approximate.

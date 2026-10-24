@@ -18,7 +18,7 @@ const MAILPIT = "http://127.0.0.1:54324";
 // Documentation addresses (RFC 5737), never a real player's. Their counts are removed after the run.
 const IP_A = "198.51.100.1";
 const IP_B = "198.51.100.2";
-const IPS = [IP_A, IP_B, "192.0.2.10", "192.0.2.11", "192.0.2.12"];
+const IPS = [IP_A, IP_B, "192.0.2.10", "192.0.2.11", "192.0.2.12", "192.0.2.13", "192.0.2.14"];
 
 async function send(address: string, ip?: string) {
   const response = await sendRoute(apiRequest("/api/auth/email", { method: "POST", body: { email: address }, ip }));
@@ -32,6 +32,9 @@ async function fillToOneShort(kind: AuthLimitKind, value: string) {
     AUTH_LIMITS[kind].limit - 1,
   ]);
 }
+async function held(kind: AuthLimitKind, value: string): Promise<number> {
+  return (await getPool().query("select count(*)::int as n from private.auth_attempt where kind = $1 and key = $2", [kind, hashKey(value)])).rows[0].n;
+}
 async function mails(address: string): Promise<number> {
   return (await (await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:${address}`)}`)).json()).messages.length;
 }
@@ -39,7 +42,7 @@ async function mails(address: string): Promise<number> {
 beforeAll(useLocalStack);
 
 afterAll(async () => {
-  const keys = [...IPS, ...["ip1", "ip2", "ip3", "addr", "log"].map((t) => emailKey(email(t)))].map(hashKey);
+  const keys = [...IPS, ...["ip1", "ip2", "ip3", "addr", "log", "tap", "full"].map((t) => emailKey(email(t)))].map(hashKey);
   await getPool().query("delete from private.auth_attempt where key = any($1)", [keys]);
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await getPool().end();
@@ -89,5 +92,26 @@ describe("POST /api/auth/email limits", () => {
     } finally {
       error.mockRestore();
     }
+  });
+
+  // Review finding 2: N2 counts code emails Auth sent, so a refused send gives the address's count back.
+  it("doesn't count a code Auth refused against the address, but counts it against the IP", async () => {
+    const address = email("tap");
+    expect((await send(address, "192.0.2.13")).status).toBe(200);
+    // A second tap within Auth's per-address wait (1 s locally, 60 s hosted) is refused by Auth itself.
+    expect(await send(address, "192.0.2.13")).toEqual({ status: 429, body: { ok: false, error: "over_email_send_rate_limit" } });
+    expect(await held("send_email", emailKey(address))).toBe(1);
+    expect(await held("send_ip", "192.0.2.13")).toBe(2);
+  });
+
+  it("doesn't count a request refused for its address against its IP", async () => {
+    const address = email("full");
+    await getPool().query("insert into private.auth_attempt (kind, key) select 'send_email', $1 from generate_series(1, $2)", [
+      hashKey(emailKey(address)),
+      AUTH_LIMITS.send_email.limit,
+    ]);
+    expect((await send(address, "192.0.2.14")).status).toBe(429);
+    expect(await held("send_ip", "192.0.2.14")).toBe(0);
+    expect(await held("send_email", emailKey(address))).toBe(AUTH_LIMITS.send_email.limit);
   });
 });

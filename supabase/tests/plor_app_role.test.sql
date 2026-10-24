@@ -82,6 +82,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.friend_invite insert', 'private.friend_invite select',
   'private.friend_invite.code update',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
+  'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
   'private.missed_answer insert', 'private.missed_answer select',

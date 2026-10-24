@@ -2,20 +2,20 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-23, by the session that built M12 12c (deleting your account), on `m12-account`.
+**Updated:** 2026-10-24, by the session that built M12 12c and 12e (sign-in code limits), on `m12-account`.
 
 ## Where things stand
 - **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
 - **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). A1–A10 are answered (human, 2026-10-23).
   - **12a and 12b are merged** (PRs #58 and #59).
-  - **12c is built and in review** (PR #60): `/account`'s Delete account (type your username, then the button), `POST /api/account/delete`, and migration `20261023200556_account_deletion.sql`: `private.delete_account` leaves each group first and then deletes the `auth.users` row (a security change: `plor_app` may execute it); run-key indexes on comments and reactions; `plor_app`'s profile insert narrowed to `(user_id, username)` (A10, a security change). The privacy page says you can delete your account yourself. The reviewer's two blocking findings (this handoff and the ROADMAP row) are fixed; its others are in ROADMAP "Next revision", For M12. It merges on all-green CI with the human's OK.
-  - **12e, sign-in code limits,** comes next, before 12d (`docs/milestones/M12-12e-sign-in-limits.md`). L1–L4 and N1–N6 are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"): our own limits in Postgres per player IP and per address, no secret key. Its last source, Vercel request headers, is in SOURCES.md (human's OK, 2026-10-23). Once PR #60 is merged: write its criteria and build it.
-  - **12d** comes next: the three fixes the human decided on 2026-10-23 (ROADMAP "Next revision", "Decided by the human"). Its criteria and open details are settled with the human when it starts.
+  - **12c is merged** (PR #60, merged by the human 2026-10-24 while its `db` and `e2e` checks were still running; the same code passed both on the earlier commit).
+  - **12e, sign-in code limits, is built and in review** (a PR from `m12-account`; `docs/milestones/M12-12e-sign-in-limits.md`). It limits code emails and code checks per player IP and per address in Postgres before Auth is called (migrations `20261024000629_auth_attempts.sql` and `20261024001501_auth_attempt_give_back.sql`, a security change). Its reviewer's blocking findings 2–4 are fixed; finding 1 is **L5**, for the human.
+  - **12d** comes after 12e: the three fixes the human decided on 2026-10-23 (ROADMAP "Next revision", "Decided by the human"; details settled in the M12 ticket's 12d bullet).
 - **The repo is public** (human, 2026-10-23: "i intend to make it PUBLIC"). Its full history has no secrets (gitleaks, DECISIONS.md Log), and CI is safe for strangers' PRs. The settings it calls for and the public puzzle drafts wait on the human (ROADMAP "Next revision", For the human).
 - **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **Merge PR #60 (12c)** once CI is green. The human approved its two security changes and the A4 Source diff row (2026-10-23: "Accept Claude's suggestions for all eight decisions"); the merge itself is the human's.
+- **12e:** merge its PR on green CI (a security change: a new table and three functions `plor_app` may execute; DECISIONS.md Log, 2026-10-24); answer **L5** (the code emails can still be used up from a few addresses; Claude suggests accepting it for the beta in writing and deciding a CAPTCHA before launch); after the merge, in Supabase's dashboard, Authentication → Rate Limits: sign-ups and sign-ins 300, token verifications 300, token refreshes 1,500 per 5 minutes (N5, N6).
 - **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
 - **The public repo:** turn on the GitHub and Vercel settings listed in ROADMAP "Next revision", For the human, and decide about the public puzzle drafts.
 - **OK four SOURCES.md rows** Claude drafted from the pages (2026-10-23, in the session, not yet in the repo): npm scripts (npm 11.19.1's bundled docs), Supabase database testing (`/guides/database/testing` and `/local-development/testing/overview` at `07e69b9`), Next.js error handling (bundled 16.4.2 `/app/getting-started/error-handling`, which covers UI error boundaries only, not the route-handler wrapper), and GitHub secret scanning availability (docs.github.com, accessed 2026-10-23). If the drafts are lost, re-read those pages; then point DECISIONS.md's Task runner, Test runner, Error handling and Secret scanning Source cells at them (ROADMAP "Next revision", For the human).
@@ -25,15 +25,16 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once PR #60 is merged: start 12d on `m12-account`. Its details are settled (M12 ticket, 12d bullet); write its criteria and build it.
+Once 12e's PR is merged: start 12d on `m12-account`. Its details are settled (M12 ticket, 12d bullet); write its criteria and build it. Repo auto-merge is on (human, 2026-10-24), so a PR can be set to merge itself when its checks pass.
 
 ## Local state
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
-- The local Supabase stack is **left running** in Docker Desktop with every migration up to `20261023200556_account_deletion.sql`. It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
+- The local Supabase stack is **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql`. It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
 - A fresh checkout needs `npx next typegen` (or a build or dev run) before `npx tsc --noEmit -p .`, or `LayoutProps` is missing.
 - npm skipped two install scripts not covered by `allowScripts` (`fsevents`, `unrs-resolver`); every suite passed without them.
 - `npm run test:e2e` needs the stack running and `.env.local` pointing at it; Playwright starts the dev server. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
+- Sign-in on the local dev server is limited like production: without a forwarded IP, `next dev` keys every request by the connection (`::1`), so 5 code emails an hour from this Mac. To clear the counts: `delete from private.auth_attempt;` on the local database.
 - The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
   1. `npm ci`, then `npx supabase start`, then `npx supabase migration up`, then `npm run dev`.

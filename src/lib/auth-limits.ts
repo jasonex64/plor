@@ -47,6 +47,12 @@ export async function takeAttempt(db: Db, kind: AuthLimitKind, value: string): P
   throw new AppError("too_many_attempts", 429);
 }
 
+// Takes back the attempt just counted, for a request that went no further (supabase/migrations/
+// 20261024001501_auth_attempt_give_back.sql): N2 counts the code emails Auth actually sent.
+export async function giveBackAttempt(db: Db, kind: AuthLimitKind, value: string): Promise<void> {
+  await db.query("select private.give_back_auth_attempt($1, $2)", [kind, hashKey(value)]);
+}
+
 // A new code gets a fresh set of checks (N4).
 export async function clearAttempts(db: Db, kind: AuthLimitKind, value: string): Promise<void> {
   await db.query("select private.clear_auth_attempts($1, $2)", [kind, hashKey(value)]);
