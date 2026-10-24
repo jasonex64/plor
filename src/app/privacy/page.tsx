@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <main>
       <h1>Plor privacy policy</h1>
-      <p>Last updated: 2026-10-19</p>
+      <p>Last updated: 2026-10-23</p>
       <p>
         Plor (plor.app) is a small daily word game. This page says what we keep about you, why, and how to have it
         deleted. Questions: <a href="mailto:privacy@plor.app">privacy@plor.app</a>.
@@ -63,10 +63,11 @@ export default function Privacy() {
 
       <h2>Keeping and deleting</h2>
       <p>
-        We keep your account and games until you ask us to delete them. Email{" "}
-        <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with, and we will delete
-        your account together with all your games and unlisted answers. Our providers&apos; logs are not part of
-        your account and expire on their own schedules.
+        We keep your account and games until you delete them. You can delete your account yourself on your account
+        page: it removes your account together with all your games, unlisted answers, points, comments, reactions,
+        reports and friends, straight away. A group you made stays with its other members. For anything else, email{" "}
+        <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with. Our providers&apos;
+        logs are not part of your account and expire on their own schedules.
       </p>
 
       <h2>Children</h2>

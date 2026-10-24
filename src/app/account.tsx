@@ -2,7 +2,8 @@
 
 // The player's account (docs/milestones/M12-account.md, 12a; A1): their username and all-time points, the display
 // name others see (M07 7a), their friends and invite link (M07 7b), and Sign out. Moved off the home page, which is
-// about the day (M11 H1). The username can change once every 30 days (12b, A2). Plain UI; the look is M14.
+// about the day (M11 H1). The username can change once every 30 days (12b, A2), and the account can be deleted (12c).
+// Plain UI; the look is M14.
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
@@ -35,6 +36,7 @@ export function Account({ onSignedOut }: { onSignedOut: () => void }) {
           <DisplayName initial={account.displayName} />
           <Friends />
           <SignOut onSignedOut={onSignedOut} />
+          <DeleteAccount username={account.username} onDeleted={onSignedOut} />
         </>
       )}
       {!account && !error && <p>Loading…</p>}
@@ -108,6 +110,45 @@ export function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
       </button>
       {error && <p role="alert">{error}</p>}
     </>
+  );
+}
+
+// Deleting the account (12c, A4): the button stays off until the box holds the player's own username, which the server
+// checks again. Everything of theirs goes (A5), and this device is signed out (A9).
+function DeleteAccount({ username, onDeleted }: { username: string; onDeleted: () => void }) {
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function remove(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/account/delete", { method: "POST", body: { username: typed } });
+      onDeleted();
+    } catch (err) {
+      setError(errorText(err));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={remove}>
+      <h3>Delete account</h3>
+      <p>
+        This deletes your account and everything in it for good: your games, points, comments, reactions and friends. A
+        group you made passes to its longest-standing member.
+      </p>
+      <label>
+        Type your username to confirm
+        <input value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" />
+      </label>
+      <button type="submit" disabled={busy || typed !== username}>
+        Delete my account
+      </button>
+      {error && <p role="alert">{error}</p>}
+    </form>
   );
 }
 

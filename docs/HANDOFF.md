@@ -2,40 +2,38 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-23, by the session that finished M10 and M11 and built M12 12a and 12b, on `m12-account`.
+**Updated:** 2026-10-23, by the session that built M12 12c (deleting your account), on `m12-account`.
 
 ## Where things stand
 - **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
-  - M11 made the home page the Offbeat card (streak, game, yesterday's standings), the feed (`src/comments/feed.ts`), friends today, the friends leaderboard, groups and account. `latestOnly` (`src/lib/latest.ts`) guards overlapping loads, and the page moves to the new day at midnight except a game in play.
-- **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). The ticket is merged (PR #57); A1–A8 and the 30-day username interval are answered (human, 2026-10-23).
-  - **12a is merged** (PR #58): `/account` (`src/app/account.tsx`) with the username, all-time points (`allTimePoints` in `src/game/ledger.ts`, `GET /api/account`), display name, friends and invite link, and Sign out; the home page's Account section is a link and Sign out.
-  - **12b is in review** (PR #59): sign out of this device only; "Use a different email" and spaced codes; a username change once every 30 days (migration `20261023083041_username_change.sql`, a security change in DECISIONS.md: plor_app may update `username`, and a trigger with the caller's rights keeps the rule). The reviewer's blocking findings are fixed. It merges on all-green CI with the human's OK.
-  - **12c** (deleting your account) waits on a SOURCES.md entry the human adds.
-- **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
+- **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). A1–A10 are answered (human, 2026-10-23).
+  - **12a and 12b are merged** (PRs #58 and #59).
+  - **12c is built and in review** (PR #60): `/account`'s Delete account (type your username, then the button), `POST /api/account/delete`, and migration `20261023200556_account_deletion.sql`: `private.delete_account` leaves each group first and then deletes the `auth.users` row (a security change: `plor_app` may execute it); run-key indexes on comments and reactions; `plor_app`'s profile insert narrowed to `(user_id, username)` (A10, a security change). The privacy page says you can delete your account yourself. The reviewer's two blocking findings (this handoff and the ROADMAP row) are fixed; its others are in ROADMAP "Next revision", For M12. It merges on all-green CI with the human's OK.
+  - **12e, sign-in code limits,** comes next, before 12d (`docs/milestones/M12-12e-sign-in-limits.md`). L1–L4 and N1–N6 are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"): our own limits in Postgres per player IP and per address, no secret key. Its last source, Vercel request headers, is in SOURCES.md (human's OK, 2026-10-23). Once PR #60 is merged: write its criteria and build it.
+  - **12d** comes next: the three fixes the human decided on 2026-10-23 (ROADMAP "Next revision", "Decided by the human"). Its criteria and open details are settled with the human when it starts.
+- **The repo is public** (human, 2026-10-23: "i intend to make it PUBLIC"). Its full history has no secrets (gitleaks, DECISIONS.md Log), and CI is safe for strangers' PRs. The settings it calls for and the public puzzle drafts wait on the human (ROADMAP "Next revision", For the human).
+- **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch. Don't build on it before the MVP is done.
 
 ## Waiting on the human
-- **M12: merge PR #59 (12b)** once CI is green (it carries a security change: the username update grant, with the trigger's rights lowered after review), and **add the Supabase Auth "managing users" source** to SOURCES.md before 12c (A7).
-- **`plor_app`'s INSERT on `private.profile` covers `username_changed_at`** (ROADMAP "Next revision", For the human).
-- **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
-- **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
-- **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
-  - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
-  - check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*).
-- **Before approving the later drafted days,** note:
-  - three repeat 2026-10-22's categories: car brand (11-06), state capitals (11-10) and tea (11-16);
-  - several had a host swapped under the host-name rule (M06 ticket, Evidence).
+- **Merge PR #60 (12c)** once CI is green. The human approved its two security changes and the A4 Source diff row (2026-10-23: "Accept Claude's suggestions for all eight decisions"); the merge itself is the human's.
+- **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
+- **The public repo:** turn on the GitHub and Vercel settings listed in ROADMAP "Next revision", For the human, and decide about the public puzzle drafts.
+- **OK four SOURCES.md rows** Claude drafted from the pages (2026-10-23, in the session, not yet in the repo): npm scripts (npm 11.19.1's bundled docs), Supabase database testing (`/guides/database/testing` and `/local-development/testing/overview` at `07e69b9`), Next.js error handling (bundled 16.4.2 `/app/getting-started/error-handling`, which covers UI error boundaries only, not the route-handler wrapper), and GitHub secret scanning availability (docs.github.com, accessed 2026-10-23). If the drafts are lost, re-read those pages; then point DECISIONS.md's Task runner, Test runner, Error handling and Secret scanning Source cells at them (ROADMAP "Next revision", For the human).
+- **New questions for the repeated categories** (human, 2026-10-23: "new categories"; Claude suggested replacements in the session, for the human to pick): 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.
+- **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants): check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*), and that the hosted `postgres` role may delete from `auth.users` inside `delete_account` (12c; *unverified*: it does locally). "Allow public access" is already off in the hosted Realtime settings (human, 2026-10-23).
+- **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it (human OK, 2026-10-23).
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once 12b is merged and the human has added the Supabase Auth source: write 12c's acceptance criteria (A4, A5, A7, A8, and ROADMAP "Next revision", For M12: leave each group first, the comment and reaction indexes) and build it on `m12-account`. Without the source, stop and ask (CLAUDE.md).
+Once PR #60 is merged: start 12d on `m12-account`. Its details are settled (M12 ticket, 12d bullet); write its criteria and build it.
 
 ## Local state
-- The local Supabase stack is running, Realtime included, and holds:
-  - every migration up to `20261023083041_username_change.sql`;
-  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally;
-  - the approved 2026-10-22 day.
-- No dev server is left running.
-- `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
+- The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
+- The local Supabase stack is **left running** in Docker Desktop with every migration up to `20261023200556_account_deletion.sql`. It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
+- Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
+- A fresh checkout needs `npx next typegen` (or a build or dev run) before `npx tsc --noEmit -p .`, or `LayoutProps` is missing.
+- npm skipped two install scripts not covered by `allowScripts` (`fsevents`, `unrs-resolver`); every suite passed without them.
+- `npm run test:e2e` needs the stack running and `.env.local` pointing at it; Playwright starts the dev server. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
 - The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
   1. `npm ci`, then `npx supabase start`, then `npx supabase migration up`, then `npm run dev`.
