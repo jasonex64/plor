@@ -1,6 +1,19 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { describe, expect, it } from "vitest";
+import { thingId, uuidV5 } from "../src/content/thing-id.ts";
 import { aliasesFor, linkToWikidata, oewnSubtree, parseCsv, taxaToItems, usdaCheeses, type Item } from "./base.ts";
+
+describe("thing IDs", () => {
+  it("are RFC 4122 version 5 UUIDs", () => {
+    // Python's documented example: uuid.uuid5(uuid.NAMESPACE_DNS, "python.org").
+    expect(uuidV5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", "python.org")).toBe("886313e1-3b8a-5372-9b90-0c9aee199e5d");
+  });
+
+  it("are the same for the same source entry, and differ between sources", () => {
+    expect(thingId("wikidata", "Q144")).toBe(thingId("wikidata", "Q144"));
+    expect(thingId("wikidata", "Q144")).not.toBe(thingId("oewn", "Q144"));
+  });
+});
 
 describe("aliasesFor", () => {
   it("normalizes names, adds their plurals, then synonyms and scientific names, each alias once", () => {

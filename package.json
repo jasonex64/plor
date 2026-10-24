@@ -15,11 +15,7 @@
     "test:sql": "supabase test db",
     "lockfile": "node scripts/lockfile.ts",
     "content:validate": "node scripts/content-validate.ts",
-    "content:plurals": "node scripts/content-plurals.ts",
-    "content:letters": "node scripts/content-letters.ts",
-    "content:additions-check": "node scripts/content-additions-check.ts",
     "base": "node --env-file-if-exists=.env.local scripts/base.ts",
-    "survey:score": "node scripts/survey-score.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

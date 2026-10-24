@@ -1,79 +1,100 @@
-import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+// The drafted-day validator on format 3 (src/content/puzzle.ts; docs/milestones/M13-13a-the-base.md): one valid day,
+// then the same day with a single rule broken per case, written to a temporary content root (M01: one case per rule).
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
+import type { Puzzle } from "../src/content/puzzle.ts";
 import { validateRoot } from "./content-validate.ts";
 
-// Each failing fixture is the valid one with a single rule broken (M01 ticket: one fixture per rule).
-const FIXTURES = join(import.meta.dirname, "fixtures", "content");
 const FILE = "offbeat/2026-11-02.json";
+const id = (n: number) => `00000000-0000-5000-8000-${String(n).padStart(12, "0")}`;
+// Schedule A: Q2 and Q4 steal a medium letter, Q5 a heavy consonant, Q7 a vowel (M04 G8).
+const STEALS: (string | undefined)[] = [undefined, "c", undefined, "p", "r", undefined, "o"];
 
-const EXPECTED: Record<string, string> = {
-  "alias-shared": `${FILE} q2 entry "tiger": "lions" collides with "lions" of entry "lion" (both normalize to "lions")`,
-  "alias-normalized": `${FILE} q3 entry "zebra": "  LÏON'S " collides with "lions" of entry "lion" (both normalize to "lions")`,
-  "host-bank-unknown-entry": `${FILE} q1 entry "panda": in host_bank but not in the accepted bank`,
-  "host-answer-not-in-bank": `${FILE} q3 entry "giraffe": host answer is not in host_bank`,
-  "match-group-unknown-entry": `${FILE} q1 entry "golden-eagle": in match group "eagle" but not in the accepted bank`,
-  "match-group-key-not-host-answer": `${FILE} q1 entry "lion": match group key is not a host answer`,
-  "match-group-contains-key": `${FILE} q1 entry "eagle": listed in its own match group (a host answer always matches itself)`,
-  "plural-missing": `${FILE} q1 entry "lion": no plural alias "lions" (run npm run content:plurals, or set "plural" to override)`,
-  "path-mismatch": `${FILE}: path must be offbeat/2026-11-03.json to match its game_id and date`,
-  "question-count": `${FILE}: has 6 questions, expected 7`,
-  "no-host-answers": `${FILE} q2: has no host answers`,
-  "duplicate-entry-id": `${FILE} q2 entry "lion": ID used by more than one entry`,
-  // M02 2f, B11: rules that had no fixture.
-  "match-group-key-unknown": `${FILE} q1 entry "tiger": match group key is not in the accepted bank`,
-  "host-bank-duplicate": `${FILE} q1 entry "lion": listed twice in host_bank`,
-  "host-answer-duplicate": `${FILE} q1 entry "eagle": listed twice in host_answers`,
-  "name-normalizes-empty": `${FILE} q1 entry "salmon": "!!!" is empty after normalization`,
-  // M04 13c-3: stolen letters, schedule A ("Rules to build", rule 6).
-  "steals-off-schedule": `${FILE} q3: steals "x", but schedule A steals nothing at question 3`,
-  "steals-missing": `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`,
-  "steals-wrong-tier": `${FILE} q5: steals "x", which is not a heavy consonant letter (rnlts)`,
-  "steals-repeated": `${FILE} q4: steals "m", which an earlier question already stole`,
-  "host-untypeable": `${FILE} q6 entry "march": host answer's name "March" can't be typed without M, C, T`,
-  // M06: an alias that avoids the letters no longer saves a host answer whose name uses them.
-  "host-name-stolen": `${FILE} q4 entry "red": host answer's name "crimson" can't be typed without M, C`,
-  "no-safe-answer": `${FILE} q4: no safe answer can be typed without M, P`,
-  // M02 2f, B9: a mistyped extension used to be skipped silently.
-  "not-json": "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",
+function valid(): Puzzle {
+  return {
+    format: 3,
+    game_id: "offbeat",
+    date: "2026-11-02",
+    questions: STEALS.map((steals, i) => ({
+      prompt: `Name a thing ${i + 1}`,
+      category: "animal",
+      host_bank: [id(i * 10 + 1), id(i * 10 + 2)],
+      host_answers: [id(i * 10 + 1)],
+      levels: { [id(i * 10 + 1)]: "common" as const, [id(i * 10 + 3)]: "uncommon" as const },
+      ...(steals ? { steals } : {}),
+    })),
+  };
+}
+
+const roots: string[] = [];
+afterAll(() => roots.forEach((r) => rmSync(r, { recursive: true, force: true })));
+
+// A content root holding the given files.
+function root(files: Record<string, string>): string {
+  const dir = mkdtempSync(join(tmpdir(), "plor-content-"));
+  roots.push(dir);
+  for (const [path, text] of Object.entries(files)) {
+    mkdirSync(join(dir, path, ".."), { recursive: true });
+    writeFileSync(join(dir, path), text);
+  }
+  return dir;
+}
+
+const errorsFor = (puzzle: unknown, file = FILE) => validateRoot(root({ [file]: JSON.stringify(puzzle) })).errors;
+const broken = (change: (p: Puzzle) => void) => {
+  const p = valid();
+  change(p);
+  return errorsFor(p);
 };
 
-describe("validateRoot", () => {
-  it("passes the valid fixture", () => {
-    expect(validateRoot(join(FIXTURES, "valid"))).toEqual({ files: 1, errors: [] });
+describe("content:validate on format 3", () => {
+  it("passes a valid drafted day", () => {
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()) }))).toEqual({ files: 1, errors: [] });
   });
 
-  it.each(Object.entries(EXPECTED))("rejects %s with exactly its own error", (name, error) => {
-    expect(validateRoot(join(FIXTURES, name))).toEqual({ files: 1, errors: [error] });
+  it("refuses an empty root, a stray file, and a file that isn't JSON", () => {
+    expect(validateRoot(root({})).errors).toEqual([expect.stringMatching(/no puzzle files found$/)]);
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "offbeat/2026-11-03.jsno": "{}" })).errors).toEqual([
+      "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",
+    ]);
+    expect(validateRoot(root({ [FILE]: "{ nope" })).errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
   });
 
-  it("fails when the root holds no puzzle files", () => {
-    const empty = mkdtempSync(join(tmpdir(), "plor-content-"));
-    try {
-      expect(validateRoot(empty)).toEqual({ files: 0, errors: [`${empty}: no puzzle files found`] });
-    } finally {
-      rmSync(empty, { recursive: true, force: true });
-    }
+  it.each<[string, (p: Puzzle) => void, string]>([
+    ["question count", (p) => p.questions.pop(), `${FILE}: has 6 questions, expected 7`],
+    ["no host answers", (p) => (p.questions[1].host_answers = []), `${FILE} q2: has no host answers`],
+    ["host answer outside the bank", (p) => (p.questions[2].host_answers = [id(99)]), `${FILE} q3 thing "${id(99)}": host answer is not in host_bank`],
+    ["host bank duplicate", (p) => p.questions[0].host_bank.push(id(1)), `${FILE} q1 thing "${id(1)}": listed twice in host_bank`],
+    ["host answer duplicate", (p) => p.questions[0].host_answers.push(id(1)), `${FILE} q1 thing "${id(1)}": listed twice in host_answers`],
+    ["steals where schedule A steals nothing", (p) => (p.questions[0].steals = "b"), `${FILE} q1: steals "b", but schedule A steals nothing at question 1`],
+    ["no steal where schedule A steals", (p) => delete p.questions[1].steals, `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`],
+    ["a letter from the wrong tier", (p) => (p.questions[4].steals = "e"), `${FILE} q5: steals "e", which is not a heavy consonant letter (rnlts)`],
+    ["a letter stolen twice", (p) => (p.questions[3].steals = "c"), `${FILE} q4: steals "c", which an earlier question already stole`],
+  ])("refuses %s", (_, change, message) => {
+    expect(broken(change)).toEqual([message]);
   });
 
-  it("throws when the root does not exist", () => {
-    expect(() => validateRoot(join(FIXTURES, "no-such-root"))).toThrow(/ENOENT/);
+  it("refuses fields of the wrong shape, and unknown ones", () => {
+    const p = valid() as unknown as { questions: Record<string, unknown>[] };
+    p.questions[0].host_bank = ["dog"];
+    p.questions[1].category = "Dog Breed";
+    p.questions[2].levels = { [id(21)]: "rare" };
+    p.questions[3].entries = [];
+    expect(errorsFor(p)).toEqual([
+      `${FILE} q1: "host_bank" must be a list of thing IDs`,
+      `${FILE} q2: "category" must be a category key (lower-case letters and _)`,
+      `${FILE} q3: "levels" must map thing IDs to "common" or "uncommon"`,
+      `${FILE} q4: unknown field "entries"`,
+    ]);
   });
-});
 
-describe("content:validate exit code", () => {
-  const run = (root: string) =>
-    spawnSync(process.execPath, [join(import.meta.dirname, "content-validate.ts"), root], { encoding: "utf8" });
-
-  it("exits 0 on valid content", () => {
-    expect(run(join(FIXTURES, "valid")).status).toBe(0);
+  it("refuses a file whose path doesn't match its date", () => {
+    expect(errorsFor(valid(), "offbeat/2026-11-03.json")).toEqual(["offbeat/2026-11-03.json: path must be offbeat/2026-11-02.json to match its game_id and date"]);
   });
 
-  it("exits 1 and prints the error on invalid content", () => {
-    const result = run(join(FIXTURES, "plural-missing"));
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain(EXPECTED["plural-missing"]);
+  it("refuses an older format", () => {
+    expect(errorsFor({ ...valid(), format: 2 })).toEqual([`${FILE}: "format" must be 3`]);
   });
 });

@@ -16,6 +16,7 @@ import pg from "pg";
 import pluralize from "pluralize";
 import { BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS } from "../src/config/tunables.ts";
 import { normalize } from "../src/content/puzzle.ts";
+import { thingId } from "../src/content/thing-id.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 export type Item = { id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string };
@@ -471,7 +472,8 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   const client = await localClient();
   try {
     await client.query("begin");
-    const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [def.source, manifest.snapshot, JSON.stringify(items)]);
+    const withIds = items.map((item) => ({ ...item, thing_id: thingId(def.source, item.id) }));
+    const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [def.source, manifest.snapshot, JSON.stringify(withIds)]);
     if (def.category) {
       const c = def.category;
       await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, def.source, c.root, c.member_of ?? null]);

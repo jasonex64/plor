@@ -10,7 +10,7 @@ import {
   RARITY_MIN_PLAYERS,
   RARITY_ZERO_SHARE,
 } from "@/config/tunables";
-import type { Puzzle, Question } from "@/content/puzzle";
+import type { ApprovedPuzzle, ApprovedQuestion } from "@/content/puzzle";
 
 // inDay: given before the run's day ended at midnight; later answers earn no bonus (D8).
 export type ScoredEvent = { index: number; entryId: string; matched: boolean; inDay: boolean };
@@ -20,11 +20,11 @@ export type ScoredEvent = { index: number; entryId: string; matched: boolean; in
 export type DayCounts = Map<number, { answered: number; byEntry: Map<string, number> }>;
 
 // The share of players expected to give this answer before any are counted (D11, N5): the host bank, the common
-// tier, shares HOST_BANK_EXPECTED_SHARE, and every other listed answer the rest. With every answer in the host bank,
-// they all share evenly (Claude's reading; no number involved).
-export function expectedShare(question: Question, entryId: string): number {
+// tier, shares HOST_BANK_EXPECTED_SHARE, and every other member of the category, as approved, the rest. With every
+// member in the host bank, they all share evenly (Claude's reading; no number involved). 13c replaces it with levels.
+export function expectedShare(question: ApprovedQuestion, entryId: string): number {
   const bank = question.host_bank.length;
-  const others = question.entries.length - bank;
+  const others = question.members - bank;
   if (others === 0) return 1 / bank;
   return question.host_bank.includes(entryId) ? HOST_BANK_EXPECTED_SHARE / bank : (1 - HOST_BANK_EXPECTED_SHARE) / others;
 }
@@ -53,7 +53,7 @@ export function cappedBonus(sum: number, survived: number, total: number): numbe
 
 // counts: the closed day's counts for the final bonus, or null for the provisional one (the expectation alone).
 // bonuses lines up with events: 0 for a caught answer or one given after midnight.
-export function scoreRun(puzzle: Puzzle, events: ScoredEvent[], counts: DayCounts | null): { ladder: number; bonus: number; bonuses: number[] } {
+export function scoreRun(puzzle: ApprovedPuzzle, events: ScoredEvent[], counts: DayCounts | null): { ladder: number; bonus: number; bonuses: number[] } {
   const bonuses = events.map((e) => {
     if (e.matched || !e.inDay) return 0;
     const expected = expectedShare(puzzle.questions[e.index], e.entryId);

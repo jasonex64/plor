@@ -89,6 +89,45 @@ Seven concrete categories that use every source, in an order that rises roughly 
   - WordNet's "animal" (00015568-n) carries no Wikidata ID, so Claude linked it to Q729 ("animal").
 - **Fruit comes from Wikidata alone,** whose tree has tomato under fruit. Open English WordNet supplies cheese, with USDA's cheeses linked to it.
 
+## 13a-2 and 13a-3 (decided 2026-10-24, before 13a-2's code)
+**The human's answers (guided questions):**
+
+| Subject | Answer |
+|---|---|
+| A name shared by unrelated members ("robin": American and European) | "Caught if any meaning is (Recommended)" |
+| Scientific names as answers | "Yes, they count (Recommended)" |
+| The reveal's "You said ___" | The thing's main name ("yes" to Claude's suggestion) |
+| A stolen letter and an alias that avoids it ("Ursus maritimus" when P is gone) | "Yes: letters limit typing (Recommended)": today's rule, unchanged |
+
+**Claude's design:**
+- **No per-day copy** (the human asked about database size, 2026-10-24). A format-3 day stores, per question:
+  - its prompt and category key;
+  - its host answers, with display names;
+  - its host bank and the drafting session's popularity levels;
+  - the stolen letter.
+
+  It also stores the day's `approved_at` and each category's member count at approval, for the bonus. Every answer is resolved against the base **as of `approved_at`**: only aliases and facts added by then count. So a started day never changes, and the database grows only with the base, not with days.
+- **Resolving a typed answer:**
+  1. **Exact:** the normalized text is looked up by the alias index. The candidates are the things with that alias that are members of the question's category, walking up their kind_of facts to its root, as of `approved_at`.
+  2. **Otherwise one typo** (text of 4+ letters, as today):
+     - every text one edit away (a deletion, insertion, substitution or swap of neighbours), over the alphabet the aliases use, is looked up the same way;
+     - an alias with a stolen letter doesn't count;
+     - the typed text resolves if exactly one alias is that close.
+
+     This is today's rule (`editDistanceAtMost`), enumerated instead of scanned, so it needs no similarity threshold.
+- **One alias, several members:**
+  - On one line of the tree, it is the highest (evidence: "aardvark" at three ranks).
+  - Unrelated members ("robin") are one answer, caught if any of them is (human).
+  - The answer stored is the caught member if there is one; else the highest popularity level, then the smallest ID. The rule is deterministic, so counts and the bonus agree.
+- **Caught:** the answer is a host answer, or has one among its ancestors (human: "bear covers polar bear"). Match groups go: the tree replaces them.
+- **Format 2 is retired** (M13 D8): its validator rules, `content:plurals`, the per-day lists, and the format-2 fixtures. The tests get a small base fixture and a format-3 day.
+- **13a-2** is the format, the engine (runs, matching, payload, scoring, ledger, board, insights) and the admin puzzles page on it, with the tests rebuilt.
+- **13a-3** is:
+  - the drafting script;
+  - format 3's draft validator and letter picker;
+  - the T1 day drafted, approved and played (e2e);
+  - the matching items (digits, zero-width characters).
+
 ## Acceptance criteria
 - [ ] **The tables** in `private`: things (a random permanent ID, its name), aliases (with their kind and origin), facts (thing, trait, value, origin, source reference, when), categories (a recipe over facts, or a kept member list), and a log of every addition.
   - Writes go only through guarded functions.

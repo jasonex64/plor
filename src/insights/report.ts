@@ -2,9 +2,9 @@
 // and misses, with no user IDs (D4), and returns per-question totals. Difficulty is the share of players a question's
 // host answers catch, and it should rise gently through the day (DECISIONS.md: Game 1); there is no stored target,
 // so each question is compared with the day's others (D2).
-import { normalize, type Puzzle } from "../content/puzzle.ts";
+import { normalize, type ApprovedPuzzle } from "../content/puzzle.ts";
 import { INSIGHTS_MIN_PLAYERS, INSIGHTS_SHAPE_DROP_POINTS, INSIGHTS_TOP_ANSWERS } from "../config/tunables.ts";
-import { hostAnswers, named, type Named } from "../game/payload.ts";
+import { hostAnswers, named, type Named, type Names } from "../game/payload.ts";
 
 export type AnswerRow = { question_idx: number; entry_id: string; matched: boolean };
 export type MissRow = { question_idx: number; typed: string };
@@ -28,7 +28,8 @@ export type QuestionInsights = {
 
 export type DayInsights = { date: string; finished: boolean; questions: QuestionInsights[] };
 
-export function buildInsights(date: string, finished: boolean, puzzle: Puzzle, answers: AnswerRow[], misses: MissRow[]): DayInsights {
+// names: the main names of every answer given and every host answer (src/game/payload.ts, thingNames).
+export function buildInsights(date: string, finished: boolean, puzzle: ApprovedPuzzle, answers: AnswerRow[], misses: MissRow[], names: Names): DayInsights {
   const questions = puzzle.questions.map((question, index): QuestionInsights => {
     const rows = answers.filter((a) => a.question_idx === index);
     const caught = rows.filter((a) => a.matched).length;
@@ -36,13 +37,13 @@ export function buildInsights(date: string, finished: boolean, puzzle: Puzzle, a
     const counts = new Map<string, number>();
     for (const row of rows) counts.set(row.entry_id, (counts.get(row.entry_id) ?? 0) + 1);
     const topAnswers = [...counts]
-      .map(([id, count]) => ({ answer: named(question, id), count }))
+      .map(([id, count]) => ({ answer: named(names, id), count }))
       .sort((a, b) => b.count - a.count || a.answer.name.localeCompare(b.answer.name))
       .slice(0, INSIGHTS_TOP_ANSWERS);
     return {
       index,
       prompt: question.prompt,
-      hostAnswers: hostAnswers(question),
+      hostAnswers: hostAnswers(question, names),
       answered: rows.length,
       caught,
       catchRate: rows.length ? caught / rows.length : null,

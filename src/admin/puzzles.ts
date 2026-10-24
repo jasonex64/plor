@@ -5,6 +5,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
 import { GAME_ID, checkPuzzleFile, parsePuzzle, type Puzzle } from "@/content/puzzle";
+import { thingNames, type Named, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 
@@ -25,8 +26,9 @@ export function readDrafts(): Map<string, Puzzle> {
   return drafts;
 }
 
-// What the page shows of a puzzle: each question's prompt, stolen letter, host answers and every answer it accepts.
-export type QuestionView = { prompt: string; steals: string | null; hostAnswers: string[]; answers: { id: string; name: string; aliases: string[] }[] };
+// What the page shows of a puzzle: each question's prompt, category, stolen letter, host answers and host bank by name.
+// The category's members aren't listed: there can be tens of thousands (docs/milestones/M13-13a-the-base.md).
+export type QuestionView = { prompt: string; category: string; steals: string | null; hostAnswers: string[]; hostBank: Named[] };
 export type DayView = {
   date: string;
   // The questions an admin saved for the day, if any.
@@ -38,12 +40,14 @@ export type DayView = {
   started: boolean;
 };
 
-function view(puzzle: Puzzle): QuestionView[] {
+// A host bank entry missing from this database (a draft built against another one) shows its ID.
+function view(puzzle: Puzzle, names: Names): QuestionView[] {
   return puzzle.questions.map((q) => ({
     prompt: q.prompt,
+    category: q.category,
     steals: q.steals ?? null,
     hostAnswers: q.host_answers,
-    answers: q.entries.map((e) => ({ id: e.id, name: e.name, aliases: e.aliases })),
+    hostBank: q.host_bank.map((id) => ({ id, name: names.get(id) ?? id })),
   }));
 }
 
@@ -61,21 +65,22 @@ export async function listDays(db: Db, drafts: Map<string, Puzzle>): Promise<{ t
   const questions = new Map(saved.rows.map((r) => [r.date, r.prompts]));
   const approved = new Map(live.rows.map((r) => [r.date, r.content]));
   const dates = new Set([...questions.keys(), ...approved.keys(), ...[...drafts.keys()].filter((d) => d >= today)]);
+  const names = await thingNames(db, [...dates].flatMap((d) => [drafts.get(d), approved.get(d)].flatMap((p) => p?.questions.flatMap((q) => q.host_bank) ?? [])));
   const days = [...dates].sort().map((date) => {
     const draft = drafts.get(date);
     const puzzle = approved.get(date);
     return {
       date,
       questions: questions.get(date) ?? null,
-      draft: draft ? view(draft) : null,
-      live: puzzle ? view(puzzle) : null,
+      draft: draft ? view(draft, names) : null,
+      live: puzzle ? view(puzzle, names) : null,
       started: puzzle !== undefined && date <= today,
     };
   });
   return { today, days };
 }
 
-// The SQLSTATEs the two guarded functions raise (migration 20261021232903_puzzle_entry.sql), as API errors.
+// The SQLSTATEs the two guarded functions raise (migrations 20261021232903_puzzle_entry.sql, 20261024213853_answer_engine.sql), as API errors.
 function guarded(err: unknown): never {
   if (err instanceof DatabaseError) {
     if (err.code === "OB007") throw new AppError("admins_only", 403);
@@ -89,6 +94,16 @@ export async function saveQuestions(db: Db, userId: string, date: string, prompt
   await db.query("select private.save_questions($1, $2, $3::date, $4)", [userId, GAME_ID, date, prompts]).catch(guarded);
 }
 
-export async function approvePuzzle(db: Db, userId: string, puzzle: Puzzle): Promise<void> {
-  await db.query("select private.approve_puzzle($1, $2)", [userId, puzzle]).catch(guarded);
+// Approves a day, or returns the problems private.approve_puzzle found against the base (OB009), one per question as it
+// names them ("question 3: ..."), reworded to the "q3" the page files them under.
+export async function approvePuzzle(db: Db, userId: string, puzzle: Puzzle): Promise<string[]> {
+  try {
+    await db.query("select private.approve_puzzle($1, $2)", [userId, puzzle]);
+    return [];
+  } catch (err) {
+    if (err instanceof DatabaseError && err.code === "OB009") {
+      return err.message.replace(/^puzzle_invalid: /, "").split("; ").map((p) => p.replace(/^question (\d+):/, `${puzzle.date} q$1:`));
+    }
+    return guarded(err);
+  }
 }

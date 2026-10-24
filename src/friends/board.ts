@@ -4,8 +4,8 @@
 // which one caught them. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql, and
 // since 12d 20261024031116_board_hides_progress.sql); this is the full picture the page loads first and refetches
 // after a reconnect.
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
-import { named } from "@/game/payload";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { named, thingNames, type Names } from "@/game/payload";
 import type { RunStatus } from "@/game/runs";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, runReactions, type Reactions } from "@/reactions/reactions";
@@ -37,7 +37,7 @@ const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 type Row = { user_id: string; username: string; name: string; status: RunStatus | null; answered: number | null };
 
 export async function getBoard(db: Db, viewerId: string): Promise<Board> {
-  const { rows: today } = await db.query<{ date: string; content: Puzzle | null }>(
+  const { rows: today } = await db.query<{ date: string; content: ApprovedPuzzle | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
     [GAME_ID],
@@ -66,13 +66,14 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
     );
     for (const e of events) caught.set(e.user_id, e);
   }
+  const names = await thingNames(db, [...caught.values()].map((e) => e.entry_id));
   // Reactions wait for the viewer's run to end too: a reaction on how a friend's run ended says something about it.
   const reactions = finished ? await runReactions(db, viewerId, date, rows.map((r) => r.user_id)) : new Map<string, Reactions>();
 
   return {
     date,
     finished,
-    mine: finished && content ? ended(viewer!, caught.get(viewerId), content) : null,
+    mine: finished && content ? ended(viewer!, caught.get(viewerId), names) : null,
     reactionsOnMine: finished ? (reactions.get(viewerId) ?? NO_REACTIONS) : null,
     friends: friends
       .map((f): BoardFriend => {
@@ -82,7 +83,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
           name: f.name,
           state,
           question: state === "playing" ? f.answered! + 1 : null,
-          ended: state === "finished" ? ended(f, caught.get(f.user_id), content!) : null,
+          ended: state === "finished" ? ended(f, caught.get(f.user_id), names) : null,
           reactions: finished && state !== "not_started" ? (reactions.get(f.user_id) ?? NO_REACTIONS) : null,
         };
       })
@@ -90,10 +91,10 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   };
 }
 
-function ended(f: Row, event: { question_idx: number; entry_id: string } | undefined, content: Puzzle): Ended {
+function ended(f: Row, event: { question_idx: number; entry_id: string } | undefined, names: Names): Ended {
   if (f.status === "survived") return { result: "survived" };
   if (f.status === "timed_out") return { result: "timed_out", question: f.answered! + 1 };
   // A died run always has its matched event (run_status: died = bool_or(matched)).
   if (!event) throw new Error(`run of ${f.username} is died with no matched event`);
-  return { result: "caught", question: event.question_idx + 1, answer: named(content.questions[event.question_idx], event.entry_id).name };
+  return { result: "caught", question: event.question_idx + 1, answer: named(names, event.entry_id).name };
 }
