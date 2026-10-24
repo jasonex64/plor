@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is drafted below and waits for the human's OK in SOURCES.md; then the criteria are written and 12e is built, before 12d. No code before they're answered.
+**Status:** planned: draft sub-ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "also work on fixing sign-in code check vulnerabilites"). L1–L4 and all six numbers are answered (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested"). Vercel's request headers page is in SOURCES.md (human, 2026-10-23: "OK: add the Vercel request headers row to SOURCES.md"). Next: write the criteria and build 12e, before 12d, once PR #60 (12c) is merged (CLAUDE.md: merge the open PR before the next sub-ticket). No code before they're answered.
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send.
@@ -45,7 +45,7 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
 - SOURCES.md, Supabase email sending and Auth limits (`/rate-limits` at `07e69b9`): the per-IP token buckets, the defaults, "IP address forwarding" (`Sb-Forwarded-For`, a secret API key only, off by default).
 - SOURCES.md, Supabase email sign-in: one code per address per 60 s; codes last 1 hour.
 - SOURCES.md, Vercel functions package (`@vercel/functions` 3.10.1): `ipAddress()`, which reads `x-real-ip` (installed `headers.js`).
-- **Drafted for the human's OK** (not yet in SOURCES.md): Vercel request headers, https://vercel.com/docs/headers/request-headers, last updated 2025-12-13, accessed 2026-10-23. `x-forwarded-for` is "the public IP address of the client"; Vercel overwrites it and "do[es] not forward external IPs", a restriction "in place to prevent IP spoofing"; `x-real-ip` and `x-vercel-forwarded-for` are identical to it. A proxy in front of Vercel could overwrite `x-forwarded-for`; Plor has none. Draft row: `| Vercel request headers (M12 12e) | https://vercel.com/docs/headers/request-headers (\`x-forwarded-for\`, \`x-real-ip\`, \`x-vercel-forwarded-for\`) | last updated 2025-12-13, accessed 2026-10-23 (added by the human's OK, <date>) | The client IP a function sees: set by Vercel, overwritten so a client can't spoof it, and the same in all three headers |`. L1 (a) waits on it.
+- SOURCES.md, Vercel request headers (added human, 2026-10-23: "OK: add the Vercel request headers row to SOURCES.md"): `x-forwarded-for` is "the public IP address of the client"; Vercel overwrites it and does "not forward external IPs", to "prevent IP spoofing"; `x-real-ip` is identical. Plor has no proxy in front of Vercel.
 - DECISIONS.md: Sign-in, Logging, Error handling, Row-level security in `private`, App database role; the Log entry accepting the risk for the playtest (2026-10-20).
 - `docs/milestones/M02-2f-cleanup.md`, Review, blocking finding 1 (the guessing risk).
 
@@ -63,7 +63,7 @@ Written once L1–L4 and the numbers are answered. With L1 (a) they will cover:
 - Revoking the legacy JWT secret (ROADMAP, For M15): a dashboard action, unrelated to codes.
 
 ## Plan
-1. The human answers L1–L4, gives the numbers, and adds Vercel's request headers page to SOURCES.md.
+1. ~~The human answers L1–L4, gives the numbers, and adds Vercel's request headers page to SOURCES.md~~ (done, 2026-10-23).
 2. **Hypothesis check** on the local stack: a wrong code doesn't use up the right one (M02 2f, hypothesis 3, observed then). Also check whether Auth limits wrong codes per address on its own. Expected: no per-address limit beyond the per-IP bucket. *Disproved if* the right code stops working after some number of wrong ones. Then that number is Auth's, and our per-address cap is recorded against it.
 3. Tests first, then the migration, `take_auth_attempt`, the two routes and the form's message, on `m12-account`, with one PR.
 4. The human raises Auth's hosted limits (L1 a, L3) after it merges.
