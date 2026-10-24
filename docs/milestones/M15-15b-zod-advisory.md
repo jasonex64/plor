@@ -1,6 +1,6 @@
 # M15 15b — The zod security advisory
 
-**Status:** in review (2026-10-24): its PR waits for green CI and the human's OK to merge. Built ahead of the rest of M15 (human, 2026-10-24: "M15, as 15b"). The human asked for it: "yes resolve the zod thing but explain to me what it is, in simpler terms as we fix it".
+**Status:** done (2026-10-24): merged in PR #69 by GitHub auto-merge, which waits for every required check (`db`, `e2e`, `secrets`, `check`) to pass (human, 2026-10-24: "Yes, merge PR #69 once every CI check is green"). Dependabot alert #1 closes on the merge (checked by the next session, HANDOFF.md). Built ahead of the rest of M15 (human, 2026-10-24: "M15, as 15b"). The human asked for it: "yes resolve the zod thing but explain to me what it is, in simpler terms as we fix it".
 
 ## Goal
 No installed copy of zod has the memory bug in GHSA-mrhx-c7xc-m3w5, and future security fixes for dependencies arrive as pull requests the human approves.
@@ -34,7 +34,7 @@ No installed copy of zod has the memory bug in GHSA-mrhx-c7xc-m3w5, and future s
 
 ## Acceptance criteria
 - [x] `package.json` has `"overrides": { "zod": "^4.6.6" }`, and `npm ls zod` shows no version below 4.6.6.
-- [x] `npm run lockfile -- check`, `npm test`, `npm run lint`, `npx tsc --noEmit -p .` and `npm run build` pass (local); CI pending on the PR.
+- [x] `npm run lockfile -- check`, `npm test`, `npm run lint`, `npx tsc --noEmit -p .` and `npm run build` pass, locally and in CI (PR #69's required checks, which gate its merge).
 - [ ] Dependabot alert #1 is closed after the merge.
 - [x] **Z4:** Dependabot security updates are on for the repo, and DECISIONS.md's lockfile row says how their PRs fit the one-way rule. The source was added with the human's OK (2026-10-24: "Yes to both (Recommended)").
 

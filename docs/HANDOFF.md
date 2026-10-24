@@ -5,11 +5,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 **Updated:** 2026-10-24, by the session that reviewed the MVP, built M12 12f, drafted M13's ticket and fixed the zod advisory (M15 15b), on the Windows machine.
 
 ## Where things stand
-- **M15 15b, the zod security advisory, is in review**:
+- **M15 15b, the zod security advisory, is done**:
   - PR #69 from `m15-launch-readiness`; ticket `docs/milestones/M15-15b-zod-advisory.md`;
   - an npm override forces zod to `^4.6.6` (4.6.7 installed), because `@vercel/cli-config` pins 4.1.11.
 
-  It waits for green CI and the human's OK to merge. After the merge, check that Dependabot alert #1 closed.
+  PR #69 merges itself by GitHub auto-merge once every required check passes (human, 2026-10-24: "Yes, merge PR #69 once every CI check is green"). If it hasn't merged, read its failing check. After the merge, check that Dependabot alert #1 closed: `gh api repos/jasonex64/plor/dependabot/alerts/1 --jq .state`.
 - **Dependabot security updates are now on for the repo** (a repo setting, outside any diff; DECISIONS.md Log, 2026-10-24). Its PRs may arrive at any time. They run CI and merge only with the human's OK. They're the one exception to the lockfile rule.
 - **M13's draft ticket and the new CLAUDE.md rule "Ask before designing"** are on `m13-answer-lists-and-content` in PR #61, not yet on `main`.
   - The human answered four rounds of guided questions on the answer database (2026-10-24). Claude proposed a design: things, aliases, facts and categories, frozen into each day at approval; misses auto-accepted by a share of players unless the facts contradict them; rarity pooled per category, with recent days weighted.
@@ -17,7 +17,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The MVP (M00–M12) is done.** The order from here is M13, then M14, then M15 (ROADMAP, Focus on the M13 branch). plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **PR #69:** OK to merge on green CI.
 - **M13:** go-ahead to rewrite its ticket around the database design, then its open numbers and sources:
   - the auto-accept share and minimum;
   - the recency weighting;
@@ -26,9 +25,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - The rest is in PR #61's handoff and ROADMAP "Next revision", For the human.
 
 ## Next step
-1. Merge PR #69 on green CI with the human's OK.
-2. Confirm alert #1 closed.
-3. Back to M13 on `m13-answer-lists-and-content`. Merge `main` into it first, since #69 touches ROADMAP's M15 row, which PR #61 also changes.
+1. Confirm PR #69 merged and alert #1 closed; delete `m15-launch-readiness` if auto-merge didn't (M15 continues later on a fresh branch from `main`).
+2. Back to M13 on `m13-answer-lists-and-content`. Merge `main` into it first, since #69 touches ROADMAP's M15 row, which PR #61 also changes.
 
 ## Local state
 - **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m15-launch-readiness`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running, and no temporary test files are left.
