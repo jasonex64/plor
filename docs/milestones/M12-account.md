@@ -1,6 +1,6 @@
 # M12 — Account
 
-**Status:** in review (2026-10-23): 12f, the MVP review fixes, is its own sub-ticket, in review in its PR, `docs/milestones/M12-12f-review-fixes.md` (human, 2026-10-23: "draft and execute"). 12a, 12b, 12c, 12e and 12d are done and merged (PRs #58, #59, #60, #62 and #63), each with the human's approval of its security changes; the ticket was PR #57.
+**Status:** done (2026-10-23). 12f, the MVP review fixes (`docs/milestones/M12-12f-review-fixes.md`; human, 2026-10-23: "draft and execute"), merged in PR #67 on green CI (human, 2026-10-23: "Yes, merge PR #67 once every CI check is green"). 12a, 12b, 12c, 12e and 12d were merged (PRs #58, #59, #60, #62 and #63), each with the human's approval of its security changes; the ticket was PR #57.
 
 ## Goal
 A player can see and manage their own account in one place: their username (and change it, if A2 allows), display name, friends and invite link, all-time points, sign-out, and deleting the account themselves. The sign-in fixes filed for M12 come with it.

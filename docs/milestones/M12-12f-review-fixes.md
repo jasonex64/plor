@@ -1,6 +1,6 @@
 # M12 12f — MVP review fixes
 
-**Status:** in review (2026-10-23): built on `m12-account` and reviewed. Its PR waits for green CI and the human's approval to merge. Drafted from Claude's review of the MVP against its tickets. The human asked for it to be drafted and built (2026-10-23: "draft and execute").
+**Status:** done (2026-10-23): merged in PR #67 by GitHub auto-merge, which waits for every required check (`db`, `e2e`, `secrets`, `check`) to pass (human, 2026-10-23: "Yes, merge PR #67 once every CI check is green"). Drafted from Claude's review of the MVP against its tickets. The human asked for it to be drafted and built (2026-10-23: "draft and execute").
 
 ## Goal
 A player can find how to add a friend from the home page, a day with no puzzle doesn't leave the page stuck, and taps that delete other players' or your own data ask first.
@@ -60,7 +60,7 @@ A player can find how to add a friend from the home page, a day with no puzzle d
 - [x] **F3.** Removing a friend asks first, and cancelling keeps the friend while accepting removes them (e2e). Leave and Remove member ask first (code read; same pattern).
 - [x] **F4.** Sign-up's text no longer says the username can't change. The account page's box lower-cases what's typed (e2e: typing upper case changes the username).
 - [x] **F5, F6.** The feed's box is labelled "Comment to your friends" (e2e). The privacy page names groups.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db` and `npm run test:e2e` pass (local: done), and so does CI (pending on the PR).
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db` and `npm run test:e2e` pass, locally and in CI (PR #67's required checks, which gate its merge).
 
 ## Out of scope
 These go to ROADMAP "Next revision" or to the human:
