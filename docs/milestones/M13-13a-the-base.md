@@ -162,7 +162,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
 - [x] **Admin search and browse:** an admin looks up a thing by name or alias and sees its names, aliases, facts and categories (e2e). A non-admin gets 403.
 - [x] **Credits:** the privacy page has a "Data sources" section crediting the CC BY sources, and names Wikidata and USDA.
 - [x] **The M13 matching items:** a plural alias without its synonym, digits under the typo rule, and zero-width characters stripped by normalization. Each has a test.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql` and `npm run test:e2e` pass, and so does CI. (Local: pass; CI: pending on the PR.)
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql` and `npm run test:e2e` pass, and so does CI. Local, 2026-10-24: 35 files (204 tests), 33 db files (222 tests), `Result: PASS`, 13 e2e passed. CI on PR #71 at `0ffaf79`: check, db, e2e, secrets and Vercel all pass (runs 40143057892, 40143059567).
 
 ## Out of scope
 - Learning from misses, the audit page and undo: 13b.
