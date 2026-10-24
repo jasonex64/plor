@@ -63,10 +63,12 @@ select lives_ok($$insert into private.profile (user_id, username) values ('00000
   'the old username is free for anyone at once');
 select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
   'OB011', null, 'a second change within 30 days of the last is refused');
-update private.profile set username_changed_at = now() - interval '29 days 23:59:59' where user_id = '00000000-0000-0000-0000-00000000000b';
+-- statement_timestamp(), as the trigger uses: now() is when the transaction began, which over a remote connection
+-- can be more than the second this check turns on.
+update private.profile set username_changed_at = statement_timestamp() - interval '29 days 23:59:59' where user_id = '00000000-0000-0000-0000-00000000000b';
 select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
   'OB011', null, 'a change a second short of 30 days after the last is refused');
-update private.profile set username_changed_at = now() - interval '30 days 1 second' where user_id = '00000000-0000-0000-0000-00000000000b';
+update private.profile set username_changed_at = statement_timestamp() - interval '30 days 1 second' where user_id = '00000000-0000-0000-0000-00000000000b';
 select lives_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
   'a change more than 30 days after the last is allowed');
 select throws_ok($$update private.profile set username = 'Bad' where user_id = '00000000-0000-0000-0000-00000000000c'$$,

@@ -3,6 +3,10 @@
 -- started can't change. They're called as the test's own role, which can't SET ROLE plor_app locally; that plor_app
 -- may only execute them, never write the tables, is checked by plor_app_role.test.sql and game.test.sql.
 begin;
+-- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
+set local role postgres;
+set local search_path to extensions, public;
+create extension if not exists pgtap with schema extensions;
 select plan(9);
 
 insert into auth.users (id, email) values
