@@ -90,7 +90,8 @@ select is((select count(*)::int from realtime.messages where topic = 'board:0000
 set local realtime.topic to 'board:00000000-0000-0000-0000-0000000007c2';
 select is((select count(*)::int from realtime.messages where topic = 'board:00000000-0000-0000-0000-0000000007c2'), 1,
   'a user can read their own board');
-reset role;
+-- Back to postgres, not `reset role`: a remote run's session role is cli_login_postgres, which can't see pgTAP.
+set local role postgres;
 
 select * from finish();
 rollback;
