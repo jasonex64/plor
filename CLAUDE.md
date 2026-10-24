@@ -8,6 +8,11 @@ Every session starts with no memory of earlier ones. Everything the next session
 - **First thing:** read `docs/HANDOFF.md`, then run `git branch -a` and `gh pr list`. If a milestone branch or PR is open, read `docs/HANDOFF.md` on that branch too; the most recently updated one wins.
 - **Last thing:** before a session ends, or hands work to another agent, rewrite `docs/HANDOFF.md` and commit it on the branch you worked on. Say where things stand, what's half done, what waits on the human, anything left running, and the next step. Keep it short; history belongs in git.
 
+## Ask before designing
+For every ticket and every subject that needs the human's intent, ask guiding questions before proposing anything. *(Human, 2026-10-24: "let's do this process moving forward for every ticket and every subject that comes up so there's no confusion about what i want".)*
+- **Rounds of up to four multiple-choice questions** (the AskUserQuestion tool). Start with the long-term picture, then narrow down to collisions between answers. Keep the questions inquisitive and concrete, give plain-language options that each state their trade-off, and let the human answer in their own words.
+- **After each round,** say in a few lines what it settled. Then propose the design and record the answers in the ticket, quoted.
+
 ## Before writing code
 1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The one exception is drafting a day's puzzle, which follows DECISIONS.md, "Puzzle drafting".
 2. **Say where we are.** Give the current milestone, its status and what comes next, taken from `docs/ROADMAP.md`.
