@@ -1,112 +1,160 @@
-# M13 — Answer lists and content
+# M13 — The answer database
 
-**Status:** planned: draft ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "u can close and start the ticket"). A1–A6 and the numbers wait on the human. No code before they're answered, and none before the answer source is in SOURCES.md (A2).
+**Status:** planned: draft ticket for the human's approval, 2026-10-24.
+- **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
+- **Waiting on the human:** D1–D8 and the numbers, and the sources for SOURCES.md (D2).
+- **No code before then.**
 
 ## Goal
-A fair answer is accepted, a clever dodge isn't always safe, and each day is drafted from lists that improve once and help every later day.
+One growing database of things, their names and the facts about them. It decides which answers each question accepts, learns from what players type, and measures how rare each answer really is, so that an AI can later draft whole days that the human approves in under a minute.
 
 ## Who uses it / what breaks without it
 - **Used by:**
   - every player, on every question;
-  - the human and the drafting session, who build each day (DECISIONS.md, "Puzzle drafting").
+  - the human, who approves days and audits what the game learned;
+  - later, the AI that drafts days (ROADMAP Later) and future games that need meaning, not only words.
 - **Breaks without it:**
-  - **Fair answers are refused.** Each day's accepted bank is typed by hand for that day. Free typing (M04) and stolen letters push players toward unusual answers, and a missing one is "not in our list". WordNet held 223 of one day's 226 animals (M04), but it isn't a source yet.
-  - **The game is too easy, and in the wrong way.** In the M02 2g survey, 14 of 21 questions caught nobody, and only 10 of 110 answers were caught (`M02-2g-survey.md`, Findings). Obscure answers are always safe, and the rarity bonus (M09) pays extra for them. The human chose for the host to anticipate the dodge on later questions (ROADMAP, Design review, 1).
-  - **The provisional bonus can't tell a popular dodge from a rare answer.** Today every answer outside the host bank is "uncommon" (M09 D11 (b)).
-  - **Every day is drafted from scratch.** A missing answer found on one day stays missing on the next day with the same kind of question.
-- **The human's words:**
-  - "we want it to be challenging" (2026-10-21, M04 G3);
-  - "lets go for host anticipating dodges later. with less letters available it will be harder for them to come up with crazy ideas anyway" (2026-10-22, Design review, 1);
-  - order: M13 first, then M14, then M15, with content drafted right before the beta (2026-10-23, accepting Claude's revised order).
+  - **Fair answers are refused.** Each day's accepted list is typed by hand for that day (DECISIONS.md, Answer model), and a missing answer is "not in our list". WordNet held 223 of one day's 226 animals (M04), but it isn't a source.
+  - **The game is too easy, in the wrong way.** In the M02 2g survey, 14 of 21 questions caught nobody. Obscure answers are always safe, and the rarity bonus pays extra for them (`M02-2g-survey.md`, Findings; ROADMAP, Design review, 1).
+  - **Nothing learned carries over.** A missing answer found on one day is missing again the next time the same kind of question comes up. Rarity is guessed per day (M09 D11 (b): host bank = common).
+  - **AI drafting has nothing to stand on.** The human wants the AI to draft the questions, the answer lists, the host's answers, the rarities and the stolen letters. That needs categories and facts a program can query, not hand-typed lists.
+
+## What the human wants (guided questions, 2026-10-24)
+| Subject | The human's answer |
+|---|---|
+| Who writes days, long term | "ideally AI would write them and I veto them", with "a way for me to manually write a puzzle if i ever want to, as well as the host's specific answer". The AI always drafts "what letters get removed each day, as well as the answer bank, host answer bank, and rarities of answers" |
+| Repeating questions | "I would not mind reusing specific questions asked in the past before if enough time has passed"; the gap: "About a month" |
+| Unlisted answers players type | "automatically accepted after N players type, but with an easy way for me to audit what's added and remove if needed. i would manually audit these" |
+| When an addition counts | "From the next time": a started day's list doesn't change |
+| How many players | "A share of players" |
+| Question mix | "Mostly concrete" |
+| Other games | Word games (game 2) keep their own dictionary, but "i could see offbeat's database being used for a future game that i develop later as well" |
+| Rarity | Pooled per category, recent days weighted, "if it's not too difficult to implement and interferes with other aspects of design. but this seems most ideal" |
+| New questions from traits | "Yes, combine traits" (e.g. animal + lives in Africa) |
+| Player stats from history | Low priority; "specifically answer trends and firsts and records" are worth keeping possible |
+| Whose truth | "Technically correct" (a spider isn't an insect) |
+| Facts against the crowd | "Facts win": a miss the database knows is wrong never auto-accepts |
+| Leniency | "very lenient only if it's not too difficult to implement. if it is, then go common nicknames" |
+| Audience | "US English" |
+| Review time per day | "Under a minute" |
+| Themed days | "Yes, sometimes" |
 
 ## Source
-- **SOURCES.md has no answer source.** That's the gap A2 asks the human to close. Until it's added, no list is built from one (CLAUDE.md: "If no source covers the work, stop and ask").
-- **Used as they are today:**
-  - **DECISIONS.md, Game 1 and its Answer model:** one level of detail, match groups, normalization and plural aliases at authoring, and the typed-text rule.
-  - **Puzzle content format** (Hard to reverse): format 2 today. A3 makes format 3.
-  - **Unicode normalization** (UAX #15, UAX #44) and **pluralize** 8.0.0, for authoring.
-  - **M09:** the bonus and its expectation (D11, N5).
-  - **M04:** G3 and G9, the letter tiers, `scripts/content-letters.ts`.
+- **SOURCES.md has no source for answers or facts.** D2 asks the human to add one or more. Until then, nothing is built from one (CLAUDE.md: "If no source covers the work, stop and ask").
+- **Kept as they are:**
+  - **DECISIONS.md, Game 1 and the Answer model:** sudden death, the fixed sequence, the server as the only holder of host answers, one level of detail per question, match groups, normalization at authoring, and the typed-text rule.
+  - **DECISIONS.md, Puzzle content format** (Hard to reverse): "an approved day … can't be changed once its day has started". D3 changes the format, not that rule.
+  - **DECISIONS.md, Points ledger** and **M09:** the bonus formula (N1–N4). D5 replaces only where the expected share comes from (D11, N5).
+  - **Unicode normalization** (UAX #15, UAX #44) and **pluralize** 8.0.0, for aliases.
+  - **PostgreSQL 17** and **Supabase keys and RLS / database roles**, for the new tables and their grants (D1).
 
 ## Claude's design (for the human to approve)
-Sub-tickets, in this order:
-- **13a, categories from a source:**
-  - one reviewed list per kind of question (a "category"), built from the A2 source where one exists, curated where none can (abstract questions such as "something you'd bring to a potluck");
-  - drafting picks a day's entries from its category (A1);
-  - logged misses grow the category, not one day.
+The database has five parts. Each day takes a frozen copy when it's approved.
 
-  It also takes the Next revision items for M13 on matching: plural aliases, digits, zero-width characters.
-- **13b, popularity tiers and the dodging host** (A3, content format 3):
-  - each entry carries a tier;
-  - the host bank may include popular dodges on later questions;
-  - the provisional bonus uses the tiers instead of "host bank = common";
-  - the admin page shows and edits tiers. It also takes the match-group bug from Next revision.
-- **13c, the letter picker** (A4): `content:letters` also keeps enough familiar answers safe (G9), counting by tier.
-- **13d, tuning** (A5): host answers and banks aimed at the target catch rate, with the human, on a sample of days, measured against the survey and the M03 report.
+1. **Things.**
+   - Each answer exists once, with a permanent ID (D3) and its US English name.
+   - It has **aliases**: plurals, other spellings, nicknames ("Cali", "Chevy", "NYC"), brand-for-generic ("Kleenex") and slang.
+   - Leniency comes from aliases. The typo rule stays at one letter, because looser typo matching hits the wrong thing once lists hold thousands of entries (D6).
+2. **Facts.**
+   - Each fact is a thing, a trait and a value: axolotl, is a kind of, salamander; axolotl, lives in, Mexico; eagle, can fly, yes.
+   - Each fact names its origin (a reference source, the AI, players or the human) and when it was added.
+   - "Is a kind of" links make a tree: salamander → amphibian → animal.
+   - "Technically correct" means the reference source decides. A fact from the source outranks one from players (Facts win).
+3. **Categories as recipes.**
+   - A category is a rule over facts, not a typed list: "animal" is everything under animal in the tree; "African animal" is animal and lives in Africa.
+   - That's what lets the AI combine traits into new questions.
+   - Open-ended categories ("something you'd bring to a potluck") are the exception: a kept list of members, since no reference can decide them. The human said there will be few of those ("Mostly concrete").
+4. **The question bank.**
+   - Each question has its prompt, its category recipe, theme tags (Thanksgiving, animal week), the days it was used and how it performed.
+   - A question may return after the repeat gap (D7).
+5. **History.**
+   - Each answer a player gives points at a thing's permanent ID. That's already true of the day's entries today (`private.run_event`), but only within one day.
+   - Misses keep their typed text (`private.missed_answer`, M02).
+   - Every addition or removal is logged: what, by whom (the source, the AI, the players' rule or the human) and when. The audit page reads that log and can undo an entry.
 
-**Moved out of M13:**
-- To **M15**, right before the beta:
-  - which days to play (M04 G6);
-  - the 9 parked days;
-  - drafting and approving the beta's stock;
-  - moving drafts out of the public repo (`M15-15a-private-drafts.md`).
+**How a day uses it.**
+- At approval, the day stores its 7 questions with their full accepted lists (every member of each category with its aliases), the host bank, the host answers, the stolen letters and each entry's expected share, all keyed by thing ID.
+- Matching then works on the day's copy as today, and a started day never changes. A fix made later reaches only days approved after it.
 
-  Days drafted now would be in format 2 and public for weeks (human, 2026-10-23).
-- **No content days and no `db push`** until the human asks.
+**How it learns (D4).**
+- **A miss the facts reject** goes to the audit list and is never accepted automatically. For example, "spider" for "Name an insect", when the source files spiders under arachnids.
+- **A miss the database has never heard of** is counted by distinct players, and becomes a member from the next day that uses the category. The trigger is the share of players in D4.
+- **An alias** is a miss one typo away from nothing that names a known thing ("hippo"). It joins the same flow as an alias.
+
+**How rarity works (D5).**
+- Each answer's expected share for a question comes from its category's pooled history: every day the category or its question was asked, recent days weighted more.
+- The AI's first guess is used until enough players have answered.
+- The provisional and final bonus then work as in M09.
+- The host anticipating the dodge (Design review, 1) uses the same numbers: the host may pick a popular answer that isn't the most common one, from a given question on (D5).
+
+**What it makes possible later.** These aren't M13 scope; they need nothing more than the history above:
+- **Firsts and records:** the earliest answer per thing per category.
+- **Answer trends:** a thing's share over time.
+- **Personal collections:** distinct things per player per category.
 
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| A1 | **Where the big lists live, and how a typed answer is checked.** (a) **Day files only:** a script copies a category's entries into each day's file at drafting; runtime matching is unchanged; a fix to a list helps only days drafted after it. (b) **Categories in the database:** each question points at a category, and the typed text is checked against the category's current list. A list fix then reaches days already approved, which breaks "an approved day can't change once its day has started" (DECISIONS.md, Puzzle content format) unless categories are versioned. (c) **Category files in the repo, copied into the day at approval:** categories are reviewed files, one per category; drafting picks from them; approval stores the full entries in the day's `private.puzzle` row as today | (c). Matching, the started-day rule and the admin page stay as they are. A category fixed once helps every later day. A category file holds no host answers, so it's safe in the public repo. Its tiers (A3) hint at what's common, but common answers are common to anyone. Cost: bigger puzzle rows (a few thousand entries at most; *unverified* until 13a measures one) | |
-| A2 | **The answer source** (the human adds it to SOURCES.md; only a human can). (a) **WordNet** for concrete categories: noun hyponym trees (animals, foods, plants, objects). M04 measured it, but its license and version aren't recorded (*unverified*). (b) WordNet, plus a structured source for list-like categories it handles poorly (countries, elements, US states and capitals, national parks, NFL teams). Which one is the human's pick; candidates aren't read yet (*unverified*). (c) No source: keep curating by hand, and grow lists from misses only | (b), starting with (a). Most concrete questions are covered by WordNet; the rest are short closed lists a reference page settles. Each added source names its license, version and the categories it's for. Abstract questions stay curated either way | |
-| A3 | **Popularity tiers** (content format 3, Hard to reverse; M09 D11 (c)). (a) **Three tiers per entry:** common, uncommon and rare, plus a "dodge" mark for the clever answers players reach for to avoid the obvious one; the host bank is common entries plus, from a given question on, dodges. (b) Two tiers (common, other) and a dodge mark. (c) A measured share per entry instead of tiers, once there's data | (a). It gives the bonus three steps, and the dodge mark is what Design review 1 needs. Tiers are set when a category is built, reviewed on the admin page, and can be replaced by measured shares from M03's counts later (c). Each tier's expected share replaces N5, and those are human numbers | |
-| A4 | **The letter picker.** (a) **Keep it an authoring script** (`content:letters`): letters live in the day's file, the same for every player (fixed sequence), and the picker also keeps G9 familiar (common or uncommon) answers safe on each question. (b) A runtime picker that chooses each day's letters on the server | (a). Letters stay reviewable in the diff, and nothing new runs at midnight. The script already follows schedule A and refuses impossible questions | |
-| A5 | **Tuning target** (M04 G3, "challenging"). (a) **A catch-rate curve** from Q1 to Q7 that host answers are picked to hit: the numbers are the human's. (b) A single target for the whole day. (c) No target: tune by feel, playing days together | (a), with the survey's measured rates as the starting point. The curve then also says which question the host may first pick a dodge on (A3) | |
-| A6 | **What the M04 G9 minimum counts:** "familiar" means common or uncommon, so rare entries don't count toward the safe answers left | As written | |
+| D1 | **Where the database lives.** (a) **Postgres tables in `private`**, read and written only through guarded functions, as puzzles are (M06); the admin pages audit and edit it. (b) Files in the repo, changed by pull requests | (a). Auto-accepting misses (the human's rule) has to write while players play, and files can't. New tables, functions and `plor_app` grants are a security change, recorded in DECISIONS.md when built | |
+| D2 | **The sources** (the human adds each to SOURCES.md). (a) **Wikidata** for facts and traits (taxonomy, where things live, colors, counts); its license and how to pull a subset are read before it's proposed (*unverified*). (b) **WordNet** for the "kind of" tree of everyday nouns and their synonyms (aliases); its license is *unverified* too. (c) Both | (c), (a) for facts and (b) for everyday words. Only the subsets the categories need are imported, by a script whose output is reviewed. Claude reads each license and brings the SOURCES.md rows for the human's OK | |
+| D3 | **Hard to reverse: permanent thing IDs and content format 3.** Each thing gets a permanent ID that answers, history and days refer to forever. Format 3 is the day's frozen copy keyed by thing IDs, with expected shares and the question's category recipe. (a) **IDs owned by Plor** (a random ID per thing), each linked to its source's own ID where there is one. (b) The source's IDs as ours | (a). A thing that's in no source (a curated or player-added answer) still needs an ID, and a source can change or merge its IDs | |
+| D4 | **Auto-accepting a miss.** (a) **Accepted once the share of distinct players who typed it, among the players who answered that category's questions, reaches X%, and at least M players typed it**, counted across days, from the next day on, unless the facts reject it (then audit only). (b) Per day: X% of one day's players | (a). Pooling across days lets a small beta reach the share. The minimum M stops one player out of one counting as 100%. X and M are human numbers | |
+| D5 | **Rarity from play, with recency.** (a) **Pooled per category and weighted by age:** an answer given *h* days ago counts half as much as one today (a half-life *h*), blended with the AI's first guess until enough players have answered (M09 N1's role). The host may pick a dodge from question *q* on. (b) Pooled, unweighted. (c) Per day only, as now | (a), as the human asked, provided it's simple. It is: one weighted count per answer per category. *h* and *q* are human numbers, and the AI's first-guess shares per level (common, uncommon, rare) replace N5 | |
+| D6 | **Leniency.** (a) **Lenient aliases, typo rule unchanged:** nicknames, brand-for-generic and slang as aliases (from the sources, the AI and players); still one typo for 4+ letters, with two-entry ties a retry. (b) Also widen the typo rule | (a). It's "very lenient" through data, which is easy. A wider typo rule is the hard part the human said to skip if hard | |
+| D7 | **The question bank's repeat gap and themes.** (a) **A question may repeat once 30 days have passed since its last use** ("About a month"), and themes are tags on questions. (b) Another gap | (a), if "about a month" means 30 days: a human number to confirm | |
+| D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | |
+
+## Sub-tickets (Claude's order, each its own PR on this branch)
+- **13a, the base.**
+  - Things, aliases, facts, the "kind of" tree, categories as recipes, and the audit log (D1, D3, D6), with tables and functions, pgTAP and grants.
+  - The import from the D2 sources for the categories the first test days use, reviewed.
+  - Approval freezes format 3 into a day, and matching runs on it.
+  - The Next revision matching items for M13: plural aliases, digits, zero-width characters.
+- **13b, learning from misses** (D4): the facts check, the auto-accept rule with its share and minimum, and the audit page with undo.
+- **13c, rarity and the host** (D5): pooled, weighted shares in the bonus; the dodging host; the letter picker keeping enough familiar answers safe (M04 G9).
+- **13d, the question bank and tuning** (D7, M04 G3): questions with recipes, themes and the repeat gap; difficulty tuned with the human toward a target catch rate per question.
 
 ## Acceptance criteria
-Written once A1–A6 are answered. They will cover:
-- **13a:**
-  - a category built from the source, with its review in the diff;
-  - drafting from it;
-  - a day approved with its entries copied in;
-  - the matching fixes, with tests.
-- **13b:**
-  - format 3 in the validator, the admin page and the bonus (unit and db tests);
-  - format 2 days still readable or converted, decided in 13b.
-- **13c:** the picker refuses a day that leaves fewer than G9 familiar answers safe (unit test).
-- **13d:** the sample days meet the A5 curve on the survey's and the human's answers (recorded table).
+Each sub-ticket's criteria are written before its code, once D1–D8 are answered. They'll cover:
+- **13a:** a category recipe returns the source's members, with the import reviewed in the diff; a day approved in format 3 plays end to end (db tests and e2e); the grants (pgTAP).
+- **13b:** a miss reaching the threshold is a member the next day, not today; a fact-rejected miss never is; an undo removes it from later days only (db tests).
+- **13c:** the bonus uses the weighted pooled share, the host picks a dodge only from question *q*, and the picker refuses a day below G9 (unit and db tests).
+- **13d:** a question isn't offered again within the gap; the sample days meet the catch-rate targets (recorded table).
 
 ## Out of scope
-- The days for the beta, the parked days, and private drafts: M15 (above).
-- Seeing friends' misses (ROADMAP Later).
-- AI drafting from data (ROADMAP Later).
-- Game 2's dictionary (M16): it may share A2's source, decided there.
+- **The AI that drafts days** (ROADMAP Later: needs an API key in Vercel and its own ticket). M13 builds what it stands on.
+- **Player-facing stats** (trends, firsts, collections): ROADMAP Later, made possible by M13's history.
+- **The beta's days, the parked days, and private drafts:** M15.
+- **Game 2's dictionary** (M16): word games keep their own (human, 2026-10-24).
 
 ## Numbers
-Every one is the human's. None is set, so each is asked for with its decision.
+None is set. Each is the human's, asked with its decision.
 
 | Value | Used for | Origin |
 |---|---|---|
-| Expected share per tier (common, uncommon, rare) | The provisional bonus (replaces N5, 50% for the host bank) | A3, for the human |
-| First question where the host may pick a dodge | The host bank (A3) | A3/A5, for the human |
-| Target catch rate per question (Q1–Q7) | Tuning (13d) | M04 G3, A5, for the human |
-| Fewest familiar safe answers left after stolen letters and host answers | The letter picker (13c) | M04 G9, for the human |
-| Host bank size guideline | Drafting | ROADMAP Next revision (M01), for the human |
+| X, the share of a category's players who must type a miss | Auto-accept (D4) | For the human |
+| M, the fewest distinct players for an auto-accept | Auto-accept (D4) | For the human |
+| *h*, the half-life of an answer's weight in days | Rarity (D5) | For the human |
+| *q*, the first question where the host may pick a dodge | The host (D5) | For the human |
+| The AI's first-guess share per level (common, uncommon, rare) | Rarity before data (D5; replaces N5) | For the human |
+| The repeat gap: 30 days? | The question bank (D7) | The human: "About a month", to confirm |
+| Target catch rate per question, Q1–Q7 | Tuning (13d) | M04 G3, for the human |
+| Fewest familiar safe answers after stolen letters | The letter picker (13c) | M04 G9, for the human |
 
 ## Plan
-1. The human answers A1–A6 and adds the A2 source(s) to SOURCES.md.
-2. **13a:** one category end to end (animals, the one M04 measured).
-   - *Hypothesis:* the source covers at least the 223 of 226 animals M04 counted, with its version pinned.
-   - *Disproved* if the pinned version's count is lower, which would mean M04 measured something else.
-   - Then the remaining categories the drafted days use.
-3. **13b**, **13c** and **13d** in order, each its own PR on this branch, with its criteria written before its code.
+1. The human answers D1–D8 and the numbers. Claude reads the D2 licenses and brings the SOURCES.md rows for the human's OK.
+2. **13a** with one category end to end: animals, the one M04 measured.
+   - *Hypothesis:* the source's animal subtree holds at least the 223 of 226 animals M04 counted.
+   - *Disproved* if it holds fewer, which would mean M04 measured a different version.
+   - Then the categories of the first test days.
+3. **13b**, **13c** and **13d** in order, each with its criteria before its code.
 
 ## Removes
-- `M13-13a-private-drafts.md` from M13: it's now `M15-15a-private-drafts.md`, moved by its P4 (b).
-- Once 13a–13b ship:
-  - hand-typed per-day accepted banks, which become picks from categories;
-  - the "host bank = common" expectation (M09 D11 (b)), replaced by tiers.
+- The 2026-10-23 draft's A1–A6, replaced by D1–D8.
+- Once 13a–13c ship:
+  - hand-typed per-day accepted banks (`content/offbeat/*.json` as the drafting format; D8);
+  - the "host bank = common" expectation (M09 D11 (b), N5);
+  - the per-day-only rarity.
 
 ---
 *Fill in the sections below at the end.*
