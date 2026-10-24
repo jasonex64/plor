@@ -47,5 +47,8 @@
   },
   "engines": {
     "node": "^24"
+  },
+  "overrides": {
+    "zod": "^4.6.6"
   }
 }
