@@ -34,7 +34,10 @@ select ok(has_schema_privilege('authenticated', 'public', 'usage'), 'authenticat
 select ok(has_schema_privilege('plor_app', 'private', 'usage'), 'plor_app can use schema private');
 select ok(not has_schema_privilege('plor_app', 'private', 'create'), 'plor_app cannot create objects in private');
 select ok(has_table_privilege('plor_app', 'private.profile', 'select'), 'plor_app can read profiles');
-select ok(has_table_privilege('plor_app', 'private.profile', 'insert'), 'plor_app can create profiles');
+-- M12 12c, A10: a profile is created with its user ID and username only, never username_changed_at.
+select ok(has_column_privilege('plor_app', 'private.profile', 'username', 'insert')
+  and not has_column_privilege('plor_app', 'private.profile', 'username_changed_at', 'insert'),
+  'plor_app can create profiles, naming only the user ID and username');
 -- A comma list is true when any one privilege is held, so this asserts none of them is.
 select ok(not has_table_privilege('plor_app', 'private.profile', 'update, delete, truncate, references, trigger'),
   'plor_app cannot change whole rows of, delete, truncate, reference or trigger on profiles');
@@ -65,16 +68,25 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
+  -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
+  'private.clear_auth_attempts(text,text) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
   'private.comment delete', 'private.comment insert', 'private.comment select',
+  -- An admin's deletion of a reported comment and its record are one guarded function; plor_app only reads the
+  -- record (M12 12d, D1 a).
+  'private.comment_deletion select',
   -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
   -- reads them all. Deleting the comment removes its reports (cascade), so none is deleted directly.
   'private.comment_report insert', 'private.comment_report select',
   'private.day_of(timestamp with time zone) execute',
+  -- Deleting your own account (M12 12c, A7): one guarded function, never Auth's table.
+  'private.delete_account(uuid,text) execute',
+  'private.delete_reported_comment(uuid,bigint) execute',
   -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
   'private.friend_invite insert', 'private.friend_invite select',
   'private.friend_invite.code update',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
+  'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
   'private.missed_answer insert', 'private.missed_answer select',
@@ -85,10 +97,11 @@ select is(pg_temp.grants('plor_app'), array[
   'private.player_group.invite_code update', 'private.player_group.name update',
   -- The points ledger (M09 9a, D7): append-only, written by settling and read by the leaderboard.
   'private.points_ledger insert', 'private.points_ledger select',
-  'private.profile insert', 'private.profile select',
+  'private.profile select',
   -- The display name (M07 7a) and the username (M12 12b, A2: once every 30 days, a trigger's rule) are the columns a
-  -- player changes.
-  'private.profile.display_name update', 'private.profile.username update',
+  -- player changes; a profile is created naming only its user ID and username (M12 12c, A10).
+  'private.profile.display_name update', 'private.profile.user_id insert', 'private.profile.username insert',
+  'private.profile.username update',
   'private.puzzle select',
   'private.puzzle_questions select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it
@@ -103,6 +116,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
   'private.save_questions(uuid,text,date,text[]) execute',
+  'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');
 select ok(not exists (select from pg_roles where rolname = 'plor_publisher'), 'plor_publisher is gone (M06: puzzles get in through the admin page)');
 

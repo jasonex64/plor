@@ -24,9 +24,14 @@ export async function nextServer() {
   return { ...actual, connection: async () => {} };
 }
 
-export function apiRequest(path: string, init: { method: "GET" | "POST"; body?: unknown; protocol?: string | null }): Request {
+// ip is the player's address as Vercel would forward it (x-forwarded-for); the sign-in routes need one (M12 12e).
+export function apiRequest(
+  path: string,
+  init: { method: "GET" | "POST"; body?: unknown; protocol?: string | null; ip?: string },
+): Request {
   const headers = new Headers({ "content-type": "application/json" });
   if (init.protocol !== null) headers.set("x-protocol", init.protocol ?? String(PROTOCOL_VERSION));
+  if (init.ip !== undefined) headers.set("x-forwarded-for", init.ip);
   return new Request(`http://127.0.0.1:3000${path}`, {
     method: init.method,
     headers,

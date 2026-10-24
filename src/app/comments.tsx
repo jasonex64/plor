@@ -133,7 +133,8 @@ export function Comments({ username, runOver, nudge, group }: { username: string
       {thread?.canPost && (
         <form onSubmit={post}>
           <label>
-            Comment
+            {/* The feed's box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
+            {group ? "Comment" : "Comment to your friends"}
             <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />
           </label>
           <button type="submit" disabled={busy}>

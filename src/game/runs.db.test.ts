@@ -16,7 +16,7 @@ import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { matchAnswer } from "./matching";
-import { startRun } from "./runs";
+import { startRun, todaysState } from "./runs";
 import { publicQuestion } from "./payload";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -407,7 +407,7 @@ describe("the 20-second timer", () => {
   });
 });
 
-describe("startRun's foreign keys", () => {
+describe("startRun's foreign keys, and a day with no puzzle", () => {
   async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {
     const client = await getPool().connect();
     try {
@@ -425,6 +425,16 @@ describe("startRun's foreign keys", () => {
       await client.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
       await client.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
       await expect(startRun(client, userId)).rejects.toMatchObject({ code: "no_puzzle_today", status: 404 });
+    });
+  });
+
+  // GET /api/run shows it as no puzzle today, with the streak and the reset (docs/milestones/M12-12f-review-fixes.md, F2).
+  it("has no run state when nothing is approved for today and no run is in progress", async () => {
+    const { userId } = await newPlayer("n");
+    await inRolledBackTransaction(async (client) => {
+      await client.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+      await client.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
+      expect(await todaysState(client, userId)).toBeNull();
     });
   });
 

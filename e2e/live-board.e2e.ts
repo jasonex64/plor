@@ -1,5 +1,6 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
-// with emailed codes, become friends through an invite link, and one sees the other's run change without reloading.
+// with emailed codes, become friends through an invite link, and one sees the other start without reloading, and
+// nothing more until their own run is over (M12 12d).
 // Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked on the same pages once
 // both have played. A second test restarts Realtime and checks that the page refetches the board with
 // reason=reconnect.
@@ -38,9 +39,13 @@ async function openBoard(page: Page): Promise<void> {
 test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const watcher = await (await browser.newContext()).newPage();
   const player = await (await browser.newContext()).newPage();
-  // Every frame either page receives from Realtime, to check what a payload holds (M08 8d).
-  const frames: string[] = [];
-  for (const page of [watcher, player]) {
+  // Every frame each page receives from Realtime, to check what a payload holds (M08 8d) and what reaches the
+  // watcher before they've finished (12d).
+  const framesOf = new Map<Page, string[]>([
+    [watcher, []],
+    [player, []],
+  ]);
+  for (const [page, frames] of framesOf) {
     page.on("websocket", (ws) => {
       if (ws.url().includes("/realtime/v1")) ws.on("framereceived", (f) => void frames.push(String(f.payload)));
     });
@@ -50,10 +55,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   await watcher.goto("/");
   await signInAndPick(watcher, "w");
-  // The invite link is on the account page (M12 12a).
-  await watcher.getByRole("link", { name: "Your account" }).click();
-  await watcher.getByRole("button", { name: "Make my invite link" }).click();
-  const link = await watcher.locator("code").filter({ hasText: "/invite/" }).textContent();
+  // The invite link is on the home page's board (M12 12f, F1) as well as the account page (12a).
+  const invite = watcher.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
+  await invite.getByRole("button", { name: "Make my invite link" }).click();
+  const link = await invite.locator("code").textContent();
 
   await player.goto(new URL(link!).pathname);
   await signInAndPick(player, "p");
@@ -66,15 +71,22 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
   await expect(row).toHaveText(`${playerName}: hasn't played yet`);
 
-  // The player starts and is caught on question 1; the watcher's page changes without a reload.
+  // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
+  // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
+  const started = `${playerName}: started (you'll see how it's going once you finish)`;
   await player.goto("/");
   await player.getByRole("button", { name: "Start today's puzzle" }).click();
-  await expect(row).toHaveText(`${playerName}: on question 1`);
+  await expect(row).toHaveText(started);
   await player.getByLabel("Your answer").fill(hostAnswer);
   await player.getByRole("button", { name: "Answer" }).click();
-  // The watcher hasn't played, so how the run ended stays hidden.
-  await expect(row).toHaveText(`${playerName}: finished (you'll see how once you finish)`);
-  await expect(row).not.toContainText(hostAnswer);
+  await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
+  // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
+  // wherever it goes, and the watcher's frames hold only the start.
+  await openBoard(watcher);
+  await expect(row).toHaveText(started);
+  const statuses = framesOf.get(watcher)!.filter((f) => f.includes("friend_status") && f.includes(playerName));
+  expect(statuses).toHaveLength(1);
+  expect(statuses[0]).toMatch(/"state": ?"started"/);
 
   // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
   // (7d): the watcher first, then the friend, with the full list behind the row.
@@ -127,7 +139,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // (8d). Then the watcher reports it, and it's gone for the watcher at once (8c, D5). Made an admin, the watcher
   // finds it on the reported-comments page and deletes it, and the player's open page loses it too.
   const body = `report me ${RUN}`;
-  await player.getByLabel("Comment", { exact: true }).fill(body);
+  await player.getByLabel("Comment to your friends").fill(body);
   await player.getByRole("button", { name: "Post" }).click();
   const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(playerComment).toBeVisible();
@@ -144,10 +156,13 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(reported).toContainText("1 report, first");
   await reported.getByRole("button", { name: "Delete comment" }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();
+  // The deletion's record, with the admin and the author (M12 12d).
+  const record = watcher.getByRole("region", { name: "Deleted comments" }).getByRole("listitem").filter({ hasText: body });
+  await expect(record).toContainText(`: ${watcherName} deleted ${playerName}'s comment`);
   await expect(player.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
 
   // Every change came over Realtime as a nudge, and no frame either page received holds the comment's text.
-  const received = frames.join("\n");
+  const received = [...framesOf.values()].flat().join("\n");
   expect(received).toContain("comments_changed");
   expect(received).toContain("run_reactions_changed");
   expect(received).not.toContain(body);

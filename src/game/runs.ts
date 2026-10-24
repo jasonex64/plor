@@ -64,15 +64,15 @@ const RUN_OVER = "OB003";
 const TIME_UP = "OB005";
 const NOT_OPEN = "OB006";
 
-async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle }> {
+// null when nothing is approved for today.
+async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle } | null> {
   const { rows } = await db.query<{ date: string; content: Puzzle | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
     [GAME_ID],
   );
   const { date, content } = rows[0];
-  if (!content) throw new AppError("no_puzzle_today", 404);
-  return { date, puzzle: content };
+  return content ? { date, puzzle: content } : null;
 }
 
 async function events(db: Db, userId: string, date: string): Promise<StoredEvent[]> {
@@ -162,8 +162,9 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Pr
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a
 // reveal or with a question in play: it's finished first, then today's puzzle shows (G13; human, 2026-10-21: "Resume
-// yesterday's run").
-export async function todaysState(db: Db, userId: string): Promise<RunState> {
+// yesterday's run"). null when there's neither: nothing is approved for today, an expected state the page shows as
+// such (docs/milestones/M12-12f-review-fixes.md, F2).
+export async function todaysState(db: Db, userId: string): Promise<RunState | null> {
   const { rows } = await db.query<{ date: string; content: Puzzle }>(
     `select s.puzzle_date::text as date, p.content
      from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
@@ -172,8 +173,8 @@ export async function todaysState(db: Db, userId: string): Promise<RunState> {
     [userId, GAME_ID],
   );
   if (rows.length) return stateOf(db, userId, rows[0].date, rows[0].content);
-  const { date, puzzle } = await todaysPuzzle(db);
-  return stateOf(db, userId, date, puzzle);
+  const today = await todaysPuzzle(db);
+  return today && stateOf(db, userId, today.date, today.puzzle);
 }
 
 // Starts today's run, or returns it if it already exists: the primary key allows one per player per day,
@@ -193,8 +194,11 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
     }
     throw err;
   }
-  // Read back as "today" again: if midnight passed since the insert, the player sees the new day (not started).
-  return todaysState(db, userId);
+  // Read back as "today" again: if midnight passed since the insert, the player sees the new day (not started), which
+  // may have no puzzle.
+  const state = await todaysState(db, userId);
+  if (!state) throw new AppError("no_puzzle_today", 404);
+  return state;
 }
 
 // Answers one question of the player's latest run with typed text, which the server turns into an entry

@@ -1,5 +1,6 @@
 // Signing players in on a page, shared by the e2e tests: an emailed code read from the local Mailpit inbox, then a
 // username. Every player's email starts with RUN, so each file's afterAll can delete its players.
+import { createHash } from "node:crypto";
 import { expect, type Page } from "@playwright/test";
 
 const MAILPIT = "http://127.0.0.1:54324";
@@ -19,9 +20,19 @@ async function emailedCode(email: string): Promise<string> {
   return code!;
 }
 
+// Gives the page's sign-in requests a player IP of their own, as Vercel would forward it, so the sign-in limits
+// (docs/milestones/M12-12e-sign-in-limits.md) count each test player apart. 10.0.0.0/8 is private: no real player has one.
+export async function forwardPlayerIp(page: Page, email: string): Promise<void> {
+  const [a, b, c] = createHash("sha256").update(email).digest();
+  await page.route("**/api/auth/email**", (route) =>
+    route.continue({ headers: { ...route.request().headers(), "x-forwarded-for": `10.${a}.${b}.${c}` } }),
+  );
+}
+
 // Signs in on the page it's on (home or an invite link) and picks a username.
 export async function signInAndPick(page: Page, name: string): Promise<void> {
   const email = `${RUN}-${name}@example.test`;
+  await forwardPlayerIp(page, email);
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
   await page.getByLabel("Code").fill(await emailedCode(email));

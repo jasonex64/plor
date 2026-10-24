@@ -2,40 +2,46 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-23, by the session that finished M10 and M11 and built M12 12a and 12b, on `m12-account`.
+**Updated:** 2026-10-23 (Pacific), by the session that reviewed the MVP and built M12 12f, on the Windows machine.
 
 ## Where things stand
-- **M08 to M11 are done** (tickets in `docs/milestones/`; M11's last PR was #56). Their branches are deleted.
-  - M11 made the home page the Offbeat card (streak, game, yesterday's standings), the feed (`src/comments/feed.ts`), friends today, the friends leaderboard, groups and account. `latestOnly` (`src/lib/latest.ts`) guards overlapping loads, and the page moves to the new day at midnight except a game in play.
-- **M12, Account, is in progress** (`docs/milestones/M12-account.md`, branch `m12-account`). The ticket is merged (PR #57); A1–A8 and the 30-day username interval are answered (human, 2026-10-23).
-  - **12a is merged** (PR #58): `/account` (`src/app/account.tsx`) with the username, all-time points (`allTimePoints` in `src/game/ledger.ts`, `GET /api/account`), display name, friends and invite link, and Sign out; the home page's Account section is a link and Sign out.
-  - **12b is in review** (PR #59): sign out of this device only; "Use a different email" and spaced codes; a username change once every 30 days (migration `20261023083041_username_change.sql`, a security change in DECISIONS.md: plor_app may update `username`, and a trigger with the caller's rights keeps the rule). The reviewer's blocking findings are fixed. It merges on all-green CI with the human's OK.
-  - **12c** (deleting your account) waits on a SOURCES.md entry the human adds.
-- **M16, Game 2 (the substring game),** has a draft ticket in PR #42 from `m16-game-2`, docs only, after launch. The name (S1), the word list (S2) and S15–S19 wait on the human. Don't build on it before the MVP is done.
+- **M12 is done again, with 12f, the MVP review fixes** (`docs/milestones/M12-12f-review-fixes.md`). PR #67 merges itself by GitHub auto-merge once every required check passes (human, 2026-10-23: "Yes, merge PR #67 once every CI check is green"), and that deletes `m12-account`. If it hasn't merged, read its failing check. The human asked Claude to review plor.app against the MVP, then said "draft and execute" (2026-10-23). 12f:
+  - puts the invite link on the home page's board, without Reset;
+  - makes a day with no puzzle show the streak and a countdown, and move on at midnight (protocol 6);
+  - asks before Leave group, Remove member and Remove friend;
+  - fixes the username copy and lower-casing, labels the feed's box "Comment to your friends", and adds groups to the privacy page.
+
+- **M00 to M11 and M12 12a to 12e are done.** The hosted database has every migration to 12d, and its pgTAP run passed (`Files=17, Tests=269`, human, 2026-10-24).
+- **plor.app can't be played yet.** It has no admin and no approved day. No day is drafted for 2026-10-23 to 10-25, and 9 days are parked (ROADMAP, "From the MVP review" and For M13). Until 12f deploys, a signed-in player on a day with no puzzle sees only "There's no puzzle today yet" and the page doesn't move on at midnight.
+- **The repo is public.** Its protections are on (DECISIONS.md Log, 2026-10-24). The public puzzle drafts wait on 13a.
+- **M13 13a** (puzzle drafts out of the public repo) is a draft ticket in PR #61 from `m13-answer-lists-and-content`, with P1–P5 for the human.
+- **M16, Game 2,** has a draft ticket (branch `m16-game-2`), docs only, for after launch.
 
 ## Waiting on the human
-- **M12: merge PR #59 (12b)** once CI is green (it carries a security change: the username update grant, with the trigger's rights lowered after review), and **add the Supabase Auth "managing users" source** to SOURCES.md before 12c (A7).
-- **`plor_app`'s INSERT on `private.profile` covers `username_changed_at`** (ROADMAP "Next revision", For the human).
-- **Shares can sometimes be differenced** to learn one friend's answer (ROADMAP "Next revision", For the human).
-- **A group board counts a member's whole week,** even the days before they joined (ROADMAP "Next revision", For the human).
-- **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants):
-  - turn "Allow public access" off in the hosted project's Realtime settings (M07 D5);
-  - check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*).
-- **Before approving the later drafted days,** note:
-  - three repeat 2026-10-22's categories: car brand (11-06), state capitals (11-10) and tea (11-16);
-  - several had a host swapped under the host-name rule (M06 ticket, Evidence).
+- **Making plor.app playable:**
+  1. make your account an admin: insert its user ID into `private.admin` in the hosted SQL editor;
+  2. approve the drafted days on `/admin/puzzles`;
+  3. decide what fills the days with no puzzle.
+- **13a's P1–P5** (`docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`).
+- **New questions for the repeated categories:** 11-06 Q2 and Q3, 11-10 Q4, 11-16 Q4. The human types the new prompts on the admin page; a drafting session follows DECISIONS.md, "Puzzle drafting".
+- **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it.
 - ROADMAP "Next revision", For the human, has the rest.
 
 ## Next step
-Once 12b is merged and the human has added the Supabase Auth source: write 12c's acceptance criteria (A4, A5, A7, A8, and ROADMAP "Next revision", For M12: leave each group first, the comment and reaction indexes) and build it on `m12-account`. Without the source, stop and ask (CLAUDE.md).
+1. Check that PR #67 merged; on this machine, switch to `main` and pull.
+2. The rest is the human's call. In ROADMAP order: M13 (answer lists and content, starting with 13a's P1–P5, PR #61), M14 (look and feel), M15 (launch readiness).
+
+Until the human asks, there are no content days, staging or `db push`.
 
 ## Local state
-- The local Supabase stack is running, Realtime included, and holds:
-  - every migration up to `20261023083041_username_change.sql`;
-  - `jasonex64` as an admin, who hasn't played 2026-10-22 locally;
-  - the approved 2026-10-22 day.
-- No dev server is left running.
-- `npm run test:e2e` needs that stack running and `.env.local` pointing at it; Playwright starts the dev server. Chromium is installed with `npx playwright install chromium`. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
+- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m12-account`, committing as `jasonex64 <jasonex64@gmail.com>`. Switch to `main` once PR #67 has merged. Its local stack runs in Docker Desktop, with every migration up to `20261024031547_comment_deletion_record.sql`; `.env.local` points at it. No dev server is left running, and no temporary test files are left.
+- The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
+- The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
+- On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
+- A fresh checkout needs `npx next typegen` (or a build or dev run) before `npx tsc --noEmit -p .`, or `LayoutProps` is missing.
+- npm skipped two install scripts not covered by `allowScripts` (`fsevents`, `unrs-resolver`); every suite passed without them.
+- `npm run test:e2e` needs the stack running and `.env.local` pointing at it; Playwright starts the dev server. Right after `npm run build` the first e2e run can time out on a slow dev compile; a rerun passes.
+- Sign-in on the local dev server is limited like production: without a forwarded IP, `next dev` keys every request by the connection (`::1`), so 5 code emails an hour from this Mac. To clear the counts: `delete from private.auth_attempt;` on the local database.
 - The dev server only serves `localhost:3000`; `127.0.0.1:3000` stays on "Loading…" (Next.js blocks other dev origins).
 - To run it on another machine:
   1. `npm ci`, then `npx supabase start`, then `npx supabase migration up`, then `npm run dev`.

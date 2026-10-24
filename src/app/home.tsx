@@ -204,7 +204,7 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
   return (
     <form onSubmit={save}>
       <h2>Pick a username</h2>
-      <p>Your friends will see it. It can&apos;t be changed later.</p>
+      <p>Your friends will see it. You can change it later on your account page.</p>
       <label>
         Username
         <input

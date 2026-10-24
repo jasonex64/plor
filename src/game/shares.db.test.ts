@@ -80,16 +80,16 @@ describe("how many players gave each answer (H5)", () => {
       await run(client, d, today, [{ q: 0, entry: host, matched: true }]);
 
       // 4 players answered question 1, one under the minimum (ANSWER_SHARE_MIN_PLAYERS, 5): no share yet.
-      expect((await todaysState(client, a)).answered.map((x) => x.share)).toEqual([null, null]);
+      expect((await todaysState(client, a))!.answered.map((x) => x.share)).toEqual([null, null]);
 
       // A fifth player gives the safe answer: 4 of 5 gave A's, 1 of 5 gave D's. Question 2 has 1 player, under it.
       await run(client, await newUser(client), today, [{ q: 0, entry: safe, matched: false }]);
-      const aState = await todaysState(client, a);
+      const aState = (await todaysState(client, a))!;
       expect(aState.status).toBe("died");
       expect(aState.answered.map((x) => x.share)).toEqual([0.8, null]);
-      expect((await todaysState(client, d)).answered.map((x) => x.share)).toEqual([0.2]);
+      expect((await todaysState(client, d))!.answered.map((x) => x.share)).toEqual([0.2]);
       // B's run is still going, so B sees no share.
-      const bState = await todaysState(client, b);
+      const bState = (await todaysState(client, b))!;
       expect(bState.status).toBe("in_progress");
       expect(bState.answered.map((x) => x.share)).toEqual([null]);
     });

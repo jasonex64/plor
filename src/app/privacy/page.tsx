@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <main>
       <h1>Plor privacy policy</h1>
-      <p>Last updated: 2026-10-19</p>
+      <p>Last updated: 2026-10-24</p>
       <p>
         Plor (plor.app) is a small daily word game. This page says what we keep about you, why, and how to have it
         deleted. Questions: <a href="mailto:privacy@plor.app">privacy@plor.app</a>.
@@ -33,8 +33,23 @@ export default function Privacy() {
           signed in who opens your invite link, can see your username and your display name if you set one.
         </li>
         <li>
+          <strong>Your groups:</strong> which groups you are in, and the comments and reactions you post in them.
+          Everyone in a group, friends or not, can see your username and display name, your points for the week, and
+          your comments and reactions in that group. Anyone signed in who opens a group&apos;s invite link sees its
+          name.
+        </li>
+        <li>
+          <strong>Deleted comments:</strong> if an admin deletes one of your comments after it was reported, we keep
+          its text, and which admin deleted it, until you delete your account.
+        </li>
+        <li>
           <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
           cookies.
+        </li>
+        <li>
+          <strong>Sign-in attempts:</strong> to stop anyone guessing sign-in codes or flooding sign-in, we count recent
+          attempts by a scrambled form of your IP address and email address, never the addresses themselves. An
+          attempt stops counting after an hour or less, and is deleted the next time anyone signs in after that.
         </li>
         <li>
           <strong>Technical logs:</strong> our providers keep logs, which can include your email address, your IP
@@ -63,10 +78,11 @@ export default function Privacy() {
 
       <h2>Keeping and deleting</h2>
       <p>
-        We keep your account and games until you ask us to delete them. Email{" "}
-        <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with, and we will delete
-        your account together with all your games and unlisted answers. Our providers&apos; logs are not part of
-        your account and expire on their own schedules.
+        We keep your account and games until you delete them. You can delete your account yourself on your account
+        page: it removes your account together with all your games, unlisted answers, points, comments, reactions,
+        reports and friends, straight away. A group you made stays with its other members. For anything else, email{" "}
+        <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with. Our providers&apos;
+        logs are not part of your account and expire on their own schedules.
       </p>
 
       <h2>Children</h2>

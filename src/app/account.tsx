@@ -2,11 +2,13 @@
 
 // The player's account (docs/milestones/M12-account.md, 12a; A1): their username and all-time points, the display
 // name others see (M07 7a), their friends and invite link (M07 7b), and Sign out. Moved off the home page, which is
-// about the day (M11 H1). The username can change once every 30 days (12b, A2). Plain UI; the look is M14.
+// about the day (M11 H1). The username can change once every 30 days (12b, A2), and the account can be deleted (12c).
+// Plain UI; the look is M14.
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
+import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 
 // usernameChangeableAt: when the username may change again, or null if it may now.
@@ -35,6 +37,7 @@ export function Account({ onSignedOut }: { onSignedOut: () => void }) {
           <DisplayName initial={account.displayName} />
           <Friends />
           <SignOut onSignedOut={onSignedOut} />
+          <DeleteAccount username={account.username} onDeleted={onSignedOut} />
         </>
       )}
       {!account && !error && <p>Loading…</p>}
@@ -72,7 +75,15 @@ function Username({ changeableAt, onChanged }: { changeableAt: string | null; on
     <form onSubmit={change}>
       <label>
         New username
-        <input value={draft} onChange={(e) => setDraft(e.target.value)} autoComplete="off" />
+        {/* Lower-cased as typed, like sign-up's box (src/app/home.tsx; 12f, F4). */}
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value.toLowerCase())}
+          autoComplete="off"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+        />
       </label>
       <button type="submit" disabled={busy}>
         Change username
@@ -108,6 +119,45 @@ export function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
       </button>
       {error && <p role="alert">{error}</p>}
     </>
+  );
+}
+
+// Deleting the account (12c, A4): the button stays off until the box holds the player's own username, which the server
+// checks again. Everything of theirs goes (A5), and this device is signed out (A9).
+function DeleteAccount({ username, onDeleted }: { username: string; onDeleted: () => void }) {
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function remove(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/account/delete", { method: "POST", body: { username: typed } });
+      onDeleted();
+    } catch (err) {
+      setError(errorText(err));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={remove}>
+      <h3>Delete account</h3>
+      <p>
+        This deletes your account and everything in it for good: your games, points, comments, reactions and friends. A
+        group you made passes to its longest-standing member.
+      </p>
+      <label>
+        Type your username to confirm
+        <input value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" />
+      </label>
+      <button type="submit" disabled={busy || typed !== username}>
+        Delete my account
+      </button>
+      {error && <p role="alert">{error}</p>}
+    </form>
   );
 }
 
@@ -156,26 +206,28 @@ function DisplayName({ initial }: { initial: string | null }) {
   );
 }
 
-// Friends, with Remove (M07 D4), and the player's own invite link (7b).
+// Friends, with Remove (M07 D4), which asks first: a new invite link is the only way back
+// (docs/milestones/M12-12f-review-fixes.md, F3). Then the player's own invite link (7b).
 function Friends() {
-  const [state, setState] = useState<{ inviteCode: string | null; friends: Friend[] } | null>(null);
+  const [friends, setFriends] = useState<Friend[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   function load() {
-    api<{ inviteCode: string | null; friends: Friend[] }>("/api/friends", { method: "GET" }).then(setState, (err) =>
-      setError(errorText(err)),
+    api<{ friends: Friend[] }>("/api/friends", { method: "GET" }).then(
+      (r) => setFriends(r.friends),
+      (err) => setError(errorText(err)),
     );
   }
   useEffect(load, []);
 
-  async function run(action: () => Promise<void>) {
+  async function removeFriend(friend: Friend) {
+    if (!window.confirm(`Remove ${friend.name} as a friend? To be friends again, one of you opens the other's invite link.`)) return;
     setBusy(true);
     setError(null);
-    setCopied(false);
     try {
-      await action();
+      await api("/api/friends/remove", { method: "POST", body: { username: friend.username } });
+      load();
     } catch (err) {
       setError(errorText(err));
     } finally {
@@ -183,62 +235,25 @@ function Friends() {
     }
   }
 
-  const issue = (reset: boolean) =>
-    run(async () => {
-      const { inviteCode } = await api<{ inviteCode: string }>("/api/friends/invite", { method: "POST", body: { reset } });
-      setState((s) => s && { ...s, inviteCode });
-    });
-  const removeFriend = (username: string) =>
-    run(async () => {
-      await api("/api/friends/remove", { method: "POST", body: { username } });
-      load();
-    });
-  const link = state?.inviteCode ? `${window.location.origin}/invite/${state.inviteCode}` : null;
-
   return (
     <section aria-label="Friends">
       <h2>Friends</h2>
-      {state && state.friends.length === 0 && <p>No friends yet. Send someone your invite link.</p>}
-      {state && state.friends.length > 0 && (
+      {friends && friends.length === 0 && <p>No friends yet. Send someone your invite link.</p>}
+      {friends && friends.length > 0 && (
         <ul>
-          {state.friends.map((f) => (
+          {friends.map((f) => (
             <li key={f.username}>
               {f.name}{" "}
-              <button type="button" disabled={busy} onClick={() => void removeFriend(f.username)}>
+              <button type="button" disabled={busy} onClick={() => void removeFriend(f)}>
                 Remove
               </button>
             </li>
           ))}
         </ul>
       )}
-      {state && link && (
-        <p>
-          Your invite link: <code>{link}</code>{" "}
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() =>
-              void run(async () => {
-                await navigator.clipboard.writeText(link);
-                setCopied(true);
-              })
-            }
-          >
-            Copy
-          </button>{" "}
-          <button type="button" disabled={busy} onClick={() => void issue(true)}>
-            Reset link
-          </button>
-          {copied && " Copied."}
-        </p>
-      )}
-      {state && !link && (
-        <button type="button" disabled={busy} onClick={() => void issue(false)}>
-          Make my invite link
-        </button>
-      )}
-      {!state && !error && <p>Loading…</p>}
+      {!friends && !error && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
+      <InviteLink canReset />
     </section>
   );
 }

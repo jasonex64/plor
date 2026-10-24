@@ -1,8 +1,9 @@
 "use client";
 
 // The live board (docs/milestones/M07-friends-and-live-board.md, 7c): friends' runs today, updated over the player's
-// own Realtime topic (src/app/board-channel.ts). Payloads say only playing or finished; how a friend's run ended comes
-// from the HTTP board once the player's own run is over, so nothing reaches the page early. So do reactions on runs
+// own Realtime topic (src/app/board-channel.ts). Until the player's own run is over, a friend shows only whether
+// they've started (M12 12d); then their question, or that they've finished. How a friend's run ended comes from the
+// HTTP board once the player's own run is over, so nothing reaches the page early. So do reactions on runs
 // (M08 8b), which the player can add to friends' runs from then on. The same channel carries nudges that comments or
 // reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see.
 import { useCallback, useEffect, useState } from "react";
@@ -11,7 +12,16 @@ import { placeRows, type Place } from "@/friends/ended";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import type { Emoji } from "@/reactions/reactions";
-import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel, type ChangedMessage, type StatusMessage } from "./board-channel";
+import {
+  PAUSED_TEXT,
+  PAYLOAD_VERSION,
+  STATUS_VERSION,
+  changesThread,
+  useBoardChannel,
+  type ChangedMessage,
+  type StatusMessage,
+} from "./board-channel";
+import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
@@ -62,7 +72,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
   }
 
   function onStatus(message: StatusMessage) {
-    if (message.v !== PAYLOAD_VERSION) {
+    if (message.v !== STATUS_VERSION) {
       console.error("board message with unknown version", message.v);
       load();
       return;
@@ -73,8 +83,9 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
       if (message.state === "finished" && !board.finished) load();
       return;
     }
-    // A friend finished while the player has finished too: fetch how their run ended.
-    if (message.state === "finished" && board.finished) {
+    // A friend finished: fetch how their run ended. Only a player who has finished is told (M12 12d), so this page's
+    // own refetch for that may still be on its way.
+    if (message.state === "finished") {
       load();
       return;
     }
@@ -107,7 +118,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
           Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
         </p>
       )}
-      {board && board.friends.length === 0 && <p>Add friends to see their runs here.</p>}
+      {board && board.friends.length === 0 && <p>Send a friend your invite link to see their runs here.</p>}
       {board && board.friends.length > 0 && (
         <ul>
           {board.friends.map((f) => (
@@ -120,6 +131,8 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
       )}
       {!board && !error && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
+      {/* Adding a friend starts here, not only on the account page (docs/milestones/M12-12f-review-fixes.md, F1). */}
+      <InviteLink canReset={false} />
     </section>
   );
 }
@@ -129,7 +142,7 @@ function describe(f: BoardFriend): string {
   if (f.ended?.result === "survived") return "survived every question";
   if (f.ended?.result === "timed_out") return `ran out of time on question ${f.ended.question}`;
   if (f.state === "playing") return `on question ${f.question}`;
-  if (f.state === "finished") return "finished (you'll see how once you finish)";
+  if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "hasn't played yet";
 }
 
