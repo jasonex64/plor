@@ -7,18 +7,18 @@ set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
 select plan(19);
 
--- A small tree in a test source's IDs: animal > bear > polar bear, panda; animal > fish; food > fruit and vegetable,
+-- Its aliases start with "fx" where a lookup uses them, so real loaded data can sit beside it. A small tree in a test source's IDs: animal > bear > polar bear, panda; animal > fish; food > fruit and vegetable,
 -- with tomato under both (human, 2026-10-24: "Accept in both"); a cycle a <-> b, as a messy source might have.
 select is(private.import_source('wikidata', 'test-1', '[
   {"id": "tA", "name": "animal", "aliases": [{"alias": "animal", "kind": "name"}]},
   {"id": "tB", "name": "bear", "aliases": [{"alias": "bear", "kind": "name"}, {"alias": "bears", "kind": "plural"}], "kind_of": ["tA"]},
-  {"id": "tP", "name": "polar bear", "aliases": [{"alias": "polar bear", "kind": "name"}, {"alias": "ursus maritimus", "kind": "scientific"}], "kind_of": ["tB"]},
-  {"id": "tG", "name": "Ailuropoda melanoleuca", "aliases": [{"alias": "ailuropoda melanoleuca", "kind": "scientific"}], "kind_of": ["tB"]},
+  {"id": "tP", "name": "polar bear", "aliases": [{"alias": "polar bear", "kind": "name"}, {"alias": "fx ursus maritimus", "kind": "scientific"}], "kind_of": ["tB"]},
+  {"id": "tG", "name": "Ailuropoda melanoleuca", "aliases": [{"alias": "fx ailuropoda melanoleuca", "kind": "scientific"}], "kind_of": ["tB"]},
   {"id": "tF", "name": "fish", "aliases": [{"alias": "fish", "kind": "name"}], "kind_of": ["tA"]},
   {"id": "tX", "name": "food", "aliases": [{"alias": "food", "kind": "name"}]},
   {"id": "tR", "name": "fruit", "aliases": [{"alias": "fruit", "kind": "name"}], "kind_of": ["tX"]},
   {"id": "tV", "name": "vegetable", "aliases": [{"alias": "vegetable", "kind": "name"}], "kind_of": ["tX"]},
-  {"id": "tT", "name": "tomato", "aliases": [{"alias": "tomato", "kind": "name"}], "kind_of": ["tR", "tV"]},
+  {"id": "tT", "name": "tomato", "aliases": [{"alias": "fx tomato", "kind": "name"}], "kind_of": ["tR", "tV"]},
   {"id": "tC1", "name": "loop one", "aliases": [{"alias": "loop one", "kind": "name"}], "kind_of": ["tC2", "tF"]},
   {"id": "tC2", "name": "loop two", "aliases": [{"alias": "loop two", "kind": "name"}], "kind_of": ["tC1"]}
 ]'::jsonb), '{"things": 11, "aliases": 13, "facts": 11}'::jsonb, 'an import adds its things, aliases and facts');
@@ -31,7 +31,8 @@ select is((select t.name from private.thing t join private.thing_source s on s.t
 select throws_ok($$ select private.import_source('wikidata', 'test-3', '[{"id": "tZ", "name": "z", "aliases": [], "kind_of": ["nope"]}]') $$,
   'P0001', null, 'a fact naming an unknown ID loads nothing');
 select is((select count(*)::int from private.thing_source where source_id = 'tZ'), 0, 'not even the thing itself');
-select is((select count(*)::int from private.base_log where action = 'import'), 2, 'each import that loaded is logged');
+select is((select count(*)::int from private.base_log where action = 'import' and detail->>'snapshot' like 'test-%'), 2,
+  'each import that loaded is logged');
 
 select private.define_category('animal', 'animal', 'wikidata', 'tA', null);
 select private.define_category('fruit', 'fruit', 'wikidata', 'tR', null);
@@ -69,12 +70,12 @@ create function pg_temp.u(n int) returns uuid language sql immutable
   return ('00000000-0000-0000-0000-' || lpad(to_hex(n), 12, '0'))::uuid;
 insert into auth.users (id, email) select pg_temp.u(n), n || '@base.example.test' from generate_series(1, 2) as s(n);
 insert into private.admin (user_id) values (pg_temp.u(1));
-select throws_ok(format('select private.base_lookup(%L, %L)', pg_temp.u(2), 'tomato'), 'OB007', null,
+select throws_ok(format('select private.base_lookup(%L, %L)', pg_temp.u(2), 'fx tomato'), 'OB007', null,
   'a player who isn''t an admin can''t look anything up');
-select is(private.base_lookup(pg_temp.u(1), 'tomato')->0->'categories', '["fruit", "vegetable"]'::jsonb,
+select is(private.base_lookup(pg_temp.u(1), 'fx tomato')->0->'categories', '["fruit", "vegetable"]'::jsonb,
   'an admin sees tomato in both categories');
-select is(private.base_lookup(pg_temp.u(1), 'ursus maritimus')->0->>'name', 'polar bear', 'any alias finds a thing');
-select is(private.base_lookup(pg_temp.u(1), 'ailuropoda melanoleuca')->0->'categories', '[]'::jsonb,
+select is(private.base_lookup(pg_temp.u(1), 'fx ursus maritimus')->0->>'name', 'polar bear', 'any alias finds a thing');
+select is(private.base_lookup(pg_temp.u(1), 'fx ailuropoda melanoleuca')->0->'categories', '[]'::jsonb,
   'a thing with no typeable name is in no category');
 select is(private.base_lookup(pg_temp.u(1), 'nothing by this name'), '[]'::jsonb, 'an unknown alias finds nothing');
 
