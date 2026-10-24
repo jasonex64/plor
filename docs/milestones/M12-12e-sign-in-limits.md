@@ -1,9 +1,9 @@
 # M12 12e — Sign-in code limits
 
-**Status:** in review (2026-10-24, PR #62): built on `m12-account`, reviewed, blocking findings 2–4 fixed. L5 (review finding 1: code emails can still be used up for everyone) waits on the human. After the merge the human sets Auth's hosted limits (N5, N6).
+**Status:** in review (2026-10-24, PR #62): built on `m12-account`, reviewed, blocking findings 2–4 fixed. L5 (review finding 1) is answered: accepted for the closed beta, a CAPTCHA decided before launch (human, 2026-10-24). After the merge the human sets Auth's hosted limits (N5, N6).
 
 ## Goal
-No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send. *(As built, guessing and code checks are closed, and so is one address flooding sign-in. Using up the code emails from many addresses is still open: L5.)*
+No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send. *(As built, guessing and code checks are closed, and so is one address flooding sign-in. Using up the code emails from many addresses is accepted for the closed beta: L5.)*
 
 ## Who uses it / what breaks without it
 - **Used by:** every player signing in by email code, and the human, whose closed beta (M15) is the first time strangers can reach sign-in.
@@ -35,7 +35,7 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
   - (c) A CAPTCHA on sending a code. Supabase Auth supports one, but it's a new third party and a new source, which is a ticket of its own.
   - (d) Raise the caps: Auth's hourly email limit in the dashboard and a paid Resend plan. That costs money and only moves the line.
 
-  **Claude's suggestion:** (a) for the beta, with (c) decided before launch.
+  **Claude's suggestion:** (a) for the beta, with (c) decided before launch. **Answer: (a)** (human, 2026-10-24: "(a) Accept for beta", chosen from Claude's options: accept it in writing for the closed beta and decide a CAPTCHA (c) before launch, M15).
 - **L4 — where it goes.** Claude suggests 12e, before 12d: it closes a security hole that is now readable in a public repo, and 12d is three game fixes. Or after 12d, as M12's last sub-ticket. **Answer: before 12d** (human, 2026-10-23: "12e numbers: use Claude's suggested values for all six, and L2–L4 as suggested").
 
 ## Numbers
@@ -115,7 +115,7 @@ No one can guess another player's sign-in code, or use up sign-in for everyone, 
 ## Review
 **12e** (reviewer, fresh context, 2026-10-24). The counting is sound: the hashed keys, the email key, the per-key lock and the grants all held. It tried case, whitespace and Unicode forms of an address against the local GoTrue v2.197.0: upper and lower case get the same answer, and the odd forms are refused with 422, so `emailKey` can't be dodged. It also checked that Vercel's header can't be spoofed.
 - Blocking findings and how each was fixed:
-  1. **The code emails can still be used up from a few addresses**, and the Goal claimed otherwise. Not fixable without the human: it's L5, and the Goal now says what's open.
+  1. **The code emails can still be used up from a few addresses**, and the Goal claimed otherwise. Not fixable without the human: it's L5, accepted for the closed beta (human, 2026-10-24), and the Goal now says what's open.
   2. **N1 and N2 counted requests, not emails.** A double tap, or a send Auth refused, used up the address's count. Fixed with the give-back (Source diff), with two new route tests.
   3. **The per-key lock had no test.** Added `src/lib/auth-limits.db.test.ts`; without the lock it fails.
   4. **The Status line and the handoff were stale.** Both rewritten.
