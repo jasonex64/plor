@@ -13,7 +13,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
     - `/admin/base`;
     - credits on the privacy page.
 
-    It waits for green CI and the **human's approval of its security change** (DECISIONS.md Log, 2026-10-24: new tables; plor_app may only execute `private.base_lookup`).
+    The human approved its security change (DECISIONS.md Log, 2026-10-24), and PR #70 merges itself by GitHub auto-merge once every required check passes. If it hasn't merged, read its failing check.
   - **13a-2 is next:**
     - format 3, with frozen lists read from the base "as of" approval instead of copied per day (the human asked about database size; the 89.9 MB measurement and this design are in the ticket);
     - the game engine reading the frozen lists from indexed tables (pg_trgm and fuzzystrmatch are available locally);
@@ -25,13 +25,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M15 15a** (private drafts) and **M14's suggested split** are drafted (ROADMAP rows); **M16** waits for after launch.
 
 ## Waiting on the human
-- **PR #70:** approve 13a-1's security change and the merge.
 - **The import review's flags** (ROADMAP Next revision, For M13): the fruit tree's protected-origin products, country codes as aliases, and a Wikidata error on two elements. Curate, or accept.
 - 15a's P1–P3 and P5, when M15 starts. The four replacement questions (11-06, 11-10, 11-16) go with M15's drafting.
 - The leftover `.claude/worktrees/m03-puzzle-insights` folder isn't on the Mac; delete it on the machine that has it.
 
 ## Next step
-1. Merge PR #70 once CI is green and the human approves the security change.
+1. Confirm PR #70 merged. The branch stays: M13 continues on it. Merge `main` into it first.
 2. Then build 13a-2 on this branch as its own PR, starting from the ticket's criteria.
 
 Ask guided questions first wherever the human's intent is needed (CLAUDE.md, "Ask before designing"). Until the human asks, there are no content days, staging or `db push`.

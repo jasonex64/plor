@@ -2,7 +2,7 @@
 
 **Status:** in progress (2026-10-24).
 - T1 was approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
-- **13a-1 is built and reviewed,** in PR #70. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24).
+- **13a-1 is done:** merged in PR #70 by GitHub auto-merge, which waits for every required check, with the human's approval of its security change (human, 2026-10-24: "I approve 13a-1's security change (new answer-database tables; plor_app may only run the admin lookup). Merge PR #70 once every CI check is green").
 - 13a-2 comes next, on this branch, as its own PR.
 
 ## Goal
