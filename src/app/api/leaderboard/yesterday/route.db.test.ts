@@ -1,5 +1,6 @@
 // Yesterday's standings against the local stack (run with `npm run test:db`; docs/milestones/M11-home-screen.md, 11a,
-// H7). V is the viewer; F is V's friend; G is in V's group but not V's friend; D is in neither. Yesterday's and an
+// H7). V is the viewer; F is V's friend, and joins V's group for one test; G is in V's group but not V's friend; D is in
+// neither. Yesterday's and an
 // earlier day's ledger rows are written directly, as the friends leaderboard test's W1 case does.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
@@ -71,6 +72,8 @@ describe("yesterday's standings", () => {
     );
     club = (await createGroup(getPool(), V.userId, "Club")).id;
     await joinGroup(getPool(), G.userId, (await getGroup(getPool(), V.userId, club)).inviteCode);
+    // Members since before yesterday, so yesterday counts for them in the group (M12 12d).
+    await getPool().query("update private.group_member set joined_at = now() - interval '2 days' where group_id = $1", [club]);
 
     const { rows } = await getPool().query<{ yesterday: string; before: string }>(
       "select (private.today() - 1)::text as yesterday, (private.today() - 2)::text as before",
@@ -106,6 +109,21 @@ describe("yesterday's standings", () => {
     useSession(D.session);
     expect(await call(`/api/leaderboard/yesterday?group=${club}`)).toEqual(notFound);
     expect(await call("/api/leaderboard/yesterday?group=not-a-group")).toEqual(notFound);
+  });
+
+  it("counts none of yesterday's points in the group for a member who joined today (M12 12d, D3)", async () => {
+    await joinGroup(getPool(), F.userId, (await getGroup(getPool(), V.userId, club)).inviteCode);
+    useSession(V.session);
+    expect(await points(`/api/leaderboard/yesterday?group=${club}`)).toEqual([
+      [G.username, 500, false],
+      [F.username, 0, false],
+      [V.username, 0, true],
+    ]);
+    // V's friends standings still have F's.
+    expect(await points("/api/leaderboard/yesterday")).toEqual([
+      [F.username, 300, false],
+      [V.username, 0, true],
+    ]);
   });
 
   it("leaves yesterday out while the viewer's own run that day is still going (M09 D5)", async () => {

@@ -10,10 +10,20 @@ import { api } from "@/lib/api-client";
 
 type Session = { url: string; publishableKey: string; userId: string; accessToken: string; expiresAt: number };
 
-// The payload version these pages understand (M00 data design §2: an unknown v is logged and the page refetches).
+// The payload versions these pages understand (M00 data design §2: an unknown v is logged and the page refetches):
+// PAYLOAD_VERSION for the comment and reaction nudges, STATUS_VERSION for friends' run states, 2 since M12 12d added
+// started (supabase/migrations/20261024031116_board_hides_progress.sql).
 export const PAYLOAD_VERSION = 1;
+export const STATUS_VERSION = 2;
 
-export type StatusMessage = { v: number; username: string; puzzleDate: string; state: "playing" | "finished"; question: number | null };
+// started: a friend's run began, sent to a player who hasn't finished that day instead of playing or finished (12d).
+export type StatusMessage = {
+  v: number;
+  username: string;
+  puzzleDate: string;
+  state: "started" | "playing" | "finished";
+  question: number | null;
+};
 
 // A comment or reaction changed on that day: in the group with groupId, or in the friends thread when there is none
 // (supabase/migrations/20261023060640_group_thread.sql).

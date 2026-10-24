@@ -1,7 +1,8 @@
 // A group's weekly leaderboard against the local stack (run with `npm run test:db`; docs/milestones/M10-groups.md,
 // 10c). The weeks, settling and the D5 exclusion are the friends board's code (src/app/api/leaderboard/route.db.test.ts);
-// this checks who a group's board shows. A creates the group and B joins it; C is A's friend but not a member; D is
-// neither. Ledger rows are written directly on this week's Monday, as that test's W1 case does.
+// this checks who a group's board shows, and from which day (M12 12d). A creates the group and B joins it; C is A's
+// friend, and a member only for the last test; D is neither. Ledger rows are written directly on this week's Monday,
+// as that test's W1 case does.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { GAME_ID } from "@/content/puzzle";
 import { weekStart } from "@/friends/leaderboard";
@@ -71,6 +72,9 @@ describe("a group's leaderboard", () => {
     const code = (await call(detail, `/api/groups/detail?id=${club}`, "GET")).body.group.inviteCode;
     useSession(B.session);
     expect((await call(join, "/api/groups/join", "POST", { code })).status).toBe(200);
+    // A and B count as members since before last week, so these tests are about who is shown; the last test is about
+    // the join day.
+    await getPool().query("update private.group_member set joined_at = now() - interval '15 days' where group_id = $1", [club]);
     await getPool().query(
       "insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))",
       [A.userId, C.userId],
@@ -144,5 +148,43 @@ describe("a group's leaderboard", () => {
     expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body).thisWeek).toEqual([[A.username, 0]]);
     useSession(B.session);
     expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).status).toBe(404);
+  });
+
+  it("counts a member only from the puzzle day they joined, that day included, and the friends board their whole week (12d)", async () => {
+    // C has 5 points on last week's Monday and 10 on this week's (from the first test), and joins on this Monday at
+    // noon Pacific.
+    const lastMonday = (await getPool().query<{ d: string }>("select ($1::date - 7)::text as d", [monday])).rows[0].d;
+    await ensurePuzzle(lastMonday);
+    await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [C.userId, GAME_ID, lastMonday]);
+    await getPool().query("insert into private.points_ledger (user_id, game_id, puzzle_date, points, bonus) values ($1, $2, $3::date, 5, 0)", [
+      C.userId,
+      GAME_ID,
+      lastMonday,
+    ]);
+    await getPool().query(
+      "insert into private.group_member (group_id, user_id, joined_at) values ($1, $2, ($3::date + time '12:00') at time zone 'America/Los_Angeles')",
+      [club, C.userId, monday],
+    );
+    useSession(A.session);
+    expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body)).toEqual({
+      thisWeek: [
+        [C.username, 10],
+        [A.username, 0],
+      ],
+      lastWeek: [
+        [A.username, 0],
+        [C.username, 0],
+      ],
+    });
+    expect(totals((await call(friendsBoard, "/api/leaderboard", "GET")).body)).toEqual({
+      thisWeek: [
+        [C.username, 10],
+        [A.username, 0],
+      ],
+      lastWeek: [
+        [C.username, 5],
+        [A.username, 0],
+      ],
+    });
   });
 });
