@@ -1,22 +1,33 @@
-// Puzzle fixtures for the database tests: today's (or any day's) puzzle on the local stack, and answers a player can
-// type. Shared by the run and board tests.
-import { readFileSync } from "node:fs";
-import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
-import { matchAnswer } from "@/game/matching";
+// Puzzle fixtures for the database tests: the fixture day (src/test/answer-fixture.ts) on the local stack, and answers
+// a player can type. Shared by the run and board tests.
+import { GAME_ID, avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
+import { FIXTURE, FIXTURE_ALIASES, FIXTURE_NAMES, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "./answer-fixture";
 
 const created: string[] = [];
+let approvedAt: string | null = null;
 
-// A real puzzle file under another date: its content is valid format 2 and has QUESTIONS_PER_DAY questions.
-export function fixture(date: string): Puzzle {
-  return { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date };
+// Loads the fixture base once per test file; every fixture day is approved as of then.
+export async function ensureFixtureBase(): Promise<void> {
+  approvedAt ??= await loadFixtureBase(getPool());
 }
 
-// Uses the puzzle already published for a day, or adds the fixture (removed again by removeCreatedPuzzles).
-export async function ensurePuzzle(date: string): Promise<Puzzle> {
+// The fixture day under a date. ensureFixtureBase must have run.
+export function fixture(date: string): ApprovedPuzzle {
+  if (!approvedAt) throw new Error("fixture(): call ensureFixtureBase() first");
+  return fixtureDay(date, approvedAt);
+}
+
+// Uses the fixture day already published for a date, or adds it (removed again by removeCreatedPuzzles). A real day
+// under that date is refused: the tests would play it, and the helpers below know only the fixture's names.
+export async function ensurePuzzle(date: string): Promise<ApprovedPuzzle> {
+  await ensureFixtureBase();
   const db = getPool();
-  const { rows } = await db.query<{ content: Puzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
-  if (rows.length) return rows[0].content;
+  const { rows } = await db.query<{ content: ApprovedPuzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
+  if (rows.length) {
+    if (!isFixtureDay(rows[0].content)) throw new Error(`${date} has a real puzzle; the database tests need it free for the fixture day`);
+    return rows[0].content;
+  }
   await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, date, fixture(date)]);
   created.push(date);
   return fixture(date);
@@ -29,16 +40,51 @@ export async function removeCreatedPuzzles(): Promise<void> {
   }
 }
 
-// A name or alias of the entry that a player can type at that question, past the stolen letters (M04 13c-3).
-export function typeableName(p: Puzzle, index: number, entryId: string): string | undefined {
-  const entry = p.questions[index].entries.find((e) => e.id === entryId)!;
-  return [entry.name, ...entry.aliases].find((n) => avoids(n, stolenLetters(p, index)));
+// A thing's main name in the fixture.
+export function nameOf(thingId: string): string {
+  const name = FIXTURE_NAMES.get(thingId);
+  if (!name) throw new Error(`${thingId} is not a fixture thing`);
+  return name;
 }
 
-// An entry the host doesn't catch, that can be typed at that question.
-export function safeEntry(p: Puzzle, index: number): string {
-  const q = p.questions[index];
-  const id = q.entries.map((e) => e.id).find((entryId) => matchAnswer(q, entryId) === "not_matched" && typeableName(p, index, entryId));
-  if (!id) throw new Error(`no safe answer for "${q.prompt}"`);
+// A name of the thing that a player can type at that question, past the stolen letters (M04 13c-3).
+export function typeableName(p: ApprovedPuzzle, index: number, thingId: string): string | undefined {
+  return (FIXTURE_ALIASES.get(thingId) ?? []).find((n) => avoids(n, stolenLetters(p, index)));
+}
+
+// The question's first host answer, by a name a player can type.
+export function hostName(p: ApprovedPuzzle, index: number): string {
+  const name = typeableName(p, index, p.questions[index].host_answers[0]);
+  if (!name) throw new Error(`the host answer of "${p.questions[index].prompt}" can't be typed`);
+  return name;
+}
+
+// The things of the question's category, in the fixture's order, that the host doesn't catch (not a host answer, not
+// under one) and that can be typed at that question.
+export function safeEntries(p: ApprovedPuzzle, index: number): string[] {
+  const caught = new Set(p.questions[index].host_answers);
+  return [...FIXTURE_NAMES.keys()].filter(
+    (thingId) => fixtureQuestionOf(thingId) === index && !caught.has(thingId) && typeableName(p, index, thingId) && !isUnderHost(thingId, index),
+  );
+}
+
+export function safeEntry(p: ApprovedPuzzle, index: number): string {
+  const [id] = safeEntries(p, index);
+  if (!id) throw new Error(`no safe answer for "${p.questions[index].prompt}"`);
   return id;
+}
+
+
+function fixtureQuestionOf(thingId: string): number {
+  return FIXTURE.findIndex((q, i) => Object.keys(q.members).some((slug) => fixtureId(i, slug) === thingId));
+}
+
+function isUnderHost(thingId: string, index: number): boolean {
+  const q = FIXTURE[index];
+  let slug = Object.keys(q.members).find((s) => fixtureId(index, s) === thingId);
+  while (slug) {
+    if (q.host.includes(slug)) return true;
+    slug = q.members[slug].under;
+  }
+  return false;
 }

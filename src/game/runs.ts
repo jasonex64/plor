@@ -2,13 +2,13 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { GAME_ID, avoids, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 import { ANSWER_SHARE_MIN_PLAYERS, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
-import { matchAnswer, resolveTyped } from "./matching";
+import { resolveTyped } from "./matching";
 import { dayCounts } from "./ledger";
-import { hostAnswers, named, publicQuestion, type Named, type PublicQuestion } from "./payload";
+import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
 import { getStreak } from "./streak";
 
@@ -65,8 +65,8 @@ const TIME_UP = "OB005";
 const NOT_OPEN = "OB006";
 
 // null when nothing is approved for today.
-async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: Puzzle } | null> {
-  const { rows } = await db.query<{ date: string; content: Puzzle | null }>(
+async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
+  const { rows } = await db.query<{ date: string; content: ApprovedPuzzle | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
     [GAME_ID],
@@ -96,8 +96,8 @@ function shareOf(counts: DayCounts | null, index: number, entryId: string): numb
   return (question.byEntry.get(entryId) ?? 0) / question.answered;
 }
 
-// counts: the day's counts once the run is over, otherwise null.
-function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: Clock, counts: DayCounts | null, streak: number): RunState {
+// counts: the day's counts once the run is over, otherwise null. names: the main names of the answers and host answers.
+function buildState(date: string, puzzle: ApprovedPuzzle, stored: StoredEvent[], clock: Clock, counts: DayCounts | null, streak: number, names: Names): RunState {
   const score = scoreRun(
     puzzle,
     stored.map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day })),
@@ -108,9 +108,9 @@ function buildState(date: string, puzzle: Puzzle, stored: StoredEvent[], clock: 
     return {
       index: e.question_idx,
       prompt: question.prompt,
-      answer: named(question, e.entry_id),
+      answer: named(names, e.entry_id),
       matched: e.matched,
-      hostAnswers: hostAnswers(question),
+      hostAnswers: hostAnswers(question, names),
       points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
       bonus: score.bonuses[i],
       share: shareOf(counts, e.question_idx, e.entry_id),
@@ -143,7 +143,7 @@ export async function msToReset(db: Db): Promise<number> {
   return rows[0].ms;
 }
 
-async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Promise<RunState> {
+async function stateOf(db: Db, userId: string, date: string, puzzle: ApprovedPuzzle): Promise<RunState> {
   // One statement, so the time left and the time to the reset are measured at the same instant.
   const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number }>(
     `select s.status,
@@ -157,7 +157,8 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Pr
   const { status, ms_left, ms_to_reset } = rows[0];
   const stored = status === null ? [] : await events(db, userId, date);
   const counts = status !== null && FINISHED.includes(status) ? (await dayCounts(db, [date])).get(date)! : null;
-  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, await getStreak(db, userId));
+  const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, await getStreak(db, userId), names);
 }
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a
@@ -165,7 +166,7 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: Puzzle): Pr
 // yesterday's run"). null when there's neither: nothing is approved for today, an expected state the page shows as
 // such (docs/milestones/M12-12f-review-fixes.md, F2).
 export async function todaysState(db: Db, userId: string): Promise<RunState | null> {
-  const { rows } = await db.query<{ date: string; content: Puzzle }>(
+  const { rows } = await db.query<{ date: string; content: ApprovedPuzzle }>(
     `select s.puzzle_date::text as date, p.content
      from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
      where s.user_id = $1 and s.game_id = $2 and s.status = 'in_progress'
@@ -201,13 +202,13 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
   return state;
 }
 
-// Answers one question of the player's latest run with typed text, which the server turns into an entry
-// (matching.ts, resolveTyped). Text that names no entry is logged as a miss and costs nothing: the player tries
-// again (human, 2026-10-21). A retry naming the same entry returns the stored result; a different entry for an
-// answered question is 409 already_answered (§5). After the question's 20 seconds the run_event trigger refuses
+// Answers one question of the player's latest run with typed text, which the server turns into a thing of the
+// question's category (matching.ts, resolveTyped). Text that names none is logged as a miss and costs nothing: the
+// player tries again (human, 2026-10-21). A retry naming the same thing returns the stored result; a different one for
+// an answered question is 409 already_answered (§5). After the question's 20 seconds the run_event trigger refuses
 // the insert with time_up, and the run has ended.
 export async function answer(db: Db, userId: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean }> {
-  const { rows } = await db.query<{ date: string; content: Puzzle }>(
+  const { rows } = await db.query<{ date: string; content: ApprovedPuzzle }>(
     `select r.puzzle_date::text as date, p.content
      from private.run r join private.puzzle p on p.game_id = r.game_id and p.puzzle_date = r.puzzle_date
      where r.user_id = $1 and r.game_id = $2
@@ -232,8 +233,8 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
-  const entryId = resolveTyped(puzzle.questions[index], typed, stolen);
-  if (!entryId) {
+  const resolved = await resolveTyped(db, puzzle, index, typed, stolen);
+  if (!resolved) {
     try {
       await logMiss(db, userId, date, index, typed);
     } catch (err) {
@@ -244,15 +245,15 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
     }
     return { run: await stateOf(db, userId, date, puzzle), notInList: true };
   }
+  const entryId = resolved.thingId;
   const settled = await settledAnswer(db, userId, date, index, entryId);
   if (settled) return { run: await stateOf(db, userId, date, puzzle), notInList: false };
 
-  const result = matchAnswer(puzzle.questions[index], entryId);
   try {
     await db.query(
       `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched)
        values ($1, $2, $3::date, $4, $5, $6)`,
-      [userId, GAME_ID, date, index, entryId, result === "matched"],
+      [userId, GAME_ID, date, index, entryId, resolved.caught],
     );
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
@@ -273,7 +274,7 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
 // Opens the next question of the player's latest run when they tap Next after a reveal (G5). Tapping again returns
 // the same state; the database refuses a run that has ended (run_over) and Next before the first answer.
 export async function openNext(db: Db, userId: string): Promise<RunState> {
-  const { rows } = await db.query<{ date: string; answered: number; content: Puzzle }>(
+  const { rows } = await db.query<{ date: string; answered: number; content: ApprovedPuzzle }>(
     `select s.puzzle_date::text as date, s.answered, p.content
      from private.run_status s join private.puzzle p on p.game_id = s.game_id and p.puzzle_date = s.puzzle_date
      where s.user_id = $1 and s.game_id = $2

@@ -8,14 +8,13 @@ import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as nextRoute } from "@/app/api/run/next/route";
 import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { answerBonus, expectedShare } from "./scoring";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
+import { ensurePuzzle, nameOf, removeCreatedPuzzles, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
-import { matchAnswer } from "./matching";
 import { startRun, todaysState } from "./runs";
 import { publicQuestion } from "./payload";
 
@@ -25,8 +24,8 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 const RUN = Date.now().toString(36);
 let today = "";
 let yesterday = "";
-let puzzle: Puzzle;
-let yesterdayPuzzle: Puzzle;
+let puzzle: ApprovedPuzzle;
+let yesterdayPuzzle: ApprovedPuzzle;
 
 async function call(response: Promise<Response>) {
   const r = await response;
@@ -38,7 +37,7 @@ const next = () => call(nextRoute(apiRequest("/api/run/next", { method: "POST" }
 const answerText = (index: number, text: string) => call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index, text } })));
 // Types a name of the entry, as a player would. The name comes from the puzzle of the run being answered: today's,
 // or yesterday's for a run from a day that has ended (the two can differ on a local stack with published days).
-const nameIn = (p: Puzzle, index: number, entryId: string) => typeableName(p, index, entryId)!;
+const nameIn = (p: ApprovedPuzzle, index: number, entryId: string) => typeableName(p, index, entryId)!;
 const answer = (index: number, entryId: string) => answerText(index, nameIn(puzzle, index, entryId));
 
 async function newPlayer(name: string): Promise<{ userId: string; session: Map<string, string> }> {
@@ -132,9 +131,9 @@ describe("a run, step by step", () => {
       {
         index: 0,
         prompt: q.prompt,
-        answer: { id: entryId, name: q.entries.find((e) => e.id === entryId)!.name },
+        answer: { id: entryId, name: nameOf(entryId) },
         matched: false,
-        hostAnswers: q.host_answers.map((id) => ({ id, name: q.entries.find((e) => e.id === id)!.name })),
+        hostAnswers: q.host_answers.map((id) => ({ id, name: nameOf(id) })),
         points: POINTS_PER_QUESTION[0],
         // The provisional rarity bonus (M09): the expectation alone, as src/game/scoring.test.ts works out by hand.
         bonus: answerBonus(0, expectedShare(q, entryId)),
@@ -185,11 +184,10 @@ describe("a run, step by step", () => {
   });
 
   it("returns the stored result for a retry, and 409 already_answered for a different entry", async () => {
-    const q = puzzle.questions[0];
     const again = await answer(0, safeEntry(puzzle, 0));
     expect(again.status).toBe(200);
     expect(again.body.run.answered).toHaveLength(1);
-    const other = q.entries.map((e) => e.id).find((id) => id !== safeEntry(puzzle, 0))!;
+    const other = safeEntries(puzzle, 0)[1];
     expect(await answer(0, other)).toEqual({ status: 409, body: { ok: false, error: "already_answered" } });
   });
 
@@ -203,8 +201,7 @@ describe("a run, step by step", () => {
 
   it("lets one of two concurrent different answers win and refuses the other with 409, never a 500", async () => {
     await next();
-    const q = puzzle.questions[2];
-    const safe = q.entries.map((e) => e.id).filter((id) => matchAnswer(q, id) === "not_matched" && typeableName(puzzle, 2, id));
+    const safe = safeEntries(puzzle, 2);
     const results = await Promise.all([answer(2, safe[0]), answer(2, safe[1])]);
     expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
     expect(results.find((r) => r.status === 409)!.body.error).toBe("already_answered");

@@ -1,114 +1,56 @@
+// The pure parts of matching (src/game/matching.ts): the texts one typo away, and which member a name is.
 import { describe, expect, it } from "vitest";
-import type { Question } from "../content/puzzle.ts";
-import { editDistanceAtMost, matchAnswer, resolveTyped } from "./matching.ts";
+import { answersAmong, oneEditAway, pickAnswer, type Candidate } from "./matching";
 
-const question: Question = {
-  prompt: "Name a pet",
-  entries: [
-    { id: "dog", name: "dog", aliases: ["dogs"] },
-    { id: "puppy", name: "puppy", aliases: ["puppies"] },
-    { id: "cat", name: "cat", aliases: ["cats"] },
-    { id: "hamster", name: "hamster", aliases: ["hamsters"] },
-    { id: "axolotl", name: "axolotl", aliases: ["axolotls"] },
-  ],
-  host_bank: ["dog", "cat", "hamster"],
-  host_answers: ["dog", "cat"],
-  match_groups: { dog: ["puppy"] },
-};
+describe("oneEditAway", () => {
+  const near = oneEditAway("horse");
 
-describe("matchAnswer", () => {
-  it("matches a host answer itself", () => {
-    expect(matchAnswer(question, "dog")).toBe("matched");
+  it("holds every text one letter missing, extra, wrong or swapped with its neighbour away", () => {
+    expect(near).toEqual(expect.arrayContaining(["hors", "horsee", "horde", "hrose", "ohrse", "horsr"]));
   });
 
-  it("matches a host answer that has no match group", () => {
-    expect(matchAnswer(question, "cat")).toBe("matched");
+  it("holds neither the text itself nor anything two edits away", () => {
+    expect(near).not.toContain("horse");
+    expect(near).not.toContain("hose s");
+    expect(near).not.toContain("hrsoe");
   });
 
-  it("matches an entry in a host answer's group", () => {
-    expect(matchAnswer(question, "puppy")).toBe("matched");
-  });
-
-  it("does not match a host-bank entry that isn't a host answer", () => {
-    expect(matchAnswer(question, "hamster")).toBe("not_matched");
-  });
-
-  it("does not match a niche answer", () => {
-    expect(matchAnswer(question, "axolotl")).toBe("not_matched");
-  });
-
-  it("only uses groups of host answers", () => {
-    const groupOnNonHost: Question = { ...question, host_answers: ["cat"], match_groups: { dog: ["puppy"] } };
-    expect(matchAnswer(groupOnNonHost, "puppy")).toBe("not_matched");
+  it("normalizes what it makes, as aliases are", () => {
+    expect(oneEditAway("ab")).not.toContain(" b");
+    expect(oneEditAway("ab")).toContain("b");
   });
 });
 
-describe("editDistanceAtMost", () => {
-  it.each([
-    ["passprt", "passport", true], // a letter missing
-    ["passsport", "passport", true], // a letter extra
-    ["passpord", "passport", true], // a letter wrong
-    ["paspsort", "passport", true], // two neighbours swapped
-    ["pasprt", "passport", false], // two letters missing
-    ["pasdpord", "passport", false], // two letters wrong, same length (2c review)
-    ["abcd", "badc", false], // two swaps, same length (2c review)
-    ["passport", "passport", true],
-  ])("%s → %s within one edit: %s", (a, b, within) => {
-    expect(editDistanceAtMost(a, b, 1)).toBe(within);
+describe("pickAnswer", () => {
+  const c = (thing_id: string, caught = false, ancestors: string[] = [thing_id]): Candidate => ({ alias: "robin", thing_id, caught, ancestors });
+
+  it("is nothing for no candidates", () => {
+    expect(pickAnswer([], {})).toBeNull();
+  });
+
+  it("is caught if the host catches any meaning, and is that meaning", () => {
+    expect(pickAnswer([c("b"), c("a", true)], {})).toEqual({ thingId: "a", caught: true });
+  });
+
+  it("is the highest member of one line of the tree", () => {
+    expect(pickAnswer([c("species", false, ["species", "genus"]), c("genus", false, ["genus"])], {})).toEqual({ thingId: "genus", caught: false });
+  });
+
+  it("is the most common level, then the smallest ID, among unrelated members", () => {
+    expect(pickAnswer([c("a"), c("b")], { b: "uncommon" })).toEqual({ thingId: "b", caught: false });
+    expect(pickAnswer([c("b"), c("a")], {})).toEqual({ thingId: "a", caught: false });
   });
 });
 
-describe("resolveTyped", () => {
-  const animals: Question = {
-    prompt: "Name an animal",
-    entries: [
-      { id: "mouse", name: "mouse", aliases: ["mice"] },
-      { id: "moose", name: "moose", aliases: [] },
-      { id: "passport", name: "passport", aliases: ["passports"] },
-      { id: "cat", name: "cat", aliases: ["cats", "house cat"] },
-      { id: "car", name: "car", aliases: ["cars"] },
-    ],
-    host_bank: ["mouse"],
-    host_answers: ["mouse"],
-    match_groups: {},
-  };
+describe("answersAmong", () => {
+  const c = (thing_id: string, alias: string): Candidate => ({ alias, thing_id, caught: false, ancestors: [thing_id] });
 
-  it("finds an entry by its name or an alias, after normalization", () => {
-    expect(resolveTyped(animals, "  Mouse ", [])).toBe("mouse");
-    expect(resolveTyped(animals, "MICE", [])).toBe("mouse");
-    expect(resolveTyped(animals, "house cat", [])).toBe("cat");
+  it("counts names of one thing, and one name several things share, as one answer each", () => {
+    expect(answersAmong([c("kiwi", "kiwi"), c("kiwi", "kiwis")])).toBe(1);
+    expect(answersAmong([c("american", "robin"), c("european", "robin"), c("european", "robins")])).toBe(1);
   });
 
-  // Rules to build, rule 2: exact before typo. "moose" is one letter from the host "mouse" and must stay moose.
-  it("prefers an exact name to a typo of another entry", () => {
-    expect(resolveTyped(animals, "moose", [])).toBe("moose");
-    expect(matchAnswer(animals, resolveTyped(animals, "moose", [])!)).toBe("not_matched");
-  });
-
-  it("auto-corrects one typo of 4+ letters to the only entry that close (human, 2026-10-21)", () => {
-    expect(resolveTyped(animals, "passprt", [])).toBe("passport");
-    expect(resolveTyped(animals, "carz", [])).toBe("car");
-  });
-
-  // G12 (human, 2026-10-21): a typo never lands on a name that needs a stolen letter. "passprt" is one typo from
-  // "passport", which needs the stolen O.
-  it("doesn't auto-correct onto a name that needs a stolen letter", () => {
-    expect(resolveTyped(animals, "passprt", ["o"])).toBeNull();
-    expect(resolveTyped(animals, "passprt", ["e"])).toBe("passport");
-  });
-
-  it("names no entry when two are one typo away, instead of guessing", () => {
-    // "mose" is one letter short of both "mouse" and "moose".
-    expect(resolveTyped(animals, "mose", [])).toBeNull();
-  });
-
-  it("doesn't auto-correct text under 4 letters, and doesn't count spaces as letters (M02 2f, B4)", () => {
-    expect(resolveTyped(animals, "cst", [])).toBeNull();
-    expect(resolveTyped(animals, "ca t", [])).toBeNull();
-  });
-
-  it("names no entry for text that is in no list, or empty", () => {
-    expect(resolveTyped(animals, "unicorn", [])).toBeNull();
-    expect(resolveTyped(animals, "   ", [])).toBeNull();
+  it("counts unrelated names of unrelated things apart", () => {
+    expect(answersAmong([c("horse", "horse"), c("horde", "horde")])).toBe(2);
   });
 });

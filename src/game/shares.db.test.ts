@@ -4,8 +4,12 @@
 // todaysState, as GET /api/run does.
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
-import { fixture, safeEntry } from "@/test/puzzles";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { fixtureDay, loadFixtureBase } from "@/test/answer-fixture";
+import { safeEntry } from "@/test/puzzles";
+
+// Answers are named from the base, so each test loads the fixture base inside its transaction.
+const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
 import { dayCounts } from "./ledger";
 import { todaysState } from "./runs";
 
@@ -50,6 +54,7 @@ async function run(
 describe("how many players gave each answer (H5)", () => {
   it("shows each answer's share once the run is over and enough players answered, and none before", async () => {
     await inRolledBackTransaction(async (client) => {
+      await loadFixtureBase(client);
       const { rows } = await client.query<{ today: string }>("select private.today()::text as today");
       const today = rows[0].today;
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3) on conflict do nothing", [
@@ -57,7 +62,7 @@ describe("how many players gave each answer (H5)", () => {
         today,
         fixture(today),
       ]);
-      const { rows: content } = await client.query<{ content: Puzzle }>(
+      const { rows: content } = await client.query<{ content: ApprovedPuzzle }>(
         "select content from private.puzzle where game_id = $1 and puzzle_date = $2::date",
         [GAME_ID, today],
       );
@@ -97,6 +102,7 @@ describe("how many players gave each answer (H5)", () => {
 
   it("counts a day's answers only before its midnight, as the final bonus does (M09 D8)", async () => {
     await inRolledBackTransaction(async (client) => {
+      await loadFixtureBase(client);
       const day = "2001-02-03";
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [
         GAME_ID,

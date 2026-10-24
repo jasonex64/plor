@@ -2,13 +2,15 @@ import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { isAdmin } from "@/insights/queries";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
-import { checkPuzzle, isCalendarDate } from "@/content/puzzle";
+import { checkHostNames, checkPuzzle, isCalendarDate } from "@/content/puzzle";
+import { thingNames } from "@/game/payload";
 import { withHostAnswers } from "@/admin/puzzle-entry";
 import { approvePuzzle, readDrafts } from "@/admin/puzzles";
 
 // Approves a drafted day with the host answers the admin chose (docs/milestones/M06-puzzle-entry.md). The result is
-// checked by the same content rules as a file; a failure lists each problem and saves nothing. The database function
-// checks the admin, refuses a day that is over, and its trigger refuses changing a day that has started.
+// checked by the same content rules as a file, then the host answers' names against the stolen letters, then against
+// the answer database by private.approve_puzzle; a failure lists each problem and saves nothing. The database function
+// also checks the admin and refuses a day that is over, and its trigger refuses changing a day that has started.
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
@@ -20,9 +22,11 @@ export const POST = handle(async (request) => {
   if (!draft) throw new AppError("no_draft", 404);
   if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", 400, "hostAnswers");
   const puzzle = withHostAnswers(draft, hostAnswers);
-  const problems = checkPuzzle(date, puzzle);
-  if (problems.length) return Response.json({ ok: false, error: "puzzle_invalid", problems }, { status: 422 });
-  await approvePuzzle(getPool(), userId, puzzle);
+  const db = getPool();
+  const shape = checkPuzzle(date, puzzle);
+  const problems = shape.length ? shape : checkHostNames(date, puzzle, await thingNames(db, puzzle.questions.flatMap((q) => q.host_answers)));
+  const found = problems.length ? problems : await approvePuzzle(db, userId, puzzle);
+  if (found.length) return Response.json({ ok: false, error: "puzzle_invalid", problems: found }, { status: 422 });
   return Response.json({ ok: true });
 });
 

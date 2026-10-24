@@ -1,7 +1,8 @@
 // What the insights report reads (docs/milestones/M03-puzzle-insights.md). No query selects a user ID, so the report
 // can't name players (D4). Dates are read as text and "today" is private.today() (M00 data design §8).
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
+import { thingNames } from "@/game/payload";
 import { AppError } from "@/lib/http";
 import { buildInsights, type AnswerRow, type DayInsights, type MissRow } from "./report";
 
@@ -23,7 +24,7 @@ export async function reportDays(db: Db): Promise<string[]> {
 // day, so the report stays reachable on days with no puzzle (M03 D5; M02 2f, B3). A day that hasn't started, or has no
 // puzzle, is not available.
 export async function dayInsights(db: Db, date: string | null): Promise<DayInsights> {
-  const { rows } = await db.query<{ date: string; finished: boolean; content: Puzzle }>(
+  const { rows } = await db.query<{ date: string; finished: boolean; content: ApprovedPuzzle }>(
     `select p.puzzle_date::text as date, p.puzzle_date < private.today() as finished, p.content
      from private.puzzle p
      where p.game_id = $1 and p.puzzle_date <= private.today()
@@ -41,5 +42,6 @@ export async function dayInsights(db: Db, date: string | null): Promise<DayInsig
     "select question_idx, typed from private.missed_answer where game_id = $1 and puzzle_date = $2::date",
     [GAME_ID, day.date],
   );
-  return buildInsights(day.date, day.finished, day.content, answers.rows, misses.rows);
+  const names = await thingNames(db, [...answers.rows.map((a) => a.entry_id), ...day.content.questions.flatMap((q) => q.host_answers)]);
+  return buildInsights(day.date, day.finished, day.content, answers.rows, misses.rows, names);
 }

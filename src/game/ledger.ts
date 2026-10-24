@@ -2,7 +2,7 @@
 // §6): a run gets its one row once it's finished and its day is closed, with the ladder and the final rarity bonus.
 // A day closes at its midnight Pacific; nothing is scheduled. The leaderboard settles the players it shows just before
 // it sums, which is also how runs from before M09 get their rows.
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 import { scoreRun, type DayCounts, type ScoredEvent } from "./scoring";
 
@@ -24,7 +24,7 @@ export async function settleRuns(db: Db, userIds: string[]): Promise<number> {
   if (runs.length === 0) return 0;
   const dates = [...new Set(runs.map((r) => r.date))];
 
-  const { rows: puzzles } = await db.query<{ date: string; content: Puzzle }>(
+  const { rows: puzzles } = await db.query<{ date: string; content: ApprovedPuzzle }>(
     "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])",
     [GAME_ID, dates],
   );

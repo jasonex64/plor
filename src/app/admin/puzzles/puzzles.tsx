@@ -135,16 +135,17 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
 }
 
 function QuestionSummary({ index, q }: { index: number; q: QuestionView }) {
-  const names = new Map(q.answers.map((a) => [a.id, a.name]));
+  const names = new Map(q.hostBank.map((a) => [a.id, a.name]));
   return (
     <p>
-      Q{index + 1}. {q.prompt}. Host: {q.hostAnswers.map((id) => names.get(id)).join(", ")}
-      {q.steals && `. The Wind steals ${q.steals.toUpperCase()}`}. {q.answers.length} answers.
+      Q{index + 1}. {q.prompt} (any {q.category.replaceAll("_", " ")}). Host: {q.hostAnswers.map((id) => names.get(id) ?? id).join(", ")}
+      {q.steals && `. The Wind steals ${q.steals.toUpperCase()}`}.
     </p>
   );
 }
 
-// Reviewing a drafted day: each question's answers, its suggested host answers (changeable), then Approve.
+// Reviewing a drafted day: each question's category, its suggested host answers (changeable, from its host bank),
+// then Approve.
 function Review({ date, draft, live, onApproved }: { date: string; draft: QuestionView[]; live: QuestionView[] | null; onApproved: () => void }) {
   const [hosts, setHosts] = useState<string[][]>((live ?? draft).map((q) => q.hostAnswers));
   const [problems, setProblems] = useState<string[]>([]);
@@ -176,7 +177,7 @@ function Review({ date, draft, live, onApproved }: { date: string; draft: Questi
       {draft.map((q, i) => (
         <section key={i}>
           <h4>
-            Q{i + 1}. {q.prompt}
+            Q{i + 1}. {q.prompt} (any {q.category.replaceAll("_", " ")})
             {q.steals && ` (the Wind steals ${q.steals.toUpperCase()})`}
           </h4>
           <label>
@@ -187,7 +188,7 @@ function Review({ date, draft, live, onApproved }: { date: string; draft: Questi
               value={hosts[i]}
               onChange={(e) => setHosts(hosts.map((h, j) => (j === i ? [...e.target.selectedOptions].map((o) => o.value) : h)))}
             >
-              {[...q.answers].sort((a, b) => a.name.localeCompare(b.name)).map((a) => (
+              {[...q.hostBank].sort((a, b) => a.name.localeCompare(b.name)).map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.name}
                 </option>
@@ -195,10 +196,6 @@ function Review({ date, draft, live, onApproved }: { date: string; draft: Questi
             </select>
           </label>
           <ProblemList problems={problems.filter((p) => questionOf(p) === i)} />
-          <details>
-            <summary>All {q.answers.length} answers</summary>
-            <p>{q.answers.map((a) => (a.aliases.length ? `${a.name} (${a.aliases.join(", ")})` : a.name)).join("; ")}</p>
-          </details>
         </section>
       ))}
       <button type="button" disabled={busy} onClick={approve}>

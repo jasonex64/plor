@@ -2,7 +2,6 @@
 // connect as postgres, so this file switches to plor_app the same way src/groups/groups.plor-app.db.test.ts does.
 // Needs the local stack; run with `npm run test:db`.
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { postComment } from "@/comments/comments";
@@ -12,6 +11,7 @@ import { startRun } from "@/game/runs";
 import { createGroup, leaveGroup } from "@/groups/groups";
 import { deleteAccount } from "./account";
 import { createProfile } from "./profile";
+import { fixtureDay, loadFixtureBase } from "@/test/answer-fixture";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 3 });
 const RUN = Date.now().toString(36);
@@ -110,7 +110,7 @@ describe("writes for a deleted player", () => {
       [GAME_ID],
     );
     if (!rows[0].content) {
-      const puzzle = { ...JSON.parse(readFileSync("content/offbeat/2026-10-26.json", "utf8")), date: rows[0].today };
+      const puzzle = fixtureDay(rows[0].today, await loadFixtureBase(client));
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, rows[0].today, puzzle]);
     }
     await client.query("set local role plor_app");

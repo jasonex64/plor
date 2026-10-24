@@ -114,11 +114,14 @@ select is(pg_temp.grants('plor_app'), array[
   -- Reactions (M08 8b, D8): read, react, and remove or replace your own (no update: a replace is a delete and an
   -- insert; the route scopes both to the signed-in player).
   'private.reaction delete', 'private.reaction insert', 'private.reaction select',
+  -- A format-3 day's answers are resolved against the base, and named, through two guarded read-only functions (M13 13a-2).
+  'private.resolve_answer(text,date,integer,text[]) execute',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
   'private.save_questions(uuid,text,date,text[]) execute',
   'private.take_auth_attempt(text,text,integer,interval) execute',
+  'private.thing_names(uuid[]) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');
 select ok(not exists (select from pg_roles where rolname = 'plor_publisher'), 'plor_publisher is gone (M06: puzzles get in through the admin page)');
 
