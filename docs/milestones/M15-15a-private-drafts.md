@@ -1,6 +1,6 @@
-# M13 13a — Puzzle drafts out of the public repo
+# M15 15a — Puzzle drafts out of the public repo
 
-**Status:** planned: draft ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "draft a ticket to move puzzle drafts out of the public repo before the beta"). P1–P5 wait on the human. No code before they're answered.
+**Status:** planned: draft ticket for the human's approval, 2026-10-23 (human, 2026-10-23: "draft a ticket to move puzzle drafts out of the public repo before the beta"). Moved from M13 (it was 13a) to M15 by P4 (b). P1–P3 and P5 wait on the human. No code before they're answered.
 
 ## Goal
 A drafted day's answers are never in the public repo: drafts live in the database, readable only by admins, until the human approves the day.
@@ -27,7 +27,7 @@ A drafted day's answers are never in the public repo: drafts live in the databas
 | P1 | **Where drafts live.** (a) **The database**, admin-only, uploaded on the admin page (above). (b) A second, private GitHub repo for content, pulled into each deployment: Vercel and CI would need a token for it (a new secret), and drafts would still be committed. (c) Encrypted files in this repo: the key would have to reach every drafting session (a secret in an agent's hands; CLAUDE.md, Security) | (a). No new secret; admins are already the only readers of approved days before they start; one copy instead of a file plus a row | |
 | P2 | **The 31 days already public in history** (2026-10-26 to 11-22, the parked and rehearsal days). (a) Treat their answers as spoiled: before each is approved, the human picks host answers different from the committed ones where the host bank allows, or drops the day. (b) Accept: beta players are friends who won't go looking. (c) Draft them all again from new questions | (a) for days played in the beta, since the host answers are what a reader would learn; a wider host bank is M13's work anyway | |
 | P3 | **Moving the drafts that are kept.** (a) The human uploads each file on the admin page (the same path as every future day; the page takes several files at once). (b) A one-off script the human runs with an admin database URL from their password manager | (a). One way in (CLAUDE.md, "One way to do each thing"), and no hosted credential on the machine | |
-| P4 | **Where this ticket goes.** (a) **13a**, the first sub-ticket of M13 (answer lists and content), right after M12, since M13 reworks the content pipeline and comes before the beta (M15). (b) A sub-ticket of M15. (c) Now, before 12d | (a). Nothing drafted lands in public between M12 and it if drafting pauses until then; until it ships, new days are drafted only when the human accepts them going public | |
+| P4 | **Where this ticket goes.** (a) **13a**, the first sub-ticket of M13 (answer lists and content), right after M12, since M13 reworks the content pipeline and comes before the beta (M15). (b) A sub-ticket of M15. (c) Now, before 12d | (a). Nothing drafted lands in public between M12 and it if drafting pauses until then; until it ships, new days are drafted only when the human accepts them going public | **(b), M15's first sub-ticket** (human, 2026-10-23: "u can close and start the ticket", accepting Claude's revised order: plor.app needn't be playable before launch, so drafting the beta's days and moving drafts out come right before the beta, after M13 changes the content format and M14) |
 | P5 | **Drafting until it ships.** (a) Pause drafting new days. (b) Keep drafting into the repo, accepting those days are public | (a). The four replacement questions (11-06, 11-10, 11-16) wait for this ticket | |
 
 ## Source
@@ -42,7 +42,7 @@ Written once P1–P5 are answered. They will cover: the table and function (pgTA
 
 ## Out of scope
 - Rewriting git history to remove the old files. It can't make them private again: copies may exist anywhere the public repo was cloned or cached.
-- Automatic drafting and approval (ROADMAP Later), and answer lists (the rest of M13).
+- Automatic drafting and approval (ROADMAP Later), and answer lists (M13).
 
 ## Numbers
 | Value | Used for | Origin |
@@ -51,7 +51,7 @@ Written once P1–P5 are answered. They will cover: the table and function (pgTA
 
 ## Plan
 1. Read what the bundled Next.js docs say about a route handler's request body size. Expected: no documented cap for route handlers (Server Actions have their own). If one exists and is below the largest draft, stop and ask.
-2. Once P1–P5 are answered: write the criteria, then build on the M13 branch, tests first: the migration and pgTAP, then the upload route and `readDrafts`, then the page, then the fixtures, then removing the folders and rewriting DECISIONS.md "Puzzle drafting".
+2. Once P1–P5 are answered: write the criteria, then build on the M15 branch, tests first: the migration and pgTAP, then the upload route and `readDrafts`, then the page, then the fixtures, then removing the folders and rewriting DECISIONS.md "Puzzle drafting".
 3. The human uploads the kept days on the hosted admin page after the next `db push` (P3).
 
 ## Removes
