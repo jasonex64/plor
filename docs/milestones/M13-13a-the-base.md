@@ -1,9 +1,9 @@
 # M13 13a — The base
 
-**Status:** in progress (2026-10-24).
+**Status:** done (2026-10-24), on PR #71's merge.
 - T1 was approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
 - **13a-1 is done:** merged in PR #70 by GitHub auto-merge, which waits for every required check, with the human's approval of its security change (human, 2026-10-24: "I approve 13a-1's security change (new answer-database tables; plor_app may only run the admin lookup). Merge PR #70 once every CI check is green").
-- **13a-2 is built, reviewed, and its blocking findings fixed** (Review), in PR #71. It holds format 3, the engine on the base and the drafting script, with 13a-3 folded in, since CI needs the T1 draft once the old drafts are gone. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24: private.resolve_answer and private.thing_names, and approve_puzzle rewritten).
+- **13a-2 is done:** merged in PR #71 on green CI, with the human's approval of its security change (human, 2026-10-24: "I approve 13a-2's security change (plor_app may run private.resolve_answer and private.thing_names; approve_puzzle rewritten). Merge PR #71 once every CI check is green"). It holds format 3, the engine on the base and the drafting script, with 13a-3 folded in, since CI needs the T1 draft once the old drafts are gone.
 
 ## Goal
 One complete day, built from the answer database by a Claude session, approved on the admin page and played end to end on the local stack.

@@ -7,14 +7,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
   - **13a-1** (the base, imports, admin lookup, credits) is merged (PR #70).
-  - **13a-2 is built, reviewed and its blocking findings fixed,** in PR #71, with 13a-3 folded in. It holds:
+  - **13a-2 is merged** (PR #71), with 13a-3 folded in and its security change approved by the human. It holds:
     - format 3: a day names categories and is resolved as of its approval;
     - the game engine on the base;
     - deterministic thing IDs;
     - `npm run draft` and the T1 day, `content/offbeat/2026-10-24.json`;
     - format 2 and its scripts and drafts retired.
 
-    It waits for green CI and the **human's approval of its security change**: `plor_app` may execute `private.resolve_answer` and `private.thing_names` (DECISIONS.md Log, 2026-10-24).
   - **After 13a:**
     - 13b, learning from misses: auto-accept at 1% with 3 players, the facts check, the audit page;
     - 13c, rarity from play, levels, the dodging host, 3 familiar answers;
@@ -29,13 +28,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **PR #71 (13a-2):** approve its security change (`plor_app` may run `private.resolve_answer` and `private.thing_names`; `approve_puzzle` rewritten) and the merge.
+- **13b's guided questions** (CLAUDE.md, "Ask before designing").
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. Merge 13a-2's PR on green CI with the human's OK; the branch stays for M13.
-2. Then 13b: ask guided questions where intent is needed (CLAUDE.md), write its criteria, build.
+1. 13b, learning from misses: finish the guided questions, write its criteria in a sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
 
 Until the human asks, there are no content days, staging or `db push`.
 
