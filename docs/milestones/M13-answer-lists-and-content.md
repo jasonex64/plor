@@ -3,7 +3,7 @@
 **Status:** planned (2026-10-24).
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
 - **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
-- **Waiting:** only D2, the sources, which Claude is researching for the human's OK. No code before they're in SOURCES.md.
+- **Sources:** D2's are in SOURCES.md (human, 2026-10-24). Every decision and number is answered, so 13a's criteria come next.
 
 ## Goal
 One growing database of things, their names and the facts about them. It decides which answers each question accepts, learns from what players type, and measures how rare each answer really is, so that an AI can later draft whole days that the human approves in under a minute.
@@ -40,7 +40,13 @@ One growing database of things, their names and the facts about them. It decides
 | Themed days | "Yes, sometimes" |
 
 ## Source
-- **SOURCES.md has no source for answers or facts.** D2 asks the human to add one or more. Until then, nothing is built from one (CLAUDE.md: "If no source covers the work, stop and ask").
+- **Answers and facts (SOURCES.md, added 2026-10-24 for D2):**
+  - Wikidata: things, labels and aliases, the taxon and concept trees, closed lists;
+  - Open English WordNet: the everyday "kind of" tree and synonyms;
+  - Catalogue of Life: the classification of living things, the "technically correct" tie-breaker;
+  - USDA FoodData Central: food names.
+
+  Open English WordNet and Catalogue of Life are CC BY, so the game credits them (13a).
 - **Kept as they are:**
   - **DECISIONS.md, Game 1 and the Answer model:** sudden death, the fixed sequence, the server as the only holder of host answers, one level of detail per question, match groups, normalization at authoring, and the typed-text rule.
   - **DECISIONS.md, Puzzle content format** (Hard to reverse): "an approved day … can't be changed once its day has started". D3 changes the format, not that rule.
@@ -96,7 +102,7 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
 | D1 | **Where the database lives.** (a) **Postgres tables in `private`**, read and written only through guarded functions, as puzzles are (M06); the admin pages audit and edit it. (b) Files in the repo, changed by pull requests | (a). Auto-accepting misses (the human's rule) has to write while players play, and files can't. New tables, functions and `plor_app` grants are a security change, recorded in DECISIONS.md when built | **(a), the database** (human, 2026-10-24: "Database (Recommended)", after Claude laid out both sides). Security change: the tables, functions and grants are proposed in 13a and recorded in DECISIONS.md |
-| D2 | **The sources** (the human adds each to SOURCES.md). (a) **Wikidata** for facts and traits (taxonomy, where things live, colors, counts); its license and how to pull a subset are read before it's proposed (*unverified*). (b) **WordNet** for the "kind of" tree of everyday nouns and their synonyms (aliases); its license is *unverified* too. (c) Both | (c), (a) for facts and (b) for everyday words. Only the subsets the categories need are imported, by a script whose output is reviewed. Claude reads each license and brings the SOURCES.md rows for the human's OK | **Research first** (human, 2026-10-24: "yes both and others too feel free to do as much research as u want"). Claude compares Wikidata, WordNet and other candidates (licenses, coverage, how to pull subsets) and brings SOURCES.md rows for the human's OK. Pending |
+| D2 | **The sources** (the human adds each to SOURCES.md). (a) **Wikidata** for facts and traits (taxonomy, where things live, colors, counts); its license and how to pull a subset are read before it's proposed (*unverified*). (b) **WordNet** for the "kind of" tree of everyday nouns and their synonyms (aliases); its license is *unverified* too. (c) Both | (c), (a) for facts and (b) for everyday words. Only the subsets the categories need are imported, by a script whose output is reviewed. Claude reads each license and brings the SOURCES.md rows for the human's OK | **Wikidata, Open English WordNet, Catalogue of Life and USDA FoodData Central**, added to SOURCES.md (human, 2026-10-24, from Claude's research comparing them with Princeton WordNet, ConceptNet, DBpedia, GeoNames, GBIF, Wiktionary and Natural Earth). Also decided:<br>• **Nicknames and slang** come from the AI and players, not Wiktionary, whose share-alike license would bind the data ("AI + players (Recommended)").<br>• **Traits** that no source has ("can fly", "4 legs") are filed by the AI at the right level of the tree with its reason, go live, and show in the audit list ("AI files, I audit (Recommended)").<br>• **Sources come in as reviewed snapshots** of only the needed subsets, refreshed when the human asks ("Reviewed snapshot (Recommended)"). |
 | D3 | **Hard to reverse: permanent thing IDs and content format 3.** Each thing gets a permanent ID that answers, history and days refer to forever. Format 3 is the day's frozen copy keyed by thing IDs, with expected shares and the question's category recipe. (a) **IDs owned by Plor** (a random ID per thing), each linked to its source's own ID where there is one. (b) The source's IDs as ours | (a). A thing that's in no source (a curated or player-added answer) still needs an ID, and a source can change or merge its IDs | **(a), Plor's own IDs** (human, 2026-10-24: "Plor's own IDs (Recommended)") |
 | D4 | **Auto-accepting a miss.** (a) **Accepted once the share of distinct players who typed it, among the players who answered that category's questions, reaches X%, and at least M players typed it**, counted across days, from the next day on, unless the facts reject it (then audit only). (b) Per day: X% of one day's players | (a). Pooling across days lets a small beta reach the share. The minimum M stops one player out of one counting as 100%. X and M are human numbers | **(a), with X = 1% and M = 3** (human, 2026-10-24: "1%", "3 players") |
 | D5 | **Rarity from play, with recency.** (a) **Pooled per category and weighted by age:** an answer given *h* days ago counts half as much as one today (a half-life *h*), blended with the AI's first guess until enough players have answered (M09 N1's role). The host may pick a dodge from question *q* on. (b) Pooled, unweighted. (c) Per day only, as now | (a), as the human asked, provided it's simple. It is: one weighted count per answer per category. *h* and *q* are human numbers, and the AI's first-guess shares per level (common, uncommon, rare) replace N5 | **Pooled per category with no fading:** every answer ever counts the same (human, 2026-10-24: "All history equal", after asking what fading meant). So (b), which drops *h*. The AI's first guesses are **40% / 40% / 20%** of players giving some common / uncommon / rare answer ("40 / 40 / 20"). **Dodges are tied to difficulty:** the drafting AI picks a popular dodge when the plain answers can't reach a question's catch target, so dodges get likelier toward Q7 and vary day to day (human: "random", then "Random, later more likely", then "Tied to difficulty (Recommended)"). So *q* isn't needed |
@@ -105,7 +111,9 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 | D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | **(a), start fresh** (human, 2026-10-24: "Start fresh (Recommended)") |
 
 ## Sub-tickets (Claude's order, each its own PR on this branch)
-- **13a, the base.**
+- **13a, the base.** It also includes:
+  - snapshot import scripts for the D2 sources, with a reviewed summary of each pull;
+  - a credits line for the CC BY sources, placed in 13a.
   - Things, aliases, facts, the "kind of" tree, categories as recipes, and the audit log (D1, D3, D6), with tables and functions, pgTAP and grants.
   - The import from the D2 sources for the categories the first test days use, reviewed.
   - Approval freezes format 3 into a day, and matching runs on it.
@@ -140,7 +148,7 @@ Each sub-ticket's criteria are written before its code, once D1–D8 are answere
 | Fewest familiar (common or uncommon) answers still typeable after stolen letters: **3** | The letter picker (13c; M04 G9) | Human, 2026-10-24: "3" |
 
 ## Plan
-1. ~~The human answers D1–D8 and the numbers.~~ Done 2026-10-24, except D2. Claude researches the sources and brings the SOURCES.md rows for the human's OK.
+1. ~~The human answers D1–D8 and the numbers, and approves the sources.~~ Done 2026-10-24.
 2. **13a** with one category end to end: animals, the one M04 measured.
    - *Hypothesis:* the source's animal subtree holds at least the 223 of 226 animals M04 counted.
    - *Disproved* if it holds fewer, which would mean M04 measured a different version.

@@ -11,7 +11,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
   - PR #68 (copied days to fill empty dates) was closed unmerged.
 - **M13's ticket is a draft** (`docs/milestones/M13-answer-lists-and-content.md`), on branch `m13-answer-lists-and-content` in PR #61.
   - It was rewritten 2026-10-24 around "the answer database": things, aliases, facts, categories as recipes, a frozen copy per day, auto-accepted misses with an audit page, pooled rarity, and a question bank. The human's answers to four rounds of guided questions are quoted in it.
-  - D1 and D3–D8 and every number are answered (human, 2026-10-24). Only D2, the sources, waits: Claude researched Wikidata, WordNet and others, and brings the SOURCES.md rows for the human's OK.
+  - Every decision, number and source is answered (human, 2026-10-24). The sources are Wikidata, Open English WordNet, Catalogue of Life and USDA FoodData Central, now in SOURCES.md. Nicknames come from the AI and players; traits are AI-filed and audited; sources come in as reviewed snapshots.
   - No code before then.
 - **The private-drafts ticket moved to M15** as `docs/milestones/M15-15a-private-drafts.md` (its P4 answered (b)). M15 also takes the beta's days, which days to play and the parked days.
 - **M14:** Claude suggested a split for its ticket: 14a structure and UX (navigation tabs, flows), 14b the visual system, 14c the art. It's in the ROADMAP row, not yet a ticket.
@@ -19,7 +19,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M16, Game 2,** has a draft ticket (branch `m16-game-2`), for after launch.
 
 ## Waiting on the human
-- **M13's D2:** approving the sources' SOURCES.md rows, from Claude's research.
 - **PR #69** (M15 15b, zod) merges itself on green CI. Then confirm Dependabot alert #1 closed, and merge `main` into this branch: #69 changes ROADMAP's M15 row, which this branch changes too.
 - **15a's P1–P3 and P5** (when M15 starts).
 - **New questions for the repeated categories** (11-06 Q2 and Q3, 11-10 Q4, 11-16 Q4): with M15's drafting now.
@@ -28,8 +27,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Next step
 1. Merge `main` into this branch once PR #69 has merged.
-2. Bring the source research to the human, and add the rows they approve to SOURCES.md.
-3. Then write 13a's criteria and build it on this branch, starting with animals (the ticket's Plan).
+2. Write 13a's criteria (ask guided questions first where the human's intent is needed, CLAUDE.md), then build it and build it on this branch, starting with animals (the ticket's Plan).
 
 Until the human asks, there are no content days, staging or `db push`.
 
