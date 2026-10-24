@@ -1,6 +1,6 @@
 # M12 12e — Sign-in code limits
 
-**Status:** done (2026-10-24): merged in PR #62 on green CI, with the human's approval of its security change (2026-10-24: "Yes, merge it"). L5 is accepted for the closed beta, a CAPTCHA decided before launch (human, 2026-10-24). Left for the human: Auth's hosted limits in the Supabase dashboard (N5, N6).
+**Status:** done (2026-10-24): merged in PR #62 on green CI, with the human's approval of its security change (2026-10-24: "Yes, merge it"). L5 is accepted for the closed beta, a CAPTCHA decided before launch (human, 2026-10-24). Auth's hosted limits are set in the Supabase dashboard (N5, N6; human, 2026-10-24: "supabase limits are updated").
 
 ## Goal
 No one can guess another player's sign-in code, or use up sign-in for everyone, however many requests they send. *(As built, guessing and code checks are closed, and so is one address flooding sign-in. Using up the code emails from many addresses is accepted for the closed beta: L5.)*

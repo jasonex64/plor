@@ -2,22 +2,22 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that merged M12's last sub-tickets (12e and 12d), on the Windows machine.
+**Updated:** 2026-10-24, by the session that merged M12's last sub-tickets (12e and 12d) and added four sources, on the Windows machine.
 
 ## Where things stand
 - **M08 to M12 are done**, so the MVP (M00–M12) is built. Tickets are in `docs/milestones/`. M12's sub-tickets went in PRs #58, #59, #60, #62 and #63, the last two merged on green CI with the human's approval, 2026-10-24.
   - Key 12e and 12d facts not in the code: L5 (code emails can still be used up from a few IPs) is accepted for the closed beta only, with a CAPTCHA to decide before launch (ROADMAP For M15). The board's `friend_status` payload is `v` 2 and the protocol 5.
-  - **This handoff's own PR** (M12 done, from `m12-account`) is the last one from that branch: once it's merged, delete `m12-account` locally and on GitHub (CLAUDE.md, Branches).
+  - `m12-account` is merged (PR #64) and deleted.
+- **plor.app sign-in is broken** (found 2026-10-24): `POST /api/auth/email/verify` answers `500 internal`, from production at protocol 5 (`/api/health`). Since 12e (PR #62) the sign-in routes call `private.take_auth_attempt` before Auth, and the hosted database doesn't have that migration. It most likely has nothing from M07 on (the handoff and DECISIONS.md, Database migrations: `db push` is the human's, held until asked), so the board, feed, groups and account pages would fail for signed-in players too (*unverified*: the hosted migration list wasn't read; it needs the database password).
 - **The repo is public** (human, 2026-10-23: "i intend to make it PUBLIC"). Its full history has no secrets (gitleaks, DECISIONS.md Log), and CI is safe for strangers' PRs. The settings it calls for and the public puzzle drafts wait on the human (ROADMAP "Next revision", For the human).
 - **M13 13a** (puzzle drafts out of the public repo) is a draft ticket in PR #61 from `m13-answer-lists-and-content`, with P1–P5 for the human.
 - **M16, Game 2 (the substring game),** has a draft ticket, merged in PR #42 (branch `m16-game-2` still exists), docs only, after launch.
 
 ## Waiting on the human
-- **Merge this handoff's PR** (M12 done) on green CI, then `m12-account` is deleted.
-- **12e:** in Supabase's dashboard, Authentication → Rate Limits: sign-ups and sign-ins 300, token verifications 300, token refreshes 1,500 per 5 minutes (N5, N6).
+- **Fix plor.app:** `npx supabase migration list --linked` to see what the hosted database has, the checks below ("Before plor.app gets M07 and later" and ROADMAP For M15's pending-migrations item), then `npx supabase db push` and `npx supabase test db --linked`. Each prompts for the database password, which stays with the human.
+- **Secret scanning:** GitHub's is on (human, 2026-10-24) beside gitleaks; whether it replaces gitleaks is the human's call (DECISIONS.md, Secret scanning).
 - **13a's** (P1–P5: `docs/milestones/M13-13a-private-drafts.md` on `m13-answer-lists-and-content`; drafting new days pauses until it ships, if P5 is (a)).
 - **The public repo:** turn on the GitHub and Vercel settings listed in ROADMAP "Next revision", For the human, and decide about the public puzzle drafts.
-- **OK four SOURCES.md rows** Claude drafted from the pages (2026-10-23, in the session, not yet in the repo): npm scripts (npm 11.19.1's bundled docs), Supabase database testing (`/guides/database/testing` and `/local-development/testing/overview` at `07e69b9`), Next.js error handling (bundled 16.4.2 `/app/getting-started/error-handling`, which covers UI error boundaries only, not the route-handler wrapper), and GitHub secret scanning availability (docs.github.com, accessed 2026-10-23). If the drafts are lost, re-read those pages; then point DECISIONS.md's Task runner, Test runner, Error handling and Secret scanning Source cells at them (ROADMAP "Next revision", For the human).
 - **New questions for the repeated categories** (human, 2026-10-23: "new categories"; Claude suggested replacements in the session, for the human to pick): 11-06 Q2 (car brand) and Q3 (a dessert you'd bring to a potluck), 11-10 Q4 (a US state capital), 11-16 Q4 (a kind of tea). The human types the new prompts on the admin page; a drafting session then follows DECISIONS.md, "Puzzle drafting", on a `content-<date>` branch.
 - **Before plor.app gets M07 and later** (`db push`, M15 or when the human wants): check that `[[:alpha:]]` behaves the same there for display names and group names (M07 7a, M10 10b; *unverified*), and that the hosted `postgres` role may delete from `auth.users` inside `delete_account` (12c; *unverified*: it does locally). "Allow public access" is already off in the hosted Realtime settings (human, 2026-10-23).
 - **The leftover `.claude/worktrees/m03-puzzle-insights` folder** isn't on the Mac; delete it on the machine that has it (human OK, 2026-10-23).

@@ -104,13 +104,13 @@ These are non-blocking items found during work or review. Record each one here *
 <!-- - [ ] <item> — found in M## (implementation | review) — <why it can wait> -->
 **For the human:**
 - [ ] **The repo is public now** (human, 2026-10-23: "i intend to make it PUBLIC"). GitHub and Vercel settings that only the human can change, all free for a public repo (checked 2026-10-23 with `gh api`):
-  - GitHub secret scanning and push protection are off. Push protection refuses a secret before it lands, which CI's gitleaks can't (it runs after the push). Adding it is a second secret scanner next to gitleaks, so it needs a DECISIONS.md entry (CLAUDE.md, "One way to do each thing").
+  - *(2026-10-24, human: GitHub secret scanning is on, and Vercel's Git Fork Protection is on. Still off, read with `gh api` the same day: push protection, Dependabot alerts, private vulnerability reporting; `main` has no ruleset.)*
+  - GitHub secret scanning and push protection were off. Push protection refuses a secret before it lands, which CI's gitleaks can't (it runs after the push). Adding it is a second secret scanner next to gitleaks, so it needs a DECISIONS.md entry (CLAUDE.md, "One way to do each thing").
   - Dependabot alerts are off, and so is private vulnerability reporting (the way a stranger reports a security hole without posting it publicly).
   - `main` has no branch protection and no ruleset: anyone with push access can force-push or delete it. A ruleset that blocks force-pushes and deletion, and requires a PR with the CI checks, is free on a public repo.
   - Actions asks for approval only from first-time contributors (`first_time_contributors`); "all outside collaborators" makes every stranger's PR wait for the human before CI runs.
   - Vercel: preview deployments get `DATABASE_URL` (M02 ticket, Vercel env vars, Production and Preview). Check that Git Fork Protection is on, so a stranger's PR never deploys without the human's OK.
 - [ ] **The puzzle drafts are public** (found 2026-10-23, when the repo went public): `content/offbeat` holds 21 drafted days (2026-10-26 to 11-22, host answers included) and `content-parked` 2 more, so anyone can read a day's answers before it's played. The drafting flow (DECISIONS.md, "Puzzle drafting") keeps writing them there. The human chose to move them out before the beta (2026-10-23); the draft ticket is `docs/milestones/M13-13a-private-drafts.md` on branch `m13-answer-lists-and-content`, with P1–P5 waiting on the human. Days already committed stay readable in git history either way.
-- [ ] Sources: DECISIONS.md Source cells name sources that aren't in SOURCES.md ("npm", "Supabase testing", "GitHub Advanced Security docs"), and the Error handling row still says to pin the Next.js error-handling docs. Only a human adds a source. Found in the 2026-10-21 docs audit. *(The rows pinned at `7425d49` were re-read and re-pinned at `07e69b9`, human OK, 2026-10-23.)*
 
 **For M12 (account):**
 - [ ] Google sign-in from `/account` while signed out comes back to `/`, not `/account`: only invite links are remembered for the round trip (`src/app/home.tsx`, `invitePath`). Found in M12 12a (review).
