@@ -1,6 +1,6 @@
 # M13 13a — The base
 
-**Status:** planned (2026-10-24): criteria drafted from the human's answers. The test day's 7 categories (T1) wait on the human's OK. No code before then.
+**Status:** in progress (2026-10-24): T1 approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
 
 ## Goal
 One complete day, built from the answer database by a Claude session, approved on the admin page and played end to end on the local stack.
@@ -23,6 +23,26 @@ One complete day, built from the answer database by a Claude session, approved o
 | Reviewing an import | "Summary + flags (Recommended)": counts per category, 20 random samples, and flags (no English name, two meanings, duplicates) |
 | Where it runs | "Local only (Recommended)": nothing goes to the hosted database until the human asks (M15) |
 | Admin view | "Search and browse (Recommended)": read-only; editing and undo come with 13b |
+| The host says "bear", a player says "polar bear" | "Caught: bear covers it (Recommended)": a host answer catches everything under it in the tree, but not the reverse. It replaces the Answer model's "one level of detail" rule, so DECISIONS.md changes in 13a-2 |
+| How obscure an animal may be | "Any real animal (Recommended)": every animal with an English common name in the sources |
+| Breeds and subspecies for "Name an animal" | "Yes, under their parent (Recommended)": beagle under dog, Bengal tiger under tiger |
+| Splitting 13a | Claude's call, after measuring the animal list: **13a-1** is the base, the imports, admin browse and credits; **13a-2** is format 3, the game engine reading the frozen lists from indexed tables, the drafting script, the test day and the matching items. Each is its own PR |
+
+**The measurement behind those questions** (2026-10-24, Wikidata Query Service).
+- *Hypothesis:* tens of thousands of animals with English common names, too many for one query.
+- *Result:* the one query for all animals timed out at the 60-second limit. Per group:
+
+  | Group | Taxa with an English common name |
+  |---|---|
+  | Mammals | 6,665 |
+  | Birds | 12,928 |
+  | Reptiles | 17,251 |
+  | Amphibians | 4,082 |
+  | Ray-finned fish | 8,611 |
+  | Cartilaginous fish | 1,064 |
+
+  Insects, arachnids, crustaceans and molluscs each timed out on their own, so likely well over 100,000 in all.
+- *So* a day can't carry its full lists inside `private.puzzle`'s JSON, re-read on every request, and the frozen lists go in indexed tables (13a-2). The import fetches group by group, splitting further on a timeout.
 
 ## Source
 - **SOURCES.md, M13 D2 sources:**
@@ -34,7 +54,7 @@ One complete day, built from the answer database by a Claude session, approved o
 - **DECISIONS.md:** Answer model (matching, one level of detail, match groups); Puzzle content format (this sub-ticket makes format 3); Puzzle drafting (rewritten for the database); Puzzle approval.
 - **The M13 ticket,** D1, D3, D6 and D8.
 
-## T1 — the test day (Claude's pick, for the human's OK)
+## T1 — the test day (Claude's pick, approved by the human, 2026-10-24)
 Seven concrete categories that use every source, in an order that rises roughly in how common the obvious answers are. Tuning is 13d.
 
 | Q | Prompt | Built from | Why |
