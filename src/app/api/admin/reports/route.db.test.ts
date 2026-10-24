@@ -193,7 +193,14 @@ describe("reporting comments, and the admins' list", () => {
     const after = (await list()).body;
     expect(after.reports.filter((x: { username: string }) => x.username.endsWith(RUN))).toEqual([]);
     expect(after.deletions.filter((x: { author: string }) => x.author.endsWith(RUN))).toEqual([
-      { id: commentOf.b, deletedAt: expect.any(String), admin: players.x.username, author: players.b.username, body: "hello from b" },
+      {
+        id: commentOf.b,
+        deletedAt: expect.any(String),
+        adminId: players.x.userId,
+        admin: players.x.username,
+        author: players.b.username,
+        body: "hello from b",
+      },
     ]);
     expect(await reportCount(commentOf.b)).toBe(0);
     const { rows } = await getPool().query("select from private.reaction where comment_id = $1", [commentOf.b]);
@@ -224,5 +231,26 @@ describe("reporting comments, and the admins' list", () => {
     expect(await bodies(yesterday)).toEqual(["yesterday from b"]);
     expect(await report(rows[0].id)).toEqual(ok);
     expect(await bodies(yesterday)).toEqual([]);
+  });
+
+  it("lists a deletion by an admin who has no profile, by their ID (12d review)", async () => {
+    // Admins are added to private.admin by user ID, so one may never have picked a username.
+    const { rows: users } = await getPool().query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id::text", [
+      `${RUN}-noprofile@example.test`,
+    ]);
+    await getPool().query("insert into private.admin (user_id) values ($1)", [users[0].id]);
+    const { rows: comments } = await getPool().query<{ id: string }>(
+      "select id::text from private.comment where user_id = $1 and body = 'yesterday from b'",
+      [players.b.userId],
+    );
+    const { rows } = await getPool().query<{ deleted: boolean }>("select private.delete_reported_comment($1, $2) as deleted", [
+      users[0].id,
+      comments[0].id,
+    ]);
+    expect(rows[0].deleted).toBe(true);
+    useSession(players.x.session);
+    expect((await list()).body.deletions.filter((x: { id: string }) => x.id === comments[0].id)).toEqual([
+      { id: comments[0].id, deletedAt: expect.any(String), adminId: users[0].id, admin: null, author: players.b.username, body: "yesterday from b" },
+    ]);
   });
 });

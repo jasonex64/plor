@@ -22,15 +22,18 @@ export async function listReports(db: Db): Promise<ReportedComment[]> {
   return rows.map(({ first, ...r }) => ({ ...r, firstReportedAt: first.toISOString() }));
 }
 
-// A deleted comment's record: who deleted it and when, and whose it was. admin and author are current usernames.
-export type DeletedComment = { id: string; deletedAt: string; admin: string; author: string; body: string };
+// A deleted comment's record: who deleted it and when, and whose it was. admin and author are current usernames; admin
+// is null for an admin with no profile (admins are added by user ID, and need none), so adminId always says who.
+export type DeletedComment = { id: string; deletedAt: string; adminId: string; admin: string | null; author: string; body: string };
 
 // Newest first. Every record: the beta is small, and a page size would be a human number (12d, Numbers).
 export async function listDeletions(db: Db): Promise<DeletedComment[]> {
-  const { rows } = await db.query<{ id: string; deleted_at: Date; admin: string; author: string; body: string }>(
-    `select d.comment_id::text as id, d.deleted_at, a.username::text as admin, w.username::text as author, d.body
+  const { rows } = await db.query<{ id: string; deleted_at: Date; adminId: string; admin: string | null; author: string; body: string }>(
+    `select d.comment_id::text as id, d.deleted_at, d.admin_id::text as "adminId", a.username::text as admin,
+            w.username::text as author, d.body
      from private.comment_deletion d
-     join private.profile a on a.user_id = d.admin_id
+     left join private.profile a on a.user_id = d.admin_id
+     -- A comment's author always has a profile: the comment hangs off their run.
      join private.profile w on w.user_id = d.author_id
      order by d.deleted_at desc, d.id desc`,
   );

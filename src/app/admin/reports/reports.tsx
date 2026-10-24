@@ -71,7 +71,7 @@ export function Reports() {
               {deletions.map((d) => (
                 <li key={d.id}>
                   <p>
-                    <time dateTime={d.deletedAt}>{new Date(d.deletedAt).toLocaleString()}</time>: {d.admin} deleted {d.author}&apos;s comment
+                    <time dateTime={d.deletedAt}>{new Date(d.deletedAt).toLocaleString()}</time>: {d.admin ?? `the admin with no username, ${d.adminId},`} deleted {d.author}&apos;s comment
                   </p>
                   <p>{d.body}</p>
                 </li>
