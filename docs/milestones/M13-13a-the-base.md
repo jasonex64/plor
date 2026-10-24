@@ -1,6 +1,9 @@
 # M13 13a — The base
 
-**Status:** in progress (2026-10-24): T1 approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
+**Status:** in progress (2026-10-24).
+- T1 was approved by the human ("Approve T1 as proposed: animal, country, fruit, dog breed, kind of cheese, chemical element, US state. Start building 13a.").
+- **13a-1 is built and reviewed,** in PR #70. It waits for CI and the human's approval of its security change (DECISIONS.md Log, 2026-10-24).
+- 13a-2 comes next, on this branch, as its own PR.
 
 ## Goal
 One complete day, built from the answer database by a Claude session, approved on the admin page and played end to end on the local stack.
@@ -42,7 +45,7 @@ One complete day, built from the answer database by a Claude session, approved o
   | Cartilaginous fish | 1,064 |
 
   Insects, arachnids, crustaceans and molluscs each timed out on their own, so likely well over 100,000 in all.
-- *So* a day can't carry its full lists inside `private.puzzle`'s JSON, re-read on every request, and the frozen lists go in indexed tables (13a-2). The import fetches group by group, splitting further on a timeout.
+- *So* a day can't carry its full lists inside `private.puzzle`'s JSON, re-read on every request, and the frozen lists go in indexed tables (13a-2). The import reads Wikidata's index in slices instead (How the imports work).
 
 ## Source
 - **SOURCES.md, M13 D2 sources:**
@@ -131,10 +134,10 @@ Seven concrete categories that use every source, in an order that rises roughly 
 | Value | Used for | Origin |
 |---|---|---|
 | 193, 118, 50 | Expected counts of countries (UN members), elements and US states | Facts about the world, checked against Wikidata in the evidence. Not tuning values |
-| 20 random samples | The import review summary | Human, 2026-10-24: "Summary + flags (Recommended)", Claude's option text |
+| 20 random samples (`BASE_REVIEW_SAMPLE`) | The import review summary | Human, 2026-10-24: "Summary + flags (Recommended)", whose option text said 20 |
 | 223 of 226 animals | The animal hypothesis | M04 measurement (ROADMAP, M13 row) |
 | SPARQL limits: 60 s, 5 parallel queries | The import scripts | SOURCES.md, Wikidata |
-| 50,000 rows per slice | How many rows each bd:slice request asks for | **Claude's choice.** A request size that changes no result, only the number of requests. One such slice took 0.85 s against the 60 s limit. For the human to change |
+| 50,000 rows per slice (`BASE_SLICE_ROWS`) | How many rows each bd:slice request asks for | Human, 2026-10-24: "50,000 (Recommended)", after Claude measured one such slice at 0.85 s against the 60 s limit |
 | 118 (atomic number cap) | The element recipe | The known elements. Checked against Wikidata: 118 items, one per number |
 
 ## Plan
@@ -153,6 +156,10 @@ Seven concrete categories that use every source, in an order that rises roughly 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| T1, Q1 (animal): "Catalogue of Life tree, with Wikidata's English common names" | Wikidata's parent-taxon tree and common names, merged with Open English WordNet's animal tree. Catalogue of Life isn't used yet | Wikidata alone held 84 of the 226 old animals; with WordNet, 224. Catalogue of Life's role is the tie-breaker when sources disagree, which comes with 13b's facts rule. Approved by the human, 2026-10-24: "Approve as built (Recommended)" |
+| T1, Q3 (fruit): "Open English WordNet and Wikidata" | Wikidata alone | Its tree holds tomato under fruit, the "accept in both" case. Approved by the human with the row above |
+| Wikidata (SOURCES.md): SPARQL queries within 60 s | The large sets are read with bd:slice, the query service's index slicing | One query over the animal tree, or over any high group, times out. bd:slice isn't named in the SOURCES.md pages (*unverified* as a documented feature); it worked on 2026-10-24 |
+| USDA FoodData Central: SR Legacy food descriptions | Only the first part of "Cheese, <kind>, …", without a note in parentheses, and not the nine descriptions in `USDA_NOT_KINDS` | The rest of a description is a variant (low fat, shredded), not a kind (human, 2026-10-24: "Keep real kinds only (Recommended)") |
 
 ## Evidence
 **13a-1 (2026-10-24, local stack):**
@@ -185,7 +192,7 @@ Seven concrete categories that use every source, in an order that rises roughly 
   | Chemical element | 118 | 1 alias on two members ("ununnilium": darmstadtium / roentgenium, a Wikidata error) |
   | Country | 193 | 1 alias on two members ("bh": Bahrain / Bosnia and Herzegovina: country codes come in as alternative labels) |
   | Fruit | 2,999 | Wikidata's tree brings in thousands of named apple and pear cultivars, and protected-origin products ("Limone di Siracusa PGI"). 251 under two or more parents; 56 aliases on two members |
-  | Cheese | 58 (38 WordNet, 20 USDA) | none, after a fix: a USDA note in parentheses had been read as part of a name |
+  | Cheese | 48 (37 WordNet, root left out; 11 new from USDA, another 20 merged into WordNet's) | none, after two fixes. A USDA note in parentheses had been read as part of a name. And nine USDA "kinds" that describe a cheese were dropped (human, 2026-10-24: "Keep real kinds only (Recommended)"): pasteurized process, mexican, mexican blend, american cheddar, dry white, white, fresh, low fat, low-sodium (`USDA_NOT_KINDS`) |
   | Dog breed | 928 | 924 under two or more parents (dog breed, the domestic dog, and a WordNet parent such as terrier) |
   | Animal | 56,787 | 4,958 under two or more parents; 9,710 aliases on two or more members; 17,857 unnamed ancestors left out |
 
@@ -198,5 +205,23 @@ Seven concrete categories that use every source, in an order that rises roughly 
   - `npx tsc --noEmit -p .` and `npm run lint` clean.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**13a-1:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24.
+- **Blocking findings and how each was fixed:**
+  - *A 429 with no Retry-After header retried at once, forever* (`Number(null)` is 0). The header is now checked first, and a missing or unusable one stops the fetch.
+  - *Two numbers outside `tunables.ts`, one with no allowed origin.* `BASE_SLICE_ROWS` and `BASE_REVIEW_SAMPLE` are now in `src/config/tunables.ts`. The human chose the slice size (50,000).
+  - *An empty Source diff while T1's sources changed.* Filled in; the human approved the sources as built.
+  - *HANDOFF.md, the ROADMAP row and this Status line were stale.* All updated.
+  - *private.base_lookup was never tested as plor_app.* `src/admin/base.plor-app.db.test.ts`: the lookup works as plor_app, and plor_app can neither read the tables nor import.
+  - *The cheese evidence didn't add up.* Reloaded and counted again: 48.
+- **Taken now, though not blocking:**
+  - "adapted" in the CC BY 4.0 credit for WordNet;
+  - two stale comments in scripts/base.ts;
+  - the USDA descriptors, dropped with the human's OK.
+- **For 13a-2:** a WordNet animal merged into a Wikidata thing keeps that thing's name, which can be scientific; the frozen day needs a display-name rule. Also, a typed name on several members of one tree line resolves to the highest (Evidence).
+- **Deferred to ROADMAP "Next revision":**
+  - a final slice that comes back exactly full;
+  - slicing a live index;
+  - same_as ignored on items already linked;
+  - fruit items left with no parent;
+  - the membership walk written three times;
+  - the fruit and country flags.

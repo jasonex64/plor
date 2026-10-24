@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
+import { BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS } from "../src/config/tunables.ts";
 import { normalize } from "../src/content/puzzle.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
@@ -46,8 +47,7 @@ const USER_AGENT = "PlorAnswerDatabase/0.1 (https://github.com/jasonex64/plor; M
 type Binding = Record<string, { value: string; "xml:lang"?: string }>;
 let retries = 0;
 
-// One query. A timeout (the service answers an error page, not JSON) returns "timeout" for the caller to split the
-// query. HTTP 429 waits the Retry-After the service names and asks again, printed and counted (the 13a ticket).
+// One query. A timeout (the service answers an error page, not JSON) returns "timeout"; every caller stops on it. HTTP 429 waits the Retry-After the service names and asks again, printed and counted (the 13a ticket).
 async function sparql(query: string): Promise<Binding[] | "timeout"> {
   for (;;) {
     const response = await fetch(SPARQL, {
@@ -56,8 +56,10 @@ async function sparql(query: string): Promise<Binding[] | "timeout"> {
       body: new URLSearchParams({ query }),
     });
     if (response.status === 429) {
-      const wait = Number(response.headers.get("retry-after"));
-      if (!Number.isFinite(wait)) throw new Error("SPARQL 429 without a Retry-After");
+      // Number(null) and Number("") are 0, so the header is checked before it's read as seconds.
+      const header = response.headers.get("retry-after")?.trim();
+      const wait = header ? Number(header) : NaN;
+      if (!Number.isFinite(wait) || wait < 0) throw new Error(`SPARQL 429 without a usable Retry-After (${JSON.stringify(header ?? null)})`);
       retries++;
       console.log(`SPARQL 429: waiting ${wait} s as asked (retry ${retries})`);
       await new Promise((r) => setTimeout(r, wait * 1000));
@@ -76,8 +78,7 @@ type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parent
 
 // One predicate's statements, in slices of the query service's index (bd:slice), until a slice comes back short.
 // Each slice is a cheap read of the index, where one query over the whole tree times out (the 13a measurement).
-// SLICE is the rows asked for per request; it changes no result, only how many requests there are.
-const SLICE = 50_000;
+const SLICE = BASE_SLICE_ROWS;
 async function sliced(pattern: string, select: string, onRows: (rows: Binding[]) => void): Promise<void> {
   for (let offset = 0; ; offset += SLICE) {
     const rows = await sparql(`SELECT ${select} WHERE { SERVICE bd:slice { ${pattern}
@@ -265,6 +266,10 @@ export function parseCsv(text: string): string[][] {
   return rows;
 }
 
+// SR Legacy descriptions whose first part describes a cheese instead of naming a kind: processing, origin, color,
+// freshness, fat and salt (human, 2026-10-24: "Keep real kinds only (Recommended)"; the list is in the 13a ticket).
+export const USDA_NOT_KINDS = new Set(["pasteurized process", "mexican", "mexican blend", "american cheddar", "dry white", "white", "fresh", "low fat", "low-sodium"]);
+
 // SR Legacy cheeses: foods in "Dairy and Egg Products" described "Cheese, <kind>, ...". Each kind once, linked to
 // the WordNet cheese with the same name (as "<kind>" or "<kind> cheese") if there is one, else a new cheese under
 // WordNet's cheese.
@@ -286,7 +291,7 @@ export function usdaCheeses(foodCsv: string, categoryCsv: string, cheeseTree: It
     if (f[catCol] !== dairy || !f[descCol]?.startsWith("Cheese, ")) continue;
     // A note in parentheses ("cheddar (includes foods for USDA's food distribution program)") isn't part of the name.
     const kind = f[descCol].split(",")[1].replace(/\([^)]*\)/g, "").trim().toLowerCase();
-    if (!kind || out.has(kind)) continue;
+    if (!kind || out.has(kind) || USDA_NOT_KINDS.has(kind)) continue;
     const name = kind.endsWith("cheese") ? kind : `${kind} cheese`;
     const same = byAlias.get(normalize(kind)) ?? byAlias.get(normalize(name));
     out.set(kind, {
@@ -299,7 +304,7 @@ export function usdaCheeses(foodCsv: string, categoryCsv: string, cheeseTree: It
   return [...out.values()];
 }
 
-// Downloads a zip into a new empty directory and extracts the files pick chooses from its listing with bsdtar (Windows' tar.exe and macOS
+// Writes a downloaded zip into a new empty directory and extracts the files pick chooses from its listing with bsdtar (Windows' tar.exe and macOS
 // tar read zips; GNU tar doesn't). Returns their text.
 function unzip(url: string, zip: Buffer, pick: (listed: string[]) => string[]): Record<string, string> {
   const dir = mkdtempSync(join(tmpdir(), "plor-base-"));
@@ -481,16 +486,16 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   }
 }
 
-// What the human reviews: the count, 20 random members (human, 2026-10-24: "Summary + flags", the option's text), and
+// What the human reviews: the count, BASE_REVIEW_SAMPLE random members, and
 // flags: members under two parents (two meanings), aliases shared by two members (duplicates), and things under the
 // root with no English name (left out of the category).
 async function review(key: string): Promise<void> {
   const client = await localClient();
   try {
-    const one = async (sql: string) => (await client.query(sql, [key])).rows;
+    const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
     const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
     if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
-    const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit 20`);
+    const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
     const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
       join private.fact f on f.thing_id = m and f.trait = 'kind_of' group by t.name having count(*) > 1 order by parents desc, t.name`);
     const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m

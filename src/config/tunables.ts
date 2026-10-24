@@ -85,6 +85,14 @@ export const INSIGHTS_SHAPE_DROP_POINTS = 10;
 // How many of a question's most common answers the report lists.
 export const INSIGHTS_TOP_ANSWERS = 5;
 
+// The answer database's imports (docs/milestones/M13-13a-the-base.md; scripts/base.ts).
+// BASE_REVIEW_SAMPLE: random members shown in an import's review (human, 2026-10-24: "Summary + flags (Recommended)",
+// whose text said 20 random samples). BASE_SLICE_ROWS: rows asked for per bd:slice request to Wikidata's query
+// service (SOURCES.md, Wikidata: 60 s and 60 s of processing a minute per client); one 50,000-row slice took 0.85 s,
+// 2026-10-24 (the 13a ticket). The value waits on the human's OK.
+export const BASE_REVIEW_SAMPLE = 20;
+export const BASE_SLICE_ROWS = 50_000;
+
 // Sign-in code limits (human, 2026-10-23; docs/milestones/M12-12e-sign-in-limits.md, N1–N4), counted per hashed key
 // by private.take_auth_attempt. A code lasts an hour (SOURCES.md, Supabase email sign-in), so the checks per address
 // are counted over the same hour, and sending a new code clears them.

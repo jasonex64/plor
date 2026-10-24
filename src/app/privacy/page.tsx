@@ -98,7 +98,7 @@ export default function Privacy() {
           <a href="https://www.wikidata.org/">Wikidata</a> (CC0).
         </li>
         <li>
-          <a href="https://github.com/globalwordnet/english-wordnet">Open English WordNet</a>, 2025 Edition (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
+          <a href="https://github.com/globalwordnet/english-wordnet">Open English WordNet</a>, 2025 Edition, adapted: Plor normalizes its words and links them to the other sets (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
         </li>
         <li>
           <a href="https://fdc.nal.usda.gov/">USDA FoodData Central</a>, SR Legacy (CC0).

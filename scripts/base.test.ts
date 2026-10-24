@@ -78,10 +78,11 @@ describe("usdaCheeses", () => {
     `"15","sr_legacy_food","Cheese, cheddar (includes foods for USDA's Food Distribution Program)","1","2019-04-01"`,
     '"13","sr_legacy_food","Cheese puffs and twists","1","2019-04-01"',
     '"14","sr_legacy_food","Cheese, sauce mix","2","2019-04-01"',
+    '"16","sr_legacy_food","Cheese, low fat, cheddar or colby","1","2019-04-01"',
   ].join("\n");
   const tree: Item[] = [{ id: "07868895-n", name: "cheddar", aliases: [{ alias: "cheddar", kind: "name" }], kind_of: [] }];
 
-  it("takes each dairy 'Cheese, <kind>' once, linking a WordNet match and putting the rest under WordNet's cheese", () => {
+  it("takes each dairy 'Cheese, <kind>' once, skipping descriptions that aren't kinds, linking a WordNet match and putting the rest under WordNet's cheese", () => {
     expect(usdaCheeses(foods, categories, tree)).toEqual([
       { id: "10", name: "cheddar cheese", aliases: [{ alias: "cheddar cheese", kind: "name" }, { alias: "cheddar cheeses", kind: "plural" }, { alias: "cheddar", kind: "synonym" }], same_as: "oewn:07868895-n" },
       { id: "12", name: "brick cheese", aliases: [{ alias: "brick cheese", kind: "name" }, { alias: "brick cheeses", kind: "plural" }, { alias: "brick", kind: "synonym" }], kind_of: ["oewn:07866305-n"] },
