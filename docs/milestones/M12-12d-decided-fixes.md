@@ -1,6 +1,6 @@
 # M12 12d — The decided fixes
 
-**Status:** drafted for approval (2026-10-24). D1–D3 wait on the human; D1 is a security change.
+**Status:** in progress (2026-10-24): D1–D3 answered by the human; building on `m12-account`.
 
 ## Goal
 Three review findings from finished milestones are closed before the MVP line, as the human decided on 2026-10-23: the live board shows nothing about a friend's progress until you've finished, every admin deletion of a comment leaves a record, and a group's boards count a member only from the day they joined.
@@ -31,9 +31,9 @@ Three review findings from finished milestones are closed before the MVP line, a
 ## Decisions needed before any code
 | # | Decision | Claude's suggestion | Answer (origin) |
 |---|---|---|---|
-| D1 | **How the record is written (security change).** (a) **A function with its owner's rights,** `private.delete_reported_comment(admin_id, comment_id)`, which checks the admin, deletes a reported comment and writes its record in one statement. `plor_app` may execute it and may only read the record table. (b) `plor_app` gets INSERT and SELECT on the record table, and the route writes both in one statement | (a). App code can't write a record without the deletion, or a false one, and it matches 12c and 12e (a function `plor_app` executes, nothing written directly). The admin check stays in the route too, so a non-admin learns nothing from the body (M08 8c) | |
-| D2 | **The record when an account is deleted.** 12c deletes everything tied to an account (A5), and the privacy page says so. (a) **The record goes with the author's or the admin's account** (cascade). (b) It stays, with the author or admin shown as a deleted player: the privacy page would then say that admins keep the text of a comment they deleted | (a). It keeps the privacy page's promise as written, and the only admin today is the human. (b) keeps a fuller trail, but it keeps text from a deleted account | |
-| D3 | **Yesterday's group standings** (the home page's game card, M11 H7) are a group board too. (a) **The same rule:** a member counts only if they joined on or before yesterday's puzzle day. (b) Weekly boards only | (a). Otherwise someone who joins today shows up in yesterday's standings with points they won outside the group | |
+| D1 | **How the record is written (security change).** (a) **A function with its owner's rights,** `private.delete_reported_comment(admin_id, comment_id)`, which checks the admin, deletes a reported comment and writes its record in one statement. `plor_app` may execute it and may only read the record table. (b) `plor_app` gets INSERT and SELECT on the record table, and the route writes both in one statement | (a). App code can't write a record without the deletion, or a false one, and it matches 12c and 12e (a function `plor_app` executes, nothing written directly). The admin check stays in the route too, so a non-admin learns nothing from the body (M08 8c) | **(a)** (human, 2026-10-24: "(a) Owner's-rights function"). Security change, recorded in DECISIONS.md when built |
+| D2 | **The record when an account is deleted.** 12c deletes everything tied to an account (A5), and the privacy page says so. (a) **The record goes with the author's or the admin's account** (cascade). (b) It stays, with the author or admin shown as a deleted player: the privacy page would then say that admins keep the text of a comment they deleted | (a). It keeps the privacy page's promise as written, and the only admin today is the human. (b) keeps a fuller trail, but it keeps text from a deleted account | **(a)** (human, 2026-10-24: "(a) Record goes too") |
+| D3 | **Yesterday's group standings** (the home page's game card, M11 H7) are a group board too. (a) **The same rule:** a member counts only if they joined on or before yesterday's puzzle day. (b) Weekly boards only | (a). Otherwise someone who joins today shows up in yesterday's standings with points they won outside the group | **(a)** (human, 2026-10-24: "(a) Same rule") |
 
 ## Acceptance criteria
 Each is checked by a test that fails without the change.
@@ -56,7 +56,7 @@ Each is checked by a test that fails without the change.
 None new. The list shows every record (no limit): the beta is small, and a page size would be a human number.
 
 ## Plan
-1. The human answers D1–D3. The DECISIONS.md Log gets the board change (it changes M07's approved design) and, with D1, the security change.
+1. ~~The human answers D1–D3~~ (done, 2026-10-24). The DECISIONS.md Log gets the board change (it changes M07's approved design) and, with D1, the security change.
 2. **Board:** a migration replaces `private.broadcast_board` (recipients split by whether they've finished today); `getBoard` hides progress before the viewer finishes; `board.tsx` shows "started"; protocol 5, payload v 2. Hypothesis: `live_board.test.sql`'s "answering sends again" check fails for an unfinished friend after the change, and passes once rewritten for a finished one; if the unfinished friend still gets messages after the start, the split is wrong.
 3. **Record:** the migration adds the table, the function (D1) and its grants; `deleteReportedComment` calls it; `GET /api/admin/reports` returns the records too; the page lists them.
 4. **Group boards:** the group's sums filter by `day_of(joined_at)`.
