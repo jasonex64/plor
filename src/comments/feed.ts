@@ -16,8 +16,9 @@ export type FeedComment = Comment & { group: { id: string; name: string } | null
 
 // Before the viewer's run is over: the friends who commented, by name and in the order they first did (the live board
 // already shows friends finishing, M07); how many others did, so group members who aren't friends aren't named (G3);
-// and how many reactions the viewer could see on those comments.
-export type FeedPreview = { friends: string[]; others: number; reactions: number };
+// how many comments the viewer will be able to read (M14 14a-2a: "Finish today's Offbeat to read N comments"); and how
+// many reactions the viewer could see on those comments.
+export type FeedPreview = { friends: string[]; others: number; count: number; reactions: number };
 
 // comments is null, and preview set, until the viewer's run today is over. canPost: the viewer may post to the friends
 // thread, which is when the run is over.
@@ -58,7 +59,7 @@ export async function getFeed(db: Db, viewerId: string): Promise<Feed> {
     );
     let total = 0;
     for (const r of reactions.values()) for (const c of r.counts) total += c.count;
-    return { date, canPost: false, comments: null, preview: { friends: [...friends.values()], others: others.size, reactions: total } };
+    return { date, canPost: false, comments: null, preview: { friends: [...friends.values()], others: others.size, count: rows.length, reactions: total } };
   }
 
   const { rows } = await db.query<CommentRow & { group_id: string | null; group_name: string | null }>(

@@ -222,6 +222,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Comments and copy still saying "home page" or "account page" after 14a-1: `src/app/board-channel.ts`, `account.tsx`, `groups.tsx`, `comments.tsx`, `src/comments/feed.ts`, `src/app/api/feed/route.ts`, `api/groups/route.ts`, `api/account/route.ts`, and the privacy page's "on your account page" (now the Me tab). Found in M14 14a-1 (review).
 - [ ] Reaction buttons inherit the base button's 44px height and padding; the 320px reflow check doesn't cover board rows with reactions. Check when 14a-2 and 14a-3 lay out the board. Found in M14 14a-1 (review).
 - [ ] The admin pages have no shell yet; 14b-2 gives them their look (L19). Found in M14 14a-1 (review).
+- [ ] On Today from 768px, the feed and the live board each open the board's Realtime channel, so two sockets; one listener could serve both (`useBoardChannel`). Found in M14 14a-2a (implementation).
 
 **For M15 (launch):**
 - [ ] **Warn the human as the hosted database nears its plan's limit** (human, 2026-10-24: "raise a check to me as database grows if it's getting close to limit and ill consider buying it"). With all of WordNet's nouns and Wikidata's places of 100,000+ people, the answer database is 195 MB locally (M13 13b, Evidence). The plan's limit is to be read from Supabase's pricing page and added to SOURCES.md (Claude remembered 500 MB on the free plan, *unverified*), and the warning level is a human number. It belongs with M15's alerts.

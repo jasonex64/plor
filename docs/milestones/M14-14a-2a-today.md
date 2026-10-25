@@ -1,6 +1,6 @@
 # M14 14a-2a — Today
 
-**Status:** draft for the human's approval (2026-10-25), from the guided answers below. 14a-2b (Offbeat's game screen) follows in its own PR.
+**Status:** in progress. Approved by the human (2026-10-25: "I approve 14a-2a as drafted. Build it."). 14a-2b (Offbeat's game screen) follows in its own PR.
 
 ## Goal
 Today shows each game as a full-width banner (Play before, the score after), one leaderboard card, and a feed that names who commented without showing their words until the player has played; and from any tab, a player who left a question in play sees its seconds running out and can go back.
@@ -65,9 +65,11 @@ Earlier decisions this builds: L22 (a full-width stylized banner per game, swipe
 **Hypothesis for step 5:** GET `/api/run` already returns the question in play and `msLeft`, so the bar needs no new route. What would disprove it: a run state that has no question while a question is in play (for example during the reveal), which would hide the bar when it should show.
 
 ## Removes
-- Offbeat's card's inline Start on Today (the banner's Play replaces it; 14a-2b moves the game to `/offbeat`; until then Play starts the run in place).
+- Offbeat's card's inline "Start today's puzzle" and its rules sentence (the banner's Play replaces them; 14a-2b moves the game to `/offbeat`; until then Play starts the run in place). The e2e suites click "Play" now.
+- `GameCard`, and the result's own "Next puzzle in" countdown: the banner carries it.
 - The feed's locked sentence ("Sam, Lee and 3 others commented · 7 reactions"), replaced by the names, the filler and the link.
-- The separate Yesterday section and the weekly leaderboard's place on Today: one card holds both.
+- The `Yesterday` component: the leaderboard card holds Yesterday and This week.
+- `useCountdown`'s copy inside `game.tsx`: it moved to `src/app/countdown.ts`, shared by the game and the clock bar.
 
 ---
 *Fill in the sections below at the end.*
@@ -75,6 +77,8 @@ Earlier decisions this builds: L22 (a full-width stylized banner per game, swipe
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The ticket said the feed's server end wouldn't change | The preview gains `count`, the number of comments the viewer will read | "Finish today's Offbeat to read N comments" needs N, and the preview had only names and the others' count. It counts comments whose authors the viewer is already shown, so it reveals nothing new |
+| Plan step 3: Today listens to the board's channel once, through the board | Today keeps its own channel for the feed; from 768px the live board brings its own, so wide screens open two | Phones have no board on Today, so the feed needs its own listener there; sharing one between the two is a change to `useBoardChannel` left for later (ROADMAP, For M14) |
 
 ## Evidence
 

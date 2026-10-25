@@ -6,7 +6,7 @@
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useCallback, useEffect, useState, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
@@ -16,9 +16,10 @@ import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./
 import { Comments } from "./comments";
 import { Game } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
-import { Leaderboard, Yesterday } from "./leaderboard";
+import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { errorText, messageForRedirect } from "./messages";
-import { MeAdminLink, Shell } from "./shell";
+import { ClockBar, MeAdminLink, Shell } from "./shell";
+import styles from "./today.module.css";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null; admin: boolean };
 
@@ -83,6 +84,8 @@ export function Home({ view }: { view?: View }) {
       ) : (
         <>
           <Shell admin={me.admin} />
+          {/* Away from Today, a question left in play keeps its clock in view (M14 L18). */}
+          {view && <ClockBar />}
           {view?.kind === "friends" ? (
             <Friends username={me.username} />
           ) : view?.kind === "groups" ? (
@@ -244,32 +247,24 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
   );
 }
 
-// Offbeat's card (H1): the streak, the game or your result, and yesterday's standings. It's one card because there's
-// one game; a second game's card goes beside it, and the swipe between them with it (H8).
-// day and gameDay key what starts again at the reset (Today).
-function GameCard({
-  day,
-  gameDay,
-  onOver,
-  onDayOver,
-}: {
-  day: number;
-  gameDay: number;
-  onOver: (over: boolean) => void;
-  onDayOver: (inPlay: boolean) => void;
-}) {
-  return (
-    <section aria-label="Offbeat">
-      <h2>Offbeat</h2>
-      {/* Distinct keys: the two counts start equal, and siblings sharing a key may be dropped or duplicated. */}
-      <Game key={`game-${gameDay}`} onOver={onOver} onDayOver={onDayOver} />
-      <Yesterday key={`yesterday-${day}`} />
-    </section>
+// Whether the window is at least this wide, following resizes. The server's answer is false; Home renders on the
+// client, behind Suspense.
+function useMinWidth(px: number): boolean {
+  const query = `(min-width: ${px}px)`;
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const media = window.matchMedia(query);
+      media.addEventListener("change", onChange);
+      return () => media.removeEventListener("change", onChange);
+    },
+    [query],
   );
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
 }
 
-// Today (docs/milestones/M14-14a-1-shell.md): Offbeat's card and the feed, as M11 laid them out; the live board and
-// the leaderboard moved to Friends. The board's channel still nudges the feed when a thread changes (M08 8d, M11 11b).
+// Today (docs/milestones/M14-14a-2a-today.md): Offbeat's banner and the game, the one leaderboard card and the feed;
+// from 768px the live board too (L42), and from 1200px the board and the card in a right column. The page listens to
+// the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
 function Today({ username }: { username: string }) {
   const [runOver, setRunOver] = useState(false);
   const [commentsNudge, setCommentsNudge] = useState(0);
@@ -292,13 +287,23 @@ function Today({ username }: { username: string }) {
     if (!inPlay) setGameDay((d) => d + 1);
   }, []);
 
+  const wide = useMinWidth(768);
+
   return (
-    <>
-      <GameCard day={day} gameDay={gameDay} onOver={setRunOver} onDayOver={nextDay} />
-      {paused && <p role="status">{PAUSED_TEXT}</p>}
-      {channelError && <p role="alert">{channelError}</p>}
-      <Comments key={day} username={username} runOver={runOver} nudge={commentsNudge} />
-    </>
+    <div className={styles.today}>
+      <section id="offbeat" aria-label="Offbeat" className={styles.game}>
+        <Game key={`game-${gameDay}`} onOver={setRunOver} onDayOver={nextDay} />
+      </section>
+      <aside aria-label="Your circle" className={styles.side}>
+        {wide && <Board key={`board-${day}`} username={username} />}
+        <LeaderboardCard key={`card-${day}`} />
+      </aside>
+      <div className={styles.feed}>
+        {paused && <p role="status">{PAUSED_TEXT}</p>}
+        {channelError && <p role="alert">{channelError}</p>}
+        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} />
+      </div>
+    </div>
   );
 }
 

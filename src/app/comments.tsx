@@ -15,6 +15,7 @@ import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import type { Emoji } from "@/reactions/reactions";
+import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
@@ -148,23 +149,39 @@ export function Comments({ username, runOver, nudge, group }: { username: string
   );
 }
 
-// "Sam, Lee and 3 others commented · 7 reactions", and nothing a player could read before finishing (H3).
+// Before the player has played (docs/milestones/M14-14a-2a-today.md, L40): the friends who commented, up to 3 by
+// name (the human, 2026-10-25), then "and N more", each beside blurred filler that holds none of their words (the
+// server sends none, H3), and a link to Play. Group members who aren't friends are only counted (G3).
+const NAMED = 3;
+const FILLER = ["xxxx xx xxxx xxx xx", "xxxxxxx xxxx xx", "xxx xxxxx xxxx xxx"];
+
 function Preview({ preview }: { preview: FeedPreview }) {
-  const named = preview.friends.slice(0, 2);
+  const named = preview.friends.slice(0, NAMED);
   const more = preview.friends.length - named.length + preview.others;
   const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-  const who =
-    named.length === 0 ? plural(more, "player", "players") : more === 0 ? named.join(" and ") : `${named.join(", ")} and ${plural(more, "other", "others")}`;
+  if (preview.count === 0) {
+    return (
+      <>
+        <p>No comments yet.</p>
+        <p>Finish today&apos;s Offbeat to join in.</p>
+      </>
+    );
+  }
   return (
     <>
-      {named.length + more > 0 ? (
-        <p>
-          {who} commented · {plural(preview.reactions, "reaction", "reactions")}
-        </p>
-      ) : (
-        <p>No comments yet.</p>
-      )}
-      <p>Finish today&apos;s puzzle to read them and join in.</p>
+      <p>
+        <a href="#offbeat">Finish today&apos;s Offbeat to read {plural(preview.count, "comment", "comments")}</a>
+      </p>
+      <ul className={styles.locked}>
+        {named.map((name, i) => (
+          <li key={name}>
+            <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
+            <span className={styles.hidden}>comment hidden until you play</span>
+          </li>
+        ))}
+      </ul>
+      {more > 0 && <p>{named.length > 0 ? `and ${more} more` : `${plural(more, "player", "players")} commented`}</p>}
+      <p>{plural(preview.reactions, "reaction", "reactions")}</p>
     </>
   );
 }

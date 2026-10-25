@@ -6,8 +6,12 @@
 // (MeAdminLink), which replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c").
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import type { RunState } from "@/game/runs";
+import { api } from "@/lib/api-client";
+import { useCountdown } from "./countdown";
+import { errorText } from "./messages";
 import styles from "./shell.module.css";
 
 const icon = (children: ReactNode) => (
@@ -109,5 +113,45 @@ export function MeAdminLink() {
     <p className={styles.meAdmin}>
       <Link href="/admin">Admin</Link>
     </p>
+  );
+}
+
+// A question left in play, seen from another tab (M14 L18, docs/milestones/M14-14a-2a-today.md): its seconds left,
+// counted down from the run state the page read, and Back to Today; at zero, that time is up, with a link to the
+// result. The database stays the judge of the timer; this is only a display. Nothing shows without a question in play.
+export function ClockBar() {
+  const [run, setRun] = useState<RunState | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    api<{ run: RunState | null }>("/api/run", { method: "GET" }).then(
+      (r) => setRun(r.run),
+      (err) => setError(errorText(err)),
+    );
+  }, []);
+  if (error) return <p role="alert">{error}</p>;
+  if (!run || run.status !== "in_progress" || !run.question || run.msLeft === null) return null;
+  return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} />, document.body);
+}
+
+const NOTHING = () => {};
+
+function Clock({ index, msLeft }: { index: number; msLeft: number }) {
+  const seconds = Math.ceil(useCountdown(msLeft, NOTHING) / 1000);
+  return (
+    <div role="status" className={styles.clock}>
+      {seconds > 0 ? (
+        <>
+          <span>
+            Question {index + 1} · {seconds}s left
+          </span>
+          <Link href="/">Back</Link>
+        </>
+      ) : (
+        <>
+          <span>Time&apos;s up on question {index + 1}</span>
+          <Link href="/#result">Result</Link>
+        </>
+      )}
+    </div>
   );
 }

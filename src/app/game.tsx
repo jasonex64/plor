@@ -2,14 +2,17 @@
 
 // Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
 // text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, a reveal after each
-// answer that waits for Next, points as you go, and a result screen with the time to the next puzzle. Above it, the
-// player's streak, and on the result screen how many players gave each answer (docs/milestones/M11-home-screen.md, 11a).
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+// answer that waits for Next, points as you go, and a result screen. Above it, the player's streak, and on the result
+// screen how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). Offbeat's banner frames it on
+// Today: Play before, the score and the time to the next puzzle after (docs/milestones/M14-14a-2a-today.md).
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
 import { shareText } from "@/game/share";
 import { api } from "@/lib/api-client";
+import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
+import styles from "./game.module.css";
 import { shareLink } from "./share";
 
 // run is null on a day with no puzzle, with the streak and the time to the reset (M12 12f, F2).
@@ -65,8 +68,10 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
     return (
       <section>
         <Streak days={noPuzzle.streak} />
-        <p>There&apos;s no puzzle today.</p>
-        <ResetCountdown label="A new day starts in" msToReset={noPuzzle.msToReset} />
+        <Banner>
+          <p className={styles.line}>There&apos;s no puzzle today.</p>
+          <ResetCountdown label="A new day starts in" msToReset={noPuzzle.msToReset} />
+        </Banner>
       </section>
     );
   }
@@ -75,14 +80,25 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
     <section>
       <Streak days={run.streak} />
       {run.status === "not_started" && (
-        <>
-          <p>
-            Today&apos;s puzzle has {run.total} questions. Give an answer the host didn&apos;t: match the host and your run ends.
-          </p>
-          <button type="button" disabled={busy} onClick={() => send("/api/run/start")}>
-            Start today&apos;s puzzle
+        <Banner>
+          <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
+          {/* Play starts the run here until Offbeat's game screen, /offbeat, ships in 14a-2b. */}
+          <button type="button" className={styles.play} disabled={busy} onClick={() => send("/api/run/start")}>
+            Play
           </button>
-        </>
+        </Banner>
+      )}
+      {run.status === "in_progress" && <Banner />}
+      {over && (
+        <Banner>
+          <p className={styles.line}>
+            {pointsText(run.points)} + about {run.bonus} bonus · {endedText(run)}
+          </p>
+          <a href="#result" className={styles.result}>
+            Result
+          </a>
+          <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
+        </Banner>
       )}
       {run.status === "in_progress" && run.next && (
         <Reveal run={run} busy={busy} onNext={() => send("/api/run/next")} />
@@ -107,23 +123,21 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
   );
 }
 
-// Milliseconds left, counted down from what the server measured, waking only when the shown whole second changes,
-// so it needs no refresh rate of its own. At zero it calls onZero once.
-function useCountdown(ms: number, onZero: () => void): number {
-  const [left, setLeft] = useState(ms);
-  useEffect(() => {
-    const end = performance.now() + ms;
-    let timer: ReturnType<typeof setTimeout>;
-    function tick() {
-      const remaining = Math.max(0, end - performance.now());
-      setLeft(remaining);
-      if (remaining === 0) onZero();
-      else timer = setTimeout(tick, remaining % 1000 || 1000);
-    }
-    tick();
-    return () => clearTimeout(timer);
-  }, [ms, onZero]);
-  return left;
+// Offbeat's banner: the game's name, then what the day holds for the player.
+function Banner({ children }: { children?: ReactNode }) {
+  return (
+    <div className={styles.banner}>
+      <h2 className={styles.title}>Offbeat</h2>
+      {children}
+    </div>
+  );
+}
+
+// How a finished run ended, as the banner says it.
+function endedText(run: RunState): string {
+  if (run.status === "survived") return `survived all ${run.total}`;
+  if (run.status === "timed_out") return `time's up on question ${run.answered.length + 1}`;
+  return `caught on question ${run.answered.length}`;
 }
 
 // Seconds left on the current question. At zero it asks the server again, which decides whether time is up
@@ -254,10 +268,11 @@ function Question({
   );
 }
 
+// The result's details, below the banner, which carries the score and the time to the next puzzle.
 function Result({ run }: { run: RunState }) {
   const survived = run.answered.filter((a) => !a.matched).length;
   return (
-    <div>
+    <div id="result">
       <h2>
         {run.status === "survived"
           ? `You survived all ${run.total}!`
@@ -278,7 +293,6 @@ function Result({ run }: { run: RunState }) {
           </li>
         ))}
       </ol>
-      <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
     </div>
   );
 }
