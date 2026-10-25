@@ -215,7 +215,9 @@ These are non-blocking items found during work or review. Record each one here *
   - with links and big sets, the local database is about 287 MB of the Free plan's 500 MB (the human asked to be warned near the limit);
   - nothing removes a category or a set's rows once loaded;
   - the widened roots bring generic members (feeling: thing, state, soul, harassment; boat or ship: bottom, shell, wreck; religion: theism, mysticism); gold and silver bring green gold and coin silver; Malabo is missing; Pago Pago and Charlotte Amalie count as US cities;
-  - the draft simulator and the list checks (names resolve, no host above a familiar answer, letter room at Q7) were scratch scripts run many times: make them `scripts/` commands (CLAUDE.md, repeated procedures).
+  - the draft simulator and the list checks (names resolve, no host above a familiar answer, letter room at Q7) were scratch scripts run many times: make them `scripts/` commands (CLAUDE.md, repeated procedures);
+  - the rivers fetch's alias drop by ID (`RIVERS_DROP_LISTED_ALIASES`) has no unit test, filters aliases only (a listed label would pass) and says nothing when the item is gone; a small pure helper with a test would cover it (13e-3's second review);
+  - a river short name that is another river's full name stays ("rhine": Rhine by name, Seerhein by synonym), as the human's answer covers short names only; look at it when re-measuring (13e-3's second review).
 
   Found in M13 13e-3.
 - [ ] **Counting a miss reads every miss and answer of its category's days** (`private.record_miss`, two scans per miss, plus one more `resolve_answer` call for the near-typo flag). Fine for the beta; measure in M15's load test, where an index on `(game_id, puzzle_date, question_idx)` or a running count would do. Found in M13 13b.
