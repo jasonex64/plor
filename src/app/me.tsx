@@ -1,8 +1,8 @@
 "use client";
 
 // The Me tab's stats (docs/milestones/M14-14a-3a-me.md; L45): the player's header, totals across games, this month's
-// calendar of days played, a card per game and the rarest answers, laid out from round 7's Me boards. The account
-// below it stays until the settings sheet takes it (14a-3b).
+// calendar of days played, a card per game and the rarest answers, laid out from round 7's Me boards. The account is
+// in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { QUESTIONS_PER_DAY } from "@/config/tunables";
@@ -17,7 +17,8 @@ import styles from "./me.module.css";
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 
-export function MeStats() {
+// numbers: the player's Numbers on the calendar setting (L46).
+export function MeStats({ numbers }: { numbers: boolean }) {
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -43,7 +44,7 @@ export function MeStats() {
           <Total value={String(me.totals.longestStreak)} label="longest streak" />
         </dl>
       </section>
-      <Calendar month={me.month} />
+      <Calendar month={me.month} numbers={numbers} />
       <section aria-label="Offbeat" className={styles.card}>
         <div className={styles.game}>
           {/* Offbeat's plain block until 14c's pixel world draws its chip. */}
@@ -94,14 +95,17 @@ function shade(survived: number): number {
   return Math.min(3, Math.floor(survived / 2));
 }
 
-// This month, Sunday first: a played day (a finished run) shaded by questions survived, an earlier day without one
-// outlined, today outlined thick, and the days after it dashed. One text alternative says what the grid shows
-// (WCAG 2.2 1.1.1); the numbers on the days come with their setting (L46, 14a-3b).
-function Calendar({ month }: { month: Me["month"] }) {
+// This month, Sunday first: a played day (a finished run) shaded by questions survived, with its number when the
+// setting is on (L46), an earlier day without one outlined, today outlined thick, and the days after it dashed. Every
+// shade reaches 3:1 on the card (WCAG 2.2 1.4.11; globals.css), and one text alternative names each played day and
+// how far it went, so the shade isn't the only way to tell (1.1.1, 1.4.1; human, 2026-10-25: "Meet 3:1").
+function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) {
   const first = month.days[0].date;
   const sofar = month.days.filter((d) => d.date <= month.today);
-  const played = sofar.filter((d) => d.survived !== null).length;
+  const days = sofar.filter((d) => d.survived !== null);
+  const played = days.length;
   const name = dateText(first, { month: "long" });
+  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} survived`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
     <section aria-label="Calendar" className={styles.card}>
@@ -113,7 +117,7 @@ function Calendar({ month }: { month: Me["month"] }) {
       </div>
       <div
         role="img"
-        aria-label={`Days played in ${name}: ${played} of the ${sofar.length} days so far; darker means more questions survived`}
+        aria-label={`Days played in ${name}: ${played} of the ${sofar.length} days so far${played > 0 ? `: ${named.join("; ")}` : ""}`}
         className={styles.calendar}
       >
         {["S", "M", "T", "W", "T", "F", "S"].map((w, i) => (
@@ -133,7 +137,9 @@ function Calendar({ month }: { month: Me["month"] }) {
               d.survived !== null ? styles[`shade${shade(d.survived) + 1}`] : d.date > month.today ? styles.later : styles.missed,
               d.date === month.today ? styles.today : "",
             ].join(" ")}
-          />
+          >
+            {numbers && d.survived}
+          </span>
         ))}
       </div>
       <div className={styles.legend} aria-hidden="true">

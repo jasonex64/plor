@@ -6,7 +6,10 @@ import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { DISPLAY_NAME_MAX_LENGTH, USERNAME_CHANGE_DAYS, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
-import { changeUsername, createProfile, getProfile, setDisplayName } from "./profile";
+import { changeUsername, createProfile, getProfile, setDisplayName, setSettings } from "./profile";
+
+// Both settings off on a new profile (M14 14a-3b).
+const OFF = { skipGameScreen: false, calendarNumbers: false };
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -33,7 +36,7 @@ describe("private.profile as plor_app", () => {
   it("creates and reads a profile", async () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null, settings: OFF });
     });
   });
 
@@ -41,10 +44,24 @@ describe("private.profile as plor_app", () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
       await setDisplayName(client, userId, "Zoë");
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: "Zoë", usernameChangeableAt: null });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: "Zoë", usernameChangeableAt: null, settings: OFF });
       await setDisplayName(client, userId, null);
-      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null });
+      expect(await getProfile(client, userId)).toEqual({ username: "plor_app_probe", displayName: null, usernameChangeableAt: null, settings: OFF });
       await expect(setDisplayName(client, userId, "Zoe 😀")).rejects.toMatchObject({ code: "display_name_invalid", status: 400 });
+    });
+  });
+
+  // Since M14 14a-3b (a security change) plor_app may update the two settings' columns (DECISIONS.md Log, 2026-10-25),
+  // which the existing update policy covers.
+  it("sets the two settings, one at a time, and refuses them before the profile exists", async () => {
+    await asPlorApp(async (client, userId) => {
+      await expect(setSettings(client, userId, { skipGameScreen: true })).rejects.toMatchObject({ code: "no_profile", status: 409 });
+    });
+    await asPlorApp(async (client, userId) => {
+      await createProfile(client, userId, "plor_app_probe");
+      expect(await setSettings(client, userId, { skipGameScreen: true })).toEqual({ skipGameScreen: true, calendarNumbers: false });
+      expect(await setSettings(client, userId, { calendarNumbers: true })).toEqual({ skipGameScreen: true, calendarNumbers: true });
+      expect((await getProfile(client, userId))?.settings).toEqual({ skipGameScreen: true, calendarNumbers: true });
     });
   });
 

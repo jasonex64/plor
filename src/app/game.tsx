@@ -5,8 +5,10 @@
 // a free retry for text that names no entry, 20 seconds per question, a reveal after each answer that waits for Next,
 // points as you go, and a result with how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). On
 // Today, Offbeat's banner links in: Play before, the score and the time to the next puzzle after
-// (docs/milestones/M14-14a-2a-today.md).
+// (docs/milestones/M14-14a-2a-today.md); with Skip the game screen on, Play starts the run itself
+// (docs/milestones/M14-14a-3b-settings.md, L39).
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
@@ -61,10 +63,31 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   return { run, setRun, noPuzzle, error, setError, over, load };
 }
 
-// Offbeat on Today: Play opens the game screen, and a run in play is continued there; after it, the score, how it
-// ended, the result and the time to the next puzzle.
-export function TodayBanner(hooks: DayHooks) {
+// Starts today's run and opens the game screen with question 1 in play: Start climbing on How to play, and Play on
+// Today with Skip the game screen on.
+export function useStartRun() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function start() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/run/start", { method: "POST" });
+      router.push("/offbeat");
+    } catch (err) {
+      setError(errorText(err));
+      setBusy(false);
+    }
+  }
+  return { start, busy, error };
+}
+
+// Offbeat on Today: Play opens the game screen, or with skip starts the run there; a run in play is continued there;
+// after it, the score, how it ended, the result and the time to the next puzzle.
+export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   const { run, noPuzzle, error, over } = useRun(hooks);
+  const starting = useStartRun();
   if (noPuzzle) {
     return (
       <>
@@ -78,12 +101,24 @@ export function TodayBanner(hooks: DayHooks) {
     <>
       <Streak days={run.streak} />
       <Banner>
-        {run.status === "not_started" && (
+        {run.status === "not_started" && !skip && (
           <>
             <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
             <Link href="/offbeat" className={styles.play}>
               Play
             </Link>
+          </>
+        )}
+        {/* Skipping the game screen skips its rules line too, so the time limit is said here before it runs (WCAG 2.2
+            2.2.1; human, 2026-10-25: "Add the 20 seconds (Recommended)"). The 20 seconds are judged in SQL
+            (private.question_deadline), so they have no constant here. */}
+        {run.status === "not_started" && skip && (
+          <>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions · 20 seconds each</p>
+            <button type="button" className={styles.play} disabled={starting.busy} onClick={() => void starting.start()}>
+              Play
+            </button>
+            {starting.error && <p role="alert">{starting.error}</p>}
           </>
         )}
         {run.status === "in_progress" && (

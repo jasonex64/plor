@@ -1,9 +1,9 @@
 "use client";
 
-// The player's own invite link (docs/milestones/M07-friends-and-live-board.md, 7b), on the Friends tab's board and the
-// Me tab (docs/milestones/M12-12f-review-fixes.md, F1). Share is the share sheet or the clipboard, as the result's
-// Share (src/app/share.ts). Reset is offered only where canReset is set, the Me tab, so a stray tap on the board can't
-// break a link already sent.
+// The player's own invite link (docs/milestones/M07-friends-and-live-board.md, 7b), under Today's board and in the
+// Friends tab's friends list (docs/milestones/M12-12f-review-fixes.md, F1; docs/milestones/M14-14a-3b-settings.md).
+// Share is the share sheet or the clipboard, as the result's Share (src/app/share.ts). Reset is offered only where
+// canReset is set, the friends list, so a stray tap on the board can't break a link already sent.
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";

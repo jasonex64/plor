@@ -4,7 +4,6 @@
 // the run, the player's stats, yesterday's answers and the feed; from 1200px the feed in a right column (L42). Laid
 // out from round 5's mockup; the game's own look comes with 14c.
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Stats, Yesterday } from "@/game/offbeat";
@@ -12,7 +11,7 @@ import type { RunState } from "@/game/runs";
 import { api } from "@/lib/api-client";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
-import { Game } from "./game";
+import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import styles from "./offbeat.module.css";
 
@@ -174,8 +173,7 @@ const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
 // and goes to the game screen, as Start does there, and shows only before today's run has started
 // (docs/milestones/M14-14a-2c-review-fixes.md).
 export function HowToPlay() {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
+  const starting = useStartRun();
   const [error, setError] = useState<string | null>(null);
   const [run, setRun] = useState<RunState | null>(null);
   useEffect(() => {
@@ -184,18 +182,6 @@ export function HowToPlay() {
       (err) => setError(errorText(err)),
     );
   }, []);
-
-  async function start() {
-    setBusy(true);
-    setError(null);
-    try {
-      await api("/api/run/start", { method: "POST" });
-      router.push("/offbeat");
-    } catch (err) {
-      setError(errorText(err));
-      setBusy(false);
-    }
-  }
 
   return (
     <section aria-label="How to play" className={styles.how}>
@@ -223,11 +209,11 @@ export function HowToPlay() {
         {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} at the top. Run out of time and the climb ends too.
       </p>
       {run?.status === "not_started" && (
-        <button type="button" className={styles.start} disabled={busy} onClick={() => void start()}>
+        <button type="button" className={styles.start} disabled={starting.busy} onClick={() => void starting.start()}>
           Start climbing
         </button>
       )}
-      {error && <p role="alert">{error}</p>}
+      {(error ?? starting.error) && <p role="alert">{error ?? starting.error}</p>}
     </section>
   );
 }

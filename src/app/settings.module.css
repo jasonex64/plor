@@ -1,0 +1,247 @@
+/* The settings sheet (docs/milestones/M14-14a-3b-settings.md), sized from round 7's boards 2 and 3: on phones a sheet
+   at the bottom, from 768px a 440px panel at the right (M14 L44, L42). */
+.dialog {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: auto 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.dialog::backdrop {
+  background: rgba(10, 10, 10, 0.45);
+}
+
+/* The content fills the dialog, so a click whose target is the dialog itself is on the dimmed page. */
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 16px 20px;
+}
+
+.handle {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--edge);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border-radius: 22px;
+}
+
+.fields {
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.field dd {
+  margin: 0;
+}
+
+/* An open form takes the row's whole width. */
+.field dd:has(form) {
+  flex-basis: 100%;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Change and Set read as round 7's links, and stay 44px tall to tap (WCAG 2.2 2.5.8). */
+.inline {
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+
+/* The switches are spaced as the sheet's other rows are. */
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+.line {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* A switch: the off knob at the left in the muted colour; on, the track in the accent and the knob at the right. */
+.switch {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 52px;
+  height: 30px;
+  margin: 0;
+  border: 1.5px solid var(--edge);
+  border-radius: 15px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.switch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 11px;
+  background: var(--muted);
+}
+
+.switch:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.switch:checked::before {
+  left: auto;
+  right: 3px;
+  background: var(--on-accent);
+}
+
+.link {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.end {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.secondary {
+  min-height: 48px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.danger {
+  padding: 12px;
+  border: 1.5px solid var(--danger);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.dangerHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.dangerText {
+  color: var(--danger);
+}
+
+.dangerButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+@media (min-width: 768px) {
+  .dialog {
+    width: 440px;
+    height: 100%;
+    max-height: 100%;
+    margin: 0 0 0 auto;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.16);
+  }
+
+  .sheet {
+    box-sizing: border-box;
+    min-height: 100%;
+    gap: 14px;
+    padding: 24px;
+  }
+
+  .handle {
+    display: none;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  /* Sign out and Delete account sit at the panel's foot (round 7, board 3). */
+  .end {
+    margin-top: auto;
+  }
+}

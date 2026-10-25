@@ -1,5 +1,5 @@
 // The Me tab's stats against the local stack (run with `npm run test:db`; docs/milestones/M14-14a-3a-me.md, criteria
-// 1-5). Past days are written directly with the answer triggers switched off (session_replication_role), as
+// 1-5; docs/milestones/M14-14a-3b-settings.md, criterion 8). Past days are written directly with the answer triggers switched off (session_replication_role), as
 // src/app/api/offbeat/route.db.test.ts does. T is today. Puzzle days: T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1
 // and T (T-4, T-6 and T-7 have none). By hand:
 //   P: T-8 survived all 7 (ledger 1000); T-5 caught on question 3 (2 survived, 125); T-3 time ran out on question 5
@@ -12,10 +12,13 @@
 //   O1-O5: answered question 1 only, on some of P's days, so P's answers there have shares:
 //      T-5: P's answer, O1-O4 another: 1 of 5 → 0.2
 //      T-3: P's answer and O1, O2 the same, O3-O5 another: 3 of 6 → 0.5
-//      T-2: P's catch (the host's answer), O1-O4 the same: 5 of 5 → 1
+//      T-2: P's catch (the host's answer), O1-O4 the same: 5 of 5 → 1, and caught, so left out
+//      T-1: O1-O5 also answered questions 1 and 2. Question 1: P's answer and theirs the same, 6 of 6 → 1. Question 2:
+//           P's catch, theirs another: 1 of 6 → 0.17, the rarest, but caught, so left out (human, 2026-10-25: "Leave
+//           caught out (Recommended)")
 //      T-8: only P and O1 answered: under ANSWER_SHARE_MIN_PLAYERS, left out
 //      T:   P's answer, O1-O4 another: 0.2 and the latest day, so first if today weren't left out
-//   P's rarest answers: T-5's (0.2), T-3's (0.5), T-2's (1).
+//   P's rarest answers: T-5's (0.2), T-3's (0.5), T-1's question 1 (1).
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
@@ -147,6 +150,7 @@ describe("the Me tab's stats", () => {
       for (const o of [o3, o4, o5]) await pastRun(client, o, day[3], [{ entry: other }]);
       for (const o of [o1, o2, o3, o4]) await pastRun(client, o, day[2], [{ entry: puzzles[2].questions[0].host_answers[0], matched: true }]);
       await pastRun(client, o1, day[8], [{ entry: other }]);
+      for (const o of others) await pastRun(client, o, day[1], [{ entry: safeEntry(puzzles[1], 0) }, { entry: safeEntry(puzzles[1], 1) }]);
       for (const o of [o1, o2, o3, o4]) await pastRun(client, o, day[0], [{ entry: other }]);
       await client.query("commit");
     } catch (err) {
@@ -188,15 +192,15 @@ describe("the Me tab's stats", () => {
     expect(me.month.days.every((d: { date: string }) => d.date.startsWith(month))).toBe(true);
   });
 
-  it("gives P's 3 rarest answers from closed days with enough players, lowest share first (criterion 4)", async () => {
+  it("gives P's 3 rarest answers that survived, from closed days with enough players, lowest share first (criterion 4)", async () => {
     useSession(P.session);
     const { me } = (await call()).body;
-    const [p5, p3, p2] = [puzzles[5], puzzles[3], puzzles[2]];
+    const [p5, p3, p1] = [puzzles[5], puzzles[3], puzzles[1]];
     const answer = (id: string) => ({ id, name: nameOf(id) });
     expect(me.rarest).toEqual([
       { answer: answer(safeEntry(p5, 0)), prompt: p5.questions[0].prompt, date: day[5], share: 0.2 },
       { answer: answer(safeEntry(p3, 0)), prompt: p3.questions[0].prompt, date: day[3], share: 0.5 },
-      { answer: answer(p2.questions[0].host_answers[0]), prompt: p2.questions[0].prompt, date: day[2], share: 1 },
+      { answer: answer(safeEntry(p1, 0)), prompt: p1.questions[0].prompt, date: day[1], share: 1 },
     ]);
   });
 

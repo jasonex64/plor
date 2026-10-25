@@ -5,22 +5,50 @@ import type { Db } from "@/lib/db";
 import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 
+// The player's two settings (docs/milestones/M14-14a-3b-settings.md): Skip the game screen (L39) and Numbers on the
+// calendar (L46), both off until turned on.
+export type Settings = { skipGameScreen: boolean; calendarNumbers: boolean };
+
 // usernameChangeableAt: when the username may next change, or null if it may now (M12 A2: once every 30 days, the
 // first change at once).
-export type Profile = { username: string; displayName: string | null; usernameChangeableAt: string | null };
+export type Profile = { username: string; displayName: string | null; usernameChangeableAt: string | null; settings: Settings };
+
+const SETTINGS = `json_build_object('skipGameScreen', skip_game_screen, 'calendarNumbers', calendar_numbers)`;
 
 export async function getProfile(db: Db, userId: string): Promise<Profile | null> {
   // The trigger (supabase/migrations/20261023083041_username_change.sql) refuses a change before this time.
-  const { rows } = await db.query<{ username: string; displayName: string | null; changeable: Date | null }>(
+  const { rows } = await db.query<{ username: string; displayName: string | null; changeable: Date | null; settings: Settings }>(
     `select username, display_name as "displayName",
             case when username_changed_at + make_interval(days => $2) > statement_timestamp()
-                 then username_changed_at + make_interval(days => $2) end as changeable
+                 then username_changed_at + make_interval(days => $2) end as changeable,
+            ${SETTINGS} as settings
      from private.profile where user_id = $1`,
     [userId, USERNAME_CHANGE_DAYS],
   );
   if (!rows[0]) return null;
   const { changeable, ...rest } = rows[0];
   return { ...rest, usernameChangeableAt: changeable?.toISOString() ?? null };
+}
+
+// The settings as sent by the browser: one or both, each a boolean, and nothing else, or 400.
+export function readSettings(input: Record<string, unknown>): Partial<Settings> {
+  const keys = Object.keys(input);
+  const known: (keyof Settings)[] = ["skipGameScreen", "calendarNumbers"];
+  if (keys.length === 0 || keys.some((k) => !(known as string[]).includes(k) || typeof input[k] !== "boolean")) {
+    throw new AppError("settings_invalid", 400);
+  }
+  return input as Partial<Settings>;
+}
+
+// Sets the signed-in player's settings, leaving any not given as they were, and returns both.
+export async function setSettings(db: Db, userId: string, settings: Partial<Settings>): Promise<Settings> {
+  const { rows } = await db.query<{ settings: Settings }>(
+    `update private.profile set skip_game_screen = coalesce($2, skip_game_screen), calendar_numbers = coalesce($3, calendar_numbers)
+     where user_id = $1 returning ${SETTINGS} as settings`,
+    [userId, settings.skipGameScreen ?? null, settings.calendarNumbers ?? null],
+  );
+  if (!rows[0]) throw new AppError("no_profile", 409);
+  return rows[0].settings;
 }
 
 export async function createProfile(db: Db, userId: string, username: string): Promise<void> {

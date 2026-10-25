@@ -149,10 +149,17 @@
   text-align: center;
 }
 
+/* A day's number, with Numbers on the calendar on, 13px bold in its shade's number colour (round 7; L46). */
 .day {
   box-sizing: border-box;
   aspect-ratio: 1 / 1;
   border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .missed {
@@ -169,18 +176,22 @@
 
 .shade1 {
   background: var(--shade-1);
+  color: var(--on-shade-1);
 }
 
 .shade2 {
   background: var(--shade-2);
+  color: var(--on-shade-2);
 }
 
 .shade3 {
   background: var(--shade-3);
+  color: var(--on-shade-3);
 }
 
 .shade4 {
   background: var(--shade-4);
+  color: var(--on-shade-4);
 }
 
 .legend {
