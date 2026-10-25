@@ -1,30 +1,22 @@
-// Drafting a day from the answer database (docs/milestones/M13-13a-the-base.md; DECISIONS.md, Puzzle drafting):
-// `npm run draft -- <spec.json>`. A Claude session writes the spec: the date, and per question its prompt, category,
-// host bank and uncommon answers, by name. This script turns each name into the category's thing (or takes
-// "#<thing id>" for one a name can't single out), draws the host answers from the bank at random (M13 13c), picks the
-// letters the Wind steals (schedule A) so 3 familiar answers stay typeable and safe, checks the day, writes
-// content/offbeat/<date>.json for the human to approve on /admin/puzzles, and prints the soft guide: each question's
-// expected catch rate against its target. The local stack only (13a: "Local
-// only"); thing IDs are the same on every database (src/content/thing-id.ts), so the draft holds wherever the same
-// snapshots are loaded.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+// Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
+// `npm run draft -- <date> [--questions <id>,…]`. It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
+// the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
+// ones in that order; orders picked ones easiest first; turns each name into the category's thing (or takes
+// "#<thing id>" for one a name can't single out); draws the host answers from each question's bank at random (13c);
+// picks the letters the Wind steals (schedule A) so 3 familiar answers stay typeable and safe; checks the day; writes
+// content/offbeat/<date>.json for the human to approve on /admin/puzzles; and prints the soft guide: each question's
+// expected catch rate against its target. The local stack only (13a: "Local only"); thing IDs are the same on every
+// database (src/content/thing-id.ts), so the draft holds wherever the same snapshots are loaded.
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { GAME_ID, checkHostNames, checkPuzzle, normalize, stolenLetters, type ApprovedPuzzle, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
+import { GAME_ID, checkHostNames, checkPuzzle, checkPuzzleFile, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
-
-type SpecQuestion = { prompt: string; category: string; host_bank: string[]; uncommon?: string[] };
-type Spec = { date: string; questions: SpecQuestion[] };
-
-// A small stable hash of the date, so the letter order differs from day to day but not from run to run (as the
-// format-2 picker did).
-function seed(text: string): number {
-  return [...text].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-}
 
 // The host answers for question index: HOST_ANSWERS_PER_QUESTION[index] of the bank, drawn at random but the same for
 // a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank").
@@ -136,36 +128,53 @@ export async function familiarLeft(db: pg.Client, category: string, hosts: strin
   return rows.filter((r) => !caught.has(r.id)).length >= FAMILIAR_SAFE_MIN;
 }
 
-// Each question's expected catch rate: the blended share (first guess with the category's pooled past days, as the
-// provisional bonus sees them) of every member the host catches.
+type Question = Puzzle["questions"][number];
+
+// The expected share of players some host answers catch: the blended share (the first guess with the category's pooled
+// past days, as the provisional bonus sees them) of every member the host catches.
+async function catchRate(db: pg.Client, date: string, q: Question, hosts: string[]): Promise<number> {
+  const { rows } = await db.query<{ n: number }>("select count(*)::int as n from private.category_members($1)", [q.category]);
+  const question = { ...q, host_answers: hosts, root: "", member_of: null, members: rows[0].n };
+  const counts = (await pooledCounts(db, { format: 3, game_id: GAME_ID, date, approved_at: "", questions: [question] }, false)).get(0);
+  const caught = await caughtMembers(db, q.category, hosts);
+  return caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(question, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(question, id)), 0);
+}
+
+// Each question's expected catch rate with its host answers, for the soft guide.
 async function expectedCatches(db: pg.Client, day: Puzzle): Promise<number[]> {
-  const questions = [];
-  for (const q of day.questions) {
-    const { rows } = await db.query<{ n: number }>("select count(*)::int as n from private.category_members($1)", [q.category]);
-    questions.push({ ...q, root: "", member_of: null, members: rows[0].n });
-  }
-  const approved: ApprovedPuzzle = { ...day, approved_at: "", questions };
-  const pooled = await pooledCounts(db, approved, false);
   const catches = [];
-  for (const [i, q] of approved.questions.entries()) {
-    const counts = pooled.get(i);
-    const caught = await caughtMembers(db, q.category, q.host_answers);
-    catches.push(caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(q, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(q, id)), 0));
-  }
+  for (const q of day.questions) catches.push(await catchRate(db, day.date, q, q.host_answers));
   return catches;
 }
 
-export async function draft(db: pg.Client, spec: Spec): Promise<{ day: Puzzle; guide: string[] }> {
-  const questions: Puzzle["questions"] = [];
-  for (const [i, q] of spec.questions.entries()) {
-    const ids = await resolveNames(db, q.category, [...new Set([...q.host_bank, ...(q.uncommon ?? [])])]);
-    const levels: Record<string, Level> = {};
-    for (const n of q.uncommon ?? []) levels[ids.get(n)!] = "uncommon";
-    for (const n of q.host_bank) levels[ids.get(n)!] = "common";
-    const bank = q.host_bank.map((n) => ids.get(n)!);
-    questions.push({ prompt: q.prompt, category: q.category, host_bank: bank, host_answers: pickHosts(spec.date, i, bank), levels });
+// A bank question as the day will hold it, before its host answers are drawn: its host bank and levels as thing IDs.
+async function resolveQuestion(db: pg.Client, q: BankQuestion): Promise<Question> {
+  const ids = await resolveNames(db, q.category, [...new Set([...q.host_bank, ...q.uncommon])]);
+  const levels: Record<string, Level> = {};
+  for (const n of q.uncommon) levels[ids.get(n)!] = "uncommon";
+  for (const n of q.host_bank) levels[ids.get(n)!] = "common";
+  return { prompt: q.prompt, category: q.category, host_bank: q.host_bank.map((n) => ids.get(n)!), host_answers: [], levels };
+}
+
+// The order measure ("Easiest first (Recommended)"): the expected catch rate of one host answer, averaged over the
+// question's host bank, so every question is measured alike before its position decides how many the host names.
+async function oneHostCatch(db: pg.Client, date: string, q: Question): Promise<number> {
+  let sum = 0;
+  for (const id of q.host_bank) sum += await catchRate(db, date, q, [id]);
+  return sum / q.host_bank.length;
+}
+
+// days: every drafted day, for the gap. ids: the 7 bank questions to use, in order, instead of the pick.
+export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, ids?: string[]): Promise<{ day: Puzzle; guide: string[] }> {
+  const chosen = ids ? namedQuestions(bank, days, date, ids) : pickQuestions(bank, days, date);
+  const resolved: { q: Question; catch: number }[] = [];
+  for (const q of chosen) {
+    const question = await resolveQuestion(db, q);
+    resolved.push({ q: question, catch: ids ? 0 : await oneHostCatch(db, date, question) });
   }
-  const unlettered: Puzzle = { format: 3, game_id: GAME_ID, date: spec.date, questions };
+  const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
+  const questions = ordered.map(({ q }, i) => ({ ...q, host_answers: pickHosts(date, i, q.host_bank) }));
+  const unlettered: Puzzle = { format: 3, game_id: GAME_ID, date, questions };
   const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
     questions.flatMap((q) => q.host_answers),
   ]);
@@ -174,7 +183,9 @@ export async function draft(db: pg.Client, spec: Spec): Promise<{ day: Puzzle; g
     ...unlettered,
     questions: questions.map((q, i) => (steals[i] ? { ...q, steals: steals[i] } : q)),
   });
-  const steals = await pickLetters(spec.date, questions.length, async (upTo, trial) => {
+  // The furthest the letters got: questions before it held with some choice, so the block is at or after it.
+  let held = 0;
+  const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
     const day = withSteals(trial);
     const part = { ...day, questions: day.questions.slice(0, upTo) };
     if (checkHostNames("", part, names).length) return false;
@@ -182,26 +193,38 @@ export async function draft(db: pg.Client, spec: Spec): Promise<{ day: Puzzle; g
       const q = part.questions[i];
       if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
     }
+    held = Math.max(held, upTo);
     return true;
   });
-  if (!steals) throw new Error(`no letters fit schedule A for ${spec.date}`);
+  if (!steals) {
+    const at = questions[held];
+    throw new Error(`no letters fit schedule A for ${date}: questions 1 to ${held} hold; the block is at question ${held + 1} ("${at.prompt}", hosts drawn ${at.host_answers.map((id) => names.get(id) ?? id).join(", ")}) or after it. Change that question's bank or uncommon answers`);
+  }
   const day = withSteals(steals);
-  const problems = [...checkPuzzle(spec.date, day), ...checkHostNames(spec.date, day, names)];
+  const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, names)];
   if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
   return { day, guide: softGuide(await expectedCatches(db, day)) };
 }
 
 async function main(): Promise<void> {
-  const [path] = process.argv.slice(2);
-  if (!path) {
-    console.error("usage: npm run draft -- <spec.json>");
+  const [date, flag, list] = process.argv.slice(2);
+  if (!date || (flag !== undefined && (flag !== "--questions" || !list))) {
+    console.error("usage: npm run draft -- <date> [--questions <id>,…]");
     process.exit(2);
   }
-  const spec = JSON.parse(readFileSync(path, "utf8")) as Spec;
+  const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
+  if (!bank) throw new Error(errors.join("\n"));
+  const dir = join("content", GAME_ID);
+  const days = readdirSync(dir).filter((n) => n.endsWith(".json")).map((n) => {
+    const file = `${GAME_ID}/${n}`;
+    const text = readFileSync(join(dir, n), "utf8");
+    const problems = checkPuzzleFile(file, text);
+    if (problems.length) throw new Error(problems.join("\n"));
+    return parsePuzzle(file, text).puzzle!;
+  });
   const db = await localClient();
   try {
-    const { day, guide } = await draft(db, spec);
-    const dir = join("content", GAME_ID);
+    const { day, guide } = await draft(db, bank, days, date, list?.split(","));
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
     console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);

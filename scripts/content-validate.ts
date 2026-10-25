@@ -1,10 +1,12 @@
-// Validates every puzzle file under a content root: `npm run content:validate [-- <root>]` (default `content`).
-// Prints one line per error naming the file, question and entry, and exits 1 on any error, or when no
-// puzzle file is found, so a wrong root can't pass silently (M01 ticket).
+// Validates every puzzle file under a content root, and its question bank (bank.json at the root, M13 13d):
+// `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
+// entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
+// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d).
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
-import { checkPuzzleFile } from "../src/content/puzzle.ts";
+import { gapProblems, parseBank } from "../src/content/bank.ts";
+import { checkPuzzleFile, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
 
 // Every file (not directory) under `root`, relative to it, with "/" separators, sorted so output is stable.
 // Throws if `root` is missing.
@@ -15,18 +17,24 @@ function listFiles(root: string): string[] {
     .sort();
 }
 
+const BANK = "bank.json";
+
 export function listPuzzleFiles(root: string): string[] {
-  return listFiles(root).filter((p) => p.endsWith(".json"));
+  return listFiles(root).filter((p) => p.endsWith(".json") && p !== BANK);
 }
 
 export function validateRoot(root: string): { files: number; errors: string[] } {
   const all = listFiles(root);
-  const files = all.filter((p) => p.endsWith(".json"));
+  const files = listPuzzleFiles(root);
   // Anything else under the root is an error, so a mistyped file name can't drop a day while CONTENT OK prints
   // (M02 2f, B9).
-  const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle`);
+  const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle or the bank`);
   if (files.length === 0) return { files: 0, errors: [...strays, `${root}: no puzzle files found`] };
-  const errors = [...strays, ...files.flatMap((file) => checkPuzzleFile(file, readFileSync(join(root, file), "utf8")))];
+  const texts = files.map((file) => ({ file, text: readFileSync(join(root, file), "utf8") }));
+  const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text))];
+  const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
+  errors.push(...gapProblems(days));
+  if (all.includes(BANK)) errors.push(...parseBank(BANK, readFileSync(join(root, BANK), "utf8")).errors);
   return { files: files.length, errors };
 }
 

@@ -125,6 +125,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `plor_app` can still delete any comment with no record, through the `private.comment delete` grant that a player's own deletes need; D1 (a) only stops a record without a deletion, or a false one. Found in M12 12d (review). For the DECISIONS.md row, or a guarded function for own deletes too.
 - [ ] React's "two children with the same key" warnings now show keys `0` and `1` in the e2e run; 12d's list is keyed by comment ID, so likely older code (`key={i}` in `src/app/admin/puzzles/puzzles.tsx`?), not traced. Found in M12 12d (review).
 - [ ] The privacy page says sign-in counts are deleted "the next time anyone signs in"; in fact code-email rows go on the next code request and code-check rows on the next check, and stay if no one makes another. Found in M12 12e (review). Approximately right.
+- [ ] **A flaky live-board reconnect test:** `live-board.e2e.ts`'s "a reconnect refetches the board" failed once in a slow full e2e run (3.4 minutes instead of about 1.7), and passed alone and in the next full run. Not traced. Found in M13 13d.
 - [ ] **A flaky e2e sign-in:** `emailedCode` (`e2e/players.ts`) waits for the code email for `expect.poll`'s default 5 seconds. On a slow CI runner (PR #71, run 40143780456, an e2e job of 11 minutes instead of about 4) one code took longer and `live-board.e2e.ts`'s reset test failed at sign-in; the same commit's other run passed. Found in M13 13a-2 (CI).
 
 **From the MVP review (M12 12f, 2026-10-23):**

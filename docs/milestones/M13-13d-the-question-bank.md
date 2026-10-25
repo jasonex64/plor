@@ -1,6 +1,6 @@
 # M13 13d — The question bank
 
-**Status:** planned (2026-10-24). The human answered three rounds of guided questions; the design below waits for the human's approval.
+**Status:** in review (2026-10-24): built; the reviewer next. The human answered three rounds of guided questions and approved the design, its security change and 13e (human, 2026-10-24: "I approve 13d's design, its security change (dropping private.save_questions and its grant), and 13e as the next sub-ticket. Build 13d.").
 
 ## Goal
 A bank of questions the draft picks each day's 7 from, never asking a category again within 30 days, preferring a date's theme and ordering the day easiest first, so a day can be drafted from a date alone and the human only vetoes.
@@ -65,13 +65,13 @@ Already decided in the M13 ticket: **at least 30 days** between uses, "the AI ma
 **13e (new, proposed): growing the categories.** Reaching the 210+ categories daily days need, through more reviewed imports and recipes that combine traits ("African animal"). It gets its own guided questions after 13d, before M15 needs daily days.
 
 ## Acceptance criteria
-- [ ] **Picking** (unit tests on a bank and drafted days in temp folders): the gap leaves out a category used 29 days before or after, and keeps one used 30 days away; a theme's questions come first; never-used before least recently used; the same pick for a date every time; too few eligible stops with the count.
-- [ ] **Order** (unit test): easiest first by the expected catch of one host answer.
-- [ ] **By hand** (unit test): `--questions` takes the 7 named questions in that order, and refuses an unknown ID or a category inside the gap.
-- [ ] **The gap in CI** (unit test): `content:validate` refuses two days asking a category 29 days apart, and passes 30.
-- [ ] **The bank page** (e2e): an admin sees T1's questions with the day they ran; a player gets 403.
-- [ ] **Removed:** `private.puzzle_questions` and `private.save_questions` dropped (pgTAP: `plor_app`'s grants without them); the admin page has no questions box.
-- [ ] **The first bank** holds T1's 7 questions, and `npm run draft -- 2026-10-24 --questions <T1's ids>` reproduces T1's file.
+- [x] **Picking** (unit tests on a bank and drafted days in temp folders): the gap leaves out a category used 29 days before or after, and keeps one used 30 days away; a theme's questions come first; never-used before least recently used; the same pick for a date every time; too few eligible stops with the count.
+- [x] **Order** (unit test): easiest first by the expected catch of one host answer.
+- [x] **By hand** (unit test): `--questions` takes the 7 named questions in that order, and refuses an unknown ID or a category inside the gap.
+- [x] **The gap in CI** (unit test): `content:validate` refuses two days asking a category 29 days apart, and passes 30.
+- [x] **The bank page** (e2e): an admin sees T1's questions with the day they ran; a player gets 403.
+- [x] **Removed:** `private.puzzle_questions` and `private.save_questions` dropped (pgTAP: `plor_app`'s grants without them); the admin page has no questions box.
+- [x] **The first bank** holds T1's 7 questions, and `npm run draft -- 2026-10-24 --questions <T1's ids>` reproduces T1's file.
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
 
 ## Out of scope
@@ -102,8 +102,25 @@ Already decided in the M13 ticket: **at least 30 days** between uses, "the AI ma
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Design 4: the days a question ran | Matched by the question's prompt and category in the drafted days | A drafted day doesn't name its bank question, and adding a field would change format 3 (Hard to reverse); prompt and category identify it |
+| Design 2: each category once | Also within one day: the gap counts the same category twice on a date | A 30-day gap can't allow two uses on one day |
+| (not in the design) | When no letters fit, the draft names the question where it blocks, with its drawn hosts | DECISIONS.md, Puzzle drafting, said to tell the human which question; the first pick for 2026-11-30 showed the plain "no letters fit" said nothing |
+| (not in the design) | `isObject`, `checkKeys` and `isText` are exported from `src/content/puzzle.ts` | The bank's checks reuse them rather than copying them |
 
 ## Evidence
+**13d's build (2026-10-24, local stack):**
+- `npm test` → 37 files, 217 tests passed, including:
+  - `src/content/bank.test.ts` (9 tests): the shape; the gap at 29 and 30 days; the pick: the gap before and after, the theme first, never used before least recently used, the same for a date, and "only 5 … 2 more needed"; `--questions` in order, refusing an unknown ID and a category inside the gap; easiest first;
+  - `content-validate.test.ts`: two days asking a category 29 days apart are refused and 30 pass; `bank.json` is checked and not counted as a puzzle.
+- **The first bank reproduces T1:** `npm run draft -- 2026-10-24 --questions name-an-animal,…,name-a-us-state` rewrote `content/offbeat/2026-10-24.json` byte for byte (`diff` empty), with letters U, P, T, E.
+- **Picking by date** (the trial file deleted after; no content days without the human's ask):
+  - `npm run draft -- 2026-11-01` → "only 0 bank questions ask a category not used within 30 days; 7 more needed";
+  - `npm run draft -- 2026-11-30` picked and ordered all 7, then stopped: "questions 1 to 6 hold; the block is at question 7 ("Name a fruit", hosts drawn grape, apple, orange)".
+- `npm run test:db` → 36 files, 232 tests passed (the admin puzzles route test without its saving tests: 7 passed).
+- `npm run test:sql` → `Result: PASS`, with `plor_app`'s exact grants no longer holding `private.save_questions` or `private.puzzle_questions`.
+- `npx playwright test` → 14 passed, including `bank.e2e.ts`: an admin opens "Question bank" from `/admin`, sees 7 questions and "Name an animal" in category animal with 2026-10-24; a player sees "This page is for admins only.".
+  - The first full run had 2 failures: `bank.e2e.ts`, where the refusal text also appeared in the footer's audit count (fixed with an exact match), and `live-board.e2e.ts`'s reconnect test in a slow run. The latter passed alone and in the next full run; it's in ROADMAP as flaky.
+- `npx tsc --noEmit -p .`, `npx eslint src e2e scripts` and `npm run content:validate` clean.
 
 ## Review
 - Blocking findings and how each was fixed:

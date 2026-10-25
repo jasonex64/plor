@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(41);
 
 -- Real puzzles and runs may exist for the days used here (staging during the playtest). The whole file runs in
 -- one transaction that is rolled back, so clearing them changes nothing outside the test (2b review).
@@ -146,7 +146,7 @@ select throws_ok($$insert into private.missed_answer (user_id, game_id, puzzle_d
 select ok(not has_table_privilege('plor_app', t, 'update, delete, truncate'), t || ': plor_app cannot update, delete or truncate')
   from unnest(array['private.run', 'private.run_event', 'private.missed_answer', 'private.puzzle']) as t;
 select ok(not has_table_privilege('plor_app', t, 'insert, update, delete, truncate'), t || ': plor_app writes it only through its guarded function (M06)')
-  from unnest(array['private.puzzle', 'private.puzzle_questions']) as t;
+  from unnest(array['private.puzzle']) as t;
 
 -- §7: account deletion (M12) cascades through runs, answers and misses even though nobody holds DELETE.
 delete from auth.users where id = '00000000-0000-0000-0000-0000000000a1';
