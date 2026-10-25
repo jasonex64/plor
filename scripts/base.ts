@@ -1,10 +1,11 @@
-// The answer database's imports (docs/milestones/M13-13a-the-base.md): `npm run base -- fetch|load <set>` and
-// `npm run base -- review <category>`.
+// The answer database's imports (docs/milestones/M13-13a-the-base.md): `npm run base -- fetch|load <set>`,
+// `npm run base -- load all` and `npm run base -- review <category>…`.
 // - fetch: pulls one set from its source (SOURCES.md, M13 D2) into a snapshot outside git, data/snapshots/<set>/<date>.json,
 //   and writes the committed manifest, data/manifests/<set>.json: source, date, method, item count and checksum.
-// - load: loads the manifest's snapshot into the local stack with private.import_source, then defines the set's category.
-// - review: what the human reviews for an import (human, 2026-10-24: "Summary + flags (Recommended)"): the
-//   category's count, 20 random members, and flags.
+// - load: loads the manifest's snapshot into the local stack with private.import_source. `load all` loads every set,
+//   then defines every category in data/categories.json, the one place categories are defined (13e).
+// - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
+//   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -14,15 +15,15 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
-import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS } from "../src/config/tunables.ts";
+import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
+import { CATEGORIES_FILE, parseCategories, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 export type Item = { id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string };
 type Source = "wikidata" | "oewn" | "usda";
-type Category = { key: string; name: string; root: string; member_of?: string };
-type SetDef = { source: Source; method: string; category?: Category; fetch: () => Promise<Item[]> };
+type SetDef = { source: Source; method: string; fetch: () => Promise<Item[]> };
 
 // --- aliases ---
 
@@ -341,7 +342,6 @@ const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
     method: `SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under ${ANIMALIA} with an English common name, plus their ancestors up to it`,
-    category: { key: "animal", name: "animal", root: ANIMALIA },
     fetch: async () => {
       const taxa = await fetchTaxa(ANIMALIA);
       if (!taxa.has(DOG)) throw new Error(`${DOG} (the domestic dog) wasn't fetched`);
@@ -351,13 +351,11 @@ const SETS: Record<string, SetDef> = {
   "wikidata-dog-breeds": {
     source: "wikidata",
     method: "SPARQL: instances of dog breed (P31 Q39367), each under dog breed and under the domestic dog taxon",
-    category: { key: "dog_breed", name: "dog breed", root: "Q39367" },
     fetch: async () => [await rootItem("Q39367", "dog breed"), ...labelledItems(await labelled("?x wdt:P31 wd:Q39367 ."), () => ["Q39367", DOG])],
   },
   "wikidata-countries": {
     source: "wikidata",
     method: "SPARQL: sovereign states (P31 Q3624078), not dissolved (no P576), with a UN membership (P463 Q1065) that has no end time (P582)",
-    category: { key: "country", name: "country", root: "Q6256", member_of: "Q1065" },
     fetch: async () => [
       await rootItem("Q6256", "country"),
       await rootItem("Q1065", "United Nations"),
@@ -373,7 +371,6 @@ const SETS: Record<string, SetDef> = {
     source: "wikidata",
     // 118: the known elements, one per atomic number up to 118 (checked 2026-10-24: 118 items, 118 numbers).
     method: "SPARQL: chemical elements (P31 Q11344) with an atomic number (P1086) of at most 118",
-    category: { key: "chemical_element", name: "chemical element", root: "Q11344" },
     fetch: async () => [
       await rootItem("Q11344", "chemical element"),
       ...labelledItems(await labelled("?x wdt:P31 wd:Q11344 ; wdt:P1086 ?z . FILTER(?z <= 118)"), () => ["Q11344"]),
@@ -382,13 +379,11 @@ const SETS: Record<string, SetDef> = {
   "wikidata-us-states": {
     source: "wikidata",
     method: "SPARQL: instances of U.S. state (P31 Q35657)",
-    category: { key: "us_state", name: "US state", root: "Q35657" },
     fetch: async () => [await rootItem("Q35657", "U.S. state"), ...labelledItems(await labelled("?x wdt:P31 wd:Q35657 ."), () => ["Q35657"])],
   },
   "wikidata-fruit": {
     source: "wikidata",
     method: "SPARQL: everything that is an instance or subclass (P31|P279) of a subclass of fruit (P279* Q1364), with its parents in that tree",
-    category: { key: "fruit", name: "fruit", root: "Q1364" },
     fetch: async () => {
       const found = await labelled("?x wdt:P31|wdt:P279 ?parent . ?parent wdt:P279* wd:Q1364 .");
       return [await rootItem("Q1364", "fruit"), ...labelledItems(found, (id, parents) => [...parents].filter((p) => p === "Q1364" || found.has(p)))];
@@ -430,7 +425,6 @@ const SETS: Record<string, SetDef> = {
   "oewn-cheese": {
     source: "oewn",
     method: `${OEWN_ZIP}: noun.food.json, synset ${OEWN_CHEESE} and its hyponyms`,
-    category: { key: "cheese", name: "kind of cheese", root: OEWN_CHEESE },
     fetch: async () => {
       const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), () => ["noun.food.json"]);
       return oewnSubtree(JSON.parse(files["noun.food.json"]) as Record<string, Synset>, OEWN_CHEESE);
@@ -499,12 +493,8 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
     await client.query("begin");
     const withIds = items.map((item) => ({ ...item, thing_id: thingId(def.source, item.id) }));
     const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [def.source, manifest.snapshot, JSON.stringify(withIds)]);
-    if (def.category) {
-      const c = def.category;
-      await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, def.source, c.root, c.member_of ?? null]);
-    }
     await client.query("commit");
-    console.log(`LOADED ${set} (${manifest.snapshot}): ${JSON.stringify(rows[0].counts)}${def.category ? `; category ${def.category.key}` : ""}`);
+    console.log(`LOADED ${set} (${manifest.snapshot}): ${JSON.stringify(rows[0].counts)}`);
   } catch (err) {
     await client.query("rollback");
     throw err;
@@ -513,43 +503,73 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   }
 }
 
-// What the human reviews: the count, BASE_REVIEW_SAMPLE random members, and
-// flags: members under two parents (two meanings), aliases shared by two members (duplicates), and things under the
-// root with no English name (left out of the category).
-async function review(key: string): Promise<void> {
+function readCategories(): CategoryDef[] {
+  const { categories, errors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
+  if (!categories) throw new Error(errors.join("\n"));
+  return categories;
+}
+
+// Every category in data/categories.json, in one transaction: a root or member_of that isn't loaded fails them all.
+async function defineCategories(): Promise<void> {
+  const categories = readCategories();
   const client = await localClient();
   try {
-    const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
-    const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
-    if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
-    const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
-    const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
-      join private.fact f on f.thing_id = m and f.trait = 'kind_of' group by t.name having count(*) > 1 order by parents desc, t.name`);
-    const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m
-      join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m group by a.alias having count(*) > 1 order by a.alias`);
-    const [{ unnamed }] = await one(`with recursive cat as (select root from private.category where key = $1),
-      under (id) as (select root from cat union select f.thing_id from private.fact f join under u on f.value_thing = u.id where f.trait = 'kind_of')
-      select count(*)::int as unnamed from under u where not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
-    console.log(`REVIEW ${key}: ${n} members`);
-    console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);
-    console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
-    console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
-    console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
+    await client.query("begin");
+    for (const c of categories) {
+      await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
+    }
+    await client.query("commit");
+    console.log(`DEFINED ${categories.length} categories from ${CATEGORIES_FILE}`);
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
   } finally {
     await client.end();
   }
 }
 
+// What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
+// CATEGORY_MIN_MEMBERS members (13e), members under two parents (two meanings), aliases shared by two members
+// (duplicates), and things under the root with no English name (left out of the category).
+async function review(keys: string[]): Promise<void> {
+  const client = await localClient();
+  try {
+    for (const key of keys) await reviewOne(client, key);
+  } finally {
+    await client.end();
+  }
+}
+
+async function reviewOne(client: pg.Client, key: string): Promise<void> {
+  const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
+  const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
+  if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
+  const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
+  const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
+    join private.fact f on f.thing_id = m and f.trait = 'kind_of' group by t.name having count(*) > 1 order by parents desc, t.name`);
+  const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m
+    join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m group by a.alias having count(*) > 1 order by a.alias`);
+  const [{ unnamed }] = await one(`with recursive cat as (select root from private.category where key = $1),
+    under (id) as (select root from cat union select f.thing_id from private.fact f join under u on f.value_thing = u.id where f.trait = 'kind_of')
+    select count(*)::int as unnamed from under u where not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
+  console.log(`REVIEW ${key}: ${n} members`);
+  if (n < CATEGORY_MIN_MEMBERS) console.log(`  flag, fewer than ${CATEGORY_MIN_MEMBERS} members: ${n}`);
+  console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);
+  console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
+  console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
+  console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
+}
+
 async function main(): Promise<void> {
-  const [command, name] = process.argv.slice(2);
-  if (command === "review" && name) return review(name);
+  const [command, name, ...more] = process.argv.slice(2);
+  if (command === "review" && name) return review([name, ...more]);
   if (command === "load" && name === "all") {
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
-    return;
+    return defineCategories();
   }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- load all\n       npm run base -- review <category key>`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- load all\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   await (command === "fetch" ? fetchSet(name, def) : loadSet(name, def));

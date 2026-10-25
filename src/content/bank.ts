@@ -2,8 +2,8 @@
 // picked from and the themes set for dates (human, 2026-10-24: "A file, like drafts (Recommended)"). Its shape, the
 // 30-day gap between uses of a category, and the pick. Pure and relative-imported: content:validate, npm run draft
 // and the admin bank page all use it.
-import { QUESTIONS_PER_DAY, REPEAT_GAP_DAYS } from "../config/tunables.ts";
-import { checkKeys, isCalendarDate, isObject, isText, type Puzzle } from "./puzzle.ts";
+import { HOST_ANSWERS_PER_QUESTION, QUESTIONS_PER_DAY, REPEAT_GAP_DAYS } from "../config/tunables.ts";
+import { CATEGORY_KEY, checkKeys, isCalendarDate, isObject, isText, type Puzzle } from "./puzzle.ts";
 
 // A question as the bank holds it: its answers by name (or "#<thing id>"), resolved when a day is drafted.
 export type BankQuestion = {
@@ -18,7 +18,9 @@ export type BankQuestion = {
 export type Bank = { format: 1; questions: BankQuestion[]; themes: Record<string, string> };
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const CATEGORY = /^[a-z][a-z_]*$/;
+// A question can land at any position, so its host bank holds at least the most host answers any position takes (13e;
+// DECISIONS.md, Puzzle drafting).
+const HOST_BANK_MIN = Math.max(...HOST_ANSWERS_PER_QUESTION);
 
 function isNames(v: unknown): v is string[] {
   return Array.isArray(v) && v.every(isText);
@@ -29,8 +31,9 @@ function checkBankQuestion(errors: string[], where: string, v: unknown) {
   checkKeys(errors, where, v, ["id", "prompt", "category", "host_bank", "uncommon", "themes", "added_by"]);
   if ("id" in v && !(typeof v.id === "string" && SLUG.test(v.id))) errors.push(`${where}: "id" must be a lower-case slug`);
   if ("prompt" in v && !isText(v.prompt)) errors.push(`${where}: "prompt" must be text`);
-  if ("category" in v && !(typeof v.category === "string" && CATEGORY.test(v.category))) errors.push(`${where}: "category" must be a category key`);
-  if ("host_bank" in v && !(isNames(v.host_bank) && v.host_bank.length > 0)) errors.push(`${where}: "host_bank" must list names`);
+  if ("category" in v && !(typeof v.category === "string" && CATEGORY_KEY.test(v.category))) errors.push(`${where}: "category" must be a category key`);
+  if ("host_bank" in v && !isNames(v.host_bank)) errors.push(`${where}: "host_bank" must list names`);
+  else if (isNames(v.host_bank) && v.host_bank.length < HOST_BANK_MIN) errors.push(`${where}: "host_bank" lists ${v.host_bank.length} names, at least ${HOST_BANK_MIN} needed`);
   if ("uncommon" in v && !isNames(v.uncommon)) errors.push(`${where}: "uncommon" must list names`);
   if ("themes" in v && !(Array.isArray(v.themes) && v.themes.every((t) => typeof t === "string" && SLUG.test(t)))) {
     errors.push(`${where}: "themes" must list lower-case slugs`);
