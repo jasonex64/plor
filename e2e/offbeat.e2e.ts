@@ -83,8 +83,11 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   await how.getByRole("button", { name: "Start climbing" }).click();
   await expect(page).toHaveURL("http://localhost:3000/offbeat");
   await expect(page.getByLabel("Your answer")).toBeVisible();
-  // Once the run has started, How to play offers no start (14a-2c, criterion 2).
+  // Once the run has started, How to play offers no start (14a-2c, criterion 2). Its text shows before the run's
+  // state does, and the clock bar asks for the run too, so the check waits until every request has answered.
   await page.goto("/offbeat/how-to-play");
+  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
   await expect(page.getByRole("region", { name: "How to play" })).toContainText("Up on the ridge");
   await expect(page.getByRole("button", { name: "Start climbing" })).toHaveCount(0);
 });

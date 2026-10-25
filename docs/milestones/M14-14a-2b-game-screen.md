@@ -58,7 +58,7 @@ Earlier decisions this builds: L25 (Play opens a separate game screen with How t
 | Yesterday only | The revealed answers | L34, L25 ("Yesterday's answers") |
 | 7 questions, 20 seconds, 25 to 350 points | The rules line and How to play | DECISIONS.md, Game 1 |
 | The page's sizes: cards 14px padding and radius, the chart 86px tall, stat numbers 24px, Start 52px, How to play 48px | Layout | Round 5's game screen (the approved mockups) |
-| Smaller sizes: text 11px (the chart's days), 12px (stat labels, pills), 13px (the chart's caption), 14px (the answers, muted text), 20px (card headings); gaps of 1–16px | Layout | Round 5's game screen (recorded by 14a-2c, from 14a-2b's review) |
+| Smaller sizes: text 11px (the chart's days), 12px (stat labels, pills), 13px (the chart's caption), 14px (the answers, muted text), 20px (card headings); gaps of 1–16px; card headings at line height 1.1; the stats' 8px 2px padding; the bars' 3px corners; the answers' 6px 0 padding; the pills' 2px 8px padding and round ends (999px); Start's 20px text | Layout | Round 5's game screen: `.h`, `.stat`, `.spark i`, `.row` as the answers use it, `.pill` and `.primary` (recorded by 14a-2c, from 14a-2b's review and 14a-2c's) |
 | How to play: 14px between paragraphs, 16px text at line height 1.45, in the page's 960px column | Layout | Round 3's How to play; L43's column. 14a-2b had 12px, 1.5 and a 640px width that no source gave, corrected by 14a-2c |
 | The back links 44px tall | Touch target | As `globals.css`'s buttons (44px) |
 | The average to one decimal, out of 7 ("5.2/7"); the best score with a thousands comma ("1,050") | The stats | Round 5's game screen |

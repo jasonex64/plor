@@ -9,7 +9,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
 - **14a-2b is done:** merged in PR #81 on green CI, 2026-10-25.
-- **14a-2c, the review fixes, is in progress** (`docs/milestones/M14-14a-2c-review-fixes.md`).
+- **14a-2c, the review fixes, is in review** (`docs/milestones/M14-14a-2c-review-fixes.md`): reviewed and its blocking findings fixed; it merges on green CI.
 - **Next step:** the overnight plan below.
 
 ## Overnight plan (human, 2026-10-25, before sleeping)
@@ -41,7 +41,13 @@ Every sub-ticket follows CLAUDE.md as usual: a ticket, the sources, numbers with
 1. Run `npx supabase db push` once 14a-3's and 14b-1's migrations are on main.
 2. Read the parked questions, below.
 
-**Parked questions:** none yet.
+**Parked questions:**
+1. **A source for the settings sheet.** It's a modal dialog, held focus and Escape included (round 7: "Focus stays inside while it's open"). No entry in SOURCES.md covers the HTML `<dialog>` element. Should MDN's `<dialog>` page (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) be added, as its Web Share and Clipboard pages were? CLAUDE.md: "If no source covers the work, stop and ask." Until then, these wait:
+   - the settings sheet (now 14a-3b), with its two switches and their migration;
+   - 14b-1, whose theme picker is in the sheet. Its themes and credits would have no caller without the picker.
+2. **Where the friends list goes.** The Me tab holds the friends list (with Remove) and the invite link with Reset (M12 12a, 12f). L45's Me and round 7's sheet have no place for them. Until you say where they go, they stay on Me, below the stats, as they work now.
+
+**Order changed by parked question 1:** after 14a-2c comes 14a-3a, Me (the stats, the calendar, the game card, the rarest answers, the avatar slots and Friends' empty state), which needs no new source. Then the night stops at the parked questions.
 - **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
 - **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
 - **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).
