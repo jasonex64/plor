@@ -1,6 +1,6 @@
 # M14 — Look and feel
 
-**Status:** in progress, alongside M13 (human, 2026-10-24: "while the other session works on database and answer generating can we do the layout stuff here"). 14a (structure and UX) and 14b (the visual system) are in guided questions and mockup review: L3–L5, L9, L10 and L16–L41 below are answered. 14c (the art and the game's motion) comes after. The mockups are the private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ). Earlier: planned, after every functional milestone (human, 2026-10-21: "nothing visual comes until after things are functijnal"; before that, after the MVP, human, 2026-10-20). Numbered M07, then M13, before the renumbering of 2026-10-21. L7 is answered by M04's G5. L11 is still open (M04's G6 is open and moved to M13 answer lists). Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
+**Status:** in progress, alongside M13 (human, 2026-10-24: "while the other session works on database and answer generating can we do the layout stuff here"). 14a (structure and UX) and 14b (the visual system) are in guided questions and mockup review: L3–L5, L9, L10 and L16–L43 below are answered. 14c (the art and the game's motion) comes after. The mockups are the private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ). Earlier: planned, after every functional milestone (human, 2026-10-21: "nothing visual comes until after things are functijnal"; before that, after the MVP, human, 2026-10-20). Numbered M07, then M13, before the renumbering of 2026-10-21. L7 is answered by M04's G5. L11 is still open (M04's G6 is open and moved to M13 answer lists). Draft ticket for the human's approval, 2026-10-20. It replaces the draft on `claude/m12-visual-design-70d269` (draft PR #12, closed in the roadmap reset of 2026-10-20). Only the human's own decisions and notes were carried over. The mockups stay readable at commit `cd03d0f` (GitHub keeps a closed PR's commits).
 
 ## Goal
 Give every Offbeat screen a finished, phone-first look with code-drawn pixel art and small animations, once every screen works.
@@ -86,7 +86,8 @@ The look comes after every functional milestone (human, 2026-10-21), so the scop
 | L39 | Play, then Start | "allow a toggle in settings" (human, 2026-10-24): an Account setting to go straight to question 1 from Play. Claude's default, from L25: off, so Play opens the game screen until a player turns it on |
 | L40 | Comments you can't read yet | "Who commented, blurred text" (human, 2026-10-24). The blurred text is filler shapes, never the real comment, which isn't sent until the player has played (critique, round 1: real blurred text leaks to screen readers and find-in-page) |
 | L41 | Today's boards and feed (desktop) | "One board, wide feed" (human, 2026-10-24): one leaderboard card with a Yesterday / This week switch and one group picker; the feed spans the centre |
-## Acceptance criteria
+| L42 | Breakpoints | The human asked Claude to choose ("suggest for me", 2026-10-24). **Below 768px:** the phone layout with the bottom tab bar. **768–1199px:** the sidebar and one centre column; Friends today and the leaderboard move into it under the games, and games sit side by side while two fit (two banners need about 500px). **1200px and up:** the right column. The design target stays 360px (L9), and nothing may break down to 320px (WCAG 2.2, 1.4.10 Reflow) |
+| L43 | White space | Asked whether to leave room for later features (human, 2026-10-24). Claude's answer, per "Build for today": no empty columns held for future features. A page with nothing for a side column drops it and centres its content in a column at most 960px wide (Account); a column whose content grows in real use stays (the game screen's comments) |## Acceptance criteria
 Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, checked with screenshots at the L9 width.
 - [ ]
 
@@ -103,6 +104,9 @@ Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, c
 | Contrast 4.5:1 for text; target size per 2.5.8 | Accessibility | L10: WCAG 2.2 AA (SOURCES.md) |
 | How many presets: 5 | Themes | L21, picked by Claude when the human left it to Claude, 2026-10-24 |
 | Sprout stages: 1–4, 5–14, 15–29, 30+ days | The streak symbol | L26, human, 2026-10-24 |
+| Breakpoints: 768px (tab bar below, sidebar above), 1200px (right column from here up) | Layout | L42, picked by Claude when the human asked for a suggestion, 2026-10-24 |
+| Content column at most 960px when a page has no side column | Layout | L43, Claude, 2026-10-24 |
+| Reflow floor: 320px | Layout | WCAG 2.2, 1.4.10 (SOURCES.md) |
 
 ## Plan
 1. The human answers L1–L15.
