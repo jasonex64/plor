@@ -14,7 +14,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
     - all of WordNet's nouns and Wikidata's places of 100,000+ people for the facts check (the base is 195 MB locally);
     - `npm run base -- load all`.
   - **13c, rarity and the host, is merged** (PR #73) (`docs/milestones/M13-13c-rarity-and-the-host.md`): the bonus's first guess 40/40/20 blended with counts pooled per category (provisional on past days only); host answers 1, 1, 1, 1, 2, 2, 3 drawn at random from the bank; 3 familiar answers typeable and safe in the draft and at approval; the soft guide in the draft's summary. T1 is redrafted (letters U, P, T, E).
-  - **Then 13d,** the question bank, themes and the repeat gap.
+  - **Then 13d,** the question bank (designed, waiting for approval), and **13e,** growing the categories to the 210+ a 30-day gap per category needs for daily days.
 - **New Next revision items** (ROADMAP), including from 13c's review: the rare tier counting members at approval, and smaller gaps.
   - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
   - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
@@ -22,12 +22,15 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13d's guided questions** (CLAUDE.md, "Ask before designing").
+- **13d's design** (`docs/milestones/M13-13d-the-question-bank.md`): approve it, its security change (dropping `private.save_questions` and its grant) and 13e as the next sub-ticket.
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13d, the question bank: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
+1. 13d, the question bank: the guided questions are answered and the design is in its sub-ticket. On the human's approval, build on `m13-answer-lists-and-content` (the branch stays for M13) and open its PR.
+2. Then 13e, growing the categories: guided questions first.
+
+**Shared local database:** another session (M14 layout work, worktree `C:/Users/jason/RIFF-m14`) runs its e2e suite against the same local stack. Message it before a `db reset` or a full suite run.
 
 Until the human asks, there are no content days, staging or `db push`.
 

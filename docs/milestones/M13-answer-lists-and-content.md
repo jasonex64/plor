@@ -1,6 +1,6 @@
 # M13 — The answer database
 
-**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, done (PR #73, `M13-13c-rarity-and-the-host.md`); 13d, the question bank, next.
+**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, done (PR #73, `M13-13c-rarity-and-the-host.md`); 13d, the question bank, designed from the human's guided answers (`M13-13d-the-question-bank.md`), waiting for approval; 13e, growing the categories, proposed.
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
 - **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
 - **Sources:** D2's are in SOURCES.md (human, 2026-10-24). Every decision and number is answered, so 13a's criteria come next.
@@ -120,7 +120,8 @@ The database has five parts. Each day takes a frozen copy when it's approved.
   - The Next revision matching items for M13: plural aliases, digits, zero-width characters.
 - **13b, learning from misses** (D4): the facts check, the auto-accept rule with its share and minimum, and the audit page with undo.
 - **13c, rarity and the host** (D5; its own file, `M13-13c-rarity-and-the-host.md`): pooled shares in the bonus; host answers fixed at 1, 1, 1, 1, 2, 2, 3 per question, drawn at random from the host bank (replacing the dodging host: human, 2026-10-24); the letter picker keeping 3 familiar answers typeable and safe (M04 G9).
-- **13d, the question bank and tuning** (D7, M04 G3): questions with recipes, themes and the repeat gap; difficulty tuned with the human toward a target catch rate per question.
+- **13d, the question bank** (D7; its own file, `M13-13d-the-question-bank.md`): `content/bank.json`, the draft picking a day's 7 from it by date (30 days between uses of a category, a date's theme first, easiest first), the gap in CI and the bank page. Tuning toward targets became 13c's soft guide.
+- **13e, growing the categories** (proposed with 13d, 2026-10-24): a 30-day gap per category with 7 questions a day needs 210+ categories, and there are 7 (human: "Keep it; grow categories (Recommended)"). Its own guided questions after 13d, before M15 needs daily days.
 
 ## Acceptance criteria
 Each sub-ticket's criteria are written before its code, once D1–D8 are answered. They'll cover:
