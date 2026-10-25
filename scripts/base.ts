@@ -200,6 +200,7 @@ const USDA_ZIP = "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_lega
 const OEWN_CHEESE = "07866305-n"; // "a solid food prepared from the pressed curd of milk" (noun.food.json)
 
 const OEWN_ANIMAL = "00015568-n"; // "a living organism characterized by voluntary movement" (noun.Tops.json)
+const OEWN_ENTITY = "00001740-n"; // "entity": the root every noun synset is under (noun.Tops.json)
 
 type Synset = { members: string[]; hypernym?: string[]; instance_hypernym?: string[]; wikidata?: string };
 
@@ -400,6 +401,21 @@ const SETS: Record<string, SetDef> = {
       const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
       const known = new Set([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => i.id));
       return linkToWikidata(oewnSubtree(synsets, OEWN_ANIMAL), synsets, known, OEWN_ANIMAL, ANIMALIA);
+    },
+  },
+  // Every noun, so 13b's facts check knows "Paris" names a city, not an animal (human, 2026-10-24: "Import all of
+  // WordNet (Recommended)"). Merged by WordNet's own IDs only: linking more of WordNet to Wikidata would put WordNet's
+  // trees under Wikidata's category roots (all of WordNet's "country" under the 193 countries).
+  "oewn-nouns": {
+    source: "oewn",
+    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ENTITY} ("entity") and everything under it, merged with oewn-animals and oewn-cheese by synset ID, for 13b's facts check`,
+    fetch: async () => {
+      const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), (listed) => listed.filter((n) => /^noun.[^/]+.json$/.test(n)));
+      const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
+      if (synsets[OEWN_ENTITY]?.members[0] !== "entity") throw new Error(`${OEWN_ENTITY} isn't "entity" in this edition`);
+      const items = oewnSubtree(synsets, OEWN_ENTITY);
+      console.log(`${Object.keys(synsets).length} noun synsets, ${items.length} under ${OEWN_ENTITY}`);
+      return items;
     },
   },
   "oewn-cheese": {

@@ -1,6 +1,6 @@
 # M13 13b — Learning from misses
 
-**Status:** planned (2026-10-24). The human answered three rounds of guided questions; the design below waits for the human's approval, with the LDNOOBW row for SOURCES.md and the security change.
+**Status:** in progress (2026-10-24). The human answered three rounds of guided questions and approved the design, the LDNOOBW row for SOURCES.md and the security change (human, 2026-10-24: "I approve 13b's design, adding LDNOOBW to SOURCES.md, and its security change (new miss-review tables; plor_app may run the one miss function; admin-only audit functions). Measure the WordNet load first, then build 13b.").
 
 ## Goal
 An answer players type that the database doesn't accept becomes an answer from the next day on, once enough players type it (D4), unless the facts reject it, and the human can audit and undo every addition.
@@ -32,7 +32,7 @@ Already decided in the M13 ticket: **X = 1%** of the players who answered the ca
 - **The M13 ticket:** D4 (the rule, X and M), "How it learns (D4)", "Facts win", "Technically correct".
 - **13a** (`M13-13a-the-base.md`): the base's tables, `private.resolve_answer`, the typo rule (`src/game/matching.ts`), normalization (`src/content/puzzle.ts`), imports through `npm run base`.
 - **Open English WordNet** (SOURCES.md, M13 D2): every noun synset and its hypernym ("kind of") links, for the facts check.
-- **To add, with the human's OK:** LDNOOBW, https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words, file `en` (403 lines, last changed 2020-07-13 at commit `4638b97`), CC BY 4.0. Read 2026-10-24 through the GitHub API (license, size, last commit); its contents weren't reviewed.
+- **LDNOOBW** (SOURCES.md, added with the human's OK, 2026-10-24): https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words, file `en` (403 lines, last changed 2020-07-13 at commit `4638b97`), CC BY 4.0. Read 2026-10-24 through the GitHub API (license, size, last commit); its contents weren't reviewed.
 - **PostgreSQL 17** and **Supabase roles and RLS** for the new tables, functions and grants.
 
 ## Claude's design (for the human to approve)
@@ -118,6 +118,13 @@ Each outcome is decided once per text and category, and logged in `private.base_
 |---|---|---|
 
 ## Evidence
+**The WordNet noun load (step 2, 2026-10-24, local stack):**
+- `npm run base -- fetch oewn-nouns` → "71864 noun synsets, 71864 under 00001740-n", snapshot 2026-10-25 (UTC).
+  - *The hypothesis was off:* 71,864 synsets, about 12% fewer than WordNet 3.0's 82,000. OEWN 2025 is smaller than the figure Claude remembered. Every one is under "entity".
+- `npm run base -- load oewn-nouns` → `{"facts":70143,"things":67816,"aliases":226962}`.
+- The base tables with their indexes went from **91 MB to 164 MB** (78,111 → 145,927 things; `pg_total_relation_size`).
+- Every category kept its member count: animal 56,787, cheese 48, chemical_element 118, country 193, dog_breed 928, fruit 2,999, us_state 50, before and after. The load put nothing new under a category root.
+- **The human's call on the size** (2026-10-24): "keep it all, raise a check to me as database grows if it's getting close to limit and ill consider buying it". The check is in ROADMAP, For M15: the hosted database doesn't hold the base yet.
 
 ## Review
 - Blocking findings and how each was fixed:
