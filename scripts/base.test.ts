@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { describe, expect, it } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, linkToWikidata, oewnSubtree, parseCsv, taxaToItems, usdaCheeses, type Item } from "./base.ts";
+import { aliasesFor, linkToWikidata, oewnSubtree, parseCsv, parseLinks, taxaToItems, usdaCheeses, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -121,5 +121,18 @@ describe("linkToWikidata", () => {
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ]);
+  });
+});
+
+describe("parseLinks", () => {
+  const link = { thing: "oewn:1-n", name: "tulip", kind_of: "oewn:2-n", kind_of_name: "flower" };
+  it("takes a list of links, and refuses a link missing a field, holding an extra one, or with an empty name", () => {
+    expect(parseLinks(JSON.stringify([link]))).toEqual([link]);
+    expect(() => parseLinks(JSON.stringify({ link }))).toThrow("data/links.json: must be a list of links");
+    const short = { thing: link.thing, name: link.name, kind_of: link.kind_of };
+    for (const bad of [short, { ...link, note: "x" }, { ...link, name: " " }]) {
+      expect(() => parseLinks(JSON.stringify([link, bad]))).toThrow("data/links.json link 2: must hold exactly thing, name, kind_of, kind_of_name, each as text");
+    }
+    expect(() => parseLinks(JSON.stringify([{ ...link, kind_of: "2-n" }]))).toThrow('data/links.json link 1: "thing" and "kind_of" must be refs as "source:id"');
   });
 });

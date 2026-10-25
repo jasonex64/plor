@@ -1,10 +1,13 @@
 // The question bank's admin page (docs/milestones/M13-13d-the-question-bank.md): an admin sees each bank question with
 // the days it ran, from content/bank.json and the drafted days in content/offbeat; a player who isn't an admin sees the
 // refusal. The bank and drafts are the repo's own (T1, 2026-10-24).
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 
+// Every question the page lists: the repo's bank, which grows with each batch (13e).
+const QUESTIONS = (JSON.parse(readFileSync("content/bank.json", "utf8")) as { questions: unknown[] }).questions.length;
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 
 test.afterAll(async () => {
@@ -23,7 +26,7 @@ test("an admin sees the bank's questions and the days they ran; a player can't",
   const animal = admin.getByRole("article", { name: "Name an animal" });
   await expect(animal).toContainText("Category animal");
   await expect(animal.getByRole("listitem").filter({ hasText: "2026-10-24" })).toBeVisible();
-  await expect(admin.getByRole("region", { name: "Questions" }).getByRole("article")).toHaveCount(7);
+  await expect(admin.getByRole("region", { name: "Questions" }).getByRole("article")).toHaveCount(QUESTIONS);
 
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");

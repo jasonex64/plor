@@ -1,9 +1,9 @@
 // The drafting script's pure parts (scripts/draft.ts): the letter picker, which tries schedule A's slots in a
 // date-seeded order and skips what doesn't fit (the database checks it runs per choice are the caller's: here fits is
-// a stand-in); the host answers drawn from the bank; and the soft guide.
+// a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { pickHosts, pickLetters, softGuide } from "./draft.ts";
+import { pickHosts, pickLetters, softGuide, withHosts } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -46,6 +46,25 @@ describe("pickHosts", () => {
 
   it("refuses a bank smaller than the host's count", () => {
     expect(() => pickHosts("2026-11-02", 6, ["a", "b"])).toThrow("the host bank holds 2, and the host names 3");
+  });
+});
+
+describe("withHosts", () => {
+  // Seven questions whose host banks are named as the letters suggest: "bee" and "ant" avoid "o"; "owl", "ox" and "cow" don't.
+  const names = new Map([["bee", "bee"], ["ant", "ant"], ["gnu", "gnu"], ["owl", "owl"], ["ox", "ox"], ["cow", "cow"]]);
+  const question = (host_bank: string[]) => ({ prompt: "Name an animal", category: "animal", host_bank, host_answers: [], levels: {} });
+  const steals = [undefined, undefined, undefined, undefined, undefined, undefined, "o"];
+  it("draws the host answers only among bank answers whose names avoid the letters stolen so far", () => {
+    const bank = ["bee", "ant", "gnu", "owl", "ox", "cow"];
+    const day = withHosts("2026-11-02", Array.from({ length: 7 }, () => question(bank)), steals, names)!;
+    expect(day.questions[6].steals).toBe("o");
+    // Before the "o" is stolen, the draw is over the whole bank; at Q7, over the three that avoid it, the same each time.
+    for (let i = 0; i < 6; i++) expect(day.questions[i].host_answers).toEqual(pickHosts("2026-11-02", i, bank));
+    expect(day.questions[6].host_answers).toEqual(pickHosts("2026-11-02", 6, ["bee", "ant", "gnu"]));
+  });
+
+  it("finds no day when a question has fewer sayable answers than the host names there", () => {
+    expect(withHosts("2026-11-02", Array.from({ length: 7 }, () => question(["bee", "ant", "owl", "ox", "cow"])), steals, names)).toBeNull();
   });
 });
 
