@@ -8,7 +8,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
-- **Next step:** the reviewer's findings, then open its PR from this branch and merge on green CI with the human's OK.
+- **In review: PR #81.** The reviewer's blocking findings are fixed and the rest are in ROADMAP, For M14. **Waiting on the human:** the merge, on green CI.
+- **Next step:** once #81 merges, mark 14a-2b done with its CI evidence, then 14a-3 (Friends, Groups, Me and settings) starts with its guided questions.
 - **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
 - **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
 - **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).

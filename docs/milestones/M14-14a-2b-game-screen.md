@@ -1,6 +1,6 @@
 # M14 14a-2b — Offbeat's game screen
 
-**Status:** built and in review (2026-10-25). Approved by the human with its security change (2026-10-25: "I approve 14a-2b as drafted, including the security change (yesterday's host answers to every signed-in player). Build it.").
+**Status:** built and in review (2026-10-25), PR #81. Approved by the human with its security change (2026-10-25: "I approve 14a-2b as drafted, including the security change (yesterday's host answers to every signed-in player). Build it.").
 
 ## Goal
 Offbeat gets its own page, `/offbeat`: the day's rules before Start, the run itself and its result, how to play, the player's Offbeat stats, yesterday's answers, and Offbeat's comments. Today's Play opens it.
