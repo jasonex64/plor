@@ -137,21 +137,22 @@ const NOTHING = () => {};
 
 function Clock({ index, msLeft }: { index: number; msLeft: number }) {
   const seconds = Math.ceil(useCountdown(msLeft, NOTHING) / 1000);
+  // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
-    <div role="status" className={styles.clock}>
+    <section aria-label="Question in play" className={styles.clock}>
       {seconds > 0 ? (
         <>
-          <span>
+          <span role="timer">
             Question {index + 1} · {seconds}s left
           </span>
           <Link href="/">Back</Link>
         </>
       ) : (
         <>
-          <span>Time&apos;s up on question {index + 1}</span>
+          <span role="status">Time&apos;s up on question {index + 1}</span>
           <Link href="/#result">Result</Link>
         </>
       )}
-    </div>
+    </section>
   );
 }

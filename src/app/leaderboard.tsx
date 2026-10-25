@@ -51,13 +51,15 @@ export function LeaderboardCard() {
   const [day, setDay] = useState<Day | null>(null);
   const [week, setWeek] = useState<Week | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Kept apart from the board's error, which each new choice clears, so a failed list of groups stays on show.
+  const [groupsError, setGroupsError] = useState<string | null>(null);
   // Choices can change faster than the answers come back: only the newest choice's answer is shown (M11 H6).
   const [latest] = useState(latestOnly);
 
   useEffect(() => {
     api<{ groups: { id: string; name: string }[] }>("/api/groups", { method: "GET" }).then(
       (r) => setGroups(r.groups),
-      (err) => setError(errorText(err)),
+      (err) => setGroupsError(errorText(err)),
     );
   }, []);
   useEffect(() => {
@@ -103,6 +105,7 @@ export function LeaderboardCard() {
         {week && <Entries entries={week.entries} />}
         {!day && !week && !error && <p>Loading…</p>}
       </section>
+      {groupsError && <p role="alert">{groupsError}</p>}
       {error && <p role="alert">{error}</p>}
     </section>
   );

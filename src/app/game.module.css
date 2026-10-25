@@ -41,6 +41,12 @@
   font-weight: 800;
 }
 
+/* On the game's colour the accent ring would fade (Paper's is 1.75:1 on it), so focus there is white: 10.8:1, the
+   pairing src/app/colors.test.ts checks (WCAG 2.2 1.4.11). */
+.banner :focus-visible {
+  outline-color: var(--on-offbeat);
+}
+
 .result {
   color: var(--on-offbeat);
   font-weight: 700;

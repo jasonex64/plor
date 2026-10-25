@@ -5,6 +5,7 @@
   right: 0;
   bottom: 0;
   z-index: 10;
+  box-sizing: border-box;
   height: 64px;
   background: var(--surface);
   border-top: 1px solid var(--line);

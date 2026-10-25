@@ -1,6 +1,6 @@
 # M14 14a-2a — Today
 
-**Status:** in progress. Approved by the human (2026-10-25: "I approve 14a-2a as drafted. Build it."). 14a-2b (Offbeat's game screen) follows in its own PR.
+**Status:** in review: built, reviewed (blocking findings fixed), evidence below; its PR waits for green CI and the human. Approved by the human (2026-10-25: "I approve 14a-2a as drafted. Build it."). 14a-2b (Offbeat's game screen) follows in its own PR.
 
 ## Goal
 Today shows each game as a full-width banner (Play before, the score after), one leaderboard card, and a feed that names who commented without showing their words until the player has played; and from any tab, a player who left a question in play sees its seconds running out and can go back.
@@ -52,6 +52,11 @@ Earlier decisions this builds: L22 (a full-width stylized banner per game, swipe
 | 1200px; 768px | The right column; the stacked middle band | L42 |
 | 320px | Reflow | WCAG 2.2 1.4.10 |
 | The banner's heights (230px phone, 240px desktop) and the card's spacing | Layout | The approved mockups (rounds 5 to 7) |
+| The banner's title 40px (phone) and 46px (from 768px), Play 140×48px at 20px, the banner's 18px radius and Play's 14px | The banner | The approved mockups (rounds 3 and 5) |
+| The right column, 360px | Today from 1200px | The approved desktop mockups (rounds 4 and 5) |
+| The switch's options 36px tall, the board picker 40px | The leaderboard card | The approved mockups (rounds 5 and 6) |
+| The filler's 4px blur | The locked feed | The approved mockups (rounds 5 and 6) |
+| The clock bar 48px tall; the page's room for it, 112px on phones (the tab bar's 64px and the bar's 48px) and 48px from 768px | The clock bar | The mockups' primary controls, 48px tall (rounds 3 to 6); the room follows from the two heights |
 
 ## Plan
 1. Tests first: `e2e/today.e2e.ts` and the clock bar's case in `shell.e2e.ts` fail.
@@ -81,7 +86,41 @@ Earlier decisions this builds: L22 (a full-width stylized banner per game, swipe
 | Plan step 3: Today listens to the board's channel once, through the board | Today keeps its own channel for the feed; from 768px the live board brings its own, so wide screens open two | Phones have no board on Today, so the feed needs its own listener there; sharing one between the two is a change to `useBoardChannel` left for later (ROADMAP, For M14) |
 
 ## Evidence
+All runs on the worktree `C:/Users/jason/RIFF-m14`, `m14-look-and-feel` merged with main after M13 13e-1, against the shared local stack (2026-10-25).
+
+**Criteria 1–6 and 8:** `npm run test:e2e -- --reporter=list` → `27 passed (2.9m)`, among them:
+```
+  ok 21 › e2e\shell.e2e.ts:128:1 › away from Today, a question in play shows its clock above the tab bar, and time's up at zero (3.1s)
+  ok 24 › e2e\today.e2e.ts:33:1 › Offbeat's banner has Play before the run, and the score, how it ended and Result after (2.7s)
+  ok 25 › e2e\today.e2e.ts:53:1 › one leaderboard card switches between yesterday and this week, for friends or a group (5.8s)
+  ok 26 › e2e\today.e2e.ts:81:1 › before playing, the feed names who commented and holds none of their words (8.6s)
+  ok 27 › e2e\today.e2e.ts:116:1 › Today's columns: the circle on the right from 1200px, stacked below it, and no sideways scroll at 320px (6.3s)
+```
+They check:
+- **1:** "Don't match the Wind · 7 questions" and the banner's background, `rgb(47, 61, 92)`; Play starts the run.
+- **2:** "0 points + about 0 bonus · caught on question 1", "Next puzzle in", and Result leads to `#result` holding "You survived 0 of 7 questions".
+- **3:** Yesterday chosen and dated, the board picker's Friends and the group, and the requests to `/api/leaderboard`, `/api/groups/leaderboard` and `/api/leaderboard/yesterday?group=`.
+- **4:** "Finish today's Offbeat to read 1 comment" linking to `#offbeat`, the friend's name, filler that is `aria-hidden` and only "x"s, and the comment's text nowhere in the page's HTML.
+- **5:** the circle right of the banner at 1440px, under it at 1024px, no live board on phones, no sideways scroll at 320px.
+- **6:** the bar's timer and Back at 360px sitting on the tab bar, at the top beside the sidebar at 1440px, then "Time's up on question 1" as a status with Result → `/#result`, the clock faked past 20 seconds.
+- **8:** every other suite still passes, with its assertions moved, not dropped: "Start today's puzzle" is "Play" (WCAG 2.2 2.5.3: the name holds the visible word); `groups.e2e.ts` reads Today's four top-level sections and the card's board picker; `live-board.e2e.ts` reads Yesterday in the card (the Yesterday radio chosen, the board picker on Friends).
+
+**The feed's `count`:** `npx vitest run src/app/api/feed/route.db.test.ts` → `Tests 4 passed (4)`, with `count: 2` for the viewer who can see two comments.
+
+**Criterion 7 and the locked text's branches:** `npm test` → `Test Files 40 passed (40)`, `Tests 250 passed (250)`, among them `src/app/colors.test.ts` (white on Offbeat's colour, 10.8:1; Offbeat's colour declared once, for every theme) and `src/comments/preview.test.ts` (no comments; 4 friends and 1 other give 3 names and "and 2 more"; 1 friend; only others).
+
+**Criterion 8, the rest:** `npm run lint` → no problems; `npx tsc --noEmit -p .` → no output; `npm run build` → `○ /` and `○ /friends` among the routes.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent reviewed 14a-2a's diff in a fresh context (2026-10-25).
+- **Blocking findings and how each was fixed:**
+  1. The feed test read the filler as text (`toHaveText` uses `textContent`). Fixed: it reads the name, the `aria-hidden` filler and the hidden words apart.
+  2. The focus ring on the banner was Paper's accent on navy, about 1.75:1. Fixed: white inside the banner, the 10.8:1 pairing `colors.test.ts` checks.
+  3. The clock bar was a live region, read out every second. Fixed: the seconds are a `timer`; only "Time's up" is a `status`; the bar is a region named "Question in play".
+  4. A failed list of groups could be wiped by a later board load. Fixed: its own error state.
+  5. "and N more" and the other locked-feed branches had no test. Fixed: `previewText` in `src/comments/preview.ts`, unit-tested.
+  6. Layout sizes had no recorded origin. Fixed: rows in Numbers.
+  7. The clock at 768px and up had no evidence. Fixed: the test checks it at 1440px.
+  8. ROADMAP and the handoff were stale. Fixed.
+- **Found while fixing them:** the tab bar's 64px didn't include its 1px border, so the clock bar overlapped it by a pixel (`box-sizing: border-box` on the bar).
+- **Deferred to ROADMAP "Next revision", For M14:** the hidden clock's padding after Back; the card showing the old choice's rows while the new one loads; "Result" from another tab reaching `#result` before the run has loaded; the card's two date styles; one shared `NOTHING` for the countdowns; the switch's chosen option by fill alone; `openLive` with two sockets on Today.

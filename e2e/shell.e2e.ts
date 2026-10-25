@@ -135,17 +135,22 @@ test("away from Today, a question in play shows its clock above the tab bar, and
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
 
-  const clock = page.getByRole("status").filter({ hasText: /^Question 1 · \d+s left/ });
-  await expect(clock).toBeVisible();
+  const clock = page.getByRole("region", { name: "Question in play" });
+  await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
   await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
-  // Past the question's 20 seconds.
+  // From 768px, at the top of the content, beside the sidebar.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const [wide, side] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
+  expect([wide.y, wide.x]).toEqual([0, side.x + side.width]);
+  await page.setViewportSize({ width: 360, height: 800 });
+
+  // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
-  const over = page.getByRole("status").filter({ hasText: "Time's up on question 1" });
-  await expect(over).toBeVisible();
-  await expect(over.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/#result");
+  await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {
