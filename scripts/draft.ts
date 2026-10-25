@@ -1,25 +1,59 @@
 // Drafting a day from the answer database (docs/milestones/M13-13a-the-base.md; DECISIONS.md, Puzzle drafting):
 // `npm run draft -- <spec.json>`. A Claude session writes the spec: the date, and per question its prompt, category,
-// host bank, host answers and uncommon answers, by name. This script turns each name into the category's thing (or
-// takes "#<thing id>" for one a name can't single out), picks the letters the Wind steals (schedule A), checks the day,
-// and writes content/offbeat/<date>.json for the human to approve on /admin/puzzles. The local stack only (13a: "Local
+// host bank and uncommon answers, by name. This script turns each name into the category's thing (or takes
+// "#<thing id>" for one a name can't single out), draws the host answers from the bank at random (M13 13c), picks the
+// letters the Wind steals (schedule A) so 3 familiar answers stay typeable and safe, checks the day, writes
+// content/offbeat/<date>.json for the human to approve on /admin/puzzles, and prints the soft guide: each question's
+// expected catch rate against its target. The local stack only (13a: "Local
 // only"); thing IDs are the same on every database (src/content/thing-id.ts), so the draft holds wherever the same
 // snapshots are loaded.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type pg from "pg";
-import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { GAME_ID, checkHostNames, checkPuzzle, normalize, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
+import { GAME_ID, checkHostNames, checkPuzzle, normalize, stolenLetters, type ApprovedPuzzle, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { pooledCounts } from "../src/game/ledger.ts";
+import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
 
-type SpecQuestion = { prompt: string; category: string; host_bank: string[]; host_answers: string[]; uncommon?: string[] };
+type SpecQuestion = { prompt: string; category: string; host_bank: string[]; uncommon?: string[] };
 type Spec = { date: string; questions: SpecQuestion[] };
 
 // A small stable hash of the date, so the letter order differs from day to day but not from run to run (as the
 // format-2 picker did).
 function seed(text: string): number {
   return [...text].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+}
+
+// The host answers for question index: HOST_ANSWERS_PER_QUESTION[index] of the bank, drawn at random but the same for
+// a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank").
+export function pickHosts(date: string, index: number, bank: string[]): string[] {
+  const count = HOST_ANSWERS_PER_QUESTION[index];
+  if (bank.length < count) throw new Error(`q${index + 1}: the host bank holds ${bank.length}, and the host names ${count}`);
+  let h = seed(`${date}:${index}`);
+  const left = [...bank];
+  const picked: string[] = [];
+  while (picked.length < count) {
+    h = (h * 1103515245 + 12345) >>> 0;
+    picked.push(...left.splice(h % left.length, 1));
+  }
+  return picked;
+}
+
+// The expected share of players finishing a day, from each question's expected catch rate: each must be survived.
+export function finishRate(catches: number[]): number {
+  return catches.reduce((p, c) => p * (1 - c), 1);
+}
+
+// The soft guide in the draft's summary (human, 2026-10-24: "Keep as a soft guide", "Show, never warn
+// (Recommended)"): each question's expected catch rate next to its target, and the finish rate next to the targets'.
+export function softGuide(catches: number[]): string[] {
+  const pct = (x: number) => `${Math.round(x * 100)}%`;
+  return [
+    ...catches.map((c, i) => `  q${i + 1}: expected catch ${pct(c)} (target ${pct(CATCH_TARGETS[i])})`),
+    `  expected finish ${pct(finishRate(catches))} (the targets': ${pct(finishRate(CATCH_TARGETS))})`,
+  ];
 }
 
 // The letters for schedule A's slots, tried depth first in a date-seeded order; fits(upTo, steals) says whether the
@@ -53,7 +87,7 @@ async function resolveNames(db: pg.Client, category: string, names: string[]): P
   const texts = names.filter((n) => !n.startsWith("#")).map(normalize);
   const { rows } = await db.query<{ alias: string; id: string; name: string }>(
     `select a.alias, m::text as id, t.name from private.category_members($1) m
-     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2)`,
+     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
     [category, texts],
   );
   const { rows: given } = await db.query<{ id: string }>("select m::text as id from private.category_members($1) m where m = any($2::uuid[])", [
@@ -76,29 +110,60 @@ async function resolveNames(db: pg.Client, category: string, names: string[]): P
   return out;
 }
 
-// Whether a member the host doesn't catch (not a host answer, nor under one) can be typed without the letters.
-async function safeAnswerLeft(db: pg.Client, category: string, hosts: string[], stolen: string[]): Promise<boolean> {
-  const { rows } = await db.query<{ ok: boolean }>(
+// What the host catches: the host answers and every member under them.
+async function caughtMembers(db: pg.Client, category: string, hosts: string[]): Promise<string[]> {
+  const { rows } = await db.query<{ id: string }>(
     `with recursive caught (id) as (
        select unnest($2::uuid[])
        union
-       select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of'
+       select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of' and f.removed_at is null
      )
-     select exists (select from private.category_members($1) m join private.thing_alias a on a.thing_id = m
-                    where m not in (select id from caught) and ($3::text is null or a.alias !~ $3)) as ok`,
-    [category, hosts, stolen.length ? `[${stolen.join("")}]` : null],
+     select m::text as id from private.category_members($1) m where m in (select id from caught)`,
+    [category, hosts],
   );
-  return rows[0].ok;
+  return rows.map((r) => r.id);
 }
 
-export async function draft(db: pg.Client, spec: Spec): Promise<Puzzle> {
+// Whether at least FAMILIAR_SAFE_MIN familiar members (in levels) the host doesn't catch can be typed without the
+// letters (human, 2026-10-24: "Typeable and safe (Recommended)"; private.approve_puzzle checks the same).
+export async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
+  const caught = new Set(await caughtMembers(db, category, hosts));
+  const { rows } = await db.query<{ id: string }>(
+    `select distinct m::text as id from private.category_members($1) m join private.thing_alias a on a.thing_id = m
+     where m = any($2::uuid[]) and a.removed_at is null and ($3::text is null or a.alias !~ $3)`,
+    [category, Object.keys(levels), stolen.length ? `[${stolen.join("")}]` : null],
+  );
+  return rows.filter((r) => !caught.has(r.id)).length >= FAMILIAR_SAFE_MIN;
+}
+
+// Each question's expected catch rate: the blended share (first guess with the category's pooled past days, as the
+// provisional bonus sees them) of every member the host catches.
+async function expectedCatches(db: pg.Client, day: Puzzle): Promise<number[]> {
+  const questions = [];
+  for (const q of day.questions) {
+    const { rows } = await db.query<{ n: number }>("select count(*)::int as n from private.category_members($1)", [q.category]);
+    questions.push({ ...q, root: "", member_of: null, members: rows[0].n });
+  }
+  const approved: ApprovedPuzzle = { ...day, approved_at: "", questions };
+  const pooled = await pooledCounts(db, approved, false);
+  const catches = [];
+  for (const [i, q] of approved.questions.entries()) {
+    const counts = pooled.get(i);
+    const caught = await caughtMembers(db, q.category, q.host_answers);
+    catches.push(caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(q, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(q, id)), 0));
+  }
+  return catches;
+}
+
+export async function draft(db: pg.Client, spec: Spec): Promise<{ day: Puzzle; guide: string[] }> {
   const questions: Puzzle["questions"] = [];
-  for (const q of spec.questions) {
-    const ids = await resolveNames(db, q.category, [...new Set([...q.host_bank, ...q.host_answers, ...(q.uncommon ?? [])])]);
+  for (const [i, q] of spec.questions.entries()) {
+    const ids = await resolveNames(db, q.category, [...new Set([...q.host_bank, ...(q.uncommon ?? [])])]);
     const levels: Record<string, Level> = {};
     for (const n of q.uncommon ?? []) levels[ids.get(n)!] = "uncommon";
     for (const n of q.host_bank) levels[ids.get(n)!] = "common";
-    questions.push({ prompt: q.prompt, category: q.category, host_bank: q.host_bank.map((n) => ids.get(n)!), host_answers: q.host_answers.map((n) => ids.get(n)!), levels });
+    const bank = q.host_bank.map((n) => ids.get(n)!);
+    questions.push({ prompt: q.prompt, category: q.category, host_bank: bank, host_answers: pickHosts(spec.date, i, bank), levels });
   }
   const unlettered: Puzzle = { format: 3, game_id: GAME_ID, date: spec.date, questions };
   const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
@@ -114,7 +179,8 @@ export async function draft(db: pg.Client, spec: Spec): Promise<Puzzle> {
     const part = { ...day, questions: day.questions.slice(0, upTo) };
     if (checkHostNames("", part, names).length) return false;
     for (let i = 0; i < upTo; i++) {
-      if (!(await safeAnswerLeft(db, part.questions[i].category, part.questions[i].host_answers, stolenLetters(part, i)))) return false;
+      const q = part.questions[i];
+      if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
     }
     return true;
   });
@@ -122,7 +188,7 @@ export async function draft(db: pg.Client, spec: Spec): Promise<Puzzle> {
   const day = withSteals(steals);
   const problems = [...checkPuzzle(spec.date, day), ...checkHostNames(spec.date, day, names)];
   if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
-  return day;
+  return { day, guide: softGuide(await expectedCatches(db, day)) };
 }
 
 async function main(): Promise<void> {
@@ -134,11 +200,12 @@ async function main(): Promise<void> {
   const spec = JSON.parse(readFileSync(path, "utf8")) as Spec;
   const db = await localClient();
   try {
-    const day = await draft(db, spec);
+    const { day, guide } = await draft(db, spec);
     const dir = join("content", GAME_ID);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
     console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);
+    console.log(guide.join("\n"));
   } finally {
     await db.end();
   }

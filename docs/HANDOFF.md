@@ -8,7 +8,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
 - **15c is closed, not built:** M14 14a-1 adds the Admin link (sidebar, and the Me tab on phones) with an `admin` flag on `GET /api/profile` (human, 2026-10-24; M14 ticket L49). Until 14a-1 lands, an admin types `plor.app/admin`.
 - **Storage** (DECISIONS.md Log): Free plan for now, the answer database grows freely, the human warned near 500 MB. Supabase's pricing page (read 2026-10-24) waits on the human's OK to go into SOURCES.md.
-- **plor.app admin is set up** (human, 2026-10-24): the hosted format-1 days are gone (no puzzles left there), M13's 3 migrations are pushed (the admin pages, which read the answer tables, load), and the human is in `private.admin`. The hosted answer database is empty by choice, so the puzzles page lists the T1 day's host answers as raw IDs; it stays unapproved there (its answers are public and its categories aren't loaded). `npx.cmd supabase test db --linked` passed after this push (human, 2026-10-24: "yes it passed"). Run hosted commands from `RIFF-m15` (or any clean checkout of `main`), never a checkout with another session's uncommitted migrations.
+- **plor.app admin is set up** (human, 2026-10-24): the hosted format-1 days are gone (no puzzles left there), M13's 3 migrations are pushed (the admin pages, which read the answer tables, load), and the human is in `private.admin`. The hosted answer database is empty by choice, so the puzzles page lists the T1 day's host answers as raw IDs; it stays unapproved there (its answers are public and its categories aren't loaded). `npx.cmd supabase test db --linked` passed after this push (human, 2026-10-24: "yes it passed"). **13c's migration `20261025042950_rarity_and_the_host.sql` reached `main` right after,** so the hosted database is one behind again: every migration merged to `main` deploys its code at once on Vercel, while the database waits for the human's `db push`. Run hosted commands from `RIFF-m15` (or any clean checkout of `main`), never a checkout with another session's uncommitted migrations.
 
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md`, `M13-13a-the-base.md` and `M13-13b-learning-from-misses.md`.
@@ -19,20 +19,21 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
     - `/admin/audit` with undo for every decision that made an answer, and "N to review" on the admin pages;
     - all of WordNet's nouns and Wikidata's places of 100,000+ people for the facts check (the base is 195 MB locally);
     - `npm run base -- load all`.
-  - **Next: 13c,** rarity from play, levels, the dodging host and 3 familiar answers. Then 13d, the question bank and tuning to Gentle, 3%→20%.
-- **New Next revision items** (ROADMAP):
+  - **13c, rarity and the host, is merged** (PR #73) (`docs/milestones/M13-13c-rarity-and-the-host.md`): the bonus's first guess 40/40/20 blended with counts pooled per category (provisional on past days only); host answers 1, 1, 1, 1, 2, 2, 3 drawn at random from the bank; 3 familiar answers typeable and safe in the draft and at approval; the soft guide in the draft's summary. T1 is redrafted (letters U, P, T, E).
+  - **Then 13d,** the question bank, themes and the repeat gap.
+- **New Next revision items** (ROADMAP), including from 13c's review: the rare tier counting members at approval, and smaller gaps.
   - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
   - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
 - **M15 15b (zod) is merged.** Dependabot alert #1 still showed `open` after the merge. Check it, and dismiss it as fixed if it stays.
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13c's guided questions** (CLAUDE.md, "Ask before designing").
+- **13d's guided questions** (CLAUDE.md, "Ask before designing").
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13c, rarity and the host: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
+1. 13d, the question bank: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
 
 Until the human asks, there are no content days, staging or `db push`.
 
