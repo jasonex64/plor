@@ -77,7 +77,10 @@ The look comes after every functional milestone (human, 2026-10-21), so the scop
 | L30 | The result screen | "the results for each game should be tied to the thematics of the game itself" (human, 2026-10-24), so Offbeat's moves to 14c, carrying today's result content |
 | L31 | Empty friends and the weekly board | The empty text "should be more generalized and friendly, because other games wont be 'getting caught' and people might only want to play one game". The weekly board switches between games (human, 2026-10-24). The overall view: "Decide at game 2" (M16) |
 | L32 | The mockups' wording | Provisional: "some of the text still doensnt sound right but this is about layout so i might want more revisions later" (human, 2026-10-24) |
-
+| L33 | How styles are written | "CSS Modules + CSS variables (Recommended)" (human, 2026-10-24); goes into DECISIONS.md with the first build PR, replacing `globals.css` as the only stylesheet |
+| L34 | Yesterday's answers on the game screen | "Yes, once the day is closed": every signed-in player sees a closed day's host answers (human, 2026-10-24). A new data exposure, so a security change for the human's approval when built |
+| L35 | "Your Offbeat" stats | "Streak for this game, Best score, Average questions survived, Last 7 days chart" (human, 2026-10-24) |
+| L36 | Order of work | "can we do desktop layout first" (human, 2026-10-24): the desktop mockup catches up with rounds 2 and 3 before the build is split into sub-tickets |
 ## Acceptance criteria
 Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, checked with screenshots at the L9 width.
 - [ ]

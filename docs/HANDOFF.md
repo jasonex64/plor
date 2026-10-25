@@ -2,7 +2,16 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that built M13 13a-1 and 13a-2 with the human's guided answers, on the Windows machine.
+**Updated:** 2026-10-24, on `m14-look-and-feel`, by the session doing M14's layout while another session builds M13 13b on `m13-answer-lists-and-content` (human: "while the other session works on database and answer generating can we do the layout stuff here"). The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
+
+## M14 (this branch)
+- **14a and 14b are in guided questions and mockup review.** L3–L5, L9, L10 and L16–L36 are answered in `docs/milestones/M14-look-and-feel.md`; WCAG 2.2 is pinned in SOURCES.md.
+- **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ): fonts, accents, themes, phone rounds 2 and 3, and desktop round 4 (Today, the game screen, Account). The human edits and moves boards there too, so read a board before republishing it.
+- **Waiting on the human:** review of desktop round 4, then the sub-ticket split. Claude's proposal: 14a-1 colour slots, fonts and navigation (tab bar and sidebar, a page per tab); 14a-2 Today and the game screen; 14a-3 Friends, Groups, Account and the empty states; 14b-1 themes on the account (a migration and a grant: a security change); 14b-2 the sprout and the admin pages. The human answered "can we do desktop layout first" before choosing.
+- **Next step:** after the split is chosen, write the first sub-ticket's file (copy `_TEMPLATE.md`) with its criteria, and record CSS Modules in DECISIONS.md with the first build PR (L33).
+- **Wording** in the mockups is provisional (L32).
+- **impeccable** (a design-review skill the human installed) is used only when the human asks (human, 2026-10-24: "Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout ("Keep local, ignored").
+- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed. Nothing is pushed yet.
 
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
