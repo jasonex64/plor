@@ -3,7 +3,7 @@
 // Night following the device; fonts served by Plor, not Google; and the focus ring on the tabs.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -112,32 +112,38 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
   }
 });
 
-// The tabs stay during a run, and leaving lets the timer run (M14 L18): back on Today, the question is still in play.
+// The tabs stay during a run, and leaving lets the timer run (M14 L18): back on the game screen, the question is still
+// in play. On the game screen the Today tab is current, as the page it opens from (14a-2b).
 test("a question in play is still there after a visit to another tab", async ({ browser }) => {
   const { page, nav } = await player(browser, "se", { width: 360, height: 800 });
-  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
-  await nav.getByRole("link", { name: "Today" }).click();
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/offbeat");
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
-// Away from Today, the question's clock sits just above the tab bar, with Back; at zero it says time's up and links to
-// the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6). The clock is faked so zero comes at once.
-test("away from Today, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
+// Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
+// and links to the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6; 14a-2b moved the game to
+// /offbeat). The clock is faked so zero comes at once.
+test("away from the game screen, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "sh");
-  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
+  // Not on the game screen itself, which shows the question's own countdown.
+  const clock = page.getByRole("region", { name: "Question in play" });
+  await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
 
-  const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
-  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/");
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/offbeat");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
@@ -150,7 +156,7 @@ test("away from Today, a question in play shows its clock above the tab bar, and
   // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
   await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
-  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/#result");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/offbeat#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {

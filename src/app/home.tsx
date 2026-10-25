@@ -1,7 +1,8 @@
 "use client";
 
 // Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
-// (the game and the feed), Friends, Groups or Me; or, on an invite link (/invite/<code>), the friend request; on a
+// (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
+// (docs/milestones/M14-14a-2b-game-screen.md); or, on an invite link (/invite/<code>), the friend request; on a
 // group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
@@ -14,10 +15,11 @@ import { Account } from "./account";
 import { Board } from "./board";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
-import { Game } from "./game";
+import { TodayBanner } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { errorText, messageForRedirect } from "./messages";
+import { HowToPlay, OffbeatScreen } from "./offbeat";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 
@@ -28,6 +30,8 @@ export type View =
   | { kind: "friends" }
   | { kind: "groups" }
   | { kind: "me" }
+  | { kind: "offbeat" }
+  | { kind: "howToPlay" }
   | { kind: "invite"; code: string }
   | { kind: "joinGroup"; code: string }
   | { kind: "group"; id: string };
@@ -84,9 +88,13 @@ export function Home({ view }: { view?: View }) {
       ) : (
         <>
           <Shell admin={me.admin} />
-          {/* Away from Today, a question left in play keeps its clock in view (M14 L18). */}
-          {view && <ClockBar />}
-          {view?.kind === "friends" ? (
+          {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
+          {view?.kind !== "offbeat" && <ClockBar />}
+          {view?.kind === "offbeat" ? (
+            <OffbeatScreen username={me.username} />
+          ) : view?.kind === "howToPlay" ? (
+            <HowToPlay />
+          ) : view?.kind === "friends" ? (
             <Friends username={me.username} />
           ) : view?.kind === "groups" ? (
             <Groups />
@@ -262,7 +270,8 @@ function useMinWidth(px: number): boolean {
   return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
 }
 
-// Today (docs/milestones/M14-14a-2a-today.md): Offbeat's banner and the game, the one leaderboard card and the feed;
+// Today (docs/milestones/M14-14a-2a-today.md): Offbeat's banner, which links to its game screen (14a-2b), the one
+// leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in a right column. The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
 function Today({ username }: { username: string }) {
@@ -278,21 +287,17 @@ function Today({ username }: { username: string }) {
     },
     failed: (err) => setChannelError(errorText(err)),
   });
-  // Count resets: at midnight Pacific every section that shows a day starts again, from the server's new day (M11 H6),
-  // except a game in play, which goes on to its end (gameDay).
+  // Count resets: at midnight Pacific every section that shows a day starts again, from the server's new day (M11 H6).
+  // The run itself is played on the game screen, which keeps a game in play to its end.
   const [day, setDay] = useState(0);
-  const [gameDay, setGameDay] = useState(0);
-  const nextDay = useCallback((inPlay: boolean) => {
-    setDay((d) => d + 1);
-    if (!inPlay) setGameDay((d) => d + 1);
-  }, []);
+  const nextDay = useCallback(() => setDay((d) => d + 1), []);
 
   const wide = useMinWidth(768);
 
   return (
     <div className={styles.today}>
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={setRunOver} onDayOver={nextDay} />
+        <TodayBanner key={`game-${day}`} onOver={setRunOver} onDayOver={nextDay} />
       </section>
       <aside aria-label="Your circle" className={styles.side}>
         {wide && <Board key={`board-${day}`} username={username} />}

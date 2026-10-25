@@ -151,7 +151,7 @@ export function Comments({ username, runOver, nudge, group }: { username: string
 }
 
 // Before the player has played (docs/milestones/M14-14a-2a-today.md, L40): the names, blurred filler that holds none
-// of their words (the server sends none, H3), and a link to Play; src/comments/preview.ts says what.
+// of their words (the server sends none, H3), and a link to the game screen; src/comments/preview.ts says what.
 const FILLER = ["xxxx xx xxxx xxx xx", "xxxxxxx xxxx xx", "xxx xxxxx xxxx xxx"];
 
 function Preview({ preview }: { preview: FeedPreview }) {
@@ -167,7 +167,7 @@ function Preview({ preview }: { preview: FeedPreview }) {
   return (
     <>
       <p>
-        <a href="#offbeat">{text.read}</a>
+        <Link href="/offbeat">{text.read}</Link>
       </p>
       <ul className={styles.locked}>
         {/* By position: two friends can share a display name. */}

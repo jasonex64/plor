@@ -1,6 +1,6 @@
 # M14 14a-2b — Offbeat's game screen
 
-**Status:** draft for the human's approval (2026-10-25), from the guided answers below. It includes a **security change** (yesterday's host answers shown to every signed-in player), which needs the human's explicit approval.
+**Status:** built and in review (2026-10-25). Approved by the human with its security change (2026-10-25: "I approve 14a-2b as drafted, including the security change (yesterday's host answers to every signed-in player). Build it.").
 
 ## Goal
 Offbeat gets its own page, `/offbeat`: the day's rules before Start, the run itself and its result, how to play, the player's Offbeat stats, yesterday's answers, and Offbeat's comments. Today's Play opens it.
@@ -20,6 +20,7 @@ Guided questions, 2026-10-25:
 | The reveal's risk (a category returns after 30+ days, its host answers drawn from its host bank) | "Yes, show them (Recommended)" |
 | How to play | "Yes, in 14a-2b (Recommended)", moved from 14a-3 |
 | Today's Result link | "/offbeat#result (Recommended)"; the clock bar's Result too |
+| A run left at a reveal past midnight (found while building: such a run stays in progress indefinitely, DECISIONS.md Game 1: Timer, so its player could read all 7 answers and then finish it) | "Hide from that player (Recommended)": a player whose own run yesterday is still going sees no answers until they finish it, as yesterday's leaderboard hides that day (M09 D5). Accepted: a second account could still read them |
 
 Earlier decisions this builds: L25 (Play opens a separate game screen with How to play, the player's stats, yesterday's answers and the game's comments), L29 (How to play friendlier and told through the ridge and the Wind; round 3's wording, provisional per L32), L34 ("Yes, once the day is closed": every signed-in player sees a closed day's host answers; a security change), L35 ("Streak for this game, Best score, Average questions survived, Last 7 days chart"), and the best score: "Points plus the final bonus (Recommended)" (14a-2a's questions). The rules line above Start is round 5's ("7 questions · 20 seconds each…"), from the critique's P1.
 
@@ -56,7 +57,9 @@ Earlier decisions this builds: L25 (Play opens a separate game screen with How t
 | 7 days, today included | The chart | L35 ("Last 7 days chart") |
 | Yesterday only | The revealed answers | L34, L25 ("Yesterday's answers") |
 | 7 questions, 20 seconds, 25 to 350 points | The rules line and How to play | DECISIONS.md, Game 1 |
-| The page's sizes | Layout | The approved mockups (rounds 3, 5 and 6), as 14a-2a's |
+| The page's sizes: cards 14px padding and radius, the chart 86px tall, stat numbers 24px, Start 52px, How to play 48px | Layout | Round 5's game screen (the approved mockups) |
+| The average to one decimal, out of 7 ("5.2/7"); the best score with a thousands comma ("1,050") | The stats | Round 5's game screen |
+| The feed's column, 360px from 1200px | Desktop | As Today's right column (14a-2a, L42) |
 
 ## Plan
 1. Tests first: the db route test for `GET /api/offbeat` (stats with hand-worked numbers; yesterday's answers for a player who played and one who didn't; no today) and `e2e/offbeat.e2e.ts` fail.
@@ -79,8 +82,35 @@ Earlier decisions this builds: L25 (Play opens a separate game screen with How t
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The mockups draw Today's banner before and after a run only | During a run, Today's banner says "Your run is still going" with **Continue** to `/offbeat` | A run waiting at a reveal has no clock, so the clock bar doesn't show; without the link, Today would give no way back to it. Wording provisional (L32) |
+| The clock bar showed away from Today (14a-2a) | It shows on every page but the game screen, Today included | The question is on `/offbeat` now, so Today is "away" |
+| Round 5 heads the comments "Offbeat comments" | The feed keeps its heading and region name, "Feed" | It's the same feed component as Today's (criterion 6); one name for one thing. Renaming it is ROADMAP Next revision |
+| Round 5 draws a pixel banner with the date | The plain block in Offbeat's colour, with the title and the date | The game's look is 14c (Out of scope) |
+| Round 5 shows the streak in the header | The streak is in the stats card on the game screen; Today keeps its streak line | The header's sprout is 14b-2; the card is L35's |
+| The chart's dash is for "a day not played" (L35 answers) | A run not finished yet (in progress) is a dash too | Its questions survived aren't final until it ends; the stats load again when the run ends |
+| Styles in CSS Modules (DECISIONS.md, Styling) | Each bar's height is an inline style | It's the data (survived out of 7), not a style choice; everything else is in `offbeat.module.css` |
+| Round 3's How to play says the Wind steals letters on questions 2, 4, 5 and 7 | The same words, as text | It matches `LETTER_SCHEDULE` today; if the schedule changes, the wording is changed with it, as the rules line's 20 seconds and points are |
+| Round 3's How to play ends with "Start climbing" | It starts the run and opens `/offbeat` | What the button says it does |
 
 ## Evidence
+Run on the Windows checkout against the local stack, 2026-10-25.
+- **Criteria 4 and 5, and the security change** (`src/app/api/offbeat/route.db.test.ts`): `npx vitest run src/app/api/offbeat/route.db.test.ts --no-file-parallelism` → `Tests  7 passed (7)`. It covers streak 5, best 1000, average 2.8 and the chart `–, 2, –, 4, 0, 1, –`, worked by hand in the file's header. It also covers yesterday's questions with the Wind's answers and P's own; N's with none of their own; Q's hidden while their yesterday run is still going (`{ state: "in_play" }`); a day with no puzzle (`{ state: "none" }`); nothing with today's marker; and the same reads and the settling as `plor_app`.
+- **The hypothesis held:** the route settles first. T-2's finished run had no ledger row, and the route wrote it, at 0 points. The test was written after the route, so it never failed first. As a check that it catches the case, the `settleRuns` line was removed and the file run again: `Tests  2 failed | 5 passed (7)` (criterion 4's case and the `plor_app` case). Then the line was restored: `7 passed`.
+- **Criteria 1–3, 6 and 7** (`e2e/offbeat.e2e.ts`): `npx playwright test e2e/offbeat.e2e.ts --repeat-each 3` → `9 passed (59.6s)`.
+- **Criterion 2 in the moved suites:**
+  - `today.e2e.ts`: Play is a link to `/offbeat`; the score and Result are on Today after the run; Result opens `/offbeat#result`; the feed's link goes to `/offbeat`.
+  - `shell.e2e.ts`: Today is current on `/offbeat`; the clock bar isn't on the game screen; its Back goes to `/offbeat` and its Result to `/offbeat#result`.
+  - `groups`, `live-board` and `approve-and-play` play through `play()` in `e2e/players.ts`.
+- **Contrast** of the Safe and Caught pills in Paper and Night: `npx vitest run src/app/colors.test.ts` → `Tests  30 passed (30)`.
+- **Criterion 8:**
+  - `npx tsc --noEmit -p .`: no output.
+  - `npm run lint`: no problems.
+  - `npm test`: `Test Files  40 passed (40)`, `Tests  254 passed (254)`.
+  - `npm run test:db`: `Test Files  38 passed (38)`, `Tests  242 passed (242)`.
+  - `npm run test:e2e`: `30 passed (3.0m)`.
+  - `npm run build`: compiled, with `○ /offbeat` and `○ /offbeat/how-to-play` among the routes.
+  - The security change is in DECISIONS.md's Log, 2026-10-25.
+  - CI: with the PR.
 
 ## Review
 - Blocking findings and how each was fixed:

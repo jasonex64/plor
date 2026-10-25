@@ -5,7 +5,7 @@
 // out of the friends thread.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -61,7 +61,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
     creator.locator("main section").evaluateAll((all) => all.filter((s) => !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
   await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
   const card = creator.getByRole("region", { name: "Offbeat" });
-  await expect(card.getByRole("button", { name: "Play", exact: true })).toBeVisible();
+  await expect(card.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await expect(creator.getByRole("region", { name: "Leaderboard" }).getByLabel("Board").locator("option")).toHaveText(["Friends", "Book Club"]);
   const creatorFeed = creator.getByRole("region", { name: "Feed" });
   await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
@@ -72,13 +72,14 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   // (M11 11b).
   for (const page of [creator, joiner]) {
     await page.goto("/");
-    await page.getByRole("button", { name: "Play", exact: true }).click();
+    await play(page);
     await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
     await page.getByRole("button", { name: "Answer" }).click();
     await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
-  // After playing, the result is in the card, and the order is the same.
-  await expect(card.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
+  // After playing, the score is in the card, and the order is the same.
+  await creator.goto("/");
+  await expect(card.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
   await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
