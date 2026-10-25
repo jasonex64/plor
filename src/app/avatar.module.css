@@ -1,0 +1,27 @@
+/* Round 7's slots: 30px by a name, 64px in Me's header, the initial on the soft pill colour. */
+.slot {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--soft);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.slot::before {
+  content: attr(data-initial);
+}
+
+.large {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  font-size: 26px;
+}

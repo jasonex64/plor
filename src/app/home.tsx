@@ -18,6 +18,7 @@ import { Comments } from "./comments";
 import { TodayBanner } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
+import { MeStats } from "./me";
 import { errorText, messageForRedirect } from "./messages";
 import { HowToPlay, OffbeatScreen } from "./offbeat";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
@@ -100,6 +101,8 @@ export function Home({ view }: { view?: View }) {
             <Groups />
           ) : view?.kind === "me" ? (
             <>
+              {/* The player's stats (14a-3a), then the account, until the settings sheet takes it (14a-3b). */}
+              <MeStats />
               <Account onSignedOut={() => setMe({ signedIn: false })} />
               {me.admin && <MeAdminLink />}
             </>

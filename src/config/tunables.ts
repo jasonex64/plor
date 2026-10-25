@@ -139,3 +139,7 @@ export const AUTH_LIMITS = {
 // Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md, Numbers): the chart of questions survived covers
 // today and the days before it, this many in all (human, 2026-10-24, M14 L35: "Last 7 days chart").
 export const STATS_CHART_DAYS = 7;
+
+// The Me tab (docs/milestones/M14-14a-3a-me.md, Numbers): how many of the player's rarest answers it shows, from closed
+// days (human, 2026-10-25: "3, from closed days (Recommended)").
+export const RAREST_ANSWERS_SHOWN = 3;

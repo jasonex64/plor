@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
+import { Avatar } from "./avatar";
 import styles from "./leaderboard.module.css";
 import { errorText } from "./messages";
 
@@ -130,7 +131,7 @@ function Entries({ entries }: { entries: LeaderboardEntry[] }) {
     <ol>
       {entries.map((e) => (
         <li key={e.username}>
-          {e.name}
+          <Avatar name={e.name} /> {e.name}
           {e.you && " (you)"}: {e.points === 1 ? "1 point" : `${e.points} points`}
         </li>
       ))}

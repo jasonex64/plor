@@ -121,10 +121,16 @@ test("before playing, the feed names who commented and holds none of their words
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);
   // Beside the name, filler hidden from screen readers, which hear "comment hidden until you play" instead.
-  await expect(item.locator("[aria-hidden='true']")).toHaveText(/^[x ]+$/);
+  await expect(item.locator("[aria-hidden='true']:not([data-initial])")).toHaveText(/^[x ]+$/);
   await expect(item).toContainText("comment hidden until you play");
   // Not in the page at all: the server sends no comment text before the viewer has played (H3).
   expect(await viewer.content()).not.toContain(body);
+  // The locked feed's names carry the avatar slot (docs/milestones/M14-14a-3a-me.md, criterion 6), and so does the
+  // friend's row on the live board.
+  await expect(item.locator("[data-initial='T']")).toHaveCount(1);
+  await viewer.goto("/friends");
+  const row = viewer.getByRole("region", { name: "Friends today" }).getByRole("listitem").filter({ hasText: `td${RUN}:` });
+  await expect(row.locator("[data-initial='T']")).toHaveCount(1);
 });
 
 // Criterion 5.
