@@ -87,7 +87,8 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   await inviter.goto("/friends");
   await signInAndPick(inviter, "iv");
   const board = inviter.getByRole("region", { name: "Friends today" });
-  await expect(board.getByText("Send a friend your invite link to see their runs here.")).toBeVisible();
+  // With no friends, the board says L31's friendlier line (docs/milestones/M14-14a-3a-me.md, criterion 7).
+  await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
   await board.getByRole("button", { name: "Make my invite link" }).click();
   const invite = board.getByRole("region", { name: "Invite friends" });
   const link = await invite.locator("code").innerText();

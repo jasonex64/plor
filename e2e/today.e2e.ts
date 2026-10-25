@@ -2,7 +2,7 @@
 // the feed before playing (names, no words), and Today's columns from phone to desktop.
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -32,21 +32,35 @@ const path = (url: string) => new URL(url).pathname;
 // Criteria 1 and 2.
 test("Offbeat's banner has Play before the run, and the score, how it ended and Result after", async ({ browser }) => {
   const page = await player(browser, "ta");
-  const banner = page.getByRole("region", { name: "Offbeat" });
+  // Today's region, which the game screen's has the same name as: each check below first waits for Today's address,
+  // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
+  const banner = page.getByRole("region", { name: "Offbeat", exact: true });
   await expect(banner.getByText("Don't match the Wind · 7 questions")).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: "Offbeat" }).locator("..");
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
 
-  await banner.getByRole("button", { name: "Play", exact: true }).click();
+  // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/offbeat");
+  await play(page);
+  // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff).
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(banner.getByText("Your run is still going")).toBeVisible();
+  await banner.getByRole("link", { name: "Continue" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/offbeat");
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
+  await nav.getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/#result$/);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await expect(page).toHaveURL(/\/offbeat#result$/);
+  await expect(page.locator("#result")).toBeVisible();
 });
 
 // Criterion 3.
@@ -91,25 +105,32 @@ test("before playing, the feed names who commented and holds none of their words
   await friend.getByRole("button", { name: "Add friend" }).click();
   await expect(friend.getByRole("heading", { name: `You and tc${RUN} are now friends.` })).toBeVisible();
   await friend.goto("/");
-  await friend.getByRole("button", { name: "Play", exact: true }).click();
+  await play(friend);
   await friend.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await friend.getByRole("button", { name: "Answer" }).click();
   const body = `the words ${RUN}`;
   await friend.getByLabel("Comment to your friends").fill(body);
   await friend.getByRole("button", { name: "Post" }).click();
-  await expect(friend.getByRole("region", { name: "Feed" }).getByText(body)).toBeVisible();
+  // Posted on the game screen, whose feed is "Offbeat comments" (14a-2c); Today's below stays "Feed".
+  await expect(friend.getByRole("region", { name: "Offbeat comments" }).getByText(body)).toBeVisible();
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's Offbeat to read 1 comment" })).toHaveAttribute("href", "#offbeat");
+  await expect(feed.getByRole("link", { name: "Finish today's Offbeat to read 1 comment" })).toHaveAttribute("href", "/offbeat");
   const item = feed.getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);
   // Beside the name, filler hidden from screen readers, which hear "comment hidden until you play" instead.
-  await expect(item.locator("[aria-hidden='true']")).toHaveText(/^[x ]+$/);
+  await expect(item.locator("[aria-hidden='true']:not([data-initial])")).toHaveText(/^[x ]+$/);
   await expect(item).toContainText("comment hidden until you play");
   // Not in the page at all: the server sends no comment text before the viewer has played (H3).
   expect(await viewer.content()).not.toContain(body);
+  // The locked feed's names carry the avatar slot (docs/milestones/M14-14a-3a-me.md, criterion 6), and so does the
+  // friend's row on the live board.
+  await expect(item.locator("[data-initial='T']")).toHaveCount(1);
+  await viewer.goto("/friends");
+  const row = viewer.getByRole("region", { name: "Friends today" }).getByRole("listitem").filter({ hasText: `td${RUN}:` });
+  await expect(row.locator("[data-initial='T']")).toHaveCount(1);
 });
 
 // Criterion 5.

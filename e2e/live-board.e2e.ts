@@ -8,7 +8,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, signInAndPick } from "./players";
+import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -83,7 +83,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
   const started = `${playerName}: started (you'll see how it's going once you finish)`;
   await player.goto("/");
-  await player.getByRole("button", { name: "Play", exact: true }).click();
+  await play(player);
   await expect(row).toHaveText(started);
   await player.getByLabel("Your answer").fill(hostAnswer);
   await player.getByRole("button", { name: "Answer" }).click();
@@ -99,15 +99,16 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
   // (7d): the watcher first, then the friend, with the full list behind the row.
   await watcher.goto("/");
-  await watcher.getByRole("button", { name: "Play", exact: true }).click();
+  await play(watcher);
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
   // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
-  // Above the game, the streak: today is the watcher's first day (M11 H4). Beside the one answer, its share: two players
-  // answered question 1, under the minimum of 5 (H5).
-  await expect(watcher.getByText("Streak: 1 day played in a row")).toBeVisible();
+  // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
   await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
+  // Above Offbeat on Today, the streak: today is the watcher's first day (M11 H4).
+  await watcher.goto("/");
+  await expect(watcher.getByText("Streak: 1 day played in a row")).toBeVisible();
   // Yesterday's standings, friends by default (H7), in the leaderboard card (M14 14a-2a): neither played yesterday.
   const leaderboard = watcher.getByRole("region", { name: "Leaderboard" });
   await expect(leaderboard.getByRole("radio", { name: "Yesterday" })).toBeChecked();
@@ -189,7 +190,7 @@ test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "s");
-  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await play(page);
   await page.getByLabel("Your answer").fill(safeAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
@@ -252,13 +253,16 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page, "/");
-  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await openBoard(page, "/offbeat");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
-  // Only the reset loads yesterday's standings again, so once that answers, the page has moved to the new day.
-  const moved = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/leaderboard/yesterday");
+  // Only the reset asks for the game screen's stats again. Every load from the mount is sent before the chart can
+  // draw (Strict Mode sends two in development), so a request sent after the chart is there is the reset's (14a-2c,
+  // criterion 5). The faked clock is the browser's only: the server's day stays the same, so the reload's content
+  // can't show a new day.
+  await expect(page.getByRole("region", { name: "Your Offbeat" }).getByRole("img")).toBeVisible();
+  const moved = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/offbeat");
   await page.clock.fastForward("25:00:00");
   await moved;
-  await expect(page.getByRole("region", { name: "Yesterday" }).getByRole("listitem")).toHaveCount(1);
   await expect(page.getByLabel("Your answer")).toHaveValue("half typ");
 });

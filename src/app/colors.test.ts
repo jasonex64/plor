@@ -10,7 +10,7 @@ const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
 function slots(marker: string): Record<string, string> {
   const start = css.indexOf("{", css.indexOf(marker));
   const block = css.slice(start, css.indexOf("}", start));
-  return Object.fromEntries([...block.matchAll(/--([a-z-]+):\s*(#[0-9a-f]+);/g)].map((m) => [m[1], m[2]]));
+  return Object.fromEntries([...block.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]+);/g)].map((m) => [m[1], m[2]]));
 }
 
 type Rgb = [number, number, number];
@@ -59,7 +59,7 @@ describe("Offbeat's colour", () => {
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {
-    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "edge", "line", "muted", "on-accent", "soft", "surface", "text"]);
+    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "surface", "text"]);
   });
 
   it.each([
@@ -70,6 +70,9 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     ["accent", "bg"],
     ["accent", "surface"],
     ["on-accent", "accent"],
+    // The game screen's Safe and Caught pills (docs/milestones/M14-14a-2b-game-screen.md).
+    ["safe", "safe-bg"],
+    ["caught", "caught-bg"],
   ])("%s on %s is at least 4.5:1", (fg, bg) => {
     expect(ratio(rgb(t[fg]), rgb(t[bg]))).toBeGreaterThanOrEqual(4.5);
   });

@@ -1,0 +1,221 @@
+/* The Me tab's stats (docs/milestones/M14-14a-3a-me.md), sized from round 7's Me boards. */
+.me {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.titled {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/* The totals: two to a row, each its own box, the number above its label. */
+.totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.totals > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.totals dd,
+.stats dd {
+  margin: 0;
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.totals dd {
+  font-size: 26px;
+}
+
+.totals dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* A game's card: three stats in a row. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.stats dd {
+  font-size: 22px;
+}
+
+.stats dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.game {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chip {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--offbeat);
+}
+
+.link {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* The calendar: seven columns, 5px apart, square days with 7px corners. */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.weekday {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.day {
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  border-radius: 7px;
+}
+
+.missed {
+  border: 1.5px solid var(--edge);
+}
+
+.later {
+  border: 1px dashed var(--line);
+}
+
+.today {
+  border: 2px solid var(--text);
+}
+
+.shade1 {
+  background: var(--shade-1);
+}
+
+.shade2 {
+  background: var(--shade-2);
+}
+
+.shade3 {
+  background: var(--shade-3);
+}
+
+.shade4 {
+  background: var(--shade-4);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.rarest {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rarest li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.rarest strong {
+  font-size: 17px;
+}
+
+.rarest .muted {
+  font-size: 13px;
+}

@@ -1,16 +1,20 @@
 "use client";
 
-// Today's Offbeat run: one question at a time, answered by typing (no list, no suggestions: the server reads the
-// text; human, 2026-10-21), a free retry for text that names no entry, 20 seconds per question, a reveal after each
-// answer that waits for Next, points as you go, and a result screen. Above it, the player's streak, and on the result
-// screen how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). Offbeat's banner frames it on
-// Today: Play before, the score and the time to the next puzzle after (docs/milestones/M14-14a-2a-today.md).
+// Offbeat's run (docs/milestones/M14-14a-2b-game-screen.md): on its game screen, /offbeat, the rules and Start, then
+// one question at a time, answered by typing (no list, no suggestions: the server reads the text; human, 2026-10-21),
+// a free retry for text that names no entry, 20 seconds per question, a reveal after each answer that waits for Next,
+// points as you go, and a result with how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). On
+// Today, Offbeat's banner links in: Play before, the score and the time to the next puzzle after
+// (docs/milestones/M14-14a-2a-today.md).
+import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
 import { shareText } from "@/game/share";
+import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { useCountdown } from "./countdown";
+import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
@@ -20,19 +24,25 @@ type RunResponse = { run: RunState } | { run: null; msToReset: number; streak: n
 type NoPuzzle = { msToReset: number; streak: number };
 type AnswerResponse = { run: RunState; notInList: boolean };
 
-// onOver hears whether today's run is over, each time that changes, so the comments can open (M08 8a). onDayOver is
-// called at the reset, midnight Pacific, so the page can move to the new day (docs/milestones/M11-home-screen.md, H6);
-// inPlay says a question or a reveal is in play then, so this game is left alone: a run started before midnight is
-// played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
-export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void }) {
+// What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
+// each time that changes after, so the comments can open (M08 8a). Nothing is reported before the state loads, so a
+// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). onDayOver: the reset, midnight Pacific, so the page can move to the new day
+// (docs/milestones/M11-home-screen.md, H6); inPlay says a question or a reveal is in play then, so the game is left
+// alone: a run started before midnight is played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
+type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void };
+
+// The day's run as the server last gave it, for Today's banner and the game screen alike.
+function useRun({ onOver, onDayOver }: DayHooks) {
   const [run, setRun] = useState<RunState | null>(null);
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
-  useEffect(() => onOver(over), [onOver, over]);
+  const loaded = run !== null;
+  useEffect(() => {
+    if (loaded) onOver(over);
+  }, [onOver, loaded, over]);
 
-  // Stable, so the countdown below doesn't restart when this component re-renders.
+  // Stable, so the countdown below doesn't restart when the component re-renders.
   const load = useCallback(() => {
     api<RunResponse>("/api/run", { method: "GET" }).then(
       (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset, streak: r.streak })),
@@ -48,6 +58,53 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
     const timer = setTimeout(() => onDayOver(run?.status === "in_progress"), msToReset);
     return () => clearTimeout(timer);
   }, [run, noPuzzle, onDayOver]);
+  return { run, setRun, noPuzzle, error, setError, over, load };
+}
+
+// Offbeat on Today: Play opens the game screen, and a run in play is continued there; after it, the score, how it
+// ended, the result and the time to the next puzzle.
+export function TodayBanner(hooks: DayHooks) {
+  const { run, noPuzzle, error, over } = useRun(hooks);
+  if (noPuzzle) {
+    return (
+      <>
+        <Streak days={noPuzzle.streak} />
+        <NoPuzzleBanner msToReset={noPuzzle.msToReset} />
+      </>
+    );
+  }
+  if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
+  return (
+    <>
+      <Streak days={run.streak} />
+      <Banner>
+        {run.status === "not_started" && (
+          <>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
+            <Link href="/offbeat" className={styles.play}>
+              Play
+            </Link>
+          </>
+        )}
+        {run.status === "in_progress" && (
+          <>
+            <p className={styles.line}>Your run is still going</p>
+            <Link href="/offbeat" className={styles.play}>
+              Continue
+            </Link>
+          </>
+        )}
+        {over && <Score run={run} />}
+      </Banner>
+    </>
+  );
+}
+
+// The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
+// stated before the timer runs, WCAG 2.2 2.2.1), with How to play.
+export function Game(hooks: DayHooks) {
+  const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
+  const [busy, setBusy] = useState(false);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -64,41 +121,30 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
     }
   }
 
-  if (noPuzzle) {
-    return (
-      <section>
-        <Streak days={noPuzzle.streak} />
-        <Banner>
-          <p className={styles.line}>There&apos;s no puzzle today.</p>
-          <ResetCountdown label="A new day starts in" msToReset={noPuzzle.msToReset} />
-        </Banner>
-      </section>
-    );
-  }
+  if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
   return (
-    <section>
-      <Streak days={run.streak} />
+    <div className={styles.game}>
+      <Banner>
+        <p className={styles.line}>{longDate(run.date)}</p>
+        {over && <Score run={run} />}
+      </Banner>
       {run.status === "not_started" && (
-        <Banner>
-          <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
-          {/* Play starts the run here until Offbeat's game screen, /offbeat, ships in 14a-2b. */}
-          <button type="button" className={styles.play} disabled={busy} onClick={() => send("/api/run/start")}>
-            Play
-          </button>
-        </Banner>
-      )}
-      {run.status === "in_progress" && <Banner />}
-      {over && (
-        <Banner>
-          <p className={styles.line}>
-            {pointsText(run.points)} + about {run.bonus} bonus · {endedText(run)}
+        <>
+          {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
+              have no constant here; the points come from tunables.ts. */}
+          <p className={styles.rules}>
+            <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
+            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+            {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
-          <a href="#result" className={styles.result}>
-            Result
-          </a>
-          <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
-        </Banner>
+          <button type="button" className={styles.start} disabled={busy} onClick={() => send("/api/run/start")}>
+            Start
+          </button>
+          <Link href="/offbeat/how-to-play" className={styles.secondary}>
+            How to play
+          </Link>
+        </>
       )}
       {run.status === "in_progress" && run.next && (
         <Reveal run={run} busy={busy} onNext={() => send("/api/run/next")} />
@@ -119,8 +165,39 @@ export function Game({ onOver, onDayOver }: { onOver: (over: boolean) => void; o
       )}
       {over && <Result run={run} />}
       {error && <p role="alert">{error}</p>}
-    </section>
+    </div>
   );
+}
+
+function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
+  return (
+    <Banner>
+      <p className={styles.line}>There&apos;s no puzzle today.</p>
+      <ResetCountdown label="A new day starts in" msToReset={msToReset} />
+    </Banner>
+  );
+}
+
+// A finished run in the banner: the score, how it ended, the result's details and the time to the next puzzle. The
+// details are on the game screen, under #result.
+function Score({ run }: { run: RunState }) {
+  return (
+    <>
+      <p className={styles.line}>
+        {pointsText(run.points)} + about {run.bonus} bonus · {endedText(run)}
+      </p>
+      <Link href="/offbeat#result" className={styles.result}>
+        Result
+      </Link>
+      <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
+    </>
+  );
+}
+
+// "Saturday 24 October", as round 5's game screen dates the day. A calendar date, read in UTC so it can't shift by a
+// day.
+function longDate(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 }
 
 // Offbeat's banner: the game's name, then what the day holds for the player.
@@ -167,12 +244,6 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 }
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
-
-// How many of the question's players gave this answer so far (M11 H5). Under 1% doesn't round to a misleading 0%.
-function givenText(share: number | null): string {
-  if (share === null) return "too few players yet";
-  return share < 0.01 ? "under 1% gave this" : `${Math.round(share * 100)}% gave this`;
-}
 
 // After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
 // from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind

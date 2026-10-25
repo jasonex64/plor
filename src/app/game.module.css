@@ -1,5 +1,5 @@
-/* Offbeat's banner on Today (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour until 14c's
-   pixel world, 230px tall on phones and 240px from 768px (the approved mockups). */
+/* Offbeat's banner (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour until 14c's pixel
+   world, 230px tall on phones and 240px from 768px (the approved mockups). */
 .banner {
   box-sizing: border-box;
   min-height: 230px;
@@ -27,12 +27,16 @@
   font-weight: 700;
 }
 
-/* Play: centred at the bottom of the banner (L25), white on the game's colour. */
+/* Play, a link to the game screen: centred at the bottom of the banner (L25), white on the game's colour. */
 .play {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 140px;
   min-height: 48px;
   margin: 0;
-  border: 0;
+  text-decoration: none;
   border-radius: 14px;
   background: var(--on-offbeat);
   color: var(--offbeat);
@@ -60,4 +64,50 @@
   .title {
     font-size: 46px;
   }
+}
+
+/* The game screen (docs/milestones/M14-14a-2b-game-screen.md; round 5): the banner, then the stakes, Start and How to
+   play, full width. */
+.game {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rules {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.start,
+.secondary {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.start {
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.secondary {
+  min-height: 48px;
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
 }

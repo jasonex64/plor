@@ -1,0 +1,216 @@
+/* Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md), sized from round 5's mockup: one column, the run
+   first, then the cards and the feed; from 1200px (L42) the feed moves to a right column, 360px as on Today. */
+.screen {
+  display: grid;
+  gap: 16px;
+  grid-template-areas:
+    "back"
+    "game"
+    "cards"
+    "feed";
+}
+
+.back {
+  grid-area: back;
+  margin: 0;
+  font-weight: 700;
+}
+
+.back a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.game {
+  grid-area: game;
+}
+
+.cards {
+  grid-area: cards;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feed {
+  grid-area: feed;
+}
+
+@media (min-width: 1200px) {
+  /* With a side column the screen takes the page's full width; the 960px column is for pages without one (L43). */
+  :global(main):has(.screen) {
+    max-width: none;
+  }
+
+  .screen {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-areas:
+      "back back"
+      "game feed"
+      "cards feed";
+    align-items: start;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.heading {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.titled {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Three stats side by side: the number above, its label below. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  text-align: center;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+}
+
+.stats dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stats dd {
+  margin: 0;
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.chart figcaption {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Seven bars, each as tall as the questions survived out of 7; a day not played has none, and a dash. */
+.bars {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+  height: 86px;
+}
+
+.bars > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  height: 100%;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.bars i {
+  display: block;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.value {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.answers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.answers li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.safe,
+.caught {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.safe {
+  background: var(--safe-bg);
+  color: var(--safe);
+}
+
+.caught {
+  background: var(--caught-bg);
+  color: var(--caught);
+}
+
+/* Round 3's How to play: 14px between paragraphs, 16px text at 1.45; the page's own column, at most 960px (L43). */
+.how {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.how p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.start {
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
