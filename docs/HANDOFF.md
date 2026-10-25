@@ -41,12 +41,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13e-3's guided questions** (CLAUDE.md, "Ask before designing"): what the second batch covers (places or pop culture from Wikidata, or more WordNet).
+- **13e-3's design** (`docs/milestones/M13-13e-3-knowledge-and-places.md`): approve it. About 20 WordNet knowledge categories, 5 Wikidata place sets (world capitals, US state capitals, US cities, rivers, Canadian provinces; big sets keep entries with an English Wikipedia article), and the four weak lists reworked. Pop culture is 13e-4.
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. Write 13e-3 (the second batch of 20–30 categories, with places or pop culture from Wikidata if the human wants them) as its own sub-ticket file and PR, from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
+1. On the human's approval, build 13e-3 (its Plan: read the query service's manual on sitelinks first, then fetch and measure the five sets) in its own PR, from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
 
 **Shared local database:** another session (M14 layout work, worktree `C:/Users/jason/RIFF-m14`) runs its e2e suite against the same local stack. Message it before a `db reset` or a full suite run.
 
