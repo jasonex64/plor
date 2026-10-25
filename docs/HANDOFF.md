@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## M14 (this branch)
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **Waiting on the human:** nothing for 14a-1. 14a-2 starts with its guided questions (CLAUDE.md, "Ask before designing").
-- **14a-2a, Today, is in review** (`docs/milestones/M14-14a-2a-today.md`): the plain navy banner, one leaderboard card, the locked feed with 3 names, the clock bar above the tabs, Today's columns. Local e2e 27 of 27. Its PR waits on green CI and the human.
+- **14a-2a, Today, is in review** (`docs/milestones/M14-14a-2a-today.md`): the plain navy banner, one leaderboard card, the locked feed with 3 names, the clock bar above the tabs, Today's columns. Local e2e 27 of 27. PR #79 waits on green CI and the human.
 - **Next step:** after 14a-2a merges, 14a-2b's guided questions (how the stats count, yesterday's answers and its security change), then its ticket.
 - **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
 - **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
