@@ -1,6 +1,6 @@
 # M14 14a-3b — Settings, and the friends list on the Friends tab
 
-**Status:** in review (2026-10-25), in its PR from `m14-look-and-feel`, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). Built from the human's answers without a separate draft approval.
+**Status:** in review (2026-10-25), in PR #85 from `m14-look-and-feel`, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). Built from the human's answers without a separate draft approval.
 
 ## Goal
 A gear opens the settings sheet (on phones) or side panel (from 768px): the account's controls, moved off Me, and the two switches, Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account. With it, three answers that change 14a-3a's merged work: the friends list moves to the Friends tab, the rarest answers leave out caught ones, and the calendar's shades reach 3:1.
@@ -184,7 +184,7 @@ Run on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`) 
   - `npm run test:db`: the first full run had `Tests  2 failed | 255 passed (257)`, both in `src/lib/profile.db.test.ts`, which expected the profile without `settings`. Updated, with the `plor_app` settings case added: `Test Files  40 passed (40)`, `Tests  258 passed (258)`.
   - `npm run test:e2e`: `36 passed`, `1 failed`: settings' phone test timed out in sign-in (`players.ts:40`, waiting for "Username"), before any of its own steps. Rerun, `npx playwright test e2e/settings.e2e.ts e2e/account.e2e.ts --repeat-each=3` → `21 passed`. Recorded in ROADMAP as a sign-in flake.
   - `npm run build`: compiled, with `ƒ /api/profile/settings` and `○ /me`.
-  - CI: in the PR.
+  - CI: PR #85.
 
 ## Review
 The `reviewer` agent, in a fresh context, on `origin/main..b567957`. It read the migration, the grant, both routes, the dialog, the shell, the rarest-answers change and the shades, and found no blocking bug in the code; it re-ran tsc, lint and `npm test` (269), and, by the brief, no db or e2e run, which the Evidence above covers.

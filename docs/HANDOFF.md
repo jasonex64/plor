@@ -15,7 +15,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
 
 ### In review
-**14a-3b**, settings (`docs/milestones/M14-14a-3b-settings.md`), in its PR with auto-merge on green CI:
+**14a-3b**, settings (`docs/milestones/M14-14a-3b-settings.md`), in PR #85 with auto-merge on green CI:
 - the gear (top bar on phones, the sidebar's foot from 768px) opens a modal `<dialog>`, sheet or 440px panel, holding the username, display name, the two switches (Skip the game screen, Numbers on the calendar), Privacy policy, Sign out and Delete account;
 - the friends list and the invite link with Reset moved to the Friends tab, with avatar slots;
 - the rarest answers leave caught ones out; the calendar's shades reach 3:1, with a text alternative naming each day;
