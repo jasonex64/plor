@@ -1,6 +1,6 @@
 # M13 13d — The question bank
 
-**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design, its security change and 13e (human, 2026-10-24: "I approve 13d's design, its security change (dropping private.save_questions and its grant), and 13e as the next sub-ticket. Build 13d.").
+**Status:** done (2026-10-24), on PR #75's merge on green CI (human, 2026-10-24: "Merge PR #75 once every CI check is green, then start 13e with guided questions."). The human answered three rounds of guided questions and approved the design, its security change and 13e (human, 2026-10-24: "I approve 13d's design, its security change (dropping private.save_questions and its grant), and 13e as the next sub-ticket. Build 13d.").
 
 ## Goal
 A bank of questions the draft picks each day's 7 from, never asking a category again within 30 days, preferring a date's theme and ordering the day easiest first, so a day can be drafted from a date alone and the human only vetoes.
@@ -72,7 +72,7 @@ Already decided in the M13 ticket: **at least 30 days** between uses, "the AI ma
 - [x] **The bank page** (e2e): an admin sees T1's questions with the day they ran; a player gets 403.
 - [x] **Removed:** `private.puzzle_questions` and `private.save_questions` dropped (pgTAP: `plor_app`'s grants without them); the admin page has no questions box.
 - [x] **The first bank** holds T1's 7 questions, and `npm run draft -- 2026-10-24 --questions <T1's ids>` reproduces T1's file.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass. CI on PR #75 at `cb22ace`: check, db, e2e, secrets and Vercel all pass (runs 40167848914 and 40167872213).
 
 ## Out of scope
 - Growing the categories (13e).
