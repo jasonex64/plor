@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
   - **13a-1** (the base, imports, admin lookup, credits) is merged (PR #70).
-  - **13a-2 is merged** (PR #71), with 13a-3 folded in and its security change approved by the human. It holds:
+  - **13a is done.** 13a-2 is merged (PR #71), with 13a-3 folded in and its security change approved by the human. It holds:
     - format 3: a day names categories and is resolved as of its approval;
     - the game engine on the base;
     - deterministic thing IDs;
@@ -28,12 +28,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13b's guided questions** (CLAUDE.md, "Ask before designing").
+- **13b's design** (`docs/milestones/M13-13b-learning-from-misses.md`): approve it, the LDNOOBW row for SOURCES.md and its security change.
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13b, learning from misses: finish the guided questions, write its criteria in a sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
+1. 13b, learning from misses: the guided questions are answered and the design is in its sub-ticket. On the human's approval, measure the WordNet noun load first (its hypothesis), then build on `m13-answer-lists-and-content` (the branch stays for M13) and open its PR.
 
 Until the human asks, there are no content days, staging or `db push`.
 
