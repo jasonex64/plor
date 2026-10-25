@@ -1,6 +1,6 @@
 # M14 14a-2c — 14a-2b's review fixes
 
-**Status:** in review (2026-10-25). Built from the human's overnight answers without a separate draft approval (human, 2026-10-25: "Start the overnight plan now: follow HANDOFF.md, building each sub-ticket from my answers without waiting for my approval of the draft, and merging on green CI"; HANDOFF.md, Overnight plan: "Review fixes, then 14a-3 (Recommended)").
+**Status:** in review (2026-10-25), PR #82. Built from the human's overnight answers without a separate draft approval (human, 2026-10-25: "Start the overnight plan now: follow HANDOFF.md, building each sub-ticket from my answers without waiting for my approval of the draft, and merging on green CI"; HANDOFF.md, Overnight plan: "Review fixes, then 14a-3 (Recommended)").
 
 ## Goal
 Fix the six items that 14a-2b's review deferred to ROADMAP, For M14, before 14a-3 builds on the game screen.

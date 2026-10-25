@@ -9,7 +9,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
 - **14a-2b is done:** merged in PR #81 on green CI, 2026-10-25.
-- **14a-2c, the review fixes, is in review** (`docs/milestones/M14-14a-2c-review-fixes.md`): reviewed and its blocking findings fixed; it merges on green CI.
+- **14a-2c, the review fixes, is in review in PR #82** (`docs/milestones/M14-14a-2c-review-fixes.md`): reviewed and its blocking findings fixed; it merges on green CI.
 - **Next step:** the overnight plan below.
 
 ## Overnight plan (human, 2026-10-25, before sleeping)
