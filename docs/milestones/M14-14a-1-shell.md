@@ -16,7 +16,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Sub-ticket | What it holds | Needs from the human |
 |---|---|---|
 | **14a-1** (this file) | Colour slots (Paper and Night, following the device), fonts, the tab bar and sidebar, a page per tab with today's sections moved onto it, CSS Modules recorded in DECISIONS.md | This ticket's approval |
-| **14a-2** | The bar back to a question left in play, with its seconds left (L18; proposed, for the human's OK); Today (game banners, side by side on desktop and swiped on phone, L22, L38), Offbeat's game screen (L25) with its rules line, stats (L35) and yesterday's answers (L34), the locked feed showing who commented (L40), the one leaderboard card (L41), the right column from 1200px (L42) | Approval of the security change for L34 (closed days' host answers to every signed-in player) |
+| **14a-2** | The bar back to a question left in play, with its seconds left (L18; the human, 2026-10-25: "Yes, put L18's clock … in 14a-2"); Today (game banners, side by side on desktop and swiped on phone, L22, L38), Offbeat's game screen (L25) with its rules line, stats (L35) and yesterday's answers (L34), the locked feed showing who commented (L40), the one leaderboard card (L41), the right column from 1200px (L42) | Approval of the security change for L34 (closed days' host answers to every signed-in player) |
 | **14a-3** | Me (L45: totals, calendar with its numbers setting L46, a card per game, rarest answers), the settings sheet and side panel (L44), the skip setting (L39), How to play (L29), the empty states (L31), the avatar slots (L37) | A security change: players update their own settings columns (a migration and a grant) |
 | **14b-1** | Themes: the five presets plus Follow the device (L20, L21, L47), saved on the account, loaded without a flash | A security change (the theme column), and each preset's full colour set |
 | **14b-2** | The sprout streak (L26), the admin pages (L19), and the polish from the design reviews | — |
@@ -57,7 +57,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 - Restyling the sections themselves: they move onto their tabs as they are, and 14a-2 and 14a-3 lay them out.
 - The settings gear and sheet, the streak in the top bar, avatars, and the right column. These come in 14a-2, 14a-3, 14b-2 and the avatars ticket (L37).
 - Themes beyond Paper and Night (14b-1).
-- The bar back to a question left in play, with its seconds left (L18, "Keep it, show the clock"): proposed for 14a-2, which lays out Today and the game screen, for the human's OK. Until then a player who leaves mid-question can time out unwarned, as before 14a-1 on any page.
+- The bar back to a question left in play, with its seconds left (L18, "Keep it, show the clock"): in 14a-2, which lays out Today and the game screen (the human, 2026-10-25: "Yes, put L18's clock (the bar back to a question left in play, with its seconds left) in 14a-2."). Until then a player who leaves mid-question can time out unwarned, as before 14a-1 on any page.
 - The sign-in and pick-a-username screens: they keep their current content. M02 2c's intro text stays in the served HTML for signed-out visitors, which Google's brand check needs.
 
 ## Numbers
@@ -154,7 +154,7 @@ The `reviewer` agent reviewed 14a-1's diff in a fresh context (2026-10-25).
   1. The navigation sat inside `<main>`, so the Me tab's Admin check matched the sidebar's link too, and the tabs were inside the main landmark. Fixed: `Shell` renders into `<body>` beside `<main>` (`createPortal`).
   2. The base button rules hid the browser's disabled look. Fixed: a `button:disabled` rule (muted text, no pointer).
   3. The soft pill's alphas and the shell's sizes had no recorded origin. Fixed: two rows in Numbers (the approved mockups).
-  4. L18's clock was neither built nor deferred. Fixed: Out of scope names it, proposed for 14a-2, for the human's OK.
+  4. L18's clock was neither built nor deferred. Fixed: Out of scope names it; the human put it in 14a-2 (2026-10-25).
   5. The focus test checked one link at one size and not the colour or offset. Fixed: it tabs through every link in the tab bar (360px) and the sidebar with Admin (1440px), checking width, style, colour and offset.
   6. DECISIONS.md's Styling row had no Log line. Fixed.
   7. ROADMAP's M14 row was stale and still said settings stay on the account page. Fixed.

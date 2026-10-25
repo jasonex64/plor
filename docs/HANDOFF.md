@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## M14 (this branch)
 - **14a-1, the shell, is in review** (`docs/milestones/M14-14a-1-shell.md`): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's blocking findings are fixed; its other findings are in ROADMAP, For M14. PR #77; waiting on green CI and the human.
 - **Local e2e** passed 20 of 21. The one failure, approving a drafted day, is because the shared local database already holds M13 13d's migration, which drops a table this branch's admin page reads. After 13d merges, merge main into this branch.
-- **Waiting on the human:** the PR, and an OK to put L18's clock (the bar back to a question left in play) in 14a-2.
+- **Waiting on the human:** the PR (green CI, then the human's OK to merge). L18's clock is in 14a-2 (human, 2026-10-25).
 - **Next step:** after 14a-1 merges, write 14a-2's file (Today and the game screen) from the split in the 14a-1 ticket.
 - **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
 - **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
