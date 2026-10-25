@@ -10,7 +10,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
 - **14a-2b is done:** merged in PR #81 on green CI, 2026-10-25.
 - **14a-2c is done:** merged in PR #82 on green CI, 2026-10-25.
-- **14a-3a, Me, is built and in review** (`docs/milestones/M14-14a-3a-me.md`).
+- **14a-3a, Me, is in review in PR #83**, merging on green CI (`docs/milestones/M14-14a-3a-me.md`).
 - **Next step:** the overnight plan below.
 
 ## Overnight plan (human, 2026-10-25, before sleeping)
