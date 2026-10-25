@@ -59,6 +59,7 @@ Earlier decisions this builds: L25 (Play opens a separate game screen with How t
 | 7 questions, 20 seconds, 25 to 350 points | The rules line and How to play | DECISIONS.md, Game 1 |
 | The page's sizes: cards 14px padding and radius, the chart 86px tall, stat numbers 24px, Start 52px, How to play 48px | Layout | Round 5's game screen (the approved mockups) |
 | The average to one decimal, out of 7 ("5.2/7"); the best score with a thousands comma ("1,050") | The stats | Round 5's game screen |
+| Safe and Caught pills: Paper `--safe` #14532D on `--safe-bg` #E3F4EA (8.0:1), `--caught` #8A1C26 on `--caught-bg` #FBE4E6 (7.6:1); Night #9BE3B4 on #1F3B2A (8.2:1), #FFB3B8 on #4A1F24 (8.2:1) | Yesterday's answers | Round 5's game screen, both themes (its light and dark palettes, `safeBg`/`safeFg`/`caughtBg`/`caughtFg`); ratios by WCAG 2.2's formula, checked in `src/app/colors.test.ts` |
 | The feed's column, 360px from 1200px | Desktop | As Today's right column (14a-2a, L42) |
 
 ## Plan
@@ -101,6 +102,7 @@ Run on the Windows checkout against the local stack, 2026-10-25.
   - `today.e2e.ts`: Play is a link to `/offbeat`; the score and Result are on Today after the run; Result opens `/offbeat#result`; the feed's link goes to `/offbeat`.
   - `shell.e2e.ts`: Today is current on `/offbeat`; the clock bar isn't on the game screen; its Back goes to `/offbeat` and its Result to `/offbeat#result`.
   - `groups`, `live-board` and `approve-and-play` play through `play()` in `e2e/players.ts`.
+- **After the review**, with the Continue step: `npx playwright test e2e/today.e2e.ts` → `4 passed (1.4m)`.
 - **Contrast** of the Safe and Caught pills in Paper and Night: `npx vitest run src/app/colors.test.ts` → `Tests  30 passed (30)`.
 - **Criterion 8:**
   - `npx tsc --noEmit -p .`: no output.
@@ -113,5 +115,14 @@ Run on the Windows checkout against the local stack, 2026-10-25.
   - CI: with the PR.
 
 ## Review
+The `reviewer` agent, in a fresh context, on `515e7b5..17fb445`. It found no leak in the security change: only `private.today() - 1` is read, a run in progress is answered with `in_play` before any answer is read, and `plor_app`'s grants cover the reads and the settling. It re-ran the route db test (7 passed), the contrast test (30), `npm test` (254), lint and tsc.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - Today's "Your run is still going" and **Continue** had no test. `today.e2e.ts`'s first case now goes to Today with the question in play, checks the line, and continues the run through Continue.
+  - The eight pill colours had no origin in Numbers. They are now recorded there, from round 5's light and dark palettes, with their ratios.
+- Deferred to ROADMAP "Next revision" (For M14):
+  - The rules line and How to play type the game's numbers instead of reading tunables.
+  - The live-board reset test's weak check after the reset.
+  - `/api/offbeat` is loaded twice for a run that's already over.
+  - The smaller sizes aren't in Numbers.
+  - Start climbing shows after the run has started.
+  - "Feed" vs "Offbeat comments".

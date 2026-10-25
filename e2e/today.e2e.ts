@@ -41,11 +41,17 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
   await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/offbeat");
   await play(page);
+  // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff).
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Today" }).click();
+  await expect(banner.getByText("Your run is still going")).toBeVisible();
+  await banner.getByRole("link", { name: "Continue" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/offbeat");
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
+  await nav.getByRole("link", { name: "Today" }).click();
   await expect(banner.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();

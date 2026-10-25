@@ -229,6 +229,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The card dates Yesterday "Fri 23 Oct" and This week "From Mon, Oct 19": one style. Found in M14 14a-2a (review).
 - [ ] `NOTHING` (a countdown's no-op) is defined in `game.tsx` and `shell.tsx`; one in `countdown.ts`. Found in M14 14a-2a (review).
 - [ ] The leaderboard card's chosen period differs by fill and text colour only; the tabs add bold. Found in M14 14a-2a (review).
+- [ ] The game screen's rules line and How to play type out the game's numbers (20 seconds, 25 up to 350 points, seven questions, letters stolen on questions 2, 4, 5 and 7) that `src/config/tunables.ts` holds; read them from there so they can't drift (M14 14a-2b review)
+- [ ] `e2e/live-board.e2e.ts`'s reset test on the game screen checks only that Your Offbeat is still there after the reset, which it was before; check new-day content, as the old check of yesterday's list did (M14 14a-2b review)
+- [ ] The game screen loads `/api/offbeat` (and settles) twice for a run that's already over, because its cards are keyed on `runOver`, which goes false then true; key them on the run ending during the visit instead (M14 14a-2b review)
+- [ ] Record the game screen's smaller sizes (font sizes 11–20px, How to play's 640px width, the gaps) in 14a-2b's Numbers as round 5's, as 14a-2a recorded its card spacing (M14 14a-2b review)
+- [ ] How to play's Start climbing shows even when today's run is in progress or over; it then just opens the game screen. Show it only before the run (M14 14a-2b review)
+- [ ] The game screen's comments keep the feed's heading, "Feed"; round 5 heads them "Offbeat comments" (M14 14a-2b, Source diff)
 - [ ] `groups.e2e.ts`'s `openLive` waits on the first Realtime socket, and Today now opens two from 768px; it could catch the wrong one. Found in M14 14a-2a (review).
 
 **For M15 (launch):**
