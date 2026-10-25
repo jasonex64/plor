@@ -105,6 +105,7 @@ Filled in once L1–L15 are answered. Each screen in Scope gets one criterion, c
 | How many presets: 5 | Themes | L21, picked by Claude when the human left it to Claude, 2026-10-24 |
 | Sprout stages: 1–4, 5–14, 15–29, 30+ days | The streak symbol | L26, human, 2026-10-24 |
 | Breakpoints: 768px (tab bar below, sidebar above), 1200px (right column from here up) | Layout | L42, picked by Claude when the human asked for a suggestion, 2026-10-24 |
+| Control outline (`--edge`): #8A8A84 in Paper, #6E6E6A in Night, at least 3:1 against the background and cards (WCAG 2.2, 1.4.11) | Chips, secondary buttons, inputs, switches | Proposed by the design review, approved by the human, 2026-10-24: "Approve the control outline colours: #8A8A84 in Paper, #6E6E6A in Night." The other presets get their own edge colour when their full colour sets are written |
 | Content column at most 960px when a page has no side column | Layout | L43, Claude, 2026-10-24 |
 | Reflow floor: 320px | Layout | WCAG 2.2, 1.4.10 (SOURCES.md) |
 

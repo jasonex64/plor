@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## M14 (this branch)
 - **14a and 14b are in guided questions and mockup review.** L3–L5, L9, L10 and L16–L43 are answered in `docs/milestones/M14-look-and-feel.md`; WCAG 2.2 is pinned in SOURCES.md.
 - **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ): fonts, accents, themes, phone rounds 2 and 3, desktop round 4, and desktop round 5 (after an impeccable critique, 23/36, and audit, 14/20, of round 4). The human edits and moves boards there too, so read a board before republishing it.
-- **Open from the audit:** the darker control outline (`--edge`, Paper #8A8A84, Night #6E6E6A, about 3.3:1) is a reviewer's candidate, not yet approved. The phone boards still need round 5's fixes (avatar slots, one board, the locked-comment look, focus rings).
+- **Open from the audit:** The phone boards still need round 5's fixes (avatar slots, one board, the locked-comment look, focus rings).
 - **Waiting on the human:** review of desktop round 5, then the sub-ticket split. Claude's proposal: 14a-1 colour slots, fonts and navigation (tab bar and sidebar, a page per tab); 14a-2 Today and the game screen; 14a-3 Friends, Groups, Account and the empty states; 14b-1 themes on the account (a migration and a grant: a security change); 14b-2 the sprout and the admin pages. The human answered "can we do desktop layout first" before choosing.
 - **Next step:** after the split is chosen, write the first sub-ticket's file (copy `_TEMPLATE.md`) with its criteria, and record CSS Modules in DECISIONS.md with the first build PR (L33).
 - **Wording** in the mockups is provisional (L32).
