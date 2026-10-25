@@ -1,6 +1,6 @@
 // The admin puzzle page's server work (docs/milestones/M06-puzzle-entry.md). Drafted days are the content files a
-// Claude session committed (DECISIONS.md: Puzzle drafting); saved questions and approved days are in the database,
-// written only through private.save_questions and private.approve_puzzle, which check the admin themselves.
+// Claude session committed from the question bank (DECISIONS.md: Puzzle drafting; M13 13d); approved days are in the
+// database, written only through private.approve_puzzle, which checks the admin itself.
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
@@ -31,8 +31,6 @@ export function readDrafts(): Map<string, Puzzle> {
 export type QuestionView = { prompt: string; category: string; steals: string | null; hostAnswers: string[]; hostBank: Named[] };
 export type DayView = {
   date: string;
-  // The questions an admin saved for the day, if any.
-  questions: string[] | null;
   // The drafted day from the content files, if one exists.
   draft: QuestionView[] | null;
   // The approved day players get, if any.
@@ -51,27 +49,21 @@ function view(puzzle: Puzzle, names: Names): QuestionView[] {
   }));
 }
 
-// Every day from today on that has saved questions, a draft or an approved puzzle, oldest first.
+// Every day from today on that has a draft or an approved puzzle, oldest first.
 export async function listDays(db: Db, drafts: Map<string, Puzzle>): Promise<{ today: string; days: DayView[] }> {
   const today = (await db.query<{ today: string }>("select private.today()::text as today")).rows[0].today;
-  const saved = await db.query<{ date: string; prompts: string[] }>(
-    "select puzzle_date::text as date, prompts from private.puzzle_questions where game_id = $1 and puzzle_date >= private.today()",
-    [GAME_ID],
-  );
   const live = await db.query<{ date: string; content: Puzzle }>(
     "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date >= private.today()",
     [GAME_ID],
   );
-  const questions = new Map(saved.rows.map((r) => [r.date, r.prompts]));
   const approved = new Map(live.rows.map((r) => [r.date, r.content]));
-  const dates = new Set([...questions.keys(), ...approved.keys(), ...[...drafts.keys()].filter((d) => d >= today)]);
+  const dates = new Set([...approved.keys(), ...[...drafts.keys()].filter((d) => d >= today)]);
   const names = await thingNames(db, [...dates].flatMap((d) => [drafts.get(d), approved.get(d)].flatMap((p) => p?.questions.flatMap((q) => q.host_bank) ?? [])));
   const days = [...dates].sort().map((date) => {
     const draft = drafts.get(date);
     const puzzle = approved.get(date);
     return {
       date,
-      questions: questions.get(date) ?? null,
       draft: draft ? view(draft, names) : null,
       live: puzzle ? view(puzzle, names) : null,
       started: puzzle !== undefined && date <= today,
@@ -88,10 +80,6 @@ function guarded(err: unknown): never {
     if (err.code === "OB004") throw new AppError("puzzle_started", 409);
   }
   throw err;
-}
-
-export async function saveQuestions(db: Db, userId: string, date: string, prompts: string[]): Promise<void> {
-  await db.query("select private.save_questions($1, $2, $3::date, $4)", [userId, GAME_ID, date, prompts]).catch(guarded);
 }
 
 // Approves a day, or returns the problems private.approve_puzzle found against the base (OB009), one per question as it

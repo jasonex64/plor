@@ -70,7 +70,6 @@ const MESSAGES: Record<string, string> = {
   admins_only: "This page is for admins only.",
   not_available: "There's no report for that day yet.",
   // Puzzle entry (docs/milestones/M06-puzzle-entry.md).
-  questions_invalid: "Fill in all 7 questions.",
   day_past: "That day is over.",
   puzzle_started: "That day has started, so its puzzle can't change.",
   no_draft: "There's no drafted puzzle for that day yet.",

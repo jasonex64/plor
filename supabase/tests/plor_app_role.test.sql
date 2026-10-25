@@ -66,7 +66,8 @@ create function pg_temp.grants(who text) returns text[] language sql return (
   ) as held);
 select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
-  -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
+  -- Puzzle entry (M06): an admin's approval goes through a guarded function, never the table (M13 13d dropped the
+  -- questions an admin typed, and their function).
   'private.approve_puzzle(uuid,jsonb) execute',
   -- The audit of what was learned from misses (M13 13b): admin-only functions read it, count what waits, and decide.
   'private.audit_decide(uuid,bigint,text,uuid) execute', 'private.audit_list(uuid) execute', 'private.audit_open_count(uuid) execute',
@@ -108,7 +109,6 @@ select is(pg_temp.grants('plor_app'), array[
   'private.profile.display_name update', 'private.profile.user_id insert', 'private.profile.username insert',
   'private.profile.username update',
   'private.puzzle select',
-  'private.puzzle_questions select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it
   -- was opened with Next (13c-4).
   'private.question_deadline(timestamp with time zone) execute',
@@ -124,7 +124,6 @@ select is(pg_temp.grants('plor_app'), array[
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
-  'private.save_questions(uuid,text,date,text[]) execute',
   'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.thing_names(uuid[]) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');

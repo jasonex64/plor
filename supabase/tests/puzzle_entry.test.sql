@@ -1,5 +1,5 @@
 -- Puzzle entry's guarded functions (docs/milestones/M06-puzzle-entry.md; migrations 20261021232903_puzzle_entry.sql,
--- 20261024213853_answer_engine.sql and 20261025042950_rarity_and_the_host.sql), whoever calls them: only an admin may save questions or approve a day, a past day
+-- 20261024213853_answer_engine.sql and 20261025042950_rarity_and_the_host.sql), whoever calls them: only an admin may approve a day, a past day
 -- is refused, a day that has started can't change, and a format-3 day must hold up against the answer database. They're
 -- called as the test's own role, which can't SET ROLE plor_app locally; that plor_app may only execute them, never write
 -- the tables, is checked by plor_app_role.test.sql and game.test.sql.
@@ -8,7 +8,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(18);
+select plan(13);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000e601', 'm06-admin@example.test'),
@@ -41,14 +41,6 @@ create function pg_temp.day(p_date date, p_bank text[], p_hosts text[], p_steals
 create temp table ids as select '00000000-0000-5000-8000-0000000e6101' as dog, '00000000-0000-5000-8000-0000000e6102' as cat,
   '00000000-0000-5000-8000-0000000e6103' as crab, '00000000-0000-5000-8000-0000000e6104' as rock;
 
-select throws_ok($$select private.save_questions('00000000-0000-0000-0000-00000000e602', 'offbeat', (select ahead from d), array['a','b','c','d','e','f','g'])$$,
-  'OB007', null, 'a player who is not an admin cannot save questions');
-select lives_ok($$select private.save_questions('00000000-0000-0000-0000-00000000e601', 'offbeat', (select ahead from d), array['a','b','c','d','e','f','g'])$$,
-  'an admin saves a future day''s questions');
-select is((select prompts[7] from private.puzzle_questions where game_id = 'offbeat' and puzzle_date = (select ahead from d)), 'g',
-  'the questions are stored');
-select throws_ok($$select private.save_questions('00000000-0000-0000-0000-00000000e601', 'offbeat', (select past from d), array['a','b','c','d','e','f','g'])$$,
-  'OB008', null, 'questions for a day that is over are refused');
 
 select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e602', pg_temp.day((select ahead from d), array[(select dog from ids)], array[(select dog from ids)]))$$,
   'OB007', null, 'a player who is not an admin cannot approve a day');
@@ -93,8 +85,6 @@ select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-000000
 insert into private.puzzle (game_id, puzzle_date, content)
   select 'offbeat', private.today(), jsonb_build_object('game_id', 'offbeat', 'date', private.today()::text)
   where not exists (select from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today());
-select throws_ok($$select private.save_questions('00000000-0000-0000-0000-00000000e601', 'offbeat', private.today(), array['a','b','c','d','e','f','g'])$$,
-  'OB004', null, 'questions for a day that has started are refused');
 select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day(private.today(), array[(select dog from ids)], array[(select dog from ids)]))$$,
   'OB004', null, 'a day that has started cannot be approved again');
 
