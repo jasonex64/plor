@@ -1,6 +1,6 @@
 # M15 15c — An Admin link for admins
 
-**Status:** drafted for approval (2026-10-24), from the human's guided answers. No code yet.
+**Status:** closed, not built: M14 14a-1 does it instead (human, 2026-10-24, in the M14 session: "14a-1 does it, close 15c (Recommended)"; `docs/milestones/M14-look-and-feel.md`, L49). 14a-1 puts one `admin` flag on `GET /api/profile` and the link in the sidebar and, on phones, on the Me tab. The design below is kept for the record.
 
 ## Goal
 An admin finds the admin pages from the account page, without typing `/admin`.

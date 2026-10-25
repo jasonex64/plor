@@ -6,7 +6,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## M15 (this branch)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
-- **15c, an Admin link on the account page,** is drafted for approval (`docs/milestones/M15-15c-admin-link.md`). M14's Me tab should carry it.
+- **15c is closed, not built:** M14 14a-1 adds the Admin link (sidebar, and the Me tab on phones) with an `admin` flag on `GET /api/profile` (human, 2026-10-24; M14 ticket L49). Until 14a-1 lands, an admin types `plor.app/admin`.
 - **Storage** (DECISIONS.md Log): Free plan for now, the answer database grows freely, the human warned near 500 MB. Supabase's pricing page (read 2026-10-24) waits on the human's OK to go into SOURCES.md.
 - **plor.app admin, for the human** (they chose "On plor.app"): (1) in the SQL editor, delete the format-1 days with their runs: `delete from private.run where game_id = 'offbeat' and puzzle_date in ('2026-10-19', '2026-10-20');` then the same for `private.puzzle` (a run's answers, misses, openings, comments, reactions and points go with it); (2) `npx.cmd supabase migration list --linked`, `npx.cmd supabase db push` (the 3 M13 migrations), `npx.cmd supabase test db --linked`; (3) `insert into private.admin (user_id) select id from auth.users where email = '<their sign-in email>';`. No puzzle or answer data goes up: plor.app stays without a game until launch.
 
