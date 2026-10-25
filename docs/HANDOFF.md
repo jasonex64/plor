@@ -2,53 +2,44 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, on `m14-look-and-feel`, by the session doing M14's layout while another session builds M13 13b on `m13-answer-lists-and-content` (human: "while the other session works on database and answer generating can we do the layout stuff here"). The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-25, on `m14-look-and-feel` (merged with main after 13b), by the session doing M14's layout while another session builds M13 13c on `m13-answer-lists-and-content` (human: "while the other session works on database and answer generating can we do the layout stuff here"). The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch)
-- **14a and 14b are in guided questions and mockup review.** L3–L5, L9, L10 and L16–L47 are answered in `docs/milestones/M14-look-and-feel.md`; WCAG 2.2 is pinned in SOURCES.md.
-- **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ): fonts, accents, themes, phone rounds 2 and 3, desktop round 4, and desktop round 5 (after an impeccable critique, 23/36, and audit, 14/20, of round 4). The human edits and moves boards there too, so read a board before republishing it.
-- **Phone round 6** brings round 5's fixes to the phone: Today, the game screen, Friends and Account. **Round 7** turns Account into the Me tab (stats) with settings in a sheet or side panel behind a gear (L44, L45).
-- **Waiting on the human:** approval of the split and of 14a-1 (`docs/milestones/M14-14a-1-shell.md`), and an OK to add the Next.js CSS, fonts and layouts pages to SOURCES.md.
-- **Next step:** on approval, build 14a-1 on this branch and open its PR.
-- **Wording** in the mockups is provisional (L32).
-- **impeccable** (a design-review skill the human installed) is used only when the human asks (human, 2026-10-24: "Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout ("Keep local, ignored").
-- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed. Nothing is pushed yet.
+- **14a-1, the shell, is built** (`docs/milestones/M14-14a-1-shell.md`, approved by the human with the split): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). Lint, types, the unit tests and the build pass.
+- **Its e2e run is waiting** for the local database: another session reset it mid-run (`private` schema gone), and the human chose to wait for the M13 session to rebuild it. The account and admin-base suites passed before the reset. Then: rerun `npm run test:e2e`, the reviewer, and the PR.
+- **Decisions** L3–L5, L9, L10 and L16–L49 are answered in `docs/milestones/M14-look-and-feel.md`. The split (14a-1 to 14c) is in the 14a-1 ticket. L48 (credits and an AI disclosure) is proposed for 14b-1.
+- **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).
+- **impeccable** (a design-review skill the human installed) is used only when the human asks ("Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout.
+- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` (with its own `node_modules` and a copy of the local-stack `.env.local`), so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed. Nothing is pushed yet.
 
 ## Where things stand
-- **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
-  - **13a-1** (the base, imports, admin lookup, credits) is merged (PR #70).
-  - **13a-2 is merged** (PR #71), with 13a-3 folded in and its security change approved by the human. It holds:
-    - format 3: a day names categories and is resolved as of its approval;
-    - the game engine on the base;
-    - deterministic thing IDs;
-    - `npm run draft` and the T1 day, `content/offbeat/2026-10-24.json`;
-    - format 2 and its scripts and drafts retired.
-
-  - **After 13a:**
-    - 13b, learning from misses: auto-accept at 1% with 3 players, the facts check, the audit page;
-    - 13c, rarity from play, levels, the dodging host, 3 familiar answers;
-    - 13d, the question bank and tuning to Gentle, 3%→20%.
-- **New Next revision items** (ROADMAP, For M13):
-  - "dog" is in the base twice: WordNet's links Wikidata's concept, not the taxon;
-  - "China" is missing as an alias;
-  - the bonus is near its maximum in huge categories;
-  - for the human before M15's push: the hosted format-1 days;
-  - from the 13a-2 review: matching edge cases, approval against a moving base, the walks in more places, and smaller test gaps.
+- **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md`, `M13-13a-the-base.md` and `M13-13b-learning-from-misses.md`.
+  - **13a is done** (PRs #70 and #71).
+  - **13b, learning from misses, is merged** (PR #72), with the human's approval of its design and its security change. It holds:
+    - misses counted per category and decided at 3 players and 1%: accepted, held (LDNOOBW), rejected (the facts) or near-typo;
+    - answers fixed at the day's start;
+    - `/admin/audit` with undo for every decision that made an answer, and "N to review" on the admin pages;
+    - all of WordNet's nouns and Wikidata's places of 100,000+ people for the facts check (the base is 195 MB locally);
+    - `npm run base -- load all`.
+  - **Next: 13c,** rarity from play, levels, the dodging host and 3 familiar answers. Then 13d, the question bank and tuning to Gentle, 3%→20%.
+- **New Next revision items** (ROADMAP):
+  - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
+  - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
 - **M15 15b (zod) is merged.** Dependabot alert #1 still showed `open` after the merge. Check it, and dismiss it as fixed if it stays.
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13b's guided questions** (CLAUDE.md, "Ask before designing").
+- **13c's guided questions** (CLAUDE.md, "Ask before designing").
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13b, learning from misses: finish the guided questions, write its criteria in a sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
+1. 13c, rarity and the host: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
 
 Until the human asks, there are no content days, staging or `db push`.
 
 ## Local state
-- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024213853_answer_engine.sql`, and the answer database loaded from the snapshots (with computed IDs). `.env.local` points at it. **The snapshots** (about 16 MB in `data/snapshots/`, gitignored) are what `npm run base -- load` reads. A machine without them runs `npm run base -- fetch <set>` first; the committed manifests in `data/manifests/` record what each one was. Load order: wikidata-animals, wikidata-dog-breeds, oewn-animals, the others, then usda-cheese after oewn-cheese. The animal load needs `node --max-old-space-size=4096` (run the script directly, as in the ticket's Evidence). The database tests need **today free** for the fixture day: a real day approved for today locally makes them refuse (`src/test/puzzles.ts`). No dev server is left running, and no temporary test files are left.
+- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261025002908_learning_from_misses.sql`, and the answer database loaded from the snapshots by `npm run base -- load all`, places and WordNet's nouns included (195 MB). `.env.local` points at it. **The snapshots** (`data/snapshots/`, gitignored) are what `npm run base -- load` reads. A machine without them runs `npm run base -- fetch <set>` first; the committed manifests in `data/manifests/` record what each one was. `npm run base -- load all` loads every set in order (13b). The database tests need **today free** for the fixture day: a real day approved for today locally makes them refuse (`src/test/puzzles.ts`). No dev server is left running, and no temporary test files are left.
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
 - The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.

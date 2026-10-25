@@ -1,0 +1,9 @@
+{
+  "set": "oewn-nouns",
+  "source": "oewn",
+  "snapshot": "2026-10-25",
+  "retrieved_at": "2026-10-25T00:15:27.210Z",
+  "method": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025-json.zip: every noun.*.json, synset 00001740-n (\"entity\") and everything under it, merged with oewn-animals and oewn-cheese by synset ID, for 13b's facts check",
+  "items": 71864,
+  "sha256": "f8ddff086ce8159e4acf464aa86e036329f97541d83b14fabe9d923033c700a8"
+}

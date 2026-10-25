@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-places",
+  "source": "wikidata",
+  "snapshot": "2026-10-25",
+  "retrieved_at": "2026-10-25T03:23:12.080Z",
+  "method": "SPARQL: items with a population (P1082) of at least 100000 in any statement, and an English label",
+  "items": 30313,
+  "sha256": "b1a5f43581b47f435aaef5d493cb371c18901e59fdb6e193ce3ff514dc925995"
+}

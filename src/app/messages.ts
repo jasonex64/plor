@@ -75,6 +75,8 @@ const MESSAGES: Record<string, string> = {
   puzzle_started: "That day has started, so its puzzle can't change.",
   no_draft: "There's no drafted puzzle for that day yet.",
   puzzle_invalid: "The puzzle breaks a content rule. See the problems listed.",
+  // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md).
+  audit_invalid: "That decision no longer fits this answer. Reload the page.",
 };
 
 export function messageFor(code: string): string {

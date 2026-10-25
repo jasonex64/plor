@@ -1,7 +1,8 @@
 "use client";
 
 // Looking a thing up in the answer database (docs/milestones/M13-13a-the-base.md): by any of its names, with its
-// aliases, where it came from, its facts and the categories it falls in. Read-only; editing and undo come with 13b.
+// aliases, where it came from, its facts and the categories it falls in. Read-only; what players added is audited on
+// /admin/audit (13b).
 // Plain on purpose; the look is M14's job.
 import { useState, type FormEvent } from "react";
 import type { ThingView } from "@/admin/base";

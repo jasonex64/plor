@@ -85,6 +85,15 @@ async function candidates(db: Db, gameId: string, date: string, index: number, t
   return rows;
 }
 
+// Whether text that named no answer is within a typo of a member of the question's category, whatever its length and
+// past any stolen letter. Such a miss is a typo, never a new answer: it waits in the audit (M13 13b; human, 2026-10-24:
+// "Audit only (Recommended)").
+export async function isNearTypo(db: Db, puzzle: ApprovedPuzzle, index: number, typed: string): Promise<boolean> {
+  const query = normalize(typed);
+  if (!query) return false;
+  return (await candidates(db, puzzle.game_id, puzzle.date, index, withinTypo(query))).length > 0;
+}
+
 // The answer the typed text names, or null when it names none ("not in our list, try again"). The caller has
 // already refused text with a stolen letter. An exact name or alias wins before any typo, so "moose" is never read as
 // a typo of "mouse". A typo counts only for text of 4+ letters (spaces and digits aren't letters: M02 2f B4; ROADMAP

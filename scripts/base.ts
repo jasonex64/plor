@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
-import { BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS } from "../src/config/tunables.ts";
+import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS } from "../src/config/tunables.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 
@@ -200,6 +200,7 @@ const USDA_ZIP = "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_lega
 const OEWN_CHEESE = "07866305-n"; // "a solid food prepared from the pressed curd of milk" (noun.food.json)
 
 const OEWN_ANIMAL = "00015568-n"; // "a living organism characterized by voluntary movement" (noun.Tops.json)
+const OEWN_ENTITY = "00001740-n"; // "entity": the root every noun synset is under (noun.Tops.json)
 
 type Synset = { members: string[]; hypernym?: string[]; instance_hypernym?: string[]; wikidata?: string };
 
@@ -335,6 +336,7 @@ async function download(url: string): Promise<Buffer> {
 const ANIMALIA = "Q729"; // labelled "animal"
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
 
+// In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
@@ -392,6 +394,14 @@ const SETS: Record<string, SetDef> = {
       return [await rootItem("Q1364", "fruit"), ...labelledItems(found, (id, parents) => [...parents].filter((p) => p === "Q1364" || found.has(p)))];
     },
   },
+  // Places, so 13b's facts check knows "Paris" names a city, not an animal: WordNet 2025 holds no place names (13b
+  // Evidence). Names only, with no kind_of, so no place joins a category (human, 2026-10-24: "check how much storage
+  // it'd take if its not too much then yes import", then "100,000+ people (Recommended)").
+  "wikidata-places": {
+    source: "wikidata",
+    method: `SPARQL: items with a population (P1082) of at least ${BASE_PLACES_MIN_POPULATION} in any statement, and an English label`,
+    fetch: async () => labelledItems(await labelled(`?x wdt:P1082 ?population . FILTER(?population >= ${BASE_PLACES_MIN_POPULATION})`), () => []),
+  },
   "oewn-animals": {
     source: "oewn",
     method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24)`,
@@ -400,6 +410,21 @@ const SETS: Record<string, SetDef> = {
       const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
       const known = new Set([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => i.id));
       return linkToWikidata(oewnSubtree(synsets, OEWN_ANIMAL), synsets, known, OEWN_ANIMAL, ANIMALIA);
+    },
+  },
+  // Every noun, so 13b's facts check knows "Paris" names a city, not an animal (human, 2026-10-24: "Import all of
+  // WordNet (Recommended)"). Merged by WordNet's own IDs only: linking more of WordNet to Wikidata would put WordNet's
+  // trees under Wikidata's category roots (all of WordNet's "country" under the 193 countries).
+  "oewn-nouns": {
+    source: "oewn",
+    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ENTITY} ("entity") and everything under it, merged with oewn-animals and oewn-cheese by synset ID, for 13b's facts check`,
+    fetch: async () => {
+      const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), (listed) => listed.filter((n) => /^noun.[^/]+.json$/.test(n)));
+      const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
+      if (synsets[OEWN_ENTITY]?.members[0] !== "entity") throw new Error(`${OEWN_ENTITY} isn't "entity" in this edition`);
+      const items = oewnSubtree(synsets, OEWN_ENTITY);
+      console.log(`${Object.keys(synsets).length} noun synsets, ${items.length} under ${OEWN_ENTITY}`);
+      return items;
     },
   },
   "oewn-cheese": {
@@ -518,9 +543,13 @@ async function review(key: string): Promise<void> {
 async function main(): Promise<void> {
   const [command, name] = process.argv.slice(2);
   if (command === "review" && name) return review(name);
+  if (command === "load" && name === "all") {
+    for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
+    return;
+  }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- review <category key>`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- load all\n       npm run base -- review <category key>`);
     process.exit(2);
   }
   await (command === "fetch" ? fetchSet(name, def) : loadSet(name, def));
