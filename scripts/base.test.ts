@@ -139,7 +139,11 @@ describe("parseLinks", () => {
 
 describe("riverShortNames", () => {
   it("gives the short name of an \"X River\" or \"River X\", and nothing for other names", () => {
-    expect(riverShortNames(["Mississippi River", "River Thames", "Nile", "Rio Grande", "Red river"])).toEqual(["Mississippi", "Thames", "Red"]);
+    expect(riverShortNames([["Mississippi River", "River Thames", "Nile", "Rio Grande", "Red river"]])).toEqual([["Mississippi", "Thames", "Red"]]);
+  });
+  it("skips a short name two rivers give, however written, but not one a single river gives twice", () => {
+    expect(riverShortNames([["Little River"], ["River Little"], ["little river", "Ohio River"], ["Hudson River", "River Hudson"]]))
+      .toEqual([[], [], ["Ohio"], ["Hudson", "Hudson"]]);
   });
 });
 

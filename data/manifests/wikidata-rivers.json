@@ -2,8 +2,8 @@
   "set": "wikidata-rivers",
   "source": "wikidata",
   "snapshot": "2026-10-25",
-  "retrieved_at": "2026-10-25T09:47:42.579Z",
-  "method": "SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name \"X River\" or \"River X\" also gives \"X\" as a synonym",
-  "items": 40921,
-  "sha256": "a8ad54b38a2a30f3fb51dfac6530681f40aa6707abbe38e3af6409f6978681d0"
+  "retrieved_at": "2026-10-25T19:57:24.012Z",
+  "method": "SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name \"X River\" or \"River X\" also gives \"X\" as a synonym unless another river gives it too; LDNOOBW-listed aliases of Q32298578 dropped",
+  "items": 40923,
+  "sha256": "7a973c0864b5fd686f761460de53a08cad6d95f2dce6505ef90d4c9a316d4282"
 }

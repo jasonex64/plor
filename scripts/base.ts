@@ -206,18 +206,27 @@ async function rootItem(id: string, expected: string): Promise<Item> {
   return { id, name: label, aliases: aliasesFor([label]) };
 }
 
-function labelledItems(found: Awaited<ReturnType<typeof labelled>>, kindOf: (id: string, parents: Set<string>) => string[], memberOf: string[] = [], more: (names: string[]) => string[] = () => []): Item[] {
-  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: aliasesFor([e.label], [...e.alts, ...more([e.label, ...e.alts])]), kind_of: kindOf(id, e.parents), member_of: memberOf }));
+function labelledItems(found: Awaited<ReturnType<typeof labelled>>, kindOf: (id: string, parents: Set<string>) => string[], memberOf: string[] = [], more: (id: string) => string[] = () => []): Item[] {
+  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: aliasesFor([e.label], [...e.alts, ...more(id)]), kind_of: kindOf(id, e.parents), member_of: memberOf }));
 }
 
-// A river's short names, as players type them: "Mississippi" for "Mississippi River", "Thames" for "River Thames"
-// (human, 2026-10-25: "Yes, for rivers (Recommended)").
-export function riverShortNames(names: string[]): string[] {
-  return names.flatMap((n) => {
+// Each river's short names, as players type them: "Mississippi" for "Mississippi River", "Thames" for "River Thames"
+// (human, 2026-10-25: "Yes, for rivers (Recommended)"). A short name two or more rivers give is skipped: "Little"
+// from 64 rivers would make a generic word a river, a dodge (human, 2026-10-25: "Skip shared names (Recommended)").
+export function riverShortNames(rivers: string[][]): string[][] {
+  const short = rivers.map((names) => names.flatMap((n) => {
     const m = /^(.+) River$/i.exec(n) ?? /^River (.+)$/i.exec(n);
     return m ? [m[1]] : [];
-  });
+  }));
+  const givenBy = new Map<string, Set<number>>();
+  short.forEach((names, i) => names.forEach((n) => givenBy.set(normalize(n), (givenBy.get(normalize(n)) ?? new Set()).add(i))));
+  return short.map((names) => names.filter((n) => givenBy.get(normalize(n))!.size === 1));
 }
+
+// Rivers whose LDNOOBW-listed aliases are dropped at fetch: Pūkio Stream's Wikidata alias is a racial slur. Its other
+// flagged names, and every other category's, stay typeable (human, 2026-10-25: "Drop the slur, keep rest
+// (Recommended)"). Named by ID so the slur itself stays out of the repo.
+const RIVERS_DROP_LISTED_ALIASES = ["Q32298578"];
 
 // --- Open English WordNet 2025 (SOURCES.md) and USDA FoodData Central SR Legacy (SOURCES.md) ---
 
@@ -455,11 +464,18 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-rivers": {
     source: "wikidata",
-    method: "SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name \"X River\" or \"River X\" also gives \"X\" as a synonym",
-    fetch: async () => [
-      await rootItem("Q4022", "river"),
-      ...labelledItems(await labelled(`?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`), () => ["Q4022"], [], riverShortNames),
-    ],
+    method: `SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name "X River" or "River X" also gives "X" as a synonym unless another river gives it too; LDNOOBW-listed aliases of ${RIVERS_DROP_LISTED_ALIASES.join(", ")} dropped`,
+    fetch: async () => {
+      const found = await labelled(`?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`);
+      for (const id of RIVERS_DROP_LISTED_ALIASES) {
+        const e = found.get(id);
+        if (e) e.alts = e.alts.filter((a) => !isListed(normalize(a)));
+      }
+      const ids = [...found.keys()];
+      const short = riverShortNames(ids.map((id) => [found.get(id)!.label, ...found.get(id)!.alts]));
+      const shortOf = new Map(ids.map((id, i) => [id, short[i]]));
+      return [await rootItem("Q4022", "river"), ...labelledItems(found, () => ["Q4022"], [], (id) => shortOf.get(id)!)];
+    },
   },
   "wikidata-canadian-provinces": {
     source: "wikidata",

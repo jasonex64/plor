@@ -1,6 +1,6 @@
 # M13 13e-3 — Knowledge and places
 
-**Status:** in progress (2026-10-25): built and reviewed; the review's blocking findings are fixed, and one question waits on the human (river short names, below) before the re-checks and the PR. The design is approved (human, 2026-10-25: "I approve 13e-3's design. Build it."). The sitelinks source is in SOURCES.md ("Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks).
+**Status:** in progress (2026-10-25): built and reviewed; the review's blocking findings are fixed. The human answered the river short names and the LDNOOBW flags (below), rivers are re-fetched with both, and the re-checks and the PR wait on the other snapshots reaching the Mac (`data/snapshots/` is on the Windows checkout only). The design is approved (human, 2026-10-25: "I approve 13e-3's design. Build it."). The sitelinks source is in SOURCES.md ("Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks).
 
 ## Goal
 The second batch of 13e (`M13-13e-growing-the-categories.md`): about 20 knowledge categories from WordNet and 5 place categories from new Wikidata imports, with their bank questions, and the four lists that block days at Q7 reworked.
@@ -30,6 +30,8 @@ Already decided:
 | Items Wikidata names only with a "mul" label (Juneau, 6 US cities, 37 rivers) | "Use mul when no English (Recommended)", with Wikidata's help page added to SOURCES.md |
 | Rivers named "Mississippi River" with no short alias | "Yes, for rivers (Recommended)": "X River" and "River X" also give "X" |
 | Soup, which no list gives room at Q7 | "soup can be in the questions 1-6 or wherever it can work and just not have it as q7", then "Move any blocker earlier (Recommended)" |
+| **After the review:** river short names that make generic words rivers ("little" on 64 rivers) | "Skip shared names (Recommended)": a short name two or more rivers give is skipped |
+| The batch's LDNOOBW flags (Evidence) | "Drop the slur, keep rest (Recommended)": Pūkio Stream's (Q32298578) listed alias is dropped; every other flagged name stays typeable |
 
 ## Source
 - **Wikidata** (SOURCES.md, M13 D2): things, English labels and aliases, the concept tree, closed lists checked against it; SPARQL limits. **Whether an item has an English Wikipedia article** comes from its sitelinks (`schema:about` in the query service). The SOURCES.md entry doesn't list sitelinks among what it covers (*unverified* that the read user manual covers them): read the query service's user manual on sitelinks before building, and ask the human to add it if it isn't there.
@@ -54,7 +56,7 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 
 **What building changed** (each from the human's answers above, or the checks):
 - US cities are instances of city in the United States *or a subclass* (P31/P279*): Los Angeles is only a "charter city", and Philadelphia only a "city of Pennsylvania", in Wikidata.
-- `labelled` reads mul labels when there's no English one; the rivers set adds short names (`riverShortNames`).
+- `labelled` reads mul labels when there's no English one; the rivers set adds short names (`riverShortNames`), only those a single river gives, and drops the listed aliases of the rivers in `RIVERS_DROP_LISTED_ALIASES` (named by ID, so the slur stays out of the repo).
 - Four WordNet roots were widened after the gap check: religion (05955536-n, the belief sense, where Christianity is), currency (monetary unit 13625961-n, where euro and yen are), feeling (00026390-n, where hope and grief are) and boat or ship (vessel 04537861-n, where sailboat and yacht are).
 - 17 more links (bowling and fencing → sport, pearl and amber → gem, six native elements → mineral, storm, cloud and lightning → weather, time unit → unit of measurement, food fish → seafood, bomb → weapon, techno → music genre), 105 in all.
 - The draft moves a question that blocks the letters one place earlier and tries again (`moveEarlier`), so soup, dinosaur, monkey and Canadian provinces, which have no room at Q7, still draft.
@@ -91,6 +93,7 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 - The footwear, cake and jewelry lists' old answers (replaced).
 - English-only labels in Wikidata imports (`labelled`).
 - Strict easiest-first as the only order in the draft (a blocking question moves earlier).
+- River short names several rivers give, and Pūkio Stream's listed alias.
 Otherwise it adds sets and categories, with nothing to remove: each set is a new source subset.
 
 ---
@@ -101,7 +104,8 @@ Otherwise it adds sets and categories, with nothing to remove: each set is a new
 |---|---|---|
 | Wikidata labels in English (the SOURCES.md entry's "English labels and aliases") | English, else "mul" | Wikidata moved some names to mul (Juneau's English label removed 2026-09-28 as "redundant"); its help page says English falls back to mul. The human's OK, 2026-10-25 |
 | City in the United States (Q1093829) | Q1093829 and its subclasses | Los Angeles and Philadelphia are only in subclasses |
-| Rivers' Wikidata names | Plus "X" for "X River" and "River X" | Players type "Mississippi"; the human's OK |
+| Rivers' Wikidata names | Plus "X" for "X River" and "River X", when no other river gives "X" | Players type "Mississippi"; a shared "X" (Little, Black) would be a dodge; the human's OK for both |
+| Rivers' Wikidata aliases | Less Pūkio Stream's LDNOOBW-listed alias | It is a racial slur; the human's call |
 
 ## Evidence
 **Local stack, 2026-10-25.**
@@ -122,6 +126,6 @@ Otherwise it adds sets and categories, with nothing to remove: each set is a new
   - `labelled`'s English-over-mul choice had no test: the row fold is `foldLabels`, tested in either row order;
   - the "time unit" link made birthday and yesterday units, and iron and graphite brought in cast iron and "pencil" as minerals: time unit is replaced by its true units (second, minute, hour, half-hour, quarter-hour and the sub-second ones); iron and graphite are dropped, and their facts were deleted from the local database by hand; mineral's host bank takes halite for iron;
   - this ticket's Status line: updated.
-- **Open, for the human:** river short names make generic words rivers ("little" on 64 rivers, "black" 49, "white" 25, "north" 21, "big" 17, "la" from the LA River, "branch", "fork", "creek", "de"), a dodge. Asked: skip short names shared by several rivers (recommended), a fixed stop-list, or keep as is. **Unanswered when the session ended.**
+- **Answered by the human (2026-10-25, the Mac session):** river short names made generic words rivers ("little" on 64 rivers, "black" 49, "white" 25, "north" 21, "big" 17, "la" from the LA River, "branch", "fork", "creek", "de"), a dodge: "Skip shared names (Recommended)". With it, in the re-fetched snapshot (40,923 rivers, 2026-10-25T19:57Z, `wikidata-rivers` manifest): little, black, white, north, big and branch name no river; la, fork, creek and de each name one, as one river alone gives them. Mississippi, Thames, Missouri, Ohio, Hudson, Columbia, Yukon, Mekong, Yangtze, Jordan, Niger and Potomac each still name one river; **Colorado, Congo, Red, Snake and St. Lawrence no longer name any**, as several rivers give each (for the human to see in the PR). All 11 answers of `name-a-river` still resolve to one river. Pūkio Stream's aliases are now "pukio stream" and its plural only.
 - Deferred to ROADMAP "Next revision" (for the human to see in the PR): the widened roots bring generic members (feeling: thing, state, soul, harassment, nationalism; boat or ship: bottom, shell, wreck, hulk; religion: theism, mysticism); gold and silver bring green gold and coin silver; Malabo is missing (Equatorial Guinea's capital is Ciudad de la Paz in Wikidata); Pago Pago and Charlotte Amalie come in as US cities; the older sets' `method` strings predate the mul fallback.
 - **Not yet re-run after the fixes:** the trial drafts, the simulator (36 of 40 was before `fitOrder`), `npm test` (255 before the new tests), the db, SQL and e2e suites.
