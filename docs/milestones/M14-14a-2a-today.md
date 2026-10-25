@@ -1,6 +1,6 @@
 # M14 14a-2a — Today
 
-**Status:** in review: built, reviewed (blocking findings fixed), evidence below; PR #79, waiting for green CI and the human. Approved by the human (2026-10-25: "I approve 14a-2a as drafted. Build it."). 14a-2b (Offbeat's game screen) follows in its own PR.
+**Status:** done (2026-10-25), merged by the human in PR #79 on green CI (every check passed). Approved by the human (2026-10-25: "I approve 14a-2a as drafted. Build it."). 14a-2b (Offbeat's game screen) follows in its own PR.
 
 ## Goal
 Today shows each game as a full-width banner (Play before, the score after), one leaderboard card, and a feed that names who commented without showing their words until the player has played; and from any tab, a player who left a question in play sees its seconds running out and can go back.
