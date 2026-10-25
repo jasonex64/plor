@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <main>
       <h1>Plor privacy policy</h1>
-      <p>Last updated: 2026-10-24</p>
+      <p>Last updated: 2026-10-25</p>
       <p>
         Plor (plor.app) is a small daily word game. This page says what we keep about you, why, and how to have it
         deleted. Questions: <a href="mailto:privacy@plor.app">privacy@plor.app</a>.
@@ -19,7 +19,8 @@ export default function Privacy() {
       <h2>What we keep</h2>
       <ul>
         <li>
-          <strong>Your account:</strong> your email address, the username you pick, and your display name if you set one. If you sign in with Google,
+          <strong>Your account:</strong> your email address, the username you pick, your display name if you set one, and your settings (Skip the game
+          screen, Numbers on the calendar). If you sign in with Google,
           Google also shares your name, and your profile picture if you have one; they are stored with your
           account. Plor doesn&apos;t show or use them.
         </li>

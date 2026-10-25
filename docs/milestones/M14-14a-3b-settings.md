@@ -1,6 +1,6 @@
 # M14 14a-3b — Settings, and the friends list on the Friends tab
 
-**Status:** in progress (2026-10-25), on `m14-look-and-feel`. Built from the human's answers without a separate draft approval, and merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** in review (2026-10-25), in its PR from `m14-look-and-feel`, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). Built from the human's answers without a separate draft approval.
 
 ## Goal
 A gear opens the settings sheet (on phones) or side panel (from 768px): the account's controls, moved off Me, and the two switches, Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account. With it, three answers that change 14a-3a's merged work: the friends list moves to the Friends tab, the rarest answers leave out caught ones, and the calendar's shades reach 3:1.
@@ -121,7 +121,7 @@ This ticket's guided questions (human, 2026-10-25):
 
 ## Plan
 1. Tests first, each seen failing:
-   - `src/app/api/profile/settings/route.db.test.ts` and `route.test.ts`;
+   - `src/app/api/profile/settings/route.db.test.ts`, and the signed-out case in `src/app/api/profile/route.test.ts` with the other profile routes';
    - the caught answer in `src/app/api/me/route.db.test.ts`;
    - the shades, their numbers and the danger colour in `src/app/colors.test.ts`;
    - `e2e/settings.e2e.ts`, and the moved cases in `e2e/account.e2e.ts`, `e2e/me.e2e.ts` and `e2e/shell.e2e.ts`.
@@ -164,7 +164,39 @@ This ticket's guided questions (human, 2026-10-25):
 | 14a-3a: the calendar's legend "Fewer … More survived" | Unchanged, now in the new shades | — |
 
 ## Evidence
+Run on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`) against the shared local stack, with the M13 session's OK, 2026-10-25.
+- **Tests seen failing first:**
+  - `npx vitest run src/app/api/profile/route.test.ts` with the signed-out settings case and no route: `Test Files  1 failed (1)`, the import missing. With the route: `Tests  8 passed (8)`.
+  - `npx vitest run src/app/api/me/route.db.test.ts --no-file-parallelism` with T-1's caught answer at 1 of 6 and the old query: `Tests  1 failed | 6 passed (7)`, the rarest list starting `"name": "apple"`, `"share": 0.16666666666666666`. With `and not matched`: `Tests  7 passed (7)`.
+  - `npx vitest run src/app/colors.test.ts` with the new checks and the old slots: `declares every slot`, `danger on bg …` and `shade 1 … shade 4 …` failed in both themes. With the new slots: `Tests  42 passed (42)`.
+- **Criterion 3:** `npx supabase migration up` → `{"applied":[".../20261025200806_settings.sql"],"message":"Migrations applied"}`; `npx supabase test db` → `Files=21, Tests=345`, `Result: PASS` (the role test lists the two new column grants). `npx vitest run src/app/api/profile/settings/route.db.test.ts --no-file-parallelism` → `Tests  8 passed (8)`: off for a new account, one then the other, only the signed-in player's row, and five refused bodies. `src/lib/profile.db.test.ts` → `Tests  13 passed (13)`, with `setSettings` run as `plor_app`, so its grant and the existing update policy cover the columns.
+- **Criteria 1, 4 and 5:** `npx playwright test e2e/settings.e2e.ts` → `4 passed`:
+  - at 360×800 the top bar is `{ x: 0, y: 0, width: 360, height: 56 }`, the dialog is `:modal`, focus starts on "Close settings", 30 Tabs never leave it, a point on the page hits the `DIALOG`, and Escape, Close and the dimmed page each close it;
+  - at 1440×900 the panel is `{ x: 1000, y: 0, width: 440, height: 900 }`;
+  - Skip: the line ends "· 20 seconds each" after a reload, and Play opens `/offbeat` with "Your answer" showing;
+  - Numbers: today's cell is empty, then "0" in `rgb(26, 26, 24)`, still after a reload, then empty again.
+- **The hypothesis for step 4 held:** a click in the sheet's top padding (mid-width) left it open, and one on the dimmed page closed it. As a check, the handler was replaced by a no-op: the phone test failed at `await expect(sheet).toBeHidden()` after the click on the dimmed page. Restored, it passed. The first run had clicked the sheet's rounded corner, which is outside the sheet and closed it, as it should; the test now clicks mid-width.
+- **Seen on the way:** the gear's first clicks timed out under Next.js's dev indicator (`<nextjs-portal> … intercepts pointer events`), which 14a-1 had moved to the top right; `next.config.ts` now puts it top-left, on the wordmark.
+- **Criteria 2, 6 and 7:** `e2e/account.e2e.ts` → `3 passed` (the sheet's username, display name and delete; the Friends tab's list, its link with Reset, the slot `data-initial="I"`, and Today's board at 1440px with the same link and no Reset); `e2e/me.e2e.ts` → `3 passed` (the text alternative "…: 1 of the N days so far: 25 October, 0 of 7 survived", the shade `rgba(36, 87, 214, 0.647)`); `e2e/shell.e2e.ts` → `7 passed` (Friends' sections now end with "Your friends", Me's are the stats alone, and the sidebar's Settings shows the focus ring).
+- **Criterion 8:** the rarest-answers db case above.
+- **Criterion 10:**
+  - `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  39 passed (39)`, `Tests  269 passed (269)`.
+  - `npm run test:db`: the first full run had `Tests  2 failed | 255 passed (257)`, both in `src/lib/profile.db.test.ts`, which expected the profile without `settings`. Updated, with the `plor_app` settings case added: `Test Files  40 passed (40)`, `Tests  258 passed (258)`.
+  - `npm run test:e2e`: `36 passed`, `1 failed`: settings' phone test timed out in sign-in (`players.ts:40`, waiting for "Username"), before any of its own steps. Rerun, `npx playwright test e2e/settings.e2e.ts e2e/account.e2e.ts --repeat-each=3` → `21 passed`. Recorded in ROADMAP as a sign-in flake.
+  - `npm run build`: compiled, with `ƒ /api/profile/settings` and `○ /me`.
+  - CI: in the PR.
 
 ## Review
+The `reviewer` agent, in a fresh context, on `origin/main..b567957`. It read the migration, the grant, both routes, the dialog, the shell, the rarest-answers change and the shades, and found no blocking bug in the code; it re-ran tsc, lint and `npm test` (269), and, by the brief, no db or e2e run, which the Evidence above covers.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **The handoff was stale** (questions 1 and 2 answered, "M14 added none" migrations). Rewritten in this PR, with the migration and the human's `db push`.
+  - **The privacy page:** its date didn't change with its text, and "Your account" didn't list the two settings. Both fixed (2026-10-25).
+  - **Evidence, Review and Status were empty.** Filled in above; the Status and the ROADMAP row say "in review".
+- Deferred to ROADMAP "Next revision" (For M14):
+  - the backdrop close also fires for a drag that starts inside and ends on the dimmed page, and for a click on the panel's 1px border;
+  - the forms' open state and drafts survive closing the sheet;
+  - `--on-shade-*` repeat the text and on-accent hex values;
+  - `onSettings` spreads the `me` captured at render;
+  - the phone gear has no focus-ring check;
+  - `account.e2e.ts`'s 1440px context isn't closed;
+  - three comment lines past the wrapping width.

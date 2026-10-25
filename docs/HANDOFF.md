@@ -2,73 +2,48 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25. The M14 section is the M14 session's, after its overnight run, 11:10 UTC. The rest is as the M13 session wrote it on `m13-answer-lists-and-content` (`C:/Users/jason/RIFF`), after building 13e-2 (PR #80); for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14a-3b's PR. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch, written by the M14 session)
-**Updated 2026-10-25, 11:10 UTC, after the overnight run.** Everything below is merged on main. Branch `m14-look-and-feel` is even with main, plus this handoff and 14a-3a's done line. No PR is open.
-
 ### Done
 | Sub-ticket | What | PR |
 |---|---|---|
 | 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar from 768px, the Admin link | #77 |
 | 14a-2a | Today: Offbeat's banner, one leaderboard card, the locked feed, the clock bar | #79 |
-| 14a-2b | The game screen `/offbeat`: the stakes, How to play, Your Offbeat's stats, yesterday's answers. **Security change:** yesterday's host answers go to every signed-in player (DECISIONS.md Log) | #81 |
-| 14a-2c | 14a-2b's review fixes: numbers from `tunables.ts`, Start climbing only before the run, one stats load, "Offbeat comments" | #82 |
-| 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots by names; Friends' empty state | #83 |
+| 14a-2b | The game screen `/offbeat`. **Security change:** yesterday's host answers to every signed-in player | #81 |
+| 14a-2c | 14a-2b's review fixes | #82 |
+| 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
 
-Each one's ticket is in `docs/milestones/M14-*.md`, with its evidence and review. The reviewers' non-blocking findings are in ROADMAP, For M14.
+### In review
+**14a-3b**, settings (`docs/milestones/M14-14a-3b-settings.md`), in its PR with auto-merge on green CI:
+- the gear (top bar on phones, the sidebar's foot from 768px) opens a modal `<dialog>`, sheet or 440px panel, holding the username, display name, the two switches (Skip the game screen, Numbers on the calendar), Privacy policy, Sign out and Delete account;
+- the friends list and the invite link with Reset moved to the Friends tab, with avatar slots;
+- the rarest answers leave caught ones out; the calendar's shades reach 3:1, with a text alternative naming each day;
+- `GET /api/account` is gone (the profile carries it all);
+- MDN `<dialog>` is in SOURCES.md.
+
+**Migration `20261025200806_settings.sql`** (and the **security change**: `plor_app` may update the two settings' columns, DECISIONS.md Log). Once this PR is on main, plor.app's `GET /api/profile` fails until the human runs `npx supabase db push` (human, 2026-10-25: "After today's merges (Recommended)": one push once today's batch is on main). It's applied to the Mac's local stack.
 
 ### Waiting on the human
-1. **A source for the settings sheet.** The sheet (14a-3b) is a modal dialog (round 7: "Focus stays inside while it's open"), and no entry in SOURCES.md covers the HTML `<dialog>` element. Should MDN's page (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) be added, as its Web Share and Clipboard pages were? CLAUDE.md: "If no source covers the work, stop and ask." This blocks:
-   - **14a-3b:** the gear, the sheet or side panel, the account controls moved in, and the Skip and Numbers switches with their migration;
-   - **14b-1:** the themes, whose picker is in the sheet, and the About page.
-2. **Where the friends list goes.** Me still holds the friends list (with Remove) and the invite link with Reset, below the stats (M12 12a, 12f). Neither L45 nor round 7 places them.
-3. **Small calls from the reviews** (ROADMAP, For M14):
-   - should a caught answer count among the rarest;
-   - the tie-break between equally rare answers;
-   - the calendar's lightest shade at about 1.3:1 (WCAG 1.4.11);
-   - slots in the live board's full lists.
-
-### Already decided for what's next
-Asked before the night (human, 2026-10-25), so these need no new questions:
-- **14a-3b:** the two settings are columns on the account. `plor_app` gets UPDATE on those columns only, and the route limits it to the player's own row, as for the display name. **Security change, approved:** "Approve it (Recommended)".
-- **14b-1:**
-  - the themes are Follow device, Paper, Night, Sky, Moonlit and Ink (L21);
-  - the chosen one is a column on the account. **Security change, approved:** "Approve it (Recommended)";
-  - credits and the AI note go on "An About page (Recommended)" at `/about`;
-  - the AI note covers "Code only".
-- **Merging:** "Merge; I'll push in the morning (Recommended)". Once their migrations are on main, plor.app's profile route fails until the human runs `npx supabase db push`.
-- **How:** each sub-ticket is built from these answers. A PR merges on green CI, one open at a time.
+**14b-1, themes and the About page.** The human's answers of 2026-10-25 (this session's second round):
+- **The three new themes' colours:** "Mock them up first". The derived sets (Sky, Moonlit, Ink: outline, Moonlit's divider, shades and their number colours, Safe, Caught and Delete) are to be drawn on the canvas "Plor shell layout" (Me, the sheet, Today) for the human to review before they're built. The values Claude proposed are in this session's question: control outline Sky #858C9B, Moonlit #737185, Ink #606060; Moonlit's divider #3E3C50; shades Sky a7/c4/e2/ff, Moonlit 72/a1/d0/ff, Ink 65/98/cc/ff; Safe, Caught and Delete from Paper (Sky) or Night (Moonlit, Ink).
+- **No flash:** "Add it, copy in localStorage (Recommended)": add Next.js's bundled guide "Preventing flash before hydration" (`01-app/02-guides/preventing-flash-before-hydration.md`) to SOURCES.md's Next.js row, and apply a localStorage copy of the account's theme from an inline script in `<head>`; the account stays the truth.
+- **About:** "be way more broad but yes credits should be on". About is more than credits; ask what else it holds (a guided round) before drafting it.
+- **The AI note:** "Code only, as worded (Recommended)": "Plor's code is written with help from Claude, an AI model by Anthropic."
+- Already decided: the presets Follow device, Paper, Night, Sky, Moonlit, Ink (L21); the chosen one outlined (L47); the theme a column on the account, its security change approved ("Approve it (Recommended)").
 
 ### Next step
-Answer question 1. With the source added, 14a-3b is built first, then 14b-1, each with its ticket, the reviewer and its own PR, from this branch.
+1. After 14a-3b merges: mark it done with its CI run in the ticket and ROADMAP, from this branch.
+2. Draw the three themes on the canvas, and ask the About round; then write 14b-1's ticket from the answers and build it, one PR, merged on green CI.
 
 ### Catching up on another computer
-1. **Get the code.**
-   ```
-   git fetch origin
-   git switch m14-look-and-feel
-   git pull
-   npm ci
-   ```
-   On the Mac the branch is new, and `git switch` sets it up to track `origin/m14-look-and-feel`. Main has all of M14's merged work too.
-2. **Start the local stack.**
-   ```
-   npx supabase start
-   npx supabase migration up
-   ```
-   This applies every migration up to `20261025074000_links.sql`. M14 added none. On the Mac, first run `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`. Its stack was last at `20261024001501`, so `migration up` has several to apply.
-3. **Run it.** `npx next typegen` once, before `npx tsc --noEmit -p .`. Then `npm run dev`, and sign in with a code from Mailpit at `http://127.0.0.1:54324`.
-4. **The answer database.** The tests and M14's screens use their own fixture data, so they don't need it. Real content work does: run `npm run base -- fetch <set>` for each set in `data/manifests/` (oewn-animals, oewn-cheese, oewn-nouns, usda-cheese, wikidata-animals, wikidata-countries, wikidata-dog-breeds, wikidata-elements, wikidata-fruit, wikidata-places, wikidata-us-states), then `npm run base -- load all`.
-5. **The checks:**
-   - `npm test`: 257 tests on the Windows checkout;
-   - `npm run test:db`: 248 at the last full run, before 14a-3a's no-profile case was added;
-   - `npm run test:e2e`: 33.
+1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
+2. `npx supabase start`, then `npx supabase migration up` (through `20261025200806_settings.sql`). On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
+3. `npx next typegen` once, before `npx tsc --noEmit -p .`. Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
+4. The checks: `npm test` 269; `npm run test:db` 258; `npx supabase test db` 345; `npm run test:e2e` 37. The db and e2e suites need today (and yesterday for some e2e files) free of a real approved day.
+5. **On the Mac** the M13 session (`/Users/jason/code/plor`) shares the stack and port 3000. It said it won't run db, SQL or e2e tests locally for now, nor `db reset`, and will message first if that changes. Message it before a `db reset` anyway.
 
-   The db and e2e suites need today, and for some e2e files yesterday, free of a real approved day: they add their own fixture days.
-6. **On the Windows checkout**, the M13 session and this one share one local stack and port 3000. Message the other session before a db test run, an e2e run or a `db reset`. Another machine has its own stack and needn't.
-
-**Left running:** nothing (no dev server, no background job).
+**Left running:** nothing of M14's (no dev server, no background job).
 
 ## M15 (from main, written by the M15 and M13 sessions)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
