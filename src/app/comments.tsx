@@ -14,7 +14,9 @@ import type { Comment, Thread } from "@/comments/comments";
 import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
+import { previewText } from "@/comments/preview";
 import type { Emoji } from "@/reactions/reactions";
+import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
@@ -148,23 +150,36 @@ export function Comments({ username, runOver, nudge, group }: { username: string
   );
 }
 
-// "Sam, Lee and 3 others commented · 7 reactions", and nothing a player could read before finishing (H3).
+// Before the player has played (docs/milestones/M14-14a-2a-today.md, L40): the names, blurred filler that holds none
+// of their words (the server sends none, H3), and a link to Play; src/comments/preview.ts says what.
+const FILLER = ["xxxx xx xxxx xxx xx", "xxxxxxx xxxx xx", "xxx xxxxx xxxx xxx"];
+
 function Preview({ preview }: { preview: FeedPreview }) {
-  const named = preview.friends.slice(0, 2);
-  const more = preview.friends.length - named.length + preview.others;
-  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-  const who =
-    named.length === 0 ? plural(more, "player", "players") : more === 0 ? named.join(" and ") : `${named.join(", ")} and ${plural(more, "other", "others")}`;
+  const text = previewText(preview);
+  if (text.read === null) {
+    return (
+      <>
+        <p>No comments yet.</p>
+        <p>Finish today&apos;s Offbeat to join in.</p>
+      </>
+    );
+  }
   return (
     <>
-      {named.length + more > 0 ? (
-        <p>
-          {who} commented · {plural(preview.reactions, "reaction", "reactions")}
-        </p>
-      ) : (
-        <p>No comments yet.</p>
-      )}
-      <p>Finish today&apos;s puzzle to read them and join in.</p>
+      <p>
+        <a href="#offbeat">{text.read}</a>
+      </p>
+      <ul className={styles.locked}>
+        {/* By position: two friends can share a display name. */}
+        {text.named.map((name, i) => (
+          <li key={i}>
+            <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
+            <span className={styles.hidden}>comment hidden until you play</span>
+          </li>
+        ))}
+      </ul>
+      {text.more && <p>{text.more}</p>}
+      <p>{preview.reactions === 1 ? "1 reaction" : `${preview.reactions} reactions`}</p>
     </>
   );
 }

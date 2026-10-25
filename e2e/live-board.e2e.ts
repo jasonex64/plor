@@ -83,7 +83,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
   const started = `${playerName}: started (you'll see how it's going once you finish)`;
   await player.goto("/");
-  await player.getByRole("button", { name: "Start today's puzzle" }).click();
+  await player.getByRole("button", { name: "Play", exact: true }).click();
   await expect(row).toHaveText(started);
   await player.getByLabel("Your answer").fill(hostAnswer);
   await player.getByRole("button", { name: "Answer" }).click();
@@ -99,7 +99,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
   // (7d): the watcher first, then the friend, with the full list behind the row.
   await watcher.goto("/");
-  await watcher.getByRole("button", { name: "Start today's puzzle" }).click();
+  await watcher.getByRole("button", { name: "Play", exact: true }).click();
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
   // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
@@ -108,9 +108,11 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // answered question 1, under the minimum of 5 (H5).
   await expect(watcher.getByText("Streak: 1 day played in a row")).toBeVisible();
   await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
-  // Yesterday's standings, friends by default (H7): neither played yesterday.
-  const yesterday = watcher.getByRole("region", { name: "Yesterday" });
-  await expect(yesterday.getByRole("button", { name: "Friends" })).toHaveAttribute("aria-pressed", "true");
+  // Yesterday's standings, friends by default (H7), in the leaderboard card (M14 14a-2a): neither played yesterday.
+  const leaderboard = watcher.getByRole("region", { name: "Leaderboard" });
+  await expect(leaderboard.getByRole("radio", { name: "Yesterday" })).toBeChecked();
+  await expect(leaderboard.getByLabel("Board")).toHaveValue("");
+  const yesterday = leaderboard.getByRole("region", { name: "Yesterday" });
   await expect(yesterday.getByRole("listitem")).toHaveText([`${playerName}: 0 points`, `${watcherName} (you): 0 points`]);
   await openBoard(watcher);
   // The friends leaderboard (M09 9b; weekly since M10 10a) lists both with no points yet this week, since today's
@@ -187,7 +189,7 @@ test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "s");
-  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByLabel("Your answer").fill(safeAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
@@ -251,7 +253,7 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.goto("/");
   await signInAndPick(page, "q");
   await openBoard(page, "/");
-  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
   // Only the reset loads yesterday's standings again, so once that answers, the page has moved to the new day.
   const moved = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/leaderboard/yesterday");

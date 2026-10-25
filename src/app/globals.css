@@ -13,6 +13,10 @@
   --accent: #2457d6;
   --on-accent: #ffffff;
   --soft: #2457d61a;
+  /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
+     text. 14c's pixel world replaces the plain block. */
+  --offbeat: #2f3d5c;
+  --on-offbeat: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {

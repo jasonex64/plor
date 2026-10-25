@@ -45,7 +45,7 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
   await signInAndPick(admin, "aa");
-  await expect(admin.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
+  await expect(admin.getByRole("button", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-aa@example.test`]);
   await admin.goto("/admin/puzzles");
   const day = admin.getByRole("article").filter({ hasText: ahead });
@@ -63,7 +63,7 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "ap");
-  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   // A familiar answer per question the host doesn't catch, avoiding every letter stolen by then (C at Q2, P at Q4, R at
   // Q5, O at Q7).
   const answers = ["cat", "kiwi", "green", "Kenya", "lead", "boxing", "knee"];

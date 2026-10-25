@@ -37,7 +37,25 @@ function ratio(a: Rgb, b: Rgb): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-const themes = { Paper: slots(":root {"), Night: slots("prefers-color-scheme: dark") };
+// The games' own colours sit in :root with Paper's and stay the same in every theme (M14 14a-2a).
+const GAME_SLOTS = ["offbeat", "on-offbeat"];
+const root = slots(":root {");
+const themes = {
+  Paper: Object.fromEntries(Object.entries(root).filter(([name]) => !GAME_SLOTS.includes(name))),
+  Night: slots("prefers-color-scheme: dark"),
+};
+
+describe("Offbeat's colour", () => {
+  it("is declared once, for every theme", () => {
+    expect(GAME_SLOTS.every((name) => name in root)).toBe(true);
+    expect(GAME_SLOTS.some((name) => name in themes.Night)).toBe(false);
+  });
+
+  // The banner's text and Play's label (docs/milestones/M14-14a-2a-today.md, criterion 7).
+  it("white on it is at least 4.5:1", () => {
+    expect(ratio(rgb(root["on-offbeat"]), rgb(root.offbeat))).toBeGreaterThanOrEqual(4.5);
+  });
+});
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {

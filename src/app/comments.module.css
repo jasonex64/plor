@@ -1,0 +1,26 @@
+/* The feed before the player has played (docs/milestones/M14-14a-2a-today.md, L40). */
+.locked {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Filler, not words: blurred so it reads as hidden text, and aria-hidden so it isn't read out. */
+.filler {
+  color: var(--muted);
+  filter: blur(4px);
+  user-select: none;
+}
+
+/* Read by screen readers only. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

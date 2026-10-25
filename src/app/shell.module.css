@@ -5,6 +5,7 @@
   right: 0;
   bottom: 0;
   z-index: 10;
+  box-sizing: border-box;
   height: 64px;
   background: var(--surface);
   border-top: 1px solid var(--line);
@@ -130,5 +131,51 @@
     color: var(--muted);
     font-weight: 700;
     text-decoration: none;
+  }
+}
+
+/* The clock back to a question left in play (M14 L18): on phones just above the tab bar, from 768px at the top of the
+   content beside the sidebar. */
+.clock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  z-index: 10;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  border-top: 1.5px solid var(--accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+:global(body):has(.clock) {
+  padding-bottom: 112px;
+}
+
+@media (min-width: 768px) {
+  .clock {
+    top: 0;
+    bottom: auto;
+    left: 248px;
+    border-top: 0;
+    border-bottom: 1.5px solid var(--accent);
+  }
+
+  :global(body):has(.clock) {
+    padding-bottom: 0;
+    padding-top: 48px;
   }
 }

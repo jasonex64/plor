@@ -21,7 +21,7 @@ test.afterAll(async () => {
 
 // Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are.
 const TABS = [
-  { name: "Today", path: "/", sections: ["Offbeat", "Feed"] },
+  { name: "Today", path: "/", sections: ["Offbeat", "Leaderboard", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
   { name: "Me", path: "/me", sections: ["Your account"] },
@@ -37,10 +37,13 @@ async function player(browser: Browser, name: string, viewport: { width: number;
   return { page, requests, nav: page.getByRole("navigation", { name: "Main" }) };
 }
 
-// The visible page's top-level sections: Next.js keeps a page already visited in the document, hidden, so the tab
-// navigated from is still there (cacheComponents, next.config.ts).
+// The visible page's top-level sections (those not inside another section, wherever the layout puts them): Next.js
+// keeps a page already visited in the document, hidden, so the tab navigated from is still there (cacheComponents,
+// next.config.ts).
 const sections = (page: Page) =>
-  page.locator("main > section").evaluateAll((all) => all.filter((s) => s.checkVisibility()).map((s) => s.getAttribute("aria-label")));
+  page
+    .locator("main section")
+    .evaluateAll((all) => all.filter((s) => s.checkVisibility() && !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
 
 test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ browser }) => {
   const { page, requests, nav } = await player(browser, "sa", { width: 360, height: 800 });
@@ -112,12 +115,42 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
 // The tabs stay during a run, and leaving lets the timer run (M14 L18): back on Today, the question is still in play.
 test("a question in play is still there after a visit to another tab", async ({ browser }) => {
   const { page, nav } = await player(browser, "se", { width: 360, height: 800 });
-  await page.getByRole("button", { name: "Start today's puzzle" }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page.getByLabel("Your answer")).toBeVisible();
+});
+
+// Away from Today, the question's clock sits just above the tab bar, with Back; at zero it says time's up and links to
+// the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6). The clock is faked so zero comes at once.
+test("away from Today, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
+  await page.clock.install();
+  await page.goto("/");
+  await signInAndPick(page, "sh");
+  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await expect(page.getByLabel("Your answer")).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Friends" }).click();
+
+  const clock = page.getByRole("region", { name: "Question in play" });
+  await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/");
+  const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
+  expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
+
+  // From 768px, at the top of the content, beside the sidebar.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const [wide, side] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
+  expect([wide.y, wide.x]).toEqual([0, side.x + side.width]);
+  await page.setViewportSize({ width: 360, height: 800 });
+
+  // Past the question's 20 seconds: announced once, as a status.
+  await page.clock.fastForward("00:21");
+  await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {

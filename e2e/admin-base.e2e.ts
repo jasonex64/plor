@@ -33,7 +33,7 @@ test("an admin looks a thing up by an alias; a player can't", async ({ browser }
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
   await signInAndPick(admin, "ab");
-  await expect(admin.getByRole("button", { name: "Start today's puzzle" }).or(admin.getByText("There's no puzzle today."))).toBeVisible();
+  await expect(admin.getByRole("button", { name: "Play", exact: true }).or(admin.getByText("There's no puzzle today."))).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-ab@example.test`]);
   await admin.goto("/admin/base");
   await admin.getByLabel("Name or alias").fill(`Foliage ${RUN}`);

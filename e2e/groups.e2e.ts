@@ -53,31 +53,33 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await creator.goto("/groups");
   await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
 
-  // Today's layout before playing (M11 H1, with the rest moved to their tabs, M14 14a-1): the game card first, with
-  // Start and yesterday's standings, a chip per group (H7); then the feed, with nothing to read yet.
+  // Today's layout before playing (docs/milestones/M14-14a-2a-today.md): Offbeat's banner with Play first; then, at
+  // this desktop width, the live board and the leaderboard card, whose board picker has Friends and each group (H7);
+  // then the feed, with nothing to read yet.
   await creator.goto("/");
-  const sections = () => creator.locator("main > section").evaluateAll((all) => all.map((s) => s.getAttribute("aria-label")));
-  await expect.poll(sections).toEqual(["Offbeat", "Feed"]);
+  const sections = () =>
+    creator.locator("main section").evaluateAll((all) => all.filter((s) => !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
+  await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
   const card = creator.getByRole("region", { name: "Offbeat" });
-  await expect(card.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
-  await expect(card.getByRole("region", { name: "Yesterday" }).getByRole("button")).toHaveText(["Friends", "Book Club"]);
+  await expect(card.getByRole("button", { name: "Play", exact: true })).toBeVisible();
+  await expect(creator.getByRole("region", { name: "Leaderboard" }).getByLabel("Board").locator("option")).toHaveText(["Friends", "Book Club"]);
   const creatorFeed = creator.getByRole("region", { name: "Feed" });
   await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
-  await expect(creatorFeed.getByText("Finish today's puzzle to read them and join in.")).toBeVisible();
+  await expect(creatorFeed.getByText("Finish today's Offbeat to join in.")).toBeVisible();
 
   // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
   // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group
   // (M11 11b).
   for (const page of [creator, joiner]) {
     await page.goto("/");
-    await page.getByRole("button", { name: "Start today's puzzle" }).click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
     await page.getByRole("button", { name: "Answer" }).click();
     await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
   // After playing, the result is in the card, and the order is the same.
   await expect(card.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
-  await expect.poll(sections).toEqual(["Offbeat", "Feed"]);
+  await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
   async function openLive(url: string) {
