@@ -1,6 +1,6 @@
 # M13 — The answer database
 
-**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, next.
+**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, designed from the human's guided answers (`M13-13c-rarity-and-the-host.md`), waiting for approval.
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
 - **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
 - **Sources:** D2's are in SOURCES.md (human, 2026-10-24). Every decision and number is answered, so 13a's criteria come next.
@@ -119,7 +119,7 @@ The database has five parts. Each day takes a frozen copy when it's approved.
   - Approval freezes format 3 into a day, and matching runs on it.
   - The Next revision matching items for M13: plural aliases, digits, zero-width characters.
 - **13b, learning from misses** (D4): the facts check, the auto-accept rule with its share and minimum, and the audit page with undo.
-- **13c, rarity and the host** (D5): pooled shares in the bonus; the dodging host; the letter picker keeping enough familiar answers safe (M04 G9).
+- **13c, rarity and the host** (D5; its own file, `M13-13c-rarity-and-the-host.md`): pooled shares in the bonus; host answers fixed at 1, 1, 1, 1, 2, 2, 3 per question, drawn at random from the host bank (replacing the dodging host: human, 2026-10-24); the letter picker keeping 3 familiar answers typeable and safe (M04 G9).
 - **13d, the question bank and tuning** (D7, M04 G3): questions with recipes, themes and the repeat gap; difficulty tuned with the human toward a target catch rate per question.
 
 ## Acceptance criteria
@@ -142,9 +142,9 @@ Each sub-ticket's criteria are written before its code, once D1–D8 are answere
 | M = **3** distinct players at least | Auto-accept (D4) | Human, 2026-10-24: "3 players" |
 | No fading: every answer counts equally | Rarity (D5) | Human, 2026-10-24: "All history equal" |
 | AI first guesses: **40% / 40% / 20%** of players give some common / uncommon / rare answer | Rarity before data (D5; replaces N5's 50% for the host bank) | Human, 2026-10-24: "40 / 40 / 20" |
-| Dodge picks: no odds of their own, used when needed to reach a question's catch target | The host (D5) | Human, 2026-10-24: "Tied to difficulty (Recommended)" |
+| ~~Dodge picks: used when needed to reach a question's catch target~~ Replaced in 13c: host answers per question **1, 1, 1, 1, 2, 2, 3**, drawn at random from the host bank | The host (D5) | Human, 2026-10-24: "Tied to difficulty (Recommended)"; then, in 13c's questions, "each question should have a fixed number of host answers, and if we happen to have really easy or really tough days, thats just part of variance", "1 1 1 1 2 2 3", "Random from the host bank" |
 | Repeat gap: **at least 30 days** | The question bank (D7) | Human, 2026-10-24: "just at least 30 days" |
-| Target catch rate per question, Q1–Q7: **3, 5, 7, 10, 13, 16, 20** caught per 100 players ("Gentle"; about 45% finish all 7, by Claude's multiplication) | Tuning (13d) | Human, 2026-10-24: "Gentle: 3→20%, ~45% finish". It changes DECISIONS.md, Game 1's "most players should usually finish". 13d records the change there when it's built |
+| Target catch rate per question, Q1–Q7: **3, 5, 7, 10, 13, 16, 20** caught per 100 players ("Gentle"; about 45% finish all 7, by Claude's multiplication) | A soft guide, shown in the draft's summary (13c: "Keep as a soft guide", "Show, never warn (Recommended)") | Human, 2026-10-24: "Gentle: 3→20%, ~45% finish". It changes DECISIONS.md, Game 1's "most players should usually finish". 13d records the change there when it's built |
 | Fewest familiar (common or uncommon) answers still typeable after stolen letters: **3** | The letter picker (13c; M04 G9) | Human, 2026-10-24: "3" |
 
 ## Plan
