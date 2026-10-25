@@ -64,8 +64,9 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   await page.goto("/");
   await signInAndPick(page, "ap");
   await page.getByRole("button", { name: "Start today's puzzle" }).click();
-  // A safe answer per question that avoids every letter stolen by then (C at Q2, P at Q4, R at Q5, O at Q7).
-  const answers = ["cat", "kiwi", "green", "Kenya", "tin", "June", "leg"];
+  // A familiar answer per question the host doesn't catch, avoiding every letter stolen by then (C at Q2, P at Q4, R at
+  // Q5, O at Q7).
+  const answers = ["cat", "kiwi", "green", "Kenya", "lead", "boxing", "knee"];
   for (let i = 0; i < answers.length; i++) {
     await page.getByLabel("Your answer").fill(answers[i]);
     await page.getByRole("button", { name: "Answer" }).click();
@@ -75,5 +76,6 @@ test("a player survives all seven questions of a day, past the stolen letters", 
     }
   }
   await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
-  await expect(page.getByText("Name a body part: you said leg, the host said hand")).toBeVisible();
+  // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
+  await expect(page.getByText("Name a body part: you said knee, the host said hand, head, leg")).toBeVisible();
 });

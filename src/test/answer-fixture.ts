@@ -10,7 +10,9 @@ type Querier = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Rec
 
 // A member: its names (the first is its main name), and the member it sits under, if not the root.
 type Member = { names: string[]; under?: string };
-type FixtureQuestion = { key: string; prompt: string; steals?: string; host: string[]; bank: string[]; members: Record<string, Member> };
+// host follows HOST_ANSWERS_PER_QUESTION; bank is the common level and uncommon the uncommon one, leaving at least
+// FAMILIAR_SAFE_MIN of them typeable past the stolen letters and safe from the host (M13 13c).
+type FixtureQuestion = { key: string; prompt: string; steals?: string; host: string[]; bank: string[]; uncommon: string[]; members: Record<string, Member> };
 
 // Schedule A (M04 G8): Q2 and Q4 steal a medium letter, Q5 a heavy consonant, Q7 a vowel. Every host answer's main
 // name avoids the letters stolen by then, and each question keeps answers the host doesn't catch.
@@ -20,6 +22,7 @@ export const FIXTURE: FixtureQuestion[] = [
     prompt: "Name an animal",
     host: ["bear"],
     bank: ["bear", "dog"],
+    uncommon: ["cat", "fish", "horse"],
     members: {
       bear: { names: ["bear", "bears"] },
       "polar-bear": { names: ["polar bear", "polar bears", "ursus maritimus"], under: "bear" },
@@ -43,6 +46,7 @@ export const FIXTURE: FixtureQuestion[] = [
     steals: "c",
     host: ["apple"],
     bank: ["apple", "banana"],
+    uncommon: ["kiwi", "mango"],
     members: {
       apple: { names: ["apple", "apples"] },
       banana: { names: ["banana", "bananas"] },
@@ -56,6 +60,7 @@ export const FIXTURE: FixtureQuestion[] = [
     prompt: "Name a color",
     host: ["red"],
     bank: ["red", "blue"],
+    uncommon: ["green", "yellow"],
     members: {
       red: { names: ["red"] },
       blue: { names: ["blue"] },
@@ -70,52 +75,64 @@ export const FIXTURE: FixtureQuestion[] = [
     steals: "p",
     host: ["italy"],
     bank: ["italy", "kenya"],
+    uncommon: ["mali", "togo"],
     members: {
       italy: { names: ["Italy"] },
       kenya: { names: ["Kenya"] },
       france: { names: ["France"] },
       spain: { names: ["Spain"] },
       japan: { names: ["Japan"] },
+      mali: { names: ["Mali"] },
+      togo: { names: ["Togo"] },
     },
   },
   {
     key: "fixture_metal",
     prompt: "Name a metal",
     steals: "r",
-    host: ["gold"],
+    host: ["gold", "tin"],
     bank: ["gold", "tin"],
+    uncommon: ["lead", "tungsten", "titanium"],
     members: {
       gold: { names: ["gold"] },
       tin: { names: ["tin"] },
       lead: { names: ["lead"] },
       iron: { names: ["iron"] },
       zinc: { names: ["zinc"] },
+      tungsten: { names: ["tungsten"] },
+      titanium: { names: ["titanium"] },
     },
   },
   {
-    key: "fixture_month",
-    prompt: "Name a month",
-    host: ["may"],
-    bank: ["may", "june"],
+    key: "fixture_sport",
+    prompt: "Name a sport",
+    host: ["golf", "tennis"],
+    bank: ["golf", "tennis"],
+    uncommon: ["boxing", "judo", "sumo"],
     members: {
-      may: { names: ["May"] },
-      june: { names: ["June"] },
-      july: { names: ["July"] },
-      august: { names: ["August"] },
+      golf: { names: ["golf"] },
+      tennis: { names: ["tennis"] },
+      boxing: { names: ["boxing"] },
+      judo: { names: ["judo"] },
+      sumo: { names: ["sumo"] },
+      hockey: { names: ["hockey"] },
     },
   },
   {
     key: "fixture_body_part",
     prompt: "Name a body part",
     steals: "o",
-    host: ["hand"],
-    bank: ["hand", "head"],
+    host: ["hand", "head", "leg"],
+    bank: ["hand", "head", "leg"],
+    uncommon: ["knee", "eye", "skin"],
     members: {
       hand: { names: ["hand", "hands"] },
       head: { names: ["head", "heads"] },
       leg: { names: ["leg", "legs"] },
       knee: { names: ["knee", "knees"] },
       toe: { names: ["toe", "toes"] },
+      eye: { names: ["eye", "eyes"] },
+      skin: { names: ["skin"] },
     },
   },
 ];
@@ -165,7 +182,10 @@ export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle {
       category: q.key,
       host_bank: q.bank.map((slug) => fixtureId(i, slug)),
       host_answers: q.host.map((slug) => fixtureId(i, slug)),
-      levels: Object.fromEntries(q.bank.map((slug) => [fixtureId(i, slug), "common" as const])),
+      levels: Object.fromEntries([
+        ...q.uncommon.map((slug) => [fixtureId(i, slug), "uncommon" as const]),
+        ...q.bank.map((slug) => [fixtureId(i, slug), "common" as const]),
+      ]),
       ...(q.steals ? { steals: q.steals } : {}),
       root: thingId("wikidata", sourceId(q.key, "root")),
       member_of: null,

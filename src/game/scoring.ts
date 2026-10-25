@@ -1,35 +1,43 @@
 // A run's points: the ladder for each survived question, plus a rarity bonus for each survived answer, bigger the
 // fewer players gave it (DECISIONS.md, Game 1: Scoring; docs/milestones/M09-points-and-leaderboard.md, design and
-// N1–N5). Pure, so the game screens (provisional) and settling (final) score the same way.
+// N1–N4; the first guess and pooling, docs/milestones/M13-13c-rarity-and-the-host.md). Pure, so the game screens
+// (provisional) and settling (final) score the same way.
 import {
-  HOST_BANK_EXPECTED_SHARE,
+  FIRST_GUESS_SHARES,
   PERFECT_RUN_BONUS_CAP,
   POINTS_PER_QUESTION,
   RARITY_BONUS_FRACTION,
   RARITY_EXPECTATION_WEIGHT,
   RARITY_MIN_PLAYERS,
   RARITY_ZERO_SHARE,
-} from "@/config/tunables";
+} from "../config/tunables.ts";
 import type { ApprovedPuzzle, ApprovedQuestion } from "@/content/puzzle";
 
 // inDay: given before the run's day ended at midnight; later answers earn no bonus (D8).
 export type ScoredEvent = { index: number; entryId: string; matched: boolean; inDay: boolean };
 
-// One closed day's answers given before its midnight, by question index: how many players answered it, and how many
-// gave each entry.
+// Answers given before their day's midnight, by question index: how many answers there were, and how many named each
+// entry. For the bonus they're pooled over every day of the question's category (ledger.ts, pooledCounts); for the
+// result screen's shares, one day's (ledger.ts, dayCounts).
 export type DayCounts = Map<number, { answered: number; byEntry: Map<string, number> }>;
 
-// The share of players expected to give this answer before any are counted (D11, N5): the host bank, the common
-// tier, shares HOST_BANK_EXPECTED_SHARE, and every other member of the category, as approved, the rest. With every
-// member in the host bank, they all share evenly (Claude's reading; no number involved). 13c replaces it with levels.
-export function expectedShare(question: ApprovedQuestion, entryId: string): number {
-  const bank = question.host_bank.length;
-  const others = question.members - bank;
-  if (others === 0) return 1 / bank;
-  return question.host_bank.includes(entryId) ? HOST_BANK_EXPECTED_SHARE / bank : (1 - HOST_BANK_EXPECTED_SHARE) / others;
+// The first guess at the share of players giving this answer (M13 D5, 40/40/20; docs/milestones/M13-13c-rarity-and-the-host.md):
+// each tier's share split evenly among its members, the day's levels naming the common and uncommon ones and every other
+// member of the category, as approved, being rare. A tier with no members passes its share to the others in proportion
+// to theirs (Claude's reading, as M09's "every member in the host bank"; no number involved).
+export function firstGuess(question: ApprovedQuestion, entryId: string): number {
+  const levels = Object.values(question.levels);
+  const size = {
+    common: levels.filter((l) => l === "common").length,
+    uncommon: levels.filter((l) => l === "uncommon").length,
+    rare: question.members - levels.length,
+  };
+  const tier = question.levels[entryId] ?? "rare";
+  const total = (Object.keys(size) as (keyof typeof size)[]).reduce((sum, t) => sum + (size[t] > 0 ? FIRST_GUESS_SHARES[t] : 0), 0);
+  return FIRST_GUESS_SHARES[tier] / total / size[tier];
 }
 
-// The expectation blended with the day's counts, as if it were RARITY_EXPECTATION_WEIGHT more players (N1), once
+// The first guess blended with the pooled counts, as if it were RARITY_EXPECTATION_WEIGHT more players (N1), once
 // enough players answered (N4).
 export function blendedShare(expected: number, count: number, answered: number): number {
   if (answered < RARITY_MIN_PLAYERS) return expected;
@@ -51,14 +59,15 @@ export function cappedBonus(sum: number, survived: number, total: number): numbe
   return Math.min(sum, runBonusCap(survived, total));
 }
 
-// counts: the closed day's counts for the final bonus, or null for the provisional one (the expectation alone).
-// bonuses lines up with events: 0 for a caught answer or one given after midnight.
-export function scoreRun(puzzle: ApprovedPuzzle, events: ScoredEvent[], counts: DayCounts | null): { ladder: number; bonus: number; bonuses: number[] } {
+// counts: pooled over the category's past days for the provisional bonus, and over its days through the run's own for
+// the final one (human, 2026-10-24: "Past days only (Recommended)"). bonuses lines up with events: 0 for a caught answer
+// or one given after midnight.
+export function scoreRun(puzzle: ApprovedPuzzle, events: ScoredEvent[], counts: DayCounts): { ladder: number; bonus: number; bonuses: number[] } {
   const bonuses = events.map((e) => {
     if (e.matched || !e.inDay) return 0;
-    const expected = expectedShare(puzzle.questions[e.index], e.entryId);
-    const day = counts?.get(e.index);
-    return answerBonus(e.index, day ? blendedShare(expected, day.byEntry.get(e.entryId) ?? 0, day.answered) : expected);
+    const expected = firstGuess(puzzle.questions[e.index], e.entryId);
+    const pooled = counts.get(e.index);
+    return answerBonus(e.index, pooled ? blendedShare(expected, pooled.byEntry.get(e.entryId) ?? 0, pooled.answered) : expected);
   });
   const survived = events.filter((e) => !e.matched).length;
   return {

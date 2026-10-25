@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
+import { HOST_ANSWERS_PER_QUESTION } from "../src/config/tunables.ts";
 import type { Puzzle } from "../src/content/puzzle.ts";
 import { validateRoot } from "./content-validate.ts";
 
@@ -20,8 +21,8 @@ function valid(): Puzzle {
     questions: STEALS.map((steals, i) => ({
       prompt: `Name a thing ${i + 1}`,
       category: "animal",
-      host_bank: [id(i * 10 + 1), id(i * 10 + 2)],
-      host_answers: [id(i * 10 + 1)],
+      host_bank: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)],
+      host_answers: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)].slice(0, HOST_ANSWERS_PER_QUESTION[i]),
       levels: { [id(i * 10 + 1)]: "common" as const, [id(i * 10 + 3)]: "uncommon" as const },
       ...(steals ? { steals } : {}),
     })),
@@ -64,10 +65,10 @@ describe("content:validate on format 3", () => {
 
   it.each<[string, (p: Puzzle) => void, string]>([
     ["question count", (p) => p.questions.pop(), `${FILE}: has 6 questions, expected 7`],
-    ["no host answers", (p) => (p.questions[1].host_answers = []), `${FILE} q2: has no host answers`],
+    ["a host count off 1, 1, 1, 1, 2, 2, 3", (p) => (p.questions[1].host_answers = []), `${FILE} q2: has 0 host answers, expected 1`],
     ["host answer outside the bank", (p) => (p.questions[2].host_answers = [id(99)]), `${FILE} q3 thing "${id(99)}": host answer is not in host_bank`],
     ["host bank duplicate", (p) => p.questions[0].host_bank.push(id(1)), `${FILE} q1 thing "${id(1)}": listed twice in host_bank`],
-    ["host answer duplicate", (p) => p.questions[0].host_answers.push(id(1)), `${FILE} q1 thing "${id(1)}": listed twice in host_answers`],
+    ["host answer duplicate", (p) => (p.questions[4].host_answers = [id(41), id(41)]), `${FILE} q5 thing "${id(41)}": listed twice in host_answers`],
     ["steals where schedule A steals nothing", (p) => (p.questions[0].steals = "b"), `${FILE} q1: steals "b", but schedule A steals nothing at question 1`],
     ["no steal where schedule A steals", (p) => delete p.questions[1].steals, `${FILE} q2: schedule A steals a medium letter here, and "steals" is missing`],
     ["a letter from the wrong tier", (p) => (p.questions[4].steals = "e"), `${FILE} q5: steals "e", which is not a heavy consonant letter (rnlts)`],

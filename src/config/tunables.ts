@@ -3,6 +3,18 @@
 // Origin: human, 2026-10-18 (docs/milestones/M01-puzzle-content.md, Numbers).
 export const QUESTIONS_PER_DAY = 7;
 
+// How many answers the host names at each question, Q1 to Q7, drawn at random from the host bank (human, 2026-10-24:
+// "1 1 1 1 2 2 3", "Random from the host bank"; docs/milestones/M13-13c-rarity-and-the-host.md). The validator holds
+// every day to it, drafted or written by hand.
+export const HOST_ANSWERS_PER_QUESTION = [1, 1, 1, 1, 2, 2, 3];
+// The fewest familiar answers (common or uncommon in the day's levels) a question must leave typeable past the stolen
+// letters and safe from the host (human, 2026-10-24: "3", M13 Numbers; "Typeable and safe (Recommended)", 13c; M04 G9).
+// scripts/draft.ts picks letters by it; private.approve_puzzle checks the same 3 (supabase/tests/puzzle_entry.test.sql).
+export const FAMILIAR_SAFE_MIN = 3;
+// The share of players each question would catch on a "Gentle" day, Q1 to Q7 (human, 2026-10-24, M13 Numbers: "Gentle:
+// 3→20%, ~45% finish"). Only shown next to a draft's expected catch rates (13c: "Show, never warn (Recommended)").
+export const CATCH_TARGETS = [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2];
+
 // Username length (human, 2026-10-18; docs/milestones/M02-sign-in-and-play.md, Numbers). The database's check
 // constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).
 export const USERNAME_MIN_LENGTH = 3;
@@ -56,11 +68,12 @@ export const MISS_ACCEPT_SHARE_PERCENT = 1;
 // 1000 for all seven (human, 2026-10-21; M04 G1). Replaces k points for question k. The rarity bonus comes on top.
 export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
 
-// The rarity bonus (human, 2026-10-22; docs/milestones/M09-points-and-leaderboard.md, Numbers N1–N5). Changing one
+// The rarity bonus (human, 2026-10-22; docs/milestones/M09-points-and-leaderboard.md, Numbers N1–N4). Changing one
 // changes days settled afterwards; ledger rows already written keep their bonus.
-// N5: the share of players expected to give a host-bank answer; the host bank is the "common" tier (D11).
-export const HOST_BANK_EXPECTED_SHARE = 0.5;
-// N1: the expectation weighs as this many players against a day's real counts.
+// The first guess (human, 2026-10-24, M13 D5: "40 / 40 / 20"; replaces M09's N5): the share of players expected to give
+// some common, uncommon or rare answer to a question, before play has counted any.
+export const FIRST_GUESS_SHARES = { common: 0.4, uncommon: 0.4, rare: 0.2 } as const;
+// N1: the first guess weighs as this many players against the pooled counts.
 export const RARITY_EXPECTATION_WEIGHT = 10;
 // N4: a question's real counts are used once at least this many players answered it (as INSIGHTS_MIN_PLAYERS).
 export const RARITY_MIN_PLAYERS = 5;
