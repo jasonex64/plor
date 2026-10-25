@@ -2,7 +2,8 @@
 
 // The navigation every signed-in page sits in (docs/milestones/M14-14a-1-shell.md): the four tabs the human chose
 // (M14 L17, "Me" from L45), as a bottom tab bar on phones and a sidebar from 768px (L42). It stays during a run, and
-// leaving lets the question's timer run (L18). Admin is in the sidebar only, for admins.
+// leaving lets the question's timer run (L18). Admins find Admin in the sidebar, and on phones on the Me tab
+// (MeAdminLink), which replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c").
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -95,5 +96,14 @@ export function Shell({ admin }: { admin: boolean }) {
         </Link>
       )}
     </nav>
+  );
+}
+
+// Admin on the Me tab, for phones, which have no sidebar.
+export function MeAdminLink() {
+  return (
+    <p className={styles.meAdmin}>
+      <Link href="/admin">Admin</Link>
+    </p>
   );
 }

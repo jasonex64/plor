@@ -61,8 +61,13 @@
   color: var(--accent);
 }
 
-/* From 768px (M14 L42): a sidebar, 248px wide, with the wordmark and, for admins, Admin. */
+/* From 768px (M14 L42): a sidebar, 248px wide, with the wordmark and, for admins, Admin, which then leaves the Me
+   tab. */
 @media (min-width: 768px) {
+  .meAdmin {
+    display: none;
+  }
+
   .nav {
     top: 0;
     right: auto;

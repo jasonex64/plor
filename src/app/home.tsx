@@ -18,7 +18,7 @@ import { Game } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, Yesterday } from "./leaderboard";
 import { errorText, messageForRedirect } from "./messages";
-import { Shell } from "./shell";
+import { MeAdminLink, Shell } from "./shell";
 
 type Me = { signedIn: false } | { signedIn: true; username: string | null; admin: boolean };
 
@@ -88,7 +88,10 @@ export function Home({ view }: { view?: View }) {
           ) : view?.kind === "groups" ? (
             <Groups />
           ) : view?.kind === "me" ? (
-            <Account onSignedOut={() => setMe({ signedIn: false })} />
+            <>
+              <Account onSignedOut={() => setMe({ signedIn: false })} />
+              {me.admin && <MeAdminLink />}
+            </>
           ) : view?.kind === "invite" ? (
             <AcceptInvite code={view.code} />
           ) : view?.kind === "joinGroup" ? (

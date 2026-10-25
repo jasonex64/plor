@@ -78,9 +78,23 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-sc@example.test`]);
   await page.reload();
   await expect(nav.getByRole("link", { name: "Admin" })).toBeVisible();
-  // A phone has no sidebar, so no Admin.
+  // A phone has no sidebar: Admin is on the Me tab instead, and only there (it replaces M15 15c).
   await page.setViewportSize({ width: 360, height: 800 });
   await expect(nav.getByRole("link", { name: "Admin" })).toBeHidden();
+  await nav.getByRole("link", { name: "Me" }).click();
+  await expect(page.getByRole("main").getByRole("link", { name: "Admin" })).toBeVisible();
+  await page.getByRole("main").getByRole("link", { name: "Admin" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/admin");
+  // Back on a desktop, the Me tab leaves it to the sidebar.
+  await page.goto("/me");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.getByRole("main").getByText("Admin", { exact: true })).toBeHidden();
+
+  // A player who isn't an admin sees no Admin on the Me tab either.
+  const other = await player(browser, "sg", { width: 360, height: 800 });
+  await other.nav.getByRole("link", { name: "Me" }).click();
+  await expect(other.page.getByRole("region", { name: "Your account" })).toBeVisible();
+  await expect(other.page.getByRole("link", { name: "Admin" })).toHaveCount(0);
 });
 
 test("no tab scrolls sideways at 320px", async ({ browser }) => {

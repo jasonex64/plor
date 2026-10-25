@@ -33,7 +33,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 
 ## Acceptance criteria
 1. **Tabs on phones.** At 360×800, every signed-in page shows a bottom tab bar with four links, Today, Friends, Groups and Me, and no sidebar. Each link opens its page (`/`, `/friends`, `/groups`, `/me`), and only the current one has `aria-current="page"`. Checked by a new `e2e/shell.e2e.ts`.
-2. **Sidebar from 768px.** At 768×1024 and 1440×900, the same four links are in a left sidebar, with no tab bar. An Admin link shows only for an admin. Checked in `e2e/shell.e2e.ts`.
+2. **Sidebar from 768px.** At 768×1024 and 1440×900, the same four links are in a left sidebar, with no tab bar. An Admin link shows only for an admin: in the sidebar, and on phones on the Me tab. This replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c (Recommended)"). Checked in `e2e/shell.e2e.ts`.
 3. **Reflow.** At 320px wide, no tab page scrolls sideways: `document.documentElement.scrollWidth <= innerWidth` on each. Checked in `e2e/shell.e2e.ts`.
 4. **The sections on their tabs.**
    - `/`: the Offbeat card with Yesterday, and the feed.
