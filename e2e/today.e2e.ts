@@ -32,7 +32,9 @@ const path = (url: string) => new URL(url).pathname;
 // Criteria 1 and 2.
 test("Offbeat's banner has Play before the run, and the score, how it ended and Result after", async ({ browser }) => {
   const page = await player(browser, "ta");
-  const banner = page.getByRole("region", { name: "Offbeat" });
+  // Today's region, which the game screen's has the same name as: each check below first waits for Today's address,
+  // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
+  const banner = page.getByRole("region", { name: "Offbeat", exact: true });
   await expect(banner.getByText("Don't match the Wind · 7 questions")).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: "Offbeat" }).locator("..");
@@ -44,6 +46,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff).
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
   await expect(page).toHaveURL("http://localhost:3000/offbeat");
@@ -52,6 +55,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
   await nav.getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();

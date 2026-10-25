@@ -247,6 +247,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Record the game screen's smaller sizes (font sizes 11–20px, How to play's 640px width, the gaps) in 14a-2b's Numbers as round 5's, as 14a-2a recorded its card spacing (M14 14a-2b review)
 - [ ] How to play's Start climbing shows even when today's run is in progress or over; it then just opens the game screen. Show it only before the run (M14 14a-2b review)
 - [ ] The game screen's comments keep the feed's heading, "Feed"; round 5 heads them "Offbeat comments" (M14 14a-2b, Source diff)
+- [ ] `e2e/account.e2e.ts`'s "the Me tab holds the account" timed out once on CI (run 40179952372, a docs-only commit, 2026-10-25) and passed on every run before and since; find what it waits on (M14 14a-2b CI)
 - [ ] `groups.e2e.ts`'s `openLive` waits on the first Realtime socket, and Today now opens two from 768px; it could catch the wrong one. Found in M14 14a-2a (review).
 
 **For M15 (launch):**
