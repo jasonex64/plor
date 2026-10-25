@@ -6,9 +6,41 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## M14 (from main, written by the M14 session)
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
-- **Waiting on the human:** nothing for 14a-1. 14a-2 starts with its guided questions (CLAUDE.md, "Ask before designing").
-- **14a-2a, Today, is merged** (PR #79; `docs/milestones/M14-14a-2a-today.md`): the plain navy banner, one leaderboard card, the locked feed with 3 names, the clock bar above the tabs, Today's columns. Local e2e 27 of 27. Merged on green CI.
-- **Next step:** after 14a-2a merges, 14a-2b's guided questions (how the stats count, yesterday's answers and its security change), then its ticket.
+- **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
+- **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
+- **In review: PR #81.** The reviewer's blocking findings are fixed and the rest are in ROADMAP, For M14. **Waiting on the human:** the merge, on green CI.
+- **Next step:** the overnight plan below.
+
+## Overnight plan (human, 2026-10-25, before sleeping)
+The human answered these guided questions so the work can go on without them ("after this, im going to sleep … just nonstop work while i sleep … ideally following the tickets"):
+
+- **Scope:** "Review fixes, then 14a-3 (Recommended)", and then 14b-1 too ("Build 14b-1 tonight too").
+- **How it's approved:** each ticket is drafted from the answers below and built without a separate draft approval.
+- **Merging:** "Yes, on green CI (Recommended)": merge each PR once every check is green, then start the next sub-ticket.
+- **When stuck:** "Park it, move on (Recommended)": write the question in this file and the ticket, then go on with work that doesn't depend on it. Never guess a number.
+- **How it runs:** "One long run here (Recommended)", in the M14 session.
+- **Migrations:** "Merge; I'll push in the morning (Recommended)". plor.app's profile route fails from the first migration merge until the human runs `npx supabase db push` against the hosted project. Nobody plays there yet.
+
+The steps:
+1. **PR #81** merges on green (auto-merge is on). Then mark 14a-2b done with its CI evidence.
+2. **14a-2c, the review fixes:** the six For M14 items from 14a-2b's review (ROADMAP).
+3. **14a-3:**
+   - **Me:** totals, the calendar, a card per game, the rarest answers. The calendar shows "This month, as drawn (Recommended)". The rarest answers are "3, from closed days (Recommended)", with H5's 5-player minimum.
+   - **The settings sheet:** a sheet on phones and a side panel on desktop (L44), opened from a gear in a new top bar. It holds Skip the game screen (L39) and Numbers on the calendar (L46).
+   - **The rest:** the empty states (L31) and the avatar slots (L37).
+   - **Security change, approved:** "Approve it (Recommended)": the two settings are columns on the account, and `plor_app` gets UPDATE on them, for the player's own row only.
+4. **14b-1:**
+   - **Themes:** Follow device, Paper, Night, Sky, Moonlit and Ink (L21), with the picker in the sheet; the chosen one is outlined (L47).
+   - **Security change, approved:** "Approve it (Recommended)": the theme is a column on the account, with the same UPDATE rule.
+   - **The About page:** "An About page (Recommended)", `/about`, linked from the footer and the sheet. It credits the borrowed palettes and holds the AI note, which says "Code only": the app is built with AI help.
+
+Every sub-ticket follows CLAUDE.md as usual: a ticket, the sources, numbers with origins, tests, the reviewer, evidence, its Status and ROADMAP row, and one PR at a time. The M13 session shares the local stack, so message it before db tests, e2e runs or a reset.
+
+**In the morning, for the human:**
+1. Run `npx supabase db push` once 14a-3's and 14b-1's migrations are on main.
+2. Read the parked questions, below.
+
+**Parked questions:** none yet.
 - **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
 - **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
 - **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).

@@ -13,6 +13,11 @@
   --accent: #2457d6;
   --on-accent: #ffffff;
   --soft: #2457d61a;
+  /* A question's outcome on the game screen: Safe and Caught pills, text on its own tint (round 5's mockup). */
+  --safe: #14532d;
+  --safe-bg: #e3f4ea;
+  --caught: #8a1c26;
+  --caught-bg: #fbe4e6;
   /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
      text. 14c's pixel world replaces the plain block. */
   --offbeat: #2f3d5c;
@@ -30,6 +35,10 @@
     --accent: #7ea6ff;
     --on-accent: #121212;
     --soft: #7ea6ff26;
+    --safe: #9be3b4;
+    --safe-bg: #1f3b2a;
+    --caught: #ffb3b8;
+    --caught-bg: #4a1f24;
   }
 }
 

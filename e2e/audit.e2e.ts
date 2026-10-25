@@ -38,7 +38,7 @@ test("an admin undoes an added answer, accepts a held one and undoes that; a pla
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
   await signInAndPick(admin, "au");
-  await expect(admin.getByRole("button", { name: "Play", exact: true })).toBeVisible();
+  await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-au@example.test`]);
   await admin.goto("/admin");
   await expect(admin.getByRole("link", { name: /^Answer audit \(\d+ to review\)$/ })).toBeVisible();
@@ -59,7 +59,7 @@ test("an admin undoes an added answer, accepts a held one and undoes that; a pla
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");
   await signInAndPick(player, "ay");
-  await expect(player.getByRole("button", { name: "Play", exact: true })).toBeVisible();
+  await expect(player.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await player.goto("/admin/audit");
   await expect(player.getByText("This page is for admins only.")).toBeVisible();
 });

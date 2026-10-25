@@ -59,7 +59,7 @@ describe("Offbeat's colour", () => {
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {
-    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "edge", "line", "muted", "on-accent", "soft", "surface", "text"]);
+    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "soft", "surface", "text"]);
   });
 
   it.each([
@@ -70,6 +70,9 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     ["accent", "bg"],
     ["accent", "surface"],
     ["on-accent", "accent"],
+    // The game screen's Safe and Caught pills (docs/milestones/M14-14a-2b-game-screen.md).
+    ["safe", "safe-bg"],
+    ["caught", "caught-bg"],
   ])("%s on %s is at least 4.5:1", (fg, bg) => {
     expect(ratio(rgb(t[fg]), rgb(t[bg]))).toBeGreaterThanOrEqual(4.5);
   });

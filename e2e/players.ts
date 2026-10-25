@@ -43,3 +43,11 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
   // and find the step again (seen in M14 14a-1's e2e run).
   await expect(page.getByRole("heading", { name: "Pick a username" })).toBeHidden();
 }
+
+// From Today, Play opens Offbeat's game screen and Start there begins question 1
+// (docs/milestones/M14-14a-2b-game-screen.md, criterion 2).
+export async function play(page: Page): Promise<void> {
+  await page.getByRole("link", { name: "Play", exact: true }).click();
+  await expect(page).toHaveURL(/\/offbeat$/);
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+}

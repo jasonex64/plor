@@ -72,6 +72,8 @@ const TABS = [
 // Groups).
 function current(path: string, href: string): "page" | "true" | undefined {
   if (path === href) return "page";
+  // Offbeat's game screen and its How to play are opened from Today (docs/milestones/M14-14a-2b-game-screen.md).
+  if (href === "/" && (path === "/offbeat" || path.startsWith("/offbeat/"))) return "true";
   if (href !== "/" && path.startsWith(`${href}/`)) return "true";
 }
 
@@ -116,9 +118,10 @@ export function MeAdminLink() {
   );
 }
 
-// A question left in play, seen from another tab (M14 L18, docs/milestones/M14-14a-2a-today.md): its seconds left,
-// counted down from the run state the page read, and Back to Today; at zero, that time is up, with a link to the
-// result. The database stays the judge of the timer; this is only a display. Nothing shows without a question in play.
+// A question left in play, seen from another page (M14 L18, docs/milestones/M14-14a-2a-today.md): its seconds left,
+// counted down from the run state the page read, and Back to the game screen (14a-2b); at zero, that time is up, with
+// a link to the result. The database stays the judge of the timer; this is only a display. Nothing shows without a
+// question in play.
 export function ClockBar() {
   const [run, setRun] = useState<RunState | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -145,12 +148,12 @@ function Clock({ index, msLeft }: { index: number; msLeft: number }) {
           <span role="timer">
             Question {index + 1} · {seconds}s left
           </span>
-          <Link href="/">Back</Link>
+          <Link href="/offbeat">Back</Link>
         </>
       ) : (
         <>
           <span role="status">Time&apos;s up on question {index + 1}</span>
-          <Link href="/#result">Result</Link>
+          <Link href="/offbeat#result">Result</Link>
         </>
       )}
     </section>
