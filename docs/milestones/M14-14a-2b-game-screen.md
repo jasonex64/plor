@@ -1,6 +1,6 @@
 # M14 14a-2b — Offbeat's game screen
 
-**Status:** built and in review (2026-10-25), PR #81. Approved by the human with its security change (2026-10-25: "I approve 14a-2b as drafted, including the security change (yesterday's host answers to every signed-in player). Build it.").
+**Status:** done (2026-10-25): merged in PR #81 on green CI, by auto-merge, which the human asked for ("Merge PR #81 once every CI check is green"). Approved by the human with its security change (2026-10-25: "I approve 14a-2b as drafted, including the security change (yesterday's host answers to every signed-in player). Build it.").
 
 ## Goal
 Offbeat gets its own page, `/offbeat`: the day's rules before Start, the run itself and its result, how to play, the player's Offbeat stats, yesterday's answers, and Offbeat's comments. Today's Play opens it.
@@ -58,6 +58,9 @@ Earlier decisions this builds: L25 (Play opens a separate game screen with How t
 | Yesterday only | The revealed answers | L34, L25 ("Yesterday's answers") |
 | 7 questions, 20 seconds, 25 to 350 points | The rules line and How to play | DECISIONS.md, Game 1 |
 | The page's sizes: cards 14px padding and radius, the chart 86px tall, stat numbers 24px, Start 52px, How to play 48px | Layout | Round 5's game screen (the approved mockups) |
+| Smaller sizes: text 11px (the chart's days), 12px (stat labels, pills), 13px (the chart's caption), 14px (the answers, muted text), 20px (card headings); gaps of 1–16px | Layout | Round 5's game screen (recorded by 14a-2c, from 14a-2b's review) |
+| How to play: 14px between paragraphs, 16px text at line height 1.45, in the page's 960px column | Layout | Round 3's How to play; L43's column. 14a-2b had 12px, 1.5 and a 640px width that no source gave, corrected by 14a-2c |
+| The back links 44px tall | Touch target | As `globals.css`'s buttons (44px) |
 | The average to one decimal, out of 7 ("5.2/7"); the best score with a thousands comma ("1,050") | The stats | Round 5's game screen |
 | Safe and Caught pills: Paper `--safe` #14532D on `--safe-bg` #E3F4EA (8.0:1), `--caught` #8A1C26 on `--caught-bg` #FBE4E6 (7.6:1); Night #9BE3B4 on #1F3B2A (8.2:1), #FFB3B8 on #4A1F24 (8.2:1) | Yesterday's answers | Round 5's game screen, both themes (its light and dark palettes, `safeBg`/`safeFg`/`caughtBg`/`caughtFg`); ratios by WCAG 2.2's formula, checked in `src/app/colors.test.ts` |
 | The feed's column, 360px from 1200px | Desktop | As Today's right column (14a-2a, L42) |
@@ -112,7 +115,8 @@ Run on the Windows checkout against the local stack, 2026-10-25.
   - `npm run test:e2e`: `30 passed (3.0m)`.
   - `npm run build`: compiled, with `○ /offbeat` and `○ /offbeat/how-to-play` among the routes.
   - The security change is in DECISIONS.md's Log, 2026-10-25.
-  - CI: with the PR.
+  - **CI, at d3468d8:** runs 40184128537 (pull_request) and 40184125913 (push) passed `check`, `db`, `e2e` and `secrets`; Vercel passed too. Merged as 6cf0968, 2026-10-25 10:21 UTC.
+  - **Earlier CI, at a9f44d4 and 5fc556d:** each push run failed `e2e`, in today.e2e's first case. It was a race in the test: the check could pass on the game screen's banner before the move to Today landed. Fixed in d3468d8, which waits for Today's address first; 12 of 12 local runs passed.
 
 ## Review
 The `reviewer` agent, in a fresh context, on `515e7b5..17fb445`. It found no leak in the security change: only `private.today() - 1` is read, a run in progress is answered with `in_play` before any answer is read, and `plor_app`'s grants cover the reads and the settling. It re-ran the route db test (7 passed), the contrast test (30), `npm test` (254), lint and tsc.
