@@ -1,0 +1,63 @@
+/* Offbeat's banner on Today (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour until 14c's
+   pixel world, 230px tall on phones and 240px from 768px (the approved mockups). */
+.banner {
+  box-sizing: border-box;
+  min-height: 230px;
+  padding: 24px 16px 20px;
+  border-radius: 18px;
+  background: var(--offbeat);
+  color: var(--on-offbeat);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.line {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Play: centred at the bottom of the banner (L25), white on the game's colour. */
+.play {
+  min-width: 140px;
+  min-height: 48px;
+  margin: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--on-offbeat);
+  color: var(--offbeat);
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* On the game's colour the accent ring would fade (Paper's is 1.75:1 on it), so focus there is white: 10.8:1, the
+   pairing src/app/colors.test.ts checks (WCAG 2.2 1.4.11). */
+.banner :focus-visible {
+  outline-color: var(--on-offbeat);
+}
+
+.result {
+  color: var(--on-offbeat);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .banner {
+    min-height: 240px;
+  }
+
+  .title {
+    font-size: 46px;
+  }
+}

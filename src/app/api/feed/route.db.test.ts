@@ -111,9 +111,9 @@ describe("the home page's feed", () => {
       status: 200,
       body: {
         ok: true,
-        // F is named, being V's friend; G, who isn't, is counted (G3). O's comments are in threads V can't see. The one
-        // reaction is O's on G's comment, O being a member of Club.
-        feed: { date: today, canPost: false, comments: null, preview: { friends: [F.username], others: 1, reactions: 1 } },
+        // F is named, being V's friend; G, who isn't, is counted (G3). O's comments are in threads V can't see, so V will
+        // read 2 comments. The one reaction is O's on G's comment, O being a member of Club.
+        feed: { date: today, canPost: false, comments: null, preview: { friends: [F.username], others: 1, count: 2, reactions: 1 } },
       },
     });
     expect(JSON.stringify(r.body)).not.toMatch(/words/);
