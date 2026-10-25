@@ -57,18 +57,18 @@ export function normalize(text: string): string {
 
 // --- shape (the file is untrusted input from disk) ---
 
-function isObject(v: unknown): v is Record<string, unknown> {
+export function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-function checkKeys(errors: string[], where: string, obj: Record<string, unknown>, required: string[], optional: string[] = []) {
+export function checkKeys(errors: string[], where: string, obj: Record<string, unknown>, required: string[], optional: string[] = []) {
   for (const key of required) if (!(key in obj)) errors.push(`${where}: missing "${key}"`);
   for (const key of Object.keys(obj)) {
     if (!required.includes(key) && !optional.includes(key)) errors.push(`${where}: unknown field "${key}"`);
   }
 }
 
-function isText(v: unknown): v is string {
+export function isText(v: unknown): v is string {
   return typeof v === "string" && v.trim() !== "";
 }
 

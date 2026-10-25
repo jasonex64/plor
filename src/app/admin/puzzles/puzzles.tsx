@@ -1,11 +1,9 @@
 "use client";
 
-// Puzzle entry (docs/milestones/M06-puzzle-entry.md): an admin types a day's 7 questions and saves them, copies them
-// for a Claude session to draft, then reviews the drafted day, changes the suggested host answers if they like, and
-// approves it. Plain on purpose; the look is M14's job.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { QUESTIONS_PER_DAY } from "@/config/tunables";
-import { copyForClaude } from "@/admin/puzzle-entry";
+// Puzzle entry (docs/milestones/M06-puzzle-entry.md): an admin reviews each day a Claude session drafted from the
+// question bank (M13 13d), changes the drawn host answers if they like, and approves it. Plain on purpose; the look is
+// M14's job.
+import { useCallback, useEffect, useState } from "react";
 import type { DayView, QuestionView } from "@/admin/puzzles";
 import { ApiError, api } from "@/lib/api-client";
 import { errorText } from "../../messages";
@@ -31,9 +29,8 @@ export function Puzzles() {
   if (!data) return <p>Loading…</p>;
   return (
     <section>
-      <WriteQuestions today={data.today} days={data.days} onSaved={load} />
       <h2>Days</h2>
-      {data.days.length === 0 && <p>No days yet: write a day&apos;s questions above.</p>}
+      {data.days.length === 0 && <p>No days yet: a Claude session drafts them from the question bank.</p>}
       {data.days.map((day) => (
         <Day key={day.date} day={day} onApproved={load} />
       ))}
@@ -41,94 +38,24 @@ export function Puzzles() {
   );
 }
 
-// Typing a day's questions. Picking a date that already has saved questions fills them in, so they can be edited.
-function WriteQuestions({ today, days, onSaved }: { today: string; days: DayView[]; onSaved: () => void }) {
-  const [date, setDate] = useState(today);
-  const [questions, setQuestions] = useState<string[]>(Array(QUESTIONS_PER_DAY).fill(""));
-  const [note, setNote] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  function pick(next: string) {
-    setDate(next);
-    setQuestions(days.find((d) => d.date === next)?.questions ?? Array(QUESTIONS_PER_DAY).fill(""));
-    setNote(null);
-  }
-
-  async function save(event: FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    try {
-      await api("/api/admin/puzzles/questions", { method: "POST", body: { date, questions } });
-      setNote("Saved.");
-      onSaved();
-    } catch (err) {
-      setNote(errorText(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(copyForClaude(date, questions.map((q) => q.trim())));
-      setNote("Copied. Paste it into a Claude session.");
-    } catch (err) {
-      setNote(`Couldn't copy: ${String(err)}`);
-    }
-  }
-
-  return (
-    <form onSubmit={save}>
-      <h2>Write a day&apos;s questions</h2>
-      <label>
-        Day <input type="date" required min={today} value={date} onChange={(e) => pick(e.target.value)} />
-      </label>
-      <ol>
-        {questions.map((q, i) => (
-          <li key={i}>
-            <input
-              aria-label={`Question ${i + 1}`}
-              required
-              value={q}
-              onChange={(e) => setQuestions(questions.map((old, j) => (j === i ? e.target.value : old)))}
-            />
-          </li>
-        ))}
-      </ol>
-      <button type="submit" disabled={busy}>
-        Save questions
-      </button>{" "}
-      <button type="button" onClick={copy}>
-        Copy for Claude
-      </button>
-      {note && <p role="status">{note}</p>}
-    </form>
-  );
-}
-
 function stateOf(day: DayView): string {
   if (day.started) return "live, started";
   if (day.live) return "approved";
-  if (day.draft) return "drafted, waiting for approval";
-  return "questions saved, waiting for a draft";
+  return "drafted, waiting for approval";
 }
 
 function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
-  const shown = day.live ?? day.draft;
-  const questionsDiffer =
-    day.draft !== null && day.questions !== null && day.draft.some((q, i) => q.prompt !== day.questions![i]);
+  // A listed day has a draft or an approved puzzle (listDays).
+  const shown = (day.live ?? day.draft)!;
   return (
     <article>
       <h3>
         {day.date}: {stateOf(day)}
       </h3>
-      {questionsDiffer && <p role="status">The draft&apos;s questions differ from the saved ones.</p>}
       {day.draft && !day.started ? (
         <Review date={day.date} draft={day.draft} live={day.live} onApproved={onApproved} />
-      ) : shown ? (
-        shown.map((q, i) => <QuestionSummary key={i} index={i} q={q} />)
       ) : (
-        <ol>{day.questions!.map((q, i) => <li key={i}>{q}</li>)}</ol>
+        shown.map((q, i) => <QuestionSummary key={i} index={i} q={q} />)
       )}
     </article>
   );

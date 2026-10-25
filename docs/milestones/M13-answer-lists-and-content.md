@@ -1,6 +1,6 @@
 # M13 — The answer database
 
-**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, done (PR #73, `M13-13c-rarity-and-the-host.md`); 13d, the question bank, next.
+**Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, done (PR #73, `M13-13c-rarity-and-the-host.md`); 13d, the question bank, done (PR #75, `M13-13d-the-question-bank.md`); 13e, growing the categories, next.
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
 - **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
 - **Sources:** D2's are in SOURCES.md (human, 2026-10-24). Every decision and number is answered, so 13a's criteria come next.
@@ -120,14 +120,15 @@ The database has five parts. Each day takes a frozen copy when it's approved.
   - The Next revision matching items for M13: plural aliases, digits, zero-width characters.
 - **13b, learning from misses** (D4): the facts check, the auto-accept rule with its share and minimum, and the audit page with undo.
 - **13c, rarity and the host** (D5; its own file, `M13-13c-rarity-and-the-host.md`): pooled shares in the bonus; host answers fixed at 1, 1, 1, 1, 2, 2, 3 per question, drawn at random from the host bank (replacing the dodging host: human, 2026-10-24); the letter picker keeping 3 familiar answers typeable and safe (M04 G9).
-- **13d, the question bank and tuning** (D7, M04 G3): questions with recipes, themes and the repeat gap; difficulty tuned with the human toward a target catch rate per question.
+- **13d, the question bank** (D7; its own file, `M13-13d-the-question-bank.md`): `content/bank.json`, the draft picking a day's 7 from it by date (30 days between uses of a category, a date's theme first, easiest first), the gap in CI and the bank page. Tuning toward targets became 13c's soft guide.
+- **13e, growing the categories** (proposed with 13d, 2026-10-24): a 30-day gap per category with 7 questions a day needs 210+ categories, and there are 7 (human: "Keep it; grow categories (Recommended)"). Its own guided questions after 13d, before M15 needs daily days.
 
 ## Acceptance criteria
 Each sub-ticket's criteria are written before its code, once D1–D8 are answered. They'll cover:
 - **13a:** a category recipe returns the source's members, with the import reviewed in the diff; a day approved in format 3 plays end to end (db tests and e2e); the grants (pgTAP).
 - **13b:** a miss reaching the threshold is a member the next day, not today; a fact-rejected miss never is; an undo removes it from later days only (db tests).
 - **13c:** the bonus uses the pooled share, a dodge is picked only when the plain host answers miss the question's target, and the picker refuses a day leaving fewer than 3 familiar answers (unit and db tests).
-- **13d:** a question isn't offered again within the gap; the sample days meet the catch-rate targets (recorded table).
+- **13d:** a question isn't offered again within the gap (the catch-rate targets became 13c's soft guide; DECISIONS.md, Game 1 records the change from "most players should usually finish").
 
 ## Out of scope
 - **The AI that drafts days** (ROADMAP Later: needs an API key in Vercel and its own ticket). M13 builds what it stands on.
@@ -144,7 +145,7 @@ Each sub-ticket's criteria are written before its code, once D1–D8 are answere
 | AI first guesses: **40% / 40% / 20%** of players give some common / uncommon / rare answer | Rarity before data (D5; replaces N5's 50% for the host bank) | Human, 2026-10-24: "40 / 40 / 20" |
 | ~~Dodge picks: used when needed to reach a question's catch target~~ Replaced in 13c: host answers per question **1, 1, 1, 1, 2, 2, 3**, drawn at random from the host bank | The host (D5) | Human, 2026-10-24: "Tied to difficulty (Recommended)"; then, in 13c's questions, "each question should have a fixed number of host answers, and if we happen to have really easy or really tough days, thats just part of variance", "1 1 1 1 2 2 3", "Random from the host bank" |
 | Repeat gap: **at least 30 days** | The question bank (D7) | Human, 2026-10-24: "just at least 30 days" |
-| Target catch rate per question, Q1–Q7: **3, 5, 7, 10, 13, 16, 20** caught per 100 players ("Gentle"; about 45% finish all 7, by Claude's multiplication) | A soft guide, shown in the draft's summary (13c: "Keep as a soft guide", "Show, never warn (Recommended)") | Human, 2026-10-24: "Gentle: 3→20%, ~45% finish". It changes DECISIONS.md, Game 1's "most players should usually finish". 13d records the change there when it's built |
+| Target catch rate per question, Q1–Q7: **3, 5, 7, 10, 13, 16, 20** caught per 100 players ("Gentle"; about 45% finish all 7, by Claude's multiplication) | A soft guide, shown in the draft's summary (13c: "Keep as a soft guide", "Show, never warn (Recommended)") | Human, 2026-10-24: "Gentle: 3→20%, ~45% finish". It changes DECISIONS.md, Game 1's "most players should usually finish": recorded there in 13d |
 | Fewest familiar (common or uncommon) answers still typeable after stolen letters: **3** | The letter picker (13c; M04 G9) | Human, 2026-10-24: "3" |
 
 ## Plan

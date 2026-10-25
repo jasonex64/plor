@@ -20,7 +20,8 @@ function valid(): Puzzle {
     date: "2026-11-02",
     questions: STEALS.map((steals, i) => ({
       prompt: `Name a thing ${i + 1}`,
-      category: "animal",
+      // Seven categories, as a day must hold (each category once: the 30-day gap, M13 13d).
+      category: ["animal", "fruit", "color", "country", "metal", "sport", "body_part"][i],
       host_bank: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)],
       host_answers: [id(i * 10 + 1), id(i * 10 + 2), id(i * 10 + 4)].slice(0, HOST_ANSWERS_PER_QUESTION[i]),
       levels: { [id(i * 10 + 1)]: "common" as const, [id(i * 10 + 3)]: "uncommon" as const },
@@ -58,7 +59,7 @@ describe("content:validate on format 3", () => {
   it("refuses an empty root, a stray file, and a file that isn't JSON", () => {
     expect(validateRoot(root({})).errors).toEqual([expect.stringMatching(/no puzzle files found$/)]);
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "offbeat/2026-11-03.jsno": "{}" })).errors).toEqual([
-      "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle",
+      "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle or the bank",
     ]);
     expect(validateRoot(root({ [FILE]: "{ nope" })).errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
   });
@@ -97,5 +98,22 @@ describe("content:validate on format 3", () => {
 
   it("refuses an older format", () => {
     expect(errorsFor({ ...valid(), format: 2 })).toEqual([`${FILE}: "format" must be 3`]);
+  });
+});
+
+// M13 13d: the question bank at the root, and the 30-day gap across drafted days.
+describe("content:validate with the bank and the gap", () => {
+  const dated = (date: string) => ({ ...valid(), date });
+  it("refuses two days asking a category less than 30 days apart, and passes 30", () => {
+    const near = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-01.json": JSON.stringify(dated("2026-12-01")) }));
+    expect(near.errors).toContain("animal is asked on 2026-11-02 and 2026-12-01, less than 30 days apart");
+    const far = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-02.json": JSON.stringify(dated("2026-12-02")) }));
+    expect(far.errors.filter((e) => e.includes("days apart") && e.includes("2026-12-02"))).toEqual([]);
+  });
+
+  it("checks bank.json at the root, and doesn't count it as a puzzle", () => {
+    const good = { format: 1, questions: [], themes: {} };
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify(good) }))).toEqual({ files: 1, errors: [] });
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ ...good, format: 2 }) })).errors).toContain('bank.json: "format" must be 1');
   });
 });
