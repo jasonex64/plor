@@ -7,6 +7,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import styles from "./shell.module.css";
 
 const icon = (children: ReactNode) => (
@@ -70,9 +71,11 @@ function current(path: string, href: string): "page" | "true" | undefined {
   if (href !== "/" && path.startsWith(`${href}/`)) return "true";
 }
 
+// Rendered into <body>, beside the page's <main>, so the navigation isn't inside the main landmark (M14 14a-1
+// review). Home, which renders it, runs only on the client (it reads the address bar behind Suspense).
 export function Shell({ admin }: { admin: boolean }) {
   const path = usePathname();
-  return (
+  return createPortal(
     <nav aria-label="Main" className={styles.nav}>
       <span className={styles.word} aria-hidden="true">
         Plor
@@ -95,7 +98,8 @@ export function Shell({ admin }: { admin: boolean }) {
           Admin
         </Link>
       )}
-    </nav>
+    </nav>,
+    document.body,
   );
 }
 

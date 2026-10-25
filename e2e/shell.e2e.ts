@@ -24,7 +24,7 @@ const TABS = [
   { name: "Today", path: "/", sections: ["Offbeat", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["Your account", "Friends"] },
+  { name: "Me", path: "/me", sections: ["Your account"] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.
@@ -37,7 +37,10 @@ async function player(browser: Browser, name: string, viewport: { width: number;
   return { page, requests, nav: page.getByRole("navigation", { name: "Main" }) };
 }
 
-const sections = (page: Page) => page.locator("main > section").evaluateAll((all) => all.map((s) => s.getAttribute("aria-label")));
+// The visible page's top-level sections: Next.js keeps a page already visited in the document, hidden, so the tab
+// navigated from is still there (cacheComponents, next.config.ts).
+const sections = (page: Page) =>
+  page.locator("main > section").evaluateAll((all) => all.filter((s) => s.checkVisibility()).map((s) => s.getAttribute("aria-label")));
 
 test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ browser }) => {
   const { page, requests, nav } = await player(browser, "sa", { width: 360, height: 800 });
@@ -128,20 +131,43 @@ test("the colours follow the device: Paper when light, Night when dark", async (
   }
 });
 
-// Reached by keyboard, a tab shows the focus ring: 3px, solid (WCAG 2.2 2.4.7).
-test("the tabs show the focus ring from the keyboard", async ({ browser }) => {
-  const { page } = await player(browser, "sf", { width: 1440, height: 900 });
-  const focusedTab = () =>
-    page.evaluate(() => {
-      const el = document.activeElement;
-      if (!el?.closest("nav[aria-label='Main']")) return null;
-      const style = getComputedStyle(el);
-      return { text: el.textContent, outline: `${style.outlineWidth} ${style.outlineStyle}` };
+// Reached by keyboard, every link in the tab bar and the sidebar shows the focus ring: a 3px solid outline in the
+// accent, offset 3px (criterion 9; WCAG 2.2 2.4.7). The players are admins, so the sidebar's Admin is checked too.
+test("every tab shows the focus ring from the keyboard", async ({ browser }) => {
+  for (const viewport of [
+    { width: 360, height: 800 },
+    { width: 1440, height: 900 },
+  ]) {
+    const name = `sf${viewport.width}`;
+    const { page } = await player(browser, name, viewport);
+    await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-${name}@example.test`]);
+    await page.reload();
+    await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+    const expected = TABS.map((t) => t.name).concat(viewport.width >= 768 ? ["Admin"] : []);
+    const accent = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--accent)";
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
     });
-  let found: { text: string | null; outline: string } | null = null;
-  for (let i = 0; i < 40 && !found; i++) {
-    await page.keyboard.press("Tab");
-    found = await focusedTab();
+    const focusedInNav = () =>
+      page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el?.closest("nav[aria-label='Main']")) return null;
+        const style = getComputedStyle(el);
+        return { text: el.textContent, ring: [style.outlineWidth, style.outlineStyle, style.outlineColor, style.outlineOffset] };
+      });
+    // Tab through the page until focus has passed every link in the navigation. The navigation comes after the page's
+    // own content; the cap only stops a broken page from looping, well above the links a tab page has.
+    const seen: { text: string | null; ring: string[] }[] = [];
+    for (let i = 0; i < 80 && seen.length < expected.length; i++) {
+      await page.keyboard.press("Tab");
+      const focused = await focusedInNav();
+      if (focused) seen.push(focused);
+    }
+    expect(seen.map((f) => f.text)).toEqual(expected);
+    for (const f of seen) expect(f.ring).toEqual(["3px", "solid", accent, "3px"]);
   }
-  expect(found).toEqual({ text: "Today", outline: "3px solid" });
 });

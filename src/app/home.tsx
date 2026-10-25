@@ -261,8 +261,9 @@ function GameCard({
   return (
     <section aria-label="Offbeat">
       <h2>Offbeat</h2>
-      <Game key={gameDay} onOver={onOver} onDayOver={onDayOver} />
-      <Yesterday key={day} />
+      {/* Distinct keys: the two counts start equal, and siblings sharing a key may be dropped or duplicated. */}
+      <Game key={`game-${gameDay}`} onOver={onOver} onDayOver={onDayOver} />
+      <Yesterday key={`yesterday-${day}`} />
     </section>
   );
 }

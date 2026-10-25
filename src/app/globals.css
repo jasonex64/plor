@@ -91,6 +91,12 @@ button {
   cursor: pointer;
 }
 
+/* A disabled button looks it: muted text, no pointer (the base rules above override the browser's own disabled look). */
+button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
 footer {
   margin-top: 32px;
 }

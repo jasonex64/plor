@@ -16,7 +16,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Sub-ticket | What it holds | Needs from the human |
 |---|---|---|
 | **14a-1** (this file) | Colour slots (Paper and Night, following the device), fonts, the tab bar and sidebar, a page per tab with today's sections moved onto it, CSS Modules recorded in DECISIONS.md | This ticket's approval |
-| **14a-2** | Today (game banners, side by side on desktop and swiped on phone, L22, L38), Offbeat's game screen (L25) with its rules line, stats (L35) and yesterday's answers (L34), the locked feed showing who commented (L40), the one leaderboard card (L41), the right column from 1200px (L42) | Approval of the security change for L34 (closed days' host answers to every signed-in player) |
+| **14a-2** | The bar back to a question left in play, with its seconds left (L18; proposed, for the human's OK); Today (game banners, side by side on desktop and swiped on phone, L22, L38), Offbeat's game screen (L25) with its rules line, stats (L35) and yesterday's answers (L34), the locked feed showing who commented (L40), the one leaderboard card (L41), the right column from 1200px (L42) | Approval of the security change for L34 (closed days' host answers to every signed-in player) |
 | **14a-3** | Me (L45: totals, calendar with its numbers setting L46, a card per game, rarest answers), the settings sheet and side panel (L44), the skip setting (L39), How to play (L29), the empty states (L31), the avatar slots (L37) | A security change: players update their own settings columns (a migration and a grant) |
 | **14b-1** | Themes: the five presets plus Follow the device (L20, L21, L47), saved on the account, loaded without a flash | A security change (the theme column), and each preset's full colour set |
 | **14b-2** | The sprout streak (L26), the admin pages (L19), and the polish from the design reviews | — |
@@ -57,6 +57,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 - Restyling the sections themselves: they move onto their tabs as they are, and 14a-2 and 14a-3 lay them out.
 - The settings gear and sheet, the streak in the top bar, avatars, and the right column. These come in 14a-2, 14a-3, 14b-2 and the avatars ticket (L37).
 - Themes beyond Paper and Night (14b-1).
+- The bar back to a question left in play, with its seconds left (L18, "Keep it, show the clock"): proposed for 14a-2, which lays out Today and the game screen, for the human's OK. Until then a player who leaves mid-question can time out unwarned, as before 14a-1 on any page.
 - The sign-in and pick-a-username screens: they keep their current content. M02 2c's intro text stays in the served HTML for signed-out visitors, which Google's brand check needs.
 
 ## Numbers
@@ -69,6 +70,8 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Baloo 2 800; DM Sans 400 and 700 | Fonts | L4 (human); the weights the approved mockups use. Young Serif (400) comes with 14a-2, its first user |
 | Tab bar 64px tall; sidebar 248px wide; targets 44px or more | Navigation | The approved mockups; WCAG 2.2 2.5.8 sets 24px as the minimum |
 | Focus ring: 3px accent outline, 3px offset | Focus | The approved mockups (round 5) |
+| The soft pill behind the current tab: the accent at alpha 1A (Paper) and 26 (Night) | The current tab | The approved mockups (rounds 2 to 7); its text and icon contrast is tested (criterion 7) |
+| The shell's sizes: tab labels 12px, the wordmark 30px, the icon pill 48×28px with a 14px radius, sidebar rows 46px tall, sidebar padding 28px by 16px with 20px gaps; controls' 1.5px outline, 10px (inputs) and 12px (buttons) radii and their padding | The tab bar, the sidebar, inputs and buttons | The approved mockups (rounds 5 to 7, the human: "Round 7 looks good", 2026-10-24) |
 
 ## Plan
 1. Record the Styling row in DECISIONS.md. Rewrite `globals.css` as the colour slots (Paper by default, Night under `prefers-color-scheme: dark`), the font variables and the base element styles. Its old phone-only rules go.
