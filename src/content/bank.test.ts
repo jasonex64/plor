@@ -8,7 +8,7 @@ const question = (id: string, category = id.replaceAll("-", "_"), themes: string
   id,
   prompt: `Name a ${id}`,
   category,
-  host_bank: ["x"],
+  host_bank: ["x", "y", "z"],
   uncommon: [],
   themes,
   added_by: "claude",
@@ -32,6 +32,11 @@ describe("the bank file", () => {
       'bank.json: question id "q-b" is listed twice',
       'bank.json: theme "2026-02-30": "x" must map a date to a slug',
     ]);
+  });
+
+  it("refuses a host bank smaller than the most host answers a position takes", () => {
+    const small = bank([{ ...ten[0], host_bank: ["x", "y"] }]);
+    expect(parseBank("bank.json", JSON.stringify(small)).errors).toEqual(['bank.json question 1: "host_bank" lists 2 names, at least 3 needed']);
   });
 });
 

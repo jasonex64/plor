@@ -117,6 +117,9 @@ export const BASE_SLICE_ROWS = 50_000;
 // The places 13b's facts check knows: Wikidata items with a population figure of at least this many people (human,
 // 2026-10-24: "100,000+ people (Recommended)"; docs/milestones/M13-13b-learning-from-misses.md).
 export const BASE_PLACES_MIN_POPULATION = 100_000;
+// The fewest members a category may have: `npm run base -- review` flags any under it (human, 2026-10-24: "10 members";
+// docs/milestones/M13-13e-growing-the-categories.md).
+export const CATEGORY_MIN_MEMBERS = 10;
 
 // Sign-in code limits (human, 2026-10-23; docs/milestones/M12-12e-sign-in-limits.md, N1–N4), counted per hashed key
 // by private.take_auth_attempt. A code lasts an hour (SOURCES.md, Supabase email sign-in), so the checks per address
