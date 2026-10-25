@@ -256,10 +256,13 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await openBoard(page, "/offbeat");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
-  // Only the reset loads the game screen's stats again, so once that answers, the page has moved to the new day.
-  const moved = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/offbeat");
+  // Only the reset asks for the game screen's stats again. Every load from the mount is sent before the chart can
+  // draw (Strict Mode sends two in development), so a request sent after the chart is there is the reset's (14a-2c,
+  // criterion 5). The faked clock is the browser's only: the server's day stays the same, so the reload's content
+  // can't show a new day.
+  await expect(page.getByRole("region", { name: "Your Offbeat" }).getByRole("img")).toBeVisible();
+  const moved = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/offbeat");
   await page.clock.fastForward("25:00:00");
   await moved;
-  await expect(page.getByRole("region", { name: "Your Offbeat" })).toBeVisible();
   await expect(page.getByLabel("Your answer")).toHaveValue("half typ");
 });

@@ -1,6 +1,7 @@
 // What Offbeat's game screen shows besides the run (docs/milestones/M14-14a-2b-game-screen.md): the player's stats and
 // yesterday's answers. Dates are read as text and "today" comes from private.today() alone (M00 §8).
 import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { STATS_CHART_DAYS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { settleRuns } from "./ledger";
 import { hostAnswers, named, thingNames, type Named } from "./payload";
@@ -8,7 +9,8 @@ import { FINISHED, type RunStatus } from "./runs";
 import { getStreak } from "./streak";
 
 // best: the highest points plus final bonus over closed days, null before one is settled. average: questions survived
-// per finished run, today's included once it's over; null before the first. days: today and the 6 days before (L35),
+// per finished run, today's included once it's over; null before the first. days: today and the days before it,
+// STATS_CHART_DAYS in all (L35),
 // oldest first, with the questions survived, or null for a day with no finished run.
 export type Stats = {
   streak: number;
@@ -40,9 +42,9 @@ export async function getStats(db: Db, userId: string): Promise<Stats> {
      select (select max(points) from private.points_ledger where user_id = $1 and game_id = $2) as best,
             (select avg(survived)::float8 from finished) as average,
             (select json_agg(json_build_object('date', w.day::text, 'survived', f.survived) order by w.day)
-             from (select generate_series(private.today() - 6, private.today(), interval '1 day')::date as day) as w
+             from (select generate_series(private.today() - ($4::int - 1), private.today(), interval '1 day')::date as day) as w
              left join finished f on f.puzzle_date = w.day) as days`,
-    [userId, GAME_ID, FINISHED],
+    [userId, GAME_ID, FINISHED, STATS_CHART_DAYS],
   );
   return { streak: await getStreak(db, userId), ...rows[0] };
 }

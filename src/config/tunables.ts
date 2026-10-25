@@ -135,3 +135,7 @@ export const AUTH_LIMITS = {
   check_email: { limit: 5, windowSeconds: 60 * 60 },
 } as const;
 
+
+// Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md, Numbers): the chart of questions survived covers
+// today and the days before it, this many in all (human, 2026-10-24, M14 L35: "Last 7 days chart").
+export const STATS_CHART_DAYS = 7;

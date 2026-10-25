@@ -111,7 +111,8 @@ test("before playing, the feed names who commented and holds none of their words
   const body = `the words ${RUN}`;
   await friend.getByLabel("Comment to your friends").fill(body);
   await friend.getByRole("button", { name: "Post" }).click();
-  await expect(friend.getByRole("region", { name: "Feed" }).getByText(body)).toBeVisible();
+  // Posted on the game screen, whose feed is "Offbeat comments" (14a-2c); Today's below stays "Feed".
+  await expect(friend.getByRole("region", { name: "Offbeat comments" }).getByText(body)).toBeVisible();
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
