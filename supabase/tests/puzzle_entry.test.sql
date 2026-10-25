@@ -8,7 +8,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(18);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000e601', 'm06-admin@example.test'),
@@ -71,6 +71,13 @@ select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-000000
   'OB009', format('puzzle_invalid: question 1: host bank entry %s is not a pet; question 1: host answer %s is not in the host bank',
     '00000000-0000-5000-8000-0000000e6104', '00000000-0000-5000-8000-0000000e6101'),
   'a host bank entry outside the category, and a host answer outside the host bank, are refused together');
+-- A level on a thing outside the category is refused: the bonus's first guess splits each tier among its members.
+select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d),
+    array[(select dog from ids)], array[(select dog from ids)], null, 'pet',
+    '{"00000000-0000-5000-8000-0000000e6102": "uncommon", "00000000-0000-5000-8000-0000000e6105": "uncommon",
+      "00000000-0000-5000-8000-0000000e6106": "uncommon", "00000000-0000-5000-8000-0000000e6104": "uncommon"}'))$$,
+  'OB009', 'puzzle_invalid: question 1: level on 00000000-0000-5000-8000-0000000e6104, which is not a pet',
+  'a level on a thing outside the category is refused');
 -- Three familiar answers must stay typeable and safe (M13 13c; FAMILIAR_SAFE_MIN). The host catches dog; exactly three
 -- familiar ones left (cat, hamster, mouse) pass; with H stolen, hamster and horse can't be typed, leaving cat and mouse.
 select lives_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d),

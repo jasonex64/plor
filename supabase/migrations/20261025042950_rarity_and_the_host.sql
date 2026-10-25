@@ -1,6 +1,6 @@
 -- M13 13c: rarity and the host (docs/milestones/M13-13c-rarity-and-the-host.md). Approval refuses a day leaving a
--- question with fewer than 3 familiar answers that are typeable and safe (M04 G9). No grant changes: the function keeps
--- its signature and its grant (DECISIONS.md, Puzzle approval).
+-- question with fewer than 3 familiar answers that are typeable and safe (M04 G9), or a level on a thing outside its
+-- category. No grant changes: the function keeps its signature and its grant (DECISIONS.md, Puzzle approval).
 
 -- As 13b's, with the familiar-answers check in place of "at least one answer the host doesn't catch can be typed".
 create or replace function private.approve_puzzle(p_user uuid, p_content jsonb) returns void
@@ -44,6 +44,11 @@ begin
     problems := problems || array(
       select format('question %s: host bank entry %s is not a %s', i + 1, b, cat.key)
       from unnest(bank) as b where b <> all (member_ids));
+    -- The bonus's first guess splits each tier among its members (src/game/scoring.ts, firstGuess), so a level on a
+    -- thing outside the category would skew every rare answer's share (13c review).
+    problems := problems || array(
+      select format('question %s: level on %s, which is not a %s', i + 1, l, cat.key)
+      from jsonb_object_keys(coalesce(q -> 'levels', '{}')) as l where l::uuid <> all (member_ids));
     problems := problems || array(
       select format('question %s: host answer %s is not in the host bank', i + 1, h) from unnest(hosts) as h where h <> all (bank));
     -- Three familiar answers (common or uncommon in the day's levels) the host doesn't catch, the host answers and

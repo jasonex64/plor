@@ -126,7 +126,7 @@ async function caughtMembers(db: pg.Client, category: string, hosts: string[]): 
 
 // Whether at least FAMILIAR_SAFE_MIN familiar members (in levels) the host doesn't catch can be typed without the
 // letters (human, 2026-10-24: "Typeable and safe (Recommended)"; private.approve_puzzle checks the same).
-async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
+export async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
   const caught = new Set(await caughtMembers(db, category, hosts));
   const { rows } = await db.query<{ id: string }>(
     `select distinct m::text as id from private.category_members($1) m join private.thing_alias a on a.thing_id = m

@@ -1,6 +1,6 @@
 # M13 13c — Rarity and the host
 
-**Status:** in review (2026-10-24): built; the reviewer next. The human answered three rounds of guided questions and approved the design (human, 2026-10-24: "I approve 13c's design. Build it.").
+**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design (human, 2026-10-24: "I approve 13c's design. Build it.").
 
 ## Goal
 The rarity bonus comes from what players really answer, pooled across every day a category is asked; the host names a fixed number of answers per question, drawn at random from its bank; and a player who knows the category always has 3 familiar answers that survive.
@@ -63,7 +63,7 @@ It never warns or changes the day.
 - [x] **The expected share** (unit tests, hand-worked): the 40/40/20 split on a question with known levels and members; the blend with pooled counts above and below the minimum.
 - [x] **Pooling** (db test): an answer given on one day lowers its bonus on a later day of the same category; the provisional bonus ignores today's answers, and the final bonus counts them.
 - [x] **Host counts** (unit tests): the validator refuses a day whose host counts aren't 1, 1, 1, 1, 2, 2, 3; the draft's random pick is the same for the same date and comes from the host bank.
-- [x] **Familiar answers** (unit and pgTAP): the picker refuses letters leaving fewer than 3 familiar safe answers; approval refuses such a day with OB009.
+- [x] **Familiar answers** (db test and pgTAP): the picker refuses letters leaving fewer than 3 familiar safe answers; approval refuses such a day with OB009.
 - [x] **The soft guide** (unit test): the summary's expected catch and finish rates for a hand-worked day.
 - [x] **T1** redrafted with `npm run draft` and approved and played on the local stack.
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
@@ -114,7 +114,8 @@ It never warns or changes the day.
 - `npm run test:db` → 35 files, 232 tests passed, including `ledger.db.test.ts`, reworked by hand:
   - A 150 + 0; A's second day 25 + 7 (aardvark 2 of 17 pooled over both days; that day's answers alone would give 10); B 1000 + 163; C 75 + 9; E 75 + 6;
   - the provisional pooling leaves the day out (16 answers, aardvark 1) and the final one counts it (17, 2), read as `plor_app`.
-- `npm run test:sql` → `Result: PASS`, including `puzzle_entry.test.sql`: exactly 3 familiar answers typeable and safe pass; 2 are refused with OB009.
+- `npm run test:sql` → `Result: PASS`, including `puzzle_entry.test.sql`: exactly 3 familiar answers typeable and safe pass; 2 are refused with OB009; after the review, a level on a thing outside the category is refused too.
+- After the review, `scripts/draft.db.test.ts` (4 tests) runs the draft's own familiar check on the fixture. Local, after the review fixes: `npm test` 36 files and 209 tests, `npm run test:db` 36 files and 236 tests, `npm run test:sql` PASS, 14 e2e passed.
 - `npx playwright test` → 14 passed; `approve-and-play.e2e.ts` plays the fixture past C, P, R and O with cat, kiwi, green, Kenya, lead, boxing and knee, and the reveal reads "the host said hand, head, leg".
 - `npx tsc --noEmit -p .`, `npx eslint src e2e scripts` and `npm run content:validate` clean.
 - **T1, redrafted:** `npm run draft` first refused it: "no letters fit schedule A". A diagnosis script (deleted after) found Q7's drawn hosts, Texas, California and Ohio, held every vowel the Wind could steal there.
@@ -124,5 +125,9 @@ It never warns or changes the day.
 - **T1 approved and played** on the local stack by a temporary Playwright script (deleted after, with its day and players): member counts 56,787, 193, 2,999, 928, 48, 118 and 50. Zebra, Kenya, banana, Beagle, Brie, neon and Hawaii survived all 7: 1000 points and a provisional bonus of about 321 (about 479 before 13c, when every unleveled answer was split from half the players).
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**13c:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24. It recomputed every hand-worked number and found them right, approved T1 through `private.approve_puzzle` in a rolled-back transaction, and found `pickHosts` reproduces T1's hosts and draws close to evenly over 365 dates.
+- **Blocking findings and how each was fixed:**
+  - *HANDOFF.md still asked the human to approve 13c's design.* Rewritten.
+  - *The draft's familiar check had no test* (only approval's copy did). `scripts/draft.db.test.ts` runs `familiarLeft` on the fixture: three familiar answers pass and two don't; a stolen letter, a member under a host answer and a member left out of the levels are each left out; an answer typeable only by its scientific name counts.
+  - *Levels were never checked against the category,* though `firstGuess` now divides by the members left after them. A stray level could make a rare share infinite, so 0 bonus, or negative, so a bonus above N2's half. `private.approve_puzzle` now refuses a level on a thing outside the category (OB009; pgTAP).
+- **Deferred to ROADMAP "Next revision"** (For M13): the rare tier counting members at approval; `expectedCatches` untested; two stale lines in DECISIONS.md, Game 1; the 3 in SQL tied to `FAMILIAR_SAFE_MIN` by comments only; more familiar-rule cases in pgTAP; `pooledCounts` on every state read; `pickHosts`'s generator constants unexplained; ROADMAP items naming `safeAnswerLeft`.
