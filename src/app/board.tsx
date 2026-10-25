@@ -5,7 +5,8 @@
 // they've started (M12 12d); then their question, or that they've finished. How a friend's run ended comes from the
 // HTTP board once the player's own run is over, so nothing reaches the page early. So do reactions on runs
 // (M08 8b), which the player can add to friends' runs from then on. The same channel carries nudges that comments or
-// reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see.
+// reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see. The
+// feed, on Today, listens to the channel itself (src/app/home.tsx).
 import { useCallback, useEffect, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
@@ -16,7 +17,6 @@ import {
   PAUSED_TEXT,
   PAYLOAD_VERSION,
   STATUS_VERSION,
-  changesThread,
   useBoardChannel,
   type ChangedMessage,
   type StatusMessage,
@@ -25,9 +25,7 @@ import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
-// onCommentsChanged: the home page's feed should be fetched again: the friends thread or one of the player's groups
-// changed (M11 11b).
-export function Board({ username, onCommentsChanged }: { username: string; onCommentsChanged: () => void }) {
+export function Board({ username }: { username: string }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -50,18 +48,13 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
   useEffect(load, [load]);
 
   const { paused } = useBoardChannel({
-    // Comments may have changed while the channel was down too.
-    joined: (reason) => {
-      onCommentsChanged();
-      load(reason === "reconnect" ? "reconnect" : undefined);
-    },
+    joined: (reason) => load(reason === "reconnect" ? "reconnect" : undefined),
     status: onStatus,
     changed: onChanged,
     failed: (err) => setError(errorText(err)),
   });
 
   function onChanged(message: ChangedMessage) {
-    if (changesThread(message, "feed")) onCommentsChanged();
     if (message.v !== PAYLOAD_VERSION) {
       console.error("board message with unknown version", message.v);
       load();
@@ -131,7 +124,7 @@ export function Board({ username, onCommentsChanged }: { username: string; onCom
       )}
       {!board && !error && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
-      {/* Adding a friend starts here, not only on the account page (docs/milestones/M12-12f-review-fixes.md, F1). */}
+      {/* Adding a friend starts here, not only on the Me tab (docs/milestones/M12-12f-review-fixes.md, F1). */}
       <InviteLink canReset={false} />
     </section>
   );

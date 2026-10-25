@@ -39,4 +39,7 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.getByLabel("Username").fill(`${name}${RUN}`);
   await page.getByRole("button", { name: "Save" }).click();
+  // Saved once the step is gone: a test that navigates straight after would otherwise leave before the save lands
+  // and find the step again (seen in M14 14a-1's e2e run).
+  await expect(page.getByRole("heading", { name: "Pick a username" })).toBeHidden();
 }

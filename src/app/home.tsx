@@ -1,8 +1,8 @@
 "use client";
 
-// Sign-in, then picking a username, then the game; or, on an invite link (/invite/<code>), the friend request; on a
-// group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group; on /account, the
-// player's account (M12 12a). Every step goes through
+// Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
+// (the game and the feed), Friends, Groups or Me; or, on an invite link (/invite/<code>), the friend request; on a
+// group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,18 +10,26 @@ import { Fragment, useCallback, useEffect, useState, type FormEvent } from "reac
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
-import { Account, SignOut } from "./account";
+import { Account } from "./account";
 import { Board } from "./board";
+import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
 import { Game } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, Yesterday } from "./leaderboard";
 import { errorText, messageForRedirect } from "./messages";
+import { MeAdminLink, Shell } from "./shell";
 
-type Me = { signedIn: false } | { signedIn: true; username: string | null };
+type Me = { signedIn: false } | { signedIn: true; username: string | null; admin: boolean };
 
 // What a page other than "/" shows once the player is signed in with a username.
-export type View = { kind: "invite"; code: string } | { kind: "joinGroup"; code: string } | { kind: "group"; id: string } | { kind: "account" };
+export type View =
+  | { kind: "friends" }
+  | { kind: "groups" }
+  | { kind: "me" }
+  | { kind: "invite"; code: string }
+  | { kind: "joinGroup"; code: string }
+  | { kind: "group"; id: string };
 
 // Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
 // while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
@@ -71,17 +79,29 @@ export function Home({ view }: { view?: View }) {
       {!me.signedIn ? (
         <SignIn returnTo={invitePath(view)} onSignedIn={loadMe} />
       ) : me.username === null ? (
-        <PickUsername onDone={(username) => setMe({ signedIn: true, username })} />
-      ) : view?.kind === "invite" ? (
-        <AcceptInvite code={view.code} />
-      ) : view?.kind === "joinGroup" ? (
-        <JoinGroup code={view.code} />
-      ) : view?.kind === "group" ? (
-        <GroupPage id={view.id} username={me.username} />
-      ) : view?.kind === "account" ? (
-        <Account onSignedOut={() => setMe({ signedIn: false })} />
+        <PickUsername onDone={(username) => setMe({ ...me, username })} />
       ) : (
-        <SignedIn username={me.username} onSignedOut={() => setMe({ signedIn: false })} />
+        <>
+          <Shell admin={me.admin} />
+          {view?.kind === "friends" ? (
+            <Friends username={me.username} />
+          ) : view?.kind === "groups" ? (
+            <Groups />
+          ) : view?.kind === "me" ? (
+            <>
+              <Account onSignedOut={() => setMe({ signedIn: false })} />
+              {me.admin && <MeAdminLink />}
+            </>
+          ) : view?.kind === "invite" ? (
+            <AcceptInvite code={view.code} />
+          ) : view?.kind === "joinGroup" ? (
+            <JoinGroup code={view.code} />
+          ) : view?.kind === "group" ? (
+            <GroupPage id={view.id} username={me.username} />
+          ) : (
+            <Today username={me.username} />
+          )}
+        </>
       )}
     </>
   );
@@ -204,7 +224,7 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
   return (
     <form onSubmit={save}>
       <h2>Pick a username</h2>
-      <p>Your friends will see it. You can change it later on your account page.</p>
+      <p>Your friends will see it. You can change it later on the Me tab.</p>
       <label>
         Username
         <input
@@ -226,7 +246,7 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
 
 // Offbeat's card (H1): the streak, the game or your result, and yesterday's standings. It's one card because there's
 // one game; a second game's card goes beside it, and the swipe between them with it (H8).
-// day and gameDay key what starts again at the reset (SignedIn).
+// day and gameDay key what starts again at the reset (Today).
 function GameCard({
   day,
   gameDay,
@@ -241,17 +261,28 @@ function GameCard({
   return (
     <section aria-label="Offbeat">
       <h2>Offbeat</h2>
-      <Game key={gameDay} onOver={onOver} onDayOver={onDayOver} />
-      <Yesterday key={day} />
+      {/* Distinct keys: the two counts start equal, and siblings sharing a key may be dropped or duplicated. */}
+      <Game key={`game-${gameDay}`} onOver={onOver} onDayOver={onDayOver} />
+      <Yesterday key={`yesterday-${day}`} />
     </section>
   );
 }
 
-function SignedIn({ username, onSignedOut }: { username: string; onSignedOut: () => void }) {
+// Today (docs/milestones/M14-14a-1-shell.md): Offbeat's card and the feed, as M11 laid them out; the live board and
+// the leaderboard moved to Friends. The board's channel still nudges the feed when a thread changes (M08 8d, M11 11b).
+function Today({ username }: { username: string }) {
   const [runOver, setRunOver] = useState(false);
-  // Counts the board channel's nudges that comments changed (M08 8d).
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
+  const [channelError, setChannelError] = useState<string | null>(null);
+  const { paused } = useBoardChannel({
+    joined: nudgeComments,
+    changed: (message) => {
+      if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
+      if (changesThread(message, "feed")) nudgeComments();
+    },
+    failed: (err) => setChannelError(errorText(err)),
+  });
   // Count resets: at midnight Pacific every section that shows a day starts again, from the server's new day (M11 H6),
   // except a game in play, which goes on to its end (gameDay).
   const [day, setDay] = useState(0);
@@ -263,23 +294,38 @@ function SignedIn({ username, onSignedOut }: { username: string; onSignedOut: ()
 
   return (
     <>
-      {/* The order is H1's (docs/milestones/M11-home-screen.md): the game card, the feed, friends today, this week,
-          groups, account. */}
       <GameCard day={day} gameDay={gameDay} onOver={setRunOver} onDayOver={nextDay} />
-      <Fragment key={day}>
-        <Comments username={username} runOver={runOver} nudge={commentsNudge} />
-        <Board username={username} onCommentsChanged={nudgeComments} />
-        <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
-      </Fragment>
-      <Groups />
-      {/* Not a <footer>: the page has one, with the privacy link (src/app/page.tsx; M02 2f, B5). */}
-      <section aria-label="Account">
-        <p>
-          Signed in as {username}. <Link href="/account">Your account</Link>
-        </p>
-        <SignOut onSignedOut={onSignedOut} />
-      </section>
+      {paused && <p role="status">{PAUSED_TEXT}</p>}
+      {channelError && <p role="alert">{channelError}</p>}
+      <Comments key={day} username={username} runOver={runOver} nudge={commentsNudge} />
     </>
+  );
+}
+
+// Friends (M14 14a-1): the live board and the friends leaderboard, moved from the home page. With no game on the page,
+// the time to the reset comes from the run's state, and both start again at midnight Pacific (M11 H6).
+function Friends({ username }: { username: string }) {
+  const [day, setDay] = useState(0);
+  const [msToReset, setMsToReset] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    api<{ run: { msToReset: number } } | { run: null; msToReset: number }>("/api/run", { method: "GET" }).then(
+      (r) => setMsToReset(r.run ? r.run.msToReset : r.msToReset),
+      (err) => setError(errorText(err)),
+    );
+  }, [day]);
+  useEffect(() => {
+    if (msToReset === null) return;
+    const timer = setTimeout(() => setDay((d) => d + 1), msToReset);
+    return () => clearTimeout(timer);
+  }, [msToReset]);
+
+  return (
+    <Fragment key={day}>
+      {error && <p role="alert">{error}</p>}
+      <Board username={username} />
+      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
+    </Fragment>
   );
 }
 

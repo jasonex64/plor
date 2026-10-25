@@ -2,9 +2,20 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25, on `m13-answer-lists-and-content` (`C:/Users/jason/RIFF`) by the M13 session, after building 13e-1 (and merging `main` with M15's PR #76, Supabase's pricing page in SOURCES.md). A third session does M14 layout in `C:/Users/jason/RIFF-m14`: 14a-1 is PR #77 (open, CI green, waiting on the human). For M14's latest, read the handoff on its branch.
+**Updated:** 2026-10-25, on `m14-look-and-feel` (merged with main after M13 13e-1), by the session doing M14's layout while another session builds M13 on `m13-answer-lists-and-content`. The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
 
-## M15 (this branch)
+## M14 (this branch)
+- **14a-1, the shell, is in review** (`docs/milestones/M14-14a-1-shell.md`): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's blocking findings are fixed; its other findings are in ROADMAP, For M14. PR #77; waiting on green CI and the human.
+- **Local e2e** passed 20 of 21. The one failure, approving a drafted day, is because the shared local database already holds M13 13d's migration, which drops a table this branch's admin page reads. After 13d merges, merge main into this branch.
+- **Waiting on the human:** the PR (green CI, then the human's OK to merge). L18's clock is in 14a-2 (human, 2026-10-25).
+- **Next step:** after 14a-1 merges, write 14a-2's file (Today and the game screen) from the split in the 14a-1 ticket.
+- **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
+- **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
+- **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).
+- **impeccable** (a design-review skill the human installed) is used only when the human asks ("Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout.
+- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` (its own `node_modules` and a copy of the local-stack `.env.local`), so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed.
+
+## M15 (from main, written by the M15 and M13 sessions)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
 - **15c is closed, not built:** M14 14a-1 adds the Admin link (sidebar, and the Me tab on phones) with an `admin` flag on `GET /api/profile` (human, 2026-10-24; M14 ticket L49). Until 14a-1 lands, an admin types `plor.app/admin`.
 - **Storage** (DECISIONS.md Log): Free plan for now, the answer database grows freely, the human warned near 500 MB. Supabase's pricing page is in SOURCES.md (the human's OK, 2026-10-24).
