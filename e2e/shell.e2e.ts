@@ -19,13 +19,13 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-// Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are, and Me's stats above its
-// account (docs/milestones/M14-14a-3a-me.md).
+// Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are; the friends list under
+// Friends' boards, and Me's stats alone, the account being in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 const TABS = [
   { name: "Today", path: "/", sections: ["Offbeat", "Leaderboard", "Feed"] },
-  { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard"] },
+  { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Your friends"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["All games", "Calendar", "Offbeat", "Your rarest answers", "Your account"] },
+  { name: "Me", path: "/me", sections: ["All games", "Calendar", "Offbeat", "Your rarest answers"] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.
@@ -100,7 +100,7 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
   // A player who isn't an admin sees no Admin on the Me tab either.
   const other = await player(browser, "sg", { width: 360, height: 800 });
   await other.nav.getByRole("link", { name: "Me" }).click();
-  await expect(other.page.getByRole("region", { name: "Your account" })).toBeVisible();
+  await expect(other.page.getByRole("region", { name: "All games" })).toBeVisible();
   await expect(other.page.getByRole("link", { name: "Admin" })).toHaveCount(0);
 });
 
@@ -172,7 +172,8 @@ test("the colours follow the device: Paper when light, Night when dark", async (
 });
 
 // Reached by keyboard, every link in the tab bar and the sidebar shows the focus ring: a 3px solid outline in the
-// accent, offset 3px (criterion 9; WCAG 2.2 2.4.7). The players are admins, so the sidebar's Admin is checked too.
+// accent, offset 3px (criterion 9; WCAG 2.2 2.4.7). The players are admins, so the sidebar's Admin is checked too, and
+// so is its Settings button (docs/milestones/M14-14a-3b-settings.md).
 test("every tab shows the focus ring from the keyboard", async ({ browser }) => {
   for (const viewport of [
     { width: 360, height: 800 },
@@ -183,7 +184,7 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-${name}@example.test`]);
     await page.reload();
     await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
-    const expected = TABS.map((t) => t.name).concat(viewport.width >= 768 ? ["Admin"] : []);
+    const expected = TABS.map((t) => t.name).concat(viewport.width >= 768 ? ["Admin", "Settings"] : []);
     const accent = await page.evaluate(() => {
       const probe = document.createElement("span");
       probe.style.color = "var(--accent)";

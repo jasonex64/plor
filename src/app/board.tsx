@@ -26,7 +26,9 @@ import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 
-export function Board({ username }: { username: string }) {
+// invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
+// holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
+export function Board({ username, invite }: { username: string; invite: boolean }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -131,8 +133,8 @@ export function Board({ username }: { username: string }) {
       )}
       {!board && !error && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
-      {/* Adding a friend starts here, not only on the Me tab (docs/milestones/M12-12f-review-fixes.md, F1). */}
-      <InviteLink canReset={false} />
+      {/* Adding a friend starts here too (docs/milestones/M12-12f-review-fixes.md, F1). */}
+      {invite && <InviteLink canReset={false} />}
     </section>
   );
 }

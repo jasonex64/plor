@@ -1,8 +1,7 @@
 // Changing a username against the local stack (run with `npm run test:db`; docs/milestones/M12-account.md, 12b, A2):
 // once every 30 days, the first change at once, the old name free for anyone straight away.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { GET as accountRoute } from "@/app/api/account/route";
-import { POST as createProfile } from "@/app/api/profile/route";
+import { GET as profileRoute, POST as createProfile } from "@/app/api/profile/route";
 import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
@@ -23,8 +22,9 @@ async function change(username: unknown) {
   const response = await changeRoute(apiRequest("/api/profile/username", { method: "POST", body: { username } }));
   return { status: response.status, body: await response.json() };
 }
+// The profile as the client reads it (GET /api/profile, which the settings sheet shows: M14 14a-3b).
 async function account() {
-  return (await (await accountRoute(apiRequest("/api/account", { method: "GET" }))).json()).account;
+  return (await profileRoute(apiRequest("/api/profile", { method: "GET" }))).json();
 }
 
 beforeAll(useLocalStack);

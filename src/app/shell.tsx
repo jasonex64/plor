@@ -3,15 +3,18 @@
 // The navigation every signed-in page sits in (docs/milestones/M14-14a-1-shell.md): the four tabs the human chose
 // (M14 L17, "Me" from L45), as a bottom tab bar on phones and a sidebar from 768px (L42). It stays during a run, and
 // leaving lets the question's timer run (L18). Admins find Admin in the sidebar, and on phones on the Me tab
-// (MeAdminLink), which replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c").
+// (MeAdminLink), which replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c"). The gear opens the settings
+// sheet (docs/milestones/M14-14a-3b-settings.md; L44): in a top bar on phones, at the foot of the sidebar from 768px.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { RunState } from "@/game/runs";
+import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
+import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
 
 const icon = (children: ReactNode) => (
@@ -77,34 +80,66 @@ function current(path: string, href: string): "page" | "true" | undefined {
   if (href !== "/" && path.startsWith(`${href}/`)) return "true";
 }
 
+// Round 7's gear, 22px at stroke 2.
+const GEAR = icon(
+  <>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+  </>,
+);
+
 // Rendered into <body>, beside the page's <main>, so the navigation isn't inside the main landmark (M14 14a-1
-// review). Home, which renders it, runs only on the client (it reads the address bar behind Suspense).
-export function Shell({ admin }: { admin: boolean }) {
+// review). Home, which renders it, runs only on the client (it reads the address bar behind Suspense). On phones the
+// top bar's wordmark stands for the page's own "Plor" heading, which is then read but not shown twice.
+export function Shell({ admin, profile, onChanged, onSettings, onSignedOut }: {
+  admin: boolean;
+  profile: Profile;
+  onChanged: () => void;
+  onSettings: (settings: Settings) => void;
+  onSignedOut: () => void;
+}) {
   const path = usePathname();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const open = () => dialog.current?.showModal();
   return createPortal(
-    <nav aria-label="Main" className={styles.nav}>
-      <span className={styles.word} aria-hidden="true">
-        Plor
-      </span>
-      <ul className={styles.tabs}>
-        {TABS.map((tab) => {
-          const here = current(path, tab.href);
-          return (
-            <li key={tab.href}>
-              <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
-                <span className={styles.icon}>{tab.icon}</span>
-                {tab.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-      {admin && (
-        <Link href="/admin" className={styles.admin}>
-          Admin
-        </Link>
-      )}
-    </nav>,
+    <>
+      <header className={styles.top}>
+        <span className={styles.topWord} aria-hidden="true">
+          Plor
+        </span>
+        <button type="button" className={styles.gear} aria-label="Settings" aria-haspopup="dialog" onClick={open}>
+          {GEAR}
+        </button>
+      </header>
+      <nav aria-label="Main" className={styles.nav}>
+        <span className={styles.word} aria-hidden="true">
+          Plor
+        </span>
+        <ul className={styles.tabs}>
+          {TABS.map((tab) => {
+            const here = current(path, tab.href);
+            return (
+              <li key={tab.href}>
+                <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
+                  <span className={styles.icon}>{tab.icon}</span>
+                  {tab.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        {admin && (
+          <Link href="/admin" className={styles.admin}>
+            Admin
+          </Link>
+        )}
+        <button type="button" className={styles.settings} aria-haspopup="dialog" onClick={open}>
+          <span className={styles.icon}>{GEAR}</span>
+          Settings
+        </button>
+      </nav>
+      <SettingsSheet dialog={dialog} profile={profile} onChanged={onChanged} onSettings={onSettings} onSignedOut={onSignedOut} />
+    </>,
     document.body,
   );
 }

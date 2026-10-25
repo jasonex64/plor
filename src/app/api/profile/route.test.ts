@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { POST as setDisplayName } from "./display-name/route";
+import { POST as setSettings } from "./settings/route";
 import { POST as changeUsername } from "./username/route";
 import { GET, POST } from "./route";
 
@@ -32,6 +33,12 @@ describe("/api/profile", () => {
 
   it("refuses a signed-out username change with 401 not_signed_in (M12 12b)", async () => {
     const response = await changeUsername(apiRequest("/api/profile/username", { method: "POST", body: { username: "abc" } }));
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
+  });
+
+  it("refuses a signed-out settings change with 401 not_signed_in (M14 14a-3b)", async () => {
+    const response = await setSettings(apiRequest("/api/profile/settings", { method: "POST", body: { skipGameScreen: true } }));
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
   });

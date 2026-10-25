@@ -95,7 +95,7 @@ test("one leaderboard card switches between yesterday and this week, for friends
 test("before playing, the feed names who commented and holds none of their words", async ({ browser }) => {
   const viewer = await player(browser, "tc");
   await viewer.goto("/friends");
-  const invite = viewer.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
+  const invite = viewer.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
   await invite.getByRole("button", { name: "Make my invite link" }).click();
   const link = await invite.locator("code").innerText();
 

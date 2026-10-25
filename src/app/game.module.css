@@ -37,6 +37,8 @@
   min-height: 48px;
   margin: 0;
   text-decoration: none;
+  /* Play is a link, or a button with Skip the game screen on (M14 14a-3b): neither has an outline. */
+  border: 0;
   border-radius: 14px;
   background: var(--on-offbeat);
   color: var(--offbeat);

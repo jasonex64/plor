@@ -2,9 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Home } from "../home";
 
-// The Me tab: the player's stats (docs/milestones/M14-14a-3a-me.md), then their account, as the account page had it
-// (M12 12a), until the settings sheet takes it (14a-3b). Signed out, it shows sign-in first, as every page does
-// through Home.
+// The Me tab: the player's stats (docs/milestones/M14-14a-3a-me.md); their account is in the settings sheet
+// (docs/milestones/M14-14a-3b-settings.md). Signed out, it shows sign-in first, as every page does through Home.
 export default function MePage() {
   return (
     <main>
