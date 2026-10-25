@@ -72,6 +72,9 @@ export function isText(v: unknown): v is string {
   return typeof v === "string" && v.trim() !== "";
 }
 
+// A category key, as private.category's check holds it.
+export const CATEGORY_KEY = /^[a-z][a-z_]*$/;
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 function isThingIdList(v: unknown): v is string[] {
   return Array.isArray(v) && v.every((id) => typeof id === "string" && UUID.test(id));
@@ -91,7 +94,7 @@ function checkQuestion(errors: string[], where: string, v: unknown) {
   }
   checkKeys(errors, where, v, ["prompt", "category", "host_bank", "host_answers", "levels"], ["steals"]);
   if ("prompt" in v && !isText(v.prompt)) errors.push(`${where}: "prompt" must be a non-empty string`);
-  if ("category" in v && (typeof v.category !== "string" || !/^[a-z][a-z_]*$/.test(v.category))) {
+  if ("category" in v && (typeof v.category !== "string" || !CATEGORY_KEY.test(v.category))) {
     errors.push(`${where}: "category" must be a category key (lower-case letters and _)`);
   }
   if ("steals" in v && (typeof v.steals !== "string" || !/^[a-z]$/.test(v.steals))) errors.push(`${where}: "steals" must be one lower-case letter a-z`);

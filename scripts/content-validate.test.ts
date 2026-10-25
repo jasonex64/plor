@@ -116,4 +116,13 @@ describe("content:validate with the bank and the gap", () => {
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify(good) }))).toEqual({ files: 1, errors: [] });
     expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ ...good, format: 2 }) })).errors).toContain('bank.json: "format" must be 1');
   });
+
+  // M13 13e: the bank asks only categories in data/categories.json, each host bank holding the 3 Q7 takes.
+  it("refuses a bank question asking a category not in data/categories.json, and a host bank under 3", () => {
+    const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["a", "b", "c"], uncommon: [], themes: [], added_by: "claude" };
+    const withBank = (questions: object[]) => validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ format: 1, questions, themes: {} }) })).errors;
+    expect(withBank([q])).toEqual([]);
+    expect(withBank([{ ...q, category: "no_such_category" }])).toEqual(['bank.json question "name-a-x": category "no_such_category" is not in data/categories.json']);
+    expect(withBank([{ ...q, host_bank: ["a", "b"] }])).toEqual(['bank.json question 1: "host_bank" lists 2 names, at least 3 needed']);
+  });
 });

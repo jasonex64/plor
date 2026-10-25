@@ -1,0 +1,9 @@
+[
+  { "key": "animal", "name": "animal", "source": "wikidata", "root": "Q729" },
+  { "key": "dog_breed", "name": "dog breed", "source": "wikidata", "root": "Q39367" },
+  { "key": "country", "name": "country", "source": "wikidata", "root": "Q6256", "member_of": "Q1065" },
+  { "key": "chemical_element", "name": "chemical element", "source": "wikidata", "root": "Q11344" },
+  { "key": "us_state", "name": "US state", "source": "wikidata", "root": "Q35657" },
+  { "key": "fruit", "name": "fruit", "source": "wikidata", "root": "Q1364" },
+  { "key": "cheese", "name": "kind of cheese", "source": "oewn", "root": "07866305-n" }
+]

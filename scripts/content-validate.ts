@@ -1,11 +1,13 @@
 // Validates every puzzle file under a content root, and its question bank (bank.json at the root, M13 13d):
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
-// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d).
+// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d). The bank asks only categories listed in
+// data/categories.json, which is checked too (13e).
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { gapProblems, parseBank } from "../src/content/bank.ts";
+import { CATEGORIES_FILE, parseCategories } from "../src/content/categories.ts";
 import { checkPuzzleFile, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
 
 // Every file (not directory) under `root`, relative to it, with "/" separators, sorted so output is stable.
@@ -34,7 +36,16 @@ export function validateRoot(root: string): { files: number; errors: string[] } 
   const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text))];
   const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
   errors.push(...gapProblems(days));
-  if (all.includes(BANK)) errors.push(...parseBank(BANK, readFileSync(join(root, BANK), "utf8")).errors);
+  const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
+  errors.push(...categoryErrors);
+  if (all.includes(BANK)) {
+    const { bank, errors: bankErrors } = parseBank(BANK, readFileSync(join(root, BANK), "utf8"));
+    errors.push(...bankErrors);
+    if (bank && categories) {
+      const keys = new Set(categories.map((c) => c.key));
+      for (const q of bank.questions) if (!keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${CATEGORIES_FILE}`);
+    }
+  }
   return { files: files.length, errors };
 }
 
