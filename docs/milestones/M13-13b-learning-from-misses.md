@@ -1,6 +1,6 @@
 # M13 13b — Learning from misses
 
-**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design, the LDNOOBW row for SOURCES.md and the security change (human, 2026-10-24: "I approve 13b's design, adding LDNOOBW to SOURCES.md, and its security change (new miss-review tables; plor_app may run the one miss function; admin-only audit functions). Measure the WordNet load first, then build 13b.").
+**Status:** done (2026-10-24), on PR #72's merge on green CI (human, 2026-10-24: "Merge PR #72 once every CI check is green, then start 13c with guided questions."). The human answered three rounds of guided questions and approved the design, the LDNOOBW row for SOURCES.md and the security change (human, 2026-10-24: "I approve 13b's design, adding LDNOOBW to SOURCES.md, and its security change (new miss-review tables; plor_app may run the one miss function; admin-only audit functions). Measure the WordNet load first, then build 13b.").
 
 ## Goal
 An answer players type that the database doesn't accept becomes an answer from the next day on, once enough players type it (D4), unless the facts reject it, and the human can audit and undo every addition.
@@ -87,7 +87,7 @@ Each outcome is decided once per text and category, and logged in `private.base_
   - *Disproved* if the count is far off that. Either way the added size is measured and shown to the human before the rest is built.
 - [x] **Grants** (pgTAP): `plor_app` may execute the new miss function and the three admin-only audit functions, and nothing else new; the audit functions refuse non-admins.
 - [x] **Credits:** the privacy page credits LDNOOBW under CC BY 4.0.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass. (Local, after the review fixes: 36 files and 206 tests, 35 db files and 232 tests, `Result: PASS`, 14 e2e passed; `npx eslint src e2e scripts` clean. CI: pending on the PR.)
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass. (Local, after the review fixes: 36 files and 206 tests, 35 db files and 232 tests, `Result: PASS`, 14 e2e passed; `npx eslint src e2e scripts` clean. CI on PR #72 at `cf468c9`: check, db, e2e, secrets and Vercel all pass, runs 40159150956 and 40159168993.)
 
 ## Out of scope
 - Rarity from the misses and additions (13c).

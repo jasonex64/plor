@@ -7,7 +7,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md`, `M13-13a-the-base.md` and `M13-13b-learning-from-misses.md`.
   - **13a is done** (PRs #70 and #71).
-  - **13b, learning from misses, is built and reviewed,** in its own PR, with the human's approval of its design and its security change. It holds:
+  - **13b, learning from misses, is merged** (PR #72), with the human's approval of its design and its security change. It holds:
     - misses counted per category and decided at 3 players and 1%: accepted, held (LDNOOBW), rejected (the facts) or near-typo;
     - answers fixed at the day's start;
     - `/admin/audit` with undo for every decision that made an answer, and "N to review" on the admin pages;
@@ -21,13 +21,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13b's PR:** the merge on green CI.
+- **13c's guided questions** (CLAUDE.md, "Ask before designing").
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. Merge 13b's PR on green CI with the human's OK; the branch stays for M13.
-2. Then 13c: ask guided questions where intent is needed (CLAUDE.md), write its sub-ticket, build.
+1. 13c, rarity and the host: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
 
 Until the human asks, there are no content days, staging or `db push`.
 
