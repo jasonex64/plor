@@ -1,6 +1,6 @@
 # M14 14a-1 — The shell: colour slots, fonts and navigation
 
-**Status:** in review: built, reviewed (blocking findings fixed), evidence below; its PR waits for green CI and the human. Approved by the human with the split (2026-10-24: "I approve the split and 14a-1 as drafted, and OK adding the Next.js CSS, fonts and layouts pages to SOURCES.md. Build 14a-1.").
+**Status:** in review: built, reviewed (blocking findings fixed), evidence below; PR #77, waiting for green CI and the human. Approved by the human with the split (2026-10-24: "I approve the split and 14a-1 as drafted, and OK adding the Next.js CSS, fonts and layouts pages to SOURCES.md. Build 14a-1.").
 
 ## Goal
 Every page sits in one shell: the colour slots for Paper and Night, the three fonts, and navigation to four tabs (a bottom tab bar on phones, a sidebar on wider screens), with today's sections moved onto their tabs and not yet restyled.
