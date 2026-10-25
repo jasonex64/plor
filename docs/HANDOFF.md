@@ -2,64 +2,73 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25, on `m13-answer-lists-and-content` (`C:/Users/jason/RIFF`) by the M13 session, after building 13e-2 (PR #80) and merging `main` with M14's PRs #77 and #79. A third session does M14 layout in `C:/Users/jason/RIFF-m14`; for M14's latest, read the handoff on its branch.
+**Updated:** 2026-10-25. The M14 section is the M14 session's, after its overnight run, 11:10 UTC. The rest is as the M13 session wrote it on `m13-answer-lists-and-content` (`C:/Users/jason/RIFF`), after building 13e-2 (PR #80); for M13's latest, read the handoff on its branch.
 
-## M14 (from main, written by the M14 session)
-- **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
-- **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
-- **14a-2b, the game screen, is done** (`docs/milestones/M14-14a-2b-game-screen.md`): merged in PR #81 on green CI, 2026-10-25, with its security change (yesterday's host answers to every signed-in player; DECISIONS.md Log).
-- **14a-2c, 14a-2b's review fixes, is done** (`docs/milestones/M14-14a-2c-review-fixes.md`): merged in PR #82 on green CI, 2026-10-25.
-- **14a-3a, Me, is in review in PR #83** (`docs/milestones/M14-14a-3a-me.md`). Auto-merge is on, so it merges once every check is green. If CI fails, Auto-fix wakes the M14 session.
-- **Next step:**
-  1. When #83 has merged (`gh pr view 83 --json state`), mark 14a-3a done with its CI evidence, in one commit on this branch, as 14a-2c's was.
-  2. Then answer the parked questions below. Their answers unblock 14a-3b (settings) and 14b-1 (themes and About).
+## M14 (this branch, written by the M14 session)
+**Updated 2026-10-25, 11:10 UTC, after the overnight run.** Everything below is merged on main. Branch `m14-look-and-feel` is even with main, plus this handoff and 14a-3a's done line. No PR is open.
 
-## Overnight plan (human, 2026-10-25, before sleeping)
-The human answered these guided questions so the work can go on without them ("after this, im going to sleep … just nonstop work while i sleep … ideally following the tickets"):
+### Done
+| Sub-ticket | What | PR |
+|---|---|---|
+| 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar from 768px, the Admin link | #77 |
+| 14a-2a | Today: Offbeat's banner, one leaderboard card, the locked feed, the clock bar | #79 |
+| 14a-2b | The game screen `/offbeat`: the stakes, How to play, Your Offbeat's stats, yesterday's answers. **Security change:** yesterday's host answers go to every signed-in player (DECISIONS.md Log) | #81 |
+| 14a-2c | 14a-2b's review fixes: numbers from `tunables.ts`, Start climbing only before the run, one stats load, "Offbeat comments" | #82 |
+| 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots by names; Friends' empty state | #83 |
 
-- **Scope:** "Review fixes, then 14a-3 (Recommended)", and then 14b-1 too ("Build 14b-1 tonight too").
-- **How it's approved:** each ticket is drafted from the answers below and built without a separate draft approval.
-- **Merging:** "Yes, on green CI (Recommended)": merge each PR once every check is green, then start the next sub-ticket.
-- **When stuck:** "Park it, move on (Recommended)": write the question in this file and the ticket, then go on with work that doesn't depend on it. Never guess a number.
-- **How it runs:** "One long run here (Recommended)", in the M14 session.
-- **Migrations:** "Merge; I'll push in the morning (Recommended)". plor.app's profile route fails from the first migration merge until the human runs `npx supabase db push` against the hosted project. Nobody plays there yet.
+Each one's ticket is in `docs/milestones/M14-*.md`, with its evidence and review. The reviewers' non-blocking findings are in ROADMAP, For M14.
 
-The steps:
-1. **PR #81** merges on green (auto-merge is on). Then mark 14a-2b done with its CI evidence.
-2. **14a-2c, the review fixes:** the six For M14 items from 14a-2b's review (ROADMAP).
-3. **14a-3:**
-   - **Me:** totals, the calendar, a card per game, the rarest answers. The calendar shows "This month, as drawn (Recommended)". The rarest answers are "3, from closed days (Recommended)", with H5's 5-player minimum.
-   - **The settings sheet:** a sheet on phones and a side panel on desktop (L44), opened from a gear in a new top bar. It holds Skip the game screen (L39) and Numbers on the calendar (L46).
-   - **The rest:** the empty states (L31) and the avatar slots (L37).
-   - **Security change, approved:** "Approve it (Recommended)": the two settings are columns on the account, and `plor_app` gets UPDATE on them, for the player's own row only.
-4. **14b-1:**
-   - **Themes:** Follow device, Paper, Night, Sky, Moonlit and Ink (L21), with the picker in the sheet; the chosen one is outlined (L47).
-   - **Security change, approved:** "Approve it (Recommended)": the theme is a column on the account, with the same UPDATE rule.
-   - **The About page:** "An About page (Recommended)", `/about`, linked from the footer and the sheet. It credits the borrowed palettes and holds the AI note, which says "Code only": the app is built with AI help.
+### Waiting on the human
+1. **A source for the settings sheet.** The sheet (14a-3b) is a modal dialog (round 7: "Focus stays inside while it's open"), and no entry in SOURCES.md covers the HTML `<dialog>` element. Should MDN's page (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) be added, as its Web Share and Clipboard pages were? CLAUDE.md: "If no source covers the work, stop and ask." This blocks:
+   - **14a-3b:** the gear, the sheet or side panel, the account controls moved in, and the Skip and Numbers switches with their migration;
+   - **14b-1:** the themes, whose picker is in the sheet, and the About page.
+2. **Where the friends list goes.** Me still holds the friends list (with Remove) and the invite link with Reset, below the stats (M12 12a, 12f). Neither L45 nor round 7 places them.
+3. **Small calls from the reviews** (ROADMAP, For M14):
+   - should a caught answer count among the rarest;
+   - the tie-break between equally rare answers;
+   - the calendar's lightest shade at about 1.3:1 (WCAG 1.4.11);
+   - slots in the live board's full lists.
 
-Every sub-ticket follows CLAUDE.md as usual: a ticket, the sources, numbers with origins, tests, the reviewer, evidence, its Status and ROADMAP row, and one PR at a time. The M13 session shares the local stack, so message it before db tests, e2e runs or a reset.
+### Already decided for what's next
+Asked before the night (human, 2026-10-25), so these need no new questions:
+- **14a-3b:** the two settings are columns on the account. `plor_app` gets UPDATE on those columns only, and the route limits it to the player's own row, as for the display name. **Security change, approved:** "Approve it (Recommended)".
+- **14b-1:**
+  - the themes are Follow device, Paper, Night, Sky, Moonlit and Ink (L21);
+  - the chosen one is a column on the account. **Security change, approved:** "Approve it (Recommended)";
+  - credits and the AI note go on "An About page (Recommended)" at `/about`;
+  - the AI note covers "Code only".
+- **Merging:** "Merge; I'll push in the morning (Recommended)". Once their migrations are on main, plor.app's profile route fails until the human runs `npx supabase db push`.
+- **How:** each sub-ticket is built from these answers. A PR merges on green CI, one open at a time.
 
-**Where the night ended (M14 session, 2026-10-25):**
-- **Done:** 14a-2b, 14a-2c, and 14a-3a (in PR #83, auto-merging).
-- **Not started:** 14a-3b and 14b-1, which wait on parked question 1. So **no migration reached main**, plor.app is untouched, and no `db push` is needed yet.
-- **Nothing left running:** no dev server, and no background job. The M13 session was told the shared stack is free.
+### Next step
+Answer question 1. With the source added, 14a-3b is built first, then 14b-1, each with its ticket, the reviewer and its own PR, from this branch.
 
-**In the morning, for the human:**
-1. Answer the parked questions, below.
-2. Once 14a-3b's and 14b-1's migrations are on main, run `npx supabase db push`.
+### Catching up on another computer
+1. **Get the code.**
+   ```
+   git fetch origin
+   git switch m14-look-and-feel
+   git pull
+   npm ci
+   ```
+   On the Mac the branch is new, and `git switch` sets it up to track `origin/m14-look-and-feel`. Main has all of M14's merged work too.
+2. **Start the local stack.**
+   ```
+   npx supabase start
+   npx supabase migration up
+   ```
+   This applies every migration up to `20261025074000_links.sql`. M14 added none. On the Mac, first run `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`. Its stack was last at `20261024001501`, so `migration up` has several to apply.
+3. **Run it.** `npx next typegen` once, before `npx tsc --noEmit -p .`. Then `npm run dev`, and sign in with a code from Mailpit at `http://127.0.0.1:54324`.
+4. **The answer database.** The tests and M14's screens use their own fixture data, so they don't need it. Real content work does: run `npm run base -- fetch <set>` for each set in `data/manifests/` (oewn-animals, oewn-cheese, oewn-nouns, usda-cheese, wikidata-animals, wikidata-countries, wikidata-dog-breeds, wikidata-elements, wikidata-fruit, wikidata-places, wikidata-us-states), then `npm run base -- load all`.
+5. **The checks:**
+   - `npm test`: 257 tests on the Windows checkout;
+   - `npm run test:db`: 248 at the last full run, before 14a-3a's no-profile case was added;
+   - `npm run test:e2e`: 33.
 
-**Parked questions:**
-1. **A source for the settings sheet.** It's a modal dialog, held focus and Escape included (round 7: "Focus stays inside while it's open"). No entry in SOURCES.md covers the HTML `<dialog>` element. Should MDN's `<dialog>` page (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) be added, as its Web Share and Clipboard pages were? CLAUDE.md: "If no source covers the work, stop and ask." Until then, these wait:
-   - the settings sheet (now 14a-3b), with its two switches and their migration;
-   - 14b-1, whose theme picker is in the sheet. Its themes and credits would have no caller without the picker.
-2. **Where the friends list goes.** The Me tab holds the friends list (with Remove) and the invite link with Reset (M12 12a, 12f). L45's Me and round 7's sheet have no place for them. Until you say where they go, they stay on Me, below the stats, as they work now.
+   The db and e2e suites need today, and for some e2e files yesterday, free of a real approved day: they add their own fixture days.
+6. **On the Windows checkout**, the M13 session and this one share one local stack and port 3000. Message the other session before a db test run, an e2e run or a `db reset`. Another machine has its own stack and needn't.
 
-**Order changed by parked question 1:** after 14a-2c comes 14a-3a, Me (the stats, the calendar, the game card, the rarest answers, the avatar slots and Friends' empty state), which needs no new source. Then the night stops at the parked questions.
-- **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
-- **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
-- **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).
-- **impeccable** (a design-review skill the human installed) is used only when the human asks ("Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout.
-- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` (its own `node_modules` and a copy of the local-stack `.env.local`), so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed.
+**Left running:** nothing (no dev server, no background job).
 
 ## M15 (from main, written by the M15 and M13 sessions)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
