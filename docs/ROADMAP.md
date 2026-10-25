@@ -241,6 +241,13 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The card dates Yesterday "Fri 23 Oct" and This week "From Mon, Oct 19": one style. Found in M14 14a-2a (review).
 - [ ] `NOTHING` (a countdown's no-op) is defined in `game.tsx` and `shell.tsx`; one in `countdown.ts`. Found in M14 14a-2a (review).
 - [ ] The leaderboard card's chosen period differs by fill and text colour only; the tabs add bold. Found in M14 14a-2a (review).
+- [ ] The live board's full lists under "Where everyone ended" (`src/app/board.tsx`) have names with no avatar slot; ask the human whether L37's "Boards" covers them (M14 14a-3a review)
+- [ ] Me's friends list has no avatar slots (L37 names "Account"); add them when parked question 2 settles where the list goes (M14 14a-3a review)
+- [ ] `src/game/me.ts`'s `finished` CTE copies `getStats`'s (`src/game/offbeat.ts`), `settleRuns` runs twice per `GET /api/me`, and the reads aren't in one transaction, so a request at midnight could mix two days; share the CTE and read in one transaction (M14 14a-3a review)
+- [ ] Me's calendar's text alternative gives only the count, not which days or how far; and Paper's first shade is about 1.3:1 on the surface. Check WCAG 2.2 1.4.11 with the human (M14 14a-3a review)
+- [ ] A rarest answer's name and its line run together for screen readers ("catName an animal"); put a separator or a list structure between them (M14 14a-3a review)
+- [ ] The rarest answers' tie-break (the later day, then the earlier question) is Claude's choice; confirm with the human (M14 14a-3a review)
+- [ ] A caught answer (the host's) can be a "rarest answer", at "100% gave this" when few players answered differently; ask the human whether caught answers belong there (M14 14a-3a review)
 - [ ] `useRun`'s `onOver` (`src/app/game.tsx`) reports only once a run's state has loaded, so across the reset, or on a day with no puzzle, a page's `runOver` keeps the day before's value until the new state loads. Nothing reads it as more than a reload trigger today; say so in its comment (M14 14a-2c review)
 - [ ] `e2e/offbeat.e2e.ts`'s load-order check assumes an `/api/run` response was seen; add `expect(seen).toContain("run")` so it stands on its own (M14 14a-2c review)
 - [ ] A comment line in `src/app/game.tsx` (the rules line's, at the 20 seconds) runs past the file's wrapping width (M14 14a-2c review)

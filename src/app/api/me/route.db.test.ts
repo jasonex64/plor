@@ -31,7 +31,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 
 const RUN = Date.now().toString(36);
 const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
-const [P, L] = [player("mp"), player("ml")];
+const [P, L, N] = [player("mp"), player("ml"), player("mn")];
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 // T-k, from private.today().
 const day: Record<number, string> = {};
@@ -205,6 +205,13 @@ describe("the Me tab's stats", () => {
     const { me } = (await call()).body;
     expect(me.totals).toMatchObject({ streak: 1, longestStreak: 3 });
     expect(me.rarest).toEqual([]);
+  });
+
+  // Signed in, but no username picked yet: refused as the other routes refuse it, not a 500.
+  it("refuses a player with no profile yet", async () => {
+    N.session = (await signIn(N.email)).session;
+    useSession(N.session);
+    expect(await call()).toEqual({ status: 409, body: { ok: false, error: "no_profile" } });
   });
 
   it("works as plor_app", async () => {
