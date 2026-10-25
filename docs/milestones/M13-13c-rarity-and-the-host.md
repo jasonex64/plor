@@ -1,6 +1,6 @@
 # M13 13c — Rarity and the host
 
-**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design (human, 2026-10-24: "I approve 13c's design. Build it.").
+**Status:** done (2026-10-24), on PR #73's merge on green CI (human, 2026-10-24: "Merge PR #73 once every CI check is green, then start 13d with guided questions."). The human answered three rounds of guided questions and approved the design (human, 2026-10-24: "I approve 13c's design. Build it.").
 
 ## Goal
 The rarity bonus comes from what players really answer, pooled across every day a category is asked; the host names a fixed number of answers per question, drawn at random from its bank; and a player who knows the category always has 3 familiar answers that survive.
@@ -66,7 +66,7 @@ It never warns or changes the day.
 - [x] **Familiar answers** (db test and pgTAP): the picker refuses letters leaving fewer than 3 familiar safe answers; approval refuses such a day with OB009.
 - [x] **The soft guide** (unit test): the summary's expected catch and finish rates for a hand-worked day.
 - [x] **T1** redrafted with `npm run draft` and approved and played on the local stack.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass. CI on PR #73 at `ae4703f`: check, db, e2e, secrets and Vercel all pass (runs 40164459206 and 40164475180).
 
 ## Out of scope
 - The question bank, themes and the repeat gap (13d).
