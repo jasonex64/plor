@@ -3,7 +3,7 @@
 // database instead of listing its answers; the server resolves typed text against the base as of the day's approval
 // (src/game/matching.ts). Hand-written checks, no schema library (human, 2026-10-18). The server imports this same
 // module, so content is checked one way.
-import { LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY } from "../config/tunables.ts";
+import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY } from "../config/tunables.ts";
 
 // Permanent: stored with every run and ledger row (DECISIONS.md: Game 1).
 export const GAME_ID = "offbeat";
@@ -134,11 +134,11 @@ function duplicates(ids: string[]): string[] {
   return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
 }
 
-function checkQuestionRules(where: string, q: Question): string[] {
+// hosts: how many host answers the question's position takes (HOST_ANSWERS_PER_QUESTION), undefined past the 7th.
+function checkQuestionRules(where: string, q: Question, hosts: number | undefined): string[] {
   const errors: string[] = [];
   for (const id of duplicates(q.host_bank)) errors.push(`${where} thing "${id}": listed twice in host_bank`);
-  // The count varies by question; difficulty is the share of players the answers catch (DECISIONS.md: Game 1).
-  if (q.host_answers.length === 0) errors.push(`${where}: has no host answers`);
+  if (hosts !== undefined && q.host_answers.length !== hosts) errors.push(`${where}: has ${q.host_answers.length} host answers, expected ${hosts}`);
   for (const id of duplicates(q.host_answers)) errors.push(`${where} thing "${id}": listed twice in host_answers`);
   const bank = new Set(q.host_bank);
   for (const id of q.host_answers) {
@@ -165,7 +165,7 @@ export function checkPuzzle(where: string, puzzle: Puzzle): string[] {
   if (puzzle.questions.length !== QUESTIONS_PER_DAY) {
     out.push(`${where}: has ${puzzle.questions.length} questions, expected ${QUESTIONS_PER_DAY}`);
   }
-  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${where} q${i + 1}`, q)));
+  puzzle.questions.forEach((q, i) => out.push(...checkQuestionRules(`${where} q${i + 1}`, q, HOST_ANSWERS_PER_QUESTION[i])));
   if (puzzle.questions.length === QUESTIONS_PER_DAY) out.push(...checkSchedule(where, puzzle));
   return out;
 }

@@ -8,7 +8,7 @@ import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PE
 import { AppError } from "@/lib/http";
 import { isNearTypo, resolveTyped } from "./matching";
 import { isListed } from "./misses";
-import { dayCounts } from "./ledger";
+import { dayCounts, pooledCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
 import { getStreak } from "./streak";
@@ -97,12 +97,22 @@ function shareOf(counts: DayCounts | null, index: number, entryId: string): numb
   return (question.byEntry.get(entryId) ?? 0) / question.answered;
 }
 
-// counts: the day's counts once the run is over, otherwise null. names: the main names of the answers and host answers.
-function buildState(date: string, puzzle: ApprovedPuzzle, stored: StoredEvent[], clock: Clock, counts: DayCounts | null, streak: number, names: Names): RunState {
+// counts: the day's counts once the run is over, otherwise null; pooled: the category's past days, for the provisional
+// bonus. names: the main names of the answers and host answers.
+function buildState(
+  date: string,
+  puzzle: ApprovedPuzzle,
+  stored: StoredEvent[],
+  clock: Clock,
+  counts: DayCounts | null,
+  pooled: DayCounts,
+  streak: number,
+  names: Names,
+): RunState {
   const score = scoreRun(
     puzzle,
     stored.map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day })),
-    null,
+    pooled,
   );
   const answered = stored.map((e, i) => {
     const question = puzzle.questions[e.question_idx];
@@ -159,7 +169,8 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: ApprovedPuz
   const stored = status === null ? [] : await events(db, userId, date);
   const counts = status !== null && FINISHED.includes(status) ? (await dayCounts(db, [date])).get(date)! : null;
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
-  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, await getStreak(db, userId), names);
+  const pooled = await pooledCounts(db, puzzle, false);
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, pooled, await getStreak(db, userId), names);
 }
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a

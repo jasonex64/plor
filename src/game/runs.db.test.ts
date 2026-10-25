@@ -10,7 +10,7 @@ import { GET as stateRoute } from "@/app/api/run/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
-import { answerBonus, expectedShare } from "./scoring";
+import { answerBonus, firstGuess } from "./scoring";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, nameOf, removeCreatedPuzzles, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
@@ -135,8 +135,9 @@ describe("a run, step by step", () => {
         matched: false,
         hostAnswers: q.host_answers.map((id) => ({ id, name: nameOf(id) })),
         points: POINTS_PER_QUESTION[0],
-        // The provisional rarity bonus (M09): the expectation alone, as src/game/scoring.test.ts works out by hand.
-        bonus: answerBonus(0, expectedShare(q, entryId)),
+        // The provisional rarity bonus (M09; M13 13c): the first guess alone, with no past days pooled, as
+        // src/game/scoring.test.ts works out by hand.
+        bonus: answerBonus(0, firstGuess(q, entryId)),
         // No share while the run goes on (M11 H5).
         share: null,
       },
@@ -147,7 +148,7 @@ describe("a run, step by step", () => {
       question: null,
       msLeft: null,
       points: POINTS_PER_QUESTION[0],
-      bonus: answerBonus(0, expectedShare(q, entryId)),
+      bonus: answerBonus(0, firstGuess(q, entryId)),
     });
     expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
   });

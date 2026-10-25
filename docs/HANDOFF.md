@@ -13,20 +13,21 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
     - `/admin/audit` with undo for every decision that made an answer, and "N to review" on the admin pages;
     - all of WordNet's nouns and Wikidata's places of 100,000+ people for the facts check (the base is 195 MB locally);
     - `npm run base -- load all`.
-  - **Next: 13c,** rarity from play, levels, the dodging host and 3 familiar answers. Then 13d, the question bank and tuning to Gentle, 3%→20%.
-- **New Next revision items** (ROADMAP):
+  - **13c, rarity and the host, is merged** (PR #73) (`docs/milestones/M13-13c-rarity-and-the-host.md`): the bonus's first guess 40/40/20 blended with counts pooled per category (provisional on past days only); host answers 1, 1, 1, 1, 2, 2, 3 drawn at random from the bank; 3 familiar answers typeable and safe in the draft and at approval; the soft guide in the draft's summary. T1 is redrafted (letters U, P, T, E).
+  - **Then 13d,** the question bank, themes and the repeat gap.
+- **New Next revision items** (ROADMAP), including from 13c's review: the rare tier counting members at approval, and smaller gaps.
   - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
   - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
 - **M15 15b (zod) is merged.** Dependabot alert #1 still showed `open` after the merge. Check it, and dismiss it as fixed if it stays.
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13c's guided questions** (CLAUDE.md, "Ask before designing").
+- **13d's guided questions** (CLAUDE.md, "Ask before designing").
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13c, rarity and the host: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
+1. 13d, the question bank: finish the guided questions, write its sub-ticket, build on `m13-answer-lists-and-content` (the branch stays for M13).
 
 Until the human asks, there are no content days, staging or `db push`.
 
