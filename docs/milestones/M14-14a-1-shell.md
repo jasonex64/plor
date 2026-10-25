@@ -1,6 +1,6 @@
 # M14 14a-1 — The shell: colour slots, fonts and navigation
 
-**Status:** in progress. Approved by the human with the split (2026-10-24: "I approve the split and 14a-1 as drafted, and OK adding the Next.js CSS, fonts and layouts pages to SOURCES.md. Build 14a-1.").
+**Status:** in review: built, reviewed (blocking findings fixed), evidence below; its PR waits for green CI and the human. Approved by the human with the split (2026-10-24: "I approve the split and 14a-1 as drafted, and OK adding the Next.js CSS, fonts and layouts pages to SOURCES.md. Build 14a-1.").
 
 ## Goal
 Every page sits in one shell: the colour slots for Paper and Night, the three fonts, and navigation to four tabs (a bottom tab bar on phones, a sidebar on wider screens), with today's sections moved onto their tabs and not yet restyled.
@@ -95,10 +95,69 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Source says | We built | Why different |
 |---|---|---|
 | Next.js recommends Tailwind for most styling, with CSS Modules for scoped CSS (`11-css.md`, "Recommendations") | CSS Modules and CSS variables only | The human chose "CSS Modules + CSS variables" (L33): no new dependency, and themes need CSS variables either way |
-| This ticket's plan put the shell in the root layout | `Home` renders it once the player is signed in with a username | Who's signed in is known only on the client (`Home` reads `/api/profile`), and signed-out pages have no tabs |
+| This ticket's plan put the shell in the root layout | `Home` renders it once the player is signed in with a username, into `<body>` beside `<main>` | Who's signed in is known only on the client (`Home` reads `/api/profile`), signed-out pages have no tabs, and the navigation stays out of the main landmark |
+| Criterion 8 named Young Serif among the fonts | Baloo 2 and DM Sans only | Nothing in 14a-1 uses Young Serif; it comes with 14a-2, its first user (Build for today) |
 
 ## Evidence
+All runs on the Windows checkout's worktree `C:/Users/jason/RIFF-m14`, `m14-look-and-feel` merged with main after M13 13c, against the shared local stack (2026-10-25).
+
+**Criteria 1–6, 8 and 9:** `npm run test:e2e -- --reporter=list` → `20 passed`, `1 failed`:
+```
+  ok  1 › e2e\account.e2e.ts:16:1 › the Me tab holds the account, and the navigation links to it (5.9s)
+  ok  2 › e2e\account.e2e.ts:63:1 › a player deletes their account from the Me tab (2.7s)
+  ok  3 › e2e\account.e2e.ts:85:1 › a player invites a friend from the Friends tab, and removing them asks first (6.9s)
+  ok  4 › e2e\admin-base.e2e.ts:32:1 › an admin looks a thing up by an alias; a player can't (4.8s)
+  x   5 › e2e\approve-and-play.e2e.ts:44:1 › an admin approves a drafted day on the admin page (7.1s)
+  ok  6 › e2e\approve-and-play.e2e.ts:62:1 › a player survives all seven questions of a day, past the stolen letters (5.5s)
+  ok  7 › e2e\audit.e2e.ts:37:1 › an admin undoes an added answer, accepts a held one and undoes that; a player can't (5.7s)
+  ok  8 › e2e\groups.e2e.ts:25:1 › a group is made on the Groups tab and joined by its link (14.6s)
+  ok  9 › e2e\groups.e2e.ts:125:1 › the reset reloads a group's page (2.5s)
+  ok 10 › e2e\live-board.e2e.ts:44:1 › a friend's run shows up live, with no spoiler (12.4s)
+  ok 11 › e2e\live-board.e2e.ts:186:1 › the reveal shows a safe answer's estimated rarity bonus (1.7s)
+  ok 12 › e2e\live-board.e2e.ts:199:1 › a reconnect refetches the board (10.0s)
+  ok 13 › e2e\live-board.e2e.ts:217:1 › the reset reloads every section of Today (2.3s)
+  ok 14 › e2e\live-board.e2e.ts:231:1 › the reset reloads the Friends tab (2.0s)
+  ok 15 › e2e\live-board.e2e.ts:248:1 › the reset leaves a question in play alone (2.6s)
+  ok 16 › e2e\shell.e2e.ts:45:1 › a phone gets a bottom tab bar, and each tab holds its sections (3.5s)
+  ok 17 › e2e\shell.e2e.ts:64:1 › from 768px the tabs are a sidebar, with Admin for admins only (11.2s)
+  ok 18 › e2e\shell.e2e.ts:103:1 › no tab scrolls sideways at 320px (4.0s)
+  ok 19 › e2e\shell.e2e.ts:113:1 › a question in play is still there after a visit to another tab (3.3s)
+  ok 20 › e2e\shell.e2e.ts:123:1 › the colours follow the device: Paper when light, Night when dark (1.0s)
+  ok 21 › e2e\shell.e2e.ts:136:1 › every tab shows the focus ring from the keyboard (4.5s)
+```
+The one failure isn't 14a-1's: the shared local database already holds M13 13d's migration (`20261025053147_question_bank.sql`), which drops `private.puzzle_questions`, while this branch's admin puzzles page still reads it, so the drafted day never lists. CI builds its database from this branch's own migrations; its e2e run is the clean check, and merging main once 13d is in brings the page's change.
+
+Each shell test checks:
+- **1:** the four links along the bottom at 360×800, each tab's URL, one `aria-current`, its visible sections (Today: Offbeat, Feed; Friends: Friends today, Friends leaderboard; Groups: Groups; Me: Your account), and `/account` → 404.
+- **2:** the sidebar down the left edge at 768×1024 and 1440×900; Admin only for an admin, in the sidebar, and on phones on the Me tab.
+- **3:** no sideways scroll on any tab at 320×640.
+- **5:** a question still in play after a visit to Friends.
+- **6:** the body's background in light and dark.
+- **8:** no request to Google's font hosts during test 1.
+- **9:** every link's ring at 360px and 1440px (with Admin): `3px solid`, the accent's colour, offset 3px.
+
+**Criterion 2's admin flag:** `npx vitest run src/app/api/profile/route.db.test.ts` → `Test Files 1 passed (1)`, `Tests 12 passed (12)`, among them "says whether the player is an admin" (`admin: false`, then `true` once in `private.admin`).
+
+**Criterion 4's moved suites:** the assertions moved with their sections, and none were dropped:
+- `account.e2e.ts`: the home page's Account section is gone, so its link and Sign out became the navigation's Me link and Sign out on `/me`; `/account` became `/me`.
+- `groups.e2e.ts`: the M11 order of six sections became Today's two.
+- `live-board.e2e.ts`: the players move between Today (game, feed) and Friends (board, leaderboard); the reset test is split into Today's and the Friends tab's. The test no longer covers the board's own refetch when the player's run ends while it's open (the board and the game are on different pages now).
+- `players.ts`, `openBoard` and `openLive`: signing in now waits for the username to save, and the channel waits leave the old page first. Both are races the moves exposed. With the second fixed, "the reset reloads the Friends tab" passed 6 of 6 with `--repeat-each=6` (it had failed 2 of 6).
+
+**Criterion 7:** `npm test` → `Test Files 37 passed (37)`, `Tests 233 passed (233)`, `src/app/colors.test.ts` among them (24 checks). With `--edge` set to the line colour (#e2e2dc), it fails: `× the control outline on bg is at least 3:1`, `× the control outline on surface is at least 3:1`. The colour was then put back.
+
+**Criterion 10:** `npm run lint` → no problems; `npx tsc --noEmit -p .` → no output; `npm run build` → `○ /friends`, `○ /groups`, `○ /me` among the routes, and no `/account`.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent reviewed 14a-1's diff in a fresh context (2026-10-25).
+- **Blocking findings and how each was fixed:**
+  1. The navigation sat inside `<main>`, so the Me tab's Admin check matched the sidebar's link too, and the tabs were inside the main landmark. Fixed: `Shell` renders into `<body>` beside `<main>` (`createPortal`).
+  2. The base button rules hid the browser's disabled look. Fixed: a `button:disabled` rule (muted text, no pointer).
+  3. The soft pill's alphas and the shell's sizes had no recorded origin. Fixed: two rows in Numbers (the approved mockups).
+  4. L18's clock was neither built nor deferred. Fixed: Out of scope names it, proposed for 14a-2, for the human's OK.
+  5. The focus test checked one link at one size and not the colour or offset. Fixed: it tabs through every link in the tab bar (360px) and the sidebar with Admin (1440px), checking width, style, colour and offset.
+  6. DECISIONS.md's Styling row had no Log line. Fixed.
+  7. ROADMAP's M14 row was stale and still said settings stay on the account page. Fixed.
+  8. Evidence was empty. Filled below.
+- **Found while fixing them:** Next.js's dev indicator covered the phone's Today tab in development and took its clicks (moved top-right in `next.config.ts`); `GameCard` gave `<Game>` and `<Yesterday>` the same key since M11 (made distinct); Next.js keeps a visited tab's page in the document, hidden, so the shell test reads only the visible page; `signInAndPick` raced the next navigation (it now waits for the username to save); the live-board test runs near the 30-second limit after its moves between tabs (`test.slow()`).
+- **Deferred to ROADMAP "Next revision", For M14:** the Friends tab's reset when the same `msToReset` repeats; timeouts while away from Today; Today's channel without a reconnect e2e; `body:has(.nav)` styled from a module; stale "home page" and "account page" wording, the privacy page's included; reaction buttons and the 320px check; the admin pages without the shell.

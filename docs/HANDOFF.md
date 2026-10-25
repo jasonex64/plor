@@ -2,15 +2,18 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25, on `m14-look-and-feel` (merged with main after 13b), by the session doing M14's layout while another session builds M13 13c on `m13-answer-lists-and-content` (human: "while the other session works on database and answer generating can we do the layout stuff here"). The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-25, on `m14-look-and-feel` (merged with main after M13 13c), by the session doing M14's layout while another session builds M13 on `m13-answer-lists-and-content`. The M13 lines below are as main had them; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch)
-- **14a-1, the shell, is built** (`docs/milestones/M14-14a-1-shell.md`, approved by the human with the split): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). Lint, types, the unit tests and the build pass.
-- **Its e2e run is waiting** for the local database: another session reset it mid-run (`private` schema gone), and the human chose to wait for the M13 session to rebuild it. The account and admin-base suites passed before the reset. Then: rerun `npm run test:e2e`, the reviewer, and the PR.
-- **Decisions** L3–L5, L9, L10 and L16–L49 are answered in `docs/milestones/M14-look-and-feel.md`. The split (14a-1 to 14c) is in the 14a-1 ticket. L48 (credits and an AI disclosure) is proposed for 14b-1.
+- **14a-1, the shell, is in review** (`docs/milestones/M14-14a-1-shell.md`): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's blocking findings are fixed; its other findings are in ROADMAP, For M14. Pushed with its PR; waiting on green CI and the human.
+- **Local e2e** passed 20 of 21. The one failure, approving a drafted day, is because the shared local database already holds M13 13d's migration, which drops a table this branch's admin page reads. After 13d merges, merge main into this branch.
+- **Waiting on the human:** the PR, and an OK to put L18's clock (the bar back to a question left in play) in 14a-2.
+- **Next step:** after 14a-1 merges, write 14a-2's file (Today and the game screen) from the split in the 14a-1 ticket.
+- **Sharing the local stack:** the M13 session and this one take turns on port 3000 and the database, and message each other before e2e runs, db tests or a `db reset` (db tests and e2e collide).
+- **Decisions** L3–L5, L9, L10 and L16–L49 are in `docs/milestones/M14-look-and-feel.md`. L48 (credits and an AI disclosure) is proposed for 14b-1.
 - **The mockups** are the human's private canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), rounds 1 to 7. The human edits and moves boards there too, so read a board before republishing it. Their wording is provisional (L32).
 - **impeccable** (a design-review skill the human installed) is used only when the human asks ("Ad hoc only"); its files are kept local and ignored through `.git/info/exclude` on the Windows checkout.
-- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` (with its own `node_modules` and a copy of the local-stack `.env.local`), so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed. Nothing is pushed yet.
+- **Worktree:** this branch is checked out at `C:/Users/jason/RIFF-m14` (its own `node_modules` and a copy of the local-stack `.env.local`), so the M13 session's checkout at `C:/Users/jason/RIFF` isn't disturbed.
 
 ## Where things stand
 - **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md`, `M13-13a-the-base.md` and `M13-13b-learning-from-misses.md`.
