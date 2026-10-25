@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import type { RunState } from "@/game/runs";
 import type { PublicQuestion } from "@/game/payload";
 import { shareText } from "@/game/share";
+import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
@@ -22,8 +23,9 @@ type RunResponse = { run: RunState } | { run: null; msToReset: number; streak: n
 type NoPuzzle = { msToReset: number; streak: number };
 type AnswerResponse = { run: RunState; notInList: boolean };
 
-// What a page showing the day's run hears. onOver: whether today's run is over, each time that changes, so the
-// comments can open (M08 8a). onDayOver: the reset, midnight Pacific, so the page can move to the new day
+// What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
+// each time that changes after, so the comments can open (M08 8a). Nothing is reported before the state loads, so a
+// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). onDayOver: the reset, midnight Pacific, so the page can move to the new day
 // (docs/milestones/M11-home-screen.md, H6); inPlay says a question or a reveal is in play then, so the game is left
 // alone: a run started before midnight is played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
 type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void };
@@ -34,7 +36,10 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
-  useEffect(() => onOver(over), [onOver, over]);
+  const loaded = run !== null;
+  useEffect(() => {
+    if (loaded) onOver(over);
+  }, [onOver, loaded, over]);
 
   // Stable, so the countdown below doesn't restart when the component re-renders.
   const load = useCallback(() => {
@@ -125,9 +130,12 @@ export function Game(hooks: DayHooks) {
       </Banner>
       {run.status === "not_started" && (
         <>
+          {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
+              have no constant here; the points come from tunables.ts. */}
           <p className={styles.rules}>
             <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
-            question you survive is worth more: 25 points up to 350.
+            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+            {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
           <button type="button" className={styles.start} disabled={busy} onClick={() => send("/api/run/start")}>
             Start

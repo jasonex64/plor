@@ -30,8 +30,21 @@ function shiftDay(date: string, days: number): string {
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
-// home page's feed.
-export function Comments({ username, runOver, nudge, group }: { username: string; runOver: boolean; nudge: number; group?: string }) {
+// home page's feed. title names today's feed (its heading and region): "Feed" on Today, the game screen's own on
+// Offbeat's (round 5: "Offbeat comments"; docs/milestones/M14-14a-2c-review-fixes.md).
+export function Comments({
+  username,
+  runOver,
+  nudge,
+  group,
+  title = "Feed",
+}: {
+  username: string;
+  runOver: boolean;
+  nudge: number;
+  group?: string;
+  title?: string;
+}) {
   // null shows today, whose date comes from the server (the day boundary is the server's: DECISIONS.md, Day boundary).
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
@@ -88,9 +101,9 @@ export function Comments({ username, runOver, nudge, group }: { username: string
   const isToday = shown !== null && shown === today;
   const preview = thread && "preview" in thread ? thread.preview : null;
   return (
-    <section aria-label={group ? "Comments" : "Feed"}>
+    <section aria-label={group ? "Comments" : title}>
       <h2>
-        {group ? "Comments" : isToday || !shown ? "Feed" : "Friends' comments"}
+        {group ? "Comments" : isToday || !shown ? title : "Friends' comments"}
         {shown && !isToday && ` on ${shown}`}
       </h2>
       {shown && (

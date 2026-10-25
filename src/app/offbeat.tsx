@@ -5,9 +5,10 @@
 // out from round 5's mockup; the game's own look comes with 14c.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { QUESTIONS_PER_DAY } from "@/config/tunables";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Stats, Yesterday } from "@/game/offbeat";
+import type { RunState } from "@/game/runs";
 import { api } from "@/lib/api-client";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
@@ -17,6 +18,15 @@ import styles from "./offbeat.module.css";
 
 export function OffbeatScreen({ username }: { username: string }) {
   const [runOver, setRunOver] = useState(false);
+  // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
+  // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
+  const [ended, setEnded] = useState(0);
+  const lastOver = useRef<boolean | null>(null);
+  const reportOver = useCallback((over: boolean) => {
+    if (lastOver.current === false && over) setEnded((n) => n + 1);
+    lastOver.current = over;
+    setRunOver(over);
+  }, []);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
   const [channelError, setChannelError] = useState<string | null>(null);
@@ -45,16 +55,15 @@ export function OffbeatScreen({ username }: { username: string }) {
         </Link>
       </p>
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={setRunOver} onDayOver={nextDay} />
+        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} />
       </section>
       <div className={styles.cards}>
-        {/* Loaded again when the run ends, so today's run counts at once in the streak, the average and the chart. */}
-        <OffbeatInfo key={`info-${day}-${runOver}`} />
+        <OffbeatInfo key={`info-${day}-${ended}`} />
       </div>
       <div className={styles.feed}>
         {paused && <p role="status">{PAUSED_TEXT}</p>}
         {channelError && <p role="alert">{channelError}</p>}
-        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} />
+        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title="Offbeat comments" />
       </div>
     </div>
   );
@@ -155,12 +164,26 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
   );
 }
 
-// How to play, in round 3's wording (L29; provisional, L32), told through the ridge and the Wind. Start climbing
-// starts the run and goes to the game screen, as Start does there.
+// The questions where the Wind steals a letter, from tunables.ts: "2, 4, 5 and 7".
+const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
+  LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
+);
+
+// How to play, in round 3's wording (L29; provisional, L32), told through the ridge and the Wind, with the game's
+// numbers from tunables.ts (the 20 seconds are judged in SQL, private.question_deadline). Start climbing starts the run
+// and goes to the game screen, as Start does there, and shows only before today's run has started
+// (docs/milestones/M14-14a-2c-review-fixes.md).
 export function HowToPlay() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [run, setRun] = useState<RunState | null>(null);
+  useEffect(() => {
+    api<{ run: RunState | null }>("/api/run", { method: "GET" }).then(
+      (r) => setRun(r.run),
+      (err) => setError(errorText(err)),
+    );
+  }, []);
 
   async function start() {
     setBusy(true);
@@ -186,22 +209,24 @@ export function HowToPlay() {
         Up on the ridge, the Wind is listening. It has already thought of a few answers to every question. Say one of
         them and it blows you right off.
       </p>
-      <p>Seven questions, one climb. You get 20 seconds for each.</p>
+      <p>{QUESTIONS_PER_DAY} questions, one climb. You get 20 seconds for each.</p>
       <p>
         Think off the beaten path. If the Wind didn&apos;t think of it, you&apos;re safe, and the rarer your answer, the
         bigger your bonus.
       </p>
       <p>Typo? No harm done. If it isn&apos;t a real answer, just try again.</p>
       <p>
-        Watch your letters. On questions 2, 4, 5 and 7 the Wind snatches one, so you&apos;ll have to answer without it.
+        Watch your letters. On questions {STEALS} the Wind snatches one, so you&apos;ll have to answer without it.
       </p>
       <p>
-        Keep climbing. Each step is worth more than the last: 25 points at the bottom, 350 at the top. Run out of time
-        and the climb ends too.
+        Keep climbing. Each step is worth more than the last: {POINTS_PER_QUESTION[0]} points at the bottom,{" "}
+        {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} at the top. Run out of time and the climb ends too.
       </p>
-      <button type="button" className={styles.start} disabled={busy} onClick={() => void start()}>
-        Start climbing
-      </button>
+      {run?.status === "not_started" && (
+        <button type="button" className={styles.start} disabled={busy} onClick={() => void start()}>
+          Start climbing
+        </button>
+      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );

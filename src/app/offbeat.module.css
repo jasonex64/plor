@@ -191,16 +191,17 @@
   color: var(--caught);
 }
 
+/* Round 3's How to play: 14px between paragraphs, 16px text at 1.45; the page's own column, at most 960px (L43). */
 .how {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 640px;
+  gap: 14px;
 }
 
 .how p {
   margin: 0;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .start {

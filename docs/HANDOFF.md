@@ -8,7 +8,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
-- **In review: PR #81.** The reviewer's blocking findings are fixed and the rest are in ROADMAP, For M14. **Waiting on the human:** the merge, on green CI.
+- **14a-2b is done:** merged in PR #81 on green CI, 2026-10-25.
+- **14a-2c, the review fixes, is in progress** (`docs/milestones/M14-14a-2c-review-fixes.md`).
 - **Next step:** the overnight plan below.
 
 ## Overnight plan (human, 2026-10-25, before sleeping)
