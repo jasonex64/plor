@@ -1,35 +1,11 @@
-// Puzzle entry's pure steps (docs/milestones/M06-puzzle-entry.md): reading the 7 questions an admin typed, and
-// applying the host answers chosen on the review page before the day is checked and approved.
+// Puzzle entry's pure step (docs/milestones/M06-puzzle-entry.md): applying the host answers chosen on the review page
+// before the day is checked and approved.
 import { describe, expect, it } from "vitest";
 import { checkPuzzle } from "@/content/puzzle";
 import { fixtureDraft, fixtureId } from "@/test/answer-fixture";
-import { copyForClaude, readQuestions, withHostAnswers } from "./puzzle-entry";
+import { withHostAnswers } from "./puzzle-entry";
 
 const draft = fixtureDraft("2026-11-02");
-const seven = ["Name a fruit", "Name a pet", "Name a city", "Name a tool", "Name a sport", "Name a color", "Name a planet"];
-
-describe("readQuestions", () => {
-  it("accepts 7 questions and trims them", () => {
-    expect(readQuestions(seven.map((q) => `  ${q} `))).toEqual(seven);
-  });
-
-  it("refuses the wrong count, an empty question, or anything that isn't a list of text", () => {
-    expect(readQuestions(seven.slice(0, 6))).toBeNull();
-    expect(readQuestions([...seven.slice(0, 6), "   "])).toBeNull();
-    expect(readQuestions([...seven.slice(0, 6), 7])).toBeNull();
-    expect(readQuestions("Name a fruit")).toBeNull();
-  });
-});
-
-describe("copyForClaude", () => {
-  it("holds the date, the numbered questions and where the drafting steps are", () => {
-    const text = copyForClaude("2026-10-25", seven);
-    expect(text).toContain("2026-10-25");
-    expect(text).toContain("1. Name a fruit");
-    expect(text).toContain("7. Name a planet");
-    expect(text).toContain("Puzzle drafting");
-  });
-});
 
 describe("withHostAnswers", () => {
   const unchanged = draft.questions.map((q) => q.host_answers);

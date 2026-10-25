@@ -14,6 +14,9 @@ export const FAMILIAR_SAFE_MIN = 3;
 // The share of players each question would catch on a "Gentle" day, Q1 to Q7 (human, 2026-10-24, M13 Numbers: "Gentle:
 // 3→20%, ~45% finish"). Only shown next to a draft's expected catch rates (13c: "Show, never warn (Recommended)").
 export const CATCH_TARGETS = [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2];
+// The fewest days between two uses of a category (human, 2026-10-24, M13 D7: "not saying it should be EXACTLY 30 days just
+// at least 30 days"; 13d: "Same category (Recommended)"). npm run draft picks by it and content:validate checks it.
+export const REPEAT_GAP_DAYS = 30;
 
 // Username length (human, 2026-10-18; docs/milestones/M02-sign-in-and-play.md, Numbers). The database's check
 // constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).

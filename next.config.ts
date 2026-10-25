@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/admin/puzzles": ["./content/offbeat/*.json"],
     "/api/admin/puzzles/approve": ["./content/offbeat/*.json"],
+    // The question bank page reads the bank and the drafted days it ran on (M13 13d).
+    "/api/admin/bank": ["./content/bank.json", "./content/offbeat/*.json"],
   },
 };
 

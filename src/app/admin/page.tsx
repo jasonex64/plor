@@ -15,7 +15,7 @@ export default function AdminPage() {
       <footer>
         <p>
           <Link href="/admin/puzzles">Puzzles</Link> · <Link href="/admin/reports">Reported comments</Link> ·{" "}
-          <Link href="/admin/base">Answer database</Link> · <AuditLink /> · <Link href="/">Back to Plor</Link>
+          <Link href="/admin/base">Answer database</Link> · <AuditLink /> · <Link href="/admin/bank">Question bank</Link> · <Link href="/">Back to Plor</Link>
         </p>
       </footer>
     </main>
