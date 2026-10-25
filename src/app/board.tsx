@@ -21,6 +21,7 @@ import {
   type ChangedMessage,
   type StatusMessage,
 } from "./board-channel";
+import { Avatar } from "./avatar";
 import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
@@ -111,12 +112,18 @@ export function Board({ username }: { username: string }) {
           Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
         </p>
       )}
-      {board && board.friends.length === 0 && <p>Send a friend your invite link to see their runs here.</p>}
+      {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}
+      {board && board.friends.length === 0 && (
+        <>
+          <h3>Plor is better with friends</h3>
+          <p>See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.</p>
+        </>
+      )}
       {board && board.friends.length > 0 && (
         <ul>
           {board.friends.map((f) => (
             <li key={f.username}>
-              {f.name}: {describe(f)}{" "}
+              <Avatar name={f.name} /> {f.name}: {describe(f)}{" "}
               {f.reactions && <Reactions reactions={f.reactions} busy={busy} onReact={(emoji) => void react(f.username, emoji)} />}
             </li>
           ))}

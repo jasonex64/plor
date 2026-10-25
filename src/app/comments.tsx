@@ -16,6 +16,7 @@ import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { previewText } from "@/comments/preview";
 import type { Emoji } from "@/reactions/reactions";
+import { Avatar } from "./avatar";
 import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
@@ -186,7 +187,7 @@ function Preview({ preview }: { preview: FeedPreview }) {
         {/* By position: two friends can share a display name. */}
         {text.named.map((name, i) => (
           <li key={i}>
-            <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
+            <Avatar name={name} /> <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
             <span className={styles.hidden}>comment hidden until you play</span>
           </li>
         ))}
@@ -221,7 +222,7 @@ function CommentItem({
 }) {
   return (
     <li>
-      <strong>{comment.name}</strong> {label && <>· {label} </>}<time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
+      <Avatar name={comment.name} /> <strong>{comment.name}</strong> {label && <>· {label} </>}<time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
       <p>{comment.body}</p>
       <Reactions reactions={comment.reactions} busy={busy} onReact={onReact} />{" "}
       {mine ? (

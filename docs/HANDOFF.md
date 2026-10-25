@@ -7,10 +7,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ## M14 (from main, written by the M14 session)
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
 - **14a-2a, Today, is done** (`docs/milestones/M14-14a-2a-today.md`, merged by the human in PR #79 on green CI, 2026-10-25). The reviewer's non-blocking findings are in ROADMAP, For M14.
-- **14a-2b, the game screen, is built** (`docs/milestones/M14-14a-2b-game-screen.md`), approved by the human with its security change (yesterday's host answers to every signed-in player, recorded in DECISIONS.md's Log, 2026-10-25). Every local suite passed.
-- **14a-2b is done:** merged in PR #81 on green CI, 2026-10-25.
-- **14a-2c, the review fixes, is in review in PR #82** (`docs/milestones/M14-14a-2c-review-fixes.md`): reviewed and its blocking findings fixed; it merges on green CI.
-- **Next step:** the overnight plan below.
+- **14a-2b, the game screen, is done** (`docs/milestones/M14-14a-2b-game-screen.md`): merged in PR #81 on green CI, 2026-10-25, with its security change (yesterday's host answers to every signed-in player; DECISIONS.md Log).
+- **14a-2c, 14a-2b's review fixes, is done** (`docs/milestones/M14-14a-2c-review-fixes.md`): merged in PR #82 on green CI, 2026-10-25.
+- **14a-3a, Me, is in review in PR #83** (`docs/milestones/M14-14a-3a-me.md`). Auto-merge is on, so it merges once every check is green. If CI fails, Auto-fix wakes the M14 session.
+- **Next step:**
+  1. When #83 has merged (`gh pr view 83 --json state`), mark 14a-3a done with its CI evidence, in one commit on this branch, as 14a-2c's was.
+  2. Then answer the parked questions below. Their answers unblock 14a-3b (settings) and 14b-1 (themes and About).
 
 ## Overnight plan (human, 2026-10-25, before sleeping)
 The human answered these guided questions so the work can go on without them ("after this, im going to sleep … just nonstop work while i sleep … ideally following the tickets"):
@@ -37,9 +39,14 @@ The steps:
 
 Every sub-ticket follows CLAUDE.md as usual: a ticket, the sources, numbers with origins, tests, the reviewer, evidence, its Status and ROADMAP row, and one PR at a time. The M13 session shares the local stack, so message it before db tests, e2e runs or a reset.
 
+**Where the night ended (M14 session, 2026-10-25):**
+- **Done:** 14a-2b, 14a-2c, and 14a-3a (in PR #83, auto-merging).
+- **Not started:** 14a-3b and 14b-1, which wait on parked question 1. So **no migration reached main**, plor.app is untouched, and no `db push` is needed yet.
+- **Nothing left running:** no dev server, and no background job. The M13 session was told the shared stack is free.
+
 **In the morning, for the human:**
-1. Run `npx supabase db push` once 14a-3's and 14b-1's migrations are on main.
-2. Read the parked questions, below.
+1. Answer the parked questions, below.
+2. Once 14a-3b's and 14b-1's migrations are on main, run `npx supabase db push`.
 
 **Parked questions:**
 1. **A source for the settings sheet.** It's a modal dialog, held focus and Escape included (round 7: "Focus stays inside while it's open"). No entry in SOURCES.md covers the HTML `<dialog>` element. Should MDN's `<dialog>` page (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) be added, as its Web Share and Clipboard pages were? CLAUDE.md: "If no source covers the work, stop and ask." Until then, these wait:

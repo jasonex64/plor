@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { Avatar } from "./avatar";
 import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
@@ -193,7 +194,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
             <ul>
               {group.members.map((m) => (
                 <li key={m.username}>
-                  {m.name}
+                  <Avatar name={m.name} /> {m.name}
                   {m.creator && " (creator)"}
                   {group.creator && !m.creator && (
                     <>

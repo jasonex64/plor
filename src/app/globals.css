@@ -18,6 +18,12 @@
   --safe-bg: #e3f4ea;
   --caught: #8a1c26;
   --caught-bg: #fbe4e6;
+  /* Me's calendar: a played day shaded in four steps of questions survived, the accent at rising strength (round 7's
+     palettes; M14 L46). */
+  --shade-1: #2457d633;
+  --shade-2: #2457d666;
+  --shade-3: #2457d6aa;
+  --shade-4: #2457d6;
   /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
      text. 14c's pixel world replaces the plain block. */
   --offbeat: #2f3d5c;
@@ -39,6 +45,10 @@
     --safe-bg: #1f3b2a;
     --caught: #ffb3b8;
     --caught-bg: #4a1f24;
+    --shade-1: #7ea6ff33;
+    --shade-2: #7ea6ff80;
+    --shade-3: #7ea6ffcc;
+    --shade-4: #7ea6ff;
   }
 }
 

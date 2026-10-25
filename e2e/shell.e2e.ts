@@ -19,12 +19,13 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-// Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are.
+// Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are, and Me's stats above its
+// account (docs/milestones/M14-14a-3a-me.md).
 const TABS = [
   { name: "Today", path: "/", sections: ["Offbeat", "Leaderboard", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["Your account"] },
+  { name: "Me", path: "/me", sections: ["All games", "Calendar", "Offbeat", "Your rarest answers", "Your account"] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.

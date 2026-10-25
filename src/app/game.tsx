@@ -14,6 +14,7 @@ import { shareText } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { useCountdown } from "./countdown";
+import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
@@ -243,12 +244,6 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 }
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
-
-// How many of the question's players gave this answer so far (M11 H5). Under 1% doesn't round to a misleading 0%.
-function givenText(share: number | null): string {
-  if (share === null) return "too few players yet";
-  return share < 0.01 ? "under 1% gave this" : `${Math.round(share * 100)}% gave this`;
-}
 
 // After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
 // from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
