@@ -182,7 +182,7 @@ Run on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`) 
 - **Criterion 10:**
   - `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  39 passed (39)`, `Tests  269 passed (269)`.
   - `npm run test:db`: the first full run had `Tests  2 failed | 255 passed (257)`, both in `src/lib/profile.db.test.ts`, which expected the profile without `settings`. Updated, with the `plor_app` settings case added: `Test Files  40 passed (40)`, `Tests  258 passed (258)`.
-  - `npm run test:e2e`: `36 passed`, `1 failed`: settings' phone test timed out in sign-in (`players.ts:40`, waiting for "Username"), before any of its own steps. Rerun, `npx playwright test e2e/settings.e2e.ts e2e/account.e2e.ts --repeat-each=3` → `21 passed`. Recorded in ROADMAP as a sign-in flake.
+  - `npm run test:e2e`: `36 passed`, `1 failed`: settings' phone test timed out in sign-in (`players.ts:40`, waiting for "Username"), before any of its own steps. It passed alone, and 21 of 21 in `npx playwright test e2e/settings.e2e.ts e2e/account.e2e.ts --repeat-each=3`, so it was first taken for a flake; CI's e2e job failed the same way on PR #85. The cause: its player was named "ga", which `groups.e2e.ts` also uses, and every file in a run shares `RUN`, so in a full run it signed into groups' player, who already has a username. Renamed "set", and the file now signs in one player for its four tests (serial) instead of four. Before the rename, a full run failed the same test again (`1 failed`, `33 passed`, the other three skipped as serial); after it, `npm run test:e2e` → `37 passed (1.1m)`.
   - `npm run build`: compiled, with `ƒ /api/profile/settings` and `○ /me`.
   - CI: PR #85.
 

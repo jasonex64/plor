@@ -259,7 +259,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `onSettings` in `src/app/home.tsx` spreads the `me` captured at render, so a profile reload landing between a switch's flip and its reply is overwritten by the older copy; use the updater form (M14 14a-3b review)
 - [ ] `e2e/shell.e2e.ts`'s focus-ring check covers the sidebar's Settings, not the phone top bar's gear (M14 14a-3b review)
 - [ ] `e2e/account.e2e.ts`'s 1440px context is never closed; and comment lines past the wrapping width in `src/game/me.ts`, `src/app/api/me/route.db.test.ts` and `src/app/colors.test.ts` (M14 14a-3b review)
-- [ ] A full `npm run test:e2e` run timed out once in sign-in (`e2e/players.ts:40`, waiting for "Username", settings' first test, 2026-10-25) and passed 3 of 3 times repeated; find what it waits on, with the two flakes above (M14 14a-3b)
+- [ ] Two e2e files can pick the same player name, and every file in a run shares `RUN`, so the second signs into the first's player (14a-3b's settings file did, with groups' "ga"). Nothing checks that names are unique across files; a per-file prefix in `e2e/players.ts` would (M14 14a-3b)
 - [ ] `groups.e2e.ts`'s `openLive` waits on the first Realtime socket, and Today now opens two from 768px; it could catch the wrong one. Found in M14 14a-2a (review).
 
 **For M15 (launch):**

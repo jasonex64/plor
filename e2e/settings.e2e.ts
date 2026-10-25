@@ -2,7 +2,7 @@
 // SOURCES.md), a sheet at the bottom on phones and a 440px panel from 768px, which closes with Close, Escape or a click
 // on the dimmed page; and its two switches, Skip the game screen (L39) and Numbers on the calendar (L46), saved on the
 // account. The account's own controls in it are in account.e2e.ts.
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
@@ -25,19 +25,22 @@ test.afterAll(async () => {
 const PHONE = { width: 360, height: 800 };
 const DESKTOP = { width: 1440, height: 900 };
 
-async function player(browser: Browser, name: string, viewport: { width: number; height: number }) {
-  const page = await (await browser.newContext({ viewport })).newPage();
+// One player for the whole file, its tests in order. Its name is this file's alone: every file in a run shares RUN, so
+// a name another file uses ("ga" in groups.e2e.ts) signs into that player, who has a username already.
+test.describe.configure({ mode: "serial" });
+let page: Page;
+
+test.beforeAll(async ({ browser }) => {
+  page = await (await browser.newContext({ viewport: PHONE })).newPage();
   await page.goto("/");
-  await signInAndPick(page, name);
-  return page;
-}
+  await signInAndPick(page, "set");
+});
 
 const sheetOf = (page: Page) => page.getByRole("dialog", { name: "Settings" });
 const isModal = (page: Page) => page.evaluate(() => document.querySelector("dialog")!.matches(":modal"));
 
 // Criterion 1 on a phone: the top bar's gear, the sheet along the bottom, and the three ways to close it.
-test("on a phone the gear opens the settings sheet, which closes with Close, Escape or the dimmed page", async ({ browser }) => {
-  const page = await player(browser, "ga", PHONE);
+test("on a phone the gear opens the settings sheet, which closes with Close, Escape or the dimmed page", async () => {
 
   const gear = page.getByRole("banner").getByRole("button", { name: "Settings" });
   await expect(gear).toHaveAttribute("aria-haspopup", "dialog");
@@ -78,8 +81,8 @@ test("on a phone the gear opens the settings sheet, which closes with Close, Esc
 });
 
 // Criterion 1 from 768px: Settings at the sidebar's foot, opening a 440px panel at the right, full height.
-test("from 768px the sidebar's Settings opens a side panel", async ({ browser }) => {
-  const page = await player(browser, "gb", DESKTOP);
+test("from 768px the sidebar's Settings opens a side panel", async () => {
+  await page.setViewportSize(DESKTOP);
   await expect(page.getByRole("banner")).toBeHidden();
   await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: "Settings" }).click();
   const sheet = sheetOf(page);
@@ -89,6 +92,7 @@ test("from 768px the sidebar's Settings opens a side panel", async ({ browser })
   await expect(sheet.getByRole("link", { name: "Privacy policy" })).toBeVisible();
   await page.mouse.click(500, 450);
   await expect(sheet).toBeHidden();
+  await page.setViewportSize(PHONE);
 });
 
 async function flip(page: Page, name: string, on: boolean) {
@@ -103,8 +107,8 @@ async function flip(page: Page, name: string, on: boolean) {
 }
 
 // Criterion 4: off, Play opens the game screen; on, the banner states the 20 seconds and Play starts question 1.
-test("Skip the game screen makes Play start question 1, and says the time limit first", async ({ browser }) => {
-  const page = await player(browser, "gc", PHONE);
+test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
+  await page.goto("/");
   const banner = page.getByRole("region", { name: "Offbeat" });
   await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/offbeat");
   await expect(banner).not.toContainText("20 seconds each");
@@ -118,12 +122,9 @@ test("Skip the game screen makes Play start question 1, and says the time limit 
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
-// Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Caught on question 1,
-// today is a played day with 0 survived.
-test("Numbers on the calendar shows each played day's questions survived", async ({ browser }) => {
-  const page = await player(browser, "gd", PHONE);
-  await flip(page, "Skip the game screen", true);
-  await page.getByRole("region", { name: "Offbeat" }).getByRole("button", { name: "Play", exact: true }).click();
+// Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Caught on the question 1
+// the test before left in play, today is a played day with 0 survived.
+test("Numbers on the calendar shows each played day's questions survived", async () => {
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
