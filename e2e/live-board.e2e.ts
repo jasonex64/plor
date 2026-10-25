@@ -39,6 +39,9 @@ async function openBoard(page: Page, path = "/friends"): Promise<void> {
 }
 
 test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
+  // Two players moving between Today and the Friends tab, each move waiting for the channel to join: near Playwright's
+  // default 30 seconds since M14 14a-1, so it gets Playwright's own allowance for slow tests (three times the default).
+  test.slow();
   const watcher = await (await browser.newContext()).newPage();
   const player = await (await browser.newContext()).newPage();
   // Every frame each page receives from Realtime, to check what a payload holds (M08 8d) and what reaches the
