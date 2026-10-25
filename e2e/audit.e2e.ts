@@ -1,6 +1,6 @@
 // The answer audit's page (docs/milestones/M13-13b-learning-from-misses.md): the admin pages show what waits for
-// review; an admin sees a text players added and a held one, with their counts, undoes the first and accepts the
-// second; a player who isn't an admin sees the refusal. Three typists miss on the fixture day through
+// review; an admin sees a text players added and a held one, with their counts, undoes the first, accepts the second
+// and undoes that too; a player who isn't an admin sees the refusal. Three typists miss on the fixture day through
 // private.record_miss with this run's own texts, which are removed afterwards.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
@@ -34,7 +34,7 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-test("an admin undoes an added answer and accepts a held one; a player can't", async ({ browser }) => {
+test("an admin undoes an added answer, accepts a held one and undoes that; a player can't", async ({ browser }) => {
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
   await signInAndPick(admin, "au");
@@ -52,6 +52,9 @@ test("an admin undoes an added answer and accepts a held one; a player can't", a
   await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${NEW}” for Name an animal: undone`);
   await held.getByRole("button", { name: "Accept" }).click();
   await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: accepted`);
+  // Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)").
+  await admin.getByRole("region", { name: "Decided" }).getByRole("listitem").filter({ hasText: LISTED }).getByRole("button", { name: "Undo" }).click();
+  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: undone`);
 
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");

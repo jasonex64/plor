@@ -1,6 +1,6 @@
 # M13 13b — Learning from misses
 
-**Status:** in progress (2026-10-24). The human answered three rounds of guided questions and approved the design, the LDNOOBW row for SOURCES.md and the security change (human, 2026-10-24: "I approve 13b's design, adding LDNOOBW to SOURCES.md, and its security change (new miss-review tables; plor_app may run the one miss function; admin-only audit functions). Measure the WordNet load first, then build 13b.").
+**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design, the LDNOOBW row for SOURCES.md and the security change (human, 2026-10-24: "I approve 13b's design, adding LDNOOBW to SOURCES.md, and its security change (new miss-review tables; plor_app may run the one miss function; admin-only audit functions). Measure the WordNet load first, then build 13b.").
 
 ## Goal
 An answer players type that the database doesn't accept becomes an answer from the next day on, once enough players type it (D4), unless the facts reject it, and the human can audit and undo every addition.
@@ -28,6 +28,8 @@ Already decided in the M13 ticket: **X = 1%** of the players who answered the ca
 | How the human finds out there's something to audit | "Count on admin page (Recommended)": the admin pages show "N to review" |
 | Which offensive-word list | "LDNOOBW (Recommended)": the English list of *List of Dirty, Naughty, Obscene and Otherwise Bad Words*, CC BY 4.0, credited on the privacy page |
 | The size of all of WordNet's nouns (164 MB) | "keep it all, raise a check to me as database grows if it's getting close to limit and ill consider buying it" |
+| A rejected text linked to the real member ("China" for the PRC; asked after the review) | "keep china as only the place and country for now": a rejected text can be dismissed or accepted for the category, not linked |
+| Undoing the human's own decisions (asked after the review) | "Yes, undo anything (Recommended)": every decision that made an answer can be undone, from now |
 | WordNet 2025 holds no place names (found while building) | "check how much storage it'd take if its not too much then yes import", then "100,000+ people (Recommended)": Wikidata's places of 100,000+ people |
 
 ## Source
@@ -83,9 +85,9 @@ Each outcome is decided once per text and category, and logged in `private.base_
 - [x] **All WordNet nouns** load (`npm run base -- load oewn-nouns`), and so do **Wikidata's places of 100,000+ people** (`wikidata-places`, added when WordNet turned out to hold no place names), and "Paris" typed for an animal by enough players is rejected, not accepted (on the real data in a rolled-back transaction; the rule itself is in `misses.test.sql`).
   - *Hypothesis:* about 82,000 noun synsets, WordNet 3.0's count (OEWN 2025's is *unverified*), most of them new to the base.
   - *Disproved* if the count is far off that. Either way the added size is measured and shown to the human before the rest is built.
-- [x] **Grants** (pgTAP): `plor_app` may execute the new miss function and nothing else new; the admin functions refuse non-admins.
+- [x] **Grants** (pgTAP): `plor_app` may execute the new miss function and the three admin-only audit functions, and nothing else new; the audit functions refuse non-admins.
 - [x] **Credits:** the privacy page credits LDNOOBW under CC BY 4.0.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
+- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass. (Local, after the review fixes: 36 files and 206 tests, 35 db files and 232 tests, `Result: PASS`, 14 e2e passed; `npx eslint src e2e scripts` clean. CI: pending on the PR.)
 
 ## Out of scope
 - Rarity from the misses and additions (13c).
@@ -128,6 +130,9 @@ Each outcome is decided once per text and category, and logged in `private.base_
 | Design 5: audit errors | A decision that doesn't fit raises OB012 (409 `audit_invalid`) | OB009 and OB010 were taken (groups, and OB009 again by 13a-2's approval); OB012 is the next free code. The reuse is in ROADMAP Next revision |
 | (not in the design) | The privacy page says an unlisted answer can become an answer for everyone, without who typed it, and stays after an account is deleted; it credits LDNOOBW | What happens to typed text changed, so the page that says what's kept had to say so |
 | Design 6: all of WordNet's nouns let the facts check know "Paris" | Also Wikidata's places of 100,000+ people (`wikidata-places`) | WordNet 2025 holds no place names; the human chose the import and its size after the measurement (Evidence) |
+| Design 4: link is for any text | Link is for accepted and near-typo texts; a rejected one is dismissed or accepted for the category | The human, after the review: "keep china as only the place and country for now" |
+| Design 4: undo is for an accepted text | Undo for every decision that made an answer: an added answer, an accepted held word, a link, an acceptance for the category (`category_extra.removed_at`) | The human, after the review: "Yes, undo anything (Recommended)" |
+| Design 2: the outcomes' order | Before them, a text that already names a member now (imported, or linked since the day started) makes no review | Nothing to learn: it's an answer from the next day already. Recorded after the review |
 | (not in the design) | `npm run base -- load all` | The full load in order was typed by hand twice (13a-2's review fixes and 13b's reset), so it's a script now (CLAUDE.md) |
 
 ## Evidence
@@ -140,14 +145,14 @@ Each outcome is decided once per text and category, and logged in `private.base_
 - **The human's call on the size** (2026-10-24): "keep it all, raise a check to me as database grows if it's getting close to limit and ill consider buying it". The check is in ROADMAP, For M15: the hosted database doesn't hold the base yet.
 
 **13b's build (2026-10-24, local stack):**
-- `npm run test:sql` → `Result: PASS`, including `misses.test.sql` (27 tests):
+- `npm run test:sql` → `Result: PASS`, including `misses.test.sql` (32 tests after the review fixes):
   - the threshold: 2 players aren't enough, the 3rd makes "jackalope" an answer, named "Jackalope" as most players typed it, logged once; with 301 players answering, 3 aren't 1% and the 4th makes it (`(accepted,4,302)`);
   - each outcome: a near-typo, a rejected and a listed text make no thing;
   - from the next day: a day that had started doesn't accept "jackalope"; a day approved earlier that starts later does;
   - the audit: OB007 for a player; undo keeps the answer on a day that started before it and drops it from a later one; link (only to a member), accept, accept for one category, dismiss; OB012 for a decision that doesn't fit;
   - `plor_app_role.test.sql`: `plor_app` gains `record_miss` and the three audit functions, and loses `insert` on `private.missed_answer`;
   - `answer_engine.test.sql` moved to days that have started (2000-01-01 to 01-03), since a day that hasn't started now takes what's added before it starts.
-- `npm run test:db` → 35 files, 231 tests passed, including:
+- `npm run test:db` → 35 files, 232 tests passed (after the review fixes), including:
   - `src/game/misses.db.test.ts`: three players miss through the answer route; nothing after two; at the third a new word is accepted, a word holding "2g1c" is held, and "horze" (a tie between horse and horde) is a near-typo; the new word is an answer on tomorrow's day, not today's;
   - `src/app/api/admin/audit/route.db.test.ts`: the list and the count for an admin, 400 for malformed decisions, undo and accept, 409 `audit_invalid`, 403 for a player, 401 signed out.
 - `npm test` → 36 files, 206 tests passed, including `src/game/misses.test.ts` (whole-word held words: "big butt" held, "button" and "scunthorpe" not).
@@ -167,5 +172,13 @@ Each outcome is decided once per text and category, and logged in `private.base_
   - "Paris" for an animal, the same rolled-back check → `paris|rejected|3|3|Paris`.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**13b:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24.
+- **Blocking findings and how each was fixed:**
+  - *A format-3 day with no `approved_at` resolved as of its day's start* (`greatest()` skips nulls), so 13a-2's check could never fire. `private.resolve_answer` now requires `approved_at` (pgTAP: such a day raises).
+  - *A rejected text couldn't be linked to the member it names* ("china" is rejected for country: it names chinaware and the China place). Asked the human: "keep china as only the place and country for now". Kept as built and recorded in the Source diff.
+  - *Some decisions couldn't be undone* (a link, an acceptance for the category, an accepted held word on the page). The human: "Yes, undo anything (Recommended)". All of them can be undone now, from the moment of the undo (pgTAP, three new tests; e2e undoes an accepted held word).
+  - *Stale status lines and HANDOFF.* The M13 row, the parent ticket's Status and HANDOFF are updated.
+  - *The insert policy on `private.missed_answer` stayed after its grant was revoked.* Dropped in the same migration.
+  - *No concurrency test for `record_miss`.* `misses.db.test.ts` now has two misses cross the threshold in open transactions at once: the second waits on the text's advisory lock (seen in `pg_locks`), and returns once the first commits, with one review. Without the lock the wait wouldn't show and the second insert would fail on the review's unique key.
+- **Taken now, though not blocking:** a second acceptance of one thing for a category raises OB012 (409), not a unique violation (500); `chosen` is set only by link and accept-for-category; the ticket's Grants criterion names the audit functions.
+- **Deferred to ROADMAP "Next revision"** (For M13): readers of the base that skip `removed_at` (the drafting script, the review stats), and the smaller gaps: raw typed names, `question.members`, the 1% assumption in a long-lived local database, the midnight window, `base_log` asserted for one outcome.

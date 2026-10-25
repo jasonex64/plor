@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(27);
+select plan(32);
 
 select private.import_source('wikidata', 'mb-test', '[
   {"id": "mb-animal", "name": "animal", "aliases": [{"alias": "mb animal", "kind": "name"}]},
@@ -112,6 +112,21 @@ select private.audit_decide(pg_temp.u(500), (pg_temp.review('mb_animal', 'mb ber
 select is(private.audit_open_count(pg_temp.u(500)), 0, 'nothing left to review');
 select throws_ok(format('select private.audit_decide(%L, %s, %L, null)', pg_temp.u(500), (pg_temp.review('mb_animal', 'mb bera')).id, 'undo'),
   'OB012', null, 'a decision that doesn''t fit the text''s state is refused');
+
+-- Every decision that made an answer can be undone, from now (human, 2026-10-24: "Yes, undo anything (Recommended)").
+select private.audit_decide(pg_temp.u(500), (pg_temp.review('mb_big', 'wolpertinger')).id, 'undo', null);
+select is(pg_temp.resolves('2099-01-02', 'wolpertinger'), null, 'an undone link names nothing on a later day');
+select private.audit_decide(pg_temp.u(500), (pg_temp.review('mb_animal', 'mb rock')).id, 'undo', null);
+select is(pg_temp.resolves('2099-01-01', 'mb rock'), null, 'an undone acceptance for the category ends on a later day');
+select ok(not private.in_category_now(private.thing_by_ref('wikidata', 'mb-rock'), 'mb_animal'), 'and now');
+select private.audit_decide(pg_temp.u(500), (pg_temp.review('mb_animal', 'mb crud')).id, 'undo', null);
+select is(pg_temp.resolves('2099-01-01', 'mb crud'), null, 'an accepted held word can be undone too');
+
+-- A format-3 day with no approved_at can't be resolved (the day's start alone would hide it).
+insert into private.puzzle (game_id, puzzle_date, content)
+  values ('offbeat', '2000-01-04', pg_temp.day('2000-01-04', 'mb_animal', now()) - 'approved_at');
+select throws_ok($$select * from private.resolve_answer('offbeat', '2000-01-04', 0, array['mb bear'])$$, 'P0001', null,
+  'a day with no approval time isn''t resolved');
 
 select * from finish();
 rollback;

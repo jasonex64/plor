@@ -20,6 +20,8 @@ create table private.category_extra (
   thing_id uuid not null references private.thing (id) on delete cascade,
   added_by uuid not null,
   added_at timestamptz not null default now(),
+  -- Undone from this moment on (human, 2026-10-24: "Yes, undo anything (Recommended)").
+  removed_at timestamptz check (removed_at >= added_at),
   primary key (category, thing_id)
 );
 
@@ -68,7 +70,7 @@ $$;
 create function private.in_category_now(p_thing uuid, p_key text) returns boolean
   language sql stable set search_path = ''
 as $$
-  select exists (select from private.category_extra e where e.category = p_key and e.thing_id = p_thing)
+  select exists (select from private.category_extra e where e.category = p_key and e.thing_id = p_thing and e.removed_at is null)
     or exists (
       select from private.category c
       where c.key = p_key and c.root <> p_thing
@@ -97,7 +99,7 @@ as $$
     and (cat.member_of is null or exists (
       select from private.fact m where m.thing_id = u.id and m.trait = 'member_of' and m.value_thing = cat.member_of and m.removed_at is null))
   union
-  select e.thing_id from private.category_extra e where e.category = p_key;
+  select e.thing_id from private.category_extra e where e.category = p_key and e.removed_at is null;
 $$;
 
 -- When a format-3 day's answers are fixed: the start of its day (midnight Pacific, as private.next_reset), or its
@@ -120,14 +122,16 @@ declare
   hosts uuid[];
   extras uuid[];
 begin
+  -- answers_as_of alone would hide a missing approved_at (greatest() skips nulls), so it's checked here (13b review).
   select p.content -> 'questions' -> p_index, private.answers_as_of(p.content, p.puzzle_date) into q, as_of
-  from private.puzzle p where p.game_id = p_game and p.puzzle_date = p_date and p.content ->> 'format' = '3';
+  from private.puzzle p where p.game_id = p_game and p.puzzle_date = p_date and p.content ->> 'format' = '3' and p.content ? 'approved_at';
   if q is null or as_of is null then
     raise exception 'resolve_answer: % % has no approved format-3 question %', p_game, p_date, p_index;
   end if;
   select array_agg(h::uuid) into hosts from jsonb_array_elements_text(q -> 'host_answers') as h;
   select coalesce(array_agg(e.thing_id), '{}') into extras
-  from private.category_extra e where e.category = q ->> 'category' and e.added_at <= as_of;
+  from private.category_extra e
+  where e.category = q ->> 'category' and e.added_at <= as_of and (e.removed_at is null or e.removed_at > as_of);
   return query
     select a.alias, a.thing_id, up.ids && hosts, up.ids
     from private.thing_alias a
@@ -327,8 +331,10 @@ $$;
 revoke all on function private.record_miss(uuid, text, date, int, text, text, boolean, boolean, int, numeric)
   from public, anon, authenticated, service_role;
 grant execute on function private.record_miss(uuid, text, date, int, text, text, boolean, boolean, int, numeric) to plor_app;
--- One way to log a miss: through private.record_miss (DECISIONS.md, one way per thing).
+-- One way to log a miss: through private.record_miss (DECISIONS.md, one way per thing). The insert policy goes with
+-- the grant, so restoring one alone doesn't reopen the table (13b review).
 revoke insert on table private.missed_answer from plor_app;
+drop policy missed_answer_plor_app_insert on private.missed_answer;
 
 -- The audit (human, 2026-10-24: "an easy way for me to audit what's added and remove if needed"): every text that
 -- reached the threshold, newest first, with the things already named by it (a rejected text's meanings) and the thing
@@ -375,11 +381,13 @@ grant execute on function private.audit_open_count(uuid) to plor_app;
 
 -- An admin's decision on a text, taking effect from now (13b design, 4), so a day that started before keeps what it
 -- had. A decision that doesn't fit the text's state raises OB012.
---   undo: an accepted text's thing stops being an answer.
+--   undo: any decision that made an answer, from now (human, 2026-10-24: "Yes, undo anything (Recommended)"): an
+--     accepted text's thing stops being an answer, a link's name goes, an acceptance for the category ends.
 --   link: the text becomes a name of p_thing, a member of the category ("New answer, you link (Recommended)"); an
 --     accepted text's own thing stops being an answer.
 --   accept: a held text becomes a new member.
---   accept_for_category: p_thing, which the rejected text names, becomes a member of this category alone.
+--   accept_for_category: p_thing, which the rejected text names, becomes a member of this category alone. A rejected
+--     text can't be linked (human, 2026-10-24: "keep china as only the place and country for now").
 --   dismiss: a held, rejected or near-typo text stays out.
 create function private.audit_decide(p_admin uuid, p_review bigint, p_action text, p_thing uuid) returns void
   language plpgsql security definer set search_path = ''
@@ -396,7 +404,13 @@ begin
   if not found then
     raise exception using errcode = 'OB012', message = format('audit: no review %s', p_review);
   end if;
-  if p_action = 'undo' and r.thing_id is not null and (r.decision is null or r.decision = 'accepted') then
+  if p_action = 'undo' and r.decision = 'linked' then
+    update private.thing_alias set removed_at = now() where thing_id = r.chosen and alias = r.text and removed_at is null;
+    decided := 'undone';
+  elsif p_action = 'undo' and r.decision = 'accepted' and r.outcome = 'rejected' then
+    update private.category_extra set removed_at = now() where category = r.category and thing_id = r.chosen and removed_at is null;
+    decided := 'undone';
+  elsif p_action = 'undo' and r.thing_id is not null and (r.decision is null or r.decision = 'accepted') then
     update private.thing_alias set removed_at = now() where thing_id = r.thing_id and removed_at is null;
     update private.fact set removed_at = now() where thing_id = r.thing_id and removed_at is null;
     decided := 'undone';
@@ -422,6 +436,9 @@ begin
       select from private.thing_alias a where a.thing_id = p_thing and a.alias = r.text and a.removed_at is null) then
       raise exception using errcode = 'OB012', message = format('audit: "%s" is not a name of %s', r.text, p_thing);
     end if;
+    if exists (select from private.category_extra e where e.category = r.category and e.thing_id = p_thing) then
+      raise exception using errcode = 'OB012', message = format('audit: %s is or was already accepted for %s', p_thing, r.category);
+    end if;
     insert into private.category_extra (category, thing_id, added_by) values (r.category, p_thing, p_admin);
     decided := 'accepted';
   elsif p_action = 'dismiss' and r.outcome <> 'accepted' and r.decision is null then
@@ -432,7 +449,7 @@ begin
   end if;
   update private.miss_review
   set decision = decided, decided_by = p_admin, decided_at = now(), thing_id = coalesce(made, thing_id),
-    chosen = case when decided in ('linked', 'accepted') and p_thing is not null then p_thing else chosen end
+    chosen = case when p_action in ('link', 'accept_for_category') then p_thing else chosen end
   where id = p_review;
   insert into private.base_log (actor, action, detail)
   values ('admin:' || p_admin, 'audit', jsonb_build_object('review', p_review, 'action', p_action, 'thing', coalesce(made, p_thing)));

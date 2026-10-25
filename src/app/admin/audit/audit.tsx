@@ -1,8 +1,9 @@
 "use client";
 
 // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md): the texts waiting for a
-// decision (held, rejected, near-typo), the answers players added, and what was decided. Every decision takes effect
-// from now: a day that has started keeps what it had. Plain on purpose; the look is M14's job.
+// decision (held, rejected, near-typo), the answers players added, and what was decided, each undoable if it made an
+// answer. Every decision takes effect from now: a day that has started keeps what it had. Plain on purpose; the look
+// is M14's job.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Action, Review } from "@/admin/audit";
 import type { ThingView } from "@/admin/base";
@@ -75,6 +76,15 @@ export function Audit() {
             <li key={r.id}>
               &ldquo;{r.text}&rdquo; for {r.category_name}: {r.decision}
               {r.chosen ? ` (${r.chosen.name})` : ""}, <time dateTime={r.decided_at!}>{new Date(r.decided_at!).toLocaleString()}</time>
+              {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
+              {(r.decision === "accepted" || r.decision === "linked") && (
+                <>
+                  {" "}
+                  <button type="button" disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                    Undo
+                  </button>
+                </>
+              )}
             </li>
           ))}
         </ul>

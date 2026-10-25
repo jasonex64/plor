@@ -2,43 +2,37 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-24, by the session that built M13 13a-1 and 13a-2 with the human's guided answers, on the Windows machine.
+**Updated:** 2026-10-24, by the session that built M13 13a and 13b with the human's guided answers, on the Windows machine.
 
 ## Where things stand
-- **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md` and `docs/milestones/M13-13a-the-base.md`.
-  - **13a-1** (the base, imports, admin lookup, credits) is merged (PR #70).
-  - **13a is done.** 13a-2 is merged (PR #71), with 13a-3 folded in and its security change approved by the human. It holds:
-    - format 3: a day names categories and is resolved as of its approval;
-    - the game engine on the base;
-    - deterministic thing IDs;
-    - `npm run draft` and the T1 day, `content/offbeat/2026-10-24.json`;
-    - format 2 and its scripts and drafts retired.
-
-  - **After 13a:**
-    - 13b, learning from misses: auto-accept at 1% with 3 players, the facts check, the audit page;
-    - 13c, rarity from play, levels, the dodging host, 3 familiar answers;
-    - 13d, the question bank and tuning to Gentle, 3%→20%.
-- **New Next revision items** (ROADMAP, For M13):
-  - "dog" is in the base twice: WordNet's links Wikidata's concept, not the taxon;
-  - "China" is missing as an alias;
-  - the bonus is near its maximum in huge categories;
-  - for the human before M15's push: the hosted format-1 days;
-  - from the 13a-2 review: matching edge cases, approval against a moving base, the walks in more places, and smaller test gaps.
+- **M13 is in progress** on `m13-answer-lists-and-content`. Tickets: `docs/milestones/M13-answer-lists-and-content.md`, `M13-13a-the-base.md` and `M13-13b-learning-from-misses.md`.
+  - **13a is done** (PRs #70 and #71).
+  - **13b, learning from misses, is built and reviewed,** in its own PR, with the human's approval of its design and its security change. It holds:
+    - misses counted per category and decided at 3 players and 1%: accepted, held (LDNOOBW), rejected (the facts) or near-typo;
+    - answers fixed at the day's start;
+    - `/admin/audit` with undo for every decision that made an answer, and "N to review" on the admin pages;
+    - all of WordNet's nouns and Wikidata's places of 100,000+ people for the facts check (the base is 195 MB locally);
+    - `npm run base -- load all`.
+  - **Next: 13c,** rarity from play, levels, the dodging host and 3 familiar answers. Then 13d, the question bank and tuning to Gentle, 3%→20%.
+- **New Next revision items** (ROADMAP):
+  - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
+  - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
 - **M15 15b (zod) is merged.** Dependabot alert #1 still showed `open` after the merge. Check it, and dismiss it as fixed if it stays.
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13b's design** (`docs/milestones/M13-13b-learning-from-misses.md`): approve it, the LDNOOBW row for SOURCES.md and its security change.
+- **13b's PR:** the merge on green CI.
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - 15a's P1–P3 and P5, when M15 starts.
 
 ## Next step
-1. 13b, learning from misses: the guided questions are answered and the design is in its sub-ticket. On the human's approval, measure the WordNet noun load first (its hypothesis), then build on `m13-answer-lists-and-content` (the branch stays for M13) and open its PR.
+1. Merge 13b's PR on green CI with the human's OK; the branch stays for M13.
+2. Then 13c: ask guided questions where intent is needed (CLAUDE.md), write its sub-ticket, build.
 
 Until the human asks, there are no content days, staging or `db push`.
 
 ## Local state
-- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261024213853_answer_engine.sql`, and the answer database loaded from the snapshots (with computed IDs). `.env.local` points at it. **The snapshots** (about 16 MB in `data/snapshots/`, gitignored) are what `npm run base -- load` reads. A machine without them runs `npm run base -- fetch <set>` first; the committed manifests in `data/manifests/` record what each one was. `npm run base -- load all` loads every set in order (13b). The database tests need **today free** for the fixture day: a real day approved for today locally makes them refuse (`src/test/puzzles.ts`). No dev server is left running, and no temporary test files are left.
+- **The last session ran on the Windows checkout** (`C:/Users/jason/RIFF`), on `m13-answer-lists-and-content`, committing as `jasonex64 <jasonex64@gmail.com>`. `m12-account` and `content-fill-gaps` are merged or closed and deleted. Its local stack runs in Docker Desktop, with every migration up to `20261025002908_learning_from_misses.sql`, and the answer database loaded from the snapshots by `npm run base -- load all`, places and WordNet's nouns included (195 MB). `.env.local` points at it. **The snapshots** (`data/snapshots/`, gitignored) are what `npm run base -- load` reads. A machine without them runs `npm run base -- fetch <set>` first; the committed manifests in `data/manifests/` record what each one was. `npm run base -- load all` loads every set in order (13b). The database tests need **today free** for the fixture day: a real day approved for today locally makes them refuse (`src/test/puzzles.ts`). No dev server is left running, and no temporary test files are left.
 - The Mac checkout (`/Users/jason/code/plor`) is on `m12-account`; its git uses the macOS keychain for GitHub. Its commit author is set in `.git/config` to the human's GitHub username and email, as on the other machine. **Rule (human, 2026-10-23: "any of my accounts should be able to change it, whether its on here or my deskto"):** on every machine, commit as an email verified on one of the human's GitHub accounts, and that GitHub account must be connected to the Vercel team `sixfour`; otherwise Vercel blocks the deployment ("GitHub couldn't verify an account for commit", PR #60). Commits `4f17304` to `6aa3fa6` carry the Mac's unset default, `jason@jasons-MacBook-Air.local`, and were blocked; `f3736d5` deployed. They stay as they are (human, 2026-10-23: no rewrite).
 - The Mac's local Supabase stack was **left running** in Docker Desktop with every migration up to `20261024001501_auth_attempt_give_back.sql` (12d's two aren't applied there yet: `npx supabase migration up`). It has no admin and no approved day yet. `.env.local` holds only the local stack's `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Playwright's Chromium is installed. No dev server is left running.
 - On the Mac, Docker's CLI isn't on the shell's PATH: prefix commands with `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"` (the db tests call `npx supabase status` and need it too). OrbStack is also installed and unused.
