@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25, on `m13-answer-lists-and-content` (`C:/Users/jason/RIFF`) by the M13 session, ending mid-13e-3 at the human's request ("can u let me continue on another session and tidy everything up"). A third session does M14 layout in `C:/Users/jason/RIFF-m14`; for M14's latest, read the handoff on its branch.
+**Updated:** 2026-10-25, on `m13-answer-lists-and-content` by the M13 session on the Mac (`/Users/jason/code/plor`), mid-13e-3, waiting for the snapshots. The M14 session works in its own worktree on this Mac, on `m14-look-and-feel`; for M14's latest, read the handoff on its branch.
 
 ## M14 (from main, written by the M14 session)
 - **14a-1, the shell, is done** (`docs/milestones/M14-14a-1-shell.md`, merged in PR #77 on green CI, 2026-10-25): the colour slots, Baloo 2 and DM Sans, the tab bar and the sidebar from 768px, Today, Friends, Groups and Me pages, the Admin link (it replaces M15 15c, L49). The reviewer's non-blocking findings are in ROADMAP, For M14.
@@ -42,13 +42,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13e-3's river short names** (the ticket's Review, "Open"): skip short names shared by several rivers (recommended), a stop-list, or keep. Asked, unanswered.
-- **13e-3's PR:** after that answer and the re-checks; then green CI, the human's OK, and the LDNOOBW flags to decide (in the ticket's Evidence; a racial slur among the rivers' aliases first).
+- **The snapshots for the Mac** (human, 2026-10-25: "Copy from Windows (Recommended)"): copy `C:\Users\jason\RIFF\data\snapshots` into `/Users/jason/code/plor/data/snapshots`, **all but `wikidata-rivers`**, which the Mac re-fetched with the river answer (same file name, a new checksum).
+- **13e-3's PR** merges on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). The river short names and LDNOOBW flags are answered and applied (ticket, Review).
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. Finish 13e-3: apply the human's river answer (`riverShortNames` in `scripts/base.ts`, then `npm run base -- fetch wikidata-rivers` and `load all`); re-run the trial drafts (`npm run draft -- <date>` for 2026-10-26 on; delete the files after), the suites (`npm test`, lint, tsc, test:db, test:sql, test:e2e; message the M14 session first), and the reviewer on the fixes; fill the Evidence; open the PR. After it merges: mark it done, then 13e-4's guided questions (pop culture, with card and board games: freshness and which titles count), in its own PR from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
+1. Finish 13e-3: once the snapshots are on the Mac, `npm run base -- load all`, re-run the trial drafts (`npm run draft -- <date>` for 2026-10-26 on; delete the files after) and the simulator, the suites (`npm test`, lint, tsc, test:db, test:sql, test:e2e; message the M14 session first, as you share the stack), and the reviewer on the fixes; fill the Evidence; open the PR with auto-merge. After it merges: mark it done, then 13e-4's guided questions (pop culture, with card and board games: freshness and which titles count), in its own PR from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
 
 **Shared local database:** another session (M14 layout work, worktree `C:/Users/jason/RIFF-m14`) runs its e2e suite against the same local stack. Message it before a `db reset` or a full suite run.
 
