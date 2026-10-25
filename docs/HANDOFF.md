@@ -21,7 +21,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
     - `npm run base -- load all`.
   - **13c, rarity and the host, is merged** (PR #73) (`docs/milestones/M13-13c-rarity-and-the-host.md`): the bonus's first guess 40/40/20 blended with counts pooled per category (provisional on past days only); host answers 1, 1, 1, 1, 2, 2, 3 drawn at random from the bank; 3 familiar answers typeable and safe in the draft and at approval; the soft guide in the draft's summary. T1 is redrafted (letters U, P, T, E).
   - **13d, the question bank, is merged** (PR #75) (`docs/milestones/M13-13d-the-question-bank.md`): `content/bank.json`, `npm run draft -- <date>` picking 7 by the 30-day category gap, the date's theme and easiest first, `--questions` for a hand-picked day, the gap in `content:validate`, `/admin/bank`; the admin questions box and `private.save_questions` are gone. The first bank is T1's 7 questions, so no new day can be drafted until 30 days after T1.
-  - **13e, growing the categories to 210+, is approved** (human, 2026-10-24: "Approve, build 13e-1 (Recommended)"). **13e-1, the tooling, is in its PR:** categories live only in `data/categories.json`, defined by `npm run base -- load all` (20 s locally); `npm run base -- review <key>…` with a flag under 10 members; `content:validate` refuses a bank category not in the file and a host bank under 3. Then the batches, 13e-2 onward: 20–30 categories each, mostly WordNet branches, some Wikidata imports for places and pop culture, each with its bank questions and review output, one PR each, which the human approves by merging.
+  - **13e, growing the categories to 210+, is approved** (human, 2026-10-24: "Approve, build 13e-1 (Recommended)"). **13e-1, the tooling, is done** (PR #78): categories live only in `data/categories.json`, defined by `npm run base -- load all` (20 s locally); `npm run base -- review <key>…` with a flag under 10 members; `content:validate` refuses a bank category not in the file and a host bank under 3. Then the batches, 13e-2 onward: 20–30 categories each, mostly WordNet branches, some Wikidata imports for places and pop culture, each with its bank questions and review output, one PR each, which the human approves by merging.
 - **New Next revision items** (ROADMAP), including from 13c's review: the rare tier counting members at approval, and smaller gaps.
   - For M13: readers of the base that skip `removed_at`, counting cost per miss, reused error codes, and smaller gaps from the 13b review;
   - For M15: warn the human as the hosted database nears its plan's limit (the human asked for it).
@@ -29,12 +29,12 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **13e-1's PR:** green CI, then the human's OK to merge.
+- **13e-2's guided questions** (CLAUDE.md, "Ask before designing").
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. After 13e-1 merges: mark it done with its CI evidence, then write 13e-2 (the first batch of 20–30 categories) as its own sub-ticket file and PR, from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
+1. Write 13e-2 (the first batch of 20–30 categories) as its own sub-ticket file and PR, from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
 
 **Shared local database:** another session (M14 layout work, worktree `C:/Users/jason/RIFF-m14`) runs its e2e suite against the same local stack. Message it before a `db reset` or a full suite run.
 
