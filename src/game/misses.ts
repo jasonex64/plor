@@ -1,7 +1,8 @@
 // Learning from misses (docs/milestones/M13-13b-learning-from-misses.md): the held-word check a miss gets before
-// private.record_miss decides what it becomes.
-import { normalize } from "@/content/puzzle";
-import { LDNOOBW_EN } from "./ldnoobw-en";
+// private.record_miss decides what it becomes, and the flag `npm run base -- review` raises on a category (13e-2).
+// Relative-imported, as scripts/base.ts uses it too.
+import { normalize } from "../content/puzzle.ts";
+import { LDNOOBW_EN } from "./ldnoobw-en.ts";
 
 const LISTED = LDNOOBW_EN.map(normalize).filter((w) => w !== "");
 

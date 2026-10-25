@@ -1,6 +1,6 @@
 # M13 13e — Growing the categories
 
-**Status:** in progress (2026-10-24): the design is approved (human, 2026-10-24: "Approve, build 13e-1 (Recommended)"); 13e-1, the tooling, is built and reviewed, in its PR; the batches (13e-2 onward) are next.
+**Status:** in progress (2026-10-24): the design is approved (human, 2026-10-24: "Approve, build 13e-1 (Recommended)"); 13e-1, the tooling, is done (PR #78, merged 2026-10-25 on green CI with the human's OK: "I approve 13e-1. Merge PR #78 once every CI check is green"); the batches (13e-2 onward) are next.
 
 ## Goal
 At least 210 categories, each with a bank question, so the draft can fill a day every day without asking a category again within 30 days (13d: 7 a day × 30 days).
@@ -87,7 +87,7 @@ Already decided: "Keep it; grow categories (Recommended)" (13d); new categories 
 - `npm run base -- review cheese us_state fixture_month`: `REVIEW cheese: 48 members`, `REVIEW us_state: 50 members`, `REVIEW fixture_month: 4 members` with `flag, fewer than 10 members: 4` (a db-test fixture category).
 - A probe entry with root `Q0` in the file: `load all` failed with `define_category zz_probe: Q0 or <NULL> is not a wikidata thing`, and `private.category` held no `zz_probe` row (the transaction rolled back). The file was restored and reloaded (`DEFINED 7 categories`).
 - Unit tests: `content:validate` refuses `category "no_such_category" is not in data/categories.json` and `"host_bank" lists 2 names, at least 3 needed` (`scripts/content-validate.test.ts`); the bank's own refusal (`src/content/bank.test.ts`); the file's shape and a key listed twice (`src/content/categories.test.ts`). `npm run content:validate`: `CONTENT OK content: 1 file(s)` (the real bank passes).
-- `npm test` 219 passed (before the categories test was added; 220 with it), `npm run lint` 0 errors, `npx tsc --noEmit -p .` clean, `npm run test:db` 234 passed, `npm run test:sql` PASS (337 tests), `npm run test:e2e` 15 passed. CI: in the PR.
+- `npm test` 219 passed (before the categories test was added; 220 with it), `npm run lint` 0 errors, `npx tsc --noEmit -p .` clean, `npm run test:db` 234 passed, `npm run test:sql` PASS (337 tests), `npm run test:e2e` 15 passed. CI: PR #78's runs 40171358426 (pull_request) and 40171355372 (push) on `ac0880f` passed every check (check, db, e2e, secrets, Vercel); merged as `53da1c4`.
 
 ## Review
 **13e-1** (reviewer agent, fresh context, 2026-10-25):
