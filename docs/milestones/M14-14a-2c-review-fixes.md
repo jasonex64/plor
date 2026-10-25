@@ -1,6 +1,6 @@
 # M14 14a-2c — 14a-2b's review fixes
 
-**Status:** in review (2026-10-25), PR #82. Built from the human's overnight answers without a separate draft approval (human, 2026-10-25: "Start the overnight plan now: follow HANDOFF.md, building each sub-ticket from my answers without waiting for my approval of the draft, and merging on green CI"; HANDOFF.md, Overnight plan: "Review fixes, then 14a-3 (Recommended)").
+**Status:** done (2026-10-25): merged in PR #82 on green CI, by auto-merge under the overnight plan ("merging on green CI"). Built from the human's overnight answers without a separate draft approval (human, 2026-10-25: "Start the overnight plan now: follow HANDOFF.md, building each sub-ticket from my answers without waiting for my approval of the draft, and merging on green CI"; HANDOFF.md, Overnight plan: "Review fixes, then 14a-3 (Recommended)").
 
 ## Goal
 Fix the six items that 14a-2b's review deferred to ROADMAP, For M14, before 14a-3 builds on the game screen.
@@ -96,7 +96,7 @@ Run on the Windows checkout against the local stack, 2026-10-25.
   - `npm run lint`: no problems.
   - `npm test`: `Test Files  40 passed (40)`, `Tests  257 passed (257)`.
   - `npm run test:e2e`: `29 passed`, 1 failed. The failure was `shell.e2e.ts`'s clock bar case: the timer wasn't found on the Friends tab. It passed alone, and `npx playwright test e2e/shell.e2e.ts --repeat-each 4` gave `28 passed`. It's recorded in ROADMAP as a flaky test; this sub-ticket doesn't touch the clock bar.
-  - CI: with the PR.
+  - CI, at bc27cf6: runs 40185647090 (pull_request) and 40185645119 (push) passed `check`, `db`, `e2e` and `secrets`. Merged as b217ae5, 2026-10-25 10:43 UTC.
 - **After the review:**
   - **Start climbing:** the check now waits for the clock bar to show and the network to go quiet. A check that it catches the bug: with the button shown whatever the run's state, it failed with `Expected: 0, Received: 1`. With the code restored, it passed.
   - **The reset:** the test waits for a request sent after the chart draws.
