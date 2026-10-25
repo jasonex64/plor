@@ -171,7 +171,6 @@ These are non-blocking items found during work or review. Record each one here *
   Found in M13 13b (review).
 - [ ] **Counting a miss reads every miss and answer of its category's days** (`private.record_miss`, two scans per miss, plus one more `resolve_answer` call for the near-typo flag). Fine for the beta; measure in M15's load test, where an index on `(game_id, puzzle_date, question_idx)` or a running count would do. Found in M13 13b.
 - [ ] **Error codes reused:** OB009 means "group full" (groups) and "puzzle invalid" (13a-2's approval), and OB010 "too many groups". Each call site maps its own, so nothing misreads today; a list of codes in DECISIONS.md would stop the next reuse. Found in M13 13b (it took OB012).
-- [ ] **For the human, before the next `db push`:** delete the hosted format-1 days (2026-10-19 and 10-20) with their runs (human, 2026-10-24: "Delete with their runs (Recommended)"): the format-3 engine reads only format 3. The SQL is in the handoff. Found in M13 13a-2.
 - [ ] **For the human, from the import review:**
   - Wikidata's fruit tree brings protected-origin products ("Limone di Siracusa PGI") along with thousands of cultivars, which the tree rule accepts;
   - country codes ("bh") come in as alternative labels, one on two countries;
@@ -182,6 +181,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The medium tier's stolen letters (C P H U B D M G) come from the M04 ticket's measured grouping, approved when the human chose schedule A; one explicit confirmation of the letters would settle it. Found in M04 13c-3 (review).
 - [ ] A host bank size guideline (a human number), from what players actually answer: measured in the survey, then the beta. Found in M01 (planning).
 - [ ] Changing a host answer that has a match group gives a rule error the admin page can't fix (the group's key must be a host answer); the file has to change. Found in M06 (review).
+
+- [ ] **The admin puzzles page shows a raw thing ID when the answer database lacks its name** (`names.get(id) ?? id`, `src/admin/puzzles.ts` `view`, and `src/app/admin/puzzles/puzzles.tsx`), so an admin can't tell "not loaded" from a broken day (CLAUDE.md, Fail loudly). Seen on plor.app, whose answer database is empty by choice, 2026-10-24. Found by the M15 session.
 
 **For M14 (look and feel):**
 - [ ] The share text uses placeholder symbols (🟩 survived, ⬜ not; human, 2026-10-21). Pick the real ones with the look, including rare and common answers once M13's tiers exist (Design review, 4). Found in M05 (implementation).
