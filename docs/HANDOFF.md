@@ -42,13 +42,18 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **The snapshots for the Mac** (human, 2026-10-25: "Copy from Windows (Recommended)"): copy `C:\Users\jason\RIFF\data\snapshots` into `/Users/jason/code/plor/data/snapshots`, **all but `wikidata-rivers`**, which the Mac re-fetched with the river answer (same file name, a new checksum).
+- **13e-3's last checks wait for the Windows PC** (human, 2026-10-25: "i dont have access to that device right now … record any decisions for that comptuer when i go back home"). The snapshots (`data/snapshots/`, gitignored) are there only. Every decision is already made and applied; only the runs below are left.
 - **13e-3's PR** merges on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). The river short names and LDNOOBW flags are answered and applied (ticket, Review).
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. Finish 13e-3: once the snapshots are on the Mac, `npm run base -- load all`, re-run the trial drafts (`npm run draft -- <date>` for 2026-10-26 on; delete the files after) and the simulator, the suites (`npm test`, lint, tsc, test:db, test:sql, test:e2e; message the M14 session first, as you share the stack), and the reviewer on the fixes; fill the Evidence; open the PR with auto-merge. After it merges: mark it done, then 13e-4's guided questions (pop culture, with card and board games: freshness and which titles count), in its own PR from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
+1. **On the Windows PC** (`C:/Users/jason/RIFF`), finish 13e-3:
+   1. `git switch m13-answer-lists-and-content && git pull && npm ci`. Its local stack still has 13e-3's hand deletions (time unit, iron, graphite); `npx supabase migration up` applies nothing new from M13.
+   2. `npm run base -- fetch wikidata-rivers`: its old rivers snapshot has the same file name as the Mac's and the old checksum, so `load` refuses it until re-fetched. Commit the new manifest; re-measure the short names as the ticket's Review does (generic words, the famous rivers, `name-a-river`'s 11 answers).
+   3. `npm run base -- load all`, the trial drafts (`npm run draft -- <date>` for 2026-10-26 on; delete the files after) and the simulator (a scratch script, gone: rewrite it, or do ROADMAP's From 13e-3 item first). Fill the Evidence.
+   4. The draft PR (opened from the Mac for CI) goes ready for review, with auto-merge on (human, 2026-10-25: "Merge on green CI (Recommended)").
+   After it merges: mark it done, then 13e-4's guided questions (pop culture, with card and board games: freshness and which titles count), in its own PR from `m13-answer-lists-and-content`. A new category needs the human's OK, given by merging the batch.
 
 **Shared local database:** another session (M14 layout work, worktree `C:/Users/jason/RIFF-m14`) runs its e2e suite against the same local stack. Message it before a `db reset` or a full suite run.
 
