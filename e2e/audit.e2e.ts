@@ -1,0 +1,62 @@
+// The answer audit's page (docs/milestones/M13-13b-learning-from-misses.md): the admin pages show what waits for
+// review; an admin sees a text players added and a held one, with their counts, undoes the first and accepts the
+// second; a player who isn't an admin sees the refusal. Three typists miss on the fixture day through
+// private.record_miss with this run's own texts, which are removed afterwards.
+import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
+import { RUN, signInAndPick } from "./players";
+import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+
+const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+// A new word and one holding a listed word (LDNOOBW's "2g1c").
+const NEW = `skvader ${RUN}`;
+const LISTED = `${RUN} 2g1c`;
+let puzzle: TodayPuzzle;
+
+test.beforeAll(async () => {
+  puzzle = await todayPuzzle(DB);
+  for (let n = 1; n <= 3; n++) {
+    const { rows } = await DB.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
+      `${RUN}-t${n}@example.test`,
+    ]);
+    await DB.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, 'offbeat', private.today())", [rows[0].id]);
+    for (const [text, listed] of [[NEW, false], [LISTED, true]] as const) {
+      await DB.query("select private.record_miss($1, 'offbeat', private.today(), 0, $2, $2, false, $3, 3, 1)", [rows[0].id, text, listed]);
+    }
+  }
+});
+
+test.afterAll(async () => {
+  const { rows } = await DB.query<{ thing_id: string | null }>("delete from private.miss_review where text = any($1) returning thing_id", [[NEW, LISTED]]);
+  await DB.query("delete from private.thing where id = any($1)", [rows.map((r) => r.thing_id).filter(Boolean)]);
+  await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
+  await removePuzzle(DB, puzzle);
+  await DB.end();
+});
+
+test("an admin undoes an added answer and accepts a held one; a player can't", async ({ browser }) => {
+  const admin = await (await browser.newContext()).newPage();
+  await admin.goto("/");
+  await signInAndPick(admin, "au");
+  await expect(admin.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-au@example.test`]);
+  await admin.goto("/admin");
+  await expect(admin.getByRole("link", { name: /^Answer audit \(\d+ to review\)$/ })).toBeVisible();
+
+  await admin.getByRole("link", { name: /^Answer audit/ }).click();
+  const added = admin.getByRole("region", { name: "Added by players" }).getByRole("article", { name: NEW });
+  const held = admin.getByRole("region", { name: "To review" }).getByRole("article", { name: LISTED });
+  await expect(added).toContainText("Typed by 3 of the");
+  await expect(held).toContainText("offensive-word list");
+  await added.getByRole("button", { name: "Undo" }).click();
+  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${NEW}” for Name an animal: undone`);
+  await held.getByRole("button", { name: "Accept" }).click();
+  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: accepted`);
+
+  const player = await (await browser.newContext()).newPage();
+  await player.goto("/");
+  await signInAndPick(player, "ay");
+  await expect(player.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
+  await player.goto("/admin/audit");
+  await expect(player.getByText("This page is for admins only.")).toBeVisible();
+});

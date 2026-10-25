@@ -46,6 +46,12 @@ export const FRIENDS_PER_PLACE = 3;
 export const TYPO_MAX_EDITS = 1;
 export const TYPO_MIN_LETTERS = 4;
 
+// Learning from misses (human, 2026-10-24; docs/milestones/M13-answer-lists-and-content.md, D4): a text becomes an
+// answer once at least this many distinct players typed it for a category, and at least this share (in percent) of the
+// players who answered the category's questions. private.record_miss applies both.
+export const MISS_ACCEPT_MIN_PLAYERS = 3;
+export const MISS_ACCEPT_SHARE_PERCENT = 1;
+
 // Points for surviving each question, Q1 to Q7 (the ladder): they rise with each harder question in growing jumps, to
 // 1000 for all seven (human, 2026-10-21; M04 G1). Replaces k points for question k. The rarity bonus comes on top.
 export const POINTS_PER_QUESTION = [25, 50, 75, 100, 150, 250, 350];
@@ -92,6 +98,9 @@ export const INSIGHTS_TOP_ANSWERS = 5;
 // 2026-10-24 (the 13a ticket). The value waits on the human's OK.
 export const BASE_REVIEW_SAMPLE = 20;
 export const BASE_SLICE_ROWS = 50_000;
+// The places 13b's facts check knows: Wikidata items with a population figure of at least this many people (human,
+// 2026-10-24: "100,000+ people (Recommended)"; docs/milestones/M13-13b-learning-from-misses.md).
+export const BASE_PLACES_MIN_POPULATION = 100_000;
 
 // Sign-in code limits (human, 2026-10-23; docs/milestones/M12-12e-sign-in-limits.md, N1–N4), counted per hashed key
 // by private.take_auth_attempt. A code lasts an hour (SOURCES.md, Supabase email sign-in), so the checks per address

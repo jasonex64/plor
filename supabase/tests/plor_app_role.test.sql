@@ -68,6 +68,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
   -- Puzzle entry (M06): an admin's writes go through two guarded functions, never the tables.
   'private.approve_puzzle(uuid,jsonb) execute',
+  -- The audit of what was learned from misses (M13 13b): admin-only functions read it, count what waits, and decide.
+  'private.audit_decide(uuid,bigint,text,uuid) execute', 'private.audit_list(uuid) execute', 'private.audit_open_count(uuid) execute',
   -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
   'private.base_lookup(uuid,text) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
@@ -91,7 +93,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
-  'private.missed_answer insert', 'private.missed_answer select',
+  -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
+  'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
   -- A group is created, read and deleted; its creator renames it and resets its link (M10 10b, G10).
@@ -114,6 +117,8 @@ select is(pg_temp.grants('plor_app'), array[
   -- Reactions (M08 8b, D8): read, react, and remove or replace your own (no update: a replace is a delete and an
   -- insert; the route scopes both to the signed-in player).
   'private.reaction delete', 'private.reaction insert', 'private.reaction select',
+  -- Logging a miss, and learning from it once enough players typed it (M13 13b, D4).
+  'private.record_miss(uuid,text,date,integer,text,text,boolean,boolean,integer,numeric) execute',
   -- A format-3 day's answers are resolved against the base, and named, through two guarded read-only functions (M13 13a-2).
   'private.resolve_answer(text,date,integer,text[]) execute',
   'private.run insert', 'private.run select',

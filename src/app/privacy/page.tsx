@@ -26,7 +26,8 @@ export default function Privacy() {
         <li>
           <strong>Your games:</strong> each day you play, which answer you picked for each question, whether it matched
           the host, and when. If you send an answer that isn&apos;t on our list, we keep what you typed (up to 40
-          characters) so we can add it.
+          characters). Once enough players type the same answer, it can become an answer everyone can give, shown
+          without who typed it.
         </li>
         <li>
           <strong>Your friends:</strong> who you are friends with, and your invite link. Your friends, and anyone
@@ -80,7 +81,8 @@ export default function Privacy() {
       <p>
         We keep your account and games until you delete them. You can delete your account yourself on your account
         page: it removes your account together with all your games, unlisted answers, points, comments, reactions,
-        reports and friends, straight away. A group you made stays with its other members. For anything else, email{" "}
+        reports and friends, straight away. A group you made stays with its other members, and an answer that enough
+        players typed stays in the game, without your name. For anything else, email{" "}
         <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with. Our providers&apos;
         logs are not part of your account and expire on their own schedules.
       </p>
@@ -90,7 +92,7 @@ export default function Privacy() {
 
       {/* Credits for the answer database's sources (docs/milestones/M13-13a-the-base.md; SOURCES.md, M13 D2): CC BY
           asks for attribution; CC0 asks for none, and Plor names those sources anyway. A source is listed once
-          its data is in the game: Catalogue of Life joins when it's used. */}
+          its data is in the game: Catalogue of Life joins when it's used. LDNOOBW (13b) is CC BY too. */}
       <h2>Data sources</h2>
       <p>The answers Plor accepts are built partly from these open data sets:</p>
       <ul>
@@ -104,6 +106,13 @@ export default function Privacy() {
           <a href="https://fdc.nal.usda.gov/">USDA FoodData Central</a>, SR Legacy (CC0).
         </li>
       </ul>
+      <p>
+        A new answer that players add waits for a person&apos;s review if it holds a word on the English list of{" "}
+        <a href="https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words">
+          List of Dirty, Naughty, Obscene and Otherwise Bad Words
+        </a>{" "}
+        (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
+      </p>
 
       <h2>Changes</h2>
       <p>If this page changes, the date at the top changes too.</p>
