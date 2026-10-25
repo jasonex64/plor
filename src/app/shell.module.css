@@ -1,0 +1,129 @@
+/* Phones: a bottom tab bar, 64px tall (the approved mockups, M14 14a-1 Numbers). The page leaves room for it. */
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  height: 64px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+:global(body):has(.nav) {
+  padding-bottom: 64px;
+}
+
+.word,
+.admin {
+  display: none;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 100%;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+}
+
+/* The current tab: a pill behind the icon and bold text, not colour alone (WCAG 2.2 1.4.1). */
+.on {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.on .icon {
+  background: var(--soft);
+  color: var(--accent);
+}
+
+/* From 768px (M14 L42): a sidebar, 248px wide, with the wordmark and, for admins, Admin. */
+@media (min-width: 768px) {
+  .nav {
+    top: 0;
+    right: auto;
+    width: 248px;
+    height: auto;
+    box-sizing: border-box;
+    padding: 28px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+  }
+
+  :global(body):has(.nav) {
+    padding-bottom: 0;
+    padding-left: 248px;
+  }
+
+  .word {
+    display: block;
+    padding: 0 12px;
+    font-family: var(--font-heading), system-ui, sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: auto;
+  }
+
+  .tab {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 6px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .on {
+    background: var(--soft);
+  }
+
+  .on .icon {
+    background: none;
+  }
+
+  .admin {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 12px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}

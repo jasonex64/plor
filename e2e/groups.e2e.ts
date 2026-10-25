@@ -1,5 +1,5 @@
-// Groups with two real browsers (docs/milestones/M10-groups.md, 10b to 10d; G7): one player creates a group in the
-// home page's Groups section and copies its invite link from the group's page; a second opens the link signed out,
+// Groups with two real browsers (docs/milestones/M10-groups.md, 10b to 10d; G7): one player creates a group on the
+// Groups tab (docs/milestones/M14-14a-1-shell.md) and copies its invite link from the group's page; a second opens the link signed out,
 // signs in, picks a username, joins, and lands on the group's page with both members listed and on its leaderboard.
 // Once both have played, a comment in the group's thread reaches the other member's open group page live, and stays
 // out of the friends thread.
@@ -22,9 +22,9 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-test("a group is made on the home page and joined by its link", async ({ browser }) => {
+test("a group is made on the Groups tab and joined by its link", async ({ browser }) => {
   const creator = await (await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] })).newPage();
-  await creator.goto("/");
+  await creator.goto("/groups");
   await signInAndPick(creator, "ga");
   const groups = creator.getByRole("region", { name: "Groups" });
   await expect(groups.getByText("No groups yet.")).toBeVisible();
@@ -49,14 +49,15 @@ test("a group is made on the home page and joined by its link", async ({ browser
   const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
   await expect(board.getByRole("listitem")).toHaveText([`ga${RUN}: 0 points`, `gb${RUN} (you): 0 points`]);
 
-  // The group is on the creator's home page too.
-  await creator.goto("/");
+  // The group is on the creator's Groups tab too.
+  await creator.goto("/groups");
   await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
 
-  // The home page's layout before playing (M11 H1): the game card first, with Start and yesterday's standings, a chip
-  // per group (H7); then the feed, with nothing to read yet; then the rest, in H1's order.
+  // Today's layout before playing (M11 H1, with the rest moved to their tabs, M14 14a-1): the game card first, with
+  // Start and yesterday's standings, a chip per group (H7); then the feed, with nothing to read yet.
+  await creator.goto("/");
   const sections = () => creator.locator("main > section").evaluateAll((all) => all.map((s) => s.getAttribute("aria-label")));
-  await expect.poll(sections).toEqual(["Offbeat", "Feed", "Friends today", "Friends leaderboard", "Groups", "Account"]);
+  await expect.poll(sections).toEqual(["Offbeat", "Feed"]);
   const card = creator.getByRole("region", { name: "Offbeat" });
   await expect(card.getByRole("button", { name: "Start today's puzzle" })).toBeVisible();
   await expect(card.getByRole("region", { name: "Yesterday" }).getByRole("button")).toHaveText(["Friends", "Book Club"]);
@@ -76,7 +77,7 @@ test("a group is made on the home page and joined by its link", async ({ browser
   }
   // After playing, the result is in the card, and the order is the same.
   await expect(card.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
-  await expect.poll(sections).toEqual(["Offbeat", "Feed", "Friends today", "Friends leaderboard", "Groups", "Account"]);
+  await expect.poll(sections).toEqual(["Offbeat", "Feed"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
   async function openLive(url: string) {
@@ -117,12 +118,12 @@ test("a group is made on the home page and joined by its link", async ({ browser
 });
 
 // A group's page left open past midnight moves to the new day too (M11 H6): its board and thread start again, and the
-// page asks for the time to the next reset. The browser's clock is moved past the reset, as the home page's test does.
+// page asks for the time to the next reset. The browser's clock is moved past the reset, as Today's test does.
 // Only the remount loads the board, and only the new day loads the group's details again.
 test("the reset reloads a group's page", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.clock.install();
-  await page.goto("/");
+  await page.goto("/groups");
   await signInAndPick(page, "gr");
   await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Night Owls");
   await page.getByRole("button", { name: "Create group" }).click();

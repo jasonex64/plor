@@ -31,7 +31,7 @@ async function profile() {
   return (await getProfile(apiRequest("/api/profile", { method: "GET" }))).json();
 }
 
-// The display name as stored, read where the client reads it: the account page (M12 12a).
+// The display name as stored, read where the client reads it: the Me tab (M12 12a).
 async function storedDisplayName() {
   return (await (await getAccount(apiRequest("/api/account", { method: "GET" }))).json()).account.displayName;
 }
@@ -57,7 +57,7 @@ describe("sign-in and profile", () => {
     expect(html).not.toMatch(/<a\s/i);
     expect(await enterCode(EMAIL_A, code)).toEqual({ status: 200, body: { ok: true } });
     expect([...cookieJar.keys()].some((name) => name.startsWith("sb-"))).toBe(true);
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: null, admin: false });
     firstCode = code;
   });
 
@@ -71,8 +71,19 @@ describe("sign-in and profile", () => {
 
   it("creates the profile on the first username pick", async () => {
     expect(await pick(`a${RUN}`)).toEqual({ status: 201, body: { ok: true, username: `a${RUN}` } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}` });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, admin: false });
     expect(await storedDisplayName()).toBeNull();
+  });
+
+  // The sidebar shows Admin only to admins (docs/milestones/M14-14a-1-shell.md, criterion 2).
+  it("says whether the player is an admin", async () => {
+    const db = getPool();
+    await db.query("insert into private.admin (user_id) select id from auth.users where email = $1", [EMAIL_A]);
+    try {
+      expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, admin: true });
+    } finally {
+      await db.query("delete from private.admin where user_id = (select id from auth.users where email = $1)", [EMAIL_A]);
+    }
   });
 
   it("sets, changes and clears the display name (M07 7a)", async () => {

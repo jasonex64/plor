@@ -1,8 +1,9 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
 // with emailed codes, become friends through an invite link, and one sees the other start without reloading, and
 // nothing more until their own run is over (M12 12d).
-// Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked on the same pages once
-// both have played. A second test restarts Realtime and checks that the page refetches the board with
+// Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked once both have played.
+// The board is on the Friends tab and the game and the feed on Today (docs/milestones/M14-14a-1-shell.md), so the
+// players move between them. A second test restarts Realtime and checks that the page refetches the board with
 // reason=reconnect.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
@@ -26,13 +27,14 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-// Opens the home page and waits until its board channel has joined (Realtime replies ok to the join).
-async function openBoard(page: Page): Promise<void> {
+// Opens a page, the Friends tab unless another is named, and waits until its board channel has joined (Realtime
+// replies ok to the join). Today joins the channel too, for the feed.
+async function openBoard(page: Page, path = "/friends"): Promise<void> {
   // The dev server's hot-reload socket opens too; only Realtime's counts.
   const joined = page.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1")).then((ws) =>
     ws.waitForEvent("framereceived", { predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:") }),
   );
-  await page.goto("/");
+  await page.goto(path);
   await joined;
 }
 
@@ -53,9 +55,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const watcherName = `w${RUN}`;
   const playerName = `p${RUN}`;
 
-  await watcher.goto("/");
+  await watcher.goto("/friends");
   await signInAndPick(watcher, "w");
-  // The invite link is on the home page's board (M12 12f, F1) as well as the account page (12a).
+  // The invite link is on the Friends tab's board (M12 12f, F1) as well as the Me tab (12a).
   const invite = watcher.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
   await invite.getByRole("button", { name: "Make my invite link" }).click();
   const link = await invite.locator("code").textContent();
@@ -90,6 +92,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   // Once the watcher is caught too, the friend's ending shows, and both are in one place of "where everyone ended"
   // (7d): the watcher first, then the friend, with the full list behind the row.
+  await watcher.goto("/");
   await watcher.getByRole("button", { name: "Start today's puzzle" }).click();
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
@@ -103,6 +106,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const yesterday = watcher.getByRole("region", { name: "Yesterday" });
   await expect(yesterday.getByRole("button", { name: "Friends" })).toHaveAttribute("aria-pressed", "true");
   await expect(yesterday.getByRole("listitem")).toHaveText([`${playerName}: 0 points`, `${watcherName} (you): 0 points`]);
+  await openBoard(watcher);
   // The friends leaderboard (M09 9b; weekly since M10 10a) lists both with no points yet this week, since today's
   // count once the day is over (D9). Tied on 0, they go by name: the player's "p…" before the watcher's "w…".
   await expect(watcher.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem")).toHaveText([
@@ -118,7 +122,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
 
   // The watcher reacts to the friend's run by tapping (M08 8b): another emoji replaces the first, and the same one
-  // again removes it. The player's page shows each change without a reload (8d).
+  // again removes it. The player's open board shows each change without a reload (8d).
+  await openBoard(player);
   const thumbs = row.getByRole("button", { name: "👍" });
   const heart = row.getByRole("button", { name: "❤️" });
   await thumbs.click();
@@ -138,6 +143,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // The player comments, and it reaches the watcher's open page; the watcher's reaction on it reaches the player's
   // (8d). Then the watcher reports it, and it's gone for the watcher at once (8c, D5). Made an admin, the watcher
   // finds it on the reported-comments page and deletes it, and the player's open page loses it too.
+  await openBoard(player, "/");
+  await openBoard(watcher, "/");
   const body = `report me ${RUN}`;
   await player.getByLabel("Comment to your friends").fill(body);
   await player.getByRole("button", { name: "Post" }).click();
@@ -197,19 +204,32 @@ test("a reconnect refetches the board", async ({ browser }) => {
   await expect(paused).toBeHidden();
 });
 
-// At midnight Pacific every section of an open home page starts again from the server's new day (M11 H6), not only
-// the game. The browser's clock is moved past the reset, at most 25 hours away (a day with a time change), so the page's
-// reset timer fires; each section then loads again.
-test("the reset reloads every section of the home page", async ({ browser }) => {
+// At midnight Pacific every section of an open page starts again from the server's new day (M11 H6), not only the
+// game: Today's card and feed, and the Friends tab's board and leaderboard (docs/milestones/M14-14a-1-shell.md). The
+// browser's clock is moved past the reset, at most 25 hours away (a day with a time change), so the page's reset timer
+// fires; each section then loads again.
+test("the reset reloads every section of Today", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "m");
-  await openBoard(page);
+  await openBoard(page, "/");
   await expect(page.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
-  const reloads = ["/api/run", "/api/feed", "/api/board", "/api/leaderboard", "/api/leaderboard/yesterday"].map((path) =>
+  const reloads = ["/api/run", "/api/feed", "/api/leaderboard/yesterday"].map((path) =>
     page.waitForRequest((r) => new URL(r.url()).pathname === path),
   );
+  await page.clock.fastForward("25:00:00");
+  await Promise.all(reloads);
+});
+
+test("the reset reloads the Friends tab", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.clock.install();
+  await page.goto("/friends");
+  await signInAndPick(page, "n");
+  await openBoard(page);
+  await expect(page.getByRole("region", { name: "Friends leaderboard" })).toBeVisible();
+  const reloads = ["/api/run", "/api/board", "/api/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
   await page.clock.fastForward("25:00:00");
   await Promise.all(reloads);
 });
@@ -221,7 +241,7 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page);
+  await openBoard(page, "/");
   await page.getByRole("button", { name: "Start today's puzzle" }).click();
   await page.getByLabel("Your answer").fill("half typ");
   // Only the reset loads yesterday's standings again, so once that answers, the page has moved to the new day.

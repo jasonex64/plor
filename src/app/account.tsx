@@ -99,8 +99,8 @@ function Username({ changeableAt, onChanged }: { changeableAt: string | null; on
   );
 }
 
-// Signs out of this device, on the home page and the account page alike.
-export function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
+// Signs out of this device, from the Me tab.
+function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
   const [error, setError] = useState<string | null>(null);
 
   async function signOut() {

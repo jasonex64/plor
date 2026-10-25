@@ -1,6 +1,6 @@
 # M14 14a-1 — The shell: colour slots, fonts and navigation
 
-**Status:** draft for the human's approval (2026-10-24). The split it belongs to is under "The split" below.
+**Status:** in progress. Approved by the human with the split (2026-10-24: "I approve the split and 14a-1 as drafted, and OK adding the Next.js CSS, fonts and layouts pages to SOURCES.md. Build 14a-1.").
 
 ## Goal
 Every page sits in one shell: the colour slots for Paper and Night, the three fonts, and navigation to four tabs (a bottom tab bar on phones, a sidebar on wider screens), with today's sections moved onto their tabs and not yet restyled.
@@ -11,7 +11,7 @@ Every page sits in one shell: the colour slots for Paper and Night, the three fo
   - Today, everything a player has is one long page (`SignedIn` in `src/app/home.tsx`: game, feed, live board, leaderboard, groups, account link) with no navigation, so the tabs the human chose (L17) don't exist.
   - The screens of 14a-2 and 14a-3 have no colour slots or fonts to use, so each would invent its own.
 
-## The split (Claude's proposal, for the human)
+## The split (approved by the human, 2026-10-24)
 One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Sub-ticket | What it holds | Needs from the human |
 |---|---|---|
@@ -27,7 +27,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
   - `01-app/01-getting-started/11-css.md`: CSS Modules ("locally scope CSS by generating unique class names"), Global CSS ("for *truly* global CSS"), and "Ordering and Merging" ("Import global styles … in the root", "check the build (`next build`) to verify the final CSS order").
   - `01-app/01-getting-started/13-fonts.md` and `03-api-reference/02-components/font.md`: `next/font/google` self-hosts Google fonts ("no requests are sent to Google by the browser"), `weight`, `subsets`, `display` (default `swap`) and the `variable` option for CSS variables.
   - `01-app/01-getting-started/03-layouts-and-pages.md` and `03-api-reference/04-functions/use-pathname.md`: the root layout, and `usePathname` for the active tab.
-  - **For the human:** SOURCES.md's Next.js row doesn't list the CSS, fonts and layouts pages yet. Adding them is a human's call (SOURCES.md, Rules).
+  - These pages were added to SOURCES.md's Next.js row with the human's OK (2026-10-24).
 - **WCAG 2.2** (SOURCES.md): 1.4.3 (text 4.5:1), 1.4.11 (control outlines 3:1), 1.4.10 (reflow at 320 CSS px), 2.4.7 (focus visible), 2.5.8 (target size), 4.1.2 (the active tab exposed as `aria-current="page"`).
 - **The M14 ticket's decisions**, quoted there: L3–L5, L9, L10, L16–L19, L23, L33, L42, L45, L47, and the approved outline colours.
 
@@ -49,7 +49,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
    - the control outline against the background and cards, at 3:1 or more.
 
    `npm test` passes.
-8. **Fonts are self-hosted.** Baloo 2, DM Sans and Young Serif load through `next/font/google`, and no page requests `fonts.googleapis.com` or `fonts.gstatic.com`. Checked in `e2e/shell.e2e.ts` from the page's requests.
+8. **Fonts are self-hosted.** Baloo 2 and DM Sans load through `next/font/google`, and no page requests `fonts.googleapis.com` or `fonts.gstatic.com`. Checked in `e2e/shell.e2e.ts` from the page's requests.
 9. **Focus is visible.** Every link and button in the tab bar and sidebar shows the focus ring (a 3px outline in the accent, offset 3px) when reached by keyboard. Checked in `e2e/shell.e2e.ts` by tabbing and reading the computed outline.
 10. **One way to style.** DECISIONS.md has a Styling row: CSS Modules for components, CSS variables for the colour slots and fonts, and `globals.css` only for the slots, fonts and base element styles. `npm run lint`, `npx tsc --noEmit -p .`, `npm run build` and CI pass.
 
@@ -66,22 +66,24 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | 360px design width; 320px reflow | Layout | L9 (human); WCAG 2.2 1.4.10 |
 | Paper: bg #FAFAF8, surface #FFFFFF, text #1A1A18, muted #5F5F5A, line #E2E2DC, outline #8A8A84, accent #2457D6, on-accent #FFFFFF. Night: bg #121212, surface #1C1C1C, text #EDEDEA, muted #A3A39D, line #3A3A37, outline #6E6E6A, accent #7EA6FF, on-accent #121212 | Colour slots | L21 (presets), the mockups the human approved (2026-10-24, "Round 7 looks good"); outline colours approved by the human, 2026-10-24 |
 | 4.5:1 text, 3:1 outlines | The contrast test | WCAG 2.2 1.4.3, 1.4.11 |
-| Baloo 2 800; DM Sans 400 and 700; Young Serif 400 | Fonts | L4 (human); the weights the approved mockups use |
+| Baloo 2 800; DM Sans 400 and 700 | Fonts | L4 (human); the weights the approved mockups use. Young Serif (400) comes with 14a-2, its first user |
 | Tab bar 64px tall; sidebar 248px wide; targets 44px or more | Navigation | The approved mockups; WCAG 2.2 2.5.8 sets 24px as the minimum |
 | Focus ring: 3px accent outline, 3px offset | Focus | The approved mockups (round 5) |
 
 ## Plan
 1. Record the Styling row in DECISIONS.md. Rewrite `globals.css` as the colour slots (Paper by default, Night under `prefers-color-scheme: dark`), the font variables and the base element styles. Its old phone-only rules go.
-2. Load the three fonts with `next/font/google` in `src/app/layout.tsx`, as CSS variables.
-3. Add the shell: a client component that reads `usePathname` for the active tab, rendered by the root layout around signed-in pages, with `shell.module.css` for the tab bar (below 768px) and the sidebar.
+2. Load Baloo 2 and DM Sans with `next/font/google` in `src/app/layout.tsx`, as CSS variables.
+3. Add the shell: a client component that reads `usePathname` for the active tab, rendered by `Home` once the player is signed in with a username (the root layout can't know who's signed in: pages learn it on the client), with `shell.module.css` for the tab bar (below 768px) and the sidebar. `GET /api/profile` also says whether the player is an admin, for the sidebar's Admin link; the admin routes still check on every request.
 4. Move the sections: `/friends`, `/groups` and `/me` pages through `Home`'s views, as `/account` does today. `/account` moves to `/me`. `SignedIn` keeps the game card and the feed.
 5. Write `e2e/shell.e2e.ts` and the contrast unit test, and move the existing e2e suites to the new pages.
 6. **Hypothesis for step 5:** the moved suites pass unchanged except for their `goto` paths and the region they start from, because the sections keep their names and contents. What would disprove it: an assertion that depends on two sections sharing a page, such as `groups.e2e.ts` reading the Groups region and the Offbeat card from one `/` visit. That is a real change of behaviour, so the test is changed to visit both pages and the change is noted in Evidence. It isn't weakened.
 
 ## Removes
 - `src/app/account/` (the page moves to `/me`).
-- `globals.css`'s phone-only element rules (`main` max-width, full-width labels, inputs and buttons).
-- The "Signed in as … Your account" section and the Groups and Board sections on the home page (they move to their tabs).
+- `globals.css`'s phone-only rules: `main` at 480px (now 960px, L43), and full-width buttons.
+- The "Signed in as … Your account" section and the Groups and Board sections on the home page (they move to their tabs), and the home page's M11 H1 order of six sections (Today now has two).
+- `Board`'s `onCommentsChanged` prop: the feed is on Today and the board on Friends, so Today listens to the board's channel itself, as a group's page does.
+- `SignOut`'s export: only the Me tab uses it now.
 
 ---
 *Fill in the sections below at the end.*
@@ -90,6 +92,7 @@ One PR per sub-ticket, in this order, from `m14-look-and-feel`:
 | Source says | We built | Why different |
 |---|---|---|
 | Next.js recommends Tailwind for most styling, with CSS Modules for scoped CSS (`11-css.md`, "Recommendations") | CSS Modules and CSS variables only | The human chose "CSS Modules + CSS variables" (L33): no new dependency, and themes need CSS variables either way |
+| This ticket's plan put the shell in the root layout | `Home` renders it once the player is signed in with a username | Who's signed in is known only on the client (`Home` reads `/api/profile`), and signed-out pages have no tabs |
 
 ## Evidence
 
