@@ -1,6 +1,6 @@
 # M13 13c — Rarity and the host
 
-**Status:** planned (2026-10-24). The human answered three rounds of guided questions; the design below waits for the human's approval.
+**Status:** in review (2026-10-24): built; the reviewer next. The human answered three rounds of guided questions and approved the design (human, 2026-10-24: "I approve 13c's design. Build it.").
 
 ## Goal
 The rarity bonus comes from what players really answer, pooled across every day a category is asked; the host names a fixed number of answers per question, drawn at random from its bank; and a player who knows the category always has 3 familiar answers that survive.
@@ -57,15 +57,15 @@ It never warns or changes the day.
 
 **5. The T1 day** is redrafted under the new rules (its hosts today don't follow 1, 1, 1, 1, 2, 2, 3).
 
-**Security:** none expected. `plor_app` already reads `private.run_event` and `private.puzzle`, which the pooled counts need (*unverified* until built; any new grant would come back to the human first).
+**Security:** none. `plor_app` already reads `private.run_event` and `private.puzzle`, which the pooled counts need: `ledger.db.test.ts` reads them as `plor_app`. `private.approve_puzzle` keeps its signature and grant.
 
 ## Acceptance criteria
-- [ ] **The expected share** (unit tests, hand-worked): the 40/40/20 split on a question with known levels and members; the blend with pooled counts above and below the minimum.
-- [ ] **Pooling** (db test): an answer given on one day lowers its bonus on a later day of the same category; the provisional bonus ignores today's answers, and the final bonus counts them.
-- [ ] **Host counts** (unit tests): the validator refuses a day whose host counts aren't 1, 1, 1, 1, 2, 2, 3; the draft's random pick is the same for the same date and comes from the host bank.
-- [ ] **Familiar answers** (unit and pgTAP): the picker refuses letters leaving fewer than 3 familiar safe answers; approval refuses such a day with OB009.
-- [ ] **The soft guide** (unit test): the summary's expected catch and finish rates for a hand-worked day.
-- [ ] **T1** redrafted with `npm run draft` and approved and played on the local stack.
+- [x] **The expected share** (unit tests, hand-worked): the 40/40/20 split on a question with known levels and members; the blend with pooled counts above and below the minimum.
+- [x] **Pooling** (db test): an answer given on one day lowers its bonus on a later day of the same category; the provisional bonus ignores today's answers, and the final bonus counts them.
+- [x] **Host counts** (unit tests): the validator refuses a day whose host counts aren't 1, 1, 1, 1, 2, 2, 3; the draft's random pick is the same for the same date and comes from the host bank.
+- [x] **Familiar answers** (unit and pgTAP): the picker refuses letters leaving fewer than 3 familiar safe answers; approval refuses such a day with OB009.
+- [x] **The soft guide** (unit test): the summary's expected catch and finish rates for a hand-worked day.
+- [x] **T1** redrafted with `npm run draft` and approved and played on the local stack.
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass.
 
 ## Out of scope
@@ -100,8 +100,28 @@ It never warns or changes the day.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Design 1: a tier's share split among its members | The same, and a tier with no members passes its share to the others in proportion | Claude's reading, as M09's "every member in the host bank"; no number involved (`firstGuess`) |
+| Design 2: the draft draws the hosts | It does; when the drawn hosts block every letter (T1's Q7: Texas, California and Ohio held every vowel the Wind could steal there), the drafting session changes the bank | The host counts and random draw are the human's; DECISIONS.md, Puzzle drafting, says to change the bank or the uncommon answers |
+| (not in the design) | `src/game/scoring.ts` and `ledger.ts` import relatively, with extensions; `Db` takes a script's own client | `npm run draft` runs them on plain Node for the soft guide, as `src/content/puzzle.ts` already is |
+| (not in the design) | The fixture gains members (Mali, Togo, tungsten, titanium, eye, skin) and uncommon levels, and sports replace months | Under C, P, R and O, the months and countries couldn't keep 3 familiar answers typeable and safe |
 
 ## Evidence
+**13c's build (2026-10-24, local stack):**
+- `npm test` → 36 files, 209 tests passed, including:
+  - `scoring.test.ts`: the first guess (dog 0.4/2, cat 0.4/3, horde 0.2/6; an empty tier's share passed on); pooled blending at 20 answers (horde 3 of 20 → 5) and below 5 (→ 10);
+  - `draft.test.ts`: `pickHosts` gives 1, 1, 1, 1, 2, 2, 3 from the bank, the same for a date, and refuses a small bank; the soft guide for seven 10% questions → finish 48% (the targets': 45%);
+  - `content-validate.test.ts`: a host count off the schedule is refused.
+- `npm run test:db` → 35 files, 232 tests passed, including `ledger.db.test.ts`, reworked by hand:
+  - A 150 + 0; A's second day 25 + 7 (aardvark 2 of 17 pooled over both days; that day's answers alone would give 10); B 1000 + 163; C 75 + 9; E 75 + 6;
+  - the provisional pooling leaves the day out (16 answers, aardvark 1) and the final one counts it (17, 2), read as `plor_app`.
+- `npm run test:sql` → `Result: PASS`, including `puzzle_entry.test.sql`: exactly 3 familiar answers typeable and safe pass; 2 are refused with OB009.
+- `npx playwright test` → 14 passed; `approve-and-play.e2e.ts` plays the fixture past C, P, R and O with cat, kiwi, green, Kenya, lead, boxing and knee, and the reveal reads "the host said hand, head, leg".
+- `npx tsc --noEmit -p .`, `npx eslint src e2e scripts` and `npm run content:validate` clean.
+- **T1, redrafted:** `npm run draft` first refused it: "no letters fit schedule A". A diagnosis script (deleted after) found Q7's drawn hosts, Texas, California and Ohio, held every vowel the Wind could steal there.
+  - The US-state bank became states with no E: California, Florida, Ohio, Iowa, Idaho, Utah. Uncommon answers were added to each question.
+  - The draft then wrote letters U, P, T, E; hosts Lion, Germany, grape, Labrador Retriever, Swiss cheese and cheddar, iron and hydrogen, California, Idaho and Florida.
+  - The soft guide: expected catch 7%, 7%, 8%, 7%, 18%, 13%, 20% against 3–20%; expected finish 42% against the targets' 45%.
+- **T1 approved and played** on the local stack by a temporary Playwright script (deleted after, with its day and players): member counts 56,787, 193, 2,999, 928, 48, 118 and 50. Zebra, Kenya, banana, Beagle, Brie, neon and Hawaii survived all 7: 1000 points and a provisional bonus of about 321 (about 479 before 13c, when every unleveled answer was split from half the players).
 
 ## Review
 - Blocking findings and how each was fixed:

@@ -2,12 +2,13 @@
 // Connects through the Supavisor transaction pooler, so: no named (prepared) queries, no session
 // SET, and schema-qualified table names (supabase.com/docs/guides/database/connecting-to-postgres).
 import { attachDatabasePool } from "@vercel/functions";
-import { Pool, type PoolClient, type PoolConfig } from "pg";
+import { Pool, type Client, type PoolClient, type PoolConfig } from "pg";
 import { readServerEnv, type ServerEnv } from "@/config/env";
 import { log } from "@/lib/log";
 
-// Either the pool or one transaction's client: single statements can run on both.
-export type Db = Pool | PoolClient;
+// The pool, one transaction's client, or a script's own client (scripts/draft.ts, which shares the bonus's pooling):
+// single statements run on all three.
+export type Db = Pool | PoolClient | Client;
 
 let pool: Pool | undefined;
 
