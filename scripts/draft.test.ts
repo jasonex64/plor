@@ -3,7 +3,7 @@
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { pickHosts, pickLetters, softGuide, withHosts } from "./draft.ts";
+import { blockRange, fitOrder, moveTo, pickHosts, pickLetters, softGuide, withHosts } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -65,6 +65,32 @@ describe("withHosts", () => {
 
   it("finds no day when a question has fewer sayable answers than the host names there", () => {
     expect(withHosts("2026-11-02", Array.from({ length: 7 }, () => question(["bee", "ant", "owl", "ox", "cow"])), steals, names)).toBeNull();
+  });
+});
+
+describe("moving a question that blocks the letters", () => {
+  const seven = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
+  it("knows which questions a stop covers: schedule A's slots end at Q3, Q4, Q6 and Q7", () => {
+    expect([0, 3, 4, 6].map((held) => blockRange(held, 7))).toEqual([[0, 3], [3, 4], [4, 6], [6, 7]]);
+  });
+
+  it("moves one question to an earlier place, the others in order", () => {
+    expect(moveTo(seven, 6, 3)).toEqual(["q1", "q2", "q3", "q7", "q4", "q5", "q6"]);
+  });
+
+  // A stand-in for the letters: "q7" only fits at Q4 or earlier, and the letters stop at the slot that covers it.
+  const lettersFor = async (order: string[]) => {
+    const at = order.indexOf("q7");
+    return at <= 3 ? { steals: ["x"], held: 7 } : { steals: null, held: at >= 6 ? 6 : 4 };
+  };
+
+  it("moves a blocker past the slot that covers Q5 and Q6, to the nearest place that fits", async () => {
+    expect(await fitOrder(seven, lettersFor)).toEqual({ questions: ["q1", "q2", "q3", "q7", "q4", "q5", "q6"], steals: ["x"], held: 7 });
+  });
+
+  it("keeps the order when it fits, and returns it with its stop when no place does", async () => {
+    expect((await fitOrder(seven, async () => ({ steals: ["x"], held: 7 }))).questions).toEqual(seven);
+    expect(await fitOrder(seven, async () => ({ steals: null, held: 6 }))).toEqual({ questions: seven, steals: null, held: 6 });
   });
 });
 

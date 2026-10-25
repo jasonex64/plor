@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-rivers",
+  "source": "wikidata",
+  "snapshot": "2026-10-25",
+  "retrieved_at": "2026-10-25T09:47:42.579Z",
+  "method": "SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name \"X River\" or \"River X\" also gives \"X\" as a synonym",
+  "items": 40921,
+  "sha256": "a8ad54b38a2a30f3fb51dfac6530681f40aa6707abbe38e3af6409f6978681d0"
+}

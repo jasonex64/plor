@@ -1,6 +1,6 @@
 # M13 13e-3 — Knowledge and places
 
-**Status:** planned (2026-10-25). The human answered three rounds of guided questions; the design below waits for the human's approval.
+**Status:** in progress (2026-10-25): built and reviewed; the review's blocking findings are fixed, and one question waits on the human (river short names, below) before the re-checks and the PR. The design is approved (human, 2026-10-25: "I approve 13e-3's design. Build it."). The sitelinks source is in SOURCES.md ("Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks).
 
 ## Goal
 The second batch of 13e (`M13-13e-growing-the-categories.md`): about 20 knowledge categories from WordNet and 5 place categories from new Wikidata imports, with their bank questions, and the four lists that block days at Q7 reworked.
@@ -26,6 +26,10 @@ Already decided:
 | Which entries a big place set keeps | "English Wikipedia article (Recommended)" |
 | How many place categories | "About 5 (Recommended)" |
 | Which 5, with all four kinds picked | "One of each (Recommended)": world capitals, US state capitals, US cities, rivers, Canadian provinces and territories. Mountains, islands, lakes, world cities and national parks wait for a later batch |
+| **While building:** the source for "has an English Wikipedia article" | "Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks |
+| Items Wikidata names only with a "mul" label (Juneau, 6 US cities, 37 rivers) | "Use mul when no English (Recommended)", with Wikidata's help page added to SOURCES.md |
+| Rivers named "Mississippi River" with no short alias | "Yes, for rivers (Recommended)": "X River" and "River X" also give "X" |
+| Soup, which no list gives room at Q7 | "soup can be in the questions 1-6 or wherever it can work and just not have it as q7", then "Move any blocker earlier (Recommended)" |
 
 ## Source
 - **Wikidata** (SOURCES.md, M13 D2): things, English labels and aliases, the concept tree, closed lists checked against it; SPARQL limits. **Whether an item has an English Wikipedia article** comes from its sitelinks (`schema:about` in the query service). The SOURCES.md entry doesn't list sitelinks among what it covers (*unverified* that the read user manual covers them): read the query service's user manual on sitelinks before building, and ask the human to add it if it isn't there.
@@ -48,11 +52,19 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 
 **4. One PR**, which the human approves by merging, with the review output, the LDNOOBW flags and each import's measured size.
 
+**What building changed** (each from the human's answers above, or the checks):
+- US cities are instances of city in the United States *or a subclass* (P31/P279*): Los Angeles is only a "charter city", and Philadelphia only a "city of Pennsylvania", in Wikidata.
+- `labelled` reads mul labels when there's no English one; the rivers set adds short names (`riverShortNames`).
+- Four WordNet roots were widened after the gap check: religion (05955536-n, the belief sense, where Christianity is), currency (monetary unit 13625961-n, where euro and yen are), feeling (00026390-n, where hope and grief are) and boat or ship (vessel 04537861-n, where sailboat and yacht are).
+- 17 more links (bowling and fencing → sport, pearl and amber → gem, six native elements → mineral, storm, cloud and lightning → weather, time unit → unit of measurement, food fish → seafood, bomb → weapon, techno → music genre), 105 in all.
+- The draft moves a question that blocks the letters one place earlier and tries again (`moveEarlier`), so soup, dinosaur, monkey and Canadian provinces, which have no room at Q7, still draft.
+- The footwear, cake and jewelry lists were reworked toward short host names; soup kept its list and moves earlier instead.
+
 ## Acceptance criteria
-- [ ] Each Wikidata set fetched, its manifest committed, its size measured and reported (MB in the local database) before it's kept.
-- [ ] About 25 new categories (about 20 WordNet, 5 places), each of at least 10 members, reviewed, with a bank question each.
-- [ ] Every bank answer resolves to one member; no host answer sits above another familiar answer.
-- [ ] Trial drafts succeed; the simulator drafts at least the 31 of 40 days of 13e-2.
+- [x] Each Wikidata set fetched, its manifest committed, its size measured and reported (MB in the local database) before it's kept.
+- [x] About 25 new categories (about 20 WordNet, 5 places), each of at least 10 members, reviewed, with a bank question each.
+- [x] Every bank answer resolves to one member; no host answer sits above another familiar answer.
+- [x] Trial drafts succeed; the simulator drafts at least the 31 of 40 days of 13e-2.
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e`, `npm run content:validate` and CI pass.
 
 ## Out of scope
@@ -76,7 +88,10 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 5. The checks, the review, the PR.
 
 ## Removes
-- The four weak lists' current answers (replaced). Otherwise it adds sets and categories, with nothing to remove: each set is a new source subset.
+- The footwear, cake and jewelry lists' old answers (replaced).
+- English-only labels in Wikidata imports (`labelled`).
+- Strict easiest-first as the only order in the draft (a blocking question moves earlier).
+Otherwise it adds sets and categories, with nothing to remove: each set is a new source subset.
 
 ---
 *Fill in the sections below at the end.*
@@ -84,9 +99,29 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Wikidata labels in English (the SOURCES.md entry's "English labels and aliases") | English, else "mul" | Wikidata moved some names to mul (Juneau's English label removed 2026-09-28 as "redundant"); its help page says English falls back to mul. The human's OK, 2026-10-25 |
+| City in the United States (Q1093829) | Q1093829 and its subclasses | Los Angeles and Philadelphia are only in subclasses |
+| Rivers' Wikidata names | Plus "X" for "X River" and "River X" | Players type "Mississippi"; the human's OK |
 
 ## Evidence
+**Local stack, 2026-10-25.**
+- **The imports, measured** (`pg_database_size` before and after each load): world capitals 199 members, about 0.1 MB; Canadian provinces and territories 13 (the dissolved District of Keewatin filtered out), under 0.1 MB; US cities 10,761 with an English Wikipedia article, about 11.6 MB with the first, narrower query (`P31 Q1093829`, 9,382 items; the subclass query added 1,280 things and 5,215 aliases); rivers 40,920, about 38 MB; US state capitals 50. The local database went from 236 to about 287 MB (plor.app's Free plan holds 500 MB).
+- The state capitals fetch first stopped loudly (`49 capitals for 50 states`): Alaska's capital, Juneau (Q29445), has only a mul label on Wikidata (edit by MSGJ, 2026-09-28: "Remove all redundant labels/aliases same as mul label"). After the mul fallback: 50.
+- `npm run base -- load all`: `LINKED data/links.json: {"links":105,…}`, `DEFINED 60 categories from data/categories.json`.
+- `npm run base -- review` on the 26 new categories: sport 187, weapon 236, fabric 290, dance 107, gemstone 59, mineral 284, music_genre 96, language 768, religion 108, currency 406, feeling 448, weather 147, dinosaur 51, monkey 71, shark 39, whale 31, shape 63, unit 914, seafood 151, boat 190, verse_form 39, us_state_capital 50, world_capital 199, us_city 10,761, river 40,920, canadian_province 13 members.
+- **LDNOOBW flags, for the human:** weapon 1 (butt shaft), fabric 1 (fag end), dance 1 (nude dancing), music_genre 2 ("negro spiritual", scat), feeling 8 (sexual feelings such as erotic love, sadism, nymphomania), boat 1 (destroyer escort), us_city 3 (Cumming, Hooker, Coon Rapids), river 32 (place names such as Dick Brook and Rio Negro, and **a Hawaiian stream, Pūkio Stream, whose Wikidata alias is a racial slur**).
+- Every bank answer resolves to one member (Wikidata places by the lowest Q-number among same-named members: Mississippi River Q1497, River Thames Q19686, Chicago Q1297), and no host answer sits above another familiar answer (scratch check).
+- Trial drafts (files deleted after): 2026-10-26 to 10-31 and 11-24 drafted, seven days in a row with no letter failure; 11-01 stopped on the gap, `only 4 bank questions ask a category not used within 30 days; 3 more needed` (60 − T1's 7 − 49).
+- The full-day simulator (40 dates): **36 of 40** (13e-2: 31). The 4 failures block at Q7: cheese 2, bread 1, flower 1.
+- `npm test` 255 passed, `npm run lint` 0 errors, `npx tsc --noEmit -p .` clean, `npm run test:db` 235 passed, `npm run test:sql` PASS (345), `npm run test:e2e` 27 passed, `npm run content:validate` OK. CI: in the PR.
 
 ## Review
+**Reviewer agent, fresh context, 2026-10-25.**
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - the reorder moved the wrong question once a blocker reached the slot that covers Q5 and Q6 (`held` is a slot boundary): replaced by `fitOrder`, which moves each question of the stopped slot to each earlier place, nearest first, with `blockRange` and `moveTo`, and unit tests with a stand-in for the letters;
+  - `labelled`'s English-over-mul choice had no test: the row fold is `foldLabels`, tested in either row order;
+  - the "time unit" link made birthday and yesterday units, and iron and graphite brought in cast iron and "pencil" as minerals: time unit is replaced by its true units (second, minute, hour, half-hour, quarter-hour and the sub-second ones); iron and graphite are dropped, and their facts were deleted from the local database by hand; mineral's host bank takes halite for iron;
+  - this ticket's Status line: updated.
+- **Open, for the human:** river short names make generic words rivers ("little" on 64 rivers, "black" 49, "white" 25, "north" 21, "big" 17, "la" from the LA River, "branch", "fork", "creek", "de"), a dodge. Asked: skip short names shared by several rivers (recommended), a fixed stop-list, or keep as is. **Unanswered when the session ended.**
+- Deferred to ROADMAP "Next revision" (for the human to see in the PR): the widened roots bring generic members (feeling: thing, state, soul, harassment, nationalism; boat or ship: bottom, shell, wreck, hulk; religion: theism, mysticism); gold and silver bring green gold and coin silver; Malabo is missing (Equatorial Guinea's capital is Ciudad de la Paz in Wikidata); Pago Pago and Charlotte Amalie come in as US cities; the older sets' `method` strings predate the mul fallback.
+- **Not yet re-run after the fixes:** the trial drafts, the simulator (36 of 40 was before `fitOrder`), `npm test` (255 before the new tests), the db, SQL and e2e suites.

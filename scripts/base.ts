@@ -168,16 +168,30 @@ export function taxaToItems(taxa: Map<string, Taxon>, root: string): Item[] {
   }));
 }
 
-// Labelled items: ?x with its English label and alternative labels (skos:altLabel), as synonyms.
+// Labelled items: ?x with its English label, else its "mul" label, and its English and "mul" alternative labels
+// (skos:altLabel), as synonyms. "mul" is Wikidata's default for all languages, where English falls back to it when it
+// has no label of its own (SOURCES.md, Wikidata default labels; human, 2026-10-25: "Use mul when no English
+// (Recommended)").
 async function labelled(where: string): Promise<Map<string, { label: string; alts: string[]; parents: Set<string> }>> {
   const rows = await sparql(`SELECT ?x ?label ?alt ?parent WHERE { ${where}
-    ?x rdfs:label ?label . FILTER(LANG(?label) = "en")
-    OPTIONAL { ?x skos:altLabel ?alt . FILTER(LANG(?alt) = "en") } }`);
+    ?x rdfs:label ?label . FILTER(LANG(?label) = "en" || LANG(?label) = "mul")
+    OPTIONAL { ?x skos:altLabel ?alt . FILTER(LANG(?alt) = "en" || LANG(?alt) = "mul") } }`);
   if (rows === "timeout") throw new Error("query timed out");
+  return foldLabels(rows);
+}
+
+// The query's rows, one per label and alternative label, into one entry per item: the English label wins over the
+// mul one whatever the row order, and each alternative label is kept once.
+export function foldLabels(rows: Binding[]): Map<string, { label: string; alts: string[]; parents: Set<string> }> {
   const out = new Map<string, { label: string; alts: string[]; parents: Set<string> }>();
+  const english = new Set<string>();
   for (const r of rows) {
     const id = qid(r.x.value);
     const entry = out.get(id) ?? { label: r.label.value, alts: [], parents: new Set<string>() };
+    if (r.label["xml:lang"] === "en" && !english.has(id)) {
+      english.add(id);
+      entry.label = r.label.value;
+    }
     if (r.alt && !entry.alts.includes(r.alt.value)) entry.alts.push(r.alt.value);
     if (r.parent) entry.parents.add(qid(r.parent.value));
     out.set(id, entry);
@@ -192,8 +206,17 @@ async function rootItem(id: string, expected: string): Promise<Item> {
   return { id, name: label, aliases: aliasesFor([label]) };
 }
 
-function labelledItems(found: Awaited<ReturnType<typeof labelled>>, kindOf: (id: string, parents: Set<string>) => string[], memberOf: string[] = []): Item[] {
-  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: aliasesFor([e.label], e.alts), kind_of: kindOf(id, e.parents), member_of: memberOf }));
+function labelledItems(found: Awaited<ReturnType<typeof labelled>>, kindOf: (id: string, parents: Set<string>) => string[], memberOf: string[] = [], more: (names: string[]) => string[] = () => []): Item[] {
+  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: aliasesFor([e.label], [...e.alts, ...more([e.label, ...e.alts])]), kind_of: kindOf(id, e.parents), member_of: memberOf }));
+}
+
+// A river's short names, as players type them: "Mississippi" for "Mississippi River", "Thames" for "River Thames"
+// (human, 2026-10-25: "Yes, for rivers (Recommended)").
+export function riverShortNames(names: string[]): string[] {
+  return names.flatMap((n) => {
+    const m = /^(.+) River$/i.exec(n) ?? /^River (.+)$/i.exec(n);
+    return m ? [m[1]] : [];
+  });
 }
 
 // --- Open English WordNet 2025 (SOURCES.md) and USDA FoodData Central SR Legacy (SOURCES.md) ---
@@ -398,6 +421,54 @@ const SETS: Record<string, SetDef> = {
     source: "wikidata",
     method: `SPARQL: items with a population (P1082) of at least ${BASE_PLACES_MIN_POPULATION} in any statement, and an English label`,
     fetch: async () => labelledItems(await labelled(`?x wdt:P1082 ?population . FILTER(?population >= ${BASE_PLACES_MIN_POPULATION})`), () => []),
+  },
+  // Places as categories (13e-3; human, 2026-10-25: "One of each (Recommended)"). Each item is put under the set's
+  // root, as dog breeds are. Capitals are read from the countries and states already fetched, so the lists agree.
+  "wikidata-capitals": {
+    source: "wikidata",
+    method: "SPARQL: the capital (P36) of each country in the wikidata-countries snapshot, under capital city (Q5119); a country with several capitals keeps them all",
+    fetch: async () => {
+      const countries = readSnapshot("wikidata-countries").items.filter((i) => i.member_of?.includes("Q1065")).map((i) => `wd:${i.id}`);
+      if (countries.length !== 193) throw new Error(`wikidata-countries holds ${countries.length} countries, expected 193`);
+      return [await rootItem("Q5119", "capital city"), ...labelledItems(await labelled(`VALUES ?country { ${countries.join(" ")} } ?country wdt:P36 ?x .`), () => ["Q5119"])];
+    },
+  },
+  "wikidata-us-state-capitals": {
+    source: "wikidata",
+    method: "SPARQL: the capital (P36) of each state in the wikidata-us-states snapshot, under state capital (Q11271835)",
+    fetch: async () => {
+      const states = readSnapshot("wikidata-us-states").items.filter((i) => i.id !== "Q35657").map((i) => `wd:${i.id}`);
+      const found = await labelled(`VALUES ?state { ${states.join(" ")} } ?state wdt:P36 ?x .`);
+      if (found.size !== states.length) throw new Error(`${found.size} capitals for ${states.length} states`);
+      return [await rootItem("Q11271835", "state capital"), ...labelledItems(found, () => ["Q11271835"])];
+    },
+  },
+  // Big sets keep only items with an English Wikipedia article (human, 2026-10-25: "English Wikipedia article
+  // (Recommended)"; SOURCES.md, Wikibase RDF Dump Format, Sitelinks).
+  "wikidata-us-cities": {
+    source: "wikidata",
+    method: "SPARQL: instances of city in the United States or a subclass of it (P31/P279* Q1093829, so charter cities such as Los Angeles count) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>)",
+    fetch: async () => [
+      await rootItem("Q1093829", "city in the United States"),
+      ...labelledItems(await labelled(`?x wdt:P31/wdt:P279* wd:Q1093829 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`), () => ["Q1093829"]),
+    ],
+  },
+  "wikidata-rivers": {
+    source: "wikidata",
+    method: "SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name \"X River\" or \"River X\" also gives \"X\" as a synonym",
+    fetch: async () => [
+      await rootItem("Q4022", "river"),
+      ...labelledItems(await labelled(`?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`), () => ["Q4022"], [], riverShortNames),
+    ],
+  },
+  "wikidata-canadian-provinces": {
+    source: "wikidata",
+    method: "SPARQL: instances of province of Canada (P31 Q11828004) or territory of Canada (P31 Q9357527), not dissolved (no P576), under province or territory of Canada (Q2879)",
+    fetch: async () => {
+      const found = await labelled("VALUES ?kind { wd:Q11828004 wd:Q9357527 } ?x wdt:P31 ?kind . FILTER NOT EXISTS { ?x wdt:P576 ?dissolved }");
+      if (found.size !== 13) throw new Error(`${found.size} provinces and territories, expected 13`);
+      return [await rootItem("Q2879", "province or territory of Canada"), ...labelledItems(found, () => ["Q2879"])];
+    },
   },
   "oewn-animals": {
     source: "oewn",

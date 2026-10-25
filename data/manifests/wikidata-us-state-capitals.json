@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-us-state-capitals",
+  "source": "wikidata",
+  "snapshot": "2026-10-25",
+  "retrieved_at": "2026-10-25T09:39:37.766Z",
+  "method": "SPARQL: the capital (P36) of each state in the wikidata-us-states snapshot, under state capital (Q11271835)",
+  "items": 51,
+  "sha256": "1166598e8c41823522185f800acf270b220cd0c0b067fc0162c048adbf5053ac"
+}
