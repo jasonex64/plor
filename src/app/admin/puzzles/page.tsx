@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuditLink } from "../audit-link";
 import { Suspense } from "react";
 import { Puzzles } from "./puzzles";
 
@@ -14,7 +15,7 @@ export default function PuzzlesPage() {
       <footer>
         <p>
           <Link href="/admin">Puzzle insights</Link> · <Link href="/admin/reports">Reported comments</Link> ·{" "}
-          <Link href="/admin/base">Answer database</Link> · <Link href="/">Back to Plor</Link>
+          <Link href="/admin/base">Answer database</Link> · <AuditLink /> · <Link href="/">Back to Plor</Link>
         </p>
       </footer>
     </main>

@@ -2,11 +2,12 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { GAME_ID, avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID, avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
-import { ANSWER_SHARE_MIN_PLAYERS, POINTS_PER_QUESTION } from "@/config/tunables";
+import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
-import { resolveTyped } from "./matching";
+import { isNearTypo, resolveTyped } from "./matching";
+import { isListed } from "./misses";
 import { dayCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
@@ -236,7 +237,7 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   const resolved = await resolveTyped(db, puzzle, index, typed, stolen);
   if (!resolved) {
     try {
-      await logMiss(db, userId, date, index, typed);
+      await logMiss(db, userId, puzzle, index, typed);
     } catch (err) {
       // logMiss only logs for a run in progress; one whose time ran out shows its ending instead of a 409.
       const run = await stateOf(db, userId, date, puzzle);
@@ -307,24 +308,32 @@ async function settledAnswer(db: Db, userId: string, date: string, index: number
   return true;
 }
 
-// Logs typed text that named no entry for the question the player is on, at no cost to the run (human, 2026-10-18).
-// The table's check allows 1 to 40 characters; longer text is rejected and nothing is stored.
-export async function logMiss(db: Db, userId: string, date: string, index: number, typed: string): Promise<void> {
-  let rowCount: number | null;
+// Logs typed text that named no entry for the question the player is on, at no cost to the run (human, 2026-10-18),
+// and lets private.record_miss learn from it once enough players typed it (M13 13b). The table's check allows 1 to 40
+// characters; longer text is rejected and nothing is stored.
+async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: number, typed: string): Promise<void> {
+  const text = normalize(typed);
+  let logged: boolean;
   try {
-    ({ rowCount } = await db.query(
-      `insert into private.missed_answer (user_id, game_id, puzzle_date, question_idx, typed)
-       select s.user_id, s.game_id, s.puzzle_date, $3::smallint, $4
-       from private.run_status s
-       where s.user_id = $1 and s.game_id = $2 and s.puzzle_date = $5::date
-         and s.status = 'in_progress' and s.answered = $3::smallint`,
-      [userId, GAME_ID, index, typed, date],
-    ));
+    ({
+      rows: [{ logged }],
+    } = await db.query<{ logged: boolean }>("select private.record_miss($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10) as logged", [
+      userId,
+      GAME_ID,
+      puzzle.date,
+      index,
+      typed,
+      text,
+      await isNearTypo(db, puzzle, index, typed),
+      isListed(text),
+      MISS_ACCEPT_MIN_PLAYERS,
+      MISS_ACCEPT_SHARE_PERCENT,
+    ]));
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "23514" && err.constraint === "missed_answer_typed_length") {
       throw new AppError("text_invalid", 400);
     }
     throw err;
   }
-  if (rowCount === 0) throw new AppError("not_current_question", 409);
+  if (!logged) throw new AppError("not_current_question", 409);
 }
