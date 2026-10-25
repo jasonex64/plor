@@ -157,6 +157,587 @@
       ],
       "themes": [],
       "added_by": "claude"
+    },
+    {
+      "id": "name-a-vegetable",
+      "prompt": "Name a vegetable",
+      "category": "vegetable",
+      "host_bank": [
+        "carrot",
+        "potato",
+        "broccoli",
+        "onion",
+        "lettuce",
+        "celery"
+      ],
+      "uncommon": [
+        "parsnip",
+        "kale",
+        "zucchini",
+        "radish",
+        "asparagus"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-dessert",
+      "prompt": "Name a dessert",
+      "category": "dessert",
+      "host_bank": [
+        "ice cream",
+        "apple pie",
+        "brownie",
+        "cheesecake",
+        "cupcake"
+      ],
+      "uncommon": [
+        "tiramisu",
+        "pavlova",
+        "flan",
+        "sorbet",
+        "baklava"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-drink",
+      "prompt": "Name a drink",
+      "category": "beverage",
+      "host_bank": [
+        "water",
+        "coffee",
+        "tea",
+        "milk",
+        "soda",
+        "orange juice"
+      ],
+      "uncommon": [
+        "lemonade",
+        "cider",
+        "eggnog",
+        "milkshake",
+        "cocoa"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-bread",
+      "prompt": "Name a kind of bread",
+      "category": "bread",
+      "host_bank": [
+        "bagel",
+        "croissant",
+        "rye bread",
+        "white bread",
+        "toast"
+      ],
+      "uncommon": [
+        "challah",
+        "pita",
+        "brioche",
+        "naan",
+        "matzo"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sauce",
+      "prompt": "Name a sauce",
+      "category": "sauce",
+      "host_bank": [
+        "ketchup",
+        "mustard",
+        "barbecue sauce",
+        "gravy",
+        "salsa"
+      ],
+      "uncommon": [
+        "hollandaise",
+        "aioli",
+        "tartar sauce",
+        "bechamel",
+        "pesto"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-candy",
+      "prompt": "Name a candy",
+      "category": "candy",
+      "host_bank": [
+        "lollipop",
+        "chocolate bar",
+        "licorice",
+        "jelly bean",
+        "cotton candy"
+      ],
+      "uncommon": [
+        "fudge",
+        "toffee",
+        "nougat",
+        "marshmallow",
+        "peanut brittle"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-cake",
+      "prompt": "Name a kind of cake",
+      "category": "cake",
+      "host_bank": [
+        "cheesecake",
+        "cupcake",
+        "sponge cake",
+        "chocolate cake",
+        "birthday cake"
+      ],
+      "uncommon": [
+        "pound cake",
+        "fruitcake",
+        "torte",
+        "coffee cake",
+        "gingerbread"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-soup",
+      "prompt": "Name a soup",
+      "category": "soup",
+      "host_bank": [
+        "chicken soup",
+        "chowder",
+        "minestrone",
+        "gazpacho",
+        "gumbo"
+      ],
+      "uncommon": [
+        "borscht",
+        "bisque",
+        "vichyssoise",
+        "mulligatawny",
+        "consomme"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-pasta",
+      "prompt": "Name a kind of pasta",
+      "category": "pasta",
+      "host_bank": [
+        "spaghetti",
+        "macaroni",
+        "penne",
+        "lasagna",
+        "ravioli"
+      ],
+      "uncommon": [
+        "farfalle",
+        "rigatoni",
+        "ziti",
+        "orzo",
+        "fettuccine"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bird",
+      "prompt": "Name a bird",
+      "category": "bird",
+      "host_bank": [
+        "eagle",
+        "#d1ca667e-6a7f-5060-8a21-53b6903c4c9f",
+        "pigeon",
+        "parrot",
+        "owl",
+        "penguin"
+      ],
+      "uncommon": [
+        "heron",
+        "finch",
+        "pelican",
+        "magpie",
+        "flamingo"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-fish",
+      "prompt": "Name a fish",
+      "category": "fish",
+      "host_bank": [
+        "#312729a6-cbf1-5d91-afab-5a10de3b7a1d",
+        "#9dfb39cf-5967-50ab-b813-ef346904adcf",
+        "#dd86f527-ac23-5475-85ef-101a5a73fad4",
+        "shark",
+        "trout",
+        "#63e38ba9-66b4-56c6-8d81-6b719198e7b4"
+      ],
+      "uncommon": [
+        "#1645ff3d-b171-552b-95e3-39a8f524f59f",
+        "carp",
+        "#04aadcc8-cc82-5897-95e3-49988b4bd35f",
+        "swordfish",
+        "#682b0c2e-9e6b-5563-9f05-b0389d545862"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-insect",
+      "prompt": "Name an insect",
+      "category": "insect",
+      "host_bank": [
+        "ant",
+        "bee",
+        "butterfly",
+        "fly",
+        "mosquito",
+        "ladybug"
+      ],
+      "uncommon": [
+        "cricket",
+        "beetle",
+        "grasshopper",
+        "moth",
+        "dragonfly"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-snake",
+      "prompt": "Name a snake",
+      "category": "snake",
+      "host_bank": [
+        "cobra",
+        "rattlesnake",
+        "python",
+        "anaconda",
+        "mamba"
+      ],
+      "uncommon": [
+        "boa",
+        "adder",
+        "garter snake",
+        "#f82689d5-ba7e-5312-89a2-c40e97cb28d3",
+        "sea snake"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-rodent",
+      "prompt": "Name a rodent",
+      "category": "rodent",
+      "host_bank": [
+        "mouse",
+        "rat",
+        "squirrel",
+        "hamster",
+        "beaver",
+        "guinea pig"
+      ],
+      "uncommon": [
+        "gerbil",
+        "porcupine",
+        "chinchilla",
+        "capybara",
+        "vole"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tree",
+      "prompt": "Name a tree",
+      "category": "tree",
+      "host_bank": [
+        "oak",
+        "pine",
+        "maple",
+        "palm",
+        "birch",
+        "willow"
+      ],
+      "uncommon": [
+        "sequoia",
+        "redwood",
+        "elm",
+        "spruce",
+        "magnolia"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-flower",
+      "prompt": "Name a flower",
+      "category": "flower",
+      "host_bank": [
+        "rose",
+        "tulip",
+        "daisy",
+        "sunflower",
+        "lily"
+      ],
+      "uncommon": [
+        "orchid",
+        "daffodil",
+        "carnation",
+        "peony",
+        "lavender"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-musical-instrument",
+      "prompt": "Name a musical instrument",
+      "category": "musical_instrument",
+      "host_bank": [
+        "piano",
+        "guitar",
+        "drum",
+        "violin",
+        "flute",
+        "trumpet"
+      ],
+      "uncommon": [
+        "#f909216a-51b2-5e29-aab3-55f6a15fe052",
+        "cello",
+        "saxophone",
+        "banjo",
+        "harmonica"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-piece-of-furniture",
+      "prompt": "Name a piece of furniture",
+      "category": "furniture",
+      "host_bank": [
+        "chair",
+        "bed",
+        "sofa",
+        "stool",
+        "bookcase",
+        "#69217843-eb7e-5fe7-bf7d-7d0654ab2bd1"
+      ],
+      "uncommon": [
+        "#924ff62e-8704-5d5e-8d66-c90b1db1d1f2",
+        "wardrobe",
+        "futon",
+        "chest of drawers",
+        "cabinet"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tool",
+      "prompt": "Name a tool",
+      "category": "tool",
+      "host_bank": [
+        "#7660f572-aaa2-5008-951f-afa5db5f311d",
+        "screwdriver",
+        "#b081e89a-1e32-5a3a-ae28-1d576789c446",
+        "wrench",
+        "drill",
+        "pliers"
+      ],
+      "uncommon": [
+        "chisel",
+        "shovel",
+        "rake",
+        "crowbar",
+        "axe"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kitchen-utensil",
+      "prompt": "Name a kitchen utensil",
+      "category": "kitchen_utensil",
+      "host_bank": [
+        "spatula",
+        "whisk",
+        "ladle",
+        "rolling pin",
+        "grater"
+      ],
+      "uncommon": [
+        "colander",
+        "peeler",
+        "tongs",
+        "sieve",
+        "can opener"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-household-appliance",
+      "prompt": "Name a household appliance",
+      "category": "home_appliance",
+      "host_bank": [
+        "refrigerator",
+        "oven",
+        "microwave",
+        "dishwasher",
+        "washing machine",
+        "toaster"
+      ],
+      "uncommon": [
+        "space heater",
+        "blender",
+        "vacuum cleaner",
+        "coffee maker",
+        "fan"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-item-of-clothing",
+      "prompt": "Name an item of clothing",
+      "category": "clothing",
+      "host_bank": [
+        "shirt",
+        "#7fe33b80-372c-5d4a-9ae4-f74e6dc56e86",
+        "#3d0779fe-c9a7-5242-b3d5-ddc69ba665a5",
+        "jacket",
+        "sock",
+        "skirt"
+      ],
+      "uncommon": [
+        "scarf",
+        "sweater",
+        "#f3eef2d4-dfee-5438-9bf2-c7f29b47d6da",
+        "kimono",
+        "poncho"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-something-you-wear-on-your-head",
+      "prompt": "Name something you wear on your head",
+      "category": "headwear",
+      "host_bank": [
+        "hat",
+        "cap",
+        "helmet",
+        "crown",
+        "hood"
+      ],
+      "uncommon": [
+        "#5dc17506-0f84-5a9d-b983-6aa6ea19a76f",
+        "tiara",
+        "headband",
+        "wig",
+        "bandanna"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-footwear",
+      "prompt": "Name a kind of footwear",
+      "category": "footwear",
+      "host_bank": [
+        "boot",
+        "sneaker",
+        "slipper",
+        "sandal",
+        "loafer"
+      ],
+      "uncommon": [
+        "moccasin",
+        "clog",
+        "pump",
+        "oxford",
+        "cleats"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-piece-of-jewelry",
+      "prompt": "Name a piece of jewelry",
+      "category": "jewelry",
+      "host_bank": [
+        "ring",
+        "necklace",
+        "bracelet",
+        "earring",
+        "pendant"
+      ],
+      "uncommon": [
+        "brooch",
+        "locket",
+        "tiara",
+        "bangle",
+        "charm"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-vehicle",
+      "prompt": "Name a vehicle",
+      "category": "vehicle",
+      "host_bank": [
+        "#946e9084-e7ed-5d15-bd6d-d3a2a47d4272",
+        "#7000f2ab-555f-5f90-934d-e9e8371192a3",
+        "bicycle",
+        "motorcycle",
+        "train",
+        "airplane"
+      ],
+      "uncommon": [
+        "#b74b89cb-2f95-5dd0-bc22-d61447908bae",
+        "#19edf9f1-73bf-5a9a-bc81-6de3b2fcc642",
+        "#b1f0bcd1-3f60-5c74-ae5b-d18d515c9812",
+        "sled",
+        "skateboard"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-color",
+      "prompt": "Name a color",
+      "category": "color",
+      "host_bank": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "black",
+        "white"
+      ],
+      "uncommon": [
+        "purple",
+        "orange",
+        "pink",
+        "brown",
+        "gray"
+      ],
+      "themes": [],
+      "added_by": "claude"
     }
   ],
   "themes": {}

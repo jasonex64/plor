@@ -3,7 +3,8 @@
 // - fetch: pulls one set from its source (SOURCES.md, M13 D2) into a snapshot outside git, data/snapshots/<set>/<date>.json,
 //   and writes the committed manifest, data/manifests/<set>.json: source, date, method, item count and checksum.
 // - load: loads the manifest's snapshot into the local stack with private.import_source. `load all` loads every set,
-//   then defines every category in data/categories.json, the one place categories are defined (13e).
+//   then the links in data/links.json (13e-2), then defines every category in data/categories.json, the one place
+//   categories are defined (13e).
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
@@ -19,6 +20,7 @@ import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS, CATEGO
 import { CATEGORIES_FILE, parseCategories, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
+import { isListed } from "../src/game/misses.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 export type Item = { id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string };
@@ -503,6 +505,37 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   }
 }
 
+// Links (13e-2; human, 2026-10-25: "Links as facts (Recommended)"): reviewed kind_of facts filling gaps in a source's
+// tree, each naming both things as the base names them, so a wrong ID is refused by private.load_links.
+export type Link = { thing: string; name: string; kind_of: string; kind_of_name: string };
+export const LINKS_FILE = "data/links.json";
+
+// The links file is disk input: a list of links, each with exactly its four fields as text, refs as "source:id".
+export function parseLinks(text: string): Link[] {
+  const data: unknown = JSON.parse(text);
+  if (!Array.isArray(data)) throw new Error(`${LINKS_FILE}: must be a list of links`);
+  const fields = ["thing", "name", "kind_of", "kind_of_name"];
+  data.forEach((v, i) => {
+    const ok = typeof v === "object" && v !== null && !Array.isArray(v) && Object.keys(v).length === fields.length
+      && fields.every((f) => typeof (v as Record<string, unknown>)[f] === "string" && (v as Record<string, string>)[f].trim() !== "");
+    if (!ok) throw new Error(`${LINKS_FILE} link ${i + 1}: must hold exactly ${fields.join(", ")}, each as text`);
+    const { thing, kind_of } = v as Link;
+    if (![thing, kind_of].every((ref) => /^[a-z]+:./.test(ref))) throw new Error(`${LINKS_FILE} link ${i + 1}: "thing" and "kind_of" must be refs as "source:id"`);
+  });
+  return data as Link[];
+}
+
+async function loadLinks(): Promise<void> {
+  const links = parseLinks(readFileSync(LINKS_FILE, "utf8"));
+  const client = await localClient();
+  try {
+    const { rows } = await client.query("select private.load_links($1::jsonb) as counts", [JSON.stringify(links)]);
+    console.log(`LINKED ${LINKS_FILE}: ${JSON.stringify(rows[0].counts)}`);
+  } finally {
+    await client.end();
+  }
+}
+
 function readCategories(): CategoryDef[] {
   const { categories, errors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
   if (!categories) throw new Error(errors.join("\n"));
@@ -529,7 +562,8 @@ async function defineCategories(): Promise<void> {
 }
 
 // What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
-// CATEGORY_MIN_MEMBERS members (13e), members under two parents (two meanings), aliases shared by two members
+// CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list, for the human to decide per category
+// (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by two members
 // (duplicates), and things under the root with no English name (left out of the category).
 async function review(keys: string[]): Promise<void> {
   const client = await localClient();
@@ -547,6 +581,11 @@ async function reviewOne(client: pg.Client, key: string): Promise<void> {
   const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
   const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
     join private.fact f on f.thing_id = m and f.trait = 'kind_of' group by t.name having count(*) > 1 order by parents desc, t.name`);
+  const aliases = await one(`select t.name, a.alias from private.category_members($1) m join private.thing t on t.id = m
+    join private.thing_alias a on a.thing_id = m and a.removed_at is null`);
+  const listedBy = new Map<string, string[]>();
+  for (const r of aliases) if (isListed(r.alias)) listedBy.set(r.name, [...(listedBy.get(r.name) ?? []), `"${r.alias}"`]);
+  const listed = [...listedBy].map(([name, hits]) => `${name} (${hits.join(", ")})`);
   const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m
     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m group by a.alias having count(*) > 1 order by a.alias`);
   const [{ unnamed }] = await one(`with recursive cat as (select root from private.category where key = $1),
@@ -555,6 +594,7 @@ async function reviewOne(client: pg.Client, key: string): Promise<void> {
   console.log(`REVIEW ${key}: ${n} members`);
   if (n < CATEGORY_MIN_MEMBERS) console.log(`  flag, fewer than ${CATEGORY_MIN_MEMBERS} members: ${n}`);
   console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);
+  console.log(`  flag, an alias on the LDNOOBW list: ${listed.length}${listed.length ? ` (${listed.join("; ")})` : ""}`);
   console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
   console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
   console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
@@ -565,6 +605,7 @@ async function main(): Promise<void> {
   if (command === "review" && name) return review([name, ...more]);
   if (command === "load" && name === "all") {
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
+    await loadLinks();
     return defineCategories();
   }
   const def = name ? SETS[name] : undefined;

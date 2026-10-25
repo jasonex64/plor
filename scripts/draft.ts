@@ -2,8 +2,9 @@
 // `npm run draft -- <date> [--questions <id>,…]`. It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
 // the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
 // ones in that order; orders picked ones easiest first; turns each name into the category's thing (or takes
-// "#<thing id>" for one a name can't single out); draws the host answers from each question's bank at random (13c);
-// picks the letters the Wind steals (schedule A) so 3 familiar answers stay typeable and safe; checks the day; writes
+// "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
+// draws each question's host answers at random among its bank answers the host can still say past the letters stolen
+// so far (13c; letters first, 13e-2), so 3 familiar answers stay typeable and safe; checks the day; writes
 // content/offbeat/<date>.json for the human to approve on /admin/puzzles; and prints the soft guide: each question's
 // expected catch rate against its target. The local stack only (13a: "Local only"); thing IDs are the same on every
 // database (src/content/thing-id.ts), so the draft holds wherever the same snapshots are loaded.
@@ -13,13 +14,14 @@ import { pathToFileURL } from "node:url";
 import type pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
-import { GAME_ID, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { GAME_ID, avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
 
 // The host answers for question index: HOST_ANSWERS_PER_QUESTION[index] of the bank, drawn at random but the same for
-// a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank").
+// a date every time (human, 2026-10-24: "1 1 1 1 2 2 3", "Random from the host bank"). The draft passes only the bank
+// answers whose names avoid the letters stolen so far (human, 2026-10-25: "Back to 3 (Recommended)" with letters first).
 export function pickHosts(date: string, index: number, bank: string[]): string[] {
   const count = HOST_ANSWERS_PER_QUESTION[index];
   if (bank.length < count) throw new Error(`q${index + 1}: the host bank holds ${bank.length}, and the host names ${count}`);
@@ -31,6 +33,21 @@ export function pickHosts(date: string, index: number, bank: string[]): string[]
     picked.push(...left.splice(h % left.length, 1));
   }
   return picked;
+}
+
+// The day with these letters (steals, by question), each question's host answers drawn among its bank answers whose
+// names (by thing ID) avoid the letters stolen up to it: letters first (13e-2). null when a question has fewer such
+// answers than the host names there.
+export function withHosts(date: string, questions: Puzzle["questions"], steals: (string | undefined)[], names: Map<string, string>): Puzzle | null {
+  const lettered = questions.map((q, i) => (steals[i] ? { ...q, steals: steals[i] } : q));
+  const out: Puzzle["questions"] = [];
+  for (const [i, q] of lettered.entries()) {
+    const stolen = stolenLetters({ questions: lettered }, i);
+    const sayable = q.host_bank.filter((id) => avoids(names.get(id)!, stolen));
+    if (sayable.length < HOST_ANSWERS_PER_QUESTION[i]) return null;
+    out.push({ ...q, host_answers: pickHosts(date, i, sayable) });
+  }
+  return { format: 3, game_id: GAME_ID, date, questions: out };
 }
 
 // The expected share of players finishing a day, from each question's expected catch rate: each must be survived.
@@ -173,22 +190,17 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
     resolved.push({ q: question, catch: ids ? 0 : await oneHostCatch(db, date, question) });
   }
   const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
-  const questions = ordered.map(({ q }, i) => ({ ...q, host_answers: pickHosts(date, i, q.host_bank) }));
-  const unlettered: Puzzle = { format: 3, game_id: GAME_ID, date, questions };
+  const questions = ordered.map(({ q }) => q);
   const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
-    questions.flatMap((q) => q.host_answers),
+    questions.flatMap((q) => q.host_bank),
   ]);
   const names = new Map(rows.map((r) => [r.id, r.name]));
-  const withSteals = (steals: (string | undefined)[]): Puzzle => ({
-    ...unlettered,
-    questions: questions.map((q, i) => (steals[i] ? { ...q, steals: steals[i] } : q)),
-  });
+  const withSteals = (steals: (string | undefined)[], upTo: number) => withHosts(date, questions.slice(0, upTo), steals, names);
   // The furthest the letters got: questions before it held with some choice, so the block is at or after it.
   let held = 0;
   const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
-    const day = withSteals(trial);
-    const part = { ...day, questions: day.questions.slice(0, upTo) };
-    if (checkHostNames("", part, names).length) return false;
+    const part = withSteals(trial, upTo);
+    if (!part) return false;
     for (let i = 0; i < upTo; i++) {
       const q = part.questions[i];
       if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
@@ -198,9 +210,9 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   });
   if (!steals) {
     const at = questions[held];
-    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at question ${held + 1} ("${at.prompt}", hosts drawn ${at.host_answers.map((id) => names.get(id) ?? id).join(", ")}) or after it. Change that question's bank or uncommon answers`);
+    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at question ${held + 1} ("${at.prompt}") or after it. Change that question's bank or uncommon answers`);
   }
-  const day = withSteals(steals);
+  const day = withSteals(steals, questions.length)!;
   const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, names)];
   if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
   return { day, guide: softGuide(await expectedCatches(db, day)) };
