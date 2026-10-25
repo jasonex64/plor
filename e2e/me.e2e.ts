@@ -69,7 +69,7 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   const sofar = Number(today.slice(8, 10));
   await expect(calendar.getByRole("img")).toHaveAttribute(
     "aria-label",
-    `Days played in ${dateText(today, { month: "long" })}: 0 of the ${sofar} days so far; darker means more questions survived`,
+    `Days played in ${dateText(today, { month: "long" })}: 0 of the ${sofar} days so far`,
   );
   const todayCell = calendar.locator(`[data-date='${today}']`);
   expect(await todayCell.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("2px");
@@ -92,8 +92,15 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   await expect(total(page, "Offbeat", "avg. survived")).toHaveText("0.0/7");
   await expect(total(page, "Offbeat", "full climbs")).toHaveText("0");
   await expect(calendar.getByText(`1 of ${sofar} days`)).toBeVisible();
-  // Paper's first shade, the accent at alpha 0x33 (round 7).
-  expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(36, 87, 214, 0.2)");
+  // The text alternative names the day and how far it went (docs/milestones/M14-14a-3b-settings.md, criterion 6).
+  await expect(calendar.getByRole("img")).toHaveAttribute(
+    "aria-label",
+    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 survived`,
+  );
+  // Paper's first shade, the accent at alpha 0xa5, the lightest reaching 3:1 on the card (14a-3b).
+  expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(36, 87, 214, 0.647)");
+  // No numbers until the player turns them on (L46).
+  await expect(todayCell).toHaveText("");
 });
 
 // Criterion 4: yesterday, the player and four others answered question 1, the player with an answer none of them gave.
@@ -142,7 +149,8 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
   const board = page.getByRole("region", { name: "Friends today" });
   await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
   await expect(board).toContainText("compare scores every week, in whichever games you both play.");
-  await expect(board.getByRole("button", { name: "Make my invite link" })).toBeVisible();
+  // The invite link sits below, with the friends list (docs/milestones/M14-14a-3b-settings.md, criterion 7).
+  await expect(page.getByRole("region", { name: "Your friends" }).getByRole("button", { name: "Make my invite link" })).toBeVisible();
 
   // The leaderboards: the player's own row.
   const week = page.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem");

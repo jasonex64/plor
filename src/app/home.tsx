@@ -11,10 +11,11 @@ import { Fragment, useCallback, useEffect, useState, useSyncExternalStore, type 
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
-import { Account } from "./account";
+import type { Profile } from "@/lib/profile";
 import { Board } from "./board";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
+import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
@@ -24,7 +25,12 @@ import { HowToPlay, OffbeatScreen } from "./offbeat";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 
-type Me = { signedIn: false } | { signedIn: true; username: string | null; admin: boolean };
+// GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
+// sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md).
+type Me =
+  | { signedIn: false }
+  | { signedIn: true; username: null; admin: boolean }
+  | ({ signedIn: true; admin: boolean } & Profile);
 
 // What a page other than "/" shows once the player is signed in with a username.
 export type View =
@@ -85,10 +91,16 @@ export function Home({ view }: { view?: View }) {
       {!me.signedIn ? (
         <SignIn returnTo={invitePath(view)} onSignedIn={loadMe} />
       ) : me.username === null ? (
-        <PickUsername onDone={(username) => setMe({ ...me, username })} />
+        <PickUsername onDone={loadMe} />
       ) : (
         <>
-          <Shell admin={me.admin} />
+          <Shell
+            admin={me.admin}
+            profile={me}
+            onChanged={loadMe}
+            onSettings={(settings) => setMe({ ...me, settings })}
+            onSignedOut={() => setMe({ signedIn: false })}
+          />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
           {view?.kind !== "offbeat" && <ClockBar />}
           {view?.kind === "offbeat" ? (
@@ -101,9 +113,8 @@ export function Home({ view }: { view?: View }) {
             <Groups />
           ) : view?.kind === "me" ? (
             <>
-              {/* The player's stats (14a-3a), then the account, until the settings sheet takes it (14a-3b). */}
-              <MeStats />
-              <Account onSignedOut={() => setMe({ signedIn: false })} />
+              {/* Only the stats (L45); the account is in the settings sheet (14a-3b). */}
+              <MeStats numbers={me.settings.calendarNumbers} />
               {me.admin && <MeAdminLink />}
             </>
           ) : view?.kind === "invite" ? (
@@ -113,7 +124,7 @@ export function Home({ view }: { view?: View }) {
           ) : view?.kind === "group" ? (
             <GroupPage id={view.id} username={me.username} />
           ) : (
-            <Today username={me.username} />
+            <Today username={me.username} skip={me.settings.skipGameScreen} />
           )}
         </>
       )}
@@ -217,7 +228,7 @@ function SignIn({ returnTo, onSignedIn }: { returnTo?: string; onSignedIn: () =>
   );
 }
 
-function PickUsername({ onDone }: { onDone: (username: string) => void }) {
+function PickUsername({ onDone }: { onDone: () => void }) {
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -227,8 +238,8 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
     setBusy(true);
     setError(null);
     try {
-      const created = await api<{ username: string }>("/api/profile", { method: "POST", body: { username } });
-      onDone(created.username);
+      await api("/api/profile", { method: "POST", body: { username } });
+      onDone();
     } catch (err) {
       setError(errorText(err));
       setBusy(false);
@@ -238,7 +249,7 @@ function PickUsername({ onDone }: { onDone: (username: string) => void }) {
   return (
     <form onSubmit={save}>
       <h2>Pick a username</h2>
-      <p>Your friends will see it. You can change it later on the Me tab.</p>
+      <p>Your friends will see it. You can change it later in Settings.</p>
       <label>
         Username
         <input
@@ -277,7 +288,7 @@ function useMinWidth(px: number): boolean {
 // leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in a right column. The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
-function Today({ username }: { username: string }) {
+function Today({ username, skip }: { username: string; skip: boolean }) {
   const [runOver, setRunOver] = useState(false);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
@@ -300,10 +311,10 @@ function Today({ username }: { username: string }) {
   return (
     <div className={styles.today}>
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <TodayBanner key={`game-${day}`} onOver={setRunOver} onDayOver={nextDay} />
+        <TodayBanner key={`game-${day}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
       </section>
       <aside aria-label="Your circle" className={styles.side}>
-        {wide && <Board key={`board-${day}`} username={username} />}
+        {wide && <Board key={`board-${day}`} username={username} invite />}
         <LeaderboardCard key={`card-${day}`} />
       </aside>
       <div className={styles.feed}>
@@ -315,8 +326,10 @@ function Today({ username }: { username: string }) {
   );
 }
 
-// Friends (M14 14a-1): the live board and the friends leaderboard, moved from the home page. With no game on the page,
-// the time to the reset comes from the run's state, and both start again at midnight Pacific (M11 H6).
+// Friends (M14 14a-1): the live board and the friends leaderboard, moved from the home page, then the friends list with
+// the invite link (human, 2026-10-25: "friends list should be in the friends tab"; "Below the boards (Recommended)";
+// docs/milestones/M14-14a-3b-settings.md), whose link is the board's here, so it shows once. With no game on the page,
+// the time to the reset comes from the run's state, and the boards start again at midnight Pacific (M11 H6).
 function Friends({ username }: { username: string }) {
   const [day, setDay] = useState(0);
   const [msToReset, setMsToReset] = useState<number | null>(null);
@@ -336,8 +349,9 @@ function Friends({ username }: { username: string }) {
   return (
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
-      <Board username={username} />
+      <Board username={username} invite={false} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
+      <FriendsList />
     </Fragment>
   );
 }

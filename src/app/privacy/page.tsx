@@ -79,8 +79,8 @@ export default function Privacy() {
 
       <h2>Keeping and deleting</h2>
       <p>
-        We keep your account and games until you delete them. You can delete your account yourself on your account
-        page: it removes your account together with all your games, unlisted answers, points, comments, reactions,
+        We keep your account and games until you delete them. You can delete your account yourself in Settings (the
+        gear): it removes your account together with all your games, unlisted answers, points, comments, reactions,
         reports and friends, straight away. A group you made stays with its other members, and an answer that enough
         players typed stays in the game, without your name. For anything else, email{" "}
         <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with. Our providers&apos;

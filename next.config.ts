@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   // In development, Next.js's indicator sits bottom-left by default, over the phone's tab bar and the sidebar, and
-  // takes their clicks (docs/milestones/M14-14a-1-shell.md, Evidence). Top-right is clear of both
+  // takes their clicks (docs/milestones/M14-14a-1-shell.md, Evidence); top-right now holds the phone's gear
+  // (docs/milestones/M14-14a-3b-settings.md). Top-left is the wordmark's, which takes no clicks
   // (next.config.js "devIndicators").
-  devIndicators: { position: "top-right" },
+  devIndicators: { position: "top-left" },
   partialPrefetching: true,
   // The admin puzzle routes read the drafted days from content/offbeat at request time (docs/milestones/
   // M06-puzzle-entry.md), so the files must be in those routes' server traces (next.config.js "output",

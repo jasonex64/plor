@@ -74,13 +74,15 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
   };
 }
 
-// The player's answers given before their day's midnight on closed days, by their share of that question's answers
-// then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a share here is the one the result
+// The player's answers that survived (a caught one is the Wind's, not theirs: human, 2026-10-25, "Leave caught out
+// (Recommended)"; docs/milestones/M14-14a-3b-settings.md), given before their day's midnight on closed days, by their
+// share of that question's answers then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a share here is the one the result
 // showed once the day was over. Only questions at least ANSWER_SHARE_MIN_PLAYERS answered have a share.
 async function rarestAnswers(db: Db, userId: string): Promise<Me["rarest"]> {
   const { rows: events } = await db.query<{ date: string; question_idx: number; entry_id: string }>(
     `select puzzle_date::text as date, question_idx, entry_id from private.run_event
-     where user_id = $1 and game_id = $2 and puzzle_date < private.today() and private.day_of(created_at) = puzzle_date`,
+     where user_id = $1 and game_id = $2 and puzzle_date < private.today() and private.day_of(created_at) = puzzle_date
+       and not matched`,
     [userId, GAME_ID],
   );
   const dates = [...new Set(events.map((e) => e.date))];
@@ -91,7 +93,8 @@ async function rarestAnswers(db: Db, userId: string): Promise<Me["rarest"]> {
     if (!question || question.answered < ANSWER_SHARE_MIN_PLAYERS) return [];
     return [{ ...e, share: (question.byEntry.get(e.entry_id) ?? 0) / question.answered }];
   });
-  // Lowest share first; on a tie, the later day, then the earlier question.
+  // Lowest share first; on a tie, the later day, then the earlier question (Claude's, kept by the human, 2026-10-25:
+  // "Keep it (Recommended)").
   const picked = shared
     .sort((a, b) => a.share - b.share || b.date.localeCompare(a.date) || a.question_idx - b.question_idx)
     .slice(0, RAREST_ANSWERS_SHOWN);

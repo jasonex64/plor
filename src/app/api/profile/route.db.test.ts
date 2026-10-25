@@ -2,7 +2,6 @@
 // `npm run test:db`): the real Auth server sends the email, the local Mailpit inbox receives it, and the
 // route handlers run with a cookie jar standing in for the browser. Only Next.js's request scope is faked.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { GET as getAccount } from "@/app/api/account/route";
 import { POST as signOut } from "@/app/api/auth/sign-out/route";
 import { getPool } from "@/lib/db";
 import { enterCode, requestCode, signIn, useLocalStack, useSession } from "@/test/local-stack";
@@ -27,13 +26,22 @@ afterAll(async () => {
   await getPool().end();
 });
 
+// A new profile as GET /api/profile returns it: no display name, the username changeable at once, both settings off
+// (M12 A2; M14 14a-3b).
+const NEW_PROFILE = (username: string) => ({
+  username,
+  displayName: null,
+  usernameChangeableAt: null,
+  settings: { skipGameScreen: false, calendarNumbers: false },
+});
+
 async function profile() {
   return (await getProfile(apiRequest("/api/profile", { method: "GET" }))).json();
 }
 
-// The display name as stored, read where the client reads it: the Me tab (M12 12a).
+// The display name as stored, read where the client reads it: the profile, which the settings sheet shows (M14 14a-3b).
 async function storedDisplayName() {
-  return (await (await getAccount(apiRequest("/api/account", { method: "GET" }))).json()).account.displayName;
+  return (await profile()).displayName;
 }
 
 async function rename(displayName: unknown) {
@@ -71,7 +79,7 @@ describe("sign-in and profile", () => {
 
   it("creates the profile on the first username pick", async () => {
     expect(await pick(`a${RUN}`)).toEqual({ status: 201, body: { ok: true, username: `a${RUN}` } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, admin: false });
+    expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: false });
     expect(await storedDisplayName()).toBeNull();
   });
 
@@ -80,7 +88,7 @@ describe("sign-in and profile", () => {
     const db = getPool();
     await db.query("insert into private.admin (user_id) select id from auth.users where email = $1", [EMAIL_A]);
     try {
-      expect(await profile()).toEqual({ ok: true, signedIn: true, username: `a${RUN}`, admin: true });
+      expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: true });
     } finally {
       await db.query("delete from private.admin where user_id = (select id from auth.users where email = $1)", [EMAIL_A]);
     }

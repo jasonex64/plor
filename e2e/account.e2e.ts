@@ -1,7 +1,7 @@
-// The account page (docs/milestones/M12-account.md, 12a; A1), now the Me tab (docs/milestones/M14-14a-1-shell.md):
-// reached from the navigation, it shows the player's username and all-time points and holds the display name, friends
-// and invite link. Opened signed out, it asks for sign-in first. The Friends tab's board has the invite link too,
-// without Reset (docs/milestones/M12-12f-review-fixes.md, F1).
+// The account (docs/milestones/M12-account.md, 12a; A1), in the settings sheet since M14 14a-3b
+// (docs/milestones/M14-14a-3b-settings.md): reached from the gear, it holds the username, display name, Sign out and
+// Delete account; Me shows the points. Opened signed out, a tab asks for sign-in first. The friends list and the invite
+// link with Reset are on the Friends tab; Today's board has the invite link too, without Reset (M12 12f, F1).
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick, forwardPlayerIp } from "./players";
@@ -13,7 +13,7 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-test("the Me tab holds the account, and the navigation links to it", async ({ browser }) => {
+test("the settings sheet holds the account, and the gear opens it", async ({ browser }) => {
   const signedOut = await (await browser.newContext()).newPage();
   await forwardPlayerIp(signedOut, `${RUN}-typo@example.test`);
   await signedOut.goto("/me");
@@ -27,45 +27,53 @@ test("the Me tab holds the account, and the navigation links to it", async ({ br
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "ac");
-  // Today holds neither the account's fields nor its friends list.
+  // No tab holds the account's fields or the sheet's buttons until the gear is used.
   await expect(page.getByLabel(/Display name/)).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Friends", exact: true })).toHaveCount(0);
-  // The Friends tab's board offers the invite link (12f, F1); the next test makes and uses it.
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeHidden();
+  // Me shows the points (M14 14a-3a), and no account section.
   const nav = page.getByRole("navigation", { name: "Main" });
-  await nav.getByRole("link", { name: "Friends" }).click();
-  const invite = page.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
-  await expect(invite.getByRole("button", { name: "Make my invite link" })).toBeVisible();
-
   await nav.getByRole("link", { name: "Me" }).click();
   await expect(page).toHaveURL(/\/me$/);
-  const account = page.getByRole("region", { name: "Your account" });
-  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
-  await expect(account.getByText(`Username: ac${RUN}`)).toBeVisible();
-  await expect(account.getByText("All-time points: 0 points")).toBeVisible();
-  await expect(account.getByRole("button", { name: "Make my invite link" })).toBeVisible();
-  await account.getByLabel(/Display name/).fill("Ace");
-  await account.getByRole("button", { name: "Save" }).click();
-  await expect(account.getByRole("button", { name: "Clear" })).toBeVisible();
-  // Reloaded, the page reads the saved name back.
-  await page.reload();
-  const reloaded = page.getByRole("region", { name: "Your account" });
-  await expect(reloaded.getByLabel(/Display name/)).toHaveValue("Ace");
+  await expect(page.getByRole("region", { name: "All games" }).getByRole("definition").first()).toHaveText("0");
+  await expect(page.getByRole("region", { name: "Your account" })).toHaveCount(0);
 
-  // The username changes once, and the page says when it can change again (12b, A2). Typed in upper case, it's
+  await page.getByRole("button", { name: "Settings" }).click();
+  const sheet = page.getByRole("dialog", { name: "Settings" });
+  await expect(sheet.getByRole("button", { name: "Sign out" })).toBeVisible();
+  await expect(sheet.getByRole("term").filter({ hasText: "Username" })).toBeVisible();
+  await expect(sheet.getByText(`ac${RUN}`)).toBeVisible();
+  await expect(sheet.getByText("Not set")).toBeVisible();
+  await sheet.getByRole("button", { name: "Set display name" }).click();
+  await sheet.getByLabel(/Display name/).fill("Ace");
+  await sheet.getByRole("button", { name: "Save" }).click();
+  await expect(sheet.getByRole("button", { name: "Change display name" })).toBeVisible();
+  await expect(sheet.getByText("Ace", { exact: true })).toBeVisible();
+  // Reloaded, the sheet reads the saved name back, and Clear is offered.
+  await page.reload();
+  await page.getByRole("button", { name: "Settings" }).click();
+  await sheet.getByRole("button", { name: "Change display name" }).click();
+  await expect(sheet.getByLabel(/Display name/)).toHaveValue("Ace");
+  await expect(sheet.getByRole("button", { name: "Clear" })).toBeVisible();
+  await sheet.getByRole("button", { name: "Cancel" }).click();
+
+  // The username changes once, and the sheet says when it can change again (12b, A2). Typed in upper case, it's
   // lower-cased like sign-up's box (12f, F4).
-  await reloaded.getByLabel("New username").fill(`AD${RUN.toUpperCase()}`);
-  await reloaded.getByRole("button", { name: "Change username" }).click();
-  await expect(reloaded.getByText(`Username: ad${RUN}`)).toBeVisible();
-  await expect(reloaded.getByText(/^You can change it again on /)).toBeVisible();
+  await sheet.getByRole("button", { name: "Change username" }).click();
+  await sheet.getByLabel("New username").fill(`AD${RUN.toUpperCase()}`);
+  await sheet.getByRole("button", { name: "Change username" }).click();
+  await expect(sheet.getByText(`ad${RUN}`, { exact: true })).toBeVisible();
+  await expect(sheet.getByText(/^You can change it again on /)).toBeVisible();
 });
 
-// Deleting the account (12c, A4): the button waits for the player's own username, and deleting signs them out.
-test("a player deletes their account from the Me tab", async ({ browser }) => {
+// Deleting the account (12c, A4): "Delete…" opens the confirm form, whose button waits for the player's own username,
+// and deleting signs them out.
+test("a player deletes their account from the settings sheet", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "dx");
-  await page.goto("/me");
-  const account = page.getByRole("region", { name: "Your account" });
+  await page.getByRole("button", { name: "Settings" }).click();
+  const account = page.getByRole("dialog", { name: "Settings" }).getByRole("region", { name: "Delete account" });
+  await account.getByRole("button", { name: "Delete…" }).click();
   const button = account.getByRole("button", { name: "Delete my account" });
   await expect(button).toBeDisabled();
   await account.getByLabel(/Type your username/).fill(`other${RUN}`);
@@ -81,7 +89,9 @@ test("a player deletes their account from the Me tab", async ({ browser }) => {
   expect(rows).toHaveLength(0);
 });
 
-// A friend added from the Friends tab's invite link (12f, F1), and removing them asks first (F3).
+// A friend added from the invite link on the Friends tab, which holds the friends list with the link and its Reset
+// (M14 14a-3b, criterion 7), and removing them asks first (F3). Today's board, from 768px, has the link without Reset
+// (12f, F1).
 test("a player invites a friend from the Friends tab, and removing them asks first", async ({ browser }) => {
   const inviter = await (await browser.newContext()).newPage();
   await inviter.goto("/friends");
@@ -89,12 +99,21 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   const board = inviter.getByRole("region", { name: "Friends today" });
   // With no friends, the board says L31's friendlier line (docs/milestones/M14-14a-3a-me.md, criterion 7).
   await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
-  await board.getByRole("button", { name: "Make my invite link" }).click();
-  const invite = board.getByRole("region", { name: "Invite friends" });
+  // The link shows once on this tab: in the friends list, not on the board.
+  await expect(board.getByRole("region", { name: "Invite friends" })).toHaveCount(0);
+  const friends = inviter.getByRole("region", { name: "Your friends" });
+  await expect(friends.getByText("No friends yet. Send someone your invite link.")).toBeVisible();
+  await friends.getByRole("button", { name: "Make my invite link" }).click();
+  const invite = friends.getByRole("region", { name: "Invite friends" });
   const link = await invite.locator("code").innerText();
-  // With a link shown, there's no Reset on the board that would break a link already sent (F1).
   await expect(invite.getByRole("button", { name: "Share" })).toBeVisible();
-  await expect(inviter.getByRole("button", { name: "Reset link" })).toHaveCount(0);
+  await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();
+  // Today's board, from 768px, has the same link and no Reset that would break a link already sent (F1).
+  const wide = await (await inviter.context().browser()!.newContext({ viewport: { width: 1440, height: 900 }, storageState: await inviter.context().storageState() })).newPage();
+  await wide.goto("/");
+  const todayInvite = wide.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
+  await expect(todayInvite.locator("code")).toHaveText(link);
+  await expect(wide.getByRole("button", { name: "Reset link" })).toHaveCount(0);
 
   const friend = await (await browser.newContext()).newPage();
   await friend.goto(new URL(link).pathname);
@@ -102,10 +121,11 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   await friend.getByRole("button", { name: "Add friend" }).click();
   await expect(friend.getByRole("heading", { name: `You and iv${RUN} are now friends.` })).toBeVisible();
 
-  await inviter.goto("/me");
-  const friends = inviter.getByRole("region", { name: "Friends", exact: true });
+  await inviter.reload();
   const row = friends.getByRole("listitem").filter({ hasText: `if${RUN}` });
   await expect(row).toBeVisible();
+  // The moved list carries the avatar slots (L37).
+  await expect(row.locator("[data-initial]")).toHaveAttribute("data-initial", "I");
   // Cancelled, nothing changes. The question is recorded, so a Remove that didn't ask fails here.
   let asked = "";
   inviter.once("dialog", (dialog) => {

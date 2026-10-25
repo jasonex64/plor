@@ -63,8 +63,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   await watcher.goto("/friends");
   await signInAndPick(watcher, "w");
-  // The invite link is on the Friends tab's board (M12 12f, F1) as well as the Me tab (12a).
-  const invite = watcher.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
+  // The invite link is on the Friends tab, with the friends list (M14 14a-3b).
+  const invite = watcher.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
   await invite.getByRole("button", { name: "Make my invite link" }).click();
   const link = await invite.locator("code").textContent();
 
