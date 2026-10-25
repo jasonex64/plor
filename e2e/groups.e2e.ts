@@ -81,6 +81,8 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
   async function openLive(url: string) {
+    // Leave the page first, so the old page's channel can't be the one waited on (as live-board.e2e.ts's openBoard).
+    await creator.goto("about:blank");
     const socket = creator.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1"));
     await creator.goto(url);
     const ws = await socket;

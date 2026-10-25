@@ -30,6 +30,9 @@ test.afterAll(async () => {
 // Opens a page, the Friends tab unless another is named, and waits until its board channel has joined (Realtime
 // replies ok to the join). Today joins the channel too, for the feed.
 async function openBoard(page: Page, path = "/friends"): Promise<void> {
+  // Leave the page first, so a channel the old page was still opening can't be the one waited on: it closes with the
+  // page, and its join never comes (seen in M14 14a-1, once signing in waits for the username to save).
+  await page.goto("about:blank");
   // The dev server's hot-reload socket opens too; only Realtime's counts.
   const joined = page.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1")).then((ws) =>
     ws.waitForEvent("framereceived", { predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:") }),
@@ -230,7 +233,10 @@ test("the reset reloads the Friends tab", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/friends");
   await signInAndPick(page, "n");
+  // The page sets its reset timer once the run's state says how long is left, so the clock moves only after that.
+  const timed = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/run");
   await openBoard(page);
+  await timed;
   await expect(page.getByRole("region", { name: "Friends leaderboard" })).toBeVisible();
   const reloads = ["/api/run", "/api/board", "/api/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
   await page.clock.fastForward("25:00:00");
