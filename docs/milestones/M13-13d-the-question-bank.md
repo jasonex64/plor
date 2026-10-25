@@ -1,6 +1,6 @@
 # M13 13d — The question bank
 
-**Status:** in review (2026-10-24): built; the reviewer next. The human answered three rounds of guided questions and approved the design, its security change and 13e (human, 2026-10-24: "I approve 13d's design, its security change (dropping private.save_questions and its grant), and 13e as the next sub-ticket. Build 13d.").
+**Status:** in review (2026-10-24): built, reviewed and its blocking findings fixed, in its own PR. The human answered three rounds of guided questions and approved the design, its security change and 13e (human, 2026-10-24: "I approve 13d's design, its security change (dropping private.save_questions and its grant), and 13e as the next sub-ticket. Build 13d.").
 
 ## Goal
 A bank of questions the draft picks each day's 7 from, never asking a category again within 30 days, preferring a date's theme and ordering the day easiest first, so a day can be drafted from a date alone and the human only vetoes.
@@ -121,7 +121,15 @@ Already decided in the M13 ticket: **at least 30 days** between uses, "the AI ma
 - `npx playwright test` → 14 passed, including `bank.e2e.ts`: an admin opens "Question bank" from `/admin`, sees 7 questions and "Name an animal" in category animal with 2026-10-24; a player sees "This page is for admins only.".
   - The first full run had 2 failures: `bank.e2e.ts`, where the refusal text also appeared in the footer's audit count (fixed with an exact match), and `live-board.e2e.ts`'s reconnect test in a slow run. The latter passed alone and in the next full run; it's in ROADMAP as flaky.
 - `npx tsc --noEmit -p .`, `npx eslint src e2e scripts` and `npm run content:validate` clean.
+- **After the review fixes:** `npm test` 37 files, 217 tests; `npm run test:db` 37 files, 234 tests, with `bank.db.test.ts` (a played day, 25% caught) and `draft.db.test.ts`'s `oneHostCatch`. The leaderboard and comment-report files failed in the first run while the M14 session's e2e added and removed today's fixture day on the shared database, and passed alone (17 tests). `npm run test:sql` PASS; `bank.e2e.ts`, `audit.e2e.ts` and `approve-and-play.e2e.ts` passed (4 tests). `npm run draft -- 2026-10-5` now prints its usage and stops.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**13d:** the `reviewer` agent reviewed the diff in a fresh context, 2026-10-24. It checked the gap's boundary both ways, the ranking, the removals (nothing left outside old migrations and DECISIONS.md's historical Log row) and the grants, and ran the unit tests and pgTAP.
+- **Blocking findings and how each was fixed:**
+  - *A malformed date switched the gap off:* `daysApart` gave NaN, so "2026-10-5" or "garbage" picked categories inside the gap. `npm run draft` now refuses anything but a calendar date.
+  - *HANDOFF, the ROADMAP row and the M13 ticket's Status still said "waiting for approval".* Updated.
+  - *DECISIONS.md, Game 1 still said "most players should usually finish"*, which M13 said 13d would record as replaced. It now gives the host counts, the easiest-first order, variance, and the Gentle targets as a soft guide, with the human's words. The M13 ticket's stale 13d criterion is updated too.
+  - *The bank page computed its own catch rate,* a second copy of the insights measure, with no test of a played day. It now takes each started day's `dayInsights`; `src/admin/bank.db.test.ts` checks a played day (4 answers, 1 caught: 25%, matched through question 2) and an unplayed one.
+  - *The easiest-first measure had no test.* `scripts/draft.db.test.ts` checks `oneHostCatch` on the fixture against a hand-worked 0.2167, ignoring the question's host answers.
+- **Taken now, though not blocking:** the "no letters fit" message says "no question holds" when none does.
+- **Deferred to ROADMAP "Next revision"** (For M13): the bank's prompt-and-category identity unchecked, a theme with no tagged question, themed questions on other dates (for the human), no 401 test for the bank route, and M15 15a's and M16's tickets citing the dropped objects.

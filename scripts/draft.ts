@@ -13,7 +13,7 @@ import { pathToFileURL } from "node:url";
 import type pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
-import { GAME_ID, checkHostNames, checkPuzzle, checkPuzzleFile, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { GAME_ID, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
@@ -158,7 +158,7 @@ async function resolveQuestion(db: pg.Client, q: BankQuestion): Promise<Question
 
 // The order measure ("Easiest first (Recommended)"): the expected catch rate of one host answer, averaged over the
 // question's host bank, so every question is measured alike before its position decides how many the host names.
-async function oneHostCatch(db: pg.Client, date: string, q: Question): Promise<number> {
+export async function oneHostCatch(db: pg.Client, date: string, q: Question): Promise<number> {
   let sum = 0;
   for (const id of q.host_bank) sum += await catchRate(db, date, q, [id]);
   return sum / q.host_bank.length;
@@ -198,7 +198,7 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   });
   if (!steals) {
     const at = questions[held];
-    throw new Error(`no letters fit schedule A for ${date}: questions 1 to ${held} hold; the block is at question ${held + 1} ("${at.prompt}", hosts drawn ${at.host_answers.map((id) => names.get(id) ?? id).join(", ")}) or after it. Change that question's bank or uncommon answers`);
+    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at question ${held + 1} ("${at.prompt}", hosts drawn ${at.host_answers.map((id) => names.get(id) ?? id).join(", ")}) or after it. Change that question's bank or uncommon answers`);
   }
   const day = withSteals(steals);
   const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, names)];
@@ -208,7 +208,8 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
 
 async function main(): Promise<void> {
   const [date, flag, list] = process.argv.slice(2);
-  if (!date || (flag !== undefined && (flag !== "--questions" || !list))) {
+  // The date is user input: a malformed one would make every gap NaN and let any category through (13d review).
+  if (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list))) {
     console.error("usage: npm run draft -- <date> [--questions <id>,…]");
     process.exit(2);
   }
