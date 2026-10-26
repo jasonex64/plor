@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** approved (2026-10-26): the human approved the design ("Approve 13e-4's design and go through O1–O5") and answered O1–O5 (below); 13e-4a is next. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a in review in PR #87, merging on green CI; 13e-4b next. Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -74,7 +74,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
 ## 13e-4a — The facts and the machinery
-**Status:** in progress (2026-10-26): designed below, the format change and A1–A4 answered by the human; being built.
+**Status:** in review (2026-10-26): built, reviewed in a fresh context, the 7 blocking findings fixed; PR #87, merging on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
 
 **Source:** SOURCES.md, Wikidata properties (M13 13e-4), read 2026-10-26; Wikidata (M13 D2); 13a–13e-3's tickets for the base, the format, misses and the draft.
 
@@ -141,3 +141,41 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 - The older Wikidata snapshots fetched before the mul fallback (re-fetched).
 - 13e's "combined traits later, after the 200" (moved ahead by the human, 2026-10-26).
 Otherwise it adds facts and recipes to the sets already loaded, which is the point: fewer separate imports.
+
+---
+
+## 13e-4a Source diff
+| Source says | We built | Why different |
+|---|---|---|
+| P1082 population: several values allowed when a point in time tells them apart; a single best value | The best-rank values, the one with the latest point in time; two differing values tied for latest are left out and counted (3 US cities) | The import can't choose between them, so it says how many it skipped |
+| P17 country: values may be historical countries or dependent territories | Only the 193 countries of `wikidata-countries`; the rest dropped and counted (11 for capitals, 250 for rivers) | A3, the human: "Drop and count them (Recommended)" |
+| P141: one of 9 values | Values outside the 9 dropped and counted (1) | The import knows only the 9 status things |
+| P30 continent: every continent a subject spans | As the source says, Eurasia and Insular Oceania included | No difference; their fit for questions is 13e-4b's review |
+
+## 13e-4a Evidence
+**Local stack, the Windows checkout, 2026-10-26.**
+- **The re-fetch** (`npm run base -- fetch <set>`, each set once; places twice, below):
+  - countries: `continent on 193 of 193 items`, `population on 193 of 193 items`; 203 items, so 2 roots and 8 continent things (Africa 54 countries, Europe 47, Asia 46, North America 23, South America 12, Oceania 12, Insular Oceania 6, Eurasia 1; Russia, Turkey, Kazakhstan and four Pacific states list two or three);
+  - US states 50 of 50 populations; US state capitals 50 of 50; Canadian provinces 13 of 13;
+  - world capitals: `country on 197 of 199 items, 11 values outside the things loaded dropped` (Amsterdam and Copenhagen name only the Kingdom of the Netherlands and of Denmark), population on 198;
+  - US cities: `population on 10735 of 10761 items, 3 left out with two latest values`;
+  - rivers: `country on 40662 of 40922 items, 250 values outside the things loaded dropped`;
+  - animals: `conservation_status on 37271 of 71689 items, 1 values outside the 9 dropped`, 71,698 items;
+  - places' first fetch stopped loudly (`SyntaxError: Bad control character in string literal`: the service appended its error to a response it had started), and a second run fetched 30,442 items (30,313 before). Hypothesis before the rerun: load on the service, so a rerun succeeds; it did.
+- **The load** (`npm run base -- load all`): `pg_database_size` from **269 MB to 291 MB (+22 MB)**; new rows: country 42,020, conservation_status 37,301, continent 201 facts, 11,186 populations; the mul fallback brought 853 more animals, 127 places and 14 fruit. `fact` is 64 MB, `number_fact` 2.3 MB.
+- **Real-data trials** (subsets defined inside a rolled-back transaction): African countries 54 (11 ms); countries starting with D 17 (29 ms: any of a country's names counts toward membership); African rivers 1,170 (1.3 s); endangered animals 2,846 (2.7 s); animals starting with Z 694 (5.0 s); US cities of 1,000,000+ 13 (Chicago, Dallas, Houston, Los Angeles, Manhattan, New York City, Philadelphia, Phoenix, Queens, San Antonio, San Diego, San Jose, The Bronx). That last one took **9.3 s** before `20261026053032_number_fact_lookup.sql` and **0.46 s** after (hypothesis: the partial index can't serve the as-of check; disproved if still over 2 s). A first attempt counting five subsets in one query ran over 5 minutes before the index and was cancelled; not reproduced after it.
+- **The suites:** `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=388`, `Result: PASS` (`subsets.test.sql` 43); `npm run test:db` 40 files, **262 passed**; `npm run test:e2e` 37 passed, 2 failed (groups, and Me's avatar slots), and `--last-failed` 2 passed (this PC is slow: 13e-3 Evidence). The e2e run was before the review's fixes, which change no page; CI runs it again.
+- **The tests catch what they claim** (each rule broken on purpose in the local database, then restored): `fits_where` reading `now()` instead of the day's moment fails "but a started day keeps the number it had", "and the facts" and "and the names a letter subset reads"; approval without the letter clause fails "and only those: a name not starting with it doesn't make up for one the letters block".
+- CI: in PR #87.
+
+## 13e-4a Review
+**Reviewer agent, fresh context, 2026-10-26.** Blocking findings and how each was fixed:
+1. The as-of test proved nothing (its things' names were newer than the day): it now ages the whole test base, uses an old value that fits and a new one that doesn't, and covers a fact and a letter name too.
+2. The approval's letter test passed without the letter clause: it now fails without it (U stolen, "germany" typeable but not starting with D).
+3. An offensive-word text held on a `via` or number subset could never join it: Accept decides `category_extra` by the subset's filter, in `20261026054153_subset_accept.sql`, with a test.
+4. No Evidence or Source diff: above.
+5. Stale status lines, ROADMAP and HANDOFF: updated.
+6. The TypeScript copy of the letter rule had no test and was a second way: removed; the draft asks `private.alias_starts`, and content:validate's bank name check, which used it, is gone (the draft refuses those names).
+7. The letter-skip unit test assumed its result: removed; `draft.db.test.ts` checks `familiarLeft` on a letter subset (none left with D stolen; a typeable name not starting with D doesn't count).
+
+Non-blocking findings are in ROADMAP, Next revision, From 13e-4a.
