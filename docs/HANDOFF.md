@@ -29,9 +29,12 @@ Written by a naming session on the Mac (2026-10-25), after 14b-1 merged; docs on
 - **Open, for the human (N1–N6 in the ticket):** the name (**Updraft** leads; Zephyr is crowded; Crosswind clashes with a Steam game of that name; no trademark search yet), keeping `game_id = 'offbeat'` (Claude recommends keeping it), the share line, timeouts' word, admin pages plain, How to play rewritten in the same PR.
 
 ### Next step
-1. 14b-2 (the sprout streak, L26; the admin pages' look, L19; the design reviews' polish): ask its guided questions first (CLAUDE.md), then its ticket, build and one PR from this branch.
-2. For the human (ROADMAP, For M14): About's contact address and "What Plor is" wording.
-3. 14c-1: ask N1–N6 (the ticket's open questions) as guided questions, then build it as one PR from this branch, after 14b-2's PR is merged or closed (one open PR at a time).
+**14b-2** is planned (`docs/milestones/M14-14b-2-sprout-admin-polish.md`), its guided questions answered on the Mac (human, 2026-10-26), to be built at home on the Windows checkout, one PR each, merged on green CI:
+1. **14b-2a, the sprout streak:** drafted in full in the ticket. Two choices are left for the build session, written there: where the shell reads the streak, and the sprout's colours under the Styling rule.
+2. **14b-2b, the admin pages:** "Full redesign, mockups first", drawn "At home": draw the six pages on the canvas "Plor shell layout", get the human's review, then build.
+3. **14b-2c, the review items:** "All 33" open For M14 items in ROADMAP; ask the "For the human" ones first (About's contact and wording among them).
+
+**On the Windows checkout** the local stack was last at `20261025074000_links.sql`: run `npx supabase migration up` for the settings and theme migrations before any test.
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
