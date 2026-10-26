@@ -53,6 +53,8 @@ beforeAll(async () => {
   draftDate = (await db.query<{ d: string }>("select (private.today() + 400)::text as d")).rows[0].d;
   await ensureFixtureBase();
   draft = fixtureDraft(draftDate);
+  // A bank answer players can't type: cherry, once C is gone at question 2 (the page marks it, M14 14b-2b-2b).
+  draft.questions[1].host_bank.push(fixtureId(1, "cherry"));
   createdDraftsFolder = !existsSync(DRAFTS);
   mkdirSync(DRAFTS, { recursive: true });
   draftFile = join(DRAFTS, `${draftDate}.json`);
@@ -96,6 +98,12 @@ describe("approving a drafted day", () => {
     const day = (await (await list()).json()).days.find((d: { date: string }) => d.date === draftDate);
     expect(day.live).toBeNull();
     expect(day.draft.map((q: { hostAnswers: string[] }) => q.hostAnswers)).toEqual(draft.questions.map((q) => q.host_answers));
+    // Each bank answer says which stolen letter its name has, by the rule approving checks (M14 14b-2b-2b): cherry
+    // can't be typed once C is gone at question 2, and the suggested host answers can all be typed.
+    type Choice = { id: string; stolen: string | null };
+    expect(day.draft[1].hostBank.find((a: Choice) => a.id === fixtureId(1, "cherry")).stolen).toBe("c");
+    const suggested = day.draft.flatMap((q: { hostAnswers: string[]; hostBank: Choice[] }) => q.hostBank.filter((a) => q.hostAnswers.includes(a.id)));
+    expect(suggested.map((a: Choice) => a.stolen)).toEqual(suggested.map(() => null));
   });
 
   const refused = async (hostAnswers: string[][]) => {

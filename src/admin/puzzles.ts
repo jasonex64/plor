@@ -4,7 +4,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
-import { GAME_ID, checkPuzzleFile, parsePuzzle, type Puzzle } from "@/content/puzzle";
+import { GAME_ID, avoids, checkPuzzleFile, parsePuzzle, stolenLetters, type Puzzle } from "@/content/puzzle";
 import { thingNames, type Named, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -28,7 +28,10 @@ export function readDrafts(): Map<string, Puzzle> {
 
 // What the page shows of a puzzle: each question's prompt, category, stolen letter, host answers and host bank by name.
 // The category's members aren't listed: there can be tens of thousands (docs/milestones/M13-13a-the-base.md).
-export type QuestionView = { prompt: string; category: string; steals: string | null; hostAnswers: string[]; hostBank: Named[] };
+// A bank answer's stolen is a letter stolen at or before its question that its name has, so players can't type it
+// and it can't be a host answer (checkHostNames, the approve route's rule); null when it can.
+export type HostChoice = Named & { stolen: string | null };
+export type QuestionView = { prompt: string; category: string; steals: string | null; hostAnswers: string[]; hostBank: HostChoice[] };
 export type DayView = {
   date: string;
   // The drafted day from the content files, if one exists.
@@ -38,15 +41,22 @@ export type DayView = {
   started: boolean;
 };
 
-// A host bank entry missing from this database (a draft built against another one) shows its ID.
+// A host bank entry missing from this database (a draft built against another one) shows its ID, and approving it is
+// refused for that (checkHostNames).
 function view(puzzle: Puzzle, names: Names): QuestionView[] {
-  return puzzle.questions.map((q) => ({
-    prompt: q.prompt,
-    category: q.category,
-    steals: q.steals ?? null,
-    hostAnswers: q.host_answers,
-    hostBank: q.host_bank.map((id) => ({ id, name: names.get(id) ?? id })),
-  }));
+  return puzzle.questions.map((q, i) => {
+    const stolen = stolenLetters(puzzle, i);
+    return {
+      prompt: q.prompt,
+      category: q.category,
+      steals: q.steals ?? null,
+      hostAnswers: q.host_answers,
+      hostBank: q.host_bank.map((id) => {
+        const name = names.get(id);
+        return { id, name: name ?? id, stolen: name === undefined ? null : (stolen.find((letter) => !avoids(name, [letter])) ?? null) };
+      }),
+    };
+  });
 }
 
 // Every day from today on that has a draft or an approved puzzle, oldest first.

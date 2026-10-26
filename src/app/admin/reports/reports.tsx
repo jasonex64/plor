@@ -1,11 +1,11 @@
 "use client";
 
-// Reported comments (docs/milestones/M08-comments-and-reactions.md, 8c and D5): each comment with a report, the oldest
-// first report first, and Delete, which removes it for everyone; then every deleted comment, newest first, with the
-// admin who deleted it (M12 12d). Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md,
-// criterion 6): Delete asks inline before it deletes for everyone, and the decisions are one log.
+// Reported comments (docs/milestones/M08-comments-and-reactions.md, 8c and D5): each comment with an open report, the
+// oldest first report first, with Keep comment, which leaves it for everyone (M14 14b-2b-2b), and Delete, which removes
+// it for everyone; then every decision, newest first, with the admin who made it (M12 12d). Laid out as round 10 draws
+// it (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6): Delete asks inline before it deletes for everyone.
 import { useCallback, useEffect, useState } from "react";
-import type { DeletedComment, ReportedComment } from "@/admin/reports";
+import type { Decision, ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
 import { Avatar } from "../../avatar";
 import { errorText } from "../../messages";
@@ -17,15 +17,15 @@ const when = (at: string) => new Date(at).toLocaleString("en-GB", { day: "numeri
 
 export function Reports({ onChanged }: { onChanged: () => void }) {
   const [reports, setReports] = useState<ReportedComment[] | null>(null);
-  const [deletions, setDeletions] = useState<DeletedComment[] | null>(null);
+  const [decisions, setDecisions] = useState<Decision[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    api<{ reports: ReportedComment[]; deletions: DeletedComment[] }>("/api/admin/reports", { method: "GET" }).then(
+    api<{ reports: ReportedComment[]; decisions: Decision[] }>("/api/admin/reports", { method: "GET" }).then(
       (r) => {
         setReports(r.reports);
-        setDeletions(r.deletions);
+        setDecisions(r.decisions);
         setError(null);
       },
       (err) => setError(errorText(err)),
@@ -33,11 +33,11 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
   }, []);
   useEffect(load, [load]);
 
-  async function remove(id: string) {
+  async function decide(path: "delete" | "keep", id: string) {
     setBusy(true);
     setError(null);
     try {
-      await api("/api/admin/reports/delete", { method: "POST", body: { id } });
+      await api(`/api/admin/reports/${path}`, { method: "POST", body: { id } });
       load();
       onChanged();
     } catch (err) {
@@ -49,7 +49,10 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
 
   return (
     <>
-      <p className={admin.note}>Delete removes a comment for everyone and is logged below.</p>
+      <p className={admin.note}>
+        Keep comment leaves it for everyone but the players who reported it; Delete removes it for everyone. Both are logged
+        below.
+      </p>
       <section aria-label="Reported comments" className={admin.card}>
         <h3 className={admin.cardTitle}>
           Reported {reports && reports.length > 0 && <span className={admin.badge}>{reports.length}</span>}
@@ -58,17 +61,17 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
         {reports && reports.length > 0 && (
           <ul className={styles.reported}>
             {reports.map((r) => (
-              <Reported key={r.id} report={r} busy={busy} onDelete={() => void remove(r.id)} />
+              <Reported key={r.id} report={r} busy={busy} onKeep={() => void decide("keep", r.id)} onDelete={() => void decide("delete", r.id)} />
             ))}
           </ul>
         )}
         {!reports && !error && <p>Loading…</p>}
         {error && <p role="alert">{error}</p>}
       </section>
-      {deletions && (
+      {decisions && (
         <section aria-label="Decisions" className={admin.card}>
           <h3 className={admin.cardTitle}>Decisions</h3>
-          {deletions.length === 0 ? (
+          {decisions.length === 0 ? (
             <p>No decisions yet.</p>
           ) : (
             <table className={admin.table}>
@@ -82,13 +85,14 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
                 </tr>
               </thead>
               <tbody>
-                {deletions.map((d) => (
-                  <tr key={d.id}>
+                {decisions.map((d) => (
+                  // A comment is kept again after a new report, so the time tells its decisions apart.
+                  <tr key={`${d.decision}-${d.id}-${d.at}`}>
                     <td className={`${admin.nowrap} ${admin.muted}`}>
-                      <time dateTime={d.deletedAt}>{when(d.deletedAt)}</time>
+                      <time dateTime={d.at}>{when(d.at)}</time>
                     </td>
                     <td>
-                      <span className={`${admin.tag} ${admin.state}`}>Deleted</span>
+                      <span className={`${admin.tag} ${admin.state}`}>{d.decision === "deleted" ? "Deleted" : "Kept"}</span>
                     </td>
                     <td>{d.admin ?? `the admin with no username, ${d.adminId}`}</td>
                     <td>{d.author}</td>
@@ -104,9 +108,9 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
   );
 }
 
-// A reported comment: who wrote it, on which day, how many reported it and when first; then Delete…, which asks before
-// it deletes for everyone.
-function Reported({ report: r, busy, onDelete }: { report: ReportedComment; busy: boolean; onDelete: () => void }) {
+// A reported comment: who wrote it, on which day, how many reported it and when first; then Keep comment, and Delete…,
+// which asks before it deletes for everyone.
+function Reported({ report: r, busy, onKeep, onDelete }: { report: ReportedComment; busy: boolean; onKeep: () => void; onDelete: () => void }) {
   const [asking, setAsking] = useState(false);
   return (
     <li className={styles.item}>
@@ -130,6 +134,9 @@ function Reported({ report: r, busy, onDelete }: { report: ReportedComment; busy
         </div>
       ) : (
         <div className={styles.buttons}>
+          <button type="button" className={admin.button} disabled={busy} onClick={onKeep}>
+            Keep comment
+          </button>
           <button type="button" className={`${admin.button} ${admin.danger}`} onClick={() => setAsking(true)}>
             Delete…
           </button>

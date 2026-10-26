@@ -3,9 +3,12 @@
 // Puzzle entry (docs/milestones/M06-puzzle-entry.md): an admin reviews each day a Claude session drafted from the
 // question bank (M13 13d), changes the drawn host answers if they like, and approves it. Laid out as round 10 draws it
 // (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4): the days as a row, the chosen day as a table whose host
-// answers are checkboxes drawn as chips, Approve at the top.
+// answers are checkboxes drawn as chips, Approve at the top. A bank answer with a letter the Wind has stolen is dashed
+// with that letter struck, and can't be ticked; a host answer ticked before is in the danger colour with its problem,
+// and Approve waits until it's unticked (14b-2b-2b).
 import { useCallback, useEffect, useState } from "react";
-import type { DayView, QuestionView } from "@/admin/puzzles";
+import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
+import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import { dayText } from "../day-text";
@@ -83,6 +86,9 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   const [problems, setProblems] = useState<string[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Per question, its ticked host answers that players can't type.
+  const blocked = shown.map((q, i) => q.hostBank.filter((a) => a.stolen && hosts[i].includes(a.id)));
+  const toFix = blocked.filter((b) => b.length > 0).length;
 
   async function approve() {
     setBusy(true);
@@ -113,12 +119,21 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
           <h3 className={admin.cardTitle}>
             {dayText(day.date)} <span className={admin.sr}>({label})</span>
           </h3>
-          <p className={admin.note}>{editable ? `${state} Tick the host answers (the Wind's) you want.` : state}</p>
+          <p className={admin.note}>
+            {editable ? `${state} Tick the host answers (the Wind's) you want. Dashed ones have a letter the Wind has stolen, so players can't type them.` : state}
+          </p>
         </div>
         {editable && (
-          <button type="button" className={admin.primary} disabled={busy} onClick={approve}>
-            {day.live ? "Approve again" : "Approve day"}
-          </button>
+          <div className={styles.approve}>
+            <button type="button" className={admin.primary} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
+              {day.live ? "Approve again" : "Approve day"}
+            </button>
+            {toFix > 0 && (
+              <span id="fix-first" className={styles.fixFirst}>
+                Fix {toFix} {toFix === 1 ? "question" : "questions"} first
+              </span>
+            )}
+          </div>
         )}
       </div>
       {note && <p role="status" className={styles.note}>{note}</p>}
@@ -154,6 +169,12 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
                 ) : (
                   <ReadOnlyHosts q={q} />
                 )}
+                {editable &&
+                  blocked[i].map((a) => (
+                    <p key={a.id} className={admin.problem}>
+                      &ldquo;{a.name}&rdquo; has the {a.stolen!.toUpperCase()} the Wind steals: pick another host answer.
+                    </p>
+                  ))}
                 {problems
                   .filter((p) => questionOf(p) === i)
                   .map((p) => (
@@ -182,6 +203,29 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
       <legend className={admin.sr}>Host answers for {q.prompt}</legend>
       {visible.map((a) => {
         const on = chosen.includes(a.id);
+        // Players can't type it, so it can't be ticked; one ticked before stays a checkbox, to untick.
+        if (a.stolen && !on) {
+          return (
+            <span key={a.id} className={`${styles.chip} ${styles.blocked}`}>
+              <Struck choice={a} />
+              <span className={admin.sr}>, has {a.stolen.toUpperCase()}: players can&apos;t type it</span>
+            </span>
+          );
+        }
+        if (a.stolen) {
+          return (
+            <label key={a.id} className={`${styles.chip} ${styles.bad}`}>
+              <input
+                type="checkbox"
+                className={admin.sr}
+                aria-label={`${a.name}, has ${a.stolen.toUpperCase()}: players can't type it`}
+                checked
+                onChange={() => onChange(chosen.filter((id) => id !== a.id))}
+              />
+              <Struck choice={a} />
+            </label>
+          );
+        }
         return (
           <label key={a.id} className={on ? `${styles.chip} ${styles.checked}` : styles.chip}>
             <input type="checkbox" className={admin.sr} checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
@@ -200,6 +244,15 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         </button>
       )}
     </fieldset>
+  );
+}
+
+// The name with each letter that is the stolen one, once normalized (as players' typing is), struck through.
+function Struck({ choice: a }: { choice: HostChoice }) {
+  return (
+    <span>
+      {[...a.name].map((ch, i) => (normalize(ch) === a.stolen ? <s key={i}>{ch}</s> : ch))}
+    </span>
   );
 }
 

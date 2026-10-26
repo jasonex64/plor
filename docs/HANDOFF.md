@@ -17,14 +17,18 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
+| 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
 
-### In review: 14b-2b-2a, the admin area's look (PR #90, auto-merge on green CI)
-`docs/milestones/M14-14b-2b-2-admin-build.md`: the admin pages render through Home in the shell (`src/app/admin/admin-area.tsx`); `/admin` opens Puzzles, Insights is at `/admin/insights`; sub-tabs in two groups with counts, a phone menu and a waiting row, What needs you in the right column; Puzzles' row of days and checkbox chips, Insights' chart against the Gentle target, the audit's stacked actions, the bank's filter, the database's cards, Reports' inline Delete confirm. No server change. Local evidence: `npm test` 385, admin e2e 13, full e2e 44.
+### In review: 14b-2b-2b, the admin pages' three server changes (PR #91, auto-merge on green CI)
+`docs/milestones/M14-14b-2b-2-admin-build.md`, 14b-2b-2b. Two **security changes**, both approved by the human (2026-10-26) and in the DECISIONS.md Log:
+- **Keep comment:** `private.keep_reported_comment` and `private.comment_keep`. The reports stay, so the comment stays hidden for its reporters ("Still hidden (Recommended)").
+- **The audit's one-click link:** `private.audit_near`, fed by the game's `withinTypo` ("New lookup function (Recommended)").
+
+Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, not SQL. Local evidence: `npm test` 386, pgTAP 73, db 25, admin e2e 11. Review done: both blocking findings fixed, the rest in ROADMAP Next revision.
 
 ### Next step
-1. After 14b-2b-2a merges: mark it done (ticket, ROADMAP) with its merge evidence.
-2. **14b-2b-2b**, from the same ticket: Keep comment (the security change is **approved**, human 2026-10-26: "Approve it (Recommended)": `private.keep_reported_comment`, `private.comment_keep`, `plor_app` execute and select only; record it in DECISIONS.md), host answers the Wind's letter blocks marked in place (the rule stays in SQL), and the audit's one-click link to the near answer.
-3. Then 14b-2c (the For M14 review items), then 14c-1 (ask its N1–N6).
+1. After 14b-2b-2b merges: mark it done (ticket Status, ROADMAP row) with its merge evidence.
+2. Then 14b-2c (the For M14 review items in ROADMAP Next revision), then 14c-1 (ask its N1–N6).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
@@ -33,7 +37,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 4. The checks: `npm test` 360; `npm run test:db` 260 (before main's PR #87 tests); `npx supabase test db`; `npm run test:e2e` 42. Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
 
 ### Local state (Windows)
-- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session is resetting it (`db reset`, `load all`; the human approved), which wipes local data. Message it before any suite or dev server.
+- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session resets it from its branch (`db reset`, `load all`; the human approved), which drops M14's two new migrations (`keep_comment`, `audit_near`). Re-apply them after a reset (pending ones with `npx supabase migration up`; if the CLI refuses because of M13's unmerged migration, run the two files' SQL in one transaction and add their rows to `supabase_migrations.schema_migrations`). Message the M13 session before any suite or dev server.
 - Canvas mockups, renders, the critique snapshot and screenshots are in the session's temp folder, outside the repo.
 
 **Left running:** nothing (no dev server, no background job).
