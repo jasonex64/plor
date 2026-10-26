@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-2a's PR. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-2a's PR #90. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -18,7 +18,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 
-### In review: 14b-2b-2a, the admin area's look (its PR, auto-merge on green CI)
+### In review: 14b-2b-2a, the admin area's look (PR #90, auto-merge on green CI)
 `docs/milestones/M14-14b-2b-2-admin-build.md`: the admin pages render through Home in the shell (`src/app/admin/admin-area.tsx`); `/admin` opens Puzzles, Insights is at `/admin/insights`; sub-tabs in two groups with counts, a phone menu and a waiting row, What needs you in the right column; Puzzles' row of days and checkbox chips, Insights' chart against the Gentle target, the audit's stacked actions, the bank's filter, the database's cards, Reports' inline Delete confirm. No server change. Local evidence: `npm test` 385, admin e2e 13, full e2e 44.
 
 ### Next step
