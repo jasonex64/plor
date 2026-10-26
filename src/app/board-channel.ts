@@ -116,7 +116,12 @@ function openShared(): Shared {
           console.error("board channel", status, err?.message);
         }
       });
-  })().catch(failed);
+  })().catch((err) => {
+    // Opening failed: these listeners show it, and the connection is dropped so the next part to listen opens a
+    // fresh one, rather than joining one that never came up (14b-2b-1 review).
+    failed(err);
+    if (shared === state) shared = null;
+  });
 
   state.close = () => {
     cancelled = true;

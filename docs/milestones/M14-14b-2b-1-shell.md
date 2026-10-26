@@ -1,6 +1,6 @@
 # M14 14b-2b-1 — The wider shell, the right column, and buttons for links
 
-**Status:** in review (2026-10-26): round 10 approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."); built on `m14-look-and-feel`, one PR, merged on green CI. The admin pages are 14b-2b-2, after this.
+**Status:** in review (2026-10-26): round 10 approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."); built on `m14-look-and-feel`, one PR, to merge on green CI. The admin pages are 14b-2b-2, after this.
 
 ## Goal
 Every desktop page gets the 280px sidebar and, from 1200px, a right column behind a line; About and Privacy move into the settings sheet; and every control on the site is a button or a menu item, not a text link.
@@ -71,3 +71,9 @@ On the Windows checkout, 2026-10-26; the local stack shared with the M13 session
 - **Along the way:** an earlier run had 4 failures. Two were real and fixed: the doubled socket (`live-board.e2e.ts`), and the groups test's unscoped Post click, now scoped to the group's Comments (the friends feed beside it has a Post too). The others were the dev server compiling mid-run (Fast Refresh while I edited files, and a cold first compile slower than a 5-second wait on this PC); the same files passed 20 of 20 on a warm server, with nothing being edited.
 
 ## Review
+By the `reviewer` agent on `5bce599` (fresh context, no edits, no test runs).
+- **Blocking, fixed:**
+  1. A part that started listening after the shared Realtime connection failed to open never heard of the failure and looked live: a failed connection is now dropped, so the next part opens a fresh one (`board-channel.ts`), as each part retried on its own before.
+  2. The handoff was stale: rewritten in this PR.
+- **Deferred to ROADMAP "Next revision" (For M14):** a hidden page's column keeps the body's padding (and its nav hides the footer after an in-place sign-out); `paused` read at render can miss a change before the listener is added; crossing 1200px remounts the column's contents (a comment draft is lost); the friends feed stays locked if the run ends while it's open; the feed also shows on the invite and join pages; ButtonLink's gap and padding and the footer's margin have no recorded origin; the game banner's Result button is styled by hand; leftover blank lines in two CSS files; the Status line's wording; the e2e's underline check covers the four tabs only.
+- **Checked and fine (the reviewer):** StrictMode double mount, the last listener closing, a late listener on a healthy channel, hidden pages dropping their listeners, z-index and the clock bar, the aside labels and focus ring, the e2e changes, the Removes, the numbers.
