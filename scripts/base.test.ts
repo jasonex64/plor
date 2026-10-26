@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { describe, expect, it } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, linkToWikidata, oewnSubtree, parseCsv, parseLinks, taxaToItems, usdaCheeses, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, linkToWikidata, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -134,5 +134,35 @@ describe("parseLinks", () => {
       expect(() => parseLinks(JSON.stringify([link, bad]))).toThrow("data/links.json link 2: must hold exactly thing, name, kind_of, kind_of_name, each as text");
     }
     expect(() => parseLinks(JSON.stringify([{ ...link, kind_of: "2-n" }]))).toThrow('data/links.json link 1: "thing" and "kind_of" must be refs as "source:id"');
+  });
+});
+
+describe("riverShortNames", () => {
+  it("gives the short name of an \"X River\" or \"River X\", and nothing for other names", () => {
+    expect(riverShortNames([["Mississippi River", "River Thames", "Nile", "Rio Grande", "Red river"]])).toEqual([["Mississippi", "Thames", "Red"]]);
+  });
+  it("skips a short name two rivers give, however written, but not one a single river gives twice", () => {
+    expect(riverShortNames([["Little River"], ["River Little"], ["little river", "Ohio River"], ["Hudson River", "River Hudson"]]))
+      .toEqual([[], [], ["Ohio"], ["Hudson", "Hudson"]]);
+  });
+});
+
+describe("foldLabels", () => {
+  const row = (id: string, label: string, lang: string, alt?: string) => ({
+    x: { value: `http://www.wikidata.org/entity/${id}` },
+    label: { value: label, "xml:lang": lang },
+    ...(alt ? { alt: { value: alt } } : {}),
+  });
+  it("takes the English label over the mul one in either row order, the mul one alone, and each alternative once", () => {
+    const folded = foldLabels([
+      row("Q1", "Mul Name", "mul", "a"), row("Q1", "English Name", "en", "a"), row("Q1", "Mul Name", "mul", "b"),
+      row("Q2", "English Two", "en"), row("Q2", "Mul Two", "mul"),
+      row("Q3", "Juneau", "mul", "City and Borough of Juneau"),
+    ]);
+    expect([...folded].map(([id, e]) => [id, e.label, e.alts])).toEqual([
+      ["Q1", "English Name", ["a", "b"]],
+      ["Q2", "English Two", []],
+      ["Q3", "Juneau", ["City and Borough of Juneau"]],
+    ]);
   });
 });

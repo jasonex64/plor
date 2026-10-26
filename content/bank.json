@@ -291,18 +291,20 @@
       "prompt": "Name a kind of cake",
       "category": "cake",
       "host_bank": [
-        "cheesecake",
         "cupcake",
-        "sponge cake",
+        "cheesecake",
         "chocolate cake",
-        "birthday cake"
+        "birthday cake",
+        "sponge cake",
+        "fruitcake"
       ],
       "uncommon": [
-        "pound cake",
-        "fruitcake",
         "torte",
-        "coffee cake",
-        "gingerbread"
+        "babka",
+        "brownie",
+        "cookie",
+        "gateau",
+        "waffle"
       ],
       "themes": [],
       "added_by": "claude"
@@ -659,17 +661,19 @@
       "category": "footwear",
       "host_bank": [
         "boot",
-        "sneaker",
-        "slipper",
         "sandal",
+        "slipper",
+        "clog",
+        "pump",
         "loafer"
       ],
       "uncommon": [
-        "moccasin",
-        "clog",
-        "pump",
+        "flats",
+        "cleats",
         "oxford",
-        "cleats"
+        "moccasin",
+        "brogan",
+        "wedgie"
       ],
       "themes": [],
       "added_by": "claude"
@@ -683,14 +687,16 @@
         "necklace",
         "bracelet",
         "earring",
-        "pendant"
+        "pendant",
+        "brooch"
       ],
       "uncommon": [
-        "brooch",
-        "locket",
+        "pin",
+        "bead",
+        "pearl",
+        "charm",
         "tiara",
-        "bangle",
-        "charm"
+        "locket"
       ],
       "themes": [],
       "added_by": "claude"
@@ -735,6 +741,594 @@
         "pink",
         "brown",
         "gray"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sport",
+      "prompt": "Name a sport",
+      "category": "sport",
+      "host_bank": [
+        "soccer",
+        "basketball",
+        "baseball",
+        "tennis",
+        "golf",
+        "#8483ccda-95a9-5930-be45-660c887c0588"
+      ],
+      "uncommon": [
+        "polo",
+        "judo",
+        "lacrosse",
+        "cricket",
+        "archery",
+        "squash"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-weapon",
+      "prompt": "Name a weapon",
+      "category": "weapon",
+      "host_bank": [
+        "sword",
+        "gun",
+        "knife",
+        "bow",
+        "spear",
+        "bomb"
+      ],
+      "uncommon": [
+        "mace",
+        "lance",
+        "dart",
+        "sling",
+        "arrow",
+        "poleax"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-fabric",
+      "prompt": "Name a fabric",
+      "category": "fabric",
+      "host_bank": [
+        "cotton",
+        "silk",
+        "wool",
+        "denim",
+        "linen",
+        "velvet"
+      ],
+      "uncommon": [
+        "satin",
+        "lace",
+        "tweed",
+        "felt",
+        "nylon",
+        "corduroy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-dance",
+      "prompt": "Name a dance",
+      "category": "dance",
+      "host_bank": [
+        "ballet",
+        "tango",
+        "waltz",
+        "polka",
+        "foxtrot"
+      ],
+      "uncommon": [
+        "samba",
+        "#5ee3f522-b8d2-5c55-b724-059cf5c660f7",
+        "conga",
+        "jig",
+        "#c02d8430-f55e-5b56-ba83-77f5de638482",
+        "twist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-gemstone",
+      "prompt": "Name a gemstone",
+      "category": "gemstone",
+      "host_bank": [
+        "diamond",
+        "ruby",
+        "emerald",
+        "sapphire",
+        "pearl",
+        "opal"
+      ],
+      "uncommon": [
+        "jade",
+        "onyx",
+        "topaz",
+        "garnet",
+        "amber",
+        "agate"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-mineral",
+      "prompt": "Name a mineral",
+      "category": "mineral",
+      "host_bank": [
+        "quartz",
+        "gold",
+        "mica",
+        "talc",
+        "halite",
+        "copper"
+      ],
+      "uncommon": [
+        "gypsum",
+        "calcite",
+        "feldspar",
+        "pyrite",
+        "fluorite",
+        "jadeite"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-music-genre",
+      "prompt": "Name a music genre",
+      "category": "music_genre",
+      "host_bank": [
+        "rock",
+        "jazz",
+        "pop",
+        "blues",
+        "rap",
+        "reggae"
+      ],
+      "uncommon": [
+        "opera",
+        "disco",
+        "techno",
+        "doo-wop",
+        "trance",
+        "zydeco"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-language",
+      "prompt": "Name a language",
+      "category": "language",
+      "host_bank": [
+        "English",
+        "Spanish",
+        "French",
+        "German",
+        "Chinese",
+        "Japanese"
+      ],
+      "uncommon": [
+        "Latin",
+        "#82db741c-9f17-56e0-bac8-664f4832ab03",
+        "Hindi",
+        "Dutch",
+        "Thai",
+        "Urdu"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-religion",
+      "prompt": "Name a religion",
+      "category": "religion",
+      "host_bank": [
+        "Christianity",
+        "Islam",
+        "Judaism",
+        "Buddhism",
+        "Hinduism"
+      ],
+      "uncommon": [
+        "Sikhism",
+        "Taoism",
+        "Shinto",
+        "Jainism",
+        "paganism",
+        "Wicca"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-currency",
+      "prompt": "Name a currency",
+      "category": "currency",
+      "host_bank": [
+        "dollar",
+        "euro",
+        "yen",
+        "#264d8da3-1811-5cf1-88e4-e7ae9a13e68f",
+        "franc"
+      ],
+      "uncommon": [
+        "rand",
+        "baht",
+        "#c5ad0291-be2b-50e9-972d-af4ad68997e5",
+        "zloty",
+        "#69ae646b-7237-5f6d-9cd8-9aa9a51c5b3a",
+        "#094845be-07a4-540f-89e4-317da0f0efa5"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-feeling",
+      "prompt": "Name a feeling",
+      "category": "feeling",
+      "host_bank": [
+        "#faf2b390-2e1e-599f-92db-f61618e20864",
+        "#11743eae-97fe-5c18-97c0-2149a40c3bf2",
+        "anger",
+        "#254b8e5b-c10b-5600-b3c2-32fed401b380",
+        "#09e31276-2bbd-5852-8f96-878e16a00ea9",
+        "joy"
+      ],
+      "uncommon": [
+        "#8ccae6f1-509f-5b4f-af71-04b1780bf26a",
+        "shame",
+        "relief",
+        "#b6e1c5d5-dc96-5eeb-8fe6-0b64b7db3130",
+        "envy",
+        "#2396e0dd-97a7-54b0-9e17-612cab698fbc"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-weather",
+      "prompt": "Name a kind of weather",
+      "category": "weather",
+      "host_bank": [
+        "rain",
+        "snow",
+        "wind",
+        "storm",
+        "fog",
+        "hail"
+      ],
+      "uncommon": [
+        "sleet",
+        "frost",
+        "cloud",
+        "lightning",
+        "thaw",
+        "freeze"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-dinosaur",
+      "prompt": "Name a dinosaur",
+      "category": "dinosaur",
+      "host_bank": [
+        "tyrannosaur",
+        "triceratops",
+        "stegosaur",
+        "velociraptor",
+        "brontosaur"
+      ],
+      "uncommon": [
+        "iguanodon",
+        "allosaur",
+        "diplodocus",
+        "ankylosaur",
+        "apatosaur",
+        "deinonychus"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-monkey",
+      "prompt": "Name a monkey",
+      "category": "monkey",
+      "host_bank": [
+        "baboon",
+        "macaque",
+        "capuchin",
+        "howler monkey",
+        "spider monkey"
+      ],
+      "uncommon": [
+        "marmoset",
+        "tamarin",
+        "colobus",
+        "langur",
+        "titi",
+        "saki"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-shark",
+      "prompt": "Name a shark",
+      "category": "shark",
+      "host_bank": [
+        "great white shark",
+        "hammerhead",
+        "tiger shark",
+        "whale shark",
+        "bull shark"
+      ],
+      "uncommon": [
+        "mako",
+        "nurse shark",
+        "blue shark",
+        "thresher",
+        "basking shark",
+        "dogfish"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-whale",
+      "prompt": "Name a whale",
+      "category": "whale",
+      "host_bank": [
+        "blue whale",
+        "humpback",
+        "killer whale",
+        "sperm whale",
+        "beluga"
+      ],
+      "uncommon": [
+        "narwhal",
+        "gray whale",
+        "fin whale",
+        "minke whale",
+        "right whale",
+        "pilot whale"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-shape",
+      "prompt": "Name a shape",
+      "category": "shape",
+      "host_bank": [
+        "circle",
+        "square",
+        "triangle",
+        "star",
+        "heart"
+      ],
+      "uncommon": [
+        "pentagon",
+        "hexagon",
+        "octagon",
+        "rhombus",
+        "trapezoid",
+        "ellipse"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-unit-of-measurement",
+      "prompt": "Name a unit of measurement",
+      "category": "unit",
+      "host_bank": [
+        "meter",
+        "#380839af-8aab-5ac5-9d04-dd6de747eacf",
+        "foot",
+        "#664fb0dd-1f93-52a4-9b23-f7101efae285",
+        "#68251866-5261-5885-a779-a9a484010f5b",
+        "gram"
+      ],
+      "uncommon": [
+        "liter",
+        "#b8221447-8825-55dc-a9cf-c56388391083",
+        "#137ecb16-ea9a-555e-94f9-4085cf90e914",
+        "acre",
+        "volt",
+        "watt"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-seafood",
+      "prompt": "Name a kind of seafood",
+      "category": "seafood",
+      "host_bank": [
+        "shrimp",
+        "lobster",
+        "crab",
+        "scallop",
+        "clam",
+        "salmon"
+      ],
+      "uncommon": [
+        "oyster",
+        "mussel",
+        "squid",
+        "octopus",
+        "caviar",
+        "prawn"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-boat-or-ship",
+      "prompt": "Name a boat or ship",
+      "category": "boat",
+      "host_bank": [
+        "canoe",
+        "sailboat",
+        "yacht",
+        "ferry",
+        "ship",
+        "barge"
+      ],
+      "uncommon": [
+        "tug",
+        "dinghy",
+        "junk",
+        "sloop",
+        "punt",
+        "skiff"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-poem",
+      "prompt": "Name a kind of poem",
+      "category": "verse_form",
+      "host_bank": [
+        "haiku",
+        "sonnet",
+        "limerick",
+        "ballad",
+        "ode"
+      ],
+      "uncommon": [
+        "elegy",
+        "epic",
+        "tanka",
+        "rondeau",
+        "clerihew",
+        "terza rima"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-us-state-capital",
+      "prompt": "Name a US state capital",
+      "category": "us_state_capital",
+      "host_bank": [
+        "Sacramento",
+        "Austin",
+        "Albany",
+        "Boston",
+        "Denver",
+        "Atlanta"
+      ],
+      "uncommon": [
+        "Juneau",
+        "Boise",
+        "Salem",
+        "Dover",
+        "Helena",
+        "Pierre"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-world-capital",
+      "prompt": "Name a world capital",
+      "category": "world_capital",
+      "host_bank": [
+        "Paris",
+        "London",
+        "Tokyo",
+        "Rome",
+        "Beijing",
+        "Moscow"
+      ],
+      "uncommon": [
+        "Oslo",
+        "Lima",
+        "Cairo",
+        "Seoul",
+        "Kabul",
+        "Dublin"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-us-city",
+      "prompt": "Name a US city",
+      "category": "us_city",
+      "host_bank": [
+        "New York City",
+        "Los Angeles",
+        "#66b15946-d48e-55f2-b1ce-10187c81ac99",
+        "#a423fe81-99c7-5a0b-8dbc-b2dbb0b14cb5",
+        "#bd196d0b-081d-5ee7-9c9c-c670dcb5cf77",
+        "#d705e80d-6ca2-5c6b-8cf9-d4776c96c6e9"
+      ],
+      "uncommon": [
+        "Tulsa",
+        "#db3e5815-2abc-5f92-9da6-6002d6eefb12",
+        "#dccf87ad-b5c9-5c36-b2da-766c392932f7",
+        "#5a58febc-e1ba-50ea-b8a5-b132fd2aca9e",
+        "Boise",
+        "#ca3794f0-6528-5900-b318-04365d9dde2e"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-river",
+      "prompt": "Name a river",
+      "category": "river",
+      "host_bank": [
+        "#b3a60c3a-899f-50b0-8562-055b653082ff",
+        "Amazon",
+        "#f983e017-861a-5c94-9400-f525c5919646",
+        "#c2a583eb-6c32-58fc-bee5-8e3e49fbf572",
+        "Danube",
+        "#aa52bd23-aac1-5f38-b47f-caee78f32491"
+      ],
+      "uncommon": [
+        "#7e218e0e-0c4b-53cf-9ef6-8360ea03a848",
+        "#d14f4e2f-7ff6-556e-a782-299e2c62607e",
+        "Ganges",
+        "#8955aea7-2451-5fdc-87b8-cbf962f6228b",
+        "Tigris",
+        "Po"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-canadian-province-or-territory",
+      "prompt": "Name a Canadian province or territory",
+      "category": "canadian_province",
+      "host_bank": [
+        "Ontario",
+        "Quebec",
+        "Alberta",
+        "British Columbia",
+        "Manitoba"
+      ],
+      "uncommon": [
+        "Yukon",
+        "Nunavut",
+        "Nova Scotia",
+        "Saskatchewan",
+        "New Brunswick",
+        "Prince Edward Island"
       ],
       "themes": [],
       "added_by": "claude"

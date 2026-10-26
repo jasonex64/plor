@@ -1,7 +1,7 @@
 // Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
 // `npm run draft -- <date> [--questions <id>,…]`. It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
 // the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
-// ones in that order; orders picked ones easiest first; turns each name into the category's thing (or takes
+// ones in that order; orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
 // "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
 // draws each question's host answers at random among its bank answers the host can still say past the letters stolen
 // so far (13c; letters first, 13e-2), so 3 familiar answers stay typeable and safe; checks the day; writes
@@ -48,6 +48,40 @@ export function withHosts(date: string, questions: Puzzle["questions"], steals: 
     out.push({ ...q, host_answers: pickHosts(date, i, sayable) });
   }
   return { format: 3, game_id: GAME_ID, date, questions: out };
+}
+
+// The questions the letters were checking when they stopped: pickLetters checks them a slot at a time, up to the next
+// slot's question, so a held of 4 means questions 5 and 6 (indexes 4 and 5), which lose the same letters.
+export function blockRange(held: number, count: number): [number, number] {
+  const ends = [...LETTER_SCHEDULE.slice(0, count).flatMap((tier, i) => (tier ? [i] : [])).slice(1), count];
+  return [held, ends.find((end) => end > held) ?? count];
+}
+
+// The questions with the one at index from moved to index to (earlier), the others in order.
+export function moveTo<T>(questions: T[], from: number, to: number): T[] {
+  const out = [...questions];
+  out.splice(to, 0, ...out.splice(from, 1));
+  return out;
+}
+
+type Letters = { steals: (string | undefined)[] | null; held: number };
+
+// An order of the questions whose letters fit (human, 2026-10-25: "soup can be in the questions 1-6 or wherever it can
+// work and just not have it as q7", "Move any blocker earlier (Recommended)"): easiest first as given; if no letters
+// fit, each question where the letters stopped, last first, moves to each earlier place, nearest first, until one
+// fits. Returns the given order and its result when none does.
+export async function fitOrder<T>(questions: T[], tryOrder: (questions: T[]) => Promise<Letters>): Promise<Letters & { questions: T[] }> {
+  const first = await tryOrder(questions);
+  if (first.steals) return { questions, ...first };
+  const [from, to] = blockRange(first.held, questions.length);
+  for (let i = to - 1; i >= from; i--) {
+    for (let place = i - 1; place >= 0; place--) {
+      const next = moveTo(questions, i, place);
+      const result = await tryOrder(next);
+      if (result.steals) return { questions: next, ...result };
+    }
+  }
+  return { questions, ...first };
 }
 
 // The expected share of players finishing a day, from each question's expected catch rate: each must be survived.
@@ -189,30 +223,35 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
     const question = await resolveQuestion(db, q);
     resolved.push({ q: question, catch: ids ? 0 : await oneHostCatch(db, date, question) });
   }
-  const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
-  const questions = ordered.map(({ q }) => q);
+  const ordered = (ids ? resolved : easiestFirst(resolved, (r) => r.catch)).map(({ q }) => q);
   const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
-    questions.flatMap((q) => q.host_bank),
+    ordered.flatMap((q) => q.host_bank),
   ]);
   const names = new Map(rows.map((r) => [r.id, r.name]));
-  const withSteals = (steals: (string | undefined)[], upTo: number) => withHosts(date, questions.slice(0, upTo), steals, names);
-  // The furthest the letters got: questions before it held with some choice, so the block is at or after it.
-  let held = 0;
-  const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
-    const part = withSteals(trial, upTo);
-    if (!part) return false;
-    for (let i = 0; i < upTo; i++) {
-      const q = part.questions[i];
-      if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
-    }
-    held = Math.max(held, upTo);
-    return true;
-  });
+  // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so the
+  // block is at or after it.
+  const tryOrder = async (questions: Question[]) => {
+    let held = 0;
+    const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
+      const part = withHosts(date, questions.slice(0, upTo), trial, names);
+      if (!part) return false;
+      for (let i = 0; i < upTo; i++) {
+        const q = part.questions[i];
+        if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
+      }
+      held = Math.max(held, upTo);
+      return true;
+    });
+    return { steals, held };
+  };
+  // A hand-picked day keeps the order it was given; a picked one may move its blocking question earlier.
+  const { questions, steals, held } = ids ? { questions: ordered, ...(await tryOrder(ordered)) } : await fitOrder(ordered, tryOrder);
   if (!steals) {
-    const at = questions[held];
-    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at question ${held + 1} ("${at.prompt}") or after it. Change that question's bank or uncommon answers`);
+    const [from, to] = blockRange(held, questions.length);
+    const at = questions.slice(from, to).map((q) => `"${q.prompt}"`).join(" or ");
+    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at ${at} or after it${ids ? "" : ", in every place earlier tried"}. Change that question's bank or uncommon answers`);
   }
-  const day = withSteals(steals, questions.length)!;
+  const day = withHosts(date, questions, steals, names)!;
   const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, names)];
   if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
   return { day, guide: softGuide(await expectedCatches(db, day)) };

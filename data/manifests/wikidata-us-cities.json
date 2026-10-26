@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-us-cities",
+  "source": "wikidata",
+  "snapshot": "2026-10-25",
+  "retrieved_at": "2026-10-25T09:58:26.761Z",
+  "method": "SPARQL: instances of city in the United States or a subclass of it (P31/P279* Q1093829, so charter cities such as Los Angeles count) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>)",
+  "items": 10762,
+  "sha256": "b73ef89bed9b997f9f509ca819299588799acae58f03f602c7662ae44bed8c85"
+}
