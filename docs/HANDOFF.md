@@ -17,17 +17,17 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 plor.app's database has every migration through `20261025200806_settings.sql`: the M13 session ran `npx supabase db push` at the human's request after #85 merged, and `npx supabase test db --linked` passed 345/345 (2026-10-25).
 
-### In review
-**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), in PR #86 with auto-merge on green CI:
-- Sky, Moonlit and Ink as round 8 on the canvas drew them (human, 2026-10-25: "Build as drawn (Recommended)"); every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
-- the picker in the settings sheet, saved on the account; painted before the profile loads from a `localStorage` copy by a `<head>` script (Next.js's "Preventing flash before hydration", added to SOURCES.md);
-- `/about`: what Plor is, "Plor is made by Jason" with privacy@plor.app, Moonlit's credit, "Plor is built with help from AI."; one `Footer` on every page links it.
+### Also done
+**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), merged in PR #86 (`64eeea6`, 2026-10-26 01:26 UTC):
+- Sky, Moonlit and Ink as round 8 drew them; every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
+- the picker in the settings sheet, saved on the account (**security change**: `plor_app` may update `private.profile.theme`), painted before the profile loads from a `localStorage` copy by a `<head>` script, re-applied on every page by `KeepTheme`;
+- `/about` (what Plor is, "Plor is made by Jason", Moonlit's credit, "Plor is built with help from AI."), linked from the sheet and the shared `Footer`.
 
-**Migration `20261026010745_theme.sql`** (the **security change** approved 2026-10-24: `plor_app` may update `private.profile.theme`). Once it's on main, plor.app's `GET /api/profile` fails until `npx supabase db push` runs again.
+**Migration `20261026010745_theme.sql`:** on main; plor.app's `GET /api/profile` fails until it's pushed. The M13 session said it will run `npx supabase db push` for it from a clean checkout of main, at the human's request (2026-10-26), and was sent the merge commit. Check `supabase migration list --linked` before assuming it's done.
 
 ### Next step
-1. After 14b-1 merges: mark it done with its CI run in its ticket and ROADMAP; the human (or a session at their request) pushes the theme migration.
-2. Then 14b-2 (the sprout streak, the admin pages' look, the design reviews' polish), from its own guided questions and ticket, one PR.
+1. 14b-2 (the sprout streak, L26; the admin pages' look, L19; the design reviews' polish): ask its guided questions first (CLAUDE.md), then its ticket, build and one PR from this branch.
+2. For the human (ROADMAP, For M14): About's contact address and "What Plor is" wording.
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.

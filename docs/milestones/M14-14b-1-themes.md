@@ -1,6 +1,6 @@
 # M14 14b-1 — Themes and the About page
 
-**Status:** in review (2026-10-25), in PR #86 from `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** done (2026-10-26): merged in PR #86 on green CI (merge commit `64eeea6`, 01:26 UTC), by auto-merge at the human's request ("Yes, turn on auto-merge for PR #86 (merge commit) so it merges on green CI."). Built from the human's answers without a separate draft approval.
 
 ## Goal
 A player picks one of six themes in the settings sheet, saved on their account and shown from the first paint; and an About page says what Plor is, who makes it, its credits and its use of AI.
@@ -120,7 +120,7 @@ Run on the Mac against the shared local stack (the M13 session's OK stands: it r
   - `npm run test:db`: `Test Files  40 passed (40)`, `Tests  260 passed (260)`. `npx supabase test db`: `Files=21, Tests=345`, `Result: PASS`.
   - `npm run test:e2e`: `39 passed (1.1m)`.
   - `npm run build`: compiled, with `○ /about`.
-  - CI: PR #86.
+  - CI, at `532ce5f`: runs 40253473913 (pull_request) and 40253472868 (push) passed `check`, `db`, `e2e` and `secrets`.
 
 - **After the review:** `KeepTheme` added; `npx playwright test e2e/themes.e2e.ts e2e/shell.e2e.ts` → `9 passed`; tsc and lint clean.
 
