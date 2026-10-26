@@ -117,7 +117,7 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
 ## 13e-4b — The first subsets
-**Status:** planned (2026-10-26): the guided questions are answered (below); the design waits for the human's approval.
+**Status:** in progress (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`) and reviewed; it waits for 13e-4c, as the review found the animals import loses random branches of the tree (below), and 13e-4b's animal answers need a complete one.
 
 **What the human decided (guided questions, 2026-10-26):**
 | Question | The human's answer |
@@ -133,12 +133,54 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 
 **The survey** (the local base, 2026-10-26): named animals by status: least concern 24,141, vulnerable 3,063, endangered 2,846, data deficient 2,648, near threatened 2,363, critically endangered 1,693, extinct 475, extinct in the wild 26. Vulnerable: lion, giraffe, koala, cheetah, polar bear, snow leopard, hippopotamus; endangered: tiger, chimpanzee, red panda, blue whale, Asian elephant; critically endangered: gorilla, orangutan, black rhinoceros, vaquita, Sumatran tiger; extinct: dodo, great auk, passenger pigeon, thylacine. "Giant panda" has no status in Wikidata's taxon (the "panda" alias reaches two taxa).
 
-**Claude's design (for the human to approve):**
+**Claude's design** (approved, 2026-10-26: "I approve 13e-4b's design. Build it."):
 1. **The format change:** `private.category.fact_value` becomes `fact_values` (a list), `where`'s fact form becomes `{"trait", "values": […], "via"?}`, and `fits_where` matches any of them; `data/categories.json`'s `fact` takes `values`. DECISIONS.md's Puzzle content format row says so.
 2. **Two IUCN subsets** of `animal`: `endangered_animal` (Q278113, Q96377276, Q219127) and `extinct_animal` (Q237350), each with a bank question.
 3. **Letter subsets**, at most 2 per base, over countries, world capitals, animals, US cities, rivers and some everyday WordNet lists, to about 20–28 in all: for each base, letters with at least 10 members, preferring the 9 letters the Wind never steals (f, j, k, q, v, w, x, y, z; `LETTER_TIERS`), whose questions no day's letters can block, then the others. Each with a bank question (5–6 common and 4–6 uncommon answers, the host's starting with the letter).
 4. **The status and continent things' aliases:** only their names, no Wikidata alternative labels (ROADMAP From 13e-4a: "na", "lc", "dd" and "003 un m49 code" made those misses "rejected" in every category).
 5. **Checks:** the review output for each subset (count, sample, flags), trial drafts, the simulator, one PR the human approves by merging.
+
+**Decided while building (human, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| "Name an extinct animal" refuses woolly mammoth and T. rex: IUCN lists only modern extinctions | "Reword it (Recommended)": "Name an animal that went extinct in modern times" |
+| The batch's LDNOOBW flags: "darkie charlie", the kitefin shark's (Q1321783) first English name, a racial slur, in `animal`, `animal_k` and `endangered_animal`; the rest innocent (willow tit, Syrian wild ass, bastard sturgeon, Rio Negro frog) | "Drop the slur, keep the rest (Recommended)": the animals import drops that taxon's listed names by ID (`ANIMALS_DROP_LISTED_NAMES`), as rivers' Pūkio Stream alias is dropped |
+| May the local database be rebuilt to prove the bank on a fresh load | "Yes, rebuild it (Recommended)", once the M14 session is done with the shared stack |
+
+**What building changed** (Claude's calls, for the review):
+- The two fruit letter subsets (`fruit_k`, `fruit_j`) were dropped: Wikidata's fruit tree makes them mostly apple and rice cultivars ("Jonagold", "Kinuhikari"); vehicle W, tree F and flower W were tried as replacements and were weak too, so the batch is 22, not 24.
+- A miss on a subset of several values (`endangered_animal`) is held for the human (`held_subset`), as a new thing can't be given one of three statuses; A2 had a direct one-value fact go on the new thing.
+- Small lists have fewer uncommon answers than design point 3's 4–6, after taking out answers under a host answer (kingfisher over kookaburra, fly over flesh fly, fishing over fly-fishing): `tool_w` 2; `flower_v`, `clothing_j`, `sport_f`, `insect_f` 3.
+- A name several members bear became `#<id>`: the member whose own name it is, else the Wikidata item with the lowest Q-number (13e-3's rule for places), else the WordNet entry; "Washington" (a small town, as Washington, D.C. isn't a US city by that name) left the host answers.
+- The draft lists a category's members once per connection (`membersOf`): the 40-day simulator ran over 35 minutes with the big subsets, and 2.4 minutes after.
+
+**Review (reviewer agent, fresh context, 2026-10-26), blocking:**
+1. **The committed animals snapshot lost about 800 taxa** (Pan-Euungulata's branch: giraffe, hippopotamus, whales, pigs, deer), so on a fresh load five bank answers (vaquita, black rhinoceros, quagga, aurochs, bluebuck) name no member; the local database kept them only because loading never removes rows. Investigated: not a Wikidata edit (Artiodactyla's parent last changed 2026-10-15, and its chain reaches Animalia), and no page came back short; each read loses a different branch (06:22: 70,957 items; 07:3x: 69,114, with the branch back and carps, minnows and shiners gone, 3,566 animals in all). Cause: **13e-4c**.
+2. The ticket's status, decisions and changes while building: this section.
+3. ROADMAP and HANDOFF: updated with 13e-4c.
+4. The local database still holds the continent and status things' junk aliases and the dropped fruit subsets (loading only adds): the rebuild the human approved clears them.
+Non-blocking findings go to ROADMAP, From 13e-4b.
+
+## 13e-4c — Reading Wikidata's animal tree by key
+**Status:** in progress (2026-10-26): designed from the human's guided answers (below); being built.
+
+**The problem** (13e-4b review, then measured): the animals import reads Wikidata's whole parent-taxon list (P171, about 4 million statements) and its names (P1843), scientific names (P225) and statuses (P141) in pages by position (`bd:slice` offsets, 50,000 rows each). The same page gives different rows on different requests: five requests in a row went to five servers (wdqs2007, wdqs2022, wdqs2014, wdqs2015, wdqs2010), and the page at offset 2,000,000 returned different rows even from the same server twice (wdqs2014, wdqs2008). Each server orders results by its own internal IDs, and the servers are independent and may hold different data (SOURCES.md, Wikidata Query Service behaviour), and Wikidata keeps changing during a read. So reading by position skips and repeats rows, and one skipped parent link cuts off its whole branch: taxa under Animalia came out as 2,366,663, then 2,360,800, then 2,325,989 on three reads the same day.
+
+**What the human decided (guided questions, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| How to make the import reliable | First "not sure what u mean are there that many animals?" (the answer: about 2.3 million animal entries, about 52,000 with an English name), then "Research it first" |
+| Where the fix goes | "Its own sub-ticket, first (Recommended)": 13e-4b waits for it |
+| Taxa per batch | After the measurement below, "5,000 (Recommended)" |
+| The sources | "Add both (Recommended)": T203646 and T221774 in SOURCES.md, with the test |
+
+**The measurement** (children of N taxa from the snapshot, `VALUES ?p { … } ?t wdt:P171 ?p`, two runs each, 2026-10-26): 1,000: 0.8 s and 0.6 s; 5,000: 3.3 s and 2.1 s; 10,000: 16.5 s and 2.6 s; 20,000: 4.9 s. Time follows the rows returned and the server's load more than N; none neared 60 s.
+
+**Claude's design** (from the answers: by key, 5,000 a batch, two runs that agree):
+1. **The tree top-down:** from Animalia, the children of 5,000 taxa at a time, level by level, each taxon asked about once (a cycle can't loop), keeping each child's parents found inside the tree, as now.
+2. **Names, scientific names and statuses by ID,** 5,000 at a time: English common names for every taxon in the tree, scientific names and statuses for the taxa kept (named ones and their ancestors).
+3. **Removes** `sliced()` and `BASE_SLICE_ROWS`, the only reads by position; adds `BASE_BATCH_IDS = 5000` (the human, 2026-10-26).
+4. **The proof:** two full fetches give the same items (the same IDs, names and parents); the counts are printed and recorded.
 
 ## Numbers
 | Value | Used for | Origin |
