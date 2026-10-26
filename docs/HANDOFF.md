@@ -21,8 +21,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2b-2b | Keep comment, blocked host answers marked in place, the audit's one-click link. **Security changes:** `private.keep_reported_comment` and `private.comment_keep` (a kept comment stays hidden for its reporters); `private.audit_near` | #91 |
 
 ### Next step
-1. 14b-2c: the For M14 review items in ROADMAP Next revision (ask before designing).
-2. Then 14c-1 (ask its N1–N6).
+1. **14b-2c is drafted** (`docs/milestones/M14-14b-2c-review-items.md`, on the Mac, 2026-10-26): all 53 open For M14 items in 4 PRs by area, three rounds of guided questions answered and quoted there. It waits for the human's approval; then 14b-2c-1, the player screens, first. `main` (PR #92) is merged into this branch (`f9e9158`), so its code matches plor.app's.
+2. Then 14c-1 (ask its N1–N6), which now also holds the share symbols and a stolen key's feedback (14b-2c answers 3 and 5).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
