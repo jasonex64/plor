@@ -7,14 +7,23 @@
 // (docs/milestones/M14-14b-1-themes.md; L21, L47), with links to the privacy and About pages.
 //
 // A modal <dialog> opened with showModal() (MDN <dialog>, SOURCES.md): the page behind is inert, focus starts on the
-// first focusable element, Close, and Escape closes it. The tap on the dimmed page is a click whose target is the
-// dialog itself, since the sheet's content fills it (closedby="any" isn't in Safari).
+// first focusable element, Close, and Escape closes it. A tap on the dimmed page (the dialog's ::backdrop, outside its
+// box) closes it too, when the press both starts and ends there: a text selection dragged out of a box, or a tap on the
+// side panel's own border, leaves it open (closedby="any" isn't in Safari; docs/milestones/M14-14b-2c-review-items.md,
+// item 26).
 import { ButtonLink } from "./button-link";
-import { useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 import styles from "./settings.module.css";
+import { applyTheme } from "./theme";
+
+// Whether a pointer is outside the dialog's own box, on the dimmed page.
+function onBackdrop(dialog: HTMLDialogElement, event: { clientX: number; clientY: number }): boolean {
+  const box = dialog.getBoundingClientRect();
+  return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+}
 
 export function SettingsSheet({
   dialog,
@@ -36,13 +45,23 @@ export function SettingsSheet({
     close();
     onSignedOut();
   };
+  const pressedOutside = useRef(false);
+  // Counts the times the sheet closed: the account's forms start again closed, with no draft, the next time it opens
+  // (item 27). The settings keep theirs, so a save under way finishes as it is.
+  const [closings, setClosings] = useState(0);
   return (
     <dialog
       ref={dialog}
       aria-labelledby="settings-title"
       className={styles.dialog}
+      onClose={() => setClosings((n) => n + 1)}
+      onPointerDown={(event) => {
+        pressedOutside.current = onBackdrop(event.currentTarget, event);
+      }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) close();
+        // A click from the keyboard has no press before it, so it never closes the sheet here.
+        if (pressedOutside.current && onBackdrop(event.currentTarget, event)) close();
+        pressedOutside.current = false;
       }}
     >
       <div className={styles.sheet}>
@@ -57,7 +76,7 @@ export function SettingsSheet({
             </svg>
           </button>
         </div>
-        <dl className={styles.fields}>
+        <dl className={styles.fields} key={closings}>
           <Username username={profile.username} changeableAt={profile.usernameChangeableAt} onChanged={onChanged} />
           <DisplayName name={profile.displayName} onChanged={onChanged} />
         </dl>
@@ -80,7 +99,7 @@ export function SettingsSheet({
         </div>
         <div className={styles.end}>
           <SignOut onSignedOut={signedOut} />
-          <DeleteAccount username={profile.username} onDeleted={signedOut} />
+          <DeleteAccount key={closings} username={profile.username} onDeleted={signedOut} />
         </div>
       </div>
     </dialog>
@@ -254,23 +273,35 @@ const TILES: { theme: Theme; label: string; drawn: Exclude<Theme, "device"> }[] 
 ];
 
 // Round 7's two switches, in its wording (provisional, L32), and its theme picker: radio buttons, so the chosen one is
-// announced as checked, and drawn with a thick outline alone (L47). Each is saved as it's changed; the page follows
-// the saved value, so a refused change shows the control as it was.
+// announced as checked, and drawn with a thick outline alone (L47). Each is saved as it's changed, and shown at once
+// while it saves: the controls stay enabled, so a keyboard player's focus isn't lost, and a picked theme restyles the
+// page straight away (docs/milestones/M14-14b-2c-review-items.md, item 33). Saves go one after another, so the last
+// choice is the one kept; a refused one shows its error, and the control and the page go back to the saved value.
 function Preferences({ settings, onSettings }: { settings: Settings; onSettings: (settings: Settings) => void }) {
-  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<Partial<Settings>>({});
   const [error, setError] = useState<string | null>(null);
+  const saves = useRef<Promise<void>>(Promise.resolve());
+  const shown: Settings = { ...settings, ...pending };
+  // The theme shown is the one being saved, else the account's (Home applies the account's too, once it's saved).
+  useLayoutEffect(() => applyTheme(shown.theme), [shown.theme]);
 
-  async function save(change: Partial<Settings>) {
-    setBusy(true);
+  function save(change: Partial<Settings>) {
+    setPending((p) => ({ ...p, ...change }));
     setError(null);
-    try {
-      const r = await api<{ settings: Settings }>("/api/profile/settings", { method: "POST", body: change });
-      onSettings(r.settings);
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setBusy(false);
-    }
+    saves.current = saves.current.then(async () => {
+      try {
+        const r = await api<{ settings: Settings }>("/api/profile/settings", { method: "POST", body: change });
+        onSettings(r.settings);
+      } catch (err) {
+        setError(errorText(err));
+      }
+      // This change is no longer pending, unless a later one of the same setting is.
+      setPending((p) => {
+        const left = { ...p };
+        for (const key of Object.keys(change) as (keyof Settings)[]) if (left[key] === change[key]) delete left[key];
+        return left;
+      });
+    });
   }
 
   return (
@@ -285,9 +316,8 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
             type="checkbox"
             role="switch"
             className={styles.switch}
-            checked={settings[s.key]}
-            disabled={busy}
-            onChange={(e) => void save({ [s.key]: e.target.checked })}
+            checked={shown[s.key]}
+            onChange={(e) => save({ [s.key]: e.target.checked })}
           />
         </label>
       ))}
@@ -300,9 +330,8 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
                 type="radio"
                 name="theme"
                 className={styles.sr}
-                checked={settings.theme === t.theme}
-                disabled={busy}
-                onChange={() => void save({ theme: t.theme })}
+                checked={shown.theme === t.theme}
+                onChange={() => save({ theme: t.theme })}
               />
               <span data-theme={t.drawn} className={styles.swatch}>
                 {t.theme === "device" && <span aria-hidden="true">◐ </span>}

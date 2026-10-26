@@ -29,10 +29,10 @@
   --shade-2: #2457d6c3;
   --shade-3: #2457d6e1;
   --shade-4: #2457d6;
-  --on-shade-1: #1a1a18;
-  --on-shade-2: #1a1a18;
-  --on-shade-3: #ffffff;
-  --on-shade-4: #ffffff;
+  --on-shade-1: var(--text);
+  --on-shade-2: var(--text);
+  --on-shade-3: var(--on-accent);
+  --on-shade-4: var(--on-accent);
   /* Delete account (round 7's palettes). */
   --danger: #b4232f;
   /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
@@ -63,10 +63,10 @@
     --shade-2: #7ea6ffb1;
     --shade-3: #7ea6ffd8;
     --shade-4: #7ea6ff;
-    --on-shade-1: #ededea;
-    --on-shade-2: #121212;
-    --on-shade-3: #121212;
-    --on-shade-4: #121212;
+    --on-shade-1: var(--text);
+    --on-shade-2: var(--on-accent);
+    --on-shade-3: var(--on-accent);
+    --on-shade-4: var(--on-accent);
     --danger: #ff8a8a;
   }
 }
@@ -90,10 +90,10 @@
   --shade-2: #7ea6ffb1;
   --shade-3: #7ea6ffd8;
   --shade-4: #7ea6ff;
-  --on-shade-1: #ededea;
-  --on-shade-2: #121212;
-  --on-shade-3: #121212;
-  --on-shade-4: #121212;
+  --on-shade-1: var(--text);
+  --on-shade-2: var(--on-accent);
+  --on-shade-3: var(--on-accent);
+  --on-shade-4: var(--on-accent);
   --danger: #ff8a8a;
 }
 
@@ -120,10 +120,10 @@
   --shade-2: #1f5fbfc4;
   --shade-3: #1f5fbfe2;
   --shade-4: #1f5fbf;
-  --on-shade-1: #14213d;
+  --on-shade-1: var(--text);
   --on-shade-2: #000000;
-  --on-shade-3: #ffffff;
-  --on-shade-4: #ffffff;
+  --on-shade-3: var(--on-accent);
+  --on-shade-4: var(--on-accent);
   --danger: #b4232f;
 }
 
@@ -148,8 +148,8 @@
   --shade-4: #9ccfd8;
   --on-shade-1: #ffffff;
   --on-shade-2: #000000;
-  --on-shade-3: #2a273f;
-  --on-shade-4: #2a273f;
+  --on-shade-3: var(--on-accent);
+  --on-shade-4: var(--on-accent);
   --danger: #ff8a8a;
 }
 
@@ -172,10 +172,10 @@
   --shade-2: #ffd84d98;
   --shade-3: #ffd84dcc;
   --shade-4: #ffd84d;
-  --on-shade-1: #ffffff;
-  --on-shade-2: #000000;
-  --on-shade-3: #000000;
-  --on-shade-4: #000000;
+  --on-shade-1: var(--text);
+  --on-shade-2: var(--on-accent);
+  --on-shade-3: var(--on-accent);
+  --on-shade-4: var(--on-accent);
   --danger: #ff8a8a;
 }
 

@@ -13,7 +13,8 @@ import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
-import { getStats, getYesterday } from "@/game/offbeat";
+import { getStats, getYesterday, readStats } from "@/game/offbeat";
+import { settleRuns } from "@/game/ledger";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, fixture, nameOf, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";
@@ -153,6 +154,27 @@ describe("Offbeat's game screen", () => {
     });
     const { rows } = await getPool().query("select points from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [P.userId, day[2]]);
     expect(rows).toEqual([{ points: 0 }]);
+  });
+
+  // The Me tab reads its day once and passes it to every read (docs/milestones/M14-14b-2c-review-items.md, item 19): as
+  // of T-3 the streak counts back from there (T-3, T-5, T-8) and the chart ends there.
+  it("reads the stats as of the day it's given, not today", async () => {
+    const stats = await readStats(getPool(), P.userId, day[3]);
+    expect(stats.streak).toBe(3);
+    expect(stats.days).toHaveLength(7);
+    expect(stats.days[6]).toEqual({ date: day[3], survived: 4 });
+  });
+
+  // getMe settles against the day it read (item 19, the 14b-2c-2 review): a run is settled only once its day is
+  // before that one. T-2's row is removed, in a rolled-back transaction, so it's waiting to be settled again.
+  it("settles only the runs closed by the day it's given", async () => {
+    await inRolledBack(async (client) => {
+      await client.query("set local session_replication_role = replica");
+      await client.query("delete from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [P.userId, day[2]]);
+      await client.query("set local session_replication_role = origin");
+      expect(await settleRuns(client, [P.userId], day[2])).toBe(0);
+      expect(await settleRuns(client, [P.userId], day[1])).toBe(1);
+    });
   });
 
   it("gives yesterday's questions with the Wind's answers, and P's own answer and how it went (criterion 5)", async () => {
