@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** planned (2026-10-26): the guided questions are answered (below), the survey of what it would take is done, and the design waits for the human's approval and the open questions (O1–O5). Pop culture moves to 13e-5 and uses this.
+**Status:** approved (2026-10-26): the human approved the design ("Approve 13e-4's design and go through O1–O5") and answered O1–O5 (below); 13e-4a is next. Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -31,6 +31,8 @@ Any broad category can give narrower questions: by a fact about its members ("Na
 | Subsets, when | "i mean this should be expanded to all broad categories: the ability to generate subset/narrower questiosn from them"; then "Subsets first, as 13e-4 (Recommended)" |
 | Letter subsets and the stolen letters | "Yes, the draft skips it (Recommended)": a letter subset isn't drafted on a day that steals its letter |
 | Space | "figure out how much work it would be to apply to all the data we have so far (animals, places, etc.) then realistically draft a plan based on if doing this new mechanism will take more space)" |
+
+| **The design and O1–O5** (after the survey and the 500 MB research) | "Approve 13e-4's design and go through O1–O5"; O1 "One entry listing them (Recommended)"; O2 "A core few"; O3 "Their own table (Recommended)"; O4 "What's typed must start with it (Recommended)"; O5: "these were just suggestions btw … (u can still add it)" |
 
 The pop-culture answers are for 13e-5 and stay recorded here until its ticket is written.
 
@@ -64,13 +66,13 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 5. **The first subsets and their bank questions,** in the batch's usual way (13e: 20–30 a batch, each reviewed, the human merges): letter subsets of countries, US states, animals and some WordNet categories, and fact subsets of countries, cities, rivers and animals.
 6. **Two PRs:** 13e-4a, the facts and the machinery (with the size measured); 13e-4b, the first batch of subset categories.
 
-## Open, for the human
-- **O1 — The source.** SOURCES.md's Wikidata entry covers things, labels, the trees and closed lists, not these properties. Add each property's Wikidata page (P17, P30, P131, P1082, P2046, P2131, P141, P183, P495, P2043, P585) to SOURCES.md?
-- **O2 — Which properties.** The survey's list above, or fewer to start?
-- **O3 — Numbers.** A number column on the fact table, or its own table? (A migration either way, applied to plor.app at the next `db push`.)
-- **O4 — Letter subsets.** Which names count ("The Gambia" under G or T?), and must the typed answer itself start with the letter ("Deutschland" for Germany)?
-- **O5 — Thresholds.** Every number filter needs its threshold from the human. The examples ("countries that start with d", "countries with 1 mil gdp") were illustrations, not the exact categories wanted (human, 2026-10-26: "these were just suggestions btw for like the gdp stuff wasn't word for word exactly the categories i wanted (u can still add it)"), so Claude proposes the subsets and their thresholds in 13e-4b's batch, and the human sets each number there.
-- **Before answering O1–O5,** the human asked for research on going past the Free plan's 500 MB: what it takes, how, and the costs and trade-offs (2026-10-26).
+## O1–O5, answered (human, 2026-10-26)
+- **O1 — The source:** one SOURCES.md row, "Wikidata properties (13e-4)", listing each property's page and its use ("One entry listing them (Recommended)"). Each page is read before the row is added; a later property joins the row with the human's OK.
+- **O2 — Which properties:** "A core few": **country** (P17), **continent** (P30), **population** (P1082) and **IUCN conservation status** (P141). Continent is direct for countries, US states and Canadian provinces, and comes through the country for cities, capitals, places and rivers. State (P131), area, GDP, length, endemic-to and country of origin wait for a later batch. With these four, the estimate is about half the survey's 40–55 MB.
+- **O3 — Numbers:** "Their own table (Recommended)": thing, trait, value and the date it's true for (P585, the latest kept). Population is its only trait for now (build for today).
+- **O4 — Letter subsets:** "What's typed must start with it (Recommended)": a member counts when the typed name starts with the letter, with a leading "The" ignored ("The Gambia" counts under G; "Deutschland" counts for Germany under D). So the letter is checked on the typed answer, not only on the member list, and approval freezes the letter with the question.
+- **O5 — Thresholds:** the examples were illustrations (human: "these were just suggestions btw for like the gdp stuff wasn't word for word exactly the categories i wanted (u can still add it)"). Claude proposes the subsets and thresholds in 13e-4b's batch; the human sets each number there.
+- **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
 ## Numbers
 | Value | Used for | Origin |
@@ -79,7 +81,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 | 500 MB | The hosted plan's limit | Supabase pricing, SOURCES.md (DECISIONS.md Log, Storage) |
 | 20–30 | Categories per batch | 13e (human, 2026-10-24) |
 | 10 members at least | Every subset category | 13e (human, 2026-10-24) |
-| Each threshold | Number filters | **The human (O5)** |
+| Each threshold | Number filters | The human, per subset in 13e-4b (O5) |
 
 ## Out of scope
 - Pop culture: 13e-5, with the answers above.
@@ -87,7 +89,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - Combining two filters ("an African country that starts with K"): after this, if the human asks.
 
 ## Plan
-1. The human approves the design and answers O1–O5.
+1. ~~The human approves the design and answers O1–O5.~~ Done, 2026-10-26.
 2. 13e-4a: the migration, the fetches with the new properties (measured per set before they're kept), the recipe filters, the letter rule in the draft, the format change, tests (db tests for `category_members` filters; unit tests for the letter skip).
 3. 13e-4b: the first subset batch with bank questions, review output and the simulator.
 
