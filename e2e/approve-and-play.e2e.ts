@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } 
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { FIXTURE, fixtureDraft, loadFixtureBase } from "../src/test/answer-fixture";
+import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/admin/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
@@ -26,7 +26,12 @@ test.beforeAll(async () => {
   mkdirSync(DRAFTS, { recursive: true });
   draftFile = join(DRAFTS, `${ahead}.json`);
   if (existsSync(draftFile)) throw new Error(`${draftFile} exists; this test writes its own draft there`);
-  writeFileSync(draftFile, JSON.stringify(fixtureDraft(ahead)));
+  // Question 2's suggested host answer is cherry, which players can't type once C is gone (14b-2b-2b): the admin swaps
+  // it for apple before approving.
+  const draft = fixtureDraft(ahead);
+  draft.questions[1].host_bank.push(fixtureId(1, "cherry"));
+  draft.questions[1].host_answers = [fixtureId(1, "cherry")];
+  writeFileSync(draftFile, JSON.stringify(draft));
   puzzle = await todayPuzzle(DB);
 });
 
@@ -55,6 +60,15 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
   const day = admin.getByRole("region", { name });
   await expect(day.getByText("Draft, waiting for approval.")).toBeVisible();
+  // A ticked host answer players can't type is said in words, and Approve waits until it's swapped
+  // (docs/milestones/M14-14b-2b-2-admin-build.md, 14b-2b-2b criterion 2).
+  await expect(day.getByText("Fix 1 question first")).toBeVisible();
+  await expect(day.getByRole("button", { name: "Approve day" })).toBeDisabled();
+  await expect(day.getByText("“cherry” has the C the Wind steals: pick another host answer.")).toBeVisible();
+  await day.getByRole("checkbox", { name: "cherry, has C: players can't type it" }).uncheck();
+  await expect(day.getByRole("checkbox", { name: /^cherry/ })).toHaveCount(0);
+  await expect(day.getByText("cherry, has C: players can't type it")).toBeVisible();
+  await day.getByRole("checkbox", { name: "apple" }).check();
   await day.getByRole("button", { name: "Approve day" }).click();
   await expect(day.getByRole("status")).toHaveText(`${name} is approved. Players get it at midnight Pacific. You can change its host answers until then.`);
   const { rows } = await DB.query<{ approved: boolean; members: string }>(

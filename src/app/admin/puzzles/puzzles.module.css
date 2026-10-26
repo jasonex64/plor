@@ -90,6 +90,37 @@
   color: var(--muted);
 }
 
+/* A bank answer players can't type (round 10, board 1): dashed on the page's background, not a control; ticked, in the
+   danger colour. Its struck letter and its words say it too (WCAG 2.2 1.4.1). */
+.blocked {
+  border-style: dashed;
+  background: var(--bg);
+  color: var(--muted);
+  cursor: default;
+}
+
+.bad {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.chip s {
+  text-decoration-thickness: 2px;
+}
+
+.approve {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.fixFirst {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 @media (max-width: 767px) {
   .chip {
     min-height: 44px;

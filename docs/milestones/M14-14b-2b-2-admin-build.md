@@ -12,6 +12,8 @@ The admin pages live in Plor's shell as one admin area, in round 10's look, with
 ## What the human decided
 All in `M14-14b-2b-admin-pages.md`, "What the human decided", 1–22, quoted there; round 10 on the canvas "Plor shell layout" (boards Round10 and Round10Phone) is the approved drawing. And for 14b-2b-2b:
 - **Keep comment's database change, a security change:** "Approve it (Recommended)" (human, 2026-10-26), to the question: "A new function private.keep_reported_comment(admin, comment), run as the owner like the existing delete function, removes that comment's reports and logs which admin kept it and when, in a new private.comment_keep table (RLS on). plor_app gets execute on the function and select on the log, nothing else; the route checks the admin first, as Delete's does."
+- **What a kept comment's reporters see:** "Still hidden (Recommended)" (human, 2026-10-26), to: "Keep comment as approved removes a comment's reports. But a player's report is also what hides that comment from them (M08 D5). When an admin keeps a comment, what should the players who reported it see?", whose option said: "The reports stay in the database and the keep record marks them as handled, so the comment leaves the admins' list but stays hidden for its reporters. The function changes from deleting reports to recording the keep only; a later report by someone new lists it again." It replaces "removes that comment's reports" above; the grants are as approved.
+- **How the audit learns a near-typo's near answer, a security change:** "New lookup function (Recommended)" (human, 2026-10-26), whose option said: "a new admin-only function, run as its owner like the audit's, takes the texts one typo from what was typed (worked out by the game's own typo code) and returns the category's answers with those names now. plor_app gets execute on it, nothing else. It works for reviews already waiting and touches none of M13's functions."
 
 The split into two PRs is Claude's (CLAUDE.md, one PR per sub-ticket): 2a changes no server code; 2b holds the three changes that need it.
 
@@ -35,10 +37,16 @@ The split into two PRs is Claude's (CLAUDE.md, one PR per sub-ticket): 2a change
 Keep comment; blocked host answers marked in place; the audit's one-click link to the near answer.
 
 ## 14b-2b-2b — The three server changes (after 2a)
-### Acceptance criteria (draft)
-1. **Keep comment:** `private.keep_reported_comment` and `private.comment_keep` as approved; `POST /api/admin/reports/keep`; the reports log lists keeps beside deletions; a db test of the function and of `plor_app`'s exact grants.
-2. **Blocked host answers:** the puzzles API says, for each bank answer, whether players can still type it past the letters stolen so far (the rule's one place in SQL); the chip is dashed with the letter struck, and a checked blocked one is in the danger colour with its problem; Approve waits ("Fix N questions first").
-3. **One-click link:** a near-typo's review names its near answer, and "Link to <answer>" links it in one click; "Different answer…" opens the existing search.
+### Acceptance criteria
+1. **Keep comment:** `private.keep_reported_comment` and `private.comment_keep` as decided above: the keep is recorded, the reports stay (the comment stays hidden for its reporters), and the list shows only reports made after the last keep. `POST /api/admin/reports/keep`, admin first as Delete's. Reports' "Keep comment" beside "Delete…"; the decisions log lists keeps beside deletions. Checked by a pgTAP test of the function, `plor_app`'s exact grants, the route's db test, and live-board.e2e.ts.
+2. **Blocked host answers:** the puzzles API says, for each bank answer, which letter stolen by its question its name has, by the approve route's own rule (`avoids` and `stolenLetters`, `src/content/puzzle.ts`). Such a chip is dashed with the letter struck and can't be ticked; a ticked one is in the danger colour with its problem in words; Approve waits ("Fix N questions first"). Checked in the puzzles route's db test and approve-and-play.e2e.ts.
+3. **One-click link:** a waiting near-typo names the answers it's a typo of (`private.audit_near`), each a "Link to <answer>" button; "Different answer…" opens the existing search. Checked in the audit route's db test and audit.e2e.ts.
+4. The usual checks and CI pass.
+
+### Removes (2b)
+- `listDeletions`, `DeletedComment` and the reports API's `deletions`: one `decisions` list (deleted or kept) replaces them.
+- The near-typo's search as its only action: it stays, behind "Different answer…".
+- The draft criterion 2's "the rule's one place in SQL": the rule already has one place, in `src/content/puzzle.ts`, which the approve route uses, so the API reuses it.
 
 ## Numbers
 | Value | Used for | Origin |
@@ -66,6 +74,15 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
 | Round 10's chart axis to 25% | The axis reaches the highest rate or target, rounded up to the next 5% (round 10's step) | A day can catch more than 25% |
 | Round 10's table on Insights | The same 7 columns, without "In bank" | As drawn (the critique found "In bank" undefined) |
 | Round 10's phone boards mark Me in the tab bar on admin pages | The same on phones; on the sidebar only Admin is marked | Phones reach Admin from Me; the sidebar has Admin itself |
+
+14b-2b-2b:
+| Source says | We built | Why different |
+|---|---|---|
+| Round 10: "Keep clears a comment's reports and leaves it", and the approved function "removes that comment's reports" | The keep is recorded and the reports stay; the list shows reports made after the last keep | M08 D5: a report hides the comment for its reporter. The human chose "Still hidden (Recommended)" when asked |
+| Round 10's note: "Keep comment leaves it…" | "Keep comment leaves it for everyone but the players who reported it; Delete removes it for everyone. Both are logged below." | Says what Keep now does |
+| Round 10 blocks a chip by its question's own letter (carrot ticked at question 4 with C gone at question 2) | Blocked by every letter stolen at or before the question | The approve route's rule (`checkHostNames`); the drawing was a sketch |
+| Round 10's Approve, `aria-disabled` and focusable | `disabled`, with "Fix N questions first" beside it and each problem under its question | The reason is in words next to it; a disabled button needs no click guard |
+| Draft criterion 2: "the rule's one place in SQL" | The rule stays in `src/content/puzzle.ts`, run by the puzzles API | It already had one place there (CLAUDE.md, one way to do each thing) |
 
 
 ## Evidence

@@ -31,8 +31,9 @@ export function oneEditAway(text: string): string[] {
   return [...new Set([...out].map(normalize))].filter((t) => t && t !== text);
 }
 
-// Every text within TYPO_MAX_EDITS edits of `text`.
-function withinTypo(text: string): string[] {
+// Every text within TYPO_MAX_EDITS edits of `text`. The audit uses it too, to name a near-typo's near answers
+// (src/admin/audit.ts).
+export function withinTypo(text: string): string[] {
   let frontier = [text];
   const all = new Set<string>();
   for (let edit = 0; edit < TYPO_MAX_EDITS; edit++) {

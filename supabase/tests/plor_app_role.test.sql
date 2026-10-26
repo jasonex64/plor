@@ -70,7 +70,10 @@ select is(pg_temp.grants('plor_app'), array[
   -- questions an admin typed, and their function).
   'private.approve_puzzle(uuid,jsonb) execute',
   -- The audit of what was learned from misses (M13 13b): admin-only functions read it, count what waits, and decide.
-  'private.audit_decide(uuid,bigint,text,uuid) execute', 'private.audit_list(uuid) execute', 'private.audit_open_count(uuid) execute',
+  'private.audit_decide(uuid,bigint,text,uuid) execute', 'private.audit_list(uuid) execute',
+  -- What a waiting near-typo could be linked to, in one click (M14 14b-2b-2b).
+  'private.audit_near(uuid,bigint,text[]) execute',
+  'private.audit_open_count(uuid) execute',
   -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
   'private.base_lookup(uuid,text) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
@@ -80,6 +83,8 @@ select is(pg_temp.grants('plor_app'), array[
   -- An admin's deletion of a reported comment and its record are one guarded function; plor_app only reads the
   -- record (M12 12d, D1 a).
   'private.comment_deletion select',
+  -- So is an admin's keep of one, and its record (M14 14b-2b-2b).
+  'private.comment_keep select',
   -- Reports (M08 8c, D8): a player reports; the routes read a player's own, to hide what they reported, and an admin
   -- reads them all. Deleting the comment removes its reports (cascade), so none is deleted directly.
   'private.comment_report insert', 'private.comment_report select',
@@ -94,6 +99,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
+  'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
   'private.missed_answer select',
   -- The reset countdown (M04 13c-4).

@@ -151,8 +151,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(player.getByText("Reactions on your run")).toHaveCount(0);
 
   // The player comments, and it reaches the watcher's open page; the watcher's reaction on it reaches the player's
-  // (8d). Then the watcher reports it, and it's gone for the watcher at once (8c, D5). Made an admin, the watcher
-  // finds it on the reported-comments page and deletes it, and the player's open page loses it too.
+  // (8d). Then the watcher reports it and a second one, and they're gone for the watcher at once (8c, D5). Made an
+  // admin, the watcher finds them on the reported-comments page, keeps the second (M14 14b-2b-2b), which stays for the
+  // player and hidden for the watcher, and deletes the first, which the player's open page loses too.
   await openBoard(player, "/");
   await openBoard(watcher, "/");
   const body = `report me ${RUN}`;
@@ -164,13 +165,22 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(watcherComment).toBeVisible();
   await watcherComment.getByRole("button", { name: "😂" }).click();
   await expect(playerComment.getByRole("button", { name: "😂" })).toHaveText("😂 1");
+  const kept = `keep me ${RUN}`;
+  await player.getByLabel("Comment to your friends").fill(kept);
+  await player.getByRole("button", { name: "Post" }).click();
+  const watcherKept = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept });
   await watcherComment.getByRole("button", { name: "Report" }).click();
+  await watcherKept.getByRole("button", { name: "Report" }).click();
   await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
   await watcher.goto("/admin/reports");
   const reported = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: body });
   await expect(reported).toContainText(`${playerName} (${playerName}) · on `);
   await expect(reported).toContainText("1 report, first");
+  const reportedKept = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: kept });
+  await reportedKept.getByRole("button", { name: "Keep comment" }).click();
+  await expect(reportedKept).toHaveCount(0);
+  await expect(watcher.getByRole("region", { name: "Decisions" }).getByRole("row").filter({ hasText: kept })).toContainText("Kept");
   // Delete asks inline before it deletes for everyone (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6).
   await reported.getByRole("button", { name: "Delete…" }).click();
   await reported.getByRole("group", { name: "Confirm delete" }).getByRole("button", { name: "Delete", exact: true }).click();
@@ -180,13 +190,17 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(record).toContainText("Deleted");
   await expect(record.getByRole("cell").nth(2)).toHaveText(watcherName);
   await expect(record.getByRole("cell").nth(3)).toHaveText(playerName);
-  await expect(player.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
+  await expect(playerComment).toHaveCount(0);
+  await expect(player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept })).toBeVisible();
+  await watcher.goto("/");
+  await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
 
-  // Every change came over Realtime as a nudge, and no frame either page received holds the comment's text.
+  // Every change came over Realtime as a nudge, and no frame either page received holds a comment's text.
   const received = [...framesOf.values()].flat().join("\n");
   expect(received).toContain("comments_changed");
   expect(received).toContain("run_reactions_changed");
   expect(received).not.toContain(body);
+  expect(received).not.toContain(kept);
 });
 
 // After a safe answer, the reveal shows the points it earned and its estimated rarity bonus (M09 9a). The number

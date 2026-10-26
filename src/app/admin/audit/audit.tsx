@@ -199,7 +199,14 @@ function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; d
             Accept {t.name} as {r.category_name}
           </button>
         ))}
-      {r.outcome === "near_typo" && <LinkTo review={r} busy={busy} decide={decide} label="Same as…" />}
+      {/* A near-typo links to the answer it's a typo of in one click; the search is for any other (round 10, board 3). */}
+      {r.outcome === "near_typo" &&
+        r.near.map((t) => (
+          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+            Link to {t.name}
+          </button>
+        ))}
+      {r.outcome === "near_typo" && <LinkTo review={r} busy={busy} decide={decide} label={r.near.length > 0 ? "Different answer…" : "Same as…"} />}
       <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
         Dismiss
       </button>
