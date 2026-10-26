@@ -174,7 +174,7 @@ test("the colours follow the device: Paper when light, Night when dark", async (
 
 // Reached by keyboard, every link in the tab bar and the sidebar shows the focus ring: a 3px solid outline in the
 // accent, offset 3px (criterion 9; WCAG 2.2 2.4.7). The players are admins, so the sidebar's Admin is checked too, and
-// so is its Settings button (docs/milestones/M14-14a-3b-settings.md).
+// so is its Settings button (docs/milestones/M14-14a-3b-settings.md), and the streak's pill at its top (14b-2a).
 test("every tab shows the focus ring from the keyboard", async ({ browser }) => {
   for (const viewport of [
     { width: 360, height: 800 },
@@ -185,7 +185,9 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-${name}@example.test`]);
     await page.reload();
     await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
-    const expected = TABS.map((t) => t.name).concat(viewport.width >= 768 ? ["Admin", "Settings"] : []);
+    // From 768px the sidebar opens with the streak's pill (docs/milestones/M14-14b-2a-streak-ranks.md), a new player's Seed.
+    const wide = viewport.width >= 768;
+    const expected = (wide ? ["0 day streak, Seed"] : []).concat(TABS.map((t) => t.name), wide ? ["Admin", "Settings"] : []);
     const accent = await page.evaluate(() => {
       const probe = document.createElement("span");
       probe.style.color = "var(--accent)";

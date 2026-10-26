@@ -95,6 +95,18 @@ So the design is:
 | `/streak` has no mockup | Me's spacing and cards, the chosen theme's 3px border for the player's rank | Nothing new to approve: Plor's existing values (Numbers) |
 
 ## Evidence
+On the Windows checkout, 2026-10-26, at `d56e9de` plus the shell e2e fix below; the local stack shared with the M13 session, which held off while these ran.
+- **Criterion 1 (the pill)** and **3 (`/streak`)**: `npx playwright test e2e/shell.e2e.ts e2e/streak.e2e.ts e2e/live-board.e2e.ts`: `15 passed (1.6m)`, among them `streak.e2e.ts:38 › a phone's top bar shows the streak's rank beside the gear, and it grows when a run starts` (360px: the pill between the wordmark and the gear, named "0 day streak, Seed", opening `/streak` with its six ranks, days and the player's marked) and `streak.e2e.ts:78 › from 768px the sidebar shows the avatar slot and the streak's pill under the wordmark` (1440px). `shell.e2e.ts:178` walks the sidebar with Tab: the pill first, with the 3px accent focus ring.
+- **Criterion 2 (the ranks)**: `npx vitest run src/app/ranks.test.ts`: `Tests 12 passed (12)`, each boundary 0/1/4/5/14/15/29/30/89/90 and the days /streak lists; and in `streak.e2e.ts:38`, Start on the game screen turns the pill to "1 day streak, Daisy" with no reload.
+- **Criterion 4 (Today's line goes)**: `streak.e2e.ts:38` finds no "played in a row"; `live-board.e2e.ts` now reads the streak from the pill ("1 day streak, Daisy"); `src/game/runs.db.test.ts` checks the run state without a streak (`npm run test:db` below).
+- **Criterion 5 (every theme)**: `npx vitest run src/app/colors.test.ts`: `Tests 108 passed (108)`, with "text on the soft pill over the background is at least 4.5:1" in Paper, Night, Sky, Moonlit and Ink (the device follows Paper or Night).
+- **Criterion 6 (static)**: no `animation` or `transition` in `ranks.module.css`, `streak.module.css` or the pill's rules.
+- **Criterion 7 (the checks)**:
+  - `npx tsc --noEmit -p .`: no output; `npm run lint`: no output; `npm run build`: `○ /streak` among the routes, exit 0.
+  - `npm test`: `Test Files 40 passed (40)`, `Tests 347 passed (347)`.
+  - `npm run test:db`: `Test Files 40 passed (40)`, `Tests 260 passed (260)` (the profile route now returns `streak: 0` for a new player).
+  - `npx supabase test db`: `Files=21, Tests=345`, 3 failed, all in `answer_base.test.sql` (1, 2, 12: `have: {... "numbers": 0}`, `want` without `numbers`). The shared local database has three M13 migrations not on this branch (`20261026050238_subsets.sql` and the two after it), which add `numbers` to `private.import_source`'s result. This change touches no SQL; CI, on a fresh stack of this branch's migrations, is the check.
+  - `npx playwright test` (the full suite): `40 passed`, `1 failed`: `shell.e2e.ts:178`, whose Tab walk met the sidebar's new pill first. Its expected list now starts with the pill from 768px, and the three touched files passed after (`15 passed`, above).
 
 ## Review
 By the `reviewer` agent on `ae4eda1` (fresh context, no edits).
