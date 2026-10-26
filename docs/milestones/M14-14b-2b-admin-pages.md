@@ -44,6 +44,7 @@ After round 9 on the canvas (human, 2026-10-26), an /impeccable critique of it (
 
 On round 10 (human, 2026-10-26):
 21. **The audit's actions:** "i feel like each button should for decide should just take up the entire row it looks weird to have the dismiss button half the size of the accept": every action a full-width button, stacked in its column (Different answer… and Same as another answer… become buttons too).
+22. **The group labels and links:** "todo and lookup being smaller font bugs me, we gotta fix taht somehow some way. nothing on the screwen should bje like the blue underlined text link, everything should have a button or be able to be found from a dropdown or sidebar menu". Then: "Drop the labels, keep the divider (Recommended)" (the phone dropdown too) and "All controls site-wide (Recommended)": every action or way to another page is a button or a menu item, on player and admin pages alike; links stay only inside running text on the About and privacy pages. A Styling rule for DECISIONS.md, added with the shell's PR.
 
 ## Source
 - The canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ): round 7's shell (approved, "Round 7 looks good", 2026-10-24), and the admin boards drawn for this ticket, once the human approves them.
