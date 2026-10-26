@@ -1,6 +1,6 @@
 # M13 13e-5 — The base's shape
 
-**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"); items 3 and 4 (circles refused, one walk) built and reviewed on the Mac, not yet in a PR; items 1 and 2 (the join, the review's lists) wait for the snapshots on the Mac (the human has no access to the Windows PC until later, 2026-10-26). Pop culture moves from 13e-5 to 13e-6 and is written against this shape.
+**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"); items 3 and 4 (circles refused, one walk) built, reviewed and passing every suite on the Mac, not yet in a PR; items 1 and 2 (the join, the review's lists) wait for the snapshots on the Mac (the human has no access to the Windows PC until later, 2026-10-26). Pop culture moves from 13e-5 to 13e-6 and is written against this shape.
 
 ## Goal
 Settle how the answer base names and links things before the remaining ~150 categories are written against it: one thing per real-world thing, no circles in the "kind of" tree, one function that walks the tree, and the rules for series and titles that 13e-6 builds.
@@ -65,7 +65,7 @@ How a concept naming several taxa joins is put to the human (below).
 - [ ] After `npm run base -- load all`, "dog" names one member of `animal` (and of every category holding it), carrying WordNet's and Wikidata's names (db test on fixtures; the real count in the review output).
 - [ ] `npm run base -- review` prints odd joins; its output on the full load is in the PR.
 - [x] An import that closes a circle fails, names it, and leaves the base unchanged (pgTAP: Evidence).
-- [ ] The five walks call one function per direction (diff), and `npm test`, `npm run test:db`, `npx supabase test db` and `npm run test:e2e` pass. *(All but e2e pass: Evidence. The e2e run collided with another session's dev server and doesn't count.)*
+- [x] The five walks call one function per direction (diff), and `npm test`, `npm run test:db`, `npx supabase test db` and `npm run test:e2e` pass (Evidence).
 - [ ] Every one of the 40 simulated days that drafted before still drafts.
 - [ ] A fresh `load all`'s database size is measured and recorded (for "Load all, pay when near").
 
@@ -108,7 +108,7 @@ How a concept naming several taxa joins is put to the human (below).
 - **Unit:** `npm test` → "Test Files 40 passed (40) Tests 386 passed (386)". `npx tsc --noEmit -p .` exits 0; `npx eslint scripts/base.ts scripts/draft.ts` clean.
 - **No other walk:** `grep -rn "with recursive" scripts src | grep -v "\.test\."` prints nothing; the migration holds one recursive walk, `descendants_now`'s.
 - **Time:** a synthetic import of 57,000 things in a binary tree (rolled back) took 2.7 s with the circle check, `{"facts": 56999, "things": 57000}`. Real taxa: *unverified*.
-- **e2e: not valid.** The M14 worktree's `next dev` started on port 3000 at 14:27:18 during the run, and Playwright reuses the server on 3000: 38 failed with `ERR_CONNECTION_REFUSED` or timeouts, 6 passed against whichever server answered. Rerun when port 3000 is free.
+- **e2e:** `npm run test:e2e -- --reporter=line` → "44 passed (1.4m)", rerun once the M14 session's suite had finished and port 3000 was free. The first run had collided with the M14 worktree's `next dev`, which started on port 3000 at 14:27:18 mid-run (38 failed with `ERR_CONNECTION_REFUSED` or timeouts); it doesn't count.
 
 ## Review (`reviewer` agent, fresh context, 2026-10-26)
 - Blocking findings and how each was fixed:
