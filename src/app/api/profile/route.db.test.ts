@@ -79,7 +79,9 @@ describe("sign-in and profile", () => {
 
   it("creates the profile on the first username pick", async () => {
     expect(await pick(`a${RUN}`)).toEqual({ status: 201, body: { ok: true, username: `a${RUN}` } });
-    expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: false });
+    // With the streak, which the shell shows: a new player has played no day yet
+    // (docs/milestones/M14-14b-2a-streak-ranks.md).
+    expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: false, streak: 0 });
     expect(await storedDisplayName()).toBeNull();
   });
 
@@ -88,7 +90,7 @@ describe("sign-in and profile", () => {
     const db = getPool();
     await db.query("insert into private.admin (user_id) select id from auth.users where email = $1", [EMAIL_A]);
     try {
-      expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: true });
+      expect(await profile()).toEqual({ ok: true, signedIn: true, ...NEW_PROFILE(`a${RUN}`), admin: true, streak: 0 });
     } finally {
       await db.query("delete from private.admin where user_id = (select id from auth.users where email = $1)", [EMAIL_A]);
     }

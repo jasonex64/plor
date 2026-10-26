@@ -87,8 +87,6 @@ describe("a run, step by step", () => {
           points: 0,
           bonus: 0,
           msToReset: expect.any(Number),
-          // A new player who hasn't started today has played no day yet (M11 H4).
-          streak: 0,
         },
       },
     });
@@ -426,7 +424,7 @@ describe("startRun's foreign keys, and a day with no puzzle", () => {
     });
   });
 
-  // GET /api/run shows it as no puzzle today, with the streak and the reset (docs/milestones/M12-12f-review-fixes.md, F2).
+  // GET /api/run shows it as no puzzle today, with the reset (docs/milestones/M12-12f-review-fixes.md, F2).
   it("has no run state when nothing is approved for today and no run is in progress", async () => {
     const { userId } = await newPlayer("n");
     await inRolledBackTransaction(async (client) => {

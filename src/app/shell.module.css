@@ -16,6 +16,7 @@
 }
 
 .word,
+.who,
 .admin,
 .settings {
   display: none;
@@ -57,6 +58,40 @@
   font-size: 24px;
   font-weight: 800;
   line-height: 1;
+}
+
+/* The top bar's right side: the streak's pill and the gear, 6px apart (round 7's .me). */
+.me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The streak's pill (round 7's .streak; docs/milestones/M14-14b-2a-streak-ranks.md): the rank's 22px flower and the
+   number on the soft colour. At 26px tall it is a target above WCAG 2.2 2.5.8's 24px. */
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px 2px 6px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--text);
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .gear {
@@ -161,6 +196,16 @@
     font-size: 30px;
     font-weight: 800;
     line-height: 1;
+  }
+
+  /* The avatar slot and the streak's pill under the wordmark, 10px apart (round 7, board 3). Round 7 puts 20px above
+     them and 24px below (its 4px gap with padding 16px 12px 20px); the sidebar's own 20px gap gives the same with 4px
+     more below. */
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px 4px;
   }
 
   .tabs {

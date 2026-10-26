@@ -21,9 +21,9 @@ import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
 
-// run is null on a day with no puzzle, with the streak and the time to the reset (M12 12f, F2).
-type RunResponse = { run: RunState } | { run: null; msToReset: number; streak: number };
-type NoPuzzle = { msToReset: number; streak: number };
+// run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
+type RunResponse = { run: RunState } | { run: null; msToReset: number };
+type NoPuzzle = { msToReset: number };
 type AnswerResponse = { run: RunState; notInList: boolean };
 
 // What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
@@ -47,7 +47,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   // Stable, so the countdown below doesn't restart when the component re-renders.
   const load = useCallback(() => {
     api<RunResponse>("/api/run", { method: "GET" }).then(
-      (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset, streak: r.streak })),
+      (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset })),
       (err) => setError(errorText(err)),
     );
   }, []);
@@ -88,18 +88,10 @@ export function useStartRun() {
 export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   const { run, noPuzzle, error, over } = useRun(hooks);
   const starting = useStartRun();
-  if (noPuzzle) {
-    return (
-      <>
-        <Streak days={noPuzzle.streak} />
-        <NoPuzzleBanner msToReset={noPuzzle.msToReset} />
-      </>
-    );
-  }
+  if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
   return (
     <>
-      <Streak days={run.streak} />
       <Banner>
         {run.status === "not_started" && !skip && (
           <>
@@ -136,8 +128,9 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
 }
 
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
-// stated before the timer runs, WCAG 2.2 2.2.1), with How to play.
-export function Game(hooks: DayHooks) {
+// stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in the
+// streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
 
@@ -173,7 +166,7 @@ export function Game(hooks: DayHooks) {
             question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
-          <button type="button" className={styles.start} disabled={busy} onClick={() => send("/api/run/start")}>
+          <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
             Start
           </button>
           <Link href="/offbeat/how-to-play" className={styles.secondary}>
@@ -261,10 +254,6 @@ function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void 
 
 // Nothing to do at zero: Game's own timer moves the page to the new day.
 const NOTHING = () => {};
-
-function Streak({ days }: { days: number }) {
-  return <p>Streak: {days === 1 ? "1 day" : `${days} days`} played in a row</p>;
-}
 
 // Time to the next reset at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review). label
 // says what comes then: the next puzzle after a run, only a new day when today has none, since tomorrow may not either.
