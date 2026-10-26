@@ -1,5 +1,6 @@
 /* Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md), sized from round 5's mockup: one column, the run
-   first, then the cards and the feed; from 1200px (L42) the feed moves to a right column, 360px as on Today. */
+   first, then the cards and the feed; from 1200px (L42) the feed is in the shell's right column
+   (src/app/side-column.tsx). */
 .screen {
   display: grid;
   gap: 16px;
@@ -14,12 +15,6 @@
   grid-area: back;
   margin: 0;
   font-weight: 700;
-}
-
-.back a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
 }
 
 .game {
@@ -37,21 +32,6 @@
   grid-area: feed;
 }
 
-@media (min-width: 1200px) {
-  /* With a side column the screen takes the page's full width; the 960px column is for pages without one (L43). */
-  :global(main):has(.screen) {
-    max-width: none;
-  }
-
-  .screen {
-    grid-template-columns: minmax(0, 1fr) 360px;
-    grid-template-areas:
-      "back back"
-      "game feed"
-      "cards feed";
-    align-items: start;
-  }
-}
 
 .card {
   display: flex;

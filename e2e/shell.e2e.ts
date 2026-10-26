@@ -215,3 +215,40 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     for (const f of seen) expect(f.ring).toEqual(["3px", "solid", accent, "3px"]);
   }
 });
+
+// The wider shell (docs/milestones/M14-14b-2b-1-shell.md, criteria 1 to 4): the 280px sidebar; from 1200px the right
+// column, 360px behind a line, with the friends feed on pages without a column of their own; no footer signed in; and
+// no control drawn as a text link (an underlined link) on any tab.
+test("the sidebar is 280px, the right column holds the feed from 1200px, and no control is a text link", async ({ browser }) => {
+  const { page, nav } = await player(browser, "sw", { width: 1440, height: 900 });
+  expect((await nav.boundingBox())!.width).toBe(280);
+  await nav.getByRole("link", { name: "Me" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/me");
+  const feed = page.getByRole("complementary", { name: "Friends feed" });
+  await expect(feed.getByRole("region", { name: "Feed" })).toBeVisible();
+  expect(await feed.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
+  expect(await feed.evaluate((el) => getComputedStyle(el).borderLeftWidth)).toBe("1px");
+  // The page's own content stops at the column.
+  const main = (await page.locator("main").filter({ visible: true }).boundingBox())!;
+  expect(main.x + main.width).toBeLessThanOrEqual(1080);
+  await expect(page.locator("footer").filter({ visible: true })).toHaveCount(0);
+
+  for (const tab of TABS) {
+    await nav.getByRole("link", { name: tab.name }).click();
+    await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
+    // Today's circle (the Leaderboard) is in the right column here, beside the page's own sections.
+    await expect.poll(() => sections(page)).toEqual(tab.sections.filter((s) => s !== "Leaderboard"));
+    const underlined = await page.evaluate(() =>
+      [...document.querySelectorAll("a")]
+        .filter((a) => a.checkVisibility() && getComputedStyle(a).textDecorationLine.includes("underline"))
+        .map((a) => a.textContent),
+    );
+    expect(underlined, tab.name).toEqual([]);
+  }
+
+  // Below 1200px the other pages show no feed; Today keeps its circle in its own column.
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await nav.getByRole("link", { name: "Me" }).click();
+  await expect(page.getByRole("region", { name: "All games" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Friends feed" })).toHaveCount(0);
+});

@@ -9,7 +9,7 @@
 // A modal <dialog> opened with showModal() (MDN <dialog>, SOURCES.md): the page behind is inert, focus starts on the
 // first focusable element, Close, and Escape closes it. The tap on the dimmed page is a click whose target is the
 // dialog itself, since the sheet's content fills it (closedby="any" isn't in Safari).
-import Link from "next/link";
+import { ButtonLink } from "./button-link";
 import { useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
@@ -62,14 +62,22 @@ export function SettingsSheet({
           <DisplayName name={profile.displayName} onChanged={onChanged} />
         </dl>
         <Preferences settings={profile.settings} onSettings={onSettings} />
-        <p className={styles.links}>
-          <Link href="/privacy" className={styles.link} onClick={close}>
-            Privacy policy
-          </Link>
-          <Link href="/about" className={styles.link} onClick={close}>
-            About Plor
-          </Link>
-        </p>
+        {/* About and the privacy policy in a box like Delete account's (human, 2026-10-26: "make it a little bubble thing
+            like thedelete account"; docs/milestones/M14-14b-2b-1-shell.md, criterion 3). */}
+        <div className={styles.about}>
+          <p className={styles.aboutText}>
+            <strong>About and privacy</strong>
+            <span className={styles.muted}>What Plor is, its credits, and how your data is used.</span>
+          </p>
+          <div className={styles.aboutButtons}>
+            <ButtonLink href="/about" onClick={close}>
+              About Plor
+            </ButtonLink>
+            <ButtonLink href="/privacy" onClick={close}>
+              Privacy policy
+            </ButtonLink>
+          </div>
+        </div>
         <div className={styles.end}>
           <SignOut onSignedOut={signedOut} />
           <DeleteAccount username={profile.username} onDeleted={signedOut} />
@@ -97,7 +105,7 @@ function Field({ name, value, action, editing, onEdit, children }: {
           children
         ) : (
           <>
-            <strong>{value}</strong> ·{" "}
+            <strong>{value}</strong>{" "}
             <button type="button" className={styles.inline} onClick={onEdit}>
               {action}
               <span className={styles.sr}> {name.toLowerCase()}</span>

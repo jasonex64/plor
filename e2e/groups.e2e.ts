@@ -53,13 +53,14 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await creator.goto("/groups");
   await expect(creator.getByRole("region", { name: "Groups" }).getByRole("link", { name: "Book Club" })).toBeVisible();
 
-  // Today's layout before playing (docs/milestones/M14-14a-2a-today.md): Offbeat's banner with Play first; then, at
-  // this desktop width, the live board and the leaderboard card, whose board picker has Friends and each group (H7);
-  // then the feed, with nothing to read yet.
+  // Today's layout before playing (docs/milestones/M14-14a-2a-today.md): Offbeat's banner with Play first, then the
+  // feed, with nothing to read yet; at this desktop width (1280px) the live board and the leaderboard card, whose board
+  // picker has Friends and each group (H7), are in the right column (docs/milestones/M14-14b-2b-1-shell.md).
   await creator.goto("/");
-  const sections = () =>
-    creator.locator("main section").evaluateAll((all) => all.filter((s) => !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
-  await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
+  const sections = (within: string) => () =>
+    creator.locator(within).evaluateAll((all) => all.filter((s) => !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
+  await expect.poll(sections("main section")).toEqual(["Offbeat", "Feed"]);
+  await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   const card = creator.getByRole("region", { name: "Offbeat" });
   await expect(card.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await expect(creator.getByRole("region", { name: "Leaderboard" }).getByLabel("Board").locator("option")).toHaveText(["Friends", "Book Club"]);
@@ -80,7 +81,8 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   // After playing, the score is in the card, and the order is the same.
   await creator.goto("/");
   await expect(card.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
-  await expect.poll(sections).toEqual(["Offbeat", "Friends today", "Leaderboard", "Feed"]);
+  await expect.poll(sections("main section")).toEqual(["Offbeat", "Feed"]);
+  await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.
   async function openLive(url: string) {
@@ -100,8 +102,10 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
 
   const body = `group only ${RUN}`;
   await joiner.goto(groupUrl);
-  await joiner.getByLabel("Comment", { exact: true }).fill(body);
-  await joiner.getByRole("button", { name: "Post" }).click();
+  // The group's own thread: from 1200px the friends feed beside it has a Post too (docs/milestones/M14-14b-2b-1-shell.md).
+  const thread = joiner.getByRole("region", { name: "Comments" });
+  await thread.getByLabel("Comment", { exact: true }).fill(body);
+  await thread.getByRole("button", { name: "Post" }).click();
   await expect(joiner.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body })).toBeVisible();
   await expect(creatorThread.getByRole("listitem").filter({ hasText: body })).toBeVisible();
 
@@ -116,8 +120,8 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   });
   const refetch = creator.waitForRequest((r) => nudged && r.url().includes("/api/feed"));
   const second = `home too ${RUN}`;
-  await joiner.getByLabel("Comment", { exact: true }).fill(second);
-  await joiner.getByRole("button", { name: "Post" }).click();
+  await thread.getByLabel("Comment", { exact: true }).fill(second);
+  await thread.getByRole("button", { name: "Post" }).click();
   await refetch;
   await expect(feed.getByRole("listitem").filter({ hasText: second })).toContainText("Book Club");
 });
