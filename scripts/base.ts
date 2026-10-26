@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
-import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
+import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
@@ -145,6 +145,13 @@ export function withPopulation(items: Item[], given: Map<string, Claim[]>): { it
   return { items: out, ambiguous };
 }
 
+// Things a fact names (continents, IUCN statuses), by their label alone: their alternative labels are codes and
+// plurals ("na", "lc", "003 un m49 code", "endangereds") that would make those misses "rejected" in every category
+// (13e-4b design 4).
+function valueItems(found: Awaited<ReturnType<typeof labelled>>): Item[] {
+  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: [{ alias: normalize(e.label), kind: "name" as const }] }));
+}
+
 // A set's facts, printed with what was dropped, as each fetch reports them.
 async function factsFor(set: string, items: Item[], where: string, facts: { trait: FactTrait; property: string; allowed: Set<string> }[], population: boolean): Promise<Item[]> {
   let out = items;
@@ -168,44 +175,42 @@ function countryIds(): Set<string> {
   return new Set(ids);
 }
 
-type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string> };
+type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string>; label?: string };
 
-// One predicate's statements, in slices of the query service's index (bd:slice), until a slice comes back short.
-// Each slice is a cheap read of the index, where one query over the whole tree times out (the 13a measurement).
-const SLICE = BASE_SLICE_ROWS;
-async function sliced(pattern: string, select: string, onRows: (rows: Binding[]) => void): Promise<void> {
-  for (let offset = 0; ; offset += SLICE) {
-    const rows = await sparql(`SELECT ${select} WHERE { SERVICE bd:slice { ${pattern}
-      bd:serviceParam bd:slice.offset ${offset} . bd:serviceParam bd:slice.limit ${SLICE} . } }`);
-    if (rows === "timeout") throw new Error(`slice at ${offset} of "${pattern}" timed out`);
+// A query asked about Wikidata IDs, BASE_BATCH_IDS at a time: `pattern` gets the batch as a VALUES list. By key, never by
+// position: reading the index in pages (bd:slice offsets) skipped and repeated rows, as each query server orders its
+// index by its own internal IDs and the servers differ (SOURCES.md, Wikidata Query Service behaviour), and each read
+// lost a different branch of the tree (13e-4c).
+async function byIds(ids: string[], label: string, pattern: (values: string) => string, onRows: (rows: Binding[]) => void): Promise<void> {
+  for (let i = 0; i < ids.length; i += BASE_BATCH_IDS) {
+    const rows = await sparql(pattern(ids.slice(i, i + BASE_BATCH_IDS).map((id) => `wd:${id}`).join(" ")));
+    if (rows === "timeout") throw new Error(`${label}: the batch at ${i} of ${ids.length} IDs timed out`);
     onRows(rows);
-    console.log(`${pattern.split(" ")[1]}: ${offset + rows.length} rows read`);
-    // A short slice is the last. (Asking for a slice past the end makes the service fail, 2026-10-24, so the rows are
-    // never filtered in the query, where a slice could come back short before the end.)
-    if (rows.length < SLICE) break;
   }
 }
 
 // Every taxon under root (P171 parent taxon, followed down from root) that has an English common name (P1843),
 // with every ancestor between them and root; their scientific names (P225). US English (human, 2026-10-24): "en"
-// and "en-us" names are names, other English variants synonyms.
+// and "en-us" names are names, other English variants synonyms. The tree is read top-down, the children of each
+// level's taxa by key, each taxon asked about once, so a cycle in the source can't loop (13e-4c).
 async function fetchTaxa(root: string): Promise<Map<string, Taxon>> {
   const parents = new Map<string, string[]>();
-  const children = new Map<string, string[]>();
-  await sliced("?t wdt:P171 ?p .", "?t ?p", (rows) => {
-    for (const r of rows) {
-      const [t, p] = [qid(r.t.value), qid(r.p.value)];
-      parents.set(t, [...(parents.get(t) ?? []), p]);
-      children.set(p, [...(children.get(p) ?? []), t]);
-    }
-  });
-  const under = new Set<string>();
-  const stack = [root];
-  while (stack.length) {
-    const id = stack.pop()!;
-    if (under.has(id)) continue;
-    under.add(id);
-    stack.push(...(children.get(id) ?? []));
+  const under = new Set([root]);
+  let level = [root];
+  for (let depth = 1; level.length; depth++) {
+    const next: string[] = [];
+    await byIds(level, "P171", (v) => `SELECT ?t ?p WHERE { VALUES ?p { ${v} } ?t wdt:P171 ?p . }`, (rows) => {
+      for (const r of rows) {
+        const [t, p] = [qid(r.t.value), qid(r.p.value)];
+        parents.set(t, [...(parents.get(t) ?? []), p]);
+        if (!under.has(t)) {
+          under.add(t);
+          next.push(t);
+        }
+      }
+    });
+    console.log(`P171: level ${depth}, ${next.length} new taxa, ${under.size} in all`);
+    level = next;
   }
   console.log(`${under.size} taxa under ${root}`);
 
@@ -215,11 +220,11 @@ async function fetchTaxa(root: string): Promise<Map<string, Taxon>> {
     if (!t) taxa.set(id, (t = { names: [], synonyms: [], scientific: [], parents: new Set((parents.get(id) ?? []).filter((p) => under.has(p))) }));
     return t;
   };
-  await sliced("?t wdt:P1843 ?name .", "?t ?name", (rows) => {
+  await byIds([...under], "P1843", (v) => `SELECT ?t ?name WHERE { VALUES ?t { ${v} } ?t wdt:P1843 ?name . }`, (rows) => {
     for (const r of rows) {
       const id = qid(r.t.value);
       const lang = r.name["xml:lang"] ?? "";
-      if (!under.has(id) || !lang.startsWith("en")) continue;
+      if (!lang.startsWith("en")) continue;
       const t = taxon(id);
       const list = lang === "en" || lang === "en-us" ? t.names : t.synonyms;
       if (!list.includes(r.name.value)) list.push(r.name.value);
@@ -237,22 +242,31 @@ async function fetchTaxa(root: string): Promise<Map<string, Taxon>> {
     }
   }
   taxon(root);
-  await sliced("?t wdt:P225 ?sci .", "?t ?sci", (rows) => {
+  await byIds([...taxa.keys()], "P225", (v) => `SELECT ?t ?sci WHERE { VALUES ?t { ${v} } ?t wdt:P225 ?sci . }`, (rows) => {
     for (const r of rows) {
-      const t = taxa.get(qid(r.t.value));
-      if (t && !t.scientific.includes(r.sci.value)) t.scientific.push(r.sci.value);
+      const t = taxa.get(qid(r.t.value))!;
+      if (!t.scientific.includes(r.sci.value)) t.scientific.push(r.sci.value);
     }
+  });
+  // Each kept taxon's English label, which names it when it is one of its common names (human, 2026-10-26: "Wikidata's
+  // English label first (Recommended)").
+  await byIds([...taxa.keys()], "rdfs:label", (v) => `SELECT ?t ?l WHERE { VALUES ?t { ${v} } ?t rdfs:label ?l . FILTER(LANG(?l) = "en") }`, (rows) => {
+    for (const r of rows) taxa.get(qid(r.t.value))!.label = r.l.value;
   });
   console.log(`${taxa.size} taxa kept, ${[...taxa.values()].filter((t) => t.names.length).length} with an English name`);
   return taxa;
 }
 
-// Taxa into items. A taxon's name is its first English name, else its scientific name (it then has no 'name' alias,
-// so it can't be answered: private.category_members). root keeps no parents; every other parent is in the map.
+// Taxa into items. A taxon's name is its English label when that is one of its English common names (human,
+// 2026-10-26: "Wikidata's English label first (Recommended)": "vaquita", not the alphabetical "Chochito"), else its first
+// English name in alphabetical order, else its scientific name (it then has no 'name' alias, so it can't be answered:
+// private.category_members). The query service returns a taxon's names in no fixed order, so "first as returned"
+// named the elephant shark "Ghost Shark" on one fetch and "Whitefish" on the next (13e-4c). root keeps no parents;
+// every other parent is in the map.
 export function taxaToItems(taxa: Map<string, Taxon>, root: string): Item[] {
   return [...taxa].map(([id, t]) => ({
     id,
-    name: t.names[0] ?? t.scientific[0] ?? id,
+    name: t.names.find((n) => t.label !== undefined && normalize(n) === normalize(t.label)) ?? [...t.names].sort((a, b) => a.localeCompare(b, "en"))[0] ?? t.scientific[0] ?? id,
     aliases: aliasesFor(t.names, t.synonyms, t.scientific),
     kind_of: id === root ? [] : [...t.parents].filter((p) => taxa.has(p)),
   }));
@@ -459,24 +473,32 @@ async function download(url: string): Promise<Buffer> {
 // --- the sets for the 13a test day (T1) ---
 
 const ANIMALIA = "Q729"; // labelled "animal"
+// Taxa whose LDNOOBW-listed English names are dropped, named by ID so the word stays out of the repo: the kitefin
+// shark's first English name is a racial slur (13e-4b review flags; human, 2026-10-26: "Drop the slur, keep the rest
+// (Recommended)"), as Pūkio Stream's alias is for rivers.
+const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
 
 // In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
-    method: `SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under ${ANIMALIA} with an English common name, plus their ancestors up to it; each taxon's IUCN conservation status (P141, a bd:slice read of its truthy values) among the 9 of its one-of constraint, which are items of the set`,
+    method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query: the tree under ${ANIMALIA} read top-down by P171 parent taxon, each taxon's English common names (P1843), and for the taxa kept (those with an English name, plus their ancestors up to it) their scientific names (P225) and English labels (named by the label when it is one of the common names, else the first common name alphabetically); LDNOOBW-listed names of ${ANIMALS_DROP_LISTED_NAMES.join(", ")} dropped; each taxon's IUCN conservation status (P141, truthy) among the 9 of its one-of constraint, which are items of the set`,
     fetch: async () => {
       const taxa = await fetchTaxa(ANIMALIA);
       if (!taxa.has(DOG)) throw new Error(`${DOG} (the domestic dog) wasn't fetched`);
+      for (const id of ANIMALS_DROP_LISTED_NAMES) {
+        const t = taxa.get(id);
+        if (t) [t.names, t.synonyms] = [t.names, t.synonyms].map((names) => names.filter((n) => !isListed(normalize(n))));
+      }
       const statuses = new Map<string, Claim[]>();
-      await sliced("?t wdt:P141 ?s .", "?t ?s", (rows) => {
+      await byIds([...taxa.keys()], "P141", (v) => `SELECT ?t ?s WHERE { VALUES ?t { ${v} } ?t wdt:P141 ?s . }`, (rows) => {
         for (const r of rows) {
           const t = qid(r.t.value);
-          if (taxa.has(t)) statuses.set(t, [...(statuses.get(t) ?? []), { value: qid(r.s.value) }]);
+          statuses.set(t, [...(statuses.get(t) ?? []), { value: qid(r.s.value) }]);
         }
       });
-      const statusItems = labelledItems(await labelled(`VALUES ?x { ${IUCN_STATUSES.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      const statusItems = valueItems(await labelled(`VALUES ?x { ${IUCN_STATUSES.map((id) => `wd:${id}`).join(" ")} }`));
       if (statusItems.length !== IUCN_STATUSES.length) throw new Error(`${statusItems.length} IUCN statuses labelled, expected ${IUCN_STATUSES.length}`);
       const { items, dropped } = withFact(taxaToItems(taxa, ANIMALIA), "conservation_status", statuses, new Set(IUCN_STATUSES));
       console.log(`wikidata-animals: conservation_status on ${items.filter((i) => i.conservation_status).length} of ${items.length} items${dropped ? `, ${dropped} values outside the 9 dropped` : ""}`);
@@ -497,7 +519,7 @@ const SETS: Record<string, SetDef> = {
       const countries = labelledItems(await labelled(where), () => ["Q6256"], ["Q1065"]);
       const continents = await claims(where, "P30");
       const values = [...new Set([...continents.values()].flat().map((c) => c.value))];
-      const continentItems = labelledItems(await labelled(`VALUES ?x { ${values.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      const continentItems = valueItems(await labelled(`VALUES ?x { ${values.map((id) => `wd:${id}`).join(" ")} }`));
       const { items, dropped } = withFact(countries, "continent", continents, new Set(continentItems.map((i) => i.id)));
       console.log(`wikidata-countries: continent on ${items.filter((i) => i.continent).length} of ${items.length} items${dropped ? `, ${dropped} values with no label dropped` : ""}`);
       return [

@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a in review in PR #87, merging on green CI; 13e-4b next. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c built, reviewed and proven, in review in PR #92. Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -74,7 +74,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
 ## 13e-4a — The facts and the machinery
-**Status:** in review (2026-10-26): built, reviewed in a fresh context, the 7 blocking findings fixed; PR #87, merging on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** done (2026-10-26): merged in PR #87 (`6c4d5ee`, 2026-10-26 05:56 UTC) on green CI, 10 of 10 checks (runs 40276452444 and 40276445920 on `7796848`), by auto-merge (human, 2026-10-25: "Merge on green CI (Recommended)"). Its 3 migrations were pushed to plor.app at the human's request (2026-10-26, from a clean checkout of main at `6c4d5ee`; `migration list --linked` matches on all 36; `test db --linked` 22 files, 388 tests, PASS).
 
 **Source:** SOURCES.md, Wikidata properties (M13 13e-4), read 2026-10-26; Wikidata (M13 D2); 13a–13e-3's tickets for the base, the format, misses and the draft.
 
@@ -115,6 +115,101 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 - `import_source` reports `numbers` beside things, aliases and facts (`answer_base.test.sql`'s three expected results gain `"numbers": 0`).
 
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
+
+## 13e-4b — The first subsets
+**Status:** in review (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`), reviewed, and checked on a fresh load once 13e-4c gave a complete animal tree (Evidence below); in PR #92 with 13e-4c (human: "One PR for both (Recommended)").
+
+**What the human decided (guided questions, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| Which kinds of subsets | "By first letter", "By IUCN status" (continent and population wait) |
+| Where in the day | "Wherever easiest-first puts them (Recommended)" |
+| Which letters | "Any letter with 10+ members (Recommended)" |
+| Batch size | "About 20–30 (Recommended)" |
+| The IUCN subsets | "endangered or extinct?", then "Both, endangered as players mean it (Recommended)": "Name an endangered animal" accepts vulnerable, endangered or critically endangered (strictly, gorilla is CR and lion VU: 13e-4b survey), and "Name an extinct animal" |
+| Which bases get letters | "Countries and capitals", "Animals", "US cities and rivers", "Everyday WordNet lists" |
+| Letters per base | "At most 2 letters per base (Recommended)" |
+| **The format** (hard to reverse) | "Approve: always a list (Recommended)": a fact filter holds `values`, a list, and a thing fits with any of them; a continent is a one-item list. No day has been approved with `where` yet, so nothing stored changes |
+
+**The survey** (the local base, 2026-10-26): named animals by status: least concern 24,141, vulnerable 3,063, endangered 2,846, data deficient 2,648, near threatened 2,363, critically endangered 1,693, extinct 475, extinct in the wild 26. Vulnerable: lion, giraffe, koala, cheetah, polar bear, snow leopard, hippopotamus; endangered: tiger, chimpanzee, red panda, blue whale, Asian elephant; critically endangered: gorilla, orangutan, black rhinoceros, vaquita, Sumatran tiger; extinct: dodo, great auk, passenger pigeon, thylacine. "Giant panda" has no status in Wikidata's taxon (the "panda" alias reaches two taxa).
+
+**Claude's design** (approved, 2026-10-26: "I approve 13e-4b's design. Build it."):
+1. **The format change:** `private.category.fact_value` becomes `fact_values` (a list), `where`'s fact form becomes `{"trait", "values": […], "via"?}`, and `fits_where` matches any of them; `data/categories.json`'s `fact` takes `values`. DECISIONS.md's Puzzle content format row says so.
+2. **Two IUCN subsets** of `animal`: `endangered_animal` (Q278113, Q96377276, Q219127) and `extinct_animal` (Q237350), each with a bank question.
+3. **Letter subsets**, at most 2 per base, over countries, world capitals, animals, US cities, rivers and some everyday WordNet lists, to about 20–28 in all: for each base, letters with at least 10 members, preferring the 9 letters the Wind never steals (f, j, k, q, v, w, x, y, z; `LETTER_TIERS`), whose questions no day's letters can block, then the others. Each with a bank question (5–6 common and 4–6 uncommon answers, the host's starting with the letter).
+4. **The status and continent things' aliases:** only their names, no Wikidata alternative labels (ROADMAP From 13e-4a: "na", "lc", "dd" and "003 un m49 code" made those misses "rejected" in every category).
+5. **Checks:** the review output for each subset (count, sample, flags), trial drafts, the simulator, one PR the human approves by merging.
+
+**Decided while building (human, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| "Name an extinct animal" refuses woolly mammoth and T. rex: IUCN lists only modern extinctions | "Reword it (Recommended)": "Name an animal that went extinct in modern times" |
+| The batch's LDNOOBW flags: "darkie charlie", the kitefin shark's (Q1321783) first English name, a racial slur, in `animal`, `animal_k` and `endangered_animal`; the rest innocent (willow tit, Syrian wild ass, bastard sturgeon, Rio Negro frog) | "Drop the slur, keep the rest (Recommended)": the animals import drops that taxon's listed names by ID (`ANIMALS_DROP_LISTED_NAMES`), as rivers' Pūkio Stream alias is dropped |
+| May the local database be rebuilt to prove the bank on a fresh load | "Yes, rebuild it (Recommended)", once the M14 session is done with the shared stack |
+
+**What building changed** (Claude's calls, for the review):
+- The two fruit letter subsets (`fruit_k`, `fruit_j`) were dropped: Wikidata's fruit tree makes them mostly apple and rice cultivars ("Jonagold", "Kinuhikari"); vehicle W, tree F and flower W were tried as replacements and were weak too, so the batch is 22, not 24.
+- A miss on a subset of several values (`endangered_animal`) is held for the human (`held_subset`), as a new thing can't be given one of three statuses; A2 had a direct one-value fact go on the new thing.
+- Small lists have fewer uncommon answers than design point 3's 4–6, after taking out answers under a host answer (kingfisher over kookaburra, fly over flesh fly, fishing over fly-fishing): `tool_w` 2; `flower_v`, `clothing_j`, `sport_f`, `insect_f` 3.
+- A name several members bear became `#<id>`: the member whose own name it is, else the Wikidata item with the lowest Q-number (13e-3's rule for places), else the WordNet entry; "Washington" (a small town, as Washington, D.C. isn't a US city by that name) left the host answers.
+- The draft lists a category's members once per connection (`membersOf`): the 40-day simulator ran over 35 minutes with the big subsets, and 2.4 minutes after.
+
+**Review (reviewer agent, fresh context, 2026-10-26), blocking:**
+1. **The committed animals snapshot lost about 800 taxa** (Pan-Euungulata's branch: giraffe, hippopotamus, whales, pigs, deer), so on a fresh load five bank answers (vaquita, black rhinoceros, quagga, aurochs, bluebuck) name no member; the local database kept them only because loading never removes rows. Investigated: not a Wikidata edit (Artiodactyla's parent last changed 2026-10-15, and its chain reaches Animalia), and no page came back short; each read loses a different branch (06:22: 70,957 items; 07:3x: 69,114, with the branch back and carps, minnows and shiners gone, 3,566 animals in all). Cause: **13e-4c**.
+2. The ticket's status, decisions and changes while building: this section.
+3. ROADMAP and HANDOFF: updated with 13e-4c.
+4. The local database still holds the continent and status things' junk aliases and the dropped fruit subsets (loading only adds): the rebuild the human approved clears them.
+Non-blocking findings go to ROADMAP, From 13e-4b.
+
+**13e-4b Evidence, on a fresh load** (2026-10-26, after 13e-4c; the human's OK to rebuild: "Yes, reset it now (Recommended)"):
+- `npx supabase db reset`, then `npm run base -- load all` in 43 s: `LOADED wikidata-animals (2026-10-26): {"facts":110855,"things":71753,"aliases":212909,"numbers":0}`, `LINKED data/links.json: {"added":111,"links":111}`, `DEFINED 82 categories from data/categories.json` (60 and the 22 subsets; `fruit_k` and `fruit_j` gone). The local database is **284 MB** (291 MB before, holding every earlier read's rows).
+- The status things' names are their labels alone ("least concern", "data deficient", "endangered"); **North America keeps its junk aliases** ("na", "noam", "003 un m49 code") because continents also come in through `wikidata-places`, which keeps Wikidata's alternative labels: design point 4 holds for statuses only (ROADMAP, From 13e-4b). No alias "darkie charlie" is left.
+- **Every bank answer resolves on this fresh load:** all 82 questions, each named answer to exactly one member and each `#<id>` a member (scratch check: `0 problems`); no host answer sits above another familiar answer (`0 host answers above another familiar answer`).
+- `npm run base -- review` on the 22 subsets: members from 13 (`tool_w`) to 7,605 (`endangered_animal`): country B 24, country M 26, capital K 28, capital B 32, animal K 1,436, animal W 3,434, US city W 732, US city J 134, river K 1,663, river V 2,066, bird W 120, bird K 23, fish W 63, insect W 43, insect F 41, tree W 85, flower V 38, clothing J 19, sport F 21, tool W 13, extinct 475. LDNOOBW flags: the slur (dropped, above) and innocent names (willow tit, Syrian wild ass, bastard sturgeon, Rio Negro frog, Fluke's "butt", San Marino's "sm", Negro ant), kept (the human's answer).
+- Trial drafts 2026-10-27 to 11-01 and 11-24: all 7 drafted (e.g. 10-31: `country_b us_city_j endangered_animal language vegetable insect_w furniture`), files deleted after.
+- The simulator (scratch: `draft()` for 40 dates three days apart from 2027-01-01): **`DRAFTED 39 of 40; subset questions 64 of 273`** in 2 min 47 s; the one failure blocks at Q7 on "Name a kind of poem" (13e-3's `verse_form`). Before `membersOf` it ran over 35 minutes and was stopped.
+- `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=391`, `Result: PASS` (`subsets.test.sql` 46); `npm run test:db` 40 files, **262 passed**. e2e: no page changed; CI runs it.
+
+## 13e-4c — Reading Wikidata's animal tree by key
+**Status:** in review (2026-10-26): built and proven (Evidence below); shipped with 13e-4b in PR #92 (human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
+
+**The problem** (13e-4b review, then measured): the animals import reads Wikidata's whole parent-taxon list (P171, about 4 million statements) and its names (P1843), scientific names (P225) and statuses (P141) in pages by position (`bd:slice` offsets, 50,000 rows each). The same page gives different rows on different requests: five requests in a row went to five servers (wdqs2007, wdqs2022, wdqs2014, wdqs2015, wdqs2010), and the page at offset 2,000,000 returned different rows even from the same server twice (wdqs2014, wdqs2008). Each server orders results by its own internal IDs, and the servers are independent and may hold different data (SOURCES.md, Wikidata Query Service behaviour), and Wikidata keeps changing during a read. So reading by position skips and repeats rows, and one skipped parent link cuts off its whole branch: taxa under Animalia came out as 2,366,663, then 2,360,800, then 2,325,989 on three reads the same day.
+
+**What the human decided (guided questions, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| How to make the import reliable | First "not sure what u mean are there that many animals?" (the answer: about 2.3 million animal entries, about 52,000 with an English name), then "Research it first" |
+| Where the fix goes | "Its own sub-ticket, first (Recommended)": 13e-4b waits for it |
+| Taxa per batch | After the measurement below, "5,000 (Recommended)" |
+| The sources | "Add both (Recommended)": T203646 and T221774 in SOURCES.md, with the test |
+
+**The measurement** (children of N taxa from the snapshot, `VALUES ?p { … } ?t wdt:P171 ?p`, two runs each, 2026-10-26): 1,000: 0.8 s and 0.6 s; 5,000: 3.3 s and 2.1 s; 10,000: 16.5 s and 2.6 s; 20,000: 4.9 s. Time follows the rows returned and the server's load more than N; none neared 60 s.
+
+**Claude's design** (from the answers: by key, 5,000 a batch, two runs that agree):
+1. **The tree top-down:** from Animalia, the children of 5,000 taxa at a time, level by level, each taxon asked about once (a cycle can't loop), keeping each child's parents found inside the tree, as now.
+2. **Names, scientific names and statuses by ID,** 5,000 at a time: English common names for every taxon in the tree, scientific names and statuses for the taxa kept (named ones and their ancestors).
+3. **Removes** `sliced()` and `BASE_SLICE_ROWS`, the only reads by position; adds `BASE_BATCH_IDS = 5000` (the human, 2026-10-26).
+4. **The proof:** two full fetches give the same items (the same IDs, names and parents); the counts are printed and recorded.
+
+**Decided after its review (human, 2026-10-26):** the shown name for a taxon with several English names: "Wikidata's English label first (Recommended)": the English label when it is one of the common names ("vaquita", not the alphabetical "Chochito"; the bluebuck, not "Blaubok"), else the first common name alphabetically. The labels are read by ID for the kept taxa, with the rest.
+
+**What building changed:** a taxon's display name is its first English name **in alphabetical order**: the query service returns a taxon's names in no fixed order, so the first two by-key fetches named 65 of the 12,886 taxa with several English names differently (the elephant shark "Ghost Shark", then "Whitefish"). Every name stays typeable either way; the name is what the host says, and what the letter-subset host check reads. Claude's call: the old "first as returned" was arbitrary too.
+
+**Evidence (2026-10-26, the Windows checkout):**
+- Three reads by position the same day gave 2,366,663, 2,360,800 and 2,325,989 taxa under Animalia, each losing a different branch (13e-4b review). The page at offset 2,000,000 returned different rows on six requests, the same server twice included: wdqs2010, wdqs2014, wdqs2008 gave `Q80980176, Q107545447`; wdqs2014 and wdqs2008 also gave `Q14538644, Q14538645` and `Q49601072, Q49601076`.
+- **By key, run 1** (`npm run base -- fetch wikidata-animals`, 26 min 20 s, one 429 wait honoured): the tree in 81 levels, `2368292 taxa under Q729`, `71744 taxa kept, 53583 with an English name`, `FETCHED wikidata-animals: 71753 items`. More than any read by position kept (71,698 at most).
+- **Run 2:** the same 2,368,292 taxa and 71,753 items; **0 IDs in one run only**; parents, aliases and statuses identical; 65 display names different (above).
+- **Run 3**, with names in alphabetical order (the committed snapshot): against run 2, 0 IDs differ and 0 items differ in parents, aliases or statuses. The kitefin shark (Q1321783) is "Kitefin shark", with "kitefin shark", its plural and "dalatias licha" as its names.
+- `npx tsc --noEmit -p .` and `npx eslint scripts src` clean; `scripts/base.test.ts` 16 passed (the alphabetical name included).
+- **Run 4**, with the English label first (the human's answer after the review; the committed snapshot): against run 3, 0 IDs differ and 0 items differ in parents, aliases or statuses; 3,504 taxa renamed, e.g. Q725493 "Chochito" to "Vaquita", Q2000591 "Marlin" to "White marlin"; where the label is the scientific name the alphabetical rule stays (Q746580 "Blaubok"; "bluebuck" still answers). Then the local database rebuilt again (`db reset` + `load all`, 284 MB), and every 13e-4b check rerun on it: the bank 0 problems, no host above a familiar answer, the simulator 39 of 40, the 7 trial drafts, `npm test` 343, `test:sql` 391, `test:db` 262, tsc, lint and content:validate clean.
+
+## 13e-4b and 13e-4c Source diff
+| Source says | We built | Why different |
+|---|---|---|
+| P141 IUCN status: 9 values, "endangered" (Q96377276) one of them | "Name an endangered animal" accepts vulnerable, endangered and critically endangered (Q278113, Q96377276, Q219127) | Players mean the threatened statuses by "endangered" (gorilla is CR, lion VU); the human: "Both, endangered as players mean it (Recommended)" |
+| P141: extinct (Q237350) and extinct in the wild (Q239509) are two values | "Name an animal that went extinct in modern times" takes extinct alone | Animals extinct in the wild still live in captivity; IUCN's list holds only modern extinctions, so the prompt says so (the human: "Reword it (Recommended)") |
+| Query service: SPARQL with a 60 s limit (SOURCES.md, Wikidata) | Reads by key, 5,000 IDs a query, never `bd:slice` by position | Reading by position skips and repeats rows across servers (SOURCES.md, Wikidata Query Service behaviour, and the measurement); 13a's `bd:slice` reads are gone |
+| P1843 taxon common name: several English values, in no fixed order | One shown name: the English label when it is a common name, else the first alphabetically; every value stays typeable | A fetch must give the same snapshot twice; the human chose the label rule |
 
 ## Numbers
 | Value | Used for | Origin |
@@ -166,7 +261,7 @@ Otherwise it adds facts and recipes to the sets already loaded, which is the poi
 - **Real-data trials** (subsets defined inside a rolled-back transaction): African countries 54 (11 ms); countries starting with D 17 (29 ms: any of a country's names counts toward membership); African rivers 1,170 (1.3 s); endangered animals 2,846 (2.7 s); animals starting with Z 694 (5.0 s); US cities of 1,000,000+ 13 (Chicago, Dallas, Houston, Los Angeles, Manhattan, New York City, Philadelphia, Phoenix, Queens, San Antonio, San Diego, San Jose, The Bronx). That last one took **9.3 s** before `20261026053032_number_fact_lookup.sql` and **0.46 s** after (hypothesis: the partial index can't serve the as-of check; disproved if still over 2 s). A first attempt counting five subsets in one query ran over 5 minutes before the index and was cancelled; not reproduced after it.
 - **The suites:** `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=388`, `Result: PASS` (`subsets.test.sql` 43); `npm run test:db` 40 files, **262 passed**; `npm run test:e2e` 37 passed, 2 failed (groups, and Me's avatar slots), and `--last-failed` 2 passed (this PC is slow: 13e-3 Evidence). The e2e run was before the review's fixes, which change no page; CI runs it again.
 - **The tests catch what they claim** (each rule broken on purpose in the local database, then restored): `fits_where` reading `now()` instead of the day's moment fails "but a started day keeps the number it had", "and the facts" and "and the names a letter subset reads"; approval without the letter clause fails "and only those: a name not starting with it doesn't make up for one the letters block".
-- CI: in PR #87.
+- CI: 10 of 10 on `7796848` (runs 40276452444 and 40276445920), e2e included.
 
 ## 13e-4a Review
 **Reviewer agent, fresh context, 2026-10-26.** Blocking findings and how each was fixed:

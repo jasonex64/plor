@@ -169,18 +169,34 @@ async function resolveNames(db: pg.Client, category: string, names: string[]): P
   return out;
 }
 
+// A category's members, listed once per connection: a draft can't change them (only loads and misses add members),
+// and the letter search asks for them many times, which took seconds a time for a big subset (13e-4b: 7,605
+// endangered animals; the 40-day simulator ran over 35 minutes).
+const memberLists = new WeakMap<pg.Client, Map<string, Promise<Set<string>>>>();
+function membersOf(db: pg.Client, category: string): Promise<Set<string>> {
+  let lists = memberLists.get(db);
+  if (!lists) memberLists.set(db, (lists = new Map()));
+  let members = lists.get(category);
+  if (!members) {
+    members = db.query<{ id: string }>("select m::text as id from private.category_members($1) m", [category]).then((r) => new Set(r.rows.map((x) => x.id)));
+    lists.set(category, members);
+  }
+  return members;
+}
+
 // What the host catches: the host answers and every member under them.
 async function caughtMembers(db: pg.Client, category: string, hosts: string[]): Promise<string[]> {
   const { rows } = await db.query<{ id: string }>(
     `with recursive caught (id) as (
-       select unnest($2::uuid[])
+       select unnest($1::uuid[])
        union
        select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of' and f.removed_at is null
      )
-     select m::text as id from private.category_members($1) m where m in (select id from caught)`,
-    [category, hosts],
+     select id::text from caught`,
+    [hosts],
   );
-  return rows.map((r) => r.id);
+  const members = await membersOf(db, category);
+  return rows.map((r) => r.id).filter((id) => members.has(id));
 }
 
 // Whether at least FAMILIAR_SAFE_MIN familiar members (in levels) the host doesn't catch can be typed without the
@@ -188,12 +204,13 @@ async function caughtMembers(db: pg.Client, category: string, hosts: string[]): 
 // subset's names only when they start with its letter.
 export async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
   const caught = new Set(await caughtMembers(db, category, hosts));
+  const members = await membersOf(db, category);
   const { rows } = await db.query<{ id: string }>(
-    `select distinct m::text as id from private.category_members($1) m join private.thing_alias a on a.thing_id = m
+    `select distinct m::text as id from unnest($2::uuid[]) m join private.thing_alias a on a.thing_id = m
      cross join (select starts_with from private.category where key = $1) c
-     where m = any($2::uuid[]) and a.removed_at is null and ($3::text is null or a.alias !~ $3)
+     where a.removed_at is null and ($3::text is null or a.alias !~ $3)
        and (c.starts_with is null or private.alias_starts(a.alias, c.starts_with))`,
-    [category, Object.keys(levels), stolen.length ? `[${stolen.join("")}]` : null],
+    [category, Object.keys(levels).filter((id) => members.has(id)), stolen.length ? `[${stolen.join("")}]` : null],
   );
   return rows.filter((r) => !caught.has(r.id)).length >= FAMILIAR_SAFE_MIN;
 }
@@ -203,8 +220,7 @@ type Question = Puzzle["questions"][number];
 // The expected share of players some host answers catch: the blended share (the first guess with the category's pooled
 // past days, as the provisional bonus sees them) of every member the host catches.
 async function catchRate(db: pg.Client, date: string, q: Question, hosts: string[]): Promise<number> {
-  const { rows } = await db.query<{ n: number }>("select count(*)::int as n from private.category_members($1)", [q.category]);
-  const question = { ...q, host_answers: hosts, root: "", member_of: null, members: rows[0].n };
+  const question = { ...q, host_answers: hosts, root: "", member_of: null, members: (await membersOf(db, q.category)).size };
   const counts = (await pooledCounts(db, { format: 3, game_id: GAME_ID, date, approved_at: "", questions: [question] }, false)).get(0);
   const caught = await caughtMembers(db, q.category, hosts);
   return caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(question, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(question, id)), 0);

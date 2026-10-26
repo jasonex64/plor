@@ -23,8 +23,8 @@ describe("subsets", () => {
   const country = { key: "country", name: "country", source: "wikidata", root: "Q6256", member_of: "Q1065" };
   it("parses each filter, and gives each subset its base's family", () => {
     const subsets = [
-      { key: "african_country", name: "African country", of: "country", fact: { trait: "continent", value: "Q15" } },
-      { key: "african_capital", name: "African capital", of: "capital", fact: { trait: "continent", value: "Q15", via: "country" } },
+      { key: "african_country", name: "African country", of: "country", fact: { trait: "continent", values: ["Q15"] } },
+      { key: "african_capital", name: "African capital", of: "capital", fact: { trait: "continent", values: ["Q15"], via: "country" } },
       { key: "big_country", name: "big country", of: "country", at_least: { number: "population", value: 1000 } },
       { key: "d_country", name: "country starting with D", of: "country", starts_with: "d" },
     ];
@@ -34,8 +34,8 @@ describe("subsets", () => {
     const family = familyOf(categories!);
     expect(["country", "african_country", "d_country", "african_capital", "unlisted"].map(family)).toEqual(["country", "country", "country", "capital", "unlisted"]);
     expect(categories!.filter(isSubset).map(filterOf)).toEqual([
-      { trait: "continent", value: "Q15" },
-      { trait: "continent", value: "Q15", via: "country" },
+      { trait: "continent", values: ["Q15"] },
+      { trait: "continent", values: ["Q15"], via: "country" },
       { number: "population", at_least: 1000 },
       { starts_with: "d" },
     ]);
@@ -48,23 +48,24 @@ describe("subsets", () => {
       country,
       { ...sub, starts_with: "a", at_least: { number: "population", value: 1 } },
       sub,
-      { ...sub, fact: { trait: "country", value: "Q30" } },
-      { ...sub, fact: { trait: "conservation_status", value: "Q1", via: "country" } },
+      { ...sub, fact: { trait: "country", values: ["Q30"] } },
+      { ...sub, fact: { trait: "conservation_status", values: ["Q1"], via: "country" } },
+      { ...sub, fact: { trait: "conservation_status", values: ["Q1", "Q1"] } },
+      { ...sub, fact: { trait: "conservation_status", values: [] } },
       { ...sub, at_least: { number: "area", value: 1 } },
       { ...sub, at_least: { number: "population", value: 0.5 } },
       { ...sub, starts_with: "D" },
       { ...sub, key: "sub_of_sub", of: "early", starts_with: "a" },
-    ].map((c, i) => ("of" in c && c.key === "s" ? { ...c, key: `s_${"abcdefghij"[i]}` } : c));
+    ].map((c, i) => ("of" in c && c.key === "s" ? { ...c, key: `s_${"abcdefghijkl"[i]}` } : c));
     expect(parseCategories("c.json", JSON.stringify(broken)).errors).toEqual([
       'c.json category 1: "of" must be a base category listed before it',
       'c.json category 3: a subset has exactly one of "fact", "at_least" and "starts_with"',
       'c.json category 4: a subset has exactly one of "fact", "at_least" and "starts_with"',
-      'c.json category 5: "fact" must be {"trait": "continent" or "conservation_status", "value": the source\'s ID}, with "via": "country" only for a continent',
-      'c.json category 6: "fact" must be {"trait": "continent" or "conservation_status", "value": the source\'s ID}, with "via": "country" only for a continent',
-      'c.json category 7: "at_least" must be {"number": "population", "value": a whole number above 0}',
-      'c.json category 8: "at_least" must be {"number": "population", "value": a whole number above 0}',
-      'c.json category 9: "starts_with" must be one letter, a to z',
-      'c.json category 10: "of" must be a base category listed before it',
+      ...[5, 6, 7, 8].map((n) => `c.json category ${n}: "fact" must be {"trait": "continent" or "conservation_status", "values": the source's IDs, each once}, with "via": "country" only for a continent`),
+      'c.json category 9: "at_least" must be {"number": "population", "value": a whole number above 0}',
+      'c.json category 10: "at_least" must be {"number": "population", "value": a whole number above 0}',
+      'c.json category 11: "starts_with" must be one letter, a to z',
+      'c.json category 12: "of" must be a base category listed before it',
     ]);
   });
 });
