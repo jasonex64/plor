@@ -15,15 +15,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
 | 14a-3b | The settings sheet (a `<dialog>` from the gear) with the account, Skip the game screen and Numbers on the calendar; the friends list on the Friends tab; caught answers out of the rarest; the calendar at 3:1. **Security change:** `plor_app` updates the two settings' columns | #85 |
 
-plor.app's database has every migration through `20261025200806_settings.sql`: the M13 session ran `npx supabase db push` at the human's request after #85 merged, and `npx supabase test db --linked` passed 345/345 (2026-10-25).
-
 ### Also done
 **14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), merged in PR #86 (`64eeea6`, 2026-10-26 01:26 UTC):
 - Sky, Moonlit and Ink as round 8 drew them; every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
 - the picker in the settings sheet, saved on the account (**security change**: `plor_app` may update `private.profile.theme`), painted before the profile loads from a `localStorage` copy by a `<head>` script, re-applied on every page by `KeepTheme`;
 - `/about` (what Plor is, "Plor is made by Jason", Moonlit's credit, "Plor is built with help from AI."), linked from the sheet and the shared `Footer`.
 
-**Migration `20261026010745_theme.sql`:** on main; plor.app's `GET /api/profile` fails until it's pushed. The M13 session said it will run `npx supabase db push` for it from a clean checkout of main, at the human's request (2026-10-26), and was sent the merge commit. Check `supabase migration list --linked` before assuming it's done.
+**plor.app's database is even with main** through `20261026010745_theme.sql`: the M13 session pushed it from a clean checkout of main at `64eeea6`, at the human's request; it reported `migration list --linked` matching on both sides and `supabase test db --linked` 345/345 (2026-10-26; reported by that session, not re-run here).
 
 ### Next step
 1. 14b-2 (the sprout streak, L26; the admin pages' look, L19; the design reviews' polish): ask its guided questions first (CLAUDE.md), then its ticket, build and one PR from this branch.
