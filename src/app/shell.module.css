@@ -198,13 +198,14 @@
     line-height: 1;
   }
 
-  /* The avatar slot and the streak's pill under the wordmark, 10px apart (round 7, board 3); the sidebar's own 20px gap
-     gives the room above and below that round 7's padding did. */
+  /* The avatar slot and the streak's pill under the wordmark, 10px apart (round 7, board 3). Round 7 puts 20px above
+     them and 24px below (its 4px gap with padding 16px 12px 20px); the sidebar's own 20px gap gives the same with 4px
+     more below. */
   .who {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 12px;
+    padding: 0 12px 4px;
   }
 
   .tabs {

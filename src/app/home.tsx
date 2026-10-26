@@ -69,6 +69,14 @@ export function Home({ view }: { view?: View }) {
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
   }
   useEffect(loadMe, []);
+  // Again once the game screen's Start begins today's run, which counts in the streak at once
+  // (docs/milestones/M14-14b-2a-streak-ranks.md). A failure here is shown beside the page, not instead of it: the
+  // run's question is already being timed (14b-2a review).
+  const [streakError, setStreakError] = useState<string | null>(null);
+  function reloadStreak() {
+    setStreakError(null);
+    api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setStreakError(errorText(err)));
+  }
   // The account's theme, once the profile is known, keeping this browser's copy in step (the copy itself is re-applied
   // on every page by KeepTheme, src/app/keep-theme.tsx). Signed out, or before a username, nothing is picked.
   useLayoutEffect(() => {
@@ -114,8 +122,9 @@ export function Home({ view }: { view?: View }) {
           />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
           {view?.kind !== "offbeat" && <ClockBar />}
+          {streakError && <p role="alert">{streakError}</p>}
           {view?.kind === "offbeat" ? (
-            <OffbeatScreen username={me.username} onStarted={loadMe} />
+            <OffbeatScreen username={me.username} onStarted={reloadStreak} />
           ) : view?.kind === "howToPlay" ? (
             <HowToPlay />
           ) : view?.kind === "streak" ? (

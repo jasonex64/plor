@@ -1,6 +1,6 @@
 # M14 14b-2a — The streak ranks
 
-**Status:** in progress (2026-10-26): designed through the human's guided questions below (the drawings approved as previewed: "Good, build these (Recommended)"), being built on `m14-look-and-feel`, one PR, merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** in review (2026-10-26): designed through the human's guided questions below (the drawings approved as previewed: "Good, build these (Recommended)"), built and reviewed on `m14-look-and-feel`; one PR, merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
 
 ## Goal
 The streak shows on every page as a pill in the top bar and sidebar, with a flower for the player's streak rank, and a `/streak` page explains the ranks.
@@ -62,7 +62,8 @@ So the design is:
 | Ranks from 0, 1, 5, 15, 30, 90 days | The rank | L26 (1–4, 5–14, 15–29, 30+), human, 2026-10-24; 90: human, 2026-10-26 ("sakura blossom (3 months)", "90 days (Recommended)") |
 | The pill: Baloo 2 800 at 18px; padding 2px 10px 2px 6px; fully round; the soft colour; a 22px flower, 4px from the number | The pill | Round 7 (`.streak`) |
 | The top bar's right side: the pill and the 44px gear, 6px apart | The phone's top bar | Round 7 (`.me`) |
-| The sidebar: the 30px slot and the pill, 10px apart, padding 16px 12px 20px | The sidebar | Round 7, board 3 |
+| The sidebar: the 30px slot and the pill, 10px apart, padding 16px 12px 20px (20px above, 24px below, with its 4px gap) | The sidebar | Round 7, board 3 |
+| `/streak`: spacing as Me's (16px between parts, cards 8px apart with 14px padding, 1px line border, 14px corners, 10px inside), the heading 26px, names 18px, days 14px; the player's rank a 3px border in the text colour | `/streak` | Round 7's Me, as `me.module.css` has it; the 3px border as the chosen theme's (L47, `settings.module.css`) |
 | Each flower 96px on `/streak`, 128px from 768px | `/streak` | Human, 2026-10-26: "32×32, 3× phones / 4× desktop (Recommended)" (32 × 3, 32 × 4) |
 | The drawings' shapes and colours | The flowers | The human's approved preview (question 8), copied into `src/app/ranks.tsx` |
 
@@ -83,7 +84,24 @@ So the design is:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 14b-2's plan and round 3: a sprout growing in four stages, an empty pot at 0 | Six ranks, each a different flower, a seed at 0, and `/streak` | The human, in this ticket's guided questions (5–8): "different mature plants/flowers for each tier … (we can treat them like \"Ranks\")", "document that somewhere on the site", the flowers picked from a gallery |
+| Question 3–4: pixel art, 11×11 then 16×16 at 2px, made with pixelkit (later PixelLab, snapped by pixelkit) | Vector SVG drawings at round 7's 22px | Pixel art couldn't hold a flower at the pill's size (question 7, the human: "they all look pretty bad and not accurate"); the human chose vector ("if svg dont look good then we try other symbols pixel art", then "vector flowers"). pixelkit checked every pixel attempt; nothing pixel shipped |
+| Question 6: "Two sizes per rank", 32×32 at 3× and 4× | One drawing per rank, at 22px in the pill and 96px (128px from 768px) on `/streak` | A vector drawing has no native size, so one drawing serves both; the page's sizes are the 32×32's at 3× and 4× |
+| Question 4: "pixelkit .txt grids → SVG" | JSX shapes in `src/app/ranks.tsx`, no grids | Vector, above |
+| The locked pixel palette (question 5–6) | The vector drawings also use #3a55b8, #4a6ad6, #86a2f5, #c7d4fb and #d6d0e4 | They are in the drawings the human approved as previewed (question 8) |
+| Round 7's pill: a `<span>` | A link to `/streak` | The human: "Own page, pill links to it (Recommended)" |
+| Round 7: "4 day streak" for screen readers | "4 day streak, Daisy" | The human: "The plant's name (Recommended)" |
+| Round 7, board 3: padding 16px 12px 20px round the slot and pill | Padding 0 12px 4px | The sidebar (14a-1) already spaces its children 20px apart, so the same 20px above and 24px below come from its gap |
+| `/streak` has no mockup | Me's spacing and cards, the chosen theme's 3px border for the player's rank | Nothing new to approve: Plor's existing values (Numbers) |
 
 ## Evidence
 
 ## Review
+By the `reviewer` agent on `ae4eda1` (fresh context, no edits).
+- **Blocking, fixed:**
+  1. ROADMAP's row and the handoff weren't updated: both updated in this PR.
+  2. Reloading the profile after Start used Home's load error, which replaces the page, so a failed reload would have taken the game screen away mid-question: the reload has its own alert beside the page (`reloadStreak`, `src/app/home.tsx`).
+  3. The sidebar's padding differed from round 7 and the Source diff was empty: now 20px above and 24px below as round 7, and the Source diff filled.
+  4. `/streak`'s grid minimums (140px, 176px) had no origin: the cards now wrap at their own width, spaced with Me's values (Numbers).
+- **Deferred to ROADMAP "Next revision" (For M14):** a fourth copy of the visually-hidden rule (`shell.module.css .hidden`); the e2e doesn't check each rank's flower is drawn; the e2e's last step reloads `/streak`, adding nothing to the no-reload check before it.
+- **Checked and fine (the reviewer):** the Removes are complete; every number traces; the pill's name; target size; 1.4.1 on `/streak`; the shell e2e's narrowing to the tabs' list.
