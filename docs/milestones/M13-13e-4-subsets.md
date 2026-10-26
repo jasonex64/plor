@@ -31,7 +31,6 @@ Any broad category can give narrower questions: by a fact about its members ("Na
 | Subsets, when | "i mean this should be expanded to all broad categories: the ability to generate subset/narrower questiosn from them"; then "Subsets first, as 13e-4 (Recommended)" |
 | Letter subsets and the stolen letters | "Yes, the draft skips it (Recommended)": a letter subset isn't drafted on a day that steals its letter |
 | Space | "figure out how much work it would be to apply to all the data we have so far (animals, places, etc.) then realistically draft a plan based on if doing this new mechanism will take more space)" |
-
 | **The design and O1–O5** (after the survey and the 500 MB research) | "Approve 13e-4's design and go through O1–O5"; O1 "One entry listing them (Recommended)"; O2 "A core few"; O3 "Their own table (Recommended)"; O4 "What's typed must start with it (Recommended)"; O5: "these were just suggestions btw … (u can still add it)" |
 
 The pop-culture answers are for 13e-5 and stay recorded here until its ticket is written.
