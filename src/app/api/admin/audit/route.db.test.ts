@@ -23,8 +23,13 @@ const player = { username: `ap${RUN}`, session: new Map<string, string>() };
 const NEW = `wolpertinger ${RUN}`;
 const LISTED = `${RUN} 2g1c`;
 // One edit from bear (and its plural, the same answer) and from nothing else in the fixture's animals. It's the
-// fixture's, not this run's, so one left by an earlier run is cleared first.
+// fixture's, not this run's, so its review and the name a link gives bear (which would make it an answer, and can't
+// be given twice) are cleared before and after.
 const NEAR = "bearz";
+const clearNear = async () => {
+  await getPool().query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await getPool().query("delete from private.thing_alias where alias = $1 and source_ref like 'miss_review:%'", [NEAR]);
+};
 
 const list = async () => {
   const r = await auditGet(apiRequest("/api/admin/audit", { method: "GET" }));
@@ -41,7 +46,7 @@ beforeAll(async () => {
   const db = getPool();
   const { rows } = await db.query<{ today: string }>("select private.today()::text as today");
   await ensurePuzzle(rows[0].today);
-  await db.query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await clearNear();
   for (let n = 1; n <= 3; n++) {
     const { rows: user } = await db.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
       `${RUN}-t${n}@example.test`,
@@ -58,9 +63,10 @@ afterAll(async () => {
   const db = getPool();
   const { rows } = await db.query<{ thing_id: string | null }>(
     "delete from private.miss_review where text = any($1) returning thing_id",
-    [[NEW, LISTED, NEAR]],
+    [[NEW, LISTED]],
   );
   await db.query("delete from private.thing where id = any($1)", [rows.map((r) => r.thing_id).filter(Boolean)]);
+  await clearNear();
   await db.query("delete from auth.users where email like $1", [`%${RUN}@example.test`]);
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removeCreatedPuzzles();

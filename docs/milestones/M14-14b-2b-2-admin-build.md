@@ -1,6 +1,6 @@
 # M14 14b-2b-2 — Building the admin pages
 
-**Status:** 14b-2b-2a done (2026-10-26): merged in PR #90 on green CI (09:37 UTC), by auto-merge; the review's two Puzzles fixes then passed `approve-and-play.e2e.ts` and `admin-area.e2e.ts` locally (4 passed). 14b-2b-2b in progress. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages.").
+**Status:** 14b-2b-2a done (2026-10-26): merged in PR #90 on green CI (09:37 UTC), by auto-merge; the review's two Puzzles fixes then passed `approve-and-play.e2e.ts` and `admin-area.e2e.ts` locally (4 passed). 14b-2b-2b built and reviewed (2026-10-26), in review in its PR, with auto-merge on green CI. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages.").
 
 ## Goal
 The admin pages live in Plor's shell as one admin area, in round 10's look, with what needs the admin always in view; then the three changes round 10 drew that need the server.
@@ -92,6 +92,12 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
 - The full suite, `npx playwright test`: `44 passed (5.6m)`. After it, the sidebar stopped marking Me on admin pages (phones only): `admin-area` and `shell` again, 9 passed and 1 failed on the first run after the edit (a recompile), which then passed alone.
 - Seen at 1440px and 360px (Playwright screenshots of every admin page): as round 10, with the right column, the grouped sub-tabs and the stacked rows on phones.
 
+14b-2b-2b, on the Windows checkout, 2026-10-26, with the two migrations applied to the shared local database (M13 holding off):
+- `npx tsc --noEmit -p .` and `npm run lint`: no output. `npm test`: `Tests 386 passed (386)` (the keep route's signed-out 401).
+- `npx supabase test db supabase/tests/audit_near.test.sql supabase/tests/comment_keep.test.sql supabase/tests/plor_app_role.test.sql supabase/tests/comment_deletion.test.sql supabase/tests/misses.test.sql`: `Files=5, Tests=73 … Result: PASS` (criterion 1: a keep by a non-admin or of an unreported comment records nothing, one record with its fields, its reports stay, a second keep records nothing, a later report reopens it, both cascades; criterion 3: `audit_near` refuses a non-admin with OB007, names a waiting near-typo's members each once, nothing for a decided one, another kind, no match or a removed name; `plor_app`'s exact grants with `comment_keep select`, `keep_reported_comment` and `audit_near` execute).
+- The changed db tests, `npx vitest run src/app/api/admin/reports/route.db.test.ts src/app/api/admin/audit/route.db.test.ts src/app/api/admin/puzzles/route.db.test.ts --no-file-parallelism`: `Tests 25 passed (25)` (Keep refuses a non-admin with 403, a kept comment leaves the list, stays hidden for its reporter and is logged "kept"; the puzzles API marks cherry with "c" at question 2 and no suggested host answer; a near-typo's `near` is `[bear]`, linked in one click, then empty).
+- The e2e files, `npx playwright test e2e/admin-area.e2e.ts e2e/approve-and-play.e2e.ts e2e/audit.e2e.ts e2e/live-board.e2e.ts`: `11 passed (57.0s)` (a kept comment stays for its author, hidden for its reporter, "Kept" in the log; a ticked cherry is said in words, Approve waits with "Fix 1 question first", unticked it's a dashed chip, approving with apple; "Link to bear" beside "Different answer…", linked in one click). The first run failed 2: the tests unchecked a chip that stops being a checkbox, and a link from an earlier db run had left "bearz" as a name of bear. Both tests now click the chip and clear the link's name before and after.
+
 
 ## Review
 14b-2b-2a, by the `reviewer` agent on `1c2e154` (fresh context, no edits; tsc, lint and `npm test` re-run, 385 passed):
@@ -101,3 +107,10 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
   3. The handoff and ROADMAP didn't say where 14b-2b-2a stood: both updated.
 - **Deferred to ROADMAP "Next revision" (For M14):** the host-answer chips reorder when ticked (focus can be lost); `hostBankShare` has no caller now; phone tables lose their column labels; the bank's "Scheduled" for a started day with no answers; repeated formatting (a second `when`, `dayText` beside the leaderboard's, another visually-hidden class); focus isn't moved into Delete's confirm; the phone menu has no Escape; Me flashes current on desktop before hydration; "Show fewer" with nothing to hide. And an e2e step that approves the default day without clicking its row (the shared database was being reset when this was fixed).
 - **Checked and fine (the reviewer):** the counts, every audit action per outcome kept, Insights' previous and next and the chart's scale, the inline confirm, focus on the hidden checkboxes and inputs, aria-current, no leftovers, no text links, the e2e changes.
+
+14b-2b-2b, by the `reviewer` agent on `8aa7677` (fresh context, no edits; tsc, lint, `npm test` 386 and seven pgTAP files, 102 tests, re-run):
+- **Blocking, fixed:**
+  1. `private.audit_near`'s own admin check and its "waiting near-typo only" filter had no test (the route checks the admin first, and the code skips decided reviews before calling it): `supabase/tests/audit_near.test.sql`.
+  2. The handoff didn't say where 14b-2b-2b stood, and still said the blocked-answer rule would be in SQL: rewritten.
+- **Deferred to ROADMAP "Next revision" (For M14):** two comments with stale wording; Keep's open-report rule with milliseconds' timing (a report committed across a keep, two admins keeping at once); focus lost when a blocked chip is unticked, one `audit_near` query per near-typo, and three CSS sizes not in Numbers.
+- **Checked and fine (the reviewer):** one open-report rule in the function and the list; both functions' `search_path`, admin checks and grants; `comment_keep`'s RLS and cascades; the exact-grants list; the DECISIONS.md rows; `withinTypo` on stored normalized text and `in_category_now` as the link requires; the blocked rule matching `checkHostNames`; the blocked chips' accessible names and Approve's `aria-describedby`.

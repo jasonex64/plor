@@ -12,13 +12,18 @@ const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.
 // A new word and one holding a listed word (LDNOOBW's "2g1c").
 const NEW = `skvader ${RUN}`;
 const LISTED = `${RUN} 2g1c`;
-// One edit from the fixture's bear only. Not this run's own, so one left by an earlier run is cleared first.
+// One edit from the fixture's bear only. Not this run's own, so its review and the name a link gives bear (which
+// would make it an answer, and can't be given twice) are cleared before and after.
 const NEAR = "bearz";
+const clearNear = async () => {
+  await DB.query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await DB.query("delete from private.thing_alias where alias = $1 and source_ref like 'miss_review:%'", [NEAR]);
+};
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
-  await DB.query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await clearNear();
   for (let n = 1; n <= 3; n++) {
     const { rows } = await DB.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
       `${RUN}-t${n}@example.test`,
@@ -32,8 +37,9 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  const { rows } = await DB.query<{ thing_id: string | null }>("delete from private.miss_review where text = any($1) returning thing_id", [[NEW, LISTED, NEAR]]);
+  const { rows } = await DB.query<{ thing_id: string | null }>("delete from private.miss_review where text = any($1) returning thing_id", [[NEW, LISTED]]);
   await DB.query("delete from private.thing where id = any($1)", [rows.map((r) => r.thing_id).filter(Boolean)]);
+  await clearNear();
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removePuzzle(DB, puzzle);
   await DB.end();

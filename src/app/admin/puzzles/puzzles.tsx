@@ -215,9 +215,14 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         if (a.stolen) {
           return (
             <label key={a.id} className={`${styles.chip} ${styles.bad}`}>
-              <input type="checkbox" className={admin.sr} checked onChange={() => onChange(chosen.filter((id) => id !== a.id))} />
+              <input
+                type="checkbox"
+                className={admin.sr}
+                aria-label={`${a.name}, has ${a.stolen.toUpperCase()}: players can't type it`}
+                checked
+                onChange={() => onChange(chosen.filter((id) => id !== a.id))}
+              />
               <Struck choice={a} />
-              <span className={admin.sr}>, has {a.stolen.toUpperCase()}: players can&apos;t type it</span>
             </label>
           );
         }
