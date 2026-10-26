@@ -1,0 +1,17 @@
+/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: at least 48px tall, the control
+   outline, 12px corners, on the surface colour. */
+.button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}

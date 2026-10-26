@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ButtonLink } from "../button-link";
 
 export const metadata: Metadata = { title: "About Plor" };
 
@@ -36,7 +37,7 @@ export default function About() {
       <p>Plor is built with help from AI.</p>
 
       <p>
-        <Link href="/">Back to Plor</Link>
+        <ButtonLink href="/">Back to Plor</ButtonLink>
       </p>
     </main>
   );

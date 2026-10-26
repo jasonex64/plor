@@ -15,6 +15,7 @@ import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
+import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
 import { RankFlower, rankFor } from "./ranks";
@@ -172,7 +173,7 @@ function StreakPill({ days }: { days: number }) {
 export function MeAdminLink() {
   return (
     <p className={styles.meAdmin}>
-      <Link href="/admin">Admin</Link>
+      <ButtonLink href="/admin">Admin</ButtonLink>
     </p>
   );
 }
@@ -207,12 +208,12 @@ function Clock({ index, msLeft }: { index: number; msLeft: number }) {
           <span role="timer">
             Question {index + 1} · {seconds}s left
           </span>
-          <Link href="/offbeat">Back</Link>
+          <ButtonLink href="/offbeat">Back</ButtonLink>
         </>
       ) : (
         <>
           <span role="status">Time&apos;s up on question {index + 1}</span>
-          <Link href="/offbeat#result">Result</Link>
+          <ButtonLink href="/offbeat#result">Result</ButtonLink>
         </>
       )}
     </section>

@@ -2,45 +2,43 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2a's PR #88. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-1's PR #89. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
 | Sub-ticket | What | PR |
 |---|---|---|
-| 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar from 768px, the Admin link | #77 |
+| 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar, the Admin link | #77 |
 | 14a-2a | Today: Offbeat's banner, one leaderboard card, the locked feed, the clock bar | #79 |
 | 14a-2b | The game screen `/offbeat`. **Security change:** yesterday's host answers to every signed-in player | #81 |
 | 14a-2c | 14a-2b's review fixes | #82 |
-| 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
-| 14a-3b | The settings sheet, the friends list on Friends, the calendar at 3:1. **Security change:** `plor_app` updates the two settings' columns | #85 |
-| 14b-1 | Themes (Sky, Moonlit, Ink, picked in the sheet, saved on the account, painted before load) and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
+| 14a-3a | Me: totals, calendar, Offbeat's card, the 3 rarest answers; avatar slots | #83 |
+| 14a-3b | The settings sheet, the friends list on Friends. **Security change:** `plor_app` updates two settings' columns | #85 |
+| 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
+| 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 
-**plor.app's database is even with main** through `20261026010745_theme.sql` (the M13 session pushed it at the human's request, 2026-10-26; reported by that session, not re-run here).
+### In review: 14b-2b-1, the wider shell (PR #89, auto-merge on green CI)
+`docs/milestones/M14-14b-2b-1-shell.md`: a 280px sidebar; from 1200px a 360px right column behind a line on every player page (Today's circle, the game screen's feed, the friends feed elsewhere); About and the privacy policy in a box in the settings sheet, the footer only signed out; every control a button or a menu item (`ButtonLink` for links; DECISIONS' Styling rule); one shared Realtime socket per page. Local evidence: `npm test` 360, full e2e 42 passed; CI is the check after that.
 
-### In review: 14b-2a, the streak ranks (PR #88, auto-merge on green CI)
-`docs/milestones/M14-14b-2a-streak-ranks.md`. Eight rounds of guided questions turned the sprout into **six ranks, each a vector flower**: Seed 0, Daisy 1–4, Morning glory 5–14, Hibiscus 15–29, Lotus 30–89, Sakura 90+. They show in a pill in the top bar and sidebar, which links to `/streak`. The streak comes from `GET /api/profile`, reloaded on Start. DECISIONS' Styling row now lets Plor's drawn art keep its own hex colours.
-- **Pixel art was tried and dropped for this:** first 11×11 hand-drawn sprites checked with the human's `jasonex64/pixelkit`, then PixelLab, snapped by pixelkit. Flowers didn't hold at pill size (the human: "they all look pretty bad and not accurate"), so it's vector. Pixel art may still suit 14c's world at a larger size. PixelLab's 32×32s looked good.
-- **PixelLab (the human's trial account):** 30 generations went to 3 review packs in this session, which leaves 1 of the trial's 40 (the daily bonus aside; balance read before the last pack). Six 32×32 flowers are kept, tagged `plor-streak`, and unused. Two 16×16 review packs (flowers; gems, flames, stars, medals) were left undismissed, for the human to keep or discard.
-- If CI fails on PR #88, Auto-fix is on for this session.
+### Designed: 14b-2b, the admin pages
+`docs/milestones/M14-14b-2b-admin-pages.md` holds the human's 22 answers (two rounds, an /impeccable critique of round 9 at 22/40, and comments). Round 10 on the canvas "Plor shell layout" (boards Round10 and Round10Phone) is **approved**: "Round 10 looks good, build it: the shell change first, then the admin pages." Its parts: page-named headings under a small Admin, sub-tabs in two groups split by a line (Puzzles, Audit, Reports with counts | Insights, Bank, Database), What needs you in the right column, no Overview page (Admin opens on Puzzles), host answers the Wind's letter blocks marked in place, the Insights chart against the Gentle target, full-width stacked audit actions, Keep comment and an inline confirm for Delete, a dropdown with counts on phones.
 
 ### Next step
-After PR #88 merges (mark 14b-2a done with its merge evidence in the ticket and ROADMAP):
-1. **14b-2b, the admin pages:** "Full redesign, mockups first": draw the six pages on the canvas "Plor shell layout", get the human's review, then build.
-2. **14b-2c, the review items:** every open For M14 item in ROADMAP (35 now, with 14b-2a's two); ask the "For the human" ones first (About's contact and wording among them).
-3. **14c-1:** ask N1–N6 (its ticket's open questions) as guided questions, then build it, after 14b-2's PRs (one open PR at a time).
+1. After 14b-2b-1 merges: mark it done (ticket, ROADMAP) with its merge evidence.
+2. **14b-2b-2, the admin pages:** write its sub-ticket (criteria and Numbers from round 10), then build. **Keep comment needs the human's approval first**: a new admin action on the reports, a change to what `plor_app` may do (CLAUDE.md, Security). Ask before building it.
+3. Then 14b-2c (the For M14 review items), then 14c-1 (ask its N1–N6).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
 2. `npx supabase start`, then `npx supabase migration up`. On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
-3. `npx next typegen` once, before `npx tsc --noEmit -p .`. A stale `.next/dev` from an older checkout breaks `tsc` (it names a moved route): delete `.next/dev` and run typegen again. Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
-4. The checks, as counted at 14b-2a before main's PR #87 was merged in (it adds tests): `npm test` 347; `npm run test:db` 260; `npx supabase test db` 345; `npm run test:e2e` 41. The db and e2e suites need today (and yesterday for some e2e files) free of a real approved day. A new e2e file's player names must not repeat another file's (14b-2a's are "st" and "su").
+3. `npx next typegen` once before `npx tsc --noEmit -p .` (delete a stale `.next/dev` if tsc names a moved route). Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
+4. The checks: `npm test` 360; `npm run test:db` 260 (before main's PR #87 tests); `npx supabase test db`; `npm run test:e2e` 42. Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
 
 ### Local state (Windows)
-- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too) has every migration through `20261026010745_theme.sql`, plus M13's `20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql` and `20261026054153_subset_accept.sql`, on this branch since main (PR #87) was merged into it. Before that merge, `npx supabase test db` from this checkout failed `answer_base.test.sql` 1, 2 and 12 (`import_source` returns `numbers`). Message the M13 session before a db reset, a db or e2e suite run, or a dev server.
-- On this PC a cold e2e run can time out a few files that pass on `npx playwright test --last-failed`. In 14b-2a's run the only failure was a real one, which was fixed.
+- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session is about to `db reset` and `load all` it (the human approved), which wipes local data. Message it before any suite or dev server.
+- Canvas mockups, renders, the critique snapshot and screenshots are in the session's temp folder, outside the repo.
 
-**Left running:** nothing (no dev server, no background job). Scratch work (pixelkit clone, PixelLab downloads, previews) is outside the repo, in the session's temp folder.
+**Left running:** nothing (no dev server, no background job).
 
 ## M15 (from main, written by the M15 and M13 sessions)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").

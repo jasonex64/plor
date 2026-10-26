@@ -32,7 +32,7 @@ This ticket's guided questions (human, 2026-10-26, on the Mac):
 | Sub-ticket | What | Needs first |
 |---|---|---|
 | **14b-2a** | The streak in the top bar and sidebar as ranks of flowers, `/streak`, and the sidebar's avatar slot | Nothing: its own file, `M14-14b-2a-streak-ranks.md` |
-| **14b-2b** | The six admin pages (insights, puzzles, bank, base, audit, reports): the shell, and the look the mockups settle | The mockups, drawn on the canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), and the human's review of them |
+| **14b-2b** | The six admin pages (insights, puzzles, bank, base, audit, reports): the shell, and the look the mockups settle | Its own file, `M14-14b-2b-admin-pages.md`: the guided questions answered, the mockups drawn as round 9 on the canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), waiting for the human's review |
 | **14b-2c** | Every open For M14 item in ROADMAP at the time it starts (33 on 2026-10-26), each fixed or, where it needs the human, asked | Its ticket lists them; items that need a human answer ("For the human") are asked as guided questions first |
 
 ## 14b-2a — The streak ranks

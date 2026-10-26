@@ -1,0 +1,23 @@
+/* The right column from 1200px (docs/milestones/M14-14b-2b-1-shell.md, Numbers): 360px, the full height, behind a 1px
+   line, padded 28px 24px as round 10 draws it. The page leaves room for it, and the clock bar stops short of it. */
+.column {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 360px;
+  padding: 28px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-left: 1px solid var(--line);
+  background: var(--bg);
+}
+
+:global(body):has(.column) {
+  --right-column: 360px;
+  padding-right: 360px;
+}

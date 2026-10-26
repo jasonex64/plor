@@ -1,0 +1,7 @@
+/* The footer's two buttons side by side, wrapping on a narrow phone, 8px apart as the settings sheet's buttons are. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}

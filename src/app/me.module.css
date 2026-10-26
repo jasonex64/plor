@@ -130,11 +130,6 @@
   background: var(--offbeat);
 }
 
-.link {
-  font-weight: 700;
-  font-size: 15px;
-}
-
 /* The calendar: seven columns, 5px apart, square days with 7px corners. */
 .calendar {
   display: grid;

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { ButtonLink } from "../button-link";
 
 export const metadata: Metadata = { title: "Plor privacy policy" };
 
@@ -123,7 +123,7 @@ export default function Privacy() {
       <p>If this page changes, the date at the top changes too.</p>
 
       <p>
-        <Link href="/">Back to Plor</Link>
+        <ButtonLink href="/">Back to Plor</ButtonLink>
       </p>
     </main>
   );
