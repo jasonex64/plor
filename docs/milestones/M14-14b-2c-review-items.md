@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, built and reviewed, in review in PR #93; then 14b-2c-2. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge; then 14b-2c-2. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -123,6 +123,7 @@ Planned, confirmed per PR:
 - `npx supabase test db`: 23 of 24 files pass; `answer_base.test.sql` fails at its line 24 with `import_source: a kind_of circle`. It imports a circle on purpose, and M13 13e-5's `one_walk` migration, applied to the shared stack by the M13 session, makes `import_source` refuse one. This PR changes no SQL; CI runs pgTAP on a fresh database.
 - `e2e/player-screens.e2e.ts`: 9 tests, all passing. With `src/` set aside (a stash, restored after), the 8 run then all failed against the old code. The ninth, Today's board on a time-up, failed with only its board key reverted. A first version of that test passed without the fix, because Playwright's fake clock also fires the Realtime client's timers and the rejoin reloads the board; it now runs on the real clock.
 - The full e2e suite, after the fixes: `npx playwright test` → `53 passed (1.9m)`.
+- CI on PR #93 (run 40407721823, `b543dce`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS` (so the local `answer_base` failure was the shared stack's); `npm run test:e2e` → `53 passed (4.1m)`; `check`, `db`, `e2e` and `secrets` passed on the push and pull-request runs.
 - The first full run (48 passed, 4 failed) failed only on old text these answers change: "0 points + about 0 bonus" (groups, today), ", plus a rarity bonus of about 0." (live-board) and "catName" (me, item 20's run-together text). Those four checks now expect the new text, and their files pass (15 passed).
 
 ## Review
