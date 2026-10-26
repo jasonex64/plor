@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 in review (PR #94), 14b-3 approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-3 approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -23,16 +23,15 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ### Done since 14b-2b-2b
 - **14b-2c-1, the player screens** (PR #93, merged on green CI, 2026-10-26): 23 For M14 items, from `docs/milestones/M14-14b-2c-review-items.md` (14b-2c approved after four rounds of guided questions, answers 1–14).
 
-### In review: 14b-2c-2, Me, Friends, the settings sheet and themes (PR #94)
-Items 19, 26, 27, 28, 29 and 33, built and reviewed (two blocking findings fixed, the rest in ROADMAP For M14); the evidence is in the ticket. Me now reads its day once, first, and passes it to the settling and every read: `private.today()` is each statement's own, so a transaction alone wouldn't do. A signed-in player's theme is applied by the settings sheet alone. 41 For M14 items are open: 14b-2c-3's 8, 14b-2c-4's 16 and the 14b-2c reviews' 17.
+- **14b-2c-2, Me, Friends, the settings sheet and themes** (PR #94, merged on green CI, 2026-10-26): items 19, 26, 27, 28, 29 and 33. Me reads its day once, first, and passes it to the settling and every read (`private.today()` is each statement's own); a signed-in player's theme is applied by the settings sheet alone. 41 For M14 items are open: 14b-2c-3's 8, 14b-2c-4's 16 and the 14b-2c reviews' 17.
 
 ### Approved, not built
 - **14b-3, the invite button** (`docs/milestones/M14-14b-3-invite-button.md`, human, 2026-10-26): share buttons instead of shown links, 10-character codes on `/i/` (friends) and `/g/` (groups), every old link replaced. **Security change:** replacing the codes is proposed and recorded in DECISIONS.md before its migration. Built after 14b-2c, before 14c.
 - **Username lookup with friend requests** is on ROADMAP's Later list as its own milestone after M13 and M14.
 
 ### Next step
-1. Once PR #94 merges on green CI: mark 14b-2c-2 done (ticket Status, ROADMAP row, the ticks' PR number) with its CI run, and merge `main` into this branch.
-2. Then 14b-2c-3, the admin pages (item 52's Keep race is a security change: propose it and record it in DECISIONS.md before building), and 14b-2c-4.
+1. **14b-2c-3**, the admin pages (items 36–39, 41, 51–53). Item 52's Keep race is a security change: propose it and record it in DECISIONS.md before building.
+2. Then 14b-2c-4, the tests, comments and repeated code.
 3. Then 14b-3, then 14c-1 (ask its N1–N7). N3 holds the share symbols and N7 a stolen key's feedback.
 
 ### Catching up on another computer

@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, built and reviewed, in review in PR #94; then 14b-2c-3. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, next. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -139,6 +139,7 @@ Planned, confirmed per PR:
 14b-2c-2, on the Mac, 2026-10-26, against the same shared stack:
 
 - After the review's fixes: `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  390 passed (390)`; `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `57 passed (1.9m)`.
+- CI on PR #94 (run 40417834007, `e4c9f88`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS`; `npm run test:e2e` → `57 passed (4.6m)`.
 - `e2e/settings-sheet.e2e.ts`: 4 tests. The first three failed against the old `settings.tsx` (all three, run with only that file swapped back) and pass on the new one. The fourth, a switch's reply landing mid-theme-save, failed with only Home's theme effect put back.
 - `src/app/api/offbeat/route.db.test.ts`: `readStats` as of T-3 gives the streak and chart of T-3 (streak 3), not today's (5); `settleRuns` as of T-2 settles nothing for T-2, and as of T-1 settles it.
 - `src/app/colors.test.ts`: 133 passed, reading `var(--text)` and `var(--on-accent)` through their slots, so the shades' numbers keep their 4.5:1 checks.
