@@ -1332,6 +1332,480 @@
       ],
       "themes": [],
       "added_by": "claude"
+    },
+    {
+      "id": "name-an-endangered-animal",
+      "prompt": "Name an endangered animal",
+      "category": "endangered_animal",
+      "host_bank": [
+        "tiger",
+        "gorilla",
+        "orangutan",
+        "chimpanzee",
+        "polar bear",
+        "cheetah"
+      ],
+      "uncommon": [
+        "vaquita",
+        "red panda",
+        "snow leopard",
+        "black rhinoceros",
+        "axolotl",
+        "koala"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-modern-extinct-animal",
+      "prompt": "Name an animal that went extinct in modern times",
+      "category": "extinct_animal",
+      "host_bank": [
+        "dodo",
+        "passenger pigeon",
+        "great auk",
+        "thylacine",
+        "quagga",
+        "Steller's sea cow"
+      ],
+      "uncommon": [
+        "aurochs",
+        "Carolina parakeet",
+        "Labrador duck",
+        "huia",
+        "golden toad",
+        "bluebuck"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-country-b",
+      "prompt": "Name a country that starts with B",
+      "category": "country_b",
+      "host_bank": [
+        "Brazil",
+        "Belgium",
+        "Bolivia",
+        "Bulgaria",
+        "Bangladesh",
+        "Bahamas"
+      ],
+      "uncommon": [
+        "Belarus",
+        "Botswana",
+        "Burundi",
+        "Benin",
+        "Bhutan",
+        "Brunei"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-country-m",
+      "prompt": "Name a country that starts with M",
+      "category": "country_m",
+      "host_bank": [
+        "Mexico",
+        "Morocco",
+        "Malaysia",
+        "Madagascar",
+        "Mongolia",
+        "Mali"
+      ],
+      "uncommon": [
+        "Malawi",
+        "Mauritania",
+        "Moldova",
+        "Montenegro",
+        "Mauritius",
+        "Mozambique"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-capital-k",
+      "prompt": "Name a capital city that starts with K",
+      "category": "world_capital_k",
+      "host_bank": [
+        "Kabul",
+        "Kyiv",
+        "Kathmandu",
+        "Kingston",
+        "Kuala Lumpur",
+        "Kampala"
+      ],
+      "uncommon": [
+        "Khartoum",
+        "Kigali",
+        "Kinshasa",
+        "Kuwait City",
+        "Kingstown"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-capital-b",
+      "prompt": "Name a capital city that starts with B",
+      "category": "world_capital_b",
+      "host_bank": [
+        "Berlin",
+        "Beijing",
+        "Brussels",
+        "Budapest",
+        "Bangkok",
+        "Buenos Aires"
+      ],
+      "uncommon": [
+        "Bern",
+        "Bratislava",
+        "Belgrade",
+        "Bogotá",
+        "Bucharest",
+        "Baku"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-animal-k",
+      "prompt": "Name an animal that starts with K",
+      "category": "animal_k",
+      "host_bank": [
+        "kangaroo",
+        "koala",
+        "kiwi",
+        "#069d0b31-34cc-5f7b-8680-1e04c32b98c8",
+        "kingfisher",
+        "#2b8e1d15-685a-51c5-aed4-c377755b7c02"
+      ],
+      "uncommon": [
+        "#3cf2c4ee-c03f-5319-bca8-f31f33ba73f6",
+        "kudu",
+        "krill",
+        "#971ad99c-069a-5a9c-8135-e22ce5289a88",
+        "katydid",
+        "Komodo dragon"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-animal-w",
+      "prompt": "Name an animal that starts with W",
+      "category": "animal_w",
+      "host_bank": [
+        "#dd9cfddb-c308-51f1-baaa-d2fea9faeec7",
+        "whale",
+        "#d20ac79f-b723-5a11-a7af-0a6c9f9f788e",
+        "wombat",
+        "woodpecker",
+        "worm"
+      ],
+      "uncommon": [
+        "#72c37733-6cd5-5cbf-8733-fc74d36a4755",
+        "warthog",
+        "#46ca735f-f0e0-5916-a822-6341d3b0b220",
+        "wildebeest",
+        "wallaby",
+        "wren"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-us-city-w",
+      "prompt": "Name a US city that starts with W",
+      "category": "us_city_w",
+      "host_bank": [
+        "Wichita",
+        "Worcester",
+        "Winston-Salem",
+        "West Palm Beach",
+        "#8da7c9ea-8499-5b13-b960-f7835f8cd717",
+        "#26d2d7b0-8463-5f61-a134-7746f8da6c3e"
+      ],
+      "uncommon": [
+        "Waukegan",
+        "Wausau",
+        "Walla Walla",
+        "#f7749b46-ede9-5fee-99eb-a7c968091d2d",
+        "#d4e33888-31d3-5cdd-b760-122411df47fe"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-us-city-j",
+      "prompt": "Name a US city that starts with J",
+      "category": "us_city_j",
+      "host_bank": [
+        "#3e715118-1198-5b52-9eb1-2941b3078a0e",
+        "Jersey City",
+        "#a45e2734-0e48-52ef-901d-809a81637551",
+        "Joliet",
+        "#6b363ff9-3fba-5d01-9f35-c8e126e37611",
+        "#5dd23460-38f9-5065-b012-3bde55beaf7f"
+      ],
+      "uncommon": [
+        "#4d903bc3-b77a-517e-b565-c6e8c2601769",
+        "#14c48ce9-8c5e-5771-9965-6bd05a14ca3b",
+        "Joplin",
+        "Jurupa Valley"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-river-k",
+      "prompt": "Name a river that starts with K",
+      "category": "river_k",
+      "host_bank": [
+        "Kansas River",
+        "Kentucky River",
+        "Klamath River",
+        "Kolyma",
+        "Kama",
+        "Kuban"
+      ],
+      "uncommon": [
+        "Kasai",
+        "Kura",
+        "Kafue",
+        "Kemi",
+        "Katun"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-river-v",
+      "prompt": "Name a river that starts with V",
+      "category": "river_v",
+      "host_bank": [
+        "Volga",
+        "Vistula",
+        "Volta",
+        "Vltava",
+        "Vaal",
+        "#26569807-6087-507b-9a86-65cde5daf824"
+      ],
+      "uncommon": [
+        "Vardar",
+        "Vilyuy",
+        "Vyatka",
+        "Vychegda",
+        "Vuoksi"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bird-w",
+      "prompt": "Name a bird that starts with W",
+      "category": "bird_w",
+      "host_bank": [
+        "woodpecker",
+        "wren",
+        "warbler",
+        "whooping crane",
+        "wild turkey",
+        "woodcock"
+      ],
+      "uncommon": [
+        "waxwing",
+        "wagtail",
+        "wigeon",
+        "willet",
+        "weaver"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bird-k",
+      "prompt": "Name a bird that starts with K",
+      "category": "bird_k",
+      "host_bank": [
+        "kiwi",
+        "kookaburra",
+        "kite",
+        "king penguin",
+        "killdeer",
+        "kittiwake"
+      ],
+      "uncommon": [
+        "kingfisher",
+        "kinglet",
+        "kea",
+        "kingbird",
+        "#971ad99c-069a-5a9c-8135-e22ce5289a88"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-fish-w",
+      "prompt": "Name a fish that starts with W",
+      "category": "fish_w",
+      "host_bank": [
+        "walleye",
+        "whitefish",
+        "whale shark",
+        "wrasse",
+        "#8b728925-3991-5430-8e59-c34fba72faff",
+        "white marlin"
+      ],
+      "uncommon": [
+        "#bd8e10c2-76d3-598e-94dc-27485acc9738",
+        "Wels catfish",
+        "winter flounder",
+        "#d359f1aa-e7c7-531b-b71e-f92886e631f3",
+        "weakfish"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-insect-w",
+      "prompt": "Name an insect that starts with W",
+      "category": "insect_w",
+      "host_bank": [
+        "wasp",
+        "weevil",
+        "walking stick",
+        "whitefly",
+        "water strider"
+      ],
+      "uncommon": [
+        "water boatman",
+        "webworm",
+        "woolly aphid",
+        "water scorpion"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-insect-f",
+      "prompt": "Name an insect that starts with F",
+      "category": "insect_f",
+      "host_bank": [
+        "fly",
+        "flea",
+        "#6e366778-fa4f-5911-94b1-01c51e9f3b97",
+        "#aff418ff-ad35-5d8b-8702-c236d6fa71b2",
+        "fire ant",
+        "froghopper"
+      ],
+      "uncommon": [
+        "#1d7a7686-6060-5cdd-934d-d4cfa2f5eec5",
+        "fritillary",
+        "field cricket"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tree-w",
+      "prompt": "Name a tree that starts with W",
+      "category": "tree_w",
+      "host_bank": [
+        "willow",
+        "walnut",
+        "white oak",
+        "white pine",
+        "wych elm"
+      ],
+      "uncommon": [
+        "#a56817ec-ec2a-529f-b9af-0d10ce861e48",
+        "white birch",
+        "water oak",
+        "wild cherry"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-flower-v",
+      "prompt": "Name a flower that starts with V",
+      "category": "flower_v",
+      "host_bank": [
+        "violet",
+        "verbena",
+        "valerian",
+        "veronica",
+        "vanilla",
+        "vanda"
+      ],
+      "uncommon": [
+        "Venus' slipper",
+        "Virginian stock",
+        "Virginia spring beauty"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-clothing-j",
+      "prompt": "Name a piece of clothing that starts with J",
+      "category": "clothing_j",
+      "host_bank": [
+        "jacket",
+        "jeans",
+        "jersey",
+        "#13778283-003f-5056-a27b-a7568499ad8f",
+        "jumpsuit",
+        "jodhpurs"
+      ],
+      "uncommon": [
+        "jellaba",
+        "jockstrap",
+        "jammies"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sport-f",
+      "prompt": "Name a sport that starts with F",
+      "category": "sport_f",
+      "host_bank": [
+        "football",
+        "fencing",
+        "field hockey",
+        "figure skating",
+        "fishing"
+      ],
+      "uncommon": [
+        "fives",
+        "fox hunting",
+        "funambulism"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tool-w",
+      "prompt": "Name a tool that starts with W",
+      "category": "tool_w",
+      "host_bank": [
+        "wrench",
+        "wire cutter",
+        "wire stripper",
+        "wood chisel",
+        "weeder",
+        "wood vise"
+      ],
+      "uncommon": [
+        "wimble",
+        "wrecking bar"
+      ],
+      "themes": [],
+      "added_by": "claude"
     }
   ],
   "themes": {}

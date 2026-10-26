@@ -145,6 +145,13 @@ export function withPopulation(items: Item[], given: Map<string, Claim[]>): { it
   return { items: out, ambiguous };
 }
 
+// Things a fact names (continents, IUCN statuses), by their label alone: their alternative labels are codes and
+// plurals ("na", "lc", "003 un m49 code", "endangereds") that would make those misses "rejected" in every category
+// (13e-4b design 4).
+function valueItems(found: Awaited<ReturnType<typeof labelled>>): Item[] {
+  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: [{ alias: normalize(e.label), kind: "name" as const }] }));
+}
+
 // A set's facts, printed with what was dropped, as each fetch reports them.
 async function factsFor(set: string, items: Item[], where: string, facts: { trait: FactTrait; property: string; allowed: Set<string> }[], population: boolean): Promise<Item[]> {
   let out = items;
@@ -476,7 +483,7 @@ const SETS: Record<string, SetDef> = {
           if (taxa.has(t)) statuses.set(t, [...(statuses.get(t) ?? []), { value: qid(r.s.value) }]);
         }
       });
-      const statusItems = labelledItems(await labelled(`VALUES ?x { ${IUCN_STATUSES.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      const statusItems = valueItems(await labelled(`VALUES ?x { ${IUCN_STATUSES.map((id) => `wd:${id}`).join(" ")} }`));
       if (statusItems.length !== IUCN_STATUSES.length) throw new Error(`${statusItems.length} IUCN statuses labelled, expected ${IUCN_STATUSES.length}`);
       const { items, dropped } = withFact(taxaToItems(taxa, ANIMALIA), "conservation_status", statuses, new Set(IUCN_STATUSES));
       console.log(`wikidata-animals: conservation_status on ${items.filter((i) => i.conservation_status).length} of ${items.length} items${dropped ? `, ${dropped} values outside the 9 dropped` : ""}`);
@@ -497,7 +504,7 @@ const SETS: Record<string, SetDef> = {
       const countries = labelledItems(await labelled(where), () => ["Q6256"], ["Q1065"]);
       const continents = await claims(where, "P30");
       const values = [...new Set([...continents.values()].flat().map((c) => c.value))];
-      const continentItems = labelledItems(await labelled(`VALUES ?x { ${values.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      const continentItems = valueItems(await labelled(`VALUES ?x { ${values.map((id) => `wd:${id}`).join(" ")} }`));
       const { items, dropped } = withFact(countries, "continent", continents, new Set(continentItems.map((i) => i.id)));
       console.log(`wikidata-countries: continent on ${items.filter((i) => i.continent).length} of ${items.length} items${dropped ? `, ${dropped} values with no label dropped` : ""}`);
       return [

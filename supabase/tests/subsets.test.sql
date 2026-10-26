@@ -7,7 +7,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(43);
+select plan(46);
 
 -- The base: countries (UN members) with continents and populations, capitals with their country, animals with a status.
 create function pg_temp.c(id text, name text, continent text, pop bigint, extra jsonb = '[]') returns jsonb language sql
@@ -40,13 +40,13 @@ select is((select count(*)::int from private.fact f join private.thing_source s 
 select private.define_category('sb_country', 'country', 'wikidata', 'sb-country', 'sb-un');
 select private.define_category('sb_capital', 'capital', 'wikidata', 'sb-capital', null);
 select private.define_category('sb_animal', 'animal', 'wikidata', 'sb-animal', null);
-select private.define_subset('sb_african', 'African country', 'sb_country', 'wikidata', '{"trait": "continent", "value": "sb-africa"}');
+select private.define_subset('sb_african', 'African country', 'sb_country', 'wikidata', '{"trait": "continent", "values": ["sb-africa"]}');
 select private.define_subset('sb_big', 'big country', 'sb_country', 'wikidata', '{"number": "population", "at_least": 40000000}');
 select private.define_subset('sb_g', 'country starting with G', 'sb_country', 'wikidata', '{"starts_with": "g"}');
 select private.define_subset('sb_d', 'country starting with D', 'sb_country', 'wikidata', '{"starts_with": "d"}');
 select private.define_subset('sb_african_capital', 'African capital', 'sb_capital', 'wikidata',
-  '{"trait": "continent", "value": "sb-africa", "via": "country"}');
-select private.define_subset('sb_endangered', 'endangered animal', 'sb_animal', 'wikidata', '{"trait": "conservation_status", "value": "sb-endangered"}');
+  '{"trait": "continent", "values": ["sb-africa"], "via": "country"}');
+select private.define_subset('sb_endangered', 'endangered animal', 'sb_animal', 'wikidata', '{"trait": "conservation_status", "values": ["sb-endangered"]}');
 
 create function pg_temp.id(ref text) returns uuid language sql return private.thing_by_ref('wikidata', ref);
 create function pg_temp.names(cat text) returns text language sql
@@ -56,7 +56,7 @@ select is((select (root, member_of)::text from private.category where key = 'sb_
   (select (root, member_of)::text from private.category where key = 'sb_country'), 'a subset takes its base''s root and member_of');
 select throws_ok($$ select private.define_subset('sb_x', 'x', 'sb_nope', 'wikidata', '{"starts_with": "x"}') $$, 'P0001', null,
   'a subset of an unknown base is refused');
-select throws_ok($$ select private.define_subset('sb_x', 'x', 'sb_country', 'wikidata', '{"trait": "continent", "value": "sb-mars"}') $$,
+select throws_ok($$ select private.define_subset('sb_x', 'x', 'sb_country', 'wikidata', '{"trait": "continent", "values": ["sb-mars"]}') $$,
   'P0001', null, 'a fact value that isn''t loaded is refused');
 select throws_ok($$ insert into private.category (key, name, root, starts_with, number_trait, at_least)
   values ('sb_two', 'two', private.thing_by_ref('wikidata', 'sb-country'), 'a', 'population', 1) $$, '23514', null,
@@ -69,6 +69,8 @@ select is(pg_temp.names('sb_g'), 'Germany, Ghana, Greece, Guinea, The Gambia', '
 select is(pg_temp.names('sb_d'), 'Denmark, Djibouti, Dominica, Germany', 'any of a thing''s names can start with the letter (deutschland)');
 select is(pg_temp.names('sb_african_capital'), 'Nairobi', 'a continent through the thing''s country');
 select is(pg_temp.names('sb_endangered'), 'tiger', 'a status filter');
+select private.define_subset('sb_either', 'animal of either status', 'sb_animal', 'wikidata', '{"trait": "conservation_status", "values": ["sb-endangered", "sb-lc"]}');
+select is(pg_temp.names('sb_either'), 'cat, tiger', 'a fact filter of several values takes any of them (13e-4b)');
 select ok(private.in_category_now(pg_temp.id('sb-kenya'), 'sb_african') and not private.in_category_now(pg_temp.id('sb-denmark'), 'sb_african'),
   'in_category_now applies the filter');
 
@@ -85,7 +87,7 @@ select lives_ok($$ select private.approve_puzzle('00000000-0000-0000-0000-000000
     pg_temp.q('sb_g', 'sb-ghana', array['sb-greece', 'sb-germany', 'sb-gambia'])))) $$, 'a day of subsets is approved');
 create function pg_temp.approved(i int) returns jsonb language sql
   return (select content -> 'questions' -> i from private.puzzle where game_id = 'offbeat' and puzzle_date = '2099-02-01');
-select is(pg_temp.approved(0) -> 'where', jsonb_build_object('trait', 'continent', 'value', pg_temp.id('sb-africa')), 'a fact filter is frozen');
+select is(pg_temp.approved(0) -> 'where', jsonb_build_object('trait', 'continent', 'values', jsonb_build_array(pg_temp.id('sb-africa'))), 'a fact filter is frozen');
 select ok(not (pg_temp.approved(1) ? 'where'), 'a category without a filter gets no where');
 select is(pg_temp.approved(2) -> 'where', '{"starts_with": "g"}'::jsonb, 'a letter is frozen');
 select is((pg_temp.approved(0) ->> 'members')::int, 6, 'the member count is the subset''s');
@@ -148,10 +150,10 @@ insert into private.puzzle (game_id, puzzle_date, content)
       'host_answers', '[]'::jsonb, 'levels', '{}'::jsonb, 'root', (select root from private.category where key = cat),
       'member_of', (select member_of from private.category where key = cat), 'members', 1,
       'where', (select private.category_where(c) from private.category c where c.key = cat))))
-  from (values ('2000-03-01'::date, 'sb_d'), ('2000-03-02', 'sb_african_capital'), ('2000-03-03', 'sb_african'), ('2000-03-04', 'sb_big')) as v(d, cat);
+  from (values ('2000-03-01'::date, 'sb_d'), ('2000-03-02', 'sb_african_capital'), ('2000-03-03', 'sb_african'), ('2000-03-04', 'sb_big'), ('2000-03-05', 'sb_either')) as v(d, cat);
 insert into private.run (user_id, game_id, puzzle_date)
   select pg_temp.u(n), 'offbeat', d from generate_series(1, 3) as s(n)
-  cross join (values ('2000-03-01'::date), ('2000-03-02'), ('2000-03-03'), ('2000-03-04')) as t(d);
+  cross join (values ('2000-03-01'::date), ('2000-03-02'), ('2000-03-03'), ('2000-03-04'), ('2000-03-05')) as t(d);
 create function pg_temp.missed3(d date, t text, listed boolean = false) returns void language sql
   return (select count(private.record_miss(pg_temp.u(n), 'offbeat', d, 0, t, t, false, listed, 3, 1)) from generate_series(1, 3) as s(n));
 create function pg_temp.review(cat text, t text) returns private.miss_review language sql
@@ -175,6 +177,11 @@ select ok(private.in_category_now((pg_temp.review('sb_african_capital', 'sbmomba
 select private.audit_decide('00000000-0000-0000-0000-00000000aaaa', (pg_temp.review('sb_african_capital', 'sbmombasia')).id, 'undo', null);
 select ok(not private.in_category_now((pg_temp.review('sb_african_capital', 'sbmombasia')).thing_id, 'sb_african_capital'),
   'and undoing it ends that');
+-- A new thing can't be given one of several values: held, and the human's Accept makes it a member (13e-4b).
+select pg_temp.missed3('2000-03-05', 'sbeitheria');
+select is((pg_temp.review('sb_either', 'sbeitheria')).outcome, 'held_subset', 'a subset of several values holds the text');
+select private.audit_decide('00000000-0000-0000-0000-00000000aaaa', (pg_temp.review('sb_either', 'sbeitheria')).id, 'accept', null);
+select ok(private.in_category_now((pg_temp.review('sb_either', 'sbeitheria')).thing_id, 'sb_either'), 'and, accepted, it is a member');
 -- A text held for the offensive-word list on such a subset joins it too once accepted (13e-4a review).
 select pg_temp.missed3('2000-03-02', 'sblistedia', true);
 select is((pg_temp.review('sb_african_capital', 'sblistedia')).outcome, 'held', 'a listed text is held as before');

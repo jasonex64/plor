@@ -2,8 +2,8 @@
   "set": "wikidata-animals",
   "source": "wikidata",
   "snapshot": "2026-10-26",
-  "retrieved_at": "2026-10-26T05:23:19.754Z",
+  "retrieved_at": "2026-10-26T06:22:31.773Z",
   "method": "SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under Q729 with an English common name, plus their ancestors up to it; each taxon's IUCN conservation status (P141, a bd:slice read of its truthy values) among the 9 of its one-of constraint, which are items of the set",
-  "items": 71698,
-  "sha256": "7f8db5fe35a7eb3216b8a80edcdcb7604fd0da7ea79deeeaacae754b00c4d7d2"
+  "items": 70957,
+  "sha256": "1fa4ea6a6c05a9a0cde0250db70956b836d7c0a8f60b3670b514c7d0a2f69cb9"
 }
