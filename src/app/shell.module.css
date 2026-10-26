@@ -15,7 +15,14 @@
   padding-bottom: 64px;
 }
 
+/* Signed in, About and the privacy policy are in the settings sheet (docs/milestones/M14-14b-2b-1-shell.md, criterion
+   3), so the page footer, which signed-out visitors and Google's brand check need (M02 2c), isn't shown. */
+:global(body):has(.nav) main > footer {
+  display: none;
+}
+
 .word,
+.who,
 .admin,
 .settings {
   display: none;
@@ -57,6 +64,40 @@
   font-size: 24px;
   font-weight: 800;
   line-height: 1;
+}
+
+/* The top bar's right side: the streak's pill and the gear, 6px apart (round 7's .me). */
+.me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The streak's pill (round 7's .streak; docs/milestones/M14-14b-2a-streak-ranks.md): the rank's 22px flower and the
+   number on the soft colour. At 26px tall it is a target above WCAG 2.2 2.5.8's 24px. */
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px 2px 6px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--text);
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .gear {
@@ -114,8 +155,8 @@
   color: var(--accent);
 }
 
-/* From 768px (M14 L42): a sidebar, 248px wide, with the wordmark and, for admins, Admin, which then leaves the Me
-   tab. */
+/* From 768px (M14 L42): a sidebar, 280px wide (human, 2026-10-26: "280px"; docs/milestones/M14-14b-2b-1-shell.md),
+   with the wordmark and, for admins, Admin, which then leaves the Me tab. */
 @media (min-width: 768px) {
   .meAdmin,
   .top {
@@ -138,7 +179,7 @@
   .nav {
     top: 0;
     right: auto;
-    width: 248px;
+    width: 280px;
     height: auto;
     box-sizing: border-box;
     padding: 28px 16px;
@@ -151,7 +192,7 @@
 
   :global(body):has(.nav) {
     padding-bottom: 0;
-    padding-left: 248px;
+    padding-left: 280px;
   }
 
   .word {
@@ -161,6 +202,16 @@
     font-size: 30px;
     font-weight: 800;
     line-height: 1;
+  }
+
+  /* The avatar slot and the streak's pill under the wordmark, 10px apart (round 7, board 3). Round 7 puts 20px above
+     them and 24px below (its 4px gap with padding 16px 12px 20px); the sidebar's own 20px gap gives the same with 4px
+     more below. */
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px 4px;
   }
 
   .tabs {
@@ -213,6 +264,13 @@
     font-weight: 700;
     text-decoration: none;
   }
+
+  /* In the admin area, Admin is the current section, as a tab is (round 10). */
+  .admin[aria-current] {
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--text);
+  }
 }
 
 /* The clock back to a question left in play (M14 L18): on phones just above the tab bar, from 768px at the top of the
@@ -236,12 +294,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.clock a {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
 :global(body):has(.clock) {
   padding-bottom: 112px;
 }
@@ -250,7 +302,8 @@
   .clock {
     top: 0;
     bottom: auto;
-    left: 248px;
+    left: 280px;
+    right: var(--right-column, 0);
     border-top: 0;
     border-bottom: 1.5px solid var(--accent);
   }

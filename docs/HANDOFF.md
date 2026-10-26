@@ -2,41 +2,45 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4a merged (PR #87); 13e-4b (the first 22 subsets) and 13e-4c (the animals import reads Wikidata by key) built, reviewed and proven, in PR #92 (the human's call), merging on green CI. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14` (14b-2a, the sprout streak). The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), from main with 14b-1's PR; for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4a merged (PR #87); 13e-4b (the first 22 subsets) and 13e-4c (the animals import reads Wikidata by key) built, reviewed and proven, in PR #92 (the human's call), merging on green CI. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14`. The M14 section is the M14 session's, from main with 14b-2b-2a's PR #90 (written on the Windows checkout); for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
 | Sub-ticket | What | PR |
 |---|---|---|
-| 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar from 768px, the Admin link | #77 |
+| 14a-1 | The shell: colour slots, fonts, the tab bar, the sidebar, the Admin link | #77 |
 | 14a-2a | Today: Offbeat's banner, one leaderboard card, the locked feed, the clock bar | #79 |
 | 14a-2b | The game screen `/offbeat`. **Security change:** yesterday's host answers to every signed-in player | #81 |
 | 14a-2c | 14a-2b's review fixes | #82 |
-| 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
-| 14a-3b | The settings sheet (a `<dialog>` from the gear) with the account, Skip the game screen and Numbers on the calendar; the friends list on the Friends tab; caught answers out of the rarest; the calendar at 3:1. **Security change:** `plor_app` updates the two settings' columns | #85 |
+| 14a-3a | Me: totals, calendar, Offbeat's card, the 3 rarest answers; avatar slots | #83 |
+| 14a-3b | The settings sheet, the friends list on Friends. **Security change:** `plor_app` updates two settings' columns | #85 |
+| 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
+| 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
+| 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
+| 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
 
-plor.app's database has every migration through `20261025200806_settings.sql`: the M13 session ran `npx supabase db push` at the human's request after #85 merged, and `npx supabase test db --linked` passed 345/345 (2026-10-25).
+### In review: 14b-2b-2b, the admin pages' three server changes (PR #91, auto-merge on green CI)
+`docs/milestones/M14-14b-2b-2-admin-build.md`, 14b-2b-2b. Two **security changes**, both approved by the human (2026-10-26) and in the DECISIONS.md Log:
+- **Keep comment:** `private.keep_reported_comment` and `private.comment_keep`. The reports stay, so the comment stays hidden for its reporters ("Still hidden (Recommended)").
+- **The audit's one-click link:** `private.audit_near`, fed by the game's `withinTypo` ("New lookup function (Recommended)").
 
-### In review
-**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), in PR #86 with auto-merge on green CI:
-- Sky, Moonlit and Ink as round 8 on the canvas drew them (human, 2026-10-25: "Build as drawn (Recommended)"); every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
-- the picker in the settings sheet, saved on the account; painted before the profile loads from a `localStorage` copy by a `<head>` script (Next.js's "Preventing flash before hydration", added to SOURCES.md);
-- `/about`: what Plor is, "Plor is made by Jason" with privacy@plor.app, Moonlit's credit, "Plor is built with help from AI."; one `Footer` on every page links it.
-
-**Migration `20261026010745_theme.sql`** (the **security change** approved 2026-10-24: `plor_app` may update `private.profile.theme`). It's on main (PR #86, `64eeea6`) and **pushed to plor.app** by the M13 session (below).
+Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, not SQL. Local evidence: `npm test` 386, pgTAP 73, db 25, admin e2e 11. Review done: both blocking findings fixed, the rest in ROADMAP Next revision.
 
 ### Next step
-1. After 14b-1 merges: mark it done with its CI run in its ticket and ROADMAP; the human (or a session at their request) pushes the theme migration.
-2. Then 14b-2 (the sprout streak, the admin pages' look, the design reviews' polish), from its own guided questions and ticket, one PR.
+1. After 14b-2b-2b merges: mark it done (ticket Status, ROADMAP row) with its merge evidence.
+2. Then 14b-2c (the For M14 review items in ROADMAP Next revision), then 14c-1 (ask its N1–N6).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
-2. `npx supabase start`, then `npx supabase migration up` (through `20261026010745_theme.sql`). On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
-3. `npx next typegen` once, before `npx tsc --noEmit -p .`. Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
-4. The checks: `npm test` 330; `npm run test:db` 260; `npx supabase test db` 345; `npm run test:e2e` 39. The db and e2e suites need today (and yesterday for some e2e files) free of a real approved day. A new e2e file's player names must not repeat another file's: every file in a run shares `RUN` (ROADMAP, For M14).
-5. **On the Mac** the M13 session (`/Users/jason/code/plor`) shares the stack and port 3000. It said it won't run db, SQL or e2e tests locally for now, nor `db reset`, and will message first if that changes. Message it before a `db reset` anyway.
+2. `npx supabase start`, then `npx supabase migration up`. On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
+3. `npx next typegen` once before `npx tsc --noEmit -p .` (delete a stale `.next/dev` if tsc names a moved route). Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
+4. The checks: `npm test` 360; `npm run test:db` 260 (before main's PR #87 tests); `npx supabase test db`; `npm run test:e2e` 42. Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
 
-**Left running:** nothing of M14's (no dev server, no background job).
+### Local state (Windows)
+- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session resets it from its branch (`db reset`, `load all`; the human approved), which drops M14's two new migrations (`keep_comment`, `audit_near`). Re-apply them after a reset (pending ones with `npx supabase migration up`; if the CLI refuses because of M13's unmerged migration, run the two files' SQL in one transaction and add their rows to `supabase_migrations.schema_migrations`). Message the M13 session before any suite or dev server.
+- Canvas mockups, renders, the critique snapshot and screenshots are in the session's temp folder, outside the repo.
+
+**Left running:** nothing (no dev server, no background job).
 
 ## M15 (from main, written by the M15 and M13 sessions)
 - **15a's P1–P5 are answered** (human, 2026-10-24, guided questions): drafts in the database, admin-only; P2 moot; the T1 day deleted with 15a; drafting paused until 15a ships. Its design and criteria are rewritten for format 3 before it's built. No new milestone starts while M13 and M14 are in progress (human: "Nothing new yet").
@@ -75,7 +79,7 @@ plor.app's database has every migration through `20261025200806_settings.sql`: t
 3. ROADMAP's From 13e-3 item that makes the simulator and the list checks `scripts/` commands: the simulator has been rewritten by hand three times. The re-fetch of the older sets for the mul fallback rides in 13e-4a.
 4. **Any machine that loaded an older rivers snapshot** keeps its old short names and Pūkio Stream's dropped alias until `npx supabase db reset` and `npm run base -- load all` (loading only adds rows). The Windows stack was rebuilt this way; the Mac has no answer base loaded; plor.app's answer database is empty.
 
-**Parallel sessions on this PC (2026-10-26):** the M14 session ("M14 14b-2a: the sprout streak") works in `C:/Users/jason/RIFF-m14` on `m14-look-and-feel`. Both share the local Supabase stack and port 3000, and Playwright reuses whatever dev server is on 3000: one dev server or e2e run at a time, and message the other session before a `db reset` or a full suite run.
+**Parallel sessions on this PC (2026-10-26):** the M14 session ("M14 14b-2a: the streak ranks") works in `C:/Users/jason/RIFF-m14` on `m14-look-and-feel`. Both share the local Supabase stack and port 3000, and Playwright reuses whatever dev server is on 3000: one dev server or e2e run at a time, and message the other session before a `db reset` or a full suite run.
 
 **Shared local database:** on the Mac, the M14 session (worktree `/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`, branch `m14-look-and-feel`) runs its db and e2e suites against the same local stack, with its uncommitted 14a-3b migration applied (human's OK to share, 2026-10-25). On the Windows PC the M14 worktree was `C:/Users/jason/RIFF-m14`. Message it before a `db reset` or a full suite run.
 

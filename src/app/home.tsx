@@ -2,17 +2,20 @@
 
 // Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
 // (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
-// (docs/milestones/M14-14a-2b-game-screen.md); or, on an invite link (/invite/<code>), the friend request; on a
+// (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
+// the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
+// or, on an invite link (/invite/<code>), the friend request; on a
 // group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useCallback, useEffect, useLayoutEffect, useState, useSyncExternalStore, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
 import type { Profile } from "@/lib/profile";
+import { AdminArea, type AdminPage } from "./admin/admin-area";
 import { Board } from "./board";
+import { ButtonLink } from "./button-link";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
@@ -20,18 +23,22 @@ import { TodayBanner } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
+import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
 import { HowToPlay, OffbeatScreen } from "./offbeat";
+import { SideColumn } from "./side-column";
+import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
-// sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md).
+// sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
+// its rank (docs/milestones/M14-14b-2a-streak-ranks.md).
 type Me =
   | { signedIn: false }
   | { signedIn: true; username: null; admin: boolean }
-  | ({ signedIn: true; admin: boolean } & Profile);
+  | ({ signedIn: true; admin: boolean; streak: number } & Profile);
 
 // What a page other than "/" shows once the player is signed in with a username.
 export type View =
@@ -40,6 +47,8 @@ export type View =
   | { kind: "me" }
   | { kind: "offbeat" }
   | { kind: "howToPlay" }
+  | { kind: "streak" }
+  | { kind: "admin"; page: AdminPage }
   | { kind: "invite"; code: string }
   | { kind: "joinGroup"; code: string }
   | { kind: "group"; id: string };
@@ -65,6 +74,16 @@ export function Home({ view }: { view?: View }) {
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
   }
   useEffect(loadMe, []);
+  // Again once the game screen's Start begins today's run, which counts in the streak at once
+  // (docs/milestones/M14-14b-2a-streak-ranks.md). A failure here is shown beside the page, not instead of it: the
+  // run's question is already being timed (14b-2a review).
+  const [streakError, setStreakError] = useState<string | null>(null);
+  // From 1200px the other player pages show the friends feed in the right column (FriendsFeed).
+  const feedColumn = useMinWidth(1200);
+  function reloadStreak() {
+    setStreakError(null);
+    api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setStreakError(errorText(err)));
+  }
   // The account's theme, once the profile is known, keeping this browser's copy in step (the copy itself is re-applied
   // on every page by KeepTheme, src/app/keep-theme.tsx). Signed out, or before a username, nothing is picked.
   useLayoutEffect(() => {
@@ -103,16 +122,23 @@ export function Home({ view }: { view?: View }) {
           <Shell
             admin={me.admin}
             profile={me}
+            streak={me.streak}
             onChanged={loadMe}
             onSettings={(settings) => setMe({ ...me, settings })}
             onSignedOut={() => setMe({ signedIn: false })}
           />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
           {view?.kind !== "offbeat" && <ClockBar />}
+          {streakError && <p role="alert">{streakError}</p>}
+          {view && view.kind !== "offbeat" && view.kind !== "admin" && feedColumn && <FriendsFeed username={me.username} />}
           {view?.kind === "offbeat" ? (
-            <OffbeatScreen username={me.username} />
+            <OffbeatScreen username={me.username} onStarted={reloadStreak} />
           ) : view?.kind === "howToPlay" ? (
             <HowToPlay />
+          ) : view?.kind === "streak" ? (
+            <StreakRanks days={me.streak} />
+          ) : view?.kind === "admin" ? (
+            <AdminArea page={view.page} admin={me.admin} />
           ) : view?.kind === "friends" ? (
             <Friends username={me.username} />
           ) : view?.kind === "groups" ? (
@@ -275,24 +301,9 @@ function PickUsername({ onDone }: { onDone: () => void }) {
   );
 }
 
-// Whether the window is at least this wide, following resizes. The server's answer is false; Home renders on the
-// client, behind Suspense.
-function useMinWidth(px: number): boolean {
-  const query = `(min-width: ${px}px)`;
-  const subscribe = useCallback(
-    (onChange: () => void) => {
-      const media = window.matchMedia(query);
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    },
-    [query],
-  );
-  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
-}
-
 // Today (docs/milestones/M14-14a-2a-today.md): Offbeat's banner, which links to its game screen (14a-2b), the one
 // leaderboard card and the feed;
-// from 768px the live board too (L42), and from 1200px the board and the card in a right column. The page listens to
+// from 768px the live board too (L42), and from 1200px the board and the card in the right column (SideColumn). The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
 function Today({ username, skip }: { username: string; skip: boolean }) {
   const [runOver, setRunOver] = useState(false);
@@ -319,16 +330,60 @@ function Today({ username, skip }: { username: string; skip: boolean }) {
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
         <TodayBanner key={`game-${day}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
       </section>
-      <aside aria-label="Your circle" className={styles.side}>
+      <SideColumn label="Your circle" inPlace className={styles.side}>
         {wide && <Board key={`board-${day}`} username={username} invite />}
         <LeaderboardCard key={`card-${day}`} />
-      </aside>
+      </SideColumn>
       <div className={styles.feed}>
         {paused && <p role="status">{PAUSED_TEXT}</p>}
         {channelError && <p role="alert">{channelError}</p>}
         <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} />
       </div>
     </div>
+  );
+}
+
+// The friends feed in the right column of every player page but Today and the game screen, which have their own
+// (docs/milestones/M14-14b-2b-1-shell.md, criterion 2; human, 2026-10-26: "The friends feed everywhere (Recommended)").
+// As on Today: locked until today's run is over (M08 8a), nudged by the board's channel (M08 8d), and started again at
+// midnight Pacific (M11 H6), from the run's state.
+function FriendsFeed({ username }: { username: string }) {
+  const [day, setDay] = useState(0);
+  const [run, setRun] = useState<{ over: boolean; msToReset: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    type RunResponse = { run: { status: string; msToReset: number } } | { run: null; msToReset: number };
+    api<RunResponse>("/api/run", { method: "GET" }).then(
+      // A run is over once it died, survived or timed out (src/game/runs.ts, FINISHED).
+      (r) =>
+        setRun(
+          r.run ? { over: ["died", "survived", "timed_out"].includes(r.run.status), msToReset: r.run.msToReset } : { over: false, msToReset: r.msToReset },
+        ),
+      (err) => setError(errorText(err)),
+    );
+  }, [day]);
+  useEffect(() => {
+    if (!run) return;
+    const timer = setTimeout(() => setDay((d) => d + 1), run.msToReset);
+    return () => clearTimeout(timer);
+  }, [run]);
+  const [nudge, setNudge] = useState(0);
+  const nudgeFeed = useCallback(() => setNudge((n) => n + 1), []);
+  const { paused } = useBoardChannel({
+    joined: nudgeFeed,
+    changed: (message) => {
+      if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
+      if (changesThread(message, "feed")) nudgeFeed();
+    },
+    failed: (err) => setError(errorText(err)),
+  });
+
+  return (
+    <SideColumn label="Friends feed">
+      {paused && <p role="status">{PAUSED_TEXT}</p>}
+      {error && <p role="alert">{error}</p>}
+      {run && <Comments key={`feed-${day}`} username={username} runOver={run.over} nudge={nudge} />}
+    </SideColumn>
   );
 }
 
@@ -402,7 +457,7 @@ function AcceptInvite({ code }: { code: string }) {
       {inviter && added && <h2>You and {inviter.name} are now friends.</h2>}
       {error && <p role="alert">{error}</p>}
       <p>
-        <Link href="/">Go to today&apos;s puzzle</Link>
+        <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
       </p>
     </section>
   );

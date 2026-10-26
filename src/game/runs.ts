@@ -11,7 +11,6 @@ import { isListed } from "./misses";
 import { dayCounts, pooledCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
-import { getStreak } from "./streak";
 
 // "timed_out": the current question's 20 seconds ran out, which ends the run (M04 13c-2; the database decides). The
 // timer, not midnight, ends an unfinished run: a run started before midnight can be finished after it (human,
@@ -51,8 +50,6 @@ export type RunState = {
   bonus: number;
   // Milliseconds until the next reset at midnight Pacific (private.next_reset), for the countdown.
   msToReset: number;
-  // Days played in a row (src/game/streak.ts; M11 H4).
-  streak: number;
 };
 
 // in_day: given before the run's day ended at midnight (M09 D8).
@@ -106,7 +103,6 @@ function buildState(
   clock: Clock,
   counts: DayCounts | null,
   pooled: DayCounts,
-  streak: number,
   names: Names,
 ): RunState {
   const score = scoreRun(
@@ -142,7 +138,6 @@ function buildState(
     points: answered.reduce((sum, a) => sum + a.points, 0),
     bonus: score.bonus,
     msToReset: clock.msToReset,
-    streak,
   };
 }
 
@@ -170,7 +165,7 @@ async function stateOf(db: Db, userId: string, date: string, puzzle: ApprovedPuz
   const counts = status !== null && FINISHED.includes(status) ? (await dayCounts(db, [date])).get(date)! : null;
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
   const pooled = await pooledCounts(db, puzzle, false);
-  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, pooled, await getStreak(db, userId), names);
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset }, counts, pooled, names);
 }
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a

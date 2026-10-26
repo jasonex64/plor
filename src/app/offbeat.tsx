@@ -1,9 +1,9 @@
 "use client";
 
 // Offbeat's game screen, /offbeat, and its How to play (docs/milestones/M14-14a-2b-game-screen.md; L25, L29, L34, L35):
-// the run, the player's stats, yesterday's answers and the feed; from 1200px the feed in a right column (L42). Laid
-// out from round 5's mockup; the game's own look comes with 14c.
-import Link from "next/link";
+// the run, the player's stats, yesterday's answers and the feed; from 1200px the feed in the right column (L42;
+// SideColumn). Laid out from round 5's mockup; the game's own look comes with 14c.
+import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Stats, Yesterday } from "@/game/offbeat";
@@ -13,9 +13,11 @@ import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./
 import { Comments } from "./comments";
 import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
+import { SideColumn } from "./side-column";
 import styles from "./offbeat.module.css";
 
-export function OffbeatScreen({ username }: { username: string }) {
+// onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+export function OffbeatScreen({ username, onStarted }: { username: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
   // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
   // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
@@ -49,21 +51,21 @@ export function OffbeatScreen({ username }: { username: string }) {
   return (
     <div className={styles.screen}>
       <p className={styles.back}>
-        <Link href="/">
+        <ButtonLink href="/">
           <span aria-hidden="true">← </span>Today
-        </Link>
+        </ButtonLink>
       </p>
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} />
+        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} />
       </section>
       <div className={styles.cards}>
         <OffbeatInfo key={`info-${day}-${ended}`} />
       </div>
-      <div className={styles.feed}>
+      <SideColumn label="Feed" inPlace className={styles.feed}>
         {paused && <p role="status">{PAUSED_TEXT}</p>}
         {channelError && <p role="alert">{channelError}</p>}
         <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title="Offbeat comments" />
-      </div>
+      </SideColumn>
     </div>
   );
 }
@@ -186,9 +188,9 @@ export function HowToPlay() {
   return (
     <section aria-label="How to play" className={styles.how}>
       <p className={styles.back}>
-        <Link href="/offbeat">
+        <ButtonLink href="/offbeat">
           <span aria-hidden="true">‹ </span>Offbeat
-        </Link>
+        </ButtonLink>
       </p>
       <h2 className={styles.heading}>How to play</h2>
       <p>

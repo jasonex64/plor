@@ -1,8 +1,10 @@
 // The audit of what the game learned from misses (docs/milestones/M13-13b-learning-from-misses.md; human,
 // 2026-10-24: "an easy way for me to audit what's added and remove if needed"): every text that reached the threshold,
-// and an admin's decision on one, through private.audit_list, private.audit_open_count and private.audit_decide.
-// The routes check the admin first; the functions check again.
+// and an admin's decision on one, through private.audit_list, private.audit_open_count and private.audit_decide; and
+// what a near-typo is near, through private.audit_near (M14 14b-2b-2b). The routes check the admin first; the
+// functions check again.
 import { DatabaseError } from "pg";
+import { withinTypo } from "@/game/matching";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 
@@ -21,6 +23,8 @@ export type Review = {
   decided_at: string | null;
   chosen: Named | null;
   named: Named[];
+  // For a waiting near-typo, the answers it's a typo of, to link it to in one click; otherwise empty.
+  near: Named[];
 };
 
 export const ACTIONS = ["undo", "link", "accept", "accept_for_category", "dismiss"] as const;
@@ -38,11 +42,19 @@ function mapError(err: unknown): never {
 
 export async function listReviews(db: Db, adminId: string): Promise<{ reviews: Review[]; open: number }> {
   try {
-    const { rows } = await db.query<{ reviews: Review[]; open: number }>(
+    const { rows } = await db.query<{ reviews: Omit<Review, "near">[]; open: number }>(
       "select private.audit_list($1) as reviews, private.audit_open_count($1) as open",
       [adminId],
     );
-    return rows[0];
+    const reviews = await Promise.all(
+      rows[0].reviews.map(async (r) => {
+        if (r.outcome !== "near_typo" || r.decision) return { ...r, near: [] };
+        // The text is stored normalized (private.record_miss), as withinTypo expects.
+        const near = await db.query<{ near: Named[] }>("select private.audit_near($1, $2, $3) as near", [adminId, r.id, withinTypo(r.text)]);
+        return { ...r, near: near.rows[0].near };
+      }),
+    );
+    return { reviews, open: rows[0].open };
   } catch (err) {
     mapError(err);
   }

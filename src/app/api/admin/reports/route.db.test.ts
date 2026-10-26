@@ -1,7 +1,8 @@
 // Reports end to end against the local stack (run with `npm run test:db`): real players sign in with emailed codes,
 // play today's puzzle, and report comments through the route; an admin lists open reports and deletes the comment
-// (docs/milestones/M08-comments-and-reactions.md, 8c; D5), which leaves a record of who deleted it (M12 12d). A is the reporter; B is A's friend; C is no one's friend;
-// D is B's friend but not A's; X is an admin who hasn't played.
+// (docs/milestones/M08-comments-and-reactions.md, 8c; D5), which leaves a record of who deleted it (M12 12d), or keeps
+// it, which leaves it hidden for its reporters (M14 14b-2b-2b). A is the reporter; B is A's friend; C is no one's
+// friend; D is B's friend but not A's; X is an admin who hasn't played.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -15,6 +16,7 @@ import { POST as reportRoute } from "../../comments/report/route";
 import { GET as threadRoute, POST as postRoute } from "../../comments/route";
 import { POST as reactRoute } from "../../reactions/route";
 import { POST as deleteRoute } from "./delete/route";
+import { POST as keepRoute } from "./keep/route";
 import { GET as listRoute } from "./route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -41,6 +43,7 @@ async function call(response: Promise<Response>) {
 const report = (id: unknown) => call(reportRoute(apiRequest("/api/comments/report", { method: "POST", body: { id } })));
 const list = () => call(listRoute(apiRequest("/api/admin/reports", { method: "GET" })));
 const remove = (id: unknown) => call(deleteRoute(apiRequest("/api/admin/reports/delete", { method: "POST", body: { id } })));
+const keep = (id: unknown) => call(keepRoute(apiRequest("/api/admin/reports/keep", { method: "POST", body: { id } })));
 const bodies = async (date?: string) =>
   (await call(threadRoute(apiRequest(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" })))).body.thread.comments.map(
     (c: { body: string }) => c.body,
@@ -69,8 +72,8 @@ async function befriend(x: Player, y: Player) {
     y.userId,
   ]);
 }
-async function recordCount(id: string): Promise<number> {
-  const { rows } = await getPool().query<{ n: number }>("select count(*)::int as n from private.comment_deletion where comment_id = $1", [id]);
+async function recordCount(id: string, table = "comment_deletion"): Promise<number> {
+  const { rows } = await getPool().query<{ n: number }>(`select count(*)::int as n from private.${table} where comment_id = $1`, [id]);
   return rows[0].n;
 }
 async function reportCount(id: string): Promise<number> {
@@ -161,8 +164,10 @@ describe("reporting comments, and the admins' list", () => {
     const forbidden = { status: 403, body: { ok: false, error: "admins_only" } };
     expect(await list()).toEqual(forbidden);
     expect(await remove(commentOf.b)).toEqual(forbidden);
+    expect(await keep(commentOf.b)).toEqual(forbidden);
     expect(await reportCount(commentOf.b)).toBe(2);
     expect(await recordCount(commentOf.b)).toBe(0);
+    expect(await recordCount(commentOf.b, "comment_keep")).toBe(0);
   });
 
   it("lists open reports for an admin, one row per comment with its count", async () => {
@@ -190,10 +195,11 @@ describe("reporting comments, and the admins' list", () => {
     expect(await recordCount(commentOf.b)).toBe(1);
     const after = (await list()).body;
     expect(after.reports.filter((x: { username: string }) => x.username.endsWith(RUN))).toEqual([]);
-    expect(after.deletions.filter((x: { author: string }) => x.author.endsWith(RUN))).toEqual([
+    expect(after.decisions.filter((x: { author: string }) => x.author.endsWith(RUN))).toEqual([
       {
         id: commentOf.b,
-        deletedAt: expect.any(String),
+        decision: "deleted",
+        at: expect.any(String),
         adminId: players.x.userId,
         admin: players.x.username,
         author: players.b.username,
@@ -205,6 +211,30 @@ describe("reporting comments, and the admins' list", () => {
     expect(rows).toHaveLength(0);
     useSession(players.b.session);
     expect(await bodies()).toEqual(["hello from d", "hello from a"]);
+  });
+
+  it("lets an admin keep a reported comment: it leaves the list, stays for everyone, and stays hidden for its reporter", async () => {
+    useSession(players.b.session);
+    expect(await report(commentOf.a)).toEqual(ok);
+    useSession(players.x.session);
+    expect(await keep(commentOf.c)).toEqual(notFound);
+    expect(await keep("not an id")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await keep(commentOf.a)).toEqual(ok);
+    // Kept once: its report is handled, so keeping it again is the same 404 as an unreported comment.
+    expect(await keep(commentOf.a)).toEqual(notFound);
+    expect(await recordCount(commentOf.a, "comment_keep")).toBe(1);
+    const after = (await list()).body;
+    expect(after.reports.filter((x: { username: string }) => x.username.endsWith(RUN))).toEqual([]);
+    expect(after.decisions.filter((x: { author: string }) => x.author.endsWith(RUN))).toEqual([
+      { id: commentOf.a, decision: "kept", at: expect.any(String), adminId: players.x.userId, admin: players.x.username, author: players.a.username, body: "hello from a" },
+      expect.objectContaining({ id: commentOf.b, decision: "deleted" }),
+    ]);
+    // The report stays: B still doesn't see it (D5); A does.
+    expect(await reportCount(commentOf.a)).toBe(1);
+    useSession(players.b.session);
+    expect(await bodies()).toEqual(["hello from d"]);
+    useSession(players.a.session);
+    expect(await bodies()).toEqual(["hello from a"]);
   });
 
   it("lets A report a comment on a past day A can read (D6 makes it read-only, not unreportable)", async () => {
@@ -247,8 +277,8 @@ describe("reporting comments, and the admins' list", () => {
     ]);
     expect(rows[0].deleted).toBe(true);
     useSession(players.x.session);
-    expect((await list()).body.deletions.filter((x: { id: string }) => x.id === comments[0].id)).toEqual([
-      { id: comments[0].id, deletedAt: expect.any(String), adminId: users[0].id, admin: null, author: players.b.username, body: "yesterday from b" },
+    expect((await list()).body.decisions.filter((x: { id: string }) => x.id === comments[0].id)).toEqual([
+      { id: comments[0].id, decision: "deleted", at: expect.any(String), adminId: users[0].id, admin: null, author: players.b.username, body: "yesterday from b" },
     ]);
   });
 });

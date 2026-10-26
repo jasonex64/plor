@@ -8,7 +8,7 @@
 // the home page, today is the feed: the friends thread's and the player's groups' comments in one list, each labelled,
 // with only who commented and how many reactions until the run is over (docs/milestones/M11-home-screen.md, 11b; H2,
 // H3); earlier days are the friends thread. Plain UI; the look is M14.
-import Link from "next/link";
+import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
 import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
@@ -181,7 +181,7 @@ function Preview({ preview }: { preview: FeedPreview }) {
   return (
     <>
       <p>
-        <Link href="/offbeat">{text.read}</Link>
+        <ButtonLink href="/offbeat">{text.read}</ButtonLink>
       </p>
       <ul className={styles.locked}>
         {/* By position: two friends can share a display name. */}
@@ -198,9 +198,10 @@ function Preview({ preview }: { preview: FeedPreview }) {
   );
 }
 
-// Which thread a feed comment is in: the friends thread, or a group's, linking to its page.
+// Which thread a feed comment is in: the friends thread, or a group's, by name; the group is on the Groups tab (no text
+// links: docs/milestones/M14-14b-2b-1-shell.md, criterion 4).
 function ThreadLabel({ comment }: { comment: FeedComment }) {
-  return comment.group ? <Link href={`/groups/${comment.group.id}`}>{comment.group.name}</Link> : <>Friends</>;
+  return <>{comment.group ? comment.group.name : "Friends"}</>;
 }
 
 function CommentItem({

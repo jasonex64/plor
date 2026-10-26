@@ -1,5 +1,6 @@
 /* Today (docs/milestones/M14-14a-2a-today.md): one column, Offbeat's banner first, then the player's circle (the board
-   from 768px, and the leaderboard card), then the feed; from 1200px (L42) the circle moves to a right column. */
+   from 768px, and the leaderboard card), then the feed; from 1200px (L42) the circle is in the shell's right column
+   (src/app/side-column.tsx). */
 .today {
   display: grid;
   gap: 16px;
@@ -24,17 +25,4 @@
   grid-area: feed;
 }
 
-@media (min-width: 1200px) {
-  /* With a side column, Today takes the page's full width; the 960px column is for pages without one (L43). */
-  :global(main):has(.today) {
-    max-width: none;
-  }
 
-  .today {
-    grid-template-columns: minmax(0, 1fr) 360px;
-    grid-template-areas:
-      "game side"
-      "feed side";
-    align-items: start;
-  }
-}

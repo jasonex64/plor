@@ -71,7 +71,8 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
     { width: 1440, height: 900 },
   ]) {
     const { nav } = await player(browser, `sb${viewport.width}`, viewport);
-    await expect(nav.getByRole("link")).toHaveText(TABS.map((t) => t.name));
+    // The tabs' list: the sidebar also holds the streak's pill (docs/milestones/M14-14b-2a-streak-ranks.md).
+    await expect(nav.getByRole("list").getByRole("link")).toHaveText(TABS.map((t) => t.name));
     // Down the left edge, the full height.
     const box = (await nav.boundingBox())!;
     expect([box.x, box.y, box.height]).toEqual([0, 0, viewport.height]);
@@ -173,7 +174,7 @@ test("the colours follow the device: Paper when light, Night when dark", async (
 
 // Reached by keyboard, every link in the tab bar and the sidebar shows the focus ring: a 3px solid outline in the
 // accent, offset 3px (criterion 9; WCAG 2.2 2.4.7). The players are admins, so the sidebar's Admin is checked too, and
-// so is its Settings button (docs/milestones/M14-14a-3b-settings.md).
+// so is its Settings button (docs/milestones/M14-14a-3b-settings.md), and the streak's pill at its top (14b-2a).
 test("every tab shows the focus ring from the keyboard", async ({ browser }) => {
   for (const viewport of [
     { width: 360, height: 800 },
@@ -184,7 +185,9 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-${name}@example.test`]);
     await page.reload();
     await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
-    const expected = TABS.map((t) => t.name).concat(viewport.width >= 768 ? ["Admin", "Settings"] : []);
+    // From 768px the sidebar opens with the streak's pill (docs/milestones/M14-14b-2a-streak-ranks.md), a new player's Seed.
+    const wide = viewport.width >= 768;
+    const expected = (wide ? ["0 day streak, Seed"] : []).concat(TABS.map((t) => t.name), wide ? ["Admin", "Settings"] : []);
     const accent = await page.evaluate(() => {
       const probe = document.createElement("span");
       probe.style.color = "var(--accent)";
@@ -211,4 +214,41 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     expect(seen.map((f) => f.text)).toEqual(expected);
     for (const f of seen) expect(f.ring).toEqual(["3px", "solid", accent, "3px"]);
   }
+});
+
+// The wider shell (docs/milestones/M14-14b-2b-1-shell.md, criteria 1 to 4): the 280px sidebar; from 1200px the right
+// column, 360px behind a line, with the friends feed on pages without a column of their own; no footer signed in; and
+// no control drawn as a text link (an underlined link) on any tab.
+test("the sidebar is 280px, the right column holds the feed from 1200px, and no control is a text link", async ({ browser }) => {
+  const { page, nav } = await player(browser, "sw", { width: 1440, height: 900 });
+  expect((await nav.boundingBox())!.width).toBe(280);
+  await nav.getByRole("link", { name: "Me" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/me");
+  const feed = page.getByRole("complementary", { name: "Friends feed" });
+  await expect(feed.getByRole("region", { name: "Feed" })).toBeVisible();
+  expect(await feed.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
+  expect(await feed.evaluate((el) => getComputedStyle(el).borderLeftWidth)).toBe("1px");
+  // The page's own content stops at the column.
+  const main = (await page.locator("main").filter({ visible: true }).boundingBox())!;
+  expect(main.x + main.width).toBeLessThanOrEqual(1080);
+  await expect(page.locator("footer").filter({ visible: true })).toHaveCount(0);
+
+  for (const tab of TABS) {
+    await nav.getByRole("link", { name: tab.name }).click();
+    await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
+    // Today's circle (the Leaderboard) is in the right column here, beside the page's own sections.
+    await expect.poll(() => sections(page)).toEqual(tab.sections.filter((s) => s !== "Leaderboard"));
+    const underlined = await page.evaluate(() =>
+      [...document.querySelectorAll("a")]
+        .filter((a) => a.checkVisibility() && getComputedStyle(a).textDecorationLine.includes("underline"))
+        .map((a) => a.textContent),
+    );
+    expect(underlined, tab.name).toEqual([]);
+  }
+
+  // Below 1200px the other pages show no feed; Today keeps its circle in its own column.
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await nav.getByRole("link", { name: "Me" }).click();
+  await expect(page.getByRole("region", { name: "All games" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Friends feed" })).toHaveCount(0);
 });

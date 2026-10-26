@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { POST as remove } from "./delete/route";
+import { POST as keep } from "./keep/route";
 import { GET as list } from "./route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -19,6 +20,7 @@ describe("/api/admin/reports routes (M08 8c), signed out", () => {
   it.each([
     ["GET /api/admin/reports", () => list(apiRequest("/api/admin/reports", { method: "GET" }))],
     ["POST /api/admin/reports/delete", () => remove(apiRequest("/api/admin/reports/delete", { method: "POST", body: { id: "1" } }))],
+    ["POST /api/admin/reports/keep", () => keep(apiRequest("/api/admin/reports/keep", { method: "POST", body: { id: "1" } }))],
   ])("%s answers 401 not_signed_in", async (_name, call) => {
     const response = await call();
     expect(response.status).toBe(401);

@@ -3,7 +3,7 @@
 // Groups (docs/milestones/M10-groups.md, 10b; G1, G6, G7): the home page's Groups section, a group's page and its
 // invite link. Every step goes through the API; errors are shown and never retried silently (DECISIONS.md: Error
 // handling). The look is M14's.
-import Link from "next/link";
+import { ButtonLink } from "./button-link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
@@ -66,7 +66,7 @@ export function Groups() {
         <ul>
           {groups.map((g) => (
             <li key={g.id}>
-              <Link href={`/groups/${g.id}`}>{g.name}</Link>
+              <ButtonLink href={`/groups/${g.id}`}>{g.name}</ButtonLink>
             </li>
           ))}
         </ul>
@@ -247,7 +247,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
         {!group && !error && <p>Loading…</p>}
         {error && <p role="alert">{error}</p>}
         <p>
-          <Link href="/">Go to today&apos;s puzzle</Link>
+          <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
         </p>
       </section>
       {/* Shown once the page proves membership, and reloaded when the members change (a removal). */}
@@ -294,7 +294,7 @@ export function JoinGroup({ code }: { code: string }) {
       )}
       {error && <p role="alert">{error}</p>}
       <p>
-        <Link href="/">Go to today&apos;s puzzle</Link>
+        <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
       </p>
     </section>
   );

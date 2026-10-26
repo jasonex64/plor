@@ -143,3 +143,8 @@ export const STATS_CHART_DAYS = 7;
 // The Me tab (docs/milestones/M14-14a-3a-me.md, Numbers): how many of the player's rarest answers it shows, from closed
 // days (human, 2026-10-25: "3, from closed days (Recommended)").
 export const RAREST_ANSWERS_SHOWN = 3;
+
+// The streak's ranks (docs/milestones/M14-14b-2a-streak-ranks.md, Numbers): the first day of each, Seed to Sakura. 1, 5,
+// 15 and 30 are L26's stages (human, 2026-10-24: "1–4 sprout, 5–14, 15–29, 30+"); 90 is the human's sakura (2026-10-26:
+// "sakura blossom (3 months)", "90 days (Recommended)").
+export const STREAK_RANK_FROM = [0, 1, 5, 15, 30, 90] as const;

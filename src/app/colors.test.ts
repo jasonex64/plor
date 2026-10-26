@@ -97,12 +97,33 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     expect(ratio(rgb(t[fg]), over(t.soft, t.surface))).toBeGreaterThanOrEqual(4.5);
   });
 
+  // The streak's number on its soft pill, which sits on the phone's top bar (the background) as well as the sidebar
+  // (the surface, above) (docs/milestones/M14-14b-2a-streak-ranks.md, criterion 5).
+  it("text on the soft pill over the background is at least 4.5:1", () => {
+    expect(ratio(rgb(t.text), over(t.soft, t.bg))).toBeGreaterThanOrEqual(4.5);
+  });
+
   // Me's calendar sits on a card: each played day's shade is a graphic the calendar needs (1.4.11), and its number,
   // shown with Numbers on the calendar, is text (1.4.3).
   it.each([1, 2, 3, 4])("shade %i is at least 3:1 on the surface, and its number at least 4.5:1 on it", (k) => {
     const shade = over(t[`shade-${k}`], t.surface);
     expect(ratio(shade, rgb(t.surface))).toBeGreaterThanOrEqual(3);
     expect(ratio(rgb(t[`on-shade-${k}`]), shade)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  // The admin pages (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 7): Delete's confirm button, text on the
+  // danger colour; the insights chart's bars (muted, and caught for the dip) and its target line (accent) as graphics
+  // on the card (1.4.11), and the dip's words in the caught colour as text.
+  it("on-accent on the danger colour is at least 4.5:1", () => {
+    expect(ratio(rgb(t["on-accent"]), rgb(t.danger))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(["muted", "caught", "accent"])("the chart's %s on the surface is at least 3:1", (fg) => {
+    expect(ratio(rgb(t[fg]), rgb(t.surface))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the caught colour as text on the surface is at least 4.5:1", () => {
+    expect(ratio(rgb(t.caught), rgb(t.surface))).toBeGreaterThanOrEqual(4.5);
   });
 
   it.each(["bg", "surface"])("the control outline on %s is at least 3:1", (bg) => {

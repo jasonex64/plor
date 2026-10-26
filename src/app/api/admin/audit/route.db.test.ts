@@ -1,11 +1,13 @@
 // The answer audit's route against the local stack (run with `npm run test:db`;
 // docs/milestones/M13-13b-learning-from-misses.md): an admin lists what was learned and decides, a decision that no
-// longer fits is 409, a malformed one 400; a player who isn't an admin gets 403, signed out 401. Three typists miss on
-// the fixture day through private.record_miss with this run's own texts, which are removed afterwards.
+// longer fits is 409, a malformed one 400; a player who isn't an admin gets 403, signed out 401; a near-typo names the
+// answer it's near, to link in one click (M14 14b-2b-2b). Three typists miss on the fixture day through
+// private.record_miss with this run's own texts, and a near-typo of the fixture's, which are removed afterwards.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import type { Review } from "@/admin/audit";
 import { getPool } from "@/lib/db";
+import { fixtureId } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
 import { apiRequest, cookieJar } from "@/test/request-scope";
@@ -20,6 +22,14 @@ const player = { username: `ap${RUN}`, session: new Map<string, string>() };
 // A new word and one holding a listed word (LDNOOBW's "2g1c").
 const NEW = `wolpertinger ${RUN}`;
 const LISTED = `${RUN} 2g1c`;
+// One edit from bear (and its plural, the same answer) and from nothing else in the fixture's animals. It's the
+// fixture's, not this run's, so its review and the name a link gives bear (which would make it an answer, and can't
+// be given twice) are cleared before and after.
+const NEAR = "bearz";
+const clearNear = async () => {
+  await getPool().query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await getPool().query("delete from private.thing_alias where alias = $1 and source_ref like 'miss_review:%'", [NEAR]);
+};
 
 const list = async () => {
   const r = await auditGet(apiRequest("/api/admin/audit", { method: "GET" }));
@@ -36,6 +46,7 @@ beforeAll(async () => {
   const db = getPool();
   const { rows } = await db.query<{ today: string }>("select private.today()::text as today");
   await ensurePuzzle(rows[0].today);
+  await clearNear();
   for (let n = 1; n <= 3; n++) {
     const { rows: user } = await db.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
       `${RUN}-t${n}@example.test`,
@@ -44,6 +55,7 @@ beforeAll(async () => {
     for (const [text, listed] of [[NEW, false], [LISTED, true]] as const) {
       await db.query("select private.record_miss($1, 'offbeat', $2::date, 0, $3, $3, false, $4, 3, 1)", [user[0].id, rows[0].today, text, listed]);
     }
+    await db.query("select private.record_miss($1, 'offbeat', $2::date, 0, $3, $3, true, false, 3, 1)", [user[0].id, rows[0].today, NEAR]);
   }
 });
 
@@ -54,6 +66,7 @@ afterAll(async () => {
     [[NEW, LISTED]],
   );
   await db.query("delete from private.thing where id = any($1)", [rows.map((r) => r.thing_id).filter(Boolean)]);
+  await clearNear();
   await db.query("delete from auth.users where email like $1", [`%${RUN}@example.test`]);
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removeCreatedPuzzles();
@@ -99,6 +112,15 @@ describe("/api/admin/audit", () => {
     const after = (await list()).body.reviews;
     expect(reviewOf(after, NEW).decision).toBe("undone");
     expect(reviewOf(after, LISTED)).toMatchObject({ decision: "accepted", thing: { name: LISTED } });
+  });
+
+  it("names the answer a waiting near-typo is near, and links it in one click", async () => {
+    useSession(admin.session);
+    const bear = { id: fixtureId(0, "bear"), name: "bear" };
+    expect(reviewOf((await list()).body.reviews, NEAR)).toMatchObject({ outcome: "near_typo", decision: null, near: [bear] });
+    expect(await post({ id: reviewOf((await list()).body.reviews, NEAR).id, action: "link", thing: bear.id })).toEqual({ status: 200, body: { ok: true } });
+    // Decided, it's near nothing to link to.
+    expect(reviewOf((await list()).body.reviews, NEAR)).toMatchObject({ decision: "linked", chosen: bear, near: [] });
   });
 
   it("answers 409 to a decision that no longer fits", async () => {

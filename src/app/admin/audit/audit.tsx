@@ -1,25 +1,30 @@
 "use client";
 
 // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md): the texts waiting for a
-// decision (held, held for a subset, rejected, near-typo), the answers players added, and what was decided, each undoable if it made an
-// answer. Every decision takes effect from now: a day that has started keeps what it had. Plain on purpose; the look
-// is M14's job.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+// decision (held, held for a subset, rejected, near-typo), the answers players added, and what was decided, each
+// undoable if it made an answer. Every decision takes effect from now: a day that has started keeps what it had. Laid
+// out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6): tables, the reason in words,
+// each action a full-width button stacked in its column.
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Action, Review } from "@/admin/audit";
+import { MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT } from "@/config/tunables";
 import type { ThingView } from "@/admin/base";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
+import admin from "../admin.module.css";
 
-const WHY: Record<Review["outcome"], string> = {
-  accepted: "Added as a new answer.",
-  held: "Held: it holds a word on the offensive-word list.",
+// Why a text waits, in words.
+const WHY: Record<Exclude<Review["outcome"], "accepted">, string> = {
+  held: "Has a word on the offensive-word list",
   // A subset whose filter a new answer can't carry (through its country, or a number: M13 13e-4a, A2).
-  held_subset: "Held: the category's filter can't be checked on a new answer. Accept makes it an answer for this category only.",
-  rejected: "Rejected: it names something outside the category.",
-  near_typo: "Held as a typo: it's one letter from an answer.",
+  held_subset: "Its filter can't be checked",
+  rejected: "Names something outside the category",
+  near_typo: "One letter from an answer",
 };
 
-export function Audit() {
+type Decide = (id: number, action: Action, thing?: string) => Promise<void>;
+
+export function Audit({ onChanged }: { onChanged: () => void }) {
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,107 +40,184 @@ export function Audit() {
   }, []);
   useEffect(load, [load]);
 
-  async function decide(id: number, action: Action, thing?: string) {
+  const decide: Decide = async (id, action, thing) => {
     setBusy(true);
     setError(null);
     try {
       await api("/api/admin/audit", { method: "POST", body: { id, action, ...(thing ? { thing } : {}) } });
       load();
+      onChanged();
     } catch (err) {
       setError(errorText(err));
     } finally {
       setBusy(false);
     }
-  }
+  };
 
   if (!reviews) return error ? <p role="alert">{error}</p> : <p>Loading…</p>;
   const waiting = reviews.filter((r) => r.outcome !== "accepted" && !r.decision);
   const added = reviews.filter((r) => r.outcome === "accepted" && !r.decision);
   const decided = reviews.filter((r) => r.decision);
-  const props = { busy, decide };
   return (
     <>
+      <p className={admin.note}>
+        What players typed that wasn&apos;t an answer, once {MISS_ACCEPT_MIN_PLAYERS} players and {MISS_ACCEPT_SHARE_PERCENT}% of a category typed
+        it. A decision counts from now: a day already started keeps its answers.
+      </p>
       {error && <p role="alert">{error}</p>}
-      <section aria-label="To review">
-        <h2>To review</h2>
-        {waiting.length === 0 && <p>Nothing to review.</p>}
-        {waiting.map((r) => (
-          <Entry key={r.id} review={r} {...props} />
-        ))}
+      <section aria-label="To review" className={admin.card}>
+        <h3 className={admin.cardTitle}>
+          To review {waiting.length > 0 && <span className={admin.badge}>{waiting.length}</span>}
+        </h3>
+        {waiting.length === 0 ? (
+          <p>Nothing to review.</p>
+        ) : (
+          <Table head={["Typed", "Category", "Why it waits", "Players", "Decide"]}>
+            {waiting.map((r) => (
+              <Row key={r.id} review={r} cells={[<span key="w" className={`${admin.tag} ${admin.decide}`}>{WHY[r.outcome as keyof typeof WHY]}</span>]}>
+                <Waiting review={r} busy={busy} decide={decide} />
+              </Row>
+            ))}
+          </Table>
+        )}
+        <p className={admin.note}>Dismiss is final: the text stays a miss and isn&apos;t asked about again.</p>
       </section>
-      <section aria-label="Added by players">
-        <h2>Added by players</h2>
-        {added.length === 0 && <p>No answers added.</p>}
-        {added.map((r) => (
-          <Entry key={r.id} review={r} {...props} />
-        ))}
+      <section aria-label="Added by players" className={admin.card}>
+        <h3 className={admin.cardTitle}>Added by players</h3>
+        {added.length === 0 ? (
+          <p>No answers added.</p>
+        ) : (
+          <Table head={["Typed", "Category", "Now the answer", "Players", "Change"]}>
+            {added.map((r) => (
+              <Row key={r.id} review={r} cells={[<span key="t">{r.thing?.name ?? "—"}</span>]}>
+                <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                  Undo
+                </button>
+                <LinkTo review={r} busy={busy} decide={decide} label="Same as another answer…" />
+              </Row>
+            ))}
+          </Table>
+        )}
       </section>
-      <section aria-label="Decided">
-        <h2>Decided</h2>
-        {decided.length === 0 && <p>Nothing decided yet.</p>}
-        <ul>
-          {decided.map((r) => (
-            <li key={r.id}>
-              &ldquo;{r.text}&rdquo; for {r.category_name}: {r.decision}
-              {r.chosen ? ` (${r.chosen.name})` : ""}, <time dateTime={r.decided_at!}>{new Date(r.decided_at!).toLocaleString()}</time>
-              {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
-              {(r.decision === "accepted" || r.decision === "linked") && (
-                <>
-                  {" "}
-                  <button type="button" disabled={busy} onClick={() => void decide(r.id, "undo")}>
-                    Undo
-                  </button>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+      <section aria-label="Decided" className={admin.card}>
+        <h3 className={admin.cardTitle}>Decided</h3>
+        {decided.length === 0 ? (
+          <p>Nothing decided yet.</p>
+        ) : (
+          <table className={admin.table}>
+            <thead>
+              <tr>
+                <th>Typed</th>
+                <th>Category</th>
+                <th>Decision</th>
+                <th>When</th>
+                <th>
+                  <span className={admin.sr}>Undo</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {decided.map((r) => (
+                <tr key={r.id} aria-label={r.text}>
+                  <td className={admin.strong}>&ldquo;{r.text}&rdquo;</td>
+                  <td>{r.category_name}</td>
+                  <td>
+                    {r.decision}
+                    {r.chosen ? ` (${r.chosen.name})` : ""}
+                  </td>
+                  <td className={`${admin.nowrap} ${admin.muted}`}>
+                    <time dateTime={r.decided_at!}>{new Date(r.decided_at!).toLocaleString()}</time>
+                  </td>
+                  <td>
+                    {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
+                    {r.decision === "accepted" || r.decision === "linked" ? (
+                      <div className={admin.actions}>
+                        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                          Undo
+                        </button>
+                      </div>
+                    ) : r.decision === "dismissed" ? (
+                      <span className={admin.muted}>Final</span>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
     </>
   );
 }
 
-type EntryProps = { review: Review; busy: boolean; decide: (id: number, action: Action, thing?: string) => Promise<void> };
-
-function Entry({ review: r, busy, decide }: EntryProps) {
+function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
-    <article aria-label={r.text}>
-      <h3>
-        &ldquo;{r.text}&rdquo; for {r.category_name}
-      </h3>
-      <p>
-        {WHY[r.outcome]} Typed by {r.players} of the {r.answered} players who answered the category.
-        {r.thing ? ` It's now the answer "${r.thing.name}".` : ""}
-      </p>
-      {r.outcome === "accepted" && (
-        <button type="button" disabled={busy} onClick={() => void decide(r.id, "undo")}>
-          Undo
-        </button>
-      )}
+    <table className={admin.table}>
+      <thead>
+        <tr>
+          {head.map((h) => (
+            <th key={h}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </table>
+  );
+}
+
+// A text's row: what was typed, its category, the given cells, how many typed it, then its actions stacked.
+function Row({ review: r, cells, children }: { review: Review; cells: ReactNode[]; children: ReactNode }) {
+  return (
+    <tr aria-label={r.text}>
+      <td className={admin.strong}>&ldquo;{r.text}&rdquo;</td>
+      <td>{r.category_name}</td>
+      {cells.map((c, i) => (
+        <td key={i}>{c}</td>
+      ))}
+      <td className={admin.nowrap}>
+        {r.players} of {r.answered}
+      </td>
+      <td>
+        <div className={admin.actions}>{children}</div>
+      </td>
+    </tr>
+  );
+}
+
+// The actions that fit a waiting text.
+function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; decide: Decide }) {
+  return (
+    <>
       {(r.outcome === "held" || r.outcome === "held_subset") && (
-        <button type="button" disabled={busy} onClick={() => void decide(r.id, "accept")}>
-          Accept
+        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept")}>
+          {r.outcome === "held_subset" ? "Accept for this category only" : "Accept"}
         </button>
       )}
       {r.outcome === "rejected" &&
         r.named.map((t) => (
-          <button key={t.id} type="button" disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
+          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
             Accept {t.name} as {r.category_name}
           </button>
         ))}
-      {r.outcome !== "accepted" && (
-        <button type="button" disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
-          Dismiss
-        </button>
-      )}
-      {(r.outcome === "accepted" || r.outcome === "near_typo") && <LinkTo review={r} busy={busy} decide={decide} />}
-    </article>
+      {/* A near-typo links to the answer it's a typo of in one click; the search is for any other (round 10, board 3). */}
+      {r.outcome === "near_typo" &&
+        r.near.map((t) => (
+          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+            Link to {t.name}
+          </button>
+        ))}
+      {r.outcome === "near_typo" && <LinkTo review={r} busy={busy} decide={decide} label={r.near.length > 0 ? "Different answer…" : "Same as…"} />}
+      <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
+        Dismiss
+      </button>
+    </>
   );
 }
 
 // "Same as": find the member the text is another name for, by any of its names, and link the text to it ("New
-// answer, you link (Recommended)").
-function LinkTo({ review: r, busy, decide }: EntryProps) {
+// answer, you link (Recommended)"). Behind a button, so the column shows one action per row until it's wanted.
+function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: boolean; decide: Decide; label: string }) {
+  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [found, setFound] = useState<ThingView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -151,19 +233,26 @@ function LinkTo({ review: r, busy, decide }: EntryProps) {
     }
   }
 
+  if (!open) {
+    return (
+      <button type="button" className={admin.button} onClick={() => setOpen(true)}>
+        {label}
+      </button>
+    );
+  }
   return (
-    <form onSubmit={search}>
-      <label>
-        Same as
-        <input value={query} onChange={(e) => setQuery(e.target.value)} />
+    <form onSubmit={search} className={admin.actions}>
+      <label className={admin.field}>
+        <span className={admin.sr}>Same as</span>
+        <input value={query} placeholder="Same as…" onChange={(e) => setQuery(e.target.value)} />
       </label>
-      <button type="submit" disabled={busy || query.trim() === ""}>
+      <button type="submit" className={admin.button} disabled={busy || query.trim() === ""}>
         Find
       </button>
       {error && <p role="alert">{error}</p>}
       {found && found.length === 0 && <p>No {r.category_name} goes by that name.</p>}
       {found?.map((t) => (
-        <button key={t.id} type="button" disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+        <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
           Link to {t.name}
         </button>
       ))}

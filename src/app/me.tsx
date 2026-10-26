@@ -3,7 +3,7 @@
 // The Me tab's stats (docs/milestones/M14-14a-3a-me.md; L45): the player's header, totals across games, this month's
 // calendar of days played, a card per game and the rarest answers, laid out from round 7's Me boards. The account is
 // in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
-import Link from "next/link";
+import { ButtonLink } from "./button-link";
 import { useEffect, useState } from "react";
 import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Me } from "@/game/me";
@@ -56,9 +56,7 @@ export function MeStats({ numbers }: { numbers: boolean }) {
           <Total value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. survived" />
           <Total value={String(me.offbeat.fullClimbs)} label="full climbs" />
         </dl>
-        <Link href="/offbeat" className={styles.link}>
-          Offbeat&apos;s game screen
-        </Link>
+        <ButtonLink href="/offbeat">Offbeat&apos;s game screen</ButtonLink>
       </section>
       <section aria-label="Your rarest answers" className={styles.card}>
         <h2 className={styles.heading}>Your rarest answers</h2>

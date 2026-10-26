@@ -84,14 +84,16 @@
   color: var(--muted);
 }
 
-/* Change and Set read as round 7's links, and stay 44px tall to tap (WCAG 2.2 2.5.8). */
+/* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), 44px
+   tall to tap (WCAG 2.2 2.5.8). */
 .inline {
   min-height: 44px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--accent);
+  margin: 0 0 0 6px;
+  padding: 0 12px;
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
   font-size: 15px;
   font-weight: 700;
 }
@@ -171,15 +173,29 @@
   background: var(--on-accent);
 }
 
-.link {
-  font-size: 15px;
-  font-weight: 700;
+.about {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  font-size: 14px;
 }
 
-.links {
+.aboutText {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 2px;
   margin: 0;
+}
+
+.aboutButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* The theme picker (round 7's .themes and .theme; M14 L47): three to a row, the chosen one outlined thick in the

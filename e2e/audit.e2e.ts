@@ -1,7 +1,8 @@
 // The answer audit's page (docs/milestones/M13-13b-learning-from-misses.md): the admin pages show what waits for
 // review; an admin sees a text players added and a held one, with their counts, undoes the first, accepts the second
-// and undoes that too; a player who isn't an admin sees the refusal. Three typists miss on the fixture day through
-// private.record_miss with this run's own texts, which are removed afterwards.
+// and undoes that too, and links a near-typo to its near answer in one click (M14 14b-2b-2b); a player who isn't an
+// admin sees the refusal. Three typists miss on the fixture day through private.record_miss with this run's own texts
+// and a near-typo of the fixture's, which are removed afterwards.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -11,10 +12,18 @@ const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.
 // A new word and one holding a listed word (LDNOOBW's "2g1c").
 const NEW = `skvader ${RUN}`;
 const LISTED = `${RUN} 2g1c`;
+// One edit from the fixture's bear only. Not this run's own, so its review and the name a link gives bear (which
+// would make it an answer, and can't be given twice) are cleared before and after.
+const NEAR = "bearz";
+const clearNear = async () => {
+  await DB.query("delete from private.miss_review where category = 'fixture_animal' and text = $1", [NEAR]);
+  await DB.query("delete from private.thing_alias where alias = $1 and source_ref like 'miss_review:%'", [NEAR]);
+};
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
+  await clearNear();
   for (let n = 1; n <= 3; n++) {
     const { rows } = await DB.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [
       `${RUN}-t${n}@example.test`,
@@ -23,12 +32,14 @@ test.beforeAll(async () => {
     for (const [text, listed] of [[NEW, false], [LISTED, true]] as const) {
       await DB.query("select private.record_miss($1, 'offbeat', private.today(), 0, $2, $2, false, $3, 3, 1)", [rows[0].id, text, listed]);
     }
+    await DB.query("select private.record_miss($1, 'offbeat', private.today(), 0, $2, $2, true, false, 3, 1)", [rows[0].id, NEAR]);
   }
 });
 
 test.afterAll(async () => {
   const { rows } = await DB.query<{ thing_id: string | null }>("delete from private.miss_review where text = any($1) returning thing_id", [[NEW, LISTED]]);
   await DB.query("delete from private.thing where id = any($1)", [rows.map((r) => r.thing_id).filter(Boolean)]);
+  await clearNear();
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removePuzzle(DB, puzzle);
   await DB.end();
@@ -41,20 +52,32 @@ test("an admin undoes an added answer, accepts a held one and undoes that; a pla
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-au@example.test`]);
   await admin.goto("/admin");
-  await expect(admin.getByRole("link", { name: /^Answer audit \(\d+ to review\)$/ })).toBeVisible();
+  // Admin opens on Puzzles, and the sub-tabs carry what waits: Audit with its count
+  // (docs/milestones/M14-14b-2b-2-admin-build.md, criteria 1 and 2).
+  await expect(admin).toHaveURL(/\/admin\/puzzles$/);
+  const tabs = admin.getByRole("navigation", { name: "Admin" });
+  await expect(tabs.getByRole("link", { name: /^Audit\s?\d+ waiting$/ })).toBeVisible();
 
-  await admin.getByRole("link", { name: /^Answer audit/ }).click();
-  const added = admin.getByRole("region", { name: "Added by players" }).getByRole("article", { name: NEW });
-  const held = admin.getByRole("region", { name: "To review" }).getByRole("article", { name: LISTED });
-  await expect(added).toContainText("Typed by 3 of the");
+  await tabs.getByRole("link", { name: /^Audit/ }).click();
+  await expect(admin).toHaveURL(/\/admin\/audit$/);
+  const added = admin.getByRole("region", { name: "Added by players" }).getByRole("row", { name: NEW });
+  const held = admin.getByRole("region", { name: "To review" }).getByRole("row", { name: LISTED });
+  const decided = (text: string) => admin.getByRole("region", { name: "Decided" }).getByRole("row", { name: text });
+  await expect(added).toContainText("3 of ");
   await expect(held).toContainText("offensive-word list");
   await added.getByRole("button", { name: "Undo" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${NEW}” for Name an animal: undone`);
+  await expect(decided(NEW)).toContainText("Name an animal");
+  await expect(decided(NEW)).toContainText("undone");
   await held.getByRole("button", { name: "Accept" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: accepted`);
+  await expect(decided(LISTED)).toContainText("accepted");
   // Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)").
-  await admin.getByRole("region", { name: "Decided" }).getByRole("listitem").filter({ hasText: LISTED }).getByRole("button", { name: "Undo" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: undone`);
+  await decided(LISTED).getByRole("button", { name: "Undo" }).click();
+  await expect(decided(LISTED)).toContainText("undone");
+  // A near-typo's first action links it to the answer it's near; the search is behind "Different answer…".
+  const near = admin.getByRole("region", { name: "To review" }).getByRole("row", { name: NEAR });
+  await expect(near.getByRole("button", { name: "Different answer…" })).toBeVisible();
+  await near.getByRole("button", { name: "Link to bear" }).click();
+  await expect(decided(NEAR)).toContainText("linked (bear)");
 
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");

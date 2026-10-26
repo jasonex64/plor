@@ -1,0 +1,128 @@
+/* Puzzles (round 10, board 1): the days as a row of buttons, the chosen one outlined in the text colour; host answers as
+   chips 30px tall (44px on phones), the checked ones filled in the accent with a tick. */
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chosen {
+  border-color: var(--text);
+  font-weight: 800;
+}
+
+.dayHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.note {
+  margin: 0;
+  font-weight: 700;
+}
+
+.problems {
+  margin: 0;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.question {
+  width: 190px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.chip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1.5px solid var(--edge);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.checked {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* The checkbox is hidden, so its focus shows on the chip (WCAG 2.2 2.4.7). */
+.chip:has(input:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.more {
+  border-style: dotted;
+  color: var(--muted);
+}
+
+/* A bank answer players can't type (round 10, board 1): dashed on the page's background, not a control; ticked, in the
+   danger colour. Its struck letter and its words say it too (WCAG 2.2 1.4.1). */
+.blocked {
+  border-style: dashed;
+  background: var(--bg);
+  color: var(--muted);
+  cursor: default;
+}
+
+.bad {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.chip s {
+  text-decoration-thickness: 2px;
+}
+
+.approve {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.fixFirst {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .chip {
+    min-height: 44px;
+  }
+}

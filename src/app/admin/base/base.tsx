@@ -2,12 +2,13 @@
 
 // Looking a thing up in the answer database (docs/milestones/M13-13a-the-base.md): by any of its names, with its
 // aliases, where it came from, its facts and the categories it falls in. Read-only; what players added is audited on
-// /admin/audit (13b).
-// Plain on purpose; the look is M14's job.
+// /admin/audit (13b). Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6): the
+// search, then each thing as a card.
 import { useState, type FormEvent } from "react";
 import type { ThingView } from "@/admin/base";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
+import admin from "../admin.module.css";
 
 export function AnswerBase() {
   const [query, setQuery] = useState("");
@@ -30,27 +31,50 @@ export function AnswerBase() {
   }
 
   return (
-    <section>
-      <form onSubmit={search}>
-        <label>
-          Name or alias
-          <input value={query} onChange={(e) => setQuery(e.target.value)} />
+    <>
+      <form onSubmit={search} className={admin.search}>
+        <label className={admin.field}>
+          <span className={admin.sr}>Name or alias</span>
+          <input value={query} placeholder="Name or alias" onChange={(e) => setQuery(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy || query.trim() === ""}>
+        <button type="submit" className={admin.primary} disabled={busy || query.trim() === ""}>
           Look up
         </button>
       </form>
       {error && <p role="alert">{error}</p>}
       {things && things.length === 0 && <p>Nothing goes by that name.</p>}
+      {things && things.length > 0 && <p className={admin.note}>{things.length === 1 ? "1 thing goes" : `${things.length} things go`} by that name.</p>}
       {things?.map((t) => (
-        <article key={t.id} aria-label={t.name}>
-          <h2>{t.name}</h2>
-          <p>Categories: {t.categories.length ? t.categories.join(", ") : "none"}</p>
-          <p>Names: {t.aliases.map((a) => `${a.alias} (${a.kind}, ${a.origin})`).join("; ")}</p>
-          <p>Facts: {t.facts.length ? t.facts.map((f) => `${f.trait.replace("_", " ")} ${f.value}`).join("; ") : "none"}</p>
-          <p>Sources: {t.sources.map((s) => `${s.source} ${s.id}`).join("; ")}</p>
+        <article key={t.id} aria-label={t.name} className={admin.card}>
+          <h3 className={admin.cardTitle}>{t.name}</h3>
+          <dl className={admin.facts}>
+            <dt>Categories</dt>
+            <dd>{t.categories.length ? t.categories.join(", ") : "none"}</dd>
+            <dt>Facts</dt>
+            <dd>{t.facts.length ? t.facts.map((f) => `${f.trait.replace("_", " ")} ${f.value}`).join("; ") : "none"}</dd>
+            <dt>Sources</dt>
+            <dd>{t.sources.map((s) => `${s.source} ${s.id}`).join("; ")}</dd>
+          </dl>
+          <table className={admin.table}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Kind</th>
+                <th>From</th>
+              </tr>
+            </thead>
+            <tbody>
+              {t.aliases.map((a) => (
+                <tr key={`${a.alias}-${a.kind}-${a.origin}`}>
+                  <td className={admin.strong}>{a.alias}</td>
+                  <td>{a.kind}</td>
+                  <td className={admin.muted}>{a.origin}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </article>
       ))}
-    </section>
+    </>
   );
 }
