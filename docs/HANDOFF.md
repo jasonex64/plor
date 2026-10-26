@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4a merged (PR #87); 13e-4b (the first 22 subsets) and 13e-4c (the animals import reads Wikidata by key) built, reviewed and proven, in PR #92 (the human's call), merging on green CI. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14`. The M14 section is the M14 session's, from main with 14b-2b-2a's PR #90 (written on the Windows checkout); for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c approved, 14b-2c-1 in review (PR #93); the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -18,27 +18,29 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 | 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
+| 14b-2b-2b | Keep comment, blocked host answers marked in place, the audit's one-click link. **Security changes:** `private.keep_reported_comment` and `private.comment_keep` (a kept comment stays hidden for its reporters); `private.audit_near` | #91 |
 
-### In review: 14b-2b-2b, the admin pages' three server changes (PR #91, auto-merge on green CI)
-`docs/milestones/M14-14b-2b-2-admin-build.md`, 14b-2b-2b. Two **security changes**, both approved by the human (2026-10-26) and in the DECISIONS.md Log:
-- **Keep comment:** `private.keep_reported_comment` and `private.comment_keep`. The reports stay, so the comment stays hidden for its reporters ("Still hidden (Recommended)").
-- **The audit's one-click link:** `private.audit_near`, fed by the game's `withinTypo` ("New lookup function (Recommended)").
-
-Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, not SQL. Local evidence: `npm test` 386, pgTAP 73, db 25, admin e2e 11. Review done: both blocking findings fixed, the rest in ROADMAP Next revision.
+### In review: 14b-2c-1, the player screens (PR #93)
+`docs/milestones/M14-14b-2c-review-items.md`: 14b-2c (all 53 For M14 items in 4 PRs by area) was approved by the human on the Mac, 2026-10-26, after four rounds of guided questions (answers 1–14, quoted there). 14b-2c-1 closes 23 items, among them 8 and 16 from 14b-2c-4. It's built, reviewed (two blocking findings fixed, the rest in ROADMAP For M14), and its evidence is in the ticket. 30 For M14 items are left for 14b-2c-2 to 14b-2c-4, plus the review's 10 new ones.
 
 ### Next step
-1. After 14b-2b-2b merges: mark it done (ticket Status, ROADMAP row) with its merge evidence.
-2. Then 14b-2c (the For M14 review items in ROADMAP Next revision), then 14c-1 (ask its N1–N6).
+1. Once PR #93 merges on green CI: mark 14b-2c-1 done (ticket Status, ROADMAP row, the ROADMAP ticks' PR number) with its CI run.
+2. Then **14b-2c-2**, Me, Friends, the settings sheet and themes (items 19, 26, 27, 28, 29, 33); then 14b-2c-3, the admin pages (item 52's Keep race is a security change: propose it and record it in DECISIONS.md before building); then 14b-2c-4.
+3. Then 14c-1 (ask its N1–N7). N3 now holds the share symbols and N7 a stolen key's feedback (14b-2c answers 3 and 5).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
 2. `npx supabase start`, then `npx supabase migration up`. On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
 3. `npx next typegen` once before `npx tsc --noEmit -p .` (delete a stale `.next/dev` if tsc names a moved route). Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
-4. The checks: `npm test` 360; `npm run test:db` 260 (before main's PR #87 tests); `npx supabase test db`; `npm run test:e2e` 42. Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
+4. The checks (2026-10-26, 14b-2c-1): `npm test` 390; `npm run test:db` 264; `npx supabase test db` 24 files; `npm run test:e2e` 53. On a stack holding M13 13e-5's `one_walk` migration before it merges, `answer_base.test.sql` fails (it imports a kind_of circle on purpose). Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
 
 ### Local state (Windows)
 - **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session resets it from its branch (`db reset`, `load all`; the human approved), which drops M14's two new migrations (`keep_comment`, `audit_near`). Re-apply them after a reset (pending ones with `npx supabase migration up`; if the CLI refuses because of M13's unmerged migration, run the two files' SQL in one transaction and add their rows to `supabase_migrations.schema_migrations`). Message the M13 session before any suite or dev server.
 - Canvas mockups, renders, the critique snapshot and screenshots are in the session's temp folder, outside the repo.
+
+### Local state (Mac)
+- The M14 worktree is `/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`. The M13 session works in `/Users/jason/code/plor` itself, and both share the Mac's local stack and port 3000. On 2026-10-26 the M13 session's 13e-5 migration `20261026212300_one_walk.sql` (not on `main` yet) was applied to that stack. Message it before a `db reset`, a full suite run or a dev server; it held while 14b-2c-1's suites ran.
+- In e2e, Playwright's fake clock moves only the browser's time: a test that needs the database to see a timeout backdates `private.run.started_at` (`e2e/player-screens.e2e.ts`). It also fires the Realtime client's own timers, whose rejoin reloads the board, so a board check after a time-up runs on the real clock.
 
 **Left running:** nothing (no dev server, no background job).
 

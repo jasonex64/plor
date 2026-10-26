@@ -80,7 +80,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   }
   // After playing, the score is in the card, and the order is the same.
   await creator.goto("/");
-  await expect(card.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
+  await expect(card.getByText("0 points · caught on question 1")).toBeVisible();
   await expect.poll(sections("main section")).toEqual(["Offbeat", "Feed"]);
   await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);

@@ -6,7 +6,7 @@
 // the page.
 import { GAME_ID } from "@/content/puzzle";
 import { friendsSql, seesCommentSql } from "@/friends/circle";
-import { FINISHED, type RunStatus } from "@/game/runs";
+import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, commentReactions } from "@/reactions/reactions";
 import { toComment, type Comment, type CommentRow } from "./comments";

@@ -186,6 +186,71 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
+/* The room the page leaves for the shell, the clock bar and the right column, flagged by them on <body> while shown
+   (src/app/body-flag.ts). On phones, the top bar (56px) and the tab bar (64px); the top bar's wordmark stands for the
+   page's own "Plor" heading, read but not shown twice; About and the privacy policy are in the settings sheet, so the
+   page footer isn't shown (M14 14a-1, 14a-3b and 14b-2b-1, Numbers and criterion 3). The clock bar, 112px above the
+   tab bar's foot (14a-2a). */
+body[data-shell] {
+  padding-top: 56px;
+  padding-bottom: 64px;
+}
+
+body[data-shell] main > h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+body[data-shell] main > footer {
+  display: none;
+}
+
+/* A jump to a part of the page (the result, #result) stops below the top bar, not under it (14b-2c-1, item 14). */
+body[data-shell] main [id] {
+  scroll-margin-top: 56px;
+}
+
+body[data-clock] {
+  padding-bottom: 112px;
+}
+
+/* From 768px, the 280px sidebar (L42; human, 2026-10-26: "280px") and no top bar; the clock bar, 48px at the top. */
+@media (min-width: 768px) {
+  body[data-shell] {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 280px;
+  }
+
+  body[data-shell] main [id] {
+    scroll-margin-top: 0;
+  }
+
+  body[data-shell] main > h1 {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  body[data-clock] {
+    padding-bottom: 0;
+    padding-top: 48px;
+  }
+}
+
+/* From 1200px, the 360px right column (M14 14b-2b-1, Numbers), which the clock bar stops short of. */
+body[data-column] {
+  --right-column: 360px;
+  padding-right: 360px;
+}
+
 /* A page's content: one column, at most 960px wide when there's no side column (M14 L43). */
 main {
   box-sizing: border-box;
@@ -249,4 +314,10 @@ button:disabled {
 
 footer {
   margin-top: 32px;
+}
+
+/* An invite link is one long word: it breaks anywhere rather than push a 320px phone sideways (WCAG 2.2 1.4.10;
+   docs/milestones/M14-14b-2c-review-items.md, found checking item 10). */
+code {
+  overflow-wrap: anywhere;
 }

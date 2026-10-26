@@ -66,7 +66,9 @@ export function MeStats({ numbers }: { numbers: boolean }) {
           <ol className={styles.rarest}>
             {me.rarest.map((r) => (
               <li key={`${r.date} ${r.prompt}`}>
-                <strong>{r.answer.name}</strong>
+                {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
+                    docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
+                <strong>{r.answer.name}</strong>{" "}
                 <span className={styles.muted}>
                   {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
                 </span>

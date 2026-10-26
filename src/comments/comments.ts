@@ -6,7 +6,7 @@
 import { DatabaseError } from "pg";
 import { GAME_ID } from "@/content/puzzle";
 import { memberSql, seesCommentSql } from "@/friends/circle";
-import { FINISHED, type RunStatus } from "@/game/runs";
+import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { NO_REACTIONS, commentReactions, type Reactions } from "@/reactions/reactions";

@@ -7,8 +7,13 @@ import type { RunState } from "./runs";
 const SURVIVED = "🟩";
 const NOT_SURVIVED = "⬜";
 
+// How many questions the run survived, for the share text and the result screen (M05 review: one count for both).
+export function survivedCount(run: RunState): number {
+  return run.answered.filter((a) => !a.matched).length;
+}
+
 export function shareText(run: RunState): string {
-  const survived = run.answered.filter((a) => !a.matched).length;
+  const survived = survivedCount(run);
   // The run's date is the Pacific day as text ("2026-10-21"); read in UTC so the label can't shift by a day.
   const day = new Date(`${run.date}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   const rounds = SURVIVED.repeat(survived) + NOT_SURVIVED.repeat(run.total - survived);

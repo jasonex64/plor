@@ -19,7 +19,8 @@ describe("where everyone ended (M07 7d)", () => {
     expect(placeRows(caught(3), [])).toEqual([{ place: { kind: "caught", question: 3 }, you: true, named: [], more: 0, everyone: [] }]);
   });
 
-  it("puts each friend in their place, in play order: questions, then ran out of time, then survived", () => {
+  // Human, 2026-10-26: "By how far they got (Recommended)" (docs/milestones/M14-14b-2c-review-items.md, answer 10).
+  it("puts each friend in their place, by how far they got: survived, then each question from the last down", () => {
     const rows = placeRows({ result: "survived" }, [
       friend("Bea", caught(5)),
       friend("Al", { result: "timed_out", question: 2 }),
@@ -27,10 +28,10 @@ describe("where everyone ended (M07 7d)", () => {
       friend("Eve", caught(5)),
     ]);
     expect(rows.map((r) => [r.place, r.you, r.everyone.map((p) => p.name)])).toEqual([
-      [{ kind: "caught", question: 1 }, false, ["Cy"]],
-      [{ kind: "caught", question: 5 }, false, ["Bea", "Eve"]],
-      [{ kind: "timed_out" }, false, ["Al"]],
       [{ kind: "survived" }, true, []],
+      [{ kind: "caught", question: 5 }, false, ["Bea", "Eve"]],
+      [{ kind: "timed_out", question: 2 }, false, ["Al"]],
+      [{ kind: "caught", question: 1 }, false, ["Cy"]],
     ]);
   });
 
@@ -49,11 +50,16 @@ describe("where everyone ended (M07 7d)", () => {
     });
   });
 
-  it("puts every friend who ran out of time in one row, whichever question it was", () => {
-    const rows = placeRows(caught(1), [friend("Al", { result: "timed_out", question: 2 }), friend("Bo", { result: "timed_out", question: 6 })]);
-    expect(rows.map((r) => [r.place, r.everyone.map((p) => p.name)])).toEqual([
-      [{ kind: "caught", question: 1 }, []],
-      [{ kind: "timed_out" }, ["Al", "Bo"]],
+  it("gives a timeout its question's row, beside a catch at the same question, the catch first", () => {
+    const rows = placeRows(caught(2), [
+      friend("Al", { result: "timed_out", question: 2 }),
+      friend("Bo", { result: "timed_out", question: 6 }),
+      friend("Cy", { result: "timed_out", question: 2 }),
+    ]);
+    expect(rows.map((r) => [r.place, r.you, r.everyone.map((p) => p.name)])).toEqual([
+      [{ kind: "timed_out", question: 6 }, false, ["Bo"]],
+      [{ kind: "caught", question: 2 }, true, []],
+      [{ kind: "timed_out", question: 2 }, false, ["Al", "Cy"]],
     ]);
   });
 

@@ -139,7 +139,7 @@ test("Me lists the rarest answers from closed days, with their share", async ({ 
   await page.goto("/me");
   const item = page.getByRole("region", { name: "Your rarest answers" }).getByRole("listitem");
   await expect(item).toHaveCount(1);
-  await expect(item).toHaveText(`${q.members.cat.names[0]}${q.prompt} · 20% gave this · ${dateText(yesterday, { day: "numeric", month: "short" })}`);
+  await expect(item).toHaveText(`${q.members.cat.names[0]} ${q.prompt} · 20% gave this · ${dateText(yesterday, { day: "numeric", month: "short" })}`);
 });
 
 // Criteria 6 and 7.

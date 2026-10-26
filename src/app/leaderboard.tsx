@@ -11,11 +11,6 @@ import { Avatar } from "./avatar";
 import styles from "./leaderboard.module.css";
 import { errorText } from "./messages";
 
-// "Mon, Oct 19". The date is a calendar date; read in UTC so the label can't shift by a day (as src/game/share.ts).
-function monday(from: string): string {
-  return new Date(`${from}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
-}
-
 // title names the board (its heading and region); path is the API route that returns it.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [board, setBoard] = useState<Board | null>(null);
@@ -31,8 +26,8 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
       <p>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
       {board && (
         <>
-          <Standings title={`This week, from ${monday(board.thisWeek.from)}`} label="This week" week={board.thisWeek} />
-          <Standings title={`Last week, from ${monday(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
+          <Standings title={`This week, from ${dayLabel(board.thisWeek.from)}`} label="This week" week={board.thisWeek} />
+          <Standings title={`Last week, from ${dayLabel(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
         </>
       )}
       {!board && !error && <p>Loading…</p>}
@@ -56,6 +51,15 @@ export function LeaderboardCard() {
   const [groupsError, setGroupsError] = useState<string | null>(null);
   // Choices can change faster than the answers come back: only the newest choice's answer is shown (M11 H6).
   const [latest] = useState(latestOnly);
+  // A new choice clears the last one's rows and error, so they aren't shown under the new label while it loads, or
+  // for good if it fails (docs/milestones/M14-14b-2c-review-items.md, item 13).
+  function choose(next: { period?: "yesterday" | "week"; group?: string | null }) {
+    if (next.period !== undefined) setPeriod(next.period);
+    if (next.group !== undefined) setGroup(next.group);
+    setDay(null);
+    setWeek(null);
+    setError(null);
+  }
 
   useEffect(() => {
     api<{ groups: { id: string; name: string }[] }>("/api/groups", { method: "GET" }).then(
@@ -81,14 +85,14 @@ export function LeaderboardCard() {
       <div role="radiogroup" aria-label="Period" className={styles.switch}>
         {(["yesterday", "week"] as const).map((p) => (
           <label key={p} className={period === p ? `${styles.choice} ${styles.on}` : styles.choice}>
-            <input type="radio" name="leaderboard-period" checked={period === p} onChange={() => setPeriod(p)} />
+            <input type="radio" name="leaderboard-period" checked={period === p} onChange={() => choose({ period: p })} />
             {p === "yesterday" ? "Yesterday" : "This week"}
           </label>
         ))}
       </div>
       <label className={styles.board}>
         Board
-        <select value={group ?? ""} onChange={(e) => setGroup(e.target.value === "" ? null : e.target.value)}>
+        <select value={group ?? ""} onChange={(e) => choose({ group: e.target.value === "" ? null : e.target.value })}>
           <option value="">Friends</option>
           {groups.map((g) => (
             <option key={g.id} value={g.id}>
@@ -100,7 +104,7 @@ export function LeaderboardCard() {
       <section aria-label={label}>
         <p className={styles.date}>
           {day && `${dayLabel(day.date)} · Offbeat`}
-          {week && `From ${monday(week.from)} · Offbeat`}
+          {week && `From ${dayLabel(week.from)} · Offbeat`}
         </p>
         {day && <Entries entries={day.entries} />}
         {week && <Entries entries={week.entries} />}
@@ -112,7 +116,8 @@ export function LeaderboardCard() {
   );
 }
 
-// "Fri 23 Oct" (L25: Yesterday is dated). A calendar date, read in UTC so it can't shift by a day.
+// "Fri 23 Oct" (L25: Yesterday is dated), and a week's Monday the same way (docs/milestones/M14-14b-2c-review-items.md,
+// item 15). A calendar date, read in UTC so it can't shift by a day.
 function dayLabel(date: string): string {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 }

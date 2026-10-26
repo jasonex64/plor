@@ -5,7 +5,7 @@ import { STATS_CHART_DAYS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { settleRuns } from "./ledger";
 import { hostAnswers, named, thingNames, type Named } from "./payload";
-import { FINISHED, type RunStatus } from "./runs";
+import { FINISHED, type RunStatus } from "./status";
 import { getStreak } from "./streak";
 
 // best: the highest points plus final bonus over closed days, null before one is settled. average: questions survived

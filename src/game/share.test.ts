@@ -16,6 +16,7 @@ function answered(index: number, matched: boolean): AnsweredQuestion {
     points: 0,
     bonus: 0,
     share: null,
+    inDay: true,
   };
 }
 

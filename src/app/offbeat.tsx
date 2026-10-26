@@ -9,7 +9,8 @@ import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/confi
 import type { Stats, Yesterday } from "@/game/offbeat";
 import type { RunState } from "@/game/runs";
 import { api } from "@/lib/api-client";
-import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
 import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
@@ -30,14 +31,12 @@ export function OffbeatScreen({ username, onStarted }: { username: string; onSta
   }, []);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
-  const [channelError, setChannelError] = useState<string | null>(null);
-  const { paused } = useBoardChannel({
+  const channel = useBoardChannel({
     joined: nudgeComments,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
       if (changesThread(message, "feed")) nudgeComments();
     },
-    failed: (err) => setChannelError(errorText(err)),
   });
   // At midnight Pacific the page starts again from the server's new day, except a game in play, which goes on to its
   // end (M11 H6), as on Today.
@@ -62,8 +61,7 @@ export function OffbeatScreen({ username, onStarted }: { username: string; onSta
         <OffbeatInfo key={`info-${day}-${ended}`} />
       </div>
       <SideColumn label="Feed" inPlace className={styles.feed}>
-        {paused && <p role="status">{PAUSED_TEXT}</p>}
-        {channelError && <p role="alert">{channelError}</p>}
+        <LiveStatus channel={channel} />
         <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title="Offbeat comments" />
       </SideColumn>
     </div>

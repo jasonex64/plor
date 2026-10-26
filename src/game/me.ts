@@ -7,7 +7,7 @@ import type { Db } from "@/lib/db";
 import { allTimePoints, dayCounts } from "./ledger";
 import { getStats } from "./offbeat";
 import { named, thingNames, type Named } from "./payload";
-import { FINISHED } from "./runs";
+import { FINISHED } from "./status";
 
 // since: the day the profile was made, by the Pacific day boundary. month: every day of today's month, oldest first,
 // with the questions survived on a finished run, or null (days after today included, so the calendar can draw them).
