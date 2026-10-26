@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, next. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, built and reviewed, in review in PR_PENDING (its questions answered, answers 15–20); then 14b-2c-4. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -42,7 +42,17 @@ Guided questions (human, 2026-10-26, on the Mac):
 13. **ButtonLink's 6px gap and 0 16px padding, the footer's 24px margin** (item 47): "Keep as shipped (Recommended)". Neither round 5's `.secondary` nor round 10 draws them, so this answer is their origin.
 14. **A live channel that couldn't be opened** (item 44): "A 'Try again' button". The player reopens it; nothing retries by itself, so no timing number is needed.
 
+**Round 5** (asked before building 14b-2c-3):
+
+15. **Keep's open-report rule** (item 52): "Leave it". A report made between an admin opening Reports and clicking Keep counts as handled; the item closes as accepted, with no security change.
+16. **Puzzles' host-answer chips** (item 36): "Stay in place (Recommended)": a ticked chip is marked, not moved, and "Show fewer" appears only when there's something to hide.
+17. **Admin tables on phones** (item 38): "Label each stacked cell (Recommended)": each stacked cell names its column, and the table keeps its roles for screen readers.
+18. **The bank's label for a started day with no answers** (item 39): "'Today, no answers yet' (Recommended)"; "Scheduled" only for a future day.
+19. **One audit query for every waiting near-typo** (item 53): "Leave it for now (Recommended)": one `audit_near` query each stays, with no security change.
+20. **A source for the table roles** (answer 17): "Add WAI-ARIA 1.2 (Recommended)": its `table`, `rowgroup`, `row`, `columnheader` and `cell` roles, added to SOURCES.md.
+
 ## Source
+- WAI-ARIA 1.2 (SOURCES.md, added for 14b-2c-3, answer 20): the `table`, `rowgroup`, `row`, `columnheader` and `cell` roles (item 38).
 - WCAG 2.2 (SOURCES.md): 1.3.1 Info and Relationships (items 20, 38); 2.4.3 Focus Order and 2.4.7 Focus Visible (items 30, 33, 36, 41, 53); 2.5.8 Target Size (item 10).
 - Next.js (SOURCES.md, the bundled docs in `node_modules/next/dist/docs/`): how the App Router keeps a visited page hidden (items 12, 43). To read before 14b-2c-1.
 - HTML `<dialog>` (SOURCES.md, MDN): the settings sheet's close (items 26, 27).
@@ -62,7 +72,7 @@ Numbers are the item's place in ROADMAP's For M14 list on 2026-10-26.
 | Closed without code | | 2 (to 14c, answer 3); 4's stolen key (to 14c, answer 5); 11 (done: the admin pages got the shell in 14b-2b-2a, PR #90); 34 (confirmed, answer 9) |
 
 **Needs the human before it's built:**
-- **Item 52**, Keep's open-report rule, changes `private.keep_reported_comment`, a security change (CLAUDE.md, "Security changes need a human"). The fix is proposed first and recorded in DECISIONS.md before 14b-2c-3 builds it.
+- **Item 52**, Keep's open-report rule: asked before 14b-2c-3 (answer 15, "Leave it"), so no security change.
 - **Item 6**, a timeout nobody outside Today learns of. ROADMAP's Correctness list kept the board's version of this out of M11 because it changes the game's writes (H6). 14b-2c-1 proposes a read-side fix first; if it needs a write, it comes back to the human.
 
 ## Acceptance criteria
@@ -91,6 +101,8 @@ No other new number is expected. If a fix needs one, stop and ask.
 3. Each PR updates this ticket's Status, ROADMAP's M14 row and the ticked items.
 
 ## Removes
+14b-2c-3 removed: `hostBankShare` and its test, the blocked chip's second rendering (a `<span>`), the phone tables' `thead { display: none }`, and three stale comments.
+
 14b-2c-2 removed: Me's copy of the `finished` CTE (one `FINISHED_RUNS` in `src/game/offbeat.ts`), the second settle per `GET /api/me`, the sheet's `event.target === event.currentTarget` close and `Preferences`' `busy` disabling, Home's re-applying of the account's theme, and the hex values that repeated `--text` and `--on-accent` in the `--on-shade-*` slots.
 
 Planned, confirmed per PR:
@@ -124,6 +136,15 @@ Planned, confirmed per PR:
 | Item 26 suggests comparing the click with the sheet's box, or `pointerdown` | Both: a press must start (`pointerdown`) and end (`click`) outside the dialog's own box | The dialog's box, not the sheet's: from 768px the 1px left border is the dialog's, and a tap on it is on the panel |
 | Item 33 names the theme picker and 14a-3b's switches | Both show their change at once, stay enabled, and save one after another; the settings sheet alone applies a signed-in player's theme | Home re-applied the account's theme on every profile change, putting the page back mid-save (the 14b-2c-2 review) |
 
+14b-2c-3:
+
+| Source says | We built | Why different |
+|---|---|---|
+| Item 53: unticking a blocked host answer swaps its checkbox for a plain chip | A blocked chip is always a checkbox, `aria-disabled` once unticked | So the keyboard's focus stays on it; it can't be ticked again, and its words say why |
+| Answer 18: "Scheduled" for a future day, "Today, no answers yet" for a started one | Also "<day>, no answers" for a past day with none (a day that went by unapproved, or no one played) | Answer 18 named no wording for that case; Claude's, for the human to change |
+| Answer 17 and WAI-ARIA 1.2: explicit table roles; the header row kept for screen readers | The header row hidden on phones by a new visually-hidden rule in `admin.module.css` | CSS Modules can't `composes:` inside a media query; item 49 (14b-2c-4) folds the copies together |
+| Item 41: Me marked current on desktop admin pages until `useMinWidth` reads the width | No change | Not reproduced: a `MutationObserver` added with `addInitScript`, before the page loaded, saw no `aria-current` on Me at 1440px on `/admin/bank` (`SEEN []`). Home renders only on the client, so the width is read on the first render |
+
 ## Evidence
 14b-2c-1, on the Mac, 2026-10-26, against the shared local stack (which also holds M13 13e-5's unmerged `20261026212300_one_walk.sql`):
 
@@ -146,6 +167,14 @@ Planned, confirmed per PR:
 - Item 29, the `setMe` updater, has no test: it's a race between two answers, checked by reading.
 - `npx supabase test db`: as in 14b-2c-1, 23 of 24 files pass locally and `answer_base.test.sql` fails on M13 13e-5's `one_walk` migration in the shared stack (the M13 session confirmed it's expected until 13e-5 merges); CI checks it on a fresh database.
 
+14b-2c-3, on the Mac, 2026-10-26:
+
+- `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  389 passed (389)` (the `hostBankShare` test removed); `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `57 passed (1.9m)`.
+- After the review's fix to the bank: tsc and eslint clean, `npm test` 389, `npm run test:db` 266, and `bank`, `admin-area` and `approve-and-play` e2e → `5 passed (8.2s)`.
+- With `src/app/admin` set back to `HEAD`'s, the changed e2e checks failed: the phone menu and labels (`admin-area`), the blocked chip staying a checkbox (`approve-and-play`) and the Reports focus (`live-board`); all pass on the new code.
+- `src/admin/bank.db.test.ts`: past, missed (a past draft never approved), today and future days; with the review's first version of `day` put back, it fails.
+- Not tested: "Show fewer" only with something to hide (a check written for it couldn't fail on the old code, so it was dropped), and the bank page's three labels (ROADMAP, 14b-2c-3 review).
+
 ## Review
 14b-2c-1, by the `reviewer` agent in a fresh context, 2026-10-26.
 
@@ -162,3 +191,10 @@ Planned, confirmed per PR:
   - Item 33: Home re-applied the account's theme whenever the profile changed, so another setting's reply, or a profile reload, put the page back while a picked theme was still saving. Fixed: signed in, the settings sheet alone applies the theme; Home only clears it when there's no account theme. With its e2e test (red without the fix).
   - The ticket, ROADMAP and handoff: brought up to date in this PR.
 - Deferred to ROADMAP "Next revision" (For M14, "14b-2c-2 review"): the sheet CSS's stale comment; a pointercancel leaving `pressedOutside` set; clearing a pending setting by value; an in-flight account save's refusal lost when the sheet closes; two ways to give `getStreak` and `settleRuns` their day; Me's `days_played` and `average` read in two statements; the settings e2e's unclosed contexts.
+
+14b-2c-3, by the `reviewer` agent in a fresh context, 2026-10-26.
+
+- Blocking findings and how each was fixed:
+  - The bank's `day` came from whether a day had started, so a past draft never approved showed "Scheduled". Fixed: `day` compares the date with `private.today()`, with the missed day in the db test (red with the old line).
+  - The handoff and this ticket's 14b-2c-3 sections: brought up to date in this PR.
+- Deferred to ROADMAP "Next revision" (For M14, "14b-2c-3 review"): a ticked chip hidden again by "Show fewer"; `.blocked`'s stale comment; no plain `content` fallback before the alt-text label; no tests of the bank's labels or of "Show fewer"; the themes table's unlabelled cells; the phone menu's document-wide Escape.

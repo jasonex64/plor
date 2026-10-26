@@ -52,11 +52,6 @@ describe("buildInsights", () => {
     expect(day.questions[0].hostAnswers).toEqual([{ id: "dog", name: "dog" }]);
   });
 
-  it("measures the share of answers in the host bank, matched or not", () => {
-    // Q1: 2 dog (host) + 4 cat (host bank, not host) + 4 axolotl.
-    expect(day.questions[0].hostBankShare).toBe(0.6);
-  });
-
   it("marks a question with fewer than 5 players as too few", () => {
     expect(day.questions.map((q) => q.tooFew)).toEqual([false, false, false, true]);
   });
@@ -114,7 +109,7 @@ describe("buildInsights", () => {
 
   it("reports a question nobody answered without a rate", () => {
     const empty = build("d", false, puzzle, [], []);
-    expect(empty.questions[0]).toMatchObject({ answered: 0, catchRate: null, hostBankShare: null, tooFew: true, breaksShape: false });
+    expect(empty.questions[0]).toMatchObject({ answered: 0, catchRate: null, tooFew: true, breaksShape: false });
     expect(empty.finished).toBe(false);
   });
 });

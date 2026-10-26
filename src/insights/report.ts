@@ -18,8 +18,6 @@ export type QuestionInsights = {
   // Share of answers that matched the host, 0..1; null when nobody answered.
   catchRate: number | null;
   tooFew: boolean;
-  // Share of answers that were in the host bank, matched or not, 0..1; null when nobody answered.
-  hostBankShare: number | null;
   topAnswers: { answer: Named; count: number }[];
   // A question with enough players that catches at least INSIGHTS_SHAPE_DROP_POINTS fewer than an earlier one.
   breaksShape: boolean;
@@ -33,7 +31,6 @@ export function buildInsights(date: string, finished: boolean, puzzle: ApprovedP
   const questions = puzzle.questions.map((question, index): QuestionInsights => {
     const rows = answers.filter((a) => a.question_idx === index);
     const caught = rows.filter((a) => a.matched).length;
-    const bank = new Set(question.host_bank);
     const counts = new Map<string, number>();
     for (const row of rows) counts.set(row.entry_id, (counts.get(row.entry_id) ?? 0) + 1);
     const topAnswers = [...counts]
@@ -48,7 +45,6 @@ export function buildInsights(date: string, finished: boolean, puzzle: ApprovedP
       caught,
       catchRate: rows.length ? caught / rows.length : null,
       tooFew: rows.length < INSIGHTS_MIN_PLAYERS,
-      hostBankShare: rows.length ? rows.filter((a) => bank.has(a.entry_id)).length / rows.length : null,
       topAnswers,
       breaksShape: false,
       misses: groupMisses(misses.filter((m) => m.question_idx === index)),
