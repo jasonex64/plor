@@ -1,9 +1,13 @@
 /* The colour slots, the fonts and base element styles (DECISIONS.md: Styling). Components use the slots through CSS
-   Modules, never hex values. Paper and Night are the presets the human chose (docs/milestones/M14-look-and-feel.md,
-   L21); the outline colours were approved by the human (M14, Numbers). Every pairing the screens use passes WCAG 2.2
-   (1.4.3 for text, 1.4.11 for outlines), checked by src/app/colors.test.ts. */
-:root {
-  color-scheme: light dark;
+   Modules, never hex values. The six themes (docs/milestones/M14-look-and-feel.md, L20, L21;
+   docs/milestones/M14-14b-1-themes.md): Paper by default, Night under the device's dark mode, and each chosen one as a
+   [data-theme] block, which <html> carries when a player picks it, and the settings sheet's tiles carry to draw
+   themselves. The outline colours were approved by the human (M14, Numbers), Sky's, Moonlit's and Ink's with round 8
+   ("Build as drawn", 2026-10-25). Every pairing the screens use passes WCAG 2.2 (1.4.3 for text, 1.4.11 for outlines
+   and the calendar's shades), checked by src/app/colors.test.ts. */
+:root,
+[data-theme="paper"] {
+  color-scheme: light;
   --bg: #fafaf8;
   --surface: #ffffff;
   --text: #1a1a18;
@@ -37,8 +41,11 @@
   --on-offbeat: #ffffff;
 }
 
+/* Following the device: Night when it's dark and no theme is chosen. The same values as [data-theme="night"], which
+   colors.test.ts checks. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
+    color-scheme: dark;
     --bg: #121212;
     --surface: #1c1c1c;
     --text: #ededea;
@@ -62,6 +69,114 @@
     --on-shade-4: #121212;
     --danger: #ff8a8a;
   }
+}
+
+[data-theme="night"] {
+  color-scheme: dark;
+  --bg: #121212;
+  --surface: #1c1c1c;
+  --text: #ededea;
+  --muted: #a3a39d;
+  --line: #3a3a37;
+  --edge: #6e6e6a;
+  --accent: #7ea6ff;
+  --on-accent: #121212;
+  --soft: #7ea6ff26;
+  --safe: #9be3b4;
+  --safe-bg: #1f3b2a;
+  --caught: #ffb3b8;
+  --caught-bg: #4a1f24;
+  --shade-1: #7ea6ff8a;
+  --shade-2: #7ea6ffb1;
+  --shade-3: #7ea6ffd8;
+  --shade-4: #7ea6ff;
+  --on-shade-1: #ededea;
+  --on-shade-2: #121212;
+  --on-shade-3: #121212;
+  --on-shade-4: #121212;
+  --danger: #ff8a8a;
+}
+
+/* Sky, Moonlit and Ink: the Themes board's colours (L21; Moonlit's are monkeytype's "rose pine moon", from Rosé Pine,
+   credited on /about), with the rest filled by round 8's rule: the outline, the text faded toward the card until 3:1;
+   Moonlit's divider as visible as Night's; the shades as Paper's and Night's; each shade's number the first of text,
+   on-accent, white and black reaching 4.5:1; Safe, Caught and Delete as Paper (Sky) or Night (Moonlit, Ink). */
+[data-theme="sky"] {
+  color-scheme: light;
+  --bg: #eef3fa;
+  --surface: #ffffff;
+  --text: #14213d;
+  --muted: #4a5a78;
+  --line: #d5deec;
+  --edge: #858c9b;
+  --accent: #1f5fbf;
+  --on-accent: #ffffff;
+  --soft: #1f5fbf1a;
+  --safe: #14532d;
+  --safe-bg: #e3f4ea;
+  --caught: #8a1c26;
+  --caught-bg: #fbe4e6;
+  --shade-1: #1f5fbfa7;
+  --shade-2: #1f5fbfc4;
+  --shade-3: #1f5fbfe2;
+  --shade-4: #1f5fbf;
+  --on-shade-1: #14213d;
+  --on-shade-2: #000000;
+  --on-shade-3: #ffffff;
+  --on-shade-4: #ffffff;
+  --danger: #b4232f;
+}
+
+[data-theme="moonlit"] {
+  color-scheme: dark;
+  --bg: #2a273f;
+  --surface: #211f32;
+  --text: #e0def4;
+  --muted: #c4a7e7;
+  --line: #3e3c50;
+  --edge: #737185;
+  --accent: #9ccfd8;
+  --on-accent: #2a273f;
+  --soft: #9ccfd826;
+  --safe: #9be3b4;
+  --safe-bg: #1f3b2a;
+  --caught: #ffb3b8;
+  --caught-bg: #4a1f24;
+  --shade-1: #9ccfd872;
+  --shade-2: #9ccfd8a1;
+  --shade-3: #9ccfd8d0;
+  --shade-4: #9ccfd8;
+  --on-shade-1: #ffffff;
+  --on-shade-2: #000000;
+  --on-shade-3: #2a273f;
+  --on-shade-4: #2a273f;
+  --danger: #ff8a8a;
+}
+
+[data-theme="ink"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #111111;
+  --text: #ffffff;
+  --muted: #b5b5b5;
+  --line: #2a2a2a;
+  --edge: #606060;
+  --accent: #ffd84d;
+  --on-accent: #000000;
+  --soft: #ffd84d26;
+  --safe: #9be3b4;
+  --safe-bg: #1f3b2a;
+  --caught: #ffb3b8;
+  --caught-bg: #4a1f24;
+  --shade-1: #ffd84d65;
+  --shade-2: #ffd84d98;
+  --shade-3: #ffd84dcc;
+  --shade-4: #ffd84d;
+  --on-shade-1: #ffffff;
+  --on-shade-2: #000000;
+  --on-shade-3: #000000;
+  --on-shade-4: #000000;
+  --danger: #ff8a8a;
 }
 
 body {

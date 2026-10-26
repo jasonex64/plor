@@ -38,18 +38,29 @@ function ratio(a: Rgb, b: Rgb): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-// The games' own colours sit in :root with Paper's and stay the same in every theme (M14 14a-2a).
+// The games' own colours sit in :root with Paper's and stay the same in every theme (M14 14a-2a). Each theme is a
+// [data-theme] block, Paper's shared with :root, and Night's repeated for the device's dark mode
+// (docs/milestones/M14-14b-1-themes.md, criterion 1).
 const GAME_SLOTS = ["offbeat", "on-offbeat"];
-const root = slots(":root {");
+const root = slots(":root,");
 const themes = {
   Paper: Object.fromEntries(Object.entries(root).filter(([name]) => !GAME_SLOTS.includes(name))),
-  Night: slots("prefers-color-scheme: dark"),
+  Night: slots('[data-theme="night"]'),
+  Sky: slots('[data-theme="sky"]'),
+  Moonlit: slots('[data-theme="moonlit"]'),
+  Ink: slots('[data-theme="ink"]'),
 };
+
+describe("Night", () => {
+  it("is the same for the device's dark mode as when it's chosen", () => {
+    expect(slots("prefers-color-scheme: dark")).toEqual(themes.Night);
+  });
+});
 
 describe("Offbeat's colour", () => {
   it("is declared once, for every theme", () => {
     expect(GAME_SLOTS.every((name) => name in root)).toBe(true);
-    expect(GAME_SLOTS.some((name) => name in themes.Night)).toBe(false);
+    for (const t of Object.values(themes).slice(1)) expect(GAME_SLOTS.some((name) => name in t)).toBe(false);
   });
 
   // The banner's text and Play's label (docs/milestones/M14-14a-2a-today.md, criterion 7).

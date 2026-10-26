@@ -176,6 +176,65 @@
   font-weight: 700;
 }
 
+.links {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+}
+
+/* The theme picker (round 7's .themes and .theme; M14 L47): three to a row, the chosen one outlined thick in the
+   page's text colour, the rest in the control outline; each tile wears its own theme inside. */
+.themes {
+  margin: 0;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.themes legend {
+  padding: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tile {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  min-height: 48px;
+  overflow: hidden;
+  border: 1.5px solid var(--edge);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tile:has(:checked) {
+  border: 3px solid var(--text);
+}
+
+/* The radio itself is hidden, so its focus shows on the tile (WCAG 2.2 2.4.7). */
+.tile:has(:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.swatch {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .end {
   display: flex;
   flex-direction: column;

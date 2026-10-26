@@ -20,7 +20,7 @@ export default function Privacy() {
       <ul>
         <li>
           <strong>Your account:</strong> your email address, the username you pick, your display name if you set one, and your settings (Skip the game
-          screen, Numbers on the calendar). If you sign in with Google,
+          screen, Numbers on the calendar, your theme). If you sign in with Google,
           Google also shares your name, and your profile picture if you have one; they are stored with your
           account. Plor doesn&apos;t show or use them.
         </li>
@@ -47,6 +47,10 @@ export default function Privacy() {
         <li>
           <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
           cookies.
+        </li>
+        <li>
+          <strong>Your theme, in this browser:</strong> a copy of the theme you picked, kept in this browser&apos;s
+          storage so pages open in it straight away. Signing out removes it.
         </li>
         <li>
           <strong>Sign-in attempts:</strong> to stop anyone guessing sign-in codes or flooding sign-in, we count recent

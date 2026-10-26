@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { Home } from "../../../home";
+import { Footer } from "../../../footer";
 
 // A group's invite link (docs/milestones/M10-groups.md, 10b; G7): sign in if needed, pick a username if needed, then
 // join. The API checks the code; this page only passes it on.
@@ -12,11 +12,7 @@ export default function JoinGroupPage({ params }: { params: Promise<{ code: stri
       <Suspense fallback={<p>Loading…</p>}>
         <JoinHome params={params} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/privacy">Privacy policy</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

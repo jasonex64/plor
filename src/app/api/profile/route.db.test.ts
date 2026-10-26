@@ -32,7 +32,7 @@ const NEW_PROFILE = (username: string) => ({
   username,
   displayName: null,
   usernameChangeableAt: null,
-  settings: { skipGameScreen: false, calendarNumbers: false },
+  settings: { skipGameScreen: false, calendarNumbers: false, theme: "device" },
 });
 
 async function profile() {
