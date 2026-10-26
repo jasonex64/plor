@@ -6,7 +6,7 @@ import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/content/puzzle";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
-import { FINISHED } from "@/game/runs";
+import { FINISHED } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { log } from "@/lib/log";

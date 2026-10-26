@@ -78,10 +78,11 @@ Claude's draft wording; the human chose the pictures, the tiers and the tone, an
 |---|---|---|
 | N1 | The name: Updraft, Zephyr, or keep looking | Open ("not quite yet", human, 2026-10-25). A trademark search (USPTO) is the human's to run or commission before launch |
 | N2 | `game_id`: keep `offbeat` as the internal ID and change only what players see, or migrate it | Open. Claude's recommendation: keep it. It's stored on every run, run event, ledger row, comment and reaction and in `content/offbeat/` paths (DECISIONS.md, Game 1); the route `/offbeat` would move to the new name either way |
-| N3 | The share line: the name and the symbols (e.g. a 💨 at the stop where the player was blown off) | Open |
+| N3 | The share line: the name and the symbols (e.g. a 💨 at the stop where the player was blown off), including rare and common answers now M13's tiers exist | Open. Also ROADMAP's placeholder-symbols item (M05), moved here (human, 2026-10-26: "Move to 14c (Recommended)"; `M14-14b-2c-review-items.md`, answer 3) |
 | N4 | Timeouts: one word ("Frozen") at every stop, or tiers like the caught line | Open |
 | N5 | Admin pages: plain words, since only the human sees them | Claude's reading of "Everywhere" (players' screens), *unverified*: confirm |
 | N6 | The How to play text (L29) rewritten in the new words in the same PR | Claude's proposal, for the human |
+| N7 | A stolen letter's key: what the player feels when they press it (it does nothing today, and only a status line says why) | Open, with 14c's motion and L8's timings (human, 2026-10-26: "Wait for 14c (Recommended)"; `M14-14b-2c-review-items.md`, answer 5; M04 G11) |
 
 ## Acceptance criteria
 Draft shape, filled in once N1–N6 are answered:

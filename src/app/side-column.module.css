@@ -1,5 +1,5 @@
 /* The right column from 1200px (docs/milestones/M14-14b-2b-1-shell.md, Numbers): 360px, the full height, behind a 1px
-   line, padded 28px 24px as round 10 draws it. The page leaves room for it, and the clock bar stops short of it. */
+   line, padded 28px 24px as round 10 draws it. The page's room for it is in globals.css (body[data-column]). */
 .column {
   position: fixed;
   top: 0;
@@ -17,7 +17,8 @@
   background: var(--bg);
 }
 
-:global(body):has(.column) {
-  --right-column: 360px;
-  padding-right: 360px;
+/* The column's box and its place in the page add no box of their own, so below 1200px the column is laid out where
+   the page puts it. */
+.contents {
+  display: contents;
 }

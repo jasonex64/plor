@@ -15,6 +15,7 @@ import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
+import { useBodyFlag } from "./body-flag";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
@@ -110,6 +111,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
 }) {
   const path = usePathname();
   const sidebar = useMinWidth(768);
+  useBodyFlag("shell", true);
   const dialog = useRef<HTMLDialogElement>(null);
   const open = () => dialog.current?.showModal();
   return createPortal(
@@ -187,7 +189,7 @@ export function MeAdminLink() {
 // counted down from the run state the page read, and Back to the game screen (14a-2b); at zero, that time is up, with
 // a link to the result. The database stays the judge of the timer; this is only a display. Nothing shows without a
 // question in play.
-export function ClockBar() {
+export function ClockBar({ onTimeUp }: { onTimeUp: () => void }) {
   const [run, setRun] = useState<RunState | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -198,13 +200,13 @@ export function ClockBar() {
   }, []);
   if (error) return <p role="alert">{error}</p>;
   if (!run || run.status !== "in_progress" || !run.question || run.msLeft === null) return null;
-  return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} />, document.body);
+  return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} onTimeUp={onTimeUp} />, document.body);
 }
 
-const NOTHING = () => {};
-
-function Clock({ index, msLeft }: { index: number; msLeft: number }) {
-  const seconds = Math.ceil(useCountdown(msLeft, NOTHING) / 1000);
+// At zero the page's parts that wait for the run to be over read it again (Home's timeUps).
+function Clock({ index, msLeft, onTimeUp }: { index: number; msLeft: number; onTimeUp: () => void }) {
+  useBodyFlag("clock", true);
+  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
     <section aria-label="Question in play" className={styles.clock}>

@@ -9,12 +9,14 @@
 // (docs/milestones/M14-14a-3b-settings.md, L39).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
+import { FINISHED } from "@/game/status";
 import type { PublicQuestion } from "@/game/payload";
-import { shareText } from "@/game/share";
+import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
+import { bonusNote, earnsBonus } from "./bonus";
 import { useCountdown } from "./countdown";
 import { givenText } from "./given";
 import { errorText } from "./messages";
@@ -28,7 +30,10 @@ type AnswerResponse = { run: RunState; notInList: boolean };
 
 // What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
 // each time that changes after, so the comments can open (M08 8a). Nothing is reported before the state loads, so a
-// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). onDayOver: the reset, midnight Pacific, so the page can move to the new day
+// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). So across
+// the reset, or on a day with no puzzle, a page's last value stays the day before's until the new state loads: the
+// pages read it only to open the comments, which load again on the new day (14b-2c-1, item 21). onDayOver: the reset,
+// midnight Pacific, so the page can move to the new day
 // (docs/milestones/M11-home-screen.md, H6); inPlay says a question or a reveal is in play then, so the game is left
 // alone: a run started before midnight is played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
 type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void };
@@ -38,7 +43,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   const [run, setRun] = useState<RunState | null>(null);
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
+  const over = run !== null && FINISHED.includes(run.status);
   const loaded = run !== null;
   useEffect(() => {
     if (loaded) onOver(over);
@@ -212,7 +217,8 @@ function Score({ run }: { run: RunState }) {
   return (
     <>
       <p className={styles.line}>
-        {pointsText(run.points)} + about {run.bonus} bonus · {endedText(run)}
+        {pointsText(run.points)}
+        {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
       </p>
       <Link href="/offbeat#result" className={styles.result}>
         Result
@@ -307,6 +313,7 @@ function Question({
 }) {
   const [typed, setTyped] = useState("");
   const [notInList, setNotInList] = useState<string | null>(null);
+  const input = useRef<HTMLInputElement>(null);
   const [blocked, setBlocked] = useState<string | null>(null);
 
   // A stolen letter's key does nothing (G11, human, 2026-10-21). Filtering the value, not the key press, also
@@ -318,14 +325,16 @@ function Question({
     setNotInList(null);
   }
 
-  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight.
+  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight. Text
+  // that names no entry stays in the box, selected, so a typo is fixed or typed over rather than retyped (human,
+  // 2026-10-26: "Keep the text (Recommended)"; docs/milestones/M14-14b-2c-review-items.md, answer 6).
   async function submit(event: FormEvent) {
     event.preventDefault();
     const text = typed.trim();
     if (text === "" || busy) return;
     if (await onAnswer(text)) {
       setNotInList(text);
-      setTyped("");
+      input.current?.select();
     }
   }
 
@@ -344,6 +353,7 @@ function Question({
         <label>
           Your answer
           <input
+            ref={input}
             value={typed}
             autoFocus
             autoComplete="off"
@@ -363,11 +373,17 @@ function Question({
   );
 }
 
-// The result's details, below the banner, which carries the score and the time to the next puzzle.
+// The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
+// #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
+// so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14).
 function Result({ run }: { run: RunState }) {
-  const survived = run.answered.filter((a) => !a.matched).length;
+  const survived = survivedCount(run);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (window.location.hash === "#result") box.current?.scrollIntoView();
+  }, []);
   return (
-    <div id="result">
+    <div id="result" ref={box}>
       <h2>
         {run.status === "survived"
           ? `You survived all ${run.total}!`
@@ -376,8 +392,8 @@ function Result({ run }: { run: RunState }) {
             : `Caught on question ${run.answered.length}`}
       </h2>
       <p>
-        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}, plus a rarity bonus of about{" "}
-        {run.bonus}. The final bonus is worked out once the day is over.
+        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}
+        {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
       <Share run={run} />
       <ol>

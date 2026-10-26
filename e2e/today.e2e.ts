@@ -56,7 +56,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
 
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page).toHaveURL("http://localhost:3000/");
-  await expect(banner.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
+  await expect(banner.getByText("0 points · caught on question 1")).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
   await expect(page).toHaveURL(/\/offbeat#result$/);

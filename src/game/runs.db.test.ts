@@ -138,6 +138,8 @@ describe("a run, step by step", () => {
         bonus: answerBonus(0, firstGuess(q, entryId)),
         // No share while the run goes on (M11 H5).
         share: null,
+        // Given before the day's midnight (M09 D8).
+        inDay: true,
       },
     ]);
     // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
@@ -286,6 +288,8 @@ describe("other ways a run ends", () => {
     const { status, body } = await answerText(0, nameIn(yesterdayPuzzle, 0, entryId));
     expect(status).toBe(200);
     expect(body.run).toMatchObject({ date: yesterday, status: "in_progress", question: null });
+    // Given after its day's midnight: it earns no rarity bonus, and the result can say why (M09 D8; 14b-2c answer 7).
+    expect(body.run.answered[0]).toMatchObject({ inDay: false, bonus: 0 });
     expect((await next()).body.run).toMatchObject({ date: yesterday, status: "in_progress", question: { index: 1 } });
   });
 

@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
-import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { LiveStatus } from "./live-status";
 import { Avatar } from "./avatar";
 import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
@@ -88,7 +89,7 @@ export function Groups() {
 
 // A group's page: members, the invite link every member can share, the creator's powers (G1, G6), the group's weekly
 // leaderboard (10c) and its thread, live (10d; G4, G5). username is the signed-in player's.
-export function GroupPage({ id, username }: { id: string; username: string }) {
+export function GroupPage({ id, username, timeUps }: { id: string; username: string; timeUps: number }) {
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
   const [draft, setDraft] = useState("");
@@ -98,20 +99,20 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
   // player's run is over.
   const [threadNudge, setThreadNudge] = useState(0);
   const nudgeThread = useCallback(() => setThreadNudge((n) => n + 1), []);
-  const { paused } = useBoardChannel({
+  const channel = useBoardChannel({
     joined: nudgeThread,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
       if (changesThread(message, { group: id })) nudgeThread();
     },
-    failed: (err) => setError(errorText(err)),
   });
 
   // A reload after a removal can overlap the first load: only the newest answer is shown (M11 H6).
   const [latest] = useState(latestOnly);
   // The time to the reset, from the last load, and a count of resets: the thread and the board start again at midnight
   // Pacific, from the server's new day (M11 H6).
-  const [msToReset, setMsToReset] = useState<number | null>(null);
+  // An object, so a repeated answer (0 right at midnight) still starts the timer again (14b-2c-1, item 5).
+  const [reset, setReset] = useState<{ ms: number } | null>(null);
   const [day, setDay] = useState(0);
   function load() {
     latest(
@@ -119,17 +120,17 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
       (r) => {
         setGroup(r.group);
         setDraft(r.group.name);
-        setMsToReset(r.msToReset);
+        setReset({ ms: r.msToReset });
       },
       (err) => setError(errorText(err)),
     );
   }
   useEffect(load, [id, setError, latest, day]);
   useEffect(() => {
-    if (msToReset === null) return;
-    const timer = setTimeout(() => setDay((d) => d + 1), msToReset);
+    if (reset === null) return;
+    const timer = setTimeout(() => setDay((d) => d + 1), reset.ms);
     return () => clearTimeout(timer);
-  }, [msToReset]);
+  }, [reset]);
 
   const act = (action: () => Promise<void>) => {
     setCopied(false);
@@ -175,7 +176,7 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
   return (
     <>
       <section aria-label="Group">
-        {paused && <p role="status">{PAUSED_TEXT}</p>}
+        <LiveStatus channel={channel} />
         {group && link && (
           <>
             <h2>{group.name}</h2>
@@ -258,7 +259,8 @@ export function GroupPage({ id, username }: { id: string; username: string }) {
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
         />
       )}
-      {group && <Comments key={day} username={username} runOver={false} nudge={threadNudge} group={id} />}
+      {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (Home's timeUps). */}
+      {group && <Comments key={`${day}-${timeUps}`} username={username} runOver={false} nudge={threadNudge} group={id} />}
     </>
   );
 }
