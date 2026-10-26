@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14b-1's PR, plus 14c-1's draft from a naming session in the same worktree. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-26. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14b-1's PR and 14b-2's plan, plus 14c-1's draft from a naming session in the same worktree. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -33,6 +33,10 @@ Written by a naming session on the Mac (2026-10-25), after 14b-1 merged; docs on
 1. **14b-2a, the sprout streak:** drafted in full in the ticket. Two choices are left for the build session, written there: where the shell reads the streak, and the sprout's colours under the Styling rule.
 2. **14b-2b, the admin pages:** "Full redesign, mockups first", drawn "At home": draw the six pages on the canvas "Plor shell layout", get the human's review, then build.
 3. **14b-2c, the review items:** "All 33" open For M14 items in ROADMAP; ask the "For the human" ones first (About's contact and wording among them).
+
+Also waiting:
+- **For the human** (ROADMAP, For M14): About's contact address and "What Plor is" wording (14b-2c asks it).
+- **14c-1:** ask N1–N6 (the ticket's open questions) as guided questions, then build it as one PR from this branch, after 14b-2's PRs (one open PR at a time).
 
 **On the Windows checkout** the local stack was last at `20261025074000_links.sql`: run `npx supabase migration up` for the settings and theme migrations before any test.
 
