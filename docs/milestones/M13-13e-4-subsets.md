@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c built, reviewed and proven, in review in PR #92. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c done (PR #92). Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -117,7 +117,7 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
 ## 13e-4b — The first subsets
-**Status:** in review (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`), reviewed, and checked on a fresh load once 13e-4c gave a complete animal tree (Evidence below); in PR #92 with 13e-4c (human: "One PR for both (Recommended)").
+**Status:** done (2026-10-26): merged in PR #92 (`f526633`, 2026-10-26 10:46 UTC) on green CI, every check (runs 40307500816 and 40307496875 on `ea5e346`; the push run's build first failed fetching Google Fonts, the same commit's other run having passed, and passed when that job was re-run unchanged), by auto-merge. Its migration `20261026061619_subset_values.sql` was pushed to plor.app at the human's request ("please push with supabase cli when it's done"): from a clean checkout of main, `db push --linked --include-all` (M14's two later migrations were already there; the two sets share no function or column), `migration list --linked` 39 of 39 matching, `test db --linked` 24 files, 406 tests, PASS (a first run stopped after 160 tests and 272 s, cause unverified, likely the connection; the rerun passed).
 
 **What the human decided (guided questions, 2026-10-26):**
 | Question | The human's answer |
@@ -171,7 +171,7 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 - `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=391`, `Result: PASS` (`subsets.test.sql` 46); `npm run test:db` 40 files, **262 passed**. e2e: no page changed; CI runs it.
 
 ## 13e-4c — Reading Wikidata's animal tree by key
-**Status:** in review (2026-10-26): built and proven (Evidence below); shipped with 13e-4b in PR #92 (human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
+**Status:** done (2026-10-26): with 13e-4b in PR #92 (see 13e-4b's Status for the CI runs and the plor.app push; human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
 
 **The problem** (13e-4b review, then measured): the animals import reads Wikidata's whole parent-taxon list (P171, about 4 million statements) and its names (P1843), scientific names (P225) and statuses (P141) in pages by position (`bd:slice` offsets, 50,000 rows each). The same page gives different rows on different requests: five requests in a row went to five servers (wdqs2007, wdqs2022, wdqs2014, wdqs2015, wdqs2010), and the page at offset 2,000,000 returned different rows even from the same server twice (wdqs2014, wdqs2008). Each server orders results by its own internal IDs, and the servers are independent and may hold different data (SOURCES.md, Wikidata Query Service behaviour), and Wikidata keeps changing during a read. So reading by position skips and repeats rows, and one skipped parent link cuts off its whole branch: taxa under Animalia came out as 2,366,663, then 2,360,800, then 2,325,989 on three reads the same day.
 
