@@ -18,17 +18,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 | 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
-
-### In review: 14b-2b-2b, the admin pages' three server changes (PR #91, auto-merge on green CI)
-`docs/milestones/M14-14b-2b-2-admin-build.md`, 14b-2b-2b. Two **security changes**, both approved by the human (2026-10-26) and in the DECISIONS.md Log:
-- **Keep comment:** `private.keep_reported_comment` and `private.comment_keep`. The reports stay, so the comment stays hidden for its reporters ("Still hidden (Recommended)").
-- **The audit's one-click link:** `private.audit_near`, fed by the game's `withinTypo` ("New lookup function (Recommended)").
-
-Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, not SQL. Local evidence: `npm test` 386, pgTAP 73, db 25, admin e2e 11. Review done: both blocking findings fixed, the rest in ROADMAP Next revision.
+| 14b-2b-2b | Keep comment, blocked host answers marked in place, the audit's one-click link. **Security changes:** `private.keep_reported_comment` and `private.comment_keep` (a kept comment stays hidden for its reporters); `private.audit_near` | #91 |
 
 ### Next step
-1. After 14b-2b-2b merges: mark it done (ticket Status, ROADMAP row) with its merge evidence.
-2. Then 14b-2c (the For M14 review items in ROADMAP Next revision), then 14c-1 (ask its N1–N6).
+1. 14b-2c: the For M14 review items in ROADMAP Next revision (ask before designing).
+2. Then 14c-1 (ask its N1–N6).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.

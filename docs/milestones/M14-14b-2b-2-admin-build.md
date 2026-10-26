@@ -1,6 +1,6 @@
 # M14 14b-2b-2 — Building the admin pages
 
-**Status:** 14b-2b-2a done (2026-10-26): merged in PR #90 on green CI (09:37 UTC), by auto-merge; the review's two Puzzles fixes then passed `approve-and-play.e2e.ts` and `admin-area.e2e.ts` locally (4 passed). 14b-2b-2b built and reviewed (2026-10-26), in review in PR #91, with auto-merge on green CI. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages.").
+**Status:** 14b-2b-2a done (2026-10-26): merged in PR #90 on green CI (09:37 UTC), by auto-merge; the review's two Puzzles fixes then passed `approve-and-play.e2e.ts` and `admin-area.e2e.ts` locally (4 passed). 14b-2b-2b done (2026-10-26): merged in PR #91 on green CI (10:21 UTC, 10 checks), by auto-merge; its two migrations re-applied locally after M13's reset, and audit_near, comment_keep and plor_app_role's pgTAP passed again (32 tests). Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages.").
 
 ## Goal
 The admin pages live in Plor's shell as one admin area, in round 10's look, with what needs the admin always in view; then the three changes round 10 drew that need the server.
