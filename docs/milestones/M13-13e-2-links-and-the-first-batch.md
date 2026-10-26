@@ -1,6 +1,6 @@
 # M13 13e-2 — Links and the first batch
 
-**Status:** in progress (2026-10-25): designed from the human's guided answers below and built; in review, then its PR.
+**Status:** done (PR #80, merged 2026-10-25 on green CI with the human's OK: "Keep all 27 categories as they are, flagged names included. Merge PR #80 once every CI check is green.").
 
 ## Goal
 The first batch of 13e (`M13-13e-growing-the-categories.md`): 27 everyday categories from WordNet, each with a bank question, with the links and drafting change they turned out to need.
@@ -17,7 +17,7 @@ The first batch of 13e (`M13-13e-growing-the-categories.md`): 27 everyday catego
 |---|---|
 | What the first batch covers | "Everyday, WordNet only (Recommended)" |
 | Related categories (bird under animal) on the same day | "Allow it (Recommended)" |
-| Members with a name on the LDNOOBW list | "Flag; you decide each" |
+| Members with a name on the LDNOOBW list | "Flag; you decide each"; on the batch's flags: "Keep all 27 categories as they are, flagged names included" (human, 2026-10-25) |
 | How questions are worded | "Friendlier where it fits" |
 | Friendly wording wider than the category | "Wording fits category (Recommended)" |
 | Answers per bank question | "Like T1: 5–6 and 4–6 (Recommended)" |
@@ -44,7 +44,7 @@ The first batch of 13e (`M13-13e-growing-the-categories.md`): 27 everyday catego
 - [x] Every bank answer resolves to one member (the draft resolves them all in the trial drafts).
 - [x] Trial drafts: 2026-10-26, 10-27 and 10-28 draft from the new questions, 10-29 stops on the 30-day gap ("1 more needed"), 11-24 drafts; the files are deleted after.
 - [x] The full-day simulator drafts most days with letters first, against 4 of 40 before.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e`, `npm run content:validate` and CI pass.
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e`, `npm run content:validate` and CI pass.
 
 ## Out of scope
 - Removing a link once loaded (none needed yet; a wrong link is a Next revision item).
@@ -79,7 +79,7 @@ The first batch of 13e (`M13-13e-growing-the-categories.md`): 27 everyday catego
 - `supabase/tests/links.test.sql` (8 tests) in `npm run test:sql`: `Result: PASS`, 345 tests in 21 files.
 - Trial drafts (files deleted after): 2026-10-26 `letters Q2 M, Q4 G, Q5 T, Q7 I`; 10-27 `Q2 G, Q4 B, Q5 N, Q7 O`; 10-28 `Q2 C, Q4 M, Q5 S, Q7 O`; 10-29 `only 6 bank questions ask a category not used within 30 days; 1 more needed`; 11-24 `Q2 U, Q4 D, Q5 T, Q7 I`. Before letters first, all five failed on letters (`no letters fit schedule A`).
 - The full-day simulator (a scratch script calling `draft()` for 40 dates three days apart in 2027, no files, no gap between them): hosts drawn first, **4 of 40**; with 2 hosts at Q7 instead, 8 of 40; **letters first with the final lists, 31 of 40**. The 9 failures all block at Q7: soup 4, jewelry 2, footwear 2, cake 1.
-- `npm test` 223 passed, `npm run lint` 0 errors, `npx tsc --noEmit -p .` clean, `npm run test:db` 234 passed, `npm run test:sql` PASS (345), `npm run test:e2e` 15 passed (after `e2e/bank.e2e.ts` counted the bank's questions instead of a fixed 7), `npm run content:validate` OK. CI: in the PR.
+- `npm test` 223 passed, `npm run lint` 0 errors, `npx tsc --noEmit -p .` clean, `npm run test:db` 234 passed, `npm run test:sql` PASS (345), `npm run test:e2e` 15 passed (after `e2e/bank.e2e.ts` counted the bank's questions instead of a fixed 7), `npm run content:validate` OK. CI: PR #80's runs 40180028078 (pull_request) and 40180025398 (push) on `4730464` passed every check (check, db, e2e, secrets, Vercel); merged as `c91f9d8`.
 
 ## Review
 **Reviewer agent, fresh context, 2026-10-25.**

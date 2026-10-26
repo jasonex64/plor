@@ -1,9 +1,9 @@
 {
   "set": "wikidata-us-states",
   "source": "wikidata",
-  "snapshot": "2026-10-24",
-  "retrieved_at": "2026-10-24T10:07:49.927Z",
-  "method": "SPARQL: instances of U.S. state (P31 Q35657)",
+  "snapshot": "2026-10-26",
+  "retrieved_at": "2026-10-26T05:16:50.782Z",
+  "method": "SPARQL: instances of U.S. state (P31 Q35657), with each one's population (P1082, the best-rank value with the latest point in time P585)",
   "items": 51,
-  "sha256": "ba1b45b63baf6eb27f01c04603d64d464eb1119977d9721e491452ca850c7de4"
+  "sha256": "7457f414359e75d8b8eca5c2c7853f2af6b5f0e245158f2787c0eda9977e0e39"
 }

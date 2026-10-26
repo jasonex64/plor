@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-canadian-provinces",
+  "source": "wikidata",
+  "snapshot": "2026-10-26",
+  "retrieved_at": "2026-10-26T05:16:59.534Z",
+  "method": "SPARQL: instances of province of Canada (P31 Q11828004) or territory of Canada (P31 Q9357527), not dissolved (no P576), under province or territory of Canada (Q2879), with each one's population (P1082, the best-rank value with the latest point in time P585)",
+  "items": 14,
+  "sha256": "7c6186cfd8ead6f17bc702abf0cb2580d154effd13a979dfde1f19c2b402a63c"
+}

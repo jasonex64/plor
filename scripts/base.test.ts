@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { describe, expect, it } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, linkToWikidata, oewnSubtree, parseCsv, parseLinks, taxaToItems, usdaCheeses, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, latestNumber, linkToWikidata, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -134,5 +134,60 @@ describe("parseLinks", () => {
       expect(() => parseLinks(JSON.stringify([link, bad]))).toThrow("data/links.json link 2: must hold exactly thing, name, kind_of, kind_of_name, each as text");
     }
     expect(() => parseLinks(JSON.stringify([{ ...link, kind_of: "2-n" }]))).toThrow('data/links.json link 1: "thing" and "kind_of" must be refs as "source:id"');
+  });
+});
+
+describe("riverShortNames", () => {
+  it("gives the short name of an \"X River\" or \"River X\", and nothing for other names", () => {
+    expect(riverShortNames([["Mississippi River", "River Thames", "Nile", "Rio Grande", "Red river"]])).toEqual([["Mississippi", "Thames", "Red"]]);
+  });
+  it("skips a short name two rivers give, however written, but not one a single river gives twice", () => {
+    expect(riverShortNames([["Little River"], ["River Little"], ["little river", "Ohio River"], ["Hudson River", "River Hudson"]]))
+      .toEqual([[], [], ["Ohio"], ["Hudson", "Hudson"]]);
+  });
+});
+
+describe("foldLabels", () => {
+  const row = (id: string, label: string, lang: string, alt?: string) => ({
+    x: { value: `http://www.wikidata.org/entity/${id}` },
+    label: { value: label, "xml:lang": lang },
+    ...(alt ? { alt: { value: alt } } : {}),
+  });
+  it("takes the English label over the mul one in either row order, the mul one alone, and each alternative once", () => {
+    const folded = foldLabels([
+      row("Q1", "Mul Name", "mul", "a"), row("Q1", "English Name", "en", "a"), row("Q1", "Mul Name", "mul", "b"),
+      row("Q2", "English Two", "en"), row("Q2", "Mul Two", "mul"),
+      row("Q3", "Juneau", "mul", "City and Borough of Juneau"),
+    ]);
+    expect([...folded].map(([id, e]) => [id, e.label, e.alts])).toEqual([
+      ["Q1", "English Name", ["a", "b"]],
+      ["Q2", "English Two", []],
+      ["Q3", "Juneau", ["City and Borough of Juneau"]],
+    ]);
+  });
+});
+
+describe("facts for subsets", () => {
+  const items: Item[] = [
+    { id: "Q1", name: "Nile", aliases: [] },
+    { id: "Q2", name: "Rhine", aliases: [] },
+    { id: "Q3", name: "Amur", aliases: [] },
+  ];
+  it("keeps a fact's values among the things loaded, and counts the rest", () => {
+    const given = new Map([["Q1", [{ value: "QEgypt" }, { value: "QSudan" }, { value: "QSudan" }]], ["Q2", [{ value: "QOld" }]]]);
+    const { items: out, dropped } = withFact(items, "country", given, new Set(["QEgypt", "QSudan"]));
+    expect(out.map((i) => i.country)).toEqual([["QEgypt", "QSudan"], undefined, undefined]);
+    expect(dropped).toBe(1);
+  });
+
+  it("takes the population with the latest point in time, and leaves out a tie it can't choose", () => {
+    expect(latestNumber([{ value: "10", time: "2010-01-01T00:00:00Z" }, { value: "12", time: "2020-07-01T00:00:00Z" }, { value: "9" }])).toEqual({ value: 12, as_of: "2020-07-01" });
+    expect(latestNumber([{ value: "7" }])).toEqual({ value: 7, as_of: null });
+    expect(latestNumber([{ value: "7" }, { value: "8" }])).toBeNull();
+    expect(latestNumber([{ value: "7", time: "2020-01-01T00:00:00Z" }, { value: "7", time: "2020-01-01T00:00:00Z" }])).toEqual({ value: 7, as_of: "2020-01-01" });
+    expect(() => latestNumber([{ value: "1.5" }])).toThrow("not a whole number of people");
+    const { items: out, ambiguous } = withPopulation(items, new Map([["Q1", [{ value: "5" }]], ["Q2", [{ value: "1" }, { value: "2" }]]]));
+    expect(out.map((i) => i.population?.value)).toEqual([5, undefined, undefined]);
+    expect(ambiguous).toBe(1);
   });
 });

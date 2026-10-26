@@ -21,11 +21,11 @@ select is(private.import_source('wikidata', 'test-1', '[
   {"id": "tT", "name": "tomato", "aliases": [{"alias": "fx tomato", "kind": "name"}], "kind_of": ["tR", "tV"]},
   {"id": "tC1", "name": "loop one", "aliases": [{"alias": "loop one", "kind": "name"}], "kind_of": ["tC2", "tF"]},
   {"id": "tC2", "name": "loop two", "aliases": [{"alias": "loop two", "kind": "name"}], "kind_of": ["tC1"]}
-]'::jsonb), '{"things": 11, "aliases": 13, "facts": 11}'::jsonb, 'an import adds its things, aliases and facts');
+]'::jsonb), '{"things": 11, "aliases": 13, "facts": 11, "numbers": 0}'::jsonb, 'an import adds its things, aliases and facts');
 
 select is(private.import_source('wikidata', 'test-2', '[
   {"id": "tB", "name": "renamed", "aliases": [{"alias": "bear", "kind": "name"}, {"alias": "bruin", "kind": "synonym"}], "kind_of": ["tA"]}
-]'::jsonb), '{"things": 0, "aliases": 1, "facts": 0}'::jsonb, 'a later snapshot adds only what is new');
+]'::jsonb), '{"things": 0, "aliases": 1, "facts": 0, "numbers": 0}'::jsonb, 'a later snapshot adds only what is new');
 select is((select t.name from private.thing t join private.thing_source s on s.thing_id = t.id where s.source_id = 'tB'),
   'bear', 'and keeps an existing thing''s name');
 select throws_ok($$ select private.import_source('wikidata', 'test-3', '[{"id": "tZ", "name": "z", "aliases": [], "kind_of": ["nope"]}]') $$,
@@ -60,7 +60,7 @@ select is(pg_temp.members('un_country'), array['France'], 'member_of keeps only 
 select is(private.import_source('usda', 'test-5', '[
   {"id": "u1", "name": "tomatoes, raw", "aliases": [{"alias": "tomatoes", "kind": "plural"}], "same_as": "wikidata:tT"},
   {"id": "u2", "name": "plantain", "aliases": [{"alias": "plantain", "kind": "name"}], "kind_of": ["wikidata:tR"]}
-]'::jsonb), '{"things": 1, "aliases": 2, "facts": 1}'::jsonb, 'same_as adds no thing; a cross-source ref is a fact');
+]'::jsonb), '{"things": 1, "aliases": 2, "facts": 1, "numbers": 0}'::jsonb, 'same_as adds no thing; a cross-source ref is a fact');
 select is(pg_temp.members('fruit'), array['plantain', 'tomato'], 'the other source''s fruit joins the category');
 select throws_ok($$ select private.import_source('usda', 'test-6', '[{"id": "u3", "name": "x", "aliases": [], "same_as": "wikidata:none"}]') $$,
   'P0001', null, 'same_as must name a known thing');
