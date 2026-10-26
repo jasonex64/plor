@@ -2,8 +2,8 @@
   "set": "wikidata-countries",
   "source": "wikidata",
   "snapshot": "2026-10-26",
-  "retrieved_at": "2026-10-26T05:16:48.439Z",
+  "retrieved_at": "2026-10-26T06:19:53.720Z",
   "method": "SPARQL: sovereign states (P31 Q3624078), not dissolved (no P576), with a UN membership (P463 Q1065) that has no end time (P582); each one's continents (P30, best rank, every one listed), which are items of the set, and its population (P1082, the best-rank value with the latest point in time P585)",
   "items": 203,
-  "sha256": "2b79adf5c5df0357b0b43f15c2256a5879928b858370137450540c4527402049"
+  "sha256": "87fabdb451b3c893d806bb3154ceae5b70a7b4004d52ec1cf1c76aa419c18f2e"
 }

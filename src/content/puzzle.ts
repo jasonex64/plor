@@ -28,7 +28,7 @@ export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questio
 // What private.approve_puzzle stores: the moment answers are resolved as of, and per question the category's root
 // and member_of as approved, its member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md,
 // Puzzle content format).
-export type Where = { trait: string; value: string; via?: "country" } | { number: "population"; at_least: number } | { starts_with: string };
+export type Where = { trait: string; values: string[]; via?: "country" } | { number: "population"; at_least: number } | { starts_with: string };
 export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number; where?: Where };
 export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[]; approved_at: string };
 

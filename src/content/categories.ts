@@ -7,8 +7,9 @@ import { CATEGORY_KEY, checkKeys, isObject, isText } from "./puzzle.ts";
 
 export type BaseCategory = { key: string; name: string; source: "oewn" | "wikidata"; root: string; member_of?: string };
 // A1's forms (human, 2026-10-26): a continent or an IUCN status, the continent maybe through the member's country; a
-// population at least some value ("At least only (Recommended)"); a letter.
-export type Fact = { trait: "continent" | "conservation_status"; value: string; via?: "country" };
+// population at least some value ("At least only (Recommended)"); a letter. A fact lists its values, and a member fits
+// with any of them (13e-4b: "Approve: always a list (Recommended)").
+export type Fact = { trait: "continent" | "conservation_status"; values: string[]; via?: "country" };
 export type Subset = { key: string; name: string; of: string } & ({ fact: Fact } | { at_least: { number: "population"; value: number } } | { starts_with: string });
 export type CategoryDef = BaseCategory | Subset;
 
@@ -19,7 +20,7 @@ export function isSubset(c: CategoryDef): c is Subset {
 }
 
 // A subset's filter as private.define_subset takes it, with a fact's value still the source's ID.
-export function filterOf(c: Subset): Record<string, string | number> {
+export function filterOf(c: Subset): Record<string, string | number | string[]> {
   if ("fact" in c) return { ...c.fact };
   if ("at_least" in c) return { number: c.at_least.number, at_least: c.at_least.value };
   return { starts_with: c.starts_with };
@@ -62,9 +63,11 @@ export function parseCategories(file: string, text: string): { categories: Categ
     if (filters.length !== 1) errors.push(`${where}: a subset has exactly one of "fact", "at_least" and "starts_with"`);
     if ("fact" in v) {
       const f = v.fact;
-      const ok = isObject(f) && (f.trait === "continent" || f.trait === "conservation_status") && isText(f.value)
-        && Object.keys(f).every((k) => ["trait", "value", "via"].includes(k)) && (!("via" in f) || (f.via === "country" && f.trait === "continent"));
-      if (!ok) errors.push(`${where}: "fact" must be {"trait": "continent" or "conservation_status", "value": the source's ID}, with "via": "country" only for a continent`);
+      const values = isObject(f) ? f.values : undefined;
+      const ok = isObject(f) && (f.trait === "continent" || f.trait === "conservation_status")
+        && Array.isArray(values) && values.length > 0 && values.every(isText) && new Set(values).size === values.length
+        && Object.keys(f).every((k) => ["trait", "values", "via"].includes(k)) && (!("via" in f) || (f.via === "country" && f.trait === "continent"));
+      if (!ok) errors.push(`${where}: "fact" must be {"trait": "continent" or "conservation_status", "values": the source's IDs, each once}, with "via": "country" only for a continent`);
     }
     if ("at_least" in v) {
       const n = v.at_least;

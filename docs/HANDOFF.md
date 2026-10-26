@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-2a's PR #90. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4a merged (PR #87); 13e-4b (the first 22 subsets) and 13e-4c (the animals import reads Wikidata by key) built, reviewed and proven, in PR #92 (the human's call), merging on green CI. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14`. The M14 section is the M14 session's, from main with 14b-2b-2a's PR #90 (written on the Windows checkout); for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -69,13 +69,12 @@ Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, 
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **PR #87** merges on green CI; then plor.app's `db push` for its 3 migrations, when the human asks.
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. **13e-4a is in PR #87** (`docs/milestones/M13-13e-4-subsets.md`), auto-merge on green CI. After it merges: mark it done with its CI run (ticket and ROADMAP), and remind the human that plor.app needs `npx supabase db push` for its 3 migrations (`20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`), run from a clean checkout of main, only at their request.
-   Then **13e-4b**: Claude proposes the first subsets (about 20–30, with bank questions and review output) and the human sets each threshold (O5), approving by merging. ROADMAP From 13e-4a lists the data quirks to review first (Oceania, boroughs, junk aliases on continent and status things).
+1. **13e-4a is done** (PR #87, `docs/milestones/M13-13e-4-subsets.md`), and **plor.app's database is even with main** (2026-10-26, at the human's request: "Push 13e-4a's 3 migrations to plor.app now, from a clean checkout of main, then run the hosted tests"): from a temporary worktree of `origin/main` at `6c4d5ee` (removed after), `db push --linked --dry-run` listed exactly the 3, the push applied them, `migration list --linked` matches on all 36, and `test db --linked` passed (22 files, 388 tests). The 3: `20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`. plor.app's answer database is still empty by choice.
+   **13e-4b and 13e-4c** are in PR #92: both reviewed, every review finding answered (ticket), the animal tree read by key and proven by fetches that agree, the local database rebuilt and every bank answer resolving on it. After the PR merges on green CI: mark both done; plor.app needs a `db push` for `20261026061619_subset_values.sql`, at the human's request; 13e-4b has no other migration.
 2. **Then 13e-5, pop culture,** with the answers already recorded in 13e-4's ticket (animated films and anime, Nintendo plus genres, younger-leaning groups with K-pop, board games, superheroes), built as subsets where it can.
 3. ROADMAP's From 13e-3 item that makes the simulator and the list checks `scripts/` commands: the simulator has been rewritten by hand three times. The re-fetch of the older sets for the mul fallback rides in 13e-4a.
 4. **Any machine that loaded an older rivers snapshot** keeps its old short names and Pūkio Stream's dropped alias until `npx supabase db reset` and `npm run base -- load all` (loading only adds rows). The Windows stack was rebuilt this way; the Mac has no answer base loaded; plor.app's answer database is empty.

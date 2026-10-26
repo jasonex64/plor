@@ -109,11 +109,11 @@ export const INSIGHTS_TOP_ANSWERS = 5;
 
 // The answer database's imports (docs/milestones/M13-13a-the-base.md; scripts/base.ts).
 // BASE_REVIEW_SAMPLE: random members shown in an import's review (human, 2026-10-24: "Summary + flags (Recommended)",
-// whose text said 20 random samples). BASE_SLICE_ROWS: rows asked for per bd:slice request to Wikidata's query
-// service (SOURCES.md, Wikidata: 60 s and 60 s of processing a minute per client); one 50,000-row slice took 0.85 s,
-// 2026-10-24 (the 13a ticket). The value waits on the human's OK.
+// whose text said 20 random samples). BASE_BATCH_IDS: Wikidata IDs one query asks about (the children of these taxa,
+// their names), as the import reads the animal tree by key (13e-4c; human, 2026-10-26: "5,000 (Recommended)", after
+// 5,000 took 3.3 s and 2.1 s against the query service's 60 s limit).
 export const BASE_REVIEW_SAMPLE = 20;
-export const BASE_SLICE_ROWS = 50_000;
+export const BASE_BATCH_IDS = 5_000;
 // The places 13b's facts check knows: Wikidata items with a population figure of at least this many people (human,
 // 2026-10-24: "100,000+ people (Recommended)"; docs/milestones/M13-13b-learning-from-misses.md).
 export const BASE_PLACES_MIN_POPULATION = 100_000;
