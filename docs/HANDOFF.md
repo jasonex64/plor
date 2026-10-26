@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c approved, 14b-2c-1 in review (PR_PENDING); the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c approved, 14b-2c-1 in review (PR #93); the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -20,11 +20,11 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
 | 14b-2b-2b | Keep comment, blocked host answers marked in place, the audit's one-click link. **Security changes:** `private.keep_reported_comment` and `private.comment_keep` (a kept comment stays hidden for its reporters); `private.audit_near` | #91 |
 
-### In review: 14b-2c-1, the player screens (PR_PENDING)
+### In review: 14b-2c-1, the player screens (PR #93)
 `docs/milestones/M14-14b-2c-review-items.md`: 14b-2c (all 53 For M14 items in 4 PRs by area) was approved by the human on the Mac, 2026-10-26, after four rounds of guided questions (answers 1–14, quoted there). 14b-2c-1 closes 23 items, among them 8 and 16 from 14b-2c-4. It's built, reviewed (two blocking findings fixed, the rest in ROADMAP For M14), and its evidence is in the ticket. 30 For M14 items are left for 14b-2c-2 to 14b-2c-4, plus the review's 10 new ones.
 
 ### Next step
-1. Once PR_PENDING merges on green CI: mark 14b-2c-1 done (ticket Status, ROADMAP row, the ROADMAP ticks' PR number) with its CI run.
+1. Once PR #93 merges on green CI: mark 14b-2c-1 done (ticket Status, ROADMAP row, the ROADMAP ticks' PR number) with its CI run.
 2. Then **14b-2c-2**, Me, Friends, the settings sheet and themes (items 19, 26, 27, 28, 29, 33); then 14b-2c-3, the admin pages (item 52's Keep race is a security change: propose it and record it in DECISIONS.md before building); then 14b-2c-4.
 3. Then 14c-1 (ask its N1–N7). N3 now holds the share symbols and N7 a stolen key's feedback (14b-2c answers 3 and 5).
 
