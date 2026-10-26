@@ -1,23 +1,17 @@
-import Link from "next/link";
-import { AuditLink } from "../audit-link";
 import { Suspense } from "react";
-import { Reports } from "./reports";
+import { Footer } from "../../footer";
+import { Home } from "../../home";
 
-// Admin-only reported comments (docs/milestones/M08-comments-and-reactions.md, 8c). The page itself shows nothing
-// private: the list comes from /api/admin/reports, which checks the signed-in user against private.admin.
+// Reported comments (docs/milestones/M08-comments-and-reactions.md, 8c). In the admin area of Plor's shell (docs/milestones/M14-14b-2b-2-admin-build.md). The page itself shows
+// nothing private: its data comes from the admin APIs, which check the signed-in user against private.admin.
 export default function ReportsPage() {
   return (
     <main>
-      <h1>Reported comments</h1>
+      <h1>Plor</h1>
       <Suspense fallback={<p>Loading…</p>}>
-        <Reports />
+        <Home view={{ kind: "admin", page: "reports" }} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/admin">Puzzle insights</Link> · <Link href="/admin/puzzles">Puzzles</Link> ·{" "}
-          <Link href="/admin/base">Answer database</Link> · <AuditLink /> · <Link href="/admin/bank">Question bank</Link> · <Link href="/">Back to Plor</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

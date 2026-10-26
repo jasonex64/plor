@@ -18,6 +18,7 @@ import { Avatar } from "./avatar";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
+import { useMinWidth } from "./min-width";
 import { RankFlower, rankFor } from "./ranks";
 import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
@@ -78,10 +79,13 @@ const TABS = [
 
 // A tab is the current page on its own path, and the current section on a page under it (a group's page is under
 // Groups).
-function current(path: string, href: string): "page" | "true" | undefined {
+function current(path: string, href: string, sidebar: boolean): "page" | "true" | undefined {
   if (path === href) return "page";
   // Offbeat's game screen and its How to play are opened from Today (docs/milestones/M14-14a-2b-game-screen.md).
   if (href === "/" && (path === "/offbeat" || path.startsWith("/offbeat/"))) return "true";
+  // On phones Admin is reached from the Me tab (MeAdminLink), so the admin pages sit under it; the sidebar has its own
+  // Admin (round 10).
+  if (href === "/me" && !sidebar && (path === "/admin" || path.startsWith("/admin/"))) return "true";
   if (href !== "/" && path.startsWith(`${href}/`)) return "true";
 }
 
@@ -105,6 +109,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
   onSignedOut: () => void;
 }) {
   const path = usePathname();
+  const sidebar = useMinWidth(768);
   const dialog = useRef<HTMLDialogElement>(null);
   const open = () => dialog.current?.showModal();
   return createPortal(
@@ -130,7 +135,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
         </div>
         <ul className={styles.tabs}>
           {TABS.map((tab) => {
-            const here = current(path, tab.href);
+            const here = current(path, tab.href, sidebar);
             return (
               <li key={tab.href}>
                 <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
@@ -142,7 +147,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
           })}
         </ul>
         {admin && (
-          <Link href="/admin" className={styles.admin}>
+          <Link href="/admin" className={styles.admin} aria-current={path === "/admin" || path.startsWith("/admin/") ? "true" : undefined}>
             Admin
           </Link>
         )}

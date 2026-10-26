@@ -3,6 +3,7 @@
 // Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
 // (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
 // (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
+// the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
 // or, on an invite link (/invite/<code>), the friend request; on a
 // group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
@@ -12,6 +13,7 @@ import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
 import type { Profile } from "@/lib/profile";
+import { AdminArea, type AdminPage } from "./admin/admin-area";
 import { Board } from "./board";
 import { ButtonLink } from "./button-link";
 import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
@@ -46,6 +48,7 @@ export type View =
   | { kind: "offbeat" }
   | { kind: "howToPlay" }
   | { kind: "streak" }
+  | { kind: "admin"; page: AdminPage }
   | { kind: "invite"; code: string }
   | { kind: "joinGroup"; code: string }
   | { kind: "group"; id: string };
@@ -127,13 +130,15 @@ export function Home({ view }: { view?: View }) {
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
           {view?.kind !== "offbeat" && <ClockBar />}
           {streakError && <p role="alert">{streakError}</p>}
-          {view && view.kind !== "offbeat" && feedColumn && <FriendsFeed username={me.username} />}
+          {view && view.kind !== "offbeat" && view.kind !== "admin" && feedColumn && <FriendsFeed username={me.username} />}
           {view?.kind === "offbeat" ? (
             <OffbeatScreen username={me.username} onStarted={reloadStreak} />
           ) : view?.kind === "howToPlay" ? (
             <HowToPlay />
           ) : view?.kind === "streak" ? (
             <StreakRanks days={me.streak} />
+          ) : view?.kind === "admin" ? (
+            <AdminArea page={view.page} admin={me.admin} />
           ) : view?.kind === "friends" ? (
             <Friends username={me.username} />
           ) : view?.kind === "groups" ? (

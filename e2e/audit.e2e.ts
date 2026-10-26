@@ -41,20 +41,27 @@ test("an admin undoes an added answer, accepts a held one and undoes that; a pla
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-au@example.test`]);
   await admin.goto("/admin");
-  await expect(admin.getByRole("link", { name: /^Answer audit \(\d+ to review\)$/ })).toBeVisible();
+  // Admin opens on Puzzles, and the sub-tabs carry what waits: Audit with its count
+  // (docs/milestones/M14-14b-2b-2-admin-build.md, criteria 1 and 2).
+  await expect(admin).toHaveURL(/\/admin\/puzzles$/);
+  const tabs = admin.getByRole("navigation", { name: "Admin" });
+  await expect(tabs.getByRole("link", { name: /^Audit\s?\d+ waiting$/ })).toBeVisible();
 
-  await admin.getByRole("link", { name: /^Answer audit/ }).click();
-  const added = admin.getByRole("region", { name: "Added by players" }).getByRole("article", { name: NEW });
-  const held = admin.getByRole("region", { name: "To review" }).getByRole("article", { name: LISTED });
-  await expect(added).toContainText("Typed by 3 of the");
+  await tabs.getByRole("link", { name: /^Audit/ }).click();
+  await expect(admin).toHaveURL(/\/admin\/audit$/);
+  const added = admin.getByRole("region", { name: "Added by players" }).getByRole("row", { name: NEW });
+  const held = admin.getByRole("region", { name: "To review" }).getByRole("row", { name: LISTED });
+  const decided = (text: string) => admin.getByRole("region", { name: "Decided" }).getByRole("row", { name: text });
+  await expect(added).toContainText("3 of ");
   await expect(held).toContainText("offensive-word list");
   await added.getByRole("button", { name: "Undo" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${NEW}” for Name an animal: undone`);
+  await expect(decided(NEW)).toContainText("Name an animal");
+  await expect(decided(NEW)).toContainText("undone");
   await held.getByRole("button", { name: "Accept" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: accepted`);
+  await expect(decided(LISTED)).toContainText("accepted");
   // Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)").
-  await admin.getByRole("region", { name: "Decided" }).getByRole("listitem").filter({ hasText: LISTED }).getByRole("button", { name: "Undo" }).click();
-  await expect(admin.getByRole("region", { name: "Decided" })).toContainText(`“${LISTED}” for Name an animal: undone`);
+  await decided(LISTED).getByRole("button", { name: "Undo" }).click();
+  await expect(decided(LISTED)).toContainText("undone");
 
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");

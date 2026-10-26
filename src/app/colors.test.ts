@@ -111,6 +111,21 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     expect(ratio(rgb(t[`on-shade-${k}`]), shade)).toBeGreaterThanOrEqual(4.5);
   });
 
+  // The admin pages (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 7): Delete's confirm button, text on the
+  // danger colour; the insights chart's bars (muted, and caught for the dip) and its target line (accent) as graphics
+  // on the card (1.4.11), and the dip's words in the caught colour as text.
+  it("on-accent on the danger colour is at least 4.5:1", () => {
+    expect(ratio(rgb(t["on-accent"]), rgb(t.danger))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(["muted", "caught", "accent"])("the chart's %s on the surface is at least 3:1", (fg) => {
+    expect(ratio(rgb(t[fg]), rgb(t.surface))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the caught colour as text on the surface is at least 4.5:1", () => {
+    expect(ratio(rgb(t.caught), rgb(t.surface))).toBeGreaterThanOrEqual(4.5);
+  });
+
   it.each(["bg", "surface"])("the control outline on %s is at least 3:1", (bg) => {
     expect(ratio(rgb(t.edge), rgb(t[bg]))).toBeGreaterThanOrEqual(3);
   });

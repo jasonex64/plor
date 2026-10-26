@@ -264,6 +264,13 @@
     font-weight: 700;
     text-decoration: none;
   }
+
+  /* In the admin area, Admin is the current section, as a tab is (round 10). */
+  .admin[aria-current] {
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--text);
+  }
 }
 
 /* The clock back to a question left in play (M14 L18): on phones just above the tab bar, from 768px at the top of the

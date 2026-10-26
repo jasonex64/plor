@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-1's PR #89. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-2a's PR #90. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -16,16 +16,14 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-3b | The settings sheet, the friends list on Friends. **Security change:** `plor_app` updates two settings' columns | #85 |
 | 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
+| 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 
-### In review: 14b-2b-1, the wider shell (PR #89, auto-merge on green CI)
-`docs/milestones/M14-14b-2b-1-shell.md`: a 280px sidebar; from 1200px a 360px right column behind a line on every player page (Today's circle, the game screen's feed, the friends feed elsewhere); About and the privacy policy in a box in the settings sheet, the footer only signed out; every control a button or a menu item (`ButtonLink` for links; DECISIONS' Styling rule); one shared Realtime socket per page. Local evidence: `npm test` 360, full e2e 42 passed; CI is the check after that.
-
-### Designed: 14b-2b, the admin pages
-`docs/milestones/M14-14b-2b-admin-pages.md` holds the human's 22 answers (two rounds, an /impeccable critique of round 9 at 22/40, and comments). Round 10 on the canvas "Plor shell layout" (boards Round10 and Round10Phone) is **approved**: "Round 10 looks good, build it: the shell change first, then the admin pages." Its parts: page-named headings under a small Admin, sub-tabs in two groups split by a line (Puzzles, Audit, Reports with counts | Insights, Bank, Database), What needs you in the right column, no Overview page (Admin opens on Puzzles), host answers the Wind's letter blocks marked in place, the Insights chart against the Gentle target, full-width stacked audit actions, Keep comment and an inline confirm for Delete, a dropdown with counts on phones.
+### In review: 14b-2b-2a, the admin area's look (PR #90, auto-merge on green CI)
+`docs/milestones/M14-14b-2b-2-admin-build.md`: the admin pages render through Home in the shell (`src/app/admin/admin-area.tsx`); `/admin` opens Puzzles, Insights is at `/admin/insights`; sub-tabs in two groups with counts, a phone menu and a waiting row, What needs you in the right column; Puzzles' row of days and checkbox chips, Insights' chart against the Gentle target, the audit's stacked actions, the bank's filter, the database's cards, Reports' inline Delete confirm. No server change. Local evidence: `npm test` 385, admin e2e 13, full e2e 44.
 
 ### Next step
-1. After 14b-2b-1 merges: mark it done (ticket, ROADMAP) with its merge evidence.
-2. **14b-2b-2, the admin pages:** write its sub-ticket (criteria and Numbers from round 10), then build. **Keep comment needs the human's approval first**: a new admin action on the reports, a change to what `plor_app` may do (CLAUDE.md, Security). Ask before building it.
+1. After 14b-2b-2a merges: mark it done (ticket, ROADMAP) with its merge evidence.
+2. **14b-2b-2b**, from the same ticket: Keep comment (the security change is **approved**, human 2026-10-26: "Approve it (Recommended)": `private.keep_reported_comment`, `private.comment_keep`, `plor_app` execute and select only; record it in DECISIONS.md), host answers the Wind's letter blocks marked in place (the rule stays in SQL), and the audit's one-click link to the near answer.
 3. Then 14b-2c (the For M14 review items), then 14c-1 (ask its N1–N6).
 
 ### Catching up on another computer
@@ -35,7 +33,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 4. The checks: `npm test` 360; `npm run test:db` 260 (before main's PR #87 tests); `npx supabase test db`; `npm run test:e2e` 42. Don't edit files while e2e runs: the dev server's Fast Refresh remounts pages mid-test. A new e2e file's player names must not repeat another file's.
 
 ### Local state (Windows)
-- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session is about to `db reset` and `load all` it (the human approved), which wipes local data. Message it before any suite or dev server.
+- **The shared local stack** (Docker; the M13 session in `C:/Users/jason/RIFF` uses it and port 3000 too): the M13 session is resetting it (`db reset`, `load all`; the human approved), which wipes local data. Message it before any suite or dev server.
 - Canvas mockups, renders, the critique snapshot and screenshots are in the session's temp folder, outside the repo.
 
 **Left running:** nothing (no dev server, no background job).

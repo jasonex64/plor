@@ -1,0 +1,47 @@
+/* Reported comments (round 10, board 6): each comment between lines, its text on the page's background, the inline
+   confirmation outlined in the danger colour. */
+.reported {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.who {
+  margin: 0;
+}
+
+.body {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 15px;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--danger);
+  border-radius: 10px;
+}
+
+.confirmText {
+  flex-grow: 1;
+  color: var(--danger);
+}

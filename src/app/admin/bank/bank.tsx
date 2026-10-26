@@ -2,14 +2,18 @@
 
 // The question bank (docs/milestones/M13-13d-the-question-bank.md): each question with its category, themes, the days
 // it ran and the share of answers the host caught on each, then the themes set for dates. Read-only: the bank is
-// content/bank.json, changed in pull requests. Plain on purpose; the look is M14's job.
+// content/bank.json, changed in pull requests. Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md,
+// criterion 6): one table with a filter, then the themes.
 import { useEffect, useState } from "react";
 import type { BankView } from "@/admin/bank";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
+import admin from "../admin.module.css";
+import { dayText } from "../day-text";
 
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
+  const [filter, setFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     api<BankView>("/api/admin/bank", { method: "GET" }).then(setBank, (err) => setError(errorText(err)));
@@ -17,42 +21,94 @@ export function Bank() {
 
   if (error) return <p role="alert">{error}</p>;
   if (!bank) return <p>Loading…</p>;
+  const needle = filter.trim().toLowerCase();
+  const questions = bank.questions.filter((q) => !needle || q.prompt.toLowerCase().includes(needle) || q.category.toLowerCase().includes(needle));
   return (
     <>
-      <section aria-label="Questions">
-        {bank.questions.length === 0 && <p>The bank holds no questions.</p>}
-        {bank.questions.map((q) => (
-          <article key={q.id} aria-label={q.prompt}>
-            <h2>{q.prompt}</h2>
-            <p>
-              Category {q.category}; themes: {q.themes.length ? q.themes.join(", ") : "none"}; added by {q.addedBy}.
-            </p>
-            {q.uses.length === 0 ? (
-              <p>Not used yet.</p>
-            ) : (
-              <ul>
-                {q.uses.map((u) => (
-                  <li key={u.date}>
-                    {u.date}: {u.catchRate === null ? "not played yet" : `${Math.round(u.catchRate * 100)}% caught of ${u.answered} answers`}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
+      <p className={admin.note}>
+        Read-only: the bank is <code>content/bank.json</code>, changed in pull requests. {bank.questions.length}{" "}
+        {bank.questions.length === 1 ? "question" : "questions"}.
+      </p>
+      <section aria-label="Questions" className={admin.card}>
+        <label className={admin.field}>
+          <span className={admin.sr}>Filter questions or categories</span>
+          <input value={filter} placeholder="Filter questions or categories" onChange={(e) => setFilter(e.target.value)} />
+        </label>
+        {bank.questions.length === 0 ? (
+          <p>The bank holds no questions.</p>
+        ) : (
+          <table className={admin.table}>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Category</th>
+                <th>Themes</th>
+                <th>Added by</th>
+                <th>Runs (caught)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {questions.map((q) => (
+                <tr key={q.id} aria-label={q.prompt}>
+                  <td className={admin.strong}>{q.prompt}</td>
+                  <td>{q.category}</td>
+                  <td>
+                    {q.themes.length ? (
+                      <span className={admin.tags}>
+                        {q.themes.map((t) => (
+                          <span key={t} className={`${admin.tag} ${admin.state}`}>
+                            {t}
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span className={admin.muted}>—</span>
+                    )}
+                  </td>
+                  <td>{q.addedBy.charAt(0).toUpperCase() + q.addedBy.slice(1)}</td>
+                  <td>
+                    {q.uses.length === 0 ? (
+                      <span className={admin.muted}>Not used yet</span>
+                    ) : (
+                      <ul className={admin.plain}>
+                        {q.uses.map((u) => (
+                          <li key={u.date} className={admin.nowrap}>
+                            {u.catchRate === null ? (
+                              <span className={admin.muted}>Scheduled {dayText(u.date)}</span>
+                            ) : (
+                              <>
+                                {dayText(u.date)} <b>{Math.round(u.catchRate * 100)}%</b> <span className={admin.muted}>of {u.answered}</span>
+                              </>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {bank.questions.length > 0 && questions.length === 0 && <p>No question or category matches.</p>}
       </section>
-      <section aria-label="Themes">
-        <h2>Themes by date</h2>
+      <section aria-label="Themes" className={admin.card}>
+        <h3 className={admin.cardTitle}>Themes by date</h3>
         {bank.themes.length === 0 ? (
           <p>No themes set.</p>
         ) : (
-          <ul>
-            {bank.themes.map((t) => (
-              <li key={t.date}>
-                {t.date}: {t.theme}
-              </li>
-            ))}
-          </ul>
+          <table className={admin.table}>
+            <tbody>
+              {bank.themes.map((t) => (
+                <tr key={t.date}>
+                  <td className={admin.nowrap}>{dayText(t.date)}</td>
+                  <td>
+                    <span className={`${admin.tag} ${admin.state}`}>{t.theme}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </section>
     </>

@@ -1,0 +1,122 @@
+/* Insights (round 10, board 2): the chart 220px tall, each bar 56% of its column in the muted colour, the target a 2px
+   dashed line in the accent, the dip in the caught colour; under each bar its question and rate. */
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.picker > button {
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.day select {
+  min-height: 40px;
+  min-width: 160px;
+}
+
+.chart {
+  display: grid;
+  grid-template-rows: 220px auto;
+  column-gap: 12px;
+}
+
+.axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+  transform: translateY(6px);
+}
+
+.column {
+  position: relative;
+  border-bottom: 1.5px solid var(--edge);
+}
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 22%;
+  right: 22%;
+  border-radius: 5px 5px 0 0;
+  background: var(--muted);
+}
+
+.dip {
+  background: var(--caught);
+}
+
+.target {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  border-top: 2px dashed var(--accent);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.label span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.label b {
+  font-size: 15px;
+}
+
+.dipText {
+  color: var(--caught);
+  font-weight: 700;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: var(--muted);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.keyBar,
+.keyDip {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--muted);
+}
+
+.keyDip {
+  background: var(--caught);
+}
+
+.keyTarget {
+  display: inline-block;
+  width: 18px;
+  border-top: 2px dashed var(--accent);
+}
+
+.misses {
+  margin: 0;
+  padding-left: 18px;
+}
