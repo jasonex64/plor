@@ -42,6 +42,9 @@ After round 9 on the canvas (human, 2026-10-26), an /impeccable critique of it (
 19. **The Overview page:** "Drop it; Admin opens on Puzzles (Recommended)".
 20. **Admin counts on a phone:** "In the dropdown and a strip (Recommended)": each page in the dropdown with its count, and a one-line strip of what's waiting under it.
 
+On round 10 (human, 2026-10-26):
+21. **The audit's actions:** "i feel like each button should for decide should just take up the entire row it looks weird to have the dismiss button half the size of the accept": every action a full-width button, stacked in its column (Different answer… and Same as another answer… become buttons too).
+
 ## Source
 - The canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ): round 7's shell (approved, "Round 7 looks good", 2026-10-24), and the admin boards drawn for this ticket, once the human approves them.
 - **WCAG 2.2** (SOURCES.md), as every M14 screen.
