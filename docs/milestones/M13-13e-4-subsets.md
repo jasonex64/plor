@@ -83,6 +83,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 | Each threshold | Number filters | The human, per subset in 13e-4b (O5) |
 
 ## Out of scope
+- An AI that writes subsets by itself: Claude proposes each batch's subsets in a session and the human approves them by merging (human, 2026-10-26: "Claude proposes, I approve (Recommended)"). ROADMAP's "AI that drafts days" stays in Later.
 - Pop culture: 13e-5, with the answers above.
 - AI-filed traits ("can fly") and facts for WordNet's categories.
 - Combining two filters ("an African country that starts with K"): after this, if the human asks.
