@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, built and reviewed, in review in PR #95 (its questions answered, answers 15–20); then 14b-2c-4. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, done (2026-10-26): merged in PR #95 on green CI (23:52 UTC, as `9344f0a`), by auto-merge, after one rerun of a build whose font download failed. 14b-2c-4, the tests, comments and repeated code, next. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -170,6 +170,7 @@ Planned, confirmed per PR:
 14b-2c-3, on the Mac, 2026-10-26:
 
 - `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  389 passed (389)` (the `hostBankShare` test removed); `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `57 passed (1.9m)`.
+- CI on PR #95 (run 40421607596, `120a2e8`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS`; `npm run test:e2e` → `57 passed (4.7m)`. Its `check` job's build first failed on a font download (ROADMAP For M14) and passed on a rerun.
 - After the review's fix to the bank: tsc and eslint clean, `npm test` 389, `npm run test:db` 266, and `bank`, `admin-area` and `approve-and-play` e2e → `5 passed (8.2s)`.
 - With `src/app/admin` set back to `HEAD`'s, the changed e2e checks failed: the phone menu and labels (`admin-area`), the blocked chip staying a checkbox (`approve-and-play`) and the Reports focus (`live-board`); all pass on the new code.
 - `src/admin/bank.db.test.ts`: past, missed (a past draft never approved), today and future days; with the review's first version of `day` put back, it fails.

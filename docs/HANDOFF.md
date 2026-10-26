@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 in review (PR #95), 14b-3 approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 merged (PR #95), 14b-3 approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -23,7 +23,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ### Done since 14b-2b-2b
 - **14b-2c-1, the player screens** (PR #93, merged on green CI, 2026-10-26): 23 For M14 items, from `docs/milestones/M14-14b-2c-review-items.md` (14b-2c approved after four rounds of guided questions, answers 1–14).
 
-- **14b-2c-3, the admin pages** (in review, PR #95): items 36–39, 41, 51 and 53 built, 52 closed as accepted by the human (answer 15, "Leave it": no security change), the audit's one query per near-typo kept (answer 19). WAI-ARIA 1.2 joined SOURCES.md for the admin tables' explicit roles (answer 20).
+- **14b-2c-3, the admin pages** (PR #95, merged on green CI, 2026-10-26): items 36–39, 41, 51 and 53 built, 52 closed as accepted by the human (answer 15, "Leave it": no security change), the audit's one query per near-typo kept (answer 19). WAI-ARIA 1.2 joined SOURCES.md for the admin tables' explicit roles (answer 20).
 - **14b-2c-2, Me, Friends, the settings sheet and themes** (PR #94, merged on green CI, 2026-10-26): items 19, 26, 27, 28, 29 and 33. Me reads its day once, first, and passes it to the settling and every read (`private.today()` is each statement's own); a signed-in player's theme is applied by the settings sheet alone. 41 For M14 items are open: 14b-2c-3's 8, 14b-2c-4's 16 and the 14b-2c reviews' 17.
 
 ### Approved, not built
@@ -31,8 +31,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Username lookup with friend requests** is on ROADMAP's Later list as its own milestone after M13 and M14.
 
 ### Next step
-1. Once PR #95 merges on green CI: mark 14b-2c-3 done (ticket Status, ROADMAP row, the ticks' PR number) with its CI run, and merge `main` into this branch.
-2. Then **14b-2c-4**, the tests, comments and repeated code (16 items, plus the 14b-2c reviews' 23 by then).
+1. **14b-2c-4**, the tests, comments and repeated code: its 16 items, plus the 14b-2c reviews' findings and the font-download note (ROADMAP For M14).
 3. Then 14b-3, then 14c-1 (ask its N1–N7). N3 holds the share symbols and N7 a stolen key's feedback.
 
 ### Catching up on another computer
