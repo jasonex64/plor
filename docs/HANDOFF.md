@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4 (subsets) approved, and 13e-4a (the facts and the machinery) in review in PR #87, merging on green CI. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14` (14b-2a, the sprout streak). The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), from main with 14b-1's PR; for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-26 (UTC), on `m13-answer-lists-and-content` by the M13 session on the Windows PC (`C:/Users/jason/RIFF`): 13e-3 merged (PR #84); 13e-4a (subsets: the facts and the machinery) merged in PR #87 and marked done; 13e-4b next. An M14 session runs in parallel in `C:/Users/jason/RIFF-m14` (14b-2a, the sprout streak). The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), from main with 14b-1's PR; for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -65,12 +65,12 @@ plor.app's database has every migration through `20261025200806_settings.sql`: t
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **PR #87** merges on green CI; then plor.app's `db push` for its 3 migrations, when the human asks.
+- **plor.app's `db push`** for 13e-4a's 3 migrations (PR #87, merged), when the human asks. Until then plor.app runs main's code against a database without them (Vercel deploys on merge).
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. **13e-4a is in PR #87** (`docs/milestones/M13-13e-4-subsets.md`), auto-merge on green CI. After it merges: mark it done with its CI run (ticket and ROADMAP), and remind the human that plor.app needs `npx supabase db push` for its 3 migrations (`20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`), run from a clean checkout of main, only at their request.
+1. **13e-4a is done** (PR #87, `docs/milestones/M13-13e-4-subsets.md`). plor.app needs `npx supabase db push` for its 3 migrations (`20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`), run from a clean checkout of main, only at their request.
    Then **13e-4b**: Claude proposes the first subsets (about 20–30, with bank questions and review output) and the human sets each threshold (O5), approving by merging. ROADMAP From 13e-4a lists the data quirks to review first (Oceania, boroughs, junk aliases on continent and status things).
 2. **Then 13e-5, pop culture,** with the answers already recorded in 13e-4's ticket (animated films and anime, Nintendo plus genres, younger-leaning groups with K-pop, board games, superheroes), built as subsets where it can.
 3. ROADMAP's From 13e-3 item that makes the simulator and the list checks `scripts/` commands: the simulator has been rewritten by hand three times. The re-fetch of the older sets for the mul fallback rides in 13e-4a.

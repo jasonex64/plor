@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a in review in PR #87, merging on green CI; 13e-4b next. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b next. Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -74,7 +74,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
 ## 13e-4a — The facts and the machinery
-**Status:** in review (2026-10-26): built, reviewed in a fresh context, the 7 blocking findings fixed; PR #87, merging on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** done (2026-10-26): merged in PR #87 (`6c4d5ee`, 2026-10-26 05:56 UTC) on green CI, 10 of 10 checks (runs 40276452444 and 40276445920 on `7796848`), by auto-merge (human, 2026-10-25: "Merge on green CI (Recommended)"). Its 3 migrations wait for plor.app's next `db push`, at the human's request.
 
 **Source:** SOURCES.md, Wikidata properties (M13 13e-4), read 2026-10-26; Wikidata (M13 D2); 13a–13e-3's tickets for the base, the format, misses and the draft.
 
@@ -166,7 +166,7 @@ Otherwise it adds facts and recipes to the sets already loaded, which is the poi
 - **Real-data trials** (subsets defined inside a rolled-back transaction): African countries 54 (11 ms); countries starting with D 17 (29 ms: any of a country's names counts toward membership); African rivers 1,170 (1.3 s); endangered animals 2,846 (2.7 s); animals starting with Z 694 (5.0 s); US cities of 1,000,000+ 13 (Chicago, Dallas, Houston, Los Angeles, Manhattan, New York City, Philadelphia, Phoenix, Queens, San Antonio, San Diego, San Jose, The Bronx). That last one took **9.3 s** before `20261026053032_number_fact_lookup.sql` and **0.46 s** after (hypothesis: the partial index can't serve the as-of check; disproved if still over 2 s). A first attempt counting five subsets in one query ran over 5 minutes before the index and was cancelled; not reproduced after it.
 - **The suites:** `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=388`, `Result: PASS` (`subsets.test.sql` 43); `npm run test:db` 40 files, **262 passed**; `npm run test:e2e` 37 passed, 2 failed (groups, and Me's avatar slots), and `--last-failed` 2 passed (this PC is slow: 13e-3 Evidence). The e2e run was before the review's fixes, which change no page; CI runs it again.
 - **The tests catch what they claim** (each rule broken on purpose in the local database, then restored): `fits_where` reading `now()` instead of the day's moment fails "but a started day keeps the number it had", "and the facts" and "and the names a letter subset reads"; approval without the letter clause fails "and only those: a name not starting with it doesn't make up for one the letters block".
-- CI: in PR #87.
+- CI: 10 of 10 on `7796848` (runs 40276452444 and 40276445920), e2e included.
 
 ## 13e-4a Review
 **Reviewer agent, fresh context, 2026-10-26.** Blocking findings and how each was fixed:
