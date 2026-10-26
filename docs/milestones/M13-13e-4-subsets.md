@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b next. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c built, reviewed and proven, in review in one PR. Pop culture moves to 13e-5 and uses this.
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
@@ -117,7 +117,7 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
 ## 13e-4b — The first subsets
-**Status:** in progress (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`) and reviewed; it waits for 13e-4c, as the review found the animals import loses random branches of the tree (below), and 13e-4b's animal answers need a complete one.
+**Status:** in review (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`), reviewed, and checked on a fresh load once 13e-4c gave a complete animal tree (Evidence below); in one PR with 13e-4c (human: "One PR for both (Recommended)").
 
 **What the human decided (guided questions, 2026-10-26):**
 | Question | The human's answer |
@@ -191,6 +191,8 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 3. **Removes** `sliced()` and `BASE_SLICE_ROWS`, the only reads by position; adds `BASE_BATCH_IDS = 5000` (the human, 2026-10-26).
 4. **The proof:** two full fetches give the same items (the same IDs, names and parents); the counts are printed and recorded.
 
+**Decided after its review (human, 2026-10-26):** the shown name for a taxon with several English names: "Wikidata's English label first (Recommended)": the English label when it is one of the common names ("vaquita", not the alphabetical "Chochito"; the bluebuck, not "Blaubok"), else the first common name alphabetically. The labels are read by ID for the kept taxa, with the rest.
+
 **What building changed:** a taxon's display name is its first English name **in alphabetical order**: the query service returns a taxon's names in no fixed order, so the first two by-key fetches named 65 of the 12,886 taxa with several English names differently (the elephant shark "Ghost Shark", then "Whitefish"). Every name stays typeable either way; the name is what the host says, and what the letter-subset host check reads. Claude's call: the old "first as returned" was arbitrary too.
 
 **Evidence (2026-10-26, the Windows checkout):**
@@ -199,6 +201,15 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 - **Run 2:** the same 2,368,292 taxa and 71,753 items; **0 IDs in one run only**; parents, aliases and statuses identical; 65 display names different (above).
 - **Run 3**, with names in alphabetical order (the committed snapshot): against run 2, 0 IDs differ and 0 items differ in parents, aliases or statuses. The kitefin shark (Q1321783) is "Kitefin shark", with "kitefin shark", its plural and "dalatias licha" as its names.
 - `npx tsc --noEmit -p .` and `npx eslint scripts src` clean; `scripts/base.test.ts` 16 passed (the alphabetical name included).
+- **Run 4**, with the English label first (the human's answer after the review; the committed snapshot): against run 3, 0 IDs differ and 0 items differ in parents, aliases or statuses; 3,504 taxa renamed, e.g. Q725493 "Chochito" to "Vaquita", Q2000591 "Marlin" to "White marlin"; where the label is the scientific name the alphabetical rule stays (Q746580 "Blaubok"; "bluebuck" still answers). Then the local database rebuilt again (`db reset` + `load all`, 284 MB), and every 13e-4b check rerun on it: the bank 0 problems, no host above a familiar answer, the simulator 39 of 40, the 7 trial drafts, `npm test` 343, `test:sql` 391, `test:db` 262, tsc, lint and content:validate clean.
+
+## 13e-4b and 13e-4c Source diff
+| Source says | We built | Why different |
+|---|---|---|
+| P141 IUCN status: 9 values, "endangered" (Q96377276) one of them | "Name an endangered animal" accepts vulnerable, endangered and critically endangered (Q278113, Q96377276, Q219127) | Players mean the threatened statuses by "endangered" (gorilla is CR, lion VU); the human: "Both, endangered as players mean it (Recommended)" |
+| P141: extinct (Q237350) and extinct in the wild (Q239509) are two values | "Name an animal that went extinct in modern times" takes extinct alone | Animals extinct in the wild still live in captivity; IUCN's list holds only modern extinctions, so the prompt says so (the human: "Reword it (Recommended)") |
+| Query service: SPARQL with a 60 s limit (SOURCES.md, Wikidata) | Reads by key, 5,000 IDs a query, never `bd:slice` by position | Reading by position skips and repeats rows across servers (SOURCES.md, Wikidata Query Service behaviour, and the measurement); 13a's `bd:slice` reads are gone |
+| P1843 taxon common name: several English values, in no fixed order | One shown name: the English label when it is a common name, else the first alphabetically; every value stays typeable | A fetch must give the same snapshot twice; the human chose the label rule |
 
 ## Numbers
 | Value | Used for | Origin |

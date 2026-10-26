@@ -175,7 +175,7 @@ function countryIds(): Set<string> {
   return new Set(ids);
 }
 
-type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string> };
+type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string>; label?: string };
 
 // A query asked about Wikidata IDs, BASE_BATCH_IDS at a time: `pattern` gets the batch as a VALUES list. By key, never by
 // position: reading the index in pages (bd:slice offsets) skipped and repeated rows, as each query server orders its
@@ -248,18 +248,25 @@ async function fetchTaxa(root: string): Promise<Map<string, Taxon>> {
       if (!t.scientific.includes(r.sci.value)) t.scientific.push(r.sci.value);
     }
   });
+  // Each kept taxon's English label, which names it when it is one of its common names (human, 2026-10-26: "Wikidata's
+  // English label first (Recommended)").
+  await byIds([...taxa.keys()], "rdfs:label", (v) => `SELECT ?t ?l WHERE { VALUES ?t { ${v} } ?t rdfs:label ?l . FILTER(LANG(?l) = "en") }`, (rows) => {
+    for (const r of rows) taxa.get(qid(r.t.value))!.label = r.l.value;
+  });
   console.log(`${taxa.size} taxa kept, ${[...taxa.values()].filter((t) => t.names.length).length} with an English name`);
   return taxa;
 }
 
-// Taxa into items. A taxon's name is its first English name in alphabetical order, else its scientific name (it then
-// has no 'name' alias, so it can't be answered: private.category_members). The query service returns a taxon's
-// names in no fixed order, so "first as returned" named the elephant shark "Ghost Shark" on one fetch and "Whitefish"
-// on the next (13e-4c). root keeps no parents; every other parent is in the map.
+// Taxa into items. A taxon's name is its English label when that is one of its English common names (human,
+// 2026-10-26: "Wikidata's English label first (Recommended)": "vaquita", not the alphabetical "Chochito"), else its first
+// English name in alphabetical order, else its scientific name (it then has no 'name' alias, so it can't be answered:
+// private.category_members). The query service returns a taxon's names in no fixed order, so "first as returned"
+// named the elephant shark "Ghost Shark" on one fetch and "Whitefish" on the next (13e-4c). root keeps no parents;
+// every other parent is in the map.
 export function taxaToItems(taxa: Map<string, Taxon>, root: string): Item[] {
   return [...taxa].map(([id, t]) => ({
     id,
-    name: [...t.names].sort((a, b) => a.localeCompare(b, "en"))[0] ?? t.scientific[0] ?? id,
+    name: t.names.find((n) => t.label !== undefined && normalize(n) === normalize(t.label)) ?? [...t.names].sort((a, b) => a.localeCompare(b, "en"))[0] ?? t.scientific[0] ?? id,
     aliases: aliasesFor(t.names, t.synonyms, t.scientific),
     kind_of: id === root ? [] : [...t.parents].filter((p) => taxa.has(p)),
   }));
@@ -476,7 +483,7 @@ const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English com
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
-    method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query: the tree under ${ANIMALIA} read top-down by P171 parent taxon, each taxon's English common names (P1843), and for the taxa kept (those with an English name, plus their ancestors up to it) their scientific names (P225); LDNOOBW-listed names of ${ANIMALS_DROP_LISTED_NAMES.join(", ")} dropped; each taxon's IUCN conservation status (P141, truthy) among the 9 of its one-of constraint, which are items of the set`,
+    method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query: the tree under ${ANIMALIA} read top-down by P171 parent taxon, each taxon's English common names (P1843), and for the taxa kept (those with an English name, plus their ancestors up to it) their scientific names (P225) and English labels (named by the label when it is one of the common names, else the first common name alphabetically); LDNOOBW-listed names of ${ANIMALS_DROP_LISTED_NAMES.join(", ")} dropped; each taxon's IUCN conservation status (P141, truthy) among the 9 of its one-of constraint, which are items of the set`,
     fetch: async () => {
       const taxa = await fetchTaxa(ANIMALIA);
       if (!taxa.has(DOG)) throw new Error(`${DOG} (the domestic dog) wasn't fetched`);
