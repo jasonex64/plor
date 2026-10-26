@@ -17,6 +17,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
+| 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
 
 ### In review: 14b-2b-2a, the admin area's look (PR #90, auto-merge on green CI)
 `docs/milestones/M14-14b-2b-2-admin-build.md`: the admin pages render through Home in the shell (`src/app/admin/admin-area.tsx`); `/admin` opens Puzzles, Insights is at `/admin/insights`; sub-tabs in two groups with counts, a phone menu and a waiting row, What needs you in the right column; Puzzles' row of days and checkbox chips, Insights' chart against the Gentle target, the audit's stacked actions, the bank's filter, the database's cards, Reports' inline Delete confirm. No server change. Local evidence: `npm test` 385, admin e2e 13, full e2e 44.

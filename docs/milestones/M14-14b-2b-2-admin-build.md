@@ -1,6 +1,6 @@
 # M14 14b-2b-2 — Building the admin pages
 
-**Status:** 14b-2b-2a in review (2026-10-26), in PR #90, on `m14-look-and-feel`; 14b-2b-2b after it. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."), in two PRs, each merged on green CI.
+**Status:** 14b-2b-2a done (2026-10-26): merged in PR #90 on green CI (09:37 UTC), by auto-merge; the review's two Puzzles fixes then passed `approve-and-play.e2e.ts` and `admin-area.e2e.ts` locally (4 passed). 14b-2b-2b in progress. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages.").
 
 ## Goal
 The admin pages live in Plor's shell as one admin area, in round 10's look, with what needs the admin always in view; then the three changes round 10 drew that need the server.
