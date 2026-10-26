@@ -1,6 +1,6 @@
 # M14 14b-2b-2 — Building the admin pages
 
-**Status:** 14b-2b-2a in progress (2026-10-26), on `m14-look-and-feel`; 14b-2b-2b after it. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."), in two PRs, each merged on green CI.
+**Status:** 14b-2b-2a in review (2026-10-26), on `m14-look-and-feel`; 14b-2b-2b after it. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."), in two PRs, each merged on green CI.
 
 ## Goal
 The admin pages live in Plor's shell as one admin area, in round 10's look, with what needs the admin always in view; then the three changes round 10 drew that need the server.
@@ -57,7 +57,23 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
 ---
 
 ## Source diff
+14b-2b-2a:
+| Source says | We built | Why different |
+|---|---|---|
+| Round 10 starts each admin page at "Admin / Puzzles" | The page's own "Plor" heading above it on desktop, as on every page (hidden on phones by the top bar) | One page structure for every page in the shell (Home renders them all) |
+| Round 10's phone menu, a listbox | A button that opens a list of links, grouped by a line | Each admin page is a page to go to: links, not options |
+| Round 10 draws tables at 1440px only | Below 768px each table row stacks as a block | Round 10's phone boards draw cards; the tables reflow into them without a second layout |
+| Round 10's chart axis to 25% | The axis reaches the highest rate or target, rounded up to the next 5% (round 10's step) | A day can catch more than 25% |
+| Round 10's table on Insights | The same 7 columns, without "In bank" | As drawn (the critique found "In bank" undefined) |
+| Round 10's phone boards mark Me in the tab bar on admin pages | The same on phones; on the sidebar only Admin is marked | Phones reach Admin from Me; the sidebar has Admin itself |
+
 
 ## Evidence
+14b-2b-2a, on the Windows checkout, 2026-10-26, with the M13 session holding off the shared stack:
+- `npx tsc --noEmit -p .` and `npm run lint`: no output. `npm test`: `Tests 385 passed (385)` (colors.test.ts adds on-accent on danger, the chart's bars and target at 3:1 and the dip's words at 4.5:1, in every theme).
+- The admin e2e files, `npx playwright test e2e/admin-area.e2e.ts e2e/approve-and-play.e2e.ts e2e/audit.e2e.ts e2e/bank.e2e.ts e2e/admin-base.e2e.ts e2e/live-board.e2e.ts`: `13 passed (1.5m)` (criteria 1–6: /admin opening Puzzles in the shell with Admin current, the two groups of sub-tabs and the Audit count, What needs you at 1440px, the insights chart's description, the phone menu at 360px with no sideways scroll, approving a day from its row and section, the audit's rows and Undo, the bank's rows and days, the database's labelled values, and the inline Delete confirm with the decisions log).
+- The full suite, `npx playwright test`: `44 passed (5.6m)`. After it, the sidebar stopped marking Me on admin pages (phones only): `admin-area` and `shell` again, 9 passed and 1 failed on the first run after the edit (a recompile), which then passed alone.
+- Seen at 1440px and 360px (Playwright screenshots of every admin page): as round 10, with the right column, the grouped sub-tabs and the stacked rows on phones.
+
 
 ## Review
