@@ -116,6 +116,30 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
+## 13e-4b — The first subsets
+**Status:** planned (2026-10-26): the guided questions are answered (below); the design waits for the human's approval.
+
+**What the human decided (guided questions, 2026-10-26):**
+| Question | The human's answer |
+|---|---|
+| Which kinds of subsets | "By first letter", "By IUCN status" (continent and population wait) |
+| Where in the day | "Wherever easiest-first puts them (Recommended)" |
+| Which letters | "Any letter with 10+ members (Recommended)" |
+| Batch size | "About 20–30 (Recommended)" |
+| The IUCN subsets | "endangered or extinct?", then "Both, endangered as players mean it (Recommended)": "Name an endangered animal" accepts vulnerable, endangered or critically endangered (strictly, gorilla is CR and lion VU: 13e-4b survey), and "Name an extinct animal" |
+| Which bases get letters | "Countries and capitals", "Animals", "US cities and rivers", "Everyday WordNet lists" |
+| Letters per base | "At most 2 letters per base (Recommended)" |
+| **The format** (hard to reverse) | "Approve: always a list (Recommended)": a fact filter holds `values`, a list, and a thing fits with any of them; a continent is a one-item list. No day has been approved with `where` yet, so nothing stored changes |
+
+**The survey** (the local base, 2026-10-26): named animals by status: least concern 24,141, vulnerable 3,063, endangered 2,846, data deficient 2,648, near threatened 2,363, critically endangered 1,693, extinct 475, extinct in the wild 26. Vulnerable: lion, giraffe, koala, cheetah, polar bear, snow leopard, hippopotamus; endangered: tiger, chimpanzee, red panda, blue whale, Asian elephant; critically endangered: gorilla, orangutan, black rhinoceros, vaquita, Sumatran tiger; extinct: dodo, great auk, passenger pigeon, thylacine. "Giant panda" has no status in Wikidata's taxon (the "panda" alias reaches two taxa).
+
+**Claude's design (for the human to approve):**
+1. **The format change:** `private.category.fact_value` becomes `fact_values` (a list), `where`'s fact form becomes `{"trait", "values": […], "via"?}`, and `fits_where` matches any of them; `data/categories.json`'s `fact` takes `values`. DECISIONS.md's Puzzle content format row says so.
+2. **Two IUCN subsets** of `animal`: `endangered_animal` (Q278113, Q96377276, Q219127) and `extinct_animal` (Q237350), each with a bank question.
+3. **Letter subsets**, at most 2 per base, over countries, world capitals, animals, US cities, rivers and some everyday WordNet lists, to about 20–28 in all: for each base, letters with at least 10 members, preferring the 9 letters the Wind never steals (f, j, k, q, v, w, x, y, z; `LETTER_TIERS`), whose questions no day's letters can block, then the others. Each with a bank question (5–6 common and 4–6 uncommon answers, the host's starting with the letter).
+4. **The status and continent things' aliases:** only their names, no Wikidata alternative labels (ROADMAP From 13e-4a: "na", "lc", "dd" and "003 un m49 code" made those misses "rejected" in every category).
+5. **Checks:** the review output for each subset (count, sample, flags), trial drafts, the simulator, one PR the human approves by merging.
+
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
