@@ -71,7 +71,8 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
     { width: 1440, height: 900 },
   ]) {
     const { nav } = await player(browser, `sb${viewport.width}`, viewport);
-    await expect(nav.getByRole("link")).toHaveText(TABS.map((t) => t.name));
+    // The tabs' list: the sidebar also holds the streak's pill (docs/milestones/M14-14b-2a-streak-ranks.md).
+    await expect(nav.getByRole("list").getByRole("link")).toHaveText(TABS.map((t) => t.name));
     // Down the left edge, the full height.
     const box = (await nav.boundingBox())!;
     expect([box.x, box.y, box.height]).toEqual([0, 0, viewport.height]);

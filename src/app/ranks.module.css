@@ -1,0 +1,17 @@
+/* The ranks' flowers (src/app/ranks.tsx): the outline is the drawing laid under itself in one dark colour, 2.2 units
+   wider, as previewed to the human; its details (veins, dots, shading) stay inside the shapes and add no outline. */
+.flower {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.outline * {
+  fill: var(--outline);
+  stroke: var(--outline);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+.outline .detail {
+  display: none;
+}

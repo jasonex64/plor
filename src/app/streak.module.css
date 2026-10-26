@@ -1,0 +1,71 @@
+/* /streak (docs/milestones/M14-14b-2a-streak-ranks.md): the ranks as cards like Me's (round 7), each flower 96px, 128px
+   from 768px (Numbers); the player's rank outlined thick in the page's text colour, as the chosen theme is (M14 L47). */
+.streak {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.streak p {
+  margin: 0;
+}
+
+.ranks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.current {
+  border: 3px solid var(--text);
+}
+
+.name {
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.days,
+.yours {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.yours {
+  color: var(--text);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .ranks {
+    grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  }
+
+  .rank svg {
+    width: 128px;
+    height: 128px;
+  }
+}

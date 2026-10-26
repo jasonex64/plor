@@ -106,9 +106,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
   // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
   await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
-  // Above Offbeat on Today, the streak: today is the watcher's first day (M11 H4).
+  // The streak's pill: today is the watcher's first day (M11 H4), the first rank's
+  // (docs/milestones/M14-14b-2a-streak-ranks.md).
   await watcher.goto("/");
-  await expect(watcher.getByText("Streak: 1 day played in a row")).toBeVisible();
+  await expect(watcher.getByRole("link", { name: "1 day streak, Daisy" })).toBeVisible();
   // Yesterday's standings, friends by default (H7), in the leaderboard card (M14 14a-2a): neither played yesterday.
   const leaderboard = watcher.getByRole("region", { name: "Leaderboard" });
   await expect(leaderboard.getByRole("radio", { name: "Yesterday" })).toBeChecked();

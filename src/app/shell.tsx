@@ -5,6 +5,8 @@
 // leaving lets the question's timer run (L18). Admins find Admin in the sidebar, and on phones on the Me tab
 // (MeAdminLink), which replaces M15 15c (human, 2026-10-24: "14a-1 does it, close 15c"). The gear opens the settings
 // sheet (docs/milestones/M14-14a-3b-settings.md; L44): in a top bar on phones, at the foot of the sidebar from 768px.
+// The streak's pill shows its rank and opens /streak (docs/milestones/M14-14b-2a-streak-ranks.md): beside the gear on
+// phones, under the sidebar's wordmark with the avatar slot from 768px.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -12,8 +14,10 @@ import { createPortal } from "react-dom";
 import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
+import { Avatar } from "./avatar";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
+import { RankFlower, rankFor } from "./ranks";
 import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
 
@@ -91,9 +95,10 @@ const GEAR = icon(
 // Rendered into <body>, beside the page's <main>, so the navigation isn't inside the main landmark (M14 14a-1
 // review). Home, which renders it, runs only on the client (it reads the address bar behind Suspense). On phones the
 // top bar's wordmark stands for the page's own "Plor" heading, which is then read but not shown twice.
-export function Shell({ admin, profile, onChanged, onSettings, onSignedOut }: {
+export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedOut }: {
   admin: boolean;
   profile: Profile;
+  streak: number;
   onChanged: () => void;
   onSettings: (settings: Settings) => void;
   onSignedOut: () => void;
@@ -107,14 +112,21 @@ export function Shell({ admin, profile, onChanged, onSettings, onSignedOut }: {
         <span className={styles.topWord} aria-hidden="true">
           Plor
         </span>
-        <button type="button" className={styles.gear} aria-label="Settings" aria-haspopup="dialog" onClick={open}>
-          {GEAR}
-        </button>
+        <div className={styles.me}>
+          <StreakPill days={streak} />
+          <button type="button" className={styles.gear} aria-label="Settings" aria-haspopup="dialog" onClick={open}>
+            {GEAR}
+          </button>
+        </div>
       </header>
       <nav aria-label="Main" className={styles.nav}>
         <span className={styles.word} aria-hidden="true">
           Plor
         </span>
+        <div className={styles.who}>
+          <Avatar name={profile.username} />
+          <StreakPill days={streak} />
+        </div>
         <ul className={styles.tabs}>
           {TABS.map((tab) => {
             const here = current(path, tab.href);
@@ -141,6 +153,18 @@ export function Shell({ admin, profile, onChanged, onSettings, onSignedOut }: {
       <SettingsSheet dialog={dialog} profile={profile} onChanged={onChanged} onSettings={onSettings} onSignedOut={onSignedOut} />
     </>,
     document.body,
+  );
+}
+
+// The streak and its rank on the soft pill (round 7's .streak), read as "4 day streak, Daisy": the flower is decoration.
+function StreakPill({ days }: { days: number }) {
+  const rank = rankFor(days);
+  return (
+    <Link href="/streak" className={styles.streak}>
+      <RankFlower rank={rank} size={22} />
+      {days}
+      <span className={styles.hidden}> day streak, {rank.name}</span>
+    </Link>
   );
 }
 

@@ -31,39 +31,15 @@ This ticket's guided questions (human, 2026-10-26, on the Mac):
 ## The sub-tickets
 | Sub-ticket | What | Needs first |
 |---|---|---|
-| **14b-2a** | The sprout streak in the top bar and sidebar, and the sidebar's avatar slot | Nothing: drafted below |
+| **14b-2a** | The streak in the top bar and sidebar as ranks of flowers, `/streak`, and the sidebar's avatar slot | Nothing: its own file, `M14-14b-2a-streak-ranks.md` |
 | **14b-2b** | The six admin pages (insights, puzzles, bank, base, audit, reports): the shell, and the look the mockups settle | The mockups, drawn on the canvas "Plor shell layout" (https://claude.ai/artifact/9QkZKZZZsEpCJsDVv7VfGZ), and the human's review of them |
 | **14b-2c** | Every open For M14 item in ROADMAP at the time it starts (33 on 2026-10-26), each fixed or, where it needs the human, asked | Its ticket lists them; items that need a human answer ("For the human") are asked as guided questions first |
 
-## 14b-2a — The sprout streak
-
-### Source
-- **Round 3's board 6**, "Streak symbol candidates", the sprout's four stages (its SVG paths and colours), and **round 7's** pill (`.streak`: the sprout and the number on the soft pill) in the phone top bar beside the gear and in the sidebar under the wordmark, with the avatar slot (`.av`). On the canvas the human approved ("Round 7 looks good", 2026-10-24).
-- **WCAG 2.2** (SOURCES.md): 1.1.1 (the sprout is decoration; the pill's text says "N day streak"), 1.4.3 (the number on the soft pill, 4.5:1 in every theme), 1.4.10 (the top bar at 320px).
-- The streak's count: `getStreak` (`src/game/streak.ts`, M11 H4), as Today shows it now.
-
-### Acceptance criteria (draft)
-1. **The pill.** Below 768px, the top bar shows the streak pill between the wordmark and the gear; from 768px, the sidebar shows the avatar slot and the pill under the wordmark. Its text for screen readers is "N day streak". Checked in an e2e at 360px and 1440px.
-2. **The stages.** The sprout is drawn at stage 1 for 1–4 days, 2 for 5–14, 3 for 15–29 and 4 for 30 and up (L26); at 0, the empty pot. Checked by a unit test of the stage choice and an e2e of the pot at 0 and stage 1 after a run.
-3. **Today's line goes.** "Streak: N days played in a row" is no longer on Today or the no-puzzle banner.
-4. **Every theme.** The number on the soft pill passes 4.5:1 in all six themes (`colors.test.ts` already checks text on the soft pill; it covers the new place).
-5. **Static.** Nothing moves (human: "No motion yet").
-6. The usual checks and CI pass.
-
-### Open for the build session
-- **Where the shell reads the streak.** Today's run state carries it (`/api/run`, which the clock bar already reads); the shell needs it on every page. Choose the one read and say why in the ticket.
-- **The sprout's colours.** Round 3 draws them as fixed greens and browns (#8A6A4A, #2E7D4F, #43A866, #5CC27E; at 30+, #6B4F35, #3E9A5E, #E8A0B4). DECISIONS.md, Styling, allows hex values only for a game's own art; the sprout is Plor's. Either slots for them (the same in every theme, like `--offbeat`) or a Styling row change; ask the human if the choice isn't clear from the rule.
-
-### Numbers (from the mockups)
-| Value | Used for | Origin |
-|---|---|---|
-| Stages 1–4, 5–14, 15–29, 30+ days | The sprout | L26, human, 2026-10-24 |
-| The pill: Baloo 2 800 at 18px; padding 2px 10px 2px 6px; fully round; the soft colour; a 22px sprout, 4px from the number | The pill | Round 7 (`.streak`) |
-| The top bar's right side: the pill and the 44px gear, 6px apart | The phone's top bar | Round 7 (`.me`) |
-| The sidebar: the 30px slot and the pill, 10px apart, padding 16px 12px 20px | The sidebar | Round 7, board 3 |
+## 14b-2a — The streak ranks
+Its own file, `M14-14b-2a-streak-ranks.md`: the build session's guided questions turned the sprout into six streak ranks, each a vector flower (Seed, Daisy, Morning glory, Hibiscus, Lotus, Sakura), shown in the pill and explained on `/streak`.
 
 ## Out of scope
-- Motion for the sprout (14c).
+- Motion for the streak's symbol (14c).
 - Real avatars (L37's own ticket).
 - 14c's game world.
 

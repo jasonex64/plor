@@ -97,6 +97,12 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     expect(ratio(rgb(t[fg]), over(t.soft, t.surface))).toBeGreaterThanOrEqual(4.5);
   });
 
+  // The streak's number on its soft pill, which sits on the phone's top bar (the background) as well as the sidebar
+  // (the surface, above) (docs/milestones/M14-14b-2a-streak-ranks.md, criterion 5).
+  it("text on the soft pill over the background is at least 4.5:1", () => {
+    expect(ratio(rgb(t.text), over(t.soft, t.bg))).toBeGreaterThanOrEqual(4.5);
+  });
+
   // Me's calendar sits on a card: each played day's shade is a graphic the calendar needs (1.4.11), and its number,
   // shown with Numbers on the calendar, is text (1.4.3).
   it.each([1, 2, 3, 4])("shade %i is at least 3:1 on the surface, and its number at least 4.5:1 on it", (k) => {

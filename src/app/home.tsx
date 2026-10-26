@@ -2,7 +2,8 @@
 
 // Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
 // (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
-// (docs/milestones/M14-14a-2b-game-screen.md); or, on an invite link (/invite/<code>), the friend request; on a
+// (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
+// or, on an invite link (/invite/<code>), the friend request; on a
 // group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
@@ -22,16 +23,18 @@ import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { errorText, messageForRedirect } from "./messages";
 import { HowToPlay, OffbeatScreen } from "./offbeat";
+import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
-// sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md).
+// sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
+// its rank (docs/milestones/M14-14b-2a-streak-ranks.md).
 type Me =
   | { signedIn: false }
   | { signedIn: true; username: null; admin: boolean }
-  | ({ signedIn: true; admin: boolean } & Profile);
+  | ({ signedIn: true; admin: boolean; streak: number } & Profile);
 
 // What a page other than "/" shows once the player is signed in with a username.
 export type View =
@@ -40,6 +43,7 @@ export type View =
   | { kind: "me" }
   | { kind: "offbeat" }
   | { kind: "howToPlay" }
+  | { kind: "streak" }
   | { kind: "invite"; code: string }
   | { kind: "joinGroup"; code: string }
   | { kind: "group"; id: string };
@@ -103,6 +107,7 @@ export function Home({ view }: { view?: View }) {
           <Shell
             admin={me.admin}
             profile={me}
+            streak={me.streak}
             onChanged={loadMe}
             onSettings={(settings) => setMe({ ...me, settings })}
             onSignedOut={() => setMe({ signedIn: false })}
@@ -110,9 +115,11 @@ export function Home({ view }: { view?: View }) {
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
           {view?.kind !== "offbeat" && <ClockBar />}
           {view?.kind === "offbeat" ? (
-            <OffbeatScreen username={me.username} />
+            <OffbeatScreen username={me.username} onStarted={loadMe} />
           ) : view?.kind === "howToPlay" ? (
             <HowToPlay />
+          ) : view?.kind === "streak" ? (
+            <StreakRanks days={me.streak} />
           ) : view?.kind === "friends" ? (
             <Friends username={me.username} />
           ) : view?.kind === "groups" ? (

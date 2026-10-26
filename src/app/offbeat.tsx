@@ -15,7 +15,8 @@ import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import styles from "./offbeat.module.css";
 
-export function OffbeatScreen({ username }: { username: string }) {
+// onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+export function OffbeatScreen({ username, onStarted }: { username: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
   // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
   // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
@@ -54,7 +55,7 @@ export function OffbeatScreen({ username }: { username: string }) {
         </Link>
       </p>
       <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} />
+        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} />
       </section>
       <div className={styles.cards}>
         <OffbeatInfo key={`info-${day}-${ended}`} />
