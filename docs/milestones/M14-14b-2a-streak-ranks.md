@@ -1,6 +1,6 @@
 # M14 14b-2a — The streak ranks
 
-**Status:** in review (2026-10-26): designed through the human's guided questions below (the drawings approved as previewed: "Good, build these (Recommended)"), built and reviewed on `m14-look-and-feel`; one PR, merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** in review (2026-10-26): designed through the human's guided questions below (the drawings approved as previewed: "Good, build these (Recommended)"), built and reviewed on `m14-look-and-feel`, in PR #88, set to merge on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
 
 ## Goal
 The streak shows on every page as a pill in the top bar and sidebar, with a flower for the player's streak rank, and a `/streak` page explains the ranks.
