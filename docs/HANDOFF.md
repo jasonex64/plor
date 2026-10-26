@@ -71,6 +71,7 @@ Blocked host answers reuse the approve route's rule in `src/content/puzzle.ts`, 
 ## Waiting on the human
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
+- **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`, asked for by the human): 81 findings and proposed sub-tickets per milestone, none approved. Most urgent: the scripts' local-only guard can be bypassed by `?host=` (13-α, a security change), M15 15a leaves `content/bank.json` public, and drafting's pause is missing from DECISIONS. M14's share is in the report's "M14" section, not yet in M14's tickets.
 
 ## Next step
 1. **13e-4a is done** (PR #87, `docs/milestones/M13-13e-4-subsets.md`), and **plor.app's database is even with main** (2026-10-26, at the human's request: "Push 13e-4a's 3 migrations to plor.app now, from a clean checkout of main, then run the hosted tests"): from a temporary worktree of `origin/main` at `6c4d5ee` (removed after), `db push --linked --dry-run` listed exactly the 3, the push applied them, `migration list --linked` matches on all 36, and `test db --linked` passed (22 files, 388 tests). The 3: `20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`. plor.app's answer database is still empty by choice.

@@ -1,6 +1,7 @@
 # M13 — The answer database
 
 **Status:** in progress (2026-10-24): 13a, the base, done (PRs #70 and #71); 13b, learning from misses, done (PR #72, `M13-13b-learning-from-misses.md`); 13c, rarity and the host, done (PR #73, `M13-13c-rarity-and-the-host.md`); 13d, the question bank, done (PR #75, `M13-13d-the-question-bank.md`); 13e, growing the categories, designed from the human's guided answers (`M13-13e-growing-the-categories.md`), waiting for approval.
+- **Audit proposals (2026-10-26, not approved):** 13-α to 13-γ in `docs/audits/2026-10-26-codebase-audit.md`, "M13"; 13-α is a security change.
 - **Where it came from.** It's rewritten around the database the human described in four rounds of guided questions (2026-10-24), replacing the 2026-10-23 draft's A1–A6. The human: "YES" to rewriting it around the design.
 - **Decisions.** D1 and D3–D8 and every number are answered (human, 2026-10-24, in four more rounds of guided questions).
 - **Sources:** D2's are in SOURCES.md (human, 2026-10-24). Every decision and number is answered, so 13a's criteria come next.

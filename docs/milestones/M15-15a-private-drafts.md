@@ -2,6 +2,8 @@
 
 **Status:** planned: P1–P5 answered (human, 2026-10-24, in guided questions). Moved from M13 (it was 13a) to M15 by P4 (b). Before building, the design and criteria are rewritten for format 3 (below); no code yet, and no new milestone starts while M13 and M14 are in progress (human, 2026-10-24: "Nothing new yet").
 
+**Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M15": the question bank and drafting history have no private home in this design, the flow cites retired scripts, and drafting's pause is missing from DECISIONS.
+
 **Since M13 (2026-10-24):** 13a-2 retired format 2 and its drafts. The tree holds one drafted day, the T1 day `content/offbeat/2026-10-24.json` (format 3), written by `npm run draft` (DECISIONS.md, Puzzle drafting). So the design below changes in three places when it's rewritten: `npm run draft` writes into the git-ignored folder; the upload checks a format-3 file with the format-3 validator; and the fixtures are M13's (`src/test/answer-fixture.ts`), not the old sample day.
 
 ## Goal
