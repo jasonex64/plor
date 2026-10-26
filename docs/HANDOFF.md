@@ -18,7 +18,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 plor.app's database has every migration through `20261025200806_settings.sql`: the M13 session ran `npx supabase db push` at the human's request after #85 merged, and `npx supabase test db --linked` passed 345/345 (2026-10-25).
 
 ### In review
-**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), in its PR with auto-merge on green CI:
+**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), in PR #86 with auto-merge on green CI:
 - Sky, Moonlit and Ink as round 8 on the canvas drew them (human, 2026-10-25: "Build as drawn (Recommended)"); every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
 - the picker in the settings sheet, saved on the account; painted before the profile loads from a `localStorage` copy by a `<head>` script (Next.js's "Preventing flash before hydration", added to SOURCES.md);
 - `/about`: what Plor is, "Plor is made by Jason" with privacy@plor.app, Moonlit's credit, "Plor is built with help from AI."; one `Footer` on every page links it.
