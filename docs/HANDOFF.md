@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14b-1's PR. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14b-1's PR, plus 14c-1's draft from a naming session in the same worktree. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -23,9 +23,15 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 **plor.app's database is even with main** through `20261026010745_theme.sql`: the M13 session pushed it from a clean checkout of main at `64eeea6`, at the human's request; it reported `migration list --linked` matching on both sides and `supabase test db --linked` 345/345 (2026-10-26; reported by that session, not re-run here).
 
+### Drafted: 14c-1, the game's name and words
+Written by a naming session on the Mac (2026-10-25), after 14b-1 merged; docs only, no code. `docs/milestones/M14-14c-1-name-and-words.md` holds the human's answers from five rounds of guided questions, quoted:
+- **Words, decided:** a question is a **stop**; the answer is a **sign** ("Paint your sign" / "Plant it"); the Wind **whispered** its answers, narrated, never speaking itself; the get-past and caught lines escalate in three tiers (stops 1–2, 3–5, 6–7: "Shrugged it off!" / "Dug in!" / "Braved the storm!"; "tipped over" / "tumbled" / "sent flying at stop N"); "climbed" for survived; points stay points; screens mixing games stay plain.
+- **Open, for the human (N1–N6 in the ticket):** the name (**Updraft** leads; Zephyr is crowded; Crosswind clashes with a Steam game of that name; no trademark search yet), keeping `game_id = 'offbeat'` (Claude recommends keeping it), the share line, timeouts' word, admin pages plain, How to play rewritten in the same PR.
+
 ### Next step
 1. 14b-2 (the sprout streak, L26; the admin pages' look, L19; the design reviews' polish): ask its guided questions first (CLAUDE.md), then its ticket, build and one PR from this branch.
 2. For the human (ROADMAP, For M14): About's contact address and "What Plor is" wording.
+3. 14c-1: ask N1–N6 (the ticket's open questions) as guided questions, then build it as one PR from this branch, after 14b-2's PR is merged or closed (one open PR at a time).
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
