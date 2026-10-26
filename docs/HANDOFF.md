@@ -19,7 +19,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 | 14b-2b-2a | The admin pages in the shell, as round 10 draws them | #90 |
 
-### In review: 14b-2b-2b, the admin pages' three server changes (auto-merge on green CI)
+### In review: 14b-2b-2b, the admin pages' three server changes (PR #91, auto-merge on green CI)
 `docs/milestones/M14-14b-2b-2-admin-build.md`, 14b-2b-2b. Two **security changes**, both approved by the human (2026-10-26) and in the DECISIONS.md Log:
 - **Keep comment:** `private.keep_reported_comment` and `private.comment_keep`. The reports stay, so the comment stays hidden for its reporters ("Still hidden (Recommended)").
 - **The audit's one-click link:** `private.audit_near`, fed by the game's `withinTypo` ("New lookup function (Recommended)").
