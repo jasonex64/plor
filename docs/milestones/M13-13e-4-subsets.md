@@ -73,6 +73,41 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **O5 — Thresholds:** the examples were illustrations (human: "these were just suggestions btw for like the gdp stuff wasn't word for word exactly the categories i wanted (u can still add it)"). Claude proposes the subsets and thresholds in 13e-4b's batch; the human sets each number there.
 - **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
+## 13e-4a — The facts and the machinery
+**Status:** in progress (2026-10-26): designed below, the format change and A1–A4 answered by the human; being built.
+
+**Source:** SOURCES.md, Wikidata properties (M13 13e-4), read 2026-10-26; Wikidata (M13 D2); 13a–13e-3's tickets for the base, the format, misses and the draft.
+
+**Which sets get which facts** (O2's four):
+| Set | Facts |
+|---|---|
+| countries | continent (P30, every one listed), population (P1082) |
+| US states, US state capitals, US cities, Canadian provinces | population |
+| world capitals | country (P17), population; continent through the country |
+| rivers | country (P17); continent through the country |
+| animals | IUCN conservation status (P141) |
+| places, dog breeds, elements, fruit | none (places have no category; the others' facts aren't among O2's four) |
+
+About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, populations 11,300), about 21 MB at 230 bytes a fact, before measuring.
+
+**The design:**
+1. **Facts.** `private.fact`'s traits widen to `country`, `continent` and `conservation_status` (thing-valued, as today). The values are things: the 193 countries already loaded; the continents and the 9 IUCN statuses, fetched as items with names and no `kind_of` (as places are), so no category takes them in and 13b's facts check knows "africa" names a continent. A P17 value that isn't one of the 193 countries is dropped and counted (A3).
+2. **Numbers** in their own table, `private.number_fact` (O3): thing, trait (`population` only), value, the point in time (P585), origin, source_ref, added_at, removed_at. From each thing's best-rank values, the one with the latest point in time is kept; a reload with a different value removes the old from that moment and adds the new, so a started day keeps the number it had.
+3. **Subset recipes** in `data/categories.json`: `"of": "<base key>"` (the subset takes its base's root and member_of) and one filter: `"fact": {"trait": …, "value": …, "via"?: "country"}`, `"at_least": {"number": "population", "value": N}`, or `"starts_with": "d"`. `private.category` gains the filter's columns, and one SQL function decides whether a thing fits a filter as of a moment, used by `category_members`, `in_category_now` and `resolve_answer`.
+4. **Letters** (O4): a letter subset accepts a typed name that starts with its letter, a leading "the " ignored; its members are things with such a name. The approval's and the draft's "3 familiar answers typeable" checks count only such names; the draft's host bank names must start with it too. A day that steals the letter at or before the question can't type any answer, so the draft's letter search already refuses it and `fitOrder` moves the question earlier ("Yes, the draft skips it"); a unit test shows it.
+5. **The format change** (A1): an approved question of a subset gains `where`, the filter as approval froze it. Days without it are unchanged.
+6. **Misses on subsets** (A2).
+7. **Re-fetch every Wikidata set** with its facts (also ROADMAP From 13e-3, the mul fallback for the older sets), each measured before it's kept.
+8. **Tests:** db tests of the filters in `category_members` and `resolve_answer` (as of a day), the number reload, misses on subsets; unit tests for the categories parser, the letter rule and the draft's letter skip; pgTAP for the new table's grants (none for `plor_app`).
+
+**Answered by the human (2026-10-26):**
+- **A1 — the format's new field:** "Approve it (Recommended)", after a walk-through with an example day: an approved subset question gains `where`, one of `{"trait": "continent", "value": "<thing id>", "via": "country"}` (via only for continent), `{"trait": "continent" | "conservation_status", "value": "<thing id>"}`, `{"number": "population", "at_least": N}` or `{"starts_with": "<letter>"}`. Approval writes it; drafts and days without it are unchanged. DECISIONS.md, Puzzle content format, records it.
+- **A2 — misses on a subset:** "Learn only if it fits (Recommended)": a letter subset learns only a text starting with its letter (any other is logged and nothing more); a direct fact filter (`continent` of a country, an animal's status) is added to the new thing with its root; a `via` or number filter can't be carried, so an otherwise accepted text is held for the human, who can accept it for the subset on the audit page.
+- **A3 — countries outside the 193:** "Drop and count them (Recommended)".
+- **A4 — number filters:** "At least only (Recommended)".
+
+**Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
+
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
