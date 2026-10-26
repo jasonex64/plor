@@ -69,7 +69,8 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **O2 — Which properties.** The survey's list above, or fewer to start?
 - **O3 — Numbers.** A number column on the fact table, or its own table? (A migration either way, applied to plor.app at the next `db push`.)
 - **O4 — Letter subsets.** Which names count ("The Gambia" under G or T?), and must the typed answer itself start with the letter ("Deutschland" for Germany)?
-- **O5 — Thresholds.** Every number filter needs its threshold from the human ("countries with 1 mil gdp": GDP of at least US$1 million covers every country, so did you mean something else, such as population over 1 million or GDP over US$1 trillion?).
+- **O5 — Thresholds.** Every number filter needs its threshold from the human. The examples ("countries that start with d", "countries with 1 mil gdp") were illustrations, not the exact categories wanted (human, 2026-10-26: "these were just suggestions btw for like the gdp stuff wasn't word for word exactly the categories i wanted (u can still add it)"), so Claude proposes the subsets and their thresholds in 13e-4b's batch, and the human sets each number there.
+- **Before answering O1–O5,** the human asked for research on going past the Free plan's 500 MB: what it takes, how, and the costs and trade-offs (2026-10-26).
 
 ## Numbers
 | Value | Used for | Origin |
