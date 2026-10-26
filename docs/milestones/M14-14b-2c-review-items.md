@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge; then 14b-2c-2. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, built and reviewed, in review in PR_PENDING; then 14b-2c-3. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -91,6 +91,8 @@ No other new number is expected. If a fix needs one, stop and ask.
 3. Each PR updates this ticket's Status, ROADMAP's M14 row and the ticked items.
 
 ## Removes
+14b-2c-2 removed: Me's copy of the `finished` CTE (one `FINISHED_RUNS` in `src/game/offbeat.ts`), the second settle per `GET /api/me`, the sheet's `event.target === event.currentTarget` close and `Preferences`' `busy` disabling, Home's re-applying of the account's theme, and the hex values that repeated `--text` and `--on-accent` in the `--on-shade-*` slots.
+
 Planned, confirmed per PR:
 - the second survived count (item 3);
 - `NOTHING`'s second copy (16);
@@ -114,6 +116,14 @@ Planned, confirmed per PR:
 | Item 14: the jump to `#result` | Also a 56px scroll margin on phones | Without it the result would land under the fixed top bar |
 | Items 8 and 16 were planned for 14b-2c-4 | Closed here | The same changes removed them (the body rules left `shell.module.css`; the clock bar's `NOTHING` went with its new time-up) |
 
+14b-2c-2:
+
+| Source says | We built | Why different |
+|---|---|---|
+| Item 19, and this ticket's Source (PostgreSQL 17, transactions): read `GET /api/me` in one transaction so a request at midnight can't mix two days | No transaction: the day is read once, first, and passed to the settling (`settleRuns`) and every read (`readStats`, `getStreak`, getMe's query, `rarestAnswers`); `getStats` reads its day first the same way | `private.today()` is `day_of(statement_timestamp())` (`supabase/migrations/20261021044659_today_uses_statement_time.sql`; PostgreSQL 17, "Current Date/Time": each statement's own start), so statements in one transaction can still see two days. A day passed as a parameter is one for every statement |
+| Item 26 suggests comparing the click with the sheet's box, or `pointerdown` | Both: a press must start (`pointerdown`) and end (`click`) outside the dialog's own box | The dialog's box, not the sheet's: from 768px the 1px left border is the dialog's, and a tap on it is on the panel |
+| Item 33 names the theme picker and 14a-3b's switches | Both show their change at once, stay enabled, and save one after another; the settings sheet alone applies a signed-in player's theme | Home re-applied the account's theme on every profile change, putting the page back mid-save (the 14b-2c-2 review) |
+
 ## Evidence
 14b-2c-1, on the Mac, 2026-10-26, against the shared local stack (which also holds M13 13e-5's unmerged `20261026212300_one_walk.sql`):
 
@@ -126,6 +136,15 @@ Planned, confirmed per PR:
 - CI on PR #93 (run 40407721823, `b543dce`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS` (so the local `answer_base` failure was the shared stack's); `npm run test:e2e` → `53 passed (4.1m)`; `check`, `db`, `e2e` and `secrets` passed on the push and pull-request runs.
 - The first full run (48 passed, 4 failed) failed only on old text these answers change: "0 points + about 0 bonus" (groups, today), ", plus a rarity bonus of about 0." (live-board) and "catName" (me, item 20's run-together text). Those four checks now expect the new text, and their files pass (15 passed).
 
+14b-2c-2, on the Mac, 2026-10-26, against the same shared stack:
+
+- After the review's fixes: `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  390 passed (390)`; `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `57 passed (1.9m)`.
+- `e2e/settings-sheet.e2e.ts`: 4 tests. The first three failed against the old `settings.tsx` (all three, run with only that file swapped back) and pass on the new one. The fourth, a switch's reply landing mid-theme-save, failed with only Home's theme effect put back.
+- `src/app/api/offbeat/route.db.test.ts`: `readStats` as of T-3 gives the streak and chart of T-3 (streak 3), not today's (5); `settleRuns` as of T-2 settles nothing for T-2, and as of T-1 settles it.
+- `src/app/colors.test.ts`: 133 passed, reading `var(--text)` and `var(--on-accent)` through their slots, so the shades' numbers keep their 4.5:1 checks.
+- Item 29, the `setMe` updater, has no test: it's a race between two answers, checked by reading.
+- `npx supabase test db`: as in 14b-2c-1, 23 of 24 files pass locally and `answer_base.test.sql` fails on M13 13e-5's `one_walk` migration in the shared stack (the M13 session confirmed it's expected until 13e-5 merges); CI checks it on a fresh database.
+
 ## Review
 14b-2c-1, by the `reviewer` agent in a fresh context, 2026-10-26.
 
@@ -134,3 +153,11 @@ Planned, confirmed per PR:
   - Today's own board (from 768px) wasn't reloaded on a time-up. Fixed: it's re-keyed on Home's `timeUps`, with its e2e test (red without the fix).
   - The handoff, this ticket's Status, Evidence, Source diff and Review, and the ROADMAP row: brought up to date in this PR.
 - Deferred to ROADMAP "Next revision" (For M14, "14b-2c-1 review"): the Friends tab's whole-page re-key on a time-up; Me's stats after a time-up; a failed channel's client never closed; a token error that outlives a later success; two LiveStatus alerts on one page; the Try again test's weak join check; focus lost when the column moves; the result's repeated scroll; no tests for the `{ ms }` reset fix or the 768px body room; double blank lines.
+
+14b-2c-2, by the `reviewer` agent in a fresh context, 2026-10-26.
+
+- Blocking findings and how each was fixed:
+  - Item 19 still mixed two days: the settling read its own `private.today()` before the day was read. Fixed: the day is read first and passed to `settleRuns` (and `allTimePoints`), in `getMe` and `getStats`, with the settle-by-day db test.
+  - Item 33: Home re-applied the account's theme whenever the profile changed, so another setting's reply, or a profile reload, put the page back while a picked theme was still saving. Fixed: signed in, the settings sheet alone applies the theme; Home only clears it when there's no account theme. With its e2e test (red without the fix).
+  - The ticket, ROADMAP and handoff: brought up to date in this PR.
+- Deferred to ROADMAP "Next revision" (For M14, "14b-2c-2 review"): the sheet CSS's stale comment; a pointercancel leaving `pressedOutside` set; clearing a pending setting by value; an in-flight account save's refusal lost when the sheet closes; two ways to give `getStreak` and `settleRuns` their day; Me's `days_played` and `average` read in two statements; the settings e2e's unclosed contexts.

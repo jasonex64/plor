@@ -97,11 +97,14 @@ export function Home({ view }: { view?: View }) {
     setStreakError(null);
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setStreakError(errorText(err)));
   }
-  // The account's theme, once the profile is known, keeping this browser's copy in step (the copy itself is re-applied
-  // on every page by KeepTheme, src/app/keep-theme.tsx). Signed out, or before a username, nothing is picked.
+  // Signed out, or before a username, no theme is picked, and this browser's copy is cleared (the copy itself is
+  // re-applied on every page by KeepTheme, src/app/keep-theme.tsx). Signed in, the settings sheet, which the shell
+  // always holds, applies the theme it shows: the account's, or the one being saved, so a profile reload or another
+  // setting's reply landing mid-save doesn't put the page back (docs/milestones/M14-14b-2c-review-items.md, item 33).
+  const accountTheme = me?.signedIn === true && me.username !== null;
   useLayoutEffect(() => {
-    if (me) applyTheme(me.signedIn && me.username !== null ? me.settings.theme : null);
-  }, [me]);
+    if (me && !accountTheme) applyTheme(null);
+  }, [me, accountTheme]);
 
   // Back from Google with an invite pending: go back to its page. On an invite page the remembered one is spent, so
   // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
@@ -137,7 +140,9 @@ export function Home({ view }: { view?: View }) {
             profile={me}
             streak={me.streak}
             onChanged={loadMe}
-            onSettings={(settings) => setMe({ ...me, settings })}
+            // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's copy
+            // (docs/milestones/M14-14b-2c-review-items.md, item 29).
+            onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
             onSignedOut={() => setMe({ signedIn: false })}
           />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
