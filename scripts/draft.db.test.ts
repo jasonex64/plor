@@ -41,6 +41,34 @@ describe("familiarLeft", () => {
   });
 });
 
+// A letter subset (13e-4a, O4): only names starting with its letter count, so a day that steals the letter at or
+// before it leaves no familiar answer typeable and the letter search refuses that letter ("Yes, the draft skips it").
+// Its own small base, with made-up names.
+describe("familiarLeft on a letter subset", () => {
+  const ref = (slug: string) => db.query<{ id: string }>("select private.thing_by_ref('wikidata', $1)::text as id", [slug]).then((r) => r.rows[0].id);
+  beforeAll(async () => {
+    const item = (id: string, names: string[]) => ({ id, name: names[0], aliases: names.map((alias, k) => ({ alias, kind: k ? "synonym" : "name" })), kind_of: ["dt-root"] });
+    await db.query("select private.import_source('wikidata', 'draft-letter-test', $1::jsonb)", [JSON.stringify([
+      { id: "dt-root", name: "dt thing", aliases: [] },
+      item("dt-host", ["dekko"]), item("dt-a", ["daxo"]), item("dt-b", ["dimo"]), item("dt-c", ["dunzo", "zonbi"]),
+    ])]);
+    await db.query("select private.define_category('dt_base', 'dt thing', 'wikidata', 'dt-root', null)");
+    await db.query(`select private.define_subset('dt_d', 'dt thing starting with D', 'dt_base', 'wikidata', '{"starts_with": "d"}')`);
+  });
+  const lv = async () => Object.fromEntries(await Promise.all(["dt-a", "dt-b", "dt-c"].map(async (s) => [await ref(s), "common" as const])));
+  const fits = async (stolen: string[]) => familiarLeft(db, "dt_d", [await ref("dt-host")], await lv(), stolen);
+
+  it("counts three names starting with the letter, and none once the letter is stolen", async () => {
+    expect(await fits([])).toBe(true);
+    expect(await fits(["d"])).toBe(false);
+  });
+
+  it("doesn't count a typeable name that doesn't start with the letter", async () => {
+    // With U stolen, "dunzo" can't be typed; "zonbi" can, but doesn't start with D: two are left.
+    expect(await fits(["u"])).toBe(false);
+  });
+});
+
 describe("oneHostCatch", () => {
   it("averages, over the host bank, the expected catch of each answer as the only host", async () => {
     // Bear as the host catches bear (common, 0.4/2) and polar bear under it (rare, 0.2/6): 0.2333. Dog catches dog alone:

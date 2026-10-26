@@ -1,6 +1,6 @@
 # M13 13e-3 — Knowledge and places
 
-**Status:** in review (2026-10-26): built and reviewed; the review's blocking findings are fixed; the human answered the river short names and the LDNOOBW flags (below); the last checks ran on the Windows checkout (Evidence), and PR #84 merges on green CI (human, 2026-10-25: "Merge on green CI (Recommended)"). The design is approved (human, 2026-10-25: "I approve 13e-3's design. Build it."). The sitelinks source is in SOURCES.md ("Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks).
+**Status:** done (2026-10-26): merged in PR #84 (`54d56cf`, 2026-10-26 03:55 UTC) on green CI, 10 of 10 checks (runs 40265950038 and 40265948384 on `0bcffe4`), by auto-merge (human, 2026-10-25: "Merge on green CI (Recommended)"). No migration, so plor.app needs no `db push`. The design is approved (human, 2026-10-25: "I approve 13e-3's design. Build it."). The sitelinks source is in SOURCES.md ("Add it to SOURCES.md (Recommended)": Wikibase RDF Dump Format, 1.10 Sitelinks).
 
 ## Goal
 The second batch of 13e (`M13-13e-growing-the-categories.md`): about 20 knowledge categories from WordNet and 5 place categories from new Wikidata imports, with their bank questions, and the four lists that block days at Q7 reworked.
@@ -67,7 +67,7 @@ The Wikidata IDs above are Claude's reading, *unverified*: each is checked by it
 - [x] About 25 new categories (about 20 WordNet, 5 places), each of at least 10 members, reviewed, with a bank question each.
 - [x] Every bank answer resolves to one member; no host answer sits above another familiar answer.
 - [x] Trial drafts succeed; the simulator drafts at least the 31 of 40 days of 13e-2.
-- [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e`, `npm run content:validate` and CI pass. *(All pass locally but one e2e test that this PC is too slow for, main's code, which CI passes: Evidence; checked once CI passes on the last commit.)*
+- [x] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e`, `npm run content:validate` and CI pass. *(Locally all but one e2e test this PC is too slow for, main's code: Evidence. CI: 10 of 10 on `0bcffe4`, runs 40265950038 and 40265948384.)*
 
 ## Out of scope
 - Pop culture, card and board games (13e-4).

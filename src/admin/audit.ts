@@ -12,7 +12,7 @@ export type Review = {
   category: string;
   category_name: string;
   text: string;
-  outcome: "accepted" | "held" | "rejected" | "near_typo";
+  outcome: "accepted" | "held" | "held_subset" | "rejected" | "near_typo";
   players: number;
   answered: number;
   reached_at: string;

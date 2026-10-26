@@ -17,13 +17,20 @@ import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
 import { BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_SLICE_ROWS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
-import { CATEGORIES_FILE, parseCategories, type CategoryDef } from "../src/content/categories.ts";
+import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed } from "../src/game/misses.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
-export type Item = { id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string };
+// The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
+// IDs, a population as a number with its point in time.
+export type Population = { value: number; as_of: string | null };
+export type FactTrait = "country" | "continent" | "conservation_status";
+export type Item = {
+  id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string;
+  country?: string[]; continent?: string[]; conservation_status?: string[]; population?: Population;
+};
 type Source = "wikidata" | "oewn" | "usda";
 type SetDef = { source: Source; method: string; fetch: () => Promise<Item[]> };
 
@@ -77,6 +84,89 @@ async function sparql(query: string): Promise<Binding[] | "timeout"> {
 }
 
 const qid = (uri: string) => uri.replace("http://www.wikidata.org/entity/", "");
+
+// --- facts for subsets (13e-4a; SOURCES.md, Wikidata properties) ---
+
+// IUCN's categories, P141's one-of constraint (SOURCES.md, Wikidata properties).
+const IUCN_STATUSES = ["Q211005", "Q719675", "Q278113", "Q96377276", "Q219127", "Q239509", "Q237350", "Q3245245", "Q3350324"];
+
+export type Claim = { value: string; time?: string };
+
+// Each item's best-rank statements of a property (wikibase:BestRank: the preferred ones, else the normal ones, as
+// wdt: reads them), with their point in time (P585), for the items `where` selects as ?x.
+async function claims(where: string, property: string): Promise<Map<string, Claim[]>> {
+  const rows = await sparql(`SELECT ?x ?v ?t WHERE { ${where}
+    ?x p:${property} ?claim . ?claim a wikibase:BestRank ; ps:${property} ?v . OPTIONAL { ?claim pq:P585 ?t } }`);
+  if (rows === "timeout") throw new Error(`the ${property} query timed out`);
+  const out = new Map<string, Claim[]>();
+  for (const r of rows) {
+    const id = qid(r.x.value);
+    out.set(id, [...(out.get(id) ?? []), { value: qid(r.v.value), ...(r.t ? { time: r.t.value } : {}) }]);
+  }
+  return out;
+}
+
+// Each item with the values its claims give a fact, keeping only those in allowed (things the import loads): a
+// country outside the 193 is dropped and counted (human, 2026-10-26, A3: "Drop and count them (Recommended)").
+export function withFact(items: Item[], trait: FactTrait, given: Map<string, Claim[]>, allowed: Set<string>): { items: Item[]; dropped: number } {
+  let dropped = 0;
+  const out = items.map((item) => {
+    const values = [...new Set((given.get(item.id) ?? []).map((c) => c.value))];
+    const kept = values.filter((v) => allowed.has(v));
+    dropped += values.length - kept.length;
+    return kept.length ? { ...item, [trait]: kept } : item;
+  });
+  return { items: out, dropped };
+}
+
+// The population a thing is given: among its best-rank values, the one with the latest point in time (P1082 requires
+// one: SOURCES.md, Wikidata properties). null when two values tie for latest (both undated, or the same date) and
+// differ, as the import can't choose between them; the caller counts those.
+export function latestNumber(given: Claim[]): Population | null {
+  const sorted = [...given].sort((a, b) => (b.time ?? "").localeCompare(a.time ?? ""));
+  const [top, next] = sorted;
+  if (next && (next.time ?? "") === (top.time ?? "") && next.value !== top.value) return null;
+  const value = Number(top.value);
+  // Third-party data: a value that isn't a whole number of people stops the fetch.
+  if (!Number.isInteger(value) || value < 0) throw new Error(`population ${JSON.stringify(top.value)} is not a whole number of people`);
+  return { value, as_of: top.time ? top.time.slice(0, 10) : null };
+}
+
+// Each item with its population, and how many had values the import can't choose between.
+export function withPopulation(items: Item[], given: Map<string, Claim[]>): { items: Item[]; ambiguous: number } {
+  let ambiguous = 0;
+  const out = items.map((item) => {
+    const values = given.get(item.id);
+    if (!values) return item;
+    const population = latestNumber(values);
+    if (!population) ambiguous++;
+    return population ? { ...item, population } : item;
+  });
+  return { items: out, ambiguous };
+}
+
+// A set's facts, printed with what was dropped, as each fetch reports them.
+async function factsFor(set: string, items: Item[], where: string, facts: { trait: FactTrait; property: string; allowed: Set<string> }[], population: boolean): Promise<Item[]> {
+  let out = items;
+  for (const f of facts) {
+    const { items: next, dropped } = withFact(out, f.trait, await claims(where, f.property), f.allowed);
+    out = next;
+    console.log(`${set}: ${f.trait} on ${out.filter((i) => i[f.trait]).length} of ${out.length} items${dropped ? `, ${dropped} values outside the things loaded dropped` : ""}`);
+  }
+  if (population) {
+    const { items: next, ambiguous } = withPopulation(out, await claims(where, "P1082"));
+    out = next;
+    console.log(`${set}: population on ${out.filter((i) => i.population).length} of ${out.length} items${ambiguous ? `, ${ambiguous} left out with two latest values` : ""}`);
+  }
+  return out;
+}
+
+// The 193 countries of the wikidata-countries snapshot, the only countries a fact may name (A3).
+function countryIds(): Set<string> {
+  const ids = readSnapshot("wikidata-countries").items.filter((i) => i.member_of?.includes("Q1065")).map((i) => i.id);
+  if (ids.length !== 193) throw new Error(`wikidata-countries holds ${ids.length} countries, expected 193`);
+  return new Set(ids);
+}
 
 type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string> };
 
@@ -375,11 +465,22 @@ const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English com
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
-    method: `SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under ${ANIMALIA} with an English common name, plus their ancestors up to it`,
+    method: `SPARQL bd:slice reads of P171, P1843 (English) and P225: taxa under ${ANIMALIA} with an English common name, plus their ancestors up to it; each taxon's IUCN conservation status (P141, a bd:slice read of its truthy values) among the 9 of its one-of constraint, which are items of the set`,
     fetch: async () => {
       const taxa = await fetchTaxa(ANIMALIA);
       if (!taxa.has(DOG)) throw new Error(`${DOG} (the domestic dog) wasn't fetched`);
-      return taxaToItems(taxa, ANIMALIA);
+      const statuses = new Map<string, Claim[]>();
+      await sliced("?t wdt:P141 ?s .", "?t ?s", (rows) => {
+        for (const r of rows) {
+          const t = qid(r.t.value);
+          if (taxa.has(t)) statuses.set(t, [...(statuses.get(t) ?? []), { value: qid(r.s.value) }]);
+        }
+      });
+      const statusItems = labelledItems(await labelled(`VALUES ?x { ${IUCN_STATUSES.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      if (statusItems.length !== IUCN_STATUSES.length) throw new Error(`${statusItems.length} IUCN statuses labelled, expected ${IUCN_STATUSES.length}`);
+      const { items, dropped } = withFact(taxaToItems(taxa, ANIMALIA), "conservation_status", statuses, new Set(IUCN_STATUSES));
+      console.log(`wikidata-animals: conservation_status on ${items.filter((i) => i.conservation_status).length} of ${items.length} items${dropped ? `, ${dropped} values outside the 9 dropped` : ""}`);
+      return [...statusItems, ...items];
     },
   },
   "wikidata-dog-breeds": {
@@ -389,17 +490,23 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-countries": {
     source: "wikidata",
-    method: "SPARQL: sovereign states (P31 Q3624078), not dissolved (no P576), with a UN membership (P463 Q1065) that has no end time (P582)",
-    fetch: async () => [
-      await rootItem("Q6256", "country"),
-      await rootItem("Q1065", "United Nations"),
-      ...labelledItems(
-        await labelled(`?x p:P463 ?st . ?st ps:P463 wd:Q1065 . FILTER NOT EXISTS { ?st pq:P582 ?end }
-          ?x wdt:P31 wd:Q3624078 . FILTER NOT EXISTS { ?x wdt:P576 ?dissolved }`),
-        () => ["Q6256"],
-        ["Q1065"],
-      ),
-    ],
+    method: "SPARQL: sovereign states (P31 Q3624078), not dissolved (no P576), with a UN membership (P463 Q1065) that has no end time (P582); each one's continents (P30, best rank, every one listed), which are items of the set, and its population (P1082, the best-rank value with the latest point in time P585)",
+    fetch: async () => {
+      const where = `?x p:P463 ?st . ?st ps:P463 wd:Q1065 . FILTER NOT EXISTS { ?st pq:P582 ?end }
+          ?x wdt:P31 wd:Q3624078 . FILTER NOT EXISTS { ?x wdt:P576 ?dissolved }`;
+      const countries = labelledItems(await labelled(where), () => ["Q6256"], ["Q1065"]);
+      const continents = await claims(where, "P30");
+      const values = [...new Set([...continents.values()].flat().map((c) => c.value))];
+      const continentItems = labelledItems(await labelled(`VALUES ?x { ${values.map((id) => `wd:${id}`).join(" ")} }`), () => []);
+      const { items, dropped } = withFact(countries, "continent", continents, new Set(continentItems.map((i) => i.id)));
+      console.log(`wikidata-countries: continent on ${items.filter((i) => i.continent).length} of ${items.length} items${dropped ? `, ${dropped} values with no label dropped` : ""}`);
+      return [
+        await rootItem("Q6256", "country"),
+        await rootItem("Q1065", "United Nations"),
+        ...continentItems,
+        ...(await factsFor("wikidata-countries", items, where, [], true)),
+      ];
+    },
   },
   "wikidata-elements": {
     source: "wikidata",
@@ -412,8 +519,11 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-us-states": {
     source: "wikidata",
-    method: "SPARQL: instances of U.S. state (P31 Q35657)",
-    fetch: async () => [await rootItem("Q35657", "U.S. state"), ...labelledItems(await labelled("?x wdt:P31 wd:Q35657 ."), () => ["Q35657"])],
+    method: "SPARQL: instances of U.S. state (P31 Q35657), with each one's population (P1082, the best-rank value with the latest point in time P585)",
+    fetch: async () => {
+      const where = "?x wdt:P31 wd:Q35657 .";
+      return [await rootItem("Q35657", "U.S. state"), ...(await factsFor("wikidata-us-states", labelledItems(await labelled(where), () => ["Q35657"]), where, [], true))];
+    },
   },
   "wikidata-fruit": {
     source: "wikidata",
@@ -435,38 +545,41 @@ const SETS: Record<string, SetDef> = {
   // root, as dog breeds are. Capitals are read from the countries and states already fetched, so the lists agree.
   "wikidata-capitals": {
     source: "wikidata",
-    method: "SPARQL: the capital (P36) of each country in the wikidata-countries snapshot, under capital city (Q5119); a country with several capitals keeps them all",
+    method: "SPARQL: the capital (P36) of each country in the wikidata-countries snapshot, under capital city (Q5119); a country with several capitals keeps them all; each capital's country (P17, best rank, only the snapshot's 193) and population (P1082, the best-rank value with the latest point in time P585)",
     fetch: async () => {
-      const countries = readSnapshot("wikidata-countries").items.filter((i) => i.member_of?.includes("Q1065")).map((i) => `wd:${i.id}`);
-      if (countries.length !== 193) throw new Error(`wikidata-countries holds ${countries.length} countries, expected 193`);
-      return [await rootItem("Q5119", "capital city"), ...labelledItems(await labelled(`VALUES ?country { ${countries.join(" ")} } ?country wdt:P36 ?x .`), () => ["Q5119"])];
+      const countries = countryIds();
+      const where = `VALUES ?country { ${[...countries].map((id) => `wd:${id}`).join(" ")} } ?country wdt:P36 ?x .`;
+      const capitals = labelledItems(await labelled(where), () => ["Q5119"]);
+      return [await rootItem("Q5119", "capital city"), ...(await factsFor("wikidata-capitals", capitals, where, [{ trait: "country", property: "P17", allowed: countries }], true))];
     },
   },
   "wikidata-us-state-capitals": {
     source: "wikidata",
-    method: "SPARQL: the capital (P36) of each state in the wikidata-us-states snapshot, under state capital (Q11271835)",
+    method: "SPARQL: the capital (P36) of each state in the wikidata-us-states snapshot, under state capital (Q11271835), with each one's population (P1082, the best-rank value with the latest point in time P585)",
     fetch: async () => {
       const states = readSnapshot("wikidata-us-states").items.filter((i) => i.id !== "Q35657").map((i) => `wd:${i.id}`);
-      const found = await labelled(`VALUES ?state { ${states.join(" ")} } ?state wdt:P36 ?x .`);
+      const where = `VALUES ?state { ${states.join(" ")} } ?state wdt:P36 ?x .`;
+      const found = await labelled(where);
       if (found.size !== states.length) throw new Error(`${found.size} capitals for ${states.length} states`);
-      return [await rootItem("Q11271835", "state capital"), ...labelledItems(found, () => ["Q11271835"])];
+      return [await rootItem("Q11271835", "state capital"), ...(await factsFor("wikidata-us-state-capitals", labelledItems(found, () => ["Q11271835"]), where, [], true))];
     },
   },
   // Big sets keep only items with an English Wikipedia article (human, 2026-10-25: "English Wikipedia article
   // (Recommended)"; SOURCES.md, Wikibase RDF Dump Format, Sitelinks).
   "wikidata-us-cities": {
     source: "wikidata",
-    method: "SPARQL: instances of city in the United States or a subclass of it (P31/P279* Q1093829, so charter cities such as Los Angeles count) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>)",
-    fetch: async () => [
-      await rootItem("Q1093829", "city in the United States"),
-      ...labelledItems(await labelled(`?x wdt:P31/wdt:P279* wd:Q1093829 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`), () => ["Q1093829"]),
-    ],
+    method: "SPARQL: instances of city in the United States or a subclass of it (P31/P279* Q1093829, so charter cities such as Los Angeles count) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>), with each one's population (P1082, the best-rank value with the latest point in time P585)",
+    fetch: async () => {
+      const where = `?x wdt:P31/wdt:P279* wd:Q1093829 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`;
+      return [await rootItem("Q1093829", "city in the United States"), ...(await factsFor("wikidata-us-cities", labelledItems(await labelled(where), () => ["Q1093829"]), where, [], true))];
+    },
   },
   "wikidata-rivers": {
     source: "wikidata",
-    method: `SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name "X River" or "River X" also gives "X" as a synonym unless another river gives it too; LDNOOBW-listed aliases of ${RIVERS_DROP_LISTED_ALIASES.join(", ")} dropped`,
+    method: `SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name "X River" or "River X" also gives "X" as a synonym unless another river gives it too; LDNOOBW-listed aliases of ${RIVERS_DROP_LISTED_ALIASES.join(", ")} dropped; each river's countries (P17, best rank, only the wikidata-countries snapshot's 193)`,
     fetch: async () => {
-      const found = await labelled(`?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`);
+      const where = `?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`;
+      const found = await labelled(where);
       for (const id of RIVERS_DROP_LISTED_ALIASES) {
         const e = found.get(id);
         if (e) e.alts = e.alts.filter((a) => !isListed(normalize(a)));
@@ -474,16 +587,18 @@ const SETS: Record<string, SetDef> = {
       const ids = [...found.keys()];
       const short = riverShortNames(ids.map((id) => [found.get(id)!.label, ...found.get(id)!.alts]));
       const shortOf = new Map(ids.map((id, i) => [id, short[i]]));
-      return [await rootItem("Q4022", "river"), ...labelledItems(found, () => ["Q4022"], [], (id) => shortOf.get(id)!)];
+      const rivers = labelledItems(found, () => ["Q4022"], [], (id) => shortOf.get(id)!);
+      return [await rootItem("Q4022", "river"), ...(await factsFor("wikidata-rivers", rivers, where, [{ trait: "country", property: "P17", allowed: countryIds() }], false))];
     },
   },
   "wikidata-canadian-provinces": {
     source: "wikidata",
-    method: "SPARQL: instances of province of Canada (P31 Q11828004) or territory of Canada (P31 Q9357527), not dissolved (no P576), under province or territory of Canada (Q2879)",
+    method: "SPARQL: instances of province of Canada (P31 Q11828004) or territory of Canada (P31 Q9357527), not dissolved (no P576), under province or territory of Canada (Q2879), with each one's population (P1082, the best-rank value with the latest point in time P585)",
     fetch: async () => {
-      const found = await labelled("VALUES ?kind { wd:Q11828004 wd:Q9357527 } ?x wdt:P31 ?kind . FILTER NOT EXISTS { ?x wdt:P576 ?dissolved }");
+      const where = "VALUES ?kind { wd:Q11828004 wd:Q9357527 } ?x wdt:P31 ?kind . FILTER NOT EXISTS { ?x wdt:P576 ?dissolved }";
+      const found = await labelled(where);
       if (found.size !== 13) throw new Error(`${found.size} provinces and territories, expected 13`);
-      return [await rootItem("Q2879", "province or territory of Canada"), ...labelledItems(found, () => ["Q2879"])];
+      return [await rootItem("Q2879", "province or territory of Canada"), ...(await factsFor("wikidata-canadian-provinces", labelledItems(found, () => ["Q2879"]), where, [], true))];
     },
   },
   "oewn-animals": {
@@ -629,14 +744,20 @@ function readCategories(): CategoryDef[] {
   return categories;
 }
 
-// Every category in data/categories.json, in one transaction: a root or member_of that isn't loaded fails them all.
+// Every category in data/categories.json, in one transaction: a root, member_of or filter value that isn't loaded fails
+// them all. A subset follows its base (parseCategories checks the order).
 async function defineCategories(): Promise<void> {
   const categories = readCategories();
   const client = await localClient();
   try {
     await client.query("begin");
+    const bases = new Map(categories.filter((c): c is BaseCategory => !isSubset(c)).map((c) => [c.key, c]));
     for (const c of categories) {
-      await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
+      if (isSubset(c)) {
+        await client.query("select private.define_subset($1, $2, $3, $4, $5::jsonb)", [c.key, c.name, c.of, bases.get(c.of)!.source, JSON.stringify(filterOf(c))]);
+      } else {
+        await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
+      }
     }
     await client.query("commit");
     console.log(`DEFINED ${categories.length} categories from ${CATEGORIES_FILE}`);
