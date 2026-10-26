@@ -65,12 +65,11 @@ plor.app's database has every migration through `20261025200806_settings.sql`: t
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
 ## Waiting on the human
-- **plor.app's `db push`** for 13e-4a's 3 migrations (PR #87, merged), when the human asks. Until then plor.app runs main's code against a database without them (Vercel deploys on merge).
 - **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 
 ## Next step
-1. **13e-4a is done** (PR #87, `docs/milestones/M13-13e-4-subsets.md`). plor.app needs `npx supabase db push` for its 3 migrations (`20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`), run from a clean checkout of main, only at their request.
+1. **13e-4a is done** (PR #87, `docs/milestones/M13-13e-4-subsets.md`), and **plor.app's database is even with main** (2026-10-26, at the human's request: "Push 13e-4a's 3 migrations to plor.app now, from a clean checkout of main, then run the hosted tests"): from a temporary worktree of `origin/main` at `6c4d5ee` (removed after), `db push --linked --dry-run` listed exactly the 3, the push applied them, `migration list --linked` matches on all 36, and `test db --linked` passed (22 files, 388 tests). The 3: `20261026050238_subsets.sql`, `20261026053032_number_fact_lookup.sql`, `20261026054153_subset_accept.sql`. plor.app's answer database is still empty by choice.
    Then **13e-4b**: Claude proposes the first subsets (about 20–30, with bank questions and review output) and the human sets each threshold (O5), approving by merging. ROADMAP From 13e-4a lists the data quirks to review first (Oceania, boroughs, junk aliases on continent and status things).
 2. **Then 13e-5, pop culture,** with the answers already recorded in 13e-4's ticket (animated films and anime, Nintendo plus genres, younger-leaning groups with K-pop, board games, superheroes), built as subsets where it can.
 3. ROADMAP's From 13e-3 item that makes the simulator and the list checks `scripts/` commands: the simulator has been rewritten by hand three times. The re-fetch of the older sets for the mul fallback rides in 13e-4a.

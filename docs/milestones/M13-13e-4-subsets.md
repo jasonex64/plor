@@ -74,7 +74,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 - **The 500 MB research** (2026-10-26, for the human; Supabase's pricing, database size, disk size, billing FAQ and cost control pages, the last four not in SOURCES.md): Free has 500 MB, then a grace period and possibly read-only or a pause; Pro is $25 a month with 8 GB, daily backups and no pausing. Not decided: the plan stays Free while building.
 
 ## 13e-4a — The facts and the machinery
-**Status:** done (2026-10-26): merged in PR #87 (`6c4d5ee`, 2026-10-26 05:56 UTC) on green CI, 10 of 10 checks (runs 40276452444 and 40276445920 on `7796848`), by auto-merge (human, 2026-10-25: "Merge on green CI (Recommended)"). Its 3 migrations wait for plor.app's next `db push`, at the human's request.
+**Status:** done (2026-10-26): merged in PR #87 (`6c4d5ee`, 2026-10-26 05:56 UTC) on green CI, 10 of 10 checks (runs 40276452444 and 40276445920 on `7796848`), by auto-merge (human, 2026-10-25: "Merge on green CI (Recommended)"). Its 3 migrations were pushed to plor.app at the human's request (2026-10-26, from a clean checkout of main at `6c4d5ee`; `migration list --linked` matches on all 36; `test db --linked` 22 files, 388 tests, PASS).
 
 **Source:** SOURCES.md, Wikidata properties (M13 13e-4), read 2026-10-26; Wikidata (M13 D2); 13a–13e-3's tickets for the base, the format, misses and the draft.
 
