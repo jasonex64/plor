@@ -27,6 +27,15 @@ describe("pickLetters", () => {
     expect(LETTER_TIERS.medium).toContain(steals![1]);
   });
 
+  it("never steals a letter subset's letter at or before its question (13e-4a: \"Yes, the draft skips it\")", async () => {
+    // As familiarLeft sees it: question 5 asks a subset of names starting with the letter Q2 would steal first, so
+    // with that letter stolen at Q2 or Q4 nothing there can be typed.
+    const first = (await pickLetters("2026-11-02", 7, fitsAll))!;
+    const letter = first[1]!;
+    const steals = await pickLetters("2026-11-02", 7, async (upTo, trial) => upTo <= 4 || !trial.slice(0, 5).includes(letter));
+    expect(steals!.slice(0, 5)).not.toContain(letter);
+  });
+
   it("finds nothing when no letter fits", async () => {
     expect(await pickLetters("2026-11-02", 7, async (upTo) => upTo < 5)).toBeNull();
   });

@@ -106,6 +106,14 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 - **A3 — countries outside the 193:** "Drop and count them (Recommended)".
 - **A4 — number filters:** "At least only (Recommended)".
 
+**The repeat gap and families** (asked while building, 2026-10-26): "Separate, not same day": each subset keeps its own 30-day gap, but a day holds one question per family (a base and its subsets). `gapProblems`, `pickQuestions` and `namedQuestions` take the family from `data/categories.json`.
+
+**What building changed:**
+- A subset is defined by its own function, `private.define_subset(key, name, of, source, where)`, which copies its base's root and member_of; `define_category` is unchanged, so its callers and tests are too.
+- A held text for a subset has its own outcome, `held_subset`, as the audit page says "held" means an offensive-word match; Accept there makes a new thing accepted for that subset (`category_extra`), and Undo ends that too.
+- A letter subset's named host answers must start with its letter: `content:validate` checks the names in the bank, and the draft checks the things' names.
+- `import_source` reports `numbers` beside things, aliases and facts (`answer_base.test.sql`'s three expected results gain `"numbers": 0`).
+
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
 ## Numbers

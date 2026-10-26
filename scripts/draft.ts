@@ -7,14 +7,18 @@
 // so far (13c; letters first, 13e-2), so 3 familiar answers stay typeable and safe; checks the day; writes
 // content/offbeat/<date>.json for the human to approve on /admin/puzzles; and prints the soft guide: each question's
 // expected catch rate against its target. The local stack only (13a: "Local only"); thing IDs are the same on every
-// database (src/content/thing-id.ts), so the draft holds wherever the same snapshots are loaded.
+// database (src/content/thing-id.ts), so the draft holds wherever the same snapshots are loaded. A day holds one
+// question per family, a base category and its subsets (13e-4a: "Separate, not same day"); a letter subset's names
+// count only when they start with its letter, its host answers' names included (O4), so a day that steals the letter
+// at or before it leaves no familiar answer typeable, and the letters skip it ("Yes, the draft skips it").
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
-import { GAME_ID, avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
+import { GAME_ID, avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, startsWith, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
@@ -124,10 +128,17 @@ export async function pickLetters(date: string, count: number, fits: (upTo: numb
   return chosen ? steals(chosen) : null;
 }
 
-// Each name's thing among the category's members: "#<id>" as given, else the members bearing that name. Throws, listing
-// the candidates, for a name with none or several.
+// A letter subset's letter, or null for any other category.
+async function letterOf(db: pg.Client, category: string): Promise<string | null> {
+  const { rows } = await db.query<{ starts_with: string | null }>("select starts_with from private.category where key = $1", [category]);
+  return rows[0]?.starts_with ?? null;
+}
+
+// Each name's thing among the category's members: "#<id>" as given, else the members bearing that name (for a letter
+// subset, a name starting with its letter). Throws, listing the candidates, for a name with none or several.
 async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
-  const texts = names.filter((n) => !n.startsWith("#")).map(normalize);
+  const letter = await letterOf(db, category);
+  const texts = names.filter((n) => !n.startsWith("#")).map(normalize).filter((t) => letter === null || startsWith(t, letter));
   const { rows } = await db.query<{ alias: string; id: string; name: string }>(
     `select a.alias, m::text as id, t.name from private.category_members($1) m
      join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
@@ -168,12 +179,15 @@ async function caughtMembers(db: pg.Client, category: string, hosts: string[]): 
 }
 
 // Whether at least FAMILIAR_SAFE_MIN familiar members (in levels) the host doesn't catch can be typed without the
-// letters (human, 2026-10-24: "Typeable and safe (Recommended)"; private.approve_puzzle checks the same).
+// letters (human, 2026-10-24: "Typeable and safe (Recommended)"; private.approve_puzzle checks the same), a letter
+// subset's names only when they start with its letter.
 export async function familiarLeft(db: pg.Client, category: string, hosts: string[], levels: Record<string, Level>, stolen: string[]): Promise<boolean> {
   const caught = new Set(await caughtMembers(db, category, hosts));
   const { rows } = await db.query<{ id: string }>(
     `select distinct m::text as id from private.category_members($1) m join private.thing_alias a on a.thing_id = m
-     where m = any($2::uuid[]) and a.removed_at is null and ($3::text is null or a.alias !~ $3)`,
+     cross join (select starts_with from private.category where key = $1) c
+     where m = any($2::uuid[]) and a.removed_at is null and ($3::text is null or a.alias !~ $3)
+       and (c.starts_with is null or private.alias_starts(a.alias, c.starts_with))`,
     [category, Object.keys(levels), stolen.length ? `[${stolen.join("")}]` : null],
   );
   return rows.filter((r) => !caught.has(r.id)).length >= FAMILIAR_SAFE_MIN;
@@ -215,9 +229,10 @@ export async function oneHostCatch(db: pg.Client, date: string, q: Question): Pr
   return sum / q.host_bank.length;
 }
 
-// days: every drafted day, for the gap. ids: the 7 bank questions to use, in order, instead of the pick.
-export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, ids?: string[]): Promise<{ day: Puzzle; guide: string[] }> {
-  const chosen = ids ? namedQuestions(bank, days, date, ids) : pickQuestions(bank, days, date);
+// days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
+// questions to use, in order, instead of the pick.
+export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[]): Promise<{ day: Puzzle; guide: string[] }> {
+  const chosen = ids ? namedQuestions(bank, days, date, ids, family) : pickQuestions(bank, days, date, family);
   const resolved: { q: Question; catch: number }[] = [];
   for (const q of chosen) {
     const question = await resolveQuestion(db, q);
@@ -228,6 +243,12 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
     ordered.flatMap((q) => q.host_bank),
   ]);
   const names = new Map(rows.map((r) => [r.id, r.name]));
+  // The host says a letter subset's answers by their names, so each must start with the letter (O4).
+  for (const q of ordered) {
+    const letter = await letterOf(db, q.category);
+    const off = letter === null ? [] : q.host_bank.filter((id) => !startsWith(normalize(names.get(id)!), letter));
+    if (off.length) throw new Error(`${q.category}: host bank names ${off.map((id) => `"${names.get(id)}"`).join(", ")} don't start with "${letter}"`);
+  }
   // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so the
   // block is at or after it.
   const tryOrder = async (questions: Question[]) => {
@@ -274,9 +295,11 @@ async function main(): Promise<void> {
     if (problems.length) throw new Error(problems.join("\n"));
     return parsePuzzle(file, text).puzzle!;
   });
+  const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
+  if (!categories) throw new Error(categoryErrors.join("\n"));
   const db = await localClient();
   try {
-    const { day, guide } = await draft(db, bank, days, date, list?.split(","));
+    const { day, guide } = await draft(db, bank, days, date, familyOf(categories), list?.split(","));
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
     console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);

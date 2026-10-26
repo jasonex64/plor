@@ -1,7 +1,7 @@
 "use client";
 
 // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md): the texts waiting for a
-// decision (held, rejected, near-typo), the answers players added, and what was decided, each undoable if it made an
+// decision (held, held for a subset, rejected, near-typo), the answers players added, and what was decided, each undoable if it made an
 // answer. Every decision takes effect from now: a day that has started keeps what it had. Plain on purpose; the look
 // is M14's job.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
@@ -13,6 +13,8 @@ import { errorText } from "../../messages";
 const WHY: Record<Review["outcome"], string> = {
   accepted: "Added as a new answer.",
   held: "Held: it holds a word on the offensive-word list.",
+  // A subset whose filter a new answer can't carry (through its country, or a number: M13 13e-4a, A2).
+  held_subset: "Held: the category's filter can't be checked on a new answer. Accept makes it an answer for this category only.",
   rejected: "Rejected: it names something outside the category.",
   near_typo: "Held as a typo: it's one letter from an answer.",
 };
@@ -110,7 +112,7 @@ function Entry({ review: r, busy, decide }: EntryProps) {
           Undo
         </button>
       )}
-      {r.outcome === "held" && (
+      {(r.outcome === "held" || r.outcome === "held_subset") && (
         <button type="button" disabled={busy} onClick={() => void decide(r.id, "accept")}>
           Accept
         </button>

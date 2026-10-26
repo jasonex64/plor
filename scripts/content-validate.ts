@@ -1,14 +1,15 @@
 // Validates every puzzle file under a content root, and its question bank (bank.json at the root, M13 13d):
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
-// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d). The bank asks only categories listed in
-// data/categories.json, which is checked too (13e).
+// Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d), and no day asks two of one family (13e-4a).
+// The bank asks only categories listed in data/categories.json, which is checked too (13e); a letter subset's named
+// host answers start with its letter, as the host's answer must (13e-4a, O4).
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { gapProblems, parseBank } from "../src/content/bank.ts";
-import { CATEGORIES_FILE, parseCategories } from "../src/content/categories.ts";
-import { checkPuzzleFile, parsePuzzle, type Puzzle } from "../src/content/puzzle.ts";
+import { CATEGORIES_FILE, familyOf, isSubset, parseCategories } from "../src/content/categories.ts";
+import { checkPuzzleFile, normalize, parsePuzzle, startsWith, type Puzzle } from "../src/content/puzzle.ts";
 
 // Every file (not directory) under `root`, relative to it, with "/" separators, sorted so output is stable.
 // Throws if `root` is missing.
@@ -35,15 +36,23 @@ export function validateRoot(root: string): { files: number; errors: string[] } 
   const texts = files.map((file) => ({ file, text: readFileSync(join(root, file), "utf8") }));
   const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text))];
   const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
-  errors.push(...gapProblems(days));
   const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
   errors.push(...categoryErrors);
+  // A broken categories file is reported above, and every family is then its own category.
+  errors.push(...gapProblems(days, familyOf(categories ?? [])));
   if (all.includes(BANK)) {
     const { bank, errors: bankErrors } = parseBank(BANK, readFileSync(join(root, BANK), "utf8"));
     errors.push(...bankErrors);
     if (bank && categories) {
       const keys = new Set(categories.map((c) => c.key));
       for (const q of bank.questions) if (!keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${CATEGORIES_FILE}`);
+      const letters = new Map(categories.flatMap((c) => (isSubset(c) && "starts_with" in c ? [[c.key, c.starts_with]] : [])));
+      for (const q of bank.questions) {
+        const letter = letters.get(q.category);
+        for (const name of letter ? q.host_bank.filter((n) => !n.startsWith("#") && !startsWith(normalize(n), letter)) : []) {
+          errors.push(`${BANK} question "${q.id}": host answer "${name}" doesn't start with "${letter}"`);
+        }
+      }
     }
   }
   return { files: files.length, errors };

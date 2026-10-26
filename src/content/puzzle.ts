@@ -26,8 +26,10 @@ export type Question = {
 export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] };
 
 // What private.approve_puzzle stores: the moment answers are resolved as of, and per question the category's root
-// and member_of as approved, and its member count.
-export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number };
+// and member_of as approved, its member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md,
+// Puzzle content format).
+export type Where = { trait: string; value: string; via?: "country" } | { number: "population"; at_least: number } | { starts_with: string };
+export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number; where?: Where };
 export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[]; approved_at: string };
 
 // The letters gone by question `index`: every letter stolen at it or before it.
@@ -43,6 +45,13 @@ export function avoids(name: string, stolen: string[]): boolean {
 
 // Normalization of names and typed text (human-approved format, 2026-10-18; SOURCES.md: Unicode normalization).
 // Lowercase first: lowercasing can produce combining marks (e.g. U+0130), which NFKD + \p{M} then remove.
+// Whether a normalized name starts with a letter subset's letter, a leading "the " ignored (human, 2026-10-26: "What's
+// typed must start with it (Recommended)"), as private.alias_starts decides it in the database; this copy serves the
+// checks that run without one (content:validate).
+export function startsWith(name: string, letter: string): boolean {
+  return name.replace(/^the /, "").startsWith(letter);
+}
+
 export function normalize(text: string): string {
   return text
     .toLowerCase()

@@ -1,9 +1,9 @@
 {
   "set": "wikidata-capitals",
   "source": "wikidata",
-  "snapshot": "2026-10-25",
-  "retrieved_at": "2026-10-25T09:39:34.749Z",
-  "method": "SPARQL: the capital (P36) of each country in the wikidata-countries snapshot, under capital city (Q5119); a country with several capitals keeps them all",
+  "snapshot": "2026-10-26",
+  "retrieved_at": "2026-10-26T05:16:54.352Z",
+  "method": "SPARQL: the capital (P36) of each country in the wikidata-countries snapshot, under capital city (Q5119); a country with several capitals keeps them all; each capital's country (P17, best rank, only the snapshot's 193) and population (P1082, the best-rank value with the latest point in time P585)",
   "items": 200,
-  "sha256": "c85b1198aed828bf11af39ade61bd7f459818f2a0379818fd07ed3ae766a4a0b"
+  "sha256": "21dc1a1a67eaf1c8a3e5f2046a448de1e83f30deac21d3959b3c0bd137b67bda"
 }
