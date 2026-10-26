@@ -3,14 +3,15 @@
 // The settings sheet (docs/milestones/M14-14a-3b-settings.md; M14 L44), opened from the shell's gear: a sheet at the
 // bottom on phones and a side panel from 768px, as round 7 draws them. It holds the account (M12 12a, 12b, 12c: the
 // username, once every 30 days; the display name friends see, M07 7a; Sign out; Delete account) and the two settings,
-// Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account.
+// Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account; and the theme
+// (docs/milestones/M14-14b-1-themes.md; L21, L47), with links to the privacy and About pages.
 //
 // A modal <dialog> opened with showModal() (MDN <dialog>, SOURCES.md): the page behind is inert, focus starts on the
 // first focusable element, Close, and Escape closes it. The tap on the dimmed page is a click whose target is the
 // dialog itself, since the sheet's content fills it (closedby="any" isn't in Safari).
 import Link from "next/link";
 import { useState, type FormEvent, type ReactNode, type RefObject } from "react";
-import type { Profile, Settings } from "@/lib/profile";
+import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 import styles from "./settings.module.css";
@@ -60,10 +61,15 @@ export function SettingsSheet({
           <Username username={profile.username} changeableAt={profile.usernameChangeableAt} onChanged={onChanged} />
           <DisplayName name={profile.displayName} onChanged={onChanged} />
         </dl>
-        <Switches settings={profile.settings} onSettings={onSettings} />
-        <Link href="/privacy" className={styles.link} onClick={close}>
-          Privacy policy
-        </Link>
+        <Preferences settings={profile.settings} onSettings={onSettings} />
+        <p className={styles.links}>
+          <Link href="/privacy" className={styles.link} onClick={close}>
+            Privacy policy
+          </Link>
+          <Link href="/about" className={styles.link} onClick={close}>
+            About Plor
+          </Link>
+        </p>
         <div className={styles.end}>
           <SignOut onSignedOut={signedOut} />
           <DeleteAccount username={profile.username} onDeleted={signedOut} />
@@ -223,22 +229,34 @@ function DisplayName({ name, onChanged }: { name: string | null; onChanged: () =
   );
 }
 
-const SWITCHES: { key: keyof Settings; label: string; line: string }[] = [
+const SWITCHES: { key: "skipGameScreen" | "calendarNumbers"; label: string; line: string }[] = [
   { key: "skipGameScreen", label: "Skip the game screen", line: "Play goes straight to question 1." },
   { key: "calendarNumbers", label: "Numbers on the calendar", line: "Show how many questions you survived each day." },
 ];
 
-// Round 7's two switches, in its wording (provisional, L32). Each is saved as it's flipped; the page follows the
-// saved value, so a refused change shows the switch as it was.
-function Switches({ settings, onSettings }: { settings: Settings; onSettings: (settings: Settings) => void }) {
+// The six themes (L21), each tile drawn in its own theme's background and accent through its data-theme; Follow
+// device is drawn as Paper, with round 7's half-moon.
+const TILES: { theme: Theme; label: string; drawn: Exclude<Theme, "device"> }[] = [
+  { theme: "device", label: "Follow device", drawn: "paper" },
+  { theme: "paper", label: "Paper", drawn: "paper" },
+  { theme: "night", label: "Night", drawn: "night" },
+  { theme: "sky", label: "Sky", drawn: "sky" },
+  { theme: "moonlit", label: "Moonlit", drawn: "moonlit" },
+  { theme: "ink", label: "Ink", drawn: "ink" },
+];
+
+// Round 7's two switches, in its wording (provisional, L32), and its theme picker: radio buttons, so the chosen one is
+// announced as checked, and drawn with a thick outline alone (L47). Each is saved as it's changed; the page follows
+// the saved value, so a refused change shows the control as it was.
+function Preferences({ settings, onSettings }: { settings: Settings; onSettings: (settings: Settings) => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function flip(key: keyof Settings, on: boolean) {
+  async function save(change: Partial<Settings>) {
     setBusy(true);
     setError(null);
     try {
-      const r = await api<{ settings: Settings }>("/api/profile/settings", { method: "POST", body: { [key]: on } });
+      const r = await api<{ settings: Settings }>("/api/profile/settings", { method: "POST", body: change });
       onSettings(r.settings);
     } catch (err) {
       setError(errorText(err));
@@ -261,10 +279,31 @@ function Switches({ settings, onSettings }: { settings: Settings; onSettings: (s
             className={styles.switch}
             checked={settings[s.key]}
             disabled={busy}
-            onChange={(e) => void flip(s.key, e.target.checked)}
+            onChange={(e) => void save({ [s.key]: e.target.checked })}
           />
         </label>
       ))}
+      <fieldset className={styles.themes}>
+        <legend>Theme</legend>
+        <div className={styles.tiles}>
+          {TILES.map((t) => (
+            <label key={t.theme} className={styles.tile}>
+              <input
+                type="radio"
+                name="theme"
+                className={styles.sr}
+                checked={settings.theme === t.theme}
+                disabled={busy}
+                onChange={() => void save({ theme: t.theme })}
+              />
+              <span data-theme={t.drawn} className={styles.swatch}>
+                {t.theme === "device" && <span aria-hidden="true">◐ </span>}
+                {t.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {error && <p role="alert">{error}</p>}
     </div>
   );

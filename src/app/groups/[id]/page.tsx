@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { Home } from "../../home";
+import { Footer } from "../../footer";
 
 // A group's page (docs/milestones/M10-groups.md, 10b; G7): its name, members and invite link, for members only. The API
 // checks membership; this page only passes the ID on.
@@ -11,11 +11,7 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
       <Suspense fallback={<p>Loading…</p>}>
         <GroupHome params={params} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/privacy">Privacy policy</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

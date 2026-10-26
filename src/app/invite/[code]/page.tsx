@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { Home } from "../../home";
+import { Footer } from "../../footer";
 
 // An invite link (docs/milestones/M07-friends-and-live-board.md, 7b): sign in if needed, pick a username if needed,
 // then add the link's owner as a friend. The API checks the code; this page only passes it on.
@@ -12,11 +12,7 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
       <Suspense fallback={<p>Loading…</p>}>
         <InviteHome params={params} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/privacy">Privacy policy</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

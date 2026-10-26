@@ -7,7 +7,7 @@
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useCallback, useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
@@ -22,6 +22,7 @@ import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { errorText, messageForRedirect } from "./messages";
 import { HowToPlay, OffbeatScreen } from "./offbeat";
+import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 
@@ -64,6 +65,12 @@ export function Home({ view }: { view?: View }) {
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
   }
   useEffect(loadMe, []);
+  // The account's theme, once the profile is known: Home owns it, so it also re-applies it after React's development
+  // remount clears the attribute the <head> script set (Next.js, "Preventing flash before hydration"). Signed out, or
+  // before a username, nothing is picked.
+  useLayoutEffect(() => {
+    if (me) applyTheme(me.signedIn && me.username !== null ? me.settings.theme : null);
+  }, [me]);
 
   // Back from Google with an invite pending: go back to its page. On an invite page the remembered one is spent, so
   // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
