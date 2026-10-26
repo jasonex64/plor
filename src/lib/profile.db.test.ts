@@ -8,8 +8,8 @@ import { afterAll, describe, expect, it } from "vitest";
 import { DISPLAY_NAME_MAX_LENGTH, USERNAME_CHANGE_DAYS, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
 import { changeUsername, createProfile, getProfile, setDisplayName, setSettings } from "./profile";
 
-// Both settings off on a new profile (M14 14a-3b).
-const OFF = { skipGameScreen: false, calendarNumbers: false };
+// Both settings off and the theme following the device on a new profile (M14 14a-3b, 14b-1).
+const OFF = { skipGameScreen: false, calendarNumbers: false, theme: "device" };
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -53,15 +53,17 @@ describe("private.profile as plor_app", () => {
 
   // Since M14 14a-3b (a security change) plor_app may update the two settings' columns (DECISIONS.md Log, 2026-10-25),
   // which the existing update policy covers.
-  it("sets the two settings, one at a time, and refuses them before the profile exists", async () => {
+  it("sets the settings and the theme, one at a time, and refuses them before the profile exists", async () => {
     await asPlorApp(async (client, userId) => {
       await expect(setSettings(client, userId, { skipGameScreen: true })).rejects.toMatchObject({ code: "no_profile", status: 409 });
     });
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
-      expect(await setSettings(client, userId, { skipGameScreen: true })).toEqual({ skipGameScreen: true, calendarNumbers: false });
-      expect(await setSettings(client, userId, { calendarNumbers: true })).toEqual({ skipGameScreen: true, calendarNumbers: true });
-      expect((await getProfile(client, userId))?.settings).toEqual({ skipGameScreen: true, calendarNumbers: true });
+      expect(await setSettings(client, userId, { skipGameScreen: true })).toEqual({ ...OFF, skipGameScreen: true });
+      expect(await setSettings(client, userId, { calendarNumbers: true })).toEqual({ ...OFF, skipGameScreen: true, calendarNumbers: true });
+      // And the theme (14b-1): its own column grant.
+      expect(await setSettings(client, userId, { theme: "moonlit" })).toEqual({ skipGameScreen: true, calendarNumbers: true, theme: "moonlit" });
+      expect((await getProfile(client, userId))?.settings).toEqual({ skipGameScreen: true, calendarNumbers: true, theme: "moonlit" });
     });
   });
 

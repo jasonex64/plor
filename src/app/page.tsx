@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { Home } from "./home";
+import { Footer } from "./footer";
 
 // The introduction and the privacy link are static, so they are in the served HTML before any script runs: Google's
 // brand verification rejected a home page that showed only a sign-in form, didn't explain the app, and was headed
@@ -24,11 +24,7 @@ export default function Page() {
       <Suspense fallback={<p>Loading…</p>}>
         <Home />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/privacy">Privacy policy</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

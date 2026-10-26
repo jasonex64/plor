@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14a-3b's PR. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
+**Updated:** 2026-10-25. The M14 section is the M14 session's (on the Mac, worktree `.claude/worktrees/m14-settings-900486`), written with 14b-1's PR. The rest is as the M13 session wrote it on `m13-answer-lists-and-content`; for M13's latest, read the handoff on its branch.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -13,34 +13,27 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-2b | The game screen `/offbeat`. **Security change:** yesterday's host answers to every signed-in player | #81 |
 | 14a-2c | 14a-2b's review fixes | #82 |
 | 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
+| 14a-3b | The settings sheet (a `<dialog>` from the gear) with the account, Skip the game screen and Numbers on the calendar; the friends list on the Friends tab; caught answers out of the rarest; the calendar at 3:1. **Security change:** `plor_app` updates the two settings' columns | #85 |
+
+plor.app's database has every migration through `20261025200806_settings.sql`: the M13 session ran `npx supabase db push` at the human's request after #85 merged, and `npx supabase test db --linked` passed 345/345 (2026-10-25).
 
 ### In review
-**14a-3b**, settings (`docs/milestones/M14-14a-3b-settings.md`), in PR #85 with auto-merge on green CI:
-- the gear (top bar on phones, the sidebar's foot from 768px) opens a modal `<dialog>`, sheet or 440px panel, holding the username, display name, the two switches (Skip the game screen, Numbers on the calendar), Privacy policy, Sign out and Delete account;
-- the friends list and the invite link with Reset moved to the Friends tab, with avatar slots;
-- the rarest answers leave caught ones out; the calendar's shades reach 3:1, with a text alternative naming each day;
-- `GET /api/account` is gone (the profile carries it all);
-- MDN `<dialog>` is in SOURCES.md.
+**14b-1**, themes and the About page (`docs/milestones/M14-14b-1-themes.md`), in PR #86 with auto-merge on green CI:
+- Sky, Moonlit and Ink as round 8 on the canvas drew them (human, 2026-10-25: "Build as drawn (Recommended)"); every theme a `[data-theme]` block in `globals.css`, all five checked by `colors.test.ts`;
+- the picker in the settings sheet, saved on the account; painted before the profile loads from a `localStorage` copy by a `<head>` script (Next.js's "Preventing flash before hydration", added to SOURCES.md);
+- `/about`: what Plor is, "Plor is made by Jason" with privacy@plor.app, Moonlit's credit, "Plor is built with help from AI."; one `Footer` on every page links it.
 
-**Migration `20261025200806_settings.sql`** (and the **security change**: `plor_app` may update the two settings' columns, DECISIONS.md Log). Once this PR is on main, plor.app's `GET /api/profile` fails until the human runs `npx supabase db push` (human, 2026-10-25: "After today's merges (Recommended)": one push once today's batch is on main). It's applied to the Mac's local stack.
-
-### Waiting on the human
-**14b-1, themes and the About page.** The human's answers of 2026-10-25 (this session's second round):
-- **The three new themes' colours:** "Mock them up first". The derived sets (Sky, Moonlit, Ink: outline, Moonlit's divider, shades and their number colours, Safe, Caught and Delete) are to be drawn on the canvas "Plor shell layout" (Me, the sheet, Today) for the human to review before they're built. The values Claude proposed are in this session's question: control outline Sky #858C9B, Moonlit #737185, Ink #606060; Moonlit's divider #3E3C50; shades Sky a7/c4/e2/ff, Moonlit 72/a1/d0/ff, Ink 65/98/cc/ff; Safe, Caught and Delete from Paper (Sky) or Night (Moonlit, Ink).
-- **No flash:** "Add it, copy in localStorage (Recommended)": add Next.js's bundled guide "Preventing flash before hydration" (`01-app/02-guides/preventing-flash-before-hydration.md`) to SOURCES.md's Next.js row, and apply a localStorage copy of the account's theme from an inline script in `<head>`; the account stays the truth.
-- **About:** "be way more broad but yes credits should be on". About is more than credits; ask what else it holds (a guided round) before drafting it.
-- **The AI note:** "Code only, as worded (Recommended)": "Plor's code is written with help from Claude, an AI model by Anthropic."
-- Already decided: the presets Follow device, Paper, Night, Sky, Moonlit, Ink (L21); the chosen one outlined (L47); the theme a column on the account, its security change approved ("Approve it (Recommended)").
+**Migration `20261026010745_theme.sql`** (the **security change** approved 2026-10-24: `plor_app` may update `private.profile.theme`). Once it's on main, plor.app's `GET /api/profile` fails until `npx supabase db push` runs again.
 
 ### Next step
-1. After 14a-3b merges: mark it done with its CI run in the ticket and ROADMAP, from this branch.
-2. Draw the three themes on the canvas, and ask the About round; then write 14b-1's ticket from the answers and build it, one PR, merged on green CI.
+1. After 14b-1 merges: mark it done with its CI run in its ticket and ROADMAP; the human (or a session at their request) pushes the theme migration.
+2. Then 14b-2 (the sprout streak, the admin pages' look, the design reviews' polish), from its own guided questions and ticket, one PR.
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
-2. `npx supabase start`, then `npx supabase migration up` (through `20261025200806_settings.sql`). On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
+2. `npx supabase start`, then `npx supabase migration up` (through `20261026010745_theme.sql`). On the Mac, first `export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"`.
 3. `npx next typegen` once, before `npx tsc --noEmit -p .`. Then `npm run dev`; sign in with a code from Mailpit at `http://127.0.0.1:54324`.
-4. The checks: `npm test` 269; `npm run test:db` 258; `npx supabase test db` 345; `npm run test:e2e` 37. The db and e2e suites need today (and yesterday for some e2e files) free of a real approved day.
+4. The checks: `npm test` 330; `npm run test:db` 260; `npx supabase test db` 345; `npm run test:e2e` 39. The db and e2e suites need today (and yesterday for some e2e files) free of a real approved day. A new e2e file's player names must not repeat another file's: every file in a run shares `RUN` (ROADMAP, For M14).
 5. **On the Mac** the M13 session (`/Users/jason/code/plor`) shares the stack and port 3000. It said it won't run db, SQL or e2e tests locally for now, nor `db reset`, and will message first if that changes. Message it before a `db reset` anyway.
 
 **Left running:** nothing of M14's (no dev server, no background job).
