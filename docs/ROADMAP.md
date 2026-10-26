@@ -216,6 +216,8 @@ These are non-blocking items found during work or review. Record each one here *
   - `animal_k` and `bird_k` are different families, so they can share a day and answers (kestrel, kiwi, kingfisher);
   - no tests for `valueItems`, for `define_subset` with some values unknown, or for a new thing on a several-value subset getting no status;
   - an animal with two IUCN statuses (30 of them) can sit in `extinct_animal` and another status's subset; not checked against the bank answers.
+  - continents keep the junk alternative labels their `wikidata-places` entry brings (North America: "na", "noam", "003 un m49 code"), as places keep Wikidata's aliases; only the IUCN status things are named by their label alone (13e-4b Evidence);
+  - the 40-day simulator and the list checks (names resolve, no host above a familiar answer) are still scratch scripts, rewritten again for 13e-4b (From 13e-3);
 
   Found in M13 13e-4b.
 - [ ] **From 13e-4a:**

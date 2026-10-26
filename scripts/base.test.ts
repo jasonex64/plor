@@ -27,16 +27,18 @@ describe("aliasesFor", () => {
 });
 
 describe("taxaToItems", () => {
-  it("names a taxon by its first English name, else its scientific name; root keeps no parents; parents outside are dropped", () => {
+  it("names a taxon by its first English name in alphabetical order, whatever order the names came in, else its scientific name; root keeps no parents; parents outside are dropped", () => {
     const taxa = new Map([
       ["Q2", { names: ["bear"], synonyms: ["Bear"], scientific: ["Ursidae"], parents: new Set(["Q1"]) }],
       ["Q3", { names: [], synonyms: [], scientific: ["Ursus"], parents: new Set(["Q2", "Q9"]) }],
       ["Q1", { names: ["animal"], synonyms: [], scientific: [], parents: new Set(["Q0"]) }],
+      ["Q4", { names: ["whitefish", "elephant shark"], synonyms: [], scientific: [], parents: new Set(["Q1"]) }],
     ]);
     expect(taxaToItems(taxa, "Q1")).toEqual([
       { id: "Q2", name: "bear", aliases: [{ alias: "bear", kind: "name" }, { alias: "bears", kind: "plural" }, { alias: "ursidae", kind: "scientific" }], kind_of: ["Q1"] },
       { id: "Q3", name: "Ursus", aliases: [{ alias: "ursus", kind: "scientific" }], kind_of: ["Q2"] },
       { id: "Q1", name: "animal", aliases: [{ alias: "animal", kind: "name" }, { alias: "animals", kind: "plural" }], kind_of: [] },
+      expect.objectContaining({ id: "Q4", name: "elephant shark" }),
     ]);
   });
 });

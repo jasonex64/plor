@@ -252,12 +252,14 @@ async function fetchTaxa(root: string): Promise<Map<string, Taxon>> {
   return taxa;
 }
 
-// Taxa into items. A taxon's name is its first English name, else its scientific name (it then has no 'name' alias,
-// so it can't be answered: private.category_members). root keeps no parents; every other parent is in the map.
+// Taxa into items. A taxon's name is its first English name in alphabetical order, else its scientific name (it then
+// has no 'name' alias, so it can't be answered: private.category_members). The query service returns a taxon's
+// names in no fixed order, so "first as returned" named the elephant shark "Ghost Shark" on one fetch and "Whitefish"
+// on the next (13e-4c). root keeps no parents; every other parent is in the map.
 export function taxaToItems(taxa: Map<string, Taxon>, root: string): Item[] {
   return [...taxa].map(([id, t]) => ({
     id,
-    name: t.names[0] ?? t.scientific[0] ?? id,
+    name: [...t.names].sort((a, b) => a.localeCompare(b, "en"))[0] ?? t.scientific[0] ?? id,
     aliases: aliasesFor(t.names, t.synonyms, t.scientific),
     kind_of: id === root ? [] : [...t.parents].filter((p) => taxa.has(p)),
   }));

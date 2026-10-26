@@ -161,8 +161,17 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 4. The local database still holds the continent and status things' junk aliases and the dropped fruit subsets (loading only adds): the rebuild the human approved clears them.
 Non-blocking findings go to ROADMAP, From 13e-4b.
 
+**13e-4b Evidence, on a fresh load** (2026-10-26, after 13e-4c; the human's OK to rebuild: "Yes, reset it now (Recommended)"):
+- `npx supabase db reset`, then `npm run base -- load all` in 43 s: `LOADED wikidata-animals (2026-10-26): {"facts":110855,"things":71753,"aliases":212909,"numbers":0}`, `LINKED data/links.json: {"added":111,"links":111}`, `DEFINED 82 categories from data/categories.json` (60 and the 22 subsets; `fruit_k` and `fruit_j` gone). The local database is **284 MB** (291 MB before, holding every earlier read's rows).
+- The status things' names are their labels alone ("least concern", "data deficient", "endangered"); **North America keeps its junk aliases** ("na", "noam", "003 un m49 code") because continents also come in through `wikidata-places`, which keeps Wikidata's alternative labels: design point 4 holds for statuses only (ROADMAP, From 13e-4b). No alias "darkie charlie" is left.
+- **Every bank answer resolves on this fresh load:** all 82 questions, each named answer to exactly one member and each `#<id>` a member (scratch check: `0 problems`); no host answer sits above another familiar answer (`0 host answers above another familiar answer`).
+- `npm run base -- review` on the 22 subsets: members from 13 (`tool_w`) to 7,605 (`endangered_animal`): country B 24, country M 26, capital K 28, capital B 32, animal K 1,436, animal W 3,434, US city W 732, US city J 134, river K 1,663, river V 2,066, bird W 120, bird K 23, fish W 63, insect W 43, insect F 41, tree W 85, flower V 38, clothing J 19, sport F 21, tool W 13, extinct 475. LDNOOBW flags: the slur (dropped, above) and innocent names (willow tit, Syrian wild ass, bastard sturgeon, Rio Negro frog, Fluke's "butt", San Marino's "sm", Negro ant), kept (the human's answer).
+- Trial drafts 2026-10-27 to 11-01 and 11-24: all 7 drafted (e.g. 10-31: `country_b us_city_j endangered_animal language vegetable insect_w furniture`), files deleted after.
+- The simulator (scratch: `draft()` for 40 dates three days apart from 2027-01-01): **`DRAFTED 39 of 40; subset questions 64 of 273`** in 2 min 47 s; the one failure blocks at Q7 on "Name a kind of poem" (13e-3's `verse_form`). Before `membersOf` it ran over 35 minutes and was stopped.
+- `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=391`, `Result: PASS` (`subsets.test.sql` 46); `npm run test:db` 40 files, **262 passed**. e2e: no page changed; CI runs it.
+
 ## 13e-4c — Reading Wikidata's animal tree by key
-**Status:** in progress (2026-10-26): designed from the human's guided answers (below); being built.
+**Status:** in review (2026-10-26): built and proven (Evidence below); shipped with 13e-4b in one PR (human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
 
 **The problem** (13e-4b review, then measured): the animals import reads Wikidata's whole parent-taxon list (P171, about 4 million statements) and its names (P1843), scientific names (P225) and statuses (P141) in pages by position (`bd:slice` offsets, 50,000 rows each). The same page gives different rows on different requests: five requests in a row went to five servers (wdqs2007, wdqs2022, wdqs2014, wdqs2015, wdqs2010), and the page at offset 2,000,000 returned different rows even from the same server twice (wdqs2014, wdqs2008). Each server orders results by its own internal IDs, and the servers are independent and may hold different data (SOURCES.md, Wikidata Query Service behaviour), and Wikidata keeps changing during a read. So reading by position skips and repeats rows, and one skipped parent link cuts off its whole branch: taxa under Animalia came out as 2,366,663, then 2,360,800, then 2,325,989 on three reads the same day.
 
@@ -181,6 +190,15 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 2. **Names, scientific names and statuses by ID,** 5,000 at a time: English common names for every taxon in the tree, scientific names and statuses for the taxa kept (named ones and their ancestors).
 3. **Removes** `sliced()` and `BASE_SLICE_ROWS`, the only reads by position; adds `BASE_BATCH_IDS = 5000` (the human, 2026-10-26).
 4. **The proof:** two full fetches give the same items (the same IDs, names and parents); the counts are printed and recorded.
+
+**What building changed:** a taxon's display name is its first English name **in alphabetical order**: the query service returns a taxon's names in no fixed order, so the first two by-key fetches named 65 of the 12,886 taxa with several English names differently (the elephant shark "Ghost Shark", then "Whitefish"). Every name stays typeable either way; the name is what the host says, and what the letter-subset host check reads. Claude's call: the old "first as returned" was arbitrary too.
+
+**Evidence (2026-10-26, the Windows checkout):**
+- Three reads by position the same day gave 2,366,663, 2,360,800 and 2,325,989 taxa under Animalia, each losing a different branch (13e-4b review). The page at offset 2,000,000 returned different rows on six requests, the same server twice included: wdqs2010, wdqs2014, wdqs2008 gave `Q80980176, Q107545447`; wdqs2014 and wdqs2008 also gave `Q14538644, Q14538645` and `Q49601072, Q49601076`.
+- **By key, run 1** (`npm run base -- fetch wikidata-animals`, 26 min 20 s, one 429 wait honoured): the tree in 81 levels, `2368292 taxa under Q729`, `71744 taxa kept, 53583 with an English name`, `FETCHED wikidata-animals: 71753 items`. More than any read by position kept (71,698 at most).
+- **Run 2:** the same 2,368,292 taxa and 71,753 items; **0 IDs in one run only**; parents, aliases and statuses identical; 65 display names different (above).
+- **Run 3**, with names in alphabetical order (the committed snapshot): against run 2, 0 IDs differ and 0 items differ in parents, aliases or statuses. The kitefin shark (Q1321783) is "Kitefin shark", with "kitefin shark", its plural and "dalatias licha" as its names.
+- `npx tsc --noEmit -p .` and `npx eslint scripts src` clean; `scripts/base.test.ts` 16 passed (the alphabetical name included).
 
 ## Numbers
 | Value | Used for | Origin |
