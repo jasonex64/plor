@@ -63,6 +63,8 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
         key={day.date}
         day={day}
         onApproved={() => {
+          // Stay on the day just approved, so its message stays in view (14b-2b-2a review).
+          setChosen(day.date);
           load();
           onChanged();
         }}
@@ -74,8 +76,10 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
 function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   const { label } = stateOf(day);
   const editable = day.draft !== null && !day.started;
-  const shown = (day.live ?? day.draft)!;
-  const [hosts, setHosts] = useState<string[][]>(shown.map((q) => q.hostAnswers));
+  // An editable day shows its draft, which Approve saves; the approved day's host answers, if any, are the starting
+  // choice (14b-2b-2a review). A day already started shows what players got.
+  const shown = editable ? day.draft! : (day.live ?? day.draft)!;
+  const [hosts, setHosts] = useState<string[][]>((day.live ?? day.draft)!.map((q) => q.hostAnswers));
   const [problems, setProblems] = useState<string[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

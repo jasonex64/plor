@@ -1,6 +1,6 @@
 # M14 14b-2b-2 — Building the admin pages
 
-**Status:** 14b-2b-2a in review (2026-10-26), on `m14-look-and-feel`; 14b-2b-2b after it. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."), in two PRs, each merged on green CI.
+**Status:** 14b-2b-2a in review (2026-10-26), in its PR, on `m14-look-and-feel`; 14b-2b-2b after it. Built from round 10, approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."), in two PRs, each merged on green CI.
 
 ## Goal
 The admin pages live in Plor's shell as one admin area, in round 10's look, with what needs the admin always in view; then the three changes round 10 drew that need the server.
@@ -77,3 +77,10 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
 
 
 ## Review
+14b-2b-2a, by the `reviewer` agent on `1c2e154` (fresh context, no edits; tsc, lint and `npm test` re-run, 385 passed):
+- **Blocking, fixed:**
+  1. After approving the day shown by default, the page moved to the next waiting day and the approved message went with it: approving now keeps the view on that day.
+  2. A day with both a draft and an approved puzzle showed the approved questions while Approve saves the draft: an editable day now shows its draft, the approved host answers only seeding the choice (as the old page did).
+  3. The handoff and ROADMAP didn't say where 14b-2b-2a stood: both updated.
+- **Deferred to ROADMAP "Next revision" (For M14):** the host-answer chips reorder when ticked (focus can be lost); `hostBankShare` has no caller now; phone tables lose their column labels; the bank's "Scheduled" for a started day with no answers; repeated formatting (a second `when`, `dayText` beside the leaderboard's, another visually-hidden class); focus isn't moved into Delete's confirm; the phone menu has no Escape; Me flashes current on desktop before hydration; "Show fewer" with nothing to hide. And an e2e step that approves the default day without clicking its row (the shared database was being reset when this was fixed).
+- **Checked and fine (the reviewer):** the counts, every audit action per outcome kept, Insights' previous and next and the chart's scale, the inline confirm, focus on the hidden checkboxes and inputs, aria-current, no leftovers, no text links, the e2e changes.
