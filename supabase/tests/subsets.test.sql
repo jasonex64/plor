@@ -7,7 +7,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(38);
+select plan(43);
 
 -- The base: countries (UN members) with continents and populations, capitals with their country, animals with a status.
 create function pg_temp.c(id text, name text, continent text, pop bigint, extra jsonb = '[]') returns jsonb language sql
@@ -22,7 +22,7 @@ select is(private.import_source('wikidata', 'sb-1', jsonb_build_array(
   pg_temp.c('sb-kenya', 'Kenya', 'sb-africa', 50000000), pg_temp.c('sb-ghana', 'Ghana', 'sb-africa', 30000000),
   pg_temp.c('sb-egypt', 'Egypt', 'sb-africa', 100000000), pg_temp.c('sb-guinea', 'Guinea', 'sb-africa', 13000000),
   pg_temp.c('sb-djibouti', 'Djibouti', 'sb-africa', 1000000), pg_temp.c('sb-denmark', 'Denmark', 'sb-europe', 5000000),
-  pg_temp.c('sb-greece', 'Greece', 'sb-europe', 10000000),
+  pg_temp.c('sb-greece', 'Greece', 'sb-europe', 10000000), pg_temp.c('sb-dominica', 'Dominica', 'sb-europe', 70000),
   pg_temp.c('sb-gambia', 'The Gambia', 'sb-africa', 2000000, '[{"alias": "gambia", "kind": "synonym"}]'),
   pg_temp.c('sb-germany', 'Germany', 'sb-europe', 80000000, '[{"alias": "deutschland", "kind": "synonym"}]'),
   '{"id": "sb-capital", "name": "capital city", "aliases": []}'::jsonb,
@@ -33,9 +33,9 @@ select is(private.import_source('wikidata', 'sb-1', jsonb_build_array(
   '{"id": "sb-lc", "name": "least concern", "aliases": []}'::jsonb,
   '{"id": "sb-tiger", "name": "tiger", "aliases": [{"alias": "sb tiger", "kind": "name"}], "kind_of": ["sb-animal"], "conservation_status": ["sb-endangered"]}'::jsonb,
   '{"id": "sb-cat", "name": "cat", "aliases": [{"alias": "sb cat", "kind": "name"}], "kind_of": ["sb-animal"], "conservation_status": ["sb-lc"]}'::jsonb
-)) -> 'numbers', '9'::jsonb, 'an import adds its populations as number facts');
+)) -> 'numbers', '10'::jsonb, 'an import adds its populations as number facts');
 select is((select count(*)::int from private.fact f join private.thing_source s on s.thing_id = f.thing_id and s.source_id like 'sb-%'
-  where f.trait in ('country', 'continent', 'conservation_status')), 13, 'and its country, continent and status facts');
+  where f.trait in ('country', 'continent', 'conservation_status')), 14, 'and its country, continent and status facts');
 
 select private.define_category('sb_country', 'country', 'wikidata', 'sb-country', 'sb-un');
 select private.define_category('sb_capital', 'capital', 'wikidata', 'sb-capital', null);
@@ -66,7 +66,7 @@ select throws_ok($$ insert into private.category (key, name, root, starts_with, 
 select is(pg_temp.names('sb_african'), 'Djibouti, Egypt, Ghana, Guinea, Kenya, The Gambia', 'a fact filter');
 select is(pg_temp.names('sb_big'), 'Egypt, Germany, Kenya', 'a number filter: at least');
 select is(pg_temp.names('sb_g'), 'Germany, Ghana, Greece, Guinea, The Gambia', 'a letter filter, a leading "the" ignored');
-select is(pg_temp.names('sb_d'), 'Denmark, Djibouti, Germany', 'any of a thing''s names can start with the letter (deutschland)');
+select is(pg_temp.names('sb_d'), 'Denmark, Djibouti, Dominica, Germany', 'any of a thing''s names can start with the letter (deutschland)');
 select is(pg_temp.names('sb_african_capital'), 'Nairobi', 'a continent through the thing''s country');
 select is(pg_temp.names('sb_endangered'), 'tiger', 'a status filter');
 select ok(private.in_category_now(pg_temp.id('sb-kenya'), 'sb_african') and not private.in_category_now(pg_temp.id('sb-denmark'), 'sb_african'),
@@ -89,10 +89,15 @@ select is(pg_temp.approved(0) -> 'where', jsonb_build_object('trait', 'continent
 select ok(not (pg_temp.approved(1) ? 'where'), 'a category without a filter gets no where');
 select is(pg_temp.approved(2) -> 'where', '{"starts_with": "g"}'::jsonb, 'a letter is frozen');
 select is((pg_temp.approved(0) ->> 'members')::int, 6, 'the member count is the subset''s');
--- D has Djibouti and Germany (by "deutschland") past Denmark the host: 2 familiar answers, not 3.
+-- Past Djibouti the host, D has Denmark, Dominica and Germany ("deutschland"): 3 familiar answers. With U stolen,
+-- "deutschland" can't be typed, and "germany", though typeable, doesn't start with D, so only 2 are left (O4).
+select lives_ok($$ select private.approve_puzzle('00000000-0000-0000-0000-00000000aaaa', jsonb_build_object('format', 3, 'game_id', 'offbeat',
+  'date', '2099-02-02', 'questions', jsonb_build_array(pg_temp.q('sb_d', 'sb-djibouti', array['sb-denmark', 'sb-dominica', 'sb-germany'])))) $$,
+  'a letter subset''s familiar answers count its names starting with the letter');
 select throws_ok($$ select private.approve_puzzle('00000000-0000-0000-0000-00000000aaaa', jsonb_build_object('format', 3, 'game_id', 'offbeat',
-  'date', '2099-02-02', 'questions', jsonb_build_array(pg_temp.q('sb_d', 'sb-denmark', array['sb-djibouti', 'sb-germany'])))) $$,
-  'OB009', null, 'a letter subset needs 3 familiar answers too');
+  'date', '2099-02-03', 'questions', jsonb_build_array(pg_temp.q('sb_d', 'sb-djibouti', array['sb-denmark', 'sb-dominica', 'sb-germany'])
+    || '{"steals": "u"}'::jsonb))) $$,
+  'OB009', null, 'and only those: a name not starting with it doesn''t make up for one the letters block');
 
 -- Answers, as of the day.
 create function pg_temp.resolves(d date, i int, t text) returns text language sql
@@ -104,20 +109,34 @@ select is(pg_temp.resolves('2099-02-01', 2, 'the gambia') || ' / ' || pg_temp.re
 select is(pg_temp.resolves('2099-02-01', 2, 'deutschland'), null, 'a typed name must start with the letter itself (O4)');
 select is(pg_temp.resolves('2099-02-01', 2, 'germany'), 'Germany', 'whichever name the player types');
 
--- A started day keeps the numbers it had: the populations date from 3 days ago, the day's answers from 2.
-update private.number_fact set added_at = now() - interval '3 days';
-insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', '2000-02-01', jsonb_build_object('format', 3, 'game_id', 'offbeat',
-  'date', '2000-02-01', 'approved_at', now() - interval '2 days', 'questions', jsonb_build_array(jsonb_build_object('prompt', 'Name one',
-  'category', 'sb_big', 'host_bank', '[]'::jsonb, 'host_answers', '[]'::jsonb, 'levels', '{}'::jsonb,
-  'root', pg_temp.id('sb-country'), 'member_of', pg_temp.id('sb-un'), 'members', 3,
-  'where', '{"number": "population", "at_least": 40000000}'::jsonb))));
-select is(private.import_source('wikidata', 'sb-2', jsonb_build_array(pg_temp.c('sb-denmark', 'Denmark', 'sb-europe', 50000000))) -> 'numbers',
+-- A started day keeps what it had (answers as of the day: 13b). Everything in this base dates from 3 days ago, and
+-- the old days' answers from 2; then a population, a continent and a name change now.
+update private.thing_alias a set added_at = now() - interval '3 days' from private.thing_source s where s.thing_id = a.thing_id and s.source_id like 'sb-%';
+update private.fact f set added_at = now() - interval '3 days' from private.thing_source s where s.thing_id = f.thing_id and s.source_id like 'sb-%';
+update private.number_fact n set added_at = now() - interval '3 days' from private.thing_source s where s.thing_id = n.thing_id and s.source_id like 'sb-%';
+select private.define_subset('sb_mid', 'country of 4,000,000+', 'sb_country', 'wikidata', '{"number": "population", "at_least": 4000000}');
+create function pg_temp.old_day(d date, cat text) returns jsonb language sql return jsonb_build_object('format', 3, 'game_id', 'offbeat',
+  'date', d, 'approved_at', now() - interval '2 days', 'questions', jsonb_build_array(jsonb_build_object('prompt', 'Name one',
+  'category', cat, 'host_bank', '[]'::jsonb, 'host_answers', '[]'::jsonb, 'levels', '{}'::jsonb,
+  'root', pg_temp.id('sb-country'), 'member_of', pg_temp.id('sb-un'), 'members', 1,
+  'where', (select private.category_where(c) from private.category c where c.key = cat))));
+insert into private.puzzle (game_id, puzzle_date, content) values
+  ('offbeat', '2000-02-01', pg_temp.old_day('2000-02-01', 'sb_mid')),
+  ('offbeat', '2000-02-02', pg_temp.old_day('2000-02-02', 'sb_african')),
+  ('offbeat', '2000-02-03', pg_temp.old_day('2000-02-03', 'sb_d'));
+select is(private.import_source('wikidata', 'sb-2', jsonb_build_array(pg_temp.c('sb-denmark', 'Denmark', 'sb-europe', 3000000))) -> 'numbers',
   '1'::jsonb, 'a changed population is a new number fact');
 select is((select count(*)::int from private.number_fact where thing_id = pg_temp.id('sb-denmark') and removed_at = now()), 1, 'and the old one ends now');
-select is(private.import_source('wikidata', 'sb-3', jsonb_build_array(pg_temp.c('sb-denmark', 'Denmark', 'sb-europe', 50000000))) -> 'numbers',
+select is(private.import_source('wikidata', 'sb-3', jsonb_build_array(pg_temp.c('sb-denmark', 'Denmark', 'sb-europe', 3000000))) -> 'numbers',
   '0'::jsonb, 'the same population again adds nothing');
-select is(pg_temp.names('sb_big'), 'Denmark, Egypt, Germany, Kenya', 'the subset follows the new number');
-select is(pg_temp.resolves('2000-02-01', 0, 'denmark'), null, 'but the started day keeps the old one');
+update private.fact set removed_at = now() where thing_id = pg_temp.id('sb-kenya') and trait = 'continent';
+update private.thing_alias set removed_at = now() where thing_id = pg_temp.id('sb-germany') and alias = 'deutschland';
+select ok(not private.in_category_now(pg_temp.id('sb-denmark'), 'sb_mid'), 'the subset follows the new number');
+select is(pg_temp.resolves('2000-02-01', 0, 'denmark'), 'Denmark', 'but a started day keeps the number it had');
+select ok(not private.in_category_now(pg_temp.id('sb-kenya'), 'sb_african') and pg_temp.resolves('2000-02-02', 0, 'kenya') = 'Kenya',
+  'and the facts');
+select ok(not private.in_category_now(pg_temp.id('sb-germany'), 'sb_d') and pg_temp.resolves('2000-02-03', 0, 'deutschland') = 'Germany',
+  'and the names a letter subset reads');
 
 -- Misses on subsets (A2: "Learn only if it fits (Recommended)"): days asking each subset in question 1.
 create function pg_temp.u(n int) returns uuid language sql immutable
@@ -133,8 +152,8 @@ insert into private.puzzle (game_id, puzzle_date, content)
 insert into private.run (user_id, game_id, puzzle_date)
   select pg_temp.u(n), 'offbeat', d from generate_series(1, 3) as s(n)
   cross join (values ('2000-03-01'::date), ('2000-03-02'), ('2000-03-03'), ('2000-03-04')) as t(d);
-create function pg_temp.missed3(d date, t text) returns void language sql
-  return (select count(private.record_miss(pg_temp.u(n), 'offbeat', d, 0, t, t, false, false, 3, 1)) from generate_series(1, 3) as s(n));
+create function pg_temp.missed3(d date, t text, listed boolean = false) returns void language sql
+  return (select count(private.record_miss(pg_temp.u(n), 'offbeat', d, 0, t, t, false, listed, 3, 1)) from generate_series(1, 3) as s(n));
 create function pg_temp.review(cat text, t text) returns private.miss_review language sql
   return (select r from private.miss_review r where r.category = cat and r.text = t);
 
@@ -156,6 +175,12 @@ select ok(private.in_category_now((pg_temp.review('sb_african_capital', 'sbmomba
 select private.audit_decide('00000000-0000-0000-0000-00000000aaaa', (pg_temp.review('sb_african_capital', 'sbmombasia')).id, 'undo', null);
 select ok(not private.in_category_now((pg_temp.review('sb_african_capital', 'sbmombasia')).thing_id, 'sb_african_capital'),
   'and undoing it ends that');
+-- A text held for the offensive-word list on such a subset joins it too once accepted (13e-4a review).
+select pg_temp.missed3('2000-03-02', 'sblistedia', true);
+select is((pg_temp.review('sb_african_capital', 'sblistedia')).outcome, 'held', 'a listed text is held as before');
+select private.audit_decide('00000000-0000-0000-0000-00000000aaaa', (pg_temp.review('sb_african_capital', 'sblistedia')).id, 'accept', null);
+select ok(private.in_category_now((pg_temp.review('sb_african_capital', 'sblistedia')).thing_id, 'sb_african_capital'),
+  'and, accepted, is a member of the subset its filter can''t be checked on');
 
 -- The new table holds no grant for the app (the functions plor_app runs read it as their owner).
 select ok(not has_table_privilege('plor_app', 'private.number_fact', 'select') and not has_table_privilege('plor_app', 'private.number_fact', 'insert'),

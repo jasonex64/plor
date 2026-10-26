@@ -18,7 +18,7 @@ import type pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
-import { GAME_ID, avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, startsWith, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
+import { GAME_ID, avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { pooledCounts } from "../src/game/ledger.ts";
 import { blendedShare, firstGuess } from "../src/game/scoring.ts";
 import { localClient } from "./base.ts";
@@ -128,17 +128,22 @@ export async function pickLetters(date: string, count: number, fits: (upTo: numb
   return chosen ? steals(chosen) : null;
 }
 
-// A letter subset's letter, or null for any other category.
-async function letterOf(db: pg.Client, category: string): Promise<string | null> {
-  const { rows } = await db.query<{ starts_with: string | null }>("select starts_with from private.category where key = $1", [category]);
-  return rows[0]?.starts_with ?? null;
+// The names (normalized) among texts that don't start with the category's letter, as private.alias_starts decides it, the
+// one place the letter rule lives (O4); none for a category that isn't a letter subset.
+async function offLetter(db: pg.Client, category: string, texts: string[]): Promise<Set<string>> {
+  const { rows } = await db.query<{ t: string }>(
+    `select t from unnest($2::text[]) t, private.category c where c.key = $1 and c.starts_with is not null and not private.alias_starts(t, c.starts_with)`,
+    [category, texts],
+  );
+  return new Set(rows.map((r) => r.t));
 }
 
 // Each name's thing among the category's members: "#<id>" as given, else the members bearing that name (for a letter
 // subset, a name starting with its letter). Throws, listing the candidates, for a name with none or several.
 async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
-  const letter = await letterOf(db, category);
-  const texts = names.filter((n) => !n.startsWith("#")).map(normalize).filter((t) => letter === null || startsWith(t, letter));
+  const named = names.filter((n) => !n.startsWith("#")).map(normalize);
+  const off = await offLetter(db, category, named);
+  const texts = named.filter((t) => !off.has(t));
   const { rows } = await db.query<{ alias: string; id: string; name: string }>(
     `select a.alias, m::text as id, t.name from private.category_members($1) m
      join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
@@ -245,9 +250,9 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   const names = new Map(rows.map((r) => [r.id, r.name]));
   // The host says a letter subset's answers by their names, so each must start with the letter (O4).
   for (const q of ordered) {
-    const letter = await letterOf(db, q.category);
-    const off = letter === null ? [] : q.host_bank.filter((id) => !startsWith(normalize(names.get(id)!), letter));
-    if (off.length) throw new Error(`${q.category}: host bank names ${off.map((id) => `"${names.get(id)}"`).join(", ")} don't start with "${letter}"`);
+    const off = await offLetter(db, q.category, q.host_bank.map((id) => normalize(names.get(id)!)));
+    const named = q.host_bank.filter((id) => off.has(normalize(names.get(id)!)));
+    if (named.length) throw new Error(`${q.category}: host bank names ${named.map((id) => `"${names.get(id)}"`).join(", ")} don't start with its letter`);
   }
   // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so the
   // block is at or after it.

@@ -45,13 +45,6 @@ export function avoids(name: string, stolen: string[]): boolean {
 
 // Normalization of names and typed text (human-approved format, 2026-10-18; SOURCES.md: Unicode normalization).
 // Lowercase first: lowercasing can produce combining marks (e.g. U+0130), which NFKD + \p{M} then remove.
-// Whether a normalized name starts with a letter subset's letter, a leading "the " ignored (human, 2026-10-26: "What's
-// typed must start with it (Recommended)"), as private.alias_starts decides it in the database; this copy serves the
-// checks that run without one (content:validate).
-export function startsWith(name: string, letter: string): boolean {
-  return name.replace(/^the /, "").startsWith(letter);
-}
-
 export function normalize(text: string): string {
   return text
     .toLowerCase()
