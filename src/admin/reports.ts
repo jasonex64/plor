@@ -25,9 +25,9 @@ export async function listReports(db: Db): Promise<ReportedComment[]> {
   return rows.map(({ first, ...r }) => ({ ...r, firstReportedAt: first.toISOString() }));
 }
 
-// An admin's decision on a reported comment: deleted, or kept for everyone. at is when; admin and author are current
-// usernames; admin is null for an admin with no profile (admins are added by user ID, and need none), so adminId
-// always says who.
+// An admin's decision on a reported comment: deleted, or kept (shown again to everyone but its reporters). at is when;
+// admin and author are current usernames; admin is null for an admin with no profile (admins are added by user ID, and
+// need none), so adminId always says who.
 export type Decision = { id: string; decision: "deleted" | "kept"; at: string; adminId: string; admin: string | null; author: string; body: string };
 
 // Newest first. Every record: the beta is small, and a page size would be a human number (12d, Numbers).
@@ -54,9 +54,10 @@ export async function deleteReportedComment(db: Db, adminId: string, id: string)
   if (!rows[0].deleted) throw new AppError("comment_not_found", 404);
 }
 
-// Keeps a reported comment for everyone: its open reports are handled and it leaves this list, while it stays hidden
-// for the players who reported it (D5), and the keep is recorded: one guarded function
-// (supabase/migrations/20261026094023_keep_comment.sql). A comment with no open report is the same 404 as a missing one.
+// Keeps a reported comment for everyone but the players who reported it: its open reports are handled and it leaves
+// this list, while it stays hidden for the players who reported it (D5), and the keep is recorded: one guarded function
+// (supabase/migrations/20261026094023_keep_comment.sql). A comment with no open report is the same 404 as a missing
+// one.
 export async function keepReportedComment(db: Db, adminId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ kept: boolean }>("select private.keep_reported_comment($1, $2) as kept", [adminId, id]);
   if (!rows[0].kept) throw new AppError("comment_not_found", 404);

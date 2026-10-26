@@ -182,6 +182,11 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(reportedKept).toHaveCount(0);
   await expect(watcher.getByRole("region", { name: "Decisions" }).getByRole("row").filter({ hasText: kept })).toContainText("Kept");
   // Delete asks inline before it deletes for everyone (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6).
+  // The keyboard's focus follows the swap: to Cancel when it asks, back to Delete… on Cancel (14b-2c-3, item 41).
+  await reported.getByRole("button", { name: "Delete…" }).click();
+  await expect(reported.getByRole("button", { name: "Cancel" })).toBeFocused();
+  await reported.getByRole("button", { name: "Cancel" }).click();
+  await expect(reported.getByRole("button", { name: "Delete…" })).toBeFocused();
   await reported.getByRole("button", { name: "Delete…" }).click();
   await reported.getByRole("group", { name: "Confirm delete" }).getByRole("button", { name: "Delete", exact: true }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();

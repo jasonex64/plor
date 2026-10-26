@@ -55,20 +55,20 @@ export function AnswerBase() {
             <dt>Sources</dt>
             <dd>{t.sources.map((s) => `${s.source} ${s.id}`).join("; ")}</dd>
           </dl>
-          <table className={admin.table}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Kind</th>
-                <th>From</th>
+          <table className={admin.table} role="table">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th role="columnheader">Name</th>
+                <th role="columnheader">Kind</th>
+                <th role="columnheader">From</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {t.aliases.map((a) => (
-                <tr key={`${a.alias}-${a.kind}-${a.origin}`}>
-                  <td className={admin.strong}>{a.alias}</td>
-                  <td>{a.kind}</td>
-                  <td className={admin.muted}>{a.origin}</td>
+                <tr role="row" key={`${a.alias}-${a.kind}-${a.origin}`}>
+                  <td role="cell" className={admin.strong} data-label="Name">{a.alias}</td>
+                  <td role="cell" data-label="Kind">{a.kind}</td>
+                  <td role="cell" className={admin.muted} data-label="From">{a.origin}</td>
                 </tr>
               ))}
             </tbody>

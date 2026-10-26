@@ -72,9 +72,9 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
         {waiting.length === 0 ? (
           <p>Nothing to review.</p>
         ) : (
-          <Table head={["Typed", "Category", "Why it waits", "Players", "Decide"]}>
+          <Table head={WAITING}>
             {waiting.map((r) => (
-              <Row key={r.id} review={r} cells={[<span key="w" className={`${admin.tag} ${admin.decide}`}>{WHY[r.outcome as keyof typeof WHY]}</span>]}>
+              <Row key={r.id} head={WAITING} review={r} cells={[<span key="w" className={`${admin.tag} ${admin.decide}`}>{WHY[r.outcome as keyof typeof WHY]}</span>]}>
                 <Waiting review={r} busy={busy} decide={decide} />
               </Row>
             ))}
@@ -87,9 +87,9 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
         {added.length === 0 ? (
           <p>No answers added.</p>
         ) : (
-          <Table head={["Typed", "Category", "Now the answer", "Players", "Change"]}>
+          <Table head={ADDED}>
             {added.map((r) => (
-              <Row key={r.id} review={r} cells={[<span key="t">{r.thing?.name ?? "—"}</span>]}>
+              <Row key={r.id} head={ADDED} review={r} cells={[<span key="t">{r.thing?.name ?? "—"}</span>]}>
                 <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
                   Undo
                 </button>
@@ -104,31 +104,31 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
         {decided.length === 0 ? (
           <p>Nothing decided yet.</p>
         ) : (
-          <table className={admin.table}>
-            <thead>
-              <tr>
-                <th>Typed</th>
-                <th>Category</th>
-                <th>Decision</th>
-                <th>When</th>
-                <th>
+          <table className={admin.table} role="table">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th role="columnheader">Typed</th>
+                <th role="columnheader">Category</th>
+                <th role="columnheader">Decision</th>
+                <th role="columnheader">When</th>
+                <th role="columnheader">
                   <span className={admin.sr}>Undo</span>
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {decided.map((r) => (
-                <tr key={r.id} aria-label={r.text}>
-                  <td className={admin.strong}>&ldquo;{r.text}&rdquo;</td>
-                  <td>{r.category_name}</td>
-                  <td>
+                <tr role="row" key={r.id} aria-label={r.text}>
+                  <td role="cell" className={admin.strong} data-label="Typed">&ldquo;{r.text}&rdquo;</td>
+                  <td role="cell" data-label="Category">{r.category_name}</td>
+                  <td role="cell" data-label="Decision">
                     {r.decision}
                     {r.chosen ? ` (${r.chosen.name})` : ""}
                   </td>
-                  <td className={`${admin.nowrap} ${admin.muted}`}>
+                  <td role="cell" className={`${admin.nowrap} ${admin.muted}`} data-label="When">
                     <time dateTime={r.decided_at!}>{new Date(r.decided_at!).toLocaleString()}</time>
                   </td>
-                  <td>
+                  <td role="cell">
                     {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
                     {r.decision === "accepted" || r.decision === "linked" ? (
                       <div className={admin.actions}>
@@ -152,32 +152,40 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
 
 function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
-    <table className={admin.table}>
-      <thead>
-        <tr>
+    <table className={admin.table} role="table">
+      <thead role="rowgroup">
+        <tr role="row">
           {head.map((h) => (
-            <th key={h}>{h}</th>
+            <th role="columnheader" key={h}>{h}</th>
           ))}
         </tr>
       </thead>
-      <tbody>{children}</tbody>
+      <tbody role="rowgroup">{children}</tbody>
     </table>
   );
 }
 
-// A text's row: what was typed, its category, the given cells, how many typed it, then its actions stacked.
-function Row({ review: r, cells, children }: { review: Review; cells: ReactNode[]; children: ReactNode }) {
+// The columns of the waiting texts' table and the added answers', named once for each table's header and for the
+// labels its cells show on phones (docs/milestones/M14-14b-2c-review-items.md, answer 17).
+const WAITING = ["Typed", "Category", "Why it waits", "Players", "Decide"];
+const ADDED = ["Typed", "Category", "Now the answer", "Players", "Change"];
+
+// A text's row: what was typed, its category, the given cells, how many typed it, then its actions stacked. head is
+// its table's columns, which label the cells on phones; the actions' cell needs none.
+function Row({ head, review: r, cells, children }: { head: string[]; review: Review; cells: ReactNode[]; children: ReactNode }) {
   return (
-    <tr aria-label={r.text}>
-      <td className={admin.strong}>&ldquo;{r.text}&rdquo;</td>
-      <td>{r.category_name}</td>
+    <tr role="row" aria-label={r.text}>
+      <td role="cell" className={admin.strong} data-label={head[0]}>&ldquo;{r.text}&rdquo;</td>
+      <td role="cell" data-label={head[1]}>{r.category_name}</td>
       {cells.map((c, i) => (
-        <td key={i}>{c}</td>
+        <td role="cell" key={i} data-label={head[2 + i]}>
+          {c}
+        </td>
       ))}
-      <td className={admin.nowrap}>
+      <td role="cell" className={admin.nowrap} data-label={head[2 + cells.length]}>
         {r.players} of {r.answered}
       </td>
-      <td>
+      <td role="cell">
         <div className={admin.actions}>{children}</div>
       </td>
     </tr>

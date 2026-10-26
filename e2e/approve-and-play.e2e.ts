@@ -65,15 +65,21 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(day.getByText("Fix 1 question first")).toBeVisible();
   await expect(day.getByRole("button", { name: "Approve day" })).toBeDisabled();
   await expect(day.getByText("“cherry” has the C the Wind steals: pick another host answer.")).toBeVisible();
-  // A chip is clicked, as an admin would: its checkbox is visually hidden behind it (and unticked, cherry's stops being
-  // a checkbox, so uncheck() couldn't read it back).
+  // A chip is clicked, as an admin would: its checkbox is visually hidden behind it.
   const chip = (name: string) => day.locator("label").filter({ has: admin.getByRole("checkbox", { name, exact: true }) });
+  const cherry = day.getByRole("checkbox", { name: "cherry, has C: players can't type it", exact: true });
+  const chipsOf = () => day.getByRole("group", { name: /^Host answers for/ }).nth(1).locator("label").allTextContents();
+  const before = await chipsOf();
   await chip("cherry, has C: players can't type it").click();
-  await expect(day.getByRole("checkbox", { name: /^cherry/ })).toHaveCount(0);
-  // No longer a control: a dashed chip, its letter struck, said in words.
-  await expect(day.getByText(/^cherry ?, has C: players can't type it$/)).toBeVisible();
+  // Unticked, it stays a checkbox, now unavailable, and keeps the focus (14b-2c-3, item 53); a dashed chip, its letter
+  // struck, said in words.
+  await expect(cherry).not.toBeChecked();
+  await expect(cherry).toHaveAttribute("aria-disabled", "true");
+  await expect(cherry).toBeFocused();
   await chip("apple").click();
   await expect(day.getByRole("checkbox", { name: "apple", exact: true })).toBeChecked();
+  // Ticking and unticking moved no chip (answer 16).
+  expect(await chipsOf()).toEqual(before);
   await day.getByRole("button", { name: "Approve day" }).click();
   await expect(day.getByRole("status")).toHaveText(`${name} is approved. Players get it at midnight Pacific. You can change its host answers until then.`);
   const { rows } = await DB.query<{ approved: boolean; members: string }>(

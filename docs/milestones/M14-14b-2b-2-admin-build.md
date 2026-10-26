@@ -53,6 +53,8 @@ Keep comment; blocked host answers marked in place; the audit's one-click link t
 |---|---|---|
 | Sub-tabs 40px tall, 0 12px padding, 10px corners; counts 20px badges | Sub-tabs | Round 10 |
 | Chips 30px tall (44px on phones), 0 10px padding, fully round | Host answers | Round 10 |
+| A blocked host answer's struck letter: a 2px line | Puzzles' blocked chips (14b-2b-2b) | Round 10, approved 2026-10-26 (recorded in 14b-2c-3, item 53) |
+| The Approve column's 6px gap, and its 13px note | Puzzles' Approve column (14b-2b-2b) | Round 10, approved 2026-10-26 (recorded in 14b-2c-3, item 53) |
 | Chart 220px tall; bars 56% of their column; the target dashed 2px | Insights | Round 10 |
 | Table headers 12px muted; cells 10px 8px | Every admin table | Round 10 |
 | The right column | What needs you | 14b-2b-1 (360px from 1200px) |
