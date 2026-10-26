@@ -818,9 +818,8 @@ async function reviewOne(client: pg.Client, key: string): Promise<void> {
   const listed = [...listedBy].map(([name, hits]) => `${name} (${hits.join(", ")})`);
   const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m
     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m group by a.alias having count(*) > 1 order by a.alias`);
-  const [{ unnamed }] = await one(`with recursive cat as (select root from private.category where key = $1),
-    under (id) as (select root from cat union select f.thing_id from private.fact f join under u on f.value_thing = u.id where f.trait = 'kind_of')
-    select count(*)::int as unnamed from under u where not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
+  const [{ unnamed }] = await one(`select count(*)::int as unnamed from private.category c cross join private.descendants_now(array[c.root]) as u(id)
+    where c.key = $1 and not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
   console.log(`REVIEW ${key}: ${n} members`);
   if (n < CATEGORY_MIN_MEMBERS) console.log(`  flag, fewer than ${CATEGORY_MIN_MEMBERS} members: ${n}`);
   console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);

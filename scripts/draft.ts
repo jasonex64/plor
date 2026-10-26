@@ -187,12 +187,7 @@ function membersOf(db: pg.Client, category: string): Promise<Set<string>> {
 // What the host catches: the host answers and every member under them.
 async function caughtMembers(db: pg.Client, category: string, hosts: string[]): Promise<string[]> {
   const { rows } = await db.query<{ id: string }>(
-    `with recursive caught (id) as (
-       select unnest($1::uuid[])
-       union
-       select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of' and f.removed_at is null
-     )
-     select id::text from caught`,
+    "select id::text from private.descendants_now($1::uuid[]) as id",
     [hosts],
   );
   const members = await membersOf(db, category);

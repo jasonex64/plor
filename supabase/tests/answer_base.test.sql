@@ -8,7 +8,8 @@ create extension if not exists pgtap with schema extensions;
 select plan(19);
 
 -- Its aliases start with "fx" where a lookup uses them, so real loaded data can sit beside it. A small tree in a test source's IDs: animal > bear > polar bear, panda; animal > fish; food > fruit and vegetable,
--- with tomato under both (human, 2026-10-24: "Accept in both"); a cycle a <-> b, as a messy source might have.
+-- with tomato under both (human, 2026-10-24: "Accept in both"). A cycle, which a messy source might have, is refused
+-- since 13e-5 (one_walk.test.sql).
 select is(private.import_source('wikidata', 'test-1', '[
   {"id": "tA", "name": "animal", "aliases": [{"alias": "animal", "kind": "name"}]},
   {"id": "tB", "name": "bear", "aliases": [{"alias": "bear", "kind": "name"}, {"alias": "bears", "kind": "plural"}], "kind_of": ["tA"]},
@@ -18,10 +19,8 @@ select is(private.import_source('wikidata', 'test-1', '[
   {"id": "tX", "name": "food", "aliases": [{"alias": "food", "kind": "name"}]},
   {"id": "tR", "name": "fruit", "aliases": [{"alias": "fruit", "kind": "name"}], "kind_of": ["tX"]},
   {"id": "tV", "name": "vegetable", "aliases": [{"alias": "vegetable", "kind": "name"}], "kind_of": ["tX"]},
-  {"id": "tT", "name": "tomato", "aliases": [{"alias": "fx tomato", "kind": "name"}], "kind_of": ["tR", "tV"]},
-  {"id": "tC1", "name": "loop one", "aliases": [{"alias": "loop one", "kind": "name"}], "kind_of": ["tC2", "tF"]},
-  {"id": "tC2", "name": "loop two", "aliases": [{"alias": "loop two", "kind": "name"}], "kind_of": ["tC1"]}
-]'::jsonb), '{"things": 11, "aliases": 13, "facts": 11, "numbers": 0}'::jsonb, 'an import adds its things, aliases and facts');
+  {"id": "tT", "name": "tomato", "aliases": [{"alias": "fx tomato", "kind": "name"}], "kind_of": ["tR", "tV"]}
+]'::jsonb), '{"things": 9, "aliases": 11, "facts": 8, "numbers": 0}'::jsonb, 'an import adds its things, aliases and facts');
 
 select is(private.import_source('wikidata', 'test-2', '[
   {"id": "tB", "name": "renamed", "aliases": [{"alias": "bear", "kind": "name"}, {"alias": "bruin", "kind": "synonym"}], "kind_of": ["tA"]}
@@ -39,8 +38,8 @@ select private.define_category('fruit', 'fruit', 'wikidata', 'tR', null);
 select private.define_category('vegetable', 'vegetable', 'wikidata', 'tV', null);
 create function pg_temp.members(k text) returns text[] language sql
   return (select array_agg(t.name order by t.name) from private.category_members(k) m join private.thing t on t.id = m);
-select is(pg_temp.members('animal'), array['bear', 'fish', 'loop one', 'loop two', 'polar bear'],
-  'a category holds everything under its root that has a typeable name, through a cycle, but not the root');
+select is(pg_temp.members('animal'), array['bear', 'fish', 'polar bear'],
+  'a category holds everything under its root that has a typeable name, but not the root');
 select is(pg_temp.members('fruit'), array['tomato'], 'tomato is a fruit');
 select is(pg_temp.members('vegetable'), array['tomato'], 'and a vegetable');
 select throws_ok($$ select private.define_category('x', 'x', 'wikidata', 'missing', null) $$, 'P0001', null,

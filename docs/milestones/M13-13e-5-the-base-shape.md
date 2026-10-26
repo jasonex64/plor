@@ -1,6 +1,6 @@
 # M13 13e-5 — The base's shape
 
-**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"). Pop culture moves from 13e-5 to 13e-6 and is written against this shape.
+**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"); items 3 and 4 (circles refused, one walk) built and reviewed on the Mac, not yet in a PR; items 1 and 2 (the join, the review's lists) wait for the snapshots on the Mac (the human has no access to the Windows PC until later, 2026-10-26). Pop culture moves from 13e-5 to 13e-6 and is written against this shape.
 
 ## Goal
 Settle how the answer base names and links things before the remaining ~150 categories are written against it: one thing per real-world thing, no circles in the "kind of" tree, one function that walks the tree, and the rules for series and titles that 13e-6 builds.
@@ -64,8 +64,8 @@ How a concept naming several taxa joins is put to the human (below).
 - [ ] The review prints every common-name item that names more than one loaded taxon, unjoined.
 - [ ] After `npm run base -- load all`, "dog" names one member of `animal` (and of every category holding it), carrying WordNet's and Wikidata's names (db test on fixtures; the real count in the review output).
 - [ ] `npm run base -- review` prints odd joins; its output on the full load is in the PR.
-- [ ] An import that closes a circle fails, names it, and leaves the base unchanged (pgTAP).
-- [ ] The five walks call one function per direction (diff), and `npm test`, `npm run test:db`, `npx supabase test db` and `npm run test:e2e` pass.
+- [x] An import that closes a circle fails, names it, and leaves the base unchanged (pgTAP: Evidence).
+- [ ] The five walks call one function per direction (diff), and `npm test`, `npm run test:db`, `npx supabase test db` and `npm run test:e2e` pass. *(All but e2e pass: Evidence. The e2e run collided with another session's dev server and doesn't count.)*
 - [ ] Every one of the 40 simulated days that drafted before still drafts.
 - [ ] A fresh `load all`'s database size is measured and recorded (for "Load all, pay when near").
 
@@ -91,3 +91,27 @@ How a concept naming several taxa joins is put to the human (below).
 - The second "dog" (and every concept/taxon double) and the drafting session's pick by ID.
 - ROADMAP For M13 items it closes: the membership walk written three times (13a-1), the kind_of walks (13a-2), merging across sources (13a-2), imports not refusing cycles (13a-2).
 - ROADMAP's Design review item 1, marked replaced by 13c.
+
+---
+
+## Source diff
+| Source says | We built | Why different |
+|---|---|---|
+| Design item 4: one function per direction | Down is the new `private.descendants_now(uuid[])`; up stays `private.ancestors_as_of`, which `base_lookup` (through `in_category_now`), `resolve_answer` and `load_links` already shared | The upward walk was already one function; only the downward one was copied (4 places, not 5) |
+| — | The review's "unnamed" count now skips removed kind_of facts, as `descendants_now` does | One walk; the count is more accurate. Recorded in ROADMAP (13e-5 review) |
+| 13a-1's fixture: a cycle loads and categories walk through it | The cycle is out of `answer_base.test.sql`; `one_walk.test.sql` asserts imports refuse one and the walk still stops on one loaded before 13e-5 | The human's rule changed it ("Yes, check on import (Recommended)") |
+
+## Evidence (items 3 and 4, 2026-10-26, the Mac)
+- **Migration applied locally:** `npx supabase migration up --local` → "Applying migration 20261026212300_one_walk.sql... Migrations applied".
+- **pgTAP:** `npx supabase test db` → "Files=25, Tests=414 … Result: PASS" (406 before, 8 new in `one_walk.test.sql`). The 13a-1 fixture's cycle first failed as expected: "import_source: a kind_of circle: loop two (…) kind_of loop one (…), and loop one is already under loop two".
+- **The db suite:** `npm run test:db` → "Test Files 40 passed (40) Tests 264 passed (264)", before the review's added pgTAP test, which touches no TypeScript.
+- **Unit:** `npm test` → "Test Files 40 passed (40) Tests 386 passed (386)". `npx tsc --noEmit -p .` exits 0; `npx eslint scripts/base.ts scripts/draft.ts` clean.
+- **No other walk:** `grep -rn "with recursive" scripts src | grep -v "\.test\."` prints nothing; the migration holds one recursive walk, `descendants_now`'s.
+- **Time:** a synthetic import of 57,000 things in a binary tree (rolled back) took 2.7 s with the circle check, `{"facts": 56999, "things": 57000}`. Real taxa: *unverified*.
+- **e2e: not valid.** The M14 worktree's `next dev` started on port 3000 at 14:27:18 during the run, and Playwright reuses the server on 3000: 38 failed with `ERR_CONNECTION_REFUSED` or timeouts, 6 passed against whichever server answered. Rerun when port 3000 is free.
+
+## Review (`reviewer` agent, fresh context, 2026-10-26)
+- Blocking findings and how each was fixed:
+  - nothing tested that the walk stops on a circle already in a base (bases loaded before 13e-5 may hold one): `one_walk.test.sql` now inserts one directly and asserts a finite walk;
+  - ticket, ROADMAP and HANDOFF not updated: done in the same commit.
+- Deferred to ROADMAP "Next revision": For M13, "From the 13e-5 review" (the unnamed count, which circle is named, the unchanged-base test's reach, the real snapshots unverified).
