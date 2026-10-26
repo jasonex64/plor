@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** drafted (2026-10-26, on the Mac), waiting for the human's approval. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, in progress. Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
