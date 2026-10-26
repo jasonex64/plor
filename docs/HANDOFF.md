@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2a's PR #88. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) after 14b-2a merged (PR #88). The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -15,17 +15,17 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-3a | Me: totals, this month's calendar, Offbeat's card, the 3 rarest answers; avatar slots; Friends' empty state | #83 |
 | 14a-3b | The settings sheet, the friends list on Friends, the calendar at 3:1. **Security change:** `plor_app` updates the two settings' columns | #85 |
 | 14b-1 | Themes (Sky, Moonlit, Ink, picked in the sheet, saved on the account, painted before load) and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
+| 14b-2a | The streak as six vector flower ranks in a pill (top bar, sidebar beside the avatar slot) and `/streak`; merged on green CI (`9257f30`, 2026-10-26 06:10 UTC) | #88 |
 
 **plor.app's database is even with main** through `20261026010745_theme.sql` (the M13 session pushed it at the human's request, 2026-10-26; reported by that session, not re-run here).
 
-### In review: 14b-2a, the streak ranks (PR #88, auto-merge on green CI)
+### Notes from 14b-2a (`docs/milestones/M14-14b-2a-streak-ranks.md`)
 `docs/milestones/M14-14b-2a-streak-ranks.md`. Eight rounds of guided questions turned the sprout into **six ranks, each a vector flower**: Seed 0, Daisy 1–4, Morning glory 5–14, Hibiscus 15–29, Lotus 30–89, Sakura 90+. They show in a pill in the top bar and sidebar, which links to `/streak`. The streak comes from `GET /api/profile`, reloaded on Start. DECISIONS' Styling row now lets Plor's drawn art keep its own hex colours.
 - **Pixel art was tried and dropped for this:** first 11×11 hand-drawn sprites checked with the human's `jasonex64/pixelkit`, then PixelLab, snapped by pixelkit. Flowers didn't hold at pill size (the human: "they all look pretty bad and not accurate"), so it's vector. Pixel art may still suit 14c's world at a larger size. PixelLab's 32×32s looked good.
 - **PixelLab (the human's trial account):** 30 generations went to 3 review packs in this session, which leaves 1 of the trial's 40 (the daily bonus aside; balance read before the last pack). Six 32×32 flowers are kept, tagged `plor-streak`, and unused. Two 16×16 review packs (flowers; gems, flames, stars, medals) were left undismissed, for the human to keep or discard.
-- If CI fails on PR #88, Auto-fix is on for this session.
 
 ### Next step
-After PR #88 merges (mark 14b-2a done with its merge evidence in the ticket and ROADMAP):
+One open PR at a time, from this branch; 14b-2a's done status is committed here and rides with the next PR:
 1. **14b-2b, the admin pages:** "Full redesign, mockups first": draw the six pages on the canvas "Plor shell layout", get the human's review, then build.
 2. **14b-2c, the review items:** every open For M14 item in ROADMAP (35 now, with 14b-2a's two); ask the "For the human" ones first (About's contact and wording among them).
 3. **14c-1:** ask N1–N6 (its ticket's open questions) as guided questions, then build it, after 14b-2's PRs (one open PR at a time).
