@@ -110,6 +110,10 @@ The database has five parts. Each day takes a frozen copy when it's approved.
 | D7 | **The question bank's repeat gap and themes.** (a) **A question may repeat once 30 days have passed since its last use** ("About a month"), and themes are tags on questions. (b) Another gap | (a), if "about a month" means 30 days: a human number to confirm | **At least 30 days between uses** of a question; the AI may wait longer (human, 2026-10-24: "not saying it should be EXACTLY 30 days just at least 30 days"). Themes are tags |
 | D8 | **What happens to today's format-2 days and their history.** (a) **Start fresh:** the drafted days (public in the repo, and never played but by the human and the survey) are retired, and M15 drafts the beta's days in format 3. Old runs keep their per-day entry IDs; pooled history starts with format 3. (b) Map old entries to thing IDs | (a). No player history worth keeping exists yet, and the human said to draft the beta's days in M15 | **(a), start fresh** (human, 2026-10-24: "Start fresh (Recommended)") |
 
+## Decided later (human, 2026-10-26, relayed by the "Production/local database sync" session)
+- **Squash the migrations when M13 ends:** fold `supabase/migrations` into one baseline once M13 is done, and rebuild plor.app's database once at a ship (it holds only the human's admin row and the T1 day). The human's answer to "When should the 39+ pages be folded into one?": "When M13 ends", as the answer schema (drafting, lookup) keeps changing in M13 and launch has no date.
+- **15d stays as approved:** plor.app updates only when the human says "ship it". The human weighed a CI push and chose "ok we can keep push on my word".
+
 ## Sub-tickets (Claude's order, each its own PR on this branch)
 - **13a, the base** (its own file, `docs/milestones/M13-13a-the-base.md`, with criteria from the human's answers, 2026-10-24). It also includes:
   - snapshot import scripts for the D2 sources, with a reviewed summary of each pull;
