@@ -1,23 +1,7 @@
-import Link from "next/link";
-import { AuditLink } from "./audit-link";
-import { Suspense } from "react";
-import { Insights } from "./insights";
+import { redirect } from "next/navigation";
 
-// Admin-only puzzle insights (docs/milestones/M03-puzzle-insights.md). The page itself shows nothing private: the
-// report comes from /api/admin/insights, which checks the signed-in user against private.admin.
+// Admin opens on Puzzles, the most frequent job (human, 2026-10-26: "Drop it; Admin opens on Puzzles (Recommended)";
+// docs/milestones/M14-14b-2b-2-admin-build.md, criterion 1). Insights is at /admin/insights.
 export default function AdminPage() {
-  return (
-    <main>
-      <h1>Puzzle insights</h1>
-      <Suspense fallback={<p>Loading…</p>}>
-        <Insights />
-      </Suspense>
-      <footer>
-        <p>
-          <Link href="/admin/puzzles">Puzzles</Link> · <Link href="/admin/reports">Reported comments</Link> ·{" "}
-          <Link href="/admin/base">Answer database</Link> · <AuditLink /> · <Link href="/admin/bank">Question bank</Link> · <Link href="/">Back to Plor</Link>
-        </p>
-      </footer>
-    </main>
-  );
+  redirect("/admin/puzzles");
 }

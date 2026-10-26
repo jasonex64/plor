@@ -39,8 +39,9 @@ test("an admin looks a thing up by an alias; a player can't", async ({ browser }
   await admin.getByLabel("Name or alias").fill(`Foliage ${RUN}`);
   await admin.getByRole("button", { name: "Look up" }).click();
   const thing = admin.getByRole("article", { name: `Leaf ${RUN}` });
-  await expect(thing.getByText(`Categories: ${KEY}`)).toBeVisible();
-  await expect(thing.getByText("Facts: kind of e2e root")).toBeVisible();
+  // Each thing's categories and facts as labelled values (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6).
+  await expect(thing.locator("dt:has-text('Categories') + dd")).toHaveText(KEY);
+  await expect(thing.locator("dt:has-text('Facts') + dd")).toHaveText("kind of e2e root");
   await admin.getByLabel("Name or alias").fill(`nothing ${RUN}`);
   await admin.getByRole("button", { name: "Look up" }).click();
   await expect(admin.getByText("Nothing goes by that name.")).toBeVisible();

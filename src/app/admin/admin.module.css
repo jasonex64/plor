@@ -1,0 +1,437 @@
+/* The admin area (docs/milestones/M14-14b-2b-2-admin-build.md; round 10, approved 2026-10-26): Plor's look made denser
+   for desk work. Sizes are round 10's (the ticket's Numbers); cards and spacing as Me's. Colours are the slots, each
+   with one meaning: neutral tags for states, the accent's soft tint for "needs a decision", the danger colour for
+   problems, and the caught colour only for the insights chart's dip. */
+.area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The sub-tabs: two groups split by a line, no labels. */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.group {
+  display: flex;
+  gap: 2px;
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.on {
+  background: var(--soft);
+  color: var(--text);
+}
+
+.badge {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* On phones: the page menu, 48px tall, and the waiting row. */
+.phone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menuButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--edge);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.menuButton span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu {
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menuLookUp {
+  border-top: 1.5px solid var(--edge);
+}
+
+.menuItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 14px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.menuItem[aria-current] {
+  background: var(--soft);
+}
+
+.waiting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+/* What needs you, in the right column. */
+.needsTitle {
+  margin: 0;
+  font-size: 18px;
+}
+
+.needs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.need {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.needs li:last-child .need {
+  border-bottom: 1px solid var(--line);
+}
+
+.needNumber {
+  grid-row: span 2;
+  text-align: right;
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.needWhat {
+  font-weight: 700;
+}
+
+/* Shared by the pages: cards, tables, tags, chips and buttons. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: 0 8px 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.nowrap {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  box-sizing: border-box;
+}
+
+.state {
+  border: 1px solid var(--edge);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.decide {
+  background: var(--soft);
+  color: var(--accent);
+}
+
+.problem {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.button {
+  min-height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--edge);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.primary {
+  min-height: 40px;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.dangerFill {
+  border: 0;
+  background: var(--danger);
+  color: var(--on-accent);
+}
+
+/* An action column: each action a full-width button, stacked (human, 2026-10-26: "each button should for decide should
+   just take up the entire row"). */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 230px;
+}
+
+.actions .button {
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1.5px solid var(--edge);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.field input {
+  flex-grow: 1;
+  min-height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* The input sits borderless inside the field, so the field shows its focus (WCAG 2.2 2.4.7). */
+.field:has(input:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* On phones a table's rows stack, each a block with its cells one under another (round 10's phone cards). */
+@media (max-width: 767px) {
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .table td {
+    padding: 2px 0;
+    border: 0;
+  }
+
+  .actions {
+    width: auto;
+  }
+}
+
+.plain {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 640px;
+}
+
+.search .field {
+  flex-grow: 1;
+}
+
+/* A thing's categories, facts and sources: a label column and its value. */
+.facts {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 6px 10px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.facts dd {
+  margin: 0;
+}

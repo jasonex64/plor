@@ -1,23 +1,17 @@
-import Link from "next/link";
 import { Suspense } from "react";
-import { Audit } from "./audit";
+import { Footer } from "../../footer";
+import { Home } from "../../home";
 
-// Admin-only audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md). The page itself
-// shows nothing private: the list comes from /api/admin/audit, which checks the signed-in user against private.admin.
+// The answer audit (docs/milestones/M13-13b-learning-from-misses.md). In the admin area of Plor's shell (docs/milestones/M14-14b-2b-2-admin-build.md). The page itself shows
+// nothing private: its data comes from the admin APIs, which check the signed-in user against private.admin.
 export default function AuditPage() {
   return (
     <main>
-      <h1>Answer audit</h1>
+      <h1>Plor</h1>
       <Suspense fallback={<p>Loading…</p>}>
-        <Audit />
+        <Home view={{ kind: "admin", page: "audit" }} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/admin">Puzzle insights</Link> · <Link href="/admin/puzzles">Puzzles</Link> ·{" "}
-          <Link href="/admin/reports">Reported comments</Link> · <Link href="/admin/base">Answer database</Link> ·{" "}
-          <Link href="/admin/bank">Question bank</Link> · <Link href="/">Back to Plor</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

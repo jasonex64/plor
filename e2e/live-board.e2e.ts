@@ -169,13 +169,17 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
   await watcher.goto("/admin/reports");
   const reported = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: body });
-  await expect(reported).toContainText(`${playerName} (${playerName}) on `);
+  await expect(reported).toContainText(`${playerName} (${playerName}) · on `);
   await expect(reported).toContainText("1 report, first");
-  await reported.getByRole("button", { name: "Delete comment" }).click();
+  // Delete asks inline before it deletes for everyone (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6).
+  await reported.getByRole("button", { name: "Delete…" }).click();
+  await reported.getByRole("group", { name: "Confirm delete" }).getByRole("button", { name: "Delete", exact: true }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();
-  // The deletion's record, with the admin and the author (M12 12d).
-  const record = watcher.getByRole("region", { name: "Deleted comments" }).getByRole("listitem").filter({ hasText: body });
-  await expect(record).toContainText(`: ${watcherName} deleted ${playerName}'s comment`);
+  // The deletion's record, with the admin and the author (M12 12d), in the decisions log.
+  const record = watcher.getByRole("region", { name: "Decisions" }).getByRole("row").filter({ hasText: body });
+  await expect(record).toContainText("Deleted");
+  await expect(record.getByRole("cell").nth(2)).toHaveText(watcherName);
+  await expect(record.getByRole("cell").nth(3)).toHaveText(playerName);
   await expect(player.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
 
   // Every change came over Realtime as a nudge, and no frame either page received holds the comment's text.

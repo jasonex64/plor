@@ -1,23 +1,17 @@
-import Link from "next/link";
-import { AuditLink } from "../audit-link";
 import { Suspense } from "react";
-import { AnswerBase } from "./base";
+import { Footer } from "../../footer";
+import { Home } from "../../home";
 
-// Admin-only answer database lookup (docs/milestones/M13-13a-the-base.md). The page itself shows nothing private: the
-// results come from /api/admin/base, which checks the signed-in user against private.admin.
-export default function AnswerBasePage() {
+// The answer database (docs/milestones/M13-13a-the-base.md). In the admin area of Plor's shell (docs/milestones/M14-14b-2b-2-admin-build.md). The page itself shows
+// nothing private: its data comes from the admin APIs, which check the signed-in user against private.admin.
+export default function BasePage() {
   return (
     <main>
-      <h1>Answer database</h1>
+      <h1>Plor</h1>
       <Suspense fallback={<p>Loading…</p>}>
-        <AnswerBase />
+        <Home view={{ kind: "admin", page: "base" }} />
       </Suspense>
-      <footer>
-        <p>
-          <Link href="/admin">Puzzle insights</Link> · <Link href="/admin/puzzles">Puzzles</Link> ·{" "}
-          <Link href="/admin/reports">Reported comments</Link> · <AuditLink /> · <Link href="/admin/bank">Question bank</Link> · <Link href="/">Back to Plor</Link>
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

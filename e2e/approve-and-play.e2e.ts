@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { FIXTURE, fixtureDraft, loadFixtureBase } from "../src/test/answer-fixture";
+import { dayText } from "../src/app/admin/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -48,10 +49,14 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-aa@example.test`]);
   await admin.goto("/admin/puzzles");
-  const day = admin.getByRole("article").filter({ hasText: ahead });
-  await expect(day.getByRole("heading", { name: `${ahead}: drafted, waiting for approval` })).toBeVisible();
-  await day.getByRole("button", { name: "Approve" }).click();
-  await expect(day.getByText("Approved.")).toBeVisible();
+  // The day as the admin pages write it, "Wed 28 Oct" (src/app/admin/day-text.ts): chosen from the row of days, then
+  // approved from its own section (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4).
+  const name = dayText(ahead);
+  await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
+  const day = admin.getByRole("region", { name });
+  await expect(day.getByText("Draft, waiting for approval.")).toBeVisible();
+  await day.getByRole("button", { name: "Approve day" }).click();
+  await expect(day.getByRole("status")).toHaveText(`${name} is approved. Players get it at midnight Pacific. You can change its host answers until then.`);
   const { rows } = await DB.query<{ approved: boolean; members: string }>(
     "select content ? 'approved_at' as approved, content->'questions'->0->>'members' as members from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date",
     [ahead],

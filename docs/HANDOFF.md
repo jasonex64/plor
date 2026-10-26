@@ -16,6 +16,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14a-3b | The settings sheet, the friends list on Friends. **Security change:** `plor_app` updates two settings' columns | #85 |
 | 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
+| 14b-2b-1 | The 280px sidebar, a right column from 1200px, About and Privacy in Settings, buttons for every control link, one Realtime socket per page | #89 |
 
 ### In review: 14b-2b-1, the wider shell (PR #89, auto-merge on green CI)
 `docs/milestones/M14-14b-2b-1-shell.md`: a 280px sidebar; from 1200px a 360px right column behind a line on every player page (Today's circle, the game screen's feed, the friends feed elsewhere); About and the privacy policy in a box in the settings sheet, the footer only signed out; every control a button or a menu item (`ButtonLink` for links; DECISIONS' Styling rule); one shared Realtime socket per page. Local evidence: `npm test` 360, full e2e 42 passed; CI is the check after that.

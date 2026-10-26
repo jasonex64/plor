@@ -142,7 +142,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
           })}
         </ul>
         {admin && (
-          <Link href="/admin" className={styles.admin}>
+          <Link href="/admin" className={styles.admin} aria-current={path === "/admin" || path.startsWith("/admin/") ? "true" : undefined}>
             Admin
           </Link>
         )}
