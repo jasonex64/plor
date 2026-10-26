@@ -1,6 +1,6 @@
 # M14 14b-2b-1 — The wider shell, the right column, and buttons for links
 
-**Status:** in review (2026-10-26): round 10 approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."); built on `m14-look-and-feel`, one PR, to merge on green CI. The admin pages are 14b-2b-2, after this.
+**Status:** in review (2026-10-26): round 10 approved by the human ("Round 10 looks good, build it: the shell change first, then the admin pages."); built on `m14-look-and-feel`, in PR #89, to merge on green CI. The admin pages are 14b-2b-2, after this.
 
 ## Goal
 Every desktop page gets the 280px sidebar and, from 1200px, a right column behind a line; About and Privacy move into the settings sheet; and every control on the site is a button or a menu item, not a text link.

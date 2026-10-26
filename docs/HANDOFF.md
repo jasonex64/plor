@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-1's PR. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26. The M14 section is the M14 session's, written on the Windows checkout (`C:/Users/jason/RIFF-m14`) with 14b-2b-1's PR #89. The rest is the M13 session's, from main after PR #87 (13e-4a) merged; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -17,7 +17,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 | 14b-1 | Themes and `/about`. **Security change:** `plor_app` may update `private.profile.theme` | #86 |
 | 14b-2a | The streak as six vector flower ranks in a pill, and `/streak` | #88 |
 
-### In review: 14b-2b-1, the wider shell (its PR, auto-merge on green CI)
+### In review: 14b-2b-1, the wider shell (PR #89, auto-merge on green CI)
 `docs/milestones/M14-14b-2b-1-shell.md`: a 280px sidebar; from 1200px a 360px right column behind a line on every player page (Today's circle, the game screen's feed, the friends feed elsewhere); About and the privacy policy in a box in the settings sheet, the footer only signed out; every control a button or a menu item (`ButtonLink` for links; DECISIONS' Styling rule); one shared Realtime socket per page. Local evidence: `npm test` 360, full e2e 42 passed; CI is the check after that.
 
 ### Designed: 14b-2b, the admin pages
