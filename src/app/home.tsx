@@ -65,9 +65,8 @@ export function Home({ view }: { view?: View }) {
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
   }
   useEffect(loadMe, []);
-  // The account's theme, once the profile is known: Home owns it, so it also re-applies it after React's development
-  // remount clears the attribute the <head> script set (Next.js, "Preventing flash before hydration"). Signed out, or
-  // before a username, nothing is picked.
+  // The account's theme, once the profile is known, keeping this browser's copy in step (the copy itself is re-applied
+  // on every page by KeepTheme, src/app/keep-theme.tsx). Signed out, or before a username, nothing is picked.
   useLayoutEffect(() => {
     if (me) applyTheme(me.signedIn && me.username !== null ? me.settings.theme : null);
   }, [me]);

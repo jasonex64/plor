@@ -10,6 +10,16 @@ export const THEME_KEY = "plor.theme";
 // applies the account's (the guide's own try/catch).
 export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
+// This browser's copy, as THEME_SCRIPT reads it, or null when there's none or storage can't be read (the script's
+// try/catch).
+export function themeCopy(): string | null {
+  try {
+    return window.localStorage.getItem(THEME_KEY);
+  } catch {
+    return null;
+  }
+}
+
 // Applies the account's theme and keeps this browser's copy in step; null (signed out, or no profile yet) clears both.
 export function applyTheme(theme: Theme | null): void {
   const html = document.documentElement;

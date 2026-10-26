@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Baloo_2, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { KeepTheme } from "./keep-theme";
 import { THEME_SCRIPT } from "./theme";
 
 export const metadata: Metadata = {
@@ -23,7 +24,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <KeepTheme />
+        {children}
+      </body>
     </html>
   );
 }

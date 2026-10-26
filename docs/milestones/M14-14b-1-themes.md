@@ -1,6 +1,6 @@
 # M14 14b-1 — Themes and the About page
 
-**Status:** in progress (2026-10-25), on `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** in review (2026-10-25), in its PR from `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
 
 ## Goal
 A player picks one of six themes in the settings sheet, saved on their account and shown from the first paint; and an About page says what Plor is, who makes it, its credits and its use of AI.
@@ -90,9 +90,47 @@ This ticket's guided questions (human, 2026-10-25):
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The guide's `<html data-theme="light">` default | No attribute by default; `:root` is Paper and the device's dark mode gives Night under `:root:not([data-theme])` | "Follow device" is the default (L5, L21), which an attribute would override |
+| The guide's script sets whatever the copy holds | The copy holds only a picked theme; Follow device removes it | No attribute means following the device, so nothing to store |
+| The guide re-applies in `useLayoutEffect` from `localStorage`, in the component that owns the theme | `KeepTheme`, in the root layout, re-applies the copy on every page as the guide does; `Home` then applies the account's theme and writes the copy | The account is the truth (L20); the copy only bridges the first paint. Fixed after the review, which found the first version re-applied only from the profile, and not at all on pages without `Home` |
+| — (the ticket names no recovery) | Storage that can't be read or written keeps no copy, with no error shown | The guide's own `try/catch`: the account's theme still applies once the profile loads, so the only cost is the device's theme until then, as on a new device |
+| Round 7's tiles are `role="radio"` spans | Native radio inputs, hidden inside each tile's label, in a fieldset named "Theme" | Keyboard and screen-reader behaviour come with the element (WCAG 2.2 4.1.2) |
+| Round 7 draws Follow device in Paper's colours with "◐" | The same, the half-moon hidden from screen readers | The label says it |
+| L48 (2026-10-24): the credits in the privacy page's "Data sources" | An About page, with the data sources left on the privacy page and linked | The human chose an About page, and not to move the data sources (2026-10-25) |
+| The earlier AI answer: "Code only" | "Plor is built with help from AI." | The human's later answer, "just the bare minimum" (2026-10-25) |
+| A footer inside `<main>` (every page since M02) | Unchanged, now one `Footer` | Inside `<main>` it isn't a `contentinfo` landmark; moving it is layout, not this ticket |
 
 ## Evidence
+Run on the Mac against the shared local stack (the M13 session's OK stands: it runs no local db, SQL or e2e tests), 2026-10-25.
+- **Tests seen failing first:**
+  - `npx vitest run src/app/colors.test.ts` with the five themes and the old slots: `is the same for the device's dark mode as when it's chosen`, `is declared once, for every theme` and each new theme's `declares every slot` failed. With the blocks: `Tests  103 passed (103)`.
+  - `npx supabase test db` with the theme grant listed and no migration: `Failed test 16: "plor_app holds exactly the grants the routes need"`. `npx vitest run src/app/api/profile/settings/route.db.test.ts` before `theme` existed: `Tests  10 failed (10)`.
+- **Criterion 3:** `npx supabase migration up` → `"Migrations applied"` (`20261026010745_theme.sql`); `npx supabase test db` → `Files=21, Tests=345`, `Result: PASS`; the settings, profile and profile-route db tests → `Tests  35 passed (35)`: each of the six themes set and read back, "dark" and 7 refused with `settings_invalid`, and `setSettings(…, { theme: "moonlit" })` run as `plor_app`.
+- **Criteria 2, 4 and 5:** `npx playwright test e2e/themes.e2e.ts` → `2 passed`:
+  - six radios in the group "Theme", Follow device checked; Sky's tile `rgb(238, 243, 250)` on a Paper page;
+  - Ink: `data-theme="ink"`, the copy `ink`, the body `rgb(0, 0, 0)`; its tile's outline 3px, Sky's under 3px in `rgb(96, 96, 96)` (Chrome snaps 1.5px to 1px);
+  - reloaded with `/api/profile` held back, the body is already `rgb(0, 0, 0)`;
+  - Follow device: no attribute and no copy, and with the device dark the body is `rgb(18, 18, 18)`;
+  - signing out from Moonlit: no attribute, no copy, `rgb(250, 250, 248)`;
+  - About from the signed-out home page's footer: its headings, "Plor is made by Jason.", `mailto:privacy@plor.app`, the monkeytype and Rosé Pine links, "Plor is built with help from AI.", and the sheet's About Plor link.
+- **The hypothesis held:** with the `<head>` script removed, the held-back reload failed with `Expected: "rgb(0, 0, 0)"`, `Received: "rgb(250, 250, 248)"`; restored, it passed.
+- **Criterion 1:** `src/app/colors.test.ts` → in `npm test` below.
+- **Criterion 7:**
+  - `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  39 passed (39)`, `Tests  330 passed (330)`.
+  - `npm run test:db`: `Test Files  40 passed (40)`, `Tests  260 passed (260)`. `npx supabase test db`: `Files=21, Tests=345`, `Result: PASS`.
+  - `npm run test:e2e`: `39 passed (1.1m)`.
+  - `npm run build`: compiled, with `○ /about`.
+  - CI: in the PR.
+
+- **After the review:** `KeepTheme` added; `npx playwright test e2e/themes.e2e.ts e2e/shell.e2e.ts` → `9 passed`; tsc and lint clean.
 
 ## Review
+The `reviewer` agent, in a fresh context, on `ffe5b8c..e0a8bbb`. It checked every hex against Numbers, the cascade (a Paper tile on a dark page, `:root:not([data-theme])`, Night's order), the migration and grant, `readSettings`, the `<head>` script, sign-out and delete clearing the copy, the picker's markup and sizes, the Footer on nine pages, the privacy page and DECISIONS; it re-ran tsc, lint and `npm test` (330), and, by the brief, no db or e2e run, which the Evidence covers.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **The handoff was stale** (14a-3b in review, 14b-1 waiting, the "Code only" wording, no theme migration). Rewritten in this PR, with plor.app's database even with main through the settings migration (the M13 session's push, 2026-10-25) and the theme migration still to push.
+  - **The development re-apply** came only from the profile, and never on pages without `Home`. `KeepTheme` now re-applies the copy on mount on every page, as the guide does (Source diff).
+  - **Source diff, Evidence and Review** were being written; filled in above.
+- Deferred to ROADMAP "Next revision" (For M14):
+  - the picker restyles when the save returns, and disables the focused radio meanwhile (the switches do the same);
+  - About's contact address and its "What Plor is" wording are Claude's, for the human to confirm;
+  - the privacy page's date was already 2026-10-25, so criterion 6's "its date changes" held as "it's today's".
