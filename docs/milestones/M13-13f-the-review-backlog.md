@@ -1,6 +1,6 @@
 # M13 13f — The review backlog
 
-**Status:** planned, waiting for the human's approval (drafted 2026-10-27 from the human's triage of ROADMAP's For M13 items)
+**Status:** in progress (approved by the human, 2026-10-27: "I approve 13f's plan as drafted. Start 13f-1, player scoring: list its items and ask its guided questions.")
 
 ## Goal
 Clear ROADMAP's 40 open "For M13" items before M13 closes, in four sub-tickets by what they touch, each with its own guided questions before code; then close M13 with the migration squash decided for its end.
