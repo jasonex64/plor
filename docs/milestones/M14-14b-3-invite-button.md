@@ -1,6 +1,6 @@
 # M14 14b-3 — The invite button
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11); built, in review in PR #98. When the PR is ready the human is asked before it merges, and plor.app gets the migration straight after (answer 12).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11). Done (2026-10-27): merged in PR #98 on green CI at 01:08:12 UTC as `356083f`, on the human's word ("PR #98's e2e checks have passed: merge it now and push its migration to plor.app straight after"), and its migration pushed to plor.app at 01:08:40 (answer 12).
 
 ## Goal
 Friend and group invites are shared from a button, never shown as a raw link, with 10-character codes on short paths, so the Friends tab and a group's page stop showing a long URL.
@@ -116,6 +116,8 @@ On the Mac, 2026-10-27, against the shared local stack:
 - **The checks:** `supabase/tests/friends.test.sql` (10 accepted; 9, `+/` and a shared code refused), `groups.test.sql` (9 and `+/` refused) and the new `invite_codes.test.sql` (the old 22 refused for both; a group code of 10 accepted) pass. `npx supabase test db`: every file but `answer_base.test.sql`, which fails on the shared stack's `one_walk`, as in 14b-2c.
 - **The codes in the app:** `src/friends/friends.test.ts` checks 50 new codes are 10 base64url characters and all differ, and refuses 9, 11, `+/` and the old 22-character size.
 - `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  391 passed (391)`; `npm run test:db` → `Tests  266 passed (266)` (the friends and groups routes issue real 10-character codes through the database's checks); `npx playwright test` → `60 passed (2.1m)` before the review's fixes; after them `59 passed`, `1 failed`: `shell.e2e.ts`'s "from 768px the tabs are a sidebar" on a `toHaveURL` wait, a test this change doesn't touch, which then passed 5 of 5 alone (`--repeat-each=5`), so it's filed in ROADMAP with the other flaky tests.
+- **CI on PR #98** (run 40429809769, `3b83551`), on a fresh database: `npm run test:sql` → `Files=25, Tests=410`, `Result: PASS` (the moved fixtures and `invite_codes.test.sql` included); `npm run test:e2e` → `60 passed (5.2m)`.
+- **plor.app**, from a clean worktree of `origin/main` at `356083f` (removed after): `npx supabase db push --linked --dry-run` listed `20261027004038_short_invite_codes.sql` alone; `npx supabase db push --linked` applied it at 01:08:40 UTC, 28 seconds after the merge; `npx supabase migration list --linked`: 40 of 40 matching; `npx supabase test db --linked` → `Files=25, Tests=410`, `Result: PASS`. The migration ends by adding the 10-character checks, which would have failed on any code left at 22, so every friend and group code there is a fresh 10-character one.
 - **e2e, by criterion:**
   - 1: `account.e2e.ts` presses "Invite a friend", gets an `/i/` link of 10 characters by the clipboard (`e2e/players.ts`, `sharedLink`), and finds no `/i/` in the page's text; `groups.e2e.ts` does the same with "Share group link" and `/g/`.
   - 2: `account.e2e.ts`: Reset shows beside the button once there's a link, and not on Today's board.

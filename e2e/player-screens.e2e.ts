@@ -7,6 +7,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -32,12 +33,12 @@ async function player(browser: Browser, name: string, viewport: { width: number;
   return page;
 }
 
-// Starts today's run and is caught on question 1 by the host's answer.
+// Starts today's run and is tipped over at stop 1 by the host's answer.
 async function caught(page: Page) {
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
 }
 
 const bodyPadding = (page: Page) =>
@@ -53,7 +54,7 @@ test("the room for the clock bar and the right column goes with the page that sh
   await expect(page.getByLabel("Your answer")).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
-  const clock = page.getByRole("region", { name: "Question in play" });
+  const clock = page.getByRole("region", { name: "Stop in play" });
   await expect(clock.getByRole("timer")).toBeVisible();
   expect((await bodyPadding(page)).bottom).toBe("112px");
   await clock.getByRole("link", { name: "Back" }).click();
@@ -101,7 +102,7 @@ test("a question's time running out on another page opens the friends feed there
     [`${RUN}-xc@example.test`],
   );
   await page.clock.fastForward("00:21");
-  await expect(page.getByRole("region", { name: "Question in play" }).getByRole("status")).toHaveText("Time's up on question 1");
+  await expect(page.getByRole("region", { name: "Stop in play" }).getByRole("status")).toHaveText("Dozed off at stop 1");
   await expect(feed.getByLabel("Comment to your friends")).toBeVisible();
 });
 
@@ -118,12 +119,12 @@ test("a question's time running out on Today shows where everyone ended on its b
   await expect(board).toBeVisible();
   await expect(board.getByRole("region", { name: "Where everyone ended" })).toHaveCount(0);
   // Question 1's 20 seconds, then the clock bar's zero.
-  await expect(page.getByRole("region", { name: "Question in play" }).getByRole("status")).toHaveText("Time's up on question 1", { timeout: 30_000 });
-  await expect(board.getByRole("region", { name: "Where everyone ended" })).toContainText("Ran out of time on question 1: You");
+  await expect(page.getByRole("region", { name: "Stop in play" }).getByRole("status")).toHaveText("Dozed off at stop 1", { timeout: 30_000 });
+  await expect(board.getByRole("region", { name: "Where everyone ended" })).toContainText("Dozed off at stop 1: You");
 });
 
 // Item 4 (answers 6 and 7): a typo is fixed in place, and a run with nothing survived has no bonus line.
-test("text that names no entry stays selected in the box, and a catch on question 1 has no bonus line", async ({ browser }) => {
+test("text that names no entry stays selected in the box, and a catch on stop 1 has no bonus line", async ({ browser }) => {
   const page = await player(browser, "xd", PHONE);
   await play(page);
   const input = page.getByLabel("Your answer");
@@ -136,10 +137,10 @@ test("text that names no entry stays selected in the box, and a catch on questio
   await input.fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   const result = page.locator("#result");
-  await expect(result).toContainText("You survived 0 of 7 questions and scored 0 points.");
+  await expect(result).toContainText("You climbed 0 of 7 stops and scored 0 points.");
   await expect(result).not.toContainText("bonus");
   await page.goto("/");
-  await expect(page.getByRole("region", { name: "Offbeat" })).toContainText("0 points · caught on question 1");
+  await expect(page.getByRole("region", { name: GAME.name })).toContainText("0 points · tipped over at stop 1");
 });
 
 // Item 14: Result lands before the run has loaded; the result brings itself into view, below the phone's top bar.
@@ -147,8 +148,8 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   const page = await player(browser, "xe", { width: 360, height: 400 });
   await caught(page);
   await page.goto("/");
-  await page.getByRole("region", { name: "Offbeat" }).getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/offbeat#result$/);
+  await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Result" }).click();
+  await expect(page).toHaveURL(/\/updraft#result$/);
   await expect(page.locator("#result")).toBeVisible();
   const at = () =>
     page.evaluate(() => ({

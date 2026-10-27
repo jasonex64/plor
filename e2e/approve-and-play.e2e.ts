@@ -11,6 +11,7 @@ import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/a
 import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { gotPastText } from "../src/game/words";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const DRAFTS = join(process.cwd(), "content", "offbeat");
@@ -101,11 +102,11 @@ test("a player survives all seven questions of a day, past the stolen letters", 
     await page.getByLabel("Your answer").fill(answers[i]);
     await page.getByRole("button", { name: "Answer" }).click();
     if (i < answers.length - 1) {
-      await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: gotPastText(i + 1) })).toBeVisible();
       await page.getByRole("button", { name: "Next", exact: true }).click();
     }
   }
-  await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
-  // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
-  await expect(page.getByText("Name a body part: you said knee, the host said hand, head, leg")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "You reached the top!" })).toBeVisible();
+  // Three host answers on stop 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
+  await expect(page.getByText("Name a body part: you said knee, the Wind whispered hand, head, leg")).toBeVisible();
 });

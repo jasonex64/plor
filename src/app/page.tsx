@@ -18,9 +18,9 @@ export default function Page() {
       </p>
       <h2>Today&apos;s game: {GAME.name}</h2>
       <p>
-        Seven questions, such as &quot;Name an animal&quot;. For each one, give an answer the host didn&apos;t pick: if
-        you match the host, your run ends. Unusual answers are your way through. Sign in to play and see how your friends
-        did.
+        Seven stops up the ridge, each asking something like &quot;Name an animal&quot;. At each one, give an answer the
+        Wind didn&apos;t think of: match the Wind and it sends you flying. Unusual answers are your way up. Sign in to
+        play and see how your friends did.
       </p>
       <Suspense fallback={<p>Loading…</p>}>
         <Home />

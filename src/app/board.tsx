@@ -25,6 +25,7 @@ import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
+import { capitalized, caughtText, timedOutText } from "@/game/words";
 
 // invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
 // holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
@@ -139,18 +140,19 @@ export function Board({ username, invite }: { username: string; invite: boolean 
 }
 
 function describe(f: BoardFriend): string {
-  if (f.ended?.result === "caught") return `caught on question ${f.ended.question} by "${f.ended.answer}"`;
-  if (f.ended?.result === "survived") return "survived every question";
-  if (f.ended?.result === "timed_out") return `ran out of time on question ${f.ended.question}`;
-  if (f.state === "playing") return `on question ${f.question}`;
+  if (f.ended?.result === "caught") return `${caughtText(f.ended.question)} by "${f.ended.answer}"`;
+  if (f.ended?.result === "survived") return "reached the top";
+  if (f.ended?.result === "timed_out") return timedOutText(f.ended.question);
+  if (f.state === "playing") return `on stop ${f.question}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "hasn't played yet";
 }
 
 function placeLabel(place: Place): string {
-  if (place.kind === "caught") return `Caught on question ${place.question}`;
-  if (place.kind === "timed_out") return `Ran out of time on question ${place.question}`;
-  return "Survived";
+  // Updraft's words by the stop's tier (docs/milestones/M14-14c-1-name-and-words.md, "The words").
+  if (place.kind === "caught") return capitalized(caughtText(place.question));
+  if (place.kind === "timed_out") return capitalized(timedOutText(place.question));
+  return "Reached the top";
 }
 
 // "Where everyone ended" (M07 7d): one row per place, the player first, up to FRIENDS_PER_PLACE friends by name, then

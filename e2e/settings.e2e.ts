@@ -6,6 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -106,28 +107,28 @@ async function flip(page: Page, name: string, on: boolean) {
   await page.keyboard.press("Escape");
 }
 
-// Criterion 4: off, Play opens the game screen; on, the banner states the 20 seconds and Play starts question 1.
-test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
+// Criterion 4: off, Play opens the game screen; on, the banner states the 20 seconds and Play starts stop 1.
+test("Skip the game screen makes Play start stop 1, and says the time limit first", async () => {
   await page.goto("/");
-  const banner = page.getByRole("region", { name: "Offbeat" });
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/offbeat");
+  const banner = page.getByRole("region", { name: GAME.name });
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/updraft");
   await expect(banner).not.toContainText("20 seconds each");
 
   await flip(page, "Skip the game screen", true);
   // Saved on the account: a reload keeps it.
   await page.reload();
-  await expect(banner).toContainText("Don't match the Wind · 7 questions · 20 seconds each");
+  await expect(banner).toContainText("Don't match the Wind · 7 stops · 20 seconds each");
   await banner.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/offbeat$/);
+  await expect(page).toHaveURL(/\/updraft$/);
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
-// Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Caught on the question 1
-// the test before left in play, today is a played day with 0 survived.
-test("Numbers on the calendar shows each played day's questions survived", async () => {
+// Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Tipped over at the
+// stop 1 the test before left in play, today is a played day with 0 climbed.
+test("Numbers on the calendar shows each played day's stops climbed", async () => {
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
   await page.goto("/me");
   const cell = page.getByRole("region", { name: "Calendar" }).locator(`[data-date='${today}']`);
   await expect(page.getByRole("region", { name: "Calendar" }).getByText(/^1 of \d+ days$/)).toBeVisible();

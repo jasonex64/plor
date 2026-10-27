@@ -10,6 +10,8 @@ import { Pool } from "pg";
 import { execSync } from "node:child_process";
 import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { gotPastText } from "../src/game/words";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -78,7 +80,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
   await expect(row).toHaveText(`${playerName}: hasn't played yet`);
 
-  // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
+  // The player starts and is tipped over at stop 1; the watcher's page shows the start without a reload, and the
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
   const started = `${playerName}: started (you'll see how it's going once you finish)`;
   await player.goto("/");
@@ -86,7 +88,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(row).toHaveText(started);
   await player.getByLabel("Your answer").fill(hostAnswer);
   await player.getByRole("button", { name: "Answer" }).click();
-  await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
+  await expect(player.getByText("You climbed 0 of 7 stops")).toBeVisible();
   // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
   // wherever it goes, and the watcher's frames hold only the start.
   await openBoard(watcher);
@@ -101,9 +103,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await play(watcher);
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
-  // Caught on question 1: no survived answers, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
-  await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points.")).toBeVisible();
-  // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
+  // Tipped over at stop 1: no stops climbed, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
+  await expect(watcher.getByText("You climbed 0 of 7 stops and scored 0 points.")).toBeVisible();
+  // Beside the one answer, its share: two players answered at stop 1, under the minimum of 5 (H5).
   await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
   // The streak's pill: today is the watcher's first day (M11 H4), the first rank's
   // (docs/milestones/M14-14b-2a-streak-ranks.md).
@@ -123,10 +125,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
     `${watcherName} (you): 0 points`,
   ]);
   // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
-  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}" 👍😂😮😢❤️`);
+  await expect(row).toHaveText(`${playerName}: tipped over at stop 1 by "${hostAnswer}" 👍😂😮😢❤️`);
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   await expect(place).toHaveCount(1);
-  await expect(place.locator("summary")).toHaveText(`Caught on question 1: You, ${playerName}`);
+  await expect(place.locator("summary")).toHaveText(`Tipped over at stop 1: You, ${playerName}`);
   await place.locator("summary").click();
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
 
@@ -216,7 +218,7 @@ test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser
   await play(page);
   await page.getByLabel("Your answer").fill(safeAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: gotPastText(1) })).toBeVisible();
   await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
 });
 
@@ -307,14 +309,14 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page, "/offbeat");
+  await openBoard(page, "/updraft");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
   // Only the reset asks for the game screen's stats again. Every load from the mount is sent before the chart can
   // draw (Strict Mode sends two in development), so a request sent after the chart is there is the reset's (14a-2c,
   // criterion 5). The faked clock is the browser's only: the server's day stays the same, so the reload's content
   // can't show a new day.
-  await expect(page.getByRole("region", { name: "Your Offbeat" }).getByRole("img")).toBeVisible();
+  await expect(page.getByRole("region", { name: `Your ${GAME.name}` }).getByRole("img")).toBeVisible();
   const moved = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/offbeat");
   await page.clock.fastForward("25:00:00");
   await moved;
