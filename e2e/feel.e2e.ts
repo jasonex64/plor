@@ -31,6 +31,19 @@ async function hold(page: Page, path: string): Promise<() => void> {
   return release;
 }
 
+// The introduction is in the served HTML, before any script runs (Google's brand check, M02 2c): the frame around the
+// page mustn't hold it back. The invite pages' lines too.
+test("the pages' static text is served without JavaScript", async ({ browser }) => {
+  const page = await (await browser.newContext({ javaScriptEnabled: false })).newPage();
+  await page.goto("/");
+  await expect(page.getByText("Plor is a small site with a daily word game.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Today's game:/ })).toBeVisible();
+  await page.goto("/i/AAAAAAAAAA");
+  await expect(page.getByText("A friend invited you to Plor")).toBeVisible();
+  await page.goto("/g/AAAAAAAAAA");
+  await expect(page.getByText("You were invited to a group on Plor")).toBeVisible();
+});
+
 test("the tab bar stays on screen across tab switches", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "fl");
@@ -78,4 +91,12 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
     release();
     await expect(page.getByRole("status", { name: label })).toHaveCount(0);
   }
+
+  // Today was open before (Next.js keeps a visited page with its data), so its banner's skeleton shows on a fresh load.
+  const run = await hold(page, "/api/run");
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading today's puzzle" })).toBeVisible();
+  await expect(page.getByText("Loading…")).toHaveCount(0);
+  run();
+  await expect(page.getByRole("status", { name: "Loading today's puzzle" })).toHaveCount(0);
 });

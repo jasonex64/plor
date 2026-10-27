@@ -12,6 +12,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Fragment,
+  Suspense,
   createContext,
   use,
   useCallback,
@@ -90,10 +91,13 @@ function usePlayer(): { player: Player; timeUps: number; reloadStreak: () => voi
   return { player: me, timeUps, reloadStreak };
 }
 
+// The frame reads no address-bar hooks itself, so the page inside it is in the served HTML (Google's brand check, M02
+// 2c) and Next.js can check its navigation is instant: a component that reads the address renders on the client up to
+// its nearest Suspense boundary, and on a route with an unknown code or ID even usePathname waits for the request
+// (node_modules/next/dist/docs/01-app/03-api-reference/04-functions/use-search-params.md, Prerendering; use-pathname.md,
+// Cache Components). The parts that read it are FrameParts, behind their own boundary, and RedirectError, shown only
+// on the client; what depends on the session waits inside Signed.
 export function Frame({ children }: { children: ReactNode }) {
-  const redirectError = useSearchParams().get("error");
-  const path = usePathname();
-  const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -105,8 +109,6 @@ export function Frame({ children }: { children: ReactNode }) {
   // (docs/milestones/M14-14b-2a-streak-ranks.md). A failure here is shown beside the page, not instead of it: the
   // run's question is already being timed (14b-2a review).
   const [streakError, setStreakError] = useState<string | null>(null);
-  // From 1200px the other player pages show the friends feed in the right column (FriendsFeed).
-  const feedColumn = useMinWidth(1200);
   // Counts the times the clock bar saw a question's time run out away from the game screen. The database decides a
   // timeout when the run is next read (src/game/status.ts), so the parts of the page that wait for the run to be over
   // read it again then (docs/milestones/M14-14b-2c-review-items.md, items 6 and 46).
@@ -125,13 +127,58 @@ export function Frame({ children }: { children: ReactNode }) {
     if (me && !accountTheme) applyTheme(null);
   }, [me, accountTheme]);
 
+  const player = me?.signedIn && me.username !== null ? me : null;
+  return (
+    <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
+      <Suspense fallback={null}>
+        <FrameParts
+          signedIn={me?.signedIn === true}
+          player={player}
+          timeUp={timeUp}
+          timeUps={timeUps}
+          streakError={streakError}
+          shell={
+            player && (
+              <Shell
+                admin={player.admin}
+                profile={player}
+                streak={player.streak}
+                onChanged={loadMe}
+                // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's
+                // copy (docs/milestones/M14-14b-2c-review-items.md, item 29).
+                onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
+                onSignedOut={() => setMe({ signedIn: false })}
+              />
+            )
+          }
+        />
+      </Suspense>
+      {children}
+    </FrameContext>
+  );
+}
+
+// The frame's parts that read the address: the shell (its current tab), the clock bar away from the game screen, the
+// friends feed's column, and the invite remembered across a Google sign-in.
+function FrameParts({ signedIn, player, timeUp, timeUps, streakError, shell }: {
+  signedIn: boolean;
+  player: Player | null;
+  timeUp: () => void;
+  timeUps: number;
+  streakError: string | null;
+  shell: ReactNode;
+}) {
+  const path = usePathname();
+  const router = useRouter();
+  // From 1200px the other player pages show the friends feed in the right column (FriendsFeed).
+  const feedColumn = useMinWidth(1200);
   // Back from Google with an invite pending: go back to its page. On an invite page the remembered one is spent, so
   // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
   // "/". Storage that can't be read holds nothing, because the write before leaving for Google would have failed and
   // been shown to the player.
   const onInvite = INVITE_PATH.test(path);
   useEffect(() => {
-    if (!me?.signedIn) return;
+    if (!signedIn) return;
     let pending: string | null;
     try {
       pending = window.sessionStorage.getItem(PENDING_INVITE);
@@ -141,48 +188,42 @@ export function Frame({ children }: { children: ReactNode }) {
     }
     const code = pending && !onInvite ? INVITE_PATH.exec(pending)?.[1] : undefined;
     if (pending && code && INVITE_CODE.test(code)) router.replace(pending);
-  }, [onInvite, me, router]);
+  }, [onInvite, signedIn, router]);
 
-  // The page itself always renders, so its static parts are in the served HTML and Next.js can check its navigation is
-  // instant (node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md); what depends on the
-  // session waits inside Signed.
-  const player = me?.signedIn && me.username !== null ? me : null;
+  if (!player) return null;
   return (
-    <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
-      {redirectError && me?.signedIn === false && <p role="alert">{messageForRedirect(redirectError)}</p>}
-      {player && (
-        <>
-          <Shell
-            admin={player.admin}
-            profile={player}
-            streak={player.streak}
-            onChanged={loadMe}
-            // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's copy
-            // (docs/milestones/M14-14b-2c-review-items.md, item 29).
-            onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
-            onSignedOut={() => setMe({ signedIn: false })}
-          />
-          {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-          {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
-          {streakError && <p role="alert">{streakError}</p>}
-          {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} timeUps={timeUps} />}
-        </>
-      )}
-      {children}
-    </FrameContext>
+    <>
+      {shell}
+      {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
+      {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
+      {streakError && <p role="alert">{streakError}</p>}
+      {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} timeUps={timeUps} />}
+    </>
   );
 }
 
-// Around each page's own section: sign-in, then picking a username, then the section.
+// Around each page's own section: sign-in, then picking a username, then the section. The profile is read on the
+// client, so the served HTML holds the skeleton here.
 export function Signed({ children }: { children: ReactNode }) {
   const { me, loadError, loadMe } = useFrame();
-  const path = usePathname();
   if (loadError) return <p role="alert">{loadError}</p>;
   // Only until the profile first loads (a page opened from its address); afterwards the frame keeps it.
   if (!me) return <PageSkeleton />;
-  if (!me.signedIn) return <SignIn returnTo={INVITE_PATH.test(path) ? path : undefined} onSignedIn={loadMe} />;
+  if (!me.signedIn)
+    return (
+      <>
+        <RedirectError />
+        <SignIn onSignedIn={loadMe} />
+      </>
+    );
   if (me.username === null) return <PickUsername onDone={loadMe} />;
   return children;
+}
+
+// A sign-in that came back with an error (src/app/auth/callback/route.ts), above the sign-in it failed.
+function RedirectError() {
+  const redirectError = useSearchParams().get("error");
+  return redirectError && <p role="alert">{messageForRedirect(redirectError)}</p>;
 }
 
 // Each page's section, with what it needs from the player.
@@ -232,7 +273,10 @@ export function InviteTab({ code }: { code: string }) {
   return <AcceptInvite code={code} username={player.username} />;
 }
 
-function SignIn({ returnTo, onSignedIn }: { returnTo?: string; onSignedIn: () => void }) {
+function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
+  // An invite page's own path, remembered across a Google sign-in (PENDING_INVITE).
+  const path = usePathname();
+  const returnTo = INVITE_PATH.test(path) ? path : undefined;
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [code, setCode] = useState("");
