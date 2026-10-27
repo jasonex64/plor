@@ -186,7 +186,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] **The question bank's identity and themes** (`src/content/bank.ts`):
   - a question's uses are matched by prompt and category, but `parseBank` doesn't refuse two questions with the same pair, and fixing a typo in a prompt makes a question that ran look never used;
   - a date's theme with no tagged question drafts an unthemed day without a word (a typo like "xmas" against "christmas"); `content:validate` could require a tagged question per themed date;
-  - **for the human:** themed questions aren't held back on other dates, so a never-used "christmas" question ranks early in July.
+  - ~~**for the human:** themed questions aren't held back on other dates, so a never-used "christmas" question ranks early in July.~~ *(Answered: they stay as they are. Human, 2026-10-27: "no", to "Should themed questions be held back on dates other than their theme's?")*
 
   Found in M13 13d (review).
 - [ ] **Smaller gaps from the 13d review:** the bank route has no test of 401 when signed out (the e2e covers the admin and a player); M15 15a's and M16's tickets still cite `private.save_questions` and `private.puzzle_questions`, which 13d dropped. Found in M13 13d (review).

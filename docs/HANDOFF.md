@@ -79,8 +79,13 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **M15 15b (zod) is merged,** and Dependabot alert #1 now shows `fixed` (checked 2026-10-24).
 - **The order stays** M13, then M14, then M15. plor.app needn't be playable before launch.
 
+## Overnight rules (human, 2026-10-27, before sleeping: "after this next push, can you work on the next batch overnight?")
+- **Batches:** everyday things and knowledge, from WordNet ("Everyday things (Recommended), Knowledge"), 20–30 categories a batch, each with a bank question.
+- **Merging:** "Merge each on green, keep going": a session merges each PR once every check passes (`gh pr view --json statusCheckRollup`, every check SUCCESS on the head), then starts the next batch, each its own PR. **No plor.app `db push`** without the human.
+- **Flags:** "Today's rules, unclear ones wait (Recommended)": drop LDNOOBW-listed slurs and crude nicknames by ID and keep real names; mark clearly different things sharing a name as reviewed in `data/sameness.json`; strengthen thin lists; anything unclear is listed in the PR for the human.
+- **Themed questions** stay as they are on other dates (human: "no" to holding them back; ROADMAP, 13d review).
+
 ## Waiting on the human
-- **For the human, from 13d's review** (ROADMAP, For M13): should themed questions be held back on other dates?
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
 - **13e-6's PR #102** (Next step 4): approval by merging.
 - **Copy snapshots to the Mac:** `data/snapshots/wikidata-sameness/2026-10-27.json`, `data/snapshots/oewn-animals/2026-10-27.json`, and 13e-6's six new sets' 2026-10-27 snapshots.
