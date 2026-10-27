@@ -375,16 +375,18 @@ const wikidataIds = (synset: Synset) => [synset.wikidata ?? []].flat();
 // is loaded; one naming several loaded taxa (cat, cattle, rabbit) stays its own thing and keeps them as unjoined, for
 // the review (13e-5 item 1; SOURCES.md, Wikidata common-name link; human, 2026-10-26: "Join only clear cases").
 // A synset may give a list of IDs (["Q124657158", "Q664443"]): the same rule holds over all they name.
-// hand holds a person's decisions from the review: joins to split, and the taxon an unjoined word joins. Each must
+// hand holds a person's decisions from the review: joins to split, each with the thing it rejects, and the taxon an
+// unjoined word joins. Each must
 // still fit the data, or the fetch stops naming it, so a re-fetch can't apply a stale decision silently.
-export type HandJoins = { split: Set<string>; pick: Map<string, string> };
+export type HandJoins = { split: Map<string, string>; pick: Map<string, string> };
 export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string, taxaOf: Map<string, string[]>, hand: HandJoins): Item[] {
   const used = new Set<string>();
   const linked = items.map((item) => {
     if (item.id === root) return { ...item, same_as: `wikidata:${rootLink}` };
     const taxa = [...new Set(wikidataIds(synsets[item.id]).flatMap((id) => (known.has(id) ? [id] : (taxaOf.get(id) ?? []).filter((t) => known.has(t)))))];
-    if (hand.split.has(item.id)) {
-      if (taxa.length !== 1) throw new Error(`hand split ${item.id} (${item.name}): it no longer joins one thing (${taxa.length})`);
+    const rejected = hand.split.get(item.id);
+    if (rejected) {
+      if (taxa.length !== 1 || taxa[0] !== rejected) throw new Error(`hand split ${item.id} (${item.name}) from ${rejected}: it now joins ${taxa.join(", ") || "nothing"}`);
       used.add(item.id);
       return item;
     }
@@ -397,7 +399,7 @@ export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, k
     if (taxa.length === 1) return { ...item, same_as: `wikidata:${taxa[0]}` };
     return taxa.length ? { ...item, unjoined: taxa } : item;
   });
-  const unused = [...hand.split, ...hand.pick.keys()].filter((id) => !used.has(id));
+  const unused = [...hand.split.keys(), ...hand.pick.keys()].filter((id) => !used.has(id));
   if (unused.length) throw new Error(`hand joins name synsets not in the tree: ${unused.join(", ")}`);
   return linked;
 }
@@ -526,10 +528,10 @@ const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English com
 // "better-known one"), the species for horseshoe crab, and for dog the taxon the breeds sit under. The twin left over
 // is Wikidata's own double, for 13e-5b.
 const OEWN_ANIMALS_HAND: HandJoins = {
-  split: new Set([
-    "02461453-n", // ground sloth, the extinct giant: not Folivora, every sloth
-    "01682603-n", // leopard lizard, "any of several": not one species, the long-nosed
-    "01547030-n", // zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch
+  split: new Map([
+    ["02461453-n", "Q2274076"], // ground sloth, the extinct giant: not Folivora, every sloth
+    ["01682603-n", "Q2703595"], // leopard lizard, "any of several": not one species, the long-nosed
+    ["01547030-n", "Q331065"], // zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch
   ]),
   pick: new Map([
     ["01790476-n", "Q1133152"], // horseshoe crab: Atlantic horseshoe crab, the species, not Limulidae, the family

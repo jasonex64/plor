@@ -263,6 +263,7 @@ These are non-blocking items found during work or review. Record each one here *
   - `analyzeBase` names its tables by hand (leaving out `private.category_extra`), and `load <one set>` doesn't analyze;
   - the root's `same_as` is now unconditional (a missing root fails the import), with no test;
   - the P13176 query and its row parsing have no unit test (as `byIds`, From 13e-4c);
+  - `OEWN_ANIMALS_HAND`: a synset in both `split` and `pick` takes the split and its pick is ignored, without an error; a pick still applies when the word gains a third loaded taxon after the person chose between two (the human's decisions, 2026-10-27);
   - **a join retires a thing ID:** a WordNet thing joined on a fresh load takes its Wikidata side's ID, so a file naming the old ID breaks (three bank answers did, fixed in 13e-5; the T1 day still names two). Format 3 calls thing IDs permanent; whether a retired ID should keep pointing at its thing is for the human (HANDOFF, Waiting on the human).
 
   Found in M13 13e-5 (second review, 2026-10-27).

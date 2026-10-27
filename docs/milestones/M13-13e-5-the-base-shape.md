@@ -172,6 +172,11 @@ How a concept naming several taxa joins is put to the human (below).
 - **Still connects locally:** a throwaway script calling `localClient()` with `.env.local` → `connected: { current_user: 'postgres', port: 5432 }` (deleted after).
 - **Unit:** `npm test` → "Test Files 40 passed (40) Tests 388 passed (388)" (386 + the 2 new). `npx tsc --noEmit -p .` exits 0; `npx eslint scripts/base.ts scripts/base.test.ts src/config/env.ts` clean. `npm run test:db`, pgTAP and e2e not rerun: item 7 touches no SQL, and the db suite shares the stack with the M14 session.
 
+## Review of the human's decisions (`reviewer` agent, fresh context, 2026-10-27)
+- Blocking, fixed: a split checked only that its word joined one thing, not which, so a later edition re-pointing "ground sloth" to a right taxon would still drop it silently. Each split now names the thing it rejects (`Map<synset, QID>`) and stops the fetch if the join differs; tested. A re-fetch after the fix gave the same snapshot (sha256 `8d3f5c92…` before and after).
+- Its own checks: 3 splits and 30 picks, no synset twice; every pick is in the snapshot; the 58 article counts in the comments match a live query.
+- Deferred to ROADMAP "Next revision" (From the 13e-5 second review): a synset in both lists, and a pick still applying once a third taxon loads.
+
 ## Review of items 1, 2, 8 and 9 (`reviewer` agent, fresh context, 2026-10-27)
 - Blocking findings and how each was fixed:
   - the simulator's 40, 3 and 2027-01-01 had no origin in this ticket: the Numbers table names them;
