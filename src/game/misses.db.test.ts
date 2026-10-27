@@ -22,10 +22,12 @@ const RUN = Date.now().toString(36);
 // review of it left by an earlier run is cleared first.
 const NEW = `Jackalope ${RUN}`;
 const LISTED = `${RUN} 2g1c`;
+// A word on Plor's list, which LDNOOBW doesn't list, is held the same way (13e-9b).
+const PLOR_LISTED = `${RUN} kaffir cat`;
 const NEAR = "horze";
 // RACED: crossed by two players at once.
 const RACED = `bunyip ${RUN}`;
-const texts = [NEW.toLowerCase(), LISTED, NEAR, RACED];
+const texts = [NEW.toLowerCase(), LISTED, PLOR_LISTED, NEAR, RACED];
 let today: ApprovedPuzzle;
 let tomorrow: ApprovedPuzzle;
 
@@ -66,7 +68,7 @@ async function playerMisses(n: number): Promise<void> {
   await signIn(`${RUN}-m${n}@example.test`).then(({ session }) => useSession(session));
   expect((await createProfile(apiRequest("/api/profile", { method: "POST", body: { username: `m${n}${RUN}` } }))).status).toBe(201);
   expect((await startRoute(apiRequest("/api/run/start", { method: "POST" }))).status).toBe(200);
-  for (const text of [NEW, LISTED, NEAR]) {
+  for (const text of [NEW, LISTED, PLOR_LISTED, NEAR]) {
     const r = await answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text } }));
     expect(await r.json()).toMatchObject({ ok: true, notInList: true });
   }
@@ -83,6 +85,7 @@ describe("three players typing the same misses for a category", () => {
     await playerMisses(3);
     expect(await review(NEW.toLowerCase())).toMatchObject({ outcome: "accepted", thing_id: expect.any(String) });
     expect(await review(LISTED)).toEqual({ outcome: "held", thing_id: null });
+    expect(await review(PLOR_LISTED)).toEqual({ outcome: "held", thing_id: null });
     expect(await review(NEAR)).toEqual({ outcome: "near_typo", thing_id: null });
   });
 

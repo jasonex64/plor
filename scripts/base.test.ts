@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, dropListed, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withPopulation, type Item, type Mark, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseListed, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withoutListed, withPopulation, type Item, type Listed, type Mark, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -425,14 +425,66 @@ describe("titledItems", () => {
   });
 });
 
-describe("dropListed", () => {
-  it("leaves out the items named and drops only listed names from the others", () => {
+// 13e-9b: Plor's list dropped from every item at load, LDNOOBW's only where data/listed.json names the item, and a
+// listed shown name renamed or dropped by hand, never guessed.
+describe("withoutListed", () => {
+  const none: Listed = { drop: [], drop_listed_names: [], rename: [] };
+  const lime: Item = { id: "Q2", name: "Kaffir lime", aliases: aliasesFor(["kaffir lime"], ["makrut lime"]) };
+
+  it("drops Plor's words from every item, LDNOOBW's only from the items named, and the items named", () => {
     const items: Item[] = [
       { id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) },
-      { id: "Q2", name: "hearts", aliases: aliasesFor(["hearts"], ["bitch"]) },
-      { id: "Q3", name: "kept", aliases: aliasesFor(["kept"], ["bitch"]) },
+      { id: "Q3", name: "alastrim", aliases: aliasesFor(["alastrim"], ["kaffir pox", "white pox"]) },
+      { id: "Q4", name: "hearts", aliases: aliasesFor(["hearts"], ["bitch"]) },
+      { id: "Q5", name: "kept", aliases: aliasesFor(["kept"], ["bitch"]) },
+      { id: "Q6", name: "kafir", aliases: aliasesFor(["kafir"]) },
     ];
-    expect(dropListed(items, ["Q1"], ["Q2"])).toEqual([{ id: "Q2", name: "hearts", aliases: aliasesFor(["hearts"]) }, items[2]]);
+    const listed: Listed = { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }], drop_listed_names: [{ ref: "wikidata:Q4", why: "x" }] };
+    expect(withoutListed("wikidata", items, listed)).toEqual({
+      items: [
+        { id: "Q3", name: "alastrim", aliases: aliasesFor(["alastrim"], ["white pox"]) },
+        { id: "Q4", name: "hearts", aliases: aliasesFor(["hearts"]) },
+        items[3],
+      ],
+      aliases: 4, dropped: 2,
+    });
+  });
+
+  it("stops on a listed shown name with no decision, naming the names left", () => {
+    expect(() => withoutListed("wikidata", [lime], none)).toThrow("wikidata:Q2: its shown name is listed; data/listed.json needs a rename or a drop (names left: makrut lime)");
+  });
+
+  it("renames to one of the names left, and refuses any other rename", () => {
+    const rename = (name: string): Listed => ({ ...none, rename: [{ ref: "wikidata:Q2", name, why: "x" }] });
+    expect(withoutListed("wikidata", [lime], rename("Makrut lime")).items).toEqual([{ id: "Q2", name: "Makrut lime", aliases: [{ alias: "makrut lime", kind: "name" }] }]);
+    expect(() => withoutListed("wikidata", [lime], rename("thai lime"))).toThrow("rename wikidata:Q2: \"thai lime\" isn't one of its names left");
+    expect(() => withoutListed("wikidata", [{ id: "Q2", name: "makrut lime", aliases: aliasesFor(["makrut lime"]) }], rename("makrut lime"))).toThrow("its shown name isn't listed");
+  });
+
+  it("reads only its own source's rows", () => {
+    expect(withoutListed("oewn", [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }], { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] }).dropped).toBe(0);
+  });
+
+  it("keeps an item that had no names to begin with, as ancestor taxa kept for the tree have none", () => {
+    const items: Item[] = [{ id: "Q8", name: "Q8", aliases: [] }, { id: "Q9", name: "tortoise", aliases: aliasesFor(["tortoise"]), kind_of: ["Q8"] }];
+    expect(withoutListed("wikidata", items, none)).toEqual({ items, aliases: 0, dropped: 0 });
+  });
+
+  it("stops when a dropped item is another's parent", () => {
+    const items: Item[] = [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }, { id: "Q7", name: "child", aliases: aliasesFor(["child"]), kind_of: ["Q1"] }];
+    expect(() => withoutListed("wikidata", items, { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] })).toThrow("wikidata:Q7 is under wikidata:Q1");
+  });
+});
+
+describe("parseListed", () => {
+  const empty = { drop: [], drop_listed_names: [], rename: [] };
+  it("reads the file and refuses a bad ref, a row decided twice, or an item both dropped and kept", () => {
+    const file = { ...empty, rename: [{ ref: "wikidata:Q2", name: "makrut lime", why: "x" }] };
+    expect(parseListed(JSON.stringify(file))).toEqual(file);
+    expect(() => parseListed(JSON.stringify({ ...empty, drop: [{ ref: "Q1", why: "x" }] }))).toThrow('Q1 must be refs as "source:id"');
+    expect(() => parseListed(JSON.stringify({ ...empty, drop: [{ ref: "oewn:1", why: "x" }, { ref: "oewn:1", why: "y" }] }))).toThrow("drop: oewn:1 listed twice");
+    expect(() => parseListed(JSON.stringify({ ...file, drop: [{ ref: "wikidata:Q2", why: "x" }] }))).toThrow("wikidata:Q2 both dropped and kept");
+    expect(() => parseListed(JSON.stringify({ drop: [] }))).toThrow("must hold exactly drop, drop_listed_names, rename");
   });
 });
 

@@ -22,7 +22,7 @@ import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
-import { isListed } from "../src/game/misses.ts";
+import { isListed, isPlorListed } from "../src/game/misses.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
@@ -334,11 +334,6 @@ export function riverShortNames(rivers: string[][]): string[][] {
   return short.map((names) => names.filter((n) => givenBy.get(normalize(n))!.size === 1));
 }
 
-// Rivers whose LDNOOBW-listed aliases are dropped at fetch: Pūkio Stream's Wikidata alias is a racial slur. Its other
-// flagged names, and every other category's, stay typeable (human, 2026-10-25: "Drop the slur, keep rest
-// (Recommended)"). Named by ID so the slur itself stays out of the repo.
-const RIVERS_DROP_LISTED_ALIASES = ["Q32298578"];
-
 // --- Open English WordNet 2025 (SOURCES.md) and USDA FoodData Central SR Legacy (SOURCES.md) ---
 
 const OEWN_ZIP = "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025-json.zip";
@@ -527,10 +522,6 @@ async function download(url: string): Promise<Buffer> {
 // --- the sets for the 13a test day (T1) ---
 
 const ANIMALIA = "Q729"; // labelled "animal"
-// Taxa whose LDNOOBW-listed English names are dropped, named by ID so the word stays out of the repo: the kitefin
-// shark's first English name is a racial slur (13e-4b review flags; human, 2026-10-26: "Drop the slur, keep the rest
-// (Recommended)"), as Pūkio Stream's alias is for rivers.
-const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
 
 // --- pop culture (13e-6; SOURCES.md, Wikidata pop culture) ---
@@ -631,17 +622,6 @@ export function titledItems(found: Map<string, { label: string; alts: string[]; 
 }
 
 const ENWIKI = "?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .";
-
-// LDNOOBW-listed slurs and crude nicknames, by ID so the words stay out of the repo (13e-6 review flags; human,
-// 2026-10-27: "Drop slurs and crude nicknames (Recommended)", as for the shark in 13e-4b): a board game titled with a
-// racial slur goes; the others keep their proper names and lose the listed ones. Real titles and band names that
-// contain a listed word stay.
-const POP_DROP_ITEMS = ["Q18965471"];
-const POP_DROP_LISTED_NAMES = ["Q920413", "Q3381489", "Q867799", "Q7439472", "Q1004599", "Q134969", "Q4817374"];
-export function dropListed(items: Item[], dropItems: string[], dropNames: string[]): Item[] {
-  return items.filter((i) => !dropItems.includes(i.id))
-    .map((i) => (dropNames.includes(i.id) ? { ...i, aliases: i.aliases.filter((a) => !isListed(a.alias)) } : i));
-}
 
 // Labels for many IDs, by key in batches (one query listing every label timed out for tabletop games); parents, when
 // given, ride along as labelled's do.
@@ -781,14 +761,10 @@ async function titleSet(set: string, root: Item, where: string, seriesClass: str
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
     source: "wikidata",
-    method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query: the tree under ${ANIMALIA} read top-down by P171 parent taxon, each taxon's English common names (P1843), and for the taxa kept (those with an English name, plus their ancestors up to it) their scientific names (P225) and English labels (named by the label when it is one of the common names, else the first common name alphabetically); LDNOOBW-listed names of ${ANIMALS_DROP_LISTED_NAMES.join(", ")} dropped; each taxon's IUCN conservation status (P141, truthy) among the 9 of its one-of constraint, which are items of the set`,
+    method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query: the tree under ${ANIMALIA} read top-down by P171 parent taxon, each taxon's English common names (P1843), and for the taxa kept (those with an English name, plus their ancestors up to it) their scientific names (P225) and English labels (named by the label when it is one of the common names, else the first common name alphabetically); each taxon's IUCN conservation status (P141, truthy) among the 9 of its one-of constraint, which are items of the set`,
     fetch: async () => {
       const taxa = await fetchTaxa(ANIMALIA);
       if (!taxa.has(DOG)) throw new Error(`${DOG} (the domestic dog) wasn't fetched`);
-      for (const id of ANIMALS_DROP_LISTED_NAMES) {
-        const t = taxa.get(id);
-        if (t) [t.names, t.synonyms] = [t.names, t.synonyms].map((names) => names.filter((n) => !isListed(normalize(n))));
-      }
       const statuses = new Map<string, Claim[]>();
       await byIds([...taxa.keys()], "P141", (v) => `SELECT ?t ?s WHERE { VALUES ?t { ${v} } ?t wdt:P141 ?s . }`, (rows) => {
         for (const r of rows) {
@@ -896,14 +872,10 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-rivers": {
     source: "wikidata",
-    method: `SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name "X River" or "River X" also gives "X" as a synonym unless another river gives it too; LDNOOBW-listed aliases of ${RIVERS_DROP_LISTED_ALIASES.join(", ")} dropped; each river's countries (P17, best rank, only the wikidata-countries snapshot's 193)`,
+    method: `SPARQL: instances of river (P31 Q4022) with an English Wikipedia article (schema:about, schema:isPartOf <https://en.wikipedia.org/>); each name "X River" or "River X" also gives "X" as a synonym unless another river gives it too; each river's countries (P17, best rank, only the wikidata-countries snapshot's 193)`,
     fetch: async () => {
       const where = `?x wdt:P31 wd:Q4022 . ?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .`;
       const found = await labelled(where);
-      for (const id of RIVERS_DROP_LISTED_ALIASES) {
-        const e = found.get(id);
-        if (e) e.alts = e.alts.filter((a) => !isListed(normalize(a)));
-      }
       const ids = [...found.keys()];
       const short = riverShortNames(ids.map((id) => [found.get(id)!.label, ...found.get(id)!.alts]));
       const shortOf = new Map(ids.map((id, i) => [id, short[i]]));
@@ -932,7 +904,7 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-tabletop-games": {
     source: "wikidata",
-    method: `SPARQL: instances of board game (P31/P279* Q131436) or card game (P31/P279* Q142714) with an English Wikipedia article, each under the one it is (or both), both under tabletop game (Q3244175, their parent); title forms; LDNOOBW-listed names of ${POP_DROP_LISTED_NAMES.join(", ")} dropped and ${POP_DROP_ITEMS.join(", ")} left out; a short form two games share goes to the one with more sitelinks`,
+    method: `SPARQL: instances of board game (P31/P279* Q131436) or card game (P31/P279* Q142714) with an English Wikipedia article, each under the one it is (or both), both under tabletop game (Q3244175, their parent); title forms; a short form two games share goes to the one with more sitelinks`,
     fetch: async () => {
       const root = await rootItem("Q3244175", "tabletop game");
       const classes = [await rootItem("Q131436", "board game"), await rootItem("Q142714", "card game")].map((c) => ({ ...c, kind_of: [root.id] }));
@@ -943,7 +915,7 @@ const SETS: Record<string, SetDef> = {
       }
       const found = await labelledIds([...parents.keys()], parents);
       for (const c of classes) found.delete(c.id);
-      const items = dropListed(titledItems(found, await sitelinksOf([...found.keys()]), (_, parents) => [...parents]), POP_DROP_ITEMS, POP_DROP_LISTED_NAMES);
+      const items = titledItems(found, await sitelinksOf([...found.keys()]), (_, parents) => [...parents]);
       console.log(`wikidata-tabletop-games: ${items.filter((i) => i.kind_of?.includes("Q131436")).length} board games, ${items.filter((i) => i.kind_of?.includes("Q142714")).length} card games`);
       return [root, ...classes, ...items];
     },
@@ -962,10 +934,10 @@ const SETS: Record<string, SetDef> = {
   },
   "wikidata-pop-groups": {
     source: "wikidata",
-    method: "SPARQL: musical groups (P31/P279* Q215380) whose genre (P136) is pop music (Q37073) or K-pop (Q213665) or a sub-genre of either (P279*), with an English Wikipedia article, under musical group; genre (pop music and K-pop, a sub-genre counting for its broader one), which are items of the set; LDNOOBW-listed names of the POP_DROP_LISTED_NAMES items dropped",
-    fetch: async () => dropListed(await titleSet("wikidata-pop-groups", await rootItem("Q215380", "musical group"),
+    method: "SPARQL: musical groups (P31/P279* Q215380) whose genre (P136) is pop music (Q37073) or K-pop (Q213665) or a sub-genre of either (P279*), with an English Wikipedia article, under musical group; genre (pop music and K-pop, a sub-genre counting for its broader one), which are items of the set",
+    fetch: async () => titleSet("wikidata-pop-groups", await rootItem("Q215380", "musical group"),
       `{ ?x wdt:P31/wdt:P279* wd:Q215380 ; wdt:P136/wdt:P279* wd:Q37073 . } UNION { ?x wdt:P31/wdt:P279* wd:Q215380 ; wdt:P136/wdt:P279* wd:Q213665 . } ${ENWIKI}`, null,
-      [{ trait: "genre", property: "P136", only: ["Q37073", "Q213665"], broader: true }]), POP_DROP_ITEMS, POP_DROP_LISTED_NAMES),
+      [{ trait: "genre", property: "P136", only: ["Q37073", "Q213665"], broader: true }]),
   },
   "wikidata-superheroes": {
     source: "wikidata",
@@ -1076,20 +1048,102 @@ export async function localClient(): Promise<pg.Client> {
 async function loadSet(set: string, def: SetDef): Promise<void> {
   const { manifest, items: read } = readSnapshot(set);
   const name = (id: string) => loadedWikidata().names.get(mergePlan().into.get(id) ?? id);
-  const items = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
+  const named = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
+  const { items, aliases, dropped } = withoutListed(def.source, named, readListed());
   const client = await localClient();
   try {
     await client.query("begin");
     const withIds = items.map((item) => ({ ...item, thing_id: thingId(def.source, item.id) }));
     const { rows } = await client.query("select private.import_source($1, $2, $3::jsonb) as counts", [def.source, manifest.snapshot, JSON.stringify(withIds)]);
     await client.query("commit");
-    console.log(`LOADED ${set} (${manifest.snapshot}): ${JSON.stringify(rows[0].counts)}`);
+    console.log(`LOADED ${set} (${manifest.snapshot}): ${JSON.stringify(rows[0].counts)}${aliases || dropped ? `, listed words: ${aliases} names and ${dropped} items dropped` : ""}`);
   } catch (err) {
     await client.query("rollback");
     throw err;
   } finally {
     await client.end();
   }
+}
+
+// --- listed words: Plor's list and LDNOOBW's, dropped at load (13e-9b) ---
+
+// Every hand decision about listed words (docs/milestones/M13-13e-9b-the-word-list.md), each item named as
+// "source:id": items dropped whole; items whose LDNOOBW-listed names go while their real names stay (LDNOOBW's words
+// are in real titles and band names, so they're dropped only where a person named the item); and the new shown name
+// of an item whose name is listed (human, 2026-10-27: "You, in a hand file (Recommended)").
+export const LISTED_FILE = "data/listed.json";
+export type Listed = {
+  drop: { ref: string; why: string }[];
+  drop_listed_names: { ref: string; why: string }[];
+  rename: { ref: string; name: string; why: string }[];
+};
+const LISTED_FIELDS: Record<keyof Listed, string[]> = { drop: ["ref", "why"], drop_listed_names: ["ref", "why"], rename: ["ref", "name", "why"] };
+
+export function parseListed(text: string): Listed {
+  const listed = parseLists<Listed>(LISTED_FILE, LISTED_FIELDS, { drop: ["ref"], drop_listed_names: ["ref"], rename: ["ref"] }, text);
+  const refs = [...listed.drop, ...listed.drop_listed_names, ...listed.rename].map((r) => r.ref);
+  const bad = refs.filter((ref) => !/^(wikidata|oewn|usda):./.test(ref));
+  if (bad.length) throw new Error(`${LISTED_FILE}: ${bad.join(", ")} must be refs as "source:id"`);
+  const dropped = new Set(listed.drop.map((r) => r.ref));
+  const both = [...listed.drop_listed_names, ...listed.rename].filter((r) => dropped.has(r.ref)).map((r) => r.ref);
+  if (both.length) throw new Error(`${LISTED_FILE}: ${both.join(", ")} both dropped and kept`);
+  return listed;
+}
+
+// One set's items without the listed words: every alias holding a word on Plor's list goes, from every item; the
+// drop_listed_names items also lose their LDNOOBW-listed names; drop items go, and so does an item left with no names.
+// An item whose shown name went needs a rename to one of its names left, or a drop, or the load stops, naming its ID
+// and the names left, never the word (human, 2026-10-27: "Rename it (Recommended)").
+export function withoutListed(source: Source, items: Item[], listed: Listed): { items: Item[]; aliases: number; dropped: number } {
+  const mine = (rows: { ref: string }[]) => rows.filter((r) => r.ref.startsWith(`${source}:`)).map((r) => r.ref.slice(source.length + 1));
+  const drop = new Set(mine(listed.drop));
+  const names = new Set(mine(listed.drop_listed_names));
+  const rename = new Map(listed.rename.filter((r) => r.ref.startsWith(`${source}:`)).map((r) => [r.ref.slice(source.length + 1), r.name]));
+  const kept: Item[] = [];
+  let aliases = 0;
+  for (const item of items) {
+    if (drop.has(item.id)) continue;
+    const gone = (text: string) => isPlorListed(normalize(text)) || (names.has(item.id) && isListed(normalize(text)));
+    const left = item.aliases.filter((a) => !gone(a.alias));
+    aliases += item.aliases.length - left.length;
+    // Gone when the list took every name; an ancestor taxon kept for the tree has none to begin with and stays.
+    if (!left.length && item.aliases.length) continue;
+    const to = rename.get(item.id);
+    const ref = `${source}:${item.id}`;
+    if (!gone(item.name)) {
+      if (to !== undefined) throw new Error(`${LISTED_FILE} rename ${ref}: its shown name isn't listed`);
+      kept.push(left.length === item.aliases.length ? item : { ...item, aliases: left });
+      continue;
+    }
+    if (to === undefined) throw new Error(`${ref}: its shown name is listed; ${LISTED_FILE} needs a rename or a drop (names left: ${left.map((a) => a.alias).join(", ")})`);
+    if (!left.some((a) => a.alias === normalize(to))) throw new Error(`${LISTED_FILE} rename ${ref}: "${to}" isn't one of its names left`);
+    // The new shown name becomes a name, not a synonym: a category's members need one (private.category_members).
+    kept.push({ ...item, name: to, aliases: left.map((a) => (a.alias === normalize(to) ? { ...a, kind: "name" } : a)) });
+  }
+  // A dropped item can't be another's parent: its facts would name a thing never loaded.
+  const keptIds = new Set(kept.map((i) => i.id));
+  const goneIds = new Set(items.map((i) => i.id).filter((id) => !keptIds.has(id)));
+  for (const item of kept) {
+    const parent = [...(item.kind_of ?? []), ...(item.member_of ?? [])].find((p) => goneIds.has(p));
+    if (parent) throw new Error(`${source}:${item.id} is under ${source}:${parent}, which the listed words drop`);
+  }
+  return { items: kept, aliases, dropped: items.length - kept.length };
+}
+
+// The hand file, read and checked once: a rename or a drop_listed_names row must name a loaded item, or it decides
+// nothing; a drop may name one today's snapshots don't hold (an item dropped at fetch before 13e-9b), printed (human,
+// 2026-10-27: "Strict, except drops (Recommended)").
+let listedFile: Listed | undefined;
+function readListed(): Listed {
+  if (listedFile) return listedFile;
+  const listed = parseListed(readFileSync(LISTED_FILE, "utf8"));
+  const loadedRefs = new Set(Object.entries(SETS).flatMap(([set, def]) => readSnapshot(set).items.map((i) => `${def.source}:${i.id}`)));
+  const missing = [...listed.drop_listed_names, ...listed.rename].map((r) => r.ref).filter((ref) => !loadedRefs.has(ref));
+  if (missing.length) throw new Error(`${LISTED_FILE}: ${missing.join(", ")} isn't in any loaded set`);
+  const absent = listed.drop.map((r) => r.ref).filter((ref) => !loadedRefs.has(ref));
+  if (absent.length) console.log(`${LISTED_FILE}: ${absent.length} drop not in today's snapshots: ${absent.join(", ")}`);
+  listedFile = listed;
+  return listed;
 }
 
 // --- sameness: Wikidata's own doubles and the human's decisions (13e-5b) ---
@@ -1119,29 +1173,33 @@ const SAMENESS_KEYS: Record<keyof Sameness, string[]> = {
   merge: ["old"], apart: ["a", "b"], reviewed: ["category", "name"], wordnet_split: ["synset"], wordnet_pick: ["synset"], wordnet_join: ["synset"],
 };
 
-export function parseSameness(text: string): Sameness {
+// A hand file of named lists of rows, every field text (disk input, checked here): exactly the lists named, each row
+// exactly its list's fields, and what each row decides (its key fields) at most once in its list.
+function parseLists<T>(file: string, fieldsOf: Record<string, string[]>, keysOf: Record<string, string[]>, text: string): T {
   const data: unknown = JSON.parse(text);
-  const lists = Object.keys(SAMENESS_FIELDS) as (keyof Sameness)[];
+  const lists = Object.keys(fieldsOf);
   if (typeof data !== "object" || data === null || Array.isArray(data) || Object.keys(data).sort().join() !== [...lists].sort().join()) {
-    throw new Error(`${SAMENESS_FILE}: must hold exactly ${lists.join(", ")}`);
+    throw new Error(`${file}: must hold exactly ${lists.join(", ")}`);
   }
   for (const list of lists) {
     const rows = (data as Record<string, unknown>)[list];
-    if (!Array.isArray(rows)) throw new Error(`${SAMENESS_FILE}: ${list} must be a list`);
-    const fields = SAMENESS_FIELDS[list];
+    if (!Array.isArray(rows)) throw new Error(`${file}: ${list} must be a list`);
+    const fields = fieldsOf[list];
     rows.forEach((row, i) => {
       const ok = typeof row === "object" && row !== null && !Array.isArray(row) && Object.keys(row).length === fields.length
         && fields.every((f) => typeof (row as Record<string, unknown>)[f] === "string" && ((row as Record<string, string>)[f]).trim() !== "");
-      if (!ok) throw new Error(`${SAMENESS_FILE} ${list} ${i + 1}: must hold exactly ${fields.join(", ")}, each as text`);
+      if (!ok) throw new Error(`${file} ${list} ${i + 1}: must hold exactly ${fields.join(", ")}, each as text`);
     });
-    // What each row decides, once: an old item merges once, a pair is apart once, a category's name is reviewed once, a
-    // synset is split, picked or joined once.
-    const keys = rows.map((row) => SAMENESS_KEYS[list].map((f) => (row as Record<string, string>)[f]).join(" "));
+    const keys = rows.map((row) => keysOf[list].map((f) => (row as Record<string, string>)[f]).join(" "));
     const twice = keys.filter((v, i) => keys.indexOf(v) !== i);
-    if (twice.length) throw new Error(`${SAMENESS_FILE} ${list}: ${[...new Set(twice)].join(", ")} listed twice`);
+    if (twice.length) throw new Error(`${file} ${list}: ${[...new Set(twice)].join(", ")} listed twice`);
   }
-  return data as Sameness;
+  return data as T;
 }
+
+// What each row decides, once: an old item merges once, a pair is apart once, a category's name is reviewed once, a
+// synset is split, picked or joined once.
+export const parseSameness = (text: string): Sameness => parseLists(SAMENESS_FILE, SAMENESS_FIELDS, SAMENESS_KEYS, text);
 
 const readSameness = () => parseSameness(readFileSync(SAMENESS_FILE, "utf8"));
 
@@ -1381,10 +1439,10 @@ async function analyzeBase(): Promise<void> {
 }
 
 // What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
-// CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list, for the human to decide per category
-// (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by two members
-// (duplicates), things under the root with no English name (left out of the category), WordNet words joined to a
-// Wikidata thing sharing no name, and words naming several taxa, left unjoined for a person to fix (13e-5).
+// CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list or Plor's (13e-9b), for the human to
+// decide per category (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by
+// two members (duplicates), things under the root with no English name (left out of the category), WordNet words
+// joined to a Wikidata thing sharing no name, and words naming several taxa, left unjoined for a person to fix (13e-5).
 // Joins are read from the loaded snapshots (13e-5 items 1 and 2): odd joins, and words naming several taxa, unjoined.
 type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; odd: Map<string, string> };
 // What the doubles list reads (13e-5b): the bank, the pairs a person kept apart, and the merge plan's forks and P460 pairs.
@@ -1427,7 +1485,7 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
   console.log(`REVIEW ${key}: ${n} members`);
   if (n < CATEGORY_MIN_MEMBERS) console.log(`  flag, fewer than ${CATEGORY_MIN_MEMBERS} members: ${n}`);
   console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);
-  console.log(`  flag, an alias on the LDNOOBW list: ${listed.length}${listed.length ? ` (${listed.join("; ")})` : ""}`);
+  console.log(`  flag, an alias on the LDNOOBW list or Plor's: ${listed.length}${listed.length ? ` (${listed.join("; ")})` : ""}`);
   console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
   console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
   console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);

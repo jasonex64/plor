@@ -1,0 +1,73 @@
+{
+  "drop": [
+    {
+      "ref": "wikidata:Q18965471",
+      "why": "a board game titled with a racial slur on the LDNOOBW list (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b, so today's snapshot doesn't hold it"
+    },
+    {
+      "ref": "oewn:02128524-n",
+      "why": "the cat whose English names hold the slur on Plor's list; only its Latin name is left, and \"wildcat\" stays its own entry (13e-9b; human, 2026-10-27: \"Drop them (Recommended)\")"
+    },
+    {
+      "ref": "oewn:12548614-n",
+      "why": "the coral tree whose English names hold the slur on Plor's list; only Latin names are left, and \"coral tree\" stays its own entry (13e-9b; human, 2026-10-27: \"Drop them (Recommended)\")"
+    },
+    {
+      "ref": "oewn:12549273-n",
+      "why": "WordNet's second entry for the same coral tree, loaded as one thing with oewn:12548614-n (13e-9b; human, 2026-10-27: \"Drop them (Recommended)\")"
+    },
+    {
+      "ref": "oewn:10248534-n",
+      "why": "the slur itself as a WordNet noun; its spelling \"caffer\" stays off Plor's list for the Latin species names, so it isn't emptied by the list (13e-9b: the ticket has it not loaded; human, 2026-10-27: \"Keep Latin names (Recommended)\")"
+    },
+    {
+      "ref": "oewn:11623913-n",
+      "why": "the cycad whose English name holds the slur on Plor's list; only its Latin name is left, so it has no clean common name (13e-9b; human, 2026-10-27: \"Rename it (Recommended)\": drop it only if it has none)"
+    }
+  ],
+  "drop_listed_names": [
+    {
+      "ref": "wikidata:Q32298578",
+      "why": "Pūkio Stream: its Wikidata alias is a racial slur; its other names stay (human, 2026-10-25: \"Drop the slur, keep rest (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q1321783",
+      "why": "the kitefin shark: its first English name is a racial slur (13e-4b review; human, 2026-10-26: \"Drop the slur, keep the rest (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q920413",
+      "why": "a tabletop game's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q3381489",
+      "why": "a tabletop game's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q867799",
+      "why": "a tabletop game's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q7439472",
+      "why": "a tabletop game's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q1004599",
+      "why": "a tabletop game's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q134969",
+      "why": "R.E.M.'s LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    },
+    {
+      "ref": "wikidata:Q4817374",
+      "why": "Atomizer's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
+    }
+  ],
+  "rename": [
+    {
+      "ref": "wikidata:Q137505841",
+      "name": "makrut lime",
+      "why": "its shown name holds the slur on Plor's list; makrut lime is one of its names left, the ticket's pick (13e-9b; human, 2026-10-27: \"Rename it (Recommended)\", then \"I approve 13e-9b's design as drafted\")"
+    }
+  ]
+}

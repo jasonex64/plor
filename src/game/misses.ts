@@ -3,12 +3,18 @@
 // Relative-imported, as scripts/base.ts uses it too.
 import { normalize } from "../content/puzzle.ts";
 import { LDNOOBW_EN } from "./ldnoobw-en.ts";
+import { PLOR_LISTED } from "./plor-listed.ts";
 
-const LISTED = LDNOOBW_EN.map(normalize).filter((w) => w !== "");
+const words = (list: readonly string[]) => list.map(normalize).filter((w) => w !== "");
+const PLOR = words(PLOR_LISTED);
+const LISTED = [...words(LDNOOBW_EN), ...PLOR];
 
-// Whether a normalized text holds a listed word or phrase as whole words, so "big butt" is held but "button" isn't
-// (human, 2026-10-24: "Hold listed words (Recommended)").
-export function isListed(text: string): boolean {
-  const padded = ` ${text} `;
-  return LISTED.some((w) => padded.includes(` ${w} `));
-}
+const holds = (list: string[], text: string) => list.some((w) => ` ${text} `.includes(` ${w} `));
+
+// Whether a normalized text holds a word or phrase on either list as whole words, so "big butt" is held but "button"
+// isn't (human, 2026-10-24: "Hold listed words (Recommended)"; Plor's list, 13e-9b).
+export const isListed = (text: string): boolean => holds(LISTED, text);
+
+// Whether it holds a word on Plor's list, which the load drops from every set (13e-9b). LDNOOBW's words are dropped
+// only from the items data/listed.json names, as real titles and band names hold some of them.
+export const isPlorListed = (text: string): boolean => holds(PLOR, text);

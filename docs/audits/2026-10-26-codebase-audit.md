@@ -136,6 +136,7 @@ Grep sizes: 15–16 non-test `GAME_ID` importers (M16 lists 7); 42 non-test file
 - **13-α (TOOL-5):** built as M13 13e-5 item 7 ("fold into 13e-5"); the hosted load waits for M15, connecting as `postgres` ("Hosted too, guarded", "Guard now, hosted in M15", "postgres, recorded").
 - **DOM-7 (the bank):** the bank stays public ("Stay public") and the 82 banks in history are accepted for the beta ("Accept for the beta"); 15a is deferred to M15 ("Defer to M15").
 - **DOC-9 (the pause):** lifted rather than recorded ("Lift the pause"), so DECISIONS' drafting row is right as it stands. All in the DECISIONS.md Log, 2026-10-26.
+- **FUT-4 / DB-11 / DOM-9 (14c-1's N2 and the name's home):** keep `offbeat` as the internal ID ("Keep it (Recommended)"); the address becomes the new name ("The new name"); games 2–6 get neutral permanent IDs ("Neutral IDs (Recommended)"); one record per game holds its ID, shown name and address ("One place, in 14c-1"), built now with "Offbeat" ("Build it now, as Offbeat") by the M14 session as its next sub-ticket ("M14 session, next"); shared screens carry no game name ("No game name"). Recorded, by the human's choice ("Notes until 14c-1 starts"), here and in the side-session notes for M14, not yet in 14c-1 or DECISIONS.
 
 ## Proposed sub-tickets, by milestone (for the human's approval)
 Each needs its own guided-questions round before design (CLAUDE.md, "Ask before designing"). **Security** marks a change CLAUDE.md requires to be proposed and recorded in DECISIONS.md first. Numbers in brackets are findings.
