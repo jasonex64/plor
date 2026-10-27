@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-sameness",
+  "source": "wikidata",
+  "snapshot": "2026-10-27",
+  "retrieved_at": "2026-10-27T05:25:10.058Z",
+  "method": "SPARQL by key, 5000 IDs a query, over every item of the Wikidata snapshots: P12763 taxon synonym of, P1420 taxon synonym (read from the other side), P2959 permanent duplicated item and P460 said to be the same as (truthy) between two loaded items, and each marked item's sitelink count",
+  "items": 2145,
+  "sha256": "4c8a987c2d66951673d964056505d40294babbb74c7e5612c76569d524221680"
+}

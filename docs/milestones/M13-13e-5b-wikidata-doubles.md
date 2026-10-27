@@ -31,6 +31,13 @@ Asked after 13e-5's review lists showed "dog" with two loaded taxa (human: "Next
 | Where the review list is decided | "here, and summarize what i did more understandably": in chat, one by one, as on 2026-10-27 |
 | Today's 30 decisions (13e-5) as merges | "Yes, count them (Recommended)": each pair merges, the current-name item keeping its ID |
 | What a retired ID does | "Keep pointing (Recommended)" |
+| Approval, after the scaling check | "yes fix the gaps" |
+| The shown name, after "WordNet's word first" renamed the fruit fly "drosophila" and broke 5 simulated days | "Keep a name WordNet lists (Recommended)"; that didn't fix it either (WordNet's drosophila synset never lists "fruit fly", which Claude had assumed unchecked), so asked again: "Wikidata's common name (Recommended)": Wikidata's everyday name, in WordNet's spelling where only capitals differ, WordNet's word over a scientific name |
+| How to go through the review's 106 entries | "Bulk the clear ones (Recommended)" |
+| Goldfish: species and the domestic subspecies | "Merge into the species (Recommended)" |
+| Kinkajou: the species and its one-species genus | "Keep apart (Recommended)" |
+| Kookaburra, walrus, wolverine: WordNet synsets with no Wikidata ID | "Apply all three (Recommended)": each joins its species; WordNet's "Atlantic walrus" (a subspecies) split off the species |
+| The other 92, clearly different things sharing a name | "Mark all 92 (Recommended)" |
 
 ## Reading Wikidata (2026-10-27, the Windows PC)
 **Hypothesis:** taxa carry a synonym property, and other items use P460 or P2959; disproved if those properties mean something else or link too few loaded pairs to help (under a tenth of the shared names). **Result:** held for taxa, weak elsewhere. Read with `wbgetentities` the same day:
@@ -98,6 +105,12 @@ Measured on the Windows PC's full load:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Design 1: merges at fetch, each set's fetch reading its marks | One small snapshot of the marks, `wikidata-sameness` (`npm run base -- fetch wikidata-sameness`, 48 s), read at load by `planMerges`; `load` folds each merged item into its kept one (`withMerges`, `merged_into`) | Re-fetching every Wikidata set to add marks means re-reading the 2.3-million-taxon animal tree; the marks can be refreshed on their own as Wikidata changes |
+| Design 5: WordNet's word as the shown name | Wikidata's common name, in WordNet's spelling where only capitals differ, WordNet's word over a scientific name (`shownNames`, at load) | The human's two later answers (decisions table): WordNet's first word renamed the fruit fly "drosophila" and broke 5 simulated days |
+| 13a's rule (`answer_engine.test.sql`): "a typeable name stays" when WordNet joins | `import_source` gives a joining WordNet item's name to the thing; the load picks that name | One place picks the name (TypeScript, which has `normalize`); the test now checks the SQL's part, its comment says where the choice is made |
+| Design 2: hand decisions as `merge`, `apart`, `split`, `pick` | Also `reviewed` (a bank answer's name reviewed as different things, so the review doesn't ask again) and `wordnet_join` (a synset naming no Wikidata ID joins the thing a person names) | Both have callers: the 94 reviewed names, and kookaburra, walrus and wolverine |
+| The human's 30 decisions (13e-5) as merges | 29 merges and one apart pair | Horseshoe crab's two taxa are a family and its species, not one thing |
+| Design 4: a migration for `thing_retired` and the readers | `private.thing_retired`, `private.thing_now`; `thing_names` and `approve_puzzle` read through it; `scripts/draft.ts` reads the bank's `#` IDs through it | No grant change: the readers run with their owners' rights, and the scripts as the local superuser |
 
 ## Evidence
 

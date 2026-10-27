@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseSameness, planMerges, riverShortNames, shownNames, taxaToItems, usdaCheeses, withFact, withMerges, withPopulation, type Item, type Mark, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -115,7 +115,7 @@ describe("usdaCheeses", () => {
 });
 
 describe("linkToWikidata", () => {
-  const none = { split: new Map<string, string>(), pick: new Map<string, string>() };
+  const none = { split: new Map<string, string>(), pick: new Map<string, string>(), join: new Map<string, string>() };
   it("links each WordNet item to the loaded Wikidata thing its synset names, and the root to the category's root", () => {
     const synsets = { root: { members: ["animal"] }, bear: { members: ["bear"], wikidata: "Q1" }, yeti: { members: ["yeti"], wikidata: "Q9" } };
     const items = [
@@ -167,7 +167,8 @@ describe("linkToWikidata", () => {
       { id: "cat", name: "cat", aliases: [], kind_of: ["root"] },
     ];
     const known = new Set(["Q729", "Q1", "Q2", "Q3"]);
-    const link = (split: [string, string][], pick: [string, string][], from = items) => linkToWikidata(from, synsets, known, "root", "Q729", new Map(), { split: new Map(split), pick: new Map(pick) });
+    const link = (split: [string, string][], pick: [string, string][], from = items, join: [string, string][] = []) =>
+      linkToWikidata(from, synsets, known, "root", "Q729", new Map(), { split: new Map(split), pick: new Map(pick), join: new Map(join) });
     expect(link([["sloth", "Q1"]], [["cat", "Q3"]])).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "sloth", name: "ground sloth", aliases: [], kind_of: ["root"] },
@@ -179,6 +180,12 @@ describe("linkToWikidata", () => {
     // The join it split now goes elsewhere: the decision no longer holds.
     expect(() => link([["sloth", "Q7"]], [])).toThrow("hand split sloth (ground sloth) from Q7: it now joins Q1");
     expect(() => link([["gone", "Q1"]], [], items)).toThrow("hand joins name synsets not in the tree: gone");
+    // A synset naming no loaded item joins the one a person names; one that already names one refuses.
+    const bare = [...items, { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] }];
+    const withYeti = { ...synsets, yeti: { members: ["yeti"] } };
+    const joined = linkToWikidata(bare, withYeti, known, "root", "Q729", new Map(), { split: new Map(), pick: new Map([["cat", "Q3"]]), join: new Map([["yeti", "Q1"]]) });
+    expect(joined[3]).toEqual({ id: "yeti", name: "yeti", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" });
+    expect(() => link([], [["cat", "Q3"]], items, [["sloth", "Q2"]])).toThrow("hand join sloth (ground sloth) → Q2: it already names Q1");
   });
 });
 
@@ -278,5 +285,95 @@ describe("localClient", () => {
   it("refuses a database that isn't this machine", async () => {
     vi.stubEnv("DATABASE_URL", "postgresql://postgres:postgres@elsewhere.invalid:5432/postgres");
     await expect(localClient()).rejects.toThrow(/^refusing elsewhere\.invalid/);
+  });
+});
+
+describe("parseSameness", () => {
+  const empty = { merge: [], apart: [], reviewed: [], wordnet_split: [], wordnet_pick: [], wordnet_join: [] };
+  it("takes the four lists, each row exactly its fields as text", () => {
+    const file = { ...empty, merge: [{ old: "Q1", kept: "Q2", why: "one species" }] };
+    expect(parseSameness(JSON.stringify(file))).toEqual(file);
+  });
+  it("refuses a missing or extra list, a row with a missing, empty or extra field, and an ID listed twice", () => {
+    expect(() => parseSameness(JSON.stringify({ merge: [] }))).toThrow("must hold exactly merge, apart, reviewed, wordnet_split, wordnet_pick, wordnet_join");
+    expect(() => parseSameness(JSON.stringify({ ...empty, merge: [{ old: "Q1", kept: "Q2" }] }))).toThrow("merge 1: must hold exactly old, kept, why");
+    expect(() => parseSameness(JSON.stringify({ ...empty, merge: [{ old: "Q1", kept: " ", why: "x" }] }))).toThrow("merge 1");
+    expect(() => parseSameness(JSON.stringify({ ...empty, apart: [{ a: "Q1", b: "Q2", why: "x", extra: "y" }] }))).toThrow("apart 1");
+    const twice = [{ old: "Q1", kept: "Q2", why: "x" }, { old: "Q1", kept: "Q3", why: "y" }];
+    expect(() => parseSameness(JSON.stringify({ ...empty, merge: twice }))).toThrow("merge: Q1 listed twice");
+    const names = [{ category: "fish", name: "cod", why: "x" }, { category: "fish", name: "tuna", why: "y" }, { category: "bird", name: "cod", why: "z" }];
+    expect(parseSameness(JSON.stringify({ ...empty, reviewed: names })).reviewed).toHaveLength(3);
+    expect(() => parseSameness(JSON.stringify({ ...empty, reviewed: [...names, names[0]] }))).toThrow("reviewed: fish cod listed twice");
+  });
+});
+
+describe("planMerges", () => {
+  const none: Sameness = { merge: [], apart: [], reviewed: [], wordnet_split: [], wordnet_pick: [], wordnet_join: [] };
+  const mark = (id: string, m: Partial<Mark> = {}): Mark => ({ id, synonym_of: [], duplicates: [], said_same: [], sitelinks: 0, ...m });
+  const setOf = (ids: string, set = "animals") => new Map(ids.split(" ").map((id) => [id, set]));
+
+  it("folds an old name into its current one, and a chain to its end", () => {
+    const marks = [mark("A", { synonym_of: ["B"] }), mark("B", { synonym_of: ["C"] }), mark("C")];
+    expect(planMerges(marks, setOf("A B C"), none).into).toEqual(new Map([["A", "C"], ["B", "C"]]));
+  });
+
+  it("keeps the better-known ID where no side is named, and lists a tie", () => {
+    const marks = [
+      mark("A", { synonym_of: ["B"], sitelinks: 3 }), mark("B", { synonym_of: ["A"], sitelinks: 9 }),
+      mark("C", { duplicates: ["D"], sitelinks: 5 }), mark("D", { duplicates: ["C"], sitelinks: 1 }),
+      mark("E", { duplicates: ["F"], sitelinks: 2 }), mark("F", { duplicates: ["E"], sitelinks: 2 }),
+    ];
+    const plan = planMerges(marks, setOf("A B C D E F"), none);
+    expect(plan.into).toEqual(new Map([["A", "B"], ["D", "C"]]));
+    expect(plan.forks).toEqual([["E", "F"]]);
+  });
+
+  it("doesn't merge a fork or a circle, but still merges an old name into a fork's own item", () => {
+    const marks = [
+      mark("A", { synonym_of: ["B", "C"] }), mark("B"), mark("C"), mark("Z", { synonym_of: ["A"] }),
+      mark("X", { synonym_of: ["Y"] }), mark("Y", { synonym_of: ["W"] }), mark("W", { synonym_of: ["X"] }),
+    ];
+    const plan = planMerges(marks, setOf("A B C Z X Y W"), none);
+    expect(plan.into).toEqual(new Map([["Z", "A"]]));
+    expect(plan.forks).toEqual([["A", "B", "C"], ["X", "Y", "W"]]);
+  });
+
+  it("adds the human's merges, keeps their apart pairs apart, and lists P460 pairs", () => {
+    const marks = [mark("A", { synonym_of: ["B"], said_same: ["C"] }), mark("B"), mark("C", { said_same: ["A"] })];
+    const s: Sameness = { ...none, merge: [{ old: "D", kept: "E", why: "x" }], apart: [{ a: "A", b: "B", why: "y" }] };
+    const plan = planMerges(marks, setOf("A B C D E"), s);
+    expect(plan.into).toEqual(new Map([["D", "E"]]));
+    expect(plan.saidSame).toEqual([["A", "C"]]);
+  });
+
+  it("stops on a decision that no longer fits, a merge Wikidata reverses, or a merge across two sets", () => {
+    const marks = [mark("A", { synonym_of: ["B"] }), mark("B")];
+    expect(() => planMerges(marks, setOf("A B"), { ...none, merge: [{ old: "A", kept: "Q9", why: "x" }] })).toThrow("Q9 isn't loaded");
+    expect(() => planMerges(marks, setOf("A B"), { ...none, merge: [{ old: "B", kept: "A", why: "x" }] })).toThrow("Wikidata keeps B instead");
+    expect(() => planMerges(marks, setOf("A B"), { ...none, apart: [{ a: "A", b: "Q9", why: "x" }] })).toThrow("Q9 isn't loaded");
+    const across = new Map([["A", "animals"], ["B", "places"]]);
+    expect(() => planMerges(marks, across, none)).toThrow("a merge across two sets: A (animals) into B (places)");
+  });
+});
+
+describe("withMerges", () => {
+  it("folds a merged item into its kept one, with its names and none of its facts", () => {
+    const items: Item[] = [
+      { id: "A", name: "a", aliases: aliasesFor(["a"]), kind_of: ["R"], conservation_status: ["LC"] },
+      { id: "B", name: "b", aliases: aliasesFor(["b"]), kind_of: ["R"] },
+    ];
+    expect(withMerges(items, new Map([["A", "B"]]))).toEqual([
+      { id: "A", name: "a", aliases: aliasesFor(["a"]), merged_into: "wikidata:B" },
+      items[1],
+    ]);
+  });
+});
+
+describe("shownNames", () => {
+  const names = new Map([["Q1", { name: "Dog", scientific: false }], ["Q2", { name: "fruit fly", scientific: false }], ["Q3", { name: "Ursus maritimus", scientific: true }]]);
+  const item = (name: string, to: string): Item => ({ id: name, name, aliases: aliasesFor([name]), same_as: `wikidata:${to}` });
+  it("keeps Wikidata's common name, in WordNet's spelling when only capitals differ, and takes WordNet's over a scientific one", () => {
+    const items = [item("dog", "Q1"), item("drosophila", "Q2"), item("polar bear", "Q3"), { id: "yeti", name: "yeti", aliases: [] }];
+    expect(shownNames(items, (id) => names.get(id)).map((i) => i.name)).toEqual(["dog", "fruit fly", "polar bear", "yeti"]);
   });
 });
