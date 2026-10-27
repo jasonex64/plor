@@ -3535,7 +3535,7 @@
       "category": "hormone",
       "host_bank": [
         "insulin",
-        "aldosterone",
+        "progesterone",
         "testosterone",
         "estrogen",
         "melatonin",
@@ -3543,7 +3543,7 @@
       ],
       "uncommon": [
         "oxytocin",
-        "progesterone",
+        "aldosterone",
         "thyroxine",
         "glucagon",
         "prolactin",
@@ -3631,12 +3631,12 @@
         "jump rope",
         "cable",
         "bungee",
-        "hawser"
+        "high wire"
       ],
       "uncommon": [
         "halyard",
         "slackline",
-        "high wire",
+        "hawser",
         "guide rope",
         "lashing",
         "cordage"

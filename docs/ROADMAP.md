@@ -218,7 +218,7 @@ These are non-blocking items found during work or review. Record each one here *
   - no tests for `valueItems`, for `define_subset` with some values unknown, or for a new thing on a several-value subset getting no status;
   - an animal with two IUCN statuses (30 of them) can sit in `extinct_animal` and another status's subset; not checked against the bank answers.
   - continents keep the junk alternative labels their `wikidata-places` entry brings (North America: "na", "noam", "003 un m49 code"), as places keep Wikidata's aliases; only the IUCN status things are named by their label alone (13e-4b Evidence);
-  - the 40-day simulator and the list checks (names resolve, no host above a familiar answer) are still scratch scripts, rewritten again for 13e-4b (From 13e-3); *(the simulator is `npm run draft -- simulate` since 13e-5, item 8; names resolving is `npm run base -- check-bank` since 13e-9; "no host above a familiar answer" is still scratch)*;
+  - the 40-day simulator and the list checks (names resolve, no host above a familiar answer) are still scratch scripts, rewritten again for 13e-4b (From 13e-3); *(the simulator is `npm run draft -- simulate` since 13e-5, item 8; names resolving is `npm run draft -- check-bank` since 13e-9; "no host above a familiar answer" is still scratch)*;
   - `fetchTaxa`'s walk and `byIds`'s batching have no unit test (a cycle, two parents on different levels, a batch of exactly `BASE_BATCH_IDS`); they are proven only by live fetches agreeing. An injected query function over a fixed parent table would cover them (13e-4c's review);
   - `ANIMALS_DROP_LISTED_NAMES` (like the rivers' drop) has no test and does nothing, silently, if the taxon leaves the fetch; the review flags would still show the name (13e-4c's review);
 
@@ -242,7 +242,7 @@ These are non-blocking items found during work or review. Record each one here *
   - with links and big sets, the local database is about 287 MB of the Free plan's 500 MB (the human asked to be warned near the limit);
   - nothing removes a category or a set's rows once loaded; **it bit in 13e-3**: re-fetching rivers dropped the shared short names and Pūkio Stream's alias from the snapshot, but `load all` kept the old rows in the Windows database until a `db reset` (13e-3 Evidence). Any database loaded from an older snapshot keeps rows the new one dropped;
   - the widened roots bring generic members (feeling: thing, state, soul, harassment; boat or ship: bottom, shell, wreck; religion: theism, mysticism); gold and silver bring green gold and coin silver; Malabo is missing; Pago Pago and Charlotte Amalie count as US cities;
-  - the draft simulator and the list checks (names resolve, no host above a familiar answer, letter room at Q7) were scratch scripts run many times: make them `scripts/` commands (CLAUDE.md, repeated procedures); *(the simulator done in 13e-5, item 8; names resolving done in 13e-9 as `npm run base -- check-bank`; "no host above a familiar answer" and letter room at Q7 left)*;
+  - the draft simulator and the list checks (names resolve, no host above a familiar answer, letter room at Q7) were scratch scripts run many times: make them `scripts/` commands (CLAUDE.md, repeated procedures); *(the simulator done in 13e-5, item 8; names resolving done in 13e-9 as `npm run draft -- check-bank`; "no host above a familiar answer" and letter room at Q7 left)*;
   - the rivers fetch's alias drop by ID (`RIVERS_DROP_LISTED_ALIASES`) has no unit test, filters aliases only (a listed label would pass) and says nothing when the item is gone; a small pure helper with a test would cover it (13e-3's second review);
   - a river short name that is another river's full name stays ("rhine": Rhine by name, Seerhein by synonym), as the human's answer covers short names only; look at it when re-measuring (13e-3's second review).
 
@@ -293,6 +293,11 @@ These are non-blocking items found during work or review. Record each one here *
   - toy and cosmetic left out, and building's brothel synonyms, room's torture-chamber alias and car's "gypsy cab" kept: for the human.
 
   Found in M13 13e-7 (review, 2026-10-27).
+- [ ] **From the 13e-9 review (around the house and more):**
+  - nothing tests check-bank on a retired `#<id>` (read through `private.thing_now`); the reviewer's other point, a `::uuid` cast inside an OR with names, went with the move to `nameCandidates`, which casts only the `#` answers;
+  - members that don't fit their prompts, as "widened roots bring generic members": road (ski run, piste, branch line, trunk line, loop-line), form of government (Weimar Republic, Mogul empire, Second Empire, hegemony), coffee (chicory, Postum, coffee substitute), garden (grove, pot farm, landscaping), bed (couch), and computer and table (13e-9 ticket, Review);
+  - the M13 row's "60 of 210 categories so far" is stale (170 after 13e-9).
+  Found in M13 13e-9 (review, 2026-10-27).
 - [ ] **From the 13e-8 review (knowledge):**
   - **for the human first:** the disease category accepts a racial slur, an alias of alastrim (`14148170-n`); WordNet items need a drop-by-ID (as `dropListed` does for Wikidata sets);
   - nothing catches two answers of one question naming the same thing ("xylophone" and "marimba"); a content check over IDs would;

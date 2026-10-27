@@ -1462,54 +1462,9 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
   console.log(`  flag, a P460 pair or fork a bank answer names: ${pairs.length}${pairs.length ? ` (${pairs.map(([kind, p]) => `${kind} ${p.join(" / ")}`).join("; ")})` : ""}`);
 }
 
-// The bank's answers against the loaded base (13e-9; ROADMAP, From 13e-3: the list checks as a command, run by hand
-// for each batch since 13e-6): a name answer must name exactly one member of its question's category, an ID answer
-// must be a member (read through private.thing_now), and no two answers of one question may name the same thing
-// (13e-8 review: "xylophone" and "marimba"). Prints each problem and exits 1 on any.
-export async function bankProblems(client: pg.Client, questions: Bank["questions"]): Promise<string[]> {
-  const problems: string[] = [];
-  for (const q of questions) {
-    const answers = [...q.host_bank, ...q.uncommon];
-    const { rows } = await client.query<{ given: string; things: string[] }>(
-      `select p.given, array(select distinct m::text from private.category_members($1) m
-         where (p.given like '#%' and m = private.thing_now(substr(p.given, 2)::uuid))
-            or (p.given not like '#%' and exists (select from private.thing_alias x
-              where x.thing_id = m and x.alias = p.alias and x.removed_at is null))) as things
-       from unnest($2::text[], $3::text[]) as p(given, alias)`,
-      [q.category, answers, answers.map((a) => (a.startsWith("#") ? "" : normalize(a)))],
-    );
-    const seen = new Map<string, string>();
-    for (const r of rows) {
-      if (r.things.length !== 1) {
-        problems.push(`${q.id}: "${r.given}" names ${r.things.length} members of ${q.category}`);
-        continue;
-      }
-      const other = seen.get(r.things[0]);
-      if (other) problems.push(`${q.id}: "${other}" and "${r.given}" name the same thing`);
-      seen.set(r.things[0], r.given);
-    }
-  }
-  return problems;
-}
-
-async function checkBank(): Promise<void> {
-  const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
-  if (!bank) throw new Error(errors.join("\n"));
-  const client = await localClient();
-  try {
-    const problems = await bankProblems(client, bank.questions);
-    for (const p of problems) console.log(p);
-    console.log(`CHECKED ${bank.questions.length} questions: ${problems.length} problem${problems.length === 1 ? "" : "s"}`);
-    if (problems.length) process.exitCode = 1;
-  } finally {
-    await client.end();
-  }
-}
-
 async function main(): Promise<void> {
   const [command, name, ...more] = process.argv.slice(2);
   if (command === "review" && name) return review([name, ...more]);
-  if (command === "check-bank" && !name) return checkBank();
   if (command === "load" && name === "all") {
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
     await loadLinks();
@@ -1519,7 +1474,7 @@ async function main(): Promise<void> {
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…\n       npm run base -- check-bank`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   await (command === "fetch" ? fetchSet(name, def) : loadSet(name, def));

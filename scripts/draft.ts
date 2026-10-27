@@ -1,5 +1,5 @@
 // Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
-// `npm run draft -- <date> [--questions <id>,…]`, and `npm run draft -- simulate` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
+// `npm run draft -- <date> [--questions <id>,…]`, `npm run draft -- simulate` and `npm run draft -- check-bank` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
 // the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
 // ones in that order; orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
 // "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
@@ -139,9 +139,10 @@ async function offLetter(db: pg.Client, category: string, texts: string[]): Prom
   return new Set(rows.map((r) => r.t));
 }
 
-// Each name's thing among the category's members: "#<id>" as given, else the members bearing that name (for a letter
-// subset, a name starting with its letter). Throws, listing the candidates, for a name with none or several.
-async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
+// Each name's candidates among the category's members: "#<id>" as given (a retired ID read as its thing's current one,
+// 13e-5b), else the members bearing that name (for a letter subset, a name starting with its letter). The one way a
+// bank answer is matched, for the draft and for check-bank.
+async function nameCandidates(db: pg.Client, category: string, names: string[]): Promise<Map<string, { id: string; name: string }[]>> {
   const named = names.filter((n) => !n.startsWith("#")).map(normalize);
   const off = await offLetter(db, category, named);
   const texts = named.filter((t) => !off.has(t));
@@ -150,27 +151,55 @@ async function resolveNames(db: pg.Client, category: string, names: string[]): P
      join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
     [category, texts],
   );
-  // A bank ID may be one a join or merge retired: it's read as its thing's current ID (13e-5b).
-  const { rows: given } = await db.query<{ given: string; id: string }>(
-    `select x::text as given, private.thing_now(x)::text as id from unnest($2::uuid[]) as x
-     where private.thing_now(x) in (select private.category_members($1))`,
+  const { rows: given } = await db.query<{ given: string; id: string; name: string }>(
+    `select x::text as given, t.id::text as id, t.name from unnest($2::uuid[]) as x join private.thing t on t.id = private.thing_now(x)
+     where t.id in (select private.category_members($1))`,
     [category, names.filter((n) => n.startsWith("#")).map((n) => n.slice(1))],
   );
-  const out = new Map<string, string>();
+  const out = new Map<string, { id: string; name: string }[]>();
   for (const name of names) {
-    if (name.startsWith("#")) {
-      const found = given.find((g) => g.given === name.slice(1));
-      if (!found) throw new Error(`${category}: ${name} is not a member`);
-      out.set(name, found.id);
-      continue;
-    }
-    const found = [...new Map(rows.filter((r) => r.alias === normalize(name)).map((r) => [r.id, r.name])).entries()];
-    if (found.length !== 1) {
-      throw new Error(`${category}: "${name}" names ${found.length === 0 ? "no member" : `several members: ${found.map(([id, n]) => `${n} #${id}`).join(", ")}`}`);
-    }
-    out.set(name, found[0][0]);
+    const found = name.startsWith("#") ? given.filter((g) => g.given === name.slice(1)) : rows.filter((r) => r.alias === normalize(name));
+    out.set(name, [...new Map(found.map((r) => [r.id, r.name])).entries()].map(([id, n]) => ({ id, name: n })));
   }
   return out;
+}
+
+// Each name's thing among the category's members. Throws, listing the candidates, for a name with none or several.
+async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  for (const [name, found] of await nameCandidates(db, category, names)) {
+    if (found.length !== 1) throw new Error(`${category}: ${nameProblem(name, found)}`);
+    out.set(name, found[0].id);
+  }
+  return out;
+}
+
+function nameProblem(name: string, found: { id: string; name: string }[]): string {
+  if (name.startsWith("#")) return `${name} is not a member`;
+  return `"${name}" names ${found.length === 0 ? "no member" : `several members: ${found.map((f) => `${f.name} #${f.id}`).join(", ")}`}`;
+}
+
+// The bank's answers against the loaded base (13e-9; ROADMAP, From 13e-3: the list checks as a command, run by hand
+// for each batch since 13e-6): each answer must give one member as the draft reads it, and no two answers of one
+// question may name the same thing (13e-8 review: "xylophone" and "marimba").
+export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Promise<string[]> {
+  const problems: string[] = [];
+  for (const q of questions) {
+    const answers = [...q.host_bank, ...q.uncommon];
+    const candidates = await nameCandidates(db, q.category, answers);
+    const seen = new Map<string, string>();
+    for (const name of answers) {
+      const found = candidates.get(name)!;
+      if (found.length !== 1) {
+        problems.push(`${q.id}: ${nameProblem(name, found)}`);
+        continue;
+      }
+      const other = seen.get(found[0].id);
+      if (other) problems.push(`${q.id}: "${other}" and "${name}" name the same thing`);
+      seen.set(found[0].id, name);
+    }
+  }
+  return problems;
 }
 
 // A category's members, listed once per connection: a draft can't change them (only loads and misses add members),
@@ -332,12 +361,21 @@ async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key:
   if (drafted < SIMULATE_DAYS) process.exitCode = 1;
 }
 
+// `npm run draft -- check-bank`: prints each of bankProblems' problems, and exits 1 on any.
+async function checkBank(db: pg.Client, bank: Bank): Promise<void> {
+  const problems = await bankProblems(db, bank.questions);
+  for (const p of problems) console.log(p);
+  console.log(`CHECKED ${bank.questions.length} questions: ${problems.length} problem${problems.length === 1 ? "" : "s"}`);
+  if (problems.length) process.exitCode = 1;
+}
+
 async function main(): Promise<void> {
   const [date, flag, list] = process.argv.slice(2);
   const simulating = date === "simulate" && flag === undefined;
+  const checking = date === "check-bank" && flag === undefined;
   // The date is user input: a malformed one would make every gap NaN and let any category through (13d review).
-  if (!simulating && (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list)))) {
-    console.error("usage: npm run draft -- <date> [--questions <id>,…]\n       npm run draft -- simulate");
+  if (!simulating && !checking && (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list)))) {
+    console.error("usage: npm run draft -- <date> [--questions <id>,…]\n       npm run draft -- simulate\n       npm run draft -- check-bank");
     process.exit(2);
   }
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
@@ -355,6 +393,7 @@ async function main(): Promise<void> {
   const db = await localClient();
   try {
     if (simulating) return await simulate(db, bank, days, familyOf(categories));
+    if (checking) return await checkBank(db, bank);
     const { day, guide } = await draft(db, bank, days, date, familyOf(categories), list?.split(","));
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
