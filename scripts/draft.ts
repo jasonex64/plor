@@ -284,53 +284,113 @@ export async function oneHostCatch(db: pg.Client, date: string, q: Question): Pr
   return sum / q.host_bank.length;
 }
 
-// days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
-// questions to use, in order, instead of the pick.
-export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[]): Promise<{ day: Puzzle; guide: string[] }> {
-  const chosen = ids ? namedQuestions(bank, days, date, ids, family) : pickQuestions(bank, days, date, family);
-  const resolved: { q: Question; catch: number }[] = [];
-  for (const q of chosen) {
-    const question = await resolveQuestion(db, q);
-    resolved.push({ q: question, catch: ids ? 0 : await oneHostCatch(db, date, question) });
-  }
-  const ordered = (ids ? resolved : easiestFirst(resolved, (r) => r.catch)).map(({ q }) => q);
-  const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
-    ordered.flatMap((q) => q.host_bank),
-  ]);
-  const names = new Map(rows.map((r) => [r.id, r.name]));
-  // The host says a letter subset's answers by their names, so each must start with the letter (O4).
-  for (const q of ordered) {
-    const off = await offLetter(db, q.category, q.host_bank.map((id) => normalize(names.get(id)!)));
-    const named = q.host_bank.filter((id) => off.has(normalize(names.get(id)!)));
-    if (named.length) throw new Error(`${q.category}: host bank names ${named.map((id) => `"${names.get(id)}"`).join(", ")} don't start with its letter`);
-  }
-  // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so the
-  // block is at or after it.
-  const tryOrder = async (questions: Question[]) => {
-    let held = 0;
-    const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
-      const part = withHosts(date, questions.slice(0, upTo), trial, names);
-      if (!part) return false;
-      for (let i = 0; i < upTo; i++) {
-        const q = part.questions[i];
-        if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
-      }
-      held = Math.max(held, upTo);
-      return true;
-    });
-    return { steals, held };
+// A picked day's questions, swapping out a blocker until the letters fit (13e-10b; human, 2026-10-27: "Draft swaps the
+// blocker (Recommended)", "The pick's next choice (Recommended)", "Until one fits (Recommended)"): pick(leftOut) is the
+// pick without the questions left out; attempt(chosen) builds the day, or names the questions where its letters stopped
+// (fitOrder's block range). Each question of that range is left out alone, last first, and the day picked, re-sorted and
+// retried ("Re-sort and retry (Recommended)"); the first that fits wins. When none fits alone, the last stays out and
+// the next round starts from that day, so a thin list is the one left out, not the questions that replace it (review).
+// It ends when the letters fit, or when the pick throws for too few eligible questions, which names those swapped out.
+export async function withSwaps<Q extends { id: string; prompt: string }, R>(
+  pick: (leftOut: ReadonlySet<string>) => Q[],
+  attempt: (chosen: Q[]) => Promise<{ built: R } | { blockers: Q[] }>,
+): Promise<{ built: R; swapped: Q[] }> {
+  const tryWithout = async (out: Q[]) => {
+    let chosen: Q[];
+    try {
+      chosen = pick(new Set(out.map((q) => q.id)));
+    } catch (err) {
+      if (!out.length) throw err;
+      throw new Error(`${(err as Error).message}, after swapping out ${out.map((q) => `"${q.prompt}"`).join(", ")}, as no letters fit with them`, { cause: err });
+    }
+    return attempt(chosen);
   };
-  // A hand-picked day keeps the order it was given; a picked one may move its blocking question earlier.
-  const { questions, steals, held } = ids ? { questions: ordered, ...(await tryOrder(ordered)) } : await fitOrder(ordered, tryOrder);
-  if (!steals) {
-    const [from, to] = blockRange(held, questions.length);
-    const at = questions.slice(from, to).map((q) => `"${q.prompt}"`).join(" or ");
-    throw new Error(`no letters fit schedule A for ${date}: ${held ? `questions 1 to ${held} hold` : "no question holds"}; the block is at ${at} or after it${ids ? "" : ", in every place earlier tried"}. Change that question's bank or uncommon answers`);
+  const swapped: Q[] = [];
+  let result = await tryWithout(swapped);
+  while (!("built" in result)) {
+    let next: { q: Q; result: { built: R } | { blockers: Q[] } } | undefined;
+    for (const q of [...result.blockers].reverse()) {
+      const alone = await tryWithout([...swapped, q]);
+      if ("built" in alone) return { built: alone.built, swapped: [...swapped, q] };
+      next ??= { q, result: alone };
+    }
+    swapped.push(next!.q);
+    result = next!.result;
   }
-  const day = withHosts(date, questions, steals, names)!;
-  const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, names)];
+  return { built: result.built, swapped };
+}
+
+// The summary's line for each question swapped out ("Say it in the summary (Recommended)").
+export const swapLines = (swapped: { prompt: string }[]): string[] => swapped.map((q) => `swapped out "${q.prompt}": no letters fit with it`);
+
+// days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
+// questions to use, in order, instead of the pick; a hand-picked day is never swapped ("Never (Recommended)").
+export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[]): Promise<{ day: Puzzle; guide: string[]; swapped: BankQuestion[] }> {
+  // The day from these 7 bank questions: resolved, easiest first (a picked day), its host names checked, and its
+  // letters searched; steals is null when none fit, with held saying how far they got.
+  const assemble = async (chosen: BankQuestion[]) => {
+    const resolved: { q: Question; bank: BankQuestion; catch: number }[] = [];
+    for (const b of chosen) {
+      const question = await resolveQuestion(db, b);
+      resolved.push({ q: question, bank: b, catch: ids ? 0 : await oneHostCatch(db, date, question) });
+    }
+    const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
+    const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
+      ordered.flatMap((r) => r.q.host_bank),
+    ]);
+    const names = new Map(rows.map((r) => [r.id, r.name]));
+    // The host says a letter subset's answers by their names, so each must start with the letter (O4).
+    for (const { q } of ordered) {
+      const off = await offLetter(db, q.category, q.host_bank.map((id) => normalize(names.get(id)!)));
+      const named = q.host_bank.filter((id) => off.has(normalize(names.get(id)!)));
+      if (named.length) throw new Error(`${q.category}: host bank names ${named.map((id) => `"${names.get(id)}"`).join(", ")} don't start with its letter`);
+    }
+    // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so
+    // the block is at or after it.
+    const tryOrder = async (rs: typeof ordered) => {
+      let held = 0;
+      const questions = rs.map((r) => r.q);
+      const steals = await pickLetters(date, questions.length, async (upTo, trial) => {
+        const part = withHosts(date, questions.slice(0, upTo), trial, names);
+        if (!part) return false;
+        for (let i = 0; i < upTo; i++) {
+          const q = part.questions[i];
+          if (!(await familiarLeft(db, q.category, q.host_answers, q.levels, stolenLetters(part, i)))) return false;
+        }
+        held = Math.max(held, upTo);
+        return true;
+      });
+      return { steals, held };
+    };
+    // A hand-picked day keeps the order it was given; a picked one may move its blocking question earlier.
+    const fitted = ids ? { questions: ordered, ...(await tryOrder(ordered)) } : await fitOrder(ordered, tryOrder);
+    return { ...fitted, names };
+  };
+  const blocked = (a: Awaited<ReturnType<typeof assemble>>) => {
+    const [from, to] = blockRange(a.held, a.questions.length);
+    return a.questions.slice(from, to);
+  };
+  let built: Awaited<ReturnType<typeof assemble>>;
+  let swapped: BankQuestion[] = [];
+  if (ids) {
+    built = await assemble(namedQuestions(bank, days, date, ids, family));
+  } else {
+    ({ built, swapped } = await withSwaps<BankQuestion, typeof built>(
+      (leftOut) => pickQuestions(bank, days, date, family, leftOut),
+      async (chosen) => {
+        const a = await assemble(chosen);
+        return a.steals ? { built: a } : { blockers: blocked(a).map((r) => r.bank) };
+      },
+    ));
+  }
+  if (!built.steals) {
+    const at = blocked(built).map((r) => `"${r.q.prompt}"`).join(" or ");
+    throw new Error(`no letters fit schedule A for ${date}: ${built.held ? `questions 1 to ${built.held} hold` : "no question holds"}; the block is at ${at} or after it. Change that question's bank or uncommon answers`);
+  }
+  const day = withHosts(date, built.questions.map((r) => r.q), built.steals, built.names)!;
+  const problems = [...checkPuzzle(date, day), ...checkHostNames(date, day, built.names)];
   if (problems.length) throw new Error(`the drafted day breaks the rules:\n${problems.join("\n")}`);
-  return { day, guide: softGuide(await expectedCatches(db, day)) };
+  return { day, guide: [...swapLines(swapped), ...softGuide(await expectedCatches(db, day))], swapped };
 }
 
 // The simulator, `npm run draft -- simulate`: draft() for SIMULATE_DAYS consecutive dates from SIMULATE_FROM, each
@@ -356,12 +416,13 @@ async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key:
   // command exit 1.
   for (const date of simulateDates()) {
     try {
-      const { day } = await draft(db, bank, past, date, family);
+      const { day, swapped } = await draft(db, bank, past, date, family);
       past.push(day);
+      const swaps = swapLines(swapped);
       drafted++;
       questions += day.questions.length;
       subset += day.questions.filter((q) => family(q.category) !== q.category).length;
-      console.log(`${date} ${day.questions.map((q) => (q.steals ? `${q.category}:${q.steals}` : q.category)).join(" ")}`);
+      console.log(`${date} ${day.questions.map((q) => (q.steals ? `${q.category}:${q.steals}` : q.category)).join(" ")}${swaps.length ? ` (${swaps.join("; ")})` : ""}`);
     } catch (err) {
       console.log(`${date} FAILED: ${(err as Error).message}`);
     }

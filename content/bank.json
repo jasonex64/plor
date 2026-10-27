@@ -4466,6 +4466,702 @@
       ],
       "themes": [],
       "added_by": "claude"
+    },
+    {
+      "id": "name-a-gun",
+      "prompt": "Name a kind of gun",
+      "category": "gun",
+      "host_bank": [
+        "rifle",
+        "pistol",
+        "shotgun",
+        "revolver",
+        "machine gun",
+        "musket"
+      ],
+      "uncommon": [
+        "blunderbuss",
+        "derringer",
+        "carbine",
+        "flintlock",
+        "Gatling gun",
+        "Tommy gun"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-social-science",
+      "prompt": "Name a social science",
+      "category": "social_science",
+      "host_bank": [
+        "economics",
+        "sociology",
+        "anthropology",
+        "archeology",
+        "criminology",
+        "politics"
+      ],
+      "uncommon": [
+        "demography",
+        "ethnology",
+        "Egyptology",
+        "penology",
+        "geopolitics",
+        "civics"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-writing-implement",
+      "prompt": "Name a writing implement",
+      "category": "writing_implement",
+      "host_bank": [
+        "pen",
+        "pencil",
+        "crayon",
+        "marker",
+        "chalk",
+        "highlighter"
+      ],
+      "uncommon": [
+        "quill",
+        "fountain pen",
+        "ballpoint",
+        "felt-tip pen",
+        "Sharpie",
+        "charcoal"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-soft-drink",
+      "prompt": "Name a soft drink",
+      "category": "soft_drink",
+      "host_bank": [
+        "cola",
+        "root beer",
+        "ginger ale",
+        "cream soda",
+        "orange soda",
+        "Pepsi"
+      ],
+      "uncommon": [
+        "Coca Cola",
+        "sarsaparilla",
+        "birch beer",
+        "bitter lemon",
+        "egg cream",
+        "phosphate"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-building-material",
+      "prompt": "Name a building material",
+      "category": "building_material",
+      "host_bank": [
+        "brick",
+        "concrete",
+        "plaster",
+        "lumber",
+        "tile",
+        "stucco"
+      ],
+      "uncommon": [
+        "adobe",
+        "thatch",
+        "slate",
+        "mortar",
+        "cinder block",
+        "shingle"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-coin",
+      "prompt": "Name a coin",
+      "category": "coin",
+      "host_bank": [
+        "penny",
+        "nickel",
+        "dime",
+        "quarter",
+        "half dollar",
+        "silver dollar"
+      ],
+      "uncommon": [
+        "shilling",
+        "doubloon",
+        "guinea",
+        "sixpence",
+        "farthing",
+        "ducat"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-vine",
+      "prompt": "Name a vine",
+      "category": "vine",
+      "host_bank": [
+        "ivy",
+        "grape",
+        "kudzu",
+        "clematis",
+        "bougainvillea",
+        "hop"
+      ],
+      "uncommon": [
+        "Boston ivy",
+        "Chinese wistaria",
+        "cucumber",
+        "bittersweet",
+        "fox grape",
+        "Jamaica honeysuckle"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bird-of-prey",
+      "prompt": "Name a bird of prey",
+      "category": "bird_of_prey",
+      "host_bank": [
+        "hawk",
+        "eagle",
+        "owl",
+        "falcon",
+        "vulture",
+        "osprey"
+      ],
+      "uncommon": [
+        "condor",
+        "harrier",
+        "kite",
+        "secretary bird",
+        "Common Kestrel",
+        "Common Buzzard"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-game-bird",
+      "prompt": "Name a game bird",
+      "category": "game_bird",
+      "host_bank": [
+        "pheasant",
+        "quail",
+        "grouse",
+        "peacock",
+        "ptarmigan",
+        "prairie chicken"
+      ],
+      "uncommon": [
+        "northern bobwhite",
+        "Western Capercaillie",
+        "tragopan",
+        "tinamou",
+        "sage grouse",
+        "Grey Partridge"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-parrot",
+      "prompt": "Name a kind of parrot",
+      "category": "parrot",
+      "host_bank": [
+        "macaw",
+        "cockatoo",
+        "parakeet",
+        "budgerigar",
+        "cockatiel",
+        "lorikeet"
+      ],
+      "uncommon": [
+        "rainbow lorikeet",
+        "kea",
+        "lory",
+        "Grey Parrot",
+        "amazon",
+        "Carolina parakeet"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-waterfowl",
+      "prompt": "Name a waterfowl",
+      "category": "waterfowl",
+      "host_bank": [
+        "duck",
+        "goose",
+        "mallard",
+        "teal",
+        "wood duck",
+        "Canada Goose"
+      ],
+      "uncommon": [
+        "eider",
+        "merganser",
+        "shelduck",
+        "scaup",
+        "canvasback",
+        "bufflehead"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-amphibian",
+      "prompt": "Name an amphibian",
+      "category": "amphibian",
+      "host_bank": [
+        "frog",
+        "newt",
+        "salamander",
+        "axolotl",
+        "bullfrog",
+        "American toad"
+      ],
+      "uncommon": [
+        "caecilian",
+        "hellbender",
+        "olm",
+        "mudpuppy",
+        "eft",
+        "Common Fire Salamander"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-crustacean",
+      "prompt": "Name a crustacean",
+      "category": "crustacean",
+      "host_bank": [
+        "crab",
+        "lobster",
+        "shrimp",
+        "krill",
+        "barnacle",
+        "prawn"
+      ],
+      "uncommon": [
+        "fiddler crab",
+        "mantis shrimp",
+        "pill bug",
+        "hermit crab",
+        "Dungeness crab",
+        "brine shrimp"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-mollusk",
+      "prompt": "Name a mollusk",
+      "category": "mollusk",
+      "host_bank": [
+        "snail",
+        "clam",
+        "oyster",
+        "squid",
+        "octopus",
+        "mussel"
+      ],
+      "uncommon": [
+        "scallop",
+        "conch",
+        "periwinkle",
+        "cuttlefish",
+        "limpet",
+        "chambered nautilus"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-beetle",
+      "prompt": "Name a kind of beetle",
+      "category": "beetle",
+      "host_bank": [
+        "ladybug",
+        "weevil",
+        "dung beetle",
+        "stag beetle",
+        "June beetle",
+        "Japanese beetle"
+      ],
+      "uncommon": [
+        "scarab",
+        "rhinoceros beetle",
+        "boll weevil",
+        "click beetle",
+        "tiger beetle",
+        "bombardier beetle"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sword",
+      "prompt": "Name a kind of sword",
+      "category": "sword",
+      "host_bank": [
+        "rapier",
+        "broadsword",
+        "scimitar",
+        "cutlass",
+        "epee",
+        "claymore"
+      ],
+      "uncommon": [
+        "falchion",
+        "backsword",
+        "foil",
+        "cavalry sword",
+        "fencing sword"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-conifer",
+      "prompt": "Name a conifer",
+      "category": "conifer",
+      "host_bank": [
+        "pine",
+        "fir",
+        "spruce",
+        "cypress",
+        "larch",
+        "juniper"
+      ],
+      "uncommon": [
+        "hemlock",
+        "yew",
+        "douglas fir",
+        "arborvitae",
+        "deodar",
+        "cedar of Lebanon"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-palm",
+      "prompt": "Name a kind of palm",
+      "category": "palm",
+      "host_bank": [
+        "coconut",
+        "date palm",
+        "palmetto",
+        "oil palm",
+        "royal palm",
+        "sago palm"
+      ],
+      "uncommon": [
+        "rattan",
+        "raffia palm",
+        "fan palm",
+        "carnauba",
+        "saw palmetto",
+        "areca"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-legume",
+      "prompt": "Name a legume",
+      "category": "legume",
+      "host_bank": [
+        "lentil",
+        "chickpea",
+        "kidney bean",
+        "lima bean",
+        "black bean",
+        "snow pea"
+      ],
+      "uncommon": [
+        "navy bean",
+        "pinto bean",
+        "mung bean",
+        "fava bean",
+        "black-eyed pea",
+        "split-pea"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-cookie",
+      "prompt": "Name a kind of cookie",
+      "category": "cookie",
+      "host_bank": [
+        "chocolate chip cookie",
+        "oatmeal cookie",
+        "sugar cookie",
+        "gingersnap",
+        "shortbread",
+        "Oreo"
+      ],
+      "uncommon": [
+        "macaroon",
+        "fortune cookie",
+        "gingerbread man",
+        "butter cookie",
+        "ladyfinger",
+        "brownie"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-breakfast-cereal",
+      "prompt": "Name a breakfast cereal",
+      "category": "breakfast_cereal",
+      "host_bank": [
+        "granola",
+        "corn flake",
+        "raisin bran",
+        "grits",
+        "puffed rice",
+        "puffed wheat"
+      ],
+      "uncommon": [
+        "kasha",
+        "bran flake",
+        "wheatflake",
+        "atole",
+        "Pablum",
+        "hasty pudding"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-shirt",
+      "prompt": "Name a kind of shirt",
+      "category": "shirt",
+      "host_bank": [
+        "polo shirt",
+        "tank top",
+        "turtleneck",
+        "jersey",
+        "dress shirt",
+        "work-shirt"
+      ],
+      "uncommon": [
+        "kurta",
+        "dashiki",
+        "camise",
+        "hair shirt",
+        "mock polo neck"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-trousers",
+      "prompt": "Name a kind of trousers",
+      "category": "trousers",
+      "host_bank": [
+        "jeans",
+        "slacks",
+        "chinos",
+        "sweat pants",
+        "Bermuda shorts",
+        "bellbottom trousers"
+      ],
+      "uncommon": [
+        "jodhpurs",
+        "lederhosen",
+        "pedal pushers",
+        "plus fours",
+        "breeches",
+        "hot pants"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-hat",
+      "prompt": "Name a kind of hat",
+      "category": "hat",
+      "host_bank": [
+        "fedora",
+        "cowboy hat",
+        "sombrero",
+        "bowler hat",
+        "sunhat",
+        "bonnet"
+      ],
+      "uncommon": [
+        "boater",
+        "cloche",
+        "deerstalker",
+        "tricorn",
+        "pillbox",
+        "porkpie"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-truck",
+      "prompt": "Name a kind of truck",
+      "category": "truck",
+      "host_bank": [
+        "dump truck",
+        "fire engine",
+        "tow truck",
+        "pickup",
+        "garbage truck",
+        "moving van"
+      ],
+      "uncommon": [
+        "bookmobile",
+        "tanker truck",
+        "lorry",
+        "minivan",
+        "delivery truck",
+        "milk float"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-house",
+      "prompt": "Name a kind of house",
+      "category": "house",
+      "host_bank": [
+        "mansion",
+        "bungalow",
+        "farmhouse",
+        "chalet",
+        "log cabin",
+        "ranch house"
+      ],
+      "uncommon": [
+        "hacienda",
+        "brownstone",
+        "dacha",
+        "manor",
+        "saltbox",
+        "row house"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-religious-holiday",
+      "prompt": "Name a religious holiday",
+      "category": "religious_holiday",
+      "host_bank": [
+        "Christmas",
+        "Easter Sunday",
+        "Hanukkah",
+        "Yom Kippur",
+        "Good Friday",
+        "Ash Wednesday"
+      ],
+      "uncommon": [
+        "Rosh Hashanah",
+        "Purim",
+        "Ascension",
+        "Epiphany",
+        "Palm Sunday",
+        "All Saints' Day"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-natural-science",
+      "prompt": "Name a branch of natural science",
+      "category": "natural_science",
+      "host_bank": [
+        "biology",
+        "chemistry",
+        "#444c8113-84a1-50a4-9bcf-e6a5f33dcdac",
+        "astronomy",
+        "geology",
+        "botany"
+      ],
+      "uncommon": [
+        "zoology",
+        "ecology",
+        "genetics",
+        "meteorology",
+        "anatomy",
+        "oceanography",
+        "virology",
+        "mycology",
+        "optics",
+        "acoustics",
+        "cytology",
+        "hydrology",
+        "mechanics",
+        "histology"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-percussion-instrument",
+      "prompt": "Name a percussion instrument",
+      "category": "percussion_instrument",
+      "host_bank": [
+        "drum",
+        "cymbal",
+        "xylophone",
+        "tambourine",
+        "triangle",
+        "bongo"
+      ],
+      "uncommon": [
+        "kettledrum",
+        "#927704da-988d-5b32-b38f-2d0c1fdf8f72",
+        "maraca",
+        "snare drum",
+        "glockenspiel",
+        "steel drum"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-squash",
+      "prompt": "Name a kind of squash",
+      "category": "squash",
+      "host_bank": [
+        "zucchini",
+        "butternut squash",
+        "acorn squash",
+        "spaghetti squash",
+        "summer squash",
+        "winter squash"
+      ],
+      "uncommon": [
+        "hubbard squash",
+        "turban squash",
+        "crookneck",
+        "pattypan squash",
+        "cocozelle",
+        "marrow"
+      ],
+      "themes": [],
+      "added_by": "claude"
     }
   ],
   "themes": {}

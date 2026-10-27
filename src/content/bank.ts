@@ -110,12 +110,14 @@ export function seed(text: string): number {
 // REPEAT_GAP_DAYS, and each family once (family: a subset's base, else the category); the date's theme first, then questions never used, then the least recently
 // used; ties in a date-seeded order. Throws, saying how many are missing, when fewer are eligible ("Stop and ask
 // (Recommended)"). days: every drafted day; the date's own, if drafted before, is left out, as a redraft replaces it.
-export function pickQuestions(bank: Bank, days: Puzzle[], date: string, family: (key: string) => string): BankQuestion[] {
+// leftOut: question IDs the draft swapped out for this date because no letters fit with them (13e-10b), skipped as if
+// they weren't in the bank, so the next choice is the one the pick would make without them.
+export function pickQuestions(bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, leftOut: ReadonlySet<string> = new Set()): BankQuestion[] {
   const others = days.filter((d) => d.date !== date);
   const theme = bank.themes[date];
   const blocked = new Set(others.flatMap((d) => (daysApart(d.date, date) < REPEAT_GAP_DAYS ? d.questions.map((q) => q.category) : [])));
   const ranked = bank.questions
-    .filter((q) => !blocked.has(q.category))
+    .filter((q) => !blocked.has(q.category) && !leftOut.has(q.id))
     .map((q) => ({ q, themed: theme !== undefined && q.themes.includes(theme), last: usesOf(q, others).at(-1) ?? "", tie: seed(`${date}:${q.id}`) }))
     .sort((a, b) => Number(b.themed) - Number(a.themed) || a.last.localeCompare(b.last) || a.tie - b.tie);
   const picked: BankQuestion[] = [];

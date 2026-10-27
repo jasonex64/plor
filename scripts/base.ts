@@ -1433,6 +1433,11 @@ async function analyzeBase(): Promise<void> {
   try {
     await client.query("analyze private.thing, private.thing_source, private.thing_alias, private.fact, private.number_fact, private.category");
     console.log("ANALYZED the base's tables");
+    // The database's size after each load, so the base's growth toward the plan's limit is seen on every machine
+    // (human, 2026-10-27: "30 and keep track of database size", "load all prints it (Recommended)"; DECISIONS.md Log,
+    // Storage: warned near 500 MB).
+    const { rows } = await client.query<{ size: string }>("select pg_size_pretty(pg_database_size(current_database())) as size");
+    console.log(`DATABASE ${rows[0].size}`);
   } finally {
     await client.end();
   }
