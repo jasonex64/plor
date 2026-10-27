@@ -68,6 +68,8 @@ This ticket's guided questions (human, 2026-10-27, on the Mac):
 |---|---|---|
 | The docs' variable-font example gives one `src` and a weight range | DM Sans as two `src` entries on the one file, 400 and 700 | Google's CSS declares exactly those two weights for this file; the same two faces as before, nothing wider |
 | The OFL asks for the copyright and licence with redistributed fonts | `OFL-Baloo2.txt` and `OFL-DMSans.txt` beside the files; `.gitattributes`' `* text=auto eol=lf` stores DM Sans's licence with LF line endings, not its upstream CRLF | The text is unchanged; only its line endings, by the repo's rule for text files |
+| Google's CSS gave each Latin face a `unicode-range` | `localFont` declares none | The files hold only Latin glyphs, so other characters fall back to the next font as before; noted after the review |
+| `next/font/google` picked each font's own fallback metrics | `next/font/local`'s default, `adjustFontFallback: 'Arial'` | Both are metric-adjusted Arial for the moment before the font loads; noted after the review |
 | — | Criterion 3's grep finds one hit in `.next`: this ticket's own comment in `layout.tsx`, copied into a source map | Not a request: outside source maps there are none, and no URL to either host anywhere |
 
 ## Evidence
