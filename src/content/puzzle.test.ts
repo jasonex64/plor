@@ -10,6 +10,9 @@ describe("normalize", () => {
     ["ＬＩＯＮ", "lion"], // fullwidth forms fold under NFKD
     ["...", ""],
     ["li​on‍", "lion"], // format characters (zero-width space, zero-width joiner) are dropped
+    ["Łódź", "lodz"], // Latin letters NFKD leaves whole are folded (13f-1)
+    ["Straße", "strasse"],
+    ["Ærøskøbing", "aeroskobing"],
   ])("%j -> %j", (input, output) => {
     expect(normalize(input)).toBe(output);
   });

@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseListed, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withoutListed, withPopulation, type Item, type Listed, type Mark, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withAddedNames, withNormalizedAliases, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -426,10 +426,11 @@ describe("titledItems", () => {
 });
 
 // 13e-9b: Plor's list dropped from every item at load, LDNOOBW's only where data/listed.json names the item, and a
-// listed shown name renamed or dropped by hand, never guessed.
+// listed shown name renamed (data/names.json, 13f-1) or dropped by hand, never guessed.
 describe("withoutListed", () => {
-  const none: Listed = { drop: [], drop_listed_names: [], rename: [] };
+  const none: Listed = { drop: [], drop_listed_names: [] };
   const lime: Item = { id: "Q2", name: "Kaffir lime", aliases: aliasesFor(["kaffir lime"], ["makrut lime"]) };
+  const rename = (name: string): Names["rename"] => [{ ref: "wikidata:Q2", name, why: "x" }];
 
   it("drops Plor's words from every item, LDNOOBW's only from the items named, and the items named", () => {
     const items: Item[] = [
@@ -439,8 +440,8 @@ describe("withoutListed", () => {
       { id: "Q5", name: "kept", aliases: aliasesFor(["kept"], ["bitch"]) },
       { id: "Q6", name: "kafir", aliases: aliasesFor(["kafir"]) },
     ];
-    const listed: Listed = { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }], drop_listed_names: [{ ref: "wikidata:Q4", why: "x" }] };
-    expect(withoutListed("wikidata", items, listed)).toEqual({
+    const listed: Listed = { drop: [{ ref: "wikidata:Q1", why: "x" }], drop_listed_names: [{ ref: "wikidata:Q4", why: "x" }] };
+    expect(withoutListed("wikidata", items, listed, [])).toEqual({
       items: [
         { id: "Q3", name: "alastrim", aliases: aliasesFor(["alastrim"], ["white pox"]) },
         { id: "Q4", name: "hearts", aliases: aliasesFor(["hearts"]) },
@@ -451,40 +452,89 @@ describe("withoutListed", () => {
   });
 
   it("stops on a listed shown name with no decision, naming the names left", () => {
-    expect(() => withoutListed("wikidata", [lime], none)).toThrow("wikidata:Q2: its shown name is listed; data/listed.json needs a rename or a drop (names left: makrut lime)");
+    expect(() => withoutListed("wikidata", [lime], none, [])).toThrow("wikidata:Q2: its shown name is listed; data/names.json needs a rename or data/listed.json a drop (names left: makrut lime)");
   });
 
   it("renames to one of the names left, and refuses any other rename", () => {
-    const rename = (name: string): Listed => ({ ...none, rename: [{ ref: "wikidata:Q2", name, why: "x" }] });
-    expect(withoutListed("wikidata", [lime], rename("Makrut lime")).items).toEqual([{ id: "Q2", name: "Makrut lime", aliases: [{ alias: "makrut lime", kind: "name" }] }]);
-    expect(() => withoutListed("wikidata", [lime], rename("thai lime"))).toThrow("rename wikidata:Q2: \"thai lime\" isn't one of its names left");
-    expect(() => withoutListed("wikidata", [{ id: "Q2", name: "makrut lime", aliases: aliasesFor(["makrut lime"]) }], rename("makrut lime"))).toThrow("its shown name isn't listed");
+    expect(withoutListed("wikidata", [lime], none, rename("Makrut lime")).items).toEqual([{ id: "Q2", name: "Makrut lime", aliases: [{ alias: "makrut lime", kind: "name" }] }]);
+    expect(() => withoutListed("wikidata", [lime], none, rename("thai lime"))).toThrow("rename wikidata:Q2: \"thai lime\" isn't one of its names left");
+  });
+
+  // 13f-1: WordNet's first word as the shown name ("cornet" for the trumpet), renamed by hand.
+  it("renames a shown name that isn't listed, to one of its names, as a name", () => {
+    const cornet: Item = { id: "Q9", name: "cornet", aliases: aliasesFor(["cornet"], ["trumpet"]) };
+    expect(withoutListed("wikidata", [cornet], none, [{ ref: "wikidata:Q9", name: "trumpet", why: "x" }]).items).toEqual([
+      { id: "Q9", name: "trumpet", aliases: aliasesFor(["cornet"]).concat([{ alias: "trumpet", kind: "name" }]) },
+    ]);
   });
 
   it("reads only its own source's rows", () => {
-    expect(withoutListed("oewn", [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }], { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] }).dropped).toBe(0);
+    expect(withoutListed("oewn", [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }], { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] }, []).dropped).toBe(0);
   });
 
   it("keeps an item that had no names to begin with, as ancestor taxa kept for the tree have none", () => {
     const items: Item[] = [{ id: "Q8", name: "Q8", aliases: [] }, { id: "Q9", name: "tortoise", aliases: aliasesFor(["tortoise"]), kind_of: ["Q8"] }];
-    expect(withoutListed("wikidata", items, none)).toEqual({ items, aliases: 0, dropped: 0 });
+    expect(withoutListed("wikidata", items, none, [])).toEqual({ items, aliases: 0, dropped: 0 });
   });
 
   it("stops when a dropped item is another's parent", () => {
     const items: Item[] = [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }, { id: "Q7", name: "child", aliases: aliasesFor(["child"]), kind_of: ["Q1"] }];
-    expect(() => withoutListed("wikidata", items, { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] })).toThrow("wikidata:Q7 is under wikidata:Q1");
+    expect(() => withoutListed("wikidata", items, { ...none, drop: [{ ref: "wikidata:Q1", why: "x" }] }, [])).toThrow("wikidata:Q7 is under wikidata:Q1");
   });
 });
 
 describe("parseListed", () => {
-  const empty = { drop: [], drop_listed_names: [], rename: [] };
+  const empty = { drop: [], drop_listed_names: [] };
   it("reads the file and refuses a bad ref, a row decided twice, or an item both dropped and kept", () => {
-    const file = { ...empty, rename: [{ ref: "wikidata:Q2", name: "makrut lime", why: "x" }] };
+    const file = { ...empty, drop_listed_names: [{ ref: "wikidata:Q2", why: "x" }] };
     expect(parseListed(JSON.stringify(file))).toEqual(file);
     expect(() => parseListed(JSON.stringify({ ...empty, drop: [{ ref: "Q1", why: "x" }] }))).toThrow('Q1 must be refs as "source:id"');
     expect(() => parseListed(JSON.stringify({ ...empty, drop: [{ ref: "oewn:1", why: "x" }, { ref: "oewn:1", why: "y" }] }))).toThrow("drop: oewn:1 listed twice");
     expect(() => parseListed(JSON.stringify({ ...file, drop: [{ ref: "wikidata:Q2", why: "x" }] }))).toThrow("wikidata:Q2 both dropped and kept");
-    expect(() => parseListed(JSON.stringify({ drop: [] }))).toThrow("must hold exactly drop, drop_listed_names, rename");
+    expect(() => parseListed(JSON.stringify({ drop: [] }))).toThrow("must hold exactly drop, drop_listed_names");
+  });
+});
+
+// 13f-1: snapshots' names normalized again at load, as normalize changed after they were fetched.
+describe("withNormalizedAliases", () => {
+  it("writes each name as today's normalize does, one name where two now fold together, a name kept over a synonym", () => {
+    const item: Item = { id: "Q1", name: "Łódź", aliases: [{ alias: "łodz", kind: "synonym" }, { alias: "lodz", kind: "name" }, { alias: "lodzs", kind: "plural" }] };
+    expect(withNormalizedAliases([item])).toEqual([{ ...item, aliases: [{ alias: "lodz", kind: "name" }, { alias: "lodzs", kind: "plural" }] }]);
+    const plain: Item = { id: "Q2", name: "bear", aliases: aliasesFor(["bear"]) };
+    expect(withNormalizedAliases([plain])[0]).toBe(plain);
+  });
+});
+
+// 13f-1: names the sources lack, added by hand ("china" for the People's Republic), and renames.
+describe("names.json", () => {
+  it("reads the file and refuses a bad ref or an item renamed twice", () => {
+    const file = { add: [{ ref: "wikidata:Q148", name: "China", why: "x" }], rename: [{ ref: "oewn:1", name: "trumpet", why: "x" }] };
+    expect(parseNames(JSON.stringify(file))).toEqual(file);
+    expect(() => parseNames(JSON.stringify({ ...file, add: [{ ref: "Q148", name: "China", why: "x" }] }))).toThrow('Q148 must be refs as "source:id"');
+    expect(() => parseNames(JSON.stringify({ ...file, rename: [...file.rename, { ref: "oewn:1", name: "horn", why: "y" }] }))).toThrow("rename: oewn:1 listed twice");
+  });
+
+  it("refuses a line that decides nothing: a name on a dropped item, a listed name added, a name added twice", () => {
+    const none: Listed = { drop: [], drop_listed_names: [] };
+    const add = (name: string, ref = "wikidata:Q148") => ({ ref, name, why: "x" });
+    expect(() => checkHandFiles({ ...none, drop: [{ ref: "wikidata:Q148", why: "x" }] }, { add: [add("China")], rename: [] })).toThrow("wikidata:Q148 dropped by data/listed.json");
+    expect(() => checkHandFiles({ ...none, drop: [{ ref: "oewn:1", why: "x" }] }, { add: [], rename: [add("trumpet", "oewn:1")] })).toThrow("oewn:1 dropped by data/listed.json");
+    expect(() => checkHandFiles(none, { add: [add("gypsy cab")], rename: [] })).toThrow("add wikidata:Q148: the name is listed");
+    expect(() => checkHandFiles(none, { add: [add("China"), add("china")], rename: [] })).toThrow("add: wikidata:Q148 china added twice");
+    expect(() => checkHandFiles(none, { add: [add("China")], rename: [] })).not.toThrow();
+  });
+
+  it("refuses a rename to the name the item already shows", () => {
+    const cornet: Item = { id: "Q9", name: "trumpet", aliases: aliasesFor(["trumpet"]) };
+    expect(() => withoutListed("wikidata", [cornet], { drop: [], drop_listed_names: [] }, [{ ref: "wikidata:Q9", name: "trumpet", why: "x" }])).toThrow('it already shows "trumpet"');
+  });
+
+  it("adds each name to its item as a synonym, and refuses one the item already has", () => {
+    const prc: Item = { id: "Q148", name: "People's Republic of China", aliases: aliasesFor(["People's Republic of China"]) };
+    const add = [{ ref: "wikidata:Q148", name: "China", why: "x" }];
+    expect(withAddedNames("wikidata", [prc], add)).toEqual([{ ...prc, aliases: [...prc.aliases, { alias: "china", kind: "synonym" }] }]);
+    expect(withAddedNames("oewn", [prc], add)).toEqual([prc]);
+    expect(() => withAddedNames("wikidata", [prc], [{ ref: "wikidata:Q148", name: "People's Republic of China", why: "x" }])).toThrow('add wikidata:Q148: it already has "peoples republic of china"');
   });
 });
 
