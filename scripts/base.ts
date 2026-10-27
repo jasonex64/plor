@@ -1351,6 +1351,11 @@ async function defineCategories(): Promise<void> {
         await client.query("select private.define_subset($1, $2, $3, $4, $5::jsonb)", [c.key, c.name, c.of, bases.get(c.of)!.source, JSON.stringify(filterOf(c))]);
       } else {
         await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
+        if (c.within) {
+          const { rows } = await client.query(`select c.root in (select private.descendants_now(array[w.root])) as inside
+            from private.category c, private.category w where c.key = $1 and w.key = $2`, [c.key, c.within]);
+          if (!rows[0]?.inside) throw new Error(`${CATEGORIES_FILE}: ${c.key} says it's within ${c.within}, but its root isn't under ${c.within}'s`);
+        }
       }
     }
     await client.query("commit");

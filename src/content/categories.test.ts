@@ -19,6 +19,18 @@ describe("parseCategories", () => {
   });
 });
 
+describe("within", () => {
+  it("puts a category inside another, and its subsets, in the other's family, and refuses an unknown or later base", () => {
+    const fruit = { key: "fruit", name: "fruit", source: "wikidata", root: "Q1364" };
+    const berry = { key: "berry", name: "berry", source: "oewn", root: "07758680-n", within: "fruit" };
+    const berryB = { key: "berry_b", name: "berry starting with B", of: "berry", starts_with: "b" };
+    const { categories, errors } = parseCategories("c.json", JSON.stringify([fruit, berry, berryB]));
+    expect(errors).toEqual([]);
+    expect(["fruit", "berry", "berry_b"].map(familyOf(categories!))).toEqual(["fruit", "fruit", "fruit"]);
+    expect(parseCategories("c.json", JSON.stringify([berry, fruit])).errors).toEqual(['c.json category 1: "within" must be a base category listed before it']);
+  });
+});
+
 describe("subsets", () => {
   const country = { key: "country", name: "country", source: "wikidata", root: "Q6256", member_of: "Q1065" };
   it("parses each filter, and gives each subset its base's family", () => {
