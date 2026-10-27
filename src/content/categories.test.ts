@@ -61,7 +61,7 @@ describe("subsets", () => {
       'c.json category 1: "of" must be a base category listed before it',
       'c.json category 3: a subset has exactly one of "fact", "at_least" and "starts_with"',
       'c.json category 4: a subset has exactly one of "fact", "at_least" and "starts_with"',
-      ...[5, 6, 7, 8].map((n) => `c.json category ${n}: "fact" must be {"trait": "continent" or "conservation_status", "values": the source's IDs, each once}, with "via": "country" only for a continent`),
+      ...[5, 6, 7, 8].map((n) => `c.json category ${n}: "fact" must be {"trait": one of continent, conservation_status, genre, publisher, "values": the source's IDs, each once}, with "via": "country" only for a continent`),
       'c.json category 9: "at_least" must be {"number": "population", "value": a whole number above 0}',
       'c.json category 10: "at_least" must be {"number": "population", "value": a whole number above 0}',
       'c.json category 11: "starts_with" must be one letter, a to z',

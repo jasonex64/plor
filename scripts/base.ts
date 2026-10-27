@@ -17,7 +17,7 @@ import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
 import { isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
-import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
+import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VIDEO_GAME_MIN_SITELINKS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
@@ -28,10 +28,10 @@ export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scie
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
 // IDs, a population as a number with its point in time.
 export type Population = { value: number; as_of: string | null };
-export type FactTrait = "country" | "continent" | "conservation_status";
+export type FactTrait = "country" | "continent" | "conservation_status" | "genre" | "publisher";
 export type Item = {
   id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string;
-  country?: string[]; continent?: string[]; conservation_status?: string[]; population?: Population;
+  country?: string[]; continent?: string[]; conservation_status?: string[]; genre?: string[]; publisher?: string[]; population?: Population;
   // Wikidata taxa a WordNet item could join, left unjoined because there are several (linkToWikidata); the review
   // prints them and import_source doesn't read them.
   unjoined?: string[];
@@ -533,6 +533,250 @@ const ANIMALIA = "Q729"; // labelled "animal"
 const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
 
+// --- pop culture (13e-6; SOURCES.md, Wikidata pop culture) ---
+
+// English words for a whole number, and back ("Mario Kart 8" ↔ "Mario Kart Eight": 13e-5 item 6, numbers both ways).
+const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+  "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+const SCALES: [number, string][] = [[1e9, "billion"], [1e6, "million"], [1e3, "thousand"], [100, "hundred"]];
+export function numberWords(n: number): string {
+  for (const [size, word] of SCALES) {
+    if (n >= size) return `${numberWords(Math.floor(n / size))} ${word}${n % size ? ` ${numberWords(n % size)}` : ""}`;
+  }
+  if (n < 20) return ONES[n];
+  return `${TENS[Math.floor(n / 10)]}${n % 10 ? ` ${ONES[n % 10]}` : ""}`;
+}
+// A run of number words counts only if it spells its own number back ("sixty four", not "hundred" or "one one").
+export function wordsNumber(words: string[]): number | null {
+  const n = parseWords(words);
+  return n !== null && numberWords(n) === words.join(" ") ? n : null;
+}
+function parseWords(words: string[]): number | null {
+  let total = 0;
+  let part = 0;
+  for (const w of words) {
+    const scale = SCALES.find(([, name]) => name === w)?.[0];
+    if (ONES.includes(w)) part += ONES.indexOf(w);
+    else if (TENS.indexOf(w) > 1) part += TENS.indexOf(w) * 10;
+    else if (scale === 100) part *= 100;
+    else if (scale) {
+      total += part * scale;
+      part = 0;
+    } else return null;
+  }
+  return total + part;
+}
+
+// A title's other forms (13e-5 item 6; human, 2026-10-26: "Very lenient (Recommended)"): without a leading "the", "a"
+// or "an" ("The Lion King" → "Lion King"), the part after a subtitle's colon ("Zelda: Breath of the Wild" → "Breath of
+// the Wild"), and its numbers in the other spelling ("Mario Kart 8" ↔ "Mario Kart Eight").
+export function titleForms(title: string): string[] {
+  const forms = new Set<string>();
+  const add = (t: string) => {
+    const bare = t.trim().replace(/^(the|a|an)\s+/i, "");
+    if (bare) forms.add(bare);
+    if (bare !== t.trim()) forms.add(t.trim());
+  };
+  add(title);
+  const colon = title.indexOf(":");
+  if (colon > 0 && colon < title.length - 1) add(title.slice(colon + 1));
+  for (const f of [...forms]) {
+    if (/\d/.test(f)) forms.add(f.replace(/\d+/g, (d) => numberWords(Number(d))));
+    const words = f.split(/(\s+)/);
+    let changed = false;
+    const out: string[] = [];
+    for (let i = 0; i < words.length; ) {
+      let j = i;
+      const run: string[] = [];
+      while (j < words.length && (/^\s+$/.test(words[j]) ? run.length > 0 : parseWords([words[j].toLowerCase()]) !== null)) {
+        if (!/^\s+$/.test(words[j])) run.push(words[j].toLowerCase());
+        j++;
+      }
+      const value = run.length ? wordsNumber(run) : null;
+      if (value !== null) {
+        out.push(String(value), ...(/^\s+$/.test(words[j - 1] ?? "") ? [words[j - 1]] : []));
+        changed = true;
+        i = j;
+      } else {
+        out.push(words[i]);
+        i++;
+      }
+    }
+    if (changed) forms.add(out.join("").trim());
+  }
+  forms.delete(title.trim());
+  return [...forms];
+}
+
+// Titled items: each label and its other names, and the title forms; a form two items share goes to the one with more
+// sitelinks, and no form another item has as its own name is given (13e-5 item 6: "the other keeps its full title").
+export function titledItems(found: Map<string, { label: string; alts: string[]; parents: Set<string> }>, sitelinks: Map<string, number>, kindOf: (id: string, parents: Set<string>) => string[]): Item[] {
+  const own = new Map<string, string[]>();
+  for (const [id, e] of found) own.set(id, [e.label, ...e.alts].map(normalize));
+  const ownNames = new Set([...own.values()].flat());
+  const forms = new Map<string, string[]>();
+  for (const [id, e] of found) for (const t of [e.label, ...e.alts]) for (const f of titleForms(t)) {
+    const n = normalize(f);
+    if (!n || own.get(id)!.includes(n) || ownNames.has(n)) continue;
+    forms.set(n, [...new Set([...(forms.get(n) ?? []), id])]);
+  }
+  const extra = new Map<string, string[]>();
+  for (const [form, ids] of forms) {
+    const ranked = [...ids].sort((a, b) => (sitelinks.get(b) ?? 0) - (sitelinks.get(a) ?? 0));
+    if (ranked.length > 1 && (sitelinks.get(ranked[0]) ?? 0) === (sitelinks.get(ranked[1]) ?? 0)) continue;
+    extra.set(ranked[0], [...(extra.get(ranked[0]) ?? []), form]);
+  }
+  return [...found].map(([id, e]) => ({ id, name: e.label, aliases: aliasesFor([e.label], [...e.alts, ...(extra.get(id) ?? [])]), kind_of: kindOf(id, e.parents) }));
+}
+
+const ENWIKI = "?article schema:about ?x ; schema:isPartOf <https://en.wikipedia.org/> .";
+
+// LDNOOBW-listed slurs and crude nicknames, by ID so the words stay out of the repo (13e-6 review flags; human,
+// 2026-10-27: "Drop slurs and crude nicknames (Recommended)", as for the shark in 13e-4b): a board game titled with a
+// racial slur goes; the others keep their proper names and lose the listed ones. Real titles and band names that
+// contain a listed word stay.
+const POP_DROP_ITEMS = ["Q18965471"];
+const POP_DROP_LISTED_NAMES = ["Q920413", "Q3381489", "Q867799", "Q7439472", "Q1004599", "Q134969", "Q4817374"];
+export function dropListed(items: Item[], dropItems: string[], dropNames: string[]): Item[] {
+  return items.filter((i) => !dropItems.includes(i.id))
+    .map((i) => (dropNames.includes(i.id) ? { ...i, aliases: i.aliases.filter((a) => !isListed(a.alias)) } : i));
+}
+
+// Labels for many IDs, by key in batches (one query listing every label timed out for tabletop games); parents, when
+// given, ride along as labelled's do.
+async function labelledIds(ids: string[], parents: Map<string, Set<string>> = new Map()): Promise<Map<string, { label: string; alts: string[]; parents: Set<string> }>> {
+  const rows: Binding[] = [];
+  await byIds(ids, "labels", (v) => `SELECT ?x ?label ?alt WHERE { VALUES ?x { ${v} } ?x rdfs:label ?label . FILTER(LANG(?label) = "en" || LANG(?label) = "mul")
+    OPTIONAL { ?x skos:altLabel ?alt . FILTER(LANG(?alt) = "en" || LANG(?alt) = "mul") } }`, (r) => rows.push(...r));
+  const found = foldLabels(rows);
+  for (const [id, e] of found) e.parents = parents.get(id) ?? new Set();
+  return found;
+}
+
+// The IDs a pattern finds, with the values of ?parent when it binds one, without labels.
+async function idsWhere(where: string): Promise<Map<string, Set<string>>> {
+  const rows = await sparql(`SELECT ?x ?parent WHERE { ${where} }`);
+  if (rows === "timeout") throw new Error("query timed out");
+  const out = new Map<string, Set<string>>();
+  for (const r of rows) {
+    const id = qid(r.x.value);
+    if (!out.has(id)) out.set(id, new Set());
+    if (r.parent) out.get(id)!.add(qid(r.parent.value));
+  }
+  return out;
+}
+
+async function sitelinksOf(ids: string[]): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  await byIds(ids, "sitelinks", (v) => `SELECT ?x ?n WHERE { VALUES ?x { ${v} } ?x wikibase:sitelinks ?n . }`, (rows) => {
+    for (const r of rows) out.set(qid(r.x.value), Number(r.n.value));
+  });
+  return out;
+}
+
+// Each member's single-medium series (P179 to an item of seriesClass that's no Q196600 media franchise: 13e-5 item 5;
+// human, 2026-10-26: "Skip cross-media series"), so a host saying "Mario Kart" catches "Mario Kart 8".
+async function seriesOf(ids: string[], seriesClass: string): Promise<Map<string, string>> {
+  const all = new Map<string, Set<string>>();
+  // Two queries: each member's series, then which of them are seriesClass and no franchise (one query with both timed
+  // out on 5,347 video games, 2026-10-27).
+  await byIds(ids, "P179", (v) => `SELECT ?x ?s WHERE { VALUES ?x { ${v} } ?x wdt:P179 ?s . }`, (rows) => {
+    for (const r of rows) all.set(qid(r.x.value), new Set([...(all.get(qid(r.x.value)) ?? []), qid(r.s.value)]));
+  });
+  const single = new Set<string>();
+  await byIds([...new Set([...all.values()].flatMap((s) => [...s]))], "series class", (v) => `SELECT ?s WHERE { VALUES ?s { ${v} } ?s wdt:P31 wd:${seriesClass} .
+    FILTER NOT EXISTS { ?s wdt:P31 wd:Q196600 } }`, (rows) => {
+    for (const r of rows) single.add(qid(r.s.value));
+  });
+  // One series each: a member in two (rare) stays under the root, so no series catches a member it doesn't own.
+  return new Map([...all].map(([id, s]) => [id, [...s].filter((x) => single.has(x))] as const).filter(([, s]) => s.length === 1).map(([id, s]) => [id, s[0]]));
+}
+
+// The series none of whose names (label or other names) is a member's name, so no name names a series and a title.
+export function distinctSeries<T extends { label: string; alts: string[] }>(series: Map<string, T>, members: Map<string, { label: string; alts: string[] }>): Map<string, T> {
+  const names = new Set([...members.values()].flatMap((e) => [e.label, ...e.alts].map(normalize)));
+  return new Map([...series].filter(([, e]) => ![e.label, ...e.alts].some((n) => names.has(normalize(n)))));
+}
+
+// A set of titles under root: the members where finds, their single-medium series (when seriesClass names one) under
+// root with the members under them, title forms, and the facts asked for, whose values are items of the set.
+// A genre counts its sub-genres (human, 2026-10-27: "Yes, count sub-genres (Recommended)"): each value's broader
+// values among within, so "platform fighter" also gives "fighting game". The class tree is walked up a level a query
+// (each class's P279 parents), as the animal tree is read by key: one P279+ query over every genre timed out.
+// Genre links not followed: racing games aren't sports games here (human, 2026-10-27: "Leave racing out
+// (Recommended)"), though Wikidata files racing video game (Q860750) under sports video game (Q868217).
+const GENRE_LINKS_CUT = new Set(["Q860750 Q868217"]);
+
+async function broaderWithin(values: string[], within: Set<string>): Promise<Map<string, string[]>> {
+  const parents = new Map<string, string[]>();
+  let level = [...new Set(values)];
+  while (level.length) {
+    const next = new Set<string>();
+    await byIds(level, "P279", (v) => `SELECT ?g ?p WHERE { VALUES ?g { ${v} } ?g wdt:P279 ?p . }`, (rows) => {
+      for (const r of rows) {
+        const [g, p] = [qid(r.g.value), qid(r.p.value)];
+        if (GENRE_LINKS_CUT.has(`${g} ${p}`)) continue;
+        parents.set(g, [...(parents.get(g) ?? []), p]);
+        next.add(p);
+      }
+    });
+    for (const g of level) if (!parents.has(g)) parents.set(g, []);
+    level = [...next].filter((p) => !parents.has(p));
+  }
+  const up = new Map<string, string[]>();
+  for (const v of values) {
+    const seen = new Set<string>();
+    const stack = [...(parents.get(v) ?? [])];
+    while (stack.length) {
+      const p = stack.pop()!;
+      if (seen.has(p)) continue;
+      seen.add(p);
+      stack.push(...(parents.get(p) ?? []));
+    }
+    const broader = [...seen].filter((p) => within.has(p) && p !== v);
+    if (broader.length) up.set(v, broader);
+  }
+  return up;
+}
+
+async function titleSet(set: string, root: Item, where: string, seriesClass: string | null, facts: { trait: FactTrait; property: string; only?: string[]; broader?: boolean }[]): Promise<Item[]> {
+  const found = await labelledIds([...(await idsWhere(where)).keys()]);
+  const ids = [...found.keys()];
+  const linked = seriesClass ? await seriesOf(ids, seriesClass) : new Map<string, string>();
+  const seriesIds = [...new Set(linked.values())].filter((s) => !found.has(s));
+  const allSeries = seriesIds.length ? await labelledIds(seriesIds) : new Map<string, { label: string; alts: string[]; parents: Set<string> }>();
+  // A series that shares a name with a member would give that name two things ("Minecraft"), so it's left out and its
+  // entries sit under the root (human, 2026-10-27: "Keep only distinct names (Recommended)").
+  const seriesFound = distinctSeries(allSeries, found);
+  const series = new Map([...linked].filter(([, s]) => seriesFound.has(s) || found.has(s)));
+  const links = await sitelinksOf([...ids, ...seriesFound.keys()]);
+  const both = new Map([...found, ...seriesFound]);
+  let items = titledItems(both, links, (id) => (series.has(id) && both.has(series.get(id)!) ? [series.get(id)!] : [root.id]));
+  const valueItems: Item[] = [];
+  for (const f of facts) {
+    const given = new Map<string, Claim[]>();
+    // Only item values: an "unknown value" comes back as a generated .well-known/genid IRI, which names nothing to load.
+    await byIds(ids, f.property, (v) => `SELECT ?x ?v WHERE { VALUES ?x { ${v} } ?x wdt:${f.property} ?v .
+      FILTER(STRSTARTS(STR(?v), "http://www.wikidata.org/entity/Q")) }`, (rows) => {
+      for (const r of rows) given.set(qid(r.x.value), [...(given.get(qid(r.x.value)) ?? []), { value: qid(r.v.value) }]);
+    });
+    const used = [...new Set([...given.values()].flat().map((c) => c.value))];
+    if (f.broader) {
+      const up = await broaderWithin(used, new Set(f.only ?? used));
+      for (const [id, claims] of given) given.set(id, [...claims, ...claims.flatMap((c) => (up.get(c.value) ?? []).map((value) => ({ value })))]);
+    }
+    const values = f.only ?? used;
+    const labelledValues = values.length ? await labelledIds(values) : new Map();
+    for (const [id, e] of labelledValues) if (!both.has(id) && id !== root.id) valueItems.push({ id, name: e.label, aliases: aliasesFor([e.label], e.alts) });
+    const { items: next, dropped } = withFact(items, f.trait, given, new Set(labelledValues.keys()));
+    items = next;
+    console.log(`${set}: ${f.trait} on ${items.filter((i) => i[f.trait]).length} of ${items.length} items${dropped ? `, ${dropped} values dropped (${f.only ? "outside the set's own values" : "no English or mul label"})` : ""}`);
+  }
+  console.log(`${set}: ${found.size} members, ${seriesFound.size} series (${allSeries.size - seriesFound.size} left out, named like an entry)`);
+  return [root, ...valueItems.filter((v, i, all) => all.findIndex((o) => o.id === v.id) === i), ...items];
+}
+
 // In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
   "wikidata-animals": {
@@ -675,6 +919,60 @@ const SETS: Record<string, SetDef> = {
       const found = await labelled(where);
       if (found.size !== 13) throw new Error(`${found.size} provinces and territories, expected 13`);
       return [await rootItem("Q2879", "province or territory of Canada"), ...(await factsFor("wikidata-canadian-provinces", labelledItems(found, () => ["Q2879"]), where, [], true))];
+    },
+  },
+  // Pop culture (13e-6; human, 2026-10-26 and 2026-10-27, docs/milestones/M13-13e-6-pop-culture.md): each item with an
+  // English Wikipedia article ("English Wikipedia article (Recommended)").
+  "wikidata-video-games": {
+    source: "wikidata",
+    method: `SPARQL: instances of video game (P31 Q7889) with an English Wikipedia article and at least ${BASE_VIDEO_GAME_MIN_SITELINKS} sitelinks, under video game; each one's single-medium series (P179 to a P31 Q7058673 video game series, no Q196600 media franchise, one series each, none named like one of its games) under video game with its games under it; title forms; genre (P136, with each genre's broader genres P279+ among those the set uses, racing not under sports) and publisher (P123), whose values are items of the set; a short form two games share goes to the one with more sitelinks`,
+    fetch: async () => titleSet("wikidata-video-games", await rootItem("Q7889", "video game"),
+      `?x wdt:P31 wd:Q7889 ; wikibase:sitelinks ?links . FILTER(?links >= ${BASE_VIDEO_GAME_MIN_SITELINKS}) ${ENWIKI}`, "Q7058673",
+      [{ trait: "genre", property: "P136", broader: true }, { trait: "publisher", property: "P123" }]),
+  },
+  "wikidata-tabletop-games": {
+    source: "wikidata",
+    method: `SPARQL: instances of board game (P31/P279* Q131436) or card game (P31/P279* Q142714) with an English Wikipedia article, each under the one it is (or both), both under tabletop game (Q3244175, their parent); title forms; LDNOOBW-listed names of ${POP_DROP_LISTED_NAMES.join(", ")} dropped and ${POP_DROP_ITEMS.join(", ")} left out; a short form two games share goes to the one with more sitelinks`,
+    fetch: async () => {
+      const root = await rootItem("Q3244175", "tabletop game");
+      const classes = [await rootItem("Q131436", "board game"), await rootItem("Q142714", "card game")].map((c) => ({ ...c, kind_of: [root.id] }));
+      // One class a query: both in one VALUES list timed out (2026-10-27).
+      const parents = new Map<string, Set<string>>();
+      for (const c of ["Q131436", "Q142714"]) {
+        for (const [id] of await idsWhere(`?x wdt:P31/wdt:P279* wd:${c} . ${ENWIKI}`)) parents.set(id, new Set([...(parents.get(id) ?? []), c]));
+      }
+      const found = await labelledIds([...parents.keys()], parents);
+      for (const c of classes) found.delete(c.id);
+      const items = dropListed(titledItems(found, await sitelinksOf([...found.keys()]), (_, parents) => [...parents]), POP_DROP_ITEMS, POP_DROP_LISTED_NAMES);
+      console.log(`wikidata-tabletop-games: ${items.filter((i) => i.kind_of?.includes("Q131436")).length} board games, ${items.filter((i) => i.kind_of?.includes("Q142714")).length} card games`);
+      return [root, ...classes, ...items];
+    },
+  },
+  "wikidata-animated-films": {
+    source: "wikidata",
+    method: "SPARQL: instances of animated film (P31 Q202866) or anime film (P31 Q20650540), or films (P31 Q11424) whose genre (P136) is animated film, with an English Wikipedia article, under animated film; each one's single-medium series (P179 to a P31 Q24856 film series, no Q196600 media franchise, one series each, none named like one of its films) under animated film with its films under it; title forms; a short form two films share goes to the one with more sitelinks",
+    fetch: async () => titleSet("wikidata-animated-films", await rootItem("Q202866", "animated film"),
+      `{ ?x wdt:P31 wd:Q202866 } UNION { ?x wdt:P31 wd:Q20650540 } UNION { ?x wdt:P31 wd:Q11424 ; wdt:P136 wd:Q202866 } ${ENWIKI}`, "Q24856", []),
+  },
+  "wikidata-anime": {
+    source: "wikidata",
+    method: "SPARQL: instances of anime television series (P31 Q63952888) or anime film (P31 Q20650540) with an English Wikipedia article, under anime (Q1107); title forms; a short form two share goes to the one with more sitelinks",
+    fetch: async () => titleSet("wikidata-anime", await rootItem("Q1107", "anime"),
+      `{ ?x wdt:P31 wd:Q63952888 } UNION { ?x wdt:P31 wd:Q20650540 } ${ENWIKI}`, null, []),
+  },
+  "wikidata-pop-groups": {
+    source: "wikidata",
+    method: "SPARQL: musical groups (P31/P279* Q215380) whose genre (P136) is pop music (Q37073) or K-pop (Q213665) or a sub-genre of either (P279*), with an English Wikipedia article, under musical group; genre (pop music and K-pop, a sub-genre counting for its broader one), which are items of the set; LDNOOBW-listed names of the POP_DROP_LISTED_NAMES items dropped",
+    fetch: async () => dropListed(await titleSet("wikidata-pop-groups", await rootItem("Q215380", "musical group"),
+      `{ ?x wdt:P31/wdt:P279* wd:Q215380 ; wdt:P136/wdt:P279* wd:Q37073 . } UNION { ?x wdt:P31/wdt:P279* wd:Q215380 ; wdt:P136/wdt:P279* wd:Q213665 . } ${ENWIKI}`, null,
+      [{ trait: "genre", property: "P136", only: ["Q37073", "Q213665"], broader: true }]), POP_DROP_ITEMS, POP_DROP_LISTED_NAMES),
+  },
+  "wikidata-superheroes": {
+    source: "wikidata",
+    method: "SPARQL: characters whose occupation (P106) is superhero (Q188784), with an English Wikipedia article, under superhero",
+    fetch: async () => {
+      const root = await rootItem("Q188784", "superhero");
+      return [root, ...labelledItems(await labelledIds([...(await idsWhere(`?x wdt:P106 wd:Q188784 . ${ENWIKI}`)).keys()]), () => [root.id])];
     },
   },
   "oewn-animals": {
@@ -1155,7 +1453,7 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
     join private.thing_source s on s.thing_id = m and s.source = 'wikidata'`)).map((r) => r.source_id as string));
   const sharedIds = new Set(open.flatMap((r) => r.qids ?? []));
   const pairs = [...doubles.plan.saidSame.map((p) => ["P460", p] as const), ...doubles.plan.forks.map((p) => ["fork", p] as const)]
-    .filter(([, p]) => p.every((id) => members.has(id)) && p.some((id) => sharedIds.has(id)));
+    .filter(([, p]) => p.every((id) => members.has(id)) && p.some((id) => sharedIds.has(id)) && !(p.length === 2 && doubles.apart.has([...p].sort().join(" "))));
   console.log(`  flag, a P460 pair or fork a bank answer names: ${pairs.length}${pairs.length ? ` (${pairs.map(([kind, p]) => `${kind} ${p.join(" / ")}`).join("; ")})` : ""}`);
 }
 

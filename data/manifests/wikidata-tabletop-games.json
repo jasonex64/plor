@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-tabletop-games",
+  "source": "wikidata",
+  "snapshot": "2026-10-27",
+  "retrieved_at": "2026-10-27T08:52:24.881Z",
+  "method": "SPARQL: instances of board game (P31/P279* Q131436) or card game (P31/P279* Q142714) with an English Wikipedia article, each under the one it is (or both), both under tabletop game (Q3244175, their parent); title forms; LDNOOBW-listed names of Q920413, Q3381489, Q867799, Q7439472, Q1004599, Q134969, Q4817374 dropped and Q18965471 left out; a short form two games share goes to the one with more sitelinks",
+  "items": 2900,
+  "sha256": "993d8ad46b922667a20d9b0da2dde07d8824c159ddf64b7b3c058f91807b99f2"
+}

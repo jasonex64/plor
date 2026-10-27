@@ -9,7 +9,7 @@ export type BaseCategory = { key: string; name: string; source: "oewn" | "wikida
 // A1's forms (human, 2026-10-26): a continent or an IUCN status, the continent maybe through the member's country; a
 // population at least some value ("At least only (Recommended)"); a letter. A fact lists its values, and a member fits
 // with any of them (13e-4b: "Approve: always a list (Recommended)").
-export type Fact = { trait: "continent" | "conservation_status"; values: string[]; via?: "country" };
+export type Fact = { trait: "continent" | "conservation_status" | "genre" | "publisher"; values: string[]; via?: "country" };
 export type Subset = { key: string; name: string; of: string } & ({ fact: Fact } | { at_least: { number: "population"; value: number } } | { starts_with: string });
 export type CategoryDef = BaseCategory | Subset;
 
@@ -28,6 +28,9 @@ export function filterOf(c: Subset): Record<string, string | number | string[]> 
 
 // A category's family: a subset's base, else itself. A day holds one question per family (human, 2026-10-26:
 // "Separate, not same day"). A key not listed is its own family.
+// The facts a subset may filter on: 13e-4a's, and 13e-6's genre and publisher (pop culture).
+const FACT_TRAITS = ["continent", "conservation_status", "genre", "publisher"];
+
 export function familyOf(categories: CategoryDef[]): (key: string) => string {
   const of = new Map(categories.map((c) => [c.key, isSubset(c) ? c.of : c.key]));
   return (key) => of.get(key) ?? key;
@@ -64,10 +67,10 @@ export function parseCategories(file: string, text: string): { categories: Categ
     if ("fact" in v) {
       const f = v.fact;
       const values = isObject(f) ? f.values : undefined;
-      const ok = isObject(f) && (f.trait === "continent" || f.trait === "conservation_status")
+      const ok = isObject(f) && FACT_TRAITS.includes(f.trait as string)
         && Array.isArray(values) && values.length > 0 && values.every(isText) && new Set(values).size === values.length
         && Object.keys(f).every((k) => ["trait", "values", "via"].includes(k)) && (!("via" in f) || (f.via === "country" && f.trait === "continent"));
-      if (!ok) errors.push(`${where}: "fact" must be {"trait": "continent" or "conservation_status", "values": the source's IDs, each once}, with "via": "country" only for a continent`);
+      if (!ok) errors.push(`${where}: "fact" must be {"trait": one of ${FACT_TRAITS.join(", ")}, "values": the source's IDs, each once}, with "via": "country" only for a continent`);
     }
     if ("at_least" in v) {
       const n = v.at_least;

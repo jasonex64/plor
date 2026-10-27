@@ -121,6 +121,9 @@ export const BASE_PLACES_MIN_POPULATION = 100_000;
 // The fewest members a category may have: `npm run base -- review` flags any under it (human, 2026-10-24: "10 members";
 // docs/milestones/M13-13e-growing-the-categories.md).
 export const CATEGORY_MIN_MEMBERS = 10;
+// A video game counts as well known with Wikipedia articles in at least this many languages (Wikidata sitelinks; human,
+// 2026-10-27: "10+ languages (Recommended)"; docs/milestones/M13-13e-6-pop-culture.md).
+export const BASE_VIDEO_GAME_MIN_SITELINKS = 10;
 
 // Sign-in code limits (human, 2026-10-23; docs/milestones/M12-12e-sign-in-limits.md, N1–N4), counted per hashed key
 // by private.take_auth_attempt. A code lasts an hour (SOURCES.md, Supabase email sign-in), so the checks per address

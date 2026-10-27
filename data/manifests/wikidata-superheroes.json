@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-superheroes",
+  "source": "wikidata",
+  "snapshot": "2026-10-27",
+  "retrieved_at": "2026-10-27T07:36:42.342Z",
+  "method": "SPARQL: characters whose occupation (P106) is superhero (Q188784), with an English Wikipedia article, under superhero",
+  "items": 963,
+  "sha256": "2b62f22c6c8c30a29d499f52b8b66bf5d9c844918f8e5b8de80bb2a63e3d8b12"
+}

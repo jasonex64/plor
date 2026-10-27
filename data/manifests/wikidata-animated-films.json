@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-animated-films",
+  "source": "wikidata",
+  "snapshot": "2026-10-27",
+  "retrieved_at": "2026-10-27T08:52:30.612Z",
+  "method": "SPARQL: instances of animated film (P31 Q202866) or anime film (P31 Q20650540), or films (P31 Q11424) whose genre (P136) is animated film, with an English Wikipedia article, under animated film; each one's single-medium series (P179 to a P31 Q24856 film series, no Q196600 media franchise, one series each, none named like one of its films) under animated film with its films under it; title forms; a short form two films share goes to the one with more sitelinks",
+  "items": 2739,
+  "sha256": "163cb57781330e22d1fb289b588e82cfc019e9a96518fcc37efa846a1d5279d0"
+}
