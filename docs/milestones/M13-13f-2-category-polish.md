@@ -1,6 +1,6 @@
 # M13 13f-2 — Category polish
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13f-2's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #112)
+**Status:** done (merged on green CI in PR #112, `5d5ff54`, 2026-10-27 23:30 UTC; approved by the human, 2026-10-27: "I approve 13f-2's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #112)
 
 ## Goal
 Close every For M13 item about what categories hold: bring back the left-out categories the human chose, cleaned; apply the data fixes decided in 13f's triage and here; close the rest as accepted.
