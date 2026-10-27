@@ -84,6 +84,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Merging:** "Merge each on green, keep going": a session merges each PR once every check passes (`gh pr view --json statusCheckRollup`, every check SUCCESS on the head), then starts the next batch, each its own PR. **No plor.app `db push`** without the human.
 - **Flags:** "Today's rules, unclear ones wait (Recommended)": drop LDNOOBW-listed slurs and crude nicknames by ID and keep real names; mark clearly different things sharing a name as reviewed in `data/sameness.json`; strengthen thin lists; anything unclear is listed in the PR for the human.
 - **Themed questions** stay as they are on other dates (human: "no" to holding them back; ROADMAP, 13d review).
+- **Overlaps** ("Allow, never the same day (Recommended)"): a new category inside an old one (berry in fruit, cookie in dessert) is kept, and the draft treats it as the old one's family, as it does subsets, so a day never asks both.
+- **Alcohol** ("Include them"): wine, beer, cocktail and liquor categories may go in.
+- **How far** ("Keep going toward 210"): batch after batch from everyday things and knowledge until 210 categories, or until something needs the human.
+- **Weak lists** ("Drop it from the batch (Recommended)"): a category that can't get 6 familiar host answers each naming one member, or that blocks the simulator, is left out and listed in its PR with the reason.
 
 ## Waiting on the human
 - **The import review's flags** (ROADMAP, For M13): fruit products, country codes, an element alias.
