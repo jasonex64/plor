@@ -1,6 +1,6 @@
 # M14 14c-1 — The game's name and words
 
-**Status:** approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed in PR #99, set to auto-merge on green CI on the human's word (2026-10-27: "Yes, turn on auto-merge for PR #99 so it merges on green CI, then mark 14c-1 done"); done once it merges. Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
+**Status:** done (2026-10-27): merged in PR #99 on green CI (merge commit `a504b56`, 02:13 UTC; runs 40436433417 and 40436427479 at `47bc98e`). Before that: approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed in PR #99, set to auto-merge on green CI on the human's word (2026-10-27: "Yes, turn on auto-merge for PR #99 so it merges on green CI, then mark 14c-1 done");  Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
 
 ## Goal
 Give game 1 a name and a set of words that speak its world (the ridge, the Wind, the signs) instead of "Offbeat", "safe", "caught", "answer" and "host".
