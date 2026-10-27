@@ -1,6 +1,6 @@
 # M14 14b-6 — Feel and polish: the frame that stays, skeletons, instant feedback, numbers and headlines
 
-**Status:** drafted for the human's approval (2026-10-27), from three rounds of guided questions and an Impeccable critique of every page.
+**Status:** approved (human, 2026-10-27: "Approve, build 14b-6a (Recommended)"); 14b-6a, the frame and skeletons, in progress. Drafted from three rounds of guided questions and an Impeccable critique of every page.
 
 ## Goal
 Plor feels instant: the frame stays put between pages, every wait shows the shape of what's coming, comments and reactions land at once with an undo, detail pages slide in and out, numbers don't jitter, headlines wrap evenly, the question's clock reads as a clock, and the admin sees at a glance when tomorrow has no puzzle.
@@ -56,11 +56,10 @@ Round 3:
 6. **Detail pages slide (14b-6e).** Links from a tab into a detail page (`/updraft`, `/updraft/how-to-play`, `/streak`, `/groups/[id]`) carry `nav-forward`; each detail page's own back button carries `nav-back`. The content slides 60px with the 200 ms the human chose; the shell and tab bar are anchored and don't move; reduced motion makes it instant. Tab-to-tab switches don't slide. The browser's own back doesn't slide (source).
 7. **Tomorrow's puzzle warning (14b-6f).** When tomorrow (Pacific) has no approved day, the admin rail's "days approved ahead" row moves to the top in the danger slot and reads "Tomorrow has no puzzle"; the phone's Waiting strip shows it first. The Puzzles day row shows tomorrow as an empty "Not drafted" slot when it has no day.
 
-### Proposed answers to check at approval
-These came up while designing; each is the drafter's recommendation, not yet the human's:
-- **P1. Leaving during the 5 s:** send it at once when the player navigates away or closes the page (`fetch` with `keepalive`), so nothing is lost; the alternative is to drop it.
-- **P2. Several reactions in a row:** one toast per change, and only the last state is sent when the window ends.
-- **P3. Fetching tabs ahead:** "Tabs open instantly" is the frame plus prefetched skeletons, not each tab's data fetched in the background (that would be more data on phones, and a cache nobody has asked for).
+### Decided at approval (human, 2026-10-27)
+- **P1. Leaving during the 5 s:** "Send it on leaving (Recommended)": sent at once when the player navigates away or closes the page (`fetch` with `keepalive`).
+- **P2. Several reactions in a row:** "Last state wins (Recommended)": one toast, updated with each tap; only the final state is sent when the window ends.
+- **P3. Fetching tabs ahead:** "Frame + skeletons (Recommended)": the frame stays and the tab's skeleton shows at once; no tab's data is fetched in the background.
 
 ## Acceptance criteria
 Each is checked with a command or a test's output, recorded under Evidence.
