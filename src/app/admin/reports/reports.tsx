@@ -11,10 +11,8 @@ import { api } from "@/lib/api-client";
 import { Avatar } from "../../avatar";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
-import { dayText } from "../day-text";
+import { dayText, whenText } from "../../day-text";
 import styles from "./reports.module.css";
-
-const when = (at: string) => new Date(at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 export function Reports({ onChanged }: { onChanged: () => void }) {
   const [reports, setReports] = useState<ReportedComment[] | null>(null);
@@ -76,7 +74,7 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
             <p>No decisions yet.</p>
           ) : (
             <table className={admin.table} role="table">
-              <thead role="rowgroup">
+              <thead role="rowgroup" className="sr-only-on-phones">
                 <tr role="row">
                   <th role="columnheader">When</th>
                   <th role="columnheader">Decision</th>
@@ -90,7 +88,7 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
                   // A comment is kept again after a new report, so the time tells its decisions apart.
                   <tr role="row" key={`${d.decision}-${d.id}-${d.at}`}>
                     <td role="cell" className={`${admin.nowrap} ${admin.muted}`} data-label="When">
-                      <time dateTime={d.at}>{when(d.at)}</time>
+                      <time dateTime={d.at}>{whenText(d.at)}</time>
                     </td>
                     <td role="cell" data-label="Decision">
                       <span className={`${admin.tag} ${admin.state}`}>{d.decision === "deleted" ? "Deleted" : "Kept"}</span>
@@ -131,7 +129,7 @@ function Reported({ report: r, busy, onKeep, onDelete }: { report: ReportedComme
         <Avatar name={r.name} /> <strong>{r.name}</strong>{" "}
         <span className={admin.muted}>
           ({r.username}) · on {dayText(r.date)} · {r.reports} {r.reports === 1 ? "report" : "reports"}, first{" "}
-          <time dateTime={r.firstReportedAt}>{when(r.firstReportedAt)}</time>
+          <time dateTime={r.firstReportedAt}>{whenText(r.firstReportedAt)}</time>
         </span>
       </p>
       <p className={styles.body}>{r.body}</p>

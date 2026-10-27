@@ -241,6 +241,37 @@ test("a reconnect refetches the board", async ({ browser }) => {
 // game: Today's card and feed, and the Friends tab's board and leaderboard (docs/milestones/M14-14a-1-shell.md). The
 // browser's clock is moved past the reset, at most 25 hours away (a day with a time change), so the page's reset timer
 // fires; each section then loads again.
+// Today's own subscription, for the feed's nudges: on a phone the board isn't on Today, so it's the page's only
+// listener. While the channel is down the feed says so, and once it's back the feed is fetched again (M11 H6;
+// docs/milestones/M14-14b-2c-review-items.md, item 7).
+test("a reconnect on Today shows the pause in the feed and fetches it again", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "rt");
+  await openBoard(page, "/");
+  execSync("docker restart supabase_realtime_plor", { stdio: "ignore" });
+  const paused = page.getByRole("region", { name: "Feed" }).locator("xpath=..").getByText("Live updates paused, reconnecting…");
+  await expect(paused).toBeVisible();
+  // Waited for only once the channel is down, so the feed's loads as the page starts can't count (the 14b-2c-4 review).
+  const refetch = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/feed");
+  await refetch;
+  await expect(paused).toBeHidden();
+});
+
+// One Realtime socket per page, however many parts listen (docs/milestones/M14-14b-2b-1-shell.md): from 1200px Today
+// has its own subscription and the board's, and still opens one (14b-2c-4, item 35).
+test("Today opens one Realtime socket from 1200px", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "rs");
+  const sockets: string[] = [];
+  page.on("websocket", (ws) => void (ws.url().includes("/realtime/v1") && sockets.push(ws.url())));
+  await openBoard(page, "/");
+  await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(sockets).toHaveLength(1);
+});
+
 test("the reset reloads every section of Today", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.clock.install();

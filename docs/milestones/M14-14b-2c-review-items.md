@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, built and reviewed, in review in PR #95 (its questions answered, answers 15–20); then 14b-2c-4. Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, done (2026-10-26): merged in PR #95 on green CI (23:52 UTC, as `9344f0a`), by auto-merge, after one rerun of a build whose font download failed. 14b-2c-4, the tests, comments and repeated code, built and reviewed, in review in PR #96 (answers 21–23). With it, 14b-2c's own 53 items are closed but the three flaky tests left for the Windows PC (answer 4). Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -50,6 +50,13 @@ Guided questions (human, 2026-10-26, on the Mac):
 18. **The bank's label for a started day with no answers** (item 39): "'Today, no answers yet' (Recommended)"; "Scheduled" only for a future day.
 19. **One audit query for every waiting near-typo** (item 53): "Leave it for now (Recommended)": one `audit_near` query each stays, with no security change.
 20. **A source for the table roles** (answer 17): "Add WAI-ARIA 1.2 (Recommended)": its `table`, `rowgroup`, `row`, `columnheader` and `cell` roles, added to SOURCES.md.
+
+**Round 6** (asked before building 14b-2c-4):
+
+21. **One way for text only screen readers get** (items 12, 15): "One class in globals.css (Recommended)": `.sr-only` in `globals.css`, with `clip-path`, and its phones-only form beside it; DECISIONS.md's Styling row changes with it.
+22. **Repeated e2e player names** (item 10): "A check that fails on repeats (Recommended)": a unit test reads every e2e file's player names and fails on a repeat.
+23. **The banner's Result button** (item 14): "ButtonLink gets Offbeat's colours (Recommended)": one optional colour on ButtonLink, for the banner.
+24. **A test of approving the day shown by default** (item 42, asked while building 14b-2c-4): "Close it, no test". The page's default is the repo's own T1 draft, which a test can't approve; the fix it would guard was checked by hand in 14b-2b-2a.
 
 ## Source
 - WAI-ARIA 1.2 (SOURCES.md, added for 14b-2c-3, answer 20): the `table`, `rowgroup`, `row`, `columnheader` and `cell` roles (item 38).
@@ -101,6 +108,8 @@ No other new number is expected. If a fix needs one, stop and ask.
 3. Each PR updates this ticket's Status, ROADMAP's M14 row and the ticked items.
 
 ## Removes
+14b-2c-4 removed: five copies of the visually-hidden rule (`shell.module.css .hidden`, `comments.module.css .hidden`, `settings.module.css .sr`, `admin.module.css .sr` and its phone `.table thead` rule) and the shell's own phone `h1` rule with its 768px reset, four of them on the deprecated `clip`; `leaderboard.tsx`'s `dayLabel`, Reports' `when` and What needs you's copy of it; `game.module.css`'s `.result`; `src/app/admin/day-text.ts` (moved to `src/app/day-text.ts`); four double blank lines.
+
 14b-2c-3 removed: `hostBankShare` and its test, the blocked chip's second rendering (a `<span>`), the phone tables' `thead { display: none }`, and three stale comments.
 
 14b-2c-2 removed: Me's copy of the `finished` CTE (one `FINISHED_RUNS` in `src/game/offbeat.ts`), the second settle per `GET /api/me`, the sheet's `event.target === event.currentTarget` close and `Preferences`' `busy` disabling, Home's re-applying of the account's theme, and the hex values that repeated `--text` and `--on-accent` in the `--on-shade-*` slots.
@@ -145,6 +154,15 @@ Planned, confirmed per PR:
 | Answer 17 and WAI-ARIA 1.2: explicit table roles; the header row kept for screen readers | The header row hidden on phones by a new visually-hidden rule in `admin.module.css` | CSS Modules can't `composes:` inside a media query; item 49 (14b-2c-4) folds the copies together |
 | Item 41: Me marked current on desktop admin pages until `useMinWidth` reads the width | No change | Not reproduced: a `MutationObserver` added with `addInitScript`, before the page loaded, saw no `aria-current` on Me at 1440px on `/admin/bank` (`SEEN []`). Home renders only on the client, so the width is read on the first render |
 
+14b-2c-4:
+
+| Source says | We built | Why different |
+|---|---|---|
+| Answer 21: one class, `.sr-only`, in `globals.css` | `.sr-only` and `.sr-only-on-phones`, its phones-only form, beside it, which the shell's phone `h1` uses too | The admin tables' header row and the shell's heading are hidden only on phones; one file holds both forms |
+| Item 42: a check that approving the day shown by default works | Not built; closed | The default is the earliest waiting draft, the repo's own T1 day, so the test could only approve a real day (human, 2026-10-26: "Close it, no test"; answer 24) |
+| Items 1, 24, 25: the flaky tests, found and fixed | Not reproduced on the Mac, left open | Answer 4: 20 of 20 repeated runs of each, run in parallel, and every full run passed; they stay for the Windows PC and CI |
+| Item 35: `groups.e2e.ts`'s `openLive` could catch Today's second socket | Closed with a check, no change to `openLive` | Since 14b-2b-1 a page opens one socket; the new check proves Today does from 1200px, so there's no second socket to catch |
+
 ## Evidence
 14b-2c-1, on the Mac, 2026-10-26, against the shared local stack (which also holds M13 13e-5's unmerged `20261026212300_one_walk.sql`):
 
@@ -170,10 +188,20 @@ Planned, confirmed per PR:
 14b-2c-3, on the Mac, 2026-10-26:
 
 - `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  389 passed (389)` (the `hostBankShare` test removed); `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `57 passed (1.9m)`.
+- CI on PR #95 (run 40421607596, `120a2e8`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS`; `npm run test:e2e` → `57 passed (4.7m)`. Its `check` job's build first failed on a font download (ROADMAP For M14) and passed on a rerun.
 - After the review's fix to the bank: tsc and eslint clean, `npm test` 389, `npm run test:db` 266, and `bank`, `admin-area` and `approve-and-play` e2e → `5 passed (8.2s)`.
 - With `src/app/admin` set back to `HEAD`'s, the changed e2e checks failed: the phone menu and labels (`admin-area`), the blocked chip staying a checkbox (`approve-and-play`) and the Reports focus (`live-board`); all pass on the new code.
 - `src/admin/bank.db.test.ts`: past, missed (a past draft never approved), today and future days; with the review's first version of `day` put back, it fails.
 - Not tested: "Show fewer" only with something to hide (a check written for it couldn't fail on the old code, so it was dropped), and the bank page's three labels (ROADMAP, 14b-2c-3 review).
+
+14b-2c-4, on the Mac, 2026-10-26:
+
+- `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Test Files  42 passed (42)`, `Tests  390 passed (390)` (with `e2e/players.test.ts`); `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `60 passed (2.1m)`.
+- `e2e/players.test.ts`: with `"ga"` (groups.e2e.ts's) planted in `today.e2e.ts`, `Tests  1 failed (1)` naming `"ga"`; restored, it passes. A first plant through BSD `sed` hadn't landed, so it was redone in Python and checked in the file first.
+- Items 1, 24 and 25, the flaky tests. Hypothesis: none reproduces on the Mac, since each passed in every full run here. It's disproved by any failure in 20 parallel repeats. `npx playwright test e2e/shell.e2e.ts e2e/account.e2e.ts -g "clock above the tab bar|the Me tab holds the account|settings sheet holds the account" --repeat-each=20` → `40 passed (1.0m)` (item 25's test is now "the settings sheet holds the account"). Not reproduced; left for the Windows PC and CI.
+- `live-board.e2e.ts`'s Today reconnect test: green, and red with Today's channel nudging the feed only on its first join. Its first version waited for `/api/feed` before the channel went down, so a start-up load could pass it (the review); it now waits after the pause shows.
+- `live-board.e2e.ts`'s one-socket test, with the hypothesis that React's development double-mount closes the first connection before its socket opens: one socket at 1440px on Today.
+- With the changed e2e files run together (`shell`, `streak`, `offbeat`, `account`): `17 passed (29.4s)`.
 
 ## Review
 14b-2c-1, by the `reviewer` agent in a fresh context, 2026-10-26.
@@ -198,3 +226,12 @@ Planned, confirmed per PR:
   - The bank's `day` came from whether a day had started, so a past draft never approved showed "Scheduled". Fixed: `day` compares the date with `private.today()`, with the missed day in the db test (red with the old line).
   - The handoff and this ticket's 14b-2c-3 sections: brought up to date in this PR.
 - Deferred to ROADMAP "Next revision" (For M14, "14b-2c-3 review"): a ticked chip hidden again by "Show fewer"; `.blocked`'s stale comment; no plain `content` fallback before the alt-text label; no tests of the bank's labels or of "Show fewer"; the themes table's unlabelled cells; the phone menu's document-wide Escape.
+
+14b-2c-4, by the `reviewer` agent in a fresh context, 2026-10-26.
+
+- Blocking findings and how each was fixed:
+  - Today's reconnect test could pass on the feed's start-up loads: it now waits for `/api/feed` only after the pause shows, and fails when a reconnect stops nudging the feed.
+  - Item 42 was left open with no human answer: asked, and closed (answer 24).
+  - This ticket's 14b-2c-4 Evidence and the handoff: brought up to date in this PR.
+  - Also fixed, as they made this change's own claims untrue: a double blank line it left in `reports.tsx`, a blank line at the end of `comments.module.css`, `day-text.ts`'s item number, and the copies' count in DECISIONS.md's Log.
+- Deferred to ROADMAP "Next revision" (For M14, "14b-2c-4 review"): `e2e/players.test.ts` misses players made other ways (by hand, by insert, or with names built at run time); the reset test's comment now sits above the reconnect test; the one-socket test could count a socket from before its own page load.

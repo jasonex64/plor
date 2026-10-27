@@ -9,7 +9,7 @@ import type { BankView } from "@/admin/bank";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
-import { dayText } from "../day-text";
+import { dayText } from "../../day-text";
 
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
@@ -31,14 +31,14 @@ export function Bank() {
       </p>
       <section aria-label="Questions" className={admin.card}>
         <label className={admin.field}>
-          <span className={admin.sr}>Filter questions or categories</span>
+          <span className="sr-only">Filter questions or categories</span>
           <input value={filter} placeholder="Filter questions or categories" onChange={(e) => setFilter(e.target.value)} />
         </label>
         {bank.questions.length === 0 ? (
           <p>The bank holds no questions.</p>
         ) : (
           <table className={admin.table} role="table">
-            <thead role="rowgroup">
+            <thead role="rowgroup" className="sr-only-on-phones">
               <tr role="row">
                 <th role="columnheader">Question</th>
                 <th role="columnheader">Category</th>

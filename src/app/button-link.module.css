@@ -15,3 +15,10 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+/* On Offbeat's banner: no fill, the outline and letters in the banner's white (game.module.css's focus ring there). */
+.offbeat {
+  border-color: var(--on-offbeat);
+  background: transparent;
+  color: var(--on-offbeat);
+}

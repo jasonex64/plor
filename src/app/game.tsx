@@ -17,6 +17,7 @@ import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { bonusNote, earnsBonus } from "./bonus";
+import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { givenText } from "./given";
 import { errorText } from "./messages";
@@ -133,8 +134,8 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
 }
 
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
-// stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in the
-// streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+// stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
+// the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
@@ -220,9 +221,9 @@ function Score({ run }: { run: RunState }) {
         {pointsText(run.points)}
         {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
       </p>
-      <Link href="/offbeat#result" className={styles.result}>
+      <ButtonLink href="/offbeat#result" tone="offbeat">
         Result
-      </Link>
+      </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
     </>
   );

@@ -127,7 +127,7 @@ function Field({ name, value, action, editing, onEdit, children }: {
             <strong>{value}</strong>{" "}
             <button type="button" className={styles.inline} onClick={onEdit}>
               {action}
-              <span className={styles.sr}> {name.toLowerCase()}</span>
+              <span className="sr-only"> {name.toLowerCase()}</span>
             </button>
           </>
         )}
@@ -329,7 +329,7 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
               <input
                 type="radio"
                 name="theme"
-                className={styles.sr}
+                className="sr-only"
                 checked={shown.theme === t.theme}
                 onChange={() => save({ theme: t.theme })}
               />

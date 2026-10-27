@@ -114,6 +114,7 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   const todayInvite = wide.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
   await expect(todayInvite.locator("code")).toHaveText(link);
   await expect(wide.getByRole("button", { name: "Reset link" })).toHaveCount(0);
+  await wide.context().close();
 
   const friend = await (await browser.newContext()).newPage();
   await friend.goto(new URL(link).pathname);

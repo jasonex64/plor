@@ -105,14 +105,14 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
           <p>Nothing decided yet.</p>
         ) : (
           <table className={admin.table} role="table">
-            <thead role="rowgroup">
+            <thead role="rowgroup" className="sr-only-on-phones">
               <tr role="row">
                 <th role="columnheader">Typed</th>
                 <th role="columnheader">Category</th>
                 <th role="columnheader">Decision</th>
                 <th role="columnheader">When</th>
                 <th role="columnheader">
-                  <span className={admin.sr}>Undo</span>
+                  <span className="sr-only">Undo</span>
                 </th>
               </tr>
             </thead>
@@ -153,7 +153,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
 function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
     <table className={admin.table} role="table">
-      <thead role="rowgroup">
+      <thead role="rowgroup" className="sr-only-on-phones">
         <tr role="row">
           {head.map((h) => (
             <th role="columnheader" key={h}>{h}</th>
@@ -251,7 +251,7 @@ function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: bool
   return (
     <form onSubmit={search} className={admin.actions}>
       <label className={admin.field}>
-        <span className={admin.sr}>Same as</span>
+        <span className="sr-only">Same as</span>
         <input value={query} placeholder="Same as…" onChange={(e) => setQuery(e.target.value)} />
       </label>
       <button type="submit" className={admin.button} disabled={busy || query.trim() === ""}>

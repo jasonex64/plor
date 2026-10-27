@@ -17,7 +17,7 @@ import { SideColumn } from "../side-column";
 import { Audit } from "./audit/audit";
 import { AnswerBase } from "./base/base";
 import { Bank } from "./bank/bank";
-import { dayText } from "./day-text";
+import { dayText, whenText } from "../day-text";
 import { Insights } from "./insights";
 import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
@@ -117,7 +117,7 @@ function Count({ n }: { n: number }) {
   return (
     <>
       <span className={styles.badge}>{n}</span>
-      <span className={styles.sr}> waiting</span>
+      <span className="sr-only"> waiting</span>
     </>
   );
 }
@@ -189,7 +189,7 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
           {current && counts && <Count n={current.count(counts)} />}
         </span>
         <span aria-hidden="true">▾</span>
-        <span className={styles.sr}> (admin pages)</span>
+        <span className="sr-only"> (admin pages)</span>
       </button>
       {open && (
         <div className={styles.menu}>
@@ -232,7 +232,7 @@ function NeedsYou({ counts }: { counts: Counts }) {
       href: "/admin/reports",
       n: counts.reports.length,
       what: counts.reports.length === 1 ? "reported comment" : "reported comments",
-      more: first ? `First reported ${new Date(first.firstReportedAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}` : "None",
+      more: first ? `First reported ${whenText(first.firstReportedAt)}` : "None",
     },
     {
       href: "/admin/puzzles",

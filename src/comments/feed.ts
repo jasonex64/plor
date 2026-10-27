@@ -1,9 +1,9 @@
-// The home page's feed (docs/milestones/M11-home-screen.md, 11b; H2 (a), H3 (a)): today's comments from the friends
-// thread and from every group the viewer is in, in one list, oldest first, each labelled with its thread. The rules
-// are each thread's own (M08; M10 G4): who sees a comment is seesCommentSql, a comment the viewer reported stays hidden
-// from them, and posting goes to the friends thread. Until the viewer's run today is over, the feed shows who commented
-// and how many reactions there are, never the text: the comment bodies aren't read at all then, so they can't reach
-// the page.
+// Today's feed, and the friends feed in other pages' right column (docs/milestones/M11-home-screen.md, 11b; H2 (a), H3
+// (a)): today's comments from the friends thread and from every group the viewer is in, in one list, oldest first, each
+// labelled with its thread. The rules are each thread's own (M08; M10 G4): who sees a comment is seesCommentSql, a
+// comment the viewer reported stays hidden from them, and posting goes to the friends thread. Until the viewer's run
+// today is over, the feed shows who commented and how many reactions there are, never the text: the comment bodies
+// aren't read at all then, so they can't reach the page.
 import { GAME_ID } from "@/content/puzzle";
 import { friendsSql, seesCommentSql } from "@/friends/circle";
 import { FINISHED, type RunStatus } from "@/game/status";

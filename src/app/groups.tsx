@@ -1,6 +1,6 @@
 "use client";
 
-// Groups (docs/milestones/M10-groups.md, 10b; G1, G6, G7): the home page's Groups section, a group's page and its
+// Groups (docs/milestones/M10-groups.md, 10b; G1, G6, G7): the Groups tab, a group's page and its
 // invite link. Every step goes through the API; errors are shown and never retried silently (DECISIONS.md: Error
 // handling). The look is M14's.
 import { ButtonLink } from "./button-link";

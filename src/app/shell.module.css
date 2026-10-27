@@ -37,7 +37,6 @@
   border-bottom: 1px solid var(--line);
 }
 
-
 .topWord {
   font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 24px;
@@ -68,15 +67,6 @@
   line-height: 22px;
   font-variant-numeric: tabular-nums;
   text-decoration: none;
-}
-
-.hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .gear {

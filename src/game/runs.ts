@@ -82,7 +82,6 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
 
 type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
 
-
 // The share of the question's players who gave this entry, or null below the minimum (H5).
 function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
   const question = counts?.get(index);

@@ -171,7 +171,7 @@ function StreakPill({ days }: { days: number }) {
     <Link href="/streak" className={styles.streak}>
       <RankFlower rank={rank} size={22} />
       {days}
-      <span className={styles.hidden}> day streak, {rank.name}</span>
+      <span className="sr-only"> day streak, {rank.name}</span>
     </Link>
   );
 }

@@ -130,6 +130,8 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   await expect(stat("day streak")).toHaveText("1");
   await page.waitForLoadState("networkidle");
   expect(seen).toContain("stats");
+  // The run's state was seen, so the check below looks at what came after it (14b-2c-4, item 22).
+  expect(seen).toContain("run");
   expect(seen.slice(seen.indexOf("run")).filter((e) => e === "stats")).toEqual([]);
 });
 
