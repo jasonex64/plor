@@ -1,6 +1,6 @@
 # M13 13e-7 — Everyday things
 
-**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #PR, merged on green by those rules.
+**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #103, merged on green by those rules.
 
 ## Goal
 25 more categories of everyday things from WordNet, each with a bank question, toward 13e's 210 (101 before this batch).
