@@ -3309,60 +3309,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-percussion-instrument",
-      "prompt": "Name a percussion instrument",
-      "category": "percussion_instrument",
-      "host_bank": [
-        "drum",
-        "cymbal",
-        "xylophone",
-        "tambourine",
-        "triangle",
-        "bongo"
-      ],
-      "uncommon": [
-        "marimba",
-        "#927704da-988d-5b32-b38f-2d0c1fdf8f72",
-        "maraca",
-        "snare drum",
-        "glockenspiel",
-        "steel drum"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
-      "id": "name-a-natural-science",
-      "prompt": "Name a branch of natural science",
-      "category": "natural_science",
-      "host_bank": [
-        "biology",
-        "chemistry",
-        "#444c8113-84a1-50a4-9bcf-e6a5f33dcdac",
-        "astronomy",
-        "geology",
-        "botany"
-      ],
-      "uncommon": [
-        "zoology",
-        "ecology",
-        "genetics",
-        "meteorology",
-        "anatomy",
-        "oceanography",
-        "virology",
-        "mycology",
-        "optics",
-        "acoustics",
-        "cytology",
-        "hydrology",
-        "mechanics",
-        "histology"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-branch-of-math",
       "prompt": "Name a branch of mathematics",
       "category": "mathematics",

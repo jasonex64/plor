@@ -145,8 +145,6 @@
   { "key": "cactus", "name": "cactus", "source": "oewn", "root": "11862673-n" },
   { "key": "stringed_instrument", "name": "stringed instrument", "source": "oewn", "root": "04345614-n", "within": "musical_instrument" },
   { "key": "wind_instrument", "name": "wind instrument", "source": "oewn", "root": "04594218-n", "within": "musical_instrument" },
-  { "key": "percussion_instrument", "name": "percussion instrument", "source": "oewn", "root": "03921556-n", "within": "musical_instrument" },
-  { "key": "natural_science", "name": "branch of natural science", "source": "oewn", "root": "06009578-n" },
   { "key": "mathematics", "name": "branch of mathematics", "source": "oewn", "root": "06009822-n" },
   { "key": "punctuation", "name": "punctuation mark", "source": "oewn", "root": "06854415-n" }
 ]
