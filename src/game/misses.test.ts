@@ -18,7 +18,7 @@ describe("isListed", () => {
   // Plor's list (13e-9b): the slur in every spelling, plural and compound found in the base, and not the Latin
   // species names or the words that only start like it (human, 2026-10-27: "Keep Latin names (Recommended)").
   it("holds Plor's list beside LDNOOBW's", () => {
-    for (const text of ["kaffir lime", "cape kafferboom", "kafirs", "caffer cat"]) expect(isListed(text)).toBe(true);
+    for (const text of ["kaffir lime", "cape kafferboom", "kafirs", "caffer cat", "ambulance chaser"]) expect(isListed(text)).toBe(true);
     for (const text of ["syncerus caffer", "cossypha caffra", "kaffiyeh", "kaffrine"]) expect(isListed(text)).toBe(false);
   });
 });
