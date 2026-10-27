@@ -27,7 +27,7 @@ insert into private.friendship (user_a, user_b) values
 insert into private.run (user_id, game_id, puzzle_date)
   select id, 'offbeat', '2000-01-01' from auth.users where email like '%10d@example.test';
 insert into private.player_group (id, name, creator_id, invite_code)
-  values ('00000000-0000-0000-0000-0000000010d0', 'Club', '00000000-0000-0000-0000-000000010d01', 'abcdefghijklmnopqrst10');
+  values ('00000000-0000-0000-0000-0000000010d0', 'Club', '00000000-0000-0000-0000-000000010d01', 'abcdefgh10');
 insert into private.group_member (group_id, user_id) values
   ('00000000-0000-0000-0000-0000000010d0', '00000000-0000-0000-0000-000000010d01'),
   ('00000000-0000-0000-0000-0000000010d0', '00000000-0000-0000-0000-000000010d02');

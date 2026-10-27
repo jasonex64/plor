@@ -29,7 +29,7 @@ insert into private.comment_report (comment_id, reporter_id) values (-1, pg_temp
 
 -- Friends both ways (user_a < user_b), and invite codes.
 insert into private.friendship (user_a, user_b) values (pg_temp.u(1), pg_temp.u(2)), (pg_temp.u(1), pg_temp.u(3)), (pg_temp.u(2), pg_temp.u(3));
-insert into private.friend_invite (user_id, code) values (pg_temp.u(1), lpad('1', 22, 'f')), (pg_temp.u(2), lpad('2', 22, 'f'));
+insert into private.friend_invite (user_id, code) values (pg_temp.u(1), lpad('1', 10, 'f')), (pg_temp.u(2), lpad('2', 10, 'f'));
 
 -- Groups (M10 G6): 'mine' was made by 1, with 3 joining before 2, so 3 is the longest-standing member after 1;
 -- 'alone' has 1 only; 'theirs' was made by 2, with 1 a member.
@@ -46,9 +46,9 @@ begin
 end;
 $$;
 insert into g values
-  ('mine', pg_temp.make_group('Mine', pg_temp.u(1), array[pg_temp.u(3), pg_temp.u(2)], lpad('1', 22, 'g'))),
-  ('alone', pg_temp.make_group('Alone', pg_temp.u(1), array[]::uuid[], lpad('2', 22, 'g'))),
-  ('theirs', pg_temp.make_group('Theirs', pg_temp.u(2), array[pg_temp.u(1)], lpad('3', 22, 'g')));
+  ('mine', pg_temp.make_group('Mine', pg_temp.u(1), array[pg_temp.u(3), pg_temp.u(2)], lpad('1', 10, 'g'))),
+  ('alone', pg_temp.make_group('Alone', pg_temp.u(1), array[]::uuid[], lpad('2', 10, 'g'))),
+  ('theirs', pg_temp.make_group('Theirs', pg_temp.u(2), array[pg_temp.u(1)], lpad('3', 10, 'g')));
 set constraints all immediate;
 set constraints all deferred;
 

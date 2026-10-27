@@ -19,8 +19,8 @@ create function pg_temp.make_group(creator uuid, name text, code text) returns u
        m as (insert into private.group_member (group_id, user_id) select id, creator from g)
   select id from g
 $$;
--- 22 base64url characters, unique per n.
-create function pg_temp.code(n int) returns text language sql immutable return lpad(n::text, 22, 'c');
+-- 10 base64url characters, unique per n (M14 14b-3).
+create function pg_temp.code(n int) returns text language sql immutable return lpad(n::text, 10, 'c');
 -- Runs the creator-is-a-member check now, as a commit would, then defers it again.
 create function pg_temp.check_creators() returns void language plpgsql as $$
 begin
@@ -42,8 +42,8 @@ select throws_ok($$select pg_temp.make_group(pg_temp.u(2), ' Club', pg_temp.code
 select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Dice 🎲', pg_temp.code(3))$$, '23514', null, 'an emoji is rejected');
 
 -- Invite codes (G8).
-select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Short', 'abcdefghijklmnopqrstu')$$, '23514', null, 'a 21-character code is rejected');
-select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Plus', 'abcdefghijklmnopqrst+/')$$, '23514', null,
+select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Short', 'abcdefghi')$$, '23514', null, 'a 9-character code is rejected');
+select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Plus', 'abcdefgh+/')$$, '23514', null,
   'a code with characters outside base64url is rejected');
 select throws_ok($$select pg_temp.make_group(pg_temp.u(2), 'Twin', pg_temp.code(1))$$, '23505', null, 'two groups cannot share a code');
 

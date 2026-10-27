@@ -14,6 +14,7 @@ import { Avatar } from "./avatar";
 import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
+import { shareLink } from "./share";
 
 type GroupSummary = { id: string; name: string };
 type Member = { username: string; name: string; creator: boolean };
@@ -134,6 +135,7 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
 
   const act = (action: () => Promise<void>) => {
     setCopied(false);
+    setLinkReset(false);
     void run(action);
   };
   const rename = (event: FormEvent) => {
@@ -143,10 +145,14 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
       setGroup((g) => g && { ...g, name: r.name });
     });
   };
+  // The link isn't shown (docs/milestones/M14-14b-3-invite-button.md), so a reset says it happened, as the friend
+  // link's does.
+  const [linkReset, setLinkReset] = useState(false);
   const resetLink = () =>
     act(async () => {
       const { inviteCode } = await api<{ inviteCode: string }>("/api/groups/invite", { method: "POST", body: { id } });
       setGroup((g) => g && { ...g, inviteCode });
+      setLinkReset(true);
     });
   // Leaving or removing deletes that member's comments in the group (G6), so both ask first, like Delete
   // (docs/milestones/M12-12f-review-fixes.md, F3).
@@ -172,7 +178,7 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
     });
   };
 
-  const link = group ? `${window.location.origin}/groups/join/${group.inviteCode}` : null;
+  const link = group ? `${window.location.origin}/g/${group.inviteCode}` : null;
   return (
     <>
       <section aria-label="Group">
@@ -209,18 +215,18 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
               ))}
             </ul>
             <p>
-              Invite link: <code>{link}</code>{" "}
+              {/* Shared from a button, never shown (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share
+                  sheet, or the clipboard where there's none. */}
               <button
                 type="button"
                 disabled={busy}
                 onClick={() =>
                   act(async () => {
-                    await navigator.clipboard.writeText(link);
-                    setCopied(true);
+                    if (await shareLink(`Join ${group.name} on Plor`, link)) setCopied(true);
                   })
                 }
               >
-                Copy
+                Share group link
               </button>
               {group.creator && (
                 <>
@@ -231,6 +237,7 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
                 </>
               )}
               {copied && " Copied."}
+              {linkReset && " New link made. The old one no longer works."}
             </p>
             <button type="button" disabled={busy} onClick={leave}>
               Leave group

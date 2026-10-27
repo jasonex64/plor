@@ -19,7 +19,7 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-const CODE = "abcdefghijklmnopqrst-_";
+const CODE = "abcdefgh-_";
 
 describe("/api/friends routes (M07 7b)", () => {
   it.each([

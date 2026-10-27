@@ -2,7 +2,7 @@
 // code per player, one row per pair with the smaller user ID first, no friendship with yourself.
 import { randomBytes } from "node:crypto";
 import { DatabaseError } from "pg";
-import { INVITE_CODE_BYTES } from "@/config/tunables";
+import { INVITE_CODE_LENGTH } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { circleSql } from "./circle";
@@ -12,8 +12,11 @@ import { INVITE_CODE } from "./invite-code";
 // shown, which is the display name if set, else the username (M07 7a).
 export type Friend = { username: string; name: string };
 
+// A fresh code: enough random bytes for INVITE_CODE_LENGTH base64url characters (6 bits each), written in base64url and
+// cut to that length, so every character is random. The migration makes codes the same way
+// (supabase/migrations/20261027004038_short_invite_codes.sql).
 export function newInviteCode(): string {
-  return randomBytes(INVITE_CODE_BYTES).toString("base64url");
+  return randomBytes(Math.ceil((INVITE_CODE_LENGTH * 6) / 8)).toString("base64url").slice(0, INVITE_CODE_LENGTH);
 }
 
 // A code from a link or a request body. Anything that can't be a code is the same 404 as an unknown one, so the

@@ -1,6 +1,6 @@
 # M14 14b-4 — The game's name record
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-4 ticket as drafted and build it now"); built and reviewed, in review in PR #97. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
+**Status:** approved (human, 2026-10-26: "Approve the 14b-4 ticket as drafted and build it now"); done (2026-10-27): merged in PR #97 on green CI (00:45 UTC, as `1ff0c63`), by auto-merge. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
 
 ## Goal
 Offbeat's shown name and address live in one record, with its permanent ID, so 14c-1's rename (N1) changes one place, and screens shared by every game carry no game name.
@@ -82,6 +82,7 @@ On the Mac, 2026-10-26, against the shared local stack:
   - Player-facing "Offbeat" outside the record (code lines, not comments or component names): `0`. Links written as `"/offbeat`, `` `/offbeat `` or `/offbeat#` outside it: `0`.
   - `npm run content:validate` → `CONTENT OK content: 1 file(s)`: the scripts load the record through their relative `.ts` imports.
 - `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  390 passed (390)`; `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `60 passed (2.1m)`.
+- CI on PR #97 (run 40427582013, `88906c6`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS`; `npm run test:e2e` → `60 passed (5.1m)`.
 - Criteria 2 and 3: `today.e2e.ts` checks the leaderboard card is dated and names no game (`not.toContainText(GAME.name)`), and its feed link reads "Finish today's game to read 1 comment" and goes to the record's address; `groups.e2e.ts` and `player-screens.e2e.ts` check "Finish today's game to join in."; `player-screens.e2e.ts`'s card checks are anchored to the date alone; `share.test.ts` builds its expected text from `GAME.name`. After the review's fixes: `today.e2e.ts` → `4 passed (8.9s)`, `share.test.ts` → `5 passed (5)`.
 - Criterion 4: DECISIONS.md's Game 1 "Name and ID" and its Log row; 14c-1's N2 closed, pointing here.
 

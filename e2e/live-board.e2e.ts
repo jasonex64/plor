@@ -8,7 +8,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -65,8 +65,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await signInAndPick(watcher, "w");
   // The invite link is on the Friends tab, with the friends list (M14 14a-3b).
   const invite = watcher.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  await invite.getByRole("button", { name: "Make my invite link" }).click();
-  const link = await invite.locator("code").textContent();
+  const link = await sharedLink(watcher, invite.getByRole("button", { name: "Invite a friend" }));
 
   await player.goto(new URL(link!).pathname);
   await signInAndPick(player, "p");

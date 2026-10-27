@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { Home } from "../../../home";
-import { Footer } from "../../../footer";
+import { Home } from "../../home";
+import { Footer } from "../../footer";
 
-// A group's invite link (docs/milestones/M10-groups.md, 10b; G7): sign in if needed, pick a username if needed, then
+// A group's invite link, /g/<code> (docs/milestones/M10-groups.md, 10b; G7; M14 14b-3): sign in if needed, pick a username if needed, then
 // join. The API checks the code; this page only passes it on.
 export default function JoinGroupPage({ params }: { params: Promise<{ code: string }> }) {
   return (
