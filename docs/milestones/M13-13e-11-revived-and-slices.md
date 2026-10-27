@@ -1,6 +1,6 @@
 # M13 13e-11 — Revived categories and slices
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-11's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27)
+**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-11's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #109)
 
 ## Goal
 30 more categories with bank questions (196 → 226), so `npm run draft -- simulate` drafts 30 days in a row (13e's stop rule); and `load all` prints the database's size.
