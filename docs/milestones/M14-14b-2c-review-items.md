@@ -1,6 +1,6 @@
 # M14 14b-2c — The review items
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, done (2026-10-26): merged in PR #95 on green CI (23:52 UTC, as `9344f0a`), by auto-merge, after one rerun of a build whose font download failed. 14b-2c-4, the tests, comments and repeated code, built and reviewed, in review in PR #96 (answers 21–23). With it, 14b-2c's own 53 items are closed but the three flaky tests left for the Windows PC (answer 4). Its guided questions are answered (below).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-2c ticket as drafted"); 14b-2c-1, the player screens, done (2026-10-26): merged in PR #93 on green CI (21:58 UTC, as `1662837`), by auto-merge. 14b-2c-2, Me, Friends, the settings sheet and themes, done (2026-10-26): merged in PR #94 on green CI (23:21 UTC, as `db7f736`), by auto-merge. 14b-2c-3, the admin pages, done (2026-10-26): merged in PR #95 on green CI (23:52 UTC, as `9344f0a`), by auto-merge, after one rerun of a build whose font download failed. 14b-2c-4, the tests, comments and repeated code, done (2026-10-26): merged in PR #96 on green CI (2026-10-27 00:26 UTC, as `03f700b`), by auto-merge (answers 21–24). With it, 14b-2c's own 53 items are closed but the three flaky tests left for the Windows PC (answer 4). Its guided questions are answered (below).
 
 ## Goal
 Every open For M14 item in ROADMAP Next revision is fixed, moved with the human's answer, or closed with a reason, so M14's look work ends with an empty list before 14c (`M14-14b-2-sprout-admin-polish.md`, answer 7: "All 33").
@@ -196,6 +196,7 @@ Planned, confirmed per PR:
 
 14b-2c-4, on the Mac, 2026-10-26:
 
+- CI on PR #96 (run 40425550671, `660a887`), on a fresh database: `npm run test:sql` → `Files=24, Tests=406`, `Result: PASS`; `npm run test:e2e` → `60 passed (4.9m)`.
 - `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Test Files  42 passed (42)`, `Tests  390 passed (390)` (with `e2e/players.test.ts`); `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `60 passed (2.1m)`.
 - `e2e/players.test.ts`: with `"ga"` (groups.e2e.ts's) planted in `today.e2e.ts`, `Tests  1 failed (1)` naming `"ga"`; restored, it passes. A first plant through BSD `sed` hadn't landed, so it was redone in Python and checked in the file first.
 - Items 1, 24 and 25, the flaky tests. Hypothesis: none reproduces on the Mac, since each passed in every full run here. It's disproved by any failure in 20 parallel repeats. `npx playwright test e2e/shell.e2e.ts e2e/account.e2e.ts -g "clock above the tab bar|the Me tab holds the account|settings sheet holds the account" --repeat-each=20` → `40 passed (1.0m)` (item 25's test is now "the settings sheet holds the account"). Not reproduced; left for the Windows PC and CI.
