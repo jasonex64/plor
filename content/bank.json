@@ -2597,7 +2597,15 @@
         "zeppelin",
         "bomber",
         "airliner",
-        "hang glider"
+        "hang glider",
+        "drone",
+        "airship",
+        "fighter",
+        "warplane",
+        "jetliner",
+        "monoplane",
+        "propeller plane",
+        "dive bomber"
       ],
       "themes": [],
       "added_by": "claude"
@@ -2735,7 +2743,15 @@
         "Cognac",
         "schnapps",
         "mescal",
-        "ouzo"
+        "ouzo",
+        "Armagnac",
+        "Calvados",
+        "grappa",
+        "kirsch",
+        "aquavit",
+        "moonshine",
+        "slivovitz",
+        "sloe gin"
       ],
       "themes": [],
       "added_by": "claude"
@@ -2828,6 +2844,512 @@
         "banger",
         "chipolata",
         "saveloy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bone",
+      "prompt": "Name a bone",
+      "category": "bone",
+      "host_bank": [
+        "skull",
+        "femur",
+        "rib",
+        "jaw",
+        "tibia",
+        "sternum"
+      ],
+      "uncommon": [
+        "fibula",
+        "humerus",
+        "clavicle",
+        "patella",
+        "coccyx",
+        "scapula"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-muscle",
+      "prompt": "Name a muscle",
+      "category": "muscle",
+      "host_bank": [
+        "biceps",
+        "triceps",
+        "calf",
+        "quadriceps",
+        "deltoid",
+        "pectoral"
+      ],
+      "uncommon": [
+        "trapezius",
+        "gluteus maximus",
+        "soleus",
+        "abdominal",
+        "sartorius",
+        "masseter"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tooth",
+      "prompt": "Name a kind of tooth",
+      "category": "tooth",
+      "host_bank": [
+        "molar",
+        "incisor",
+        "canine",
+        "wisdom tooth",
+        "second molar",
+        "tusk"
+      ],
+      "uncommon": [
+        "premolar",
+        "bucktooth",
+        "front tooth",
+        "back tooth",
+        "primary tooth",
+        "permanent tooth"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-disease",
+      "prompt": "Name a disease",
+      "category": "disease",
+      "host_bank": [
+        "flu",
+        "measles",
+        "chickenpox",
+        "smallpox",
+        "cancer",
+        "asthma"
+      ],
+      "uncommon": [
+        "mumps",
+        "tuberculosis",
+        "cholera",
+        "leprosy",
+        "rabies",
+        "scurvy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-vitamin",
+      "prompt": "Name a vitamin",
+      "category": "vitamin",
+      "host_bank": [
+        "vitamin A",
+        "vitamin C",
+        "vitamin D",
+        "vitamin E",
+        "vitamin K",
+        "vitamin B12"
+      ],
+      "uncommon": [
+        "niacin",
+        "biotin",
+        "vitamin B6",
+        "vitamin B1",
+        "vitamin B2",
+        "folic acid"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-alloy",
+      "prompt": "Name an alloy",
+      "category": "alloy",
+      "host_bank": [
+        "steel",
+        "brass",
+        "bronze",
+        "pewter",
+        "solder",
+        "white gold"
+      ],
+      "uncommon": [
+        "stainless steel",
+        "electrum",
+        "gunmetal",
+        "cupronickel",
+        "amalgam",
+        "Nichrome"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-rock",
+      "prompt": "Name a kind of rock",
+      "category": "rock",
+      "host_bank": [
+        "granite",
+        "marble",
+        "limestone",
+        "sandstone",
+        "basalt",
+        "slate"
+      ],
+      "uncommon": [
+        "obsidian",
+        "pumice",
+        "shale",
+        "quartzite",
+        "gneiss",
+        "schist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-acid",
+      "prompt": "Name an acid",
+      "category": "acid",
+      "host_bank": [
+        "citric acid",
+        "vinegar",
+        "sulfuric acid",
+        "hydrochloric acid",
+        "lactic acid",
+        "nitric acid"
+      ],
+      "uncommon": [
+        "acetic acid",
+        "formic acid",
+        "malic acid",
+        "uric acid",
+        "butyric acid",
+        "oxalic acid"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-polygon",
+      "prompt": "Name a polygon",
+      "category": "polygon",
+      "host_bank": [
+        "triangle",
+        "square",
+        "pentagon",
+        "hexagon",
+        "octagon",
+        "rectangle"
+      ],
+      "uncommon": [
+        "rhombus",
+        "trapezoid",
+        "heptagon",
+        "decagon",
+        "parallelogram",
+        "nonagon"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-holiday",
+      "prompt": "Name a holiday",
+      "category": "holiday",
+      "host_bank": [
+        "Christmas",
+        "Easter",
+        "Thanksgiving",
+        "Hanukkah",
+        "Passover",
+        "New Year's Day"
+      ],
+      "uncommon": [
+        "Mardi Gras",
+        "Boxing Day",
+        "Yom Kippur",
+        "Labor Day",
+        "Memorial Day",
+        "Good Friday"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-mythical-being",
+      "prompt": "Name a mythical creature",
+      "category": "mythical_being",
+      "host_bank": [
+        "phoenix",
+        "centaur",
+        "werewolf",
+        "Medusa",
+        "Minotaur",
+        "troll"
+      ],
+      "uncommon": [
+        "griffin",
+        "basilisk",
+        "Cerberus",
+        "sphinx",
+        "Valkyrie",
+        "harpy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-athlete",
+      "prompt": "Name a kind of athlete",
+      "category": "athlete",
+      "host_bank": [
+        "swimmer",
+        "gymnast",
+        "skier",
+        "pitcher",
+        "goalkeeper",
+        "sprinter"
+      ],
+      "uncommon": [
+        "hurdler",
+        "diver",
+        "quarterback",
+        "batsman",
+        "cricketer",
+        "skater"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-scientist",
+      "prompt": "Name a kind of scientist",
+      "category": "scientist",
+      "host_bank": [
+        "chemist",
+        "physicist",
+        "biologist",
+        "astronomer",
+        "geologist",
+        "botanist"
+      ],
+      "uncommon": [
+        "zoologist",
+        "geneticist",
+        "ecologist",
+        "economist",
+        "linguist",
+        "virologist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-artist",
+      "prompt": "Name a kind of artist",
+      "category": "artist",
+      "host_bank": [
+        "painter",
+        "sculptor",
+        "photographer",
+        "illustrator",
+        "cartoonist",
+        "composer"
+      ],
+      "uncommon": [
+        "engraver",
+        "muralist",
+        "printmaker",
+        "portraitist",
+        "lithographer",
+        "songwriter"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-musician",
+      "prompt": "Name a kind of musician",
+      "category": "musician",
+      "host_bank": [
+        "singer",
+        "drummer",
+        "guitarist",
+        "pianist",
+        "violinist",
+        "rapper"
+      ],
+      "uncommon": [
+        "cellist",
+        "trumpeter",
+        "flutist",
+        "harpist",
+        "organist",
+        "bassist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-writer",
+      "prompt": "Name a kind of writer",
+      "category": "writer",
+      "host_bank": [
+        "poet",
+        "novelist",
+        "journalist",
+        "playwright",
+        "screenwriter",
+        "columnist"
+      ],
+      "uncommon": [
+        "essayist",
+        "biographer",
+        "lyricist",
+        "ghostwriter",
+        "librettist",
+        "speechwriter"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-ruler",
+      "prompt": "Name a title for a ruler",
+      "category": "ruler",
+      "host_bank": [
+        "king",
+        "empress",
+        "emperor",
+        "pharaoh",
+        "sultan",
+        "regent"
+      ],
+      "uncommon": [
+        "shah",
+        "khan",
+        "caliph",
+        "kaiser",
+        "shogun",
+        "emir"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-cactus",
+      "prompt": "Name a cactus",
+      "category": "cactus",
+      "host_bank": [
+        "saguaro",
+        "prickly pear",
+        "Christmas cactus",
+        "cholla",
+        "peyote",
+        "hedgehog cactus"
+      ],
+      "uncommon": [
+        "Easter cactus",
+        "rattail cactus",
+        "mammillaria",
+        "epiphyllum",
+        "crab cactus",
+        "rainbow cactus"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-stringed-instrument",
+      "prompt": "Name a stringed instrument",
+      "category": "stringed_instrument",
+      "host_bank": [
+        "guitar",
+        "violin",
+        "cello",
+        "harp",
+        "banjo",
+        "ukulele"
+      ],
+      "uncommon": [
+        "mandolin",
+        "sitar",
+        "lute",
+        "zither",
+        "balalaika",
+        "harpsichord"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-wind-instrument",
+      "prompt": "Name a wind instrument",
+      "category": "wind_instrument",
+      "host_bank": [
+        "flute",
+        "trumpet",
+        "saxophone",
+        "clarinet",
+        "trombone",
+        "harmonica"
+      ],
+      "uncommon": [
+        "oboe",
+        "bassoon",
+        "piccolo",
+        "tuba",
+        "French horn",
+        "bagpipe"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-branch-of-math",
+      "prompt": "Name a branch of mathematics",
+      "category": "mathematics",
+      "host_bank": [
+        "algebra",
+        "geometry",
+        "calculus",
+        "arithmetic",
+        "statistics",
+        "trigonometry"
+      ],
+      "uncommon": [
+        "topology",
+        "set theory",
+        "linear algebra",
+        "group theory",
+        "probability theory",
+        "integral calculus"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-punctuation-mark",
+      "prompt": "Name a punctuation mark",
+      "category": "punctuation",
+      "host_bank": [
+        "comma",
+        "period",
+        "question mark",
+        "exclamation mark",
+        "colon",
+        "semicolon"
+      ],
+      "uncommon": [
+        "apostrophe",
+        "hyphen",
+        "parenthesis",
+        "quotation mark",
+        "ampersand",
+        "en dash"
       ],
       "themes": [],
       "added_by": "claude"
