@@ -48,7 +48,7 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
 // (docs/milestones/M14-14a-2b-game-screen.md, criterion 2).
 export async function play(page: Page): Promise<void> {
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/offbeat$/);
+  await expect(page).toHaveURL(/\/updraft$/);
   await page.getByRole("button", { name: "Start", exact: true }).click();
 }
 

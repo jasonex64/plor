@@ -54,7 +54,7 @@ export function MeStats({ numbers }: { numbers: boolean }) {
         </div>
         <dl className={styles.stats}>
           <Total value={me.offbeat.best === null ? "–" : me.offbeat.best.toLocaleString("en-US")} label="best score" />
-          <Total value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. survived" />
+          <Total value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. stops climbed" />
           <Total value={String(me.offbeat.fullClimbs)} label="full climbs" />
         </dl>
         <ButtonLink href={GAME.path}>{GAME.name}&apos;s game screen</ButtonLink>
@@ -106,7 +106,7 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
   const days = sofar.filter((d) => d.survived !== null);
   const played = days.length;
   const name = dateText(first, { month: "long" });
-  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} survived`);
+  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} stops climbed`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
     <section aria-label="Calendar" className={styles.card}>
@@ -148,7 +148,7 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
         {[1, 2, 3, 4].map((k) => (
           <i key={k} className={styles[`shade${k}`]} />
         ))}
-        <span>More survived</span>
+        <span>More climbed</span>
       </div>
     </section>
   );

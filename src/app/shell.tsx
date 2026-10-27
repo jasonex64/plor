@@ -24,6 +24,7 @@ import { RankFlower, rankFor } from "./ranks";
 import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
 import { GAME } from "@/platform/game";
+import { capitalized, timedOutText } from "@/game/words";
 
 const icon = (children: ReactNode) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -210,17 +211,17 @@ function Clock({ index, msLeft, onTimeUp }: { index: number; msLeft: number; onT
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
-    <section aria-label="Question in play" className={styles.clock}>
+    <section aria-label="Stop in play" className={styles.clock}>
       {seconds > 0 ? (
         <>
           <span role="timer">
-            Question {index + 1} · {seconds}s left
+            Stop {index + 1} · {seconds}s left
           </span>
           <ButtonLink href={GAME.path}>Back</ButtonLink>
         </>
       ) : (
         <>
-          <span role="status">Time&apos;s up on question {index + 1}</span>
+          <span role="status">{capitalized(timedOutText(index + 1))}</span>
           <ButtonLink href={`${GAME.path}#result`}>Result</ButtonLink>
         </>
       )}

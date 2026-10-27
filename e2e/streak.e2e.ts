@@ -72,7 +72,7 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   // (criterion 2).
   await page.goto("/");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/offbeat");
+  await expect(page).toHaveURL("http://localhost:3000/updraft");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(top.getByRole("link", { name: "1 day streak, Daisy" })).toBeVisible();
   // Then /streak itself counts the run: this click opens the page afresh, so it checks /streak's own reading of the

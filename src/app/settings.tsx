@@ -257,8 +257,8 @@ function DisplayName({ name, onChanged }: { name: string | null; onChanged: () =
 }
 
 const SWITCHES: { key: "skipGameScreen" | "calendarNumbers"; label: string; line: string }[] = [
-  { key: "skipGameScreen", label: "Skip the game screen", line: "Play goes straight to question 1." },
-  { key: "calendarNumbers", label: "Numbers on the calendar", line: "Show how many questions you survived each day." },
+  { key: "skipGameScreen", label: "Skip the game screen", line: "Play goes straight to stop 1." },
+  { key: "calendarNumbers", label: "Numbers on the calendar", line: "Show how many stops you climbed each day." },
 ];
 
 // The six themes (L21), each tile drawn in its own theme's background and accent through its data-theme; Follow

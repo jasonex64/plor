@@ -1,6 +1,6 @@
 "use client";
 
-// Offbeat's game screen, /offbeat, and its How to play (docs/milestones/M14-14a-2b-game-screen.md; L25, L29, L34, L35):
+// The game's screen, at its record's address (src/platform/game.ts), and its How to play (docs/milestones/M14-14a-2b-game-screen.md; L25, L29, L34, L35):
 // the run, the player's stats, yesterday's answers and the feed; from 1200px the feed in the right column (L42;
 // SideColumn). Laid out from round 5's mockup; the game's own look comes with 14c.
 import { ButtonLink } from "./button-link";
@@ -17,6 +17,7 @@ import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import styles from "./offbeat.module.css";
 import { GAME } from "@/platform/game";
+import { capitalized, caughtWord } from "@/game/words";
 
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function OffbeatScreen({ username, onStarted }: { username: string; onStarted: () => void }) {
@@ -90,7 +91,8 @@ const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 const weekday = (date: string) => dateText(date, { weekday: "short" });
 
-// The stats as round 5 shows them: "1,050 best score", "5.2/7 avg. survived", and the questions survived each day.
+// The stats as round 5 shows them, in Updraft's words (14c-1): "1,050 best score", "5.2/7 avg. stops climbed", and the
+// stops climbed each day.
 function YourOffbeat({ stats }: { stats: Stats }) {
   const today = stats.days[stats.days.length - 1].date;
   const said = stats.days.map(
@@ -109,12 +111,12 @@ function YourOffbeat({ stats }: { stats: Stats }) {
           <dd>{stats.best === null ? "–" : stats.best.toLocaleString("en-US")}</dd>
         </div>
         <div>
-          <dt>avg. survived</dt>
+          <dt>avg. stops climbed</dt>
           <dd>{stats.average === null ? "–" : `${stats.average.toFixed(1)}/${QUESTIONS_PER_DAY}`}</dd>
         </div>
       </dl>
       <figure className={styles.chart}>
-        <figcaption>Questions survived, last 7 days</figcaption>
+        <figcaption>Stops climbed, last 7 days</figcaption>
         {/* The bars are one image to a screen reader, whose label says each day's value (WCAG 2.2 1.1.1). */}
         <div role="img" aria-label={said.join(", ")} className={styles.bars}>
           {stats.days.map((d) => (
@@ -134,9 +136,9 @@ function YourOffbeat({ stats }: { stats: Stats }) {
 // answer and how it went where they gave one.
 function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
   return (
-    <section aria-label="Yesterday's answers" className={styles.card}>
+    <section aria-label="Yesterday on the ridge" className={styles.card}>
       <div className={styles.titled}>
-        <h2 className={styles.heading}>Yesterday&apos;s answers</h2>
+        <h2 className={styles.heading}>Yesterday on the ridge</h2>
         <span className={styles.muted}>{dateText(yesterday.date, { weekday: "short", day: "numeric", month: "short" })}</span>
       </div>
       {yesterday.state === "none" && <p>There was no puzzle yesterday.</p>}
@@ -150,7 +152,7 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
                   {q.index + 1} · {q.prompt}
                 </strong>
                 {q.yours && (
-                  <span className={q.yours.matched ? styles.caught : styles.safe}>{q.yours.matched ? "Caught" : "Safe"}</span>
+                  <span className={q.yours.matched ? styles.caught : styles.safe}>{q.yours.matched ? capitalized(caughtWord(q.index + 1)) : "Climbed"}</span>
                 )}
               </div>
               <span className={styles.muted}>
@@ -169,10 +171,10 @@ const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
   LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
 );
 
-// How to play, in round 3's wording (L29; provisional, L32), told through the ridge and the Wind, with the game's
-// numbers from tunables.ts (the 20 seconds are judged in SQL, private.question_deadline). Start climbing starts the run
-// and goes to the game screen, as Start does there, and shows only before today's run has started
-// (docs/milestones/M14-14a-2c-review-fixes.md).
+// How to play, in round 3's wording (L29; provisional, L32) and Updraft's words since 14c-1 (N6), told through the
+// ridge and the Wind, with the game's numbers from tunables.ts (the 20 seconds are judged in SQL,
+// private.question_deadline). Start climbing starts the run and goes to the game screen, as Start does there, and shows
+// only before today's run has started (docs/milestones/M14-14a-2c-review-fixes.md).
 export function HowToPlay() {
   const starting = useStartRun();
   const [error, setError] = useState<string | null>(null);
@@ -194,20 +196,20 @@ export function HowToPlay() {
       </p>
       <h2 className={styles.heading}>How to play</h2>
       <p>
-        Up on the ridge, the Wind is listening. It has already thought of a few answers to every question. Say one of
-        them and it blows you right off.
+        Up on the ridge, the Wind is listening. At every stop it has already thought of a few answers. Say one of them
+        and it sends you flying.
       </p>
-      <p>{QUESTIONS_PER_DAY} questions, one climb. You get 20 seconds for each.</p>
+      <p>{QUESTIONS_PER_DAY} stops, one climb. You get 20 seconds at each.</p>
       <p>
-        Think off the beaten path. If the Wind didn&apos;t think of it, you&apos;re safe, and the rarer your answer, the
+        Think off the beaten path. If the Wind didn&apos;t think of it, you climb on, and the rarer your answer, the
         bigger your bonus.
       </p>
       <p>Typo? No harm done. If it isn&apos;t a real answer, just try again.</p>
       <p>
-        Watch your letters. On questions {STEALS} the Wind snatches one, so you&apos;ll have to answer without it.
+        Watch your letters. At stops {STEALS} the Wind snatches one, so you&apos;ll have to answer without it.
       </p>
       <p>
-        Keep climbing. Each step is worth more than the last: {POINTS_PER_QUESTION[0]} points at the bottom,{" "}
+        Keep climbing. Each stop is worth more than the last: {POINTS_PER_QUESTION[0]} points at the bottom,{" "}
         {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} at the top. Run out of time and the climb ends too.
       </p>
       {run?.status === "not_started" && (

@@ -16,6 +16,7 @@ import type { PublicQuestion } from "@/game/payload";
 import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
+import { capitalized, caughtText, gotPastText, timedOutText } from "@/game/words";
 import { bonusNote, earnsBonus } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
@@ -102,7 +103,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
       <Banner>
         {run.status === "not_started" && !skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops</p>
             <Link href={GAME.path} className={styles.play}>
               Play
             </Link>
@@ -113,7 +114,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             (private.question_deadline), so they have no constant here. */}
         {run.status === "not_started" && skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions · 20 seconds each</p>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops · 20 seconds each</p>
             <button type="button" className={styles.play} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
@@ -169,8 +170,8 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
           {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
               have no constant here; the points come from tunables.ts. */}
           <p className={styles.rules}>
-            <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
-            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+            <strong>{run.total} stops · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
+            stop you climb is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
           <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
@@ -246,11 +247,12 @@ function Banner({ children }: { children?: ReactNode }) {
   );
 }
 
-// How a finished run ended, as the banner says it.
+// How a finished run ended, as the banner and the result say it, in Updraft's words by the stop's tier
+// (docs/milestones/M14-14c-1-name-and-words.md, "The words").
 function endedText(run: RunState): string {
-  if (run.status === "survived") return `survived all ${run.total}`;
-  if (run.status === "timed_out") return `time's up on question ${run.answered.length + 1}`;
-  return `caught on question ${run.answered.length}`;
+  if (run.status === "survived") return "reached the top";
+  if (run.status === "timed_out") return timedOutText(run.answered.length + 1);
+  return caughtText(run.answered.length);
 }
 
 // Seconds left on the current question. At zero it asks the server again, which decides whether time is up
@@ -277,16 +279,16 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
-// After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
+// After a stop climbed (G5): its tier's line, your answer next to the Wind's, the points it earned with its estimated rarity bonus (M09:
 // from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
 // steals at the next question. The next question and its 20 seconds start on Next.
 function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
   const last = run.answered[run.answered.length - 1];
   return (
     <div>
-      <h2>Safe!</h2>
+      <h2>{gotPastText(last.index + 1)}</h2>
       <p>
-        You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
+        You said {last.answer.name}; the Wind whispered {last.hostAnswers.map((h) => h.name).join(", ")}.
       </p>
       <p>
         +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
@@ -343,7 +345,7 @@ function Question({
   return (
     <div>
       <p>
-        Question {question.index + 1} of {total} · {pointsText(points)} so far
+        Stop {question.index + 1} of {total} · {pointsText(points)} so far
       </p>
       <h2>{question.prompt}</h2>
       {question.stolen.length > 0 && (
@@ -386,23 +388,17 @@ function Result({ run }: { run: RunState }) {
   }, []);
   return (
     <div id="result" ref={box}>
-      <h2>
-        {run.status === "survived"
-          ? `You survived all ${run.total}!`
-          : run.status === "timed_out"
-            ? `Time's up on question ${run.answered.length + 1}`
-            : `Caught on question ${run.answered.length}`}
-      </h2>
+      <h2>{run.status === "survived" ? "You reached the top!" : capitalized(endedText(run))}</h2>
       <p>
-        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}
+        You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
       <Share run={run} />
       <ol>
         {run.answered.map((a) => (
           <li key={a.index}>
-            {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
+            {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
+            {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
           </li>
         ))}
       </ol>

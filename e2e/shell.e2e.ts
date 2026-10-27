@@ -5,6 +5,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -22,10 +23,10 @@ test.afterAll(async () => {
 // Each tab's path and the sections it holds (criterion 4): today's sections, moved as they are; the friends list under
 // Friends' boards, and Me's stats alone, the account being in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 const TABS = [
-  { name: "Today", path: "/", sections: ["Offbeat", "Leaderboard", "Feed"] },
+  { name: "Today", path: "/", sections: [GAME.name, "Leaderboard", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Your friends"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["All games", "Calendar", "Offbeat", "Your rarest answers"] },
+  { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, "Your rarest answers"] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.
@@ -123,14 +124,14 @@ test("a question in play is still there after a visit to another tab", async ({ 
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
-  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/offbeat");
+  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/updraft");
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
 // Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
 // and links to the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6; 14a-2b moved the game to
-// /offbeat). The clock is faked so zero comes at once.
+// /updraft). The clock is faked so zero comes at once.
 test("away from the game screen, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
   await page.clock.install();
@@ -139,13 +140,13 @@ test("away from the game screen, a question in play shows its clock above the ta
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   // Not on the game screen itself, which shows the question's own countdown.
-  const clock = page.getByRole("region", { name: "Question in play" });
+  const clock = page.getByRole("region", { name: "Stop in play" });
   await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
 
-  await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
-  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/offbeat");
+  await expect(clock.getByRole("timer")).toHaveText(/^Stop 1 · \d+s left$/);
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/updraft");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
@@ -157,8 +158,8 @@ test("away from the game screen, a question in play shows its clock above the ta
 
   // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
-  await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
-  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/offbeat#result");
+  await expect(clock.getByRole("status")).toHaveText("Dozed off at stop 1");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/updraft#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {
@@ -284,7 +285,7 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   expect(await underlined(), "the settings sheet").toEqual([]);
   await page.keyboard.press("Escape");
 
-  for (const path of ["/offbeat/how-to-play", "/streak"]) {
+  for (const path of ["/updraft/how-to-play", "/streak"]) {
     await page.goto(path);
     await expect(nav).toBeVisible();
     await page.waitForLoadState("networkidle");
@@ -303,6 +304,6 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await nav.getByRole("link", { name: "Friends" }).click();
-  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Stop in play" })).toBeVisible();
   expect(await underlined(), "the clock bar").toEqual([]);
 });

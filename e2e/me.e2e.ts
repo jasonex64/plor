@@ -6,6 +6,7 @@ import { Pool } from "pg";
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -73,29 +74,29 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   );
   const todayCell = calendar.locator(`[data-date='${today}']`);
   expect(await todayCell.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("2px");
-  await expect(total(page, "Offbeat", "best score")).toHaveText("–");
-  await expect(page.getByRole("region", { name: "Offbeat", exact: true }).getByRole("link", { name: "Offbeat's game screen" })).toHaveAttribute(
+  await expect(total(page, GAME.name, "best score")).toHaveText("–");
+  await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: `${GAME.name}'s game screen` })).toHaveAttribute(
     "href",
-    "/offbeat",
+    "/updraft",
   );
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
-  // Caught on question 1: a finished run with 0 survived, shaded at the first step.
+  // Tipped over at stop 1: a finished run with 0 survived, shaded at the first step.
   await page.goto("/");
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
   await page.goto("/me");
   await expect(total(page, "All games", "days played")).toHaveText("1");
   await expect(total(page, "All games", "day streak now")).toHaveText("1");
-  await expect(total(page, "Offbeat", "avg. survived")).toHaveText("0.0/7");
-  await expect(total(page, "Offbeat", "full climbs")).toHaveText("0");
+  await expect(total(page, GAME.name, "avg. stops climbed")).toHaveText("0.0/7");
+  await expect(total(page, GAME.name, "full climbs")).toHaveText("0");
   await expect(calendar.getByText(`1 of ${sofar} days`)).toBeVisible();
   // The text alternative names the day and how far it went (docs/milestones/M14-14a-3b-settings.md, criterion 6).
   await expect(calendar.getByRole("img")).toHaveAttribute(
     "aria-label",
-    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 survived`,
+    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 stops climbed`,
   );
   // Paper's first shade, the accent at alpha 0xa5, the lightest reaching 3:1 on the card (14a-3b).
   expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(36, 87, 214, 0.647)");
@@ -173,6 +174,6 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
   await page.getByRole("button", { name: "Answer" }).click();
   await page.getByLabel("Comment to your friends").fill(`slots ${RUN}`);
   await page.getByRole("button", { name: "Post" }).click();
-  const comment = page.getByRole("region", { name: "Offbeat comments" }).getByRole("listitem").filter({ hasText: `slots ${RUN}` });
+  const comment = page.getByRole("region", { name: `${GAME.name} comments` }).getByRole("listitem").filter({ hasText: `slots ${RUN}` });
   await expect(comment.locator("[data-initial='M']")).toHaveCount(1);
 });

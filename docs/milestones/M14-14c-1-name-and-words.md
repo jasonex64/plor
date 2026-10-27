@@ -1,6 +1,6 @@
 # M14 14c-1 — The game's name and words
 
-**Status:** draft, for the human's approval. Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below): every open question is answered. No code before the ticket's approval.
+**Status:** approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed, in PR PR_PENDING, waiting for the human's word to merge. Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
 
 ## Goal
 Give game 1 a name and a set of words that speak its world (the ridge, the Wind, the signs) instead of "Offbeat", "safe", "caught", "answer" and "host".
@@ -117,13 +117,13 @@ Screens shared by every game keep plain words and name no game (round 4; 14b-4).
 | N7 | A stolen letter's key: what the player feels when they press it (it does nothing today, and only a status line says why) | **With 14c's art**, not 14c-1 (human, 2026-10-27: "With 14c's art (Recommended)"; earlier "Wait for 14c (Recommended)") |
 
 ## Acceptance criteria
-- [ ] The game's record reads `name: "Updraft"` and `path: "/updraft"`, and the route folder is `src/app/updraft/` (renamed by hand, 14b-4 answer 3); `/offbeat` answers 404 (no redirect).
-- [ ] No player-facing string on the game's own screens says "Offbeat", "safe", "caught", "survived", "host" or "question": checked by grep over `src/app` and `src/game/share.ts`, with every remaining hit listed and justified (the plain ones this ticket keeps: "Your answer", "Answer", the retry and stolen-letter lines, "Your rarest answers", the admin pages).
-- [ ] The get-past, caught and timeout lines follow the three tiers: a unit test on the stop → word lookup at stops 2, 3, 5 and 6 (each tier's edges), for all three.
-- [ ] The share line: a unit test per symbol (🟪 a bonus above 0, 🟩 none, 💨 a catch, ❄️ a timeout, ⬜ unreached), the name from the record, and no prompt or answer in it.
-- [ ] How to play reads in the new words.
-- [ ] Shared screens and the admin pages keep plain words (round 4; N5).
-- [ ] The existing e2e tests that read these strings are updated to the new words, not deleted or loosened (CLAUDE.md, "Never cheat a check").
+- [x] The game's record reads `name: "Updraft"` and `path: "/updraft"`, and the route folder is `src/app/updraft/` (renamed by hand, 14b-4 answer 3); `/offbeat` answers 404 (no redirect).
+- [x] No player-facing string on the game's own screens says "Offbeat", "safe", "caught", "survived", "host" or "question": checked by grep over `src/app` and `src/game/share.ts`, with every remaining hit listed and justified (the plain ones this ticket keeps: "Your answer", "Answer", the retry and stolen-letter lines, "Your rarest answers", the admin pages).
+- [x] The get-past, caught and timeout lines follow the three tiers: a unit test on the stop → word lookup at stops 2, 3, 5 and 6 (each tier's edges), for all three.
+- [x] The share line: a unit test per symbol (🟪 a bonus above 0, 🟩 none, 💨 a catch, ❄️ a timeout, ⬜ unreached), the name from the record, and no prompt or answer in it.
+- [x] How to play reads in the new words.
+- [x] Shared screens and the admin pages keep plain words (round 4; N5).
+- [x] The existing e2e tests that read these strings are updated to the new words, not deleted or loosened (CLAUDE.md, "Never cheat a check").
 
 ## Out of scope
 - The pixel art and the motion (the rest of 14c).
@@ -141,7 +141,7 @@ Screens shared by every game keep plain words and name no game (round 4; 14b-4).
 2. One PR from `m14-look-and-feel`: the record's name and address with the folder's rename, the strings, the tier lookups and their tests, the share line and its tests, How to play, the e2e updates. plor.app's code changes on merge; no migration.
 
 ## Removes
-Nothing yet: a draft ticket with no code. The PR removes the old strings ("Offbeat" as the shown name, "Safe!", "Caught", "survived", "the host said", "isn't in our list") with no fallback to them.
+The old player-facing strings, with no fallback to them: "Offbeat" as the shown name and `/offbeat` as the address (the route folder renamed to `src/app/updraft/`, no redirect), "Safe!", "Caught" and "caught on question N", "Time's up on question N", "survived" and its stat labels, "the host said", "Yesterday's answers", "Question N of 7" and "Question in play"; the share line's placeholder symbols (🟩 survived, ⬜ not; M05) and ROADMAP's item for them. ("isn't in our list" stays: round 8 kept the retry line plain.)
 
 ---
 *Fill in the sections below at the end.*
@@ -149,9 +149,33 @@ Nothing yet: a draft ticket with no code. The PR removes the old strings ("Offbe
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| M05 S1: the share line shows how far the player got, not how the run ended | 💨 at the stop where the Wind caught the player, ❄️ where time ran out | Superseded by the human's answers (rounds 6 and 10, N3): the ending is part of the line, still with no prompt or answer |
+| The words table: "climbed" for how far you got | The result's list says "(climbed, +N points, bonus +B)" for a stop got past, beside "(tipped over at stop N)" for the catch | The old line said "(safe, …)"; "climbed" is the table's word for a stop got past (round 9) |
+| The words table covers the game's own screens | The home page's introduction is rewritten in the same words ("Seven stops up the ridge… match the Wind and it sends you flying") | It introduces the game, so it's the game's own text, like its banner (14b-4, answer 2) |
+| The table renames "question 3" to "stop 3" everywhere a question is numbered | The board's clock region is "Stop in play" (was "Question in play") | Its accessible name numbers no question but names one; the same word keeps it consistent (round 4) |
+| The words table: the caught line is always "*<word> at stop N*", yesterday's card included | Yesterday's card shows the word alone in its pill ("Tipped over", "Tumbled", "Sent flying"), and "Climbed" for a stop got past | Each row of the card already starts with its stop's number ("3 · Name a fruit"), so "at stop 3" would say it twice; the table gives no word for a stop got past there, and "Climbed" is round 9's |
+| Plain words outside the game's own screens (round 4; N5) | The privacy page keeps "for each question, whether it matched the host" | A legal page describing what's stored, in the plain words the data has; not the game's own screen |
 
 ## Evidence
+On the Mac, 2026-10-27, against the shared local stack (M13's work was on the Windows PC today):
+
+- Criterion 1: `src/platform/game.ts` reads `name: "Updraft"`, `path: "/updraft"`; `git mv src/app/offbeat src/app/updraft`. The new e2e test "the old address /offbeat answers 404" passes (`e2e/offbeat.e2e.ts`).
+- Criterion 2: `grep -rniE "offbeat|\bsafe\b|caught|survived|\bhost\b|question" src/app src/game/share.ts --include='*.tsx' --include='share.ts'`, comment lines and `/admin/`, `/api/` left out. Every hit left is a code identifier (`run.question`, `d.survived`, `run.status === "survived"`, `OffbeatScreen`, `POINTS_PER_QUESTION`, the view kind `"offbeat"`, ButtonLink's `tone`, `id="offbeat"`, `styles.caught`/`styles.safe`, `CAUGHT = "💨"`), or one of these kept plain: `privacy/page.tsx` ("Questions:" by the email address; "for each question, whether it matched the host", Source diff) and `about/page.tsx` ("Questions, ideas or problems"). The plain ones the ticket keeps ("Your answer", "Answer", the retry and stolen-letter lines, "Your rarest answers", the admin pages) are unchanged. After the review, `src/app/messages.ts`'s run errors say "stop" too.
+- Criterion 3: `src/game/words.test.ts`, each tier's edges at stops 1, 2, 3, 5, 6 and 7 and the three texts at 2, 3, 5 and 6.
+- Criterion 4: `src/game/share.test.ts`, one test per symbol, the name from `GAME.name`, no prompt or answer.
+- Criterion 5: `e2e/offbeat.e2e.ts` reads How to play's new lines ("7 stops, one climb.", "At stops 2, 4, 5, and 7 the Wind snatches one", the points at the bottom and top).
+- Criterion 6: the leaderboard, the feed and the admin pages are untouched; `today.e2e.ts` still checks the card names no game.
+- Criterion 7: every e2e assertion on a changed string now expects the new one; none was removed. The e2e files read the name from `GAME.name` and the get-past words from `gotPastText`; the caught and timeout lines are written out ("tipped over at stop 1"), and the URLs stay literal (`/updraft`) so they check the real address, not the record against itself.
+- `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  395 passed (395)`; `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `61 passed (2.1m)` (after the review's fixes; the run before them failed 4, the strings the review also found, plus the shell clock test, which then passed 5 of 5 alone).
 
 ## Review
+By the `reviewer` agent in a fresh context, 2026-10-27.
+
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - How to play's two e2e assertions still read the old lines: updated to "7 stops, one climb." and "At stops … the Wind snatches one" (the first full e2e run had also caught them, with today's and Me's stakes and calendar lines).
+  - `offbeat.e2e.ts`'s check that yesterday's card shows no pill before the player plays read `/^(Safe|Caught)$/`, which could no longer fail: it reads the new pills, `/^(Climbed|Tipped over|Tumbled|Sent flying)$/`.
+  - Three run errors in `src/app/messages.ts` still said "question" (`already_answered`, `not_open`, `not_current_question`): they say "stop".
+  - ROADMAP's row and the handoff still said "waiting for approval": updated.
+- Fixed as well, small defects of this change's own: the yesterday card's word-only pill, now a Source diff row; "Offbeat" left in the two route pages' comments; old words in `settings.e2e.ts`'s test titles and `live-board.e2e.ts`'s comments.
+- Not changed: two comment lines a little past the usual width (`src/app/game.tsx`, `src/platform/game.ts`), style only. The reviewer noted the literal caught and timeout lines in e2e are a stronger check than words.ts, so they stay.
+- Deferred to ROADMAP "Next revision": none.
