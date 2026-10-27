@@ -4,7 +4,10 @@
 // The Latin "caffer" and "caffra" stay off it, so species keep their formal names ("Keep Latin names (Recommended)").
 // An insult goes on it when dropping its item alone would let players' misses bring it back (13e-10: "Add it to
 // Plor's list (Recommended)"); "quack" stays off, as a duck's sound already keeps it out of the doctor category.
+// A slur that's also part of official place or species names (Squaw Lake, Hottentot Teal) goes on as the phrases that
+// hold it in the base, not the bare word (13e-11: "Just the two phrases (Recommended)").
 export const PLOR_LISTED: readonly string[] = [
   "kaffir", "kaffirs", "kafir", "kafirs", "kaffer", "kaffers", "caffre", "caffres", "kafferboom", "kafferbooms",
-  "caffer cat", "caffer cats", "ambulance chaser", "ambulance chasers",
+  "caffer cat", "caffer cats", "ambulance chaser", "ambulance chasers", "old squaw", "old squaws", "hottentot bread",
+  "hottentot breads", "hottentots bread", "hottentots breads",
 ];

@@ -27,6 +27,14 @@
     {
       "ref": "oewn:10516787-n",
       "why": "\"quack\", an insult for a doctor, in the new doctor category (13e-10; human, 2026-10-27: \"Jobs only, closely reviewed (Recommended)\": insults dropped)"
+    },
+    {
+      "ref": "oewn:13260634-n",
+      "why": "a vine whose shown name holds an LDNOOBW-listed racial slur; its other names are Latin only, so it has no clean common name (13e-11 review flag; the overnight rule, \"drop LDNOOBW-listed slurs\", and 13e-9b's \"Rename it (Recommended)\": drop it if it has none)"
+    },
+    {
+      "ref": "oewn:01856511-n",
+      "why": "WordNet's long-tailed duck, shown as \"old squaw\", a slur now on Plor's list; it's in two sets with different shown names (joined to Wikidata's Long-tailed Duck in oewn-animals, \"old squaw\" in oewn-nouns), so one rename can't fit both; the bird stays as Wikidata's Long-tailed Duck (13e-11 review; human, 2026-10-27: \"Just the two phrases (Recommended)\")"
     }
   ],
   "drop_listed_names": [
