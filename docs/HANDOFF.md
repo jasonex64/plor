@@ -34,7 +34,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 ### Next step
 1. **14b-4, the game's name record** is done (PR #97, merged on green CI, 2026-10-27): `src/platform/game.ts` holds the game's ID, shown name and address; shared screens name no game.
 2. **14b-3, the invite button** is done (PR #98, merged on green CI on the human's word, 2026-10-27 01:08 UTC): share buttons, 10-character codes on `/i/` and `/g/`, every old link replaced. Its migration `20261027004038_short_invite_codes.sql` is on plor.app (pushed 28 s after the merge; 40 of 40 migrations matching; hosted pgTAP 410 passed). On this Mac's shared stack it was applied by its SQL, with its row in `supabase_migrations.schema_migrations`, since M13 13e-5's unmerged `one_walk` makes `migration up` refuse.
-3. **Next: 14c-1, the game's name and words** (ask its N1, N3–N7; N2 is closed by 14b-4). N3 holds the share symbols and N7 a stolen key's feedback.
+3. **Next: 14c-1, the game's name and words** (`docs/milestones/M14-14c-1-name-and-words.md`): every open question answered on 2026-10-27, rounds 6–10, quoted: the name **Updraft** (plor.app/updraft), the share line's 🟪/🟩/💨/❄️/⬜, three timeout tiers, and the words gone through one by one (several kept plain). Waiting for the human's approval; then one PR, no migration. N3 holds the share symbols and N7 a stolen key's feedback.
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
