@@ -1,6 +1,6 @@
 # M13 13e-8 — Knowledge
 
-**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #PR, merged on green by those rules.
+**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #104, merged on green by those rules.
 
 ## Goal
 22 knowledge categories from WordNet (the body, science, people, music, language), each with a bank question, toward 13e's 210 (126 before this batch).
