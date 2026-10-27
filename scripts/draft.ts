@@ -1,5 +1,5 @@
 // Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
-// `npm run draft -- <date> [--questions <id>,…]`. It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
+// `npm run draft -- <date> [--questions <id>,…]`, and `npm run draft -- simulate` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
 // the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
 // ones in that order; orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
 // "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
@@ -188,12 +188,7 @@ function membersOf(db: pg.Client, category: string): Promise<Set<string>> {
 // What the host catches: the host answers and every member under them.
 async function caughtMembers(db: pg.Client, category: string, hosts: string[]): Promise<string[]> {
   const { rows } = await db.query<{ id: string }>(
-    `with recursive caught (id) as (
-       select unnest($1::uuid[])
-       union
-       select f.thing_id from private.fact f join caught c on f.value_thing = c.id where f.trait = 'kind_of' and f.removed_at is null
-     )
-     select id::text from caught`,
+    "select id::text from private.descendants_now($1::uuid[]) as id",
     [hosts],
   );
   const members = await membersOf(db, category);
@@ -300,11 +295,46 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   return { day, guide: softGuide(await expectedCatches(db, day)) };
 }
 
+// The simulator, `npm run draft -- simulate`: draft() for SIMULATE_DAYS dates SIMULATE_STEP days apart from
+// SIMULATE_FROM, the drafted days on disk as the only past days, writing no files. Its values are the ones 13e-2 to
+// 13e-4 ran by hand, so the counts compare (13e-4 Evidence: 39 of 40); it was rewritten by hand three times before it
+// became this command (CLAUDE.md, repeated procedures; 13e-5).
+const SIMULATE_DAYS = 40;
+const SIMULATE_STEP = 3;
+const SIMULATE_FROM = "2027-01-01";
+
+export function simulateDates(): string[] {
+  const from = Date.parse(`${SIMULATE_FROM}T00:00:00Z`);
+  return Array.from({ length: SIMULATE_DAYS }, (_, i) => new Date(from + i * SIMULATE_STEP * 86_400_000).toISOString().slice(0, 10));
+}
+
+async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key: string) => string): Promise<void> {
+  let drafted = 0;
+  let questions = 0;
+  let subset = 0;
+  // A day that doesn't draft is what the simulator measures: each is printed with its reason, and any one makes the
+  // command exit 1.
+  for (const date of simulateDates()) {
+    try {
+      const { day } = await draft(db, bank, days, date, family);
+      drafted++;
+      questions += day.questions.length;
+      subset += day.questions.filter((q) => family(q.category) !== q.category).length;
+      console.log(`${date} ${day.questions.map((q) => (q.steals ? `${q.category}:${q.steals}` : q.category)).join(" ")}`);
+    } catch (err) {
+      console.log(`${date} FAILED: ${(err as Error).message}`);
+    }
+  }
+  console.log(`DRAFTED ${drafted} of ${SIMULATE_DAYS}; subset questions ${subset} of ${questions}`);
+  if (drafted < SIMULATE_DAYS) process.exitCode = 1;
+}
+
 async function main(): Promise<void> {
   const [date, flag, list] = process.argv.slice(2);
+  const simulating = date === "simulate" && flag === undefined;
   // The date is user input: a malformed one would make every gap NaN and let any category through (13d review).
-  if (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list))) {
-    console.error("usage: npm run draft -- <date> [--questions <id>,…]");
+  if (!simulating && (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list)))) {
+    console.error("usage: npm run draft -- <date> [--questions <id>,…]\n       npm run draft -- simulate");
     process.exit(2);
   }
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
@@ -321,6 +351,7 @@ async function main(): Promise<void> {
   if (!categories) throw new Error(categoryErrors.join("\n"));
   const db = await localClient();
   try {
+    if (simulating) return await simulate(db, bank, days, familyOf(categories));
     const { day, guide } = await draft(db, bank, days, date, familyOf(categories), list?.split(","));
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);

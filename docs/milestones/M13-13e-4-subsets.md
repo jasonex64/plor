@@ -1,12 +1,12 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c built, reviewed and proven, in review in PR #92. Pop culture moves to 13e-5 and uses this.
+**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c done (PR #92). Pop culture moves to 13e-6 and uses this (renumbered 2026-10-26, when the base's shape took 13e-5: `M13-13e-5-the-base-shape.md`).
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
 
 ## Who uses it / what breaks without it
-- **Used by:** the drafting session (13d), which gets many more questions from the sets already loaded; 13e-5 (pop culture), whose narrow questions are subsets of broad sets; every player who meets them.
+- **Used by:** the drafting session (13d), which gets many more questions from the sets already loaded; 13e-6 (pop culture), whose narrow questions are subsets of broad sets; every player who meets them.
 - **Breaks without it:**
   - every narrow question needs its own import, so "Nintendo game", "Nintendo racing game" and "racing game" would be three sets of mostly the same things;
   - questions like "countries that start with D" or "African countries" can't be asked (human, 2026-10-26);
@@ -33,7 +33,7 @@ Any broad category can give narrower questions: by a fact about its members ("Na
 | Space | "figure out how much work it would be to apply to all the data we have so far (animals, places, etc.) then realistically draft a plan based on if doing this new mechanism will take more space)" |
 | **The design and O1–O5** (after the survey and the 500 MB research) | "Approve 13e-4's design and go through O1–O5"; O1 "One entry listing them (Recommended)"; O2 "A core few"; O3 "Their own table (Recommended)"; O4 "What's typed must start with it (Recommended)"; O5: "these were just suggestions btw … (u can still add it)" |
 
-The pop-culture answers are for 13e-5 and stay recorded here until its ticket is written.
+The pop-culture answers are for 13e-6 and stay recorded here until its ticket is written.
 
 ## What it would take: the survey (2026-10-26)
 **The database today** (a fresh `load all`, local): 260 MB. Facts are only `kind_of` (204,421) and `member_of` (193); `private.fact` holds 204,566 rows in 45 MB with its indexes, about **230 bytes a fact**. `private.fact.value_thing` is a thing and not null, so numbers (population, GDP) don't fit yet.
@@ -55,7 +55,7 @@ The pop-culture answers are for 13e-5 and stay recorded here until its ticket is
 
 **WordNet's categories** (49 of the 60; 11 are Wikidata's) have no facts beyond the kind-of tree, so for them only **letter subsets** come without new data.
 
-**Space.** The facts most subsets would use (country and state for places and rivers; continent through the country; population and area; IUCN status and endemic-to for animals; country of origin for breeds; the elements' numbers) come to roughly **160,000–240,000 rows, about 40–55 MB** at today's 230 bytes a fact. Letter subsets cost nothing: they're worked out from names when a day's answers are fixed. A fresh database would go from 260 MB to about **300–315 MB** of the hosted Free plan's 500 MB, before 13e-5's pop-culture sets (the human asked to be warned near the limit; plor.app's answer database is empty today).
+**Space.** The facts most subsets would use (country and state for places and rivers; continent through the country; population and area; IUCN status and endemic-to for animals; country of origin for breeds; the elements' numbers) come to roughly **160,000–240,000 rows, about 40–55 MB** at today's 230 bytes a fact. Letter subsets cost nothing: they're worked out from names when a day's answers are fixed. A fresh database would go from 260 MB to about **300–315 MB** of the hosted Free plan's 500 MB, before 13e-6's pop-culture sets (the human asked to be warned near the limit; plor.app's answer database is empty today).
 
 ## Claude's design (for the human to approve)
 1. **New facts, measured before they're kept.** Each Wikidata fetch in `scripts/base.ts` also takes the chosen properties (O2): thing-valued ones (country, state, continent, IUCN status, endemic to, country of origin) as new traits in `private.fact`, and numbers (population, area, GDP, length) in a new numeric fact (a column or a table, O3). For a property with several values, the one with the latest "point in time" (P585) is kept. Every set is re-fetched, which also does ROADMAP's From 13e-3 item "re-fetch the older sets for the mul fallback".
@@ -117,7 +117,7 @@ About 93,000 rows (survey: rivers' countries 42,000, animals' statuses 39,000, p
 **Removes:** `private.fact`'s two-trait check; the older Wikidata snapshots (re-fetched); the countries' and capitals' fetches without facts. Nothing else: the rest adds to the categories and the base.
 
 ## 13e-4b — The first subsets
-**Status:** in review (2026-10-26): the design approved (human: "I approve 13e-4b's design. Build it."), built (`26fb3e3`), reviewed, and checked on a fresh load once 13e-4c gave a complete animal tree (Evidence below); in PR #92 with 13e-4c (human: "One PR for both (Recommended)").
+**Status:** done (2026-10-26): merged in PR #92 (`f526633`, 2026-10-26 10:46 UTC) on green CI, every check (runs 40307500816 and 40307496875 on `ea5e346`; the push run's build first failed fetching Google Fonts, the same commit's other run having passed, and passed when that job was re-run unchanged), by auto-merge. Its migration `20261026061619_subset_values.sql` was pushed to plor.app at the human's request ("please push with supabase cli when it's done"): from a clean checkout of main, `db push --linked --include-all` (M14's two later migrations were already there; the two sets share no function or column), `migration list --linked` 39 of 39 matching, `test db --linked` 24 files, 406 tests, PASS (a first run stopped after 160 tests and 272 s, cause unverified, likely the connection; the rerun passed).
 
 **What the human decided (guided questions, 2026-10-26):**
 | Question | The human's answer |
@@ -171,7 +171,7 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 - `npx tsc --noEmit -p .` clean; `npx eslint scripts src` clean; `npm run content:validate` `CONTENT OK`; `npm test` 39 files, **343 passed**; `npm run test:sql` `Files=22, Tests=391`, `Result: PASS` (`subsets.test.sql` 46); `npm run test:db` 40 files, **262 passed**. e2e: no page changed; CI runs it.
 
 ## 13e-4c — Reading Wikidata's animal tree by key
-**Status:** in review (2026-10-26): built and proven (Evidence below); shipped with 13e-4b in PR #92 (human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
+**Status:** done (2026-10-26): with 13e-4b in PR #92 (see 13e-4b's Status for the CI runs and the plor.app push; human, 2026-10-26: "One PR for both (Recommended)", as GitHub holds one open PR per branch; a one-off exception to "one PR per sub-ticket").
 
 **The problem** (13e-4b review, then measured): the animals import reads Wikidata's whole parent-taxon list (P171, about 4 million statements) and its names (P1843), scientific names (P225) and statuses (P141) in pages by position (`bd:slice` offsets, 50,000 rows each). The same page gives different rows on different requests: five requests in a row went to five servers (wdqs2007, wdqs2022, wdqs2014, wdqs2015, wdqs2010), and the page at offset 2,000,000 returned different rows even from the same server twice (wdqs2014, wdqs2008). Each server orders results by its own internal IDs, and the servers are independent and may hold different data (SOURCES.md, Wikidata Query Service behaviour), and Wikidata keeps changing during a read. So reading by position skips and repeats rows, and one skipped parent link cuts off its whole branch: taxa under Animalia came out as 2,366,663, then 2,360,800, then 2,325,989 on three reads the same day.
 
@@ -222,7 +222,7 @@ Non-blocking findings go to ROADMAP, From 13e-4b.
 
 ## Out of scope
 - An AI that writes subsets by itself: Claude proposes each batch's subsets in a session and the human approves them by merging (human, 2026-10-26: "Claude proposes, I approve (Recommended)"). ROADMAP's "AI that drafts days" stays in Later.
-- Pop culture: 13e-5, with the answers above.
+- Pop culture: 13e-6, with the answers above.
 - AI-filed traits ("can fly") and facts for WordNet's categories.
 - Combining two filters ("an African country that starts with K"): after this, if the human asks.
 

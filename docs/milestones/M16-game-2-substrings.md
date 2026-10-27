@@ -2,6 +2,8 @@
 
 **Status:** planned, after launch (M15). Draft ticket for the human's approval, 2026-10-22. The human answered S1–S14 the same day; S1, S2's pick and S15–S19 are still open. No code, migration or content comes before those answers and the end of the MVP (human, 2026-10-21: the MVP is M00 to M12, "all working features first").
 
+**Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
+
 ## Goal
 Add Plor's second daily game, a substring game inspired by JKLM: the player gets a few letters such as "cks" and types a word that contains them ("rocks", "backspace") before time runs out.
 

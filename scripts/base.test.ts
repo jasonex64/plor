@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, foldLabels, latestNumber, linkToWikidata, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -115,6 +115,7 @@ describe("usdaCheeses", () => {
 });
 
 describe("linkToWikidata", () => {
+  const none = { split: new Map<string, string>(), pick: new Map<string, string>() };
   it("links each WordNet item to the loaded Wikidata thing its synset names, and the root to the category's root", () => {
     const synsets = { root: { members: ["animal"] }, bear: { members: ["bear"], wikidata: "Q1" }, yeti: { members: ["yeti"], wikidata: "Q9" } };
     const items = [
@@ -122,11 +123,77 @@ describe("linkToWikidata", () => {
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"] },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ];
-    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729")).toEqual([
+    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729", new Map(), none)).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ]);
+  });
+
+  it("joins a common-name item's one loaded taxon, and leaves one naming several loaded taxa unjoined, listing them", () => {
+    const synsets = { root: { members: ["animal"] }, dog: { members: ["dog"], wikidata: "Q144" }, cat: { members: ["cat"], wikidata: "Q146" } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "dog", name: "dog", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"] },
+    ];
+    // Q144 names two taxa, one of them loaded; Q146 names two loaded ones and one that isn't.
+    const taxaOf = new Map([["Q144", ["Q26972265", "Q20717272"]], ["Q146", ["Q20980826", "Q1867423", "Q99"]]]);
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q26972265", "Q20980826", "Q1867423"]), "root", "Q729", taxaOf, none)).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "dog", name: "dog", aliases: [], kind_of: ["root"], same_as: "wikidata:Q26972265" },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"], unjoined: ["Q20980826", "Q1867423"] },
+    ]);
+  });
+
+  it("reads a synset's list of IDs, joining when they name one loaded thing between them", () => {
+    const synsets = { root: { members: ["animal"] }, owl: { members: ["owl"], wikidata: ["Q5", "Q6"] }, bat: { members: ["bat"], wikidata: ["Q7", "Q8"] } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "owl", name: "owl", aliases: [], kind_of: ["root"] },
+      { id: "bat", name: "bat", aliases: [], kind_of: ["root"] },
+    ];
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q6", "Q7", "Q8"]), "root", "Q729", new Map([["Q5", ["Q6"]]]), none)).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "owl", name: "owl", aliases: [], kind_of: ["root"], same_as: "wikidata:Q6" },
+      { id: "bat", name: "bat", aliases: [], kind_of: ["root"], unjoined: ["Q7", "Q8"] },
+    ]);
+  });
+  it("applies a person's splits and picks, and stops on one that no longer fits the data", () => {
+    const synsets = { root: { members: ["animal"] }, sloth: { members: ["ground sloth"], wikidata: "Q1" }, cat: { members: ["cat"], wikidata: ["Q2", "Q3"] } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "sloth", name: "ground sloth", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"] },
+    ];
+    const known = new Set(["Q729", "Q1", "Q2", "Q3"]);
+    const link = (split: [string, string][], pick: [string, string][], from = items) => linkToWikidata(from, synsets, known, "root", "Q729", new Map(), { split: new Map(split), pick: new Map(pick) });
+    expect(link([["sloth", "Q1"]], [["cat", "Q3"]])).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "sloth", name: "ground sloth", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"], same_as: "wikidata:Q3" },
+    ]);
+    expect(() => link([], [["cat", "Q9"]])).toThrow("hand pick cat (cat) → Q9: not among its loaded taxa (Q2, Q3)");
+    expect(() => link([], [["sloth", "Q1"]])).toThrow("hand pick sloth");
+    expect(() => link([["cat", "Q2"]], [])).toThrow("hand split cat (cat) from Q2: it now joins Q2, Q3");
+    // The join it split now goes elsewhere: the decision no longer holds.
+    expect(() => link([["sloth", "Q7"]], [])).toThrow("hand split sloth (ground sloth) from Q7: it now joins Q1");
+    expect(() => link([["gone", "Q1"]], [], items)).toThrow("hand joins name synsets not in the tree: gone");
+  });
+});
+
+describe("oddJoins", () => {
+  it("lists WordNet items joined to a Wikidata item that shares none of their aliases", () => {
+    const wikidata = new Map<string, Item>([
+      ["Q1", { id: "Q1", name: "Dog", aliases: aliasesFor(["Dog"]) }],
+      ["Q2", { id: "Q2", name: "Gliridae", aliases: aliasesFor(["Gliridae"]) }],
+    ]);
+    const wordnet: Item[] = [
+      { id: "dog", name: "dog", aliases: aliasesFor(["dog", "domestic dog"]), same_as: "wikidata:Q1" },
+      { id: "mouse", name: "mouse", aliases: aliasesFor(["mouse"]), same_as: "wikidata:Q2" },
+      { id: "yeti", name: "yeti", aliases: aliasesFor(["yeti"]) },
+    ];
+    expect(oddJoins(wordnet, wikidata)).toEqual(new Map([["mouse", "Gliridae"]]));
   });
 });
 
@@ -195,5 +262,21 @@ describe("facts for subsets", () => {
     const { items: out, ambiguous } = withPopulation(items, new Map([["Q1", [{ value: "5" }]], ["Q2", [{ value: "1" }, { value: "2" }]]]));
     expect(out.map((i) => i.population?.value)).toEqual([5, undefined, undefined]);
     expect(ambiguous).toBe(1);
+  });
+});
+
+describe("localClient", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  // Its guard read the URL's host while pg read ?host=, so this URL passed and pg went elsewhere (M13 13e-5, item 7).
+  // .invalid never resolves (RFC 6761), so a regression fails on DNS without sending credentials anywhere.
+  it("refuses a query parameter that would send pg to another host, before connecting", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://postgres:postgres@127.0.0.1:54322/postgres?host=elsewhere.invalid");
+    await expect(localClient()).rejects.toThrow(/must not contain query parameters/);
+  });
+
+  it("refuses a database that isn't this machine", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://postgres:postgres@elsewhere.invalid:5432/postgres");
+    await expect(localClient()).rejects.toThrow(/^refusing elsewhere\.invalid/);
   });
 });

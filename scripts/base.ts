@@ -4,7 +4,7 @@
 //   and writes the committed manifest, data/manifests/<set>.json: source, date, method, item count and checksum.
 // - load: loads the manifest's snapshot into the local stack with private.import_source. `load all` loads every set,
 //   then the links in data/links.json (13e-2), then defines every category in data/categories.json, the one place
-//   categories are defined (13e).
+//   categories are defined (13e), and analyzes the base's tables (13e-5).
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
@@ -16,6 +16,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
+import { isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
@@ -30,6 +31,9 @@ export type FactTrait = "country" | "continent" | "conservation_status";
 export type Item = {
   id: string; name: string; aliases: Alias[]; kind_of?: string[]; member_of?: string[]; same_as?: string;
   country?: string[]; continent?: string[]; conservation_status?: string[]; population?: Population;
+  // Wikidata taxa a WordNet item could join, left unjoined because there are several (linkToWikidata); the review
+  // prints them and import_source doesn't read them.
+  unjoined?: string[];
 };
 type Source = "wikidata" | "oewn" | "usda";
 type SetDef = { source: Source; method: string; fetch: () => Promise<Item[]> };
@@ -341,7 +345,7 @@ const OEWN_CHEESE = "07866305-n"; // "a solid food prepared from the pressed cur
 const OEWN_ANIMAL = "00015568-n"; // "a living organism characterized by voluntary movement" (noun.Tops.json)
 const OEWN_ENTITY = "00001740-n"; // "entity": the root every noun synset is under (noun.Tops.json)
 
-type Synset = { members: string[]; hypernym?: string[]; instance_hypernym?: string[]; wikidata?: string };
+type Synset = { members: string[]; hypernym?: string[]; instance_hypernym?: string[]; wikidata?: string | string[] };
 
 // A synset and everything under it, through hypernym and instance_hypernym links. root keeps no parents.
 export function oewnSubtree(synsets: Record<string, Synset>, root: string): Item[] {
@@ -363,13 +367,54 @@ export function oewnSubtree(synsets: Record<string, Synset>, root: string): Item
   });
 }
 
+const wikidataIds = (synset: Synset) => [synset.wikidata ?? []].flat();
+
 // Links WordNet items to the Wikidata things they name (a synset may carry its Wikidata ID), when that thing is
 // already loaded (known), so the two trees join. root is linked to rootLink, the category's Wikidata root.
-export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string): Item[] {
-  return items.map((item) => {
-    const link = item.id === root ? rootLink : synsets[item.id].wikidata;
-    return link && known.has(link) ? { ...item, same_as: `wikidata:${link}` } : item;
+// A synset naming a common-name item (Q144 "dog") joins the taxon taxaOf gives it by P13176 when exactly one of them
+// is loaded; one naming several loaded taxa (cat, cattle, rabbit) stays its own thing and keeps them as unjoined, for
+// the review (13e-5 item 1; SOURCES.md, Wikidata common-name link; human, 2026-10-26: "Join only clear cases").
+// A synset may give a list of IDs (["Q124657158", "Q664443"]): the same rule holds over all they name.
+// hand holds a person's decisions from the review: joins to split, each with the thing it rejects, and the taxon an
+// unjoined word joins. Each must
+// still fit the data, or the fetch stops naming it, so a re-fetch can't apply a stale decision silently.
+export type HandJoins = { split: Map<string, string>; pick: Map<string, string> };
+export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string, taxaOf: Map<string, string[]>, hand: HandJoins): Item[] {
+  const used = new Set<string>();
+  const linked = items.map((item) => {
+    if (item.id === root) return { ...item, same_as: `wikidata:${rootLink}` };
+    const taxa = [...new Set(wikidataIds(synsets[item.id]).flatMap((id) => (known.has(id) ? [id] : (taxaOf.get(id) ?? []).filter((t) => known.has(t)))))];
+    const rejected = hand.split.get(item.id);
+    if (rejected) {
+      if (taxa.length !== 1 || taxa[0] !== rejected) throw new Error(`hand split ${item.id} (${item.name}) from ${rejected}: it now joins ${taxa.join(", ") || "nothing"}`);
+      used.add(item.id);
+      return item;
+    }
+    const pick = hand.pick.get(item.id);
+    if (pick) {
+      if (taxa.length < 2 || !taxa.includes(pick)) throw new Error(`hand pick ${item.id} (${item.name}) → ${pick}: not among its loaded taxa (${taxa.join(", ") || "none"})`);
+      used.add(item.id);
+      return { ...item, same_as: `wikidata:${pick}` };
+    }
+    if (taxa.length === 1) return { ...item, same_as: `wikidata:${taxa[0]}` };
+    return taxa.length ? { ...item, unjoined: taxa } : item;
   });
+  const unused = [...hand.split.keys(), ...hand.pick.keys()].filter((id) => !used.has(id));
+  if (unused.length) throw new Error(`hand joins name synsets not in the tree: ${unused.join(", ")}`);
+  return linked;
+}
+
+// Joins whose two sides share no alias, for the review (13e-5 item 2): the WordNet item and the Wikidata item it's
+// same_as. Only Wikidata joins are checked: USDA's cheeses join WordNet's by a shared name (usdaCheeses).
+export function oddJoins(wordnet: Item[], wikidata: Map<string, Item>): Map<string, string> {
+  const odd = new Map<string, string>();
+  for (const item of wordnet) {
+    const target = item.same_as?.startsWith("wikidata:") ? wikidata.get(item.same_as.slice("wikidata:".length)) : undefined;
+    if (!target) continue;
+    const names = new Set(target.aliases.map((a) => a.alias));
+    if (!item.aliases.some((a) => names.has(a.alias))) odd.set(item.id, target.name);
+  }
+  return odd;
 }
 
 // RFC 4180 rows: quoted fields may hold commas and doubled quotes. The file is untrusted input from disk.
@@ -478,6 +523,49 @@ const ANIMALIA = "Q729"; // labelled "animal"
 // (Recommended)"), as Pūkio Stream's alias is for rivers.
 const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
+// The human's decisions on the review's lists (13e-5; human, 2026-10-27: "As recommended" for both): three joins split
+// as wrong matches, and the taxon each unjoined word joins, the one with more Wikipedia articles (the title rule's
+// "better-known one"), the species for horseshoe crab, and for dog the taxon the breeds sit under. The twin left over
+// is Wikidata's own double, for 13e-5b.
+const OEWN_ANIMALS_HAND: HandJoins = {
+  split: new Map([
+    ["02461453-n", "Q2274076"], // ground sloth, the extinct giant: not Folivora, every sloth
+    ["01682603-n", "Q2703595"], // leopard lizard, "any of several": not one species, the long-nosed
+    ["01547030-n", "Q331065"], // zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch
+  ]),
+  pick: new Map([
+    ["01790476-n", "Q1133152"], // horseshoe crab: Atlantic horseshoe crab, the species, not Limulidae, the family
+    ["02129439-n", "Q166794"], // manul: Otocolobus manul (90), not Felis manul (0)
+    ["02128341-n", "Q182304"], // jaguarundi: Puma yagouaroundi (73), not Herpailurus yagouaroundi (1)
+    ["02127963-n", "Q35255"], // cougar: Puma concolor (125), not Felis concolor (0)
+    ["02124460-n", "Q57818409"], // domestic cat: Felis silvestris catus (16), not Felis catus (9)
+    ["02120298-n", "Q28157482"], // brown hyena: Parahyaena brunnea (61), not Hyaena brunnea (0)
+    ["85147429-n", "Q208079"], // side-striped jackal: Canis adustus (36), not Lupulella adusta (30)
+    ["83443092-n", "Q188944"], // black-backed jackal: Canis mesomelas (34), not Lupulella mesomelas (30)
+    ["02086723-n", DOG], // dog: Canis lupus familiaris (7, the breeds' taxon), not Canis familiaris (7)
+    ["01649289-n", "Q622886"], // natterjack: Epidalea calamita (42), not Bufo calamita (0)
+    ["01644380-n", "Q4667968"], // green frog: Lithobates clamitans (24), not Rana clamitans (3)
+    ["01644218-n", "Q159404"], // bullfrog: Rana catesbeiana (51), not Lithobates catesbeianus (3)
+    ["02044834-n", "Q25634"], // laughing gull: Chroicocephalus ridibundus (84), not Larus ridibundus (0)
+    ["02029283-n", "Q28070835"], // surfbird: Calidris virgata (33), not Aphriza virgata (1)
+    ["02026839-n", "Q202504"], // dotterel: Charadrius morinellus (61), not Eudromias morinellus (0)
+    ["01851617-n", "Q28106731"], // shoveler: Spatula clypeata (87), not Anas clypeata (2)
+    ["01851289-n", "Q28106837"], // widgeon: Mareca penelope (88), not Anas penelope (2)
+    ["01851481-n", "Q28106685"], // American widgeon: Mareca americana (48), not Anas americana (1)
+    ["01851196-n", "Q28106902"], // garganey: Spatula querquedula (87), not Anas querquedula (1)
+    ["01851094-n", "Q28106778"], // blue-winged teal: Spatula discors (49), not Anas discors (0)
+    ["01838728-n", "Q1268205"], // whippoorwill: Antrostomus vociferus (26), not Caprimulgus vociferus (1)
+    ["01830737-n", "Q736052"], // belted kingfisher: Megaceryle alcyon (43), not Ceryle alcyon (0)
+    ["01597809-n", "Q2668013"], // tree swallow: Petrochelidon nigricans (22), not Hirundo nigricans (0)
+    ["01595335-n", "Q25404"], // blue tit: Cyanistes caeruleus (99), not Parus caeruleus (0)
+    ["01595181-n", "Q1079441"], // Carolina chickadee: Poecile carolinensis (25), not Parus carolinensis (0)
+    ["01594898-n", "Q282687"], // black-capped chickadee: Poecile atricapillus (32), not Parus atricapillus (0)
+    ["01582219-n", "Q25345384"], // jackdaw: Coloeus monedula (109), not Corvus monedula (1)
+    ["01571701-n", "Q27075919"], // Blackburnian warbler: Setophaga fusca (27), not Dendroica fusca (0)
+    ["01571533-n", "Q21962227"], // yellow warbler: Setophaga petechia (38), not Dendroica petechia (0)
+    ["01534280-n", "Q27075875"], // red siskin: Spinus cucullatus (32), not Carduelis cucullata (0)
+  ]),
+};
 
 // In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
@@ -625,12 +713,21 @@ const SETS: Record<string, SetDef> = {
   },
   "oewn-animals": {
     source: "oewn",
-    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24)`,
+    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several; the human's hand decisions on the review (3 joins split, 30 unjoined words' taxa picked) applied`,
     fetch: async () => {
       const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), (listed) => listed.filter((n) => /^noun\.[^/]+\.json$/.test(n)));
       const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
       const known = new Set([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => i.id));
-      return linkToWikidata(oewnSubtree(synsets, OEWN_ANIMAL), synsets, known, OEWN_ANIMAL, ANIMALIA);
+      const tree = oewnSubtree(synsets, OEWN_ANIMAL);
+      const unloaded = [...new Set(tree.flatMap((i) => wikidataIds(synsets[i.id])).filter((w) => !known.has(w)))];
+      const taxaOf = new Map<string, string[]>();
+      await byIds(unloaded, "P13176", (v) => `SELECT ?c ?t WHERE { VALUES ?c { ${v} } ?c wdt:P13176 ?t . }`, (rows) => {
+        for (const r of rows) taxaOf.set(qid(r.c.value), [...(taxaOf.get(qid(r.c.value)) ?? []), qid(r.t.value)]);
+      });
+      const items = linkToWikidata(tree, synsets, known, OEWN_ANIMAL, ANIMALIA, taxaOf, OEWN_ANIMALS_HAND);
+      const byP13176 = items.filter((i) => i.id !== OEWN_ANIMAL && i.same_as && !wikidataIds(synsets[i.id]).includes(i.same_as.slice("wikidata:".length))).length;
+      console.log(`oewn-animals: ${unloaded.length} Wikidata IDs not loaded, ${taxaOf.size} of them with P13176; ${byP13176} joined by it, ${items.filter((i) => i.unjoined).length} unjoined`);
+      return items;
     },
   },
   // Every noun, so 13b's facts check knows "Paris" names a city, not an animal (human, 2026-10-24: "Import all of
@@ -701,13 +798,13 @@ async function fetchSet(set: string, def: SetDef): Promise<void> {
   console.log(`FETCHED ${set}: ${items.length} items, snapshot ${snapshot}${retries ? `, ${retries} SPARQL retries after 429` : ""}`);
 }
 
-// The local stack only: DATABASE_URL must point at this machine (13a, "Local only").
+// The local stack only: DATABASE_URL must point at this machine (13a, "Local only"). It's parsed as the app parses it
+// and pg gets its fields, never the URL, so a query parameter can't send pg to another host (DECISIONS.md, Database
+// access from route handlers; M13 13e-5 item 7).
 export async function localClient(): Promise<pg.Client> {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL is not set (npm run base reads .env.local)");
-  const host = new URL(url).hostname;
-  if (host !== "127.0.0.1" && host !== "localhost") throw new Error(`refusing ${host}: 13a loads the local stack only`);
-  const client = new pg.Client({ connectionString: url });
+  const database = readDatabaseUrl();
+  if (!isLocalHost(database.host)) throw new Error(`refusing ${database.host}: 13a loads the local stack only`);
+  const client = new pg.Client(database);
   await client.connect();
   return client;
 }
@@ -791,20 +888,39 @@ async function defineCategories(): Promise<void> {
   }
 }
 
-// What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
-// CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list, for the human to decide per category
-// (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by two members
-// (duplicates), and things under the root with no English name (left out of the category).
-async function review(keys: string[]): Promise<void> {
+// The planner's statistics for the base's tables. Right after a fresh `load all` they describe empty tables until
+// autovacuum catches up, and a query over the animal category ran over 10 minutes; after ANALYZE, 2.6 s (13e-5 Evidence).
+async function analyzeBase(): Promise<void> {
   const client = await localClient();
   try {
-    for (const key of keys) await reviewOne(client, key);
+    await client.query("analyze private.thing, private.thing_source, private.thing_alias, private.fact, private.number_fact, private.category");
+    console.log("ANALYZED the base's tables");
   } finally {
     await client.end();
   }
 }
 
-async function reviewOne(client: pg.Client, key: string): Promise<void> {
+// What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
+// CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list, for the human to decide per category
+// (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by two members
+// (duplicates), things under the root with no English name (left out of the category), WordNet words joined to a
+// Wikidata thing sharing no name, and words naming several taxa, left unjoined for a person to fix (13e-5).
+// Joins are read from the loaded snapshots (13e-5 items 1 and 2): odd joins, and words naming several taxa, unjoined.
+type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; odd: Map<string, string> };
+
+async function review(keys: string[]): Promise<void> {
+  const wordnet = readSnapshot("oewn-animals").items;
+  const wikidata = new Map([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => [i.id, i]));
+  const joins: Joins = { wordnet: new Map(wordnet.map((i) => [i.id, i])), wikidata, odd: oddJoins(wordnet, wikidata) };
+  const client = await localClient();
+  try {
+    for (const key of keys) await reviewOne(client, key, joins);
+  } finally {
+    await client.end();
+  }
+}
+
+async function reviewOne(client: pg.Client, key: string, joins: Joins): Promise<void> {
   const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
   const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
   if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
@@ -818,9 +934,8 @@ async function reviewOne(client: pg.Client, key: string): Promise<void> {
   const listed = [...listedBy].map(([name, hits]) => `${name} (${hits.join(", ")})`);
   const shared = await one(`select a.alias, array_agg(t.name order by t.name) as things from private.category_members($1) m
     join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m group by a.alias having count(*) > 1 order by a.alias`);
-  const [{ unnamed }] = await one(`with recursive cat as (select root from private.category where key = $1),
-    under (id) as (select root from cat union select f.thing_id from private.fact f join under u on f.value_thing = u.id where f.trait = 'kind_of')
-    select count(*)::int as unnamed from under u where not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
+  const [{ unnamed }] = await one(`select count(*)::int as unnamed from private.category c cross join private.descendants_now(array[c.root]) as u(id)
+    where c.key = $1 and not exists (select from private.thing_alias a where a.thing_id = u.id and a.kind = 'name')`);
   console.log(`REVIEW ${key}: ${n} members`);
   if (n < CATEGORY_MIN_MEMBERS) console.log(`  flag, fewer than ${CATEGORY_MIN_MEMBERS} members: ${n}`);
   console.log(`  sample: ${sample.map((r) => r.name).join("; ")}`);
@@ -828,6 +943,13 @@ async function reviewOne(client: pg.Client, key: string): Promise<void> {
   console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
   console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
   console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
+  const wordnetIds = (await one(`select s.source_id from private.category_members($1) m
+    join private.thing_source s on s.thing_id = m and s.source = 'oewn'`)).map((r) => r.source_id as string);
+  const odd = wordnetIds.filter((id) => joins.odd.has(id)).map((id) => `${joins.wordnet.get(id)!.name} = ${joins.odd.get(id)}`);
+  const unjoined = wordnetIds.map((id) => joins.wordnet.get(id)).filter((i) => i?.unjoined)
+    .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${joins.wikidata.get(t)!.name} (${t})`).join(" / ")}`);
+  console.log(`  flag, a WordNet word joined to a Wikidata thing sharing no name: ${odd.length}${odd.length ? ` (${odd.sort().join("; ")})` : ""}`);
+  console.log(`  flag, a WordNet word naming several loaded taxa, unjoined: ${unjoined.length}${unjoined.length ? ` (${unjoined.sort().join("; ")})` : ""}`);
 }
 
 async function main(): Promise<void> {
@@ -836,7 +958,8 @@ async function main(): Promise<void> {
   if (command === "load" && name === "all") {
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
     await loadLinks();
-    return defineCategories();
+    await defineCategories();
+    return analyzeBase();
   }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
