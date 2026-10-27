@@ -1,6 +1,6 @@
 # M14 14b-5 — The fonts committed, loaded with next/font/local
 
-**Status:** in progress (2026-10-27), on `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** in review (2026-10-27), in its PR from `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
 
 ## Goal
 The shell's two fonts are files in the repo, loaded with `next/font/local`, so a build or dev server never downloads them from Google.
@@ -32,7 +32,7 @@ This ticket's guided questions (human, 2026-10-27, on the Mac):
 1. **The files are in the repo.** `src/app/fonts/` holds `Baloo2-800-latin.woff2` (18,612 bytes, SHA-256 `05dada34…aa6f4`), `DMSans-latin.woff2` (36,980 bytes, `468d56b6…002fb`), `OFL-Baloo2.txt` and `OFL-DMSans.txt`. `.gitattributes` marks `*.woff2` binary.
 2. **Loaded locally.** `src/app/layout.tsx` uses `next/font/local` with the same variables, weights and `display` as before: Baloo 2 at 800 as `--font-heading`; DM Sans at 400 and 700 from its one file as `--font-body`. No file in `src` imports `next/font/google`.
 3. **No download from Google.** After `npm run build`, nothing in `.next` names fonts.gstatic.com or fonts.googleapis.com, and `e2e/shell.e2e.ts`'s check that no page requests them still passes.
-4. **Nothing looks different.** The pages use the same families and weights: `e2e/shell.e2e.ts` checks a heading's computed font-weight (800) and family, and the body's (DM Sans).
+4. **Nothing looks different.** The pages use the same families and weights: `e2e/shell.e2e.ts` checks the heading's computed font-weight (800); that its family's one `@font-face` is the Baloo 2 file at 800, and the body's are the DM Sans file at 400 and 700; and that each of those faces loads.
 5. `npm run lint`, `npx tsc --noEmit -p .`, `npm test`, `npm run test:e2e`, `npm run build` and CI pass.
 
 ## Out of scope
@@ -80,6 +80,14 @@ Run on the Mac against the shared local stack, with the M13 session holding off 
 - **Criterion 3 and the hypothesis:** `rm -rf .next && npm run build` → exit 0, `✓ Compiled successfully`, the two files in `.next/static/media/` (`Baloo2_800_latin-…woff2`, `DMSans_latin-…woff2`). `grep -rlE 'fonts\.(gstatic|googleapis)\.com' .next` → 1 file, a source map holding this ticket's comment (Source diff); with `--exclude='*.map'` → 0, and `https?://fonts…` anywhere → 0. The hypothesis held for requests.
 - **Criterion 5:** `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  43 passed (43)`, `Tests  424 passed (424)`. `npm run test:e2e` → `61 passed (2.1m)`. CI: in the PR.
 
+- **After the review** (the stack free again, the M13 session's word): the check's first run read the heading at weight 500, from Next.js's own 404 page left by the test's `/account` visit, so it now reads on `/`. Then `npx playwright test e2e/shell.e2e.ts -g "a phone gets a bottom tab bar"` → `1 passed`. As a check, Baloo 2's `src` pointed at the DM Sans file: it failed (`- "800 Baloo2_800_latin"`, `+ "800 DMSans_latin"`); restored, it passed.
+
+- **After merging main** (`448db20`): `npm run test:e2e` → `61 passed (2.1m)`; `npm test` → `Tests  430 passed (430)`; `rm -rf .next && npm run build` → exit 0, and no Google host outside source maps.
+
 ## Review
+The `reviewer` agent, in a fresh context, on `20851df`. It matched the files' sizes and SHA-256, compared the OFL files with upstream byte for byte (LF-normalised), checked `.gitattributes` with `git check-attr`, fetched Google's CSS (two DM Sans faces on one file), read `layout.tsx` against the docs, and checked DECISIONS, SOURCES, ROADMAP and 14c-1's done line against PR #99; it re-ran tsc, lint and `npm test` (424), and, by the brief, no build or e2e.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **Criterion 4 wasn't what the test checked:** it read no computed weight and couldn't tell the two files apart. The check now reads the heading's computed weight and each family's `@font-face` file, and the criterion says exactly that; the swapped-file trial above fails it.
+  - **The handoff wasn't in the commit:** committed in the review commit, with 14b-5 and PR #99's merge.
+  - **The ROADMAP row:** 14b-5's clause sat inside 14c-1's description; moved after it.
+- Deferred to ROADMAP "Next revision": none. The reviewer's two non-blocking notes (no `unicode-range`; `next/font/local`'s Arial fallback) are recorded in the Source diff, as they change nothing players see.

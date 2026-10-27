@@ -67,6 +67,9 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   // And they're the shell's own (docs/milestones/M14-14b-5-local-fonts.md, criterion 4): the heading is drawn at 800,
   // its family's one face is the Baloo 2 file at 800, and the body's family has the DM Sans file at 400 and 700, each
   // of which loads. Read from the page's @font-face rules and faces, since next/font names the families itself.
+  // On Plor's own page: the /account visit above left Next.js's 404 page, which styles its own h1.
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: "Plor" })).toBeAttached();
   const fonts = await page.evaluate(async () => {
     const first = (el: Element) => getComputedStyle(el).fontFamily.split(",")[0].trim();
     const unquote = (family: string) => family.replace(/^['"]|['"]$/g, "");
