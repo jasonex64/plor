@@ -64,6 +64,17 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   expect((await page.goto("/account"))!.status()).toBe(404);
   // Fonts come from Plor's own server (criterion 8).
   expect(requests.filter((url) => /fonts\.(googleapis|gstatic)\.com/.test(url))).toEqual([]);
+  // And they're the shell's own: the heading's first family has an 800 face, the body's a 400 and a 700, each of which
+  // loads (docs/milestones/M14-14b-5-local-fonts.md, criterion 4). Read from the faces, since next/font names the
+  // families itself.
+  const faces = await page.evaluate(async () => {
+    const first = (el: Element) => getComputedStyle(el).fontFamily.split(",")[0].trim();
+    const weights = async (family: string, weight: string) =>
+      (await document.fonts.load(`${weight} 16px ${family}`)).map((f) => `${f.weight} ${f.status}`);
+    const [heading, body] = [first(document.querySelector("h1")!), first(document.body)];
+    return { heading: await weights(heading, "800"), regular: await weights(body, "400"), bold: await weights(body, "700") };
+  });
+  expect(faces).toEqual({ heading: ["800 loaded"], regular: ["400 loaded"], bold: ["700 loaded"] });
 });
 
 test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ browser }) => {
