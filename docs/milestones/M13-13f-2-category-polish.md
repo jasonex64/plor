@@ -1,6 +1,6 @@
 # M13 13f-2 — Category polish
 
-**Status:** planned, waiting for the human's approval (drafted 2026-10-27 from three rounds of guided questions)
+**Status:** in review (approved by the human, 2026-10-27: "I approve 13f-2's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27)
 
 ## Goal
 Close every For M13 item about what categories hold: bring back the left-out categories the human chose, cleaned; apply the data fixes decided in 13f's triage and here; close the rest as accepted.
@@ -26,13 +26,16 @@ Round 2:
 
 Round 3:
 - Links: **link cutlery (Recommended)**, **keep shelf in furniture**, **keep water in drinks**.
-- Places: **one "Oceania" (Recommended)**; **boroughs and territories out of US cities (Recommended)** (Manhattan, Queens, The Bronx; Pago Pago, Charlotte Amalie). Malabo, Amsterdam and Copenhagen: not chosen, left as they are.
+- Places: **"Two \"Oceania\"s (Recommended)"** (keep one continent); **"Boroughs as cities (Recommended)"** (Manhattan, Queens, The Bronx; Pago Pago, Charlotte Amalie out of US cities). Malabo, Amsterdam and Copenhagen: not chosen, left as they are.
 - Flagged names no longer accepted: **"Saturday night special" (gun)**, **"abortionist" (doctor)**, **"mistress" (schoolmarm)**. "paddy wagon" (truck): not chosen, kept.
 
 ## The items (ROADMAP, For M13)
 Changed in this ticket: the import review's three oddities (country codes, "ununnilium"; PGI kept); 13e-4a's Oceania and boroughs; 13e-2's cutlery, shelf and water links; 13e-7's toy, cosmetic, berry and nut; 13e-8's organ, god or goddess; 13e-9's letter; 13e-10's and 13e-11's flagged names.
 Closed as accepted (round 1): 13e-3's generic members, gold's green gold, Pago Pago-like oddities not chosen, the river short name "rhine"; 13e-9's prompt-fit list; 13e-10's prompt-fit list and the shared answers (festival and holiday, virus and disease); 13e-4b's animal K and bird K, its less familiar host answers; 13e-8's bone holding tooth; 13e-11's overlaps, hat and clothing, weak host answers, the thin lists; 13e-10b's thin lists; 13e-2's host above a familiar answer and the Q7 lists; 13e-6's anime title forms and flower V; "wolf" out of animal W.
 Closed as already done: 13e-8's "two answers of one question naming one thing" (check-bank refuses it since 13e-9).
+
+## Decided during the build (2026-10-27)
+- Country codes: **"Keep the common ones (Recommended)"**: every two- and three-letter code goes except us, uk, usa, uae, prc and drc, which players type as names ("can" for Canada, "car" for the Central African Republic and "sin" for Singapore are codes, too).
 
 ## Source
 - SOURCES.md, Open English WordNet and Wikidata (M13, D2); the batch tickets above for each item.
@@ -46,10 +49,10 @@ Closed as already done: 13e-8's "two answers of one question naming one thing" (
 5. **God or goddess and the Greek letter, tried again:** look for a root or a Wikidata set that holds Zeus, Thor and Athena, and one whose members are the Greek letters; report what's found in the PR. A new Wikidata set is fetched on the Mac and its snapshot copied to the Windows PC by the human, as the handoff says.
 
 ## Acceptance criteria
-- [ ] After `db reset` and `load all`: no country holds a two-letter code; "ununnilium" names one element; one continent answers "oceania"; the five places aren't US cities; spoon, fork and knife are kitchen utensils; none of the flagged names is accepted where the human said.
-- [ ] Toy, cosmetic, berry, nut and organ defined, each 10+ members, with a bank question; their member lists read in the PR, with what was dropped.
-- [ ] God or goddess and the Greek letter: built if a fitting source is found, otherwise reported with what was looked at.
-- [ ] `check-bank` 0 problems; `simulate` 30 of 30; `npm test`, `test:db`, pgTAP, e2e pass.
+- [x] After `db reset` and `load all`: no country holds a two-letter code; "ununnilium" names one element; one continent answers "oceania"; the five places aren't US cities; spoon, fork and knife are kitchen utensils; none of the flagged names is accepted where the human said.
+- [x] Toy, cosmetic, berry, nut and organ defined, each 10+ members, with a bank question; their member lists read in the PR, with what was dropped.
+- [x] God or goddess and the Greek letter: built if a fitting source is found, otherwise reported with what was looked at.
+- [x] `check-bank` 0 problems; `simulate` 30 of 30; `npm test`, `test:db`, pgTAP, e2e pass.
 
 ## Out of scope
 - Per-category exclusions and "never the same day" overrides (the human: "Accept them", "Accept it").
@@ -75,9 +78,23 @@ None new (6 host answers and 10 members are DECISIONS.md's and 13e's).
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Design 3: country codes off countries, by `remove` rows or a pattern | A load rule, `withoutCountryCodes`: a country's 2–3-letter aliases go, the human's six kept | About 470 codes; no country's name is three letters or fewer, so a rule is exact, and it runs wherever a country loads (the places set holds them too); the first pattern also took a plural "s", which removed "laos" (review), and is two or three letters only |
+| Design 3: boroughs dropped by `drop` or `remove` | `drop_from_set` in listed.json for Manhattan (Q11299), Queens and The Bronx, dropped from wikidata-us-cities only; `drop` for the second Manhattan item, Pago Pago and Charlotte Amalie, in no other set | The three in wikidata-places stay places, so the facts check refuses them as cities and misses can't teach them back; the other three exist only as US cities (review: they were first `drop_from_set` rows with a wrong reason) |
+| Design 3: cutlery linked | Also "knife" added to the table knife (`data/names.json`) | Only specific knives were members ("table knife", "butter knife"); the human's answer named "knife" (review) |
+| Design 1: `remove` refuses a name the item lacks | Each add and remove row must do something in some set; `load all` stops on one that did nothing anywhere | An item loads from several sets with different names (Insular Oceania's "oceania" is in the places set only) |
+| Design 4: organ (body organs) | Internal organ (`05306228-n`), with links for brain, pancreas, spleen, gallbladder, urinary bladder, appendix and esophagus | The body-organ branch holds muscles, glands, organelles and crude slang (cock, minge, cobblers); internal organ has none of them |
+| Design 4: sex toys and the racist caricature dropped by ID | "golliwog(g)", "blackface", "sex toy" and "adult toy" on Plor's list; dildo, cock ring, goat eye and sex toy dropped by ID | Listed, a typed one is held, not learned back; the toys under "sex toy" bear no listed word |
+| Design 5: god or goddess and the Greek letter built if a source is found | Not built; ROADMAP Later | WordNet has no Zeus, Thor or Athena, and the Wikidata items so named are other things; the Greek letters share WordNet's "letter" with the Latin ones |
 
 ## Evidence
+On the Mac, 2026-10-27, after `db reset` and `load all`.
+- **The load:** `oewn-nouns … listed words: 42 names and 21 items dropped`; `LINKED … 124`; `DEFINED 231`; `DATABASE 316 MB`. On the way it stopped twice by design, on a listed shown name with a clean name left ("sex toy", also "adult toy"; "golliwog", also "golliwogg"), each settled; then a dry run of the listed-word step over every snapshot found no stop left.
+- **The fixes (queries):** country codes left on countries: `drc prc uae uk us usa`; "ununnilium" on `darmstadtium` only; one continent answers "oceania"; the five places as US cities: 0, The Bronx still a place: 1; spoon and fork in kitchen utensil: 2; flagged names left: 0; schoolmarm's "mistress": 0; internal organ holds brain and pancreas.
+- **The five categories:** toy 51, cosmetic 23, berry 22, nut 30, internal organ 42 members; every member read (the lists in this ticket's build notes and the PR).
+- **check-bank** `CHECKED 231 questions: 0 problems`; **simulate** `DRAFTED 30 of 30; subset questions 74 of 210`.
+- **Suites:** `npm test` 43 files, 444 passed; lint and tsc clean; `npm run test:db` 40 files, 270 passed; `npx supabase test db` 435 PASS; `npm run test:e2e` 61 passed.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent, 2026-10-27, in a fresh context (it ran the load's steps over every snapshot and read-only queries; no writes).
+- Blocking findings and how each was fixed: the code pattern's plural "s" removed Laos's name "laos" (now two or three letters only, with a Laos test); three `drop_from_set` rows named items no other set holds, with a false reason (now plain drops, with true reasons); "knife" didn't answer kitchen utensil though the criterion said it did ("knife" added to the table knife).
+- Deferred to ROADMAP "Next revision" (From the 13f-2 review): `drop_from_set`'s set isn't checked against the sets, and nothing refuses a ref in both `drop` and `drop_from_set`; a single `load <set>` can't judge add and remove rows (only `load all` does); `import_source` only inserts, so these changes need a `db reset`; members that fit poorly, accepted (cosmetic's "pencil", toy's "trapeze", internal organ's ruminant organs and the slang "ticker", "tum"); Australia loses "oz"; `countryIds()` re-reads its snapshot each set.
