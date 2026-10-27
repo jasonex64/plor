@@ -4,7 +4,7 @@
 // earlier day's ledger rows are written directly, as the friends leaderboard test's W1 case does.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";

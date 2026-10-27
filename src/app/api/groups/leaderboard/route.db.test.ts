@@ -4,7 +4,7 @@
 // friend, and a member only for the last test; D is neither. Ledger rows are written directly on this week's Monday,
 // as that test's W1 case does.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";

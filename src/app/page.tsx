@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Home } from "./home";
 import { Footer } from "./footer";
+import { GAME } from "@/platform/game";
 
 // The introduction and the privacy link are static, so they are in the served HTML before any script runs: Google's
 // brand verification rejected a home page that showed only a sign-in form, didn't explain the app, and was headed
@@ -15,7 +16,7 @@ export default function Page() {
         Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
         midnight Pacific time.
       </p>
-      <h2>Today&apos;s game: Offbeat</h2>
+      <h2>Today&apos;s game: {GAME.name}</h2>
       <p>
         Seven questions, such as &quot;Name an animal&quot;. For each one, give an answer the host didn&apos;t pick: if
         you match the host, your run ends. Unusual answers are your way through. Sign in to play and see how your friends

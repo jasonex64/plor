@@ -1,6 +1,6 @@
 # M14 14b-3 — The invite button
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"). Built after 14b-2c, before 14c (answer 10).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11). Built after 14b-2c, before 14c (answer 10).
 
 ## Goal
 Friend and group invites are shared from a button, never shown as a raw link, with 10-character codes on short paths, so the Friends tab and a group's page stop showing a long URL.
@@ -30,10 +30,34 @@ Guided questions (human, 2026-10-26, on the Mac), after asking: "seeing the enti
 9. **Group links:** "Yes, the same way (Recommended)": a share button instead of the shown link, 10-character codes, old links replaced, and a shorter path. The path is `/g/<code>` (human, 2026-10-26, at approval: "with /g/<code> for group links").
 10. **Order:** "After 14b-2c, before 14c (Recommended)".
 
+**Round 4** (the security change, before building; human, 2026-10-26):
+
+11. **The security change below:** "Approve it (Recommended)": 10-character codes, one migration replacing both checks and every code, no grant, policy or RLS change (DECISIONS.md Log).
+12. **plor.app:** "Push right after merge (Recommended)": when the PR is ready, Claude asks first; on the human's yes it merges, and the migration is pushed to plor.app straight after from a clean checkout of `main`, then the hosted tests run.
+
 ## Source
 - Web Share API and Clipboard `writeText` (SOURCES.md, M05): the button shares or copies, as the result's Share does (`src/app/share.ts`).
 - Next.js routing (SOURCES.md; the bundled docs in `node_modules/next/dist/docs/`): the new `/i/[code]` and `/g/[code]` routes. *To read before building.*
 - M07 7b's invite design (`docs/milestones/M07-friends-and-live-board.md`): one personal, random, reusable link per player, resettable, which makes both players friends at once when opened and added.
+
+## The security change (approved, answer 11)
+Read 2026-10-26, before building. Invite codes are the tokens that let someone add a friend or join a group, so changing their length and replacing them all is a security change (CLAUDE.md).
+
+**What exists today:**
+- Codes are 22 base64url characters, from 16 random bytes in TypeScript (`newInviteCode`, `src/friends/friends.ts`). The ticket's step-1 hypothesis is disproved: SQL checks the length as well as TypeScript, in `friend_invite_code_format` and `player_group_invite_code_format` (`^[A-Za-z0-9_-]{22}$`; `20261022070948_friends.sql`, `20261023050925_groups.sql`).
+- `plor_app` may already update `friend_invite.code` and `player_group.invite_code`.
+- Nothing limits guessing on the invite routes.
+
+**Proposed:**
+1. **Code size.** A code is 10 base64url characters: 8 random bytes from Node's `randomBytes`, written in base64url and cut to their first 10 characters, which carry 60 random bits (answer 5). One constant, the length, replaces `INVITE_CODE_BYTES`, and `INVITE_CODE` checks it.
+2. **One migration**, in one transaction:
+   - The two checks are replaced by checks at 10 characters.
+   - Every `friend_invite.code` and every `player_group.invite_code` is replaced by a fresh 10-character code made in the database from `gen_random_bytes(8)`, pgcrypto's cryptographically strong bytes (PostgreSQL 17, pgcrypto; installed as `extensions.pgcrypto` 1.3 locally, and on plor.app *unverified*: a missing extension fails the migration and changes nothing).
+   - The `unique` constraints stay, so a collision, about 1 in 10^12 for a thousand codes, fails loudly rather than overwriting anything.
+   - Every link already sent stops working, and opening one gets the "unknown link" answer any unknown code gets (answer 6).
+3. **No change to grants, policies or RLS.** `plor_app` keeps exactly the grants `plor_app_role.test.sql` lists.
+4. **No guessing limit.** At 2^60 codes, answer 5 holds without one; a limit comes with friend requests, whose search needs one (ROADMAP, Later).
+5. **plor.app's code and database change together.** Once the PR merges to `main`, Vercel deploys code that writes 10-character codes, which plor.app's database refuses under its old 22-character checks until the migration is pushed, so making an invite link would fail there until then. The database is pushed only on the human's word (human, 2026-10-26, relayed in the M13 ticket on `m13-answer-lists-and-content`, "Decided later": "ok we can keep push on my word"). So the PR merges only once the human has agreed to push its migration to plor.app straight after.
 
 ## Acceptance criteria
 - [ ] The Friends tab, Today's board and a group's page show no invite URL. "Invite a friend" (and the group's "Share group link") opens the share sheet, or copies with a "Copied" note where there's none. An e2e test checks that no `/i/` or group URL is in the page's visible text.

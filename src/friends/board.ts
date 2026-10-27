@@ -4,7 +4,8 @@
 // which one caught them. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql, and
 // since 12d 20261024031116_board_hides_progress.sql); this is the full picture the page loads first and refetches
 // after a reconnect.
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { named, thingNames, type Names } from "@/game/payload";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";

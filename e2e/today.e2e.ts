@@ -4,6 +4,7 @@ import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -74,8 +75,9 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await page.goto("/");
   const card = page.getByRole("region", { name: "Leaderboard" });
   await expect(card.getByRole("radio", { name: "Yesterday" })).toBeChecked();
-  // Dated, as "Fri 23 Oct · Offbeat" (L25).
-  await expect(card.getByRole("region", { name: "Yesterday" })).toContainText(/[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2} · Offbeat/);
+  // Dated, as "Fri 23 Oct" (L25), and naming no game: the card is shared by every game (14b-4, answer 1).
+  await expect(card.getByRole("region", { name: "Yesterday" })).toContainText(/[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}/);
+  await expect(card).not.toContainText(GAME.name);
   await expect(card.getByLabel("Board").locator("option")).toHaveText(["Friends", "Owls"]);
 
   const friendsWeek = page.waitForRequest((r) => path(r.url()) === "/api/leaderboard");
@@ -116,7 +118,7 @@ test("before playing, the feed names who commented and holds none of their words
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's Offbeat to read 1 comment" })).toHaveAttribute("href", "/offbeat");
+  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/offbeat");
   const item = feed.getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);

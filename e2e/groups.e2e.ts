@@ -66,7 +66,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator.getByRole("region", { name: "Leaderboard" }).getByLabel("Board").locator("option")).toHaveText(["Friends", "Book Club"]);
   const creatorFeed = creator.getByRole("region", { name: "Feed" });
   await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
-  await expect(creatorFeed.getByText("Finish today's Offbeat to join in.")).toBeVisible();
+  await expect(creatorFeed.getByText("Finish today's game to join in.")).toBeVisible();
 
   // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
   // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group

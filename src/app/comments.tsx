@@ -20,6 +20,7 @@ import { Avatar } from "./avatar";
 import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
+import { GAME } from "@/platform/game";
 
 // The calendar day before or after a YYYY-MM-DD date.
 function shiftDay(date: string, days: number): string {
@@ -174,14 +175,14 @@ function Preview({ preview }: { preview: FeedPreview }) {
     return (
       <>
         <p>No comments yet.</p>
-        <p>Finish today&apos;s Offbeat to join in.</p>
+        <p>Finish today&apos;s game to join in.</p>
       </>
     );
   }
   return (
     <>
       <p>
-        <ButtonLink href="/offbeat">{text.read}</ButtonLink>
+        <ButtonLink href={GAME.path}>{text.read}</ButtonLink>
       </p>
       <ul className={styles.locked}>
         {/* By position: two friends can share a display name. */}

@@ -16,6 +16,7 @@ import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import styles from "./offbeat.module.css";
+import { GAME } from "@/platform/game";
 
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function OffbeatScreen({ username, onStarted }: { username: string; onStarted: () => void }) {
@@ -54,7 +55,7 @@ export function OffbeatScreen({ username, onStarted }: { username: string; onSta
           <span aria-hidden="true">← </span>Today
         </ButtonLink>
       </p>
-      <section id="offbeat" aria-label="Offbeat" className={styles.game}>
+      <section id="offbeat" aria-label={GAME.name} className={styles.game}>
         <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} />
       </section>
       <div className={styles.cards}>
@@ -62,7 +63,7 @@ export function OffbeatScreen({ username, onStarted }: { username: string; onSta
       </div>
       <SideColumn label="Feed" inPlace className={styles.feed}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title="Offbeat comments" />
+        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
       </SideColumn>
     </div>
   );
@@ -96,8 +97,8 @@ function YourOffbeat({ stats }: { stats: Stats }) {
     (d) => `${weekday(d.date)} ${d.survived ?? (d.date === today ? "not played yet" : "not played")}`,
   );
   return (
-    <section aria-label="Your Offbeat" className={styles.card}>
-      <h2 className={styles.heading}>Your Offbeat</h2>
+    <section aria-label={`Your ${GAME.name}`} className={styles.card}>
+      <h2 className={styles.heading}>Your {GAME.name}</h2>
       <dl className={styles.stats}>
         <div>
           <dt>day streak</dt>
@@ -186,8 +187,9 @@ export function HowToPlay() {
   return (
     <section aria-label="How to play" className={styles.how}>
       <p className={styles.back}>
-        <ButtonLink href="/offbeat">
-          <span aria-hidden="true">‹ </span>Offbeat
+        <ButtonLink href={GAME.path}>
+          <span aria-hidden="true">‹ </span>
+          {GAME.name}
         </ButtonLink>
       </p>
       <h2 className={styles.heading}>How to play</h2>

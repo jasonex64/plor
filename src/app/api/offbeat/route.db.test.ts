@@ -12,7 +12,8 @@
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { getStats, getYesterday, readStats } from "@/game/offbeat";
 import { settleRuns } from "@/game/ledger";
 import { getPool } from "@/lib/db";

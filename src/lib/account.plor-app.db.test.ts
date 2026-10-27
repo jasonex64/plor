@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { postComment } from "@/comments/comments";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { issueInviteCode } from "@/friends/friends";
 import { startRun } from "@/game/runs";
 import { createGroup, leaveGroup } from "@/groups/groups";

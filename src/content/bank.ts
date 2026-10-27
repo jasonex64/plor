@@ -3,6 +3,7 @@
 // 30-day gap between uses of a category, and the pick. Pure and relative-imported: content:validate, npm run draft
 // and the admin bank page all use it.
 import { HOST_ANSWERS_PER_QUESTION, QUESTIONS_PER_DAY, REPEAT_GAP_DAYS } from "../config/tunables.ts";
+import { GAME_ID } from "../platform/game.ts";
 import { CATEGORY_KEY, checkKeys, isCalendarDate, isObject, isText, type Puzzle } from "./puzzle.ts";
 
 // A question as the bank holds it: its answers by name (or "#<thing id>"), resolved when a day is drafted.
@@ -134,7 +135,7 @@ export function namedQuestions(bank: Bank, days: Puzzle[], date: string, ids: st
     if (!q) throw new Error(`no bank question "${id}"`);
     return q;
   });
-  const day: Puzzle = { format: 3, game_id: "offbeat", date, questions: questions.map((q) => ({ prompt: q.prompt, category: q.category, host_bank: [], host_answers: [], levels: {} })) };
+  const day: Puzzle = { format: 3, game_id: GAME_ID, date, questions: questions.map((q) => ({ prompt: q.prompt, category: q.category, host_bank: [], host_answers: [], levels: {} })) };
   const problems = gapProblems([...days.filter((d) => d.date !== date), day], family).filter((p) => p.includes(date));
   if (problems.length) throw new Error(problems.join("\n"));
   return questions;

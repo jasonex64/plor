@@ -23,6 +23,7 @@ import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
+import { GAME } from "@/platform/game";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -80,7 +81,7 @@ export function useStartRun() {
     setError(null);
     try {
       await api("/api/run/start", { method: "POST" });
-      router.push("/offbeat");
+      router.push(GAME.path);
     } catch (err) {
       setError(errorText(err));
       setBusy(false);
@@ -102,7 +103,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "not_started" && !skip && (
           <>
             <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
-            <Link href="/offbeat" className={styles.play}>
+            <Link href={GAME.path} className={styles.play}>
               Play
             </Link>
           </>
@@ -122,7 +123,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "in_progress" && (
           <>
             <p className={styles.line}>Your run is still going</p>
-            <Link href="/offbeat" className={styles.play}>
+            <Link href={GAME.path} className={styles.play}>
               Continue
             </Link>
           </>
@@ -175,7 +176,7 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
           <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
             Start
           </button>
-          <Link href="/offbeat/how-to-play" className={styles.secondary}>
+          <Link href={`${GAME.path}/how-to-play`} className={styles.secondary}>
             How to play
           </Link>
         </>
@@ -221,7 +222,7 @@ function Score({ run }: { run: RunState }) {
         {pointsText(run.points)}
         {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
       </p>
-      <ButtonLink href="/offbeat#result" tone="offbeat">
+      <ButtonLink href={`${GAME.path}#result`} tone="offbeat">
         Result
       </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
@@ -239,7 +240,7 @@ function longDate(date: string): string {
 function Banner({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.banner}>
-      <h2 className={styles.title}>Offbeat</h2>
+      <h2 className={styles.title}>{GAME.name}</h2>
       {children}
     </div>
   );

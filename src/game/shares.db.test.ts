@@ -4,7 +4,8 @@
 // todaysState, as GET /api/run does.
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDay, loadFixtureBase } from "@/test/answer-fixture";
 import { safeEntry } from "@/test/puzzles";
 

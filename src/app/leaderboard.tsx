@@ -104,8 +104,8 @@ export function LeaderboardCard() {
       </label>
       <section aria-label={label}>
         <p className={styles.date}>
-          {day && `${dayText(day.date)} · Offbeat`}
-          {week && `From ${dayText(week.from)} · Offbeat`}
+          {day && dayText(day.date)}
+          {week && `From ${dayText(week.from)}`}
         </p>
         {day && <Entries entries={day.entries} />}
         {week && <Entries entries={week.entries} />}

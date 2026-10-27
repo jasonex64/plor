@@ -11,7 +11,7 @@ describe("previewText", () => {
     expect(previewText({ friends: ["Sam", "Mira", "Lee", "Ari"], others: 1, count: 6, reactions: 2 })).toEqual({
       named: ["Sam", "Mira", "Lee"],
       more: "and 2 more",
-      read: "Finish today's Offbeat to read 6 comments",
+      read: "Finish today's game to read 6 comments",
     });
   });
 
@@ -19,7 +19,7 @@ describe("previewText", () => {
     expect(previewText({ friends: ["Sam"], others: 0, count: 1, reactions: 0 })).toEqual({
       named: ["Sam"],
       more: null,
-      read: "Finish today's Offbeat to read 1 comment",
+      read: "Finish today's game to read 1 comment",
     });
   });
 

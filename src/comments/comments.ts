@@ -4,7 +4,7 @@
 // A comment the viewer reported is hidden from them (8c, D5). Each group has its own thread per day, which its members
 // share, with the same rules (docs/milestones/M10-groups.md, 10d; G4).
 import { DatabaseError } from "pg";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { memberSql, seesCommentSql } from "@/friends/circle";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";

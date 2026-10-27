@@ -5,7 +5,8 @@
 import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { GAME_ID, type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDraft, fixtureId } from "@/test/answer-fixture";
 import { ensureFixtureBase, fixture } from "@/test/puzzles";
 import { getPool } from "@/lib/db";
