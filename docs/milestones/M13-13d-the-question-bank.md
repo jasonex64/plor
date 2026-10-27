@@ -28,7 +28,7 @@ Already decided in the M13 ticket: **at least 30 days** between uses, "the AI ma
 | Overlapping categories (dog breed under animal) | "Separate (Recommended)": each category has its own gap |
 | Too few questions outside the gap | "Stop and ask (Recommended)": the gap is never broken |
 | What the bank shows | "Uses and catch rate (Recommended)": the days each question ran and the share of players caught each time |
-| Where the bank lives | "A file, like drafts (Recommended)": `content/bank.json` next to the drafted days, changed in PRs, moving private with the drafts in M15 15a |
+| Where the bank lives | "A file, like drafts (Recommended)": `content/bank.json` next to the drafted days, changed in PRs, moving private with the drafts in M15 15a. **Replaced 2026-10-26:** the bank stays public (human: "Stay public"; DECISIONS.md Log) |
 | Writing a day by hand | "Pick its 7 yourself (Recommended)": the draft takes 7 named bank questions for a date; the admin page's "Write a day's questions" box goes away |
 | 7 a day with a 30-day gap per category needs 210+ categories; there are 7 | "Keep it; grow categories (Recommended)": growing the categories is its own sub-ticket (13e, below); until then the draft stops and asks |
 

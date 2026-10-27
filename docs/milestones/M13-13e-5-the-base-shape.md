@@ -1,6 +1,6 @@
 # M13 13e-5 — The base's shape
 
-**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"); items 3 and 4 (circles refused, one walk) built, reviewed and passing every suite on the Mac, not yet in a PR; items 1 and 2 (the join, the review's lists) wait for the snapshots on the Mac (the human has no access to the Windows PC until later, 2026-10-26). Pop culture moves from 13e-5 to 13e-6 and is written against this shape.
+**Status:** in progress (2026-10-26): guided questions answered (below); the design approved (human, 2026-10-26: "Approve 13e-5's design. Read the Wikidata concept → taxon property and bring its SOURCES.md row."); the SOURCES.md row added ("Add it (Recommended)"); items 3 and 4 (circles refused, one walk) built, reviewed and passing every suite on the Mac, not yet in a PR; items 1 and 2 (the join, the review's lists) wait for the snapshots on the Mac (the human has no access to the Windows PC until later, 2026-10-26). Pop culture moves from 13e-5 to 13e-6 and is written against this shape. Item 7 (the scripts connect like the app), added from the 2026-10-26 audit by the human's approval, built and tested on the Mac, not yet in a PR.
 
 ## Goal
 Settle how the answer base names and links things before the remaining ~150 categories are written against it: one thing per real-world thing, no circles in the "kind of" tree, one function that walks the tree, and the rules for series and titles that 13e-6 builds.
@@ -30,6 +30,16 @@ Asked after Claude's answer to "can you tell me if u think growing the answer da
 | A word naming several taxa (cat 2, cattle 5, rabbit 9; asked after reading Wikidata) | "Join only clear cases (Recommended)": join when exactly one linked taxon is loaded, otherwise print it in the review |
 | P13176/P14067's SOURCES.md row | "Add it (Recommended)" |
 
+**Item 7, from the 2026-10-26 codebase audit (finding TOOL-5, proposal 13-α; guided questions the same day):**
+
+| Question | The human's answer |
+|---|---|
+| Should the scripts ever write to plor.app's database? | "Hosted too, guarded" |
+| When it's built | "Guard now, hosted in M15" |
+| Which PR | "fold into 13e-5, but can u explain like im five the entire changes that are going to be made and what they mean"; after the explanation: "Approve all three: … build the guard fix as 13e-5 item 7" |
+| Which role a hosted load connects as (for M15) | "postgres, recorded" (DECISIONS.md Log, 2026-10-26) |
+| How the hosted URL reaches the script (for M15) | "[No preference]": open for M15 |
+
 Correction recorded with these: ROADMAP's Design review item 1 (a popularity tier per entry for the host's dodge) was replaced in 13c by host answers drawn at random from the bank (13c ticket, "How dodges get onto a day"), so it isn't a shape question.
 
 ## Source
@@ -37,6 +47,7 @@ Correction recorded with these: ROADMAP's Design review item 1 (a popularity tie
 - **SOURCES.md, Wikidata (M13, D2)** and **Open English WordNet (M13, D2):** where joins and series links come from.
 - **SOURCES.md, Wikibase RDF Dump Format, Sitelinks (13e-3):** the sitelink count that picks the better-known title.
 - **SOURCES.md, Wikidata common-name link (13e-5):** P13176 and its inverse P14067, added by the human's OK (2026-10-26).
+- **Item 7:** DECISIONS.md, "Database access from route handlers" ("pg receives explicit fields, never a `connectionString`"; any query parameter rejected, M00 review 3) and SOURCES.md's node-postgres row.
 - **Not yet in SOURCES.md:** the property for "part of the series" and the class that marks a single-medium series; Claude brings their row with 13e-6, before its code.
 
 ## Claude's design (approved by the human, 2026-10-26)
@@ -45,6 +56,9 @@ Correction recorded with these: ROADMAP's Design review item 1 (a popularity tie
 2. **Odd joins in the review.** `npm run base -- review` prints every join where the two sides share no name, or where the WordNet side sits outside the WordNet branch matching the Wikidata set's root (an animal joined to a WordNet food). A person checks the list in the PR.
 3. **Circles refused.** `private.import_source` refuses an import that would close a circle in "kind of", naming it, and nothing loads (fail loudly).
 4. **One walk.** One function per direction (down: a root's members; up: a thing's ancestors), used by the five places above.
+
+**Added from the audit, built in 13e-5** (the human, 2026-10-26, above):
+7. **The scripts connect like the app.** `localClient` (`scripts/base.ts`, used by `npm run base` and `npm run draft`) checked `new URL(url).hostname` but gave pg the whole URL, and pg reads `?host=` from it, so `postgresql://…@127.0.0.1:54322/postgres?host=elsewhere` passed the guard and connected elsewhere, without verified TLS. It now reads `DATABASE_URL` through `src/config/env.ts`'s `readDatabaseUrl` (the app's parser, which refuses any query parameter), refuses any host but this machine (`isLocalHost`), and gives pg the parsed fields. Who uses it: the human and every drafting or loading session. A security change (secret handling), approved by the human and recorded in the DECISIONS.md Log. Loading plor.app's base stays out of scope until M15.
 
 **Decided now, built in 13e-6** with the first data that uses them (build for today: nothing calls them before pop culture loads):
 5. **Series.** A single-medium series (one whose Wikidata class marks it as a series of one kind of work) is a thing, and its entries are "kind of" it, so a host saying "Mario Kart" catches "Mario Kart 8", as "bear" catches "polar bear". A franchise spanning media is no series: its entries stand alone. If reading Wikidata shows this takes more than the import's one extra link, or touches categories outside pop culture, Claude stops and asks (the human's condition).
@@ -66,11 +80,13 @@ How a concept naming several taxa joins is put to the human (below).
 - [ ] `npm run base -- review` prints odd joins; its output on the full load is in the PR.
 - [x] An import that closes a circle fails, names it, and leaves the base unchanged (pgTAP: Evidence).
 - [x] The five walks call one function per direction (diff), and `npm test`, `npm run test:db`, `npx supabase test db` and `npm run test:e2e` pass (Evidence).
+- [x] `localClient` refuses a `DATABASE_URL` with a query parameter before connecting, refuses any host but this machine, and still connects to the local stack (item 7: Evidence).
 - [ ] Every one of the 40 simulated days that drafted before still drafts.
 - [ ] A fresh `load all`'s database size is measured and recorded (for "Load all, pay when near").
 
 ## Out of scope
 - Series and titles' code (13e-6).
+- Loading plor.app's base from the scripts (item 7 stays local-only; the human: "Guard now, hosted in M15").
 - Readers that skip `removed_at`, and the rest of ROADMAP's For M13 items (the human: "One tree-walk function" only).
 - Pop-culture categories.
 
@@ -88,6 +104,7 @@ How a concept naming several taxa joins is put to the human (below).
 
 ## Removes
 - Four of the five copies of the walk.
+- `localClient`'s own URL parsing and its `connectionString` (item 7).
 - The second "dog" (and every concept/taxon double) and the drafting session's pick by ID.
 - ROADMAP For M13 items it closes: the membership walk written three times (13a-1), the kind_of walks (13a-2), merging across sources (13a-2), imports not refusing cycles (13a-2).
 - ROADMAP's Design review item 1, marked replaced by 13c.
@@ -110,8 +127,16 @@ How a concept naming several taxa joins is put to the human (below).
 - **Time:** a synthetic import of 57,000 things in a binary tree (rolled back) took 2.7 s with the circle check, `{"facts": 56999, "things": 57000}`. Real taxa: *unverified*.
 - **e2e:** `npm run test:e2e -- --reporter=line` → "44 passed (1.4m)", rerun once the M14 session's suite had finished and port 3000 was free. The first run had collided with the M14 worktree's `next dev`, which started on port 3000 at 14:27:18 mid-run (38 failed with `ERR_CONNECTION_REFUSED` or timeouts); it doesn't count.
 
+## Evidence (item 7, 2026-10-26, the Mac)
+- **Hypothesis first:** a `127.0.0.1…?host=elsewhere.invalid` URL passes today's guard and pg tries `elsewhere.invalid` (`.invalid` never resolves, RFC 6761); disproved if the old code already refused it, or the fixed code still connects.
+- **Red, before the fix:** `npx vitest run scripts/base.test.ts -t localClient` → "× refuses a query parameter that would send pg to another host, before connecting … but got 'getaddrinfo ENOTFOUND elsewhere.inval…'", "Tests 1 failed | 1 passed".
+- **Green, after:** the same command → "✓ refuses a query parameter … 1ms", "✓ refuses a database that isn't this machine 0ms".
+- **Still connects locally:** a throwaway script calling `localClient()` with `.env.local` → `connected: { current_user: 'postgres', port: 5432 }` (deleted after).
+- **Unit:** `npm test` → "Test Files 40 passed (40) Tests 388 passed (388)" (386 + the 2 new). `npx tsc --noEmit -p .` exits 0; `npx eslint scripts/base.ts scripts/base.test.ts src/config/env.ts` clean. `npm run test:db`, pgTAP and e2e not rerun: item 7 touches no SQL, and the db suite shares the stack with the M14 session.
+
 ## Review (`reviewer` agent, fresh context, 2026-10-26)
 - Blocking findings and how each was fixed:
   - nothing tested that the walk stops on a circle already in a base (bases loaded before 13e-5 may hold one): `one_walk.test.sql` now inserts one directly and asserts a finite walk;
   - ticket, ROADMAP and HANDOFF not updated: done in the same commit.
 - Deferred to ROADMAP "Next revision": For M13, "From the 13e-5 review" (the unnamed count, which circle is named, the unchanged-base test's reach, the real snapshots unverified).
+- **Item 7** (`reviewer` agent, fresh context, 2026-10-26): no blocking findings (`readServerEnv`'s checks and messages unchanged, pg gets fields only, no secret printed). Deferred to ROADMAP, For M13: `readSupabaseAuthEnv`'s `LOCAL_HOSTS.has` beside `isLocalHost`. Closed, not parked: the scripts' missing-URL message now points at DECISIONS instead of `.env.local`, and the remote-host test also passed before the fix (a regression guard, not the red test).

@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, foldLabels, latestNumber, linkToWikidata, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -195,5 +195,21 @@ describe("facts for subsets", () => {
     const { items: out, ambiguous } = withPopulation(items, new Map([["Q1", [{ value: "5" }]], ["Q2", [{ value: "1" }, { value: "2" }]]]));
     expect(out.map((i) => i.population?.value)).toEqual([5, undefined, undefined]);
     expect(ambiguous).toBe(1);
+  });
+});
+
+describe("localClient", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  // Its guard read the URL's host while pg read ?host=, so this URL passed and pg went elsewhere (M13 13e-5, item 7).
+  // .invalid never resolves (RFC 6761), so a regression fails on DNS without sending credentials anywhere.
+  it("refuses a query parameter that would send pg to another host, before connecting", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://postgres:postgres@127.0.0.1:54322/postgres?host=elsewhere.invalid");
+    await expect(localClient()).rejects.toThrow(/must not contain query parameters/);
+  });
+
+  it("refuses a database that isn't this machine", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://postgres:postgres@elsewhere.invalid:5432/postgres");
+    await expect(localClient()).rejects.toThrow(/^refusing elsewhere\.invalid/);
   });
 });

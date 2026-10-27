@@ -1,6 +1,6 @@
 # Codebase audit, 2026-10-26
 
-**Status:** findings recorded; every proposed fix below waits for the human's approval. No code was changed.
+**Status:** findings recorded; every proposed fix below waits for the human's approval, except the three answered on 2026-10-26 ("Answered", below). The audit itself changed no code.
 
 Asked by the human: "can you do an audit on the entire codebase for any bloat, and anticipate any future issues when implementing the whole thing/future games or the current offbeat game".
 
@@ -131,6 +131,11 @@ Grep sizes: 15–16 non-test `GAME_ID` importers (M16 lists 7); 42 non-test file
 - **FUT-14** *smaller Later items, no blocker*. Avatars need a profile column and a payload/`PROTOCOL_VERSION` bump; coins need their own append-only ledger (the points ledger is per run per day); the reaction set is in a CHECK and `tunables.ts`; invite-code shape is in SQL and a regex; `src/proxy.ts:41`'s matcher doesn't exclude a manifest or service worker (*unverified* effect); friends' typed misses aren't LDNOOBW-checked before display.
 
 ---
+
+## Answered (human, 2026-10-26, guided questions on the urgent three)
+- **13-α (TOOL-5):** built as M13 13e-5 item 7 ("fold into 13e-5"); the hosted load waits for M15, connecting as `postgres` ("Hosted too, guarded", "Guard now, hosted in M15", "postgres, recorded").
+- **DOM-7 (the bank):** the bank stays public ("Stay public") and the 82 banks in history are accepted for the beta ("Accept for the beta"); 15a is deferred to M15 ("Defer to M15").
+- **DOC-9 (the pause):** lifted rather than recorded ("Lift the pause"), so DECISIONS' drafting row is right as it stands. All in the DECISIONS.md Log, 2026-10-26.
 
 ## Proposed sub-tickets, by milestone (for the human's approval)
 Each needs its own guided-questions round before design (CLAUDE.md, "Ask before designing"). **Security** marks a change CLAUDE.md requires to be proposed and recorded in DECISIONS.md first. Numbers in brackets are findings.

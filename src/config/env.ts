@@ -57,14 +57,24 @@ function parseDatabaseUrl(raw: string, name: string): DbConnection {
   return database;
 }
 
-export function readServerEnv(source: Record<string, string | undefined> = process.env): ServerEnv {
+export function isLocalHost(host: string): boolean {
+  return LOCAL_HOSTS.has(host);
+}
+
+// DATABASE_URL's parts, read the same way by the app (readServerEnv) and the scripts (scripts/base.ts localClient,
+// M13 13e-5 item 7), so pg always gets these fields and never the URL.
+export function readDatabaseUrl(source: Record<string, string | undefined> = process.env): DbConnection {
   const raw = source.DATABASE_URL;
   if (!raw) throw new Error("DATABASE_URL is not set (see docs/DECISIONS.md, Database access from route handlers)");
   const database = parseDatabaseUrl(raw, "DATABASE_URL");
   if (!database.password) throw new Error("DATABASE_URL must include a password");
+  return database;
+}
 
+export function readServerEnv(source: Record<string, string | undefined> = process.env): ServerEnv {
+  const database = readDatabaseUrl(source);
   const supabase = readSupabaseAuthEnv(source);
-  if (LOCAL_HOSTS.has(database.host)) return { database, supabase, databaseCaCert: null };
+  if (isLocalHost(database.host)) return { database, supabase, databaseCaCert: null };
 
   const ca = source.DATABASE_CA_CERT;
   if (!ca) throw new Error(`DATABASE_CA_CERT is required for remote database host ${database.host}`);

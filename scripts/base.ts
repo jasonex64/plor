@@ -16,6 +16,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
+import { isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
@@ -701,13 +702,13 @@ async function fetchSet(set: string, def: SetDef): Promise<void> {
   console.log(`FETCHED ${set}: ${items.length} items, snapshot ${snapshot}${retries ? `, ${retries} SPARQL retries after 429` : ""}`);
 }
 
-// The local stack only: DATABASE_URL must point at this machine (13a, "Local only").
+// The local stack only: DATABASE_URL must point at this machine (13a, "Local only"). It's parsed as the app parses it
+// and pg gets its fields, never the URL, so a query parameter can't send pg to another host (DECISIONS.md, Database
+// access from route handlers; M13 13e-5 item 7).
 export async function localClient(): Promise<pg.Client> {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL is not set (npm run base reads .env.local)");
-  const host = new URL(url).hostname;
-  if (host !== "127.0.0.1" && host !== "localhost") throw new Error(`refusing ${host}: 13a loads the local stack only`);
-  const client = new pg.Client({ connectionString: url });
+  const database = readDatabaseUrl();
+  if (!isLocalHost(database.host)) throw new Error(`refusing ${database.host}: 13a loads the local stack only`);
+  const client = new pg.Client(database);
   await client.connect();
   return client;
 }
