@@ -1507,7 +1507,7 @@
       "prompt": "Name an animal that starts with W",
       "category": "animal_w",
       "host_bank": [
-        "#dd9cfddb-c308-51f1-baaa-d2fea9faeec7",
+        "wasp",
         "whale",
         "#d20ac79f-b723-5a11-a7af-0a6c9f9f788e",
         "wombat",
@@ -3870,6 +3870,599 @@
         "technocracy",
         "police state",
         "kingdom"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-academic-degree",
+      "prompt": "Name an academic degree",
+      "category": "academic_degree",
+      "host_bank": [
+        "Bachelor of Arts",
+        "Bachelor of Science",
+        "Master of Arts",
+        "Master of Science",
+        "Doctor of Medicine",
+        "Master of Fine Arts"
+      ],
+      "uncommon": [
+        "Bachelor of Laws",
+        "Doctor of Divinity",
+        "Master of Divinity",
+        "Doctor of Optometry",
+        "Associate in Arts",
+        "honorary degree"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-body-of-water",
+      "prompt": "Name a body of water",
+      "category": "body_of_water",
+      "host_bank": [
+        "lake",
+        "ocean",
+        "sea",
+        "pond",
+        "river",
+        "bay"
+      ],
+      "uncommon": [
+        "lagoon",
+        "fjord",
+        "estuary",
+        "strait",
+        "bayou",
+        "tarn"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-book",
+      "prompt": "Name a kind of book",
+      "category": "book",
+      "host_bank": [
+        "dictionary",
+        "encyclopedia",
+        "cookbook",
+        "atlas",
+        "textbook",
+        "novel"
+      ],
+      "uncommon": [
+        "glossary",
+        "hymnal",
+        "gazetteer",
+        "songbook",
+        "phrase book",
+        "field guide"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-card-game",
+      "prompt": "Name a card game",
+      "category": "card_game",
+      "host_bank": [
+        "Uno",
+        "blackjack",
+        "go fish",
+        "crazy eights",
+        "old maid",
+        "gin rummy"
+      ],
+      "uncommon": [
+        "canasta",
+        "cribbage",
+        "euchre",
+        "pinochle",
+        "whist",
+        "baccarat"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-ceremony",
+      "prompt": "Name a kind of ceremony",
+      "category": "ceremony",
+      "host_bank": [
+        "wedding",
+        "funeral",
+        "coronation",
+        "bar mitzvah",
+        "inauguration",
+        "initiation"
+      ],
+      "uncommon": [
+        "bat mitzvah",
+        "commencement",
+        "dedication",
+        "sky burial",
+        "potlatch",
+        "commemoration"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-cloud",
+      "prompt": "Name a kind of cloud",
+      "category": "cloud",
+      "host_bank": [
+        "cumulus",
+        "cirrus",
+        "stratus",
+        "nimbus",
+        "cumulonimbus",
+        "storm cloud"
+      ],
+      "uncommon": [
+        "altocumulus",
+        "altostratus",
+        "cirrocumulus",
+        "cirrostratus",
+        "contrail",
+        "mare's tail"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-doctor",
+      "prompt": "Name a kind of doctor",
+      "category": "doctor",
+      "host_bank": [
+        "surgeon",
+        "dermatologist",
+        "psychiatrist",
+        "cardiologist",
+        "veterinarian",
+        "obstetrician"
+      ],
+      "uncommon": [
+        "anesthesiologist",
+        "rheumatologist",
+        "endocrinologist",
+        "gastroenterologist",
+        "ophthalmologist",
+        "oncologist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-engine",
+      "prompt": "Name a kind of engine",
+      "category": "engine",
+      "host_bank": [
+        "jet engine",
+        "steam engine",
+        "diesel",
+        "rocket",
+        "turbine",
+        "outboard motor"
+      ],
+      "uncommon": [
+        "Wankel engine",
+        "ramjet",
+        "turbojet",
+        "four-stroke engine",
+        "radial engine",
+        "gas turbine"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-exercise",
+      "prompt": "Name an exercise",
+      "category": "exercise",
+      "host_bank": [
+        "pushup",
+        "sit-up",
+        "pull-up",
+        "jogging",
+        "yoga",
+        "jump rope"
+      ],
+      "uncommon": [
+        "deadlift",
+        "bench press",
+        "handstand",
+        "calisthenics",
+        "power walking",
+        "Kegel exercises"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-farmer",
+      "prompt": "Name a kind of farmer",
+      "category": "farmer",
+      "host_bank": [
+        "rancher",
+        "beekeeper",
+        "dairyman",
+        "cattleman",
+        "fruit grower",
+        "tenant farmer"
+      ],
+      "uncommon": [
+        "crofter",
+        "viticulturist",
+        "grazier",
+        "smallholder",
+        "sheepman",
+        "planter"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-festival",
+      "prompt": "Name a festival",
+      "category": "festival",
+      "host_bank": [
+        "Mardi Gras",
+        "Oktoberfest",
+        "carnival",
+        "film festival",
+        "jazz festival",
+        "Kwanzaa"
+      ],
+      "uncommon": [
+        "Saturnalia",
+        "Dionysia",
+        "eisteddfod",
+        "sheepshearing"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-grain",
+      "prompt": "Name a grain",
+      "category": "grain",
+      "host_bank": [
+        "wheat",
+        "rice",
+        "corn",
+        "oat",
+        "barley",
+        "millet"
+      ],
+      "uncommon": [
+        "buckwheat",
+        "bulgur",
+        "hominy",
+        "groats",
+        "malt",
+        "wild rice"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-greeting-card",
+      "prompt": "Name a kind of greeting card",
+      "category": "greeting_card",
+      "host_bank": [
+        "birthday card",
+        "Christmas card",
+        "Valentine",
+        "get-well card",
+        "sympathy card",
+        "postcard"
+      ],
+      "uncommon": [
+        "Easter card",
+        "Mass card",
+        "lettercard",
+        "spiritual bouquet"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-landform",
+      "prompt": "Name a landform",
+      "category": "landform",
+      "host_bank": [
+        "mountain",
+        "valley",
+        "canyon",
+        "volcano",
+        "cliff",
+        "glacier"
+      ],
+      "uncommon": [
+        "mesa",
+        "butte",
+        "atoll",
+        "sinkhole",
+        "geyser",
+        "escarpment"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-lawyer",
+      "prompt": "Name a kind of lawyer",
+      "category": "lawyer",
+      "host_bank": [
+        "prosecutor",
+        "district attorney",
+        "public defender",
+        "defense attorney",
+        "barrister",
+        "solicitor"
+      ],
+      "uncommon": [
+        "divorce lawyer",
+        "trial attorney",
+        "King's Counsel",
+        "Queen's Counsel",
+        "conveyancer",
+        "advocate"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-meal",
+      "prompt": "Name a meal",
+      "category": "meal",
+      "host_bank": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "brunch",
+        "supper",
+        "picnic"
+      ],
+      "uncommon": [
+        "high tea",
+        "smorgasbord",
+        "potluck",
+        "clambake",
+        "Seder",
+        "ploughman's lunch"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-medicine-branch",
+      "prompt": "Name a branch of medicine",
+      "category": "medicine_branch",
+      "host_bank": [
+        "cardiology",
+        "dermatology",
+        "pediatrics",
+        "neurology",
+        "psychiatry",
+        "dentistry"
+      ],
+      "uncommon": [
+        "oncology",
+        "rheumatology",
+        "nephrology",
+        "gastroenterology",
+        "geriatrics",
+        "toxicology"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-party",
+      "prompt": "Name a kind of party",
+      "category": "party",
+      "host_bank": [
+        "birthday party",
+        "cocktail party",
+        "tea party",
+        "slumber party",
+        "house party",
+        "luau"
+      ],
+      "uncommon": [
+        "rave",
+        "ceilidh",
+        "cotillion",
+        "barn dance",
+        "masked ball",
+        "shindig"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-playing-card",
+      "prompt": "Name a playing card",
+      "category": "playing_card",
+      "host_bank": [
+        "ace",
+        "king",
+        "queen",
+        "jack",
+        "joker",
+        "deuce"
+      ],
+      "uncommon": [
+        "trey",
+        "face card",
+        "wild card",
+        "hole card",
+        "ace of spades",
+        "ten-spot"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-race",
+      "prompt": "Name a kind of race",
+      "category": "race",
+      "host_bank": [
+        "marathon",
+        "relay",
+        "sack race",
+        "horse race",
+        "hurdles",
+        "obstacle race"
+      ],
+      "uncommon": [
+        "Kentucky Derby",
+        "Iditarod",
+        "Grand Prix",
+        "slalom",
+        "Tour de France",
+        "chariot race"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-school",
+      "prompt": "Name a kind of school",
+      "category": "school",
+      "host_bank": [
+        "boarding school",
+        "law school",
+        "medical school",
+        "private school",
+        "Sunday school",
+        "driving school"
+      ],
+      "uncommon": [
+        "finishing school",
+        "night school",
+        "charter school",
+        "trade school",
+        "conservatory",
+        "yeshiva"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sculpture",
+      "prompt": "Name a kind of sculpture",
+      "category": "sculpture",
+      "host_bank": [
+        "statue",
+        "bust",
+        "mobile",
+        "relief",
+        "woodcarving",
+        "cameo"
+      ],
+      "uncommon": [
+        "scrimshaw",
+        "intaglio",
+        "stabile",
+        "herm",
+        "sphinx",
+        "bas relief"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-simple-machine",
+      "prompt": "Name a simple machine",
+      "category": "simple_machine",
+      "host_bank": [
+        "lever",
+        "pulley",
+        "wedge",
+        "screw",
+        "wheel",
+        "inclined plane"
+      ],
+      "uncommon": [
+        "gear",
+        "sprocket",
+        "caster",
+        "millwheel",
+        "potter's wheel",
+        "roller"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-story",
+      "prompt": "Name a kind of story",
+      "category": "story",
+      "host_bank": [
+        "myth",
+        "legend",
+        "love story",
+        "short story",
+        "detective story",
+        "adventure story"
+      ],
+      "uncommon": [
+        "saga",
+        "murder mystery",
+        "thriller",
+        "Aesop's fables",
+        "Arthurian legend"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-teacher",
+      "prompt": "Name a kind of teacher",
+      "category": "teacher",
+      "host_bank": [
+        "math teacher",
+        "music teacher",
+        "art teacher",
+        "science teacher",
+        "English teacher",
+        "piano teacher"
+      ],
+      "uncommon": [
+        "governess",
+        "docent",
+        "French teacher",
+        "geometry teacher",
+        "reading teacher",
+        "catechist"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-virus",
+      "prompt": "Name a virus",
+      "category": "virus",
+      "host_bank": [
+        "Ebola virus",
+        "West Nile virus",
+        "herpes",
+        "rotavirus",
+        "poliovirus",
+        "human immunodeficiency virus"
+      ],
+      "uncommon": [
+        "Epstein-Barr virus",
+        "Marburg virus",
+        "Lassa virus",
+        "rhinovirus",
+        "hepatitis A virus",
+        "tobacco mosaic virus"
       ],
       "themes": [],
       "added_by": "claude"

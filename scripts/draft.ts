@@ -188,6 +188,7 @@ export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Pr
     const answers = [...q.host_bank, ...q.uncommon];
     const candidates = await nameCandidates(db, q.category, answers);
     const seen = new Map<string, string>();
+    const hostShown = new Map<string, string>();
     for (const name of answers) {
       const found = candidates.get(name)!;
       if (found.length !== 1) {
@@ -197,7 +198,12 @@ export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Pr
       const other = seen.get(found[0].id);
       if (other) problems.push(`${q.id}: "${other}" and "${name}" name the same thing`);
       seen.set(found[0].id, name);
+      if (q.host_bank.includes(name)) hostShown.set(name, found[0].name);
     }
+    // The host says a letter subset's answers by their shown names, which the draft requires to start with the letter
+    // (O4): a thing renamed after its answer was written (13e-5b's Wikidata names) breaks every day that picks it.
+    const off = await offLetter(db, q.category, [...hostShown.values()].map(normalize));
+    for (const [name, shown] of hostShown) if (off.has(normalize(shown))) problems.push(`${q.id}: host answer "${name}" shows as "${shown}", which doesn't start with its letter`);
   }
   return problems;
 }
@@ -327,20 +333,22 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   return { day, guide: softGuide(await expectedCatches(db, day)) };
 }
 
-// The simulator, `npm run draft -- simulate`: draft() for SIMULATE_DAYS dates SIMULATE_STEP days apart from
-// SIMULATE_FROM, the drafted days on disk as the only past days, writing no files. Its values are the ones 13e-2 to
-// 13e-4 ran by hand, so the counts compare (13e-4 Evidence: 39 of 40); it was rewritten by hand three times before it
-// became this command (CLAUDE.md, repeated procedures; 13e-5).
-const SIMULATE_DAYS = 40;
-const SIMULATE_STEP = 3;
+// The simulator, `npm run draft -- simulate`: draft() for SIMULATE_DAYS consecutive dates from SIMULATE_FROM, each
+// drafted day joining the past days the next one is drafted against, so the 30-day gap is tested between them (13e-10:
+// before, each date saw only the days on disk, and 40 days spaced 3 apart drafted with any 7 categories). 13e stops
+// growing when it drafts all of them (human, 2026-10-27: "When 30 days in a row draft (Recommended)", "Simulate does
+// 30 in a row (Recommended)"). It writes no files; it became this command after being rewritten by hand three times
+// (CLAUDE.md, repeated procedures; 13e-5).
+const SIMULATE_DAYS = 30;
 const SIMULATE_FROM = "2027-01-01";
 
 export function simulateDates(): string[] {
   const from = Date.parse(`${SIMULATE_FROM}T00:00:00Z`);
-  return Array.from({ length: SIMULATE_DAYS }, (_, i) => new Date(from + i * SIMULATE_STEP * 86_400_000).toISOString().slice(0, 10));
+  return Array.from({ length: SIMULATE_DAYS }, (_, i) => new Date(from + i * 86_400_000).toISOString().slice(0, 10));
 }
 
 async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key: string) => string): Promise<void> {
+  const past = [...days];
   let drafted = 0;
   let questions = 0;
   let subset = 0;
@@ -348,7 +356,8 @@ async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key:
   // command exit 1.
   for (const date of simulateDates()) {
     try {
-      const { day } = await draft(db, bank, days, date, family);
+      const { day } = await draft(db, bank, past, date, family);
+      past.push(day);
       drafted++;
       questions += day.questions.length;
       subset += day.questions.filter((q) => family(q.category) !== q.category).length;

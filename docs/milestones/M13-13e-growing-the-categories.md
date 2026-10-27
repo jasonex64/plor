@@ -20,6 +20,7 @@ Already decided: "Keep it; grow categories (Recommended)" (13d); new categories 
 | Combined traits ("African animal") | "Later, after the 200 (Recommended)": their own ticket |
 | Places and pop culture, which need Wikidata | "Some, in 13e (Recommended)": a smaller set of reviewed Wikidata imports, each measured for size before it's kept |
 | The smallest category | "10 members" |
+| When growth stops (2026-10-27, 13e-10's questions) | "When 30 days in a row draft (Recommended)": until `npm run draft -- simulate` drafts 30 consecutive days, which may take more than 210 |
 | Who writes each category's bank question | "Claude, in the same batch (Recommended)" |
 
 ## Source
@@ -49,7 +50,7 @@ Already decided: "Keep it; grow categories (Recommended)" (13d); new categories 
 ## Acceptance criteria
 - [x] **13e-1:** `data/categories.json` defines the 7 categories; `npm run base -- load all` gives the same member counts as before (56,787, 193, 2,999, 928, 48, 118, 50); multi-key review prints each category with the under-10 flag; `content:validate` refuses an unknown category and a host bank under 3 (unit tests).
 - [ ] **Each batch:** 20–30 categories, each of at least 10 members, reviewed in its PR, with a bank question each; any Wikidata import measured for size.
-- [ ] **Done:** 210 or more categories and bank questions, and a trial draft succeeds for each of the 30 days after T1.
+- [ ] **Done:** 210 or more categories and bank questions, and `npm run draft -- simulate` drafts 30 consecutive days (human, 2026-10-27: "When 30 days in a row draft (Recommended)"; 13e-10).
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass, for every PR.
 
 ## Out of scope

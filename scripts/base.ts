@@ -1067,8 +1067,8 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
 
 // --- listed words: Plor's list and LDNOOBW's, dropped at load (13e-9b) ---
 
-// Every hand decision about listed words (docs/milestones/M13-13e-9b-the-word-list.md), each item named as
-// "source:id": items dropped whole; items whose LDNOOBW-listed names go while their real names stay (LDNOOBW's words
+// Every hand decision about listed words (docs/milestones/M13-13e-9b-the-word-list.md), and about insults found when a
+// category's members are read (13e-10: "quack" for a doctor), each item named as "source:id": items dropped whole; items whose LDNOOBW-listed names go while their real names stay (LDNOOBW's words
 // are in real titles and band names, so they're dropped only where a person named the item); and the new shown name
 // of an item whose name is listed (human, 2026-10-27: "You, in a hand file (Recommended)").
 export const LISTED_FILE = "data/listed.json";
