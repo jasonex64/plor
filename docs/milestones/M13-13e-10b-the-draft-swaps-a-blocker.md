@@ -1,6 +1,6 @@
 # M13 13e-10b — The draft swaps a blocker
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-10b's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27)
+**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-10b's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #108)
 
 ## Goal
 When no letters fit a day's 7 questions, even after moving the blocker earlier, the draft swaps the blocking question for the pick's next choice and tries again, so a thin list costs a question instead of the whole day.
