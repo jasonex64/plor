@@ -547,7 +547,12 @@ export function numberWords(n: number): string {
   if (n < 20) return ONES[n];
   return `${TENS[Math.floor(n / 10)]}${n % 10 ? ` ${ONES[n % 10]}` : ""}`;
 }
+// A run of number words counts only if it spells its own number back ("sixty four", not "hundred" or "one one").
 export function wordsNumber(words: string[]): number | null {
+  const n = parseWords(words);
+  return n !== null && numberWords(n) === words.join(" ") ? n : null;
+}
+function parseWords(words: string[]): number | null {
   let total = 0;
   let part = 0;
   for (const w of words) {
@@ -584,7 +589,7 @@ export function titleForms(title: string): string[] {
     for (let i = 0; i < words.length; ) {
       let j = i;
       const run: string[] = [];
-      while (j < words.length && (/^\s+$/.test(words[j]) ? run.length > 0 : wordsNumber([words[j].toLowerCase()]) !== null || SCALES.some(([, n]) => n === words[j].toLowerCase()))) {
+      while (j < words.length && (/^\s+$/.test(words[j]) ? run.length > 0 : parseWords([words[j].toLowerCase()]) !== null)) {
         if (!/^\s+$/.test(words[j])) run.push(words[j].toLowerCase());
         j++;
       }
@@ -688,6 +693,12 @@ async function seriesOf(ids: string[], seriesClass: string): Promise<Map<string,
   return new Map([...all].map(([id, s]) => [id, [...s].filter((x) => single.has(x))] as const).filter(([, s]) => s.length === 1).map(([id, s]) => [id, s[0]]));
 }
 
+// The series none of whose names (label or other names) is a member's name, so no name names a series and a title.
+export function distinctSeries<T extends { label: string; alts: string[] }>(series: Map<string, T>, members: Map<string, { label: string; alts: string[] }>): Map<string, T> {
+  const names = new Set([...members.values()].flatMap((e) => [e.label, ...e.alts].map(normalize)));
+  return new Map([...series].filter(([, e]) => ![e.label, ...e.alts].some((n) => names.has(normalize(n)))));
+}
+
 // A set of titles under root: the members where finds, their single-medium series (when seriesClass names one) under
 // root with the members under them, title forms, and the facts asked for, whose values are items of the set.
 // A genre counts its sub-genres (human, 2026-10-27: "Yes, count sub-genres (Recommended)"): each value's broader
@@ -735,14 +746,9 @@ async function titleSet(set: string, root: Item, where: string, seriesClass: str
   const linked = seriesClass ? await seriesOf(ids, seriesClass) : new Map<string, string>();
   const seriesIds = [...new Set(linked.values())].filter((s) => !found.has(s));
   const allSeries = seriesIds.length ? await labelledIds(seriesIds) : new Map<string, { label: string; alts: string[]; parents: Set<string> }>();
-  // A series whose name is also one of its own entries' names would give that name two things ("Minecraft"), so it's
-  // left out and its entries sit under the root (human, 2026-10-27: "Keep only distinct names (Recommended)").
-  const entryNames = new Map<string, Set<string>>();
-  for (const [id, s] of linked) {
-    const e = found.get(id);
-    if (e) entryNames.set(s, new Set([...(entryNames.get(s) ?? []), ...[e.label, ...e.alts].map(normalize)]));
-  }
-  const seriesFound = new Map([...allSeries].filter(([id, e]) => !entryNames.get(id)?.has(normalize(e.label))));
+  // A series that shares a name with a member would give that name two things ("Minecraft"), so it's left out and its
+  // entries sit under the root (human, 2026-10-27: "Keep only distinct names (Recommended)").
+  const seriesFound = distinctSeries(allSeries, found);
   const series = new Map([...linked].filter(([, s]) => seriesFound.has(s) || found.has(s)));
   const links = await sitelinksOf([...ids, ...seriesFound.keys()]);
   const both = new Map([...found, ...seriesFound]);

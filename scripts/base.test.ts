@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, dropListed, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withPopulation, type Item, type Mark, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, dropListed, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, withPopulation, type Item, type Mark, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -389,6 +389,9 @@ describe("numberWords and wordsNumber", () => {
     expect(wordsNumber(["sixty", "four"])).toBe(64);
     expect(wordsNumber(["two", "thousand", "seventy", "seven"])).toBe(2077);
     expect(wordsNumber(["kart"])).toBeNull();
+    // A run that doesn't spell its own number back isn't one.
+    expect(wordsNumber(["hundred"])).toBeNull();
+    expect(wordsNumber(["one", "one"])).toBeNull();
   });
 });
 
@@ -399,6 +402,9 @@ describe("titleForms", () => {
     expect(titleForms("Mario Kart 8")).toEqual(["Mario Kart eight"]);
     expect(titleForms("Mario Kart Eight")).toEqual(["Mario Kart 8"]);
     expect(titleForms("Up")).toEqual([]);
+    expect(titleForms("A Million Machines")).toEqual(["Million Machines"]);
+    expect(titleForms("Thousand Sunny")).toEqual([]);
+    expect(titleForms("One Million Dollar Signpost")).toEqual(["1000000 Dollar Signpost"]);
   });
 });
 
@@ -427,5 +433,13 @@ describe("dropListed", () => {
       { id: "Q3", name: "kept", aliases: aliasesFor(["kept"], ["bitch"]) },
     ];
     expect(dropListed(items, ["Q1"], ["Q2"])).toEqual([{ id: "Q2", name: "hearts", aliases: aliasesFor(["hearts"]) }, items[2]]);
+  });
+});
+
+describe("distinctSeries", () => {
+  it("leaves out a series that shares any of its names with any member", () => {
+    const series = new Map([["S1", { label: "Mario Kart", alts: [] }], ["S2", { label: "Minecraft", alts: [] }], ["S3", { label: "Zelda", alts: ["Wii Sports"] }]]);
+    const members = new Map([["G1", { label: "Mario Kart 8", alts: [] }], ["G2", { label: "Minecraft", alts: [] }], ["G3", { label: "Wii Sports", alts: [] }]]);
+    expect([...distinctSeries(series, members).keys()]).toEqual(["S1"]);
   });
 });

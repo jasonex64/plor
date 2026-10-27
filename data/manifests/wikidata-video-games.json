@@ -2,8 +2,8 @@
   "set": "wikidata-video-games",
   "source": "wikidata",
   "snapshot": "2026-10-27",
-  "retrieved_at": "2026-10-27T08:21:20.045Z",
+  "retrieved_at": "2026-10-27T08:52:20.781Z",
   "method": "SPARQL: instances of video game (P31 Q7889) with an English Wikipedia article and at least 10 sitelinks, under video game; each one's single-medium series (P179 to a P31 Q7058673 video game series, no Q196600 media franchise, one series each, none named like one of its games) under video game with its games under it; title forms; genre (P136, with each genre's broader genres P279+ among those the set uses, racing not under sports) and publisher (P123), whose values are items of the set; a short form two games share goes to the one with more sitelinks",
-  "items": 6903,
-  "sha256": "87e9f13e9634ddeecb86acfd82914b3e8e4768277365ae0a7b492baac7744503"
+  "items": 6859,
+  "sha256": "e23def77e04c84375db6b6e2939e56dfcd3505ed29603f00f546ee115ea60f43"
 }

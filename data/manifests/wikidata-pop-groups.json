@@ -2,8 +2,8 @@
   "set": "wikidata-pop-groups",
   "source": "wikidata",
   "snapshot": "2026-10-27",
-  "retrieved_at": "2026-10-27T08:21:48.279Z",
+  "retrieved_at": "2026-10-27T08:52:50.562Z",
   "method": "SPARQL: musical groups (P31/P279* Q215380) whose genre (P136) is pop music (Q37073) or K-pop (Q213665) or a sub-genre of either (P279*), with an English Wikipedia article, under musical group; genre (pop music and K-pop, a sub-genre counting for its broader one), which are items of the set; LDNOOBW-listed names of the POP_DROP_LISTED_NAMES items dropped",
   "items": 5520,
-  "sha256": "997951dca4cd85d13ef6bc8bb87f2713a98169bb19408affd0e6c8bd197ba992"
+  "sha256": "d42b4715f8dda5771abc4eafdd85fe037deb1c4ee324bf47730aff596bed831e"
 }

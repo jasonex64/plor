@@ -1,6 +1,6 @@
 # M13 13e-6 — Pop culture
 
-**Status:** in progress (2026-10-27): the pop-culture answers recorded in 13e-4 (2026-10-26) and three rounds of guided questions (below); **approved** (human, 2026-10-27: "Approve 13e-6's design, its SOURCES.md rows and the genre and publisher facts. Build it."); the SOURCES.md row added ("Wikidata pop culture (M13 13e-6)"); the combined board-and-card root read: Q3244175 tabletop game, the parent of both.
+**Status:** in review (2026-10-27): built and reviewed on the Windows PC, the review's lists decided in chat, in one PR. Before: the pop-culture answers recorded in 13e-4 (2026-10-26) and three rounds of guided questions (below); **approved** (human, 2026-10-27: "Approve 13e-6's design, its SOURCES.md rows and the genre and publisher facts. Build it."); the SOURCES.md row added ("Wikidata pop culture (M13 13e-6)"); the combined board-and-card root read: Q3244175 tabletop game, the parent of both.
 
 ## Goal
 Five Wikidata sets of pop culture (video games, board and card games, animated films and anime, pop and K-pop groups, superheroes) with their categories, genre subsets and bank questions, loaded and reviewed like the sets before them.
@@ -65,7 +65,7 @@ Counts of items with an English Wikipedia article, by query shape (*unverified* 
 - [x] "Name a Nintendo game" and at least the genre subsets with 10+ members draft (trial drafts: all 19).
 - [x] A series catches its entries (a db test on fixtures, and "Mario Kart" on the full load); short titles answer ("Breath of the Wild").
 - [x] The review's doubles list is decided in chat and applied; the simulator still drafts what it drafts today (39 of 40), or better: 39 of 40, after the human's "Strengthen the two (Recommended)" (it first drafted 37; Evidence).
-- [ ] `npm test`, `npm run test:db`, `npx supabase test db`, `npm run test:e2e` pass.
+- [x] `npm test`, `npm run test:db`, `npx supabase test db`, `npm run test:e2e` pass (Evidence).
 
 ## Out of scope
 - Superhero subsets (the human: "None for now"); cross-media franchises (13e-5).
@@ -98,8 +98,9 @@ Counts of items with an English Wikipedia article, by query shape (*unverified* 
 | Design 1: each set's members by one query, as rivers are | IDs first (`idsWhere`), then labels by key in batches (`labelledIds`); the tabletop games one class a query | One query with labels timed out for tabletop games; a single VALUES list of every publisher failed with 400 |
 | Design 1: pop groups whose genre is pop or K-pop | Pop or K-pop or any sub-genre of either (5,517 groups, not 2,486) | The human's answer on sub-genres; One Direction ("teen pop") was out |
 | Design 2: genre facts as Wikidata gives them | Each game's genres plus their broader genres among those the set uses, walked up a level a query; racing not under sports | The human's answers on sub-genres and on sports; a single P279+ query timed out or ran to 13 MB |
-| Design 4: a single-medium series catches its entries | Only series whose name differs from all their entries (282 of 934 video-game series, 19 of 28 film series) | The human: "Keep only distinct names"; a series named like its first game gave that name two things |
-| Design 4: title forms | As designed; a form that is another member's own name isn't given | "the other keeps its full title" read as: no generated form takes another title's own name |
+| Design 4: a single-medium series catches its entries | Only series none of whose names (label or other names) is any member's name (`distinctSeries`) | The human: "Keep only distinct names"; the first build compared a series with its own linked entries' labels only and left 22 doubles ("Wii Sports", "Metal Gear Solid"; the review) |
+| Design 4: title forms, "the parts around a subtitle's colon" (13e-5 item 6: "the part after a subtitle's colon and the part before it with the subtitle") | The part after the colon; not the part before it alone | The part before it *with* the subtitle is the whole title, typeable already once `normalize` drops the colon; the part before it alone ("Zelda") would name one game for a whole series |
+| Design 4: title forms | A form that is another member's own name isn't given; a number-word run counts only when it spells its own number back | "the other keeps its full title" read as: no generated form takes another title's own name; the first build read "Million" as 0 ("0 machines"; the review) |
 | — | `dropListed`: one board game left out and seven names dropped by ID | The human's answer on listed names (as `ANIMALS_DROP_LISTED_NAMES` in 13e-4b) |
 | Design 3: categories with a bank question each | 19 categories, 19 questions; 30 answers by ID where a name fits several things (remakes, heroes sharing a mantle) | The draft refuses a name naming several members; the review's shared names were reviewed with the human |
 | Plan 2 hypothesis: +30–40 MB | +30 MB (286 → 316 MB) | Held |
@@ -113,8 +114,14 @@ Counts of items with an English Wikipedia article, by query shape (*unverified* 
 - **On the full load:** the Mario Kart series catches Mario Kart 8 (`descendants_now`); "breath of the wild" names The Legend of Zelda: Breath of the Wild; "mario kart eight" names Mario Kart 8.
 - **Bank:** 19 questions, every answer one member of its category (a check query over all 228); 30 by ID. `npm run content:validate` → "CONTENT OK".
 - **The simulator:** `npm run draft -- simulate` first → `DRAFTED 37 of 40; subset questions 78 of 259` (hypothesis 39 or better: disproved): 2027-01-31 blocked at "Name a flower that starts with V", 03-20 and 04-13 at "Name a monkey", as the new questions changed which seven a day picks. After the human's "Strengthen the two (Recommended)" (mandrill to the monkey host's answers; proboscis monkey, vervet monkey, rhesus macaque, woolly monkey, mangabey, uakari, drill, guenon, and four V flowers, to the uncommon ones, each one member): **`DRAFTED 39 of 40; subset questions 83 of 273`**, the one failure 2027-01-31 at the V flower (38 members); the poem day (2027-03-26), which failed before, now drafts.
+- **After the review's fixes** (the five title sets and the marks re-fetched; a fresh `db reset` + `load all`): video games keep 238 series (696 left out), animated films 18 (10 left out); the junk number aliases gone (`0 machines` and the like: 0 rows; the 97 aliases with a "0" left are "Zero" spelled as a digit, e.g. "yakuza 0", "kentucky route 0"); one name still on two series, "F1" (EA Sports' and Codemasters' series, two different things); 316 MB; every bank answer one member; the review: shared bank answers 0, P460 or fork pairs 0; all 19 trial days draft; the simulator `DRAFTED 39 of 40; subset questions 83 of 273` (2027-01-31, the V flower); `npm test` 415; `npm run test:db` 266; `npx supabase test db` 28 files, 435, PASS; `npm run test:e2e` 60 of 61, the one failure passing on `--last-failed` ("1 passed").
 - **Trial drafts** (each new question with six established ones, `npm run draft -- 2027-06-NN --questions …`, files deleted after): all 19 draft, e.g. `name-a-nintendo-game`: "DRAFTED … letters Q2 U, Q4 B, Q5 S, Q7 I"; the sports day first failed on an ID the racing cut had moved out (`SSX`), then drafted with the name.
 
-## Review
+## Review (`reviewer` agent, fresh context, 2026-10-27)
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - a lone scale word read as 0 and adjacent number words summed ("0 machines", "the 1 0 dollar signpost" loaded): a run counts only when it spells its own number back (unit tests);
+  - the distinct-name rule missed series against games outside its one-series links and against its other names (22 doubles in `video_game`): a series is left out when any of its names is any member's name (`distinctSeries`, unit test);
+  - the colon rule's left side was undocumented: recorded in the Source diff with its reason;
+  - HANDOFF, ROADMAP and the ticket's Status were stale: updated.
+- Its own checks: the migration differs from 20261027053000's `import_source` only in the two trait lists; `pop_culture.test.sql` 4/4; every new bank answer one member; sports and racing overlap on 6; the sitelinks cut-off's origin recorded.
+- Deferred to ROADMAP "Next revision": For M13, "From the 13e-6 review".
