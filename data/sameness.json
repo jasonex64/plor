@@ -161,6 +161,11 @@
       "a": "Q254630",
       "b": "Q10808340",
       "why": "kinkajou: Potos is the genus, Potos flavus its one species (human, 2026-10-27: keep apart)"
+    },
+    {
+      "a": "Q14621389",
+      "b": "Q7643821",
+      "why": "Superboy and Superman (Earth-One): separate characters, though Wikidata says they may be the same (P460; human, 2026-10-27: keep apart)"
     }
   ],
   "reviewed": [
@@ -633,6 +638,146 @@
       "category": "clothing_j",
       "name": "jumper",
       "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "video_game",
+      "name": "pacman",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "video_game",
+      "name": "tetris",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "tabletop_game",
+      "name": "chess",
+      "why": "chess and two chess programs (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "animated_film",
+      "name": "coco",
+      "why": "Coco and a Pokémon film also called Coco (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "animated_film",
+      "name": "the lion king",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "anime",
+      "name": "one piece",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "aquaman",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "batman",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "captain marvel",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "iron man",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "spiderman",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "superman",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "wolverine",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "superhero",
+      "name": "wonder woman",
+      "why": "different characters who carried this name (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "nintendo_game",
+      "name": "star fox",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "racing_game",
+      "name": "ridge racer",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "platform_game",
+      "name": "mega man",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "platform_game",
+      "name": "sonic the hedgehog",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "shooter_game",
+      "name": "doom",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "shooter_game",
+      "name": "overwatch",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "puzzle_game",
+      "name": "tetris",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "sports_game",
+      "name": "punchout",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "horror_game",
+      "name": "resident evil",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "horror_game",
+      "name": "silent hill 2",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "strategy_game",
+      "name": "xcom enemy unknown",
+      "why": "XCOM: Enemy Unknown and UFO: Enemy Unknown, two games (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "simulation_game",
+      "name": "simcity",
+      "why": "different games or films sharing a title (an original and a remake or sequel) (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "simulation_game",
+      "name": "the sims",
+      "why": "The Sims and The Sims Mobile (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "rhythm_game",
+      "name": "rhythm heaven",
+      "why": "Rhythm Heaven and the Japanese Rhythm Tengoku, two games (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
     }
   ],
   "wordnet_split": [

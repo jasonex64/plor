@@ -1049,7 +1049,8 @@
         "macaque",
         "capuchin",
         "howler monkey",
-        "spider monkey"
+        "spider monkey",
+        "mandrill"
       ],
       "uncommon": [
         "marmoset",
@@ -1057,7 +1058,15 @@
         "colobus",
         "langur",
         "titi",
-        "saki"
+        "saki",
+        "proboscis monkey",
+        "vervet monkey",
+        "rhesus macaque",
+        "woolly monkey",
+        "mangabey",
+        "uakari",
+        "drill",
+        "guenon"
       ],
       "themes": [],
       "added_by": "claude"
@@ -1744,7 +1753,11 @@
       "uncommon": [
         "Venus' slipper",
         "Virginian stock",
-        "Virginia spring beauty"
+        "Virginia spring beauty",
+        "vanilla orchid",
+        "Virginia crownbeard",
+        "Virginia thimbleweed",
+        "violet-flowered petunia"
       ],
       "themes": [],
       "added_by": "claude"
@@ -1803,6 +1816,443 @@
       "uncommon": [
         "wimble",
         "wrecking bar"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-video-game",
+      "prompt": "Name a video game",
+      "category": "video_game",
+      "host_bank": [
+        "Minecraft",
+        "#3f843b00-3e83-5671-9e42-aa2ca7670103",
+        "Fortnite",
+        "Super Mario Bros.",
+        "#2e793b84-6a64-5f72-8ec0-8c202c1132e2",
+        "Grand Theft Auto V"
+      ],
+      "uncommon": [
+        "Stardew Valley",
+        "Hollow Knight",
+        "Undertale",
+        "Celeste",
+        "Hades",
+        "Portal 2"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-board-or-card-game",
+      "prompt": "Name a board or card game",
+      "category": "tabletop_game",
+      "host_bank": [
+        "Monopoly",
+        "#8dbcd088-1940-5d9a-8b77-0dd7efb4062a",
+        "Scrabble",
+        "Uno",
+        "Catan",
+        "Cluedo"
+      ],
+      "uncommon": [
+        "Ticket to Ride",
+        "Pandemic",
+        "Battleship",
+        "Codenames",
+        "Dominion",
+        "Risk"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-animated-film",
+      "prompt": "Name an animated film",
+      "category": "animated_film",
+      "host_bank": [
+        "Toy Story",
+        "Frozen",
+        "#a2b039ae-fa52-5830-b120-f87358ebab63",
+        "Shrek",
+        "Finding Nemo",
+        "Moana"
+      ],
+      "uncommon": [
+        "Spirited Away",
+        "#17d1b75a-7400-59cc-b677-00a863502b7f",
+        "Ratatouille",
+        "WALL-E",
+        "Inside Out",
+        "Up"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-anime",
+      "prompt": "Name an anime",
+      "category": "anime",
+      "host_bank": [
+        "Naruto",
+        "#41a07829-65e1-5256-b4c4-22f3cf89b5b1",
+        "Dragon Ball Z",
+        "Attack on Titan",
+        "Sailor Moon",
+        "Death Note"
+      ],
+      "uncommon": [
+        "Cowboy Bebop",
+        "Demon Slayer: Kimetsu no Yaiba",
+        "My Hero Academia",
+        "Spirited Away",
+        "Neon Genesis Evangelion",
+        "Fullmetal Alchemist: Brotherhood"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-pop-group",
+      "prompt": "Name a pop or K-pop group",
+      "category": "pop_group",
+      "host_bank": [
+        "BTS",
+        "Blackpink",
+        "One Direction",
+        "ABBA",
+        "Spice Girls",
+        "Backstreet Boys"
+      ],
+      "uncommon": [
+        "NSYNC",
+        "Little Mix",
+        "Twice",
+        "Stray Kids",
+        "Fifth Harmony",
+        "Westlife"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-superhero",
+      "prompt": "Name a superhero",
+      "category": "superhero",
+      "host_bank": [
+        "#2bb4ba28-1935-5ddc-a7e2-35f1ea0c824a",
+        "#6fdc6421-377b-5391-865e-34c9a3c61cda",
+        "#c43a93f6-a8d9-57d9-abdd-d8e3084522c5",
+        "#7bb2a0a2-b054-5d56-b7c4-a4a965bfd855",
+        "#6963c52c-2441-51ab-af1f-d48deff224ee",
+        "Storm"
+      ],
+      "uncommon": [
+        "Black Panther",
+        "#39345654-4194-5a66-8804-29421ccfb231",
+        "#11df9780-d50c-537c-a70f-20af5df3a3ae",
+        "#1ca3ab8f-ea5a-5cf9-bda8-cb0d052633ba",
+        "Daredevil",
+        "#6b07a48f-e19c-5ec6-90c2-cb0488c21702"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-nintendo-game",
+      "prompt": "Name a game published by Nintendo",
+      "category": "nintendo_game",
+      "host_bank": [
+        "Super Mario Bros.",
+        "Mario Kart 8",
+        "The Legend of Zelda: Breath of the Wild",
+        "Animal Crossing: New Horizons",
+        "Super Smash Bros. Ultimate",
+        "Super Mario 64"
+      ],
+      "uncommon": [
+        "Metroid Prime",
+        "Splatoon",
+        "Kirby's Dream Land",
+        "Donkey Kong Country",
+        "#e61128d8-dace-5715-a0ff-0d0e55eb0bc0",
+        "Pikmin"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-racing-game",
+      "prompt": "Name a racing video game",
+      "category": "racing_game",
+      "host_bank": [
+        "Mario Kart 8",
+        "Gran Turismo 7",
+        "Forza Horizon 5",
+        "Crash Team Racing",
+        "Need for Speed: Underground",
+        "Burnout Paradise"
+      ],
+      "uncommon": [
+        "F-Zero",
+        "#19a487c1-43d9-53d7-a307-547a64d8be18",
+        "Wipeout",
+        "Mario Kart: Double Dash",
+        "Dirt Rally",
+        "Diddy Kong Racing"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-platform-game",
+      "prompt": "Name a platform game",
+      "category": "platform_game",
+      "host_bank": [
+        "Super Mario Bros.",
+        "#9a306070-1c40-5f28-aa74-21e55685a521",
+        "Donkey Kong Country",
+        "Crash Bandicoot",
+        "Celeste",
+        "Super Mario Odyssey"
+      ],
+      "uncommon": [
+        "Hollow Knight",
+        "Cuphead",
+        "Rayman",
+        "Spyro the Dragon",
+        "Ori and the Blind Forest",
+        "#c475f251-282c-5289-bac2-86057d144865"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-shooter-game",
+      "prompt": "Name a shooter video game",
+      "category": "shooter_game",
+      "host_bank": [
+        "Halo: Combat Evolved",
+        "#1d279b0b-b973-5d7c-8c41-3b02abf8c386",
+        "#f35fbf21-396a-5619-b174-fdaade2981c3",
+        "Counter-Strike",
+        "Call of Duty 4: Modern Warfare",
+        "Fortnite"
+      ],
+      "uncommon": [
+        "BioShock",
+        "Half-Life",
+        "Destiny",
+        "Gears of War",
+        "Titanfall 2",
+        "Borderlands"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-fighting-game",
+      "prompt": "Name a fighting game",
+      "category": "fighting_game",
+      "host_bank": [
+        "Street Fighter II",
+        "Mortal Kombat 11",
+        "Tekken 3",
+        "Super Smash Bros. Ultimate",
+        "Soulcalibur",
+        "Dragon Ball FighterZ"
+      ],
+      "uncommon": [
+        "Killer Instinct",
+        "Injustice: Gods Among Us",
+        "Virtua Fighter",
+        "Marvel vs. Capcom 2: New Age of Heroes",
+        "BlazBlue: Calamity Trigger",
+        "Guilty Gear Strive"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-role-playing-game",
+      "prompt": "Name a role-playing video game",
+      "category": "role_playing_game",
+      "host_bank": [
+        "Final Fantasy VII",
+        "The Elder Scrolls V: Skyrim",
+        "The Witcher 3: Wild Hunt",
+        "World of Warcraft",
+        "Elden Ring",
+        "Dragon Quest XI"
+      ],
+      "uncommon": [
+        "Chrono Trigger",
+        "Persona 5",
+        "Mass Effect",
+        "Baldur's Gate 3",
+        "Diablo II",
+        "Kingdom Hearts"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-puzzle-game",
+      "prompt": "Name a puzzle video game",
+      "category": "puzzle_game",
+      "host_bank": [
+        "#3f843b00-3e83-5671-9e42-aa2ca7670103",
+        "Portal",
+        "Candy Crush Saga",
+        "Angry Birds",
+        "Dr. Mario",
+        "Lemmings"
+      ],
+      "uncommon": [
+        "Monument Valley",
+        "The Witness",
+        "Baba Is You",
+        "Professor Layton and the Curious Village",
+        "Puzzle Bobble",
+        "Myst"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sports-game",
+      "prompt": "Name a sports video game",
+      "category": "sports_game",
+      "host_bank": [
+        "Wii Sports",
+        "Tony Hawk's Pro Skater",
+        "Rocket League",
+        "Mario Tennis",
+        "#bdbd6960-a601-51e5-8900-31521d8f9bfb",
+        "NBA 2K11"
+      ],
+      "uncommon": [
+        "SSX",
+        "Mario Golf",
+        "Pro Evolution Soccer 2016",
+        "Skate",
+        "Fight Night Round 3",
+        "NBA Jam"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-horror-game",
+      "prompt": "Name a horror video game",
+      "category": "horror_game",
+      "host_bank": [
+        "#db17e149-eb1a-53eb-98c1-e374fbebe159",
+        "Silent Hill",
+        "Five Nights at Freddy's",
+        "Outlast",
+        "Amnesia: The Dark Descent",
+        "Alien: Isolation"
+      ],
+      "uncommon": [
+        "Fatal Frame",
+        "Layers of Fear",
+        "Until Dawn",
+        "The Evil Within",
+        "Phasmophobia",
+        "#19f24e61-87c8-5c79-9f38-e8eacfe56a1a"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-strategy-game",
+      "prompt": "Name a strategy video game",
+      "category": "strategy_game",
+      "host_bank": [
+        "StarCraft",
+        "Age of Empires II",
+        "Command & Conquer",
+        "#63e4da13-ed74-58f6-9424-685b1b78a3fa",
+        "Civilization V",
+        "Warcraft III: Reign of Chaos"
+      ],
+      "uncommon": [
+        "Total War: Shogun 2",
+        "Into the Breach",
+        "Advance Wars",
+        "Stellaris",
+        "Company of Heroes",
+        "Rome: Total War"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-simulation-game",
+      "prompt": "Name a simulation video game",
+      "category": "simulation_game",
+      "host_bank": [
+        "#c32d6077-984c-5edf-9d12-d27d108faea1",
+        "#d7497372-eabf-57cf-b9f6-a6baf0f249c1",
+        "RollerCoaster Tycoon",
+        "Cities: Skylines",
+        "Stardew Valley",
+        "Microsoft Flight Simulator"
+      ],
+      "uncommon": [
+        "Euro Truck Simulator 2",
+        "Planet Coaster",
+        "Harvest Moon",
+        "Two Point Hospital",
+        "Frostpunk",
+        "Theme Hospital"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-rhythm-game",
+      "prompt": "Name a music or rhythm game",
+      "category": "rhythm_game",
+      "host_bank": [
+        "Guitar Hero",
+        "Just Dance",
+        "DJ Hero",
+        "Rock Band",
+        "Beat Saber",
+        "Osu!"
+      ],
+      "uncommon": [
+        "#8728e079-67de-5a76-8d18-c777f7571a4e",
+        "Patapon",
+        "Elite Beat Agents",
+        "PaRappa the Rapper",
+        "Hi-Fi Rush",
+        "Crypt of the NecroDancer"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kpop-group",
+      "prompt": "Name a K-pop group",
+      "category": "kpop_group",
+      "host_bank": [
+        "BTS",
+        "Blackpink",
+        "Twice",
+        "Exo",
+        "Stray Kids",
+        "NewJeans"
+      ],
+      "uncommon": [
+        "Seventeen",
+        "Red Velvet",
+        "BigBang",
+        "Girls' Generation",
+        "Super Junior",
+        "Itzy"
       ],
       "themes": [],
       "added_by": "claude"

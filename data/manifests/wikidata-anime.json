@@ -1,0 +1,9 @@
+{
+  "set": "wikidata-anime",
+  "source": "wikidata",
+  "snapshot": "2026-10-27",
+  "retrieved_at": "2026-10-27T07:36:57.860Z",
+  "method": "SPARQL: instances of anime television series (P31 Q63952888) or anime film (P31 Q20650540) with an English Wikipedia article, under anime (Q1107); title forms; a short form two share goes to the one with more sitelinks",
+  "items": 2181,
+  "sha256": "67c404c4a1766e5a0f129f5bf29d0f2551c3d256ba5e0c4123d27fa1a70940aa"
+}
