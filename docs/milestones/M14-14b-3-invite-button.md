@@ -1,6 +1,6 @@
 # M14 14b-3 — The invite button
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11); built, in review in PR_PENDING. When the PR is ready the human is asked before it merges, and plor.app gets the migration straight after (answer 12).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11); built, in review in PR #98. When the PR is ready the human is asked before it merges, and plor.app gets the migration straight after (answer 12).
 
 ## Goal
 Friend and group invites are shared from a button, never shown as a raw link, with 10-character codes on short paths, so the Friends tab and a group's page stop showing a long URL.
