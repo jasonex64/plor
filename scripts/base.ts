@@ -375,13 +375,31 @@ const wikidataIds = (synset: Synset) => [synset.wikidata ?? []].flat();
 // is loaded; one naming several loaded taxa (cat, cattle, rabbit) stays its own thing and keeps them as unjoined, for
 // the review (13e-5 item 1; SOURCES.md, Wikidata common-name link; human, 2026-10-26: "Join only clear cases").
 // A synset may give a list of IDs (["Q124657158", "Q664443"]): the same rule holds over all they name.
-export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string, taxaOf: Map<string, string[]>): Item[] {
-  return items.map((item) => {
+// hand holds a person's decisions from the review: joins to split, and the taxon an unjoined word joins. Each must
+// still fit the data, or the fetch stops naming it, so a re-fetch can't apply a stale decision silently.
+export type HandJoins = { split: Set<string>; pick: Map<string, string> };
+export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string, taxaOf: Map<string, string[]>, hand: HandJoins): Item[] {
+  const used = new Set<string>();
+  const linked = items.map((item) => {
     if (item.id === root) return { ...item, same_as: `wikidata:${rootLink}` };
     const taxa = [...new Set(wikidataIds(synsets[item.id]).flatMap((id) => (known.has(id) ? [id] : (taxaOf.get(id) ?? []).filter((t) => known.has(t)))))];
+    if (hand.split.has(item.id)) {
+      if (taxa.length !== 1) throw new Error(`hand split ${item.id} (${item.name}): it no longer joins one thing (${taxa.length})`);
+      used.add(item.id);
+      return item;
+    }
+    const pick = hand.pick.get(item.id);
+    if (pick) {
+      if (taxa.length < 2 || !taxa.includes(pick)) throw new Error(`hand pick ${item.id} (${item.name}) → ${pick}: not among its loaded taxa (${taxa.join(", ") || "none"})`);
+      used.add(item.id);
+      return { ...item, same_as: `wikidata:${pick}` };
+    }
     if (taxa.length === 1) return { ...item, same_as: `wikidata:${taxa[0]}` };
     return taxa.length ? { ...item, unjoined: taxa } : item;
   });
+  const unused = [...hand.split, ...hand.pick.keys()].filter((id) => !used.has(id));
+  if (unused.length) throw new Error(`hand joins name synsets not in the tree: ${unused.join(", ")}`);
+  return linked;
 }
 
 // Joins whose two sides share no alias, for the review (13e-5 item 2): the WordNet item and the Wikidata item it's
@@ -503,6 +521,49 @@ const ANIMALIA = "Q729"; // labelled "animal"
 // (Recommended)"), as Pūkio Stream's alias is for rivers.
 const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
+// The human's decisions on the review's lists (13e-5; human, 2026-10-27: "As recommended" for both): three joins split
+// as wrong matches, and the taxon each unjoined word joins, the one with more Wikipedia articles (the title rule's
+// "better-known one"), the species for horseshoe crab, and for dog the taxon the breeds sit under. The twin left over
+// is Wikidata's own double, for 13e-5b.
+const OEWN_ANIMALS_HAND: HandJoins = {
+  split: new Set([
+    "02461453-n", // ground sloth, the extinct giant: not Folivora, every sloth
+    "01682603-n", // leopard lizard, "any of several": not one species, the long-nosed
+    "01547030-n", // zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch
+  ]),
+  pick: new Map([
+    ["01790476-n", "Q1133152"], // horseshoe crab: Atlantic horseshoe crab, the species, not Limulidae, the family
+    ["02129439-n", "Q166794"], // manul: Otocolobus manul (90), not Felis manul (0)
+    ["02128341-n", "Q182304"], // jaguarundi: Puma yagouaroundi (73), not Herpailurus yagouaroundi (1)
+    ["02127963-n", "Q35255"], // cougar: Puma concolor (125), not Felis concolor (0)
+    ["02124460-n", "Q57818409"], // domestic cat: Felis silvestris catus (16), not Felis catus (9)
+    ["02120298-n", "Q28157482"], // brown hyena: Parahyaena brunnea (61), not Hyaena brunnea (0)
+    ["85147429-n", "Q208079"], // side-striped jackal: Canis adustus (36), not Lupulella adusta (30)
+    ["83443092-n", "Q188944"], // black-backed jackal: Canis mesomelas (34), not Lupulella mesomelas (30)
+    ["02086723-n", DOG], // dog: Canis lupus familiaris (7, the breeds' taxon), not Canis familiaris (7)
+    ["01649289-n", "Q622886"], // natterjack: Epidalea calamita (42), not Bufo calamita (0)
+    ["01644380-n", "Q4667968"], // green frog: Lithobates clamitans (24), not Rana clamitans (3)
+    ["01644218-n", "Q159404"], // bullfrog: Rana catesbeiana (51), not Lithobates catesbeianus (3)
+    ["02044834-n", "Q25634"], // laughing gull: Chroicocephalus ridibundus (84), not Larus ridibundus (0)
+    ["02029283-n", "Q28070835"], // surfbird: Calidris virgata (33), not Aphriza virgata (1)
+    ["02026839-n", "Q202504"], // dotterel: Charadrius morinellus (61), not Eudromias morinellus (0)
+    ["01851617-n", "Q28106731"], // shoveler: Spatula clypeata (87), not Anas clypeata (2)
+    ["01851289-n", "Q28106837"], // widgeon: Mareca penelope (88), not Anas penelope (2)
+    ["01851481-n", "Q28106685"], // American widgeon: Mareca americana (48), not Anas americana (1)
+    ["01851196-n", "Q28106902"], // garganey: Spatula querquedula (87), not Anas querquedula (1)
+    ["01851094-n", "Q28106778"], // blue-winged teal: Spatula discors (49), not Anas discors (0)
+    ["01838728-n", "Q1268205"], // whippoorwill: Antrostomus vociferus (26), not Caprimulgus vociferus (1)
+    ["01830737-n", "Q736052"], // belted kingfisher: Megaceryle alcyon (43), not Ceryle alcyon (0)
+    ["01597809-n", "Q2668013"], // tree swallow: Petrochelidon nigricans (22), not Hirundo nigricans (0)
+    ["01595335-n", "Q25404"], // blue tit: Cyanistes caeruleus (99), not Parus caeruleus (0)
+    ["01595181-n", "Q1079441"], // Carolina chickadee: Poecile carolinensis (25), not Parus carolinensis (0)
+    ["01594898-n", "Q282687"], // black-capped chickadee: Poecile atricapillus (32), not Parus atricapillus (0)
+    ["01582219-n", "Q25345384"], // jackdaw: Coloeus monedula (109), not Corvus monedula (1)
+    ["01571701-n", "Q27075919"], // Blackburnian warbler: Setophaga fusca (27), not Dendroica fusca (0)
+    ["01571533-n", "Q21962227"], // yellow warbler: Setophaga petechia (38), not Dendroica petechia (0)
+    ["01534280-n", "Q27075875"], // red siskin: Spinus cucullatus (32), not Carduelis cucullata (0)
+  ]),
+};
 
 // In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
@@ -650,7 +711,7 @@ const SETS: Record<string, SetDef> = {
   },
   "oewn-animals": {
     source: "oewn",
-    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several`,
+    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several; the human's hand decisions on the review (3 joins split, 30 unjoined words' taxa picked) applied`,
     fetch: async () => {
       const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), (listed) => listed.filter((n) => /^noun\.[^/]+\.json$/.test(n)));
       const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
@@ -661,7 +722,7 @@ const SETS: Record<string, SetDef> = {
       await byIds(unloaded, "P13176", (v) => `SELECT ?c ?t WHERE { VALUES ?c { ${v} } ?c wdt:P13176 ?t . }`, (rows) => {
         for (const r of rows) taxaOf.set(qid(r.c.value), [...(taxaOf.get(qid(r.c.value)) ?? []), qid(r.t.value)]);
       });
-      const items = linkToWikidata(tree, synsets, known, OEWN_ANIMAL, ANIMALIA, taxaOf);
+      const items = linkToWikidata(tree, synsets, known, OEWN_ANIMAL, ANIMALIA, taxaOf, OEWN_ANIMALS_HAND);
       const byP13176 = items.filter((i) => i.id !== OEWN_ANIMAL && i.same_as && !wikidataIds(synsets[i.id]).includes(i.same_as.slice("wikidata:".length))).length;
       console.log(`oewn-animals: ${unloaded.length} Wikidata IDs not loaded, ${taxaOf.size} of them with P13176; ${byP13176} joined by it, ${items.filter((i) => i.unjoined).length} unjoined`);
       return items;

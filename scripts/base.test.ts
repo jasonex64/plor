@@ -115,6 +115,7 @@ describe("usdaCheeses", () => {
 });
 
 describe("linkToWikidata", () => {
+  const none = { split: new Set<string>(), pick: new Map<string, string>() };
   it("links each WordNet item to the loaded Wikidata thing its synset names, and the root to the category's root", () => {
     const synsets = { root: { members: ["animal"] }, bear: { members: ["bear"], wikidata: "Q1" }, yeti: { members: ["yeti"], wikidata: "Q9" } };
     const items = [
@@ -122,7 +123,7 @@ describe("linkToWikidata", () => {
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"] },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ];
-    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729", new Map())).toEqual([
+    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729", new Map(), none)).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
@@ -138,7 +139,7 @@ describe("linkToWikidata", () => {
     ];
     // Q144 names two taxa, one of them loaded; Q146 names two loaded ones and one that isn't.
     const taxaOf = new Map([["Q144", ["Q26972265", "Q20717272"]], ["Q146", ["Q20980826", "Q1867423", "Q99"]]]);
-    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q26972265", "Q20980826", "Q1867423"]), "root", "Q729", taxaOf)).toEqual([
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q26972265", "Q20980826", "Q1867423"]), "root", "Q729", taxaOf, none)).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "dog", name: "dog", aliases: [], kind_of: ["root"], same_as: "wikidata:Q26972265" },
       { id: "cat", name: "cat", aliases: [], kind_of: ["root"], unjoined: ["Q20980826", "Q1867423"] },
@@ -152,13 +153,33 @@ describe("linkToWikidata", () => {
       { id: "owl", name: "owl", aliases: [], kind_of: ["root"] },
       { id: "bat", name: "bat", aliases: [], kind_of: ["root"] },
     ];
-    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q6", "Q7", "Q8"]), "root", "Q729", new Map([["Q5", ["Q6"]]]))).toEqual([
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q6", "Q7", "Q8"]), "root", "Q729", new Map([["Q5", ["Q6"]]]), none)).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "owl", name: "owl", aliases: [], kind_of: ["root"], same_as: "wikidata:Q6" },
       { id: "bat", name: "bat", aliases: [], kind_of: ["root"], unjoined: ["Q7", "Q8"] },
     ]);
   });
+  it("applies a person's splits and picks, and stops on one that no longer fits the data", () => {
+    const synsets = { root: { members: ["animal"] }, sloth: { members: ["ground sloth"], wikidata: "Q1" }, cat: { members: ["cat"], wikidata: ["Q2", "Q3"] } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "sloth", name: "ground sloth", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"] },
+    ];
+    const known = new Set(["Q729", "Q1", "Q2", "Q3"]);
+    const link = (split: string[], pick: [string, string][], from = items) => linkToWikidata(from, synsets, known, "root", "Q729", new Map(), { split: new Set(split), pick: new Map(pick) });
+    expect(link(["sloth"], [["cat", "Q3"]])).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "sloth", name: "ground sloth", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"], same_as: "wikidata:Q3" },
+    ]);
+    expect(() => link([], [["cat", "Q9"]])).toThrow("hand pick cat (cat) → Q9: not among its loaded taxa (Q2, Q3)");
+    expect(() => link([], [["sloth", "Q1"]])).toThrow("hand pick sloth");
+    expect(() => link(["cat"], [])).toThrow("hand split cat (cat): it no longer joins one thing (2)");
+    expect(() => link(["gone"], [], items)).toThrow("hand joins name synsets not in the tree: gone");
+  });
 });
+
 
 describe("oddJoins", () => {
   it("lists WordNet items joined to a Wikidata item that shares none of their aliases", () => {

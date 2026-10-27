@@ -2,8 +2,8 @@
   "set": "oewn-animals",
   "source": "oewn",
   "snapshot": "2026-10-27",
-  "retrieved_at": "2026-10-27T03:19:20.228Z",
-  "method": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025-json.zip: every noun.*.json, synset 00015568-n and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; 00015568-n itself to Q729, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several",
+  "retrieved_at": "2026-10-27T04:19:51.784Z",
+  "method": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025-json.zip: every noun.*.json, synset 00015568-n and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; 00015568-n itself to Q729, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several; the human's hand decisions on the review (3 joins split, 30 unjoined words' taxa picked) applied",
   "items": 4010,
-  "sha256": "8a3ad3517e43c945e6be479ea9ae3167368ef0f51788f8110776009b83d324d3"
+  "sha256": "8d3f5c925c882907ebc788453ed0c56b3e383b6a8566e85f743f2f29f685a807"
 }
