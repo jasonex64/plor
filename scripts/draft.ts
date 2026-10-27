@@ -188,6 +188,7 @@ export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Pr
     const answers = [...q.host_bank, ...q.uncommon];
     const candidates = await nameCandidates(db, q.category, answers);
     const seen = new Map<string, string>();
+    const hostShown = new Map<string, string>();
     for (const name of answers) {
       const found = candidates.get(name)!;
       if (found.length !== 1) {
@@ -197,7 +198,12 @@ export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Pr
       const other = seen.get(found[0].id);
       if (other) problems.push(`${q.id}: "${other}" and "${name}" name the same thing`);
       seen.set(found[0].id, name);
+      if (q.host_bank.includes(name)) hostShown.set(name, found[0].name);
     }
+    // The host says a letter subset's answers by their shown names, which the draft requires to start with the letter
+    // (O4): a thing renamed after its answer was written (13e-5b's Wikidata names) breaks every day that picks it.
+    const off = await offLetter(db, q.category, [...hostShown.values()].map(normalize));
+    for (const [name, shown] of hostShown) if (off.has(normalize(shown))) problems.push(`${q.id}: host answer "${name}" shows as "${shown}", which doesn't start with its letter`);
   }
   return problems;
 }

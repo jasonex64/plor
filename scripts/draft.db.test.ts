@@ -51,7 +51,7 @@ describe("familiarLeft on a letter subset", () => {
     const item = (id: string, names: string[]) => ({ id, name: names[0], aliases: names.map((alias, k) => ({ alias, kind: k ? "synonym" : "name" })), kind_of: ["dt-root"] });
     await db.query("select private.import_source('wikidata', 'draft-letter-test', $1::jsonb)", [JSON.stringify([
       { id: "dt-root", name: "dt thing", aliases: [] },
-      item("dt-host", ["dekko"]), item("dt-a", ["daxo"]), item("dt-b", ["dimo"]), item("dt-c", ["dunzo", "zonbi"]),
+      item("dt-host", ["dekko"]), item("dt-a", ["daxo"]), item("dt-b", ["dimo"]), item("dt-c", ["dunzo", "zonbi"]), item("dt-e", ["zuzu", "dazu"]),
     ])]);
     await db.query("select private.define_category('dt_base', 'dt thing', 'wikidata', 'dt-root', null)");
     await db.query(`select private.define_subset('dt_d', 'dt thing starting with D', 'dt_base', 'wikidata', '{"starts_with": "d"}')`);
@@ -75,6 +75,13 @@ describe("familiarLeft on a letter subset", () => {
     expect(await bankProblems(db, [{ ...question(["dekko", "daxo"], ["zonbi", cat]), category: "dt_d" }])).toEqual([
       'q: "zonbi" names no member',
       `q: ${cat} is not a member`,
+    ]);
+  });
+
+  it("refuses a host answer whose shown name doesn't start with the letter, as the draft does", async () => {
+    // "dazu" names dt-e, a member by that name, but the host says it as "zuzu" (13e-10: a renamed thing broke animal_w).
+    expect(await bankProblems(db, [{ ...question(["dekko", "dazu"], ["daxo"]), category: "dt_d" }])).toEqual([
+      'q: host answer "dazu" shows as "zuzu", which doesn\'t start with its letter',
     ]);
   });
 });
