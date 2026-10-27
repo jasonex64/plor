@@ -1,6 +1,6 @@
 # M13 13e-9 — Around the house, and more
 
-**Status:** in review (2026-10-27, overnight): built under the human's overnight rules (HANDOFF, "Overnight rules"), to be merged on green by those rules.
+**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #105, merged on green by those rules.
 
 ## Goal
 22 more WordNet categories, everyday things and knowledge, each with a bank question, toward 13e's 210 (148 before this batch, 170 after).
