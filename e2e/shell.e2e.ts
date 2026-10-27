@@ -64,6 +64,37 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   expect((await page.goto("/account"))!.status()).toBe(404);
   // Fonts come from Plor's own server (criterion 8).
   expect(requests.filter((url) => /fonts\.(googleapis|gstatic)\.com/.test(url))).toEqual([]);
+  // And they're the shell's own (docs/milestones/M14-14b-5-local-fonts.md, criterion 4): the heading is drawn at 800,
+  // its family's one face is the Baloo 2 file at 800, and the body's family has the DM Sans file at 400 and 700, each
+  // of which loads. Read from the page's @font-face rules and faces, since next/font names the families itself.
+  // On Plor's own page: the /account visit above left Next.js's 404 page, which styles its own h1.
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: "Plor" })).toBeAttached();
+  const fonts = await page.evaluate(async () => {
+    const first = (el: Element) => getComputedStyle(el).fontFamily.split(",")[0].trim();
+    const unquote = (family: string) => family.replace(/^['"]|['"]$/g, "");
+    const rules = [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules]).filter((r) => r instanceof CSSFontFaceRule);
+    const files = (family: string) =>
+      rules
+        .filter((r) => unquote(r.style.getPropertyValue("font-family")) === unquote(family))
+        .map((r) => `${r.style.getPropertyValue("font-weight")} ${/\/media\/(\w+?)[.-]/.exec(r.style.getPropertyValue("src"))?.[1]}`)
+        .sort();
+    const loads = async (family: string, weight: string) =>
+      (await document.fonts.load(`${weight} 16px ${family}`)).map((f) => `${f.weight} ${f.status}`);
+    const [h1, heading, body] = [document.querySelector("h1")!, first(document.querySelector("h1")!), first(document.body)];
+    return {
+      headingWeight: getComputedStyle(h1).fontWeight,
+      headingFiles: files(heading),
+      bodyFiles: files(body),
+      loaded: [await loads(heading, "800"), await loads(body, "400"), await loads(body, "700")],
+    };
+  });
+  expect(fonts).toEqual({
+    headingWeight: "800",
+    headingFiles: ["800 Baloo2_800_latin"],
+    bodyFiles: ["400 DMSans_latin", "700 DMSans_latin"],
+    loaded: [["800 loaded"], ["400 loaded"], ["700 loaded"]],
+  });
 });
 
 test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ browser }) => {
