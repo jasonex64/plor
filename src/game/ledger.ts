@@ -3,7 +3,8 @@
 // A day closes at its midnight Pacific; nothing is scheduled. The leaderboard settles the players it shows just before
 // it sums, which is also how runs from before M09 get their rows.
 // Relative imports with extensions: scripts/draft.ts runs this module on plain Node, which knows no "@/" paths.
-import { GAME_ID, type ApprovedPuzzle } from "../content/puzzle.ts";
+import { type ApprovedPuzzle } from "../content/puzzle.ts";
+import { GAME_ID } from "../platform/game.ts";
 import type { Db } from "@/lib/db";
 import { scoreRun, type DayCounts, type ScoredEvent } from "./scoring.ts";
 

@@ -22,6 +22,6 @@ export function previewText(preview: FeedPreview): PreviewText {
   return {
     named,
     more: others === 0 ? null : named.length > 0 ? `and ${others} more` : `${plural(others, "player", "players")} commented`,
-    read: preview.count === 0 ? null : `Finish today's Offbeat to read ${plural(preview.count, "comment", "comments")}`,
+    read: preview.count === 0 ? null : `Finish today's game to read ${plural(preview.count, "comment", "comments")}`,
   };
 }

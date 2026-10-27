@@ -3,10 +3,8 @@
 // database instead of listing its answers; the server resolves typed text against the base as of the day's approval
 // (src/game/matching.ts). Hand-written checks, no schema library (human, 2026-10-18). The server imports this same
 // module, so content is checked one way.
+import { GAME_ID } from "../platform/game.ts";
 import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER_DAY } from "../config/tunables.ts";
-
-// Permanent: stored with every run and ledger row (DECISIONS.md: Game 1).
-export const GAME_ID = "offbeat";
 
 // The drafting session's first guess at how many players give an answer (M13 D5). Members it doesn't name are rare.
 export type Level = "common" | "uncommon";

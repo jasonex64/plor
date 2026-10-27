@@ -2,7 +2,7 @@
 // row on which they started a run, finished or not. It counts back from today once they've played today, else from
 // yesterday, so it doesn't drop to 0 each morning before they play. A day with no approved puzzle couldn't be played,
 // so it neither counts nor breaks the streak (puzzles are approved by hand: DECISIONS.md, Puzzle approval).
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 
 // day: the day to count back from, when the caller reads its day once for several reads (src/game/offbeat.ts,

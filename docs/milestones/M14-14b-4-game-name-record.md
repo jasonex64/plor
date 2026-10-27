@@ -1,6 +1,6 @@
 # M14 14b-4 — The game's name record
 
-**Status:** drafted (2026-10-26, on the Mac), its guided questions answered (below); waiting for the human's approval. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
+**Status:** approved (human, 2026-10-26: "Approve the 14b-4 ticket as drafted and build it now"); built and reviewed, in review in PR_PENDING. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
 
 ## Goal
 Offbeat's shown name and address live in one record, with its permanent ID, so 14c-1's rename (N1) changes one place, and screens shared by every game carry no game name.
@@ -44,11 +44,11 @@ This sub-ticket's guided questions (human, 2026-10-26, in this session):
 - DECISIONS.md, Game 1 / Hard to reverse: a game's `game_id` is a permanent neutral ID; its shown name and address live in its record and change freely.
 
 ## Acceptance criteria
-- [ ] One record holds the game's ID (`"offbeat"`), shown name (`"Offbeat"`) and address (`/offbeat`), in a platform module, and `GAME_ID` comes from it: `grep` finds no other definition of the ID, no "Offbeat" in a player-facing string outside the record, and no `"/offbeat` link outside it (output recorded).
-- [ ] The shared screens name no game: the feed's locked line and preview say "today's game", and Today's leaderboard card shows only the date (e2e).
-- [ ] The game's own screens, its Today banner, the home page and the share text show the record's name, and every link goes to its address (e2e and unit; the share text's test reads the record).
-- [ ] DECISIONS.md's Game 1 row and Log gain the rule: a game's `game_id` is a permanent neutral ID; its shown name and address live in its record and change freely. 14c-1's N2 is closed, pointing here.
-- [ ] `npm test`, `npm run test:db` and `npm run test:e2e` pass; CI passes before merge.
+- [x] One record holds the game's ID (`"offbeat"`), shown name (`"Offbeat"`) and address (`/offbeat`), in a platform module, and `GAME_ID` comes from it: `grep` finds no other definition of the ID, no "Offbeat" in a player-facing string outside the record, and no `"/offbeat` link outside it (output recorded).
+- [x] The shared screens name no game: the feed's locked line and preview say "today's game", and Today's leaderboard card shows only the date (e2e).
+- [x] The game's own screens, its Today banner, the home page and the share text show the record's name, and every link goes to its address (e2e and unit; the share text's test reads the record).
+- [x] DECISIONS.md's Game 1 row and Log gain the rule: a game's `game_id` is a permanent neutral ID; its shown name and address live in its record and change freely. 14c-1's N2 is closed, pointing here.
+- [x] `npm test`, `npm run test:db` and `npm run test:e2e` pass; CI passes before merge.
 
 ## Out of scope
 - Picking the new name (14c-1, N1), and the rename itself.
@@ -62,7 +62,7 @@ None expected.
 2. Build, test, review, one PR from `m14-look-and-feel` after PR #96 merges.
 
 ## Removes
-The scattered "Offbeat" and `/offbeat` literals, `GAME_ID`'s home in `src/content/puzzle.ts`, and N2 from 14c-1's open questions.
+24 player-facing "Offbeat" literals and 11 `/offbeat` links (now the record's), `GAME_ID`'s definition in `src/content/puzzle.ts` (moved to `src/platform/game.ts`), `src/content/bank.ts`'s own `"offbeat"`, the shared screens' game name, and N2 from 14c-1's open questions.
 
 ---
 *Fill in the sections below at the end.*
@@ -70,9 +70,24 @@ The scattered "Offbeat" and `/offbeat` literals, `GAME_ID`'s home in `src/conten
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The audit's draft: a test ties the route folder to the record's address | No test; the folder is renamed by hand at N1 | Answer 3, "Rename by hand at N1" |
+| Shared screens name no game | The feed's "Finish today's game to read N comments" still links to the game's address | One game: the link is the record's `path`; with game 2 it needs a target of its own (M16) |
+| The record holds the ID, the name and the address | Internal identifiers that follow the ID stay as they are: the view kind `"offbeat"`, ButtonLink's `tone`, section `id`s, `content/offbeat/`, component names | They name the game's code, not what players see, and the ID is permanent (answer, "Keep it (Recommended)") |
 
 ## Evidence
+On the Mac, 2026-10-26, against the shared local stack:
+
+- Criterion 1, the record (`src/platform/game.ts`) as the one place:
+  - Definitions of the ID, `grep -rnE "GAME_ID\s*=|\bid: \"offbeat\"" src scripts`: `src/platform/game.ts:7` (`GAME`) and `:10` (`GAME_ID = GAME.id`) only. Test fixtures still write `game_id: "offbeat"` in five files (`src/test/answer-fixture.ts`, the puzzle, bank, insights and validator tests; none outside tests) and in `supabase/tests/*.sql`: they're stored rows written out as test data, not a definition the app reads.
+  - Player-facing "Offbeat" outside the record (code lines, not comments or component names): `0`. Links written as `"/offbeat`, `` `/offbeat `` or `/offbeat#` outside it: `0`.
+  - `npm run content:validate` → `CONTENT OK content: 1 file(s)`: the scripts load the record through their relative `.ts` imports.
+- `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  390 passed (390)`; `npm run test:db` → `Tests  266 passed (266)`; `npx playwright test` → `60 passed (2.1m)`.
+- Criteria 2 and 3: `today.e2e.ts` checks the leaderboard card is dated and names no game (`not.toContainText(GAME.name)`), and its feed link reads "Finish today's game to read 1 comment" and goes to the record's address; `groups.e2e.ts` and `player-screens.e2e.ts` check "Finish today's game to join in."; `player-screens.e2e.ts`'s card checks are anchored to the date alone; `share.test.ts` builds its expected text from `GAME.name`. After the review's fixes: `today.e2e.ts` → `4 passed (8.9s)`, `share.test.ts` → `5 passed (5)`.
+- Criterion 4: DECISIONS.md's Game 1 "Name and ID" and its Log row; 14c-1's N2 closed, pointing here.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+By the `reviewer` agent in a fresh context, 2026-10-26.
+
+- Blocking findings and how each was fixed: none in the code. The Evidence and the criteria weren't filled in yet: done above, with the fixtures' `"offbeat"` explained.
+- Fixed as well, small defects of this change's own: `today.e2e.ts` checked the literal "Offbeat", which would pass without testing anything once the game is renamed (it reads `GAME.name` now); a double blank line left in `src/content/puzzle.ts`; `src/comments/feed.ts`'s 162-character comment line, rewrapped; `share.ts` and its test importing the record by a relative path where the app uses `@/`.
+- Deferred to ROADMAP "Next revision": none.

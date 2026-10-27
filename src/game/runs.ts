@@ -2,7 +2,8 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { GAME_ID, avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";

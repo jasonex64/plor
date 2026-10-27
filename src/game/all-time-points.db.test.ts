@@ -4,7 +4,8 @@
 // leaderboard test does, and answered today, so they earn no rarity bonus (M09 D8) and each total is its ladder.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeCreatedPuzzles, safeEntry } from "@/test/puzzles";

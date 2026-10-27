@@ -1,6 +1,7 @@
 // What the insights report reads (docs/milestones/M03-puzzle-insights.md). No query selects a user ID, so the report
 // can't name players (D4). Dates are read as text and "today" is private.today() (M00 data design §8).
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { thingNames } from "@/game/payload";
 import { AppError } from "@/lib/http";

@@ -5,7 +5,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseBank, usesOf, type Bank } from "@/content/bank";
-import { GAME_ID, type Puzzle } from "@/content/puzzle";
+import { type Puzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { dayInsights } from "@/insights/queries";
 import type { Db } from "@/lib/db";
 

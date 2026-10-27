@@ -4,7 +4,8 @@
 import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDay, isFixtureDay, loadFixtureBase } from "@/test/answer-fixture";
 import { safeEntry, typeableName } from "@/test/puzzles";
 import { answer, openNext, startRun, todaysState } from "./runs";

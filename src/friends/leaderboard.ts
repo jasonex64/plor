@@ -8,7 +8,7 @@
 // friend's total would tell the viewer how far the friend got on questions the viewer hasn't answered (M09 D5; 9b
 // review, like M08 8a's past-day thread). A group's boards count each member only from the puzzle day they joined,
 // that day included (M12 12d, docs/milestones/M12-12d-decided-fixes.md); a friend's whole week counts.
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { settleRuns } from "@/game/ledger";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";

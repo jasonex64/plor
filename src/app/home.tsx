@@ -34,6 +34,7 @@ import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
+import { GAME } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
 // sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
@@ -343,7 +344,7 @@ function Today({ username, skip, timeUps }: { username: string; skip: boolean; t
 
   return (
     <div className={styles.today}>
-      <section id="offbeat" aria-label="Offbeat" className={styles.game}>
+      <section id="offbeat" aria-label={GAME.name} className={styles.game}>
         <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
       </section>
       <SideColumn label="Your circle" inPlace className={styles.side}>

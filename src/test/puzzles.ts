@@ -1,6 +1,7 @@
 // Puzzle fixtures for the database tests: the fixture day (src/test/answer-fixture.ts) on the local stack, and answers
 // a player can type. Shared by the run and board tests.
-import { GAME_ID, avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { FIXTURE, FIXTURE_ALIASES, FIXTURE_NAMES, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "./answer-fixture";
 

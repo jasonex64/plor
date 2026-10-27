@@ -2,6 +2,7 @@
 // answer. It shows the date and the rounds survived, whichever way the run ended (S1, S2).
 import { describe, expect, it } from "vitest";
 import type { AnsweredQuestion, RunState } from "./runs";
+import { GAME } from "@/platform/game";
 import { shareText } from "./share";
 
 const PROMPTS = ["Name an animal", "Name a fruit", "Name a color", "Name a city", "Name a sport", "Name a tool", "Name a planet"];
@@ -38,12 +39,12 @@ function finished(status: RunState["status"], outcomes: boolean[]): RunState {
 describe("shareText", () => {
   it("shows all seven rounds for a perfect run", () => {
     expect(shareText(finished("survived", [false, false, false, false, false, false, false]))).toBe(
-      "Offbeat · Oct 21\n🟩🟩🟩🟩🟩🟩🟩 7/7",
+      `${GAME.name} · Oct 21\n🟩🟩🟩🟩🟩🟩🟩 7/7`,
     );
   });
 
   it("shows the rounds survived before a catch", () => {
-    expect(shareText(finished("died", [false, false, false, true]))).toBe("Offbeat · Oct 21\n🟩🟩🟩⬜⬜⬜⬜ 3/7");
+    expect(shareText(finished("died", [false, false, false, true]))).toBe(`${GAME.name} · Oct 21\n🟩🟩🟩⬜⬜⬜⬜ 3/7`);
   });
 
   it("shows a timed-out run the same way as a caught one (S1: rounds only, however it ended)", () => {
@@ -53,7 +54,7 @@ describe("shareText", () => {
   });
 
   it("shows no rounds for a catch on question 1", () => {
-    expect(shareText(finished("died", [true]))).toBe("Offbeat · Oct 21\n⬜⬜⬜⬜⬜⬜⬜ 0/7");
+    expect(shareText(finished("died", [true]))).toBe(`${GAME.name} · Oct 21\n⬜⬜⬜⬜⬜⬜⬜ 0/7`);
   });
 
   it("holds no prompt, player answer or host answer from the run", () => {

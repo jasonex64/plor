@@ -6,7 +6,7 @@
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import type { Bank } from "@/content/bank";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDay, fixtureDraft, fixtureId } from "@/test/answer-fixture";
 import { bankView } from "./bank";
 

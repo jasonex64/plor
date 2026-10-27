@@ -1,7 +1,8 @@
 // The player's own stats for the Me tab (docs/milestones/M14-14a-3a-me.md; L45): totals across games, this month's
 // calendar, a card per game and the rarest answers. Dates are read as text and "today" comes from private.today()
 // alone (M00 §8). One game so far, so "across games" is Offbeat's numbers.
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { ANSWER_SHARE_MIN_PLAYERS, RAREST_ANSWERS_SHOWN } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { allTimePoints, dayCounts } from "./ledger";

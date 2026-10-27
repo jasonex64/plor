@@ -4,7 +4,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
-import { GAME_ID, avoids, checkPuzzleFile, parsePuzzle, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { avoids, checkPuzzleFile, parsePuzzle, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { thingNames, type Named, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";

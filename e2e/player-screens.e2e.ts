@@ -92,7 +92,7 @@ test("a question's time running out on another page opens the friends feed there
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   const feed = page.getByRole("complementary", { name: "Friends feed" });
-  await expect(feed.getByText("Finish today's Offbeat to join in.")).toBeVisible();
+  await expect(feed.getByText("Finish today's game to join in.")).toBeVisible();
   await expect(feed.getByLabel("Comment to your friends")).toHaveCount(0);
   // The browser's clock is faked, the database's isn't: question 1's deadline is the run's started_at plus 20 seconds
   // (private.question_started_at), so the run is moved back past it, as if the time had passed there too.
@@ -192,7 +192,7 @@ test("your own invite link says it's yours, and a board with reactions fits 320p
 test("the leaderboard card shows nothing of the old choice while the new one loads", async ({ browser }) => {
   const page = await player(browser, "xh", PHONE);
   const card = page.getByRole("region", { name: "Leaderboard" });
-  await expect(card.getByText(/ · Offbeat$/)).toBeVisible();
+  await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
   let release!: () => void;
   const held = new Promise<void>((resolve) => (release = resolve));
   await page.route("**/api/leaderboard", async (route) => {
@@ -201,9 +201,9 @@ test("the leaderboard card shows nothing of the old choice while the new one loa
   });
   await card.getByText("This week", { exact: true }).click();
   await expect(card.getByText("Loading…")).toBeVisible();
-  await expect(card.getByText(/ · Offbeat$/)).toHaveCount(0);
+  await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toHaveCount(0);
   release();
-  await expect(card.getByText(/^From [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2} · Offbeat$/)).toBeVisible();
+  await expect(card.getByText(/^From [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
 });
 
 // Answer 14: a channel that can't be opened shows its error with Try again, and Try again opens it.

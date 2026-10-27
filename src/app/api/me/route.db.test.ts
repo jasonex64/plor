@@ -22,7 +22,8 @@
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, fixture, nameOf, removeCreatedPuzzles, safeEntries, safeEntry } from "@/test/puzzles";

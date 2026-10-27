@@ -1,6 +1,7 @@
 // What Offbeat's game screen shows besides the run (docs/milestones/M14-14a-2b-game-screen.md): the player's stats and
 // yesterday's answers. Dates are read as text and "today" comes from private.today() alone (M00 §8).
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { STATS_CHART_DAYS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { settleRuns } from "./ledger";

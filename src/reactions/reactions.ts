@@ -3,7 +3,7 @@
 // and sees only their own reactions and their friends', or on a group's comment its members' (M10 10d, G4).
 import type { Pool } from "pg";
 import { REACTIONS } from "@/config/tunables";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
 import { FINISHED } from "@/game/status";
