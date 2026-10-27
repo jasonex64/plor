@@ -1,6 +1,6 @@
 # M14 14b-6 — Feel and polish: the frame that stays, skeletons, instant feedback, numbers and headlines
 
-**Status:** approved (human, 2026-10-27: "Approve, build 14b-6a (Recommended)"); 14b-6a, the frame and skeletons, in progress. Drafted from three rounds of guided questions and an Impeccable critique of every page.
+**Status:** approved (human, 2026-10-27: "Approve, build 14b-6a (Recommended)"); 14b-6a, the frame and skeletons, in review in PR #113 (criterion 2 as built waits for the human's word, Source diff). Drafted from three rounds of guided questions and an Impeccable critique of every page.
 
 ## Goal
 Plor feels instant: the frame stays put between pages, every wait shows the shape of what's coming, comments and reactions land at once with an undo, detail pages slide in and out, numbers don't jitter, headlines wrap evenly, the question's clock reads as a clock, and the admin sees at a glance when tomorrow has no puzzle.
