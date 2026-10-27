@@ -1,6 +1,6 @@
 # M13 13e-5b — Wikidata's own doubles
 
-**Status:** done (2026-10-27): merged on green CI in PR #101 (`88f4879`, 07:16 UTC; 10 of 10 checks SUCCESS on `8c23435`); `20261027053000_thing_retired.sql` not yet on plor.app (a `db push` only at the human's request). Before: approved (human: "yes fix the gaps"), built and reviewed on the Windows PC, the review's list decided in chat, in PR #101.
+**Status:** done (2026-10-27): merged on green CI in PR #101 (`88f4879`, 07:16 UTC; 10 of 10 checks SUCCESS on `8c23435`); `20261027053000_thing_retired.sql` pushed to plor.app the same day at the human's word ("Push now (Recommended)"; the dry run listed it alone, 42 of 42 matching, hosted pgTAP 27 files, 431 tests, PASS). Before: approved (human: "yes fix the gaps"), built and reviewed on the Windows PC, the review's list decided in chat, in PR #101.
 
 ## Goal
 One thing per real-world thing when Wikidata itself holds two items for it (one species under an old and a new scientific name, two pages that can't merge), so a typed name lands on one thing and a retired ID still finds it.
