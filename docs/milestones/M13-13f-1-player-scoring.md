@@ -1,6 +1,6 @@
 # M13 13f-1 — Player scoring
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13f-1's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #110)
+**Status:** done (merged on green CI in PR #110, `69f98c3`, 2026-10-27 22:38 UTC; approved by the human, 2026-10-27: "I approve 13f-1's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #110)
 
 ## Goal
 Close every For M13 item about what players get credit and points for: names the sources lack, offensive or wrong names, the rare tier's size, and the matching and approval edge cases.
