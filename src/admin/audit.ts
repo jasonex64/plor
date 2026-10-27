@@ -5,6 +5,7 @@
 // functions check again.
 import { DatabaseError } from "pg";
 import { withinTypo } from "@/game/matching";
+import { shownName } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 
@@ -46,12 +47,15 @@ export async function listReviews(db: Db, adminId: string): Promise<{ reviews: R
       "select private.audit_list($1) as reviews, private.audit_open_count($1) as open",
       [adminId],
     );
+    // Every thing named as screens show it (src/game/payload.ts, shownName).
+    const shown = (n: Named): Named => ({ ...n, name: shownName(n.name) });
     const reviews = await Promise.all(
-      rows[0].reviews.map(async (r) => {
+      rows[0].reviews.map(async (stored) => {
+        const r = { ...stored, thing: stored.thing && shown(stored.thing), chosen: stored.chosen && shown(stored.chosen), named: stored.named.map(shown) };
         if (r.outcome !== "near_typo" || r.decision) return { ...r, near: [] };
         // The text is stored normalized (logMiss, src/game/runs.ts), as withinTypo expects.
         const near = await db.query<{ near: Named[] }>("select private.audit_near($1, $2, $3) as near", [adminId, r.id, withinTypo(r.text)]);
-        return { ...r, near: near.rows[0].near };
+        return { ...r, near: near.rows[0].near.map(shown) };
       }),
     );
     return { reviews, open: rows[0].open };

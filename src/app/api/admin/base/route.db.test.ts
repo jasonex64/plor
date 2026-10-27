@@ -61,7 +61,8 @@ describe("GET /api/admin/base", () => {
     const r = await lookup(`  LEAFY ${RUN}! `);
     expect(r.status).toBe(200);
     expect(r.body.things).toHaveLength(1);
-    expect(r.body.things[0]).toMatchObject({ name: "Leaf Thing", categories: [KEY], facts: [{ trait: "kind_of", value: "test root", origin: "source" }] });
+    // Shown in lowercase, as every thing is (human, 2026-10-27; src/game/payload.ts, shownName).
+    expect(r.body.things[0]).toMatchObject({ name: "leaf thing", categories: [KEY], facts: [{ trait: "kind_of", value: "test root", origin: "source" }] });
   });
 
   it("finds nothing for an unknown name, and refuses nothing typed", async () => {

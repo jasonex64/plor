@@ -43,11 +43,16 @@ export function avoids(name: string, stolen: string[]): boolean {
 
 // Normalization of names and typed text (human-approved format, 2026-10-18; SOURCES.md: Unicode normalization).
 // Lowercase first: lowercasing can produce combining marks (e.g. U+0130), which NFKD + \p{M} then remove.
+// Latin letters NFKD leaves whole, folded to what a player types on a plain keyboard, so "lodz" is "Łódź" and the typo
+// rule needn't reach them (M13 13f-1, from 13a-2's review): the ones the base's names hold (2026-10-27).
+const FOLDED: Record<string, string> = { ł: "l", ı: "i", ß: "ss", đ: "d", ø: "o", æ: "ae", œ: "oe", þ: "th", ð: "d", ħ: "h" };
+
 export function normalize(text: string): string {
   return text
     .toLowerCase()
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
+    .replace(/[łıßđøæœþðħ]/g, (c) => FOLDED[c])
     // Format characters (\p{Cf}, e.g. a zero-width space pasted with a name) are dropped (ROADMAP Next revision, M13).
     .replace(/\p{Cf}/gu, "")
     .replace(/\p{P}/gu, "")

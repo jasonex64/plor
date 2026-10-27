@@ -1049,7 +1049,8 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   const { manifest, items: read } = readSnapshot(set);
   const name = (id: string) => loadedWikidata().names.get(mergePlan().into.get(id) ?? id);
   const named = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
-  const { items, aliases, dropped } = withoutListed(def.source, named, readListed());
+  const { listed, names } = readHandFiles();
+  const { items, aliases, dropped } = withoutListed(def.source, withAddedNames(def.source, withNormalizedAliases(named), names.add), listed, names.rename);
   const client = await localClient();
   try {
     await client.query("begin");
@@ -1065,40 +1066,107 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   }
 }
 
-// --- listed words: Plor's list and LDNOOBW's, dropped at load (13e-9b) ---
+// --- hand decisions on names: listed words dropped (data/listed.json, 13e-9b), names added and renamed
+// (data/names.json, 13f-1) ---
 
-// Every hand decision about listed words (docs/milestones/M13-13e-9b-the-word-list.md), and about insults found when a
-// category's members are read (13e-10: "quack" for a doctor), each item named as "source:id": items dropped whole; items whose LDNOOBW-listed names go while their real names stay (LDNOOBW's words
-// are in real titles and band names, so they're dropped only where a person named the item); and the new shown name
-// of an item whose name is listed (human, 2026-10-27: "You, in a hand file (Recommended)").
+const SOURCE_REF = /^(wikidata|oewn|usda):./;
+function checkRefs(file: string, refs: string[]): void {
+  const bad = refs.filter((ref) => !SOURCE_REF.test(ref));
+  if (bad.length) throw new Error(`${file}: ${bad.join(", ")} must be refs as "source:id"`);
+}
+// The rows of one source, keyed by the item's ID within it.
+const bySource = <R extends { ref: string }>(source: Source, rows: R[]) =>
+  rows.filter((r) => r.ref.startsWith(`${source}:`)).map((r) => ({ ...r, id: r.ref.slice(source.length + 1) }));
+
+// Every hand decision about listed words (docs/milestones/M13-13e-9b-the-word-list.md), and about insults found when
+// a category's members are read (13e-10: "quack" for a doctor), each item named as "source:id": items dropped whole,
+// and items whose LDNOOBW-listed names go while their real names stay (LDNOOBW's words are in real titles and band
+// names, so they're dropped only where a person named the item). A listed shown name's new name is in names.json.
 export const LISTED_FILE = "data/listed.json";
 export type Listed = {
   drop: { ref: string; why: string }[];
   drop_listed_names: { ref: string; why: string }[];
-  rename: { ref: string; name: string; why: string }[];
 };
-const LISTED_FIELDS: Record<keyof Listed, string[]> = { drop: ["ref", "why"], drop_listed_names: ["ref", "why"], rename: ["ref", "name", "why"] };
 
 export function parseListed(text: string): Listed {
-  const listed = parseLists<Listed>(LISTED_FILE, LISTED_FIELDS, { drop: ["ref"], drop_listed_names: ["ref"], rename: ["ref"] }, text);
-  const refs = [...listed.drop, ...listed.drop_listed_names, ...listed.rename].map((r) => r.ref);
-  const bad = refs.filter((ref) => !/^(wikidata|oewn|usda):./.test(ref));
-  if (bad.length) throw new Error(`${LISTED_FILE}: ${bad.join(", ")} must be refs as "source:id"`);
+  const listed = parseLists<Listed>(LISTED_FILE, { drop: ["ref", "why"], drop_listed_names: ["ref", "why"] }, { drop: ["ref"], drop_listed_names: ["ref"] }, text);
+  checkRefs(LISTED_FILE, [...listed.drop, ...listed.drop_listed_names].map((r) => r.ref));
   const dropped = new Set(listed.drop.map((r) => r.ref));
-  const both = [...listed.drop_listed_names, ...listed.rename].filter((r) => dropped.has(r.ref)).map((r) => r.ref);
+  const both = listed.drop_listed_names.filter((r) => dropped.has(r.ref)).map((r) => r.ref);
   if (both.length) throw new Error(`${LISTED_FILE}: ${both.join(", ")} both dropped and kept`);
   return listed;
 }
 
-// One set's items without the listed words: every alias holding a word on Plor's list goes, from every item; the
-// drop_listed_names items also lose their LDNOOBW-listed names; drop items go, and so does an item left with no names.
-// An item whose shown name went needs a rename to one of its names left, or a drop, or the load stops, naming its ID
-// and the names left, never the word (human, 2026-10-27: "Rename it (Recommended)").
-export function withoutListed(source: Source, items: Item[], listed: Listed): { items: Item[]; aliases: number; dropped: number } {
-  const mine = (rows: { ref: string }[]) => rows.filter((r) => r.ref.startsWith(`${source}:`)).map((r) => r.ref.slice(source.length + 1));
-  const drop = new Set(mine(listed.drop));
-  const names = new Set(mine(listed.drop_listed_names));
-  const rename = new Map(listed.rename.filter((r) => r.ref.startsWith(`${source}:`)).map((r) => [r.ref.slice(source.length + 1), r.name]));
+// Every hand decision on an item's names (docs/milestones/M13-13f-1-player-scoring.md; human, 2026-10-27: "A hand file
+// of names (Recommended)", "One names file (Recommended)"): a name the sources lack, added to the item its prompt means
+// ("china" for the People's Republic, which the facts check would never let players' misses add, as "china" names
+// porcelain); and the shown name an item takes instead of its source's, one of its names: for a listed shown name
+// (13e-9b: "Rename it (Recommended)") or WordNet's first word ("cornet" for the trumpet: "Rename by hand (Recommended)").
+export const NAMES_FILE = "data/names.json";
+export type Names = {
+  add: { ref: string; name: string; why: string }[];
+  rename: { ref: string; name: string; why: string }[];
+};
+
+export function parseNames(text: string): Names {
+  const names = parseLists<Names>(NAMES_FILE, { add: ["ref", "name", "why"], rename: ["ref", "name", "why"] }, { add: ["ref", "name"], rename: ["ref"] }, text);
+  checkRefs(NAMES_FILE, [...names.add, ...names.rename].map((r) => r.ref));
+  return names;
+}
+
+// The two hand files together (13f-1 review): no line may decide nothing. A name added or renamed on an item
+// listed.json drops; an added name on LDNOOBW's or Plor's list, which the load would drop again; and two added names
+// that normalize alike ("China" and "china") are each refused.
+export function checkHandFiles(listed: Listed, names: Names): void {
+  const dropped = new Set(listed.drop.map((r) => r.ref));
+  const onDropped = [...names.add, ...names.rename].filter((r) => dropped.has(r.ref)).map((r) => r.ref);
+  if (onDropped.length) throw new Error(`${NAMES_FILE}: ${[...new Set(onDropped)].join(", ")} dropped by ${LISTED_FILE}`);
+  const listedAdds = names.add.filter((r) => isListed(normalize(r.name))).map((r) => r.ref);
+  if (listedAdds.length) throw new Error(`${NAMES_FILE} add ${listedAdds.join(", ")}: the name is listed`);
+  const keys = names.add.map((r) => `${r.ref} ${normalize(r.name)}`);
+  const twice = keys.filter((k, i) => keys.indexOf(k) !== i);
+  if (twice.length) throw new Error(`${NAMES_FILE} add: ${[...new Set(twice)].join(", ")} added twice`);
+}
+
+// One set's items with every name normalized as today's normalize writes it: snapshots hold the names normalized when
+// they were fetched, so a change to normalize (13f-1 folds ł, ß, ø and the like) reaches them only here. Two names that
+// now normalize alike become one, a name over a synonym or plural, as a category's members need a name.
+export function withNormalizedAliases(items: Item[]): Item[] {
+  const rank: Record<Alias["kind"], number> = { name: 0, synonym: 1, scientific: 2, plural: 3 };
+  return items.map((item) => {
+    const by = new Map<string, Alias>();
+    for (const a of item.aliases) {
+      const alias = normalize(a.alias);
+      const had = by.get(alias);
+      if (alias && (!had || rank[a.kind] < rank[had.kind])) by.set(alias, { alias, kind: a.kind });
+    }
+    const aliases = [...by.values()];
+    return aliases.length === item.aliases.length && aliases.every((a, i) => a.alias === item.aliases[i].alias && a.kind === item.aliases[i].kind) ? item : { ...item, aliases };
+  });
+}
+
+// One set's items with the names added for them; an item that already has the name is refused, so the file never
+// carries a line that does nothing.
+export function withAddedNames(source: Source, items: Item[], add: Names["add"]): Item[] {
+  const rows = new Map<string, string[]>();
+  for (const r of bySource(source, add)) rows.set(r.id, [...(rows.get(r.id) ?? []), normalize(r.name)]);
+  return items.map((item) => {
+    const added = rows.get(item.id);
+    if (!added) return item;
+    const have = added.find((n) => item.aliases.some((a) => a.alias === n));
+    if (have) throw new Error(`${NAMES_FILE} add ${source}:${item.id}: it already has "${have}"`);
+    return { ...item, aliases: [...item.aliases, ...added.map((alias) => ({ alias, kind: "synonym" as const }))] };
+  });
+}
+
+// One set's items without the listed words, then renamed: every alias holding a word on Plor's list goes, from every
+// item; the drop_listed_names items also lose their LDNOOBW-listed names; drop items go, and so does an item left with
+// no names. A rename makes one of the item's names left its shown name; an item whose shown name went needs one, or a
+// drop, or the load stops, naming its ID and the names left, never the word.
+export function withoutListed(source: Source, items: Item[], listed: Listed, renames: Names["rename"]): { items: Item[]; aliases: number; dropped: number } {
+  const drop = new Set(bySource(source, listed.drop).map((r) => r.id));
+  const names = new Set(bySource(source, listed.drop_listed_names).map((r) => r.id));
+  const rename = new Map(bySource(source, renames).map((r) => [r.id, r.name]));
   const kept: Item[] = [];
   let aliases = 0;
   for (const item of items) {
@@ -1110,13 +1178,13 @@ export function withoutListed(source: Source, items: Item[], listed: Listed): { 
     if (!left.length && item.aliases.length) continue;
     const to = rename.get(item.id);
     const ref = `${source}:${item.id}`;
-    if (!gone(item.name)) {
-      if (to !== undefined) throw new Error(`${LISTED_FILE} rename ${ref}: its shown name isn't listed`);
+    if (to === undefined) {
+      if (gone(item.name)) throw new Error(`${ref}: its shown name is listed; ${NAMES_FILE} needs a rename or ${LISTED_FILE} a drop (names left: ${left.map((a) => a.alias).join(", ")})`);
       kept.push(left.length === item.aliases.length ? item : { ...item, aliases: left });
       continue;
     }
-    if (to === undefined) throw new Error(`${ref}: its shown name is listed; ${LISTED_FILE} needs a rename or a drop (names left: ${left.map((a) => a.alias).join(", ")})`);
-    if (!left.some((a) => a.alias === normalize(to))) throw new Error(`${LISTED_FILE} rename ${ref}: "${to}" isn't one of its names left`);
+    if (to === item.name) throw new Error(`${NAMES_FILE} rename ${ref}: it already shows "${to}"`);
+    if (!left.some((a) => a.alias === normalize(to))) throw new Error(`${NAMES_FILE} rename ${ref}: "${to}" isn't one of its names left`);
     // The new shown name becomes a name, not a synonym: a category's members need one (private.category_members).
     kept.push({ ...item, name: to, aliases: left.map((a) => (a.alias === normalize(to) ? { ...a, kind: "name" } : a)) });
   }
@@ -1130,20 +1198,28 @@ export function withoutListed(source: Source, items: Item[], listed: Listed): { 
   return { items: kept, aliases, dropped: items.length - kept.length };
 }
 
-// The hand file, read and checked once: a rename or a drop_listed_names row must name a loaded item, or it decides
+// The refs every loaded set holds, read once for the hand files' checks.
+let loadedRefsOnce: Set<string> | undefined;
+const loadedRefs = () =>
+  (loadedRefsOnce ??= new Set(Object.entries(SETS).flatMap(([set, def]) => readSnapshot(set).items.map((i) => `${def.source}:${i.id}`))));
+
+// The hand files, read and checked once: a drop_listed_names, add or rename row must name a loaded item, or it decides
 // nothing; a drop may name one today's snapshots don't hold (an item dropped at fetch before 13e-9b), printed (human,
 // 2026-10-27: "Strict, except drops (Recommended)").
-let listedFile: Listed | undefined;
-function readListed(): Listed {
-  if (listedFile) return listedFile;
+let handFiles: { listed: Listed; names: Names } | undefined;
+function readHandFiles(): { listed: Listed; names: Names } {
+  if (handFiles) return handFiles;
   const listed = parseListed(readFileSync(LISTED_FILE, "utf8"));
-  const loadedRefs = new Set(Object.entries(SETS).flatMap(([set, def]) => readSnapshot(set).items.map((i) => `${def.source}:${i.id}`)));
-  const missing = [...listed.drop_listed_names, ...listed.rename].map((r) => r.ref).filter((ref) => !loadedRefs.has(ref));
-  if (missing.length) throw new Error(`${LISTED_FILE}: ${missing.join(", ")} isn't in any loaded set`);
-  const absent = listed.drop.map((r) => r.ref).filter((ref) => !loadedRefs.has(ref));
+  const names = parseNames(readFileSync(NAMES_FILE, "utf8"));
+  checkHandFiles(listed, names);
+  for (const [file, rows] of [[LISTED_FILE, listed.drop_listed_names], [NAMES_FILE, [...names.add, ...names.rename]]] as const) {
+    const missing = rows.map((r) => r.ref).filter((ref) => !loadedRefs().has(ref));
+    if (missing.length) throw new Error(`${file}: ${missing.join(", ")} isn't in any loaded set`);
+  }
+  const absent = listed.drop.map((r) => r.ref).filter((ref) => !loadedRefs().has(ref));
   if (absent.length) console.log(`${LISTED_FILE}: ${absent.length} drop not in today's snapshots: ${absent.join(", ")}`);
-  listedFile = listed;
-  return listed;
+  handFiles = { listed, names };
+  return handFiles;
 }
 
 // --- sameness: Wikidata's own doubles and the human's decisions (13e-5b) ---
@@ -1477,7 +1553,7 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
   if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
   const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
   const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
-    join private.fact f on f.thing_id = m and f.trait = 'kind_of' group by t.name having count(*) > 1 order by parents desc, t.name`);
+    join private.fact f on f.thing_id = m and f.trait = 'kind_of' and f.removed_at is null group by t.name having count(*) > 1 order by parents desc, t.name`);
   const aliases = await one(`select t.name, a.alias from private.category_members($1) m join private.thing t on t.id = m
     join private.thing_alias a on a.thing_id = m and a.removed_at is null`);
   const listedBy = new Map<string, string[]>();

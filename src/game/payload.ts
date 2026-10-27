@@ -14,12 +14,17 @@ export function publicQuestion(puzzle: ApprovedPuzzle, index: number): PublicQue
   return { index, prompt: puzzle.questions[index].prompt, stolen: stolenLetters(puzzle, index) };
 }
 
-// The main names of these things, from the answer database (private.thing_names).
+// A thing's name as every screen shows it: in lowercase, whatever the source's capitals (human, 2026-10-27: "every
+// single thing should be displayed as al lowercase but how u store it is up to u"). The game's names come through
+// thingNames; the admin pages' own readers (src/admin/base.ts, src/admin/audit.ts) use it too.
+export const shownName = (name: string): string => name.toLowerCase();
+
+// The main names of these things, from the answer database (private.thing_names), as shown.
 export async function thingNames(db: Db, ids: string[]): Promise<Names> {
   const unique = [...new Set(ids)];
   if (unique.length === 0) return new Map();
   const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing_names($1::uuid[])", [unique]);
-  return new Map(rows.map((r) => [r.id, r.name]));
+  return new Map(rows.map((r) => [r.id, shownName(r.name)]));
 }
 
 export function hostAnswers(question: Question, names: Names): Named[] {
