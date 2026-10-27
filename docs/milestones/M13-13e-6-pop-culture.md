@@ -1,6 +1,6 @@
 # M13 13e-6 — Pop culture
 
-**Status:** in review (2026-10-27): built and reviewed on the Windows PC, the review's lists decided in chat, in one PR. Before: the pop-culture answers recorded in 13e-4 (2026-10-26) and three rounds of guided questions (below); **approved** (human, 2026-10-27: "Approve 13e-6's design, its SOURCES.md rows and the genre and publisher facts. Build it."); the SOURCES.md row added ("Wikidata pop culture (M13 13e-6)"); the combined board-and-card root read: Q3244175 tabletop game, the parent of both.
+**Status:** in review (2026-10-27): built and reviewed on the Windows PC, the review's lists decided in chat, in PR #102. Before: the pop-culture answers recorded in 13e-4 (2026-10-26) and three rounds of guided questions (below); **approved** (human, 2026-10-27: "Approve 13e-6's design, its SOURCES.md rows and the genre and publisher facts. Build it."); the SOURCES.md row added ("Wikidata pop culture (M13 13e-6)"); the combined board-and-card root read: Q3244175 tabletop game, the parent of both.
 
 ## Goal
 Five Wikidata sets of pop culture (video games, board and card games, animated films and anime, pop and K-pop groups, superheroes) with their categories, genre subsets and bank questions, loaded and reviewed like the sets before them.
