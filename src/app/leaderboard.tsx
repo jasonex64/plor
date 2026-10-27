@@ -9,6 +9,7 @@ import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { Avatar } from "./avatar";
 import styles from "./leaderboard.module.css";
+import { dayText } from "./day-text";
 import { errorText } from "./messages";
 
 // title names the board (its heading and region); path is the API route that returns it.
@@ -26,8 +27,8 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
       <p>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
       {board && (
         <>
-          <Standings title={`This week, from ${dayLabel(board.thisWeek.from)}`} label="This week" week={board.thisWeek} />
-          <Standings title={`Last week, from ${dayLabel(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
+          <Standings title={`This week, from ${dayText(board.thisWeek.from)}`} label="This week" week={board.thisWeek} />
+          <Standings title={`Last week, from ${dayText(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
         </>
       )}
       {!board && !error && <p>Loading…</p>}
@@ -103,8 +104,8 @@ export function LeaderboardCard() {
       </label>
       <section aria-label={label}>
         <p className={styles.date}>
-          {day && `${dayLabel(day.date)} · Offbeat`}
-          {week && `From ${dayLabel(week.from)} · Offbeat`}
+          {day && `${dayText(day.date)} · Offbeat`}
+          {week && `From ${dayText(week.from)} · Offbeat`}
         </p>
         {day && <Entries entries={day.entries} />}
         {week && <Entries entries={week.entries} />}
@@ -114,12 +115,6 @@ export function LeaderboardCard() {
       {error && <p role="alert">{error}</p>}
     </section>
   );
-}
-
-// "Fri 23 Oct" (L25: Yesterday is dated), and a week's Monday the same way (docs/milestones/M14-14b-2c-review-items.md,
-// item 15). A calendar date, read in UTC so it can't shift by a day.
-function dayLabel(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 }
 
 function Standings({ title, label, week }: { title: string; label: string; week: Week }) {

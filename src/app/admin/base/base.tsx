@@ -34,7 +34,7 @@ export function AnswerBase() {
     <>
       <form onSubmit={search} className={admin.search}>
         <label className={admin.field}>
-          <span className={admin.sr}>Name or alias</span>
+          <span className="sr-only">Name or alias</span>
           <input value={query} placeholder="Name or alias" onChange={(e) => setQuery(e.target.value)} />
         </label>
         <button type="submit" className={admin.primary} disabled={busy || query.trim() === ""}>
@@ -56,7 +56,7 @@ export function AnswerBase() {
             <dd>{t.sources.map((s) => `${s.source} ${s.id}`).join("; ")}</dd>
           </dl>
           <table className={admin.table} role="table">
-            <thead role="rowgroup">
+            <thead role="rowgroup" className="sr-only-on-phones">
               <tr role="row">
                 <th role="columnheader">Name</th>
                 <th role="columnheader">Kind</th>

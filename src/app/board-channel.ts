@@ -31,8 +31,8 @@ export type StatusMessage = {
 export type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string; groupId?: string };
 
 // Whether a nudge means this list should be fetched again: a group's thread (its ID) for that group's nudges, or the
-// home page's feed for the friends thread's and every group's (docs/milestones/M11-home-screen.md, 11b). An unknown
-// payload version reloads both (M00 data design §2).
+// friends feed (Today's, or a page's right column) for the friends thread's and every group's
+// (docs/milestones/M11-home-screen.md, 11b). An unknown payload version reloads both (M00 data design §2).
 export function changesThread(message: ChangedMessage, thread: "feed" | { group: string }): boolean {
   if (message.v !== PAYLOAD_VERSION) return true;
   return message.type === "comments_changed" && (thread === "feed" || message.groupId === thread.group);

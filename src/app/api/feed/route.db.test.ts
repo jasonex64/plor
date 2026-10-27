@@ -1,4 +1,4 @@
-// The home page's feed against the local stack (run with `npm run test:db`; docs/milestones/M11-home-screen.md, 11b;
+// Today's feed against the local stack (run with `npm run test:db`; docs/milestones/M11-home-screen.md, 11b;
 // H2, H3). Real players sign in, play today's puzzle and post through the route handlers. V is the viewer; F is V's
 // friend; G is in V's group Club but isn't V's friend; O is in Club too, and in Other, which V isn't in.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -70,7 +70,7 @@ afterAll(async () => {
   await getPool().end();
 });
 
-describe("the home page's feed", () => {
+describe("today's feed", () => {
   // Signing in polls the local inbox with expect.poll, which only runs inside a test.
   it("signs in four players; F posts in the friends thread, G in Club, O in Other and the friends thread; O reacts in Club", async () => {
     for (const p of [V, F, G, O]) {

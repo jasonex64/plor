@@ -11,7 +11,7 @@ import type { DayInsights, QuestionInsights } from "@/insights/report";
 import { api } from "@/lib/api-client";
 import { errorText } from "../messages";
 import admin from "./admin.module.css";
-import { dayText } from "./day-text";
+import { dayText } from "../day-text";
 import styles from "./insights.module.css";
 
 type InsightsResponse = { days: string[]; report: DayInsights };
@@ -53,7 +53,7 @@ export function Insights() {
           ‹
         </button>
         <label className={styles.day}>
-          <span className={admin.sr}>Day</span>
+          <span className="sr-only">Day</span>
           <select value={report.date} onChange={(e) => setDate(e.target.value)}>
             {days.map((d) => (
               <option key={d} value={d}>
@@ -78,7 +78,7 @@ export function Insights() {
       </section>
       <section aria-label="Questions" className={admin.card}>
         <table className={admin.table} role="table">
-          <thead role="rowgroup">
+          <thead role="rowgroup" className="sr-only-on-phones">
             <tr role="row">
               <th role="columnheader">Q</th>
               <th role="columnheader">Question</th>
@@ -183,7 +183,7 @@ function Row({ q }: { q: QuestionInsights }) {
         <td role="cell" data-label="Not in list">
           {q.misses.length > 0 ? (
             <button type="button" className={admin.button} aria-expanded={open} onClick={() => setOpen(!open)}>
-              {q.misses.length} <span className={admin.sr}>not in the list</span>
+              {q.misses.length} <span className="sr-only">not in the list</span>
               <span aria-hidden="true">{open ? " ▴" : " ▾"}</span>
             </button>
           ) : (

@@ -31,15 +31,6 @@
   color: var(--muted);
 }
 
-.sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
 /* The sub-tabs: two groups split by a line, no labels. */
 .tabs {
   display: flex;
@@ -370,8 +361,8 @@
 
 /* On phones a table's rows stack, each a block with its cells one under another (round 10's phone cards). The tables
    keep explicit table roles (WAI-ARIA 1.2), which some engines drop under display: block, and the header row stays for
-   screen readers, hidden on screen; each cell shows its column's name instead, kept out of the accessibility tree so
-   it isn't read twice (human, 2026-10-26: "Label each stacked cell (Recommended)";
+   screen readers, hidden on screen (.sr-only-on-phones, globals.css); each cell shows its column's name instead, kept
+   out of the accessibility tree so it isn't read twice (human, 2026-10-26: "Label each stacked cell (Recommended)";
    docs/milestones/M14-14b-2c-review-items.md, answer 17). */
 @media (max-width: 767px) {
   .table,
@@ -379,15 +370,6 @@
   .table tr,
   .table td {
     display: block;
-  }
-
-  .table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   .table td[data-label]::before {

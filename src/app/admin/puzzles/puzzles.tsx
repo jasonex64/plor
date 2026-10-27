@@ -11,7 +11,7 @@ import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
 import { errorText } from "../../messages";
-import { dayText } from "../day-text";
+import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
 import styles from "./puzzles.module.css";
 
@@ -117,7 +117,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
       <div className={styles.dayHead}>
         <div>
           <h3 className={admin.cardTitle}>
-            {dayText(day.date)} <span className={admin.sr}>({label})</span>
+            {dayText(day.date)} <span className="sr-only">({label})</span>
           </h3>
           <p className={admin.note}>
             {editable ? `${state} Tick the host answers (the Wind's) you want. Dashed ones have a letter the Wind has stolen, so players can't type them.` : state}
@@ -145,7 +145,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
         </ul>
       )}
       <table className={admin.table} role="table">
-        <thead role="rowgroup">
+        <thead role="rowgroup" className="sr-only-on-phones">
           <tr role="row">
             <th role="columnheader">#</th>
             <th role="columnheader">Question</th>
@@ -206,7 +206,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
   const more = order.length - visible.length;
   return (
     <fieldset className={styles.chips}>
-      <legend className={admin.sr}>Host answers for {q.prompt}</legend>
+      <legend className="sr-only">Host answers for {q.prompt}</legend>
       {visible.map((a) => {
         const on = chosen.includes(a.id);
         // Players can't type it, so it can't be ticked, only unticked if it was ticked before. It stays a checkbox
@@ -216,7 +216,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
             <label key={a.id} className={on ? `${styles.chip} ${styles.bad}` : `${styles.chip} ${styles.blocked}`}>
               <input
                 type="checkbox"
-                className={admin.sr}
+                className="sr-only"
                 aria-label={`${a.name}, has ${a.stolen.toUpperCase()}: players can't type it`}
                 aria-disabled={!on}
                 checked={on}
@@ -230,7 +230,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         }
         return (
           <label key={a.id} className={on ? `${styles.chip} ${styles.checked}` : styles.chip}>
-            <input type="checkbox" className={admin.sr} checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
+            <input type="checkbox" className="sr-only" checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
             {on && (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="m5 12.5 4.5 4.5L19 7.5" />

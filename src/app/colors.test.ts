@@ -1,7 +1,7 @@
 // Every colour pairing the screens use passes WCAG 2.2 in Paper and Night (docs/milestones/M14-14a-1-shell.md,
 // criterion 7): text at 4.5:1 (1.4.3) and control outlines at 3:1 (1.4.11); the calendar's shades at 3:1 on the card,
-// with their numbers at 4.5:1, and the danger colour (docs/milestones/M14-14a-3b-settings.md, criteria 6 and 9). The slots are read from globals.css, so a
-// changed colour is checked where it's defined.
+// with their numbers at 4.5:1, and the danger colour (docs/milestones/M14-14a-3b-settings.md, criteria 6 and 9). The
+// slots are read from globals.css, so a changed colour is checked where it's defined.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 

@@ -213,6 +213,22 @@ test("every tab shows the focus ring from the keyboard", async ({ browser }) => 
     }
     expect(seen.map((f) => f.text)).toEqual(expected);
     for (const f of seen) expect(f.ring).toEqual(["3px", "solid", accent, "3px"]);
+    // On phones the gear is in the top bar, not the navigation: tabbed to, it shows the ring too (14b-2c-4, item 30).
+    if (!wide) {
+      const gearRing = () =>
+        page.evaluate(() => {
+          const el = document.activeElement;
+          if (!el?.matches("header button[aria-label='Settings']")) return null;
+          const style = getComputedStyle(el);
+          return [style.outlineWidth, style.outlineStyle, style.outlineColor, style.outlineOffset];
+        });
+      let ring: string[] | null = null;
+      for (let i = 0; i < 80 && !ring; i++) {
+        await page.keyboard.press("Tab");
+        ring = await gearRing();
+      }
+      expect(ring).toEqual(["3px", "solid", accent, "3px"]);
+    }
   }
 });
 
@@ -251,4 +267,42 @@ test("the sidebar is 280px, the right column holds the feed from 1200px, and no 
   await nav.getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("region", { name: "All games" })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "Friends feed" })).toHaveCount(0);
+});
+
+// No control drawn as a text link beyond the four tabs either (14b-2c-4, item 48): the settings sheet, the clock bar,
+// How to play, /streak and a group's page. A link drawn as text stays only inside the About and privacy pages' prose.
+test("the settings sheet, the clock bar, How to play, /streak and a group's page have no text-link controls", async ({ browser }) => {
+  const { page, nav } = await player(browser, "su2", { width: 1440, height: 900 });
+  const underlined = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll("a")]
+        .filter((a) => a.checkVisibility() && getComputedStyle(a).textDecorationLine.includes("underline"))
+        .map((a) => a.textContent),
+    );
+  await nav.getByRole("button", { name: "Settings" }).click();
+  await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+  expect(await underlined(), "the settings sheet").toEqual([]);
+  await page.keyboard.press("Escape");
+
+  for (const path of ["/offbeat/how-to-play", "/streak"]) {
+    await page.goto(path);
+    await expect(nav).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    expect(await underlined(), path).toEqual([]);
+  }
+
+  await page.goto("/groups");
+  const groups = page.getByRole("region", { name: "Groups" });
+  await groups.getByLabel("New group's name").fill("Links");
+  await groups.getByRole("button", { name: "Create group" }).click();
+  await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole("heading", { name: "Links" })).toBeVisible();
+  expect(await underlined(), "a group's page").toEqual([]);
+
+  await page.goto("/");
+  await play(page);
+  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await nav.getByRole("link", { name: "Friends" }).click();
+  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
+  expect(await underlined(), "the clock bar").toEqual([]);
 });

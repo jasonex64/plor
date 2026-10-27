@@ -75,8 +75,9 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
 
 // The player's answers that survived (a caught one is the Wind's, not theirs: human, 2026-10-25, "Leave caught out
 // (Recommended)"; docs/milestones/M14-14a-3b-settings.md), given before their day's midnight on closed days, by their
-// share of that question's answers then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a share here is the one the result
-// showed once the day was over. Only questions at least ANSWER_SHARE_MIN_PLAYERS answered have a share.
+// share of that question's answers then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a
+// share here is the one the result showed once the day was over. Only questions at least ANSWER_SHARE_MIN_PLAYERS
+// answered have a share.
 async function rarestAnswers(db: Db, userId: string, day: string): Promise<Me["rarest"]> {
   const { rows: events } = await db.query<{ date: string; question_idx: number; entry_id: string }>(
     `select puzzle_date::text as date, question_idx, entry_id from private.run_event

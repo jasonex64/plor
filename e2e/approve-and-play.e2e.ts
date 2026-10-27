@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
-import { dayText } from "../src/app/admin/day-text";
+import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -54,7 +54,7 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-aa@example.test`]);
   await admin.goto("/admin/puzzles");
-  // The day as the admin pages write it, "Wed 28 Oct" (src/app/admin/day-text.ts): chosen from the row of days, then
+  // The day as the admin pages write it, "Wed 28 Oct" (src/app/day-text.ts): chosen from the row of days, then
   // approved from its own section (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4).
   const name = dayText(ahead);
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
