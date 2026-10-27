@@ -29,6 +29,28 @@
       "ref": "oewn:06254682-n",
       "name": "Baha'i",
       "why": "Bahaism as its followers and players name it (13f-1, from 13e-3's review)"
+    },
+    {
+      "ref": "oewn:04387433-n",
+      "name": "knife",
+      "why": "the table knife as players name it beside spoon and fork, now that cutlery is a kitchen utensil (13f-2 review; human, 2026-10-27: \"Link cutlery (Recommended)\": \"Spoon, fork and knife answer\")"
+    }
+  ],
+  "remove": [
+    {
+      "ref": "oewn:10579268-n",
+      "name": "mistress",
+      "why": "schoolmarm's bare \"mistress\" as a kind of teacher; other things rightly bear the word, so it's removed here, not listed (13f-2; human, 2026-10-27: \"mistress\" (schoolmarm))"
+    },
+    {
+      "ref": "wikidata:Q1272",
+      "name": "ununnilium",
+      "why": "the placeholder name of element 110, darmstadtium; Wikidata also gives it to roentgenium, element 111 (13f-2; human, 2026-10-27: \"Keep it on element 110 only (Recommended)\")"
+    },
+    {
+      "ref": "wikidata:Q538",
+      "name": "oceania",
+      "why": "Insular Oceania answered to \"oceania\" beside Oceania, the continent (13f-2; human, 2026-10-27: \"Two \\\"Oceania\\\"s (Recommended)\")"
     }
   ],
   "rename": [

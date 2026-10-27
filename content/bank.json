@@ -5162,6 +5162,121 @@
       ],
       "themes": [],
       "added_by": "claude"
+    },
+    {
+      "id": "name-a-toy",
+      "prompt": "Name a toy",
+      "category": "toy",
+      "host_bank": [
+        "doll",
+        "kite",
+        "yo-yo",
+        "teddy",
+        "Frisbee",
+        "Lego"
+      ],
+      "uncommon": [
+        "jack-in-the-box",
+        "pogo stick",
+        "slingshot",
+        "kaleidoscope",
+        "hula-hoop",
+        "pinwheel"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-cosmetic",
+      "prompt": "Name a cosmetic",
+      "category": "cosmetic",
+      "host_bank": [
+        "lipstick",
+        "mascara",
+        "eyeliner",
+        "nail polish",
+        "eyeshadow",
+        "rouge"
+      ],
+      "uncommon": [
+        "kohl",
+        "lip-gloss",
+        "face powder",
+        "greasepaint",
+        "bronzing powder",
+        "depilatory"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-berry",
+      "prompt": "Name a berry",
+      "category": "berry",
+      "host_bank": [
+        "strawberry",
+        "blueberry",
+        "raspberry",
+        "blackberry",
+        "cranberry",
+        "gooseberry"
+      ],
+      "uncommon": [
+        "huckleberry",
+        "lingonberry",
+        "loganberry",
+        "boysenberry",
+        "mulberry",
+        "dewberry"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-nut",
+      "prompt": "Name a nut",
+      "category": "nut",
+      "host_bank": [
+        "almond",
+        "walnut",
+        "peanut",
+        "cashew",
+        "pecan",
+        "pistachio"
+      ],
+      "uncommon": [
+        "hazelnut",
+        "macadamia nut",
+        "brazil nut",
+        "chestnut",
+        "pine nut",
+        "beechnut"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-internal-organ",
+      "prompt": "Name an internal organ",
+      "category": "internal_organ",
+      "host_bank": [
+        "heart",
+        "liver",
+        "lung",
+        "kidney",
+        "stomach",
+        "brain"
+      ],
+      "uncommon": [
+        "pancreas",
+        "spleen",
+        "gallbladder",
+        "appendix",
+        "duodenum",
+        "small intestine"
+      ],
+      "themes": [],
+      "added_by": "claude"
     }
   ],
   "themes": {}

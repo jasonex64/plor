@@ -35,6 +35,51 @@
     {
       "ref": "oewn:01856511-n",
       "why": "WordNet's long-tailed duck, shown as \"old squaw\", a slur now on Plor's list; it's in two sets with different shown names (joined to Wikidata's Long-tailed Duck in oewn-animals, \"old squaw\" in oewn-nouns), so one rename can't fit both; the bird stays as Wikidata's Long-tailed Duck (13e-11 review; human, 2026-10-27: \"Just the two phrases (Recommended)\")"
+    },
+    {
+      "ref": "oewn:03203184-n",
+      "why": "\"dildo\", a sex toy under toy, whose parent \"sex toy\" is now on Plor's list (13f-2; human, 2026-10-27: \"no sex toys and racist caricatures\")"
+    },
+    {
+      "ref": "oewn:92450755-n",
+      "why": "\"cock ring\", a sex toy under toy, whose parent \"sex toy\" is now on Plor's list (13f-2; human, 2026-10-27: \"no sex toys and racist caricatures\")"
+    },
+    {
+      "ref": "oewn:92450758-n",
+      "why": "\"goat eye\", a sex toy under toy, whose parent \"sex toy\" is now on Plor's list (13f-2; human, 2026-10-27: \"no sex toys and racist caricatures\")"
+    },
+    {
+      "ref": "oewn:92450753-n",
+      "why": "\"sex toy\" (also \"adult toy\", both on Plor's list), the parent of the toys dropped above (13f-2; human, 2026-10-27: \"no sex toys and racist caricatures\")"
+    },
+    {
+      "ref": "wikidata:Q856841",
+      "why": "Manhattan (its second item): counted as a US city, but a borough item or a city in a US territory, and in no set but wikidata-us-cities, so dropped whole (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
+    },
+    {
+      "ref": "wikidata:Q51678",
+      "why": "Pago Pago: counted as a US city, but a borough item or a city in a US territory, and in no set but wikidata-us-cities, so dropped whole (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
+    },
+    {
+      "ref": "wikidata:Q51681",
+      "why": "Charlotte Amalie: counted as a US city, but a borough item or a city in a US territory, and in no set but wikidata-us-cities, so dropped whole (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
+    }
+  ],
+  "drop_from_set": [
+    {
+      "ref": "wikidata:Q11299",
+      "set": "wikidata-us-cities",
+      "why": "Manhattan: counted as a US city of 1,000,000+ or a US city, but a borough of New York City or a city in a US territory; still a place in wikidata-places (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
+    },
+    {
+      "ref": "wikidata:Q18424",
+      "set": "wikidata-us-cities",
+      "why": "Queens: counted as a US city of 1,000,000+ or a US city, but a borough of New York City or a city in a US territory; still a place in wikidata-places (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
+    },
+    {
+      "ref": "wikidata:Q18426",
+      "set": "wikidata-us-cities",
+      "why": "The Bronx: counted as a US city of 1,000,000+ or a US city, but a borough of New York City or a city in a US territory; still a place in wikidata-places (13f-2; human, 2026-10-27: \"Boroughs as cities (Recommended)\")"
     }
   ],
   "drop_listed_names": [
