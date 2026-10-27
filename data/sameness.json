@@ -778,6 +778,16 @@
       "category": "rhythm_game",
       "name": "rhythm heaven",
       "why": "Rhythm Heaven and the Japanese Rhythm Tengoku, two games (human, 2026-10-27: \"Mark all reviewed (Recommended)\")"
+    },
+    {
+      "category": "room",
+      "name": "bathroom",
+      "why": "WordNet senses: the room with a bath and the room with a toilet (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
+    },
+    {
+      "category": "room",
+      "name": "closet",
+      "why": "WordNet senses: a closet and the water closet (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
     }
   ],
   "wordnet_split": [

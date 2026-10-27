@@ -2256,6 +2256,627 @@
       ],
       "themes": [],
       "added_by": "claude"
+    },
+    {
+      "id": "name-a-room",
+      "prompt": "Name a room",
+      "category": "room",
+      "host_bank": [
+        "kitchen",
+        "bedroom",
+        "#a584de3f-db44-5431-a076-f4d0ccceda25",
+        "living room",
+        "dining room",
+        "pantry"
+      ],
+      "uncommon": [
+        "darkroom",
+        "study",
+        "#dc0e8527-952c-573f-bb71-dcd8354d6965",
+        "nursery",
+        "ballroom",
+        "boardroom"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-building",
+      "prompt": "Name a type of building",
+      "category": "building",
+      "host_bank": [
+        "mansion",
+        "school",
+        "hospital",
+        "church",
+        "hotel",
+        "library"
+      ],
+      "uncommon": [
+        "barn",
+        "mosque",
+        "castle",
+        "skyscraper",
+        "cabin",
+        "cinema"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-meat",
+      "prompt": "Name a meat",
+      "category": "meat",
+      "host_bank": [
+        "beef",
+        "pork",
+        "chicken",
+        "lamb",
+        "turkey",
+        "bacon"
+      ],
+      "uncommon": [
+        "venison",
+        "veal",
+        "goose",
+        "duck",
+        "rabbit",
+        "quail"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-herb",
+      "prompt": "Name a herb",
+      "category": "herb",
+      "host_bank": [
+        "basil",
+        "mint",
+        "parsley",
+        "rosemary",
+        "thyme",
+        "dill"
+      ],
+      "uncommon": [
+        "sage",
+        "chives",
+        "coriander",
+        "tarragon",
+        "bay leaf",
+        "marjoram"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-berry",
+      "prompt": "Name a berry",
+      "category": "berry",
+      "host_bank": [
+        "strawberry",
+        "blueberry",
+        "raspberry",
+        "blackberry",
+        "cranberry",
+        "gooseberry"
+      ],
+      "uncommon": [
+        "mulberry",
+        "boysenberry",
+        "huckleberry",
+        "lingonberry",
+        "loganberry",
+        "bilberry"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-nut",
+      "prompt": "Name a nut",
+      "category": "nut",
+      "host_bank": [
+        "peanut",
+        "almond",
+        "walnut",
+        "cashew",
+        "pecan",
+        "hazelnut"
+      ],
+      "uncommon": [
+        "pistachio",
+        "macadamia nut",
+        "brazil nut",
+        "chestnut",
+        "pine nut",
+        "coconut"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-breakfast-food",
+      "prompt": "Name a breakfast cereal or porridge",
+      "category": "breakfast_food",
+      "host_bank": [
+        "granola",
+        "muesli",
+        "corn flake",
+        "raisin bran",
+        "grits",
+        "puffed rice"
+      ],
+      "uncommon": [
+        "kasha",
+        "bran flake",
+        "puffed wheat",
+        "polenta",
+        "hasty pudding",
+        "atole"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-salad",
+      "prompt": "Name a salad",
+      "category": "salad",
+      "host_bank": [
+        "Caesar salad",
+        "potato salad",
+        "fruit salad",
+        "coleslaw",
+        "pasta salad",
+        "green salad"
+      ],
+      "uncommon": [
+        "Waldorf salad",
+        "tabbouleh",
+        "chef's salad",
+        "salad nicoise",
+        "chicken salad",
+        "macaroni salad"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bag",
+      "prompt": "Name a kind of bag",
+      "category": "bag",
+      "host_bank": [
+        "backpack",
+        "purse",
+        "sack",
+        "duffel bag",
+        "shopping bag",
+        "sleeping bag"
+      ],
+      "uncommon": [
+        "tea bag",
+        "beanbag",
+        "saddlebag",
+        "fanny pack",
+        "golf bag",
+        "tool bag"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-sports-equipment",
+      "prompt": "Name a piece of sports equipment",
+      "category": "sports_equipment",
+      "host_bank": [
+        "basketball",
+        "baseball bat",
+        "golf club",
+        "hockey stick",
+        "dumbbell",
+        "trampoline"
+      ],
+      "uncommon": [
+        "shuttlecock",
+        "javelin",
+        "discus",
+        "cricket bat",
+        "boxing glove",
+        "pommel horse"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sandwich",
+      "prompt": "Name a sandwich",
+      "category": "sandwich",
+      "host_bank": [
+        "hamburger",
+        "cheeseburger",
+        "hotdog",
+        "club sandwich",
+        "grilled cheese",
+        "Reuben"
+      ],
+      "uncommon": [
+        "Sloppy Joe",
+        "gyro",
+        "wrap",
+        "chili dog",
+        "ham sandwich",
+        "chicken sandwich"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-hairstyle",
+      "prompt": "Name a hairstyle",
+      "category": "hairstyle",
+      "host_bank": [
+        "ponytail",
+        "braid",
+        "bob",
+        "mohawk",
+        "crew cut",
+        "Afro"
+      ],
+      "uncommon": [
+        "beehive",
+        "pompadour",
+        "pigtail",
+        "bouffant",
+        "chignon",
+        "pageboy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-stew",
+      "prompt": "Name a stew",
+      "category": "stew",
+      "host_bank": [
+        "goulash",
+        "Irish stew",
+        "beef stew",
+        "ratatouille",
+        "bouillabaisse",
+        "chicken stew"
+      ],
+      "uncommon": [
+        "hot pot",
+        "ragout",
+        "fricassee",
+        "Brunswick stew",
+        "pot-au-feu",
+        "mulligan stew"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-shop",
+      "prompt": "Name a kind of shop",
+      "category": "shop",
+      "host_bank": [
+        "bakery",
+        "florist",
+        "bookshop",
+        "barbershop",
+        "butcher shop",
+        "drugstore"
+      ],
+      "uncommon": [
+        "delicatessen",
+        "pet shop",
+        "toyshop",
+        "boutique",
+        "hardware store",
+        "convenience store"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-restaurant",
+      "prompt": "Name a kind of restaurant",
+      "category": "restaurant",
+      "host_bank": [
+        "cafe",
+        "diner",
+        "bistro",
+        "cafeteria",
+        "steakhouse",
+        "brasserie"
+      ],
+      "uncommon": [
+        "drive-thru",
+        "greasy spoon",
+        "rotisserie",
+        "grillroom",
+        "lunchroom",
+        "cybercafe"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-lamp",
+      "prompt": "Name a kind of lamp or light",
+      "category": "lamp",
+      "host_bank": [
+        "candle",
+        "lantern",
+        "flashlight",
+        "spotlight",
+        "light bulb",
+        "streetlight"
+      ],
+      "uncommon": [
+        "oil lamp",
+        "gas lamp",
+        "jack-o'-lantern",
+        "Chinese lantern",
+        "hurricane lamp",
+        "fluorescent lamp"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-an-aircraft",
+      "prompt": "Name a kind of aircraft",
+      "category": "aircraft",
+      "host_bank": [
+        "airplane",
+        "helicopter",
+        "jet",
+        "glider",
+        "blimp",
+        "hot-air balloon"
+      ],
+      "uncommon": [
+        "biplane",
+        "seaplane",
+        "zeppelin",
+        "bomber",
+        "airliner",
+        "hang glider"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-car",
+      "prompt": "Name a kind of car",
+      "category": "car",
+      "host_bank": [
+        "sedan",
+        "convertible",
+        "minivan",
+        "hatchback",
+        "limousine",
+        "sports car"
+      ],
+      "uncommon": [
+        "coupe",
+        "roadster",
+        "jeep",
+        "cab",
+        "hot rod",
+        "hybrid car"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-knife",
+      "prompt": "Name a kind of knife",
+      "category": "knife",
+      "host_bank": [
+        "pocketknife",
+        "butter knife",
+        "steak knife",
+        "bread knife",
+        "cleaver",
+        "scalpel"
+      ],
+      "uncommon": [
+        "Bowie knife",
+        "switchblade",
+        "penknife",
+        "carving knife",
+        "letter opener",
+        "fish knife"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-beer",
+      "prompt": "Name a kind of beer",
+      "category": "beer",
+      "host_bank": [
+        "lager",
+        "ale",
+        "stout",
+        "porter",
+        "Pilsner",
+        "pale ale"
+      ],
+      "uncommon": [
+        "bock",
+        "Guinness",
+        "Weissbier",
+        "light beer",
+        "draft beer",
+        "bitter"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-wine",
+      "prompt": "Name a wine",
+      "category": "wine",
+      "host_bank": [
+        "Merlot",
+        "Chardonnay",
+        "champagne",
+        "Pinot noir",
+        "Riesling",
+        "Cabernet"
+      ],
+      "uncommon": [
+        "Chianti",
+        "Rioja",
+        "zinfandel",
+        "Beaujolais",
+        "sherry",
+        "port"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-cocktail",
+      "prompt": "Name a cocktail",
+      "category": "cocktail",
+      "host_bank": [
+        "martini",
+        "margarita",
+        "daiquiri",
+        "Bloody Mary",
+        "manhattan",
+        "old fashioned"
+      ],
+      "uncommon": [
+        "White Russian",
+        "screwdriver",
+        "gimlet",
+        "sidecar",
+        "whiskey sour",
+        "Rob Roy"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-liquor",
+      "prompt": "Name a liquor",
+      "category": "liquor",
+      "host_bank": [
+        "vodka",
+        "gin",
+        "rum",
+        "whiskey",
+        "tequila",
+        "brandy"
+      ],
+      "uncommon": [
+        "bourbon",
+        "Scotch",
+        "Cognac",
+        "schnapps",
+        "mescal",
+        "ouzo"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-chair",
+      "prompt": "Name a kind of chair",
+      "category": "chair",
+      "host_bank": [
+        "armchair",
+        "rocking chair",
+        "recliner",
+        "highchair",
+        "wheelchair",
+        "deck chair"
+      ],
+      "uncommon": [
+        "throne",
+        "swivel chair",
+        "folding chair",
+        "barber chair",
+        "Windsor chair",
+        "chaise longue"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-coat",
+      "prompt": "Name a coat or jacket",
+      "category": "coat",
+      "host_bank": [
+        "raincoat",
+        "parka",
+        "blazer",
+        "trench coat",
+        "fur coat",
+        "bomber jacket"
+      ],
+      "uncommon": [
+        "pea jacket",
+        "duffel coat",
+        "greatcoat",
+        "lab coat",
+        "frock coat",
+        "Norfolk jacket"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-dress",
+      "prompt": "Name a kind of dress",
+      "category": "dress",
+      "host_bank": [
+        "gown",
+        "ball gown",
+        "sundress",
+        "mini dress",
+        "cocktail dress",
+        "sari"
+      ],
+      "uncommon": [
+        "caftan",
+        "dirndl",
+        "shirtdress",
+        "bridal gown",
+        "kirtle",
+        "tea gown"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-sausage",
+      "prompt": "Name a sausage",
+      "category": "sausage",
+      "host_bank": [
+        "salami",
+        "pepperoni",
+        "bratwurst",
+        "chorizo",
+        "bologna",
+        "frank"
+      ],
+      "uncommon": [
+        "blood sausage",
+        "knackwurst",
+        "Vienna sausage",
+        "banger",
+        "chipolata",
+        "saveloy"
+      ],
+      "themes": [],
+      "added_by": "claude"
     }
   ],
   "themes": {}
