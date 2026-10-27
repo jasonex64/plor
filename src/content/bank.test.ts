@@ -93,6 +93,18 @@ describe("pickQuestions", () => {
     expect(pickQuestions(bank(eight), days, "2026-12-01", own).map((q) => q.id)).not.toContain("q-h");
   });
 
+  it("skips the questions left out, taking the next choice in their place, themed first on a themed date", () => {
+    // Eight themed questions for seven places: leaving one out brings in the eighth, not an unthemed one.
+    const themed = Array.from({ length: 8 }, (_, i) => question(`t-${i}`, `t_${i}`, ["winter"]));
+    const all = bank([...ten, ...themed], { "2026-12-25": "winter" });
+    const first = pickQuestions(all, [], "2026-12-25", own).map((q) => q.id);
+    const out = first[0];
+    const [eighth] = themed.map((q) => q.id).filter((id) => !first.includes(id));
+    const without = pickQuestions(all, [], "2026-12-25", own, new Set([out])).map((q) => q.id);
+    expect(without).not.toContain(out);
+    expect(without.sort()).toEqual([...first.filter((id) => id !== out), eighth].sort());
+  });
+
   it("stops, saying how many are missing, when fewer than 7 are eligible", () => {
     expect(() => pickQuestions(bank(ten.slice(0, 5)), [], "2026-12-01", own)).toThrow(
       "2026-12-01: only 5 bank questions ask a category not used within 30 days; 2 more needed",

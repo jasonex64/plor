@@ -3,7 +3,7 @@
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, fitOrder, moveTo, pickHosts, pickLetters, softGuide, withHosts } from "./draft.ts";
+import { blockRange, fitOrder, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -91,6 +91,55 @@ describe("moving a question that blocks the letters", () => {
   it("keeps the order when it fits, and returns it with its stop when no place does", async () => {
     expect((await fitOrder(seven, async () => ({ steals: ["x"], held: 7 }))).questions).toEqual(seven);
     expect(await fitOrder(seven, async () => ({ steals: null, held: 6 }))).toEqual({ questions: seven, steals: null, held: 6 });
+  });
+});
+
+// 13e-10b ("Draft swaps the blocker (Recommended)"): a picked day whose letters don't fit leaves out the last question
+// where they stopped and takes the pick's next choice, until they fit or the pick runs out.
+describe("swapping out a question the letters block", () => {
+  const q = (id: string) => ({ id, prompt: `Name ${id}` });
+  const bank = ["a", "b", "c", "d", "e", "f", "g", "h", "i"].map(q);
+  // The pick: the first 7 not left out, or a throw when fewer than 7 are left.
+  const pick = (leftOut: ReadonlySet<string>) => {
+    const left = bank.filter((x) => !leftOut.has(x.id));
+    if (left.length < 7) throw new Error(`only ${left.length} bank questions eligible`);
+    return left.slice(0, 7);
+  };
+
+  it("tries each blocker alone, last first, and keeps the last out when none fits alone, until the letters fit", async () => {
+    // g and f block (the letters stop there); the day fits once neither is in it.
+    const tried: string[][] = [];
+    const result = await withSwaps(pick, async (chosen) => {
+      tried.push(chosen.map((x) => x.id));
+      const blockers = chosen.filter((x) => x.id === "f" || x.id === "g");
+      return blockers.length ? { blockers } : { built: chosen.map((x) => x.id).join("") };
+    });
+    expect(result).toEqual({ built: "abcdehi", swapped: [q("g"), q("f")] });
+    // g alone left out still blocks at f, f alone still blocks at g; so g stays out and f goes next.
+    expect(tried).toEqual(["abcdefg", "abcdefh", "abcdegh", "abcdehi"].map((t) => [...t]));
+  });
+
+  it("leaves out the real blocker of a two-question block, not the question after it (review)", async () => {
+    // The letters stop at f and g together, but only f is thin: leaving out g alone still blocks, f alone fits.
+    const result = await withSwaps(pick, async (chosen) =>
+      chosen.some((x) => x.id === "f") ? { blockers: [q("f"), chosen[6]] } : { built: chosen.map((x) => x.id).join("") });
+    expect(result).toEqual({ built: "abcdegh", swapped: [q("f")] });
+  });
+
+  it("names each swap in the summary", () => {
+    expect(swapLines([q("g"), q("f")])).toEqual(['swapped out "Name g": no letters fit with it', 'swapped out "Name f": no letters fit with it']);
+  });
+
+  it("builds the first pick with no swap when its letters fit", async () => {
+    expect(await withSwaps(pick, async (chosen) => ({ built: chosen.length }))).toEqual({ built: 7, swapped: [] });
+  });
+
+  it("fails as the pick does when too few are left, naming the questions swapped out", async () => {
+    await expect(withSwaps(pick, async (chosen) => ({ blockers: [chosen[6]] }))).rejects.toThrow(
+      'only 6 bank questions eligible, after swapping out "Name g", "Name h", "Name i", as no letters fit with them',
+    );
+    const none = () => { throw new Error("only 5 bank questions eligible"); };
+    await expect(withSwaps(none, async () => ({ built: 0 }))).rejects.toThrow(/^only 5 bank questions eligible$/);
   });
 });
 
