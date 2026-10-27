@@ -17,6 +17,7 @@ import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { capitalized, caughtText, gotPastText, timedOutText } from "@/game/words";
+import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
@@ -321,9 +322,10 @@ function Question({
   const [blocked, setBlocked] = useState<string | null>(null);
 
   // A stolen letter's key does nothing (G11, human, 2026-10-21). Filtering the value, not the key press, also
-  // covers paste and phone keyboards; accented letters count as their plain letter, as the server compares them.
+  // covers paste and phone keyboards; each character is normalized as the server normalizes text, so an accented or
+  // folded letter counts as the plain letters it becomes ("é" as e, "ß" as ss: 13f-1).
   function change(value: string) {
-    const kept = [...value].filter((ch) => !question.stolen.includes(ch.toLowerCase().normalize("NFKD").replace(/\p{M}/gu, "")));
+    const kept = [...value].filter((ch) => !question.stolen.some((letter) => normalize(ch).includes(letter)));
     setBlocked(kept.length < [...value].length ? [...value].find((ch) => !kept.includes(ch))!.toUpperCase() : null);
     setTyped(kept.join(""));
     setNotInList(null);

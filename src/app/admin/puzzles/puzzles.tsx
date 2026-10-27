@@ -254,7 +254,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
 function Struck({ choice: a }: { choice: HostChoice }) {
   return (
     <span>
-      {[...a.name].map((ch, i) => (normalize(ch) === a.stolen ? <s key={i}>{ch}</s> : ch))}
+      {[...a.name].map((ch, i) => (a.stolen !== null && normalize(ch).includes(a.stolen) ? <s key={i}>{ch}</s> : ch))}
     </span>
   );
 }

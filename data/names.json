@@ -1,0 +1,71 @@
+{
+  "add": [
+    {
+      "ref": "wikidata:Q148",
+      "name": "China",
+      "why": "what players call the People's Republic; \"china\" also names porcelain, so the facts check would never let misses add it (13f-1)"
+    },
+    {
+      "ref": "wikidata:Q61",
+      "name": "Washington",
+      "why": "the capital as players name it; \"washington\" also names US cities and the state, so misses couldn't add it (13f-1)"
+    },
+    {
+      "ref": "oewn:07079189-n",
+      "name": "metal",
+      "why": "heavy metal as players name the genre (13f-1, from 13e-3's review)"
+    },
+    {
+      "ref": "oewn:07074480-n",
+      "name": "country",
+      "why": "country music as players name the genre; \"country\" names nations too (13f-1, from 13e-3's review)"
+    },
+    {
+      "ref": "oewn:00528909-n",
+      "name": "tap",
+      "why": "tap dancing as players name the dance (13f-1, from 13e-3's review)"
+    },
+    {
+      "ref": "oewn:06254682-n",
+      "name": "Baha'i",
+      "why": "Bahaism as its followers and players name it (13f-1, from 13e-3's review)"
+    }
+  ],
+  "rename": [
+    {
+      "ref": "wikidata:Q137505841",
+      "name": "makrut lime",
+      "why": "its shown name holds the slur on Plor's list; makrut lime is one of its names left, the ticket's pick (13e-9b; human, 2026-10-27: \"Rename it (Recommended)\", then \"I approve 13e-9b's design as drafted\")"
+    },
+    {
+      "ref": "oewn:03115320-n",
+      "name": "trumpet",
+      "why": "WordNet's first word is \"cornet\", a different instrument to most players (13f-1; human, 2026-10-27: \"Rename by hand (Recommended)\")"
+    },
+    {
+      "ref": "oewn:02807418-n",
+      "name": "tuba",
+      "why": "WordNet's first word is \"bass horn\" (13f-1)"
+    },
+    {
+      "ref": "oewn:04513584-n",
+      "name": "ukulele",
+      "why": "WordNet's first word is \"uke\" (13f-1)"
+    },
+    {
+      "ref": "oewn:15118049-n",
+      "name": "sulfuric acid",
+      "why": "WordNet's first word is \"vitriol\" (13f-1)"
+    },
+    {
+      "ref": "oewn:11869740-n",
+      "name": "peyote",
+      "why": "WordNet's first word is \"mescal\", which players read as the liquor (13f-1)"
+    },
+    {
+      "ref": "oewn:04588881-n",
+      "name": "brothel",
+      "why": "its shown name \"whorehouse\" is now on Plor's list; \"brothel\" is one of its names (13f-1; human, 2026-10-27: \"whorehouse\" (building), renamed \"brothel\")"
+    }
+  ]
+}

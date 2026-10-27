@@ -1,6 +1,6 @@
 # M13 13e — Growing the categories
 
-**Status:** in progress (2026-10-24): the design is approved (human, 2026-10-24: "Approve, build 13e-1 (Recommended)"); 13e-1, the tooling, is done (PR #78, merged 2026-10-25 on green CI with the human's OK: "I approve 13e-1. Merge PR #78 once every CI check is green"); the batches (13e-2 onward) are next.
+**Status:** done (2026-10-27): 226 categories with bank questions, and `npm run draft -- simulate` drafts 30 consecutive days (PR #109, `a6b3b0c`, merged on green CI); 13e-1 to 13e-11, each its own PR. The design was approved by the human, 2026-10-24: "Approve, build 13e-1 (Recommended)"; the stop rule set 2026-10-27: "When 30 days in a row draft (Recommended)".
 
 ## Goal
 At least 210 categories, each with a bank question, so the draft can fill a day every day without asking a category again within 30 days (13d: 7 a day × 30 days).
@@ -49,8 +49,8 @@ Already decided: "Keep it; grow categories (Recommended)" (13d); new categories 
 
 ## Acceptance criteria
 - [x] **13e-1:** `data/categories.json` defines the 7 categories; `npm run base -- load all` gives the same member counts as before (56,787, 193, 2,999, 928, 48, 118, 50); multi-key review prints each category with the under-10 flag; `content:validate` refuses an unknown category and a host bank under 3 (unit tests).
-- [ ] **Each batch:** 20–30 categories, each of at least 10 members, reviewed in its PR, with a bank question each; any Wikidata import measured for size.
-- [ ] **Done:** 210 or more categories and bank questions, and `npm run draft -- simulate` drafts 30 consecutive days (human, 2026-10-27: "When 30 days in a row draft (Recommended)"; 13e-10).
+- [x] **Each batch:** 20–30 categories, each of at least 10 members, reviewed in its PR, with a bank question each; any Wikidata import measured for size.
+- [x] **Done:** 210 or more categories and bank questions, and `npm run draft -- simulate` drafts 30 consecutive days (human, 2026-10-27: "When 30 days in a row draft (Recommended)"; 13e-10).
 - [ ] `npm test`, `npm run lint`, `npx tsc --noEmit -p .`, `npm run test:db`, `npm run test:sql`, `npm run test:e2e` and CI pass, for every PR.
 
 ## Out of scope

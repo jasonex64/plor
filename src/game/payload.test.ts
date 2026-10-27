@@ -3,7 +3,8 @@
 import { describe, expect, it } from "vitest";
 import type { ApprovedPuzzle } from "@/content/puzzle";
 import { fixtureDay, fixtureId } from "@/test/answer-fixture";
-import { hostAnswers, named, publicQuestion } from "./payload";
+import type { Db } from "@/lib/db";
+import { hostAnswers, named, publicQuestion, thingNames } from "./payload";
 
 const puzzle = fixtureDay("2026-11-02", "2026-11-01T00:00:00Z");
 
@@ -40,5 +41,13 @@ describe("hostAnswers and named", () => {
 
   it("refuse a thing with no name rather than show nothing", () => {
     expect(() => named(new Map(), "missing")).toThrow("thing missing has no name");
+  });
+});
+
+// Every thing is shown in lowercase (human, 2026-10-27), whatever the base stores (13f-1).
+describe("thingNames", () => {
+  it("lowercases the names it reads", async () => {
+    const db = { query: async () => ({ rows: [{ id: "a", name: "Washington, D.C." }, { id: "b", name: "Grey Wolf" }] }) } as unknown as Db;
+    expect(await thingNames(db, ["a", "b"])).toEqual(new Map([["a", "washington, d.c."], ["b", "grey wolf"]]));
   });
 });

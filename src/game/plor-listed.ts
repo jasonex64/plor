@@ -5,9 +5,12 @@
 // An insult goes on it when dropping its item alone would let players' misses bring it back (13e-10: "Add it to
 // Plor's list (Recommended)"); "quack" stays off, as a duck's sound already keeps it out of the doctor category.
 // A slur that's also part of official place or species names (Squaw Lake, Hottentot Teal) goes on as the phrases that
-// hold it in the base, not the bare word (13e-11: "Just the two phrases (Recommended)").
+// hold it in the base, not the bare word (13e-11: "Just the two phrases (Recommended)"). Crude and slang names players
+// shouldn't be credited for go on too, so a miss can't bring them back (13f-1: "gypsy cab", "whorehouse", doctor slang,
+// "torture chamber"; "List it too" for "shrink", whose only other use, "shrink-wrap", keeps its hyphen in the base).
 export const PLOR_LISTED: readonly string[] = [
   "kaffir", "kaffirs", "kafir", "kafirs", "kaffer", "kaffers", "caffre", "caffres", "kafferboom", "kafferbooms",
   "caffer cat", "caffer cats", "ambulance chaser", "ambulance chasers", "old squaw", "old squaws", "hottentot bread",
-  "hottentot breads", "hottentots bread", "hottentots breads",
+  "hottentot breads", "hottentots bread", "hottentots breads", "gypsy cab", "gypsy cabs", "whorehouse", "whorehouses",
+  "headshrinker", "headshrinkers", "sawbones", "shrink", "shrinks", "torture chamber", "torture chambers",
 ];

@@ -74,12 +74,5 @@
       "ref": "wikidata:Q4817374",
       "why": "Atomizer's LDNOOBW-listed names; its proper names stay (13e-6 review; human, 2026-10-27: \"Drop slurs and crude nicknames (Recommended)\"); dropped at fetch before 13e-9b"
     }
-  ],
-  "rename": [
-    {
-      "ref": "wikidata:Q137505841",
-      "name": "makrut lime",
-      "why": "its shown name holds the slur on Plor's list; makrut lime is one of its names left, the ticket's pick (13e-9b; human, 2026-10-27: \"Rename it (Recommended)\", then \"I approve 13e-9b's design as drafted\")"
-    }
   ]
 }

@@ -41,11 +41,11 @@ export async function removeCreatedPuzzles(): Promise<void> {
   }
 }
 
-// A thing's main name in the fixture.
+// A thing's main name in the fixture, as screens show it: in lowercase (human, 2026-10-27; src/game/payload.ts, thingNames).
 export function nameOf(thingId: string): string {
   const name = FIXTURE_NAMES.get(thingId);
   if (!name) throw new Error(`${thingId} is not a fixture thing`);
-  return name;
+  return name.toLowerCase();
 }
 
 // A name of the thing that a player can type at that question, past the stolen letters (M04 13c-3).
