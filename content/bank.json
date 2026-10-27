@@ -2350,52 +2350,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-berry",
-      "prompt": "Name a berry",
-      "category": "berry",
-      "host_bank": [
-        "strawberry",
-        "blueberry",
-        "raspberry",
-        "blackberry",
-        "cranberry",
-        "gooseberry"
-      ],
-      "uncommon": [
-        "mulberry",
-        "boysenberry",
-        "huckleberry",
-        "lingonberry",
-        "loganberry",
-        "bilberry"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
-      "id": "name-a-nut",
-      "prompt": "Name a nut",
-      "category": "nut",
-      "host_bank": [
-        "peanut",
-        "almond",
-        "walnut",
-        "cashew",
-        "pecan",
-        "hazelnut"
-      ],
-      "uncommon": [
-        "pistachio",
-        "macadamia nut",
-        "brazil nut",
-        "chestnut",
-        "pine nut",
-        "coconut"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-breakfast-food",
       "prompt": "Name a breakfast cereal or porridge",
       "category": "breakfast_food",
