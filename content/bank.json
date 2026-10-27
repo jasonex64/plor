@@ -474,7 +474,7 @@
       ],
       "uncommon": [
         "sequoia",
-        "redwood",
+        "balsa",
         "elm",
         "spruce",
         "magnolia"
@@ -782,7 +782,7 @@
       ],
       "uncommon": [
         "mace",
-        "lance",
+        "boomerang",
         "dart",
         "sling",
         "arrow",
@@ -1013,7 +1013,7 @@
         "cloud",
         "lightning",
         "thaw",
-        "freeze"
+        "drizzle"
       ],
       "themes": [],
       "added_by": "claude"
@@ -1034,7 +1034,7 @@
         "allosaur",
         "diplodocus",
         "ankylosaur",
-        "apatosaur",
+        "utahraptor",
         "deinonychus"
       ],
       "themes": [],
@@ -1098,7 +1098,7 @@
       "prompt": "Name a whale",
       "category": "whale",
       "host_bank": [
-        "blue whale",
+        "#8335f1ef-0c74-533e-8614-da690366ee88",
         "humpback",
         "killer whale",
         "sperm whale",
@@ -1178,7 +1178,7 @@
         "squid",
         "octopus",
         "caviar",
-        "prawn"
+        "cockle"
       ],
       "themes": [],
       "added_by": "claude"
@@ -2459,7 +2459,13 @@
         "wrap",
         "chili dog",
         "ham sandwich",
-        "chicken sandwich"
+        "chicken sandwich",
+        "BLT",
+        "submarine",
+        "open sandwich",
+        "western sandwich",
+        "tunaburger",
+        "butty"
       ],
       "themes": [],
       "added_by": "claude"
@@ -3142,7 +3148,15 @@
         "ecologist",
         "economist",
         "linguist",
-        "virologist"
+        "virologist",
+        "mathematician",
+        "psychologist",
+        "archeologist",
+        "oceanographer",
+        "entomologist",
+        "ornithologist",
+        "physiologist",
+        "mineralogist"
       ],
       "themes": [],
       "added_by": "claude"
@@ -3350,6 +3364,512 @@
         "quotation mark",
         "ampersand",
         "en dash"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bridge",
+      "prompt": "Name a kind of bridge",
+      "category": "bridge",
+      "host_bank": [
+        "suspension bridge",
+        "drawbridge",
+        "footbridge",
+        "covered bridge",
+        "toll bridge",
+        "rope bridge"
+      ],
+      "uncommon": [
+        "viaduct",
+        "overpass",
+        "pontoon bridge",
+        "truss bridge",
+        "cantilever bridge",
+        "gangplank"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-clock",
+      "prompt": "Name a kind of clock",
+      "category": "clock",
+      "host_bank": [
+        "alarm clock",
+        "cuckoo clock",
+        "grandfather clock",
+        "wall clock",
+        "digital clock",
+        "pendulum clock"
+      ],
+      "uncommon": [
+        "chronometer",
+        "water clock",
+        "chess clock",
+        "time clock",
+        "turret clock",
+        "analog clock"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-computer",
+      "prompt": "Name a kind of computer",
+      "category": "computer",
+      "host_bank": [
+        "laptop",
+        "tablet",
+        "desktop computer",
+        "supercomputer",
+        "mainframe",
+        "iPad"
+      ],
+      "uncommon": [
+        "server",
+        "notebook",
+        "workstation",
+        "minicomputer",
+        "quantum computer",
+        "home computer"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-door",
+      "prompt": "Name a kind of door",
+      "category": "door",
+      "host_bank": [
+        "trap door",
+        "sliding door",
+        "revolving door",
+        "screen door",
+        "French door",
+        "barn door"
+      ],
+      "uncommon": [
+        "storm door",
+        "swing door",
+        "fire door",
+        "double door",
+        "folding door",
+        "car door"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-flag",
+      "prompt": "Name a kind of flag",
+      "category": "flag",
+      "host_bank": [
+        "#c87ab208-f28f-5eb6-b9f2-9793a9ed51ce",
+        "pennant",
+        "white flag",
+        "Union Jack",
+        "American flag",
+        "national flag"
+      ],
+      "uncommon": [
+        "jack",
+        "standard",
+        "tricolor",
+        "black flag",
+        "battle flag",
+        "Stars and Bars"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-fuel",
+      "prompt": "Name a fuel",
+      "category": "fuel",
+      "host_bank": [
+        "gasoline",
+        "coal",
+        "diesel oil",
+        "propane",
+        "kerosene",
+        "natural gas"
+      ],
+      "uncommon": [
+        "charcoal",
+        "butane",
+        "firewood",
+        "methanol",
+        "biomass",
+        "lignite"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-garden",
+      "prompt": "Name a kind of garden",
+      "category": "garden",
+      "host_bank": [
+        "rose garden",
+        "herb garden",
+        "rock garden",
+        "flower garden",
+        "kitchen garden",
+        "orchard"
+      ],
+      "uncommon": [
+        "topiary",
+        "roof garden",
+        "tea garden",
+        "sunken garden",
+        "formal garden",
+        "market garden"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-hormone",
+      "prompt": "Name a hormone",
+      "category": "hormone",
+      "host_bank": [
+        "insulin",
+        "progesterone",
+        "testosterone",
+        "estrogen",
+        "melatonin",
+        "cortisol"
+      ],
+      "uncommon": [
+        "oxytocin",
+        "aldosterone",
+        "thyroxine",
+        "glucagon",
+        "prolactin",
+        "vasopressin"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-knot",
+      "prompt": "Name a knot",
+      "category": "knot",
+      "host_bank": [
+        "bow",
+        "slipknot",
+        "reef knot",
+        "square knot",
+        "granny knot",
+        "bowline"
+      ],
+      "uncommon": [
+        "clove hitch",
+        "half hitch",
+        "sheepshank",
+        "figure eight",
+        "Windsor knot",
+        "Gordian knot"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-painting",
+      "prompt": "Name a kind of painting",
+      "category": "painting",
+      "host_bank": [
+        "landscape",
+        "sand painting",
+        "still life",
+        "mural",
+        "watercolor",
+        "oil painting"
+      ],
+      "uncommon": [
+        "fresco",
+        "seascape",
+        "cityscape",
+        "icon",
+        "miniature",
+        "gouache"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-road",
+      "prompt": "Name a kind of road",
+      "category": "road",
+      "host_bank": [
+        "highway",
+        "main street",
+        "avenue",
+        "alley",
+        "driveway",
+        "freeway"
+      ],
+      "uncommon": [
+        "beltway",
+        "turnpike",
+        "causeway",
+        "autobahn",
+        "side street",
+        "blind alley"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-rope",
+      "prompt": "Name a kind of rope",
+      "category": "rope",
+      "host_bank": [
+        "lasso",
+        "tightrope",
+        "jump rope",
+        "cable",
+        "bungee",
+        "high wire"
+      ],
+      "uncommon": [
+        "halyard",
+        "slackline",
+        "hawser",
+        "guide rope",
+        "lashing",
+        "cordage"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-soldier",
+      "prompt": "Name a kind of soldier",
+      "category": "soldier",
+      "host_bank": [
+        "marine",
+        "paratrooper",
+        "rifleman",
+        "infantryman",
+        "Green Beret",
+        "redcoat"
+      ],
+      "uncommon": [
+        "musketeer",
+        "grenadier",
+        "dragoon",
+        "hussar",
+        "legionnaire",
+        "Minuteman"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-star",
+      "prompt": "Name a kind of star",
+      "category": "star",
+      "host_bank": [
+        "sun",
+        "supernova",
+        "red giant",
+        "white dwarf",
+        "neutron star",
+        "pulsar"
+      ],
+      "uncommon": [
+        "red dwarf",
+        "nova",
+        "binary star",
+        "supergiant",
+        "variable star",
+        "lodestar"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-tower",
+      "prompt": "Name a kind of tower",
+      "category": "tower",
+      "host_bank": [
+        "lighthouse",
+        "bell tower",
+        "clock tower",
+        "watchtower",
+        "steeple",
+        "minaret"
+      ],
+      "uncommon": [
+        "silo",
+        "turret",
+        "barbican",
+        "campanile",
+        "control tower",
+        "fire tower"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-window",
+      "prompt": "Name a kind of window",
+      "category": "window",
+      "host_bank": [
+        "skylight",
+        "bay window",
+        "porthole",
+        "dormer",
+        "sash window",
+        "rose window"
+      ],
+      "uncommon": [
+        "transom",
+        "lancet window",
+        "oriel",
+        "clerestory",
+        "picture window",
+        "casement window"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-bed",
+      "prompt": "Name a kind of bed",
+      "category": "bed",
+      "host_bank": [
+        "bunk bed",
+        "hammock",
+        "water bed",
+        "double bed",
+        "cot",
+        "four-poster"
+      ],
+      "uncommon": [
+        "Murphy bed",
+        "trundle bed",
+        "sleigh bed",
+        "hospital bed",
+        "twin bed",
+        "platform bed"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-table",
+      "prompt": "Name a kind of table or desk",
+      "category": "table",
+      "host_bank": [
+        "desk",
+        "coffee table",
+        "pool table",
+        "kitchen table",
+        "dressing table",
+        "workbench"
+      ],
+      "uncommon": [
+        "gateleg table",
+        "lectern",
+        "drafting table",
+        "writing desk",
+        "trestle table",
+        "pedestal table"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-coffee",
+      "prompt": "Name a coffee drink",
+      "category": "coffee",
+      "host_bank": [
+        "espresso",
+        "cappuccino",
+        "mocha",
+        "iced coffee",
+        "Irish coffee",
+        "instant coffee"
+      ],
+      "uncommon": [
+        "caffe latte",
+        "cafe au lait",
+        "Turkish coffee",
+        "drip coffee",
+        "Vienna coffee",
+        "cafe noir"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-kind-of-milk",
+      "prompt": "Name a kind of milk",
+      "category": "milk",
+      "host_bank": [
+        "skim milk",
+        "whole milk",
+        "chocolate milk",
+        "buttermilk",
+        "goats' milk",
+        "condensed milk"
+      ],
+      "uncommon": [
+        "evaporated milk",
+        "powdered milk",
+        "low-fat milk",
+        "raw milk",
+        "sour milk",
+        "semi-skimmed milk"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-skirt",
+      "prompt": "Name a kind of skirt",
+      "category": "skirt",
+      "host_bank": [
+        "miniskirt",
+        "kilt",
+        "sarong",
+        "grass skirt",
+        "hoopskirt",
+        "maxi"
+      ],
+      "uncommon": [
+        "dirndl",
+        "culotte",
+        "ballet skirt",
+        "full skirt",
+        "hobble skirt",
+        "overskirt"
+      ],
+      "themes": [],
+      "added_by": "claude"
+    },
+    {
+      "id": "name-a-form-of-government",
+      "prompt": "Name a form of government",
+      "category": "political_system",
+      "host_bank": [
+        "democracy",
+        "monarchy",
+        "#33dd1381-b44f-5ad9-9d59-7915124464ae",
+        "dictatorship",
+        "empire",
+        "theocracy"
+      ],
+      "uncommon": [
+        "oligarchy",
+        "autocracy",
+        "plutocracy",
+        "technocracy",
+        "police state",
+        "kingdom"
       ],
       "themes": [],
       "added_by": "claude"

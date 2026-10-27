@@ -6,11 +6,12 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Level } from "../src/content/puzzle.ts";
 import { fixtureId, loadFixtureBase } from "../src/test/answer-fixture.ts";
-import { familiarLeft, oneHostCatch } from "./draft.ts";
+import { bankProblems, familiarLeft, oneHostCatch } from "./draft.ts";
 
 const db = new pg.Client({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres" });
 const animal = (slug: string) => fixtureId(0, slug);
 const levels = (...slugs: string[]): Record<string, Level> => Object.fromEntries(slugs.map((s) => [animal(s), "uncommon" as const]));
+const question = (host: string[], uncommon: string[]) => ({ id: "q", prompt: "Name an animal", category: "fixture_animal", host_bank: host, uncommon, themes: [], added_by: "claude" as const });
 const left = (hosts: string[], lv: Record<string, Level>, stolen: string[]) => familiarLeft(db, "fixture_animal", hosts.map(animal), lv, stolen);
 
 beforeAll(async () => {
@@ -66,6 +67,32 @@ describe("familiarLeft on a letter subset", () => {
   it("doesn't count a typeable name that doesn't start with the letter", async () => {
     // With U stolen, "dunzo" can't be typed; "zonbi" can, but doesn't start with D: two are left.
     expect(await fits(["u"])).toBe(false);
+  });
+
+  it("refuses a bank answer that names a member only by a name off the letter, and an ID that isn't a member", async () => {
+    // "zonbi" is dunzo's other name, which the draft can't read for a D subset (13e-9 review: "hockey" for sport F).
+    const cat = `#${animal("cat")}`;
+    expect(await bankProblems(db, [{ ...question(["dekko", "daxo"], ["zonbi", cat]), category: "dt_d" }])).toEqual([
+      'q: "zonbi" names no member',
+      `q: ${cat} is not a member`,
+    ]);
+  });
+});
+
+// The bank check (13e-9): each answer gives one member as the draft reads it, and no two answers name one thing.
+describe("bankProblems", () => {
+  it("passes answers that each name one member, by name or by ID", async () => {
+    expect(await bankProblems(db, [question(["bear", "dog"], ["cat", `#${animal("fish")}`])])).toEqual([]);
+  });
+
+  it("names an answer fitting two members or none, and two answers naming one thing", async () => {
+    const problems = await bankProblems(db, [question(["robin", "unicorn"], ["cat", `#${animal("cat")}`, "robin"])]);
+    expect(problems.map((p) => p.replace(/ several members: .*/, " several"))).toEqual([
+      'q: "robin" names several',
+      'q: "unicorn" names no member',
+      `q: "cat" and "#${animal("cat")}" name the same thing`,
+      'q: "robin" names several',
+    ]);
   });
 });
 

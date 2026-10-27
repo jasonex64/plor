@@ -788,6 +788,21 @@
       "category": "room",
       "name": "closet",
       "why": "WordNet senses: a closet and the water closet (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
+    },
+    {
+      "category": "flag",
+      "name": "banner",
+      "why": "WordNet senses: a standard (a distinctive flag) and a long strip of cloth with a slogan (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
+    },
+    {
+      "category": "flag",
+      "name": "streamer",
+      "why": "WordNet senses: a pennant (a long tapering flag) and a long strip of cloth with a slogan (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
+    },
+    {
+      "category": "political_system",
+      "name": "republic",
+      "why": "WordNet senses: a republic (a head of state who is not a monarch) and democracy (power in a body of citizens) (overnight rules, human, 2026-10-27: \"Today's rules, unclear ones wait (Recommended)\")"
     }
   ],
   "wordnet_split": [
