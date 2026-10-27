@@ -1,6 +1,6 @@
 # M13 13e-5b — Wikidata's own doubles
 
-**Status:** planned (2026-10-27): guided questions answered (below, four rounds); a scaling check measured and folded in (chains, loops, forks, the review's size, one data file for hand decisions); the design, its SOURCES.md row, the retired-ID table and the sitelinks rule for loops and P2959 wait for the human's approval.
+**Status:** planned (2026-10-27): guided questions answered (below, four rounds); a scaling check measured and folded in (chains, loops, forks, the review's size, one data file for hand decisions); **approved** (human, 2026-10-27: "yes fix the gaps", to "Approve 13e-5b with the scaling fixes?"): the design, its SOURCES.md row (added), the retired-ID table (DECISIONS.md Log) and the sitelinks rule for loops and P2959. In progress.
 
 ## Goal
 One thing per real-world thing when Wikidata itself holds two items for it (one species under an old and a new scientific name, two pages that can't merge), so a typed name lands on one thing and a retired ID still finds it.
@@ -39,7 +39,7 @@ Asked after 13e-5's review lists showed "dog" with two loaded taxa (human: "Next
 - **P2959 "permanent duplicated item"**: "this item duplicates another item and they can't be merged, as one Wikimedia project includes two pages"; 6 loaded pairs, all in places.
 - dog: Q26972265 (*Canis lupus familiaris*) lists Q20717272 as its synonym, so Q26972265 keeps its ID (13e-5's pick agrees). cat: Q57818409 (*Felis silvestris catus*) is a synonym of Q20980826 (*Felis catus*), so Q20980826 keeps its ID, and 13e-5's pick (Q57818409, more articles) follows it. Northern Shoveler (Q28106731 / Q25940): no mark; it merges by the human's 13e-5 decision.
 
-**Proposed SOURCES.md row** (needs the human's OK before code): "Wikidata sameness marks (M13 13e-5b)": https://www.wikidata.org/wiki/Property:P12763, https://www.wikidata.org/wiki/Property:P1420, https://www.wikidata.org/wiki/Property:P460, https://www.wikidata.org/wiki/Property:P2959, read 2026-10-27; what each says, as above.
+**SOURCES.md row** (added with the human's OK, 2026-10-27): "Wikidata sameness marks (M13 13e-5b)": https://www.wikidata.org/wiki/Property:P12763, https://www.wikidata.org/wiki/Property:P1420, https://www.wikidata.org/wiki/Property:P460, https://www.wikidata.org/wiki/Property:P2959, read 2026-10-27; what each says, as above.
 
 ## Scaling check (2026-10-27, asked by the human before approving: "verify this design is scalable and will work as we make more and more questions and categories")
 Measured on the Windows PC's full load:
@@ -59,7 +59,7 @@ Measured on the Windows PC's full load:
 6. **The review's new list**, `npm run base -- review`: per category, names on two or more members that are a host or uncommon bank answer of that category (given by name or by ID), P460 pairs and forks among its members whose names are bank answers, leaving out pairs `data/sameness.json` already decides; each with both items' scientific names, ranks and sitelinks, for Claude to put to the human in chat with a recommendation: merge (one thing) or apart (different things; the bank keeps naming its one by ID). WordNet's own senses ("love" twice in `feeling`) come up here too and are decided apart; merging WordNet senses stays out of scope.
 
 ## Acceptance criteria
-- [ ] The SOURCES.md row is in with the human's OK before code.
+- [x] The SOURCES.md row is in with the human's OK before code ("Wikidata sameness marks (M13 13e-5b)").
 - [ ] After a fresh `load all`, Wikidata's marked pairs and the human's 30 are one thing each: in `animal`, "dog", "cat" and "northern shoveler" each name one member, shown as WordNet's word (db query; the counts in the PR).
 - [ ] A merged thing keeps the current name's ID and its facts, and carries both items' names (pgTAP or db test on fixtures).
 - [ ] A retired ID resolves to its thing wherever a file names a thing by ID (the bank's `#` answers, a day's IDs), tested; the T1 day's two retired IDs resolve.
