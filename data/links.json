@@ -112,5 +112,6 @@
   {"thing": "oewn:15260650-n", "name": "picosecond", "kind_of": "oewn:13604927-n", "kind_of_name": "unit of measurement"},
   {"thing": "oewn:06379324-n", "name": "novel", "kind_of": "oewn:06422547-n", "kind_of_name": "book"},
   {"thing": "oewn:06608568-n", "name": "comic book", "kind_of": "oewn:06422547-n", "kind_of_name": "book"},
-  {"thing": "oewn:03075786-n", "name": "coloring book", "kind_of": "oewn:06422547-n", "kind_of_name": "book"}
+  {"thing": "oewn:03075786-n", "name": "coloring book", "kind_of": "oewn:06422547-n", "kind_of_name": "book"},
+  {"thing": "wikidata:Q26597", "name": "long-tailed duck", "kind_of": "oewn:01855502-n", "kind_of_name": "sea duck"}
 ]
