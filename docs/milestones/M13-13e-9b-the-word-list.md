@@ -1,6 +1,6 @@
 # M13 13e-9b — Plor's word list
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-9b's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27)
+**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-9b's design as drafted. Build it."; built and reviewed on the Mac, 2026-10-27; PR #106)
 
 ## Goal
 Remove the racial slur "kaffir", in every spelling, from the answer base and from what players can get accepted, with a short word list of Plor's own that sits beside LDNOOBW and is checked everywhere LDNOOBW is.
