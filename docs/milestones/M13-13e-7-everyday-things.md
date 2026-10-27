@@ -1,6 +1,6 @@
 # M13 13e-7 — Everyday things
 
-**Status:** in review (2026-10-27, overnight): built and reviewed under the human's overnight rules (HANDOFF, "Overnight rules"), in PR #103, merged on green by those rules.
+**Status:** done (2026-10-27, overnight): merged on green CI in PR #103 (`8a13e7d`, 09:58 UTC, auto-merge by the overnight rules' "Merge each on green"; 10 of 10 checks SUCCESS on `9432ee8`). No migration.
 
 ## Goal
 25 more categories of everyday things from WordNet, each with a bank question, toward 13e's 210 (101 before this batch).
