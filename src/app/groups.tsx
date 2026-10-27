@@ -15,6 +15,7 @@ import { Comments } from "./comments";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
 import { shareLink } from "./share";
+import { Line, Skeleton } from "./skeleton";
 
 type GroupSummary = { id: string; name: string };
 type Member = { username: string; name: string; creator: boolean };
@@ -73,7 +74,11 @@ export function Groups() {
           ))}
         </ul>
       )}
-      {!groups && !error && <p>Loading…</p>}
+      {!groups && !error && (
+        <Skeleton label="Loading your groups">
+          <Line />
+        </Skeleton>
+      )}
       <form onSubmit={create}>
         <label>
           New group&apos;s name
@@ -252,7 +257,11 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
             )}
           </>
         )}
-        {!group && !error && <p>Loading…</p>}
+        {!group && !error && (
+          <Skeleton label="Loading the group">
+            <Line />
+          </Skeleton>
+        )}
         {error && <p role="alert">{error}</p>}
         <p>
           <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
@@ -266,7 +275,7 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
         />
       )}
-      {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (Home's timeUps). */}
+      {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}
       {group && <Comments key={`${day}-${timeUps}`} username={username} runOver={false} nudge={threadNudge} group={id} />}
     </>
   );

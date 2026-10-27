@@ -64,7 +64,7 @@ Round 3:
 ## Acceptance criteria
 Each is checked with a command or a test's output, recorded under Evidence.
 1. **The frame stays.** An e2e test watches the tab bar with a MutationObserver while it switches Today → Friends → Groups → Me → Today, and the tab bar element is never removed. `rg -n "<Home view" src/app` finds nothing in any `page.tsx`.
-2. **No "Loading…" text.** `rg -n "Loading" src --glob '*.tsx'` finds no user-facing loading text; every route folder under `src/app` that renders a page has a `loading.tsx`; an e2e test slows `/api/profile` and sees the skeleton (by its accessible name) on each tab.
+2. **No "Loading…" text.** `rg -n "Loading…" src --glob '*.tsx'` finds only `skeleton.tsx`'s comment; the player pages' route group has a `loading.tsx` (Source diff, 14b-6a); an e2e test holds `/api/profile` and each tab's own data and sees the skeleton (by its accessible name) each time.
 3. **Optimistic with Undo.** e2e: a posted comment shows before its request is sent; Undo within 5 s removes it and no request is sent; after 5 s the request is sent once; a reaction's chip width is the same before and after its count appears; a failed send puts the screen back and shows the error. A unit test covers the hold-then-send timer (send, undo, leave-page send).
 4. **The clock.** e2e on the game screen: the countdown has computed `font-variant-numeric: tabular-nums`, sits beside the prompt, and the stats, Yesterday and comments sections aren't in the page while a question is open.
 5. **Numbers and headlines.** e2e reads computed styles: `body` has `tabular-nums`; `h1`, `h2`, `h3` have `text-wrap: balance`. The 9 per-selector `tabular-nums` rules are gone (`rg -n tabular-nums src/app` finds only `globals.css`).
@@ -86,6 +86,8 @@ Each is checked with a command or a test's output, recorded under Evidence.
 | 60px | a slide's offset | Next.js view-transitions guide, Step 3 ("The 60px offset is enough to communicate direction") |
 | tomorrow (Pacific) not approved | when the admin warning shows | human, 2026-10-27: "Tomorrow not approved"; tomorrow is the day after `private.today()` |
 | 0s | slide duration under reduced motion | Next.js view-transitions guide, "Respecting reduced motion" |
+| 1lh | a skeleton line's height | one line of the text it stands for (MDN `lh` unit is the element's line height; no new size) |
+| 12px | a skeleton line's corners | the radius buttons and inputs already have (`src/app/globals.css`, `button`) |
 
 ## Plan
 One PR per sub-ticket, in this order:
@@ -113,6 +115,10 @@ Hypotheses to check before building:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket, design 1: "Every route gets a `loading.tsx` with that page's skeleton" (from Next.js, `loading.js`: a loading file per folder) | **14b-6a:** one `src/app/(shell)/loading.tsx` for every player page, showing the page skeleton | Every page's server part is static (`npm run build` lists them ○, the code routes ◐), and each page's sections fetch their own data on the client and show their own skeletons; a loading file per folder would be identical copies of the one |
+| Ticket, design 2: "The admin rail and the phone's Waiting strip reserve their space too" | **14b-6a:** the rail shows its title and its four rows as lines until the counts land; the phone's Waiting strip shows one line while loading | When nothing is waiting the strip isn't shown at all, so the page moves up once after loading; keeping an empty strip on every visit would show a gap for nothing |
+| Ticket, design 2: "One `Skeleton` block component (a static block … sized like what it stands for)" | **14b-6a:** `Skeleton` (the label for screen readers) and `Line` (one line of text); each section's skeleton is its real container and static heading with lines where the data goes | A free-standing block has no height of its own (the cards size to their content), so a block "the size of the section" would need invented heights; the real container is that size already |
+| Next.js, authentication with Cache Components: what reads the session streams behind Suspense while the rest is in the static shell | **14b-6a:** the frame always renders the page; `Signed` shows the skeleton until the profile loads | As the source says. A first version returned the skeleton instead of the page, and the dev server reported "Could not validate that a segment in your UI has instant navigation … Dropped segment: src/app/(shell)/page.tsx" |
 
 ## Evidence
 

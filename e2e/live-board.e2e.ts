@@ -297,6 +297,10 @@ test("the reset reloads the Friends tab", async ({ browser }) => {
   await openBoard(page);
   await timed;
   await expect(page.getByRole("region", { name: "Friends leaderboard" })).toBeVisible();
+  // Three parts of the page read the run (the clock bar, the feed's column and the tab), so the first answer isn't
+  // necessarily the tab's: the clock moves only once every first load is answered (14b-6a, where the frame's parts
+  // started asking first).
+  await page.waitForLoadState("networkidle");
   const reloads = ["/api/run", "/api/board", "/api/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
   await page.clock.fastForward("25:00:00");
   await Promise.all(reloads);

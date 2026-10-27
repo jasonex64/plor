@@ -10,6 +10,7 @@ import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
 import { dayText } from "../../day-text";
+import { Line, Skeleton } from "../../skeleton";
 
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
@@ -20,7 +21,12 @@ export function Bank() {
   }, []);
 
   if (error) return <p role="alert">{error}</p>;
-  if (!bank) return <p>Loading…</p>;
+  if (!bank)
+    return (
+      <Skeleton label="Loading the question bank">
+        <Line />
+      </Skeleton>
+    );
   const needle = filter.trim().toLowerCase();
   const questions = bank.questions.filter((q) => !needle || q.prompt.toLowerCase().includes(needle) || q.category.toLowerCase().includes(needle));
   return (

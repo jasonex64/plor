@@ -101,8 +101,9 @@ const GEAR = icon(
 );
 
 // Rendered into <body>, beside the page's <main>, so the navigation isn't inside the main landmark (M14 14a-1
-// review). Home, which renders it, runs only on the client (it reads the address bar behind Suspense). On phones the
-// top bar's wordmark stands for the page's own "Plor" heading, which is then read but not shown twice.
+// review). The frame (Frame, src/app/home.tsx), which renders it, runs only on the client (it reads the address bar
+// behind Suspense). On phones the top bar's wordmark stands for the page's own "Plor" heading, which is then read but
+// not shown twice.
 export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedOut }: {
   admin: boolean;
   profile: Profile;
@@ -205,7 +206,7 @@ export function ClockBar({ onTimeUp }: { onTimeUp: () => void }) {
   return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} onTimeUp={onTimeUp} />, document.body);
 }
 
-// At zero the page's parts that wait for the run to be over read it again (Home's timeUps).
+// At zero the page's parts that wait for the run to be over read it again (the frame's timeUps).
 function Clock({ index, msLeft, onTimeUp }: { index: number; msLeft: number; onTimeUp: () => void }) {
   useBodyFlag("clock", true);
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);

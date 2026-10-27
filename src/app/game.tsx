@@ -26,6 +26,7 @@ import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
 import { GAME } from "@/platform/game";
+import { Line, Skeleton } from "./skeleton";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -98,7 +99,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   const { run, noPuzzle, error, over } = useRun(hooks);
   const starting = useStartRun();
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
-  if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
+  if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <>
       <Banner>
@@ -159,7 +160,7 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
   }
 
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
-  if (!run) return error ? <p role="alert">{error}</p> : <p>Loading today&apos;s puzzle…</p>;
+  if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <div className={styles.game}>
       <Banner>
@@ -239,6 +240,17 @@ function longDate(date: string): string {
 }
 
 // Offbeat's banner: the game's name, then what the day holds for the player.
+// The banner before today's run loads: the real banner, its title, a line where the day goes.
+function BannerSkeleton() {
+  return (
+    <Skeleton label="Loading today's puzzle">
+      <Banner>
+        <Line />
+      </Banner>
+    </Skeleton>
+  );
+}
+
 function Banner({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.banner}>

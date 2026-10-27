@@ -13,6 +13,7 @@ import { errorText } from "../messages";
 import admin from "./admin.module.css";
 import { dayText } from "../day-text";
 import styles from "./insights.module.css";
+import { Line, Skeleton } from "../skeleton";
 
 type InsightsResponse = { days: string[]; report: DayInsights };
 
@@ -41,7 +42,12 @@ export function Insights() {
   }, [date]);
 
   if (error) return <p role="alert">{error}</p>;
-  if (!data) return <p>Loading…</p>;
+  if (!data)
+    return (
+      <Skeleton label="Loading insights">
+        <Line />
+      </Skeleton>
+    );
   const { report, days } = data;
   // The days come newest first: the previous day is the next one in the list.
   const at = days.indexOf(report.date);

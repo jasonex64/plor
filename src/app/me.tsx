@@ -12,6 +12,7 @@ import { Avatar } from "./avatar";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./me.module.css";
+import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
 
 // Calendar dates, read in UTC so they can't shift by a day: "2 Oct 2026", "12 Oct", "October 2026".
@@ -26,7 +27,20 @@ export function MeStats({ numbers }: { numbers: boolean }) {
     api<{ me: Me }>("/api/me", { method: "GET" }).then((r) => setMe(r.me), (err) => setError(errorText(err)));
   }, []);
   if (error) return <p role="alert">{error}</p>;
-  if (!me) return <p>Loading…</p>;
+  if (!me)
+    return (
+      <Skeleton label="Loading your stats">
+        <div className={styles.me}>
+          <h2 className={styles.name}>
+            <Line />
+          </h2>
+          <section className={styles.section}>
+            <h2 className={styles.heading}>All games</h2>
+            <Line />
+          </section>
+        </div>
+      </Skeleton>
+    );
   return (
     <div className={styles.me}>
       <div className={styles.header}>

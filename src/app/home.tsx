@@ -1,14 +1,26 @@
 "use client";
 
-// Sign-in, then picking a username, then the player's tab inside the shell (docs/milestones/M14-14a-1-shell.md): Today
-// (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
-// (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
-// the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
-// or, on an invite link (/i/<code>), the friend request; on a
-// group's link (/g/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
-// the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
-import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useCallback, useEffect, useLayoutEffect, useState, type FormEvent } from "react";
+// The frame every player page shares (src/app/(shell)/layout.tsx): the profile, loaded once, and the shell around the
+// page (docs/milestones/M14-14a-1-shell.md), kept across navigations so a tab switch swaps only the page's own section
+// (docs/milestones/M14-14b-6-feel-and-polish.md, design 1; Next.js, "Preserving UI state"). Each page wraps its section
+// in Signed: sign-in, then picking a username, then the section: Today (Offbeat's banner and the feed), Friends, Groups
+// or Me; Offbeat's game screen and How to play (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak,
+// docs/milestones/M14-14b-2a-streak-ranks.md); the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
+// or, on an invite link (/i/<code>), the friend request; on a group's link (/g/<code>), joining it; on a group's page
+// (/groups/<id>), the group. Every step goes through the API; errors are shown to the player and never retried
+// silently (DECISIONS.md: Error handling).
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  Fragment,
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
@@ -21,15 +33,16 @@ import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel
 import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
-import { GroupPage, Groups, JoinGroup } from "./groups";
+import { GroupPage } from "./groups";
 import { InviteLink } from "./invite-link";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
-import { HowToPlay, OffbeatScreen } from "./offbeat";
+import { OffbeatScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
+import { PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
@@ -44,23 +57,15 @@ type Me =
   | { signedIn: true; username: null; admin: boolean }
   | ({ signedIn: true; admin: boolean; streak: number } & Profile);
 
-// The pages without the friends feed's column: the game screen and the admin area have their own, and an invite or a
-// group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
-// docs/milestones/M14-14b-2c-review-items.md, answer 12).
-const NO_FEED: View["kind"][] = ["offbeat", "admin", "invite", "joinGroup"];
+// A player signed in with a username, as the pages inside Signed see them.
+type Player = Extract<Me, { streak: number }>;
 
-// What a page other than "/" shows once the player is signed in with a username.
-export type View =
-  | { kind: "friends" }
-  | { kind: "groups" }
-  | { kind: "me" }
-  | { kind: "offbeat" }
-  | { kind: "howToPlay" }
-  | { kind: "streak" }
-  | { kind: "admin"; page: AdminPage }
-  | { kind: "invite"; code: string }
-  | { kind: "joinGroup"; code: string }
-  | { kind: "group"; id: string };
+// The pages without the friends feed's column: Today, the game screen and the admin area have their own, and an invite
+// or a group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
+// docs/milestones/M14-14b-2c-review-items.md, answer 12).
+function feedBeside(path: string): boolean {
+  return path !== "/" && path !== GAME.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
+}
 
 // Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
 // while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
@@ -68,13 +73,26 @@ export type View =
 const PENDING_INVITE = "plor.pendingInvite";
 const INVITE_PATH = /^\/[ig]\/(.+)$/;
 
-function invitePath(view?: View): string | undefined {
-  if (view?.kind === "invite") return `/i/${view.code}`;
-  if (view?.kind === "joinGroup") return `/g/${view.code}`;
+// What the frame shares with the page inside it: the profile, null until it loads (or when loading it failed, loadError).
+type FrameState = { me: Me | null; loadError: string | null; loadMe: () => void; timeUps: number; reloadStreak: () => void };
+const FrameContext = createContext<FrameState | null>(null);
+
+function useFrame(): FrameState {
+  const frame = use(FrameContext);
+  if (!frame) throw new Error("a player page rendered outside the frame (src/app/(shell)/layout.tsx)");
+  return frame;
 }
 
-export function Home({ view }: { view?: View }) {
+// For the sections inside Signed, which renders them only for a player with a username.
+function usePlayer(): { player: Player; timeUps: number; reloadStreak: () => void } {
+  const { me, timeUps, reloadStreak } = useFrame();
+  if (!me?.signedIn || me.username === null) throw new Error("a player section rendered outside Signed");
+  return { player: me, timeUps, reloadStreak };
+}
+
+export function Frame({ children }: { children: ReactNode }) {
   const redirectError = useSearchParams().get("error");
+  const path = usePathname();
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -111,7 +129,7 @@ export function Home({ view }: { view?: View }) {
   // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
   // "/". Storage that can't be read holds nothing, because the write before leaving for Google would have failed and
   // been shown to the player.
-  const onInvite = invitePath(view) !== undefined;
+  const onInvite = INVITE_PATH.test(path);
   useEffect(() => {
     if (!me?.signedIn) return;
     let pending: string | null;
@@ -125,21 +143,19 @@ export function Home({ view }: { view?: View }) {
     if (pending && code && INVITE_CODE.test(code)) router.replace(pending);
   }, [onInvite, me, router]);
 
-  if (loadError) return <p role="alert">{loadError}</p>;
-  if (!me) return <p>Loading…</p>;
+  // The page itself always renders, so its static parts are in the served HTML and Next.js can check its navigation is
+  // instant (node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md); what depends on the
+  // session waits inside Signed.
+  const player = me?.signedIn && me.username !== null ? me : null;
   return (
-    <>
-      {redirectError && !me.signedIn && <p role="alert">{messageForRedirect(redirectError)}</p>}
-      {!me.signedIn ? (
-        <SignIn returnTo={invitePath(view)} onSignedIn={loadMe} />
-      ) : me.username === null ? (
-        <PickUsername onDone={loadMe} />
-      ) : (
+    <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
+      {redirectError && me?.signedIn === false && <p role="alert">{messageForRedirect(redirectError)}</p>}
+      {player && (
         <>
           <Shell
-            admin={me.admin}
-            profile={me}
-            streak={me.streak}
+            admin={player.admin}
+            profile={player}
+            streak={player.streak}
             onChanged={loadMe}
             // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's copy
             // (docs/milestones/M14-14b-2c-review-items.md, item 29).
@@ -147,40 +163,73 @@ export function Home({ view }: { view?: View }) {
             onSignedOut={() => setMe({ signedIn: false })}
           />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-          {view?.kind !== "offbeat" && <ClockBar onTimeUp={timeUp} />}
+          {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
           {streakError && <p role="alert">{streakError}</p>}
-          {view && !NO_FEED.includes(view.kind) && feedColumn && <FriendsFeed username={me.username} timeUps={timeUps} />}
-          {view?.kind === "offbeat" ? (
-            <OffbeatScreen username={me.username} onStarted={reloadStreak} />
-          ) : view?.kind === "howToPlay" ? (
-            <HowToPlay />
-          ) : view?.kind === "streak" ? (
-            <StreakRanks days={me.streak} />
-          ) : view?.kind === "admin" ? (
-            <AdminArea page={view.page} admin={me.admin} />
-          ) : view?.kind === "friends" ? (
-            <Friends username={me.username} timeUps={timeUps} />
-          ) : view?.kind === "groups" ? (
-            <Groups />
-          ) : view?.kind === "me" ? (
-            <>
-              {/* Only the stats (L45); the account is in the settings sheet (14a-3b). */}
-              <MeStats numbers={me.settings.calendarNumbers} />
-              {me.admin && <MeAdminLink />}
-            </>
-          ) : view?.kind === "invite" ? (
-            <AcceptInvite code={view.code} username={me.username} />
-          ) : view?.kind === "joinGroup" ? (
-            <JoinGroup code={view.code} />
-          ) : view?.kind === "group" ? (
-            <GroupPage id={view.id} username={me.username} timeUps={timeUps} />
-          ) : (
-            <Today username={me.username} skip={me.settings.skipGameScreen} timeUps={timeUps} />
-          )}
+          {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} timeUps={timeUps} />}
         </>
       )}
+      {children}
+    </FrameContext>
+  );
+}
+
+// Around each page's own section: sign-in, then picking a username, then the section.
+export function Signed({ children }: { children: ReactNode }) {
+  const { me, loadError, loadMe } = useFrame();
+  const path = usePathname();
+  if (loadError) return <p role="alert">{loadError}</p>;
+  // Only until the profile first loads (a page opened from its address); afterwards the frame keeps it.
+  if (!me) return <PageSkeleton />;
+  if (!me.signedIn) return <SignIn returnTo={INVITE_PATH.test(path) ? path : undefined} onSignedIn={loadMe} />;
+  if (me.username === null) return <PickUsername onDone={loadMe} />;
+  return children;
+}
+
+// Each page's section, with what it needs from the player.
+export function TodayTab() {
+  const { player, timeUps } = usePlayer();
+  return <Today username={player.username} skip={player.settings.skipGameScreen} timeUps={timeUps} />;
+}
+
+export function FriendsTab() {
+  const { player, timeUps } = usePlayer();
+  return <Friends username={player.username} timeUps={timeUps} />;
+}
+
+export function MeTab() {
+  const { player } = usePlayer();
+  return (
+    <>
+      {/* Only the stats (L45); the account is in the settings sheet (14a-3b). */}
+      <MeStats numbers={player.settings.calendarNumbers} />
+      {player.admin && <MeAdminLink />}
     </>
   );
+}
+
+export function GameTab() {
+  const { player, reloadStreak } = usePlayer();
+  return <OffbeatScreen username={player.username} onStarted={reloadStreak} />;
+}
+
+export function StreakTab() {
+  const { player } = usePlayer();
+  return <StreakRanks days={player.streak} />;
+}
+
+export function AdminTab({ page }: { page: AdminPage }) {
+  const { player } = usePlayer();
+  return <AdminArea page={page} admin={player.admin} />;
+}
+
+export function GroupTab({ id }: { id: string }) {
+  const { player, timeUps } = usePlayer();
+  return <GroupPage id={id} username={player.username} timeUps={timeUps} />;
+}
+
+export function InviteTab({ code }: { code: string }) {
+  const { player } = usePlayer();
+  return <AcceptInvite code={code} username={player.username} />;
 }
 
 function SignIn({ returnTo, onSignedIn }: { returnTo?: string; onSignedIn: () => void }) {
@@ -368,7 +417,7 @@ function FriendsFeed({ username, timeUps }: { username: string; timeUps: number 
   const [day, setDay] = useState(0);
   const [run, setRun] = useState<{ over: boolean; msToReset: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Read again on the new day and when the clock bar's time runs out (Home's timeUps), so the feed opens once the run
+  // Read again on the new day and when the clock bar's time runs out (the frame's timeUps), so the feed opens once the run
   // is over, whichever page the player is on.
   useEffect(() => {
     type RunResponse = { run: { status: RunStatus; msToReset: number } } | { run: null; msToReset: number };

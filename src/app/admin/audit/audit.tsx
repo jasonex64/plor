@@ -12,6 +12,7 @@ import type { ThingView } from "@/admin/base";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
+import { Line, Skeleton } from "../../skeleton";
 
 // Why a text waits, in words.
 const WHY: Record<Exclude<Review["outcome"], "accepted">, string> = {
@@ -54,7 +55,14 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
     }
   };
 
-  if (!reviews) return error ? <p role="alert">{error}</p> : <p>Loading…</p>;
+  if (!reviews)
+    return error ? (
+      <p role="alert">{error}</p>
+    ) : (
+      <Skeleton label="Loading answers to review">
+        <Line />
+      </Skeleton>
+    );
   const waiting = reviews.filter((r) => r.outcome !== "accepted" && !r.decision);
   const added = reviews.filter((r) => r.outcome === "accepted" && !r.decision);
   const decided = reviews.filter((r) => r.decision);

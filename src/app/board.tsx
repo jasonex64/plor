@@ -26,6 +26,7 @@ import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 import { capitalized, caughtText, timedOutText } from "@/game/words";
+import { Line, Skeleton } from "./skeleton";
 
 // invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
 // holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
@@ -131,7 +132,11 @@ export function Board({ username, invite }: { username: string; invite: boolean 
           ))}
         </ul>
       )}
-      {!board && !error && <p>Loading…</p>}
+      {!board && !error && (
+        <Skeleton label="Loading the live board">
+          <Line />
+        </Skeleton>
+      )}
       {error && <p role="alert">{error}</p>}
       {/* Adding a friend starts here too (docs/milestones/M12-12f-review-fixes.md, F1). */}
       {invite && <InviteLink canReset={false} />}

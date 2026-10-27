@@ -16,6 +16,7 @@ import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import styles from "./offbeat.module.css";
+import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
 import { capitalized, caughtWord } from "@/game/words";
 
@@ -77,7 +78,19 @@ function OffbeatInfo() {
     api<{ stats: Stats; yesterday: Yesterday }>("/api/offbeat", { method: "GET" }).then(setInfo, (err) => setError(errorText(err)));
   }, []);
   if (error) return <p role="alert">{error}</p>;
-  if (!info) return <p>Loading…</p>;
+  if (!info)
+    return (
+      <Skeleton label={`Loading your ${GAME.name}`}>
+        <section className={styles.card}>
+          <h2 className={styles.heading}>Your {GAME.name}</h2>
+          <Line />
+        </section>
+        <section className={styles.card}>
+          <h2 className={styles.heading}>Yesterday on the ridge</h2>
+          <Line />
+        </section>
+      </Skeleton>
+    );
   return (
     <>
       <YourOffbeat stats={info.stats} />

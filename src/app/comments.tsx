@@ -21,6 +21,7 @@ import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
 import { GAME } from "@/platform/game";
+import { Line, Skeleton } from "./skeleton";
 
 // The calendar day before or after a YYYY-MM-DD date.
 function shiftDay(date: string, days: number): string {
@@ -159,7 +160,11 @@ export function Comments({
           </button>
         </form>
       )}
-      {!thread && !error && <p>Loading…</p>}
+      {!thread && !error && (
+        <Skeleton label="Loading comments">
+          <Line />
+        </Skeleton>
+      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );
