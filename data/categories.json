@@ -224,5 +224,10 @@
   { "key": "hat", "name": "kind of hat", "source": "oewn", "root": "03502782-n", "within": "headwear" },
   { "key": "truck", "name": "kind of truck", "source": "oewn", "root": "04497386-n", "within": "vehicle" },
   { "key": "house", "name": "kind of house", "source": "oewn", "root": "03549540-n", "within": "building" },
-  { "key": "religious_holiday", "name": "religious holiday", "source": "oewn", "root": "15208637-n", "within": "holiday" }
+  { "key": "religious_holiday", "name": "religious holiday", "source": "oewn", "root": "15208637-n", "within": "holiday" },
+  { "key": "toy", "name": "toy", "source": "oewn", "root": "03971038-n" },
+  { "key": "cosmetic", "name": "cosmetic", "source": "oewn", "root": "03117803-n" },
+  { "key": "berry", "name": "berry", "source": "oewn", "root": "07758680-n" },
+  { "key": "nut", "name": "nut", "source": "oewn", "root": "13157333-n" },
+  { "key": "internal_organ", "name": "internal organ", "source": "oewn", "root": "05306228-n" }
 ]

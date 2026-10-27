@@ -1050,7 +1050,10 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
   const name = (id: string) => loadedWikidata().names.get(mergePlan().into.get(id) ?? id);
   const named = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
   const { listed, names } = readHandFiles();
-  const { items, aliases, dropped } = withoutListed(def.source, withAddedNames(def.source, withNormalizedAliases(named), names.add), listed, names.rename);
+  // Countries load from the places set too, with the same codes, so the codes go wherever a country loads.
+  const { items: handled, used } = withHandNames(def.source, withoutCountryCodes(withNormalizedAliases(named), countryIds()), names);
+  for (const k of used) handNamesUsed.add(k);
+  const { items, aliases, dropped } = withoutListed(def.source, set, handled, listed, names.rename);
   const client = await localClient();
   try {
     await client.query("begin");
@@ -1085,12 +1088,20 @@ const bySource = <R extends { ref: string }>(source: Source, rows: R[]) =>
 export const LISTED_FILE = "data/listed.json";
 export type Listed = {
   drop: { ref: string; why: string }[];
+  // An item dropped from one set only, kept in the others: a borough the US cities set counts as a city, still a place
+  // in wikidata-places, so the facts check keeps refusing it as a city (13f-2; human, 2026-10-27: "Boroughs as cities").
+  drop_from_set: { ref: string; set: string; why: string }[];
   drop_listed_names: { ref: string; why: string }[];
 };
 
 export function parseListed(text: string): Listed {
-  const listed = parseLists<Listed>(LISTED_FILE, { drop: ["ref", "why"], drop_listed_names: ["ref", "why"] }, { drop: ["ref"], drop_listed_names: ["ref"] }, text);
-  checkRefs(LISTED_FILE, [...listed.drop, ...listed.drop_listed_names].map((r) => r.ref));
+  const listed = parseLists<Listed>(
+    LISTED_FILE,
+    { drop: ["ref", "why"], drop_from_set: ["ref", "set", "why"], drop_listed_names: ["ref", "why"] },
+    { drop: ["ref"], drop_from_set: ["ref", "set"], drop_listed_names: ["ref"] },
+    text,
+  );
+  checkRefs(LISTED_FILE, [...listed.drop, ...listed.drop_from_set, ...listed.drop_listed_names].map((r) => r.ref));
   const dropped = new Set(listed.drop.map((r) => r.ref));
   const both = listed.drop_listed_names.filter((r) => dropped.has(r.ref)).map((r) => r.ref);
   if (both.length) throw new Error(`${LISTED_FILE}: ${both.join(", ")} both dropped and kept`);
@@ -1105,12 +1116,20 @@ export function parseListed(text: string): Listed {
 export const NAMES_FILE = "data/names.json";
 export type Names = {
   add: { ref: string; name: string; why: string }[];
+  // A name taken off one item, for a word other things rightly bear, which Plor's list would strip from all of them
+  // (13f-2: schoolmarm's "mistress"; "ununnilium" on the element it doesn't name).
+  remove: { ref: string; name: string; why: string }[];
   rename: { ref: string; name: string; why: string }[];
 };
 
 export function parseNames(text: string): Names {
-  const names = parseLists<Names>(NAMES_FILE, { add: ["ref", "name", "why"], rename: ["ref", "name", "why"] }, { add: ["ref", "name"], rename: ["ref"] }, text);
-  checkRefs(NAMES_FILE, [...names.add, ...names.rename].map((r) => r.ref));
+  const names = parseLists<Names>(
+    NAMES_FILE,
+    { add: ["ref", "name", "why"], remove: ["ref", "name", "why"], rename: ["ref", "name", "why"] },
+    { add: ["ref", "name"], remove: ["ref", "name"], rename: ["ref"] },
+    text,
+  );
+  checkRefs(NAMES_FILE, [...names.add, ...names.remove, ...names.rename].map((r) => r.ref));
   return names;
 }
 
@@ -1119,7 +1138,7 @@ export function parseNames(text: string): Names {
 // that normalize alike ("China" and "china") are each refused.
 export function checkHandFiles(listed: Listed, names: Names): void {
   const dropped = new Set(listed.drop.map((r) => r.ref));
-  const onDropped = [...names.add, ...names.rename].filter((r) => dropped.has(r.ref)).map((r) => r.ref);
+  const onDropped = [...names.add, ...names.remove, ...names.rename].filter((r) => dropped.has(r.ref)).map((r) => r.ref);
   if (onDropped.length) throw new Error(`${NAMES_FILE}: ${[...new Set(onDropped)].join(", ")} dropped by ${LISTED_FILE}`);
   const listedAdds = names.add.filter((r) => isListed(normalize(r.name))).map((r) => r.ref);
   if (listedAdds.length) throw new Error(`${NAMES_FILE} add ${listedAdds.join(", ")}: the name is listed`);
@@ -1145,17 +1164,52 @@ export function withNormalizedAliases(items: Item[]): Item[] {
   });
 }
 
-// One set's items with the names added for them; an item that already has the name is refused, so the file never
-// carries a line that does nothing.
-export function withAddedNames(source: Source, items: Item[], add: Names["add"]): Item[] {
-  const rows = new Map<string, string[]>();
-  for (const r of bySource(source, add)) rows.set(r.id, [...(rows.get(r.id) ?? []), normalize(r.name)]);
+// A hand name row's key, for counting the rows a load used.
+export const handNameKey = (list: "add" | "remove", ref: string, name: string) => `${list} ${ref} "${normalize(name)}"`;
+
+// One set's items with the names added and removed for them, and the rows that did something here: an add where the
+// item lacked the name, a remove where it bore it. An item can load from several sets with different names (Insular
+// Oceania's "oceania" is in the places set only), so a row is checked across the whole load: one that does nothing in
+// every set stops `load all` (unusedHandNames), and the file never carries a line that does nothing.
+export function withHandNames(source: Source, items: Item[], names: Pick<Names, "add" | "remove">): { items: Item[]; used: string[] } {
+  const rows = (list: Names["add"]) => {
+    const by = new Map<string, string[]>();
+    for (const r of bySource(source, list)) by.set(r.id, [...(by.get(r.id) ?? []), normalize(r.name)]);
+    return by;
+  };
+  const adds = rows(names.add);
+  const removes = rows(names.remove);
+  const used: string[] = [];
+  const out = items.map((item) => {
+    const ref = `${source}:${item.id}`;
+    const has = (n: string) => item.aliases.some((a) => a.alias === n);
+    const added = (adds.get(item.id) ?? []).filter((n) => !has(n));
+    const removed = (removes.get(item.id) ?? []).filter(has);
+    if (!added.length && !removed.length) return item;
+    used.push(...added.map((n) => handNameKey("add", ref, n)), ...removed.map((n) => handNameKey("remove", ref, n)));
+    const kept = item.aliases.filter((a) => !removed.includes(a.alias));
+    return { ...item, aliases: [...kept, ...added.map((alias) => ({ alias, kind: "synonym" as const }))] };
+  });
+  return { items: out, used };
+}
+
+// The add and remove rows no set used, after `load all`.
+export function unusedHandNames(names: Pick<Names, "add" | "remove">, used: ReadonlySet<string>): string[] {
+  return [
+    ...names.add.map((r) => handNameKey("add", r.ref, r.name)),
+    ...names.remove.map((r) => handNameKey("remove", r.ref, r.name)),
+  ].filter((k) => !used.has(k));
+}
+
+// The country codes Wikidata gives as alternative labels ("bh", "can", "car"), which answer as countries though no
+// country is named by them, except the abbreviations players type as names (human, 2026-10-27: "Remove the codes
+// (Recommended)", then "Keep the common ones (Recommended)"). No country's name is three letters or fewer.
+const KEPT_COUNTRY_ABBREVIATIONS = new Set(["us", "uk", "usa", "uae", "prc", "drc"]);
+export function withoutCountryCodes(items: Item[], countries: ReadonlySet<string>): Item[] {
   return items.map((item) => {
-    const added = rows.get(item.id);
-    if (!added) return item;
-    const have = added.find((n) => item.aliases.some((a) => a.alias === n));
-    if (have) throw new Error(`${NAMES_FILE} add ${source}:${item.id}: it already has "${have}"`);
-    return { ...item, aliases: [...item.aliases, ...added.map((alias) => ({ alias, kind: "synonym" as const }))] };
+    if (!countries.has(item.id)) return item;
+    const aliases = item.aliases.filter((a) => !/^[a-z]{2,3}$/.test(a.alias) || KEPT_COUNTRY_ABBREVIATIONS.has(a.alias));
+    return aliases.length === item.aliases.length ? item : { ...item, aliases };
   });
 }
 
@@ -1163,8 +1217,8 @@ export function withAddedNames(source: Source, items: Item[], add: Names["add"])
 // item; the drop_listed_names items also lose their LDNOOBW-listed names; drop items go, and so does an item left with
 // no names. A rename makes one of the item's names left its shown name; an item whose shown name went needs one, or a
 // drop, or the load stops, naming its ID and the names left, never the word.
-export function withoutListed(source: Source, items: Item[], listed: Listed, renames: Names["rename"]): { items: Item[]; aliases: number; dropped: number } {
-  const drop = new Set(bySource(source, listed.drop).map((r) => r.id));
+export function withoutListed(source: Source, set: string, items: Item[], listed: Listed, renames: Names["rename"]): { items: Item[]; aliases: number; dropped: number } {
+  const drop = new Set([...bySource(source, listed.drop), ...bySource(source, listed.drop_from_set).filter((r) => r.set === set)].map((r) => r.id));
   const names = new Set(bySource(source, listed.drop_listed_names).map((r) => r.id));
   const rename = new Map(bySource(source, renames).map((r) => [r.id, r.name]));
   const kept: Item[] = [];
@@ -1198,6 +1252,9 @@ export function withoutListed(source: Source, items: Item[], listed: Listed, ren
   return { items: kept, aliases, dropped: items.length - kept.length };
 }
 
+// The hand name rows the sets loaded so far used (withHandNames), checked after `load all`.
+const handNamesUsed = new Set<string>();
+
 // The refs every loaded set holds, read once for the hand files' checks.
 let loadedRefsOnce: Set<string> | undefined;
 const loadedRefs = () =>
@@ -1212,7 +1269,7 @@ function readHandFiles(): { listed: Listed; names: Names } {
   const listed = parseListed(readFileSync(LISTED_FILE, "utf8"));
   const names = parseNames(readFileSync(NAMES_FILE, "utf8"));
   checkHandFiles(listed, names);
-  for (const [file, rows] of [[LISTED_FILE, listed.drop_listed_names], [NAMES_FILE, [...names.add, ...names.rename]]] as const) {
+  for (const [file, rows] of [[LISTED_FILE, [...listed.drop_listed_names, ...listed.drop_from_set]], [NAMES_FILE, [...names.add, ...names.remove, ...names.rename]]] as const) {
     const missing = rows.map((r) => r.ref).filter((ref) => !loadedRefs().has(ref));
     if (missing.length) throw new Error(`${file}: ${missing.join(", ")} isn't in any loaded set`);
   }
@@ -1606,6 +1663,8 @@ async function main(): Promise<void> {
   if (command === "review" && name) return review([name, ...more]);
   if (command === "load" && name === "all") {
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
+    const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
+    if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
     await loadLinks();
     await defineCategories();
     return analyzeBase();

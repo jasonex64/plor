@@ -114,5 +114,13 @@
   {"thing": "oewn:06608568-n", "name": "comic book", "kind_of": "oewn:06422547-n", "kind_of_name": "book"},
   {"thing": "oewn:03075786-n", "name": "coloring book", "kind_of": "oewn:06422547-n", "kind_of_name": "book"},
   {"thing": "wikidata:Q26597", "name": "long-tailed duck", "kind_of": "oewn:01855502-n", "kind_of_name": "sea duck"},
-  {"thing": "oewn:05978625-n", "name": "Confucianism", "kind_of": "oewn:05955536-n", "kind_of_name": "religion"}
+  {"thing": "oewn:05978625-n", "name": "Confucianism", "kind_of": "oewn:05955536-n", "kind_of_name": "religion"},
+  {"thing": "oewn:03158041-n", "name": "cutlery", "kind_of": "oewn:03626258-n", "kind_of_name": "kitchen utensil"},
+  {"thing": "oewn:05488747-n", "name": "brain", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05394510-n", "name": "pancreas", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05341015-n", "name": "spleen", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05392504-n", "name": "gallbladder", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05519988-n", "name": "urinary bladder", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05545209-n", "name": "appendix", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"},
+  {"thing": "oewn:05541581-n", "name": "esophagus", "kind_of": "oewn:05306228-n", "kind_of_name": "internal organ"}
 ]
