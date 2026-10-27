@@ -1,6 +1,6 @@
 # M14 14c-1 — The game's name and words
 
-**Status:** approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed, in PR PR_PENDING, waiting for the human's word to merge. Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
+**Status:** approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed, in PR #99, waiting for the human's word to merge. Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
 
 ## Goal
 Give game 1 a name and a set of words that speak its world (the ridge, the Wind, the signs) instead of "Offbeat", "safe", "caught", "answer" and "host".
