@@ -1,4 +1,5 @@
-/* Phones: a bottom tab bar, 64px tall (the approved mockups, M14 14a-1 Numbers). The page leaves room for it. */
+/* Phones: a bottom tab bar, 64px tall (the approved mockups, M14 14a-1 Numbers). The page leaves room for it
+   (globals.css, body[data-shell]). */
 .nav {
   position: fixed;
   left: 0;
@@ -11,16 +12,6 @@
   border-top: 1px solid var(--line);
 }
 
-:global(body):has(.nav) {
-  padding-bottom: 64px;
-}
-
-/* Signed in, About and the privacy policy are in the settings sheet (docs/milestones/M14-14b-2b-1-shell.md, criterion
-   3), so the page footer, which signed-out visitors and Google's brand check need (M02 2c), isn't shown. */
-:global(body):has(.nav) main > footer {
-  display: none;
-}
-
 .word,
 .who,
 .admin,
@@ -29,7 +20,7 @@
 }
 
 /* Phones: a top bar, 56px tall, with the wordmark and the gear (round 7, board 1; M14 14a-3b). The page leaves room
-   for it, and its own "Plor" heading stays for screen readers but isn't shown twice. */
+   for it, and its own "Plor" heading stays for screen readers but isn't shown twice (globals.css, body[data-shell]). */
 .top {
   position: fixed;
   top: 0;
@@ -44,19 +35,6 @@
   justify-content: space-between;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
-}
-
-:global(body):has(.top) {
-  padding-top: 56px;
-}
-
-:global(body):has(.top) main > h1 {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .topWord {
@@ -89,15 +67,6 @@
   line-height: 22px;
   font-variant-numeric: tabular-nums;
   text-decoration: none;
-}
-
-.hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .gear {
@@ -163,19 +132,6 @@
     display: none;
   }
 
-  :global(body):has(.top) {
-    padding-top: 0;
-  }
-
-  :global(body):has(.top) main > h1 {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
-
   .nav {
     top: 0;
     right: auto;
@@ -188,11 +144,6 @@
     gap: 20px;
     border-top: 0;
     border-right: 1px solid var(--line);
-  }
-
-  :global(body):has(.nav) {
-    padding-bottom: 0;
-    padding-left: 280px;
   }
 
   .word {
@@ -294,10 +245,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-:global(body):has(.clock) {
-  padding-bottom: 112px;
-}
-
 @media (min-width: 768px) {
   .clock {
     top: 0;
@@ -306,10 +253,5 @@
     right: var(--right-column, 0);
     border-top: 0;
     border-bottom: 1.5px solid var(--accent);
-  }
-
-  :global(body):has(.clock) {
-    padding-bottom: 0;
-    padding-top: 48px;
   }
 }

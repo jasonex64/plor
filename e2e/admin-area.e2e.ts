@@ -56,7 +56,23 @@ test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ 
   const page = await admin(browser, "as", { width: 360, height: 800 });
   await page.goto("/admin/bank");
   const menu = page.getByRole("navigation", { name: "Admin" });
-  await menu.getByRole("button", { name: /^Bank/ }).click();
+  const button = menu.getByRole("button", { name: /^Bank/ });
+  // Escape closes it, back on its button, and so does a press outside it (14b-2c-3, item 41).
+  await button.click();
+  await expect(menu.getByRole("list", { name: "To do" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(menu.getByRole("list", { name: "To do" })).toHaveCount(0);
+  await expect(button).toBeFocused();
+  await button.click();
+  await page.getByRole("heading", { level: 2, name: "Bank" }).click();
+  await expect(menu.getByRole("list", { name: "To do" })).toHaveCount(0);
+  // On a phone each table's cells name their columns, and the table and its headers are still there for screen
+  // readers (answer 17).
+  const table = page.getByRole("table").first();
+  await expect(table.getByRole("columnheader", { name: "Category" })).toHaveCount(1);
+  const cell = table.getByRole("cell").nth(1);
+  expect(await cell.evaluate((td) => [td.getAttribute("data-label"), getComputedStyle(td, "::before").content])).toEqual(["Category", expect.stringContaining("Category")]);
+  await button.click();
   await expect(menu.getByRole("list", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
   await expect(menu.getByRole("list", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database"]);
   await menu.getByRole("link", { name: "Database" }).click();

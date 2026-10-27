@@ -4,9 +4,10 @@
 // which one caught them. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql, and
 // since 12d 20261024031116_board_hides_progress.sql); this is the full picture the page loads first and refetches
 // after a reconnect.
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { named, thingNames, type Names } from "@/game/payload";
-import type { RunStatus } from "@/game/runs";
+import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, runReactions, type Reactions } from "@/reactions/reactions";
 import { circleSql } from "./circle";
@@ -31,8 +32,6 @@ export type BoardFriend = {
 // mine: how the viewer's own run ended, once it has (M07 7d places the viewer among their friends). reactionsOnMine:
 // friends' reactions on it, from then on too (M08 8b).
 export type Board = { date: string; finished: boolean; mine: Ended | null; reactionsOnMine: Reactions | null; friends: BoardFriend[] };
-
-const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
 
 type Row = { user_id: string; username: string; name: string; status: RunStatus | null; answered: number | null };
 

@@ -11,15 +11,15 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000f1', 'f1@example.test'),
   ('00000000-0000-0000-0000-0000000000f2', 'f2@example.test');
 
-select lives_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'abcdefghijklmnopqrst-_')$$,
-  'a 22-character base64url code is accepted');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefghijklmnopqrst-')$$,
-  '23514', null, 'a 21-character code is rejected');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefghijklmnopqrst+/')$$,
+select lives_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'abcdefgh-_')$$,
+  'a 10-character base64url code is accepted (M14 14b-3)');
+select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh-')$$,
+  '23514', null, 'a 9-character code is rejected');
+select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh+/')$$,
   '23514', null, 'a code with characters outside base64url is rejected');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefghijklmnopqrst-_')$$,
+select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh-_')$$,
   '23505', null, 'two players cannot share a code');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'ABCDEFGHIJKLMNOPQRST-_')$$,
+select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'ABCDEFGH-_')$$,
   '23505', null, 'a player has one code (reset replaces it)');
 
 select lives_ok($$insert into private.friendship (user_a, user_b) values ('00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-0000000000f2')$$,

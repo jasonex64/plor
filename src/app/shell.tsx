@@ -15,6 +15,7 @@ import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
+import { useBodyFlag } from "./body-flag";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { errorText } from "./messages";
@@ -22,6 +23,8 @@ import { useMinWidth } from "./min-width";
 import { RankFlower, rankFor } from "./ranks";
 import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
+import { GAME } from "@/platform/game";
+import { capitalized, timedOutText } from "@/game/words";
 
 const icon = (children: ReactNode) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -82,7 +85,7 @@ const TABS = [
 function current(path: string, href: string, sidebar: boolean): "page" | "true" | undefined {
   if (path === href) return "page";
   // Offbeat's game screen and its How to play are opened from Today (docs/milestones/M14-14a-2b-game-screen.md).
-  if (href === "/" && (path === "/offbeat" || path.startsWith("/offbeat/"))) return "true";
+  if (href === "/" && (path === GAME.path || path.startsWith(`${GAME.path}/`))) return "true";
   // On phones Admin is reached from the Me tab (MeAdminLink), so the admin pages sit under it; the sidebar has its own
   // Admin (round 10).
   if (href === "/me" && !sidebar && (path === "/admin" || path.startsWith("/admin/"))) return "true";
@@ -110,6 +113,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
 }) {
   const path = usePathname();
   const sidebar = useMinWidth(768);
+  useBodyFlag("shell", true);
   const dialog = useRef<HTMLDialogElement>(null);
   const open = () => dialog.current?.showModal();
   return createPortal(
@@ -169,7 +173,7 @@ function StreakPill({ days }: { days: number }) {
     <Link href="/streak" className={styles.streak}>
       <RankFlower rank={rank} size={22} />
       {days}
-      <span className={styles.hidden}> day streak, {rank.name}</span>
+      <span className="sr-only"> day streak, {rank.name}</span>
     </Link>
   );
 }
@@ -187,7 +191,7 @@ export function MeAdminLink() {
 // counted down from the run state the page read, and Back to the game screen (14a-2b); at zero, that time is up, with
 // a link to the result. The database stays the judge of the timer; this is only a display. Nothing shows without a
 // question in play.
-export function ClockBar() {
+export function ClockBar({ onTimeUp }: { onTimeUp: () => void }) {
   const [run, setRun] = useState<RunState | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -198,27 +202,27 @@ export function ClockBar() {
   }, []);
   if (error) return <p role="alert">{error}</p>;
   if (!run || run.status !== "in_progress" || !run.question || run.msLeft === null) return null;
-  return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} />, document.body);
+  return createPortal(<Clock index={run.question.index} msLeft={run.msLeft} onTimeUp={onTimeUp} />, document.body);
 }
 
-const NOTHING = () => {};
-
-function Clock({ index, msLeft }: { index: number; msLeft: number }) {
-  const seconds = Math.ceil(useCountdown(msLeft, NOTHING) / 1000);
+// At zero the page's parts that wait for the run to be over read it again (Home's timeUps).
+function Clock({ index, msLeft, onTimeUp }: { index: number; msLeft: number; onTimeUp: () => void }) {
+  useBodyFlag("clock", true);
+  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
-    <section aria-label="Question in play" className={styles.clock}>
+    <section aria-label="Stop in play" className={styles.clock}>
       {seconds > 0 ? (
         <>
           <span role="timer">
-            Question {index + 1} · {seconds}s left
+            Stop {index + 1} · {seconds}s left
           </span>
-          <ButtonLink href="/offbeat">Back</ButtonLink>
+          <ButtonLink href={GAME.path}>Back</ButtonLink>
         </>
       ) : (
         <>
-          <span role="status">Time&apos;s up on question {index + 1}</span>
-          <ButtonLink href="/offbeat#result">Result</ButtonLink>
+          <span role="status">{capitalized(timedOutText(index + 1))}</span>
+          <ButtonLink href={`${GAME.path}#result`}>Result</ButtonLink>
         </>
       )}
     </section>

@@ -1,12 +1,12 @@
-// The home page's feed (docs/milestones/M11-home-screen.md, 11b; H2 (a), H3 (a)): today's comments from the friends
-// thread and from every group the viewer is in, in one list, oldest first, each labelled with its thread. The rules
-// are each thread's own (M08; M10 G4): who sees a comment is seesCommentSql, a comment the viewer reported stays hidden
-// from them, and posting goes to the friends thread. Until the viewer's run today is over, the feed shows who commented
-// and how many reactions there are, never the text: the comment bodies aren't read at all then, so they can't reach
-// the page.
-import { GAME_ID } from "@/content/puzzle";
+// Today's feed, and the friends feed in other pages' right column (docs/milestones/M11-home-screen.md, 11b; H2 (a), H3
+// (a)): today's comments from the friends thread and from every group the viewer is in, in one list, oldest first, each
+// labelled with its thread. The rules are each thread's own (M08; M10 G4): who sees a comment is seesCommentSql, a
+// comment the viewer reported stays hidden from them, and posting goes to the friends thread. Until the viewer's run
+// today is over, the feed shows who commented and how many reactions there are, never the text: the comment bodies
+// aren't read at all then, so they can't reach the page.
+import { GAME_ID } from "@/platform/game";
 import { friendsSql, seesCommentSql } from "@/friends/circle";
-import { FINISHED, type RunStatus } from "@/game/runs";
+import { FINISHED, type RunStatus } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { NO_REACTIONS, commentReactions } from "@/reactions/reactions";
 import { toComment, type Comment, type CommentRow } from "./comments";
@@ -16,8 +16,8 @@ export type FeedComment = Comment & { group: { id: string; name: string } | null
 
 // Before the viewer's run is over: the friends who commented, by name and in the order they first did (the live board
 // already shows friends finishing, M07); how many others did, so group members who aren't friends aren't named (G3);
-// how many comments the viewer will be able to read (M14 14a-2a: "Finish today's Offbeat to read N comments"); and how
-// many reactions the viewer could see on those comments.
+// how many comments the viewer will be able to read (M14 14a-2a; no game named on a shared screen since 14b-4: "Finish
+// today's game to read N comments"); and how many reactions the viewer could see on those comments.
 export type FeedPreview = { friends: string[]; others: number; count: number; reactions: number };
 
 // comments is null, and preview set, until the viewer's run today is over. canPost: the viewer may post to the friends

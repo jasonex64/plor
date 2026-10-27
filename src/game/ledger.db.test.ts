@@ -8,7 +8,7 @@
 // (2, 3, 1) and 7 has 7 (3, 3, 1). Settling scores from the days' content alone, so the days here need no answer database.
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDay, fixtureId } from "@/test/answer-fixture";
 import { pooledCounts, settleRuns } from "./ledger";
 

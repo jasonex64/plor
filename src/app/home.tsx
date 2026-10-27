@@ -4,33 +4,37 @@
 // (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
 // (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
 // the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
-// or, on an invite link (/invite/<code>), the friend request; on a
-// group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
+// or, on an invite link (/i/<code>), the friend request; on a
+// group's link (/g/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
+import { FINISHED, type RunStatus } from "@/game/status";
 import type { Profile } from "@/lib/profile";
 import { AdminArea, type AdminPage } from "./admin/admin-area";
 import { Board } from "./board";
 import { ButtonLink } from "./button-link";
-import { PAUSED_TEXT, PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
+import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
 import { GroupPage, Groups, JoinGroup } from "./groups";
+import { InviteLink } from "./invite-link";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
+import { LiveStatus } from "./live-status";
 import { HowToPlay, OffbeatScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
 import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
+import { GAME } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
 // sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
@@ -39,6 +43,11 @@ type Me =
   | { signedIn: false }
   | { signedIn: true; username: null; admin: boolean }
   | ({ signedIn: true; admin: boolean; streak: number } & Profile);
+
+// The pages without the friends feed's column: the game screen and the admin area have their own, and an invite or a
+// group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
+// docs/milestones/M14-14b-2c-review-items.md, answer 12).
+const NO_FEED: View["kind"][] = ["offbeat", "admin", "invite", "joinGroup"];
 
 // What a page other than "/" shows once the player is signed in with a username.
 export type View =
@@ -57,11 +66,11 @@ export type View =
 // while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
 // path (M07 7b; M10 10b).
 const PENDING_INVITE = "plor.pendingInvite";
-const INVITE_PATH = /^\/(?:invite|groups\/join)\/(.+)$/;
+const INVITE_PATH = /^\/[ig]\/(.+)$/;
 
 function invitePath(view?: View): string | undefined {
-  if (view?.kind === "invite") return `/invite/${view.code}`;
-  if (view?.kind === "joinGroup") return `/groups/join/${view.code}`;
+  if (view?.kind === "invite") return `/i/${view.code}`;
+  if (view?.kind === "joinGroup") return `/g/${view.code}`;
 }
 
 export function Home({ view }: { view?: View }) {
@@ -80,15 +89,23 @@ export function Home({ view }: { view?: View }) {
   const [streakError, setStreakError] = useState<string | null>(null);
   // From 1200px the other player pages show the friends feed in the right column (FriendsFeed).
   const feedColumn = useMinWidth(1200);
+  // Counts the times the clock bar saw a question's time run out away from the game screen. The database decides a
+  // timeout when the run is next read (src/game/status.ts), so the parts of the page that wait for the run to be over
+  // read it again then (docs/milestones/M14-14b-2c-review-items.md, items 6 and 46).
+  const [timeUps, setTimeUps] = useState(0);
+  const timeUp = useCallback(() => setTimeUps((n) => n + 1), []);
   function reloadStreak() {
     setStreakError(null);
     api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setStreakError(errorText(err)));
   }
-  // The account's theme, once the profile is known, keeping this browser's copy in step (the copy itself is re-applied
-  // on every page by KeepTheme, src/app/keep-theme.tsx). Signed out, or before a username, nothing is picked.
+  // Signed out, or before a username, no theme is picked, and this browser's copy is cleared (the copy itself is
+  // re-applied on every page by KeepTheme, src/app/keep-theme.tsx). Signed in, the settings sheet, which the shell
+  // always holds, applies the theme it shows: the account's, or the one being saved, so a profile reload or another
+  // setting's reply landing mid-save doesn't put the page back (docs/milestones/M14-14b-2c-review-items.md, item 33).
+  const accountTheme = me?.signedIn === true && me.username !== null;
   useLayoutEffect(() => {
-    if (me) applyTheme(me.signedIn && me.username !== null ? me.settings.theme : null);
-  }, [me]);
+    if (me && !accountTheme) applyTheme(null);
+  }, [me, accountTheme]);
 
   // Back from Google with an invite pending: go back to its page. On an invite page the remembered one is spent, so
   // a code kept for a Google round trip that was cancelled doesn't send the player back here from the next visit to
@@ -124,13 +141,15 @@ export function Home({ view }: { view?: View }) {
             profile={me}
             streak={me.streak}
             onChanged={loadMe}
-            onSettings={(settings) => setMe({ ...me, settings })}
+            // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's copy
+            // (docs/milestones/M14-14b-2c-review-items.md, item 29).
+            onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
             onSignedOut={() => setMe({ signedIn: false })}
           />
           {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-          {view?.kind !== "offbeat" && <ClockBar />}
+          {view?.kind !== "offbeat" && <ClockBar onTimeUp={timeUp} />}
           {streakError && <p role="alert">{streakError}</p>}
-          {view && view.kind !== "offbeat" && view.kind !== "admin" && feedColumn && <FriendsFeed username={me.username} />}
+          {view && !NO_FEED.includes(view.kind) && feedColumn && <FriendsFeed username={me.username} timeUps={timeUps} />}
           {view?.kind === "offbeat" ? (
             <OffbeatScreen username={me.username} onStarted={reloadStreak} />
           ) : view?.kind === "howToPlay" ? (
@@ -140,7 +159,7 @@ export function Home({ view }: { view?: View }) {
           ) : view?.kind === "admin" ? (
             <AdminArea page={view.page} admin={me.admin} />
           ) : view?.kind === "friends" ? (
-            <Friends username={me.username} />
+            <Friends username={me.username} timeUps={timeUps} />
           ) : view?.kind === "groups" ? (
             <Groups />
           ) : view?.kind === "me" ? (
@@ -150,13 +169,13 @@ export function Home({ view }: { view?: View }) {
               {me.admin && <MeAdminLink />}
             </>
           ) : view?.kind === "invite" ? (
-            <AcceptInvite code={view.code} />
+            <AcceptInvite code={view.code} username={me.username} />
           ) : view?.kind === "joinGroup" ? (
             <JoinGroup code={view.code} />
           ) : view?.kind === "group" ? (
-            <GroupPage id={view.id} username={me.username} />
+            <GroupPage id={view.id} username={me.username} timeUps={timeUps} />
           ) : (
-            <Today username={me.username} skip={me.settings.skipGameScreen} />
+            <Today username={me.username} skip={me.settings.skipGameScreen} timeUps={timeUps} />
           )}
         </>
       )}
@@ -305,18 +324,16 @@ function PickUsername({ onDone }: { onDone: () => void }) {
 // leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in the right column (SideColumn). The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
-function Today({ username, skip }: { username: string; skip: boolean }) {
+function Today({ username, skip, timeUps }: { username: string; skip: boolean; timeUps: number }) {
   const [runOver, setRunOver] = useState(false);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
-  const [channelError, setChannelError] = useState<string | null>(null);
-  const { paused } = useBoardChannel({
+  const channel = useBoardChannel({
     joined: nudgeComments,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
       if (changesThread(message, "feed")) nudgeComments();
     },
-    failed: (err) => setChannelError(errorText(err)),
   });
   // Count resets: at midnight Pacific every section that shows a day starts again, from the server's new day (M11 H6).
   // The run itself is played on the game screen, which keeps a game in play to its end.
@@ -327,16 +344,16 @@ function Today({ username, skip }: { username: string; skip: boolean }) {
 
   return (
     <div className={styles.today}>
-      <section id="offbeat" aria-label="Offbeat" className={styles.game}>
-        <TodayBanner key={`game-${day}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
+      <section id="offbeat" aria-label={GAME.name} className={styles.game}>
+        <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
       </section>
       <SideColumn label="Your circle" inPlace className={styles.side}>
-        {wide && <Board key={`board-${day}`} username={username} invite />}
+        {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
+        {wide && <Board key={`board-${day}-${timeUps}`} username={username} invite />}
         <LeaderboardCard key={`card-${day}`} />
       </SideColumn>
       <div className={styles.feed}>
-        {paused && <p role="status">{PAUSED_TEXT}</p>}
-        {channelError && <p role="alert">{channelError}</p>}
+        <LiveStatus channel={channel} />
         <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} />
       </div>
     </div>
@@ -347,21 +364,22 @@ function Today({ username, skip }: { username: string; skip: boolean }) {
 // (docs/milestones/M14-14b-2b-1-shell.md, criterion 2; human, 2026-10-26: "The friends feed everywhere (Recommended)").
 // As on Today: locked until today's run is over (M08 8a), nudged by the board's channel (M08 8d), and started again at
 // midnight Pacific (M11 H6), from the run's state.
-function FriendsFeed({ username }: { username: string }) {
+function FriendsFeed({ username, timeUps }: { username: string; timeUps: number }) {
   const [day, setDay] = useState(0);
   const [run, setRun] = useState<{ over: boolean; msToReset: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Read again on the new day and when the clock bar's time runs out (Home's timeUps), so the feed opens once the run
+  // is over, whichever page the player is on.
   useEffect(() => {
-    type RunResponse = { run: { status: string; msToReset: number } } | { run: null; msToReset: number };
+    type RunResponse = { run: { status: RunStatus; msToReset: number } } | { run: null; msToReset: number };
     api<RunResponse>("/api/run", { method: "GET" }).then(
-      // A run is over once it died, survived or timed out (src/game/runs.ts, FINISHED).
-      (r) =>
-        setRun(
-          r.run ? { over: ["died", "survived", "timed_out"].includes(r.run.status), msToReset: r.run.msToReset } : { over: false, msToReset: r.msToReset },
-        ),
+      (r) => {
+        setRun(r.run ? { over: FINISHED.includes(r.run.status), msToReset: r.run.msToReset } : { over: false, msToReset: r.msToReset });
+        setError(null);
+      },
       (err) => setError(errorText(err)),
     );
-  }, [day]);
+  }, [day, timeUps]);
   useEffect(() => {
     if (!run) return;
     const timer = setTimeout(() => setDay((d) => d + 1), run.msToReset);
@@ -369,18 +387,17 @@ function FriendsFeed({ username }: { username: string }) {
   }, [run]);
   const [nudge, setNudge] = useState(0);
   const nudgeFeed = useCallback(() => setNudge((n) => n + 1), []);
-  const { paused } = useBoardChannel({
+  const channel = useBoardChannel({
     joined: nudgeFeed,
     changed: (message) => {
       if (message.v !== PAYLOAD_VERSION) console.error("board message with unknown version", message.v);
       if (changesThread(message, "feed")) nudgeFeed();
     },
-    failed: (err) => setError(errorText(err)),
   });
 
   return (
     <SideColumn label="Friends feed">
-      {paused && <p role="status">{PAUSED_TEXT}</p>}
+      <LiveStatus channel={channel} />
       {error && <p role="alert">{error}</p>}
       {run && <Comments key={`feed-${day}`} username={username} runOver={run.over} nudge={nudge} />}
     </SideColumn>
@@ -391,24 +408,28 @@ function FriendsFeed({ username }: { username: string }) {
 // the invite link (human, 2026-10-25: "friends list should be in the friends tab"; "Below the boards (Recommended)";
 // docs/milestones/M14-14a-3b-settings.md), whose link is the board's here, so it shows once. With no game on the page,
 // the time to the reset comes from the run's state, and the boards start again at midnight Pacific (M11 H6).
-function Friends({ username }: { username: string }) {
+function Friends({ username, timeUps }: { username: string; timeUps: number }) {
   const [day, setDay] = useState(0);
-  const [msToReset, setMsToReset] = useState<number | null>(null);
+  // Held in an object, so each answer starts the timer again even when it repeats the last (0 right at midnight), and
+  // the next reset still fires (14b-2c-1, item 5).
+  const [reset, setReset] = useState<{ ms: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     api<{ run: { msToReset: number } } | { run: null; msToReset: number }>("/api/run", { method: "GET" }).then(
-      (r) => setMsToReset(r.run ? r.run.msToReset : r.msToReset),
+      (r) => setReset({ ms: r.run ? r.run.msToReset : r.msToReset }),
       (err) => setError(errorText(err)),
     );
   }, [day]);
   useEffect(() => {
-    if (msToReset === null) return;
-    const timer = setTimeout(() => setDay((d) => d + 1), msToReset);
+    if (reset === null) return;
+    const timer = setTimeout(() => setDay((d) => d + 1), reset.ms);
     return () => clearTimeout(timer);
-  }, [msToReset]);
+  }, [reset]);
 
+  // The boards start again when the clock bar's time runs out too: how friends' runs ended shows once the player's is
+  // over (src/friends/board.ts).
   return (
-    <Fragment key={day}>
+    <Fragment key={`${day}-${timeUps}`}>
       {error && <p role="alert">{error}</p>}
       <Board username={username} invite={false} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
@@ -417,8 +438,10 @@ function Friends({ username }: { username: string }) {
   );
 }
 
-// What an invite link opens, once signed in with a username (M07 7b).
-function AcceptInvite({ code }: { code: string }) {
+// What an invite link opens, once signed in with a username (M07 7b). The player's own link says so, with the link to
+// share, rather than offering to add themselves (human, 2026-10-26: "Say it's yours (Recommended)";
+// docs/milestones/M14-14b-2c-review-items.md, answer 8).
+function AcceptInvite({ code, username }: { code: string; username: string }) {
   const [inviter, setInviter] = useState<Friend | null>(null);
   const [added, setAdded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -444,6 +467,17 @@ function AcceptInvite({ code }: { code: string }) {
     }
   }
 
+  if (inviter?.username === username) {
+    return (
+      <section aria-label="Invite">
+        <h2>This is your invite link</h2>
+        <InviteLink canReset={false} />
+        <p>
+          <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
+        </p>
+      </section>
+    );
+  }
   return (
     <section aria-label="Invite">
       {inviter && !added && (

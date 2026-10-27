@@ -14,7 +14,6 @@ import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import type { Emoji } from "@/reactions/reactions";
 import {
-  PAUSED_TEXT,
   PAYLOAD_VERSION,
   STATUS_VERSION,
   useBoardChannel,
@@ -23,8 +22,10 @@ import {
 } from "./board-channel";
 import { Avatar } from "./avatar";
 import { InviteLink } from "./invite-link";
+import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
+import { capitalized, caughtText, timedOutText } from "@/game/words";
 
 // invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
 // holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
@@ -50,11 +51,10 @@ export function Board({ username, invite }: { username: string; invite: boolean 
   );
   useEffect(load, [load]);
 
-  const { paused } = useBoardChannel({
+  const channel = useBoardChannel({
     joined: (reason) => load(reason === "reconnect" ? "reconnect" : undefined),
     status: onStatus,
     changed: onChanged,
-    failed: (err) => setError(errorText(err)),
   });
 
   function onChanged(message: ChangedMessage) {
@@ -107,8 +107,8 @@ export function Board({ username, invite }: { username: string; invite: boolean 
   return (
     <section aria-label="Friends today">
       <h2>Friends today</h2>
-      {paused && <p role="status">{PAUSED_TEXT}</p>}
-      {board?.mine && <WhereEveryoneEnded mine={board.mine} friends={board.friends} />}
+      <LiveStatus channel={channel} />
+      {board?.mine && <WhereEveryoneEnded username={username} mine={board.mine} friends={board.friends} />}
       {board?.reactionsOnMine && board.reactionsOnMine.counts.length > 0 && (
         <p>
           Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
@@ -140,23 +140,26 @@ export function Board({ username, invite }: { username: string; invite: boolean 
 }
 
 function describe(f: BoardFriend): string {
-  if (f.ended?.result === "caught") return `caught on question ${f.ended.question} by "${f.ended.answer}"`;
-  if (f.ended?.result === "survived") return "survived every question";
-  if (f.ended?.result === "timed_out") return `ran out of time on question ${f.ended.question}`;
-  if (f.state === "playing") return `on question ${f.question}`;
+  if (f.ended?.result === "caught") return `${caughtText(f.ended.question)} by "${f.ended.answer}"`;
+  if (f.ended?.result === "survived") return "reached the top";
+  if (f.ended?.result === "timed_out") return timedOutText(f.ended.question);
+  if (f.state === "playing") return `on stop ${f.question}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "hasn't played yet";
 }
 
 function placeLabel(place: Place): string {
-  if (place.kind === "caught") return `Caught on question ${place.question}`;
-  if (place.kind === "timed_out") return "Ran out of time";
-  return "Survived";
+  // Updraft's words by the stop's tier (docs/milestones/M14-14c-1-name-and-words.md, "The words").
+  if (place.kind === "caught") return capitalized(caughtText(place.question));
+  if (place.kind === "timed_out") return capitalized(timedOutText(place.question));
+  return "Reached the top";
 }
 
 // "Where everyone ended" (M07 7d): one row per place, the player first, up to FRIENDS_PER_PLACE friends by name, then
-// a count. Each row opens to its full list: a native <details>, so it works by tap and keyboard with no state.
-function WhereEveryoneEnded({ mine, friends }: { mine: Ended; friends: BoardFriend[] }) {
+// a count. Each row opens to its full list: a native <details>, so it works by tap and keyboard with no state. The full
+// list has the avatar slot by every name, as the board's other rows do (L37, "Boards"; human, 2026-10-26: "Yes, add
+// them (Recommended)"; docs/milestones/M14-14b-2c-review-items.md, answer 11).
+function WhereEveryoneEnded({ username, mine, friends }: { username: string; mine: Ended; friends: BoardFriend[] }) {
   return (
     <section aria-label="Where everyone ended">
       <h3>Where everyone ended</h3>
@@ -169,9 +172,15 @@ function WhereEveryoneEnded({ mine, friends }: { mine: Ended; friends: BoardFrie
                 {row.more > 0 && ` + ${row.more} more`}
               </summary>
               <ul>
-                {row.you && <li>You</li>}
+                {row.you && (
+                  <li>
+                    <Avatar name={username} /> You
+                  </li>
+                )}
                 {row.everyone.map((p) => (
-                  <li key={p.username}>{p.name}</li>
+                  <li key={p.username}>
+                    <Avatar name={p.name} /> {p.name}
+                  </li>
                 ))}
               </ul>
             </details>

@@ -1,5 +1,4 @@
-// The invite code's shape, shared by the server and the invite page (M07 D3). Base64url without padding writes
-// every 3 bytes as 4 characters, rounded up.
-import { INVITE_CODE_BYTES } from "@/config/tunables";
+// The invite code's shape, shared by the server and the invite pages (M07 D3; M14 14b-3).
+import { INVITE_CODE_LENGTH } from "@/config/tunables";
 
-export const INVITE_CODE = new RegExp(`^[A-Za-z0-9_-]{${Math.ceil((INVITE_CODE_BYTES * 4) / 3)}}$`);
+export const INVITE_CODE = new RegExp(`^[A-Za-z0-9_-]{${INVITE_CODE_LENGTH}}$`);

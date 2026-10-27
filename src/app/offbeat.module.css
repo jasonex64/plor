@@ -32,7 +32,6 @@
   grid-area: feed;
 }
 
-
 .card {
   display: flex;
   flex-direction: column;

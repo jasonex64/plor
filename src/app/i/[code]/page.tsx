@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Home } from "../../home";
 import { Footer } from "../../footer";
 
-// An invite link (docs/milestones/M07-friends-and-live-board.md, 7b): sign in if needed, pick a username if needed,
+// An invite link, /i/<code> (docs/milestones/M07-friends-and-live-board.md, 7b; M14 14b-3): sign in if needed, pick a username if needed,
 // then add the link's owner as a friend. The API checks the code; this page only passes it on.
 export default function InvitePage({ params }: { params: Promise<{ code: string }> }) {
   return (

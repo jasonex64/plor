@@ -14,7 +14,8 @@
   font-size: 20px;
 }
 
-/* Yesterday / This week: the chosen one is filled, not only coloured (WCAG 2.2 1.4.1). */
+/* Yesterday / This week: the chosen one is filled and bold, not only coloured (WCAG 2.2 1.4.1), bold as the shell's
+   current tab is (docs/milestones/M14-14b-2c-review-items.md, item 17). */
 .switch {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -33,7 +34,6 @@
   border-radius: 8px;
   color: var(--muted);
   font-size: 14px;
-  font-weight: 700;
   cursor: pointer;
 }
 
@@ -54,6 +54,7 @@
 .on {
   background: var(--text);
   color: var(--bg);
+  font-weight: 700;
 }
 
 .board select {

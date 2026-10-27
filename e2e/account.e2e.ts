@@ -4,7 +4,7 @@
 // link with Reset are on the Friends tab; Today's board has the invite link too, without Reset (M12 12f, F1).
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick, forwardPlayerIp } from "./players";
+import { RUN, signInAndPick, forwardPlayerIp, sharedLink } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -103,17 +103,26 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   await expect(board.getByRole("region", { name: "Invite friends" })).toHaveCount(0);
   const friends = inviter.getByRole("region", { name: "Your friends" });
   await expect(friends.getByText("No friends yet. Send someone your invite link.")).toBeVisible();
-  await friends.getByRole("button", { name: "Make my invite link" }).click();
   const invite = friends.getByRole("region", { name: "Invite friends" });
-  const link = await invite.locator("code").innerText();
-  await expect(invite.getByRole("button", { name: "Share" })).toBeVisible();
+  // One button shares the link, made the first time, and the link is never shown (M14 14b-3, criterion 1); Reset sits
+  // beside it once there's a link to reset (answer 8).
+  await expect(invite.getByRole("button", { name: "Reset link" })).toHaveCount(0);
+  const link = await sharedLink(inviter, invite.getByRole("button", { name: "Invite a friend" }));
+  expect(link).toMatch(/^http:\/\/localhost:3000\/i\/[A-Za-z0-9_-]{10}$/);
   await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();
-  // Today's board, from 768px, has the same link and no Reset that would break a link already sent (F1).
+  expect(await inviter.locator("body").innerText()).not.toContain("/i/");
+  // Today's board, from 768px, shares the same link and has no Reset that would break a link already sent (F1).
   const wide = await (await inviter.context().browser()!.newContext({ viewport: { width: 1440, height: 900 }, storageState: await inviter.context().storageState() })).newPage();
   await wide.goto("/");
   const todayInvite = wide.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
-  await expect(todayInvite.locator("code")).toHaveText(link);
+  expect(await sharedLink(wide, todayInvite.getByRole("button", { name: "Invite a friend" }))).toBe(link);
   await expect(wide.getByRole("button", { name: "Reset link" })).toHaveCount(0);
+  // A code of the old 22-character size is refused like any unknown one, and the old /invite/ address is gone
+  // (M14 14b-3, criteria 4 and 5).
+  await wide.goto("/i/abcdefghijklmnopqrst-_");
+  await expect(wide.getByText("That invite link doesn't work. Ask your friend for their current link.")).toBeVisible();
+  expect((await wide.goto(`/invite/${new URL(link).pathname.slice(3)}`))!.status()).toBe(404);
+  await wide.context().close();
 
   const friend = await (await browser.newContext()).newPage();
   await friend.goto(new URL(link).pathname);

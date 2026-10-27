@@ -9,7 +9,7 @@ import type { BankView } from "@/admin/bank";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
-import { dayText } from "../day-text";
+import { dayText } from "../../day-text";
 
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
@@ -31,28 +31,28 @@ export function Bank() {
       </p>
       <section aria-label="Questions" className={admin.card}>
         <label className={admin.field}>
-          <span className={admin.sr}>Filter questions or categories</span>
+          <span className="sr-only">Filter questions or categories</span>
           <input value={filter} placeholder="Filter questions or categories" onChange={(e) => setFilter(e.target.value)} />
         </label>
         {bank.questions.length === 0 ? (
           <p>The bank holds no questions.</p>
         ) : (
-          <table className={admin.table}>
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th>Category</th>
-                <th>Themes</th>
-                <th>Added by</th>
-                <th>Runs (caught)</th>
+          <table className={admin.table} role="table">
+            <thead role="rowgroup" className="sr-only-on-phones">
+              <tr role="row">
+                <th role="columnheader">Question</th>
+                <th role="columnheader">Category</th>
+                <th role="columnheader">Themes</th>
+                <th role="columnheader">Added by</th>
+                <th role="columnheader">Runs (caught)</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {questions.map((q) => (
-                <tr key={q.id} aria-label={q.prompt}>
-                  <td className={admin.strong}>{q.prompt}</td>
-                  <td>{q.category}</td>
-                  <td>
+                <tr role="row" key={q.id} aria-label={q.prompt}>
+                  <td role="cell" className={admin.strong} data-label="Question">{q.prompt}</td>
+                  <td role="cell" data-label="Category">{q.category}</td>
+                  <td role="cell" data-label="Themes">
                     {q.themes.length ? (
                       <span className={admin.tags}>
                         {q.themes.map((t) => (
@@ -65,16 +65,20 @@ export function Bank() {
                       <span className={admin.muted}>—</span>
                     )}
                   </td>
-                  <td>{q.addedBy.charAt(0).toUpperCase() + q.addedBy.slice(1)}</td>
-                  <td>
+                  <td role="cell" data-label="Added by">{q.addedBy.charAt(0).toUpperCase() + q.addedBy.slice(1)}</td>
+                  <td role="cell" data-label="Runs (caught)">
                     {q.uses.length === 0 ? (
                       <span className={admin.muted}>Not used yet</span>
                     ) : (
                       <ul className={admin.plain}>
                         {q.uses.map((u) => (
                           <li key={u.date} className={admin.nowrap}>
-                            {u.catchRate === null ? (
+                            {u.day === "future" ? (
                               <span className={admin.muted}>Scheduled {dayText(u.date)}</span>
+                            ) : u.catchRate === null ? (
+                              // A started day with no answers to rate yet (human, 2026-10-26: "'Today, no answers yet'
+                              // (Recommended)"); a closed one with none says so too.
+                              <span className={admin.muted}>{u.day === "today" ? "Today, no answers yet" : `${dayText(u.date)}, no answers`}</span>
                             ) : (
                               <>
                                 {dayText(u.date)} <b>{Math.round(u.catchRate * 100)}%</b> <span className={admin.muted}>of {u.answered}</span>
@@ -97,12 +101,12 @@ export function Bank() {
         {bank.themes.length === 0 ? (
           <p>No themes set.</p>
         ) : (
-          <table className={admin.table}>
-            <tbody>
+          <table className={admin.table} role="table">
+            <tbody role="rowgroup">
               {bank.themes.map((t) => (
-                <tr key={t.date}>
-                  <td className={admin.nowrap}>{dayText(t.date)}</td>
-                  <td>
+                <tr role="row" key={t.date}>
+                  <td role="cell" className={admin.nowrap}>{dayText(t.date)}</td>
+                  <td role="cell">
                     <span className={`${admin.tag} ${admin.state}`}>{t.theme}</span>
                   </td>
                 </tr>

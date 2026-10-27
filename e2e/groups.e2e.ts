@@ -5,8 +5,9 @@
 // out of the friends thread.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -33,10 +34,15 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const groupUrl = creator.url();
   await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
-  await creator.getByRole("button", { name: "Copy" }).click();
-  await expect(creator.getByText("Copied.")).toBeVisible();
-  const link = await creator.evaluate(() => navigator.clipboard.readText());
-  expect(link).toMatch(/^http:\/\/localhost:3000\/groups\/join\/[A-Za-z0-9_-]{22}$/);
+  // Shared from a button, never shown (M14 14b-3, answer 9), on /g/ with a 10-character code.
+  const link = await sharedLink(creator, creator.getByRole("button", { name: "Share group link" }));
+  expect(link).toMatch(/^http:\/\/localhost:3000\/g\/[A-Za-z0-9_-]{10}$/);
+  expect(await creator.locator("body").innerText()).not.toContain("/g/");
+  // A group's page doesn't scroll sideways on a 320px phone (14b-3, criterion 7). Polled: measured the moment after a
+  // resize, the page is still the old width while it lays out again (seen at 360 for a moment, then 320).
+  await creator.setViewportSize({ width: 320, height: 640 });
+  await expect.poll(() => creator.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await creator.setViewportSize({ width: 1280, height: 720 });
 
   const joiner = await (await browser.newContext()).newPage();
   await joiner.goto(link);
@@ -59,16 +65,16 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await creator.goto("/");
   const sections = (within: string) => () =>
     creator.locator(within).evaluateAll((all) => all.filter((s) => !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
-  await expect.poll(sections("main section")).toEqual(["Offbeat", "Feed"]);
+  await expect.poll(sections("main section")).toEqual([GAME.name, "Feed"]);
   await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
-  const card = creator.getByRole("region", { name: "Offbeat" });
+  const card = creator.getByRole("region", { name: GAME.name });
   await expect(card.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await expect(creator.getByRole("region", { name: "Leaderboard" }).getByLabel("Board").locator("option")).toHaveText(["Friends", "Book Club"]);
   const creatorFeed = creator.getByRole("region", { name: "Feed" });
   await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
-  await expect(creatorFeed.getByText("Finish today's Offbeat to join in.")).toBeVisible();
+  await expect(creatorFeed.getByText("Finish today's game to join in.")).toBeVisible();
 
-  // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
+  // Both are tipped over at stop 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
   // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group
   // (M11 11b).
   for (const page of [creator, joiner]) {
@@ -76,12 +82,12 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
     await play(page);
     await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
     await page.getByRole("button", { name: "Answer" }).click();
-    await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
+    await expect(page.getByText(/^You climbed 0 of 7 stops/)).toBeVisible();
   }
   // After playing, the score is in the card, and the order is the same.
   await creator.goto("/");
-  await expect(card.getByText("0 points + about 0 bonus · caught on question 1")).toBeVisible();
-  await expect.poll(sections("main section")).toEqual(["Offbeat", "Feed"]);
+  await expect(card.getByText("0 points · tipped over at stop 1")).toBeVisible();
+  await expect.poll(sections("main section")).toEqual([GAME.name, "Feed"]);
   await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);
   // returns the channel's socket.

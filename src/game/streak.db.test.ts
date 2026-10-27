@@ -5,7 +5,7 @@
 // which days the local database has.
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
-import { GAME_ID } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { fixtureDay } from "@/test/answer-fixture";
 
 // The streak reads only which days have a puzzle, so the fixture day needs no answer database here.

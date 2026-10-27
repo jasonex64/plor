@@ -11,7 +11,7 @@ import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
 import { errorText } from "../../messages";
-import { dayText } from "../day-text";
+import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
 import styles from "./puzzles.module.css";
 
@@ -117,7 +117,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
       <div className={styles.dayHead}>
         <div>
           <h3 className={admin.cardTitle}>
-            {dayText(day.date)} <span className={admin.sr}>({label})</span>
+            {dayText(day.date)} <span className="sr-only">({label})</span>
           </h3>
           <p className={admin.note}>
             {editable ? `${state} Tick the host answers (the Wind's) you want. Dashed ones have a letter the Wind has stolen, so players can't type them.` : state}
@@ -144,26 +144,26 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
           ))}
         </ul>
       )}
-      <table className={admin.table}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Question</th>
-            <th>Steals</th>
-            <th>Host answers</th>
+      <table className={admin.table} role="table">
+        <thead role="rowgroup" className="sr-only-on-phones">
+          <tr role="row">
+            <th role="columnheader">#</th>
+            <th role="columnheader">Question</th>
+            <th role="columnheader">Steals</th>
+            <th role="columnheader">Host answers</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {shown.map((q, i) => (
-            <tr key={i}>
-              <td className={admin.muted}>{i + 1}</td>
-              <td className={styles.question}>
+            <tr role="row" key={i}>
+              <td role="cell" className={admin.muted} data-label="#">{i + 1}</td>
+              <td role="cell" className={styles.question} data-label="Question">
                 <span className={admin.strong}>{q.prompt}</span>
                 <br />
                 <span className={admin.muted}>any {q.category.replaceAll("_", " ")}</span>
               </td>
-              <td>{q.steals ? <span className={`${admin.tag} ${admin.state}`}>−{q.steals.toUpperCase()}</span> : <span className={admin.muted}>—</span>}</td>
-              <td>
+              <td role="cell" data-label="Steals">{q.steals ? <span className={`${admin.tag} ${admin.state}`}>−{q.steals.toUpperCase()}</span> : <span className={admin.muted}>—</span>}</td>
+              <td role="cell" data-label="Host answers">
                 {editable ? (
                   <HostChips q={q} chosen={hosts[i]} onChange={(next) => setHosts(hosts.map((h, j) => (j === i ? next : h)))} />
                 ) : (
@@ -191,36 +191,38 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   );
 }
 
-// The question's host bank as checkboxes drawn as chips: the checked ones first, then the rest by name, five at first.
+// The question's host bank as checkboxes drawn as chips, five at first: the ones checked when it's drawn first, then
+// the rest by name. The order and how many show stay as drawn while the admin ticks, so nothing moves under the
+// pointer or out from under the keyboard (human, 2026-10-26: "Stay in place (Recommended)";
+// docs/milestones/M14-14b-2c-review-items.md, answer 16).
 function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[]; onChange: (next: string[]) => void }) {
   const [all, setAll] = useState(false);
-  const byName = [...q.hostBank].sort((a, b) => a.name.localeCompare(b.name));
-  const ordered = [...byName.filter((a) => chosen.includes(a.id)), ...byName.filter((a) => !chosen.includes(a.id))];
-  const visible = all ? ordered : ordered.slice(0, Math.max(SHOWN, chosen.length));
-  const more = ordered.length - visible.length;
+  const [order] = useState(() => {
+    const byName = [...q.hostBank].sort((a, b) => a.name.localeCompare(b.name));
+    return [...byName.filter((a) => chosen.includes(a.id)), ...byName.filter((a) => !chosen.includes(a.id))];
+  });
+  const [first] = useState(() => Math.max(SHOWN, chosen.length));
+  const visible = all ? order : order.slice(0, first);
+  const more = order.length - visible.length;
   return (
     <fieldset className={styles.chips}>
-      <legend className={admin.sr}>Host answers for {q.prompt}</legend>
+      <legend className="sr-only">Host answers for {q.prompt}</legend>
       {visible.map((a) => {
         const on = chosen.includes(a.id);
-        // Players can't type it, so it can't be ticked; one ticked before stays a checkbox, to untick.
-        if (a.stolen && !on) {
-          return (
-            <span key={a.id} className={`${styles.chip} ${styles.blocked}`}>
-              <Struck choice={a} />
-              <span className={admin.sr}>, has {a.stolen.toUpperCase()}: players can&apos;t type it</span>
-            </span>
-          );
-        }
+        // Players can't type it, so it can't be ticked, only unticked if it was ticked before. It stays a checkbox
+        // either way, unavailable once unticked, so unticking keeps the keyboard's focus on it (item 53).
         if (a.stolen) {
           return (
-            <label key={a.id} className={`${styles.chip} ${styles.bad}`}>
+            <label key={a.id} className={on ? `${styles.chip} ${styles.bad}` : `${styles.chip} ${styles.blocked}`}>
               <input
                 type="checkbox"
-                className={admin.sr}
+                className="sr-only"
                 aria-label={`${a.name}, has ${a.stolen.toUpperCase()}: players can't type it`}
-                checked
-                onChange={() => onChange(chosen.filter((id) => id !== a.id))}
+                aria-disabled={!on}
+                checked={on}
+                onChange={() => {
+                  if (on) onChange(chosen.filter((id) => id !== a.id));
+                }}
               />
               <Struck choice={a} />
             </label>
@@ -228,7 +230,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         }
         return (
           <label key={a.id} className={on ? `${styles.chip} ${styles.checked}` : styles.chip}>
-            <input type="checkbox" className={admin.sr} checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
+            <input type="checkbox" className="sr-only" checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
             {on && (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="m5 12.5 4.5 4.5L19 7.5" />
@@ -238,7 +240,8 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
           </label>
         );
       })}
-      {(more > 0 || all) && (
+      {/* Only when the bank holds more than the first chips, so "Show fewer" always has something to hide. */}
+      {order.length > first && (
         <button type="button" className={`${styles.chip} ${styles.more}`} onClick={() => setAll(!all)}>
           {all ? "Show fewer" : `+${more} more`}
         </button>

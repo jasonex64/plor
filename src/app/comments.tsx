@@ -1,13 +1,13 @@
 "use client";
 
-// Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): the player's own and their
-// friends', oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at
-// a time, read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can
-// be changed only where posting can. Other players' comments can be reported on any day shown, which hides them
-// from the reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4). On
-// the home page, today is the feed: the friends thread's and the player's groups' comments in one list, each labelled,
-// with only who commented and how many reactions until the run is over (docs/milestones/M11-home-screen.md, 11b; H2,
-// H3); earlier days are the friends thread. Plain UI; the look is M14.
+// Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): the player's own and their friends',
+// oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at a time,
+// read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can be
+// changed only where posting can. Other players' comments can be reported on any day shown, which hides them from the
+// reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4). On Today, and
+// in other pages' right column, today is the feed: the friends thread's and the player's groups' comments in one list,
+// each labelled, with only who commented and how many reactions until the run is over
+// (docs/milestones/M11-home-screen.md, 11b; H2, H3); earlier days are the friends thread.
 import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
@@ -20,6 +20,7 @@ import { Avatar } from "./avatar";
 import styles from "./comments.module.css";
 import { errorText } from "./messages";
 import { Reactions } from "./reactions";
+import { GAME } from "@/platform/game";
 
 // The calendar day before or after a YYYY-MM-DD date.
 function shiftDay(date: string, days: number): string {
@@ -31,7 +32,7 @@ function shiftDay(date: string, days: number): string {
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
-// home page's feed. title names today's feed (its heading and region): "Feed" on Today, the game screen's own on
+// friends feed. title names today's feed (its heading and region): "Feed" on Today, the game screen's own on
 // Offbeat's (round 5: "Offbeat comments"; docs/milestones/M14-14a-2c-review-fixes.md).
 export function Comments({
   username,
@@ -174,21 +175,21 @@ function Preview({ preview }: { preview: FeedPreview }) {
     return (
       <>
         <p>No comments yet.</p>
-        <p>Finish today&apos;s Offbeat to join in.</p>
+        <p>Finish today&apos;s game to join in.</p>
       </>
     );
   }
   return (
     <>
       <p>
-        <ButtonLink href="/offbeat">{text.read}</ButtonLink>
+        <ButtonLink href={GAME.path}>{text.read}</ButtonLink>
       </p>
       <ul className={styles.locked}>
         {/* By position: two friends can share a display name. */}
         {text.named.map((name, i) => (
           <li key={i}>
             <Avatar name={name} /> <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
-            <span className={styles.hidden}>comment hidden until you play</span>
+            <span className="sr-only">comment hidden until you play</span>
           </li>
         ))}
       </ul>

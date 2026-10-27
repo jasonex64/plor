@@ -1,11 +1,12 @@
 // What Offbeat's game screen shows besides the run (docs/milestones/M14-14a-2b-game-screen.md): the player's stats and
 // yesterday's answers. Dates are read as text and "today" comes from private.today() alone (M00 §8).
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { STATS_CHART_DAYS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { settleRuns } from "./ledger";
 import { hostAnswers, named, thingNames, type Named } from "./payload";
-import { FINISHED, type RunStatus } from "./runs";
+import { FINISHED, type RunStatus } from "./status";
 import { getStreak } from "./streak";
 
 // best: the highest points plus final bonus over closed days, null before one is settled. average: questions survived
@@ -28,25 +29,39 @@ export type Yesterday =
   | { date: string; state: "none" | "in_play" }
   | { date: string; state: "shown"; questions: YesterdayQuestion[] };
 
-export async function getStats(db: Db, userId: string): Promise<Stats> {
-  // The ledger has a day's row only once a read after its midnight settles it (DECISIONS.md, Points ledger).
-  await settleRuns(db, [userId]);
-  const { rows } = await db.query<{ best: number | null; average: number | null; days: Stats["days"] }>(
-    `with finished as (
-       select s.puzzle_date,
+// The player's finished runs, each with the questions it survived, as a CTE named finished: $1 the player, $2 the
+// game, $3 FINISHED. Shared by the game screen's stats and the Me tab (docs/milestones/M14-14b-2c-review-items.md,
+// item 19).
+export const FINISHED_RUNS = `finished as (
+       select s.puzzle_date, s.status,
               (select count(*) from private.run_event e
                where e.user_id = s.user_id and e.game_id = s.game_id and e.puzzle_date = s.puzzle_date and not e.matched)::int as survived
        from private.run_status s
        where s.user_id = $1 and s.game_id = $2 and s.status = any($3::text[])
-     )
+     )`;
+
+export async function getStats(db: Db, userId: string): Promise<Stats> {
+  // The ledger has a day's row only once a read after its midnight settles it (DECISIONS.md, Points ledger). The day
+  // is read first, so the settling and the stats are of the same one (readStats).
+  const { rows } = await db.query<{ day: string }>("select private.today()::text as day");
+  await settleRuns(db, [userId], rows[0].day);
+  return readStats(db, userId, rows[0].day);
+}
+
+// The stats as of day, read once by the caller so every part is of the same day: private.today() is each statement's
+// own (supabase/migrations/20261021044659_today_uses_statement_time.sql), so separate reads at midnight could mix two
+// (item 19). The caller has settled the player's closed runs.
+export async function readStats(db: Db, userId: string, day: string): Promise<Stats> {
+  const { rows } = await db.query<{ best: number | null; average: number | null; days: Stats["days"] }>(
+    `with ${FINISHED_RUNS}
      select (select max(points) from private.points_ledger where user_id = $1 and game_id = $2) as best,
             (select avg(survived)::float8 from finished) as average,
             (select json_agg(json_build_object('date', w.day::text, 'survived', f.survived) order by w.day)
-             from (select generate_series(private.today() - ($4::int - 1), private.today(), interval '1 day')::date as day) as w
+             from (select generate_series($5::date - ($4::int - 1), $5::date, interval '1 day')::date as day) as w
              left join finished f on f.puzzle_date = w.day) as days`,
-    [userId, GAME_ID, FINISHED, STATS_CHART_DAYS],
+    [userId, GAME_ID, FINISHED, STATS_CHART_DAYS, day],
   );
-  return { streak: await getStreak(db, userId), ...rows[0] };
+  return { streak: await getStreak(db, userId, day), ...rows[0] };
 }
 
 export async function getYesterday(db: Db, userId: string): Promise<Yesterday> {

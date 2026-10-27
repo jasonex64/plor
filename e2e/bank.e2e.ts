@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { dayText } from "../src/app/admin/day-text";
+import { dayText } from "../src/app/day-text";
 import { RUN, signInAndPick } from "./players";
 
 // Every question the page lists: the repo's bank, which grows with each batch (13e).

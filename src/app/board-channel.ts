@@ -5,8 +5,9 @@
 // (M10 10d, G5). The browser's only Supabase connection is this Realtime one (M07 D5), one per page, shared by every
 // part that listens.
 import { RealtimeClient } from "@supabase/realtime-js";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
+import { errorText } from "./messages";
 
 type Session = { url: string; publishableKey: string; userId: string; accessToken: string; expiresAt: number };
 
@@ -30,34 +31,48 @@ export type StatusMessage = {
 export type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string; groupId?: string };
 
 // Whether a nudge means this list should be fetched again: a group's thread (its ID) for that group's nudges, or the
-// home page's feed for the friends thread's and every group's (docs/milestones/M11-home-screen.md, 11b). An unknown
-// payload version reloads both (M00 data design §2).
+// friends feed (Today's, or a page's right column) for the friends thread's and every group's
+// (docs/milestones/M11-home-screen.md, 11b). An unknown payload version reloads both (M00 data design §2).
 export function changesThread(message: ChangedMessage, thread: "feed" | { group: string }): boolean {
   if (message.v !== PAYLOAD_VERSION) return true;
   return message.type === "comments_changed" && (thread === "feed" || message.groupId === thread.group);
 }
 
 // joined: the channel joined, the first time or after an interruption, when messages may have been missed, so the
-// page refetches. failed: the channel couldn't be opened, or a fresh token couldn't be fetched. The handlers may change
-// between renders; the channel stays open for the component's life.
+// page refetches. The handlers may change between renders; the channel stays open for the component's life.
 export type BoardChannelHandlers = {
   joined: (reason: "first" | "reconnect") => void;
   status?: (message: StatusMessage) => void;
   changed: (message: ChangedMessage) => void;
-  failed: (err: unknown) => void;
 };
+
+// What a listening page shows of the channel (LiveStatus, src/app/live-status.tsx). error: the channel couldn't be
+// opened (closed), or a fresh token couldn't be fetched while it runs. retry: opens it again after it couldn't be
+// opened, by the player's Try again (docs/milestones/M14-14b-2c-review-items.md, answer 14).
+export type Failure = { error: string; closed: boolean };
+export type BoardChannel = { paused: boolean; failure: Failure | null; retry: () => void };
 
 // One connection to the channel per page, shared by every component that listens (the board, the feeds): the first
 // listener opens it and the last one closes it, so a page holds one socket however many parts listen
-// (docs/milestones/M14-14b-2b-1-shell.md; ROADMAP's "two sockets" item, M14 14a-2a).
-type Listener = { handlers: { current: BoardChannelHandlers }; setPaused: (paused: boolean) => void };
-type Shared = { listeners: Set<Listener>; joined: boolean; paused: boolean; close: () => void };
+// (docs/milestones/M14-14b-2b-1-shell.md; ROADMAP's "two sockets" item, M14 14a-2a). channel: the connection the
+// listener is on now, which Try again moves it off.
+type Listener = {
+  handlers: { current: BoardChannelHandlers };
+  setPaused: (paused: boolean) => void;
+  setFailure: (failure: Failure | null) => void;
+  channel: Shared;
+};
+type Shared = { listeners: Set<Listener>; joined: boolean; paused: boolean; failure: Failure | null; close: () => void };
 let shared: Shared | null = null;
 
 function openShared(): Shared {
-  const state: Shared = { listeners: new Set(), joined: false, paused: false, close: () => {} };
+  const state: Shared = { listeners: new Set(), joined: false, paused: false, failure: null, close: () => {} };
   const each = (f: (l: Listener) => void) => state.listeners.forEach(f);
-  const failed = (err: unknown) => each((l) => l.handlers.current.failed(err));
+  const setFailure = (failure: Failure | null) => {
+    state.failure = failure;
+    each((l) => l.setFailure(failure));
+  };
+  const failed = (err: unknown, closed: boolean) => setFailure({ error: errorText(err), closed });
   let session: Session | null = null;
   let client: RealtimeClient | null = null;
   // realtime-js asks for the token on every heartbeat (RealtimeClient.ts: the 'sent' heartbeat calls setAuth). A
@@ -69,7 +84,7 @@ function openShared(): Shared {
       try {
         session = await api<Session>("/api/realtime/session", { method: "GET" });
       } catch (err) {
-        failed(err);
+        failed(err, false);
         throw err;
       }
     }
@@ -110,6 +125,8 @@ function openShared(): Shared {
           state.joined = true;
           interrupted = false;
           setPaused(false);
+          // Joined with a token in hand: an earlier token error is over.
+          setFailure(null);
         } else if (!cancelled) {
           interrupted = true;
           setPaused(true);
@@ -117,9 +134,9 @@ function openShared(): Shared {
         }
       });
   })().catch((err) => {
-    // Opening failed: these listeners show it, and the connection is dropped so the next part to listen opens a
-    // fresh one, rather than joining one that never came up (14b-2b-1 review).
-    failed(err);
+    // Opening failed: these listeners show it with Try again, and the connection is dropped so the next part to
+    // listen opens a fresh one, rather than joining one that never came up (14b-2b-1 review).
+    failed(err, true);
     if (shared === state) shared = null;
   });
 
@@ -133,24 +150,47 @@ function openShared(): Shared {
   return state;
 }
 
-// Returns paused: the channel is down (it dropped, or its join failed) and realtime-js is retrying, so the page shows
-// that live updates are paused until it's joined (docs/milestones/M11-home-screen.md, H6: "fail loudly"). A listener
-// that arrives after the join is told "first" at once, as its own data was loaded before it listened.
-export function useBoardChannel(handlers: BoardChannelHandlers): { paused: boolean } {
+// Moves every listener on a connection that couldn't be opened to a fresh one, which tells each "first" once it joins,
+// so each part refetches what it missed.
+function reopen(dead: Shared) {
+  if (!dead.failure?.closed) return;
+  const fresh = (shared ??= openShared());
+  for (const listener of dead.listeners) {
+    listener.channel = fresh;
+    fresh.listeners.add(listener);
+    listener.setPaused(fresh.paused);
+    listener.setFailure(fresh.failure);
+    // A part that listened after the failure may have opened and joined it already.
+    if (fresh.joined) listener.handlers.current.joined("first");
+  }
+  dead.listeners.clear();
+}
+
+// paused: the channel is down (it dropped, or its join failed) and realtime-js is retrying, so the page shows that
+// live updates are paused until it's joined (docs/milestones/M11-home-screen.md, H6: "fail loudly"). A listener that
+// arrives after the join is told "first" at once, as its own data was loaded before it listened.
+export function useBoardChannel(handlers: BoardChannelHandlers): BoardChannel {
   const ref = useRef(handlers);
-  // A page already listening may be paused when this part arrives.
-  const [paused, setPaused] = useState(() => shared?.paused ?? false);
+  const [paused, setPaused] = useState(false);
+  const [failure, setFailure] = useState<Failure | null>(null);
+  const listening = useRef<Listener | null>(null);
   useEffect(() => {
     ref.current = handlers;
   });
 
   useEffect(() => {
     shared ??= openShared();
-    const channel = shared;
-    const listener: Listener = { handlers: ref, setPaused };
-    channel.listeners.add(listener);
-    if (channel.joined) ref.current.joined("first");
+    const listener: Listener = { handlers: ref, setPaused, setFailure, channel: shared };
+    listening.current = listener;
+    shared.listeners.add(listener);
+    // Read once the listener is in place, so a change between this part's render and now isn't missed (14b-2b-1
+    // review): a page already listening may be paused, or its token may have failed.
+    listener.setPaused(shared.paused);
+    listener.setFailure(shared.failure);
+    if (shared.joined) ref.current.joined("first");
     return () => {
+      // The connection it's on now: Try again may have moved it.
+      const channel = listener.channel;
       channel.listeners.delete(listener);
       if (channel.listeners.size === 0) {
         channel.close();
@@ -158,8 +198,8 @@ export function useBoardChannel(handlers: BoardChannelHandlers): { paused: boole
       }
     };
   }, []);
-  return { paused };
+  const retry = useCallback(() => {
+    if (listening.current) reopen(listening.current.channel);
+  }, []);
+  return { paused, failure, retry };
 }
-
-// What a page shows while its live updates are paused.
-export const PAUSED_TEXT = "Live updates paused, reconnecting…";

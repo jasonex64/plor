@@ -1,7 +1,7 @@
 // The Me tab's stats against the local stack (run with `npm run test:db`; docs/milestones/M14-14a-3a-me.md, criteria
-// 1-5; docs/milestones/M14-14a-3b-settings.md, criterion 8). Past days are written directly with the answer triggers switched off (session_replication_role), as
-// src/app/api/offbeat/route.db.test.ts does. T is today. Puzzle days: T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1
-// and T (T-4, T-6 and T-7 have none). By hand:
+// 1-5; docs/milestones/M14-14a-3b-settings.md, criterion 8). Past days are written directly with the answer triggers
+// switched off (session_replication_role), as src/app/api/offbeat/route.db.test.ts does. T is today. Puzzle days:
+// T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1 and T (T-4, T-6 and T-7 have none). By hand:
 //   P: T-8 survived all 7 (ledger 1000); T-5 caught on question 3 (2 survived, 125); T-3 time ran out on question 5
 //      (4, 400); T-2 caught on question 1 (0, settled to 0 by the route); T-1 caught on question 2 (1, 25); T one safe
 //      answer, waiting at the reveal (in progress). Points 1000 + 125 + 400 + 0 + 25 = 1550; 5 days played (finished
@@ -22,7 +22,8 @@
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
-import { GAME_ID, type ApprovedPuzzle } from "@/content/puzzle";
+import { type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, fixture, nameOf, removeCreatedPuzzles, safeEntries, safeEntry } from "@/test/puzzles";

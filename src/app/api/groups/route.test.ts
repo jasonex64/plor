@@ -25,7 +25,7 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-const CODE = "abcdefghijklmnopqrst-_";
+const CODE = "abcdefgh-_";
 const ID = "00000000-0000-0000-0000-000000000001";
 
 describe("/api/groups routes (M10 10b, 10c)", () => {

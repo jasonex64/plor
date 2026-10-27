@@ -1,17 +1,19 @@
 // Every colour pairing the screens use passes WCAG 2.2 in Paper and Night (docs/milestones/M14-14a-1-shell.md,
 // criterion 7): text at 4.5:1 (1.4.3) and control outlines at 3:1 (1.4.11); the calendar's shades at 3:1 on the card,
-// with their numbers at 4.5:1, and the danger colour (docs/milestones/M14-14a-3b-settings.md, criteria 6 and 9). The slots are read from globals.css, so a
-// changed colour is checked where it's defined.
+// with their numbers at 4.5:1, and the danger colour (docs/milestones/M14-14a-3b-settings.md, criteria 6 and 9). The
+// slots are read from globals.css, so a changed colour is checked where it's defined.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
 
-// The custom properties declared in the first block after `marker`.
+// The custom properties declared in the first block after `marker`, a slot named as another (`var(--text)`) read as
+// that slot's colour in the same block (the numbers on the calendar's shades, M14 14b-2c-2, item 28).
 function slots(marker: string): Record<string, string> {
   const start = css.indexOf("{", css.indexOf(marker));
   const block = css.slice(start, css.indexOf("}", start));
-  return Object.fromEntries([...block.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]+);/g)].map((m) => [m[1], m[2]]));
+  const declared = Object.fromEntries([...block.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]+|var\(--[a-z0-9-]+\));/g)].map((m) => [m[1], m[2]]));
+  return Object.fromEntries(Object.entries(declared).map(([name, value]) => [name, value.startsWith("var(") ? declared[value.slice(6, -1)] : value]));
 }
 
 type Rgb = [number, number, number];

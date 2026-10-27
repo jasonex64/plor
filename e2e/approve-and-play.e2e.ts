@@ -8,9 +8,10 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
-import { dayText } from "../src/app/admin/day-text";
+import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { gotPastText } from "../src/game/words";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const DRAFTS = join(process.cwd(), "content", "offbeat");
@@ -54,7 +55,7 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-aa@example.test`]);
   await admin.goto("/admin/puzzles");
-  // The day as the admin pages write it, "Wed 28 Oct" (src/app/admin/day-text.ts): chosen from the row of days, then
+  // The day as the admin pages write it, "Wed 28 Oct" (src/app/day-text.ts): chosen from the row of days, then
   // approved from its own section (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4).
   const name = dayText(ahead);
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
@@ -65,15 +66,21 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   await expect(day.getByText("Fix 1 question first")).toBeVisible();
   await expect(day.getByRole("button", { name: "Approve day" })).toBeDisabled();
   await expect(day.getByText("“cherry” has the C the Wind steals: pick another host answer.")).toBeVisible();
-  // A chip is clicked, as an admin would: its checkbox is visually hidden behind it (and unticked, cherry's stops being
-  // a checkbox, so uncheck() couldn't read it back).
+  // A chip is clicked, as an admin would: its checkbox is visually hidden behind it.
   const chip = (name: string) => day.locator("label").filter({ has: admin.getByRole("checkbox", { name, exact: true }) });
+  const cherry = day.getByRole("checkbox", { name: "cherry, has C: players can't type it", exact: true });
+  const chipsOf = () => day.getByRole("group", { name: /^Host answers for/ }).nth(1).locator("label").allTextContents();
+  const before = await chipsOf();
   await chip("cherry, has C: players can't type it").click();
-  await expect(day.getByRole("checkbox", { name: /^cherry/ })).toHaveCount(0);
-  // No longer a control: a dashed chip, its letter struck, said in words.
-  await expect(day.getByText(/^cherry ?, has C: players can't type it$/)).toBeVisible();
+  // Unticked, it stays a checkbox, now unavailable, and keeps the focus (14b-2c-3, item 53); a dashed chip, its letter
+  // struck, said in words.
+  await expect(cherry).not.toBeChecked();
+  await expect(cherry).toHaveAttribute("aria-disabled", "true");
+  await expect(cherry).toBeFocused();
   await chip("apple").click();
   await expect(day.getByRole("checkbox", { name: "apple", exact: true })).toBeChecked();
+  // Ticking and unticking moved no chip (answer 16).
+  expect(await chipsOf()).toEqual(before);
   await day.getByRole("button", { name: "Approve day" }).click();
   await expect(day.getByRole("status")).toHaveText(`${name} is approved. Players get it at midnight Pacific. You can change its host answers until then.`);
   const { rows } = await DB.query<{ approved: boolean; members: string }>(
@@ -95,11 +102,11 @@ test("a player survives all seven questions of a day, past the stolen letters", 
     await page.getByLabel("Your answer").fill(answers[i]);
     await page.getByRole("button", { name: "Answer" }).click();
     if (i < answers.length - 1) {
-      await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: gotPastText(i + 1) })).toBeVisible();
       await page.getByRole("button", { name: "Next", exact: true }).click();
     }
   }
-  await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
-  // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
-  await expect(page.getByText("Name a body part: you said knee, the host said hand, head, leg")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "You reached the top!" })).toBeVisible();
+  // Three host answers on stop 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
+  await expect(page.getByText("Name a body part: you said knee, the Wind whispered hand, head, leg")).toBeVisible();
 });

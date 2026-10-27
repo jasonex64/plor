@@ -57,7 +57,7 @@ describe("invite links and friends", () => {
     const first = await call(invite, "/api/friends/invite", "POST", {});
     expect(first.status).toBe(200);
     codeA = first.body.inviteCode;
-    expect(codeA).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(codeA).toMatch(/^[A-Za-z0-9_-]{10}$/);
     expect((await call(invite, "/api/friends/invite", "POST", {})).body.inviteCode).toBe(codeA);
     expect((await call(friends, "/api/friends", "GET")).body.inviteCode).toBe(codeA);
   });
@@ -97,7 +97,7 @@ describe("invite links and friends", () => {
   it("stops the old link working after a reset", async () => {
     useSession(A.session);
     const reset = (await call(invite, "/api/friends/invite", "POST", { reset: true })).body.inviteCode;
-    expect(reset).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(reset).toMatch(/^[A-Za-z0-9_-]{10}$/);
     expect(reset).not.toBe(codeA);
     useSession(B.session);
     const gone = { status: 404, body: { ok: false, error: "invite_invalid" } };

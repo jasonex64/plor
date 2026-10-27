@@ -49,7 +49,7 @@ export async function listReviews(db: Db, adminId: string): Promise<{ reviews: R
     const reviews = await Promise.all(
       rows[0].reviews.map(async (r) => {
         if (r.outcome !== "near_typo" || r.decision) return { ...r, near: [] };
-        // The text is stored normalized (private.record_miss), as withinTypo expects.
+        // The text is stored normalized (logMiss, src/game/runs.ts), as withinTypo expects.
         const near = await db.query<{ near: Named[] }>("select private.audit_near($1, $2, $3) as near", [adminId, r.id, withinTypo(r.text)]);
         return { ...r, near: near.rows[0].near };
       }),

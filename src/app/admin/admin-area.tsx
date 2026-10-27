@@ -6,7 +6,7 @@
 // 1200px what needs the admin in the right column ("What needs you, always (Recommended)"). The counts come from the
 // admin APIs the pages already use, and again whenever a page changes something.
 import Link from "next/link";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { DayView } from "@/admin/puzzles";
 import type { ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
@@ -17,7 +17,7 @@ import { SideColumn } from "../side-column";
 import { Audit } from "./audit/audit";
 import { AnswerBase } from "./base/base";
 import { Bank } from "./bank/bank";
-import { dayText } from "./day-text";
+import { dayText, whenText } from "../day-text";
 import { Insights } from "./insights";
 import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
@@ -117,7 +117,7 @@ function Count({ n }: { n: number }) {
   return (
     <>
       <span className={styles.badge}>{n}</span>
-      <span className={styles.sr}> waiting</span>
+      <span className="sr-only"> waiting</span>
     </>
   );
 }
@@ -142,9 +142,29 @@ function SubTabs({ page, counts }: { page: AdminPage; counts: Counts | null }) {
   );
 }
 
-// On phones: one menu in the sub-tabs' order, the groups split by a line, then what's waiting as buttons.
+// On phones: one menu in the sub-tabs' order, the groups split by a line, then what's waiting as buttons. Escape or a
+// press outside it closes the open menu, Escape returning the focus to its button (item 41).
 function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null }) {
   const [open, setOpen] = useState(false);
+  const nav = useRef<HTMLElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      button.current?.focus();
+    };
+    const onPress = (event: PointerEvent) => {
+      if (!nav.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPress);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPress);
+    };
+  }, [open]);
   const current = TO_DO.find((t) => t.page === page);
   const waiting = counts
     ? [
@@ -162,14 +182,14 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
     </li>
   );
   return (
-    <nav aria-label="Admin" className={styles.phone}>
-      <button type="button" className={styles.menuButton} aria-expanded={open} onClick={() => setOpen(!open)}>
+    <nav ref={nav} aria-label="Admin" className={styles.phone}>
+      <button type="button" ref={button} className={styles.menuButton} aria-expanded={open} onClick={() => setOpen(!open)}>
         <span>
           {NAMES[page]}
           {current && counts && <Count n={current.count(counts)} />}
         </span>
         <span aria-hidden="true">▾</span>
-        <span className={styles.sr}> (admin pages)</span>
+        <span className="sr-only"> (admin pages)</span>
       </button>
       {open && (
         <div className={styles.menu}>
@@ -212,7 +232,7 @@ function NeedsYou({ counts }: { counts: Counts }) {
       href: "/admin/reports",
       n: counts.reports.length,
       what: counts.reports.length === 1 ? "reported comment" : "reported comments",
-      more: first ? `First reported ${new Date(first.firstReportedAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}` : "None",
+      more: first ? `First reported ${whenText(first.firstReportedAt)}` : "None",
     },
     {
       href: "/admin/puzzles",

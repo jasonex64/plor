@@ -9,17 +9,22 @@
 // (docs/milestones/M14-14a-3b-settings.md, L39).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
+import { FINISHED } from "@/game/status";
 import type { PublicQuestion } from "@/game/payload";
-import { shareText } from "@/game/share";
+import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api } from "@/lib/api-client";
+import { capitalized, caughtText, gotPastText, timedOutText } from "@/game/words";
+import { bonusNote, earnsBonus } from "./bonus";
+import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import { shareLink } from "./share";
+import { GAME } from "@/platform/game";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -28,7 +33,10 @@ type AnswerResponse = { run: RunState; notInList: boolean };
 
 // What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
 // each time that changes after, so the comments can open (M08 8a). Nothing is reported before the state loads, so a
-// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). onDayOver: the reset, midnight Pacific, so the page can move to the new day
+// run already over reports true first, never false then true (docs/milestones/M14-14a-2c-review-fixes.md). So across
+// the reset, or on a day with no puzzle, a page's last value stays the day before's until the new state loads: the
+// pages read it only to open the comments, which load again on the new day (14b-2c-1, item 21). onDayOver: the reset,
+// midnight Pacific, so the page can move to the new day
 // (docs/milestones/M11-home-screen.md, H6); inPlay says a question or a reveal is in play then, so the game is left
 // alone: a run started before midnight is played to its end after it (M04 G13; DECISIONS.md, Game 1: Timer).
 type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void };
@@ -38,7 +46,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   const [run, setRun] = useState<RunState | null>(null);
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const over = run?.status === "died" || run?.status === "survived" || run?.status === "timed_out";
+  const over = run !== null && FINISHED.includes(run.status);
   const loaded = run !== null;
   useEffect(() => {
     if (loaded) onOver(over);
@@ -74,7 +82,7 @@ export function useStartRun() {
     setError(null);
     try {
       await api("/api/run/start", { method: "POST" });
-      router.push("/offbeat");
+      router.push(GAME.path);
     } catch (err) {
       setError(errorText(err));
       setBusy(false);
@@ -95,8 +103,8 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
       <Banner>
         {run.status === "not_started" && !skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions</p>
-            <Link href="/offbeat" className={styles.play}>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops</p>
+            <Link href={GAME.path} className={styles.play}>
               Play
             </Link>
           </>
@@ -106,7 +114,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             (private.question_deadline), so they have no constant here. */}
         {run.status === "not_started" && skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} questions · 20 seconds each</p>
+            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops · 20 seconds each</p>
             <button type="button" className={styles.play} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
@@ -116,7 +124,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "in_progress" && (
           <>
             <p className={styles.line}>Your run is still going</p>
-            <Link href="/offbeat" className={styles.play}>
+            <Link href={GAME.path} className={styles.play}>
               Continue
             </Link>
           </>
@@ -128,8 +136,8 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
 }
 
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
-// stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in the
-// streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+// stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
+// the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
@@ -162,14 +170,14 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
           {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
               have no constant here; the points come from tunables.ts. */}
           <p className={styles.rules}>
-            <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
-            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+            <strong>{run.total} stops · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
+            stop you climb is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
           <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
             Start
           </button>
-          <Link href="/offbeat/how-to-play" className={styles.secondary}>
+          <Link href={`${GAME.path}/how-to-play`} className={styles.secondary}>
             How to play
           </Link>
         </>
@@ -212,11 +220,12 @@ function Score({ run }: { run: RunState }) {
   return (
     <>
       <p className={styles.line}>
-        {pointsText(run.points)} + about {run.bonus} bonus · {endedText(run)}
+        {pointsText(run.points)}
+        {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
       </p>
-      <Link href="/offbeat#result" className={styles.result}>
+      <ButtonLink href={`${GAME.path}#result`} tone="offbeat">
         Result
-      </Link>
+      </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
     </>
   );
@@ -232,17 +241,18 @@ function longDate(date: string): string {
 function Banner({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.banner}>
-      <h2 className={styles.title}>Offbeat</h2>
+      <h2 className={styles.title}>{GAME.name}</h2>
       {children}
     </div>
   );
 }
 
-// How a finished run ended, as the banner says it.
+// How a finished run ended, as the banner and the result say it, in Updraft's words by the stop's tier
+// (docs/milestones/M14-14c-1-name-and-words.md, "The words").
 function endedText(run: RunState): string {
-  if (run.status === "survived") return `survived all ${run.total}`;
-  if (run.status === "timed_out") return `time's up on question ${run.answered.length + 1}`;
-  return `caught on question ${run.answered.length}`;
+  if (run.status === "survived") return "reached the top";
+  if (run.status === "timed_out") return timedOutText(run.answered.length + 1);
+  return caughtText(run.answered.length);
 }
 
 // Seconds left on the current question. At zero it asks the server again, which decides whether time is up
@@ -269,16 +279,16 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
-// After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
+// After a stop climbed (G5): its tier's line, your answer next to the Wind's, the points it earned with its estimated rarity bonus (M09:
 // from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
 // steals at the next question. The next question and its 20 seconds start on Next.
 function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
   const last = run.answered[run.answered.length - 1];
   return (
     <div>
-      <h2>Safe!</h2>
+      <h2>{gotPastText(last.index + 1)}</h2>
       <p>
-        You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
+        You said {last.answer.name}; the Wind whispered {last.hostAnswers.map((h) => h.name).join(", ")}.
       </p>
       <p>
         +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
@@ -307,6 +317,7 @@ function Question({
 }) {
   const [typed, setTyped] = useState("");
   const [notInList, setNotInList] = useState<string | null>(null);
+  const input = useRef<HTMLInputElement>(null);
   const [blocked, setBlocked] = useState<string | null>(null);
 
   // A stolen letter's key does nothing (G11, human, 2026-10-21). Filtering the value, not the key press, also
@@ -318,21 +329,23 @@ function Question({
     setNotInList(null);
   }
 
-  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight.
+  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight. Text
+  // that names no entry stays in the box, selected, so a typo is fixed or typed over rather than retyped (human,
+  // 2026-10-26: "Keep the text (Recommended)"; docs/milestones/M14-14b-2c-review-items.md, answer 6).
   async function submit(event: FormEvent) {
     event.preventDefault();
     const text = typed.trim();
     if (text === "" || busy) return;
     if (await onAnswer(text)) {
       setNotInList(text);
-      setTyped("");
+      input.current?.select();
     }
   }
 
   return (
     <div>
       <p>
-        Question {question.index + 1} of {total} · {pointsText(points)} so far
+        Stop {question.index + 1} of {total} · {pointsText(points)} so far
       </p>
       <h2>{question.prompt}</h2>
       {question.stolen.length > 0 && (
@@ -344,6 +357,7 @@ function Question({
         <label>
           Your answer
           <input
+            ref={input}
             value={typed}
             autoFocus
             autoComplete="off"
@@ -363,28 +377,28 @@ function Question({
   );
 }
 
-// The result's details, below the banner, which carries the score and the time to the next puzzle.
+// The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
+// #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
+// so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14).
 function Result({ run }: { run: RunState }) {
-  const survived = run.answered.filter((a) => !a.matched).length;
+  const survived = survivedCount(run);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (window.location.hash === "#result") box.current?.scrollIntoView();
+  }, []);
   return (
-    <div id="result">
-      <h2>
-        {run.status === "survived"
-          ? `You survived all ${run.total}!`
-          : run.status === "timed_out"
-            ? `Time's up on question ${run.answered.length + 1}`
-            : `Caught on question ${run.answered.length}`}
-      </h2>
+    <div id="result" ref={box}>
+      <h2>{run.status === "survived" ? "You reached the top!" : capitalized(endedText(run))}</h2>
       <p>
-        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}, plus a rarity bonus of about{" "}
-        {run.bonus}. The final bonus is worked out once the day is over.
+        You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
+        {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
       <Share run={run} />
       <ol>
         {run.answered.map((a) => (
           <li key={a.index}>
-            {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
+            {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
+            {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
           </li>
         ))}
       </ol>

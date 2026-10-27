@@ -31,10 +31,11 @@ export const USERNAME_CHANGE_DAYS = 30;
 // constraint profile_display_name_format enforces it; src/lib/profile.db.test.ts checks the two agree.
 export const DISPLAY_NAME_MAX_LENGTH = 24;
 
-// Invite code size: 16 random bytes, written as 22 base64url characters (human, 2026-10-21;
-// docs/milestones/M07-friends-and-live-board.md, D3). The database's check friend_invite_code_format holds the same
-// 22 characters; the friends route test issues a real code through it.
-export const INVITE_CODE_BYTES = 16;
+// Invite code size, for friends and groups: 10 base64url characters, 60 random bits (human, 2026-10-26: "10 characters
+// (Recommended)"; docs/milestones/M14-14b-3-invite-button.md, answer 5; 22 from M07 D3 before). The database's checks
+// friend_invite_code_format and player_group_invite_code_format hold the same 10; the friends and groups route tests
+// issue real codes through them.
+export const INVITE_CODE_LENGTH = 10;
 
 // Groups (human, 2026-10-22; docs/milestones/M10-groups.md, G11): a name follows the display name rule, up to 24
 // characters; 50 members per group and 10 groups per player. The database judges all three (player_group_name_format

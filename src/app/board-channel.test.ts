@@ -1,5 +1,5 @@
 // Which nudges reload which list (docs/milestones/M10-groups.md, 10d, G5; docs/milestones/M11-home-screen.md, 11b): a
-// group's page reloads for its own group only, and the home page's feed for the friends thread and every group.
+// group's page reloads for its own group only, and the friends feed for the friends thread and every group.
 import { describe, expect, it } from "vitest";
 import { changesThread, type ChangedMessage } from "./board-channel";
 

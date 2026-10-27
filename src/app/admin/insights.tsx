@@ -11,7 +11,7 @@ import type { DayInsights, QuestionInsights } from "@/insights/report";
 import { api } from "@/lib/api-client";
 import { errorText } from "../messages";
 import admin from "./admin.module.css";
-import { dayText } from "./day-text";
+import { dayText } from "../day-text";
 import styles from "./insights.module.css";
 
 type InsightsResponse = { days: string[]; report: DayInsights };
@@ -53,7 +53,7 @@ export function Insights() {
           ‹
         </button>
         <label className={styles.day}>
-          <span className={admin.sr}>Day</span>
+          <span className="sr-only">Day</span>
           <select value={report.date} onChange={(e) => setDate(e.target.value)}>
             {days.map((d) => (
               <option key={d} value={d}>
@@ -77,19 +77,19 @@ export function Insights() {
         <Chart questions={report.questions} />
       </section>
       <section aria-label="Questions" className={admin.card}>
-        <table className={admin.table}>
-          <thead>
-            <tr>
-              <th>Q</th>
-              <th>Question</th>
-              <th>Caught</th>
-              <th>Rate</th>
-              <th>vs target</th>
-              <th>Most typed</th>
-              <th>Not in list</th>
+        <table className={admin.table} role="table">
+          <thead role="rowgroup" className="sr-only-on-phones">
+            <tr role="row">
+              <th role="columnheader">Q</th>
+              <th role="columnheader">Question</th>
+              <th role="columnheader">Caught</th>
+              <th role="columnheader">Rate</th>
+              <th role="columnheader">vs target</th>
+              <th role="columnheader">Most typed</th>
+              <th role="columnheader">Not in list</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody role="rowgroup">
             {report.questions.map((q) => (
               <Row key={q.index} q={q} />
             ))}
@@ -155,9 +155,9 @@ function Row({ q }: { q: QuestionInsights }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <tr>
-        <td className={admin.strong}>Q{q.index + 1}</td>
-        <td>
+      <tr role="row">
+        <td role="cell" className={admin.strong} data-label="Q">Q{q.index + 1}</td>
+        <td role="cell" data-label="Question">
           <span className={admin.strong}>{q.prompt}</span>
           <br />
           <span className={admin.muted}>Host: {q.hostAnswers.map((h) => h.name).join(", ")}</span>
@@ -174,16 +174,16 @@ function Row({ q }: { q: QuestionInsights }) {
             </>
           )}
         </td>
-        <td className={admin.nowrap}>
+        <td role="cell" className={admin.nowrap} data-label="Caught">
           {q.caught} of {q.answered}
         </td>
-        <td className={`${admin.nowrap} ${admin.strong}`}>{percent(q.catchRate)}</td>
-        <td className={`${admin.nowrap} ${admin.strong}`}>{versus(q)}</td>
-        <td>{q.topAnswers.length > 0 ? q.topAnswers.map((t) => `${t.answer.name} ${t.count}`).join(", ") : "—"}</td>
-        <td>
+        <td role="cell" className={`${admin.nowrap} ${admin.strong}`} data-label="Rate">{percent(q.catchRate)}</td>
+        <td role="cell" className={`${admin.nowrap} ${admin.strong}`} data-label="vs target">{versus(q)}</td>
+        <td role="cell" data-label="Most typed">{q.topAnswers.length > 0 ? q.topAnswers.map((t) => `${t.answer.name} ${t.count}`).join(", ") : "—"}</td>
+        <td role="cell" data-label="Not in list">
           {q.misses.length > 0 ? (
             <button type="button" className={admin.button} aria-expanded={open} onClick={() => setOpen(!open)}>
-              {q.misses.length} <span className={admin.sr}>not in the list</span>
+              {q.misses.length} <span className="sr-only">not in the list</span>
               <span aria-hidden="true">{open ? " ▴" : " ▾"}</span>
             </button>
           ) : (
@@ -192,9 +192,9 @@ function Row({ q }: { q: QuestionInsights }) {
         </td>
       </tr>
       {open && (
-        <tr>
-          <td />
-          <td colSpan={6}>
+        <tr role="row">
+          <td role="cell" />
+          <td role="cell" colSpan={6}>
             <ul className={styles.misses}>
               {q.misses.map((m) => (
                 <li key={m.text}>

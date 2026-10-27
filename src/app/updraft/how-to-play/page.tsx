@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Home } from "../../home";
 import { Footer } from "../../footer";
 
-// How to play Offbeat, opened from its game screen (docs/milestones/M14-14a-2b-game-screen.md, criterion 3).
+// How to play Updraft, opened from its game screen (docs/milestones/M14-14a-2b-game-screen.md, criterion 3).
 export default function HowToPlayPage() {
   return (
     <main>

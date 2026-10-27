@@ -1,7 +1,7 @@
 // Signing players in on a page, shared by the e2e tests: an emailed code read from the local Mailpit inbox, then a
 // username. Every player's email starts with RUN, so each file's afterAll can delete its players.
 import { createHash } from "node:crypto";
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 const MAILPIT = "http://127.0.0.1:54324";
 export const RUN = Date.now().toString(36);
@@ -48,6 +48,16 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
 // (docs/milestones/M14-14a-2b-game-screen.md, criterion 2).
 export async function play(page: Page): Promise<void> {
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/offbeat$/);
+  await expect(page).toHaveURL(/\/updraft$/);
   await page.getByRole("button", { name: "Start", exact: true }).click();
+}
+
+// The link a share button gives (M14 14b-3: invite links are shared, never shown). These browsers have no share sheet,
+// so it's copied (src/app/share.ts) as its text, a line break and the URL; this presses the button and returns the URL.
+export async function sharedLink(page: Page, button: Locator): Promise<string> {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await button.click();
+  await expect(page.getByText("Copied.").first()).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  return copied.split("\n").pop()!;
 }

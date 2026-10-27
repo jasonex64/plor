@@ -58,6 +58,12 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   for (const [i, [name, days]] of RANKS.entries()) {
     await expect(ranks.nth(i)).toContainText(name);
     await expect(ranks.nth(i)).toContainText(days);
+    // "each with its flower" (criterion 3): a drawing with shapes in it, at a real size (14b-2c-4, item 50).
+    const flower = ranks.nth(i).locator("svg");
+    await expect(flower).toHaveCount(1);
+    expect(await flower.evaluate((svg) => svg.querySelectorAll("path, circle, ellipse, rect, polygon").length)).toBeGreaterThan(0);
+    const box = (await flower.boundingBox())!;
+    expect(box.width * box.height).toBeGreaterThan(0);
   }
   await expect(streak.locator("[aria-current]")).toHaveCount(1);
   await expect(streak.locator("[aria-current]")).toContainText("Seed0 daysYour rank");
@@ -66,9 +72,11 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   // (criterion 2).
   await page.goto("/");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/offbeat");
+  await expect(page).toHaveURL("http://localhost:3000/updraft");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(top.getByRole("link", { name: "1 day streak, Daisy" })).toBeVisible();
+  // Then /streak itself counts the run: this click opens the page afresh, so it checks /streak's own reading of the
+  // streak, not the pill's change without a reload, which the line above checks (14b-2c-4, item 50).
   await top.getByRole("link", { name: "1 day streak, Daisy" }).click();
   await expect(streak.locator("[aria-current]")).toContainText("Daisy");
   await expect(streak.getByRole("heading", { name: "Your streak: 1 day" })).toBeVisible();

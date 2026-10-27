@@ -8,8 +8,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { gotPastText } from "../src/game/words";
+import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -65,8 +67,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await signInAndPick(watcher, "w");
   // The invite link is on the Friends tab, with the friends list (M14 14a-3b).
   const invite = watcher.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  await invite.getByRole("button", { name: "Make my invite link" }).click();
-  const link = await invite.locator("code").textContent();
+  const link = await sharedLink(watcher, invite.getByRole("button", { name: "Invite a friend" }));
 
   await player.goto(new URL(link!).pathname);
   await signInAndPick(player, "p");
@@ -79,7 +80,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
   await expect(row).toHaveText(`${playerName}: hasn't played yet`);
 
-  // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
+  // The player starts and is tipped over at stop 1; the watcher's page shows the start without a reload, and the
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
   const started = `${playerName}: started (you'll see how it's going once you finish)`;
   await player.goto("/");
@@ -87,7 +88,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(row).toHaveText(started);
   await player.getByLabel("Your answer").fill(hostAnswer);
   await player.getByRole("button", { name: "Answer" }).click();
-  await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
+  await expect(player.getByText("You climbed 0 of 7 stops")).toBeVisible();
   // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
   // wherever it goes, and the watcher's frames hold only the start.
   await openBoard(watcher);
@@ -102,9 +103,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await play(watcher);
   await watcher.getByLabel("Your answer").fill(hostAnswer);
   await watcher.getByRole("button", { name: "Answer" }).click();
-  // Caught on question 1: no survived answers, so no rarity bonus yet (M09 9a's result line).
-  await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points, plus a rarity bonus of about 0.")).toBeVisible();
-  // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
+  // Tipped over at stop 1: no stops climbed, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
+  await expect(watcher.getByText("You climbed 0 of 7 stops and scored 0 points.")).toBeVisible();
+  // Beside the one answer, its share: two players answered at stop 1, under the minimum of 5 (H5).
   await expect(watcher.getByText(/· too few players yet$/)).toBeVisible();
   // The streak's pill: today is the watcher's first day (M11 H4), the first rank's
   // (docs/milestones/M14-14b-2a-streak-ranks.md).
@@ -124,10 +125,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
     `${watcherName} (you): 0 points`,
   ]);
   // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
-  await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}" 👍😂😮😢❤️`);
+  await expect(row).toHaveText(`${playerName}: tipped over at stop 1 by "${hostAnswer}" 👍😂😮😢❤️`);
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   await expect(place).toHaveCount(1);
-  await expect(place.locator("summary")).toHaveText(`Caught on question 1: You, ${playerName}`);
+  await expect(place.locator("summary")).toHaveText(`Tipped over at stop 1: You, ${playerName}`);
   await place.locator("summary").click();
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
 
@@ -182,6 +183,11 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(reportedKept).toHaveCount(0);
   await expect(watcher.getByRole("region", { name: "Decisions" }).getByRole("row").filter({ hasText: kept })).toContainText("Kept");
   // Delete asks inline before it deletes for everyone (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 6).
+  // The keyboard's focus follows the swap: to Cancel when it asks, back to Delete… on Cancel (14b-2c-3, item 41).
+  await reported.getByRole("button", { name: "Delete…" }).click();
+  await expect(reported.getByRole("button", { name: "Cancel" })).toBeFocused();
+  await reported.getByRole("button", { name: "Cancel" }).click();
+  await expect(reported.getByRole("button", { name: "Delete…" })).toBeFocused();
   await reported.getByRole("button", { name: "Delete…" }).click();
   await reported.getByRole("group", { name: "Confirm delete" }).getByRole("button", { name: "Delete", exact: true }).click();
   await expect(watcher.getByText("No reported comments.")).toBeVisible();
@@ -212,7 +218,7 @@ test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser
   await play(page);
   await page.getByLabel("Your answer").fill(safeAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: gotPastText(1) })).toBeVisible();
   await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
 });
 
@@ -236,6 +242,37 @@ test("a reconnect refetches the board", async ({ browser }) => {
 // game: Today's card and feed, and the Friends tab's board and leaderboard (docs/milestones/M14-14a-1-shell.md). The
 // browser's clock is moved past the reset, at most 25 hours away (a day with a time change), so the page's reset timer
 // fires; each section then loads again.
+// Today's own subscription, for the feed's nudges: on a phone the board isn't on Today, so it's the page's only
+// listener. While the channel is down the feed says so, and once it's back the feed is fetched again (M11 H6;
+// docs/milestones/M14-14b-2c-review-items.md, item 7).
+test("a reconnect on Today shows the pause in the feed and fetches it again", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "rt");
+  await openBoard(page, "/");
+  execSync("docker restart supabase_realtime_plor", { stdio: "ignore" });
+  const paused = page.getByRole("region", { name: "Feed" }).locator("xpath=..").getByText("Live updates paused, reconnecting…");
+  await expect(paused).toBeVisible();
+  // Waited for only once the channel is down, so the feed's loads as the page starts can't count (the 14b-2c-4 review).
+  const refetch = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/feed");
+  await refetch;
+  await expect(paused).toBeHidden();
+});
+
+// One Realtime socket per page, however many parts listen (docs/milestones/M14-14b-2b-1-shell.md): from 1200px Today
+// has its own subscription and the board's, and still opens one (14b-2c-4, item 35).
+test("Today opens one Realtime socket from 1200px", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "rs");
+  const sockets: string[] = [];
+  page.on("websocket", (ws) => void (ws.url().includes("/realtime/v1") && sockets.push(ws.url())));
+  await openBoard(page, "/");
+  await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(sockets).toHaveLength(1);
+});
+
 test("the reset reloads every section of Today", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.clock.install();
@@ -272,14 +309,14 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page, "/offbeat");
+  await openBoard(page, "/updraft");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
   // Only the reset asks for the game screen's stats again. Every load from the mount is sent before the chart can
   // draw (Strict Mode sends two in development), so a request sent after the chart is there is the reset's (14a-2c,
   // criterion 5). The faked clock is the browser's only: the server's day stays the same, so the reload's content
   // can't show a new day.
-  await expect(page.getByRole("region", { name: "Your Offbeat" }).getByRole("img")).toBeVisible();
+  await expect(page.getByRole("region", { name: `Your ${GAME.name}` }).getByRole("img")).toBeVisible();
   const moved = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/offbeat");
   await page.clock.fastForward("25:00:00");
   await moved;

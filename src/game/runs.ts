@@ -2,7 +2,8 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { GAME_ID, avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
@@ -11,17 +12,14 @@ import { isListed } from "./misses";
 import { dayCounts, pooledCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
 import { scoreRun, type DayCounts } from "./scoring";
-
-// "timed_out": the current question's 20 seconds ran out, which ends the run (M04 13c-2; the database decides). The
-// timer, not midnight, ends an unfinished run: a run started before midnight can be finished after it (human,
-// 2026-10-21; its points count, but its answers after midnight earn no rarity bonus: M09 D1, D8).
-export type RunStatus = "not_started" | "in_progress" | "died" | "survived" | "timed_out";
+import { FINISHED, type RunStatus } from "./status";
 
 // points: what surviving this question earned, 0 when caught (DECISIONS.md, Game 1: POINTS_PER_QUESTION). bonus: its
 // provisional rarity bonus, from the expectation alone; the final one comes once the day is over (M09). share: once the
 // run is over, the fraction of the players who answered this question before the day's midnight who gave this answer,
 // from the counts the bonus uses (docs/milestones/M11-home-screen.md, H5); null while the run goes on, or while fewer
-// than ANSWER_SHARE_MIN_PLAYERS have answered it, so a share can't give away one player's answer.
+// than ANSWER_SHARE_MIN_PLAYERS have answered it, so a share can't give away one player's answer. inDay: given before
+// the run's day ended at midnight; an answer after it earns no rarity bonus (M09 D8), which the result says.
 export type AnsweredQuestion = {
   index: number;
   prompt: string;
@@ -31,6 +29,7 @@ export type AnsweredQuestion = {
   points: number;
   bonus: number;
   share: number | null;
+  inDay: boolean;
 };
 
 export type RunState = {
@@ -84,9 +83,6 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
 
 type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number };
 
-// The states of a run that's over, which open the day's thread and reactions (M08) and the shares (M11 H5).
-export const FINISHED: RunStatus[] = ["died", "survived", "timed_out"];
-
 // The share of the question's players who gave this entry, or null below the minimum (H5).
 function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
   const question = counts?.get(index);
@@ -121,6 +117,7 @@ function buildState(
       points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
       bonus: score.bonuses[i],
       share: shareOf(counts, e.question_idx, e.entry_id),
+      inDay: e.in_day,
     };
   });
   const status = clock.status ?? "not_started";
