@@ -88,7 +88,7 @@ describe("groups", () => {
     expect(page.body.msToReset).toBeGreaterThan(0);
     expect(page.body.msToReset).toBeLessThanOrEqual(25 * 60 * 60 * 1000);
     code = page.body.group.inviteCode;
-    expect(code).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(code).toMatch(/^[A-Za-z0-9_-]{10}$/);
     expect(page.body.group).toEqual({ id: club, name: "Book Club", inviteCode: code, creator: true, members: [member(A, true)] });
 
     useSession(C.session);
@@ -139,7 +139,7 @@ describe("groups", () => {
     expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "Readers" })).toEqual({ status: 200, body: { ok: true, name: "Readers" } });
     expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "Two  spaces" })).toEqual(error(400, "group_name_invalid"));
     const reset = await call(invite, "/api/groups/invite", "POST", { id: club });
-    expect(reset.body.inviteCode).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(reset.body.inviteCode).toMatch(/^[A-Za-z0-9_-]{10}$/);
     expect(reset.body.inviteCode).not.toBe(code);
     useSession(D.session);
     expect(await call(preview, `/api/groups/preview?code=${code}`, "GET")).toEqual(error(404, "invite_invalid"));

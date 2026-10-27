@@ -322,9 +322,3 @@ button:disabled {
 footer {
   margin-top: 32px;
 }
-
-/* An invite link is one long word: it breaks anywhere rather than push a 320px phone sideways (WCAG 2.2 1.4.10;
-   docs/milestones/M14-14b-2c-review-items.md, found checking item 10). */
-code {
-  overflow-wrap: anywhere;
-}

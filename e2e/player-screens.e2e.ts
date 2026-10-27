@@ -5,7 +5,7 @@
 // and Try again when the live channel can't be opened.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -165,8 +165,7 @@ test("your own invite link says it's yours, and a board with reactions fits 320p
   const host = await player(browser, "xf", PHONE);
   await host.goto("/friends");
   const invite = host.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  await invite.getByRole("button", { name: "Make my invite link" }).click();
-  const link = new URL((await invite.locator("code").textContent())!).pathname;
+  const link = new URL(await sharedLink(host, invite.getByRole("button", { name: "Invite a friend" }))).pathname;
   await host.goto(link);
   await expect(host.getByRole("heading", { name: "This is your invite link" })).toBeVisible();
   await expect(host.getByRole("button", { name: "Add friend" })).toHaveCount(0);

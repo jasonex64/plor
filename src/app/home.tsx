@@ -4,8 +4,8 @@
 // (Offbeat's banner and the feed), Friends, Groups or Me; Offbeat's game screen and How to play
 // (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak, docs/milestones/M14-14b-2a-streak-ranks.md);
 // the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
-// or, on an invite link (/invite/<code>), the friend request; on a
-// group's link (/groups/join/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
+// or, on an invite link (/i/<code>), the friend request; on a
+// group's link (/g/<code>), joining it; on a group's page (/groups/<id>), the group. Every step goes through
 // the API; errors are shown to the player and never retried silently (DECISIONS.md: Error handling).
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useState, type FormEvent } from "react";
@@ -66,11 +66,11 @@ export type View =
 // while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
 // path (M07 7b; M10 10b).
 const PENDING_INVITE = "plor.pendingInvite";
-const INVITE_PATH = /^\/(?:invite|groups\/join)\/(.+)$/;
+const INVITE_PATH = /^\/[ig]\/(.+)$/;
 
 function invitePath(view?: View): string | undefined {
-  if (view?.kind === "invite") return `/invite/${view.code}`;
-  if (view?.kind === "joinGroup") return `/groups/join/${view.code}`;
+  if (view?.kind === "invite") return `/i/${view.code}`;
+  if (view?.kind === "joinGroup") return `/g/${view.code}`;
 }
 
 export function Home({ view }: { view?: View }) {

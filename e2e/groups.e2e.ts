@@ -5,7 +5,7 @@
 // out of the friends thread.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -33,10 +33,15 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const groupUrl = creator.url();
   await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
-  await creator.getByRole("button", { name: "Copy" }).click();
-  await expect(creator.getByText("Copied.")).toBeVisible();
-  const link = await creator.evaluate(() => navigator.clipboard.readText());
-  expect(link).toMatch(/^http:\/\/localhost:3000\/groups\/join\/[A-Za-z0-9_-]{22}$/);
+  // Shared from a button, never shown (M14 14b-3, answer 9), on /g/ with a 10-character code.
+  const link = await sharedLink(creator, creator.getByRole("button", { name: "Share group link" }));
+  expect(link).toMatch(/^http:\/\/localhost:3000\/g\/[A-Za-z0-9_-]{10}$/);
+  expect(await creator.locator("body").innerText()).not.toContain("/g/");
+  // A group's page doesn't scroll sideways on a 320px phone (14b-3, criterion 7). Polled: measured the moment after a
+  // resize, the page is still the old width while it lays out again (seen at 360 for a moment, then 320).
+  await creator.setViewportSize({ width: 320, height: 640 });
+  await expect.poll(() => creator.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await creator.setViewportSize({ width: 1280, height: 720 });
 
   const joiner = await (await browser.newContext()).newPage();
   await joiner.goto(link);

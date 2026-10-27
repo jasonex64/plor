@@ -1,6 +1,6 @@
 # M14 14b-3 — The invite button
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11). Built after 14b-2c, before 14c (answer 10).
+**Status:** approved (human, 2026-10-26: "Approve the 14b-3 ticket as drafted, with /g/<code> for group links"), and its security change approved (answer 11); built, in review in PR_PENDING. When the PR is ready the human is asked before it merges, and plor.app gets the migration straight after (answer 12).
 
 ## Goal
 Friend and group invites are shared from a button, never shown as a raw link, with 10-character codes on short paths, so the Friends tab and a group's page stop showing a long URL.
@@ -60,13 +60,13 @@ Read 2026-10-26, before building. Invite codes are the tokens that let someone a
 5. **plor.app's code and database change together.** Once the PR merges to `main`, Vercel deploys code that writes 10-character codes, which plor.app's database refuses under its old 22-character checks until the migration is pushed, so making an invite link would fail there until then. The database is pushed only on the human's word (human, 2026-10-26, relayed in the M13 ticket on `m13-answer-lists-and-content`, "Decided later": "ok we can keep push on my word"). So the PR merges only once the human has agreed to push its migration to plor.app straight after.
 
 ## Acceptance criteria
-- [ ] The Friends tab, Today's board and a group's page show no invite URL. "Invite a friend" (and the group's "Share group link") opens the share sheet, or copies with a "Copied" note where there's none. An e2e test checks that no `/i/` or group URL is in the page's visible text.
-- [ ] Reset link sits beside the friend invite button on the Friends tab only, and a group's reset stays where the group page has it today. Both stop the old code working (db test).
-- [ ] New codes are 10 characters of `A-Za-z0-9_-` (60 random bits). The code check, the database and the routes accept only that length (unit and db tests).
-- [ ] Every existing friend and group code is replaced by a migration, and an old 22-character link gets the same "unknown link" answer as any unknown code (e2e).
-- [ ] Friend links are `/i/<code>` and group links `/g/<code>` (answers 7 and 9). `/invite/` and `/groups/join/` are removed, not redirected (answer 6: no old link is left to serve).
-- [ ] Opening your own link still says "This is your invite link" (14b-2c-1, answer 8).
-- [ ] No sideways scroll at 320px on the Friends tab or a group's page.
+- [x] The Friends tab, Today's board and a group's page show no invite URL. "Invite a friend" (and the group's "Share group link") opens the share sheet, or copies with a "Copied" note where there's none. An e2e test checks that no `/i/` or group URL is in the page's visible text.
+- [x] Reset link sits beside the friend invite button on the Friends tab only, and a group's reset stays where the group page has it today. Both stop the old code working (db test).
+- [x] New codes are 10 characters of `A-Za-z0-9_-` (60 random bits). The code check, the database and the routes accept only that length (unit and db tests).
+- [x] Every existing friend and group code is replaced by a migration, and an old 22-character link gets the same "unknown link" answer as any unknown code (e2e).
+- [x] Friend links are `/i/<code>` and group links `/g/<code>` (answers 7 and 9). `/invite/` and `/groups/join/` are removed, not redirected (answer 6: no old link is left to serve).
+- [x] Opening your own link still says "This is your invite link" (14b-2c-1, answer 8).
+- [x] No sideways scroll at 320px on the Friends tab or a group's page.
 
 ## Out of scope
 - Looking players up by username, friend requests and blocking (ROADMAP, Later; answer 3).
@@ -92,9 +92,10 @@ Read 2026-10-26, before building. Invite codes are the tokens that let someone a
 Hypothesis for step 1: the codes' length is checked only in TypeScript (`INVITE_CODE`), not in SQL. It's disproved if a migration constrains it, which then joins step 4.
 
 ## Removes
-- The shown link (`<code>` in `src/app/invite-link.tsx` and the group page).
-- `INVITE_CODE_BYTES`, for the one 10-character length.
+- The shown link (`<code>` in `src/app/invite-link.tsx` and the group page), with "Make my invite link", the friend link's Copy and the group's Copy.
+- `INVITE_CODE_BYTES`, for the one length `INVITE_CODE_LENGTH`.
 - The routes `/invite/[code]` and `/groups/join/[code]`, and every 22-character code.
+- `globals.css`'s `code { overflow-wrap: anywhere }`, which only the shown link needed.
 
 ---
 *Fill in the sections below at the end.*
@@ -102,9 +103,32 @@ Hypothesis for step 1: the codes' length is checked only in TypeScript (`INVITE_
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Criterion 4: an old link gets the same "unknown link" answer as any unknown code | An old code on the new path does; an old link, on `/invite/` or `/groups/join/`, gets Next.js's not-found page | Answer 6 removes the old paths ("not redirected"), so no page is left to answer on them |
+| The ticket's step-1 hypothesis: the length is checked only in TypeScript | Also in SQL: both tables' checks, replaced by the migration | Disproved on reading (the security change's section) |
+| Answer 1: one button that shares the link | "Invite a friend" also makes the code the first time, so "Make my invite link" and the separate Copy go | One button; the share falls back to copying (`src/app/share.ts`) |
+| No wording was given for the group's share text or Reset's note | "Join <group> on Plor"; "New link made. The old one no longer works." | Claude's wording, beside the friend link's existing "Add me as a friend on Plor"; for the human to change |
+| The local stack takes migrations with `npx supabase migration up` | Applied by its SQL in one transaction, with its row in `supabase_migrations.schema_migrations` | The shared stack holds M13 13e-5's unmerged `one_walk`, so the CLI refused (the handoff's documented way); CI runs every migration on a fresh database |
 
 ## Evidence
+On the Mac, 2026-10-27, against the shared local stack:
+
+- **The migration** (`20261027004038_short_invite_codes.sql`). `npx supabase migration up --local` refused (`MigrationMissingLocalError`: the stack holds M13 13e-5's unmerged `20261026212300`, as predicted), so its SQL ran in one transaction with its row added to `supabase_migrations.schema_migrations`. The stack's tables were empty, so the replacement was also run on data, in a rolled-back transaction: 500 friend codes of 22 characters became `500 rows, 500 distinct, 500 match` the new check. pgcrypto is `extensions.pgcrypto` 1.3 here.
+- **The checks:** `supabase/tests/friends.test.sql` (10 accepted; 9, `+/` and a shared code refused), `groups.test.sql` (9 and `+/` refused) and the new `invite_codes.test.sql` (the old 22 refused for both; a group code of 10 accepted) pass. `npx supabase test db`: every file but `answer_base.test.sql`, which fails on the shared stack's `one_walk`, as in 14b-2c.
+- **The codes in the app:** `src/friends/friends.test.ts` checks 50 new codes are 10 base64url characters and all differ, and refuses 9, 11, `+/` and the old 22-character size.
+- `npx tsc --noEmit -p .` and `npx eslint .` clean; `npm test` → `Tests  391 passed (391)`; `npm run test:db` → `Tests  266 passed (266)` (the friends and groups routes issue real 10-character codes through the database's checks); `npx playwright test` → `60 passed (2.1m)` before the review's fixes; after them `59 passed`, `1 failed`: `shell.e2e.ts`'s "from 768px the tabs are a sidebar" on a `toHaveURL` wait, a test this change doesn't touch, which then passed 5 of 5 alone (`--repeat-each=5`), so it's filed in ROADMAP with the other flaky tests.
+- **e2e, by criterion:**
+  - 1: `account.e2e.ts` presses "Invite a friend", gets an `/i/` link of 10 characters by the clipboard (`e2e/players.ts`, `sharedLink`), and finds no `/i/` in the page's text; `groups.e2e.ts` does the same with "Share group link" and `/g/`.
+  - 2: `account.e2e.ts`: Reset shows beside the button once there's a link, and not on Today's board.
+  - 4 and 5: `account.e2e.ts`: `/i/<22 characters>` shows "That invite link doesn't work…", and `/invite/<code>` answers 404.
+  - 6: `player-screens.e2e.ts`: your own link still says "This is your invite link".
+  - 7: `groups.e2e.ts` checks a group's page at 320px. Its first version measured the moment after a resize and saw 360; a probe found nothing sticking out and 320 half a second later, so it now polls. `player-screens.e2e.ts` checks the Friends tab at 320px.
 
 ## Review
+By the `reviewer` agent in a fresh context, 2026-10-27. It found the migration, the codes, the routes and the buttons right.
+
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **The route moves went into the wrong commit:** `git mv` had staged them, and the docs-only commit `111011f` ("14b-4 done…", pushed) carried them. At that commit `src/app/g/[code]/page.tsx` still imports `../../../home`, so it doesn't build on its own. Not rewritten (pushed; that needs the human): the 14b-3 commit says so and carries the import fix.
+  - The Evidence, the criteria, the ROADMAP row (garbled) and the handoff: done in this PR.
+  - Criterion 7 had no check of a group's page: added (`groups.e2e.ts`).
+  - Also fixed, as this change caused it: a group's Reset link gave no sign it worked once the link was hidden; it now says "New link made. The old one no longer works.", as the friend link's does. And `groups.test.sql`'s comment still said 22.
+- Deferred to ROADMAP "Next revision" (For M14, "14b-3 review"): the first share after an awaited request on iPhone Safari (*unverified*); two InviteLinks each holding the code; criteria 1 and 4 checked on friend links only; the hand-applied migration as a script.

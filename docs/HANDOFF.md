@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 merged (PR #95), 14b-2c-4 merged (PR #96); 14b-4 merged (PR #97); 14b-3 in progress, its security change approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 merged (PR #95), 14b-2c-4 merged (PR #96); 14b-4 merged (PR #97); 14b-3 in review (PR_PENDING), its merge and plor.app's push waiting on the human; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -33,8 +33,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ### Next step
 1. **14b-4, the game's name record** is done (PR #97, merged on green CI, 2026-10-27): `src/platform/game.ts` holds the game's ID, shown name and address; shared screens name no game.
-2. **14b-3, the invite button**, in progress (`docs/milestones/M14-14b-3-invite-button.md`): approved, and its security change too (answer 11, DECISIONS.md Log). When its PR is ready, ask the human first; on yes, merge it and push its migration to plor.app straight after, from a clean checkout of `main`, then run the hosted tests (answer 12).
-3. Then 14b-3, then 14c-1 (ask its N1–N7). N3 holds the share symbols and N7 a stolen key's feedback.
+2. **14b-3, the invite button** (in review, PR_PENDING; `docs/milestones/M14-14b-3-invite-button.md`): approved with its security change (answer 11, DECISIONS.md Log). Its merge waits on the human: on yes, merge it and push its migration (`20261027004038_short_invite_codes.sql`) to plor.app straight after, from a clean checkout of `main`, then run the hosted tests (answer 12). Until it's pushed, making an invite link on plor.app fails. On this Mac's shared stack the migration was applied by its SQL, with its row in `supabase_migrations.schema_migrations`, since M13 13e-5's unmerged `one_walk` makes `migration up` refuse.
+3. Then 14c-1 (ask its N1–N7). N3 holds the share symbols and N7 a stolen key's feedback.
 
 ### Catching up on another computer
 1. `git fetch origin && git switch m14-look-and-feel && git pull && npm ci`.
