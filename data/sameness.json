@@ -1,0 +1,829 @@
+{
+  "merge": [
+    {
+      "old": "Q24006022",
+      "kept": "Q166794",
+      "why": "manul: Felis manul is Otocolobus manul (human, 2026-10-27)"
+    },
+    {
+      "old": "Q182304",
+      "kept": "Q27450846",
+      "why": "jaguarundi: Puma yagouaroundi is Herpailurus yagouaroundi, the current name (human, 2026-10-27)"
+    },
+    {
+      "old": "Q109647288",
+      "kept": "Q35255",
+      "why": "cougar: Felis concolor is Puma concolor (human, 2026-10-27)"
+    },
+    {
+      "old": "Q57818409",
+      "kept": "Q20980826",
+      "why": "cat: Felis silvestris catus is Felis catus, the current name (human, 2026-10-27)"
+    },
+    {
+      "old": "Q210644",
+      "kept": "Q28157482",
+      "why": "brown hyena: Hyaena brunnea is Parahyaena brunnea (human, 2026-10-27)"
+    },
+    {
+      "old": "Q125815593",
+      "kept": "Q208079",
+      "why": "side-striped jackal: Lupulella adusta is Canis adustus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q125814326",
+      "kept": "Q188944",
+      "why": "black-backed jackal: Lupulella mesomelas is Canis mesomelas (human, 2026-10-27)"
+    },
+    {
+      "old": "Q20717272",
+      "kept": "Q26972265",
+      "why": "dog: Canis familiaris is Canis lupus familiaris (human, 2026-10-27)"
+    },
+    {
+      "old": "Q50407495",
+      "kept": "Q622886",
+      "why": "natterjack: Bufo calamita is Epidalea calamita (human, 2026-10-27)"
+    },
+    {
+      "old": "Q159363",
+      "kept": "Q4667968",
+      "why": "green frog: Rana clamitans is Lithobates clamitans (human, 2026-10-27)"
+    },
+    {
+      "old": "Q4667413",
+      "kept": "Q159404",
+      "why": "bullfrog: Lithobates catesbeianus is Rana catesbeiana (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25689558",
+      "kept": "Q25634",
+      "why": "black-headed gull: Larus ridibundus is Chroicocephalus ridibundus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q1274741",
+      "kept": "Q28070835",
+      "why": "surfbird: Aphriza virgata is Calidris virgata (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25677554",
+      "kept": "Q202504",
+      "why": "dotterel: Eudromias morinellus is Charadrius morinellus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25940",
+      "kept": "Q28106731",
+      "why": "northern shoveler: Anas clypeata is Spatula clypeata (human, 2026-10-27)"
+    },
+    {
+      "old": "Q26459",
+      "kept": "Q28106837",
+      "why": "Eurasian wigeon: Anas penelope is Mareca penelope (human, 2026-10-27)"
+    },
+    {
+      "old": "Q703790",
+      "kept": "Q28106685",
+      "why": "American wigeon: Anas americana is Mareca americana (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25644",
+      "kept": "Q28106902",
+      "why": "garganey: Anas querquedula is Spatula querquedula (human, 2026-10-27)"
+    },
+    {
+      "old": "Q504148",
+      "kept": "Q28106778",
+      "why": "blue-winged teal: Anas discors is Spatula discors (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25658709",
+      "kept": "Q1268205",
+      "why": "whip-poor-will: Caprimulgus vociferus is Antrostomus vociferus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q41214407",
+      "kept": "Q736052",
+      "why": "belted kingfisher: Ceryle alcyon is Megaceryle alcyon (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25651097",
+      "kept": "Q2668013",
+      "why": "tree martin: Hirundo nigricans is Petrochelidon nigricans (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25689712",
+      "kept": "Q25404",
+      "why": "blue tit: Parus caeruleus is Cyanistes caeruleus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q22232931",
+      "kept": "Q1079441",
+      "why": "Carolina chickadee: Parus carolinensis is Poecile carolinensis (human, 2026-10-27)"
+    },
+    {
+      "old": "Q22231582",
+      "kept": "Q282687",
+      "why": "black-capped chickadee: Parus atricapillus is Poecile atricapillus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q25394",
+      "kept": "Q25345384",
+      "why": "jackdaw: Corvus monedula is Coloeus monedula (human, 2026-10-27)"
+    },
+    {
+      "old": "Q1410964",
+      "kept": "Q27075919",
+      "why": "Blackburnian warbler: Dendroica fusca is Setophaga fusca (human, 2026-10-27)"
+    },
+    {
+      "old": "Q754042",
+      "kept": "Q21962227",
+      "why": "yellow warbler: Dendroica petechia is Setophaga petechia (human, 2026-10-27)"
+    },
+    {
+      "old": "Q1142542",
+      "kept": "Q27075875",
+      "why": "red siskin: Carduelis cucullata is Spinus cucullatus (human, 2026-10-27)"
+    },
+    {
+      "old": "Q13586001",
+      "kept": "Q123141",
+      "why": "goldfish: the domestic subspecies Carassius auratus auratus folds into the species (human, 2026-10-27)"
+    }
+  ],
+  "apart": [
+    {
+      "a": "Q1329239",
+      "b": "Q1133152",
+      "why": "horseshoe crab: Limulidae is the family, the Atlantic horseshoe crab one species in it"
+    },
+    {
+      "a": "Q254630",
+      "b": "Q10808340",
+      "why": "kinkajou: Potos is the genus, Potos flavus its one species (human, 2026-10-27: keep apart)"
+    }
+  ],
+  "reviewed": [
+    {
+      "category": "animal",
+      "name": "cat",
+      "why": "WordNet senses: big cat, true cat, the domestic cat, feline (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal",
+      "name": "coney",
+      "why": "different animals called coney: two groupers, hyrax, pika, rabbit (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal",
+      "name": "cony",
+      "why": "different animals called cony: pikas, hyrax, rabbit (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fruit",
+      "name": "mango",
+      "why": "the fruit and Rosigold, a mango cultivar (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "bird",
+      "name": "robin",
+      "why": "American robin and the European robin (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "black salmon",
+      "why": "Atlantic salmon and cobia (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "bonito",
+      "why": "albacore, bonito and skipjack tuna (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "catfish",
+      "why": "barbu, catfish and wolffish (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "cod",
+      "why": "Atlantic cod, cobia and the cod family (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "halibut",
+      "why": "Atlantic halibut and halibut in general (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "mackerel",
+      "why": "different fish called mackerel (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "salmon",
+      "why": "Atlantic salmon, rainbow runner and salmon in general (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish",
+      "name": "tuna",
+      "why": "albacore and two WordNet senses of tuna (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "snake",
+      "name": "copperhead",
+      "why": "two different snakes (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "musical_instrument",
+      "name": "harp",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "furniture",
+      "name": "ottoman",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "furniture",
+      "name": "table",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "tool",
+      "name": "hammer",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "tool",
+      "name": "saw",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "clothing",
+      "name": "dress",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "clothing",
+      "name": "frock",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "clothing",
+      "name": "trousers",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "clothing",
+      "name": "vest",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "headwear",
+      "name": "turban",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "car",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "scooter",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "tractor",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "tram",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "tramcar",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "vehicle",
+      "name": "truck",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "akron",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "boston",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "chicago",
+      "why": "Chicago and Willard, Ohio (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "dayton",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "houston",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "miami",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "omaha",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city",
+      "name": "reno",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "river",
+      "name": "indus river",
+      "why": "the Indus and Dalaman Brook (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "river",
+      "name": "mississippi river",
+      "why": "the Mississippi and its Canadian namesake, a tributary of the Ottawa River (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "river",
+      "name": "rhine",
+      "why": "the Rhine and the Seerhein (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "river",
+      "name": "river thames",
+      "why": "the Thames and the River Thame (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "sport",
+      "name": "hockey",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "dance",
+      "name": "reel",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "dance",
+      "name": "rhumba",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "dance",
+      "name": "rumba",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "language",
+      "name": "greek",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "currency",
+      "name": "lira",
+      "why": "different currencies with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "currency",
+      "name": "peso",
+      "why": "different currencies with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "currency",
+      "name": "rupee",
+      "why": "different currencies with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "currency",
+      "name": "won",
+      "why": "different currencies with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "awe",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "fear",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "happiness",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "hope",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "love",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "pride",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "sadness",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "feeling",
+      "name": "unhappiness",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "whale",
+      "name": "blue whale",
+      "why": "the Antarctic subspecies and the species (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "gal",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "gallon",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "inch",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "mil",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "mile",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "ounce",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "unit",
+      "name": "yard",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_k",
+      "name": "kestrel",
+      "why": "American and common kestrel, two species (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_k",
+      "name": "kinkajou",
+      "why": "the genus Potos and its species, and the potto (human, 2026-10-27: keep apart) (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_k",
+      "name": "kookaburra",
+      "why": "WordNet's and the Laughing Kookaburra, and the genus Dacelo (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_k",
+      "name": "potto",
+      "why": "the kinkajou (also called potto) and the West African potto (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_w",
+      "name": "weasel",
+      "why": "least weasel and weasel in general (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "animal_w",
+      "name": "wolf",
+      "why": "grey wolf and wolf in general (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_w",
+      "name": "waco",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_w",
+      "name": "wheeling",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_w",
+      "name": "wilmington",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_w",
+      "name": "woonsocket",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "jacksonville",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "janesville",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "jefferson city",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "johnstown",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "jonesboro",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "us_city_j",
+      "name": "juneau",
+      "why": "different US cities with this name (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "river_v",
+      "name": "vienne",
+      "why": "two French rivers named Vienne (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "bird_k",
+      "name": "kestrel",
+      "why": "American and common kestrel, two species (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish_w",
+      "name": "silver perch",
+      "why": "white crappie and white perch (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish_w",
+      "name": "white perch",
+      "why": "white crappie and white perch (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish_w",
+      "name": "whitetip shark",
+      "why": "oceanic and reef whitetip sharks (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "fish_w",
+      "name": "wolffish",
+      "why": "lancetfish and wolffish (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "insect_f",
+      "name": "firefly",
+      "why": "two WordNet senses: the beetle and its larva (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "insect_f",
+      "name": "fruit fly",
+      "why": "two different fruit-fly families (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "insect_f",
+      "name": "fungus gnat",
+      "why": "two WordNet senses (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "tree_w",
+      "name": "white ash",
+      "why": "snow gum and white ash (human, 2026-10-27: \"Mark all 92\")"
+    },
+    {
+      "category": "clothing_j",
+      "name": "jumper",
+      "why": "WordNet senses of this word (human, 2026-10-27: \"Mark all 92\")"
+    }
+  ],
+  "wordnet_split": [
+    {
+      "synset": "02461453-n",
+      "from": "Q2274076",
+      "why": "ground sloth, the extinct giant: not Folivora, every sloth (human, 2026-10-27)"
+    },
+    {
+      "synset": "01682603-n",
+      "from": "Q2703595",
+      "why": "leopard lizard, \"any of several\": not one species, the long-nosed (human, 2026-10-27)"
+    },
+    {
+      "synset": "01547030-n",
+      "from": "Q331065",
+      "why": "zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch (human, 2026-10-27)"
+    },
+    {
+      "synset": "02084450-n",
+      "from": "Q40994",
+      "why": "Atlantic walrus, a subspecies: not the walrus species (human, 2026-10-27)"
+    }
+  ],
+  "wordnet_pick": [
+    {
+      "synset": "01790476-n",
+      "taxon": "Q1133152",
+      "why": "horseshoe crab: the Atlantic horseshoe crab, the species, not Limulidae, the family"
+    },
+    {
+      "synset": "02129439-n",
+      "taxon": "Q166794",
+      "why": "manul: Otocolobus manul (90 articles), not Felis manul (0)"
+    },
+    {
+      "synset": "02128341-n",
+      "taxon": "Q182304",
+      "why": "jaguarundi: Puma yagouaroundi (73), not Herpailurus yagouaroundi (1)"
+    },
+    {
+      "synset": "02127963-n",
+      "taxon": "Q35255",
+      "why": "cougar: Puma concolor (125), not Felis concolor (0)"
+    },
+    {
+      "synset": "02124460-n",
+      "taxon": "Q57818409",
+      "why": "domestic cat: Felis silvestris catus (16), not Felis catus (9)"
+    },
+    {
+      "synset": "02120298-n",
+      "taxon": "Q28157482",
+      "why": "brown hyena: Parahyaena brunnea (61), not Hyaena brunnea (0)"
+    },
+    {
+      "synset": "85147429-n",
+      "taxon": "Q208079",
+      "why": "side-striped jackal: Canis adustus (36), not Lupulella adusta (30)"
+    },
+    {
+      "synset": "83443092-n",
+      "taxon": "Q188944",
+      "why": "black-backed jackal: Canis mesomelas (34), not Lupulella mesomelas (30)"
+    },
+    {
+      "synset": "02086723-n",
+      "taxon": "Q26972265",
+      "why": "dog: Canis lupus familiaris (7, the breeds' taxon), not Canis familiaris (7)"
+    },
+    {
+      "synset": "01649289-n",
+      "taxon": "Q622886",
+      "why": "natterjack: Epidalea calamita (42), not Bufo calamita (0)"
+    },
+    {
+      "synset": "01644380-n",
+      "taxon": "Q4667968",
+      "why": "green frog: Lithobates clamitans (24), not Rana clamitans (3)"
+    },
+    {
+      "synset": "01644218-n",
+      "taxon": "Q159404",
+      "why": "bullfrog: Rana catesbeiana (51), not Lithobates catesbeianus (3)"
+    },
+    {
+      "synset": "02044834-n",
+      "taxon": "Q25634",
+      "why": "laughing gull: Chroicocephalus ridibundus (84), not Larus ridibundus (0)"
+    },
+    {
+      "synset": "02029283-n",
+      "taxon": "Q28070835",
+      "why": "surfbird: Calidris virgata (33), not Aphriza virgata (1)"
+    },
+    {
+      "synset": "02026839-n",
+      "taxon": "Q202504",
+      "why": "dotterel: Charadrius morinellus (61), not Eudromias morinellus (0)"
+    },
+    {
+      "synset": "01851617-n",
+      "taxon": "Q28106731",
+      "why": "shoveler: Spatula clypeata (87), not Anas clypeata (2)"
+    },
+    {
+      "synset": "01851289-n",
+      "taxon": "Q28106837",
+      "why": "widgeon: Mareca penelope (88), not Anas penelope (2)"
+    },
+    {
+      "synset": "01851481-n",
+      "taxon": "Q28106685",
+      "why": "American widgeon: Mareca americana (48), not Anas americana (1)"
+    },
+    {
+      "synset": "01851196-n",
+      "taxon": "Q28106902",
+      "why": "garganey: Spatula querquedula (87), not Anas querquedula (1)"
+    },
+    {
+      "synset": "01851094-n",
+      "taxon": "Q28106778",
+      "why": "blue-winged teal: Spatula discors (49), not Anas discors (0)"
+    },
+    {
+      "synset": "01838728-n",
+      "taxon": "Q1268205",
+      "why": "whippoorwill: Antrostomus vociferus (26), not Caprimulgus vociferus (1)"
+    },
+    {
+      "synset": "01830737-n",
+      "taxon": "Q736052",
+      "why": "belted kingfisher: Megaceryle alcyon (43), not Ceryle alcyon (0)"
+    },
+    {
+      "synset": "01597809-n",
+      "taxon": "Q2668013",
+      "why": "tree swallow: Petrochelidon nigricans (22), not Hirundo nigricans (0)"
+    },
+    {
+      "synset": "01595335-n",
+      "taxon": "Q25404",
+      "why": "blue tit: Cyanistes caeruleus (99), not Parus caeruleus (0)"
+    },
+    {
+      "synset": "01595181-n",
+      "taxon": "Q1079441",
+      "why": "Carolina chickadee: Poecile carolinensis (25), not Parus carolinensis (0)"
+    },
+    {
+      "synset": "01594898-n",
+      "taxon": "Q282687",
+      "why": "black-capped chickadee: Poecile atricapillus (32), not Parus atricapillus (0)"
+    },
+    {
+      "synset": "01582219-n",
+      "taxon": "Q25345384",
+      "why": "jackdaw: Coloeus monedula (109), not Corvus monedula (1)"
+    },
+    {
+      "synset": "01571701-n",
+      "taxon": "Q27075919",
+      "why": "Blackburnian warbler: Setophaga fusca (27), not Dendroica fusca (0)"
+    },
+    {
+      "synset": "01571533-n",
+      "taxon": "Q21962227",
+      "why": "yellow warbler: Setophaga petechia (38), not Dendroica petechia (0)"
+    },
+    {
+      "synset": "01534280-n",
+      "taxon": "Q27075875",
+      "why": "red siskin: Spinus cucullatus (32), not Carduelis cucullata (0)"
+    }
+  ],
+  "wordnet_join": [
+    {
+      "synset": "01831197-n",
+      "taxon": "Q824974",
+      "why": "kookaburra (laughing jackass, Dacelo gigas): the Laughing Kookaburra, Dacelo novaeguineae (human, 2026-10-27)"
+    },
+    {
+      "synset": "02084223-n",
+      "taxon": "Q40994",
+      "why": "walrus, \"either of two\": the walrus species, Odobenus rosmarus (human, 2026-10-27)"
+    },
+    {
+      "synset": "02451814-n",
+      "taxon": "Q14334",
+      "why": "wolverine (North American, Gulo luscus): the wolverine species, Gulo gulo, which WordNet's \"glutton\" also joins (human, 2026-10-27)"
+    }
+  ]
+}

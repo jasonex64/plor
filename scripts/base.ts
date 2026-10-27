@@ -18,6 +18,7 @@ import pg from "pg";
 import pluralize from "pluralize";
 import { isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
+import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
@@ -34,9 +35,11 @@ export type Item = {
   // Wikidata taxa a WordNet item could join, left unjoined because there are several (linkToWikidata); the review
   // prints them and import_source doesn't read them.
   unjoined?: string[];
+  // A Wikidata item folded into the kept item of its set (13e-5b): it brings its names, not its facts.
+  merged_into?: string;
 };
 type Source = "wikidata" | "oewn" | "usda";
-type SetDef = { source: Source; method: string; fetch: () => Promise<Item[]> };
+type SetDef<T = Item> = { source: Source; method: string; fetch: () => Promise<T[]> };
 
 // --- aliases ---
 
@@ -375,10 +378,10 @@ const wikidataIds = (synset: Synset) => [synset.wikidata ?? []].flat();
 // is loaded; one naming several loaded taxa (cat, cattle, rabbit) stays its own thing and keeps them as unjoined, for
 // the review (13e-5 item 1; SOURCES.md, Wikidata common-name link; human, 2026-10-26: "Join only clear cases").
 // A synset may give a list of IDs (["Q124657158", "Q664443"]): the same rule holds over all they name.
-// hand holds a person's decisions from the review: joins to split, each with the thing it rejects, and the taxon an
-// unjoined word joins. Each must
+// hand holds a person's decisions from the review: joins to split, each with the thing it rejects, the taxon an
+// unjoined word joins, and the thing a synset naming no loaded Wikidata item joins (13e-5b). Each must
 // still fit the data, or the fetch stops naming it, so a re-fetch can't apply a stale decision silently.
-export type HandJoins = { split: Map<string, string>; pick: Map<string, string> };
+export type HandJoins = { split: Map<string, string>; pick: Map<string, string>; join: Map<string, string> };
 export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, known: Set<string>, root: string, rootLink: string, taxaOf: Map<string, string[]>, hand: HandJoins): Item[] {
   const used = new Set<string>();
   const linked = items.map((item) => {
@@ -396,10 +399,16 @@ export function linkToWikidata(items: Item[], synsets: Record<string, Synset>, k
       used.add(item.id);
       return { ...item, same_as: `wikidata:${pick}` };
     }
+    const join = hand.join.get(item.id);
+    if (join) {
+      if (taxa.length || !known.has(join)) throw new Error(`hand join ${item.id} (${item.name}) → ${join}: ${taxa.length ? `it already names ${taxa.join(", ")}` : "not loaded"}`);
+      used.add(item.id);
+      return { ...item, same_as: `wikidata:${join}` };
+    }
     if (taxa.length === 1) return { ...item, same_as: `wikidata:${taxa[0]}` };
     return taxa.length ? { ...item, unjoined: taxa } : item;
   });
-  const unused = [...hand.split.keys(), ...hand.pick.keys()].filter((id) => !used.has(id));
+  const unused = [...hand.split.keys(), ...hand.pick.keys(), ...hand.join.keys()].filter((id) => !used.has(id));
   if (unused.length) throw new Error(`hand joins name synsets not in the tree: ${unused.join(", ")}`);
   return linked;
 }
@@ -523,49 +532,6 @@ const ANIMALIA = "Q729"; // labelled "animal"
 // (Recommended)"), as Pūkio Stream's alias is for rivers.
 const ANIMALS_DROP_LISTED_NAMES = ["Q1321783"];
 const DOG = "Q26972265"; // Canis lupus familiaris: no taxon has the English common name "dog" (checked 2026-10-24)
-// The human's decisions on the review's lists (13e-5; human, 2026-10-27: "As recommended" for both): three joins split
-// as wrong matches, and the taxon each unjoined word joins, the one with more Wikipedia articles (the title rule's
-// "better-known one"), the species for horseshoe crab, and for dog the taxon the breeds sit under. The twin left over
-// is Wikidata's own double, for 13e-5b.
-const OEWN_ANIMALS_HAND: HandJoins = {
-  split: new Map([
-    ["02461453-n", "Q2274076"], // ground sloth, the extinct giant: not Folivora, every sloth
-    ["01682603-n", "Q2703595"], // leopard lizard, "any of several": not one species, the long-nosed
-    ["01547030-n", "Q331065"], // zebra finch, Poephila castanotis (the Australian): not the Sunda zebra finch
-  ]),
-  pick: new Map([
-    ["01790476-n", "Q1133152"], // horseshoe crab: Atlantic horseshoe crab, the species, not Limulidae, the family
-    ["02129439-n", "Q166794"], // manul: Otocolobus manul (90), not Felis manul (0)
-    ["02128341-n", "Q182304"], // jaguarundi: Puma yagouaroundi (73), not Herpailurus yagouaroundi (1)
-    ["02127963-n", "Q35255"], // cougar: Puma concolor (125), not Felis concolor (0)
-    ["02124460-n", "Q57818409"], // domestic cat: Felis silvestris catus (16), not Felis catus (9)
-    ["02120298-n", "Q28157482"], // brown hyena: Parahyaena brunnea (61), not Hyaena brunnea (0)
-    ["85147429-n", "Q208079"], // side-striped jackal: Canis adustus (36), not Lupulella adusta (30)
-    ["83443092-n", "Q188944"], // black-backed jackal: Canis mesomelas (34), not Lupulella mesomelas (30)
-    ["02086723-n", DOG], // dog: Canis lupus familiaris (7, the breeds' taxon), not Canis familiaris (7)
-    ["01649289-n", "Q622886"], // natterjack: Epidalea calamita (42), not Bufo calamita (0)
-    ["01644380-n", "Q4667968"], // green frog: Lithobates clamitans (24), not Rana clamitans (3)
-    ["01644218-n", "Q159404"], // bullfrog: Rana catesbeiana (51), not Lithobates catesbeianus (3)
-    ["02044834-n", "Q25634"], // laughing gull: Chroicocephalus ridibundus (84), not Larus ridibundus (0)
-    ["02029283-n", "Q28070835"], // surfbird: Calidris virgata (33), not Aphriza virgata (1)
-    ["02026839-n", "Q202504"], // dotterel: Charadrius morinellus (61), not Eudromias morinellus (0)
-    ["01851617-n", "Q28106731"], // shoveler: Spatula clypeata (87), not Anas clypeata (2)
-    ["01851289-n", "Q28106837"], // widgeon: Mareca penelope (88), not Anas penelope (2)
-    ["01851481-n", "Q28106685"], // American widgeon: Mareca americana (48), not Anas americana (1)
-    ["01851196-n", "Q28106902"], // garganey: Spatula querquedula (87), not Anas querquedula (1)
-    ["01851094-n", "Q28106778"], // blue-winged teal: Spatula discors (49), not Anas discors (0)
-    ["01838728-n", "Q1268205"], // whippoorwill: Antrostomus vociferus (26), not Caprimulgus vociferus (1)
-    ["01830737-n", "Q736052"], // belted kingfisher: Megaceryle alcyon (43), not Ceryle alcyon (0)
-    ["01597809-n", "Q2668013"], // tree swallow: Petrochelidon nigricans (22), not Hirundo nigricans (0)
-    ["01595335-n", "Q25404"], // blue tit: Cyanistes caeruleus (99), not Parus caeruleus (0)
-    ["01595181-n", "Q1079441"], // Carolina chickadee: Poecile carolinensis (25), not Parus carolinensis (0)
-    ["01594898-n", "Q282687"], // black-capped chickadee: Poecile atricapillus (32), not Parus atricapillus (0)
-    ["01582219-n", "Q25345384"], // jackdaw: Coloeus monedula (109), not Corvus monedula (1)
-    ["01571701-n", "Q27075919"], // Blackburnian warbler: Setophaga fusca (27), not Dendroica fusca (0)
-    ["01571533-n", "Q21962227"], // yellow warbler: Setophaga petechia (38), not Dendroica petechia (0)
-    ["01534280-n", "Q27075875"], // red siskin: Spinus cucullatus (32), not Carduelis cucullata (0)
-  ]),
-};
 
 // In load order: a set's refs and same_as name only sets above it (`npm run base -- load all` loads them in turn).
 const SETS: Record<string, SetDef> = {
@@ -713,7 +679,7 @@ const SETS: Record<string, SetDef> = {
   },
   "oewn-animals": {
     source: "oewn",
-    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several; the human's hand decisions on the review (3 joins split, 30 unjoined words' taxa picked) applied`,
+    method: `${OEWN_ZIP}: every noun.*.json, synset ${OEWN_ANIMAL} and its hyponyms, each linked to the wikidata-animals or wikidata-dog-breeds thing its Wikidata ID names; ${OEWN_ANIMAL} itself to ${ANIMALIA}, as it carries no Wikidata ID (Claude, 2026-10-24); a Wikidata ID that isn't loaded linked instead to the one loaded taxon its P13176 (truthy) names, and left unjoined, its loaded taxa listed, when it names several; the human's hand decisions in data/sameness.json (wordnet_split, wordnet_pick, wordnet_join) applied`,
     fetch: async () => {
       const files = unzip(OEWN_ZIP, await download(OEWN_ZIP), (listed) => listed.filter((n) => /^noun\.[^/]+\.json$/.test(n)));
       const synsets: Record<string, Synset> = Object.assign({}, ...Object.values(files).map((t) => JSON.parse(t) as Record<string, Synset>));
@@ -724,7 +690,7 @@ const SETS: Record<string, SetDef> = {
       await byIds(unloaded, "P13176", (v) => `SELECT ?c ?t WHERE { VALUES ?c { ${v} } ?c wdt:P13176 ?t . }`, (rows) => {
         for (const r of rows) taxaOf.set(qid(r.c.value), [...(taxaOf.get(qid(r.c.value)) ?? []), qid(r.t.value)]);
       });
-      const items = linkToWikidata(tree, synsets, known, OEWN_ANIMAL, ANIMALIA, taxaOf, OEWN_ANIMALS_HAND);
+      const items = linkToWikidata(tree, synsets, known, OEWN_ANIMAL, ANIMALIA, taxaOf, handJoins(readSameness()));
       const byP13176 = items.filter((i) => i.id !== OEWN_ANIMAL && i.same_as && !wikidataIds(synsets[i.id]).includes(i.same_as.slice("wikidata:".length))).length;
       console.log(`oewn-animals: ${unloaded.length} Wikidata IDs not loaded, ${taxaOf.size} of them with P13176; ${byP13176} joined by it, ${items.filter((i) => i.unjoined).length} unjoined`);
       return items;
@@ -770,15 +736,15 @@ type Manifest = { set: string; source: Source; snapshot: string; retrieved_at: s
 const manifestPath = (set: string) => join("data", "manifests", `${set}.json`);
 const snapshotPath = (set: string, snapshot: string) => join("data", "snapshots", set, `${snapshot}.json`);
 
-function readSnapshot(set: string): { manifest: Manifest; items: Item[] } {
+function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
   const manifest = JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
   const text = readFileSync(snapshotPath(set, manifest.snapshot), "utf8");
   const sha256 = createHash("sha256").update(text).digest("hex");
   if (sha256 !== manifest.sha256) throw new Error(`${set}: snapshot ${manifest.snapshot} doesn't match its manifest's checksum`);
-  return { manifest, items: JSON.parse(text) as Item[] };
+  return { manifest, items: JSON.parse(text) as T[] };
 }
 
-async function fetchSet(set: string, def: SetDef): Promise<void> {
+async function fetchSet<T>(set: string, def: SetDef<T>): Promise<void> {
   const items = await def.fetch();
   const snapshot = new Date().toISOString().slice(0, 10);
   const text = JSON.stringify(items);
@@ -810,7 +776,9 @@ export async function localClient(): Promise<pg.Client> {
 }
 
 async function loadSet(set: string, def: SetDef): Promise<void> {
-  const { manifest, items } = readSnapshot(set);
+  const { manifest, items: read } = readSnapshot(set);
+  const name = (id: string) => loadedWikidata().names.get(mergePlan().into.get(id) ?? id);
+  const items = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
   const client = await localClient();
   try {
     await client.query("begin");
@@ -825,6 +793,215 @@ async function loadSet(set: string, def: SetDef): Promise<void> {
     await client.end();
   }
 }
+
+// --- sameness: Wikidata's own doubles and the human's decisions (13e-5b) ---
+
+// Every hand decision on what is one thing (docs/milestones/M13-13e-5b-wikidata-doubles.md): merges of two Wikidata
+// items, pairs kept apart, bank answers whose name was reviewed and fits different things (so the review doesn't ask
+// again), and WordNet's splits and picks (13e-5). Disk input, checked here.
+export const SAMENESS_FILE = "data/sameness.json";
+export type Sameness = {
+  merge: { old: string; kept: string; why: string }[];
+  apart: { a: string; b: string; why: string }[];
+  reviewed: { category: string; name: string; why: string }[];
+  wordnet_split: { synset: string; from: string; why: string }[];
+  wordnet_pick: { synset: string; taxon: string; why: string }[];
+  wordnet_join: { synset: string; taxon: string; why: string }[];
+};
+const SAMENESS_FIELDS: Record<keyof Sameness, string[]> = {
+  merge: ["old", "kept", "why"],
+  apart: ["a", "b", "why"],
+  reviewed: ["category", "name", "why"],
+  wordnet_split: ["synset", "from", "why"],
+  wordnet_pick: ["synset", "taxon", "why"],
+  wordnet_join: ["synset", "taxon", "why"],
+};
+
+const SAMENESS_KEYS: Record<keyof Sameness, string[]> = {
+  merge: ["old"], apart: ["a", "b"], reviewed: ["category", "name"], wordnet_split: ["synset"], wordnet_pick: ["synset"], wordnet_join: ["synset"],
+};
+
+export function parseSameness(text: string): Sameness {
+  const data: unknown = JSON.parse(text);
+  const lists = Object.keys(SAMENESS_FIELDS) as (keyof Sameness)[];
+  if (typeof data !== "object" || data === null || Array.isArray(data) || Object.keys(data).sort().join() !== [...lists].sort().join()) {
+    throw new Error(`${SAMENESS_FILE}: must hold exactly ${lists.join(", ")}`);
+  }
+  for (const list of lists) {
+    const rows = (data as Record<string, unknown>)[list];
+    if (!Array.isArray(rows)) throw new Error(`${SAMENESS_FILE}: ${list} must be a list`);
+    const fields = SAMENESS_FIELDS[list];
+    rows.forEach((row, i) => {
+      const ok = typeof row === "object" && row !== null && !Array.isArray(row) && Object.keys(row).length === fields.length
+        && fields.every((f) => typeof (row as Record<string, unknown>)[f] === "string" && ((row as Record<string, string>)[f]).trim() !== "");
+      if (!ok) throw new Error(`${SAMENESS_FILE} ${list} ${i + 1}: must hold exactly ${fields.join(", ")}, each as text`);
+    });
+    // What each row decides, once: an old item merges once, a pair is apart once, a category's name is reviewed once, a
+    // synset is split, picked or joined once.
+    const keys = rows.map((row) => SAMENESS_KEYS[list].map((f) => (row as Record<string, string>)[f]).join(" "));
+    const twice = keys.filter((v, i) => keys.indexOf(v) !== i);
+    if (twice.length) throw new Error(`${SAMENESS_FILE} ${list}: ${[...new Set(twice)].join(", ")} listed twice`);
+  }
+  return data as Sameness;
+}
+
+const readSameness = () => parseSameness(readFileSync(SAMENESS_FILE, "utf8"));
+
+export function handJoins(s: Sameness): HandJoins {
+  return {
+    split: new Map(s.wordnet_split.map((r) => [r.synset, r.from])), pick: new Map(s.wordnet_pick.map((r) => [r.synset, r.taxon])),
+    join: new Map(s.wordnet_join.map((r) => [r.synset, r.taxon])),
+  };
+}
+
+// What Wikidata marks about a loaded item, among loaded items: the preferred names it's a taxon synonym of (P12763, and
+// P1420 read from the other side), its permanent duplicates (P2959), the items said to be the same (P460, for the
+// review only) and its sitelink count (SOURCES.md, Wikidata sameness marks).
+export type Mark = { id: string; synonym_of: string[]; duplicates: string[]; said_same: string[]; sitelinks: number };
+
+// Which item each merged one folds into. Taxon synonyms point old to kept; chains fold to their end. Where no side is
+// named (a P2959 pair, or two items each marked the other's synonym) the one with more sitelinks keeps its ID, and a
+// tie is a fork. A fork (an item pointing at two kept items) doesn't merge and goes to the review; so does a longer
+// circle. The human's merges add pairs and must agree with Wikidata's marks; their apart pairs never merge. A merge
+// across two sets stops (none on 2026-10-27; build for today). Every decision must still fit the loaded items.
+export type MergePlan = { into: Map<string, string>; forks: string[][]; saidSame: string[][] };
+export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Sameness): MergePlan {
+  const links = new Map(marks.map((m) => [m.id, m.sitelinks]));
+  const byId = new Map(marks.map((m) => [m.id, m]));
+  const apart = new Set(s.apart.flatMap((r) => [`${r.a} ${r.b}`, `${r.b} ${r.a}`]));
+  const edges = new Map<string, Set<string>>();
+  const forks: string[][] = [];
+  const add = (from: string, to: string) => {
+    if (from === to || apart.has(`${from} ${to}`)) return;
+    edges.set(from, new Set([...(edges.get(from) ?? []), to]));
+  };
+  const undirected = (a: string, b: string) => {
+    const [la, lb] = [links.get(a) ?? 0, links.get(b) ?? 0];
+    if (la === lb) forks.push([a, b].sort());
+    else if (la > lb) add(b, a);
+    else add(a, b);
+  };
+  for (const m of marks) for (const t of m.synonym_of) {
+    if (byId.get(t)?.synonym_of.includes(m.id)) {
+      if (m.id < t) undirected(m.id, t);
+    } else add(m.id, t);
+  }
+  for (const m of marks) for (const d of m.duplicates) if (m.id < d) undirected(m.id, d);
+  for (const r of s.merge) {
+    for (const id of [r.old, r.kept]) if (!setOf.has(id)) throw new Error(`${SAMENESS_FILE} merge ${r.old} → ${r.kept}: ${id} isn't loaded`);
+    if (apart.has(`${r.old} ${r.kept}`)) throw new Error(`${SAMENESS_FILE}: ${r.old} and ${r.kept} are both merged and apart`);
+    if (edges.get(r.kept)?.has(r.old)) throw new Error(`${SAMENESS_FILE} merge ${r.old} → ${r.kept}: Wikidata keeps ${r.old} instead`);
+    add(r.old, r.kept);
+  }
+  for (const r of s.apart) for (const id of [r.a, r.b]) if (!setOf.has(id)) throw new Error(`${SAMENESS_FILE} apart ${r.a} / ${r.b}: ${id} isn't loaded`);
+  const origins = new Set([...edges].filter(([, to]) => to.size > 1).map(([from]) => from));
+  for (const from of origins) forks.push([from, ...[...edges.get(from)!].sort()]);
+  const into = new Map<string, string>();
+  const circled = new Set<string>();
+  for (const from of edges.keys()) {
+    if (origins.has(from) || circled.has(from)) continue;
+    const path = [from];
+    let circle = false;
+    while (edges.get(path[path.length - 1])?.size === 1) {
+      const next = [...edges.get(path[path.length - 1])!][0];
+      if (path.includes(next)) {
+        circle = true;
+        break;
+      }
+      path.push(next);
+    }
+    if (circle) {
+      for (const id of path) circled.add(id);
+      forks.push(path);
+      continue;
+    }
+    const kept = path[path.length - 1];
+    if (setOf.get(from) !== setOf.get(kept)) throw new Error(`a merge across two sets: ${from} (${setOf.get(from)}) into ${kept} (${setOf.get(kept)})`);
+    into.set(from, kept);
+  }
+  // Every decision must hold in the plan, or the load stops naming it: a person's merge folds its old item (into its
+  // kept one, or past it along a chain), and no apart pair ends as one thing, even through a chain.
+  const end = (id: string) => into.get(id) ?? id;
+  for (const r of s.merge) {
+    if (end(r.old) !== end(r.kept)) throw new Error(`${SAMENESS_FILE} merge ${r.old} → ${r.kept} no longer holds: Wikidata's marks now make it a fork or a circle`);
+  }
+  for (const r of s.apart) if (end(r.a) === end(r.b)) throw new Error(`${SAMENESS_FILE} apart ${r.a} / ${r.b}: Wikidata's marks now merge them into ${end(r.a)}`);
+  const saidSame = marks.flatMap((m) => m.said_same.filter((t) => m.id < t).map((t) => [m.id, t]));
+  return { into, forks, saidSame };
+}
+
+// A merged item keeps its ID, name and names; its facts go, as the kept item's win (human, 2026-10-27: "Kept item's
+// facts win (Recommended)").
+export function withMerges(items: Item[], into: Map<string, string>): Item[] {
+  return items.map((item) => {
+    const kept = into.get(item.id);
+    return kept ? { id: item.id, name: item.name, aliases: item.aliases, merged_into: `wikidata:${kept}` } : item;
+  });
+}
+
+const MARKS_SET = "wikidata-sameness";
+const wikidataSets = () => Object.entries(SETS).filter(([, d]) => d.source === "wikidata").map(([set]) => set);
+
+// Each loaded Wikidata item's set and name, read once, and whether that name is its scientific name.
+type Named = { name: string; scientific: boolean };
+let loaded: { setOf: Map<string, string>; names: Map<string, Named> } | undefined;
+function loadedWikidata(): { setOf: Map<string, string>; names: Map<string, Named> } {
+  if (!loaded) {
+    loaded = { setOf: new Map(), names: new Map() };
+    for (const set of wikidataSets()) for (const item of readSnapshot(set).items) {
+      if (loaded.setOf.has(item.id)) continue;
+      loaded.setOf.set(item.id, set);
+      loaded.names.set(item.id, { name: item.name, scientific: item.aliases.some((a) => a.kind === "scientific" && a.alias === normalize(item.name)) });
+    }
+  }
+  return loaded;
+}
+
+// The shown name of a thing WordNet joins (13e-5b; human, 2026-10-27: "Wikidata's common name (Recommended)", after
+// WordNet's first word renamed the fruit fly "drosophila"): Wikidata's name, in WordNet's spelling when the two differ
+// only in capitals or marks ("Dog" → "dog"), and WordNet's word when Wikidata's is a scientific name ("Ursus
+// maritimus" → "polar bear"). import_source gives a joined WordNet item's name to the thing.
+export function shownNames(items: Item[], wikidataName: (id: string) => Named | undefined): Item[] {
+  return items.map((item) => {
+    const target = item.same_as?.startsWith("wikidata:") ? wikidataName(item.same_as.slice("wikidata:".length)) : undefined;
+    if (!target || target.scientific || normalize(target.name) === normalize(item.name)) return item;
+    return { ...item, name: target.name };
+  });
+}
+
+let plan: MergePlan | undefined;
+function mergePlan(): MergePlan {
+  plan ??= planMerges(readSnapshot<Mark>(MARKS_SET).items, loadedWikidata().setOf, readSameness());
+  return plan;
+}
+
+const MARKS: SetDef<Mark> = {
+  source: "wikidata",
+  method: `SPARQL by key, ${BASE_BATCH_IDS} IDs a query, over every item of the Wikidata snapshots: P12763 taxon synonym of, P1420 taxon synonym (read from the other side), P2959 permanent duplicated item and P460 said to be the same as (truthy) between two loaded items, and each marked item's sitelink count`,
+  fetch: async () => {
+    const { setOf } = loadedWikidata();
+    const marks = new Map<string, Mark>();
+    const mark = (id: string) => {
+      if (!marks.has(id)) marks.set(id, { id, synonym_of: [], duplicates: [], said_same: [], sitelinks: 0 });
+      return marks.get(id)!;
+    };
+    const field = { P12763: "synonym_of", P2959: "duplicates", P460: "said_same" } as const;
+    await byIds([...setOf.keys()], "sameness", (v) => `SELECT ?a ?p ?b WHERE { VALUES ?a { ${v} } VALUES ?p { wdt:P12763 wdt:P1420 wdt:P2959 wdt:P460 } ?a ?p ?b . }`, (rows) => {
+      for (const r of rows) {
+        const [a, p, b] = [qid(r.a.value), r.p.value.split("/").pop()!, qid(r.b.value)];
+        if (a === b || !setOf.has(b)) continue;
+        if (p === "P1420") mark(b).synonym_of.push(a);
+        else mark(a)[field[p as keyof typeof field]].push(b);
+        mark(p === "P1420" ? a : b);
+      }
+    });
+    await byIds([...marks.keys()], "sitelinks", (v) => `SELECT ?x ?n WHERE { VALUES ?x { ${v} } ?x wikibase:sitelinks ?n . }`, (rows) => {
+      for (const r of rows) mark(qid(r.x.value)).sitelinks = Number(r.n.value);
+    });
+    const sorted = [...marks.values()].map((m) => ({ ...m, synonym_of: [...new Set(m.synonym_of)].sort(), duplicates: [...new Set(m.duplicates)].sort(), said_same: [...new Set(m.said_same)].sort() }));
+    return sorted.sort((x, y) => x.id.localeCompare(y.id));
+  },
+};
 
 // Links (13e-2; human, 2026-10-25: "Links as facts (Recommended)"): reviewed kind_of facts filling gaps in a source's
 // tree, each naming both things as the base names them, so a wrong ID is refused by private.load_links.
@@ -907,20 +1084,28 @@ async function analyzeBase(): Promise<void> {
 // Wikidata thing sharing no name, and words naming several taxa, left unjoined for a person to fix (13e-5).
 // Joins are read from the loaded snapshots (13e-5 items 1 and 2): odd joins, and words naming several taxa, unjoined.
 type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; odd: Map<string, string> };
+// What the doubles list reads (13e-5b): the bank, the pairs a person kept apart, and the merge plan's forks and P460 pairs.
+type Doubles = { bank: Bank; apart: Set<string>; reviewed: Set<string>; plan: MergePlan };
 
 async function review(keys: string[]): Promise<void> {
   const wordnet = readSnapshot("oewn-animals").items;
   const wikidata = new Map([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => [i.id, i]));
   const joins: Joins = { wordnet: new Map(wordnet.map((i) => [i.id, i])), wikidata, odd: oddJoins(wordnet, wikidata) };
+  const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
+  if (!bank) throw new Error(errors.join("\n"));
+  const sameness = readSameness();
+  const doubles: Doubles = {
+    bank, apart: new Set(sameness.apart.map((r) => [r.a, r.b].sort().join(" "))), reviewed: new Set(sameness.reviewed.map((r) => `${r.category} ${normalize(r.name)}`)), plan: mergePlan(),
+  };
   const client = await localClient();
   try {
-    for (const key of keys) await reviewOne(client, key, joins);
+    for (const key of keys) await reviewOne(client, key, joins, doubles);
   } finally {
     await client.end();
   }
 }
 
-async function reviewOne(client: pg.Client, key: string, joins: Joins): Promise<void> {
+async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: Doubles): Promise<void> {
   const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
   const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
   if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
@@ -950,6 +1135,28 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins): Promise<
     .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${joins.wikidata.get(t)!.name} (${t})`).join(" / ")}`);
   console.log(`  flag, a WordNet word joined to a Wikidata thing sharing no name: ${odd.length}${odd.length ? ` (${odd.sort().join("; ")})` : ""}`);
   console.log(`  flag, a WordNet word naming several loaded taxa, unjoined: ${unjoined.length}${unjoined.length ? ` (${unjoined.sort().join("; ")})` : ""}`);
+  // Doubles players meet (13e-5b; human, 2026-10-27: "Bank answers (Recommended)"): a bank answer of this category,
+  // by name or by ID, whose names are on two or more members, and Wikidata's P460 pairs and forks among members that
+  // a bank answer names; names and pairs data/sameness.json already decides are left out.
+  const answers = doubles.bank.questions.filter((q) => q.category === key).flatMap((q) => [...q.host_bank, ...q.uncommon]);
+  const ids = answers.filter((a) => a.startsWith("#")).map((a) => a.slice(1));
+  const doubled = await one(`with m as (select m as id from private.category_members($1) m),
+      named as (select distinct a.alias from m join private.thing_alias a on a.thing_id = m.id and a.removed_at is null
+        where a.alias = any($2) or m.id in (select private.thing_now(x) from unnest($3::uuid[]) as x) and a.kind = 'name')
+    select n.alias, array_agg(distinct t.name || ' (' || coalesce((select string_agg(s.source || ':' || s.source_id, ' ' order by s.source)
+        from private.thing_source s where s.thing_id = t.id), '') || ')') as things,
+      array_agg(distinct s.source_id) filter (where s.source = 'wikidata') as qids
+    from named n join private.thing_alias a on a.alias = n.alias and a.removed_at is null join m on m.id = a.thing_id
+    join private.thing t on t.id = m.id left join private.thing_source s on s.thing_id = m.id
+    group by n.alias having count(distinct m.id) > 1 order by n.alias`, [key, answers.filter((a) => !a.startsWith("#")).map(normalize), ids]);
+  const open = doubled.filter((r) => !doubles.reviewed.has(`${key} ${r.alias}`) && !(r.qids?.length === 2 && doubles.apart.has([...r.qids].sort().join(" "))));
+  console.log(`  flag, a bank answer naming two or more members: ${open.length}${open.length ? ` (${open.map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
+  const members = new Set((await one(`select s.source_id from private.category_members($1) m
+    join private.thing_source s on s.thing_id = m and s.source = 'wikidata'`)).map((r) => r.source_id as string));
+  const sharedIds = new Set(open.flatMap((r) => r.qids ?? []));
+  const pairs = [...doubles.plan.saidSame.map((p) => ["P460", p] as const), ...doubles.plan.forks.map((p) => ["fork", p] as const)]
+    .filter(([, p]) => p.every((id) => members.has(id)) && p.some((id) => sharedIds.has(id)));
+  console.log(`  flag, a P460 pair or fork a bank answer names: ${pairs.length}${pairs.length ? ` (${pairs.map(([kind, p]) => `${kind} ${p.join(" / ")}`).join("; ")})` : ""}`);
 }
 
 async function main(): Promise<void> {
@@ -961,9 +1168,10 @@ async function main(): Promise<void> {
     await defineCategories();
     return analyzeBase();
   }
+  if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- load all\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   await (command === "fetch" ? fetchSet(name, def) : loadSet(name, def));

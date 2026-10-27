@@ -150,15 +150,18 @@ async function resolveNames(db: pg.Client, category: string, names: string[]): P
      join private.thing_alias a on a.thing_id = m join private.thing t on t.id = m where a.alias = any($2) and a.removed_at is null`,
     [category, texts],
   );
-  const { rows: given } = await db.query<{ id: string }>("select m::text as id from private.category_members($1) m where m = any($2::uuid[])", [
-    category,
-    names.filter((n) => n.startsWith("#")).map((n) => n.slice(1)),
-  ]);
+  // A bank ID may be one a join or merge retired: it's read as its thing's current ID (13e-5b).
+  const { rows: given } = await db.query<{ given: string; id: string }>(
+    `select x::text as given, private.thing_now(x)::text as id from unnest($2::uuid[]) as x
+     where private.thing_now(x) in (select private.category_members($1))`,
+    [category, names.filter((n) => n.startsWith("#")).map((n) => n.slice(1))],
+  );
   const out = new Map<string, string>();
   for (const name of names) {
     if (name.startsWith("#")) {
-      if (!given.some((g) => g.id === name.slice(1))) throw new Error(`${category}: ${name} is not a member`);
-      out.set(name, name.slice(1));
+      const found = given.find((g) => g.given === name.slice(1));
+      if (!found) throw new Error(`${category}: ${name} is not a member`);
+      out.set(name, found.id);
       continue;
     }
     const found = [...new Map(rows.filter((r) => r.alias === normalize(name)).map((r) => [r.id, r.name])).entries()];

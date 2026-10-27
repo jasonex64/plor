@@ -20,13 +20,14 @@ select private.import_source('wikidata', 'ae-test', '[
 select is((select thing_id::text from private.thing_source where source_id = 'ae-bear'), '00000000-0000-5000-8000-00000000ae01',
   'a new thing takes the ID the import gives');
 
--- A thing named by its scientific name takes the name of what merges into it; one with a typeable name keeps it.
+-- A joining WordNet item's name becomes the thing's shown name, over a scientific name or a typeable one; the load
+-- picks that name (scripts/base.ts, shownNames; 13e-5b, replacing 13a's rule that a typeable name stays).
 select private.import_source('oewn', 'ae-test', '[
   {"id": "ae-w-polar", "name": "polar bear", "aliases": [{"alias": "ae polar bear", "kind": "name"}], "same_as": "wikidata:ae-polar"},
   {"id": "ae-w-dog", "name": "domestic dog", "aliases": [{"alias": "ae domestic dog", "kind": "name"}], "same_as": "wikidata:ae-dog"}
 ]'::jsonb);
 select is((select name from private.thing where id = '00000000-0000-5000-8000-00000000ae02'), 'polar bear', 'a scientific name gives way to a merged common one');
-select is((select name from private.thing where id = '00000000-0000-5000-8000-00000000ae03'), 'dog', 'a typeable name stays');
+select is((select name from private.thing where id = '00000000-0000-5000-8000-00000000ae03'), 'domestic dog', 'a joining WordNet item''s name replaces a typeable name too');
 
 select private.define_category('ae_animal', 'animal', 'wikidata', 'ae-animal', null);
 -- A day approved now, whose start has passed (so its answers are fixed as of the approval, migration

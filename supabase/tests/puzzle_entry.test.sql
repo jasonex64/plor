@@ -8,7 +8,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(15);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000e601', 'm06-admin@example.test'),
@@ -51,6 +51,17 @@ select is((select (content->'questions'->0->>'members')::int from private.puzzle
   'and the category''s member count');
 select is((select content->'questions'->0->>'root' from private.puzzle where game_id = 'offbeat' and puzzle_date = (select ahead from d)), '00000000-0000-5000-8000-0000000e6100',
   'and its root, so a later change to the category leaves the day as it was');
+-- A day file may name an ID a merge retired (13e-5b): it's approved and stored under its thing's current ID.
+select private.import_source('wikidata', 'pe-test', '[
+  {"id": "pe-dog-old", "name": "old dog", "aliases": [{"alias": "hound", "kind": "name"}], "merged_into": "wikidata:pe-dog", "thing_id": "00000000-0000-5000-8000-0000000e6108"}
+]'::jsonb);
+select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d) + 1,
+  array['00000000-0000-5000-8000-0000000e6108', (select cat from ids)], array['00000000-0000-5000-8000-0000000e6108']));
+select is((select content->'questions'->0->'host_answers' from private.puzzle where game_id = 'offbeat' and puzzle_date = (select ahead from d) + 1),
+  jsonb_build_array((select dog from ids)), 'a retired ID in a day file is approved as its thing''s current ID');
+select throws_like($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d) + 2,
+  array['00000000-0000-5000-8000-0000000e6108', (select dog from ids), (select cat from ids)], array[(select dog from ids)]))$$,
+  '%name one thing now%', 'a day naming a retired ID beside its thing is refused');
 select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select past from d), array[(select dog from ids)], array[(select dog from ids)]))$$,
   'OB008', null, 'a day that is over cannot be approved');
 
