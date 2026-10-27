@@ -1,6 +1,6 @@
 # M14 14b-4 — The game's name record
 
-**Status:** approved (human, 2026-10-26: "Approve the 14b-4 ticket as drafted and build it now"); built and reviewed, in review in PR_PENDING. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
+**Status:** approved (human, 2026-10-26: "Approve the 14b-4 ticket as drafted and build it now"); built and reviewed, in review in PR #97. Built next, before 14b-3 (human, 2026-10-26, in this session: "Name record first (Recommended)").
 
 ## Goal
 Offbeat's shown name and address live in one record, with its permanent ID, so 14c-1's rename (N1) changes one place, and screens shared by every game carry no game name.

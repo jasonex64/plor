@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 merged (PR #95), 14b-2c-4 merged (PR #96); 14b-4 in review (PR_PENDING); 14b-3 and its security change approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
+**Updated:** 2026-10-26, on `m14-look-and-feel` by the M14 session on the Mac (`/Users/jason/code/plor/.claude/worktrees/m14-settings-900486`): 14b-2c-1 merged (PR #93), 14b-2c-2 merged (PR #94), 14b-2c-3 merged (PR #95), 14b-2c-4 merged (PR #96); 14b-4 in review (PR #97); 14b-3 and its security change approved; the M14 section is current. The rest came from `main` and was written by the M13 session on the Windows PC; for M13's latest, read the handoff on `m13-answer-lists-and-content`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -32,7 +32,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Username lookup with friend requests** is on ROADMAP's Later list as its own milestone after M13 and M14.
 
 ### Next step
-1. **14b-4, the game's name record** (in review, PR_PENDING): once it merges on green CI, mark it done (ticket, ROADMAP row) with its CI run, and merge `main` into this branch. `src/platform/game.ts` now holds the game's ID, shown name and address; shared screens name no game.
+1. **14b-4, the game's name record** (in review, PR #97): once it merges on green CI, mark it done (ticket, ROADMAP row) with its CI run, and merge `main` into this branch. `src/platform/game.ts` now holds the game's ID, shown name and address; shared screens name no game.
 2. Then **14b-3, the invite button** (`docs/milestones/M14-14b-3-invite-button.md`): approved, and its security change too (answer 11, DECISIONS.md Log). When its PR is ready, ask the human first; on yes, merge it and push its migration to plor.app straight after, from a clean checkout of `main`, then run the hosted tests (answer 12).
 3. Then 14b-3, then 14c-1 (ask its N1–N7). N3 holds the share symbols and N7 a stolen key's feedback.
 
