@@ -1,6 +1,6 @@
 # M13 13e-5b — Wikidata's own doubles
 
-**Status:** in review (2026-10-27): approved (human: "yes fix the gaps"), built and reviewed on the Windows PC, the review's list decided in chat, in one PR.
+**Status:** in review (2026-10-27): approved (human: "yes fix the gaps"), built and reviewed on the Windows PC, the review's list decided in chat, in PR #101.
 
 ## Goal
 One thing per real-world thing when Wikidata itself holds two items for it (one species under an old and a new scientific name, two pages that can't merge), so a typed name lands on one thing and a retired ID still finds it.
