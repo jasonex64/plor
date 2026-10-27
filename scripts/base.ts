@@ -867,6 +867,7 @@ export type Mark = { id: string; synonym_of: string[]; duplicates: string[]; sai
 export type MergePlan = { into: Map<string, string>; forks: string[][]; saidSame: string[][] };
 export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Sameness): MergePlan {
   const links = new Map(marks.map((m) => [m.id, m.sitelinks]));
+  const byId = new Map(marks.map((m) => [m.id, m]));
   const apart = new Set(s.apart.flatMap((r) => [`${r.a} ${r.b}`, `${r.b} ${r.a}`]));
   const edges = new Map<string, Set<string>>();
   const forks: string[][] = [];
@@ -881,7 +882,7 @@ export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Samenes
     else add(a, b);
   };
   for (const m of marks) for (const t of m.synonym_of) {
-    if (marks.find((o) => o.id === t)?.synonym_of.includes(m.id)) {
+    if (byId.get(t)?.synonym_of.includes(m.id)) {
       if (m.id < t) undirected(m.id, t);
     } else add(m.id, t);
   }
@@ -918,6 +919,13 @@ export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Samenes
     if (setOf.get(from) !== setOf.get(kept)) throw new Error(`a merge across two sets: ${from} (${setOf.get(from)}) into ${kept} (${setOf.get(kept)})`);
     into.set(from, kept);
   }
+  // Every decision must hold in the plan, or the load stops naming it: a person's merge folds its old item (into its
+  // kept one, or past it along a chain), and no apart pair ends as one thing, even through a chain.
+  const end = (id: string) => into.get(id) ?? id;
+  for (const r of s.merge) {
+    if (end(r.old) !== end(r.kept)) throw new Error(`${SAMENESS_FILE} merge ${r.old} → ${r.kept} no longer holds: Wikidata's marks now make it a fork or a circle`);
+  }
+  for (const r of s.apart) if (end(r.a) === end(r.b)) throw new Error(`${SAMENESS_FILE} apart ${r.a} / ${r.b}: Wikidata's marks now merge them into ${end(r.a)}`);
   const saidSame = marks.flatMap((m) => m.said_same.filter((t) => m.id < t).map((t) => [m.id, t]));
   return { into, forks, saidSame };
 }

@@ -351,6 +351,11 @@ describe("planMerges", () => {
     expect(() => planMerges(marks, setOf("A B"), { ...none, merge: [{ old: "A", kept: "Q9", why: "x" }] })).toThrow("Q9 isn't loaded");
     expect(() => planMerges(marks, setOf("A B"), { ...none, merge: [{ old: "B", kept: "A", why: "x" }] })).toThrow("Wikidata keeps B instead");
     expect(() => planMerges(marks, setOf("A B"), { ...none, apart: [{ a: "A", b: "Q9", why: "x" }] })).toThrow("Q9 isn't loaded");
+    // A person's merge that Wikidata's marks turn into a fork, and an apart pair a chain would merge, both stop.
+    const forked = [mark("D", { synonym_of: ["F"] }), mark("E"), mark("F")];
+    expect(() => planMerges(forked, setOf("D E F"), { ...none, merge: [{ old: "D", kept: "E", why: "x" }] })).toThrow("merge D → E no longer holds");
+    const chain = [mark("A", { synonym_of: ["C"] }), mark("C", { synonym_of: ["B"] }), mark("B")];
+    expect(() => planMerges(chain, setOf("A B C"), { ...none, apart: [{ a: "A", b: "B", why: "x" }] })).toThrow("apart A / B: Wikidata's marks now merge them into B");
     const across = new Map([["A", "animals"], ["B", "places"]]);
     expect(() => planMerges(marks, across, none)).toThrow("a merge across two sets: A (animals) into B (places)");
   });

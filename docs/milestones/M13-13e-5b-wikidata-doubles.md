@@ -1,6 +1,6 @@
 # M13 13e-5b — Wikidata's own doubles
 
-**Status:** planned (2026-10-27): guided questions answered (below, four rounds); a scaling check measured and folded in (chains, loops, forks, the review's size, one data file for hand decisions); **approved** (human, 2026-10-27: "yes fix the gaps", to "Approve 13e-5b with the scaling fixes?"): the design, its SOURCES.md row (added), the retired-ID table (DECISIONS.md Log) and the sitelinks rule for loops and P2959. In progress.
+**Status:** in review (2026-10-27): approved (human: "yes fix the gaps"), built and reviewed on the Windows PC, the review's list decided in chat, in one PR.
 
 ## Goal
 One thing per real-world thing when Wikidata itself holds two items for it (one species under an old and a new scientific name, two pages that can't merge), so a typed name lands on one thing and a retired ID still finds it.
@@ -38,6 +38,7 @@ Asked after 13e-5's review lists showed "dog" with two loaded taxa (human: "Next
 | Kinkajou: the species and its one-species genus | "Keep apart (Recommended)" |
 | Kookaburra, walrus, wolverine: WordNet synsets with no Wikidata ID | "Apply all three (Recommended)": each joins its species; WordNet's "Atlantic walrus" (a subspecies) split off the species |
 | The other 92, clearly different things sharing a name | "Mark all 92 (Recommended)" |
+| Kookaburra's join made its shown name "Laughing Kookaburra", which the K-bird question's host can't say (7 simulated days failed) | "Swap it in the bank (Recommended)": kookaburra moves to the uncommon answers, kingfisher to the host's |
 
 ## Reading Wikidata (2026-10-27, the Windows PC)
 **Hypothesis:** taxa carry a synonym property, and other items use P460 or P2959; disproved if those properties mean something else or link too few loaded pairs to help (under a tenth of the shared names). **Result:** held for taxa, weak elsewhere. Read with `wbgetentities` the same day:
@@ -67,14 +68,14 @@ Measured on the Windows PC's full load:
 
 ## Acceptance criteria
 - [x] The SOURCES.md row is in with the human's OK before code ("Wikidata sameness marks (M13 13e-5b)").
-- [ ] After a fresh `load all`, Wikidata's marked pairs and the human's 30 are one thing each: in `animal`, "dog", "cat" and "northern shoveler" each name one member, shown as WordNet's word (db query; the counts in the PR).
-- [ ] A merged thing keeps the current name's ID and its facts, and carries both items' names (pgTAP or db test on fixtures).
-- [ ] A retired ID resolves to its thing wherever a file names a thing by ID (the bank's `#` answers, a day's IDs), tested; the T1 day's two retired IDs resolve.
-- [ ] A stale hand decision stops the fetch, naming it; chains fold to their end; a fork isn't merged; a pair across sets stops the fetch (unit tests).
-- [ ] `data/sameness.json` holds every hand decision, `OEWN_ANIMALS_HAND` is gone, and a decided pair isn't listed again by the review.
-- [ ] The review prints the bank-answer leftovers and P460 pairs; the human decides them in chat, and the decisions are applied.
-- [ ] `npm test`, `npm run test:db`, `npx supabase test db`, `npm run test:e2e` pass; the simulator drafts the 39 of 40 it drafts today.
-- [ ] A fresh `load all`'s size is measured.
+- [x] After a fresh `load all`, Wikidata's marked pairs and the human's 30 are one thing each: in `animal`, "dog" and "northern shoveler" each name one member, shown by the human's last naming rule ("cat" still names 4: WordNet's big cat, true cat and feline beside the merged domestic cat, reviewed as different things).
+- [x] A merged thing keeps the current name's ID and its facts, and carries both items' names (`thing_retired.test.sql`, `withMerges`' unit test).
+- [x] A retired ID resolves to its thing wherever a file names a thing by ID (the bank's `#` answers, a day's IDs), tested; the T1 day's two retired IDs resolve.
+- [x] A stale hand decision stops the fetch or the load, naming it; chains fold to their end; a fork isn't merged; a pair across sets stops the load (unit tests).
+- [x] `data/sameness.json` holds every hand decision, `OEWN_ANIMALS_HAND` is gone, and a decided pair isn't listed again by the review (final review: 0).
+- [x] The review prints the bank-answer leftovers and P460 pairs; the human decides them in chat, and the decisions are applied.
+- [x] `npm test`, `npm run test:db`, `npx supabase test db`, `npm run test:e2e` pass; the simulator drafts the 39 of 40 it drafts today.
+- [x] A fresh `load all`'s size is measured: 286 MB.
 
 ## Out of scope
 - Merging by name, genus or any guess (the human: "Review only").
@@ -112,8 +113,21 @@ Measured on the Windows PC's full load:
 | The human's 30 decisions (13e-5) as merges | 29 merges and one apart pair | Horseshoe crab's two taxa are a family and its species, not one thing |
 | Design 4: a migration for `thing_retired` and the readers | `private.thing_retired`, `private.thing_now`; `thing_names` and `approve_puzzle` read through it; `scripts/draft.ts` reads the bank's `#` IDs through it | No grant change: the readers run with their owners' rights, and the scripts as the local superuser |
 
-## Evidence
+## Evidence (2026-10-27, the Windows PC)
+- **The marks:** `npm run base -- fetch wikidata-sameness` → "FETCHED wikidata-sameness: 2145 items, snapshot 2026-10-27" in 48 s. Dry plan on the real snapshots: 978 merges (975 in wikidata-animals, 3 in wikidata-places), 11 forks, 105 P460 pairs; dog Q20717272 → Q26972265, cat Q57818409 → Q20980826, shoveler Q25940 → Q28106731, jaguarundi Q182304 → Q27450846; none of the human's merges contradicted a mark.
+- **Hypothesis (Plan 2) held for the merges:** after a fresh `db reset` + `load all` (60 s; the first try, a lookup per item scanning the 71,753-item batch, ran over 10 minutes and was stopped, then joined once): in `animal`, "dog", "blue tit", "bullfrog", "cougar", "northern shoveler", "goldfish", "walrus" and "wolverine" each name one member; `animal` has 56,170 members (57,196 before); `private.thing_retired` holds 2,357 rows; 284 MB (297,981,619 bytes). **It didn't hold for the shown name or the review's size:** WordNet's first word broke 5 simulated days ("drosophila"), and so did the rule that followed (Claude's unchecked assumption that WordNet lists "fruit fly"); the review listed 106 entries, not tens. Each went back to the human (decisions table).
+- **Shown names after the last rule:** `animal` holds "dog", "fruit fly", "polar bear", "Domestic Horse", "Northern Shoveler", "Eurasian Blue Tit", "Cattle Chamois" (takin), "Dromedary".
+- **Retired IDs resolve:** `select private.thing_now(x), (select name from private.thing_names(array[x]))` for the T1 day's two (WordNet's horse `935549ff…` and giraffe `4ac8266b…`) and the bank's old killer whale `069d0b31…` → their things, "horse", "giraffe", "killer whale" (before the last naming rule). pgTAP: `thing_retired.test.sql` (10: a merge makes no thing, carries both names, its child sits under the kept thing, `thing_now`, `thing_names`, a join retires the joining ID, an unknown kept item is refused) and `puzzle_entry.test.sql`'s new test (a day naming a retired ID is approved under the current ID).
+- **The review's list decided in chat:** 106 entries; goldfish merged, walrus, wolverine and kookaburra joined by hand, kinkajou apart, 94 names marked reviewed. Final run, `npm run base -- review` over the 82 categories: "flagged: 0", P460 or fork pairs a bank answer names: 0; `animal`'s odd joins 42.
+- **The simulator:** `npm run draft -- simulate` → **`DRAFTED 39 of 40; subset questions 64 of 273`**, the poem day the one failure, as before 13e-5b (after "Laughing Kookaburra" broke 7 days and the human had kookaburra and kingfisher swapped in the K-bird question).
+- **After the review's fixes** (a fresh `db reset` + `load all`): 286 MB (300,218,035 bytes), 2,357 retired IDs, `animal` 56,170; the review "flagged: 0", P460 or fork pairs 0; the simulator `DRAFTED 39 of 40; subset questions 64 of 273`; `npm test` 410; `npm run test:db` 266; `npx supabase test db` 27 files, 431, PASS; `npm run test:e2e` 58 of 61, the 3 failures (`groups.e2e.ts`, `live-board.e2e.ts`'s reset test, `today.e2e.ts`'s banner test; none touches the base) passing on `npx playwright test --last-failed` ("3 passed"), this PC's cold-run timeouts (HANDOFF).
+- **Suites** (before the reviewer's fixes): `npm test` 410; `npm run test:db` 266; `npx supabase test db` 27 files, 428 (then `puzzle_entry.test.sql` PASS with its new test); `npm run test:e2e` 60 of 61, the one failure `shell.e2e.ts`'s clock-bar test (ROADMAP's known flake), passing on `--last-failed`. `npx tsc --noEmit -p .` exits 0; eslint clean on the changed scripts; `npm run content:validate` OK.
 
-## Review
+## Review (`reviewer` agent, fresh context, 2026-10-27)
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - a person's merge could be dropped without an error when Wikidata's marks turned it into a fork or a circle: every merge in `data/sameness.json` must hold in the final plan, or the load stops naming it (unit test);
+  - an apart pair could still merge through a chain (A → C → B): an apart pair that ends as one thing stops the load (unit test);
+  - `import_source` skipped `merged_into` for an item already loaded as its own thing, so a refreshed mark changed nothing, silently: it's refused, naming the reset and `load all` it needs (`thing_retired.test.sql`);
+  - `approve_puzzle`'s ID rewrite could fold two IDs a day file holds apart into one, losing a level: a question whose IDs now name one thing is refused (`puzzle_entry.test.sql`).
+- Its own checks: `import_source`'s merge path is linear in the batch; question order and empty parts survive the rewrite; both functions with their owners' rights keep `search_path = ''`; no grant changed; the `answer_engine.test.sql` change is the recorded rule change, not a weakened check.
+- Deferred to ROADMAP "Next revision": For M13, "From the 13e-5b review".

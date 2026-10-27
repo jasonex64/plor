@@ -5,7 +5,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(11);
 
 -- tr-new is the current name, tr-old its old one; tr-pup sits under the old one. Each item carries the ID the load
 -- would give it (src/content/thing-id.ts makes them; any fixed UUIDs do here).
@@ -36,6 +36,11 @@ select is(private.thing_now('00000000-0000-4000-8000-0000000000a4'), '00000000-0
 select throws_like($$ select private.import_source('wikidata', 'thing-retired-bad', '[
   {"id": "tr-lost", "name": "tr lost", "aliases": [], "merged_into": "wikidata:tr-nowhere", "thing_id": "00000000-0000-4000-8000-0000000000a5"}
 ]'::jsonb) $$, '%merged_into must name a kept item%', 'a merge into an unknown item is refused');
+
+-- An item already loaded as its own thing can't merge now: it would keep its thing silently.
+select throws_like($$ select private.import_source('wikidata', 'thing-retired-late', '[
+  {"id": "tr-pup", "name": "tr pup", "aliases": [], "merged_into": "wikidata:tr-new", "thing_id": "00000000-0000-4000-8000-0000000000a3"}
+]'::jsonb) $$, '%already loaded as their own things%', 'a merge of an item already loaded is refused');
 
 select * from finish();
 rollback;

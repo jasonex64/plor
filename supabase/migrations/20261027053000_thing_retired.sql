@@ -57,6 +57,17 @@ begin
   if bad is not null then
     raise exception 'import_source: merged_into must name a kept item of this source, and not beside same_as: %', left(bad, 500);
   end if;
+  -- A merge reaches only items not loaded yet: one already loaded as its own thing would keep it silently.
+  with kept as (
+    select p_source || ':' || (k->>'id') as ref, (k->>'thing_id')::uuid as given from jsonb_array_elements(p_items) as k where not k ? 'merged_into'
+  )
+  select string_agg(distinct i->>'id', ', ') into bad
+  from jsonb_array_elements(p_items) as i left join kept on kept.ref = i->>'merged_into'
+  join private.thing_source s on s.source = p_source and s.source_id = i->>'id'
+  where i ? 'merged_into' and s.thing_id is distinct from coalesce(private.thing_by_ref(p_source, i->>'merged_into'), kept.given);
+  if bad is not null then
+    raise exception 'import_source: already loaded as their own things, so they can''t merge now (npx supabase db reset, then npm run base -- load all): %', left(bad, 500);
+  end if;
 
   select string_agg(distinct i->>'same_as', ', ') into unknown
   from jsonb_array_elements(p_items) as i
@@ -192,7 +203,16 @@ begin
     raise exception 'puzzle_invalid: format 3 expected' using errcode = 'OB009';
   end if;
   -- A day's thing IDs come from its file, so an ID a join or merge retired is read as its thing's (13e-5b), and the day
-  -- is stored with the current IDs.
+  -- is stored with the current IDs. Two IDs the file holds apart that now name one thing would lose a level or repeat
+  -- an answer, so they're refused.
+  problems := problems || array(
+    select format('question %s: %s name one thing now (%s)', x.n, string_agg(i.id, ' and '), private.thing_now(i.id::uuid))
+    from jsonb_array_elements(p_content -> 'questions') with ordinality as x(q, n)
+    cross join lateral (
+      select h as id, 'host_bank' as part from jsonb_array_elements_text(x.q -> 'host_bank') as h
+      union all select l, 'levels' from jsonb_object_keys(coalesce(x.q -> 'levels', '{}')) as l
+    ) as i
+    group by x.n, i.part, private.thing_now(i.id::uuid) having count(distinct i.id) > 1);
   p_content := jsonb_set(p_content, '{questions}', (
     select coalesce(jsonb_agg(x.q || jsonb_build_object(
       'host_answers', (select coalesce(jsonb_agg(private.thing_now(h::uuid)), '[]') from jsonb_array_elements_text(x.q -> 'host_answers') as h),
