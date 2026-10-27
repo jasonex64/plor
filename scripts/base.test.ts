@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
+import { aliasesFor, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, parseLinks, riverShortNames, taxaToItems, usdaCheeses, withFact, withPopulation, type Item } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -122,11 +122,56 @@ describe("linkToWikidata", () => {
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"] },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ];
-    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729")).toEqual([
+    expect(linkToWikidata(items, synsets, new Set(["Q1", "Q729"]), "root", "Q729", new Map())).toEqual([
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
     ]);
+  });
+
+  it("joins a common-name item's one loaded taxon, and leaves one naming several loaded taxa unjoined, listing them", () => {
+    const synsets = { root: { members: ["animal"] }, dog: { members: ["dog"], wikidata: "Q144" }, cat: { members: ["cat"], wikidata: "Q146" } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "dog", name: "dog", aliases: [], kind_of: ["root"] },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"] },
+    ];
+    // Q144 names two taxa, one of them loaded; Q146 names two loaded ones and one that isn't.
+    const taxaOf = new Map([["Q144", ["Q26972265", "Q20717272"]], ["Q146", ["Q20980826", "Q1867423", "Q99"]]]);
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q26972265", "Q20980826", "Q1867423"]), "root", "Q729", taxaOf)).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "dog", name: "dog", aliases: [], kind_of: ["root"], same_as: "wikidata:Q26972265" },
+      { id: "cat", name: "cat", aliases: [], kind_of: ["root"], unjoined: ["Q20980826", "Q1867423"] },
+    ]);
+  });
+
+  it("reads a synset's list of IDs, joining when they name one loaded thing between them", () => {
+    const synsets = { root: { members: ["animal"] }, owl: { members: ["owl"], wikidata: ["Q5", "Q6"] }, bat: { members: ["bat"], wikidata: ["Q7", "Q8"] } };
+    const items = [
+      { id: "root", name: "animal", aliases: [], kind_of: [] },
+      { id: "owl", name: "owl", aliases: [], kind_of: ["root"] },
+      { id: "bat", name: "bat", aliases: [], kind_of: ["root"] },
+    ];
+    expect(linkToWikidata(items, synsets, new Set(["Q729", "Q6", "Q7", "Q8"]), "root", "Q729", new Map([["Q5", ["Q6"]]]))).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
+      { id: "owl", name: "owl", aliases: [], kind_of: ["root"], same_as: "wikidata:Q6" },
+      { id: "bat", name: "bat", aliases: [], kind_of: ["root"], unjoined: ["Q7", "Q8"] },
+    ]);
+  });
+});
+
+describe("oddJoins", () => {
+  it("lists WordNet items joined to a Wikidata item that shares none of their aliases", () => {
+    const wikidata = new Map<string, Item>([
+      ["Q1", { id: "Q1", name: "Dog", aliases: aliasesFor(["Dog"]) }],
+      ["Q2", { id: "Q2", name: "Gliridae", aliases: aliasesFor(["Gliridae"]) }],
+    ]);
+    const wordnet: Item[] = [
+      { id: "dog", name: "dog", aliases: aliasesFor(["dog", "domestic dog"]), same_as: "wikidata:Q1" },
+      { id: "mouse", name: "mouse", aliases: aliasesFor(["mouse"]), same_as: "wikidata:Q2" },
+      { id: "yeti", name: "yeti", aliases: aliasesFor(["yeti"]) },
+    ];
+    expect(oddJoins(wordnet, wikidata)).toEqual(new Map([["mouse", "Gliridae"]]));
   });
 });
 
