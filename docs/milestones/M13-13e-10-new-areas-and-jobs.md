@@ -1,6 +1,6 @@
 # M13 13e-10 — New areas and jobs
 
-**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-10's design as drafted. Build it."; the batch PR'd with simulate at 21 of 30, human: "PR the batch now (Recommended)"; the letter blocks are the next sub-ticket)
+**Status:** in review (approved by the human, 2026-10-27: "I approve 13e-10's design as drafted. Build it."; the batch PR'd with simulate at 21 of 30, human: "PR the batch now (Recommended)"; the letter blocks are the next sub-ticket; PR #107)
 
 ## Goal
 Make the simulator check what 13e's Done needs, 30 days drafted in a row, then add a batch of 20–30 categories from areas no category covers yet, plus narrow kinds of jobs, toward that goal (170 categories before this batch).
