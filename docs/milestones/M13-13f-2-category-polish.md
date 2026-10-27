@@ -89,6 +89,7 @@ None new (6 host answers and 10 members are DECISIONS.md's and 13e's).
 ## Evidence
 On the Mac, 2026-10-27, after `db reset` and `load all`.
 - **The load:** `oewn-nouns … listed words: 42 names and 21 items dropped`; `LINKED … 124`; `DEFINED 231`; `DATABASE 316 MB`. On the way it stopped twice by design, on a listed shown name with a clean name left ("sex toy", also "adult toy"; "golliwog", also "golliwogg"), each settled; then a dry run of the listed-word step over every snapshot found no stop left.
+- **After the review's fixes, on the branch with main merged** (a fresh `db reset` and `load all`): `DEFINED 231`, `LINKED … 124`, `DATABASE 316 MB`; "laos" a country's name again (1); kitchen utensil holds spoon, fork and knife; the rest as below; check-bank 0 on 231; simulate 30 of 30; `npm test` 444, lint and tsc clean, `test:db` 270, pgTAP 435, e2e 61.
 - **The fixes (queries):** country codes left on countries: `drc prc uae uk us usa`; "ununnilium" on `darmstadtium` only; one continent answers "oceania"; the five places as US cities: 0, The Bronx still a place: 1; spoon and fork in kitchen utensil: 2; flagged names left: 0; schoolmarm's "mistress": 0; internal organ holds brain and pancreas.
 - **The five categories:** toy 51, cosmetic 23, berry 22, nut 30, internal organ 42 members; every member read (the lists in this ticket's build notes and the PR).
 - **check-bank** `CHECKED 231 questions: 0 problems`; **simulate** `DRAFTED 30 of 30; subset questions 74 of 210`.
