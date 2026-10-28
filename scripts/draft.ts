@@ -14,7 +14,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import type pg from "pg";
+import pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
@@ -200,12 +200,51 @@ export async function bankProblems(db: pg.Client, questions: BankQuestion[]): Pr
       seen.set(found[0].id, name);
       if (q.host_bank.includes(name)) hostShown.set(name, found[0].name);
     }
-    // The host says a letter subset's answers by their shown names, which the draft requires to start with the letter
-    // (O4): a thing renamed after its answer was written (13e-5b's Wikidata names) breaks every day that picks it.
-    const off = await offLetter(db, q.category, [...hostShown.values()].map(normalize));
-    for (const [name, shown] of hostShown) if (off.has(normalize(shown))) problems.push(`${q.id}: host answer "${name}" shows as "${shown}", which doesn't start with its letter`);
+    // A thing renamed after its answer was written (13e-5b's Wikidata names) breaks every day that picks it.
+    const off = new Set(await shownOffLetter(db, q.category, [...hostShown.values()]));
+    for (const [name, shown] of hostShown) if (off.has(shown)) problems.push(`${q.id}: host answer "${name}" shows as "${shown}", which doesn't start with its letter`);
   }
   return problems;
+}
+
+// What check-bank shows the human, for a decision per case rather than a refusal (the human, 2026-10-28: "Add check-bank
+// flag + test (Recommended)", "Fix the three, close the last (Recommended)"): a host answer above another of its
+// question's familiar answers, which leaves the host little to catch-proof (13e-2's batch: footwear's "shoe" over
+// sneaker); and an answer of a status subset that also holds another status, which can sit in two status subsets at
+// once (13e-4b: 30 animals with two IUCN statuses).
+export async function bankFlags(db: pg.Client, questions: BankQuestion[]): Promise<string[]> {
+  const flags: string[] = [];
+  for (const q of questions) {
+    const candidates = await nameCandidates(db, q.category, [...q.host_bank, ...q.uncommon]);
+    const one = (name: string) => (candidates.get(name)!.length === 1 ? candidates.get(name)![0].id : null);
+    const familiar = [...q.host_bank, ...q.uncommon].flatMap((name) => (one(name) ? [{ name, id: one(name)! }] : []));
+    for (const host of q.host_bank) {
+      const id = one(host);
+      if (!id) continue;
+      const { rows } = await db.query<{ id: string }>(
+        `select f::text as id from unnest($1::uuid[]) as f where f <> $2::uuid and $2::uuid in (select private.ancestors_as_of(f, now()))`,
+        [familiar.map((f) => f.id), id],
+      );
+      for (const r of rows) flags.push(`${q.id}: host answer "${host}" is above "${familiar.find((f) => f.id === r.id)!.name}"`);
+    }
+    const { rows: others } = await db.query<{ id: string; status: string }>(
+      `select f.thing_id::text as id, v.name as status from private.category c
+       join private.fact f on f.thing_id = any($2::uuid[]) and f.trait = 'conservation_status' and f.removed_at is null
+       join private.thing v on v.id = f.value_thing
+       where c.key = $1 and c.fact_trait = 'conservation_status' and f.value_thing <> all (c.fact_values)
+       order by v.name`,
+      [q.category, familiar.map((f) => f.id)],
+    );
+    for (const r of others) flags.push(`${q.id}: "${familiar.find((f) => f.id === r.id)!.name}" also holds the status ${r.status}`);
+  }
+  return flags;
+}
+
+// The host answers, by their shown names, that don't start with a letter subset's letter: the host says an answer by
+// its shown name (O4), so check-bank and the draft both refuse one (13e-10 review: one rule, kept in one place).
+async function shownOffLetter(db: pg.Client, category: string, shown: string[]): Promise<string[]> {
+  const off = await offLetter(db, category, shown.map(normalize));
+  return shown.filter((name) => off.has(normalize(name)));
 }
 
 // A category's members, listed once per connection: a draft can't change them (only loads and misses add members),
@@ -356,11 +395,9 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
       ordered.flatMap((r) => r.q.host_bank),
     ]);
     const names = new Map(rows.map((r) => [r.id, r.name]));
-    // The host says a letter subset's answers by their names, so each must start with the letter (O4).
     for (const { q } of ordered) {
-      const off = await offLetter(db, q.category, q.host_bank.map((id) => normalize(names.get(id)!)));
-      const named = q.host_bank.filter((id) => off.has(normalize(names.get(id)!)));
-      if (named.length) throw new Error(`${q.category}: host bank names ${named.map((id) => `"${names.get(id)}"`).join(", ")} don't start with its letter`);
+      const named = await shownOffLetter(db, q.category, q.host_bank.map((id) => names.get(id)!));
+      if (named.length) throw new Error(`${q.category}: host bank names ${named.map((n) => `"${n}"`).join(", ")} don't start with its letter`);
     }
     // Letters for one order of the questions, and how far they got: questions before held fit with some choice, so
     // the block is at or after it.
@@ -424,13 +461,22 @@ export function simulateDates(): string[] {
   return Array.from({ length: SIMULATE_DAYS }, (_, i) => new Date(from + i * 86_400_000).toISOString().slice(0, 10));
 }
 
+// A day the draft refused, as its own errors say: not the database's error, nor the network's (which carry a code), nor
+// the connection ending.
+export function isDayFailure(err: unknown): err is Error {
+  return err instanceof Error && !(err instanceof pg.DatabaseError) && (err as NodeJS.ErrnoException).code === undefined
+    && !/Connection terminated/.test(err.message);
+}
+
 async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key: string) => string): Promise<void> {
   const past = [...days];
   let drafted = 0;
   let questions = 0;
   let subset = 0;
-  // A day that doesn't draft is what the simulator measures: each is printed with its reason, and any one makes the
-  // command exit 1.
+  // A day that doesn't draft is what the simulator measures: each is printed with its reason, the failed dates are
+  // named at the end, and any one makes the command exit 1. A lost connection or a database error isn't a day that
+  // didn't draft: it stops the run (13e-5 second review; 13f-4c).
+  const failed: string[] = [];
   for (const date of simulateDates()) {
     try {
       const { day, swapped } = await draft(db, bank, past, date, family);
@@ -441,18 +487,24 @@ async function simulate(db: pg.Client, bank: Bank, days: Puzzle[], family: (key:
       subset += day.questions.filter((q) => family(q.category) !== q.category).length;
       console.log(`${date} ${day.questions.map((q) => (q.steals ? `${q.category}:${q.steals}` : q.category)).join(" ")}${swaps.length ? ` (${swaps.join("; ")})` : ""}`);
     } catch (err) {
-      console.log(`${date} FAILED: ${(err as Error).message}`);
+      if (!isDayFailure(err)) throw err;
+      failed.push(date);
+      console.log(`${date} FAILED: ${err.message}`);
     }
   }
-  console.log(`DRAFTED ${drafted} of ${SIMULATE_DAYS}; subset questions ${subset} of ${questions}`);
+  console.log(`DRAFTED ${drafted} of ${SIMULATE_DAYS}; subset questions ${subset} of ${questions}${failed.length ? `; failed: ${failed.join(", ")}` : ""}`);
   if (drafted < SIMULATE_DAYS) process.exitCode = 1;
 }
 
-// `npm run draft -- check-bank`: prints each of bankProblems' problems, and exits 1 on any.
+// `npm run draft -- check-bank`: prints each of bankProblems' problems, and exits 1 on any; then bankFlags' flags,
+// for the human, which don't fail it.
 async function checkBank(db: pg.Client, bank: Bank): Promise<void> {
   const problems = await bankProblems(db, bank.questions);
   for (const p of problems) console.log(p);
   console.log(`CHECKED ${bank.questions.length} questions: ${problems.length} problem${problems.length === 1 ? "" : "s"}`);
+  const flags = await bankFlags(db, bank.questions);
+  for (const f of flags) console.log(`FLAG ${f}`);
+  console.log(`FLAGGED ${flags.length} for the human`);
   if (problems.length) process.exitCode = 1;
 }
 

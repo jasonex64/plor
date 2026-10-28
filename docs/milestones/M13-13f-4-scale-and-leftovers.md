@@ -1,6 +1,6 @@
 # M13 13f-4 — Scale, and the For M13 leftovers
 
-**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a done (PR #117, merged on green CI 2026-10-28 UTC, `2dac4e6`); 13f-4b done (PR #118, merged on green CI 2026-10-28 UTC, `d6468f9`); 13f-4c next.
+**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a done (PR #117, merged on green CI 2026-10-28 UTC, `2dac4e6`); 13f-4b done (PR #118, merged on green CI 2026-10-28 UTC, `d6468f9`); 13f-4c built, in review (its PR number follows).
 
 ## Goal
 Measure the four scale items and fix the ones that slow the drafting tools; close or move every For M13 item left in ROADMAP, so the list is empty when M13 closes (`docs/milestones/M13-13f-the-review-backlog.md`, criterion 2).
@@ -52,6 +52,8 @@ Round 7:
 
 During 13f-4b's build (2026-10-28): a name or fact the files give back after its end-midnight has passed can't come back as round 5 put it, as one key holds one row (a second row needs a changed uniqueness rule under every insert; clearing the old row's end changes a started day). Asked in plain words, the human chose **"Leave the gap, note it (Recommended)"**: it comes back at the next load after the old row is erased, recorded under For M15 with hosted loads.
 
+During 13f-4c's build (2026-10-28): nine `drop_listed_names` rows match nothing on today's snapshots by design (their slurs were dropped at fetch; the rows guard a re-fetch), and the loud check stopped `load all` on them. Asked, the human chose **"Print them, don't stop (Recommended)"**: an unused guard row is printed, as unused drops are (13e-9b, "Strict, except drops"); an unused rename still stops the load.
+
 ## Source
 - ROADMAP.md, For M13: the items below.
 - `docs/milestones/M13-13f-the-review-backlog.md`, Design 4 and criterion 2.
@@ -74,8 +76,8 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 ## Acceptance criteria
 - [x] Items 3 and 4: measured before and after on the real base, with the commands and times. *(13f-4a)*
 - [x] Items 1 and 2: under For M15 with the round-1 answer. *(13f-4a)*
-- [ ] ROADMAP's For M13 has no open item; each is closed with evidence or moved with its reason.
-- [ ] The suites pass; `check-bank` 0; `simulate` 30 of 30. *(13f-4a and 13f-4b: pass; 13f-4c to come)*
+- [x] ROADMAP's For M13 has no open item; each is closed with evidence or moved with its reason. *(13f-4c)*
+- [x] The suites pass; `check-bank` 0; `simulate` 30 of 30. *(13f-4a, 13f-4b, 13f-4c)*
 
 ## Out of scope
 - The migration squash (its own sub-ticket after 13f).
@@ -107,10 +109,27 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 | 13f-4b: continents named by their label alone | `withValueNamesOnly` at load, for the countries' continent values wherever a set loads them; `data/names.json`'s row removing "oceania" from Insular Oceania goes, as the label rule now does it (the load stopped on it as unused) | The places set brings the junk names; the countries set already names them by label |
 | 13f-4b: player-added things shown in normalized form | `add_player_thing` names the thing by the normalized text; `private.typed_form` goes with its last caller; DECISIONS.md's Learning from misses says so; `misses.test.sql`'s check of the old naming rule now checks the new one | The human's answer replaces 13b's "named the way players most often typed it" |
 | 13f-4b: `record_miss` reads the day's frozen filter | It judges by the day's frozen question, and a new text on a day whose question no longer matches its category (root, member_of or filter) is held for the human, not added | `add_player_thing` builds a thing from the category as it is now, which for such a day would sit in neither (the review) |
+| 13f-4c, round 3: `content:validate -- <root>` reads `<root>`'s categories | `validateRoot(root, categoriesFile)`: the command passes `data/categories.json`, the test its own file | The categories file isn't under the content root; the item's harm was the test leaning on the repo's file |
+| 13f-4c, rounds 4 and 5: the rivers' alias drop and `ANIMALS_DROP_LISTED_NAMES` tested and loud; `dropListed` loud | Nothing built: the three are gone since 13e-9b, replaced by `data/listed.json`'s rows, whose gone IDs are printed (`drop`) or refused (`drop_listed_names`) | The rounds' answers assumed the code still existed |
+| 13f-4c, round 7: an unused `rename` or `drop_listed_names` row stops the load | An unused rename stops it; an unused `drop_listed_names` row is printed | The human's answer during the build, "Print them, don't stop (Recommended)": nine rows guard a re-fetch |
+| 13f-4c, round 6: a test of a single load refusing a mistyped names.json row | A command run, not a test (Evidence) | `main()` reads the real hand files and snapshots; a test would need a harness of its own |
+| 13f-4c, round 2: the misses test counts only its own players | No change | Since 13f-3b-2 every db test removes its fixture days, so the share already counts only the file's players |
+| 13f-4c, round 3: check-bank flags a host answer above a familiar one | 263 flags on today's bank (duck over mallard, airplane over jet, lake over pond) | A broad category's host answers are often parents of its familiar answers; the flag is for the human per case, and doesn't fail the command |
 | (no source) | `record_miss` refuses a day question with no frozen root | Only format-3 days carry one, and the engine already refuses older formats (13f-4 round 2) |
 | (no source) | Only `category_members` skips the call; `in_category_now` and `resolve_answer` still call `fits_where` | They run once per thing or per typed answer, not once per member of a category |
 
 ## Evidence
+### 13f-4c (Windows, 2026-10-28 UTC)
+- **Unit and db tests, each failing on the old code first where a fix was made:** the new unit tests on HEAD's scripts (13f-3b-2 style, temporary copies): the forks test fails (the chain-fed circle listed twice); `load_finish`'s circle order on the 13f-3b-1 `load_finish` names `lo z`, on today's `lo b`. The rest are new checks of new code (bank refusals, `bankFlags`, `unusedListedRows`, `rowsOnlyIn`, `isDayFailure`, `withValueNamesOnly`) or coverage (every outcome logged, the refused links batch, the bank route's 401).
+- **The real base:** `load all` first stopped on nine `drop_listed_names` rows (guards against a re-fetch; asked, "Print them, don't stop"), then printed `data/listed.json: 9 drop_listed_names rows hold no listed name today (guards against a re-fetch): wikidata:Q32298578, …`, `DEFINED 231 categories`, nothing ended, `DATABASE 332 MB`, 80 s.
+- **A single load and a mistyped row** (a temporary names.json `add` row giving apple "apple", restored after with `git checkout`): `npm run base -- load wikidata-fruit` stopped with `Error: data/names.json: add wikidata:Q89 "apple" did nothing in wikidata-fruit`.
+- **The review** (after the review's fix: the joins are read when a member's WordNet item is in oewn-animals, not by the animal tree): `npm run base -- review dog_breed fruit animal_k`: dog_breed prints both join lines (0 and 0; its root isn't under animal, its members join), fruit none, animal_k `a WordNet word joined to a Wikidata thing sharing no name: 1 (mud turtle = Kinosternon)`.
+- **`npm run draft -- check-bank`:** `CHECKED 231 questions: 0 problems`, then 263 `FLAG` lines (all host answers above a familiar one; no status flag on today's bank), `FLAGGED 263 for the human`.
+- **`npm run draft -- simulate`:** `DRAFTED 30 of 30; subset questions 74 of 210`, output identical to 13f-4a's (`diff`), 256 s.
+- **`npm run content:validate`:** `CONTENT OK content: 1 file(s)`.
+- **Suites:** `npx supabase test db` 31 files, 510 PASS; `npm run test:db` 42 files, 280 passed, and after it the base holds `0|0` fixture categories and items; `npm test` 43 files, 458 passed; tsc clean; lint 0 errors (188 warnings, as before). `npm run test:e2e`: 60 passed, 1 failed, the known clock-bar flake (`shell.e2e.ts`); `npx playwright test --last-failed`: 1 passed.
+- **ROADMAP:** For M13 holds 0 open items (`grep -c "^- \[ \]"` over the section).
+
 ### 13f-4b (Windows, 2026-10-28 UTC)
 - **Before the fix**, the new checks on the previous functions (`typed_form`, `import_source`, `load_links`, `load_finish`, `record_miss` and `add_player_thing` put back in a rolled-back transaction, `psql -v ON_ERROR_ROLLBACK=on`; `pg_get_functiondef` after shows 13f-4b's in place and no `typed_form`):
   - `database_gaps.test.sql`: `not ok 2` (`have: 1 want: 0`, the miss off the day's letter learned), `not ok 3` (`have: accepted want: held_subset`), `not ok 5` (the retired ID's second thing not refused); 1 and 4 (the setup) pass;
@@ -132,3 +151,5 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 13f-4a: the `reviewer` agent, 2026-10-28, in a fresh context. No blocking findings: the migration's `category_members` matches 13e-5's but for the guard, `category_where` is null for exactly the 196 categories with no filter, and the per-draft cache shares no changing state across rounds. Two claims corrected as found (animal after: 0.54–0.59 s, not 0.58; the migration-only `simulate` run explained by `membersOf` running once per category). `.claude/settings.local.json` stays out of the commit.
 
 13f-4b: the `reviewer` agent, 2026-10-28, in a fresh context. Blocking, fixed: an accepted text on a day approved before its category changed would get a thing built from the category now, in neither (now held for the human); the frozen membership check's true branch had no test (an existing member, an admin's addition, a member now outside the day's filter). Deferred to ROADMAP "Next revision" (From the 13f-4b review). The continents' ended names, for the human to see: North America's "na", "noam", "n am", "003 un m49 code", "turtle island" and the like, "australia and oceania", "the old continent", "s america" and the plurals (37 in all).
+
+13f-4c: the `reviewer` agent, 2026-10-28, in a fresh context. Blocking, fixed: the review's animal-tree test dropped dog_breed's join flags without a word (now decided by the members' WordNet items); a ROADMAP line said an unused `drop_listed_names` row stops the load (it's printed); a sentence doubled in the handoff. The rest moved to Later ("Tool tidy-ups from M13's reviews", from the 13f-4c review), as For M13 stays empty.

@@ -36,7 +36,7 @@ A drafted day's answers are never in the public repo: drafts live in the databas
 
 ## Source
 - DECISIONS.md: "Puzzle drafting" (steps 1–5, rewritten by this ticket), "Puzzle content format", "Row-level security in `private`", "App database role", Log (the repo went public, 2026-10-23).
-- `docs/milestones/M06-puzzle-entry.md`: the admin page, `save_questions` and `approve_puzzle` (the guarded-function pattern this reuses).
+- `docs/milestones/M06-puzzle-entry.md`: the admin page and `approve_puzzle` (the guarded-function pattern this reuses; `save_questions` went in M13 13d).
 - PostgreSQL 17 (SOURCES.md): `jsonb`, `SECURITY DEFINER` functions, grants.
 - Next.js 16.4.2 (SOURCES.md, bundled docs): route handlers reading a request body; `outputFileTracingIncludes` in `next.config.ts`. Whether a route handler caps an uploaded body's size is *unverified*: plan step 1 reads it.
 - No source covers what a public git history keeps. It keeps every committed file, which is how git works; P2 rests on that.

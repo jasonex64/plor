@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { FAMILIAR_SAFE_MIN } from "../src/config/tunables.ts";
 import type { Level, Puzzle } from "../src/content/puzzle.ts";
 import { fixtureDraft, fixtureId, loadFixtureBase, removeFixtureBase, removeTestBase } from "../src/test/answer-fixture.ts";
-import { bankProblems, expectedCatches, familiarLeft, oneHostCatch, resolveNames } from "./draft.ts";
+import { bankFlags, bankProblems, expectedCatches, familiarLeft, oneHostCatch, resolveNames } from "./draft.ts";
 
 const db = new pg.Client({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres" });
 const animal = (slug: string) => fixtureId(0, slug);
@@ -21,7 +21,7 @@ beforeAll(async () => {
   await loadFixtureBase(db);
 });
 afterAll(async () => {
-  await removeTestBase(db, "dt-%", "dt\_%", "draft-letter-test");
+  await removeTestBase(db, "dt-%", "dt\\_%", "draft-letter-test");
   await removeFixtureBase(db);
   await db.end();
 });
@@ -198,6 +198,31 @@ describe("the familiar minimum, in the draft and at approval", () => {
       const refused = (await approve(FAMILIAR_SAFE_MIN - 1)).filter((p) => p.startsWith("question 1:"));
       expect(refused).toHaveLength(1);
       expect(refused[0]).toMatch(new RegExp(`^question 1: fewer than ${FAMILIAR_SAFE_MIN} familiar answers the host doesn't catch`));
+    } finally {
+      await db.query("rollback");
+    }
+  });
+});
+
+// check-bank's flags for the human (13f-4c): a host answer above a familiar one, and an answer of a status subset that
+// holds another status too. The status subset is this test's own, rolled back.
+describe("bankFlags", () => {
+  it("flags a host answer above another familiar answer of its question", async () => {
+    expect(await bankFlags(db, [question(["bear", "dog"], ["polar bear", "cat", "fish"])])).toEqual(['q: host answer "bear" is above "polar bear"']);
+    expect(await bankFlags(db, [question(["bear", "dog"], ["cat", "fish"])])).toEqual([]);
+  });
+
+  it("flags an answer of a status subset that also holds another status", async () => {
+    await db.query("begin");
+    try {
+      await db.query("select private.import_source('wikidata', 'bf-test', $1::jsonb)", [JSON.stringify([
+        { id: "bf-ex", name: "bf extinct", aliases: [] }, { id: "bf-en", name: "bf endangered", aliases: [] }, { id: "bf-root", name: "bf root", aliases: [] },
+        { id: "bf-a", name: "bf a", aliases: [{ alias: "bf a", kind: "name" }], kind_of: ["bf-root"], conservation_status: ["bf-ex", "bf-en"] },
+        { id: "bf-b", name: "bf b", aliases: [{ alias: "bf b", kind: "name" }], kind_of: ["bf-root"], conservation_status: ["bf-ex"] },
+      ])]);
+      await db.query("select private.define_category('bf_base', 'bf thing', 'wikidata', 'bf-root', null)");
+      await db.query(`select private.define_subset('bf_ex', 'bf extinct thing', 'bf_base', 'wikidata', '{"trait": "conservation_status", "values": ["bf-ex"]}')`);
+      expect(await bankFlags(db, [{ ...question(["bf a", "bf b"], []), category: "bf_ex" }])).toEqual(['q: "bf a" also holds the status bf endangered']);
     } finally {
       await db.query("rollback");
     }

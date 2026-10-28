@@ -33,6 +33,11 @@ function valid(): Puzzle {
 const roots: string[] = [];
 afterAll(() => roots.forEach((r) => rmSync(r, { recursive: true, force: true })));
 
+// The seven categories the day asks, in a file of this test's own (13f-4c: not the repo's data/categories.json).
+const CATS = join(mkdtempSync(join(tmpdir(), "plor-categories-")), "categories.json");
+roots.push(join(CATS, ".."));
+writeFileSync(CATS, JSON.stringify(["animal", "fruit", "color", "country", "metal", "sport", "body_part"].map((key, i) => ({ key, name: key, source: "wikidata", root: `Q${i + 1}` }))));
+
 // A content root holding the given files.
 function root(files: Record<string, string>): string {
   const dir = mkdtempSync(join(tmpdir(), "plor-content-"));
@@ -44,7 +49,7 @@ function root(files: Record<string, string>): string {
   return dir;
 }
 
-const errorsFor = (puzzle: unknown, file = FILE) => validateRoot(root({ [file]: JSON.stringify(puzzle) })).errors;
+const errorsFor = (puzzle: unknown, file = FILE) => validateRoot(root({ [file]: JSON.stringify(puzzle) }), CATS).errors;
 const broken = (change: (p: Puzzle) => void) => {
   const p = valid();
   change(p);
@@ -53,15 +58,15 @@ const broken = (change: (p: Puzzle) => void) => {
 
 describe("content:validate on format 3", () => {
   it("passes a valid drafted day", () => {
-    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()) }))).toEqual({ files: 1, errors: [] });
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()) }), CATS)).toEqual({ files: 1, errors: [] });
   });
 
   it("refuses an empty root, a stray file, and a file that isn't JSON", () => {
-    expect(validateRoot(root({})).errors).toEqual([expect.stringMatching(/no puzzle files found$/)]);
-    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "offbeat/2026-11-03.jsno": "{}" })).errors).toEqual([
+    expect(validateRoot(root({}), CATS).errors).toEqual([expect.stringMatching(/no puzzle files found$/)]);
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "offbeat/2026-11-03.jsno": "{}" }), CATS).errors).toEqual([
       "offbeat/2026-11-03.jsno: not a .json file; every file under the content root must be a puzzle or the bank",
     ]);
-    expect(validateRoot(root({ [FILE]: "{ nope" })).errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
+    expect(validateRoot(root({ [FILE]: "{ nope" }), CATS).errors).toEqual([expect.stringMatching(/^offbeat\/2026-11-02\.json: not valid JSON/)]);
   });
 
   it.each<[string, (p: Puzzle) => void, string]>([
@@ -105,24 +110,24 @@ describe("content:validate on format 3", () => {
 describe("content:validate with the bank and the gap", () => {
   const dated = (date: string) => ({ ...valid(), date });
   it("refuses two days asking a category less than 30 days apart, and passes 30", () => {
-    const near = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-01.json": JSON.stringify(dated("2026-12-01")) }));
+    const near = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-01.json": JSON.stringify(dated("2026-12-01")) }), CATS);
     expect(near.errors).toContain("animal is asked on 2026-11-02 and 2026-12-01, less than 30 days apart");
-    const far = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-02.json": JSON.stringify(dated("2026-12-02")) }));
+    const far = validateRoot(root({ "offbeat/2026-11-02.json": JSON.stringify(valid()), "offbeat/2026-12-02.json": JSON.stringify(dated("2026-12-02")) }), CATS);
     expect(far.errors.filter((e) => e.includes("days apart") && e.includes("2026-12-02"))).toEqual([]);
   });
 
   it("checks bank.json at the root, and doesn't count it as a puzzle", () => {
     const good = { format: 1, questions: [], themes: {} };
-    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify(good) }))).toEqual({ files: 1, errors: [] });
-    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ ...good, format: 2 }) })).errors).toContain('bank.json: "format" must be 1');
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify(good) }), CATS)).toEqual({ files: 1, errors: [] });
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ ...good, format: 2 }) }), CATS).errors).toContain('bank.json: "format" must be 1');
   });
 
   // M13 13e: the bank asks only categories in data/categories.json, each host bank holding the 3 Q7 takes.
   it("refuses a bank question asking a category not in data/categories.json, and a host bank under 3", () => {
     const q = { id: "name-a-x", prompt: "Name a thing", category: "animal", host_bank: ["a", "b", "c"], uncommon: [], themes: [], added_by: "claude" };
-    const withBank = (questions: object[]) => validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ format: 1, questions, themes: {} }) })).errors;
+    const withBank = (questions: object[]) => validateRoot(root({ [FILE]: JSON.stringify(valid()), "bank.json": JSON.stringify({ format: 1, questions, themes: {} }) }), CATS).errors;
     expect(withBank([q])).toEqual([]);
-    expect(withBank([{ ...q, category: "no_such_category" }])).toEqual(['bank.json question "name-a-x": category "no_such_category" is not in data/categories.json']);
-    expect(withBank([{ ...q, host_bank: ["a", "b"] }])).toEqual(['bank.json question 1: "host_bank" lists 2 names, at least 3 needed']);
+    expect(withBank([{ ...q, category: "no_such_category" }])).toEqual([`bank.json question "name-a-x": category "no_such_category" is not in ${CATS}`]);
+    expect(withBank([{ ...q, host_bank: ["a", "b"] }])).toEqual(['bank.json question "name-a-x": "host_bank" lists 2 names, at least 3 needed']);
   });
 });

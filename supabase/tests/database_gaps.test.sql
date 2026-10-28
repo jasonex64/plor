@@ -5,7 +5,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(9);
+select plan(11);
 
 select private.import_source('wikidata', 'dg-test', '[
   {"id": "dg-root", "name": "dg root", "aliases": [], "thing_id": "00000000-0000-5000-8000-00000000d900"},
@@ -67,6 +67,14 @@ select is((select thing_id from private.thing_retired where id = '00000000-0000-
 select throws_like($$ select private.import_source('oewn', 'dg-test', '[{"id": "dg-o2", "name": "dg b", "aliases": [], "same_as": "wikidata:dg-b", "thing_id": "00000000-0000-5000-8000-00000000d9f0"}]') $$,
   'import_source: retired IDs given for another thing: 00000000-0000-5000-8000-00000000d9f0 (retired for 00000000-0000-5000-8000-00000000d901, now given for 00000000-0000-5000-8000-00000000d902)',
   'the same ID given for another thing is refused, not left pointing at the old one');
+
+-- 6. A links batch with one link the base doesn't hold loads none of them (13e-2's batch; 13f-4c): the good link
+-- before it isn't left behind.
+select throws_like($$ select private.load_links('[{"thing": "wikidata:dg-c", "name": "dg c", "kind_of": "wikidata:dg-root", "kind_of_name": "dg root"},
+  {"thing": "wikidata:dg-nope", "name": "dg nope", "kind_of": "wikidata:dg-root", "kind_of_name": "dg root"}]') $$,
+  '%is not in the base', 'a links batch with an unknown thing is refused');
+select is((select count(*)::int from private.fact where thing_id = '00000000-0000-5000-8000-00000000d903' and trait = 'kind_of'), 0,
+  'and the good link before it isn''t loaded');
 
 select * from finish();
 rollback;

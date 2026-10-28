@@ -3,7 +3,7 @@
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, fitOrder, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
+import { blockRange, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -167,5 +167,13 @@ describe("the soft guide", () => {
       "  q7: expected catch 10% (target 20%)",
       "  expected finish 48% (the targets': 45%)",
     ]);
+  });
+});
+
+describe("isDayFailure", () => {
+  it("counts the draft's own refusals as failed days, and stops on the database's errors or a lost connection (13f-4c)", () => {
+    expect(isDayFailure(new Error("no letters fit schedule A for 2027-01-03"))).toBe(true);
+    expect(isDayFailure(Object.assign(new Error("read ECONNRESET"), { code: "ECONNRESET" }))).toBe(false);
+    expect(isDayFailure(new Error("Connection terminated unexpectedly"))).toBe(false);
   });
 });

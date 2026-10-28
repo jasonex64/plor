@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, handNamesOnlyIn, parentless, sparql, taxonName, valueItems, withValueNamesOnly, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, rowsOnlyIn, unusedListedRows, parentless, sparql, taxonName, valueItems, withValueNamesOnly, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -325,6 +325,15 @@ describe("planMerges", () => {
   const mark = (id: string, m: Partial<Mark> = {}): Mark => ({ id, synonym_of: [], duplicates: [], said_same: [], sitelinks: 0, ...m });
   const setOf = (ids: string, set = "animals") => new Map(ids.split(" ").map((id) => [id, set]));
 
+  it("lists a circle once, without the chains feeding it, and drops a tie the human merged (13f-4c)", () => {
+    // A > B > C > A is a circle, and D > A feeds it, which listed it a second time as D A B C; E and F tie on
+    // sitelinks, and the human merges E into F.
+    const marks = [mark("A", { synonym_of: ["B"] }), mark("B", { synonym_of: ["C"] }), mark("C", { synonym_of: ["A"] }), mark("D", { synonym_of: ["A"] }),
+      mark("E", { duplicates: ["F"] }), mark("F")];
+    const plan = planMerges(marks, setOf("A B C D E F"), { ...none, merge: [{ old: "E", kept: "F", why: "x" }] });
+    expect(plan.forks).toEqual([["A", "B", "C"]]);
+  });
+
   it("folds an old name into its current one, and a chain to its end", () => {
     const marks = [mark("A", { synonym_of: ["B"] }), mark("B", { synonym_of: ["C"] }), mark("C")];
     expect(planMerges(marks, setOf("A B C"), none).into).toEqual(new Map([["A", "C"], ["B", "C"]]));
@@ -460,7 +469,7 @@ describe("withoutListed", () => {
         { id: "Q4", name: "hearts", aliases: aliasesFor(["hearts"]) },
         items[3],
       ],
-      aliases: 4, dropped: 2,
+      aliases: 4, dropped: 2, used: ["drop_listed_names wikidata:Q4"],
     });
   });
 
@@ -487,7 +496,7 @@ describe("withoutListed", () => {
 
   it("keeps an item that had no names to begin with, as ancestor taxa kept for the tree have none", () => {
     const items: Item[] = [{ id: "Q8", name: "Q8", aliases: [] }, { id: "Q9", name: "tortoise", aliases: aliasesFor(["tortoise"]), kind_of: ["Q8"] }];
-    expect(withoutListed("wikidata", "s", items, none, [])).toEqual({ items, aliases: 0, dropped: 0 });
+    expect(withoutListed("wikidata", "s", items, none, [])).toEqual({ items, aliases: 0, dropped: 0, used: [] });
   });
 
   it("stops when a dropped item is another's parent", () => {
@@ -516,11 +525,20 @@ describe("parseListed", () => {
   });
 });
 
-describe("handNamesOnlyIn", () => {
-  it("keeps the add and remove rows whose item only this set holds, for a single load to judge (13f-3b-2)", () => {
+describe("rowsOnlyIn", () => {
+  it("keeps the rows whose item only this set holds, for a single load to judge (13f-3b-2)", () => {
     const row = (ref: string) => ({ ref, name: "x", why: "y" });
-    const names = { add: [row("wikidata:Q1"), row("wikidata:Q2"), row("oewn:3")], remove: [row("wikidata:Q1")] };
-    expect(handNamesOnlyIn(names, new Set(["wikidata:Q1", "wikidata:Q2"]), new Set(["wikidata:Q2"]))).toEqual({ add: [row("wikidata:Q1")], remove: [row("wikidata:Q1")] });
+    expect(rowsOnlyIn([row("wikidata:Q1"), row("wikidata:Q2"), row("oewn:3")], new Set(["wikidata:Q1", "wikidata:Q2"]), new Set(["wikidata:Q2"]))).toEqual([row("wikidata:Q1")]);
+  });
+});
+
+describe("unusedListedRows", () => {
+  it("names a rename whose item the list empties, and apart a drop_listed_names row on an item with no listed name (13f-4c)", () => {
+    const items: Item[] = [{ id: "Q1", name: "gone", aliases: aliasesFor(["gone"]) }, { id: "Q2", name: "clean", aliases: aliasesFor(["clean"]) }];
+    const listed: Listed = { drop: [{ ref: "wikidata:Q1", why: "x" }], drop_from_set: [], drop_listed_names: [{ ref: "wikidata:Q2", why: "x" }] };
+    const renames = [{ ref: "wikidata:Q1", name: "gone", why: "x" }];
+    const { used } = withoutListed("wikidata", "s", items, listed, renames);
+    expect(unusedListedRows(listed, renames, new Set(used))).toEqual({ renames: ["rename wikidata:Q1"], guards: ["drop_listed_names wikidata:Q2"] });
   });
 });
 
