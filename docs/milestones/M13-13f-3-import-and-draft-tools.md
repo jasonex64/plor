@@ -1,6 +1,6 @@
 # M13 13f-3 — Import and draft tools
 
-**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered and the design approved (2026-10-28), in two PRs; 13f-3b-1, the load's gaps, built and reviewed, in review in PR #115; 13f-3b-2 next.
+**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered and the design approved (2026-10-28), in two PRs; 13f-3b-1, the load's gaps, done (PR #115, merged on green CI 2026-10-28 UTC, `dae910c`; its migration not yet on plor.app, the human: "Don't push the migration to plor.app yet"); 13f-3b-2, failures, tests, admin, cleanup, built and reviewed, in review in PR #116.
 
 ## Goal
 Make the load match the files exactly, removing what they no longer give (13f-3a); and close the tool items that can fail silently or mislead, with tests for the code that runs every day, the two admin fixes, and suites that clean up after themselves (13f-3b).
@@ -84,11 +84,11 @@ During 13f-3b-1's build (2026-10-28), item 8's truncate: no fix keeps the test's
 - **To Later (comment-only, fetch-only or style):** `matching.ts`'s stale comment, `pickHosts`'s constants comment, `FACT_TRAITS`' place, the pop groups' `method` text, `simulateDates`' export, `analyzeBase`'s table list, the `Where` type, `fetchTaxa`/`byIds`/P13176 tests, `titleForms`' numbers, the import's slices, `thing_names`' duplicates, `membersOf`' cache, error codes reused, `env.ts`' two spellings, DECISIONS.md Game 1's wording.
 
 ### Acceptance criteria
-- [ ] Each silent failure listed fails loudly in a test.
-- [ ] Each daily helper listed has a test.
-- [ ] The missing-name fix, with an e2e or route test; the match-group item closed in ROADMAP with its reason.
-- [ ] After the db suite, the local base holds no `fixture_` or `dt_` category or thing.
-- [ ] The Later items moved with their reason; the suites pass.
+- [x] Each silent failure listed fails loudly in a test.
+- [x] Each daily helper listed has a test.
+- [x] The missing-name fix, with an e2e or route test; the match-group item closed in ROADMAP with its reason.
+- [x] After the db suite, the local base holds no `fixture_` or `dt_` category or thing.
+- [x] The Later items moved with their reason; the suites pass.
 
 ## Out of scope
 - Scale (13f-4). New content.
@@ -104,7 +104,7 @@ None new.
 ## Removes
 - 13f-3a: the need for a `db reset` before `load all` (the handoff's steps); `import_source`'s insert-only behaviour for owned rows.
 - 13f-3b-1: ROADMAP's "From the 13f-3a review" item; `record_miss`'s quiet return; the test's wait on the truncate's locks (kept, taken with `nowait`).
-- 13f-3b-2: the closed ROADMAP items (the match-group one among them), the raw-ID fallbacks on Puzzles, and the fixture rows the suites leave.
+- 13f-3b-2: the closed ROADMAP items (the match-group one among them), the raw-ID fallbacks on Puzzles, the fixture rows the db suites leave, `approvePuzzle`'s split on "; ", and `removeCreatedPuzzles` (now `removeFixtures`).
 
 ---
 *Fill in the sections below at the end.*
@@ -126,6 +126,15 @@ None new.
 | Design 7: a host answer's name or link | Its names, facts and links, and renames | A fact ending (the answer no longer under its category's root) changes what the day accepts more than a name does |
 | Design 5: `load_seen_name` mirrors the fresh rename | Mirrors it, but a thing two joining WordNet items name gets the one with the lower ID; a fresh load's import picks either, so its finish renamed 2 ("central chimpanzee", "wolverine") and every reload after renamed 0 | The import's rename takes whichever joining row Postgres meets first; the finish's pick is fixed, so reloads agree with each other |
 | Design 8: the truncate's locks replaced | Kept, taken with `nowait` first | The human's answer during the build: "Keep it, fail fast (Recommended)" |
+| 13f-3b-2 Design: approval's problems not split on "; " | `approve_puzzle` gives them as a JSON list in the error's detail, and `approvePuzzle` reads that | A separator a name can't hold doesn't exist; the message stays as it was for a person reading it |
+| Design: a single `load <set>` judging names.json's rows for that set | It judges the add and remove rows whose item only that set holds (`handNamesOnlyIn`) | An item in two sets (Oceania, in places and continents) may take its row in the other, which only `load all` sees |
+| Design: the review's `joins…get(t)!` | Only `joins.wikidata.get(t)!` stops by name now (`taxonName`) | `joins.wordnet.get(id)!` runs only on IDs `joins.odd` holds, all WordNet items, so it can't miss |
+| Design: the review's "no parent" count | The items of the set holding the category's root with no parent, that no item's fact names as a value and that join nothing; fruit shows 1 (Barley grits), every other category 0 | Sets that hold no tree (places) or values (continents, statuses, genres) would fill the count with items that are meant to have no parent |
+| Design: the root's `same_as` test | A unit test that the root is linked even when its Wikidata root isn't loaded | The import's refusal of an unknown `same_as` is already a pgTAP test (`answer_base.test.sql`) |
+| Design: the familiar check's 3 agreeing with `FAMILIAR_SAFE_MIN` | A db test in `scripts/draft.db.test.ts` that runs `familiarLeft` and `approve_puzzle` at the minimum and one below | As the username lengths' agreement test: the boundary on both sides, not the constant read back |
+| Design: each db test removes what it adds | `removeFixtures` (was `removeCreatedPuzzles`) also takes out the fixture base a file loaded; `removeTestBase` takes out a test's own things; `src/admin/bank.db.test.ts` loads the fixture inside its rolled-back transaction | That test read the names other files' leftovers gave it, and failed once none were left |
+| Design: a host answer whose name is missing, on the page | A missing one in the editable chips can only be unticked and is drawn as a blocked one (danger colour while ticked, dashed and muted once unticked); while ticked, its question says it isn't in the answer database and Approve waits, as for a stolen letter; the read-only list shows it in the danger colour | Approval refuses it (`checkHostNames`), so ticking it could only end in that refusal (the review: the chip looked the same ticked or not) |
+| Design, To Later: the import's slices | Closed as obsolete in ROADMAP, not moved | No `bd:slice` or OFFSET paging is left: `byIds` reads by key since 13e-4c |
 
 ## Evidence
 On the Mac, 2026-10-27/28 (UTC), with the migration applied to the local stack.
@@ -147,7 +156,43 @@ On the Mac, 2026-10-27/28 (UTC), with the migration applied to the local stack.
 - **After the suites**, `load all`: `ENDING … 79 names, 53 facts, 0 links, 0 populations`, `ERASED 9 categories: dt_base, dt_d, fixture_animal, …`, `DATABASE 319 MB` (as 13f-3a's). `check-bank`: `CHECKED 231 questions: 0 problems`. `simulate`: `DRAFTED 30 of 30; subset questions 74 of 210`.
 - **Suites:** `npx supabase test db` 29 files, 478 PASS; `npm run test:db` 41 files, 271 passed (before the review's test fix, which touched only `load_sync.test.sql`); `npm test` 43 files, 444 passed; tsc clean; lint 0 errors, none in the changed files. `npm run test:e2e`: 60 passed, 1 failed, `shell.e2e.ts` "clock above the tab bar", the known flake (ROADMAP, 14b-2c items); `npx playwright test --last-failed`: 1 passed.
 
+### 13f-3b-2 (Windows, 2026-10-28 UTC)
+- **Before the fixes**, the new tests run against the old code:
+  - **Unit tests** (temporary copies of HEAD's `scripts/base.ts` and `scripts/draft.ts`, removed after): `7 failed | 70 passed`. Failing: the swapped-in day's error, `latestNumber`'s three-way tie, the split-and-pick synset, `drop_from_set`'s set and double drop, `handNamesOnlyIn` and `parentless` (new), and the SPARQL cut-off reply. Passing: `valueItems` and the root's `same_as`, which are coverage of how the old code already behaved.
+  - **pgTAP** `tool_failures.test.sql`, with 13f-3b-1's `import_source`, `load_finish` and `define_category` and the old `approve_puzzle` put back in a rolled-back transaction:
+    - `not ok 2` (the `same_as` kept apart without a word);
+    - `not ok 3` (`… kind_of tf z …`: the old pick follows the IDs, not the names; with the first IDs tried it happened to agree, so the test was changed until it couldn't);
+    - `not ok 5` (the filter left on);
+    - 7–9 errored (no detail on the old refusal);
+    - 1, 4 and 6 passed (the control, the setup, the unknown values, which the old code already named).
+  - **Route db test:** with HEAD's `src/admin/puzzles.ts`, "lists a host answer the base doesn't have with no name" fails with `"name": "11d6ab82-…"`.
+  - **The review's taxon lookup:** `taxonName` is new, so its test can't run on the old code; HEAD read `joins.wikidata.get(t)!.name`, which throws a TypeError for a missing taxon. `taxonName`'s unit test: 60 of 60 in `scripts/base.test.ts`.
+  - **The page's missing chip** (drawn as blocked once unticked; Approve waits while one is ticked): typechecked and covered by the route test's data, but *unverified* on screen; no e2e draws it.
+- **After:**
+  - `tool_failures.test.sql` `Tests=9 … PASS`;
+  - `npx supabase test db` 30 files, 488 PASS;
+  - `npm run test:db` 41 files, 277 passed;
+  - `npm test` 43 files, 452 passed;
+  - tsc clean; lint 0 errors, none in the changed files;
+  - `npm run test:e2e` 61 passed (the e2e files still load the fixture base and leave it; ROADMAP keeps that open).
+- **The base after the db suite:**
+  - The check: categories `like 'fixture\_%' or 'dt\_%'`, wikidata source IDs `like 'fixture\_%' or 'dt-%'`, and their `base_log` rows.
+  - First run: `0|0|0` (categories, items, names).
+  - After the review: with e2e's leftovers in the base, `before: 7|55|120`, then `npm run test:db` (41 files, 277 passed), then `after: 0|0|0` (categories, items, log rows).
+- **The real base:**
+  - `load all` printed no ENDING, RENAMED, ERASED or CHANGED line, `DATABASE 322 MB`, 71 s (the `same_as` refusal found nothing on the real files);
+  - `npm run base -- load wikidata-fruit` loaded and judged its own names.json rows;
+  - `npm run base -- review fruit animal`: `items of the root's set under nothing (not in the category): 1 (Barley grits)` for fruit, 0 for animal.
+
 ## Review
+13f-3b-2: the `reviewer` agent, 2026-10-28, in a fresh context.
+- Blocking:
+  - fixed: the missing chip looked the same ticked or unticked, and a ticked one didn't hold Approve;
+  - fixed: the review's taxon lookup had no test (`taxonName`, exported and tested);
+  - fixed: the handoff and the Source diff (the slices closed as obsolete) were behind;
+  - **waits on the human:** the page reads approval's problems from the error's detail, which plor.app's `approve_puzzle` doesn't give until `20261028060000_load_gaps.sql` and `20261028080000_tool_failures.sql` are pushed (this one needs the other's functions). Merged code deploys to plor.app at once, so until then an approval refused there answers 500 instead of its problems. Push both right after the merge, at the human's word.
+- Deferred to ROADMAP "Next revision" (From the 13f-3b-2 review).
+
 13f-3b-1: the `reviewer` agent, 2026-10-28, in a fresh context (read-only queries while e2e ran).
 - Blocking, fixed: (1) "and not on tomorrow's" passed for the wrong reason: the links row of `ls-c kind_of ls-root`, ended since item 3, blocked the files' source fact at the same key, so nothing of ls-a resolved tomorrow; the test now gives the link again and checks that "ls aye" resolves tomorrow; (2) the "fails before its fix" criterion stood on reading; the checks were run on 13f-3a's code (Evidence); (3) the ticket's Status, ROADMAP's row and the handoff still said the design waited on approval, and the "From the 13f-3a review" item wasn't closed.
 - Deferred to ROADMAP "Next revision" (From the 13f-3b-1 review).

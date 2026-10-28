@@ -1,12 +1,14 @@
 // The drafting script's database steps against the local stack (run with `npm run test:db`): the easiest-first measure
 // (M13 13d) and the familiar check (docs/milestones/M13-13c-rarity-and-the-host.md): at least 3 members in the day's levels that the host doesn't catch, itself or under
 // a host answer, and that can be typed by some name past the stolen letters. private.approve_puzzle checks the same
-// rule (supabase/tests/puzzle_entry.test.sql). On the fixture base (src/test/answer-fixture.ts).
+// rule (supabase/tests/puzzle_entry.test.sql), with the same minimum (FAMILIAR_SAFE_MIN). On the fixture base
+// (src/test/answer-fixture.ts), taken out again with this file's own small base once it's done (13f-3b-2).
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { Level } from "../src/content/puzzle.ts";
-import { fixtureId, loadFixtureBase } from "../src/test/answer-fixture.ts";
-import { bankProblems, familiarLeft, oneHostCatch } from "./draft.ts";
+import { FAMILIAR_SAFE_MIN } from "../src/config/tunables.ts";
+import type { Level, Puzzle } from "../src/content/puzzle.ts";
+import { fixtureDraft, fixtureId, loadFixtureBase, removeFixtureBase, removeTestBase } from "../src/test/answer-fixture.ts";
+import { bankProblems, expectedCatches, familiarLeft, oneHostCatch, resolveNames } from "./draft.ts";
 
 const db = new pg.Client({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres" });
 const animal = (slug: string) => fixtureId(0, slug);
@@ -18,7 +20,11 @@ beforeAll(async () => {
   await db.connect();
   await loadFixtureBase(db);
 });
-afterAll(() => db.end());
+afterAll(async () => {
+  await removeTestBase(db, "dt-%", "dt\_%", "draft-letter-test");
+  await removeFixtureBase(db);
+  await db.end();
+});
 
 describe("familiarLeft", () => {
   it("counts three familiar members the host doesn't catch, and refuses two", async () => {
@@ -116,5 +122,84 @@ describe("oneHostCatch", () => {
       levels: { [animal("bear")]: "common" as const, [animal("dog")]: "common" as const, ...levels("cat", "fish", "horse") },
     };
     expect(await oneHostCatch(db, "2000-01-01", question)).toBeCloseTo((0.2 + 0.2 / 6 + 0.2) / 2, 6);
+  });
+});
+
+// The names a drafted question gives become its things (13a-2 review; 13f-3b-2): one member each, by name or by ID.
+describe("resolveNames", () => {
+  it("gives each name its one member, and refuses a name with several or none, naming the candidates", async () => {
+    expect(await resolveNames(db, "fixture_animal", ["bear", `#${animal("dog")}`])).toEqual(new Map([["bear", animal("bear")], [`#${animal("dog")}`, animal("dog")]]));
+    await expect(resolveNames(db, "fixture_animal", ["robin"])).rejects.toThrow(/^fixture_animal: "robin" names several members: /);
+    await expect(resolveNames(db, "fixture_animal", ["unicorn"])).rejects.toThrow('fixture_animal: "unicorn" names no member');
+    await expect(resolveNames(db, "fixture_animal", [`#${fixtureId(1, "banana")}`])).rejects.toThrow(`#${fixtureId(1, "banana")} is not a member`);
+  });
+});
+
+// The soft guide's numbers (13c review; 13f-3b-2): per question, the expected share its host answers catch, the members
+// under them included. As oneHostCatch's: bear (common, 0.4/2) with polar bear under it (rare, 0.2/6), dog (common).
+describe("expectedCatches", () => {
+  it("adds up what each question's host answers catch, and nothing for a question with none", async () => {
+    const day = fixtureDraft("2000-01-01");
+    const q = day.questions[0];
+    const two: Puzzle = { ...day, questions: [{ ...q, host_answers: [animal("bear"), animal("dog")] }, { ...q, host_answers: [] }] };
+    const [both, none] = await expectedCatches(db, two);
+    expect(both).toBeCloseTo(0.2 + 0.2 / 6 + 0.2, 6);
+    expect(none).toBe(0);
+  });
+});
+
+// check-bank reads "#<id>" through private.thing_now, so a bank answer naming a retired ID still finds its thing (13e-9
+// review; 13f-3b-2). The retirement is rolled back.
+describe("bankProblems on a retired ID", () => {
+  it("passes an answer naming a retired ID of a member", async () => {
+    const retired = fixtureId(0, "old-dog");
+    await db.query("begin");
+    try {
+      await db.query("insert into private.thing_retired (id, thing_id, source_ref) values ($1, $2, 'draft-test')", [retired, animal("dog")]);
+      expect(await bankProblems(db, [question(["bear", `#${retired}`], ["cat", "fish"])])).toEqual([]);
+    } finally {
+      await db.query("rollback");
+    }
+  });
+});
+
+// The draft and approval agree on the familiar minimum (13c review; 13f-3b-2): FAMILIAR_SAFE_MIN familiar members the
+// host doesn't catch pass both, one fewer fails both. The approval runs as an admin added for it, rolled back.
+describe("the familiar minimum, in the draft and at approval", () => {
+  it(`passes ${FAMILIAR_SAFE_MIN} safe familiar members and refuses one fewer, in both`, async () => {
+    // Bear, the host, catches polar bear; dog, cat, fish and horse are the fixture's safe ones, enough for the minimum.
+    const safe = ["dog", "cat", "fish", "horse"].slice(0, FAMILIAR_SAFE_MIN);
+    expect(safe.length).toBe(FAMILIAR_SAFE_MIN);
+    const day = (n: number) => {
+      const draft = fixtureDraft("2999-01-01");
+      draft.questions[0] = { ...draft.questions[0], host_bank: [animal("bear")], host_answers: [animal("bear")],
+        levels: { [animal("bear")]: "common", ...Object.fromEntries(safe.slice(0, n).map((s) => [animal(s), "uncommon" as const])) } };
+      return draft;
+    };
+    expect(await left(["bear"], day(FAMILIAR_SAFE_MIN).questions[0].levels, [])).toBe(true);
+    expect(await left(["bear"], day(FAMILIAR_SAFE_MIN - 1).questions[0].levels, [])).toBe(false);
+    const admin = fixtureId(0, "draft-test-admin");
+    await db.query("begin");
+    try {
+      await db.query("insert into auth.users (id, email) values ($1, 'draft-test-admin@example.test')", [admin]);
+      await db.query("insert into private.admin (user_id) values ($1)", [admin]);
+      const approve = async (n: number) => {
+        await db.query("savepoint a");
+        try {
+          await db.query("select private.approve_puzzle($1, $2)", [admin, day(n)]);
+          return [];
+        } catch (err) {
+          return JSON.parse((err as pg.DatabaseError).detail!) as string[];
+        } finally {
+          await db.query("rollback to savepoint a");
+        }
+      };
+      expect(await approve(FAMILIAR_SAFE_MIN)).toEqual([]);
+      const refused = (await approve(FAMILIAR_SAFE_MIN - 1)).filter((p) => p.startsWith("question 1:"));
+      expect(refused).toHaveLength(1);
+      expect(refused[0]).toMatch(new RegExp(`^question 1: fewer than ${FAMILIAR_SAFE_MIN} familiar answers the host doesn't catch`));
+    } finally {
+      await db.query("rollback");
+    }
   });
 });

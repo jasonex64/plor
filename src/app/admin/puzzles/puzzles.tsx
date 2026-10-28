@@ -86,8 +86,9 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   const [problems, setProblems] = useState<string[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  // Per question, its ticked host answers that players can't type.
-  const blocked = shown.map((q, i) => q.hostBank.filter((a) => a.stolen && hosts[i].includes(a.id)));
+  // Per question, its ticked host answers that players can't type or that this database doesn't have: approving refuses
+  // both (checkHostNames), so they're fixed first.
+  const blocked = shown.map((q, i) => q.hostBank.filter((a) => (a.stolen || a.name === null) && hosts[i].includes(a.id)));
   const toFix = blocked.filter((b) => b.length > 0).length;
 
   async function approve() {
@@ -172,7 +173,11 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
                 {editable &&
                   blocked[i].map((a) => (
                     <p key={a.id} className={admin.problem}>
-                      &ldquo;{a.name}&rdquo; has the {a.stolen!.toUpperCase()} the Wind steals: pick another host answer.
+                      {a.name === null ? (
+                        <>&ldquo;{a.id}&rdquo; isn&rsquo;t in the answer database: pick another host answer.</>
+                      ) : (
+                        <>&ldquo;{a.name}&rdquo; has the {a.stolen!.toUpperCase()} the Wind steals: pick another host answer.</>
+                      )}
                     </p>
                   ))}
                 {problems
@@ -198,7 +203,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
 function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[]; onChange: (next: string[]) => void }) {
   const [all, setAll] = useState(false);
   const [order] = useState(() => {
-    const byName = [...q.hostBank].sort((a, b) => a.name.localeCompare(b.name));
+    const byName = [...q.hostBank].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
     return [...byName.filter((a) => chosen.includes(a.id)), ...byName.filter((a) => !chosen.includes(a.id))];
   });
   const [first] = useState(() => Math.max(SHOWN, chosen.length));
@@ -209,6 +214,25 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
       <legend className="sr-only">Host answers for {q.prompt}</legend>
       {visible.map((a) => {
         const on = chosen.includes(a.id);
+        // Not in this database: it can't be approved (checkHostNames), so, like a blocked one, it can only be unticked,
+        // and it's drawn as one: in the danger colour while ticked, dashed and muted once unticked.
+        if (a.name === null) {
+          return (
+            <label key={a.id} className={on ? `${styles.chip} ${styles.bad}` : `${styles.chip} ${styles.blocked}`}>
+              <input
+                type="checkbox"
+                className="sr-only"
+                aria-label={`not loaded: ${a.id}, isn't in the answer database`}
+                aria-disabled={!on}
+                checked={on}
+                onChange={() => {
+                  if (on) onChange(chosen.filter((id) => id !== a.id));
+                }}
+              />
+              <NotLoaded id={a.id} />
+            </label>
+          );
+        }
         // Players can't type it, so it can't be ticked, only unticked if it was ticked before. It stays a checkbox
         // either way, unavailable once unticked, so unticking keeps the keyboard's focus on it (item 53).
         if (a.stolen) {
@@ -250,16 +274,34 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
   );
 }
 
-// The name with each letter that is the stolen one, once normalized (as players' typing is), struck through.
+// The name with each letter that is the stolen one, once normalized (as players' typing is), struck through. Only a
+// named answer has a stolen letter (view, src/admin/puzzles.ts).
 function Struck({ choice: a }: { choice: HostChoice }) {
   return (
     <span>
-      {[...a.name].map((ch, i) => (a.stolen !== null && normalize(ch).includes(a.stolen) ? <s key={i}>{ch}</s> : ch))}
+      {[...a.name!].map((ch, i) => (a.stolen !== null && normalize(ch).includes(a.stolen) ? <s key={i}>{ch}</s> : ch))}
     </span>
   );
 }
 
 function ReadOnlyHosts({ q }: { q: QuestionView }) {
   const names = new Map(q.hostBank.map((a) => [a.id, a.name]));
-  return <span>{q.hostAnswers.map((id) => names.get(id) ?? id).join(", ")}</span>;
+  return (
+    <span>
+      {q.hostAnswers.map((id, i) => {
+        const name = names.get(id);
+        return (
+          <span key={id}>
+            {i > 0 && ", "}
+            {name ? name : <NotLoaded id={id} />}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+// A host answer this database doesn't have, said in the danger colour rather than shown as if its ID were its name.
+function NotLoaded({ id }: { id: string }) {
+  return <span className={styles.missing}>not loaded: {id}</span>;
 }

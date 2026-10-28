@@ -11,7 +11,7 @@ import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as boardRoute } from "../board/route";
 import { POST as deleteRoute } from "../comments/delete/route";
@@ -88,7 +88,7 @@ beforeAll(async () => {
 afterAll(async () => {
   // Deleting the auth users cascades to profiles, friendships, runs, comments and reactions; then the fixture puzzles go.
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await getPool().end();
 });
 

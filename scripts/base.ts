@@ -66,7 +66,8 @@ type Binding = Record<string, { value: string; "xml:lang"?: string }>;
 let retries = 0;
 
 // One query. A timeout (the service answers an error page, not JSON) returns "timeout"; every caller stops on it. HTTP 429 waits the Retry-After the service names and asks again, printed and counted (the 13a ticket).
-async function sparql(query: string): Promise<Binding[] | "timeout"> {
+// A 200 the service cut off and ended with its timeout error is a timeout too, not a JSON error (13f-3b-2).
+export async function sparql(query: string): Promise<Binding[] | "timeout"> {
   for (;;) {
     const response = await fetch(SPARQL, {
       method: "POST",
@@ -84,7 +85,15 @@ async function sparql(query: string): Promise<Binding[] | "timeout"> {
       continue;
     }
     const text = await response.text();
-    if (response.ok) return (JSON.parse(text) as { results: { bindings: Binding[] } }).results.bindings;
+    if (response.ok) {
+      try {
+        return (JSON.parse(text) as { results: { bindings: Binding[] } }).results.bindings;
+      } catch (err) {
+        if (!(err instanceof SyntaxError)) throw err;
+        if (/timeout|TimeoutException/i.test(text)) return "timeout";
+        throw new Error(`SPARQL ${response.status}: the reply isn't JSON: ${text.slice(-300)}`);
+      }
+    }
     if (/timeout|TimeoutException/i.test(text)) return "timeout";
     throw new Error(`SPARQL ${response.status}: ${text.slice(0, 300)}`);
   }
@@ -127,12 +136,12 @@ export function withFact(items: Item[], trait: FactTrait, given: Map<string, Cla
 }
 
 // The population a thing is given: among its best-rank values, the one with the latest point in time (P1082 requires
-// one: SOURCES.md, Wikidata properties). null when two values tie for latest (both undated, or the same date) and
+// one: SOURCES.md, Wikidata properties). null when values tie for latest (undated, or the same date) and any of them
 // differ, as the import can't choose between them; the caller counts those.
 export function latestNumber(given: Claim[]): Population | null {
   const sorted = [...given].sort((a, b) => (b.time ?? "").localeCompare(a.time ?? ""));
-  const [top, next] = sorted;
-  if (next && (next.time ?? "") === (top.time ?? "") && next.value !== top.value) return null;
+  const [top] = sorted;
+  if (sorted.some((c) => (c.time ?? "") === (top.time ?? "") && c.value !== top.value)) return null;
   const value = Number(top.value);
   // Third-party data: a value that isn't a whole number of people stops the fetch.
   if (!Number.isInteger(value) || value < 0) throw new Error(`population ${JSON.stringify(top.value)} is not a whole number of people`);
@@ -155,7 +164,7 @@ export function withPopulation(items: Item[], given: Map<string, Claim[]>): { it
 // Things a fact names (continents, IUCN statuses), by their label alone: their alternative labels are codes and
 // plurals ("na", "lc", "003 un m49 code", "endangereds") that would make those misses "rejected" in every category
 // (13e-4b design 4).
-function valueItems(found: Awaited<ReturnType<typeof labelled>>): Item[] {
+export function valueItems(found: Awaited<ReturnType<typeof labelled>>): Item[] {
   return [...found].map(([id, e]) => ({ id, name: e.label, aliases: [{ alias: normalize(e.label), kind: "name" as const }] }));
 }
 
@@ -1102,6 +1111,11 @@ export function parseListed(text: string): Listed {
   const dropped = new Set(listed.drop.map((r) => r.ref));
   const both = listed.drop_listed_names.filter((r) => dropped.has(r.ref)).map((r) => r.ref);
   if (both.length) throw new Error(`${LISTED_FILE}: ${both.join(", ")} both dropped and kept`);
+  // A set's name with a typo drops nothing, and a ref dropped everywhere needs no set's drop (13f-2 review; 13f-3b-2).
+  const unknownSets = listed.drop_from_set.filter((r) => !(r.set in SETS)).map((r) => `${r.ref} (${r.set})`);
+  if (unknownSets.length) throw new Error(`${LISTED_FILE}: drop_from_set names no set: ${unknownSets.join(", ")}`);
+  const twice = listed.drop_from_set.filter((r) => dropped.has(r.ref)).map((r) => r.ref);
+  if (twice.length) throw new Error(`${LISTED_FILE}: ${twice.join(", ")} both in drop and in drop_from_set`);
   return listed;
 }
 
@@ -1191,6 +1205,13 @@ export function withHandNames(source: Source, items: Item[], names: Pick<Names, 
 }
 
 // The add and remove rows no set used, after `load all`.
+// The add and remove rows only one set can apply: their item is in it and in no other set, so a single `load <set>`
+// judges them as `load all` judges every row (13f-2 review; 13f-3b-2).
+export function handNamesOnlyIn(names: Pick<Names, "add" | "remove">, mine: ReadonlySet<string>, elsewhere: ReadonlySet<string>): Pick<Names, "add" | "remove"> {
+  const only = (r: { ref: string }) => mine.has(r.ref) && !elsewhere.has(r.ref);
+  return { add: names.add.filter(only), remove: names.remove.filter(only) };
+}
+
 export function unusedHandNames(names: Pick<Names, "add" | "remove">, used: ReadonlySet<string>): string[] {
   return [
     ...names.add.map((r) => handNameKey("add", r.ref, r.name)),
@@ -1328,8 +1349,15 @@ function parseLists<T>(file: string, fieldsOf: Record<string, string[]>, keysOf:
 }
 
 // What each row decides, once: an old item merges once, a pair is apart once, a category's name is reviewed once, a
-// synset is split, picked or joined once.
-export const parseSameness = (text: string): Sameness => parseLists(SAMENESS_FILE, SAMENESS_FIELDS, SAMENESS_KEYS, text);
+// synset is split, picked or joined once, across the three lists too: linkToWikidata reads a split first, so a pick
+// or join beside it would be ignored without a word (13e-5 second review; 13f-3b-2).
+export function parseSameness(text: string): Sameness {
+  const s = parseLists<Sameness>(SAMENESS_FILE, SAMENESS_FIELDS, SAMENESS_KEYS, text);
+  const synsets = [...s.wordnet_split, ...s.wordnet_pick, ...s.wordnet_join].map((r) => r.synset);
+  const twice = [...new Set(synsets.filter((v, i) => synsets.indexOf(v) !== i))];
+  if (twice.length) throw new Error(`${SAMENESS_FILE}: ${twice.join(", ")} decided in more than one of wordnet_split, wordnet_pick and wordnet_join`);
+  return s;
+}
 
 const readSameness = () => parseSameness(readFileSync(SAMENESS_FILE, "utf8"));
 
@@ -1521,6 +1549,14 @@ function readCategories(): CategoryDef[] {
   return categories;
 }
 
+// A category data/categories.json puts within another must have its root under the other's, or the draft would treat
+// two unrelated categories as one family (13e-7).
+export async function checkWithin(client: pg.Client, key: string, within: string): Promise<void> {
+  const { rows } = await client.query(`select c.root in (select private.descendants_now(array[w.root])) as inside
+    from private.category c, private.category w where c.key = $1 and w.key = $2`, [key, within]);
+  if (!rows[0]?.inside) throw new Error(`${CATEGORIES_FILE}: ${key} says it's within ${within}, but its root isn't under ${within}'s`);
+}
+
 // Every category in data/categories.json, in one transaction: a root, member_of or filter value that isn't loaded fails
 // them all. A subset follows its base (parseCategories checks the order).
 async function defineCategories(client: pg.Client): Promise<void> {
@@ -1533,11 +1569,7 @@ async function defineCategories(client: pg.Client): Promise<void> {
         await client.query("select private.define_subset($1, $2, $3, $4, $5::jsonb)", [c.key, c.name, c.of, bases.get(c.of)!.source, JSON.stringify(filterOf(c))]);
       } else {
         await client.query("select private.define_category($1, $2, $3, $4, $5)", [c.key, c.name, c.source, c.root, c.member_of ?? null]);
-        if (c.within) {
-          const { rows } = await client.query(`select c.root in (select private.descendants_now(array[w.root])) as inside
-            from private.category c, private.category w where c.key = $1 and w.key = $2`, [c.key, c.within]);
-          if (!rows[0]?.inside) throw new Error(`${CATEGORIES_FILE}: ${c.key} says it's within ${c.within}, but its root isn't under ${c.within}'s`);
-        }
+        if (c.within) await checkWithin(client, c.key, c.within);
       }
     }
     await client.query("commit");
@@ -1602,13 +1634,30 @@ async function analyzeBase(client: pg.Client): Promise<void> {
   console.log(`DATABASE ${rows[0].size}`);
 }
 
+// A set's items under nothing: no parent in the tree, not the set's root, not a value another item's facts name, and
+// not joined or merged into another item's thing. Such an item is outside every category of the tree and outside the
+// review's "unnamed" count (13a-1 review: a fruit item whose parents all lack an English label; 13f-3b-2).
+export function parentless(items: Item[], root: string): Item[] {
+  const values = new Set(items.flatMap((i) => [...(i.kind_of ?? []), ...(i.member_of ?? []), ...(i.country ?? []), ...(i.continent ?? []),
+    ...(i.conservation_status ?? []), ...(i.genre ?? []), ...(i.publisher ?? [])]));
+  return items.filter((i) => i.id !== root && !i.kind_of?.length && !i.same_as && !i.merged_into && !values.has(i.id));
+}
+
+// An unjoined word's taxon, by the animal snapshots the review reads: one a re-fetch dropped while the WordNet
+// snapshot still names it stops the review by name, not with a TypeError (13e-5 second review; 13f-3b-2).
+export function taxonName(joins: Joins, taxon: string): string {
+  const item = joins.wikidata.get(taxon);
+  if (!item) throw new Error(`review: the WordNet snapshot leaves a word unjoined to ${taxon}, which no loaded animal snapshot holds; fetch both again`);
+  return item.name;
+}
+
 // What the human reviews, per category: the count, BASE_REVIEW_SAMPLE random members, and flags: fewer than
 // CATEGORY_MIN_MEMBERS members (13e), members with an alias on the LDNOOBW list or Plor's (13e-9b), for the human to
 // decide per category (13e-2: "Flag; you decide each"), members under two parents (two meanings), aliases shared by
 // two members (duplicates), things under the root with no English name (left out of the category), WordNet words
 // joined to a Wikidata thing sharing no name, and words naming several taxa, left unjoined for a person to fix (13e-5).
 // Joins are read from the loaded snapshots (13e-5 items 1 and 2): odd joins, and words naming several taxa, unjoined.
-type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; odd: Map<string, string> };
+export type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; odd: Map<string, string> };
 // What the doubles list reads (13e-5b): the bank, the pairs a person kept apart, and the merge plan's forks and P460 pairs.
 type Doubles = { bank: Bank; apart: Set<string>; reviewed: Set<string>; plan: MergePlan };
 
@@ -1628,6 +1677,15 @@ async function review(keys: string[]): Promise<void> {
   } finally {
     await client.end();
   }
+}
+
+// The items of each set holding a category's root (a subset's base's), with that root's ID.
+function rootSetItems(key: string): { items: Item[]; root: string }[] {
+  const categories = readCategories();
+  const c = categories.find((x) => x.key === key)!;
+  const base = (isSubset(c) ? categories.find((x) => x.key === c.of)! : c) as BaseCategory;
+  return Object.entries(SETS).filter(([, def]) => def.source === base.source)
+    .map(([set]) => readSnapshot(set).items).filter((items) => items.some((i) => i.id === base.root)).map((items) => ({ items, root: base.root }));
 }
 
 async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: Doubles): Promise<void> {
@@ -1653,11 +1711,13 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
   console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
   console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
   console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
+  const noParent = rootSetItems(key).flatMap(({ items, root }) => parentless(items, root)).map((i) => i.name);
+  console.log(`  flag, items of the root's set under nothing (not in the category): ${noParent.length}${noParent.length ? ` (${noParent.sort().join("; ")})` : ""}`);
   const wordnetIds = (await one(`select s.source_id from private.category_members($1) m
     join private.thing_source s on s.thing_id = m and s.source = 'oewn'`)).map((r) => r.source_id as string);
   const odd = wordnetIds.filter((id) => joins.odd.has(id)).map((id) => `${joins.wordnet.get(id)!.name} = ${joins.odd.get(id)}`);
   const unjoined = wordnetIds.map((id) => joins.wordnet.get(id)).filter((i) => i?.unjoined)
-    .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${joins.wikidata.get(t)!.name} (${t})`).join(" / ")}`);
+    .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${taxonName(joins, t)} (${t})`).join(" / ")}`);
   console.log(`  flag, a WordNet word joined to a Wikidata thing sharing no name: ${odd.length}${odd.length ? ` (${odd.sort().join("; ")})` : ""}`);
   console.log(`  flag, a WordNet word naming several loaded taxa, unjoined: ${unjoined.length}${unjoined.length ? ` (${unjoined.sort().join("; ")})` : ""}`);
   // Doubles players meet (13e-5b; human, 2026-10-27: "Bank answers (Recommended)"): a bank answer of this category,
@@ -1715,6 +1775,10 @@ async function main(): Promise<void> {
   } finally {
     await client.end();
   }
+  const refsOf = (set: string) => readSnapshot(set).items.map((i) => `${SETS[set].source}:${i.id}`);
+  const own = handNamesOnlyIn(readHandFiles().names, new Set(refsOf(name)), new Set(Object.keys(SETS).filter((s) => s !== name).flatMap(refsOf)));
+  const unused = unusedHandNames(own, handNamesUsed);
+  if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in ${name} (the item already had the name, or lacked the one removed)`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

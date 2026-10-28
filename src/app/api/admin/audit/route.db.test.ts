@@ -9,7 +9,7 @@ import type { Review } from "@/admin/audit";
 import { getPool } from "@/lib/db";
 import { fixtureId } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { GET as auditGet, POST as auditPost } from "./route";
 
@@ -69,7 +69,7 @@ afterAll(async () => {
   await clearNear();
   await db.query("delete from auth.users where email like $1", [`%${RUN}@example.test`]);
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await db.end();
 });
 

@@ -3,7 +3,7 @@
 import { avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
-import { FIXTURE, FIXTURE_ALIASES, FIXTURE_NAMES, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "./answer-fixture";
+import { FIXTURE, FIXTURE_ALIASES, FIXTURE_NAMES, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase, removeFixtureBase } from "./answer-fixture";
 
 const created: string[] = [];
 let approvedAt: string | null = null;
@@ -19,7 +19,7 @@ export function fixture(date: string): ApprovedPuzzle {
   return fixtureDay(date, approvedAt);
 }
 
-// Uses the fixture day already published for a date, or adds it (removed again by removeCreatedPuzzles). A real day
+// Uses the fixture day already published for a date, or adds it (removed again by removeFixtures). A real day
 // under that date is refused: the tests would play it, and the helpers below know only the fixture's names.
 export async function ensurePuzzle(date: string): Promise<ApprovedPuzzle> {
   await ensureFixtureBase();
@@ -34,10 +34,16 @@ export async function ensurePuzzle(date: string): Promise<ApprovedPuzzle> {
   return fixture(date);
 }
 
-// Run after the runs that use them are deleted (a run references its puzzle).
-export async function removeCreatedPuzzles(): Promise<void> {
+// Takes out the fixture days this file added, then the fixture base if it loaded it, so the local base holds no
+// fixture rows once the suite is done (13f-3b-2). Run after the runs that use them are deleted (a run references its
+// puzzle) and with any day the file approved itself gone.
+export async function removeFixtures(): Promise<void> {
   for (const date of created.splice(0)) {
     await getPool().query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, date]);
+  }
+  if (approvedAt) {
+    await removeFixtureBase(getPool());
+    approvedAt = null;
   }
 }
 

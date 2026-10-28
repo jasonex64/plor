@@ -14,7 +14,7 @@ import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { answerBonus, firstGuess } from "./scoring";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, nameOf, removeCreatedPuzzles, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
+import { ensurePuzzle, nameOf, removeFixtures, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { startRun, todaysState } from "./runs";
 import { publicQuestion } from "./payload";
@@ -63,7 +63,7 @@ afterAll(async () => {
   const db = getPool();
   // Deleting the auth users cascades to profiles, runs, answers and misses; then the fixture puzzles go.
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await db.end();
 });
 

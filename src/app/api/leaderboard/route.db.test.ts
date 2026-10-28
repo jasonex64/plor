@@ -13,7 +13,7 @@ import { GAME_ID } from "@/platform/game";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles, safeEntry, typeableName } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as leaderboardRoute } from "./route";
 
@@ -83,7 +83,7 @@ beforeAll(async () => {
 afterAll(async () => {
   // Deleting the auth users cascades to profiles, friendships, runs and ledger rows; then the fixture puzzles go.
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await getPool().end();
 });
 

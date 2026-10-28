@@ -170,6 +170,27 @@ export async function loadFixtureBase(db: Querier): Promise<string> {
   return rows[0].now as string;
 }
 
+// Takes out of the base what a test imported, so the local base holds only real data once the suites are done (human,
+// 2026-10-27: "Suites clean up (Recommended)"; 13f-3b-2): the categories whose keys match keys, then the things of the
+// wikidata items whose IDs match ids, with every name, fact and link on them or naming them, and the log rows of the
+// import and the categories. A row a test left behind elsewhere (a miss review, an admin's addition) refuses it.
+export async function removeTestBase(db: Querier, ids: string, keys: string, snapshot: string): Promise<void> {
+  await db.query("delete from private.category where key like $1", [keys]);
+  // One statement: the references to a thing are checked at its end, once every row naming it is gone.
+  await db.query(`with t as materialized (select thing_id from private.thing_source where source = 'wikidata' and source_id like $1),
+    facts as (delete from private.fact where thing_id in (select thing_id from t) or value_thing in (select thing_id from t)),
+    numbers as (delete from private.number_fact where thing_id in (select thing_id from t)),
+    names as (delete from private.thing_alias where thing_id in (select thing_id from t)),
+    retired as (delete from private.thing_retired where thing_id in (select thing_id from t)),
+    sources as (delete from private.thing_source where thing_id in (select thing_id from t))
+    delete from private.thing where id in (select thing_id from t)`, [ids]);
+  await db.query(`delete from private.base_log where (action = 'import' and detail ->> 'snapshot' = $1)
+    or (action = 'define_category' and detail ->> 'key' like $2)`, [snapshot, keys]);
+}
+
+// The fixture's own rows: every source ID and category key starts with "fixture_".
+export const removeFixtureBase = (db: Querier) => removeTestBase(db, "fixture\\_%", "fixture\\_%", "fixture");
+
 // The fixture day for a date, as private.approve_puzzle would store it, approved as of approvedAt.
 export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle {
   return {

@@ -141,6 +141,16 @@ describe("swapping out a question the letters block", () => {
     const none = () => { throw new Error("only 5 bank questions eligible"); };
     await expect(withSwaps(none, async () => ({ built: 0 }))).rejects.toThrow(/^only 5 bank questions eligible$/);
   });
+
+  it("fails as building a swapped-in day does, naming the questions swapped out before it (13f-3b-2)", async () => {
+    // g blocks; the day without it holds h, whose name doesn't resolve.
+    const build = async (chosen: { id: string; prompt: string }[]) => {
+      if (chosen.some((x) => x.id === "h")) throw new Error("h: no thing named that");
+      return chosen.some((x) => x.id === "g") ? { blockers: [q("g")] } : { built: 0 };
+    };
+    await expect(withSwaps(pick, build)).rejects.toThrow('h: no thing named that, after swapping out "Name g", as no letters fit with them');
+    await expect(withSwaps(() => bank.slice(1, 8), build)).rejects.toThrow(/^h: no thing named that$/);
+  });
 });
 
 describe("the soft guide", () => {
