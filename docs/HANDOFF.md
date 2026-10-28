@@ -66,11 +66,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Loading no longer needs a `db reset`:** `npm run base -- load all` on a loaded base ends what the files dropped (the ticket's Evidence: a reload with four rows taken out of the files equals a fresh load from the next midnight). A `db reset` is still needed only to merge two already-loaded items (ROADMAP).
 
 ## Waiting on the human
-- **plor.app's hosted tests** after the 13f-3b push: `npx supabase test db --linked` from a clean checkout of `main` (the human said they'd run them; the session's auto mode refuses the command). On 2026-10-28 (UTC), from `C:/Users/jason/RIFF` with `supabase/` identical to `origin/main` after PR #116 (`c29e5c0`), the dry run listed only `20261028060000_load_gaps.sql` and `20261028080000_tool_failures.sql`, `db push --linked` applied both, and `migration list --linked` matches on all 46: plor.app is even with `main`.
 - **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`): 81 findings, none approved as tickets.
 
 ## Next step
-1. **13f-3, import and draft tools, is done**: 13f-3b-1 (PR #115, `dae910c`) and 13f-3b-2 (PR #116, `c29e5c0`), both merged on green CI, both migrations on plor.app. `load all` runs on one connection and holds a load lock; the db suite takes the fixture base out when it's done.
+1. **13f-3, import and draft tools, is done**: 13f-3b-1 (PR #115, `dae910c`) and 13f-3b-2 (PR #116, `c29e5c0`), both merged on green CI, both migrations on plor.app. **plor.app is even with `main`** (2026-10-28 UTC): the dry run listed only `load_gaps` and `tool_failures`, the push applied both, `migration list --linked` matches on all 46, and the human's `npx supabase test db --linked` passed ("Files=30, Tests=488 … Result: PASS"). `load all` runs on one connection and holds a load lock; the db suite takes the fixture base out when it's done.
 2. **13f-4, scale** (the ticket `docs/milestones/M13-13f-the-review-backlog.md`): list its items, ask its guided questions (CLAUDE.md, "Ask before designing"), then build. Then the migration squash that closes M13 (its own guided questions).
 
 **The shared local stack (Mac):** the M14 sessions ("M14: settings sheet, friends move, themes", "Visual polish and design review") use it and port 3000 too. Message them before a `db reset`, a full suite run, a `load all` or a dev server, and again when free.
