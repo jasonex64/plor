@@ -1,6 +1,6 @@
 # M13 13f-3 — Import and draft tools
 
-**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered and the design approved (2026-10-28), in two PRs; 13f-3b-1, the load's gaps, done (PR #115, merged on green CI 2026-10-28 UTC, `dae910c`; its migration not yet on plor.app, the human: "Don't push the migration to plor.app yet"); 13f-3b-2, failures, tests, admin, cleanup, built, in review (its PR number follows).
+**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered and the design approved (2026-10-28), in two PRs; 13f-3b-1, the load's gaps, done (PR #115, merged on green CI 2026-10-28 UTC, `dae910c`; its migration not yet on plor.app, the human: "Don't push the migration to plor.app yet"); 13f-3b-2, failures, tests, admin, cleanup, built and reviewed, in review in PR #116.
 
 ## Goal
 Make the load match the files exactly, removing what they no longer give (13f-3a); and close the tool items that can fail silently or mislead, with tests for the code that runs every day, the two admin fixes, and suites that clean up after themselves (13f-3b).
