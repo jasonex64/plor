@@ -1,6 +1,6 @@
 # M13 13f — The review backlog
 
-**Status:** the four sub-tickets done (13f-1 PR #110, 13f-2 PR #112, 13f-3 PRs #114 to #116, 13f-4 PRs #117 to #119, all merged on green CI by 2026-10-28); ROADMAP's For M13 is empty. Next, the migration squash that closes M13, its own sub-ticket (approved by the human, 2026-10-27: "I approve 13f's plan as drafted. Start 13f-1, player scoring: list its items and ask its guided questions.")
+**Status:** done (2026-10-28): the four sub-tickets (13f-1 PR #110, 13f-2 PR #112, 13f-3 PRs #114 to #116, 13f-4 PRs #117 to #119, all merged on green CI by 2026-10-28); ROADMAP's For M13 is empty; every criterion has evidence. The migration squash that followed is 13g (approved by the human, 2026-10-27: "I approve 13f's plan as drafted. Start 13f-1, player scoring: list its items and ask its guided questions.")
 
 ## Goal
 Clear ROADMAP's 40 open "For M13" items before M13 closes, in four sub-tickets by what they touch, each with its own guided questions before code; then close M13 with the migration squash decided for its end.
@@ -37,7 +37,7 @@ Four sub-tickets, each its own PR on this branch, in this order. Each starts by 
 ## Acceptance criteria
 - [x] Each sub-ticket lists its items, asks its questions, and closes or moves every item it lists, with evidence per item. *(each sub-ticket's Evidence)*
 - [x] ROADMAP's For M13 has no open item when 13f-4 merges; any item set aside is under Later or For M15 with the reason. *(13f-4c)*
-- [ ] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit. *(2026-10-28, the Windows base after `load all` (reloads equal a fresh load since 13f-3a): 0 countries answer to a two-letter code beyond us and uk; "ununnilium" names darmstadtium alone; the PGI fruit not yet checked, so open)*
+- [x] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit. *(2026-10-28, the Windows base after `load all` (reloads equal a fresh load since 13f-3a): 0 countries answer to a two-letter code beyond us and uk; "ununnilium" names darmstadtium alone; the PGI fruit checked on the Mac, 2026-10-28, on a base freshly loaded onto the baseline: `npx supabase db query --local` over `private.category_members('fruit')` joined to its names gives `"fruit": 3014, "pgi": 41`, e.g. "arancia rossa di sicilia pgi")*
 
 ## Out of scope
 - The migration squash (its own sub-ticket after 13f).
