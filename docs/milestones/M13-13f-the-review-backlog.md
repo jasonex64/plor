@@ -37,7 +37,7 @@ Four sub-tickets, each its own PR on this branch, in this order. Each starts by 
 ## Acceptance criteria
 - [x] Each sub-ticket lists its items, asks its questions, and closes or moves every item it lists, with evidence per item. *(each sub-ticket's Evidence)*
 - [x] ROADMAP's For M13 has no open item when 13f-4 merges; any item set aside is under Later or For M15 with the reason. *(13f-4c)*
-- [ ] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit.
+- [ ] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit. *(2026-10-28, the Windows base after `load all` (reloads equal a fresh load since 13f-3a): 0 countries answer to a two-letter code beyond us and uk; "ununnilium" names darmstadtium alone; the PGI fruit not yet checked, so open)*
 
 ## Out of scope
 - The migration squash (its own sub-ticket after 13f).
