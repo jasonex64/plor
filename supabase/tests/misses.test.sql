@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(32);
+select plan(34);
 
 select private.import_source('wikidata', 'mb-test', '[
   {"id": "mb-animal", "name": "animal", "aliases": [{"alias": "mb animal", "kind": "name"}]},
@@ -49,8 +49,9 @@ select is((pg_temp.review('mb_animal', 'jackalope')).id, null, 'two players aren
 select ok(pg_temp.miss(3, '2000-01-01', 'jackalope', 'jackalope'), 'the miss is logged');
 select is((pg_temp.review('mb_animal', 'jackalope')).outcome, 'accepted', 'the third player makes it an answer');
 select ok(private.in_category_now((pg_temp.review('mb_animal', 'jackalope')).thing_id, 'mb_animal'), 'a member of the category now');
-select is((select name from private.thing where id = (pg_temp.review('mb_animal', 'jackalope')).thing_id), 'Jackalope',
-  'named the way players most often typed it');
+-- Named by its normalized text, not the way players typed it ("Jackalope"), as every name is shown (13f-4b).
+select is((select name from private.thing where id = (pg_temp.review('mb_animal', 'jackalope')).thing_id), 'jackalope',
+  'named by its normalized text');
 select is((select count(*)::int from private.base_log where action = 'miss_review' and detail ->> 'text' = 'jackalope'), 1, 'logged');
 select ok(pg_temp.miss(4, '2000-01-01', 'jackalope', 'jackalope'), 'a later miss is still logged');
 select is((select count(*)::int from private.miss_review where text = 'jackalope'), 1, 'and the text is decided once');
@@ -127,6 +128,12 @@ insert into private.puzzle (game_id, puzzle_date, content)
   values ('offbeat', '2000-01-04', pg_temp.day('2000-01-04', 'mb_animal', now()) - 'approved_at');
 select throws_ok($$select * from private.resolve_answer('offbeat', '2000-01-04', 0, array['mb bear'])$$, 'P0001', null,
   'a day with no approval time isn''t resolved');
+
+-- Every outcome is logged, not only the accepted one's (13b review; 13f-4c): one base_log row per review this file made.
+select is((select count(*)::int from private.miss_review r where r.category like 'mb\_%' and not exists (
+    select from private.base_log l where l.action = 'miss_review' and l.detail ->> 'category' = r.category and l.detail ->> 'text' = r.text
+      and l.detail ->> 'outcome' = r.outcome)), 0, 'every review''s outcome is logged');
+select ok((select count(distinct outcome) from private.miss_review where category like 'mb\_%') >= 3, 'across several outcomes');
 
 select * from finish();
 rollback;

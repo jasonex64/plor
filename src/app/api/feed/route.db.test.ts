@@ -12,7 +12,7 @@ import { type ApprovedPuzzle } from "@/content/puzzle";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, hostName, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as feedRoute } from "./route";
 
@@ -66,7 +66,7 @@ afterAll(async () => {
   // Deleting the auth users cascades to memberships, runs, comments and reactions, and the last member's going deletes
   // each group; then the fixture puzzle goes.
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await getPool().end();
 });
 

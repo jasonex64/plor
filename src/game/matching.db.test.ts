@@ -6,7 +6,7 @@ import type { ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { fixtureId } from "@/test/answer-fixture";
 import { useLocalStack } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { resolveTyped } from "./matching";
 
 let puzzle: ApprovedPuzzle;
@@ -20,7 +20,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await getPool().end();
 });
 

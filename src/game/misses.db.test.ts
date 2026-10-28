@@ -9,7 +9,7 @@ import { POST as startRoute } from "@/app/api/run/start/route";
 import type { ApprovedPuzzle } from "@/content/puzzle";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { resolveTyped } from "./matching";
 
@@ -60,7 +60,7 @@ afterAll(async () => {
   const db = getPool();
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await clearReviews();
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await db.end();
 });
 

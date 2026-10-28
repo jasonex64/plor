@@ -8,7 +8,7 @@ import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { dayInsights } from "@/insights/queries";
-import { ensureFixtureBase, fixture, safeEntries } from "@/test/puzzles";
+import { ensureFixtureBase, fixture, removeFixtures, safeEntries } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET } from "./route";
 
@@ -71,6 +71,7 @@ afterAll(async () => {
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   if (createdPuzzle) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, today]);
   if (createdTomorrow) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, tomorrow]);
+  await removeFixtures();
   await db.end();
 });
 

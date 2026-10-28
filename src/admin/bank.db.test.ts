@@ -1,13 +1,13 @@
 // The question bank page's uses and catch rates against the local stack (run with `npm run test:db`;
 // docs/milestones/M13-13d-the-question-bank.md): a played day shows the share of answers the host caught, as the
 // insights report counts it, matched to the bank question by its prompt and category; a drafted day not yet played
-// shows none. Built in a transaction that is rolled back, with the answer triggers off while past answers go in, as in
-// src/game/ledger.db.test.ts.
+// shows none. Built in a transaction that is rolled back, the fixture base loaded inside it (the suites leave none
+// behind, 13f-3b-2), with the answer triggers off while past answers go in, as in src/game/ledger.db.test.ts.
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import type { Bank } from "@/content/bank";
 import { GAME_ID } from "@/platform/game";
-import { fixtureDay, fixtureDraft, fixtureId } from "@/test/answer-fixture";
+import { fixtureDay, fixtureDraft, fixtureId, loadFixtureBase } from "@/test/answer-fixture";
 import { bankView } from "./bank";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -29,6 +29,7 @@ describe("bankView", () => {
     const client: PoolClient = await admin.connect();
     try {
       await client.query("begin");
+      await loadFixtureBase(client);
       await client.query("set local session_replication_role = replica");
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, PLAYED, fixtureDay(PLAYED, `${PLAYED}T00:00:00Z`)]);
       // Four players answer question 2 (index 1): one says apple, the host's answer, and is caught.

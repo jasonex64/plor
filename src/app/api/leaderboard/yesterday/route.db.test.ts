@@ -8,7 +8,7 @@ import { GAME_ID } from "@/platform/game";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeCreatedPuzzles } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as yesterdayRoute } from "./route";
 
@@ -52,7 +52,7 @@ afterAll(async () => {
   // Deleting the auth users cascades to runs, ledger rows, friendships and memberships, and the last member's going
   // deletes the group; then the fixture puzzles go.
   await getPool().query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
-  await removeCreatedPuzzles();
+  await removeFixtures();
   await getPool().end();
 });
 

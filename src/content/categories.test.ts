@@ -21,13 +21,15 @@ describe("parseCategories", () => {
 
 describe("within", () => {
   it("puts a category inside another, and its subsets, in the other's family, and refuses an unknown or later base", () => {
-    const fruit = { key: "fruit", name: "fruit", source: "wikidata", root: "Q1364" };
-    const berry = { key: "berry", name: "berry", source: "oewn", root: "07758680-n", within: "fruit" };
-    const berryB = { key: "berry_b", name: "berry starting with B", of: "berry", starts_with: "b" };
-    const { categories, errors } = parseCategories("c.json", JSON.stringify([fruit, berry, berryB]));
+    // As data/categories.json has them: both WordNet's, as `load all` refuses a root outside the other's tree, and a
+    // tree of one source never holds the other's (13e-7 review; 13f-3b-2).
+    const vehicle = { key: "vehicle", name: "vehicle", source: "oewn", root: "04531608-n" };
+    const car = { key: "car", name: "kind of car", source: "oewn", root: "02961779-n", within: "vehicle" };
+    const carB = { key: "car_b", name: "kind of car starting with B", of: "car", starts_with: "b" };
+    const { categories, errors } = parseCategories("c.json", JSON.stringify([vehicle, car, carB]));
     expect(errors).toEqual([]);
-    expect(["fruit", "berry", "berry_b"].map(familyOf(categories!))).toEqual(["fruit", "fruit", "fruit"]);
-    expect(parseCategories("c.json", JSON.stringify([berry, fruit])).errors).toEqual(['c.json category 1: "within" must be a base category listed before it']);
+    expect(["vehicle", "car", "car_b"].map(familyOf(categories!))).toEqual(["vehicle", "vehicle", "vehicle"]);
+    expect(parseCategories("c.json", JSON.stringify([car, vehicle])).errors).toEqual(['c.json category 1: "within" must be a base category listed before it']);
   });
 });
 

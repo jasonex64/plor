@@ -71,7 +71,7 @@ The human's question (2026-10-22): each game scores in its own way, so how can a
 ## The platform/game boundary today
 What a split would touch, read from the code on 2026-10-22 (`main` at `fd134f7`, plus M08 on its branch). Line counts and file lists are from `grep`. Whether each piece needs to change is a design question for the split's sub-ticket (S13), *unverified* until then.
 
-**Already per game (the schema was designed for it):** every game table is keyed by `game_id`: `private.puzzle`, `run`, `run_event`, `puzzle_questions`, `comment` and `reaction`, and the live-board broadcast carries `gameId`. The points ledger is designed as unique per (user, `game_id`, date) (DECISIONS.md, Points ledger).
+**Already per game (the schema was designed for it):** every game table is keyed by `game_id`: `private.puzzle`, `run`, `run_event` (`puzzle_questions` went in M13 13d), `comment` and `reaction`, and the live-board broadcast carries `gameId`. The points ledger is designed as unique per (user, `game_id`, date) (DECISIONS.md, Points ledger).
 
 **Offbeat-only today:**
 - `run_event` holds Offbeat's answer: `question_idx`, `entry_id`, `matched` (DECISIONS.md, Run events). A game-2 answer is a typed word for every round, or a miss (S7), so it needs its own event shape or table. Run events are "Hard to reverse", so that design is decided and reviewed before its first code.

@@ -42,7 +42,10 @@ function checkBankQuestion(errors: string[], where: string, v: unknown) {
   if ("added_by" in v && v.added_by !== "human" && v.added_by !== "claude") errors.push(`${where}: "added_by" must be "human" or "claude"`);
 }
 
-// The bank's shape, every error naming where. IDs are unique; a theme set for a date is a slug.
+// The bank's shape, every error naming where: a question by its ID, or by its place when the ID itself is wrong (13e-1
+// review; 13f-4c). IDs are unique; no two questions ask one prompt for one category, as uses are matched by the two
+// (usesOf); a theme set for a date is a slug, and some question is tagged with it, so a mistyped theme can't draft an
+// unthemed day without a word (13d review; the human, 2026-10-28: "Refuse both in validation (Recommended)").
 export function parseBank(file: string, text: string): { bank: Bank | null; errors: string[] } {
   let data: unknown;
   try {
@@ -57,9 +60,17 @@ export function parseBank(file: string, text: string): { bank: Bank | null; erro
   if ("questions" in data) {
     if (!Array.isArray(data.questions)) errors.push(`${file}: "questions" must be a list`);
     else {
-      data.questions.forEach((q, i) => checkBankQuestion(errors, `${file} question ${i + 1}`, q));
+      data.questions.forEach((q, i) => checkBankQuestion(errors, `${file} question ${isObject(q) && typeof q.id === "string" && SLUG.test(q.id) ? `"${q.id}"` : i + 1}`, q));
       const ids = data.questions.map((q) => (isObject(q) ? q.id : undefined));
       for (const id of new Set(ids.filter((id, i) => id !== undefined && ids.indexOf(id) !== i))) errors.push(`${file}: question id "${id}" is listed twice`);
+      const asked = new Map<string, unknown>();
+      for (const q of data.questions) {
+        if (!isObject(q)) continue;
+        const key = JSON.stringify([q.prompt, q.category]);
+        const other = asked.get(key);
+        if (other !== undefined && other !== q.id) errors.push(`${file}: questions "${String(other)}" and "${String(q.id)}" ask "${String(q.prompt)}" for ${String(q.category)}`);
+        else asked.set(key, q.id);
+      }
     }
   }
   if ("themes" in data) {
@@ -67,6 +78,9 @@ export function parseBank(file: string, text: string): { bank: Bank | null; erro
     else {
       for (const [date, theme] of Object.entries(data.themes)) {
         if (!isCalendarDate(date) || !(typeof theme === "string" && SLUG.test(theme))) errors.push(`${file}: theme "${date}": "${String(theme)}" must map a date to a slug`);
+        else if (Array.isArray(data.questions) && !data.questions.some((q) => isObject(q) && Array.isArray(q.themes) && q.themes.includes(theme))) {
+          errors.push(`${file}: theme "${date}": no question is tagged "${theme}"`);
+        }
       }
     }
   }
@@ -96,7 +110,8 @@ export function gapProblems(days: Puzzle[], family: (key: string) => string): st
   return out;
 }
 
-// The dates a bank question ran: drafted days holding a question with its prompt and category.
+// The dates a bank question ran: drafted days holding a question with its prompt and category. A known limit: fixing a
+// typo in a prompt makes the days it ran look unused (13d review; the human kept it, 2026-10-28, round 2).
 export function usesOf(q: BankQuestion, days: Puzzle[]): string[] {
   return days.filter((d) => d.questions.some((x) => x.prompt === q.prompt && x.category === q.category)).map((d) => d.date).sort();
 }

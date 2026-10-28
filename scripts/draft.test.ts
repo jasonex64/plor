@@ -3,7 +3,7 @@
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, fitOrder, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
+import { blockRange, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -141,6 +141,16 @@ describe("swapping out a question the letters block", () => {
     const none = () => { throw new Error("only 5 bank questions eligible"); };
     await expect(withSwaps(none, async () => ({ built: 0 }))).rejects.toThrow(/^only 5 bank questions eligible$/);
   });
+
+  it("fails as building a swapped-in day does, naming the questions swapped out before it (13f-3b-2)", async () => {
+    // g blocks; the day without it holds h, whose name doesn't resolve.
+    const build = async (chosen: { id: string; prompt: string }[]) => {
+      if (chosen.some((x) => x.id === "h")) throw new Error("h: no thing named that");
+      return chosen.some((x) => x.id === "g") ? { blockers: [q("g")] } : { built: 0 };
+    };
+    await expect(withSwaps(pick, build)).rejects.toThrow('h: no thing named that, after swapping out "Name g", as no letters fit with them');
+    await expect(withSwaps(() => bank.slice(1, 8), build)).rejects.toThrow(/^h: no thing named that$/);
+  });
 });
 
 describe("the soft guide", () => {
@@ -157,5 +167,13 @@ describe("the soft guide", () => {
       "  q7: expected catch 10% (target 20%)",
       "  expected finish 48% (the targets': 45%)",
     ]);
+  });
+});
+
+describe("isDayFailure", () => {
+  it("counts the draft's own refusals as failed days, and stops on the database's errors or a lost connection (13f-4c)", () => {
+    expect(isDayFailure(new Error("no letters fit schedule A for 2027-01-03"))).toBe(true);
+    expect(isDayFailure(Object.assign(new Error("read ECONNRESET"), { code: "ECONNRESET" }))).toBe(false);
+    expect(isDayFailure(new Error("Connection terminated unexpectedly"))).toBe(false);
   });
 });
