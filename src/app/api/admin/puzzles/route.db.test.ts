@@ -1,14 +1,14 @@
 // The admin puzzle routes against the local stack (`npm run test:db`; docs/milestones/M06-puzzle-entry.md): who may use
 // them, and approving a drafted day with the host answers an admin chose. The drafted day is
 // the fixture day (src/test/answer-fixture.ts), written to content/offbeat for this file and removed afterwards, with
-// the day it approves.
+// the day it approves; a second drafted day names a thing the base doesn't have, which the listing marks.
 import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { fixtureDraft, fixtureId } from "@/test/answer-fixture";
-import { ensureFixtureBase, fixture } from "@/test/puzzles";
+import { ensureFixtureBase, fixture, removeFixtures } from "@/test/puzzles";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
@@ -25,6 +25,9 @@ let draft: Puzzle;
 let approvedHere = false;
 const DRAFTS = join(process.cwd(), "content", "offbeat");
 let draftFile = "";
+let missingFile = "";
+let missingDate = "";
+const NOT_LOADED = fixtureId(0, "not-loaded");
 let createdDraftsFolder = false;
 const sessions = new Map<string, Map<string, string>>();
 
@@ -61,10 +64,20 @@ beforeAll(async () => {
   draftFile = join(DRAFTS, `${draftDate}.json`);
   if (existsSync(draftFile)) throw new Error(`${draftFile} exists; this test writes its own draft there`);
   writeFileSync(draftFile, JSON.stringify(draft));
+  // A drafted day whose first question's host answer isn't in this database (plor.app's answer database is empty by
+  // choice; 13f-3b-2).
+  missingDate = (await db.query<{ d: string }>("select (private.today() + 401)::text as d")).rows[0].d;
+  const missing = fixtureDraft(missingDate);
+  missing.questions[0].host_bank.push(NOT_LOADED);
+  missing.questions[0].host_answers = [NOT_LOADED];
+  missingFile = join(DRAFTS, `${missingDate}.json`);
+  if (existsSync(missingFile)) throw new Error(`${missingFile} exists; this test writes its own draft there`);
+  writeFileSync(missingFile, JSON.stringify(missing));
 });
 
 afterAll(async () => {
   if (draftFile) rmSync(draftFile);
+  if (missingFile) rmSync(missingFile);
   if (createdDraftsFolder && readdirSync(DRAFTS).length === 0) {
     rmdirSync(DRAFTS);
     rmdirSync(join(process.cwd(), "content"));
@@ -72,6 +85,7 @@ afterAll(async () => {
   const db = getPool();
   if (approvedHere) await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, draftDate]);
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
+  await removeFixtures();
   await db.end();
 });
 
@@ -105,6 +119,12 @@ describe("approving a drafted day", () => {
     expect(day.draft[1].hostBank.find((a: Choice) => a.id === fixtureId(1, "cherry")).stolen).toBe("c");
     const suggested = day.draft.flatMap((q: { hostAnswers: string[]; hostBank: Choice[] }) => q.hostBank.filter((a) => q.hostAnswers.includes(a.id)));
     expect(suggested.map((a: Choice) => a.stolen)).toEqual(suggested.map(() => null));
+  });
+
+  it("lists a host answer the base doesn't have with no name, never its ID as one", async () => {
+    const day = (await (await list()).json()).days.find((d: { date: string }) => d.date === missingDate);
+    expect(day.draft[0].hostAnswers).toEqual([NOT_LOADED]);
+    expect(day.draft[0].hostBank.find((a: { id: string }) => a.id === NOT_LOADED)).toEqual({ id: NOT_LOADED, name: null, stolen: null });
   });
 
   const refused = async (hostAnswers: string[][]) => {

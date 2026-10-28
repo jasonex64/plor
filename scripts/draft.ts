@@ -165,7 +165,7 @@ async function nameCandidates(db: pg.Client, category: string, names: string[]):
 }
 
 // Each name's thing among the category's members. Throws, listing the candidates, for a name with none or several.
-async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
+export async function resolveNames(db: pg.Client, category: string, names: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   for (const [name, found] of await nameCandidates(db, category, names)) {
     if (found.length !== 1) throw new Error(`${category}: ${nameProblem(name, found)}`);
@@ -261,7 +261,7 @@ async function catchRate(db: pg.Client, date: string, q: Question, hosts: string
 }
 
 // Each question's expected catch rate with its host answers, for the soft guide.
-async function expectedCatches(db: pg.Client, day: Puzzle): Promise<number[]> {
+export async function expectedCatches(db: pg.Client, day: Puzzle): Promise<number[]> {
   const catches = [];
   for (const q of day.questions) catches.push(await catchRate(db, day.date, q, q.host_answers));
   return catches;
@@ -295,15 +295,24 @@ export async function withSwaps<Q extends { id: string; prompt: string }, R>(
   pick: (leftOut: ReadonlySet<string>) => Q[],
   attempt: (chosen: Q[]) => Promise<{ built: R } | { blockers: Q[] }>,
 ): Promise<{ built: R; swapped: Q[] }> {
+  // A failure, in the pick or in building the day it picked (a host name off its letter, a name that doesn't resolve),
+  // names the questions swapped out before it, so the day that failed can be found (13e-10b review; 13f-3b-2).
+  const afterSwaps = (err: unknown, out: Q[]) => {
+    if (!out.length) return err;
+    return new Error(`${(err as Error).message}, after swapping out ${out.map((q) => `"${q.prompt}"`).join(", ")}, as no letters fit with them`, { cause: err });
+  };
   const tryWithout = async (out: Q[]) => {
     let chosen: Q[];
     try {
       chosen = pick(new Set(out.map((q) => q.id)));
     } catch (err) {
-      if (!out.length) throw err;
-      throw new Error(`${(err as Error).message}, after swapping out ${out.map((q) => `"${q.prompt}"`).join(", ")}, as no letters fit with them`, { cause: err });
+      throw afterSwaps(err, out);
     }
-    return attempt(chosen);
+    try {
+      return await attempt(chosen);
+    } catch (err) {
+      throw afterSwaps(err, out);
+    }
   };
   const swapped: Q[] = [];
   let result = await tryWithout(swapped);

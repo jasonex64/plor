@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, handNamesOnlyIn, parentless, sparql, taxonName, valueItems, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -127,6 +127,13 @@ describe("linkToWikidata", () => {
       { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
       { id: "bear", name: "bear", aliases: [], kind_of: ["root"], same_as: "wikidata:Q1" },
       { id: "yeti", name: "yeti", aliases: [], kind_of: ["root"] },
+    ]);
+  });
+
+  it("links the root to the category's root even when that isn't loaded, so the import refuses it (same_as refs unknown) rather than loading a lone tree (13f-3b-2)", () => {
+    const items = [{ id: "root", name: "animal", aliases: [], kind_of: [] }];
+    expect(linkToWikidata(items, { root: { members: ["animal"] } }, new Set(), "root", "Q729", new Map(), none)).toEqual([
+      { id: "root", name: "animal", aliases: [], kind_of: [], same_as: "wikidata:Q729" },
     ]);
   });
 
@@ -265,6 +272,8 @@ describe("facts for subsets", () => {
     expect(latestNumber([{ value: "7" }])).toEqual({ value: 7, as_of: null });
     expect(latestNumber([{ value: "7" }, { value: "8" }])).toBeNull();
     expect(latestNumber([{ value: "7", time: "2020-01-01T00:00:00Z" }, { value: "7", time: "2020-01-01T00:00:00Z" }])).toEqual({ value: 7, as_of: "2020-01-01" });
+    // Three tied for latest, the third differing: not only the top two are compared (13f-3b-2).
+    expect(latestNumber([{ value: "7" }, { value: "7" }, { value: "8" }])).toBeNull();
     expect(() => latestNumber([{ value: "1.5" }])).toThrow("not a whole number of people");
     const { items: out, ambiguous } = withPopulation(items, new Map([["Q1", [{ value: "5" }]], ["Q2", [{ value: "1" }, { value: "2" }]]]));
     expect(out.map((i) => i.population?.value)).toEqual([5, undefined, undefined]);
@@ -290,6 +299,10 @@ describe("localClient", () => {
 
 describe("parseSameness", () => {
   const empty = { merge: [], apart: [], reviewed: [], wordnet_split: [], wordnet_pick: [], wordnet_join: [] };
+  it("refuses a synset decided in two of the split, pick and join lists (13f-3b-2)", () => {
+    const file = { ...empty, wordnet_split: [{ synset: "02084071-n", from: "Q144", why: "x" }], wordnet_pick: [{ synset: "02084071-n", taxon: "Q26972265", why: "y" }] };
+    expect(() => parseSameness(JSON.stringify(file))).toThrow("02084071-n decided in more than one of wordnet_split, wordnet_pick and wordnet_join");
+  });
   it("takes the four lists, each row exactly its fields as text", () => {
     const file = { ...empty, merge: [{ old: "Q1", kept: "Q2", why: "one species" }] };
     expect(parseSameness(JSON.stringify(file))).toEqual(file);
@@ -493,6 +506,22 @@ describe("parseListed", () => {
     expect(() => parseListed(JSON.stringify({ ...file, drop: [{ ref: "wikidata:Q2", why: "x" }] }))).toThrow("wikidata:Q2 both dropped and kept");
     expect(() => parseListed(JSON.stringify({ drop: [] }))).toThrow("must hold exactly drop, drop_from_set, drop_listed_names");
   });
+  it("refuses a drop_from_set naming no set, and a ref both in drop and in drop_from_set (13f-3b-2)", () => {
+    const fromSet = { ref: "wikidata:Q60", set: "wikidata-us-cities", why: "x" };
+    expect(parseListed(JSON.stringify({ ...empty, drop_from_set: [fromSet] })).drop_from_set).toEqual([fromSet]);
+    expect(() => parseListed(JSON.stringify({ ...empty, drop_from_set: [{ ...fromSet, set: "wikidata-us-citys" }] }))).toThrow(
+      "drop_from_set names no set: wikidata:Q60 (wikidata-us-citys)");
+    expect(() => parseListed(JSON.stringify({ ...empty, drop: [{ ref: "wikidata:Q60", why: "x" }], drop_from_set: [fromSet] }))).toThrow(
+      "wikidata:Q60 both in drop and in drop_from_set");
+  });
+});
+
+describe("handNamesOnlyIn", () => {
+  it("keeps the add and remove rows whose item only this set holds, for a single load to judge (13f-3b-2)", () => {
+    const row = (ref: string) => ({ ref, name: "x", why: "y" });
+    const names = { add: [row("wikidata:Q1"), row("wikidata:Q2"), row("oewn:3")], remove: [row("wikidata:Q1")] };
+    expect(handNamesOnlyIn(names, new Set(["wikidata:Q1", "wikidata:Q2"]), new Set(["wikidata:Q2"]))).toEqual({ add: [row("wikidata:Q1")], remove: [row("wikidata:Q1")] });
+  });
 });
 
 // 13f-1: snapshots' names normalized again at load, as normalize changed after they were fetched.
@@ -587,5 +616,43 @@ describe("distinctSeries", () => {
     const series = new Map([["S1", { label: "Mario Kart", alts: [] }], ["S2", { label: "Minecraft", alts: [] }], ["S3", { label: "Zelda", alts: ["Wii Sports"] }]]);
     const members = new Map([["G1", { label: "Mario Kart 8", alts: [] }], ["G2", { label: "Minecraft", alts: [] }], ["G3", { label: "Wii Sports", alts: [] }]]);
     expect([...distinctSeries(series, members).keys()]).toEqual(["S1"]);
+  });
+});
+
+// A reply the query service cut off and ended with its timeout error, with a 200 (13e-4a review; 13f-3b-2).
+describe("sparql", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const reply = (body: string) => vi.stubGlobal("fetch", vi.fn(async () => new Response(body, { status: 200 })));
+  it("reads a whole reply, takes a cut-off one ending in the timeout error as a timeout, and names any other broken one", async () => {
+    reply('{"results": {"bindings": [{"x": {"type": "uri", "value": "Q1"}}]}}');
+    expect(await sparql("SELECT")).toEqual([{ x: { type: "uri", value: "Q1" } }]);
+    reply('{"results": {"bindings": [{"x": {"type": "uri", "val java.util.concurrent.TimeoutException');
+    expect(await sparql("SELECT")).toBe("timeout");
+    reply('{"results": {"bindings": [{"x": ');
+    await expect(sparql("SELECT")).rejects.toThrow("SPARQL 200: the reply isn't JSON");
+  });
+});
+
+describe("valueItems", () => {
+  it("names a fact's value by its label alone, leaving out its codes and plurals (13e-4b design 4)", () => {
+    expect(valueItems(new Map([["Q15", { label: "Africa", alts: ["af", "africas"], parents: new Set<string>() }]]))).toEqual([
+      { id: "Q15", name: "Africa", aliases: [{ alias: "africa", kind: "name" }] },
+    ]);
+  });
+});
+
+describe("parentless", () => {
+  it("finds an item under nothing that is no fact's value and joins nothing, leaving out the root (13f-3b-2)", () => {
+    const item = (id: string, more: Partial<Item> = {}): Item => ({ id, name: id, aliases: [], ...more });
+    const items = [item("fruit"), item("apple", { kind_of: ["fruit"], continent: ["asia"] }), item("asia"), item("grits"), item("pear-2", { merged_into: "wikidata:pear" }), item("quince", { same_as: "oewn:1" })];
+    expect(parentless(items, "fruit").map((i) => i.id)).toEqual(["grits"]);
+  });
+});
+
+describe("taxonName", () => {
+  it("names an unjoined word's taxon, and stops by name on one no loaded animal snapshot holds (13f-3b-2)", () => {
+    const joins = { wordnet: new Map<string, Item>(), wikidata: new Map([["Q1", { id: "Q1", name: "Felis catus", aliases: [] }]]), odd: new Map<string, string>() };
+    expect(taxonName(joins, "Q1")).toBe("Felis catus");
+    expect(() => taxonName(joins, "Q2")).toThrow("review: the WordNet snapshot leaves a word unjoined to Q2, which no loaded animal snapshot holds");
   });
 });

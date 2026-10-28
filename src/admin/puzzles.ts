@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { DatabaseError } from "pg";
 import { avoids, checkPuzzleFile, parsePuzzle, stolenLetters, type Puzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
-import { thingNames, type Named, type Names } from "@/game/payload";
+import { thingNames, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 
@@ -30,8 +30,11 @@ export function readDrafts(): Map<string, Puzzle> {
 // What the page shows of a puzzle: each question's prompt, category, stolen letter, host answers and host bank by name.
 // The category's members aren't listed: there can be tens of thousands (docs/milestones/M13-13a-the-base.md).
 // A bank answer's stolen is a letter stolen at or before its question that its name has, so players can't type it
-// and it can't be a host answer (checkHostNames, the approve route's rule); null when it can.
-export type HostChoice = Named & { stolen: string | null };
+// and it can't be a host answer (checkHostNames, the approve route's rule); null when it can. Its name is null when
+// this database doesn't have the thing (a draft built against another one, or plor.app's answer database, empty by
+// choice): the page says so instead of showing the ID as a name (CLAUDE.md, Fail loudly; human, 2026-10-28: "Mark each
+// one (Recommended)").
+export type HostChoice = { id: string; name: string | null; stolen: string | null };
 export type QuestionView = { prompt: string; category: string; steals: string | null; hostAnswers: string[]; hostBank: HostChoice[] };
 export type DayView = {
   date: string;
@@ -42,8 +45,7 @@ export type DayView = {
   started: boolean;
 };
 
-// A host bank entry missing from this database (a draft built against another one) shows its ID, and approving it is
-// refused for that (checkHostNames).
+// Approving a host answer missing from this database is refused (checkHostNames).
 function view(puzzle: Puzzle, names: Names): QuestionView[] {
   return puzzle.questions.map((q, i) => {
     const stolen = stolenLetters(puzzle, i);
@@ -54,7 +56,7 @@ function view(puzzle: Puzzle, names: Names): QuestionView[] {
       hostAnswers: q.host_answers,
       hostBank: q.host_bank.map((id) => {
         const name = names.get(id);
-        return { id, name: name ?? id, stolen: name === undefined ? null : (stolen.find((letter) => !avoids(name, [letter])) ?? null) };
+        return { id, name: name ?? null, stolen: name === undefined ? null : (stolen.find((letter) => !avoids(name, [letter])) ?? null) };
       }),
     };
   });
@@ -94,14 +96,15 @@ function guarded(err: unknown): never {
 }
 
 // Approves a day, or returns the problems private.approve_puzzle found against the base (OB009), one per question as it
-// names them ("question 3: ..."), reworded to the "q3" the page files them under.
+// names them ("question 3: ..."), reworded to the "q3" the page files them under. They come as a JSON list in the
+// error's detail, so a problem whose category name holds "; " stays one (13f-3b-2).
 export async function approvePuzzle(db: Db, userId: string, puzzle: Puzzle): Promise<string[]> {
   try {
     await db.query("select private.approve_puzzle($1, $2)", [userId, puzzle]);
     return [];
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "OB009") {
-      return err.message.replace(/^puzzle_invalid: /, "").split("; ").map((p) => p.replace(/^question (\d+):/, `${puzzle.date} q$1:`));
+      return (JSON.parse(err.detail!) as string[]).map((p) => p.replace(/^question (\d+):/, `${puzzle.date} q$1:`));
     }
     return guarded(err);
   }

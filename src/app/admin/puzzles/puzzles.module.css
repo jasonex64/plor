@@ -104,6 +104,10 @@
   color: var(--danger);
 }
 
+.missing {
+  color: var(--danger);
+}
+
 .chip s {
   text-decoration-thickness: 2px;
 }
