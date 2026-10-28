@@ -1,6 +1,6 @@
 # M13 13g — The migration squash
 
-**Status:** built, proven locally and reviewed twice (both reviews' blocking findings fixed), in review as a PR (its number follows); plor.app's rebuild follows the merge. Approved and in progress (the human, 2026-10-28: "ask all questions needed to do this right now, and then execute right away. u have permission to do everything").
+**Status:** built, proven locally and reviewed twice (both reviews' blocking findings fixed), in review in PR #120; plor.app's rebuild follows the merge. Approved and in progress (the human, 2026-10-28: "ask all questions needed to do this right now, and then execute right away. u have permission to do everything").
 
 ## Goal
 Fold `supabase/migrations`' 48 files into one baseline that builds exactly today's schema, then rebuild plor.app from it, closing M13.
