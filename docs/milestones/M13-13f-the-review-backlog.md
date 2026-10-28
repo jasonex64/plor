@@ -1,6 +1,6 @@
 # M13 13f — The review backlog
 
-**Status:** in progress (approved by the human, 2026-10-27: "I approve 13f's plan as drafted. Start 13f-1, player scoring: list its items and ask its guided questions.")
+**Status:** the four sub-tickets done (13f-1 PR #110, 13f-2 PR #112, 13f-3 PRs #114 to #116, 13f-4 PRs #117 to #119, all merged on green CI by 2026-10-28); ROADMAP's For M13 is empty. Next, the migration squash that closes M13, its own sub-ticket (approved by the human, 2026-10-27: "I approve 13f's plan as drafted. Start 13f-1, player scoring: list its items and ask its guided questions.")
 
 ## Goal
 Clear ROADMAP's 40 open "For M13" items before M13 closes, in four sub-tickets by what they touch, each with its own guided questions before code; then close M13 with the migration squash decided for its end.
@@ -35,9 +35,9 @@ Four sub-tickets, each its own PR on this branch, in this order. Each starts by 
 5. **Then M13 closes:** the migrations squashed into one baseline (human, 2026-10-26: "When M13 ends"), as its own sub-ticket with its own questions.
 
 ## Acceptance criteria
-- [ ] Each sub-ticket lists its items, asks its questions, and closes or moves every item it lists, with evidence per item.
-- [ ] ROADMAP's For M13 has no open item when 13f-4 merges; any item set aside is under Later or For M15 with the reason.
-- [ ] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit.
+- [x] Each sub-ticket lists its items, asks its questions, and closes or moves every item it lists, with evidence per item. *(each sub-ticket's Evidence)*
+- [x] ROADMAP's For M13 has no open item when 13f-4 merges; any item set aside is under Later or For M15 with the reason. *(13f-4c)*
+- [ ] The decided data fixes hold after a fresh `load all`: no country holds a two-letter code as a name; "ununnilium" names element 110 only; PGI fruit still in fruit. *(2026-10-28, the Windows base after `load all` (reloads equal a fresh load since 13f-3a): 0 countries answer to a two-letter code beyond us and uk; "ununnilium" names darmstadtium alone; the PGI fruit not yet checked, so open)*
 
 ## Out of scope
 - The migration squash (its own sub-ticket after 13f).

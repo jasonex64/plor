@@ -23,7 +23,7 @@ export const REPEAT_GAP_DAYS = 30;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 // A username changes at most once every this many days, the first change at once (human, 2026-10-23,
-// docs/milestones/M12-account.md, A2). The trigger in supabase/migrations/20261023083041_username_change.sql enforces
+// docs/milestones/M12-account.md, A2). The trigger in supabase/migrations/20261028140000_baseline.sql enforces
 // the same 30: supabase/tests/profile.test.sql checks it on both sides, and src/lib/profile.db.test.ts that the two agree.
 export const USERNAME_CHANGE_DAYS = 30;
 

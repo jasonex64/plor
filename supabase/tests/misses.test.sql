@@ -1,4 +1,4 @@
--- Learning from misses (docs/milestones/M13-13b-learning-from-misses.md; migration 20261025002908_learning_from_misses.sql):
+-- Learning from misses (docs/milestones/M13-13b-learning-from-misses.md; the baseline migration):
 -- the threshold, what a text becomes, from which day it counts, and the audit. Run with `npm run test:sql`.
 -- now() is fixed inside this transaction, so "earlier" moments are made by moving timestamps back.
 begin;

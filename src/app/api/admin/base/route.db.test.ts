@@ -15,7 +15,7 @@ const RUN = Date.now().toString(36);
 const admin = { username: `ba${RUN}`, userId: "", session: new Map<string, string>() };
 const player = { username: `bp${RUN}`, userId: "", session: new Map<string, string>() };
 const id = (n: string) => `test-${RUN}-${n}`;
-// A category key is letters and underscores (migration 20261024095732_answer_base.sql), so the run's digits become letters.
+// A category key is letters and underscores (supabase/migrations/20261028140000_baseline.sql), so the run's digits become letters.
 const KEY = `test_${RUN.replace(/[0-9]/g, (d) => "abcdefghij"[Number(d)])}`;
 
 async function lookup(q: string | null) {

@@ -54,8 +54,8 @@ export type RunState = {
 // in_day: given before the run's day ended at midnight (M09 D8).
 type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
-// The SQLSTATEs raised by the answer and Next triggers (supabase/migrations/20261019074108_create_game_tables.sql, as
-// changed by 20261021081057_question_timer.sql and 20261021084917_reveal_next_and_reset.sql).
+// The SQLSTATEs raised by the answer and Next triggers
+// (supabase/migrations/20261028140000_baseline.sql).
 const OUT_OF_ORDER = "OB002";
 const RUN_OVER = "OB003";
 const TIME_UP = "OB005";

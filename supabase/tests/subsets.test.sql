@@ -1,4 +1,4 @@
--- Subsets of any category (docs/milestones/M13-13e-4-subsets.md, 13e-4a; migration 20261026050238_subsets.sql): facts
+-- Subsets of any category (docs/milestones/M13-13e-4-subsets.md, 13e-4a; the baseline migration): facts
 -- and numbers on import, each filter, the frozen `where`, answers as of a day, the letter rule, misses on subsets, and
 -- the new table's grants. Run with `npm run test:sql`. now() is fixed inside this transaction, so "earlier" moments
 -- are made by moving timestamps back.

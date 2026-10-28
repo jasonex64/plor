@@ -47,7 +47,7 @@ export async function listDecisions(db: Db): Promise<Decision[]> {
 }
 
 // Deletes a reported comment for everyone and for good, with its reports and reactions (D4, D5), and records which
-// admin did (12d): one guarded function does both (supabase/migrations/20261024031547_comment_deletion_record.sql).
+// admin did (12d): one guarded function does both (supabase/migrations/20261028140000_baseline.sql).
 // Only a reported comment: anything else is the same 404 as a missing one.
 export async function deleteReportedComment(db: Db, adminId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ deleted: boolean }>("select private.delete_reported_comment($1, $2) as deleted", [adminId, id]);
@@ -56,7 +56,7 @@ export async function deleteReportedComment(db: Db, adminId: string, id: string)
 
 // Keeps a reported comment for everyone but the players who reported it: its open reports are handled and it leaves
 // this list, while it stays hidden for the players who reported it (D5), and the keep is recorded: one guarded function
-// (supabase/migrations/20261026094023_keep_comment.sql). A comment with no open report is the same 404 as a missing
+// (supabase/migrations/20261028140000_baseline.sql). A comment with no open report is the same 404 as a missing
 // one.
 export async function keepReportedComment(db: Db, adminId: string, id: string): Promise<void> {
   const { rows } = await db.query<{ kept: boolean }>("select private.keep_reported_comment($1, $2) as kept", [adminId, id]);

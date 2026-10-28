@@ -1,5 +1,5 @@
 -- private.audit_near names what a waiting near-typo could be linked to (docs/milestones/M14-14b-2b-2-admin-build.md,
--- 14b-2b-2b; migration 20261026095252_audit_near.sql): admins only, the category's members now bearing one of the
+-- 14b-2b-2b; the baseline migration): admins only, the category's members now bearing one of the
 -- given texts, and nothing for a review that isn't a waiting near-typo. Run with `npm run test:sql`. The route, as
 -- plor_app, is src/app/api/admin/audit/route.db.test.ts.
 begin;

@@ -85,7 +85,7 @@ export async function listDays(db: Db, drafts: Map<string, Puzzle>): Promise<{ t
   return { today, days };
 }
 
-// The SQLSTATEs the two guarded functions raise (migrations 20261021232903_puzzle_entry.sql, 20261024213853_answer_engine.sql), as API errors.
+// The SQLSTATEs the two guarded functions raise (supabase/migrations/20261028140000_baseline.sql), as API errors.
 function guarded(err: unknown): never {
   if (err instanceof DatabaseError) {
     if (err.code === "OB007") throw new AppError("admins_only", 403);

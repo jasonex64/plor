@@ -7,11 +7,9 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(15);
 
 select has_role('plor_app');
--- The rename left no login behind under the old name (migration 20261019070813).
-select hasnt_role('riff_app');
 select ok((select rolcanlogin from pg_roles where rolname = 'plor_app'), 'plor_app can log in');
 select ok(
   not (select rolsuper or rolcreaterole or rolcreatedb or rolreplication or rolbypassrls or rolinherit
@@ -136,7 +134,6 @@ select is(pg_temp.grants('plor_app'), array[
   'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.thing_names(uuid[]) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');
-select ok(not exists (select from pg_roles where rolname = 'plor_publisher'), 'plor_publisher is gone (M06: puzzles get in through the admin page)');
 
 select * from finish();
 rollback;

@@ -1,5 +1,5 @@
 // private.profile access (M00 data design §3). The username rules live in the table's check constraint
-// (supabase/migrations/20261018105903_create_profile.sql), so the database is the one place that enforces them.
+// (supabase/migrations/20261028140000_baseline.sql), so the database is the one place that enforces them.
 import { DatabaseError } from "pg";
 import type { Db } from "@/lib/db";
 import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
@@ -19,7 +19,7 @@ export type Profile = { username: string; displayName: string | null; usernameCh
 const SETTINGS = `json_build_object('skipGameScreen', skip_game_screen, 'calendarNumbers', calendar_numbers, 'theme', theme)`;
 
 export async function getProfile(db: Db, userId: string): Promise<Profile | null> {
-  // The trigger (supabase/migrations/20261023083041_username_change.sql) refuses a change before this time.
+  // The trigger (supabase/migrations/20261028140000_baseline.sql) refuses a change before this time.
   const { rows } = await db.query<{ username: string; displayName: string | null; changeable: Date | null; settings: Settings }>(
     `select username, display_name as "displayName",
             case when username_changed_at + make_interval(days => $2) > statement_timestamp()
