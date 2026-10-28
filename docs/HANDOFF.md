@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-28 (UTC), on `m13-answer-lists-and-content`, by the Mac's M13 session: 13f-1 (PR #110) and 13f-2 (PR #112) merged; 13f-3 approved; then the Windows PC's session caught up (2026-10-28 UTC: pulled, `load_sync` applied, `load all` run, check-bank 0 problems) and, at the human's request ("merge when its a good time and run the migrations for me"), **merged 13f-3a in PR #114 on green CI (`6e3bd73`) and pushed its migration and 13e-6's to plor.app**; the hosted tests wait on the human. The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-28 (UTC), on `m13-answer-lists-and-content`, by the Mac's M13 session: 13f-1 (PR #110) and 13f-2 (PR #112) merged; 13f-3 approved; then the Windows PC's session caught up (2026-10-28 UTC: pulled, `load_sync` applied, `load all` run, check-bank 0 problems) and, at the human's request ("merge when its a good time and run the migrations for me"), **merged 13f-3a in PR #114 on green CI (`6e3bd73`) and pushed its migration and 13e-6's to plor.app**. **plor.app is even with `main`:** from `C:/Users/jason/RIFF` with `supabase/` identical to `origin/main`, the dry run listed only `20261027090000_genre_publisher.sql` and `20261027233000_load_sync.sql`, `db push --linked` applied both, `migration list --linked` matches on all 44, and the human's `npx supabase test db --linked` passed ("Files=29, Tests=458 … Result: PASS"; the session's auto mode refuses that command, so the human runs it). The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -66,7 +66,6 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Loading no longer needs a `db reset`:** `npm run base -- load all` on a loaded base ends what the files dropped (the ticket's Evidence: a reload with four rows taken out of the files equals a fresh load from the next midnight). A `db reset` is still needed only to merge two already-loaded items (ROADMAP).
 
 ## Waiting on the human
-- **plor.app's hosted tests.** On 2026-10-28 (UTC), from `C:/Users/jason/RIFF` with `supabase/` identical to `origin/main` after PR #114, the dry run listed only `20261027090000_genre_publisher.sql` and `20261027233000_load_sync.sql`, `db push --linked` applied both, and `migration list --linked` matches on all 44. The session's auto mode refused `npx supabase test db --linked`, so the human runs it.
 - **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`): 81 findings, none approved as tickets.
 
 ## Next step
