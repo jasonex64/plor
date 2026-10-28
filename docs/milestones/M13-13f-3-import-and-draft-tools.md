@@ -1,6 +1,6 @@
 # M13 13f-3 — Import and draft tools
 
-**Status:** 13f-3a built and reviewed twice, its fixes committed on `m13-answer-lists-and-content`; in review in PR #114 (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b not started.
+**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered and the design approved (2026-10-28), in two PRs; 13f-3b-1, the load's gaps, built and reviewed, in review in PR #115; 13f-3b-2 next.
 
 ## Goal
 Make the load match the files exactly, removing what they no longer give (13f-3a); and close the tool items that can fail silently or mislead, with tests for the code that runs every day, the two admin fixes, and suites that clean up after themselves (13f-3b).
@@ -27,6 +27,21 @@ Round 2:
 - After the second review (a run can be finished after midnight, DECISIONS.md Timer): **"Wait one more day (Recommended)"**: "Erased rows go a day later, so a run finished the next day still counts them. A run left open for 2+ days could still lose one. Erasing waits up to 2 days."
 - A category the file drops while an approved day uses it: **"Keep for those days (Recommended)"**: "The category stays until no approved day from today on uses it, then goes at a later load." Built as from yesterday on, for a run of yesterday finished today (the answer above).
 
+## 13f-3b's guided questions (2026-10-28)
+Round 1:
+- The 13f-3a review's eight deferred items (ROADMAP, "From the 13f-3a review"): **"All eight now"** (not chosen: the three safety ones only, or none).
+- The admin item "changing a host answer that has a match group": **"Close it (Recommended)"**: format 3 retired match groups (DECISIONS.md, Catching) and host answers are ticked chips, so there's nothing to build.
+- A missing name on the Puzzles page, with plor.app's answer database empty by choice: **"Mark each one (Recommended)"**: the page loads, each missing answer shows as an error naming its ID, and approval stays refused.
+
+Round 2:
+- A category only an older day uses, while a run of that day can still be resumed (a run waits at a reveal until Next, DECISIONS.md Timer): **"Keep while unfinished (Recommended)"**: a category stays while any unfinished run of a day naming it exists; no new number, nothing players see changes.
+- A load changing a host answer's name or link on an approved day not yet started: **"Name them, keep going (Recommended)"**: the load finishes and prints each such day and question.
+- Shipping: **"Two PRs (Recommended)"**: 13f-3b-1, the load gaps; 13f-3b-2, failures, tests, admin, cleanup. This replaces round 2 of 2026-10-27's "a PR each" for 13f-3b.
+
+Approved (2026-10-28): "I approve 13f-3b's design as proposed. Build 13f-3b-1, the load's gaps, first."
+
+During 13f-3b-1's build (2026-10-28), item 8's truncate: no fix keeps the test's base looking empty without a copy (30 s and more a run) or a test-only option in `load_finish`. Asked in simpler words, the human chose **"Keep it, fail fast (Recommended)"**: "Keep the test as it is, but have it give up at once with a clear error if something else is using the tables, instead of waiting."
+
 ## Source
 - ROADMAP.md, For M13: the items below and the tickets they cite.
 - DECISIONS.md, Answer model (format 3: permanent thing IDs) and its Hard to reverse list; 13e-5b's `private.thing_retired`.
@@ -45,18 +60,33 @@ Round 2:
 - [x] A thing whose item left its snapshot keeps its row and shown name, with no names, facts or links of the load's (db test).
 - [x] `check-bank` 0, `simulate` 30 of 30, the suites pass.
 
-## 13f-3b — Failures, tests, admin, cleanup
+## 13f-3b-1 — The load's gaps (proposed 2026-10-28, from ROADMAP "From the 13f-3a review")
+### Design (each with a db test that fails before its fix)
+1. **One load at a time:** `load_begin` takes a lock that `load_finish` releases, so a second load is refused by name instead of emptying the first one's `load_seen_*`.
+2. **No leftovers:** a single `load <set>` and the suites' fixture imports leave no `load_seen_*` rows.
+3. **A reload refuses what a fresh load refuses:** a ref to an item that left its snapshot is unknown to this load (`thing_by_ref` checks the load's own items), not found through its old `thing_source` row.
+4. **Circle checks on a reload:** `import_source`'s and `load_links`' circle checks ignore facts this load hasn't given, so a re-fetch that reverses an edge loads on a reloaded base as it does fresh; a fact brought back in the finish is checked again.
+5. **Shown names:** `load_seen_name` mirrors `import_source`'s rename of a thing with no name alias by a joining non-WordNet or merged item.
+6. **Categories in unfinished runs:** a category stays while any unfinished run of a day naming it exists (round 2); `record_miss` raises instead of returning quietly when a day's category is missing.
+7. **Approved future days:** the load prints each approved day not yet started, and its question, whose host answer's name or link it ended or renamed (round 2).
+8. **The db test:** `resolve_answer` end to end on a fixture day (an ended name counts today, not tomorrow); the truncate's exclusive locks replaced by a scope that doesn't hold three tables for the file's run.
+
+### Acceptance criteria
+- [x] Each of 1–8 has a db test that fails before its fix and passes after. *(Items 1–7: each has a check that fails on 13f-3a's code (Evidence). Item 8 has no fix to fail before: its end-to-end check is new coverage of 13f-3a's behaviour, and the human kept the truncate.)*
+- [x] On the real base, a reload of a fresh load prints nothing ended, renamed or touched; `check-bank` 0, `simulate` 30 of 30, the suites pass.
+
+## 13f-3b-2 — Failures, tests, admin, cleanup
 ### Design (each with a test that fails before its fix, where a test can)
 - **Silent failures to fail loudly:** `drop_from_set`'s set checked against the sets, and a ref both dropped and set-dropped refused; a single `load <set>` judging names.json's rows for that set; `import_source` refusing a `same_as` that disagrees with the one already linked; the review's `joins…get(t)!` and the circle refusal naming a dropped ID or one circle as named errors; `OEWN_ANIMALS_HAND`'s synset in both `split` and `pick` refused; `define_category` clearing the filter columns when a subset becomes a base; `latestNumber` checking every tied value; a swapped-in question's error naming the swaps before it; a SPARQL reply cut off with an error reported as a timeout; `approvePuzzle` not splitting a problem that holds "; ".
 - **Tests for daily code:** `resolveNames`/`nameCandidates` and `expectedCatches` (draft); check-bank on a retired `#<id>`; `within`'s refusal (db) and its unit test's cross-source model fixed; `valueItems` and `define_subset` with some values unknown; the root's `same_as` and the familiar check's 3 agreeing with `FAMILIAR_SAFE_MIN`.
-- **The admin pages:** Puzzles' missing name fails loudly; a host answer with a match group can be changed on the page with its group's key.
+- **The admin pages:** each missing name on Puzzles shows as an error naming its ID, in the host bank and the read-only host answers alike, and the page still loads (round 1); approval stays refused (`checkHostNames`). The match-group item is closed, not built (round 1).
 - **Cleanup:** each db test removes the things, categories and fixture days it adds (`fixture_animal`, `dt_`); the review's "no parent" count.
 - **To Later (comment-only, fetch-only or style):** `matching.ts`'s stale comment, `pickHosts`'s constants comment, `FACT_TRAITS`' place, the pop groups' `method` text, `simulateDates`' export, `analyzeBase`'s table list, the `Where` type, `fetchTaxa`/`byIds`/P13176 tests, `titleForms`' numbers, the import's slices, `thing_names`' duplicates, `membersOf`' cache, error codes reused, `env.ts`' two spellings, DECISIONS.md Game 1's wording.
 
 ### Acceptance criteria
 - [ ] Each silent failure listed fails loudly in a test.
 - [ ] Each daily helper listed has a test.
-- [ ] The two admin fixes, with e2e or route tests.
+- [ ] The missing-name fix, with an e2e or route test; the match-group item closed in ROADMAP with its reason.
 - [ ] After the db suite, the local base holds no `fixture_` or `dt_` category or thing.
 - [ ] The Later items moved with their reason; the suites pass.
 
@@ -69,11 +99,12 @@ None new.
 ## Plan
 1. The human approves this ticket.
 2. 13f-3a: the owned-row rule, the erase step, shown names, tests; load twice (before/after) on the real base and compare with a fresh one; review; PR; merge.
-3. 13f-3b: the same.
+3. 13f-3b-1, then 13f-3b-2: the same, a PR each (round 2, 2026-10-28).
 
 ## Removes
 - 13f-3a: the need for a `db reset` before `load all` (the handoff's steps); `import_source`'s insert-only behaviour for owned rows.
-- 13f-3b: the closed ROADMAP items, and the fixture rows the suites leave.
+- 13f-3b-1: ROADMAP's "From the 13f-3a review" item; `record_miss`'s quiet return; the test's wait on the truncate's locks (kept, taken with `nowait`).
+- 13f-3b-2: the closed ROADMAP items (the match-group one among them), the raw-ID fallbacks on Puzzles, and the fixture rows the suites leave.
 
 ---
 *Fill in the sections below at the end.*
@@ -89,6 +120,12 @@ None new.
 | (no source) | Readers of the base as it is now (drafting, approval, `record_miss`, the admin pages: `removed_at is null`) see an ended row gone at once | The days they work on start after the midnight the row ends; only started days must keep it, and those read as of their start |
 | (no source) | `load_links` checks a link's names against the name this load gives the thing | On a loaded base the rename lands in `load_finish`, after the links; a renamed thing named in links.json would refuse a reload that a fresh load takes (second review) |
 | (no source) | The db test truncates `thing_alias`, `fact` and `number_fact` inside its rolled-back transaction | `load_finish` ends every owned row the test's loads don't give. On the Mac's loaded base that took 95 s per run, and two runs left 7.6 million dead rows (1.7 GB); on plor.app it would lock every row |
+| 13f-3b-1 Design 1: `load_begin` takes a lock that `load_finish` releases | A session-level advisory lock, and `load all` runs on one connection from begin to finish | Each set imports in its own transaction, so a transaction lock would end with the first set; a session's lock also goes with the session if the script dies, so a crashed load never blocks the next |
+| Design 3: `thing_by_ref` checks the load's own items | `thing_by_ref` is unchanged; `import_source`, `load_links`, `define_category` and `define_subset` refuse, in an open load, a ref to an item no import of it gave (`load_seen_item`) | `thing_by_ref` is called for every ref of every import and by the app's readers; a check per call there would slow every import, and only a load should see its own items |
+| Design 4: a fact brought back in the finish is checked again | Brought back by `import_source` and `load_links` (13f-3a's second review moved it there); `load_finish` walks again from each fact this load added or brought back, only when the load also found facts already loaded | On a fresh load every fact is new and each import already checked it against all before it; the walk again would double the check for nothing |
+| Design 7: a host answer's name or link | Its names, facts and links, and renames | A fact ending (the answer no longer under its category's root) changes what the day accepts more than a name does |
+| Design 5: `load_seen_name` mirrors the fresh rename | Mirrors it, but a thing two joining WordNet items name gets the one with the lower ID; a fresh load's import picks either, so its finish renamed 2 ("central chimpanzee", "wolverine") and every reload after renamed 0 | The import's rename takes whichever joining row Postgres meets first; the finish's pick is fixed, so reloads agree with each other |
+| Design 8: the truncate's locks replaced | Kept, taken with `nowait` first | The human's answer during the build: "Keep it, fail fast (Recommended)" |
 
 ## Evidence
 On the Mac, 2026-10-27/28 (UTC), with the migration applied to the local stack.
@@ -101,7 +138,21 @@ On the Mac, 2026-10-27/28 (UTC), with the migration applied to the local stack.
 - **Size:** `DATABASE 316 MB` fresh; 321 MB after the suites and a reload.
 - **After the second review's fixes** (rows brought back by the import or link that gives them; the one-day wait; the categories' tests; links checked against the files' names): `load_sync.test.sql` `Tests=23 … PASS`; `npx supabase test db` 29 files, 458 PASS; `npm run test:db` 40 files, 270 passed (with the revive first in `load_finish`, 11 failed: the fixtures' names stayed ended; this is why it moved); `load all` after the suites: `ENDING … 79 names, 53 facts, 0 links, 0 populations`, `ERASED 9 categories: dt_base, dt_d, fixture_animal, …` (the suites' fixtures again), `DATABASE 328 MB`; check-bank `CHECKED 231 questions: 0 problems`; simulate `DRAFTED 30 of 30`; `npm run test:e2e` 61 passed; `npm test` 444, lint and tsc clean (before the SQL-only fixes).
 
+### 13f-3b-1 (Windows, 2026-10-28 UTC)
+- **Before the migration**, `npx supabase test db supabase/tests/load_sync.test.sql`: `Tests: 23 Failed: 0 … You planned 43 tests but ran 23` (13f-3a's 23 pass, the file stops at 13f-3b-1's first check, `private.load_open` missing). **After** (with the review's fix): `Files=1, Tests=44 … Result: PASS`.
+- **Each new check on 13f-3a's code** (the review asked for it run, not read): 13f-3a's seven functions put back in a transaction rolled back, `private.load_open` stubbed to false (13f-3a has no lock), the test file run with `psql -v ON_ERROR_ROLLBACK=on` so each statement stands alone: `pass 24 FAIL 25 FAIL 26 FAIL 27 pass 28 FAIL 29 FAIL 30 FAIL 31 FAIL 32 pass 33 FAIL 34 FAIL 35 pass 36 FAIL 37 FAIL 38 FAIL 39 FAIL 40 FAIL 41 pass 42 pass 43 FAIL 44`. Failing: (1) 25, finishing with none open; (2) 26, `have: 15 want: 0`; (3) 27, 29–31, no refusal; (4) 32, `died: … a kind_of circle: ls aye … kind_of ls c, and ls c is already under ls aye`, and 34; (5) 35 and 37, `have: ls n want: ls you`; (6) 38–40; (7) 41. Passing: 24 (the stub), 28 (a fresh load's refusal, the control), 33 and 36 (after 32's import was refused), 42–43 (item 8, coverage of 13f-3a's behaviour). Afterwards `pg_get_functiondef` shows 13f-3b-1's `load_open` and `load_finish` in place.
+- `scripts/base.db.test.ts` (two sessions): passes in `npm run test:db`, 41 files, 271 passed.
+- **The real base, fresh then reloaded** (`npx supabase db reset --local`, `npm run base -- load all` twice): fresh `RENAMED 2 things` (Source diff, design 5), 231 categories, `DATABASE 315 MB`, 99 s; reload: no ENDING, RENAMED, ERASED or CHANGED line, 69 s (69 s before the change).
+- Two hypotheses were disproved on the way: a reload renamed 425 and then 654 things. The first: a join into a thing the same batch makes can't rename it on a fresh load. The second: the shown-name step ran before the batch's items were linked, so a fresh load marked no names for its new items. Both fixed before the runs above. A reload also stalled (5 sets in 15 minutes) on `load_ref_seen`'s two-branch lookup, now one key lookup.
+- **After the suites**, `load all`: `ENDING … 79 names, 53 facts, 0 links, 0 populations`, `ERASED 9 categories: dt_base, dt_d, fixture_animal, …`, `DATABASE 319 MB` (as 13f-3a's). `check-bank`: `CHECKED 231 questions: 0 problems`. `simulate`: `DRAFTED 30 of 30; subset questions 74 of 210`.
+- **Suites:** `npx supabase test db` 29 files, 478 PASS; `npm run test:db` 41 files, 271 passed (before the review's test fix, which touched only `load_sync.test.sql`); `npm test` 43 files, 444 passed; tsc clean; lint 0 errors, none in the changed files. `npm run test:e2e`: 60 passed, 1 failed, `shell.e2e.ts` "clock above the tab bar", the known flake (ROADMAP, 14b-2c items); `npx playwright test --last-failed`: 1 passed.
+
 ## Review
+13f-3b-1: the `reviewer` agent, 2026-10-28, in a fresh context (read-only queries while e2e ran).
+- Blocking, fixed: (1) "and not on tomorrow's" passed for the wrong reason: the links row of `ls-c kind_of ls-root`, ended since item 3, blocked the files' source fact at the same key, so nothing of ls-a resolved tomorrow; the test now gives the link again and checks that "ls aye" resolves tomorrow; (2) the "fails before its fix" criterion stood on reading; the checks were run on 13f-3a's code (Evidence); (3) the ticket's Status, ROADMAP's row and the handoff still said the design waited on approval, and the "From the 13f-3a review" item wasn't closed.
+- Deferred to ROADMAP "Next revision" (From the 13f-3b-1 review).
+
+13f-3a:
 The `reviewer` agent twice, 2026-10-27, each in a fresh context (read-only queries; no loads).
 - Blocking findings and how each was fixed:
   - First review: erasing at once broke "a started day never changes" (the human chose the next midnight); populations weren't ended (`load_seen_number`); shown names followed the files only for one-source things (`load_seen_name`, applied in `load_finish`); the output (totals, nothing at zero); the tests (reload against fresh, links, populations, kept categories filtered to the test's).

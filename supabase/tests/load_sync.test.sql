@@ -5,12 +5,16 @@
 -- a transaction rolled back, and sets a loaded base's names, facts and populations aside first: ending them all at each
 -- finish took 95 s and left 7.6 million dead rows (1.7 GB) on the Mac's base after two runs, and would lock every row
 -- of plor.app's base while it ran.
--- A truncate inside the transaction is undone by the rollback and leaves no dead rows.
+-- A truncate inside the transaction is undone by the rollback and leaves no dead rows. It holds the three tables until
+-- the rollback, so the test takes them with nowait and fails at once if another session is using them, rather than
+-- waiting or making others wait long (13f-3b-1; human, 2026-10-28: "Keep it, fail fast (Recommended)").
+-- 13f-3b-1's part (the load's gaps) follows 13f-3a's.
 begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(44);
+lock table private.thing_alias, private.fact, private.number_fact in access exclusive mode nowait;
 truncate private.thing_alias, private.fact, private.number_fact;
 
 -- Two small trees: "ls" loaded from files A and then B, "lf" loaded fresh from B, in the same test sources' IDs. Each
@@ -142,6 +146,8 @@ select ok(not exists (select from private.number_fact where thing_id = pg_temp.i
 select is((select count(*)::int from private.thing_alias where origin = 'players' and alias = 'ls player'), 1, 'a player''s name is never erased');
 
 -- Categories the file dropped are kept while a player's miss, an admin's addition or a day from yesterday on uses them.
+-- (The files give ls-root first: in an open load a category names only what they give.)
+select pg_temp.load('ls', 'B');
 select private.define_category('ls_extra', 'ls extra', 'oewn', 'ls-root', null);
 select private.define_category('ls_day', 'ls day', 'oewn', 'ls-root', null);
 select private.define_category('ls_old', 'ls old', 'oewn', 'ls-root', null);
@@ -150,9 +156,140 @@ insert into private.category_extra (category, thing_id, added_by) values ('ls_ex
 insert into private.puzzle (game_id, puzzle_date, content) values
   ('offbeat', private.today() - 1, jsonb_build_object('format', 2, 'game_id', 'offbeat', 'date', (private.today() - 1)::text, 'questions', '[{"category": "ls_day"}]'::jsonb)),
   ('offbeat', private.today() - 2, jsonb_build_object('format', 2, 'game_id', 'offbeat', 'date', (private.today() - 2)::text, 'questions', '[{"category": "ls_old"}]'::jsonb));
-select is(private.load_finish(pg_temp.categories(array[]::text[])) - 'at' - 'aliases' - 'facts' - 'links' - 'numbers' - 'renamed',
+select is(private.load_finish(pg_temp.categories(array[]::text[])) - 'at' - 'aliases' - 'facts' - 'links' - 'numbers' - 'renamed' - 'touched',
   '{"categories": ["ls_old"], "kept_categories": ["ls_day", "ls_extra", "ls_root"]}'::jsonb,
   'kept: a player''s miss, an admin''s addition, yesterday''s day; erased: one only an older day names');
+
+-- 13f-3b-1, the load's gaps (docs/milestones/M13-13f-3-import-and-draft-tools.md).
+-- 1. The load is the session's: load_finish releases it, and finishing with none open is refused. (A second session's
+-- load_begin, refused while one is open, is in scripts/base.db.test.ts: one session can't be two.)
+select ok(not private.load_open(), 'load_finish releases the load lock');
+select throws_ok($$ select private.load_finish(array[]::text[]) $$, 'P0001',
+  'load_finish: no load is open in this session (private.load_begin)', 'finishing with no load open is refused');
+
+-- 2. Outside a load, imports and links mark nothing (a single `load <set>`, the suites' fixtures).
+select pg_temp.load('ls', 'B');
+select pg_temp.link('ls');
+select is((select count(*)::int from private.load_seen_alias) + (select count(*)::int from private.load_seen_fact)
+  + (select count(*)::int from private.load_seen_number) + (select count(*)::int from private.load_seen_name)
+  + (select count(*)::int from private.load_seen_item), 0, 'outside a load, imports and links leave no load_seen rows');
+
+-- 3. A ref to an item no file of this load gives (ls-b left its snapshot in files B) is refused, as a fresh load
+-- refuses it as unknown (lf-b was never loaded).
+select private.load_begin();
+select pg_temp.load('ls', 'B');
+select throws_like($$ select private.import_source('oewn', 'load-sync-test', '[{"id": "ls-x", "name": "ls x", "aliases": [], "kind_of": ["ls-b"]}]') $$,
+  'import_source: refs to items no file of this load gives%ls-b%', 'a reload refuses a ref to an item that left its snapshot');
+select throws_like($$ select private.import_source('oewn', 'load-sync-test', '[{"id": "lf-x", "name": "lf x", "aliases": [], "kind_of": ["lf-b"]}]') $$,
+  'import_source: refs unknown%', 'as a fresh load refuses it');
+select throws_like($$ select private.load_links('[{"thing": "oewn:ls-b", "name": "ls b", "kind_of": "oewn:ls-root", "kind_of_name": "ls root"}]') $$,
+  'link %no longer in the files this load gives', 'a link to it is refused');
+select throws_like($$ select private.define_category('ls_b', 'ls b', 'oewn', 'ls-b', null) $$,
+  'define_category ls_b: %no longer in the files this load gives', 'a category rooted at it is refused');
+select throws_like($$ select private.define_subset('ls_bs', 'ls bs', 'ls_root', 'oewn', '{"trait": "member_of", "values": ["ls-b"]}') $$,
+  'define_subset ls_bs: ls-b no longer in the files this load gives', 'a subset naming it is refused');
+select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day']));
+
+-- 4. Files that reverse an edge (ls-c kind_of ls-a becomes ls-a kind_of ls-c) load on a reloaded base as they do fresh;
+-- the walk reads only what this load's files give.
+create function pg_temp.reversed(p text) returns jsonb language sql return format('[
+  {"id": "%1$s-root", "name": "%1$s root", "aliases": [{"alias": "%1$s root", "kind": "name"}]},
+  {"id": "%1$s-c", "name": "%1$s c", "aliases": [{"alias": "%1$s c", "kind": "name"}], "kind_of": ["%1$s-root"]},
+  {"id": "%1$s-a", "name": "%1$s aye", "aliases": [{"alias": "%1$s a", "kind": "name"}, {"alias": "%1$s aye", "kind": "name"}], "kind_of": ["%1$s-c"]}]', p)::jsonb;
+select private.load_begin();
+select lives_ok($$ select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls')) $$, 'a reload takes files that reverse an edge');
+select lives_ok($$ select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) $$, 'and finishes');
+-- A circle a later set closes through a fact this load brings back: the first import brings back ls-c kind_of ls-a
+-- (ended at midnight by the load above), the second gives ls-a kind_of ls-c again, already loaded, so no import checks it.
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', '[{"id": "ls-root", "name": "ls root", "aliases": []},
+  {"id": "ls-a", "name": "ls aye", "aliases": []}, {"id": "ls-c", "name": "ls c", "aliases": [], "kind_of": ["ls-a"]}]');
+select private.import_source('oewn', 'load-sync-test', '[{"id": "ls-a", "name": "ls aye", "aliases": [], "kind_of": ["ls-c"]}]');
+select throws_like($$ select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) $$,
+  'load_finish: a kind_of circle: %', 'load_finish refuses a circle a later set closed');
+-- The refused finish left the load open; the reversed files load again.
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day']));
+
+-- 5. A joining item that isn't WordNet's names a thing with no name (a usda item joining a nameless wikidata one): its
+-- name is the thing's on a fresh load, and stays it on a reload.
+create function pg_temp.joined() returns void language sql begin atomic
+  select private.import_source('wikidata', 'load-sync-test', '[{"id": "ls-n", "name": "ls n", "aliases": []}]');
+  select private.import_source('usda', 'load-sync-test', '[{"id": "ls-u", "name": "ls you", "aliases": [{"alias": "ls you", "kind": "name"}], "same_as": "wikidata:ls-n"}]');
+end;
+select private.load_begin();
+select pg_temp.joined();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day']));
+select is((select name from private.thing where id = private.thing_by_ref('wikidata', 'ls-n')), 'ls you', 'a fresh load shows the joining item''s name');
+select private.load_begin();
+select pg_temp.joined();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) ->> 'renamed', '0', 'a reload renames nothing');
+select is((select name from private.thing where id = private.thing_by_ref('wikidata', 'ls-n')), 'ls you', 'and keeps it');
+
+-- 6. A run waits at a reveal until Next, so a category only an older day names stays while a run of it is unfinished;
+-- and a missing category is an error when a miss is recorded, not a quiet return.
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000015a1', 'ls01@load-sync.example.test');
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select private.define_category('ls_run', 'ls run', 'oewn', 'ls-root', null);
+select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day', 'ls_run']));
+insert into private.puzzle (game_id, puzzle_date, content) values
+  ('offbeat', private.today() - 3, jsonb_build_object('format', 2, 'game_id', 'offbeat', 'date', (private.today() - 3)::text,
+    'questions', '[{"category": "ls_run"}, {"category": "ls_run"}]'::jsonb)),
+  ('offbeat', private.today() - 4, jsonb_build_object('format', 2, 'game_id', 'offbeat', 'date', (private.today() - 4)::text,
+    'questions', '[{"category": "ls_none"}, {"category": "ls_none"}]'::jsonb));
+insert into private.run (user_id, game_id, puzzle_date) values
+  ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 3), ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 4);
+-- Question 1 answered without a match, question 2 not opened: waiting at the reveal.
+insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values
+  ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 3, 0, 'ls', false),
+  ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 4, 0, 'ls', false);
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) -> 'kept_categories' ? 'ls_run', true,
+  'a category an unfinished run of an older day names is kept');
+select throws_like($$ select private.record_miss('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 4, 1, 'x', 'x', false, false, 3, 1) $$,
+  'record_miss: %names a category the base doesn''t have', 'a miss on a question whose category is missing is an error');
+-- Once the run ends (a match on question 2, opened now), the next load erases it.
+insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 3, 1);
+insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values
+  ('00000000-0000-0000-0000-0000000015a1', 'offbeat', private.today() - 3, 1, 'ls', true);
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', pg_temp.reversed('ls'));
+select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) -> 'categories', '["ls_run"]'::jsonb,
+  'once the run is over, the category goes');
+
+-- 7 and 8. Today's day and tomorrow's, approved two days ago, name ls-a as a host answer; the base's ls rows date from
+-- before today began. A load whose files no longer give ls-a names tomorrow's day, not today's, and the name it ends
+-- still resolves today but not tomorrow.
+update private.thing_alias set added_at = added_at - interval '2 days' where thing_id in (select id from private.thing where name like 'ls %');
+update private.fact set added_at = added_at - interval '2 days' where thing_id in (select id from private.thing where name like 'ls %');
+create function pg_temp.day(d date) returns jsonb language sql return jsonb_build_object('format', 3, 'game_id', 'offbeat',
+  'date', d::text, 'approved_at', now() - interval '2 days', 'questions', jsonb_build_array(jsonb_build_object(
+    'prompt', 'Name an ls', 'category', 'ls_root', 'host_bank', jsonb_build_array(pg_temp.id('ls-a')),
+    'host_answers', jsonb_build_array(pg_temp.id('ls-a')), 'levels', '{}'::jsonb, 'root', pg_temp.id('ls-root'),
+    'member_of', null, 'members', 2)));
+insert into private.puzzle (game_id, puzzle_date, content) values
+  ('offbeat', private.today(), pg_temp.day(private.today())), ('offbeat', private.today() + 1, pg_temp.day(private.today() + 1));
+-- ls-c kind_of ls-root is the links row item 2 added (the files' source fact meets it at the same key), ended since
+-- item 3; the link given again keeps the edge live tomorrow too, so only the ended name differs between the two days.
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', '[{"id": "ls-root", "name": "ls root", "aliases": [{"alias": "ls root", "kind": "name"}]},
+  {"id": "ls-c", "name": "ls c", "aliases": [{"alias": "ls c", "kind": "name"}], "kind_of": ["ls-root"]},
+  {"id": "ls-a", "name": "ls aye", "aliases": [{"alias": "ls aye", "kind": "name"}], "kind_of": ["ls-c"]}]');
+select pg_temp.link('ls');
+select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) -> 'touched',
+  jsonb_build_array(jsonb_build_object('date', private.today() + 1, 'question', 1, 'answer', 'ls aye', 'changes', '["name ended"]'::jsonb)),
+  'the load names the approved day not started yet whose host answer it changed, and not today''s');
+select is((select count(*)::int from private.resolve_answer('offbeat', private.today(), 0, array['ls a'])), 1,
+  'the ended name still resolves on today''s day');
+select is((select count(*)::int from private.resolve_answer('offbeat', private.today() + 1, 0, array['ls a'])), 0,
+  'and not on tomorrow''s');
+select is((select count(*)::int from private.resolve_answer('offbeat', private.today() + 1, 0, array['ls aye'])), 1,
+  'where a name the files still give resolves');
 
 select * from finish();
 rollback;
