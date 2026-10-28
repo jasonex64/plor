@@ -1559,6 +1559,50 @@ async function defineCategories(): Promise<void> {
   }
 }
 
+// Removal on load (docs/milestones/M13-13f-3-import-and-draft-tools.md, 13f-3a; human, 2026-10-27: "Build it now
+// (Recommended)", "Erase it", "Erase at the next midnight (Recommended)"): `load all` opens a load, every set and link
+// marks what the files give, and the finish ends the owned names, facts, links and populations no file gave at the next
+// midnight (Los Angeles), shows each thing the name the files give it, and erases the categories the file no longer
+// lists, keeping the things themselves, players' rows and the admin's decisions (migration
+// 20261027233000_load_sync.sql). A load a day after that midnight erases the ended rows, as a run can be finished the
+// next day ("Wait one more day (Recommended)"). A single `load <set>` doesn't erase: it sees one set, not what the
+// others give.
+async function beginLoad(): Promise<void> {
+  const client = await localClient();
+  try {
+    const { rows } = await client.query<{ erased: { aliases: number; facts: number; numbers: number } }>(
+      "select private.load_begin() as erased");
+    const e = rows[0].erased;
+    if (e.aliases + e.facts + e.numbers > 0) {
+      console.log(`ERASED what ended before yesterday: ${e.aliases} names, ${e.facts} facts and links, ${e.numbers} populations`);
+    }
+  } finally {
+    await client.end();
+  }
+}
+
+async function finishLoad(): Promise<void> {
+  const client = await localClient();
+  try {
+    const keys = readCategories().map((c) => c.key);
+    const { rows } = await client.query<{ e: {
+      at: string; aliases: number; facts: number; links: number; numbers: number; renamed: number;
+      categories: string[]; kept_categories: string[];
+    } }>("select private.load_finish($1::text[]) as e", [keys]);
+    const e = rows[0].e;
+    if (e.aliases + e.facts + e.links + e.numbers > 0) {
+      console.log(`ENDING at ${e.at}, as the files no longer give them: ${e.aliases} names, ${e.facts} facts, ${e.links} links, ${e.numbers} populations`);
+    }
+    if (e.renamed > 0) console.log(`RENAMED ${e.renamed} things to the names the files give`);
+    if (e.categories.length) console.log(`ERASED ${e.categories.length} categories: ${e.categories.join(", ")}`);
+    if (e.kept_categories.length) {
+      console.log(`KEPT categories the file dropped, as players' misses, the admin's additions or a day from yesterday on use them: ${e.kept_categories.join(", ")}`);
+    }
+  } finally {
+    await client.end();
+  }
+}
+
 // The planner's statistics for the base's tables. Right after a fresh `load all` they describe empty tables until
 // autovacuum catches up, and a query over the animal category ran over 10 minutes; after ANALYZE, 2.6 s (13e-5 Evidence).
 async function analyzeBase(): Promise<void> {
@@ -1662,11 +1706,13 @@ async function main(): Promise<void> {
   const [command, name, ...more] = process.argv.slice(2);
   if (command === "review" && name) return review([name, ...more]);
   if (command === "load" && name === "all") {
+    await beginLoad();
     for (const [set, def] of Object.entries(SETS)) await loadSet(set, def);
     const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
     if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
     await loadLinks();
     await defineCategories();
+    await finishLoad();
     return analyzeBase();
   }
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
