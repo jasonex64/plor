@@ -1,6 +1,6 @@
 # M13 13f-4 — Scale, and the For M13 leftovers
 
-**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a built, in review (its PR number follows); 13f-4b and 13f-4c next.
+**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a built and reviewed, in review in PR #117; 13f-4b and 13f-4c next.
 
 ## Goal
 Measure the four scale items and fix the ones that slow the drafting tools; close or move every For M13 item left in ROADMAP, so the list is empty when M13 closes (`docs/milestones/M13-13f-the-review-backlog.md`, criterion 2).
