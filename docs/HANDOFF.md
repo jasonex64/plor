@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-28 (UTC), on `m13-answer-lists-and-content`, last by the Mac's M13 session: **PR #120 (13g, the migration squash) merged on green CI (`62f670a`)**; the Mac's local stack and **plor.app rebuilt from the baseline**, the human plor.app's admin again; **M13 closed**, its closing PR waiting for a merge (Next step 1). Before that, the Windows PC's M13 session built 13f-3 to 13f-4 (PRs #114 to #119, merged; their migrations reached plor.app, 46 rows) and 13g (PR #120). The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-28 (UTC), on `main` (from a short-lived `m13-answer-lists-and-content`, deleted again after its merge), last by the Mac's M13 session: **PR #120 (13g, the migration squash) merged on green CI (`62f670a`)**; the Mac's local stack and **plor.app rebuilt from the baseline**, the human plor.app's admin again; **M13 closed**: its closing PR #121 merged (`9fdbbda`), the milestone branch deleted, the Mac checkout on `main`. Before that, the Windows PC's M13 session built 13f-3 to 13f-4 (PRs #114 to #119, merged; their migrations reached plor.app, 46 rows) and 13g (PR #120). The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -66,11 +66,10 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Every machine, after pulling `main`:** `npx supabase db reset --local` (not `migration up`; the old history no longer matches), then `npm run base -- load all`. The Mac is done (2026-10-28); the Windows PC was rebuilt from the baseline for 13g's proof.
 
 ## Waiting on the human
-- **The closing PR** from `m13-answer-lists-and-content` to `main` (this session's status commits: 13g and M13 done): merge on green CI.
 - **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`): 81 findings, none approved as tickets.
 
 ## Next step
-1. **Merge the closing PR on green CI**, then delete `m13-answer-lists-and-content` locally and on origin (CLAUDE.md, "Delete the branch once the milestone is merged"), and switch the Mac checkout (`/Users/jason/code/plor`) to `main`. The Windows checkout (`C:/Users/jason/RIFF`) does the same on its next session.
+1. **The Windows checkout** (`C:/Users/jason/RIFF`) is still on the deleted `m13-answer-lists-and-content`: on its next session, `git fetch --prune && git switch main && git pull`, delete the local branch, then `npx supabase db reset --local` and `npm run base -- load all` (the old migration history no longer matches the baseline).
 2. **M14 goes on** in its own sessions (`m14-look-and-feel`, its handoff there). No new milestone starts while M14 is in progress (human: "Nothing new yet"); M15's 15a is deferred (the M15 section above).
 
 **The shared local stack (Mac):** the M14 sessions ("M14: settings sheet, friends move, themes", "Visual polish and design review") use it and port 3000 too. Message them before a `db reset`, a full suite run, a `load all` or a dev server, and again when free.
