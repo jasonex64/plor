@@ -10,7 +10,7 @@
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -38,7 +38,9 @@ export type Item = {
   // A Wikidata item folded into the kept item of its set (13e-5b): it brings its names, not its facts.
   merged_into?: string;
 };
-type Source = "wikidata" | "oewn" | "usda";
+// The sources, written once: the type and the hand files' ref check both read it (13e-9b review; 13f-4c).
+const SOURCES = ["wikidata", "oewn", "usda"] as const;
+type Source = (typeof SOURCES)[number];
 type SetDef<T = Item> = { source: Source; method: string; fetch: () => Promise<T[]> };
 
 // --- aliases ---
@@ -90,7 +92,8 @@ export async function sparql(query: string): Promise<Binding[] | "timeout"> {
         return (JSON.parse(text) as { results: { bindings: Binding[] } }).results.bindings;
       } catch (err) {
         if (!(err instanceof SyntaxError)) throw err;
-        if (/timeout|TimeoutException/i.test(text)) return "timeout";
+        // Only the service's own timeout error: a cut-off reply's data can say "timeout" too (13f-3b-2 review).
+        if (/java\.util\.concurrent\.TimeoutException/.test(text)) return "timeout";
         throw new Error(`SPARQL ${response.status}: the reply isn't JSON: ${text.slice(-300)}`);
       }
     }
@@ -185,8 +188,13 @@ async function factsFor(set: string, items: Item[], where: string, facts: { trai
 }
 
 // The 193 countries of the wikidata-countries snapshot, the only countries a fact may name (A3).
+// The countries snapshot, read and checksummed once per run: every set's load asks for its countries and continents
+// (13f-2 review; 13f-4c).
+let countriesOnce: Item[] | undefined;
+const countryItems = () => (countriesOnce ??= readSnapshot("wikidata-countries").items);
+
 function countryIds(): Set<string> {
-  const ids = readSnapshot("wikidata-countries").items.filter((i) => i.member_of?.includes("Q1065")).map((i) => i.id);
+  const ids = countryItems().filter((i) => i.member_of?.includes("Q1065")).map((i) => i.id);
   if (ids.length !== 193) throw new Error(`wikidata-countries holds ${ids.length} countries, expected 193`);
   return new Set(ids);
 }
@@ -194,7 +202,7 @@ function countryIds(): Set<string> {
 // The continents the countries' facts name, by ID: wherever a set loads one (the places set too), it's named by its
 // label alone, as valueItems names it in the countries set (13e-4b review; 13f-4b).
 function continentIds(): Set<string> {
-  return new Set(readSnapshot("wikidata-countries").items.flatMap((i) => i.continent ?? []));
+  return new Set(countryItems().flatMap((i) => i.continent ?? []));
 }
 
 type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string>; label?: string };
@@ -1023,6 +1031,10 @@ const snapshotPath = (set: string, snapshot: string) => join("data", "snapshots"
 
 function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
   const manifest = JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
+  // A machine without the snapshots is told what to do, not given ENOENT (13e-5 second review; 13f-4c).
+  if (!existsSync(snapshotPath(set, manifest.snapshot))) {
+    throw new Error(`${snapshotPath(set, manifest.snapshot)} is missing: copy data/snapshots/ from a machine that has it (a set is never fetched on a second machine)`);
+  }
   const text = readFileSync(snapshotPath(set, manifest.snapshot), "utf8");
   const sha256 = createHash("sha256").update(text).digest("hex");
   if (sha256 !== manifest.sha256) throw new Error(`${set}: snapshot ${manifest.snapshot} doesn't match its manifest's checksum`);
@@ -1068,7 +1080,8 @@ async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<voi
   // Countries load from the places set too, with the same codes, so the codes go wherever a country loads.
   const { items: handled, used } = withHandNames(def.source, withValueNamesOnly(withoutCountryCodes(withNormalizedAliases(named), countryIds()), continentIds()), names);
   for (const k of used) handNamesUsed.add(k);
-  const { items, aliases, dropped } = withoutListed(def.source, set, handled, listed, names.rename);
+  const { items, aliases, dropped, used: listedUsed } = withoutListed(def.source, set, handled, listed, names.rename);
+  for (const k of listedUsed) listedRowsUsed.add(k);
   try {
     await client.query("begin");
     const withIds = items.map((item) => ({ ...item, thing_id: thingId(def.source, item.id) }));
@@ -1084,7 +1097,7 @@ async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<voi
 // --- hand decisions on names: listed words dropped (data/listed.json, 13e-9b), names added and renamed
 // (data/names.json, 13f-1) ---
 
-const SOURCE_REF = /^(wikidata|oewn|usda):./;
+const SOURCE_REF = new RegExp(`^(${SOURCES.join("|")}):.`);
 function checkRefs(file: string, refs: string[]): void {
   const bad = refs.filter((ref) => !SOURCE_REF.test(ref));
   if (bad.length) throw new Error(`${file}: ${bad.join(", ")} must be refs as "source:id"`);
@@ -1210,14 +1223,13 @@ export function withHandNames(source: Source, items: Item[], names: Pick<Names, 
   return { items: out, used };
 }
 
-// The add and remove rows no set used, after `load all`.
-// The add and remove rows only one set can apply: their item is in it and in no other set, so a single `load <set>`
-// judges them as `load all` judges every row (13f-2 review; 13f-3b-2).
-export function handNamesOnlyIn(names: Pick<Names, "add" | "remove">, mine: ReadonlySet<string>, elsewhere: ReadonlySet<string>): Pick<Names, "add" | "remove"> {
-  const only = (r: { ref: string }) => mine.has(r.ref) && !elsewhere.has(r.ref);
-  return { add: names.add.filter(only), remove: names.remove.filter(only) };
+// The rows only one set can apply: their item is in it and in no other set, so a single `load <set>` judges them as
+// `load all` judges every row (13f-2 review; 13f-3b-2; the listed rows too, 13f-4c).
+export function rowsOnlyIn<R extends { ref: string }>(rows: R[], mine: ReadonlySet<string>, elsewhere: ReadonlySet<string>): R[] {
+  return rows.filter((r) => mine.has(r.ref) && !elsewhere.has(r.ref));
 }
 
+// The add and remove rows no set used, after `load all`.
 export function unusedHandNames(names: Pick<Names, "add" | "remove">, used: ReadonlySet<string>): string[] {
   return [
     ...names.add.map((r) => handNameKey("add", r.ref, r.name)),
@@ -1248,14 +1260,20 @@ export function withoutCountryCodes(items: Item[], countries: ReadonlySet<string
 // item; the drop_listed_names items also lose their LDNOOBW-listed names; drop items go, and so does an item left with
 // no names. A rename makes one of the item's names left its shown name; an item whose shown name went needs one, or a
 // drop, or the load stops, naming its ID and the names left, never the word.
-export function withoutListed(source: Source, set: string, items: Item[], listed: Listed, renames: Names["rename"]): { items: Item[]; aliases: number; dropped: number } {
+// used names the drop_listed_names and rename rows that did something here: a rename that does nothing in every set
+// (its item emptied by the list) stops the load; a drop_listed_names row holding no listed name is printed, as most
+// guard a re-fetch, their names dropped at fetch before 13e-9b (13e-9b review; 13f-4c; the human, 2026-10-28: "Print
+// them, don't stop (Recommended)").
+export function withoutListed(source: Source, set: string, items: Item[], listed: Listed, renames: Names["rename"]): { items: Item[]; aliases: number; dropped: number; used: string[] } {
   const drop = new Set([...bySource(source, listed.drop), ...bySource(source, listed.drop_from_set).filter((r) => r.set === set)].map((r) => r.id));
   const names = new Set(bySource(source, listed.drop_listed_names).map((r) => r.id));
   const rename = new Map(bySource(source, renames).map((r) => [r.id, r.name]));
   const kept: Item[] = [];
+  const used: string[] = [];
   let aliases = 0;
   for (const item of items) {
     if (drop.has(item.id)) continue;
+    if (names.has(item.id) && item.aliases.some((a) => isListed(normalize(a.alias)))) used.push(`drop_listed_names ${source}:${item.id}`);
     const gone = (text: string) => isPlorListed(normalize(text)) || (names.has(item.id) && isListed(normalize(text)));
     const left = item.aliases.filter((a) => !gone(a.alias));
     aliases += item.aliases.length - left.length;
@@ -1272,6 +1290,7 @@ export function withoutListed(source: Source, set: string, items: Item[], listed
     if (!left.some((a) => a.alias === normalize(to))) throw new Error(`${NAMES_FILE} rename ${ref}: "${to}" isn't one of its names left`);
     // The new shown name becomes a name, not a synonym: a category's members need one (private.category_members).
     kept.push({ ...item, name: to, aliases: left.map((a) => (a.alias === normalize(to) ? { ...a, kind: "name" } : a)) });
+    used.push(`rename ${ref}`);
   }
   // A dropped item can't be another's parent: its facts would name a thing never loaded.
   const keptIds = new Set(kept.map((i) => i.id));
@@ -1280,11 +1299,21 @@ export function withoutListed(source: Source, set: string, items: Item[], listed
     const parent = [...(item.kind_of ?? []), ...(item.member_of ?? [])].find((p) => goneIds.has(p));
     if (parent) throw new Error(`${source}:${item.id} is under ${source}:${parent}, which the listed words drop`);
   }
-  return { items: kept, aliases, dropped: items.length - kept.length };
+  return { items: kept, aliases, dropped: items.length - kept.length, used };
+}
+
+// The rename and drop_listed_names rows no set used (withoutListed), as unusedHandNames for the add and remove rows.
+export function unusedListedRows(listed: Pick<Listed, "drop_listed_names">, renames: Names["rename"], used: ReadonlySet<string>): { renames: string[]; guards: string[] } {
+  return {
+    renames: renames.map((r) => `rename ${r.ref}`).filter((k) => !used.has(k)),
+    guards: listed.drop_listed_names.map((r) => `drop_listed_names ${r.ref}`).filter((k) => !used.has(k)),
+  };
 }
 
 // The hand name rows the sets loaded so far used (withHandNames), checked after `load all`.
 const handNamesUsed = new Set<string>();
+// The listed and rename rows they used (withoutListed), checked the same way.
+const listedRowsUsed = new Set<string>();
 
 // The refs every loaded set holds, read once for the hand files' checks.
 let loadedRefsOnce: Set<string> | undefined;
@@ -1438,8 +1467,11 @@ export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Samenes
       path.push(next);
     }
     if (circle) {
+      // The circle alone, once: a chain feeding it isn't part of it, and another chain into it would list it again
+      // (13e-5b review; 13f-4c).
       for (const id of path) circled.add(id);
-      forks.push(path);
+      const loop = path.slice(path.indexOf([...edges.get(path[path.length - 1])!][0]));
+      if (!forks.some((f) => f.length === loop.length && [...f].sort().join(" ") === [...loop].sort().join(" "))) forks.push(loop);
       continue;
     }
     const kept = path[path.length - 1];
@@ -1454,7 +1486,8 @@ export function planMerges(marks: Mark[], setOf: Map<string, string>, s: Samenes
   }
   for (const r of s.apart) if (end(r.a) === end(r.b)) throw new Error(`${SAMENESS_FILE} apart ${r.a} / ${r.b}: Wikidata's marks now merge them into ${end(r.a)}`);
   const saidSame = marks.flatMap((m) => m.said_same.filter((t) => m.id < t).map((t) => [m.id, t]));
-  return { into, forks, saidSame };
+  // A tie the human then merged is decided, so it's no longer a fork (13e-5b review; 13f-4c).
+  return { into, forks: forks.filter((f) => !(f.length === 2 && end(f[0]) === end(f[1]))), saidSame };
 }
 
 // A merged item keeps its ID, name and names; its facts go, as the kept item's win (human, 2026-10-27: "Kept item's
@@ -1674,10 +1707,22 @@ export type Joins = { wordnet: Map<string, Item>; wikidata: Map<string, Item>; o
 // What the doubles list reads (13e-5b): the bank, the pairs a person kept apart, and the merge plan's forks and P460 pairs.
 type Doubles = { bank: Bank; apart: Set<string>; reviewed: Set<string>; plan: MergePlan };
 
+// The joins, read from the three animal snapshots the first time a category with a joined WordNet member needs them:
+// a category none of whose WordNet members is in oewn-animals (the small one) reads no other (13e-5 second review;
+// 13f-4c). Decided by the members, not the tree: dog breed's root isn't under animal, but its members join (review).
+let wordnetAnimalsOnce: Set<string> | undefined;
+const wordnetAnimalIds = () => (wordnetAnimalsOnce ??= new Set(readSnapshot("oewn-animals").items.map((i) => i.id)));
+let joinsOnce: Joins | undefined;
+function animalJoins(): Joins {
+  if (!joinsOnce) {
+    const wordnet = readSnapshot("oewn-animals").items;
+    const wikidata = new Map([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => [i.id, i]));
+    joinsOnce = { wordnet: new Map(wordnet.map((i) => [i.id, i])), wikidata, odd: oddJoins(wordnet, wikidata) };
+  }
+  return joinsOnce;
+}
+
 async function review(keys: string[]): Promise<void> {
-  const wordnet = readSnapshot("oewn-animals").items;
-  const wikidata = new Map([...readSnapshot("wikidata-animals").items, ...readSnapshot("wikidata-dog-breeds").items].map((i) => [i.id, i]));
-  const joins: Joins = { wordnet: new Map(wordnet.map((i) => [i.id, i])), wikidata, odd: oddJoins(wordnet, wikidata) };
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
   if (!bank) throw new Error(errors.join("\n"));
   const sameness = readSameness();
@@ -1686,25 +1731,27 @@ async function review(keys: string[]): Promise<void> {
   };
   const client = await localClient();
   try {
-    for (const key of keys) await reviewOne(client, key, joins, doubles);
+    for (const key of keys) await reviewOne(client, key, doubles);
   } finally {
     await client.end();
   }
 }
 
-// The items of each set holding a category's root (a subset's base's), with that root's ID.
-function rootSetItems(key: string): { items: Item[]; root: string }[] {
+// The items of each set holding a category's root (a subset's base's), with that root's ID; null for a key the base
+// holds but data/categories.json doesn't (one kept for an approved day or an unfinished run, 13f-3b-1).
+function rootSetItems(key: string): { items: Item[]; root: string }[] | null {
   const categories = readCategories();
-  const c = categories.find((x) => x.key === key)!;
+  const c = categories.find((x) => x.key === key);
+  if (!c) return null;
   const base = (isSubset(c) ? categories.find((x) => x.key === c.of)! : c) as BaseCategory;
   return Object.entries(SETS).filter(([, def]) => def.source === base.source)
     .map(([set]) => readSnapshot(set).items).filter((items) => items.some((i) => i.id === base.root)).map((items) => ({ items, root: base.root }));
 }
 
-async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: Doubles): Promise<void> {
+async function reviewOne(client: pg.Client, key: string, doubles: Doubles): Promise<void> {
   const one = async (sql: string, params: unknown[] = [key]) => (await client.query(sql, params)).rows;
   const [{ n }] = await one("select count(*)::int as n from private.category_members($1)");
-  if (n === 0) throw new Error(`category ${key} has no members (is it loaded?)`);
+  if (n === 0) throw new Error(`category ${key} has no members (is it loaded? \`npm run base -- load all\` defines the categories; a single \`load <set>\` doesn't)`);
   const sample = await one(`select t.name from private.category_members($1) m join private.thing t on t.id = m order by random() limit $2`, [key, BASE_REVIEW_SAMPLE]);
   const twoParents = await one(`select t.name, count(*)::int as parents from private.category_members($1) m join private.thing t on t.id = m
     join private.fact f on f.thing_id = m and f.trait = 'kind_of' and f.removed_at is null group by t.name having count(*) > 1 order by parents desc, t.name`);
@@ -1724,15 +1771,19 @@ async function reviewOne(client: pg.Client, key: string, joins: Joins, doubles: 
   console.log(`  flag, under two or more parents: ${twoParents.length}${twoParents.length ? ` (e.g. ${twoParents.slice(0, 10).map((r) => `${r.name} ×${r.parents}`).join("; ")})` : ""}`);
   console.log(`  flag, one alias on two or more members: ${shared.length}${shared.length ? ` (e.g. ${shared.slice(0, 10).map((r) => `"${r.alias}": ${r.things.join(" / ")}`).join("; ")})` : ""}`);
   console.log(`  flag, things under the root with no English name (not in the category): ${unnamed}`);
-  const noParent = rootSetItems(key).flatMap(({ items, root }) => parentless(items, root)).map((i) => i.name);
-  console.log(`  flag, items of the root's set under nothing (not in the category): ${noParent.length}${noParent.length ? ` (${noParent.sort().join("; ")})` : ""}`);
+  const sets = rootSetItems(key);
+  const noParent = (sets ?? []).flatMap(({ items, root }) => parentless(items, root)).map((i) => i.name);
+  console.log(`  flag, items of the root's set under nothing (not in the category): ${sets ? `${noParent.length}${noParent.length ? ` (${noParent.sort().join("; ")})` : ""}` : `not counted, ${key} isn't in ${CATEGORIES_FILE}`}`);
   const wordnetIds = (await one(`select s.source_id from private.category_members($1) m
     join private.thing_source s on s.thing_id = m and s.source = 'oewn'`)).map((r) => r.source_id as string);
-  const odd = wordnetIds.filter((id) => joins.odd.has(id)).map((id) => `${joins.wordnet.get(id)!.name} = ${joins.odd.get(id)}`);
-  const unjoined = wordnetIds.map((id) => joins.wordnet.get(id)).filter((i) => i?.unjoined)
-    .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${taxonName(joins, t)} (${t})`).join(" / ")}`);
-  console.log(`  flag, a WordNet word joined to a Wikidata thing sharing no name: ${odd.length}${odd.length ? ` (${odd.sort().join("; ")})` : ""}`);
-  console.log(`  flag, a WordNet word naming several loaded taxa, unjoined: ${unjoined.length}${unjoined.length ? ` (${unjoined.sort().join("; ")})` : ""}`);
+  if (wordnetIds.length && wordnetIds.some((id) => wordnetAnimalIds().has(id))) {
+    const joins = animalJoins();
+    const odd = wordnetIds.filter((id) => joins.odd.has(id)).map((id) => `${joins.wordnet.get(id)!.name} = ${joins.odd.get(id)}`);
+    const unjoined = wordnetIds.map((id) => joins.wordnet.get(id)).filter((i) => i?.unjoined)
+      .map((i) => `${i!.name}: ${i!.unjoined!.map((t) => `${taxonName(joins, t)} (${t})`).join(" / ")}`);
+    console.log(`  flag, a WordNet word joined to a Wikidata thing sharing no name: ${odd.length}${odd.length ? ` (${odd.sort().join("; ")})` : ""}`);
+    console.log(`  flag, a WordNet word naming several loaded taxa, unjoined: ${unjoined.length}${unjoined.length ? ` (${unjoined.sort().join("; ")})` : ""}`);
+  }
   // Doubles players meet (13e-5b; human, 2026-10-27: "Bank answers (Recommended)"): a bank answer of this category,
   // by name or by ID, whose names are on two or more members, and Wikidata's P460 pairs and forks among members that
   // a bank answer names; names and pairs data/sameness.json already decides are left out.
@@ -1767,6 +1818,9 @@ async function main(): Promise<void> {
       for (const [set, def] of Object.entries(SETS)) await loadSet(client, set, def);
       const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
       if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
+      const unusedRows = unusedListedRows(readHandFiles().listed, readHandFiles().names.rename, listedRowsUsed);
+      if (unusedRows.renames.length) throw new Error(`${NAMES_FILE}: ${unusedRows.renames.join(", ")} did nothing in any set (the list emptied the item)`);
+      if (unusedRows.guards.length) console.log(`${LISTED_FILE}: ${unusedRows.guards.length} drop_listed_names rows hold no listed name today (guards against a re-fetch): ${unusedRows.guards.map((k) => k.slice("drop_listed_names ".length)).join(", ")}`);
       await loadLinks(client);
       await defineCategories(client);
       await finishLoad(client);
@@ -1789,9 +1843,14 @@ async function main(): Promise<void> {
     await client.end();
   }
   const refsOf = (set: string) => readSnapshot(set).items.map((i) => `${SETS[set].source}:${i.id}`);
-  const own = handNamesOnlyIn(readHandFiles().names, new Set(refsOf(name)), new Set(Object.keys(SETS).filter((s) => s !== name).flatMap(refsOf)));
-  const unused = unusedHandNames(own, handNamesUsed);
+  const mine = new Set(refsOf(name));
+  const elsewhere = new Set(Object.keys(SETS).filter((s) => s !== name).flatMap(refsOf));
+  const { names, listed } = readHandFiles();
+  const unused = unusedHandNames({ add: rowsOnlyIn(names.add, mine, elsewhere), remove: rowsOnlyIn(names.remove, mine, elsewhere) }, handNamesUsed);
   if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in ${name} (the item already had the name, or lacked the one removed)`);
+  const unusedRows = unusedListedRows({ drop_listed_names: rowsOnlyIn(listed.drop_listed_names, mine, elsewhere) }, rowsOnlyIn(names.rename, mine, elsewhere), listedRowsUsed);
+  if (unusedRows.renames.length) throw new Error(`${NAMES_FILE}: ${unusedRows.renames.join(", ")} did nothing in ${name} (the list emptied the item)`);
+  if (unusedRows.guards.length) console.log(`${LISTED_FILE}: ${unusedRows.guards.length} drop_listed_names rows hold no listed name in ${name} today (guards against a re-fetch)`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

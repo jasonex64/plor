@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(32);
+select plan(34);
 
 select private.import_source('wikidata', 'mb-test', '[
   {"id": "mb-animal", "name": "animal", "aliases": [{"alias": "mb animal", "kind": "name"}]},
@@ -128,6 +128,12 @@ insert into private.puzzle (game_id, puzzle_date, content)
   values ('offbeat', '2000-01-04', pg_temp.day('2000-01-04', 'mb_animal', now()) - 'approved_at');
 select throws_ok($$select * from private.resolve_answer('offbeat', '2000-01-04', 0, array['mb bear'])$$, 'P0001', null,
   'a day with no approval time isn''t resolved');
+
+-- Every outcome is logged, not only the accepted one's (13b review; 13f-4c): one base_log row per review this file made.
+select is((select count(*)::int from private.miss_review r where r.category like 'mb\_%' and not exists (
+    select from private.base_log l where l.action = 'miss_review' and l.detail ->> 'category' = r.category and l.detail ->> 'text' = r.text
+      and l.detail ->> 'outcome' = r.outcome)), 0, 'every review''s outcome is logged');
+select ok((select count(distinct outcome) from private.miss_review where category like 'mb\_%') >= 3, 'across several outcomes');
 
 select * from finish();
 rollback;

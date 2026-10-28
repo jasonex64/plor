@@ -13,7 +13,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(49);
+select plan(50);
 lock table private.thing_alias, private.fact, private.number_fact in access exclusive mode nowait;
 truncate private.thing_alias, private.fact, private.number_fact;
 
@@ -331,6 +331,23 @@ select pg_temp.round('', '');
 select ok((pg_temp.edge('ls-e')).removed_at > now() and (pg_temp.edge('ls-e')).origin = 'ai', 'the link''s edge ends when links.json drops it');
 select pg_temp.round('e', '');
 select is((pg_temp.edge('ls-e')).removed_at, null, 'a snapshot giving the same edge brings it back');
+
+-- load_finish names the first circle by name, the same each time (13e-5 review; 13f-4c): lo a kind_of lo z and lo a
+-- kind_of lo b both come back fresh while the facts closing them (lo z and lo b kind_of lo a) were loaded already; lo z's
+-- ID sorts first, lo b's name does.
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', '[{"id": "lo-a", "name": "lo a", "aliases": [{"alias": "lo a", "kind": "name"}]},
+  {"id": "lo-z", "name": "lo z", "aliases": [{"alias": "lo z", "kind": "name"}], "kind_of": ["lo-a"], "thing_id": "00000000-0000-5000-8000-0000000010fa"},
+  {"id": "lo-b", "name": "lo b", "aliases": [{"alias": "lo b", "kind": "name"}], "kind_of": ["lo-a"], "thing_id": "ffffffff-0000-5000-8000-0000000010fb"}]');
+select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day']));
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', '[{"id": "lo-z", "name": "lo z", "aliases": [{"alias": "lo z", "kind": "name"}]},
+  {"id": "lo-b", "name": "lo b", "aliases": [{"alias": "lo b", "kind": "name"}]},
+  {"id": "lo-a", "name": "lo a", "aliases": [{"alias": "lo a", "kind": "name"}], "kind_of": ["lo-z", "lo-b"]}]');
+select private.import_source('oewn', 'load-sync-test', '[{"id": "lo-z", "name": "lo z", "aliases": [{"alias": "lo z", "kind": "name"}], "kind_of": ["lo-a"]},
+  {"id": "lo-b", "name": "lo b", "aliases": [{"alias": "lo b", "kind": "name"}], "kind_of": ["lo-a"]}]');
+select throws_like($$ select private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) $$,
+  'load_finish: a kind_of circle: lo a (%) kind_of lo b (%), and lo b is already under lo a', 'of two circles, load_finish names the first by name');
 
 select * from finish();
 rollback;

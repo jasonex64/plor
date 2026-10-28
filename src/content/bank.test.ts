@@ -26,7 +26,7 @@ const bank = (questions: BankQuestion[], themes: Record<string, string> = {}): B
 
 describe("the bank file", () => {
   it("parses a valid bank, and lists every problem in a broken one", () => {
-    expect(parseBank("bank.json", JSON.stringify(bank(ten.slice(0, 2), { "2026-12-25": "christmas" }))).errors).toEqual([]);
+    expect(parseBank("bank.json", JSON.stringify(bank([question("q-a", "fruit", ["christmas"]), ten[1]], { "2026-12-25": "christmas" }))).errors).toEqual([]);
     const broken = { format: 1, questions: [{ ...ten[0], id: "Bad Id" }, ten[1], ten[1]], themes: { "2026-02-30": "x" } };
     expect(parseBank("bank.json", JSON.stringify(broken)).errors).toEqual([
       'bank.json question 1: "id" must be a lower-case slug',
@@ -37,7 +37,13 @@ describe("the bank file", () => {
 
   it("refuses a host bank smaller than the most host answers a position takes", () => {
     const small = bank([{ ...ten[0], host_bank: ["x", "y"] }]);
-    expect(parseBank("bank.json", JSON.stringify(small)).errors).toEqual(['bank.json question 1: "host_bank" lists 2 names, at least 3 needed']);
+    expect(parseBank("bank.json", JSON.stringify(small)).errors).toEqual(['bank.json question "q-a": "host_bank" lists 2 names, at least 3 needed']);
+  });
+
+  it("refuses two questions asking one prompt for one category, and a themed date no question is tagged for (13f-4c)", () => {
+    const twin = { ...ten[1], prompt: ten[0].prompt, category: ten[0].category };
+    expect(parseBank("bank.json", JSON.stringify(bank([ten[0], twin]))).errors).toEqual(['bank.json: questions "q-a" and "q-b" ask "Name a q-a" for q_a']);
+    expect(parseBank("bank.json", JSON.stringify(bank(ten.slice(0, 2), { "2026-12-25": "xmas" }))).errors).toEqual(['bank.json: theme "2026-12-25": no question is tagged "xmas"']);
   });
 });
 

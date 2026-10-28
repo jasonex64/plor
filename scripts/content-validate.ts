@@ -2,7 +2,8 @@
 // `npm run content:validate [-- <root>]` (default `content`). Prints one line per error naming the file, question and
 // entry, and exits 1 on any error, or when no puzzle file is found, so a wrong root can't pass silently (M01 ticket).
 // Across the days, no category is asked twice within REPEAT_GAP_DAYS (13d), and no day asks two of one family (13e-4a).
-// The bank asks only categories listed in data/categories.json, which is checked too (13e).
+// The bank asks only categories listed in the categories file (data/categories.json from the command; a test passes
+// its own, 13e-1 review; 13f-4c), which is checked too (13e).
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -25,7 +26,7 @@ export function listPuzzleFiles(root: string): string[] {
   return listFiles(root).filter((p) => p.endsWith(".json") && p !== BANK);
 }
 
-export function validateRoot(root: string): { files: number; errors: string[] } {
+export function validateRoot(root: string, categoriesFile: string): { files: number; errors: string[] } {
   const all = listFiles(root);
   const files = listPuzzleFiles(root);
   // Anything else under the root is an error, so a mistyped file name can't drop a day while CONTENT OK prints
@@ -35,7 +36,7 @@ export function validateRoot(root: string): { files: number; errors: string[] } 
   const texts = files.map((file) => ({ file, text: readFileSync(join(root, file), "utf8") }));
   const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text))];
   const days = texts.flatMap(({ file, text }) => parsePuzzle(file, text).puzzle ?? []) as Puzzle[];
-  const { categories, errors: categoryErrors } = parseCategories(CATEGORIES_FILE, readFileSync(CATEGORIES_FILE, "utf8"));
+  const { categories, errors: categoryErrors } = parseCategories(categoriesFile, readFileSync(categoriesFile, "utf8"));
   errors.push(...categoryErrors);
   // A broken categories file is reported above, and every family is then its own category.
   errors.push(...gapProblems(days, familyOf(categories ?? [])));
@@ -44,7 +45,7 @@ export function validateRoot(root: string): { files: number; errors: string[] } 
     errors.push(...bankErrors);
     if (bank && categories) {
       const keys = new Set(categories.map((c) => c.key));
-      for (const q of bank.questions) if (!keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${CATEGORIES_FILE}`);
+      for (const q of bank.questions) if (!keys.has(q.category)) errors.push(`${BANK} question "${q.id}": category "${q.category}" is not in ${categoriesFile}`);
     }
   }
   return { files: files.length, errors };
@@ -52,7 +53,7 @@ export function validateRoot(root: string): { files: number; errors: string[] } 
 
 function main() {
   const root = process.argv[2] ?? "content";
-  const { files, errors } = validateRoot(root);
+  const { files, errors } = validateRoot(root, CATEGORIES_FILE);
   for (const line of errors) console.error(line);
   if (errors.length) {
     console.error(`CONTENT INVALID ${root}: ${errors.length} error(s) in ${files} file(s)`);
