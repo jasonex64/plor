@@ -1,6 +1,6 @@
 # M13 13f-3 — Import and draft tools
 
-**Status:** 13f-3a built and reviewed twice, its fixes committed on `m13-answer-lists-and-content`; in review in PR #114 (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b not started.
+**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b not started.
 
 ## Goal
 Make the load match the files exactly, removing what they no longer give (13f-3a); and close the tool items that can fail silently or mislead, with tests for the code that runs every day, the two admin fixes, and suites that clean up after themselves (13f-3b).

@@ -2,7 +2,7 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-10-28 (UTC), on `m13-answer-lists-and-content`, by the Mac's M13 session: 13f-1 (PR #110) and 13f-2 (PR #112) merged; 13f-3 approved; **13f-3a, removal on load, in review in PR #114**. Then the Windows PC caught up (2026-10-28 UTC): pulled, `load_sync` applied, `load all` run, check-bank 0 problems. The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
+**Updated:** 2026-10-28 (UTC), on `m13-answer-lists-and-content`, by the Mac's M13 session: 13f-1 (PR #110) and 13f-2 (PR #112) merged; 13f-3 approved; then the Windows PC's session caught up (2026-10-28 UTC: pulled, `load_sync` applied, `load all` run, check-bank 0 problems) and, at the human's request ("merge when its a good time and run the migrations for me"), **merged 13f-3a in PR #114 on green CI (`6e3bd73`) and pushed its migration and 13e-6's to plor.app**; the hosted tests wait on the human. The M14 section is the M14 session's, from `main`; for M14's latest, read the handoff on `m14-look-and-feel`.
 
 ## M14 (this branch, written by the M14 session)
 ### Done
@@ -62,17 +62,16 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 
 ## Where things stand (M13)
 - **M13 is in progress** on `m13-answer-lists-and-content`; 13a to 13e are done (226 categories, simulate 30 of 30). **13f, the review backlog** (`docs/milestones/M13-13f-the-review-backlog.md`) clears ROADMAP's For M13 items in four sub-tickets: 13f-1 player scoring (PR #110) and 13f-2 category polish (PR #112) are merged; **13f-3, import and draft tools** (`docs/milestones/M13-13f-3-import-and-draft-tools.md`) is approved, in two PRs.
-- **13f-3a, removal on load, is in review in PR #114.** `load all` now makes the base match the files: what they no longer give (names, facts, links, populations) ends at the next midnight (Pacific), and a load a day after that deletes it; shown names follow the files; a dropped category goes at once unless a player's miss, an admin's addition or a day from yesterday on uses it (migration `20261027233000_load_sync.sql`, `private.load_begin`/`load_finish`; DECISIONS.md Log). The human's answers are quoted in the ticket. Things, players' rows and the admin's rows are never erased.
+- **13f-3a, removal on load, is done** (PR #114, merged on green CI, `6e3bd73`). `load all` now makes the base match the files: what they no longer give (names, facts, links, populations) ends at the next midnight (Pacific), and a load a day after that deletes it; shown names follow the files; a dropped category goes at once unless a player's miss, an admin's addition or a day from yesterday on uses it (migration `20261027233000_load_sync.sql`, `private.load_begin`/`load_finish`; DECISIONS.md Log). The human's answers are quoted in the ticket. Things, players' rows and the admin's rows are never erased.
 - **Loading no longer needs a `db reset`:** `npm run base -- load all` on a loaded base ends what the files dropped (the ticket's Evidence: a reload with four rows taken out of the files equals a fresh load from the next midnight). A `db reset` is still needed only to merge two already-loaded items (ROADMAP).
 
 ## Waiting on the human
-- **plor.app's `db push`** of `20261027090000_genre_publisher.sql` (13e-6), and later of `20261027233000_load_sync.sql` once 13f-3a merges. The session's permission mode blocks it, so the human runs `npx supabase db push --linked` from a clean checkout of `main`, then `npx supabase test db --linked`.
+- **plor.app's hosted tests.** On 2026-10-28 (UTC), from `C:/Users/jason/RIFF` with `supabase/` identical to `origin/main` after PR #114, the dry run listed only `20261027090000_genre_publisher.sql` and `20261027233000_load_sync.sql`, `db push --linked` applied both, and `migration list --linked` matches on all 44. The session's auto mode refused `npx supabase test db --linked`, so the human runs it.
 - **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`): 81 findings, none approved as tickets.
 
 ## Next step
-1. **PR #114 (13f-3a):** merge on green CI when the human says, then mark it done in the ticket's Status and ROADMAP's row.
-2. **13f-3b, failures, tests, admin, cleanup** (the ticket's 13f-3b part): list its items, ask its guided questions (CLAUDE.md, "Ask before designing"), then build. Its own PR.
-3. Then **13f-4, scale**, then the migration squash that closes M13 (its own guided questions).
+1. **13f-3b, failures, tests, admin, cleanup** (the ticket's 13f-3b part): list its items, ask its guided questions (CLAUDE.md, "Ask before designing"), then build. Its own PR.
+2. Then **13f-4, scale**, then the migration squash that closes M13 (its own guided questions).
 
 **The shared local stack (Mac):** the M14 sessions ("M14: settings sheet, friends move, themes", "Visual polish and design review") use it and port 3000 too. Message them before a `db reset`, a full suite run, a `load all` or a dev server, and again when free.
 
