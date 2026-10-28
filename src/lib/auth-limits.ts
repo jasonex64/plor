@@ -1,7 +1,7 @@
 // Sign-in code limits (docs/milestones/M12-12e-sign-in-limits.md, L1 (a)). Our routes call Supabase Auth from the
 // server, so Auth's own per-IP limits count Vercel's address and are shared by every player (SOURCES.md, Supabase email
 // sending and Auth limits, "IP address forwarding"). These limits count each player instead, per IP and per address,
-// in private.auth_attempt (supabase/migrations/20261024000629_auth_attempts.sql), before Auth is called.
+// in private.auth_attempt (supabase/migrations/20261028140000_baseline.sql), before Auth is called.
 import { createHash } from "node:crypto";
 import { AUTH_LIMITS } from "@/config/tunables";
 import type { Db } from "@/lib/db";
@@ -47,8 +47,8 @@ export async function takeAttempt(db: Db, kind: AuthLimitKind, value: string): P
   throw new AppError("too_many_attempts", 429);
 }
 
-// Takes back the attempt just counted, for a request that went no further (supabase/migrations/
-// 20261024001501_auth_attempt_give_back.sql): N2 counts the code emails Auth actually sent.
+// Takes back the attempt just counted, for a request that went no further
+// (supabase/migrations/20261028140000_baseline.sql): N2 counts the code emails Auth actually sent.
 export async function giveBackAttempt(db: Db, kind: AuthLimitKind, value: string): Promise<void> {
   await db.query("select private.give_back_auth_attempt($1, $2)", [kind, hashKey(value)]);
 }

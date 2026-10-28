@@ -1,6 +1,6 @@
 // Groups and their members (docs/milestones/M10-groups.md, 10b; G1, G6, G8). The database keeps the rules: the name
 // format, the invite code's shape, the creator always a member, the caps and the creator handover
-// (supabase/migrations/20261023050925_groups.sql). The routes pass only the verified player's ID.
+// (supabase/migrations/20261028140000_baseline.sql). The routes pass only the verified player's ID.
 import { DatabaseError } from "pg";
 import { newInviteCode, type Friend } from "@/friends/friends";
 import type { Db } from "@/lib/db";

@@ -1,5 +1,5 @@
--- The answer database behind a format-3 day (docs/milestones/M13-13a-the-base.md, "13a-2 and 13a-3"; migration
--- 20261024213853_answer_engine.sql): the IDs an import gives, the display name a merge keeps, and resolving answers as
+-- The answer database behind a format-3 day (docs/milestones/M13-13a-the-base.md, "13a-2 and 13a-3"; the
+-- baseline migration): the IDs an import gives, the display name a merge keeps, and resolving answers as
 -- the base stood when the day was approved. Run with `npm run test:sql`.
 begin;
 -- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
@@ -30,9 +30,8 @@ select is((select name from private.thing where id = '00000000-0000-5000-8000-00
 select is((select name from private.thing where id = '00000000-0000-5000-8000-00000000ae03'), 'domestic dog', 'a joining WordNet item''s name replaces a typeable name too');
 
 select private.define_category('ae_animal', 'animal', 'wikidata', 'ae-animal', null);
--- A day approved now, whose start has passed (so its answers are fixed as of the approval, migration
--- 20261025002908_learning_from_misses.sql): question 1 is "Name an animal" with bear as the host answer; question 2 the animals that are
--- member_of the pack (only dog).
+-- A day approved now, whose start has passed (so its answers are fixed as of the approval, 13b): question 1 is "Name
+-- an animal" with bear as the host answer; question 2 the animals that are member_of the pack (only dog).
 insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', '2000-01-01', jsonb_build_object(
   'format', 3, 'game_id', 'offbeat', 'date', '2000-01-01', 'approved_at', now(), 'questions', jsonb_build_array(jsonb_build_object(
     'prompt', 'Name an animal', 'category', 'ae_animal', 'host_bank', jsonb_build_array('00000000-0000-5000-8000-00000000ae01'),

@@ -1,5 +1,5 @@
--- Puzzle entry's guarded functions (docs/milestones/M06-puzzle-entry.md; migrations 20261021232903_puzzle_entry.sql,
--- 20261024213853_answer_engine.sql and 20261025042950_rarity_and_the_host.sql), whoever calls them: only an admin may approve a day, a past day
+-- Puzzle entry's guarded functions (docs/milestones/M06-puzzle-entry.md; the baseline
+-- migration), whoever calls them: only an admin may approve a day, a past day
 -- is refused, a day that has started can't change, and a format-3 day must hold up against the answer database. They're
 -- called as the test's own role, which can't SET ROLE plor_app locally; that plor_app may only execute them, never write
 -- the tables, is checked by plor_app_role.test.sql and game.test.sql.

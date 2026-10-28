@@ -7,7 +7,7 @@ import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const id = (n: string) => `e2e-${RUN}-${n}`;
-// A category key is letters and underscores (migration 20261024095732_answer_base.sql).
+// A category key is letters and underscores (supabase/migrations/20261028140000_baseline.sql).
 const KEY = `endtoend_${RUN.replace(/[0-9]/g, (d) => "abcdefghij"[Number(d)])}`;
 
 test.beforeAll(async () => {

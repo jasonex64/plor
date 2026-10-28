@@ -14,7 +14,7 @@ export type Friend = { username: string; name: string };
 
 // A fresh code: enough random bytes for INVITE_CODE_LENGTH base64url characters (6 bits each), written in base64url and
 // cut to that length, so every character is random. The migration makes codes the same way
-// (supabase/migrations/20261027004038_short_invite_codes.sql).
+// (supabase/migrations/20261028140000_baseline.sql).
 export function newInviteCode(): string {
   return randomBytes(Math.ceil((INVITE_CODE_LENGTH * 6) / 8)).toString("base64url").slice(0, INVITE_CODE_LENGTH);
 }
