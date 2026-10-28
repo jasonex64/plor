@@ -335,14 +335,22 @@ export const swapLines = (swapped: { prompt: string }[]): string[] => swapped.ma
 // days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
 // questions to use, in order, instead of the pick; a hand-picked day is never swapped ("Never (Recommended)").
 export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[]): Promise<{ day: Puzzle; guide: string[]; swapped: BankQuestion[] }> {
+  // Each bank question resolved and measured once per draft: a swap round changes one question of the 7, and
+  // resolving and measuring the other 6 again gave the same answers each round (13e-10b review; 13f-4a).
+  const measured = new Map<string, Promise<{ q: Question; catch: number }>>();
+  const measure = (b: BankQuestion) => {
+    let m = measured.get(b.id);
+    if (!m) {
+      m = resolveQuestion(db, b).then(async (q) => ({ q, catch: ids ? 0 : await oneHostCatch(db, date, q) }));
+      measured.set(b.id, m);
+    }
+    return m;
+  };
   // The day from these 7 bank questions: resolved, easiest first (a picked day), its host names checked, and its
   // letters searched; steals is null when none fit, with held saying how far they got.
   const assemble = async (chosen: BankQuestion[]) => {
     const resolved: { q: Question; bank: BankQuestion; catch: number }[] = [];
-    for (const b of chosen) {
-      const question = await resolveQuestion(db, b);
-      resolved.push({ q: question, bank: b, catch: ids ? 0 : await oneHostCatch(db, date, question) });
-    }
+    for (const b of chosen) resolved.push({ ...(await measure(b)), bank: b });
     const ordered = ids ? resolved : easiestFirst(resolved, (r) => r.catch);
     const { rows } = await db.query<{ id: string; name: string }>("select id::text, name from private.thing where id = any($1::uuid[])", [
       ordered.flatMap((r) => r.q.host_bank),
