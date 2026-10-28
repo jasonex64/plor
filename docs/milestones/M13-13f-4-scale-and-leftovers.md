@@ -1,6 +1,6 @@
 # M13 13f-4 — Scale, and the For M13 leftovers
 
-**Status:** seven rounds of guided questions answered (2026-10-28); design proposed, waiting on the human's approval.
+**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a built, in review (its PR number follows); 13f-4b and 13f-4c next.
 
 ## Goal
 Measure the four scale items and fix the ones that slow the drafting tools; close or move every For M13 item left in ROADMAP, so the list is empty when M13 closes (`docs/milestones/M13-13f-the-review-backlog.md`, criterion 2).
@@ -70,8 +70,8 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 **13f-4c, the tools and tests**: `content:validate` (duplicate prompt and category, a themed date with no tagged question, `<root>`'s categories, errors by question ID); check-bank's two new flags (a host answer above a familiar one; an answer in two status subsets); the loud hand-file rows (`rename`, `drop_listed_names`, `dropListed`, the rivers' and animals' drop lists); the review (animal snapshots only for the animal tree, the forks list, `rootSetItems`); `simulate`'s failed dates and lost connection; the shown-name helper; the countries snapshot read once; the 13f-3b-2 review's code notes; the misses test, every outcome's log row, `members`; the bank route's 401 test, the stale ticket names; and ROADMAP: every For M13 item closed or moved as answered.
 
 ## Acceptance criteria
-- [ ] Items 3 and 4: measured before and after on the real base, with the commands and times.
-- [ ] Items 1 and 2: under For M15 with the round-1 answer.
+- [x] Items 3 and 4: measured before and after on the real base, with the commands and times. *(13f-4a)*
+- [x] Items 1 and 2: under For M15 with the round-1 answer. *(13f-4a)*
 - [ ] ROADMAP's For M13 has no open item; each is closed with evidence or moved with its reason.
 - [ ] The suites pass; `check-bank` 0; `simulate` 30 of 30.
 
@@ -99,5 +99,17 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 13f-4a: make `fits_where` cheap for a category with no filter (skip it, or let the planner inline it) | `category_members` skips the call when the category has no filter; `fits_where` keeps `set search_path` | Skipping needs no change to a function three readers share; inlining would mean dropping its `set search_path = ''`, which the migrations' functions all set, and DECISIONS.md's Log asks of the security-definer ones |
+| 13f-4a: the swap rounds resolve and measure only the question swapped in | Each bank question is resolved and measured once per `draft()` call, kept by its ID | The first attempt resolves all 7 anyway; a round's other 6 are then the ones already kept |
+| (no source) | Only `category_members` skips the call; `in_category_now` and `resolve_answer` still call `fits_where` | They run once per thing or per typed answer, not once per member of a category |
 
 ## Evidence
+### 13f-4a (Windows, 2026-10-28 UTC, the real base, 231 categories)
+- **`category_members`** (`psql`, `	iming`): before, `animal` (56,169 members, no filter) 2017, 1727 and 1890 ms; `animal_k` (1,411, a letter subset) 3752 and 3565 ms; `fruit` (3,014) 66 and 70 ms. Hypothesis: the per-member `fits_where` call is most of a base category's time. Checked first by hand, the same query with `(cat.filter is null or private.fits_where(…))`: 504 and 701 ms, and the walk alone 226 ms, so it held. After the migration: `animal` 585, 540 and 561 ms; `animal_k` 3615 ms (a subset still checks each member, as designed); `fruit` 27 ms.
+- **`npm run draft -- simulate`** (30 days): before, 265 s; with the migration alone, 265 s, the same output (`membersOf` runs `category_members` once per category per run, so its saving, about 1.3 s for animal, is too small to show in 265 s); with the swap change too, 218 s. `DRAFTED 30 of 30; subset questions 74 of 210` each time, and `diff` of the full output before and after: identical (8 swaps in the run).
+- **`npm run draft -- check-bank`**: before 52 s, after 43 s; `CHECKED 231 questions: 0 problems`, output identical.
+- **Suites:** `npx supabase test db` 30 files, 488 PASS; `npm run test:db` 41 files, 277 passed; `npm test` 43 files, 453 passed; tsc clean, lint clean on `scripts/draft.ts`.
+- No test was added for the swap change. Its claim is the same answers faster, and the identical `simulate` output with 8 swaps is the evidence; a test would only re-check that a Map caches.
+
+## Review
+13f-4a: the `reviewer` agent, 2026-10-28, in a fresh context. No blocking findings: the migration's `category_members` matches 13e-5's but for the guard, `category_where` is null for exactly the 196 categories with no filter, and the per-draft cache shares no changing state across rounds. Two claims corrected as found (animal after: 0.54–0.59 s, not 0.58; the migration-only `simulate` run explained by `membersOf` running once per category). `.claude/settings.local.json` stays out of the commit.
