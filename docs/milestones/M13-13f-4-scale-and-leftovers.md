@@ -1,6 +1,6 @@
 # M13 13f-4 — Scale, and the For M13 leftovers
 
-**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a built and reviewed, in review in PR #117; 13f-4b and 13f-4c next.
+**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a done (PR #117, merged on green CI 2026-10-28 UTC, `2dac4e6`); 13f-4b and 13f-4c next.
 
 ## Goal
 Measure the four scale items and fix the ones that slow the drafting tools; close or move every For M13 item left in ROADMAP, so the list is empty when M13 closes (`docs/milestones/M13-13f-the-review-backlog.md`, criterion 2).
@@ -49,6 +49,8 @@ Round 7:
 - From the 13e-10b review, alloy, lawyer, beer and liquor at Q7: **"Later, a content batch (Recommended)"**, with 13e-2's four.
 - From the 13e-10 review: **"One helper, fix the comment (Recommended)"**: the host answer's shown-name rule in one function check-bank and the draft share. (The prompt fits, Mardi Gras, virus and disease, "wolf": 13f-2.)
 - From the 13e-9b review: **"Loud unused rows, tidy the repeats (Recommended)"**: a `rename` or `drop_listed_names` row that applies to nothing stops the load; the source list written once. The merged-away double and a joined WordNet item's raw name go to Later (neither reachable with today's files).
+
+During 13f-4b's build (2026-10-28): a name or fact the files give back after its end-midnight has passed can't come back as round 5 put it, as one key holds one row (a second row needs a changed uniqueness rule under every insert; clearing the old row's end changes a started day). Asked in plain words, the human chose **"Leave the gap, note it (Recommended)"**: it comes back at the next load after the old row is erased, recorded under For M15 with hosted loads.
 
 ## Source
 - ROADMAP.md, For M13: the items below.
