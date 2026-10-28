@@ -69,7 +69,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **The 2026-10-26 codebase audit** (`docs/audits/2026-10-26-codebase-audit.md`): 81 findings, none approved as tickets.
 
 ## Next step
-1. **13f-3b, failures, tests, admin, cleanup** (the ticket's 13f-3b part): list its items, ask its guided questions (CLAUDE.md, "Ask before designing"), then build. Its own PR.
+1. **13f-3b's design waits on the human's approval.** Two rounds of guided questions are answered and quoted in the ticket (2026-10-28): all eight 13f-3a review items join it, the match-group item is closed, missing names are marked one by one, and it ships as two PRs, **13f-3b-1, the load's gaps**, then **13f-3b-2, failures, tests, admin, cleanup**. On approval, build 13f-3b-1 first.
 2. Then **13f-4, scale**, then the migration squash that closes M13 (its own guided questions).
 
 **The shared local stack (Mac):** the M14 sessions ("M14: settings sheet, friends move, themes", "Visual polish and design review") use it and port 3000 too. Message them before a `db reset`, a full suite run, a `load all` or a dev server, and again when free.

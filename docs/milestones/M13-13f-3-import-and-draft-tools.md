@@ -1,6 +1,6 @@
 # M13 13f-3 — Import and draft tools
 
-**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b not started.
+**Status:** 13f-3a done (PR #114, merged on green CI 2026-10-28 UTC, `6e3bd73`; its migration pushed to plor.app the same day) (approved by the human, 2026-10-27: "I approve 13f-3's design as drafted. Build 13f-3a, removal on load, first."). 13f-3b: two rounds of guided questions answered (2026-10-28); split into 13f-3b-1 and 13f-3b-2, their designs proposed, waiting on the human's approval.
 
 ## Goal
 Make the load match the files exactly, removing what they no longer give (13f-3a); and close the tool items that can fail silently or mislead, with tests for the code that runs every day, the two admin fixes, and suites that clean up after themselves (13f-3b).
@@ -27,6 +27,17 @@ Round 2:
 - After the second review (a run can be finished after midnight, DECISIONS.md Timer): **"Wait one more day (Recommended)"**: "Erased rows go a day later, so a run finished the next day still counts them. A run left open for 2+ days could still lose one. Erasing waits up to 2 days."
 - A category the file drops while an approved day uses it: **"Keep for those days (Recommended)"**: "The category stays until no approved day from today on uses it, then goes at a later load." Built as from yesterday on, for a run of yesterday finished today (the answer above).
 
+## 13f-3b's guided questions (2026-10-28)
+Round 1:
+- The 13f-3a review's eight deferred items (ROADMAP, "From the 13f-3a review"): **"All eight now"** (not chosen: the three safety ones only, or none).
+- The admin item "changing a host answer that has a match group": **"Close it (Recommended)"**: format 3 retired match groups (DECISIONS.md, Catching) and host answers are ticked chips, so there's nothing to build.
+- A missing name on the Puzzles page, with plor.app's answer database empty by choice: **"Mark each one (Recommended)"**: the page loads, each missing answer shows as an error naming its ID, and approval stays refused.
+
+Round 2:
+- A category only an older day uses, while a run of that day can still be resumed (a run waits at a reveal until Next, DECISIONS.md Timer): **"Keep while unfinished (Recommended)"**: a category stays while any unfinished run of a day naming it exists; no new number, nothing players see changes.
+- A load changing a host answer's name or link on an approved day not yet started: **"Name them, keep going (Recommended)"**: the load finishes and prints each such day and question.
+- Shipping: **"Two PRs (Recommended)"**: 13f-3b-1, the load gaps; 13f-3b-2, failures, tests, admin, cleanup. This replaces round 2 of 2026-10-27's "a PR each" for 13f-3b.
+
 ## Source
 - ROADMAP.md, For M13: the items below and the tickets they cite.
 - DECISIONS.md, Answer model (format 3: permanent thing IDs) and its Hard to reverse list; 13e-5b's `private.thing_retired`.
@@ -45,18 +56,33 @@ Round 2:
 - [x] A thing whose item left its snapshot keeps its row and shown name, with no names, facts or links of the load's (db test).
 - [x] `check-bank` 0, `simulate` 30 of 30, the suites pass.
 
-## 13f-3b — Failures, tests, admin, cleanup
+## 13f-3b-1 — The load's gaps (proposed 2026-10-28, from ROADMAP "From the 13f-3a review")
+### Design (each with a db test that fails before its fix)
+1. **One load at a time:** `load_begin` takes a lock that `load_finish` releases, so a second load is refused by name instead of emptying the first one's `load_seen_*`.
+2. **No leftovers:** a single `load <set>` and the suites' fixture imports leave no `load_seen_*` rows.
+3. **A reload refuses what a fresh load refuses:** a ref to an item that left its snapshot is unknown to this load (`thing_by_ref` checks the load's own items), not found through its old `thing_source` row.
+4. **Circle checks on a reload:** `import_source`'s and `load_links`' circle checks ignore facts this load hasn't given, so a re-fetch that reverses an edge loads on a reloaded base as it does fresh; a fact brought back in the finish is checked again.
+5. **Shown names:** `load_seen_name` mirrors `import_source`'s rename of a thing with no name alias by a joining non-WordNet or merged item.
+6. **Categories in unfinished runs:** a category stays while any unfinished run of a day naming it exists (round 2); `record_miss` raises instead of returning quietly when a day's category is missing.
+7. **Approved future days:** the load prints each approved day not yet started, and its question, whose host answer's name or link it ended or renamed (round 2).
+8. **The db test:** `resolve_answer` end to end on a fixture day (an ended name counts today, not tomorrow); the truncate's exclusive locks replaced by a scope that doesn't hold three tables for the file's run.
+
+### Acceptance criteria
+- [ ] Each of 1–8 has a db test that fails before its fix and passes after.
+- [ ] On the real base, a reload of a fresh load prints nothing ended, renamed or touched; `check-bank` 0, `simulate` 30 of 30, the suites pass.
+
+## 13f-3b-2 — Failures, tests, admin, cleanup
 ### Design (each with a test that fails before its fix, where a test can)
 - **Silent failures to fail loudly:** `drop_from_set`'s set checked against the sets, and a ref both dropped and set-dropped refused; a single `load <set>` judging names.json's rows for that set; `import_source` refusing a `same_as` that disagrees with the one already linked; the review's `joins…get(t)!` and the circle refusal naming a dropped ID or one circle as named errors; `OEWN_ANIMALS_HAND`'s synset in both `split` and `pick` refused; `define_category` clearing the filter columns when a subset becomes a base; `latestNumber` checking every tied value; a swapped-in question's error naming the swaps before it; a SPARQL reply cut off with an error reported as a timeout; `approvePuzzle` not splitting a problem that holds "; ".
 - **Tests for daily code:** `resolveNames`/`nameCandidates` and `expectedCatches` (draft); check-bank on a retired `#<id>`; `within`'s refusal (db) and its unit test's cross-source model fixed; `valueItems` and `define_subset` with some values unknown; the root's `same_as` and the familiar check's 3 agreeing with `FAMILIAR_SAFE_MIN`.
-- **The admin pages:** Puzzles' missing name fails loudly; a host answer with a match group can be changed on the page with its group's key.
+- **The admin pages:** each missing name on Puzzles shows as an error naming its ID, in the host bank and the read-only host answers alike, and the page still loads (round 1); approval stays refused (`checkHostNames`). The match-group item is closed, not built (round 1).
 - **Cleanup:** each db test removes the things, categories and fixture days it adds (`fixture_animal`, `dt_`); the review's "no parent" count.
 - **To Later (comment-only, fetch-only or style):** `matching.ts`'s stale comment, `pickHosts`'s constants comment, `FACT_TRAITS`' place, the pop groups' `method` text, `simulateDates`' export, `analyzeBase`'s table list, the `Where` type, `fetchTaxa`/`byIds`/P13176 tests, `titleForms`' numbers, the import's slices, `thing_names`' duplicates, `membersOf`' cache, error codes reused, `env.ts`' two spellings, DECISIONS.md Game 1's wording.
 
 ### Acceptance criteria
 - [ ] Each silent failure listed fails loudly in a test.
 - [ ] Each daily helper listed has a test.
-- [ ] The two admin fixes, with e2e or route tests.
+- [ ] The missing-name fix, with an e2e or route test; the match-group item closed in ROADMAP with its reason.
 - [ ] After the db suite, the local base holds no `fixture_` or `dt_` category or thing.
 - [ ] The Later items moved with their reason; the suites pass.
 
@@ -69,11 +95,12 @@ None new.
 ## Plan
 1. The human approves this ticket.
 2. 13f-3a: the owned-row rule, the erase step, shown names, tests; load twice (before/after) on the real base and compare with a fresh one; review; PR; merge.
-3. 13f-3b: the same.
+3. 13f-3b-1, then 13f-3b-2: the same, a PR each (round 2, 2026-10-28).
 
 ## Removes
 - 13f-3a: the need for a `db reset` before `load all` (the handoff's steps); `import_source`'s insert-only behaviour for owned rows.
-- 13f-3b: the closed ROADMAP items, and the fixture rows the suites leave.
+- 13f-3b-1: ROADMAP's "From the 13f-3a review" item; `record_miss`'s quiet return; the test's whole-file truncate locks.
+- 13f-3b-2: the closed ROADMAP items (the match-group one among them), the raw-ID fallbacks on Puzzles, and the fixture rows the suites leave.
 
 ---
 *Fill in the sections below at the end.*
