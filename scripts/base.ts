@@ -1630,10 +1630,10 @@ async function defineCategories(client: pg.Client): Promise<void> {
 // (Recommended)", "Erase it", "Erase at the next midnight (Recommended)"): `load all` opens a load, every set and link
 // marks what the files give, and the finish ends the owned names, facts, links and populations no file gave at the next
 // midnight (Los Angeles), shows each thing the name the files give it, and erases the categories the file no longer
-// lists, keeping the things themselves, players' rows and the admin's decisions (migration
-// 20261027233000_load_sync.sql). A load a day after that midnight erases the ended rows, as a run can be finished the
+// lists, keeping the things themselves, players' rows and the admin's decisions (the
+// baseline migration). A load a day after that midnight erases the ended rows, as a run can be finished the
 // next day ("Wait one more day (Recommended)"). A single `load <set>` doesn't erase: it sees one set, not what the
-// others give, so it marks nothing (13f-3b-1). The load is its session's (migration 20261028060000_load_gaps.sql):
+// others give, so it marks nothing (13f-3b-1). The load is its session's (the baseline):
 // `load all` runs on one connection from load_begin to load_finish, holding the load lock, so a second load is refused
 // while it runs, and the lock goes with the connection if the script dies.
 async function beginLoad(client: pg.Client): Promise<void> {

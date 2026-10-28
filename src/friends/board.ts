@@ -1,9 +1,8 @@
 // The live board (docs/milestones/M07-friends-and-live-board.md, 7c): each friend's run today, and how it ended
 // once the viewer's own run is over. Until then, only whether each friend has started (M12 12d,
 // docs/milestones/M12-12d-decided-fixes.md): a friend's question, or that they've finished, would tell the viewer
-// which one caught them. Live updates arrive over Realtime (supabase/migrations/20261022073610_live_board.sql, and
-// since 12d 20261024031116_board_hides_progress.sql); this is the full picture the page loads first and refetches
-// after a reconnect.
+// which one caught them. Live updates arrive over Realtime (supabase/migrations/20261028140000_baseline.sql); this is
+// the full picture the page loads first and refetches after a reconnect.
 import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { named, thingNames, type Names } from "@/game/payload";

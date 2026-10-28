@@ -13,7 +13,7 @@ type Session = { url: string; publishableKey: string; userId: string; accessToke
 
 // The payload versions these pages understand (M00 data design §2: an unknown v is logged and the page refetches):
 // PAYLOAD_VERSION for the comment and reaction nudges, STATUS_VERSION for friends' run states, 2 since M12 12d added
-// started (supabase/migrations/20261024031116_board_hides_progress.sql).
+// started (supabase/migrations/20261028140000_baseline.sql).
 export const PAYLOAD_VERSION = 1;
 export const STATUS_VERSION = 2;
 
@@ -27,7 +27,7 @@ export type StatusMessage = {
 };
 
 // A comment or reaction changed on that day: in the group with groupId, or in the friends thread when there is none
-// (supabase/migrations/20261023060640_group_thread.sql).
+// (supabase/migrations/20261028140000_baseline.sql).
 export type ChangedMessage = { v: number; type: "comments_changed" | "run_reactions_changed"; puzzleDate: string; groupId?: string };
 
 // Whether a nudge means this list should be fetched again: a group's thread (its ID) for that group's nudges, or the

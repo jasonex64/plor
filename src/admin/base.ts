@@ -23,7 +23,7 @@ export async function lookupThings(db: Db, adminId: string, text: unknown): Prom
     const { rows } = await db.query<{ things: ThingView[] }>("select private.base_lookup($1, $2) as things", [adminId, alias]);
     return rows[0].things.map((t) => ({ ...t, name: shownName(t.name) }));
   } catch (err) {
-    // private.base_lookup's own admin check (migration 20261024095732_answer_base.sql).
+    // private.base_lookup's own admin check (supabase/migrations/20261028140000_baseline.sql).
     if (err instanceof DatabaseError && err.code === "OB007") throw new AppError("admins_only", 403);
     throw err;
   }

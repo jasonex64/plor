@@ -324,7 +324,7 @@ describe("other ways a run ends", () => {
 // B1 (M02 2f): a run has two foreign keys, and only the one to private.puzzle means "nothing published today".
 // Each case runs on its own client inside a transaction that is rolled back, so the shared fixtures stay as they were.
 // M04 13c-2: 20 seconds per question (human, 2026-10-21). Time passing is simulated by moving the run's stored
-// times back: a question starts at the last answer's created_at, or the run's started_at (the timer migration).
+// times back: question 1 starts at the run's started_at, the others at their question_open row (13c-4).
 describe("the 20-second timer", () => {
   async function ageRun(userId: string, seconds: number) {
     const db = getPool();

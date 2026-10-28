@@ -49,7 +49,7 @@ export async function getStats(db: Db, userId: string): Promise<Stats> {
 }
 
 // The stats as of day, read once by the caller so every part is of the same day: private.today() is each statement's
-// own (supabase/migrations/20261021044659_today_uses_statement_time.sql), so separate reads at midnight could mix two
+// own (supabase/migrations/20261028140000_baseline.sql), so separate reads at midnight could mix two
 // (item 19). The caller has settled the player's closed runs.
 export async function readStats(db: Db, userId: string, day: string): Promise<Stats> {
   const { rows } = await db.query<{ best: number | null; average: number | null; days: Stats["days"] }>(

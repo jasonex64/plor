@@ -1,5 +1,5 @@
 -- Invite codes are 10 base64url characters, for groups as for friends (friends.test.sql) (docs/milestones/M14-14b-3-invite-button.md;
--- supabase/migrations/20261027004038_short_invite_codes.sql). Run with `npm run test:sql`.
+-- supabase/migrations/20261028140000_baseline.sql). Run with `npm run test:sql`.
 begin;
 -- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
 set local role postgres;
