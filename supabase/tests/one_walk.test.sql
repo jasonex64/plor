@@ -32,7 +32,8 @@ select is(pg_temp.under('ow-mammal'), array['ow animal', 'ow dog', 'ow mammal', 
 delete from private.fact where source_ref = 'one-walk-old-circle';
 
 create function pg_temp.base_size() returns int language sql
-  return (select count(*)::int from private.fact) + (select count(*)::int from private.thing) + (select count(*)::int from private.base_log);
+  return (select count(*)::int from private.fact) + (select count(*)::int from private.thing) + (select count(*)::int from private.base_log)
+    + (select count(*)::int from private.thing_source) + (select count(*)::int from private.thing_alias);
 create temp table before as select pg_temp.base_size() as n;
 
 -- A later import that puts animal under puppy closes animal > mammal > dog > puppy > animal.

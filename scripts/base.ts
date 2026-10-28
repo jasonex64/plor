@@ -191,6 +191,12 @@ function countryIds(): Set<string> {
   return new Set(ids);
 }
 
+// The continents the countries' facts name, by ID: wherever a set loads one (the places set too), it's named by its
+// label alone, as valueItems names it in the countries set (13e-4b review; 13f-4b).
+function continentIds(): Set<string> {
+  return new Set(readSnapshot("wikidata-countries").items.flatMap((i) => i.continent ?? []));
+}
+
 type Taxon = { names: string[]; synonyms: string[]; scientific: string[]; parents: Set<string>; label?: string };
 
 // A query asked about Wikidata IDs, BASE_BATCH_IDS at a time: `pattern` gets the batch as a VALUES list. By key, never by
@@ -1060,7 +1066,7 @@ async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<voi
   const named = def.source === "wikidata" ? withMerges(read, mergePlan().into) : def.source === "oewn" ? shownNames(read, name) : read;
   const { listed, names } = readHandFiles();
   // Countries load from the places set too, with the same codes, so the codes go wherever a country loads.
-  const { items: handled, used } = withHandNames(def.source, withoutCountryCodes(withNormalizedAliases(named), countryIds()), names);
+  const { items: handled, used } = withHandNames(def.source, withValueNamesOnly(withoutCountryCodes(withNormalizedAliases(named), countryIds()), continentIds()), names);
   for (const k of used) handNamesUsed.add(k);
   const { items, aliases, dropped } = withoutListed(def.source, set, handled, listed, names.rename);
   try {
@@ -1223,6 +1229,13 @@ export function unusedHandNames(names: Pick<Names, "add" | "remove">, used: Read
 // country is named by them, except the abbreviations players type as names (human, 2026-10-27: "Remove the codes
 // (Recommended)", then "Keep the common ones (Recommended)"). No country's name is three letters or fewer.
 const KEPT_COUNTRY_ABBREVIATIONS = new Set(["us", "uk", "usa", "uae", "prc", "drc"]);
+
+// A thing a fact names, wherever it loads, answers to its label alone: the places set gives North America "na", "noam"
+// and "003 un m49 code", which would answer as a continent in every continent question (13e-4b design 4 and review;
+// the human, 2026-10-28: "Fix the three, close the last (Recommended)"). A hand name (data/names.json) comes after.
+export function withValueNamesOnly(items: Item[], values: ReadonlySet<string>): Item[] {
+  return items.map((item) => (values.has(item.id) ? { ...item, aliases: [{ alias: normalize(item.name), kind: "name" as const }] } : item));
+}
 export function withoutCountryCodes(items: Item[], countries: ReadonlySet<string>): Item[] {
   return items.map((item) => {
     if (!countries.has(item.id)) return item;

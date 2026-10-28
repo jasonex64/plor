@@ -13,7 +13,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(44);
+select plan(49);
 lock table private.thing_alias, private.fact, private.number_fact in access exclusive mode nowait;
 truncate private.thing_alias, private.fact, private.number_fact;
 
@@ -290,6 +290,47 @@ select is((select count(*)::int from private.resolve_answer('offbeat', private.t
   'and not on tomorrow''s');
 select is((select count(*)::int from private.resolve_answer('offbeat', private.today() + 1, 0, array['ls aye'])), 1,
   'where a name the files still give resolves');
+
+-- 13f-4b, the 13f-3b-1 review's gaps.
+-- An ended link above a host answer names the day too: tomorrow's host ls-a keeps its own names and fact, but the link
+-- ls-c kind_of ls-root that puts it under the root isn't given.
+select private.load_begin();
+select private.import_source('oewn', 'load-sync-test', '[{"id": "ls-root", "name": "ls root", "aliases": [{"alias": "ls root", "kind": "name"}]},
+  {"id": "ls-c", "name": "ls c", "aliases": [{"alias": "ls c", "kind": "name"}]},
+  {"id": "ls-a", "name": "ls aye", "aliases": [{"alias": "ls aye", "kind": "name"}], "kind_of": ["ls-c"]}]');
+select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day'])) -> 'touched',
+  jsonb_build_array(jsonb_build_object('date', private.today() + 1, 'question', 1, 'answer', 'ls aye', 'changes', '["above it ended"]'::jsonb)),
+  'an approved day is named when a link above its host answer ends');
+
+-- A fact and a link for one edge share one row, so either kind brings it back. ls-d's edge is a snapshot's, ended by a
+-- load that doesn't give it; then links.json gives it.
+create function pg_temp.de(kinds text) returns jsonb language sql return format('[{"id": "ls-root", "name": "ls root", "aliases": [{"alias": "ls root", "kind": "name"}]},
+  {"id": "ls-d", "name": "ls d", "aliases": [{"alias": "ls d", "kind": "name"}]%s},
+  {"id": "ls-e", "name": "ls e", "aliases": [{"alias": "ls e", "kind": "name"}]%s}]',
+  case when kinds like '%d%' then ', "kind_of": ["ls-root"]' else '' end, case when kinds like '%e%' then ', "kind_of": ["ls-root"]' else '' end)::jsonb;
+create function pg_temp.edge(ref text) returns private.fact language sql
+  return (select f from private.fact f where f.thing_id = pg_temp.id(ref) and f.trait = 'kind_of' and f.value_thing = pg_temp.id('ls-root'));
+create function pg_temp.round(kinds text, links text) returns void language plpgsql as $$
+begin
+  perform private.load_begin();
+  perform private.import_source('oewn', 'load-sync-test', pg_temp.de(kinds));
+  if links <> '' then
+    perform private.load_links(format('[{"thing": "oewn:%1$s", "name": "ls %2$s", "kind_of": "oewn:ls-root", "kind_of_name": "ls root"}]', 'ls-' || links, links)::jsonb);
+  end if;
+  perform private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'ls_day']));
+end
+$$;
+select pg_temp.round('d', '');
+select pg_temp.round('', '');
+select ok((pg_temp.edge('ls-d')).removed_at > now() and (pg_temp.edge('ls-d')).origin = 'source', 'the snapshot''s edge ends when no file gives it');
+select pg_temp.round('', 'd');
+select is((pg_temp.edge('ls-d')).removed_at, null, 'a link giving the same edge brings it back');
+-- ls-e's edge is a link's, ended by a load that doesn't give it; then the snapshot gives it.
+select pg_temp.round('', 'e');
+select pg_temp.round('', '');
+select ok((pg_temp.edge('ls-e')).removed_at > now() and (pg_temp.edge('ls-e')).origin = 'ai', 'the link''s edge ends when links.json drops it');
+select pg_temp.round('e', '');
+select is((pg_temp.edge('ls-e')).removed_at, null, 'a snapshot giving the same edge brings it back');
 
 select * from finish();
 rollback;

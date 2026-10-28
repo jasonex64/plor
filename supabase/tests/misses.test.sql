@@ -49,8 +49,9 @@ select is((pg_temp.review('mb_animal', 'jackalope')).id, null, 'two players aren
 select ok(pg_temp.miss(3, '2000-01-01', 'jackalope', 'jackalope'), 'the miss is logged');
 select is((pg_temp.review('mb_animal', 'jackalope')).outcome, 'accepted', 'the third player makes it an answer');
 select ok(private.in_category_now((pg_temp.review('mb_animal', 'jackalope')).thing_id, 'mb_animal'), 'a member of the category now');
-select is((select name from private.thing where id = (pg_temp.review('mb_animal', 'jackalope')).thing_id), 'Jackalope',
-  'named the way players most often typed it');
+-- Named by its normalized text, not the way players typed it ("Jackalope"), as every name is shown (13f-4b).
+select is((select name from private.thing where id = (pg_temp.review('mb_animal', 'jackalope')).thing_id), 'jackalope',
+  'named by its normalized text');
 select is((select count(*)::int from private.base_log where action = 'miss_review' and detail ->> 'text' = 'jackalope'), 1, 'logged');
 select ok(pg_temp.miss(4, '2000-01-01', 'jackalope', 'jackalope'), 'a later miss is still logged');
 select is((select count(*)::int from private.miss_review where text = 'jackalope'), 1, 'and the text is decided once');
