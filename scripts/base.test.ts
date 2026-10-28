@@ -1,7 +1,7 @@
 // The answer database's import parsers (scripts/base.ts): what each source's rows become. Sources are untrusted input.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { thingId, uuidV5 } from "../src/content/thing-id.ts";
-import { aliasesFor, distinctSeries, handNamesOnlyIn, parentless, sparql, taxonName, valueItems, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
+import { aliasesFor, distinctSeries, handNamesOnlyIn, parentless, sparql, taxonName, valueItems, withValueNamesOnly, foldLabels, latestNumber, linkToWikidata, localClient, oddJoins, oewnSubtree, parseCsv, checkHandFiles, parseLinks, parseListed, parseNames, parseSameness, planMerges, numberWords, riverShortNames, shownNames, taxaToItems, titledItems, titleForms, wordsNumber, usdaCheeses, withFact, withMerges, unusedHandNames, withHandNames, withNormalizedAliases, withoutCountryCodes, withoutListed, withPopulation, type Item, type Listed, type Mark, type Names, type Sameness } from "./base.ts";
 
 describe("thing IDs", () => {
   it("are RFC 4122 version 5 UUIDs", () => {
@@ -654,5 +654,13 @@ describe("taxonName", () => {
     const joins = { wordnet: new Map<string, Item>(), wikidata: new Map([["Q1", { id: "Q1", name: "Felis catus", aliases: [] }]]), odd: new Map<string, string>() };
     expect(taxonName(joins, "Q1")).toBe("Felis catus");
     expect(() => taxonName(joins, "Q2")).toThrow("review: the WordNet snapshot leaves a word unjoined to Q2, which no loaded animal snapshot holds");
+  });
+});
+
+describe("withValueNamesOnly", () => {
+  it("names a thing a fact names by its label alone wherever it loads, leaving other items as they are (13f-4b)", () => {
+    const na = { id: "Q49", name: "North America", aliases: [{ alias: "north america", kind: "name" as const }, { alias: "na", kind: "synonym" as const }, { alias: "noam", kind: "synonym" as const }] };
+    const city = { id: "Q60", name: "New York City", aliases: [{ alias: "nyc", kind: "synonym" as const }] };
+    expect(withValueNamesOnly([na, city], new Set(["Q49"]))).toEqual([{ ...na, aliases: [{ alias: "north america", kind: "name" }] }, city]);
   });
 });

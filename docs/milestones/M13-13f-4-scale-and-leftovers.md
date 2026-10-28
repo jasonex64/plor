@@ -1,6 +1,6 @@
 # M13 13f-4 — Scale, and the For M13 leftovers
 
-**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a built and reviewed, in review in PR #117; 13f-4b and 13f-4c next.
+**Status:** approved (human, 2026-10-28: "I approve 13f-4's design as proposed. Build 13f-4a, the drafting tools' speed, first."); 13f-4a done (PR #117, merged on green CI 2026-10-28 UTC, `2dac4e6`); 13f-4b built and reviewed, in review in PR #118; 13f-4c next.
 
 ## Goal
 Measure the four scale items and fix the ones that slow the drafting tools; close or move every For M13 item left in ROADMAP, so the list is empty when M13 closes (`docs/milestones/M13-13f-the-review-backlog.md`, criterion 2).
@@ -50,6 +50,8 @@ Round 7:
 - From the 13e-10 review: **"One helper, fix the comment (Recommended)"**: the host answer's shown-name rule in one function check-bank and the draft share. (The prompt fits, Mardi Gras, virus and disease, "wolf": 13f-2.)
 - From the 13e-9b review: **"Loud unused rows, tidy the repeats (Recommended)"**: a `rename` or `drop_listed_names` row that applies to nothing stops the load; the source list written once. The merged-away double and a joined WordNet item's raw name go to Later (neither reachable with today's files).
 
+During 13f-4b's build (2026-10-28): a name or fact the files give back after its end-midnight has passed can't come back as round 5 put it, as one key holds one row (a second row needs a changed uniqueness rule under every insert; clearing the old row's end changes a started day). Asked in plain words, the human chose **"Leave the gap, note it (Recommended)"**: it comes back at the next load after the old row is erased, recorded under For M15 with hosted loads.
+
 ## Source
 - ROADMAP.md, For M13: the items below.
 - `docs/milestones/M13-13f-the-review-backlog.md`, Design 4 and criterion 2.
@@ -73,7 +75,7 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 - [x] Items 3 and 4: measured before and after on the real base, with the commands and times. *(13f-4a)*
 - [x] Items 1 and 2: under For M15 with the round-1 answer. *(13f-4a)*
 - [ ] ROADMAP's For M13 has no open item; each is closed with evidence or moved with its reason.
-- [ ] The suites pass; `check-bank` 0; `simulate` 30 of 30.
+- [ ] The suites pass; `check-bank` 0; `simulate` 30 of 30. *(13f-4a and 13f-4b: pass; 13f-4c to come)*
 
 ## Out of scope
 - The migration squash (its own sub-ticket after 13f).
@@ -101,9 +103,24 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 |---|---|---|
 | 13f-4a: make `fits_where` cheap for a category with no filter (skip it, or let the planner inline it) | `category_members` skips the call when the category has no filter; `fits_where` keeps `set search_path` | Skipping needs no change to a function three readers share; inlining would mean dropping its `set search_path = ''`, which the migrations' functions all set, and DECISIONS.md's Log asks of the security-definer ones |
 | 13f-4a: the swap rounds resolve and measure only the question swapped in | Each bank question is resolved and measured once per `draft()` call, kept by its ID | The first attempt resolves all 7 anyway; a round's other 6 are then the ones already kept |
+| 13f-4b, round 5: a fact given again after its midnight is added back | Not built; the gap stays | The human's answer during the build: "Leave the gap, note it (Recommended)" (one key holds one row) |
+| 13f-4b: continents named by their label alone | `withValueNamesOnly` at load, for the countries' continent values wherever a set loads them; `data/names.json`'s row removing "oceania" from Insular Oceania goes, as the label rule now does it (the load stopped on it as unused) | The places set brings the junk names; the countries set already names them by label |
+| 13f-4b: player-added things shown in normalized form | `add_player_thing` names the thing by the normalized text; `private.typed_form` goes with its last caller; DECISIONS.md's Learning from misses says so; `misses.test.sql`'s check of the old naming rule now checks the new one | The human's answer replaces 13b's "named the way players most often typed it" |
+| 13f-4b: `record_miss` reads the day's frozen filter | It judges by the day's frozen question, and a new text on a day whose question no longer matches its category (root, member_of or filter) is held for the human, not added | `add_player_thing` builds a thing from the category as it is now, which for such a day would sit in neither (the review) |
+| (no source) | `record_miss` refuses a day question with no frozen root | Only format-3 days carry one, and the engine already refuses older formats (13f-4 round 2) |
 | (no source) | Only `category_members` skips the call; `in_category_now` and `resolve_answer` still call `fits_where` | They run once per thing or per typed answer, not once per member of a category |
 
 ## Evidence
+### 13f-4b (Windows, 2026-10-28 UTC)
+- **Before the fix**, the new checks on the previous functions (`typed_form`, `import_source`, `load_links`, `load_finish`, `record_miss` and `add_player_thing` put back in a rolled-back transaction, `psql -v ON_ERROR_ROLLBACK=on`; `pg_get_functiondef` after shows 13f-4b's in place and no `typed_form`):
+  - `database_gaps.test.sql`: `not ok 2` (`have: 1 want: 0`, the miss off the day's letter learned), `not ok 3` (`have: accepted want: held_subset`), `not ok 5` (the retired ID's second thing not refused); 1 and 4 (the setup) pass;
+  - `load_sync.test.sql`: `not ok 45` (`touched` `have: []`), `not ok 47` and `not ok 49` (`have: 2026-10-29 07:00:00+00 want: NULL`, the edge not brought back by the other kind);
+  - `misses.test.sql`: `not ok 5` (`have: Jackalope want: jackalope`).
+  - The familiar rule's three new cases in `puzzle_entry.test.sql` and `one_walk`'s fuller count are coverage of the rule as it was (no fix); they pass. The unlock's new place has no test: a failing last write can't be made in a test without a fault injected.
+- **After:** `database_gaps.test.sql` 5, `load_sync.test.sql` 49, `puzzle_entry.test.sql` 18, `misses.test.sql`, `one_walk.test.sql`: PASS; `npx supabase test db` 31 files, 501 PASS; `npm run test:db` 41 files, 277 passed; `npm test` 43 files, 454 passed (`withValueNamesOnly`'s test); tsc and lint clean; `npm run test:e2e` 61 passed.
+- **After the review's fixes** (a day whose question no longer matches its category holds a new text; the membership check's true branch tested): `database_gaps.test.sql` 9 PASS. Against 13f-3a's `record_miss` (rolled back, as above): `not ok 2`, `not ok 3`, `not ok 5` (`have: NULL want: rejected`, the day's filter ignored), `not ok 6` (`have: accepted want: held_subset`), `not ok 7` (`have: 1 want: 0`, a thing made); 4 passes before and after (an existing member, nothing to learn, which didn't change). `npx supabase test db` 31 files, 505 PASS; `npm run test:db` 41 files, 277 passed. (e2e ran before these SQL-only fixes.)
+- **The real base:** `load all` first stopped, `data/names.json: remove wikidata:Q538 "oceania" did nothing in any set` (the label rule now does that row's job; the row removed); then `ENDING at 2026-10-29T07:00:00+00:00 … 37 names, 0 facts, 0 links, 0 populations` (the continents' extra names, nothing else), `DATABASE 329 MB`, 77 s; no retired-ID refusal. `check-bank`: `CHECKED 231 questions: 0 problems`.
+
 ### 13f-4a (Windows, 2026-10-28 UTC, the real base, 231 categories)
 - **`category_members`** (`psql`, `	iming`): before, `animal` (56,169 members, no filter) 2017, 1727 and 1890 ms; `animal_k` (1,411, a letter subset) 3752 and 3565 ms; `fruit` (3,014) 66 and 70 ms. Hypothesis: the per-member `fits_where` call is most of a base category's time. Checked first by hand, the same query with `(cat.filter is null or private.fits_where(…))`: 504 and 701 ms, and the walk alone 226 ms, so it held. After the migration: `animal` 585, 540 and 561 ms; `animal_k` 3615 ms (a subset still checks each member, as designed); `fruit` 27 ms.
 - **`npm run draft -- simulate`** (30 days): before, 265 s; with the migration alone, 265 s, the same output (`membersOf` runs `category_members` once per category per run, so its saving, about 1.3 s for animal, is too small to show in 265 s); with the swap change too, 218 s. `DRAFTED 30 of 30; subset questions 74 of 210` each time, and `diff` of the full output before and after: identical (8 swaps in the run).
@@ -113,3 +130,5 @@ Smaller gaps from the 13a-2, 13b, 13c, 13d and 13e-1 reviews; the question bank'
 
 ## Review
 13f-4a: the `reviewer` agent, 2026-10-28, in a fresh context. No blocking findings: the migration's `category_members` matches 13e-5's but for the guard, `category_where` is null for exactly the 196 categories with no filter, and the per-draft cache shares no changing state across rounds. Two claims corrected as found (animal after: 0.54–0.59 s, not 0.58; the migration-only `simulate` run explained by `membersOf` running once per category). `.claude/settings.local.json` stays out of the commit.
+
+13f-4b: the `reviewer` agent, 2026-10-28, in a fresh context. Blocking, fixed: an accepted text on a day approved before its category changed would get a thing built from the category now, in neither (now held for the human); the frozen membership check's true branch had no test (an existing member, an admin's addition, a member now outside the day's filter). Deferred to ROADMAP "Next revision" (From the 13f-4b review). The continents' ended names, for the human to see: North America's "na", "noam", "n am", "003 un m49 code", "turtle island" and the like, "australia and oceania", "the old continent", "s america" and the plurals (37 in all).

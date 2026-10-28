@@ -8,7 +8,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(18);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000e601', 'm06-admin@example.test'),
@@ -91,6 +91,26 @@ select throws_ok($$select private.approve_puzzle('00000000-0000-0000-0000-000000
     pg_temp.day((select ahead from d), array[(select dog from ids)], array[(select dog from ids)], 'h'))$$,
   'OB009', 'puzzle_invalid: question 1: fewer than 3 familiar answers the host doesn''t catch can be typed without h',
   'a question with fewer than 3 familiar answers typeable and safe is refused');
+
+-- The rule's other parts (13c review; 13f-4b). A familiar answer under a host answer is caught, so it doesn't count:
+-- with puppy under dog, cat, hamster and puppy leave two.
+select private.import_source('wikidata', 'pe-test', '[{"id": "pe-puppy", "name": "puppy", "aliases": [{"alias": "puppy", "kind": "name"}], "kind_of": ["pe-dog"], "thing_id": "00000000-0000-5000-8000-0000000e6109"}]'::jsonb);
+select throws_like($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d),
+    array[(select dog from ids)], array[(select dog from ids)], null, 'pet',
+    '{"00000000-0000-5000-8000-0000000e6102": "uncommon", "00000000-0000-5000-8000-0000000e6105": "uncommon", "00000000-0000-5000-8000-0000000e6109": "uncommon"}'))$$,
+  '%question 1: fewer than 3 familiar answers%', 'a familiar answer under a host answer doesn''t count');
+-- Only members in the levels are familiar: mouse and horse are safe members, but with only cat and hamster in the levels
+-- two are left.
+select throws_like($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601', pg_temp.day((select ahead from d),
+    array[(select dog from ids)], array[(select dog from ids)], null, 'pet',
+    '{"00000000-0000-5000-8000-0000000e6102": "uncommon", "00000000-0000-5000-8000-0000000e6105": "uncommon"}'))$$,
+  '%question 1: fewer than 3 familiar answers%', 'a safe member outside the levels doesn''t count');
+-- A familiar answer typeable by another of its names counts: with H stolen, hamster's "cricetid" can still be typed, so
+-- cat, mouse and hamster make three (the day refused above, now approved).
+select private.import_source('wikidata', 'pe-test', '[{"id": "pe-hamster", "name": "hamster", "aliases": [{"alias": "hamster", "kind": "name"}, {"alias": "cricetid", "kind": "synonym"}], "kind_of": ["pe-pet"]}]'::jsonb);
+select lives_ok($$select private.approve_puzzle('00000000-0000-0000-0000-00000000e601',
+    pg_temp.day((select ahead from d), array[(select dog from ids)], array[(select dog from ids)], 'h'))$$,
+  'a familiar answer typeable by a second name counts');
 
 -- A day that has started can't change. Today gets a puzzle here if it has none (rolled back at the end).
 insert into private.puzzle (game_id, puzzle_date, content)
