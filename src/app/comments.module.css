@@ -1,11 +1,40 @@
-/* The feed before the player has played (docs/milestones/M14-14a-2a-today.md, L40). */
-.locked {
+/* The feed (docs/milestones/M14-14a-2a-today.md, L40), a card of the new look with its comments as rows
+   (kit.module.css; M14 14b-8b). */
+
+/* A comment's row: its avatar beside the words, at the top. */
+.comment {
+  align-items: flex-start;
+}
+
+.comment p {
+  margin: 0;
+}
+
+/* Reactions, then Delete or Report, on one line that wraps (mockup 3's .reacts). */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* The comment box, its label above it and full width, Post under it (mockup 3's composer). */
+.compose label {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.compose textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  color: var(--text);
+  font-size: 16px;
 }
 
 /* Filler, not words: blurred so it reads as hidden text, and aria-hidden so it isn't read out. */

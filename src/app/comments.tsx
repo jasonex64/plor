@@ -19,6 +19,7 @@ import { choose } from "@/reactions/choose";
 import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
 import { Avatar } from "./avatar";
+import kit from "./kit.module.css";
 import styles from "./comments.module.css";
 import { shiftDay } from "./day-text";
 import { errorText } from "./messages";
@@ -39,6 +40,9 @@ const PENDING = "pending";
 function changed(thread: Thread | Feed | null, change: Change): Thread | Feed | null {
   if (!thread?.comments || thread.date !== change.date) return thread;
   const comments: Comment[] = thread.comments;
+  // A posted comment the loaded thread already has (another load landed before the post's own reload) isn't shown
+  // twice (14b-8b: a race the e2e caught; ROADMAP's "a sent comment can flicker or show twice").
+  if (change.type === "post" && comments.some((c) => c.username === change.comment.username && c.body === change.comment.body)) return thread;
   const next =
     change.type === "post"
       ? [...comments, change.comment]
@@ -141,18 +145,18 @@ export function Comments({
   const isToday = shown !== null && shown === today;
   const preview = shownThread && "preview" in shownThread ? shownThread.preview : null;
   return (
-    <section aria-label={group ? "Comments" : title}>
+    <section aria-label={group ? "Comments" : title} className={kit.card}>
       <h2>
         {group ? "Comments" : isToday || !shown ? title : "Friends' comments"}
         {shown && !isToday && ` on ${shown}`}
       </h2>
       {shown && (
         <p>
-          <button type="button" onClick={() => setDate(shiftDay(shown, -1))}>
+          <button type="button" className={kit.link} onClick={() => setDate(shiftDay(shown, -1))}>
             Earlier day
           </button>{" "}
           {!isToday && today && (
-            <button type="button" onClick={() => setDate(shiftDay(shown, 1) === today ? null : shiftDay(shown, 1))}>
+            <button type="button" className={kit.link} onClick={() => setDate(shiftDay(shown, 1) === today ? null : shiftDay(shown, 1))}>
               Later day
             </button>
           )}
@@ -166,7 +170,7 @@ export function Comments({
       )}
       {shownThread?.comments && shownThread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
       {shownThread?.comments && shownThread.comments.length > 0 && (
-        <ul>
+        <ul className={kit.rows}>
           {shownThread.comments.map((c) => {
             const day = shownThread.date;
             const react = (emoji: Emoji | null) =>
@@ -205,13 +209,15 @@ export function Comments({
         </ul>
       )}
       {shownThread?.canPost && (
-        <form onSubmit={post}>
+        <form onSubmit={post} className={styles.compose}>
           <label>
             {/* The feed's box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
             {group ? "Comment" : "Comment to your friends"}
             <textarea value={draft} required onChange={(e) => setDraft(e.target.value)} />
           </label>
-          <button type="submit">Post</button>
+          <button type="submit" className={`${kit.primary} ${kit.small}`}>
+            Post
+          </button>
         </form>
       )}
       {!shownThread && !error && (
@@ -245,10 +251,10 @@ function Preview({ preview }: { preview: FeedPreview }) {
           {text.read}
         </ButtonLink>
       </p>
-      <ul className={styles.locked}>
+      <ul className={kit.rows}>
         {/* By position: two friends can share a display name. */}
         {text.named.map((name, i) => (
-          <li key={i}>
+          <li key={i} className={kit.row}>
             <Avatar name={name} /> <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
             <span className="sr-only">comment hidden until you play</span>
           </li>
@@ -284,24 +290,35 @@ function CommentItem({
   onReport: () => void;
   onReact?: (emoji: Emoji | null) => void;
 }) {
+  // Mockup 3's comment row: the avatar, then the name with its thread and time as a chip, the words, and the reactions
+  // and Delete or Report under them (M14 14b-8b).
   return (
-    <li>
-      <Avatar name={comment.name} /> <strong>{comment.name}</strong> {label && <>· {label} </>}<time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
-      <p>{comment.body}</p>
-      {!pending && (
-        <>
-          <Reactions reactions={comment.reactions} onReact={onReact} />{" "}
-          {mine ? (
-            <button type="button" onClick={onDelete}>
-              Delete
-            </button>
-          ) : (
-            <button type="button" onClick={onReport}>
-              Report
-            </button>
-          )}
-        </>
-      )}
+    <li className={`${kit.row} ${styles.comment}`}>
+      <Avatar name={comment.name} />
+      <div className={kit.grow}>
+        <div className={kit.head}>
+          <strong>{comment.name}</strong>
+          <span className={kit.chip}>
+            {label && <>{label} · </>}
+            <time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
+          </span>
+        </div>
+        <p>{comment.body}</p>
+        {!pending && (
+          <div className={styles.actions}>
+            <Reactions reactions={comment.reactions} onReact={onReact} />
+            {mine ? (
+              <button type="button" className={kit.link} onClick={onDelete}>
+                Delete
+              </button>
+            ) : (
+              <button type="button" className={kit.link} onClick={onReport}>
+                Report
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </li>
   );
 }

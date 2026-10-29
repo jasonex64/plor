@@ -28,7 +28,7 @@ import { api } from "@/lib/api-client";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Profile } from "@/lib/profile";
 import { AdminArea, type AdminPage } from "./admin/admin-area";
-import { Board } from "./board";
+import { Board, FriendsInviteCard } from "./board";
 import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
@@ -482,6 +482,8 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
         <LiveStatus channel={channel} />
         <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
       </div>
+      {/* Phones end with the invite card when the player has no friends, as mockup 3 draws Today (answer 13). */}
+      {!wide && <FriendsInviteCard />}
     </div>
   );
 }

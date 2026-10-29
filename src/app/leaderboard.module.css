@@ -1,28 +1,15 @@
-/* Today's leaderboard card (docs/milestones/M14-14a-2a-today.md; the approved mockups, rounds 5 to 7). */
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--surface);
-}
+/* Today's leaderboard card (docs/milestones/M14-14a-2a-today.md; the approved mockups, rounds 5 to 7), a card of the
+   new look (kit.module.css; M14 14b-8b). */
 
-.title {
-  margin: 0;
-  font-size: 20px;
-}
-
-/* Yesterday / This week: the chosen one is filled and bold, not only coloured (WCAG 2.2 1.4.1), bold as the shell's
-   current tab is (docs/milestones/M14-14b-2c-review-items.md, item 17). */
+/* Yesterday / This week as mockup 3's segmented control (.seg): one ink-bordered strip, the chosen half filled in ink;
+   not clipped at the corners as the mockup's is, so each choice's focus ring shows (WCAG 2.2 2.4.7).
+   The chosen one is filled and bold, not only coloured (WCAG 2.2 1.4.1; docs/milestones/M14-14b-2c-review-items.md,
+   item 17). */
 .switch {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 1.5px solid var(--edge);
-  border-radius: 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-small);
 }
 
 .choice {
@@ -31,7 +18,7 @@
   align-items: center;
   justify-content: center;
   min-height: 36px;
-  border-radius: 8px;
+  background: var(--surface);
   color: var(--muted);
   font-size: 14px;
   cursor: pointer;
@@ -52,7 +39,7 @@
 }
 
 .on {
-  background: var(--text);
+  background: var(--ink);
   color: var(--bg);
   font-weight: 700;
 }
@@ -62,12 +49,6 @@
   width: 100%;
   min-height: 40px;
   margin-top: 4px;
-  padding: 0 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
   font-size: 16px;
 }
 
@@ -75,10 +56,4 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--muted);
-}
-
-.date {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
 }

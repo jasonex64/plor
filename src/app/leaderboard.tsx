@@ -8,6 +8,7 @@ import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friend
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { Avatar } from "./avatar";
+import kit from "./kit.module.css";
 import styles from "./leaderboard.module.css";
 import { dayText } from "./day-text";
 import { errorText } from "./messages";
@@ -86,8 +87,12 @@ export function LeaderboardCard() {
 
   const label = period === "yesterday" ? "Yesterday" : "This week";
   return (
-    <section aria-label="Leaderboard" className={styles.card}>
-      <h2 className={styles.title}>Leaderboard</h2>
+    <section aria-label="Leaderboard" className={kit.card}>
+      {/* Mockup 3's card: the heading with the day it shows as a chip (M14 14b-8b). */}
+      <div className={kit.head}>
+        <h2>Leaderboard</h2>
+        {(day || week) && <span className={kit.chip}>{day ? dayText(day.date) : `From ${dayText(week!.from)}`}</span>}
+      </div>
       <div role="radiogroup" aria-label="Period" className={styles.switch}>
         {(["yesterday", "week"] as const).map((p) => (
           <label key={p} className={period === p ? `${styles.choice} ${styles.on}` : styles.choice}>
@@ -97,7 +102,8 @@ export function LeaderboardCard() {
         ))}
       </div>
       <label className={styles.board}>
-        Board
+        {/* Named for screen readers; mockup 3 shows the picker alone. */}
+        <span className="sr-only">Board</span>
         <select value={group ?? ""} onChange={(e) => choose({ group: e.target.value === "" ? null : e.target.value })}>
           <option value="">Friends</option>
           {groups.map((g) => (
@@ -108,10 +114,6 @@ export function LeaderboardCard() {
         </select>
       </label>
       <section aria-label={label}>
-        <p className={styles.date}>
-          {day && dayText(day.date)}
-          {week && `From ${dayText(week.from)}`}
-        </p>
         {day && <Entries entries={day.entries} />}
         {week && <Entries entries={week.entries} />}
         {!day && !week && !error && (
@@ -135,13 +137,22 @@ function Standings({ title, label, week }: { title: string; label: string; week:
   );
 }
 
+// Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
+// is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
+// the row's text; a hidden ": " keeps the row read as "name: 3 points".
 function Entries({ entries }: { entries: LeaderboardEntry[] }) {
   return (
-    <ol>
-      {entries.map((e) => (
-        <li key={e.username}>
-          <Avatar name={e.name} /> {e.name}
-          {e.you && " (you)"}: {e.points === 1 ? "1 point" : `${e.points} points`}
+    <ol className={kit.rows}>
+      {entries.map((e, i) => (
+        <li key={e.username} className={kit.row}>
+          <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
+          <Avatar name={e.name} />
+          <span className={kit.grow}>
+            {e.name}
+            {e.you && " (you)"}
+            <span className="sr-only">: </span>
+          </span>
+          <b>{e.points === 1 ? "1 point" : `${e.points} points`}</b>
         </li>
       ))}
     </ol>

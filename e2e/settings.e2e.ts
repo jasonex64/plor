@@ -117,7 +117,9 @@ test("Skip the game screen makes Play start stop 1, and says the time limit firs
   await flip(page, "Skip the game screen", true);
   // Saved on the account: a reload keeps it.
   await page.reload();
-  await expect(banner).toContainText("Don't match the Wind · 7 stops · 20 seconds each");
+  // Said before the time runs, as the banner's chips since 14b-8b.
+  await expect(banner.getByText("20 seconds each", { exact: true })).toBeVisible();
+  await expect(banner.getByText("7 stops", { exact: true })).toBeVisible();
   await banner.getByRole("button", { name: "Play", exact: true }).click();
   await expect(page).toHaveURL(/\/updraft$/);
   await expect(page.getByLabel("Your answer")).toBeVisible();

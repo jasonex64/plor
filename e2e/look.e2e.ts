@@ -1,15 +1,24 @@
 // The new look (docs/milestones/M14-14b-8-the-new-look.md; mockup 3, "Nearly square (5px)"), read from computed styles
 // on real elements. 14b-8a: buttons, links drawn as buttons and fields take the ink border, corners and hard shadow in
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
-// bar and sidebar take the ink rules (criterion 1).
+// bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
+import { GAME } from "../src/platform/game";
+import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+// Today's banner shows the day's facts only when there is a day: the fixture day, removed again after.
+let puzzle: TodayPuzzle;
+
+test.beforeAll(async () => {
+  puzzle = await todayPuzzle(DB);
+});
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
+  await removePuzzle(DB, puzzle);
   await DB.end();
 });
 
@@ -84,4 +93,40 @@ test("the tab bar and the sidebar's current item take the ink rules", async ({ b
   await page.setViewportSize({ width: 1440, height: 900 });
   expect(await nav.evaluate((el) => `${getComputedStyle(el).borderRightWidth} ${getComputedStyle(el).borderRightColor}`)).toBe(`2px ${color}`);
   expect(await look(nav.getByRole("link", { name: "Today" }))).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+});
+
+test("a card and a chip take the kit's border, corners and shadow", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "lc");
+  const color = await ink(page);
+  const card = page.getByRole("region", { name: "Leaderboard" });
+  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  // The card's date chip, once its scores have loaded.
+  const chip = card.getByText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+ \w+$|^From /).first();
+  await expect(chip).toBeVisible();
+  // Mockup 3's 1.5px edge, which Chromium floors to whole CSS pixels (1px), as it did in the mockup itself.
+  expect(await look(chip)).toEqual({ border: `1px ${color}`, corners: "4px", shadow: "none" });
+});
+
+// Signed in, Today starts with the game: the introduction is gone (answer 12); the banner's chips are its white on the
+// game's colour, not the kit's plain chip (a production CSS order once let the kit's win: 14b-8b review); and with no
+// friends a phone ends with the invite card, which from 768px the board says instead (answer 13).
+test("signed-in Today: no introduction, the banner's own chips, and the invite card on phones", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "lt");
+  const banner = page.getByRole("region", { name: GAME.name, exact: true });
+  const chip = banner.getByText("7 stops", { exact: true });
+  await expect(chip).toBeVisible();
+  await expect(page.getByText("Plor is a small site with a daily word game.")).toBeHidden();
+  expect(await chip.evaluate((el) => getComputedStyle(el).color)).toBe("rgb(255, 255, 255)");
+  const color = await ink(page);
+  expect(await chip.evaluate((el) => getComputedStyle(el).borderTopColor)).not.toBe(color);
+
+  const card = page.getByRole("region", { name: "Plor is better with friends" });
+  await expect(card.getByRole("button", { name: "Invite a friend" })).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(card).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
 });

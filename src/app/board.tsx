@@ -22,6 +22,7 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
+import kit from "./kit.module.css";
 import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
@@ -118,7 +119,7 @@ export function Board({ username, invite }: { username: string; invite: boolean 
   }
 
   return (
-    <section aria-label="Friends today">
+    <section aria-label="Friends today" className={kit.card}>
       <h2>Friends today</h2>
       <LiveStatus channel={channel} />
       {shownBoard?.mine && <WhereEveryoneEnded username={username} mine={shownBoard.mine} friends={shownBoard.friends} />}
@@ -130,15 +131,20 @@ export function Board({ username, invite }: { username: string; invite: boolean 
       {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}
       {shownBoard && shownBoard.friends.length === 0 && (
         <>
-          <h3>Plor is better with friends</h3>
-          <p>See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.</p>
+          <h3>{BETTER_WITH_FRIENDS.title}</h3>
+          <p>{BETTER_WITH_FRIENDS.text}</p>
         </>
       )}
+      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, then the reactions. */}
       {shownBoard && shownBoard.friends.length > 0 && (
-        <ul>
+        <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
-            <li key={f.username}>
-              <Avatar name={f.name} /> {f.name}: {describe(f)}{" "}
+            <li key={f.username} className={kit.row}>
+              <Avatar name={f.name} />
+              <span className={kit.grow}>
+                <b>{f.name}</b>
+                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>
+              </span>{" "}
               {f.reactions && <Reactions reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
             </li>
           ))}
@@ -154,6 +160,42 @@ export function Board({ username, invite }: { username: string; invite: boolean 
       {invite && <InviteLink canReset={false} />}
     </section>
   );
+}
+
+// L31's wording (round 3's, provisional per L32), for a player with no friends yet: under the board, and on phones as
+// Today's own card (docs/milestones/M14-14b-8-the-new-look.md, answer 13).
+export const BETTER_WITH_FRIENDS = {
+  title: "Plor is better with friends",
+  text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
+};
+
+// Phone Today's invite card when the player has no friends (mockup 3's soft tile; answer 13). From 768px the board says
+// it instead.
+export function FriendsInviteCard() {
+  const [friends, setFriends] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    api<{ friends: unknown[] }>("/api/friends", { method: "GET" }).then(
+      (r) => setFriends(r.friends.length),
+      (err) => setError(errorText(err)),
+    );
+  }, []);
+  if (error) return <p role="alert">{error}</p>;
+  if (friends !== 0) return null;
+  return (
+    <section aria-label={BETTER_WITH_FRIENDS.title} className={`${kit.card} ${kit.soft}`}>
+      <h2>{BETTER_WITH_FRIENDS.title}</h2>
+      <p>{BETTER_WITH_FRIENDS.text}</p>
+      <InviteLink canReset={false} />
+    </section>
+  );
+}
+
+// A friend's state as a chip: safe at the top, caught for a run that ended lower, plain otherwise.
+function toneOf(f: BoardFriend): string {
+  if (f.ended?.result === "survived") return `${kit.chip} ${kit.safe}`;
+  if (f.ended) return `${kit.chip} ${kit.caught}`;
+  return kit.chip;
 }
 
 function describe(f: BoardFriend): string {
@@ -180,9 +222,9 @@ function WhereEveryoneEnded({ username, mine, friends }: { username: string; min
   return (
     <section aria-label="Where everyone ended">
       <h3>Where everyone ended</h3>
-      <ul>
+      <ul className={kit.rows}>
         {placeRows(mine, friends).map((row) => (
-          <li key={placeLabel(row.place)}>
+          <li key={placeLabel(row.place)} className={kit.row}>
             <details>
               <summary>
                 {placeLabel(row.place)}: {[...(row.you ? ["You"] : []), ...row.named.map((p) => p.name)].join(", ")}

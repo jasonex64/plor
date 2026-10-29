@@ -1,0 +1,194 @@
+/* The new look's shared pieces (docs/milestones/M14-14b-8-the-new-look.md; mockup 3's toolkit, "Nearly square (5px)"):
+   a card, a list of bordered rows, chips and badges, and the button kinds beyond the base one (globals.css). One way
+   each: every page takes them from here. Sizes are mockup 3's; colours are the theme's own slots. */
+
+/* A section as a card (mockup 3's .tile): the ink border, the card's corners and hard shadow. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* The one tinted card on a screen (mockup 3's .tile.soft), in the theme's soft slot. */
+.soft {
+  background: var(--soft);
+}
+
+/* A card's heading, at mockup 3's .tile h2 size. */
+.card > h2,
+.card > h3,
+.head > h2,
+.head > h3 {
+  margin: 0;
+}
+
+.card > h2,
+.head > h2 {
+  font-size: 20px;
+}
+
+/* A heading with something beside it, such as a chip (mockup 3's .row.between). */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* A list as bordered rows (mockup 3's ul.list). */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+  background: var(--surface);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.safe {
+  background: var(--safe-bg);
+  color: var(--safe);
+}
+
+.caught {
+  background: var(--caught-bg);
+  color: var(--caught);
+}
+
+/* A number as a stat tile (mockup 3's .stat): the ink border, small corners, a small hard shadow. */
+.stat {
+  padding: 10px 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-small);
+  box-shadow: var(--shadow-card-small);
+}
+
+/* A rank or a stop as a round badge (mockup 3's .badge); the first is the accent one. */
+.badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* A place drawn from data-place, so a list's own order says it and the number isn't in the row's text twice. */
+.badge[data-place]::before {
+  content: attr(data-place);
+}
+
+.hot {
+  border: 1.5px solid var(--ink);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* The button kinds below are written on button and a (a link drawn as a button), so they outrank a module's own one
+   class (the button-link's .button) whatever order the CSS loads in. */
+
+/* The main action, filled in the accent (mockup 3's .btn). */
+:is(button, a).primary {
+  padding: 10px 18px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* A smaller button (mockup 3's .btn.small): a 3px drop, small corners. */
+:is(button, a).small {
+  min-height: 0;
+  padding: 6px 12px;
+  border-radius: var(--r-small);
+  box-shadow: var(--shadow-button-small);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+:is(button, a).small:active:not(:disabled) {
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* A minor action (mockup 3's .link): a thin ink outline, no shadow and no press. */
+button.link {
+  min-height: 0;
+  margin: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+button.link:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+/* A warning drawn as a button: the admin's "Tomorrow has no puzzle" (M14 14b-6f), in the danger colour. */
+:is(button, a).danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(button, a).small:active:not(:disabled) {
+    box-shadow: var(--shadow-button-small);
+  }
+}
