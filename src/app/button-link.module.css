@@ -1,5 +1,5 @@
-/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: at least 48px tall, the control
-   outline, 12px corners, on the surface colour. */
+/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: at least 48px tall, on the
+   surface colour, with the buttons' ink border, corners, hard shadow and press (globals.css; M14 14b-8). */
 .button {
   box-sizing: border-box;
   display: inline-flex;
@@ -8,12 +8,32 @@
   gap: 6px;
   min-height: 48px;
   padding: 0 16px;
-  border: 1.5px solid var(--edge);
-  border-radius: 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-button);
   background: var(--surface);
   color: var(--text);
+  box-shadow: var(--shadow-button);
   font-weight: 700;
   text-decoration: none;
+  transition:
+    transform 80ms,
+    box-shadow 80ms;
+}
+
+.button:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+
+  .button:active {
+    transform: none;
+    box-shadow: var(--shadow-button);
+  }
 }
 
 /* On Offbeat's banner: no fill, the outline and letters in the banner's white (game.module.css's focus ring there). */

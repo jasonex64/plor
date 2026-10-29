@@ -9,7 +9,8 @@
   box-sizing: border-box;
   height: 64px;
   background: var(--surface);
-  border-top: 1px solid var(--line);
+  /* The new look's 2px ink rule (mockup 3's .tabs; M14 14b-8). */
+  border-top: 2px solid var(--ink);
 }
 
 .word,
@@ -51,15 +52,17 @@
 }
 
 /* The streak's pill (round 7's .streak; docs/milestones/M14-14b-2a-streak-ranks.md): the rank's 22px flower and the
-   number on the soft colour. At 26px tall it is a target above WCAG 2.2 2.5.8's 24px. */
+   number, as mockup 3's streak chip (M14 14b-8): the safe colours, a 1.5px ink border, small corners. At 26px tall
+   it is a target above WCAG 2.2 2.5.8's 24px. */
 .streak {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 10px 2px 6px;
-  border-radius: 999px;
-  background: var(--soft);
-  color: var(--text);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+  background: var(--safe-bg);
+  color: var(--safe);
   font-size: 18px;
   font-weight: 800;
   line-height: 22px;
@@ -77,6 +80,9 @@
   border: 0;
   border-radius: 22px;
   background: transparent;
+  /* An icon, not one of the kit's buttons: no shadow and no press. */
+  box-shadow: none;
+  transform: none;
 }
 
 .tabs {
@@ -110,7 +116,8 @@
   border-radius: 14px;
 }
 
-/* The current tab: a pill behind the icon and bold text, not colour alone (WCAG 2.2 1.4.1). */
+/* The current tab: a box behind the icon and bold text, not colour alone (WCAG 2.2 1.4.1); the box is mockup 3's current
+   tab, the soft fill outlined in ink with small corners (M14 14b-8). */
 .on {
   color: var(--text);
   font-weight: 700;
@@ -119,6 +126,8 @@
 .on .icon {
   background: var(--soft);
   color: var(--accent);
+  outline: 2px solid var(--ink);
+  border-radius: var(--r-small);
 }
 
 /* From 768px (M14 L42): a sidebar, 280px wide (human, 2026-10-26: "280px"; docs/milestones/M14-14b-2b-1-shell.md),
@@ -140,7 +149,7 @@
     flex-direction: column;
     gap: 20px;
     border-top: 0;
-    border-right: 1px solid var(--line);
+    border-right: 2px solid var(--ink);
   }
 
   .word {
@@ -174,16 +183,21 @@
     gap: 8px;
     min-height: 46px;
     padding: 0 6px;
-    border-radius: 12px;
+    border: 2px solid transparent;
+    border-radius: var(--r-small);
     font-size: 16px;
   }
 
+  /* The current item, as mockup 3's sidebar draws it: the soft fill, a 2px ink border and a small hard shadow. */
   .on {
     background: var(--soft);
+    border-color: var(--ink);
+    box-shadow: var(--shadow-card-small);
   }
 
   .on .icon {
     background: none;
+    outline: 0;
   }
 
   /* Settings at the sidebar's foot (round 7, board 3). */
@@ -195,8 +209,10 @@
     margin: auto 0 0;
     padding: 0 6px;
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--r-small);
     background: transparent;
+    box-shadow: none;
+    transform: none;
     font-size: 16px;
     font-weight: 700;
   }
@@ -214,8 +230,10 @@
 
   /* In the admin area, Admin is the current section, as a tab is (round 10). */
   .admin[aria-current] {
-    border-radius: 12px;
+    border: 2px solid var(--ink);
+    border-radius: var(--r-small);
     background: var(--soft);
+    box-shadow: var(--shadow-card-small);
     color: var(--text);
   }
 }
@@ -236,7 +254,7 @@
   justify-content: space-between;
   gap: 12px;
   background: var(--surface);
-  border-top: 1.5px solid var(--accent);
+  border-top: 2px solid var(--ink);
   font-weight: 700;
 }
 
@@ -247,6 +265,6 @@
     left: 280px;
     right: var(--right-column, 0);
     border-top: 0;
-    border-bottom: 1.5px solid var(--accent);
+    border-bottom: 2px solid var(--ink);
   }
 }

@@ -1,11 +1,11 @@
 /* Skeletons (docs/milestones/M14-14b-6-feel-and-polish.md, design 2): static blocks in a colour slot, no shimmer. A
    line is one line of the text it stands for (1lh), as wide as its place; the rest of a skeleton is the section's own
-   container and static heading, so it's the size the section will be. The corners are the 12px
-   that buttons and inputs already have (globals.css). */
+   container and static heading, so it's the size the section will be. The corners are the kit's small ones, as inputs
+   have (globals.css; M14 14b-8). */
 .bone {
   display: block;
   width: 100%;
   height: 1lh;
-  border-radius: 12px;
+  border-radius: var(--r-small);
   background: var(--line);
 }

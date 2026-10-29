@@ -1,6 +1,6 @@
 # M14 14b-8 — The new look: hard ink shadows, nearly square corners, cards, rows and chips
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, in progress. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
+**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, done; next 14b-8b. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
 
 ## Goal
 Plor's player and admin pages take the look the human chose on mockup 3 with its "Nearly square (5px)" setting: hard ink shadows and borders, nearly square corners, sections as bordered cards, lists as bordered rows, facts as chips and badges, in Baloo 2 and each theme's own colours.
@@ -45,7 +45,8 @@ Plor's player and admin pages take the look the human chose on mockup 3 with its
 | Value | Used for | Origin |
 |---|---|---|
 | 5px | cards, big buttons, the question card | mockup 3 "Nearly square (5px)": `--r-tile`, `--r-btn` (human, 2026-10-28: "Nearly square (5px)") |
-| 4px | small buttons, chips, list rows, inputs, stat tiles, stolen-letter tiles | mockup 3 sq5: `--r-btn-s`, `--r-chip`, `--r-li`, `--r-input`, `--r-stat`, `--r-letter` ("Square them too") |
+| 4px | small buttons, chips, list rows, inputs, stat tiles, stolen-letter tiles; skeleton lines, as the inputs they stand beside | mockup 3 sq5: `--r-btn-s`, `--r-chip`, `--r-li`, `--r-input`, `--r-stat`, `--r-letter` ("Square them too") |
+| 10px 12px | the padding inside inputs, text boxes and pickers (14b-8a) | `globals.css`'s input padding, unchanged, now shared by all three (mockup 3's fields have 9px 12px; one value is kept, not two) |
 | 2px | calendar cells | mockup 3 sq5: `--r-cell` |
 | 2px, 1.5px | borders: cards, buttons, inputs, the tab bar; chips, rows, small links | mockup 2 and 3 (`.tile`, `.btn`, `.chip`, `ul.list li`); "Keep 2px border" |
 | 4px 4px 0, 3px 3px 0 | card and stat-tile shadows | mockup 2 and 3 (`.tile`, `.stat`); "4px shadow" |
@@ -73,13 +74,14 @@ Every other size (paddings, gaps, font sizes) is read from mockup 3's CSS when b
 ## Plan
 One PR each, in order; the human sees each PR's screenshots before it merges:
 1. **14b-8a, the kit and the shell:** the variables, the base buttons, links drawn as buttons, inputs, text boxes and pickers, the tab bar, the sidebar, the streak pill, the clock bar, the Undo toast and the skeletons. Every page picks up the buttons and fields at once. The card, row, chip and badge come with 14b-8b, where they're first used, so nothing is added before it has a caller (CLAUDE.md, "Build for today").
-2. **14b-8b, Today and the game:** Today, the question card and clock, the run's result, How to play.
-3. **14b-8c, the other player pages:** Friends, Groups, a group, Me, `/streak`, the settings sheet.
-4. **14b-8d, the admin pages.**
+2. **14b-8b, Today and the game:** Today, the question card and clock, the run's result, How to play. Its buttons with their own styles, which 14b-8a's base shadow and press now reach: `game.tsx`'s `.play` and the banner's `.offbeat` button-link (an ink shadow under a white button on navy), `.start` in `game.tsx` and `offbeat.tsx`, and the reaction buttons (to the mockup's chips).
+3. **14b-8c, the other player pages:** Friends, Groups, a group, Me, `/streak`, the settings sheet. Its buttons as above: `settings.tsx`'s `.close` (a round button with an ink ring and shadow), `.secondary`, `.dangerButton` and `.inline` (still a 1.5px `--edge` border and 12px corners under the ink shadow).
+4. **14b-8d, the admin pages.** Its buttons as above: `admin.button` (36px, 10px corners), `.primary`, `.dangerFill`, Puzzles' `.day`, the pill `.chip` and `.more`, all with the big `0 4px 0` shadow where the mockup's small button has `0 3px 0`, and `admin-area`'s `.menuButton`.
 5. **The critique** (criterion 6), then 14b-7.
 
 ## Removes
 - The corner values the kit replaces (`globals.css`'s 10px and 12px, the modules' 7px to 20px corners), and per-page styles a shared card, row, chip or badge replaces; each PR lists its own.
+- **14b-8a:** the base controls' 1.5px `--edge` border and their 10px and 12px corners; the button-link's, the Undo toast's and the skeleton line's 12px corners and the toast's `--edge` border; the tab bar's and sidebar's 1px `--line` rules; the streak pill's 999px pill shape and soft fill; the clock bar's 1.5px accent rule.
 
 ---
 *Fill in the sections below at the end.*
@@ -87,9 +89,23 @@ One PR each, in order; the human sees each PR's screenshots before it merges:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Mockup 3's buttons come in four kinds (`.btn` accent, `.btn.plain`, `.btn.small`, `.link`) | **14b-8a:** the base `button` and the button-link are the mockup's plain big button (2px ink, 5px, `0 4px 0`); the filled, small and link kinds come where the pages that use them are restyled (14b-8b to d) | The app's base buttons are its 44px and 48px controls, the size of the mockup's big button; a kind with no caller yet isn't added (CLAUDE.md, "Build for today") |
+| Mockup 3 draws the gear as a round avatar with a 2px ink border | **14b-8a:** the gear keeps its borderless 44px icon, with no shadow or press | A 44px ink ring beside the streak chip is heavier than the mockup's 30px one, and the gear is an icon, not one of the kit's buttons; 14b-8b's screenshots show it beside the mockup's |
+| Mockup 3's phone top bar has no rule; the clock bar isn't drawn | **14b-8a:** the top bar keeps its 1px `--line` rule; the clock bar's rule is 2px ink, like the tab bar's | The top bar's rule separates it from content scrolling under it, which the mockup's static phone doesn't show; the clock bar takes the tab bar's rule by analogy (answer 8) |
+| Mockup 3's reduced-motion rule only drops the press's transition | **14b-8a:** under reduced motion a button doesn't move or lose its shadow | Answer 9: "Yes, press down (Recommended)", whose option said "off under reduced motion" (WCAG 2.2, 2.3.3) |
 
 ## Evidence
+### 14b-8a (2026-10-29, the Windows PC's local stack)
+- **Criterion 1, the kit's first part:** `e2e/look.e2e.ts` (3 tests): in the light and dark colour schemes, the signed-out page's "Email me a sign-in code" button and "About Plor" button-link read a 2px border in the theme's text colour, 5px corners and a `0px 4px 0px 0px` shadow in that colour, and the Email field 2px, 4px and no shadow; pressing the button (mouse down) moves it to `matrix(1, 0, 0, 1, 0, 4)`, and under `reducedMotion: "reduce"` its transform stays `none`; signed in, the tab bar's top border is 2px ink at 390px, and at 1440px the sidebar's right edge is 2px ink and its current item 2px ink, 4px corners, a `3px 3px 0px 0px` ink shadow: passed.
+- **Criterion 2, seen** (a throwaway e2e, deleted after; a seeded player who had played and commented, removed after): Today, Friends and Me at 390×844 and 1440×900. Buttons and button-links carry the ink border, corners and drop shadow; fields their ink border; the tab bar its ink rule, the sidebar's current item its bordered, shadowed box; the streak pill is the green ink-bordered chip. Still the old look until 14b-8b and c: the cards' rounded corners, the reactions as full buttons (heavy with the shadow; 14b-8b makes them the mockup's chips), and the pages' layouts. Four were sent to the human.
+- `npx tsc --noEmit -p .` and `npx eslint src e2e scripts` clean; `npm test` **470 passed**; `npm run test:db` **280 passed**; `npm run build` compiled, 73 of 73 pages; the full `npx playwright test` **72 passed** (8.4 min). No test players or puzzles left.
+- **After the review's fixes:** `look.e2e.ts` (the gear held down reads transform `none` and shadow `none`), `shell.e2e.ts`, `settings.e2e.ts`, `settings-sheet.e2e.ts` and `feel.e2e.ts`: **27 passed**; `npx tsc` and `npx eslint src e2e` clean.
 
 ## Review
+### 14b-8a (the `reviewer` agent, fresh context, on the uncommitted diff over `a84fa40`)
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. **The gear and the sidebar's Settings still pressed down,** and under reduced motion gained a shadow while held: their `transform: none; box-shadow: none` (one class) lost to the base `button:active:not(:disabled)` (two classes and an element). Fixed: the base press rules are in `:where()`, so a button's own class wins; `look.e2e.ts` holds the gear down and reads `none`, `none`.
+  2. **`textarea` and `select` had a 9px 12px padding with no recorded origin.** Fixed: inputs, text boxes and pickers share the inputs' existing 10px 12px, in Numbers; the skeleton line's 4px corners joined the 4px row.
+- Moved into this ticket's Plan: the buttons with their own styles that the base shadow and press now reach, each under the sub-ticket that restyles it (14b-8b to d).
+- Deferred to ROADMAP "Next revision" (For M14): disabled buttons keep the full ink border and shadow; the sidebar's items grew from 46px to 50px with the transparent border; `look.e2e.ts` doesn't close its contexts, its reduced-motion check doesn't assert the shadow stays, and nothing checks a `[data-theme]` element's own ink.
+- Unverified by the reviewer: mockup 3 itself (no Artifact tool in its context; it checked against the Numbers, which quote it), the streak pill's safe colours (mockup 3's `.chip.streak`: `background: var(--safe-bg); color: var(--safe)`, read in this session), and the 80 ms on the shadow's transition (mockup 3's `.btn`: `transition: transform .08s, box-shadow .08s`).
