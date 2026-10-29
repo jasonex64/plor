@@ -44,7 +44,6 @@
 }
 
 .name {
-  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 18px;
   font-weight: 800;
   line-height: 1.1;

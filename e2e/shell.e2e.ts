@@ -64,10 +64,11 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   expect((await page.goto("/account"))!.status()).toBe(404);
   // Fonts come from Plor's own server (criterion 8).
   expect(requests.filter((url) => /fonts\.(googleapis|gstatic)\.com/.test(url))).toEqual([]);
-  // And they're the shell's own (docs/milestones/M14-14b-5-local-fonts.md, criterion 4): the heading is drawn at 800,
-  // its family's one face is the Baloo 2 file at 800, and the body's family has the DM Sans file at 400 and 700, each
-  // of which loads. Read from the page's @font-face rules and faces, since next/font names the families itself.
-  // On Plor's own page: the /account visit above left Next.js's 404 page, which styles its own h1.
+  // And they're Plor's own (docs/milestones/M14-14b-5-local-fonts.md, criterion 4): one font for all text (M14 14b-6d,
+  // criterion 5), so the heading and the body share one family, whose faces are the Baloo 2 file at 400, 700 and 800,
+  // each of which loads, and the heading is drawn at 800. Read from the page's @font-face rules and faces, since
+  // next/font names the family itself. On Plor's own page: the /account visit above left Next.js's 404 page, which
+  // styles its own h1.
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Plor" })).toBeAttached();
   const fonts = await page.evaluate(async () => {
@@ -79,21 +80,21 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
         .filter((r) => unquote(r.style.getPropertyValue("font-family")) === unquote(family))
         .map((r) => `${r.style.getPropertyValue("font-weight")} ${/\/media\/(\w+?)[.-]/.exec(r.style.getPropertyValue("src"))?.[1]}`)
         .sort();
-    const loads = async (family: string, weight: string) =>
-      (await document.fonts.load(`${weight} 16px ${family}`)).map((f) => `${f.weight} ${f.status}`);
-    const [h1, heading, body] = [document.querySelector("h1")!, first(document.querySelector("h1")!), first(document.body)];
+    const loads = async (weight: string) =>
+      (await document.fonts.load(`${weight} 16px ${first(document.body)}`)).map((f) => `${f.weight} ${f.status}`);
+    const h1 = document.querySelector("h1")!;
     return {
+      sameFamily: first(h1) === first(document.body),
       headingWeight: getComputedStyle(h1).fontWeight,
-      headingFiles: files(heading),
-      bodyFiles: files(body),
-      loaded: [await loads(heading, "800"), await loads(body, "400"), await loads(body, "700")],
+      files: files(first(document.body)),
+      loaded: [await loads("400"), await loads("700"), await loads("800")],
     };
   });
   expect(fonts).toEqual({
+    sameFamily: true,
     headingWeight: "800",
-    headingFiles: ["800 Baloo2_800_latin"],
-    bodyFiles: ["400 DMSans_latin", "700 DMSans_latin"],
-    loaded: [["800 loaded"], ["400 loaded"], ["700 loaded"]],
+    files: ["400 Baloo2_latin", "700 Baloo2_latin", "800 Baloo2_latin"],
+    loaded: [["400 loaded"], ["700 loaded"], ["800 loaded"]],
   });
 });
 

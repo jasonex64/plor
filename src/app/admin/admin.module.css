@@ -183,11 +183,9 @@
 .needNumber {
   grid-row: span 2;
   text-align: right;
-  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 28px;
   font-weight: 800;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .needWhat {
@@ -249,7 +247,6 @@
 
 .nowrap {
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
 }
 
 .tag {

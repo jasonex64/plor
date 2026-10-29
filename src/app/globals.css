@@ -183,7 +183,9 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font), system-ui, sans-serif;
+  /* Every digit the same width, so counting and lined-up numbers don't shift (M14 14b-6d; MDN font-variant-numeric). */
+  font-variant-numeric: tabular-nums;
 }
 
 /* The room the page leaves for the shell, the clock bar and the right column, flagged by them on <body> while shown
@@ -268,8 +270,18 @@ main {
 
 h1,
 h2 {
-  font-family: var(--font-heading), system-ui, sans-serif;
   font-weight: 800;
+}
+
+/* Headings wrap into even lines, paragraphs avoid a lone last word (M14 14b-6d; MDN text-wrap). */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
@@ -284,6 +296,12 @@ a {
 
 label {
   display: block;
+}
+
+/* The comment box and the pickers take the page's font too (M14 14b-6d: one font for all text); their own sizes stay. */
+textarea,
+select {
+  font-family: inherit;
 }
 
 /* 16px text in inputs, so iOS doesn't zoom into them. */
