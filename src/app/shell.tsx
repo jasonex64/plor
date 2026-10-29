@@ -25,6 +25,7 @@ import { SettingsSheet } from "./settings";
 import styles from "./shell.module.css";
 import { GAME } from "@/platform/game";
 import { capitalized, timedOutText } from "@/game/words";
+import { FORWARD } from "./slide";
 
 const icon = (children: ReactNode) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -119,7 +120,9 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
   const open = () => dialog.current?.showModal();
   return createPortal(
     <>
-      <header className={styles.top}>
+      {/* Anchored while a detail page slides (globals.css; M14 14b-6e), as are the tab bar and the clock bar: named
+          inline, as the guide does, since a CSS Module would rename them and the global rules wouldn't match. */}
+      <header className={styles.top} style={{ viewTransitionName: "plor-top" }}>
         <span className={styles.topWord} aria-hidden="true">
           Plor
         </span>
@@ -130,7 +133,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
           </button>
         </div>
       </header>
-      <nav aria-label="Main" className={styles.nav}>
+      <nav aria-label="Main" className={styles.nav} style={{ viewTransitionName: "plor-nav" }}>
         <span className={styles.word} aria-hidden="true">
           Plor
         </span>
@@ -171,7 +174,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
 function StreakPill({ days }: { days: number }) {
   const rank = rankFor(days);
   return (
-    <Link href="/streak" className={styles.streak}>
+    <Link href="/streak" transitionTypes={FORWARD} className={styles.streak}>
       <RankFlower rank={rank} size={22} />
       {days}
       <span className="sr-only"> day streak, {rank.name}</span>
@@ -212,18 +215,22 @@ function Clock({ index, msLeft, onTimeUp }: { index: number; msLeft: number; onT
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
-    <section aria-label="Stop in play" className={styles.clock}>
+    <section aria-label="Stop in play" className={styles.clock} style={{ viewTransitionName: "plor-clock" }}>
       {seconds > 0 ? (
         <>
           <span role="timer">
             Stop {index + 1} · {seconds}s left
           </span>
-          <ButtonLink href={GAME.path}>Back</ButtonLink>
+          <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
+            Back
+          </ButtonLink>
         </>
       ) : (
         <>
           <span role="status">{capitalized(timedOutText(index + 1))}</span>
-          <ButtonLink href={`${GAME.path}#result`}>Result</ButtonLink>
+          <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD}>
+            Result
+          </ButtonLink>
         </>
       )}
     </section>

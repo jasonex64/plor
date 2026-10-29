@@ -14,6 +14,7 @@ import { errorText } from "./messages";
 import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
+import { FORWARD } from "./slide";
 
 // Calendar dates, read in UTC so they can't shift by a day: "2 Oct 2026", "12 Oct", "October 2026".
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
@@ -71,7 +72,9 @@ export function MeStats({ numbers }: { numbers: boolean }) {
           <Total value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. stops climbed" />
           <Total value={String(me.offbeat.fullClimbs)} label="full climbs" />
         </dl>
-        <ButtonLink href={GAME.path}>{GAME.name}&apos;s game screen</ButtonLink>
+        <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
+          {GAME.name}&apos;s game screen
+        </ButtonLink>
       </section>
       <section aria-label="Your rarest answers" className={styles.card}>
         <h2 className={styles.heading}>Your rarest answers</h2>

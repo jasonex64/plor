@@ -346,3 +346,90 @@ button:disabled {
 footer {
   margin-top: 32px;
 }
+
+/* Detail pages slide (M14 14b-6e; node_modules/next/dist/docs/01-app/02-guides/view-transitions.md, Step 3, its CSS):
+   60px, the old page fading out as the new one fades in, the guide's timing halved to the human's 200 ms (answer 24).
+   Forward slides left, back slides right. */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -60px;
+  animation:
+    75ms ease-in both fade reverse,
+    200ms ease-in-out both slide reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --slide-offset: 60px;
+  animation:
+    105ms ease-out 75ms both fade,
+    200ms ease-in-out both slide;
+}
+
+::view-transition-old(.nav-back) {
+  --slide-offset: 60px;
+  animation:
+    75ms ease-in both fade reverse,
+    200ms ease-in-out both slide reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --slide-offset: -60px;
+  animation:
+    105ms ease-out 75ms both fade,
+    200ms ease-in-out both slide;
+}
+
+@keyframes fade {
+  from {
+    filter: blur(3px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide {
+  from {
+    translate: var(--slide-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+
+/* The shell's fixed parts don't move: named in shell.tsx, shown at once above the sliding page ("Anchoring the
+   header"). */
+::view-transition-group(plor-top),
+::view-transition-group(plor-nav),
+::view-transition-group(plor-clock) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(plor-top),
+::view-transition-old(plor-nav),
+::view-transition-old(plor-clock) {
+  display: none;
+}
+
+::view-transition-new(plor-top),
+::view-transition-new(plor-nav),
+::view-transition-new(plor-clock) {
+  animation: none;
+}
+
+/* Taps during a slide reach the page ("Keeping the page interactive"). */
+::view-transition {
+  pointer-events: none;
+}
+
+/* No movement for players who ask for less (WCAG 2.2, 2.3.3; "Respecting reduced motion"). */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

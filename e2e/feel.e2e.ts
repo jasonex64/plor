@@ -1,7 +1,8 @@
 // The frame and the skeletons (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6a): the tab bar stays on screen
 // while the player moves between tabs (criterion 1), and a section whose data hasn't landed shows its skeleton, by its
 // label, never "Loading…" text (criterion 2). Comments and reactions at once, with Undo (14b-6b, criterion 3). The
-// question's clock (14b-6c, criterion 4). Numbers and headlines (14b-6d, criterion 5).
+// question's clock (14b-6c, criterion 4). Numbers and headlines (14b-6d, criterion 5). Detail pages slide (14b-6e,
+// criterion 6).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { UNDO_SECONDS } from "../src/config/tunables";
@@ -231,4 +232,75 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   for (const part of hidden) await expect(part).toBeVisible();
+});
+
+type Slide = { types: string[]; animations: { pseudo: string; name: string; duration: number }[] };
+
+// Records each view transition the page starts: its types, and once it's ready the animations it runs.
+async function watchSlides(page: Page): Promise<() => Promise<Slide[]>> {
+  await page.evaluate(() => {
+    const w = window as unknown as { slides: Slide[] };
+    w.slides = [];
+    const start = document.startViewTransition.bind(document);
+    document.startViewTransition = ((update: Parameters<typeof start>[0]) => {
+      const transition = start(update);
+      const slide: Slide = { types: [...transition.types], animations: [] };
+      w.slides.push(slide);
+      void transition.ready.then(() => {
+        slide.animations = document.getAnimations().map((a) => ({
+          pseudo: (a.effect as KeyframeEffect).pseudoElement ?? "",
+          name: (a as CSSAnimation).animationName,
+          duration: Number(a.effect!.getTiming().duration),
+        }));
+      });
+      return transition;
+    }) as typeof document.startViewTransition;
+  });
+  return () => page.evaluate(() => (window as unknown as { slides: Slide[] }).slides);
+}
+
+// The new page's slide in the transition a navigation started, once its animations are known.
+async function slideOf(slides: () => Promise<Slide[]>, count: number) {
+  await expect.poll(async () => (await slides()).length).toBeGreaterThanOrEqual(count);
+  await expect.poll(async () => (await slides())[count - 1].animations.length).toBeGreaterThan(0);
+  const slide = (await slides())[count - 1];
+  return { types: slide.types, slide: slide.animations.find((a) => a.name === "slide" && a.pseudo.startsWith("::view-transition-new"))?.duration };
+}
+
+// A link into a detail page slides forward and its back button slides back, 200 ms (answer 24); a tab switch doesn't
+// slide; with reduced motion the slide takes 0 s (criterion 6; design 6).
+test("detail pages slide in and back, tabs don't, and reduced motion stills them", async ({ page }) => {
+  await page.goto("/");
+  await signInAndPick(page, "fv");
+  const slides = await watchSlides(page);
+
+  // The tab bar is anchored: named, and not animated while the page slides ("Anchoring the header").
+  const nav = page.getByRole("navigation", { name: "Main" });
+  expect(await nav.evaluate((el) => getComputedStyle(el).viewTransitionName)).toBe("plor-nav");
+  await page.getByRole("link", { name: "Play", exact: true }).click();
+  await expect(page).toHaveURL(/\/updraft$/);
+  expect(await slideOf(slides, 1)).toEqual({ types: ["nav-forward"], slide: 200 });
+  expect((await slides())[0].animations.filter((a) => a.pseudo.includes("plor-"))).toEqual([]);
+
+  await page.getByRole("main").getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  expect(await slideOf(slides, 2)).toEqual({ types: ["nav-back"], slide: 200 });
+
+  const before = (await slides()).length;
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
+  await expect(page.getByRole("region", { name: "Your rarest answers" })).toBeVisible();
+  const after = (await slides()).slice(before);
+  expect(after.flatMap((s) => s.types)).toEqual([]);
+  expect(after.flatMap((s) => s.animations).filter((a) => a.name === "slide")).toEqual([]);
+
+  // With reduced motion every slide in the transition takes 0 s (the new page's has already finished when the
+  // transition is ready; the old page's is still listed, held by its fill).
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const count = (await slides()).length + 1;
+  await page.getByRole("link", { name: `${GAME.name}'s game screen` }).click();
+  await expect(page).toHaveURL(/\/updraft$/);
+  await expect.poll(async () => (await slides()).length).toBeGreaterThanOrEqual(count);
+  await expect.poll(async () => (await slides())[count - 1].types).toEqual(["nav-forward"]);
+  const still = (await slides())[count - 1].animations.filter((a) => a.name === "slide");
+  expect(new Set(still.map((a) => a.duration))).toEqual(new Set([0]));
 });

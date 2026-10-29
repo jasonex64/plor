@@ -25,6 +25,7 @@ import { Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
+import { FORWARD } from "./slide";
 
 // The calendar day before or after a YYYY-MM-DD date.
 function shiftDay(date: string, days: number): string {
@@ -246,7 +247,9 @@ function Preview({ preview }: { preview: FeedPreview }) {
   return (
     <>
       <p>
-        <ButtonLink href={GAME.path}>{text.read}</ButtonLink>
+        <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
+          {text.read}
+        </ButtonLink>
       </p>
       <ul className={styles.locked}>
         {/* By position: two friends can share a display name. */}

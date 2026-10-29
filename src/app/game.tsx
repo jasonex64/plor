@@ -21,6 +21,7 @@ import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
+import { FORWARD } from "./slide";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
@@ -74,8 +75,8 @@ function useRun({ onOver, onDayOver }: DayHooks) {
 }
 
 // Starts today's run and opens the game screen with question 1 in play: Start climbing on How to play, and Play on
-// Today with Skip the game screen on.
-export function useStartRun() {
+// Today with Skip the game screen on. direction: the slide, back up from How to play, forward from Today (14b-6e).
+export function useStartRun(direction: string[]) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +85,7 @@ export function useStartRun() {
     setError(null);
     try {
       await api("/api/run/start", { method: "POST" });
-      router.push(GAME.path);
+      router.push(GAME.path, { transitionTypes: direction });
     } catch (err) {
       setError(errorText(err));
       setBusy(false);
@@ -97,7 +98,7 @@ export function useStartRun() {
 // after it, the score, how it ended, the result and the time to the next puzzle.
 export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   const { run, noPuzzle, error, over } = useRun(hooks);
-  const starting = useStartRun();
+  const starting = useStartRun(FORWARD);
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
@@ -106,7 +107,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "not_started" && !skip && (
           <>
             <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops</p>
-            <Link href={GAME.path} className={styles.play}>
+            <Link href={GAME.path} transitionTypes={FORWARD} className={styles.play}>
               Play
             </Link>
           </>
@@ -126,7 +127,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "in_progress" && (
           <>
             <p className={styles.line}>Your run is still going</p>
-            <Link href={GAME.path} className={styles.play}>
+            <Link href={GAME.path} transitionTypes={FORWARD} className={styles.play}>
               Continue
             </Link>
           </>
@@ -185,7 +186,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
           <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
             Start
           </button>
-          <Link href={`${GAME.path}/how-to-play`} className={styles.secondary}>
+          <Link href={`${GAME.path}/how-to-play`} transitionTypes={FORWARD} className={styles.secondary}>
             How to play
           </Link>
         </>
@@ -229,7 +230,7 @@ function Score({ run }: { run: RunState }) {
         {pointsText(run.points)}
         {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
       </p>
-      <ButtonLink href={`${GAME.path}#result`} tone="offbeat">
+      <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD} tone="offbeat">
         Result
       </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />

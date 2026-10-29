@@ -1,6 +1,6 @@
 # M14 14b-6 — Feel and polish: the frame that stays, skeletons, instant feedback, numbers and headlines
 
-**Status:** approved (human, 2026-10-27: "Approve, build 14b-6a (Recommended)"); 14b-6a, the frame and skeletons, done (PR #113; criterion 2 accepted as built (human, 2026-10-28: "Accept as built (Recommended)"), Source diff); 14b-6d, numbers and headlines, done (PR #124; one font, Baloo 2, for all text: answers 13–15); 14b-6b, comments and reactions with Undo, done (PR #125; answers 16–19); 14b-6c, the question's clock, done (PR #126; answers 20–23); next 14b-6e. Drafted from three rounds of guided questions and an Impeccable critique of every page.
+**Status:** approved (human, 2026-10-27: "Approve, build 14b-6a (Recommended)"); 14b-6a, the frame and skeletons, done (PR #113; criterion 2 accepted as built (human, 2026-10-28: "Accept as built (Recommended)"), Source diff); 14b-6d, numbers and headlines, done (PR #124; one font, Baloo 2, for all text: answers 13–15); 14b-6b, comments and reactions with Undo, done (PR #125; answers 16–19); 14b-6c, the question's clock, done (PR #126; answers 20–23); 14b-6e, detail pages that slide, done (answers 24–26); next 14b-6f. Drafted from three rounds of guided questions and an Impeccable critique of every page.
 
 ## Goal
 Plor feels instant: the frame stays put between pages, every wait shows the shape of what's coming, comments and reactions land at once with an undo, detail pages slide in and out, numbers don't jitter, headlines wrap evenly, the question's clock reads as a clock, and the admin sees at a glance when tomorrow has no puzzle.
@@ -74,6 +74,15 @@ The Plan's first hypothesis was disproved: DM Sans's file has no tabular figures
 22. **The banner while a question is open:** "Hide the banner", where design 4 had it shrink to one line.
 23. **When the banner, stats, Yesterday and comments are hidden:** "The whole run (Recommended)" for the panels, and for the banner "Hidden the whole run (Recommended)": from Start until the run ends, the reveal between stops included.
 
+### 14b-6e's details (human, 2026-10-28, on the Windows PC, quoted)
+24. **The fade:** "Guide's fades, scaled to 200 ms (Recommended)": the source's slide (400 ms) and fades (out 150 ms; in 210 ms after 150 ms) halved, so the slide takes the 200 ms chosen at round 3.
+25. **Back buttons:** "Add one to each (Recommended)": `/streak` gets "← Me" and a group's page "← Groups", like the game screen's "← Today".
+26. **Which links slide forward:** "Every way in (Recommended)": Play and Continue on Today (and Play with Skip the game screen on), the clock bar's Back and Result, the feed's "Finish today's game" button, Me's game-screen button, the streak pill, a group's name, a new or joined group, and How to play. How to play's Start climbing slides back, up to the game screen.
+
+### How 14b-6e is built (from design 6 and answers 24–26)
+- One `Slide` wrapper (`src/app/slide.tsx`, React's `<ViewTransition>` with the guide's enter and exit maps, `default: "none"`) in each participating `page.tsx`: Today, Friends, Groups and Me, which slide out and back in, and the four detail pages, which slide in and out. The links above carry `transitionTypes={["nav-forward"]}` (or `["nav-back"]`); `router.push` carries the same for Play with the skip on, a new group, and Start climbing.
+- The shell's fixed parts (the top bar, the tab bar, the sidebar and the clock bar) are named and not animated, above the sliding content (the guide's "Anchoring the header"). `::view-transition { pointer-events: none }` keeps the page usable during a slide, and reduced motion sets every view-transition animation to 0s (the guide's CSS).
+
 ### How 14b-6c is built (from design 4 and answers 20–23)
 - While the run is in progress, the game screen shows the stop line, the prompt with the seconds left beside it as a number, the stolen letters and the answer box, or between stops the reveal and Next: no banner, no "Your Updraft" or "Yesterday on the ridge", and no comments (the right column's feed included). They come back when the run ends.
 - The number is the prompt's size and weight (the `h2` beside it); `role="timer"` named "Seconds left", so it's read with its meaning. The clock bar on other pages is unchanged.
@@ -121,6 +130,9 @@ Each is checked with a command or a test's output, recorded under Evidence.
 | `z-index: 10` | the toast above the page (14b-6b) | the shell's own layer: the top bar, tab bar and clock bar (`shell.module.css`), unchanged |
 | 200 ms | a detail page's slide | human, 2026-10-27: "Quick, 200 ms" |
 | 60px | a slide's offset | Next.js view-transitions guide, Step 3 ("The 60px offset is enough to communicate direction") |
+| 75 ms; 105 ms after 75 ms | the old page's fade out; the new page's fade in (14b-6e) | the guide's 150 ms and 210 ms after 150 ms, halved with its 400 ms slide to the human's 200 ms (answer 24) |
+| ease-in, ease-out, ease-in-out | the fades' and the slide's easing (14b-6e) | the guide's CSS, unchanged |
+| `z-index: 100` | the anchored shell above the sliding content (14b-6e) | the guide's "Anchoring the header" |
 | tomorrow (Pacific) not approved | when the admin warning shows | human, 2026-10-27: "Tomorrow not approved"; tomorrow is the day after `private.today()` |
 | 0s | slide duration under reduced motion | Next.js view-transitions guide, "Respecting reduced motion" |
 | 1lh | a skeleton line's height | one line of the text it stands for (MDN `lh` unit is the element's line height; no new size) |
@@ -147,6 +159,7 @@ Hypotheses to check before building:
 - DM Sans (`src/app/fonts/DMSans-latin.woff2`, `OFL-DMSans.txt`), the 800-only `Baloo2-800-latin.woff2` (one variable file replaces both fonts), the `--font-heading` variable and its 12 `font-family` declarations (14b-6d, answers 13–15).
 - `reactions.tsx`'s disable-all-buttons-while-waiting and `comments.tsx`'s reload-after-post (14b-6b: the `busy` state in `comments.tsx` and `board.tsx`, the `busy` prop of `Reactions` and `CommentItem`, `comments.tsx`'s `run` helper, `board.tsx`'s awaited `react`; the literal paddings in `globals.css`'s room rules, now the `--room-bottom`, `--sidebar` and `--right-column` they name).
 - The admin rail's plain "0 days approved ahead / None yet" row (replaced by the warning).
+- 14b-6e removes nothing: it adds motion to links that were already there, and the two back buttons answer 25 asked for.
 
 ---
 *Fill in the sections below at the end.*
@@ -165,8 +178,15 @@ Hypotheses to check before building:
 | Design 4: "the banner shrinks to one line while a question is open" | **14b-6c:** the banner is hidden for the whole run, the reveal between stops included | The human's answers 22 and 23 ("Hide the banner"; "Hidden the whole run") |
 | Design 4: the countdown at "the heading size already in `globals.css`" | **14b-6c:** the prompt's size and weight (`1.5em`, `800`), checked equal to the prompt `h2` in the e2e | `globals.css` sets no heading size; the human left the size to the game's redesign and chose "Prompt's size for now" (answer 21) |
 | `live-board.e2e.ts`, "the reset leaves a question in play alone": the stats card's reload during a question proves the reset fired | **14b-6c:** that wait is gone; the test fast-forwards past the reset and checks the typed text stays | The card is hidden during the run (answer 23), so nothing on the screen reloads then; the reset's own reloads are checked on Today ("the reset reloads every section of Today") |
+| Criterion 6: the types "checked on the rendered `ViewTransition` classes", and under reduced motion "the transition's animation duration is 0s" | **14b-6e:** checked on the transition the browser runs: its `types` and its animations' names and durations | React puts the classes on the transition's pseudo-elements, which a test can't read directly; the transition's types and animations are what the classes produce. Under reduced motion a 0 s animation may already be gone when the transition is ready, so the test checks that every slide still listed reads 0 |
 
 ## Evidence
+### 14b-6e (2026-10-28 and 29, the Windows PC's local stack)
+- **Criterion 6:** `e2e/feel.e2e.ts` "detail pages slide in and back, tabs don't, and reduced motion stills them" wraps `document.startViewTransition` to record each transition's `types` and, once it's ready, its animations (`document.getAnimations()`): Today's Play gives `["nav-forward"]` and a 200 ms `slide` on `::view-transition-new(…)`; the game screen's "← Today" gives `["nav-back"]` and the same; the Me tab gives no types and no `slide`; with `reducedMotion: "reduce"`, Me's game-screen button gives `["nav-forward"]` and every `slide` in it has duration 0 (the new page's had already finished when the transition was ready; the old page's, held by its fill, reads 0): passed.
+- **Hypotheses checked on the way:** that React starts a transition for pages Next.js keeps hidden (Activity) rather than unmounts, and puts the link's types on it: both held (the forward and back steps). That a 0 s animation would read 0 when the transition is ready: only half held, as above.
+- **Not the change:** one `feel.e2e.ts` run failed waiting for a comment's send while the game day turned over (`private.today()` 2026-10-29 at 00:01:37 Pacific); rerun after midnight, it passed.
+- `npx tsc --noEmit -p .` and `npx eslint src e2e scripts` clean; `npm test` 45 files, **467 passed**; `npm run test:db` 42 files, **280 passed**; `npm run build` compiled, 73 of 73 pages; the full `npx playwright test` **68 passed** (7.4 min). No test players or fixture day left (0 and 0).
+
 ### 14b-6c (2026-10-28, the Windows PC's local stack)
 - **Criterion 4:** `e2e/feel.e2e.ts` "a question shows its seconds beside the prompt, and nothing else until the run ends": on Start, the timer named "Seconds left" reads a bare number; its computed `font-variant-numeric` is `tabular-nums` and its size and weight equal the prompt `h2`'s; it sits to the right of the prompt, overlapping its line; the banner's "Updraft" heading, "Your Updraft", "Yesterday on the ridge" and "Updraft comments" are not in the page; after the run ends (the host answer), all four are visible: passed.
 - **Seen in the browser** (a throwaway e2e, deleted after): at 390px and 1440px a question shows only Back, "Stop 1 of 7 · 0 points so far", "Name an animal" with "20" at its right at the same size, and the answer box; no right column on desktop.
@@ -202,6 +222,13 @@ Hypotheses to check before building:
 - `npx tsc --noEmit -p .` clean; `npx eslint src e2e scripts` clean (`npm run lint`'s 94 warnings are all in the untracked Impeccable skill under `.claude/skills/`, ROADMAP Housekeeping); `npm test` 43 files, **440 passed**; `npm run build` clean (the player pages ○ static, the code routes ◐); `npx playwright test` **64 passed** (2.1 min), after the review's fixes.
 
 ## Review
+### 14b-6e (the `reviewer` agent, fresh context, on the uncommitted diff over `5064de5`)
+- Blocking findings and how each was fixed:
+  1. **The shell wasn't anchored:** `view-transition-name` set in `shell.module.css` was renamed by CSS Modules (`k28k9a_plor-nav` in the built CSS), so the global rules for `plor-top`, `plor-nav` and `plor-clock` never matched and the shell cross-faded by the browser's default. Fixed: the names are set inline in `shell.tsx`, as the guide does; the built CSS holds no renamed name. The criterion 6 e2e now checks the tab bar's computed name is `plor-nav` and that no animation runs on a `plor-` pseudo-element during the slide: `feel.e2e.ts` and `shell.e2e.ts` 16 passed.
+  2. **`@keyframes fade` dropped the guide's blur** (`filter: blur(3px)` to `blur(0)`) with no Source diff row. Fixed: the guide's keyframes, unchanged.
+- Also fixed: Removes now says why 14b-6e removes nothing; the e2e clicks "← Today" inside `main`, not the first "Today" link on the page.
+- Deferred to ROADMAP "Next revision" (For M14): the clock bar's Back slides forward even from How to play, where it goes back up; a tab tapped during a slide is lost (the guide: named parts skip hit-testing while a transition runs); the e2e's tab step reads the transitions as soon as the page shows, so one not yet ready would show its types but not its animations.
+
 ### 14b-6c (the `reviewer` agent, fresh context, on the uncommitted diff over `4da80f1`)
 - Blocking findings: none. The reviewer checked every state (loading, no puzzle, not started, a question, a reveal, over, the reset in and out of play), that nothing the screen keeps is lost when the cards and feed unmount, and that the docs match the code; it reran `npx tsc` and `npx eslint` (clean). It judged the reset test's change a legitimate update, not a weakened check, as the stats card can't reload during play by design (answer 23).
 - Deferred to ROADMAP "Next revision" (For M14): the reset test no longer proves the reset fired, and its header still says the rest of the page moves; Start drops the feed's draft and its earlier day, and a held post's Undo after Start can't put its text back; a run already in progress flashes the cards and feed (and loads them) before the run loads; the prompt can re-wrap once when the number goes from 10 to 9; the e2e compares the number with the page's first `h2`, not the prompt; screen readers saying "Seconds left" and the 320px layout are unverified.

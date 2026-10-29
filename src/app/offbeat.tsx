@@ -15,6 +15,7 @@ import { Comments } from "./comments";
 import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
+import { BACK } from "./slide";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
@@ -56,7 +57,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
   return (
     <div className={styles.screen}>
       <p className={styles.back}>
-        <ButtonLink href="/">
+        <ButtonLink href="/" transitionTypes={BACK}>
           <span aria-hidden="true">← </span>Today
         </ButtonLink>
       </p>
@@ -196,7 +197,7 @@ const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
 // private.question_deadline). Start climbing starts the run and goes to the game screen, as Start does there, and shows
 // only before today's run has started (docs/milestones/M14-14a-2c-review-fixes.md).
 export function HowToPlay() {
-  const starting = useStartRun();
+  const starting = useStartRun(BACK);
   const [error, setError] = useState<string | null>(null);
   const [run, setRun] = useState<RunState | null>(null);
   useEffect(() => {
@@ -209,7 +210,7 @@ export function HowToPlay() {
   return (
     <section aria-label="How to play" className={styles.how}>
       <p className={styles.back}>
-        <ButtonLink href={GAME.path}>
+        <ButtonLink href={GAME.path} transitionTypes={BACK}>
           <span aria-hidden="true">‹ </span>
           {GAME.name}
         </ButtonLink>

@@ -49,6 +49,7 @@ import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
+import { BACK } from "./slide";
 import { GAME } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
@@ -262,9 +263,27 @@ export function GameTab() {
   return <OffbeatScreen username={player.username} name={nameOf(player)} onStarted={reloadStreak} />;
 }
 
+// The detail pages' way back up, which slides back (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6e, answer 25),
+// as the game screen's "← Today" does.
+function BackTo({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <p>
+      <ButtonLink href={href} transitionTypes={BACK}>
+        <span aria-hidden="true">← </span>
+        {children}
+      </ButtonLink>
+    </p>
+  );
+}
+
 export function StreakTab() {
   const { player } = usePlayer();
-  return <StreakRanks days={player.streak} />;
+  return (
+    <>
+      <BackTo href="/me">Me</BackTo>
+      <StreakRanks days={player.streak} />
+    </>
+  );
 }
 
 export function AdminTab({ page }: { page: AdminPage }) {
@@ -274,7 +293,12 @@ export function AdminTab({ page }: { page: AdminPage }) {
 
 export function GroupTab({ id }: { id: string }) {
   const { player, timeUps } = usePlayer();
-  return <GroupPage id={id} username={player.username} name={nameOf(player)} timeUps={timeUps} />;
+  return (
+    <>
+      <BackTo href="/groups">Groups</BackTo>
+      <GroupPage id={id} username={player.username} name={nameOf(player)} timeUps={timeUps} />
+    </>
+  );
 }
 
 export function InviteTab({ code }: { code: string }) {
