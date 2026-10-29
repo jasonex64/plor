@@ -29,6 +29,10 @@ const TABS = [
   { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, "Your rarest answers"] },
 ];
 
+// On phones, a player with no friends also has Today's invite card at its foot; from 768px the board says it instead
+// (docs/milestones/M14-14b-8-the-new-look.md, answer 13).
+const onPhone = (tab: (typeof TABS)[number]) => (tab.path === "/" ? [...tab.sections, "Plor is better with friends"] : tab.sections);
+
 // A signed-in player in a fresh browser of the given size, with every request recorded.
 async function player(browser: Browser, name: string, viewport: { width: number; height: number }) {
   const page = await (await browser.newContext({ viewport })).newPage();
@@ -58,7 +62,7 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
     await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
     await expect(nav.locator("[aria-current]")).toHaveCount(1);
     await expect(nav.getByRole("link", { name: tab.name })).toHaveAttribute("aria-current", "page");
-    await expect.poll(() => sections(page)).toEqual(tab.sections);
+    await expect.poll(() => sections(page)).toEqual(onPhone(tab));
   }
   // The account page moved to the Me tab (criterion 4).
   expect((await page.goto("/account"))!.status()).toBe(404);
@@ -145,7 +149,7 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
   const { page } = await player(browser, "sd", { width: 320, height: 640 });
   for (const tab of TABS) {
     await page.goto(tab.path);
-    await expect.poll(() => sections(page)).toEqual(tab.sections);
+    await expect.poll(() => sections(page)).toEqual(onPhone(tab));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
 });
