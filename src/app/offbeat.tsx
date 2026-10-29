@@ -21,7 +21,7 @@ import { GAME } from "@/platform/game";
 import { capitalized, caughtWord } from "@/game/words";
 
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
-export function OffbeatScreen({ username, onStarted }: { username: string; onStarted: () => void }) {
+export function OffbeatScreen({ username, name, onStarted }: { username: string; name: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
   // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
   // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
@@ -65,7 +65,7 @@ export function OffbeatScreen({ username, onStarted }: { username: string; onSta
       </div>
       <SideColumn label="Feed" inPlace className={styles.feed}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
       </SideColumn>
     </div>
   );

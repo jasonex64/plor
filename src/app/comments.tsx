@@ -9,17 +9,20 @@
 // each labelled, with only who commented and how many reactions until the run is over
 // (docs/milestones/M11-home-screen.md, 11b; H2, H3); earlier days are the friends thread.
 import { ButtonLink } from "./button-link";
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
 import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { previewText } from "@/comments/preview";
+import { choose } from "@/reactions/choose";
 import type { Emoji } from "@/reactions/reactions";
+import type { Held } from "@/lib/hold";
 import { Avatar } from "./avatar";
 import styles from "./comments.module.css";
 import { errorText } from "./messages";
-import { Reactions } from "./reactions";
+import { Reactions, reactionText } from "./reactions";
+import { useHeldChanges, useUndo } from "./undo";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
 
@@ -30,6 +33,27 @@ function shiftDay(date: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+// A change shown before the server has it (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b): it lasts while the
+// action is held for Undo and sent, then the thread loaded again shows it for real.
+// date: the day of the thread it was made on, which it changes only (the player may move to an earlier day meanwhile).
+type Change = { date: string } & ({ type: "post"; comment: Comment } | { type: "delete"; id: string } | { type: "react"; id: string; emoji: Emoji | null });
+
+// A posted comment's ID until it's sent, numbered so two held at once differ; shown without its buttons.
+const PENDING = "pending";
+
+function changed(thread: Thread | Feed | null, change: Change): Thread | Feed | null {
+  if (!thread?.comments || thread.date !== change.date) return thread;
+  const comments: Comment[] = thread.comments;
+  const next =
+    change.type === "post"
+      ? [...comments, change.comment]
+      : change.type === "delete"
+        ? comments.filter((c) => c.id !== change.id)
+        : comments.map((c) => (c.id === change.id ? { ...c, reactions: choose(c.reactions, change.emoji) } : c));
+  // A feed's comments keep their thread labels: only the list changes.
+  return { ...thread, comments: next } as Thread | Feed;
+}
+
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
@@ -37,12 +61,15 @@ function shiftDay(date: string, days: number): string {
 // Offbeat's (round 5: "Offbeat comments"; docs/milestones/M14-14a-2c-review-fixes.md).
 export function Comments({
   username,
+  name,
   runOver,
   nudge,
   group,
   title = "Feed",
 }: {
   username: string;
+  // The player's name as their comments show it, for one posted before the server has it.
+  name: string;
   runOver: boolean;
   nudge: number;
   group?: string;
@@ -52,9 +79,10 @@ export function Comments({
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
   const [thread, setThread] = useState<Thread | Feed | null>(null);
+  const [shownThread, showChange] = useHeldChanges(thread, changed);
   const [draft, setDraft] = useState("");
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const undo = useUndo();
   // Loads overlap (nudges, "Earlier day", the run ending): only the newest answer is shown (M11 H6).
   const [latest] = useState(latestOnly);
 
@@ -66,43 +94,57 @@ export function Comments({
     };
     const failed = (err: unknown) => setError(errorText(err));
     if (!group && date === null) {
-      latest(api<{ feed: Feed }>("/api/feed", { method: "GET" }), (r) => shown(r.feed), failed);
-      return;
+      return latest(api<{ feed: Feed }>("/api/feed", { method: "GET" }), (r) => shown(r.feed), failed);
     }
     const query = new URLSearchParams();
     if (date) query.set("date", date);
     if (group) query.set("group", group);
-    latest(api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }), (r) => shown(r.thread), failed);
+    return latest(api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }), (r) => shown(r.thread), failed);
   }, [date, group, latest]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
-  useEffect(load, [load, runOver, nudge]);
+  useEffect(() => void load(), [load, runOver, nudge]);
 
-  async function run(action: () => Promise<unknown>) {
-    setBusy(true);
-    setError(null);
-    try {
-      await action();
-      load();
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setBusy(false);
-    }
+  // The load for the day shown now, which may not be the one an action was made on (Earlier day during its window).
+  const loadShown = useRef(load);
+  useEffect(() => {
+    loadShown.current = load;
+  }, [load]);
+  const posted = useRef(0);
+
+  // Shows the change at once and holds the action for Undo; once it's sent, the thread is loaded again before the
+  // change is let go. Undone, replaced or failed, the change just goes (the toast says why).
+  function act(change: Change, action: Held, onNotSent?: () => void) {
+    showChange(change, undo.hold(action).then((sent) => (sent ? loadShown.current() : onNotSent?.())));
   }
 
   function post(event: FormEvent) {
     event.preventDefault();
     if (!thread) return;
-    void run(async () => {
-      await api("/api/comments", { method: "POST", body: { date: thread.date, body: draft, group } });
-      setDraft("");
-    });
+    const body = draft.trim();
+    const day = thread.date;
+    setDraft("");
+    const comment = { id: `${PENDING}-${posted.current++}`, username, name, body, createdAt: new Date().toISOString(), reactions: { counts: [], mine: null } };
+    act(
+      { date: day, type: "post", comment },
+      {
+        text: "Comment posted",
+        failed: "Your comment wasn't posted",
+        send: (keepalive) => api("/api/comments", { method: "POST", body: { date: day, body, group }, keepalive }),
+      },
+      // The text goes back in the box, unless the player has started another.
+      () => setDraft((d) => (d === "" ? body : d)),
+    );
   }
 
-  const shown = thread?.date ?? null;
+  function report(id: string) {
+    setError(null);
+    api("/api/comments/report", { method: "POST", body: { id } }).then(load, (err) => setError(errorText(err)));
+  }
+
+  const shown = shownThread?.date ?? null;
   const isToday = shown !== null && shown === today;
-  const preview = thread && "preview" in thread ? thread.preview : null;
+  const preview = shownThread && "preview" in shownThread ? shownThread.preview : null;
   return (
     <section aria-label={group ? "Comments" : title}>
       <h2>
@@ -122,45 +164,62 @@ export function Comments({
         </p>
       )}
       {preview && <Preview preview={preview} />}
-      {thread && thread.comments === null && !preview && (
+      {shownThread && shownThread.comments === null && !preview && (
         <p>
           Finish {isToday ? "today's" : "that day's"} puzzle to see {group ? "the group's" : "your friends'"} comments.
         </p>
       )}
-      {thread?.comments && thread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
-      {thread?.comments && thread.comments.length > 0 && (
+      {shownThread?.comments && shownThread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
+      {shownThread?.comments && shownThread.comments.length > 0 && (
         <ul>
-          {thread.comments.map((c) => (
-            <CommentItem
-              key={c.id}
-              comment={c}
-              label={"group" in c ? <ThreadLabel comment={c as FeedComment} /> : undefined}
-              mine={c.username === username}
-              busy={busy}
-              onDelete={() => run(() => api("/api/comments/delete", { method: "POST", body: { id: c.id } }))}
-              onReport={() => run(() => api("/api/comments/report", { method: "POST", body: { id: c.id } }))}
-              onReact={
-                thread.canPost
-                  ? (emoji) => run(() => api("/api/reactions", { method: "POST", body: { date: thread.date, target: { type: "comment", id: c.id }, emoji } }))
-                  : undefined
-              }
-            />
-          ))}
+          {shownThread.comments.map((c) => {
+            const day = shownThread.date;
+            const react = (emoji: Emoji | null) =>
+              act(
+                { date: day, type: "react", id: c.id, emoji },
+                {
+                  key: `comment ${c.id}`,
+                  text: reactionText(c.reactions, emoji),
+                  failed: "Your reaction wasn't saved",
+                  send: (keepalive) =>
+                    api("/api/reactions", { method: "POST", body: { date: day, target: { type: "comment", id: c.id }, emoji }, keepalive }),
+                },
+              );
+            const remove = () =>
+              act(
+                { date: day, type: "delete", id: c.id },
+                {
+                  text: "Comment deleted",
+                  failed: "Your comment wasn't deleted",
+                  send: (keepalive) => api("/api/comments/delete", { method: "POST", body: { id: c.id }, keepalive }),
+                },
+              );
+            return (
+              <CommentItem
+                key={c.id}
+                comment={c}
+                label={"group" in c ? <ThreadLabel comment={c as FeedComment} /> : undefined}
+                mine={c.username === username}
+                pending={c.id.startsWith(PENDING)}
+                onDelete={remove}
+                onReport={() => report(c.id)}
+                onReact={shownThread.canPost ? react : undefined}
+              />
+            );
+          })}
         </ul>
       )}
-      {thread?.canPost && (
+      {shownThread?.canPost && (
         <form onSubmit={post}>
           <label>
             {/* The feed's box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
             {group ? "Comment" : "Comment to your friends"}
-            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />
+            <textarea value={draft} required onChange={(e) => setDraft(e.target.value)} />
           </label>
-          <button type="submit" disabled={busy}>
-            Post
-          </button>
+          <button type="submit">Post</button>
         </form>
       )}
-      {!thread && !error && (
+      {!shownThread && !error && (
         <Skeleton label="Loading comments">
           <Line />
         </Skeleton>
@@ -214,7 +273,7 @@ function CommentItem({
   comment,
   label,
   mine,
-  busy,
+  pending,
   onDelete,
   onReport,
   onReact,
@@ -222,7 +281,8 @@ function CommentItem({
   comment: Comment;
   label?: ReactNode;
   mine: boolean;
-  busy: boolean;
+  // Posted but held for Undo: nothing to react to, delete or report yet.
+  pending: boolean;
   onDelete: () => void;
   onReport: () => void;
   onReact?: (emoji: Emoji | null) => void;
@@ -231,15 +291,19 @@ function CommentItem({
     <li>
       <Avatar name={comment.name} /> <strong>{comment.name}</strong> {label && <>· {label} </>}<time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
       <p>{comment.body}</p>
-      <Reactions reactions={comment.reactions} busy={busy} onReact={onReact} />{" "}
-      {mine ? (
-        <button type="button" disabled={busy} onClick={onDelete}>
-          Delete
-        </button>
-      ) : (
-        <button type="button" disabled={busy} onClick={onReport}>
-          Report
-        </button>
+      {!pending && (
+        <>
+          <Reactions reactions={comment.reactions} onReact={onReact} />{" "}
+          {mine ? (
+            <button type="button" onClick={onDelete}>
+              Delete
+            </button>
+          ) : (
+            <button type="button" onClick={onReport}>
+              Report
+            </button>
+          )}
+        </>
       )}
     </li>
   );

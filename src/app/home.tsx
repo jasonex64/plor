@@ -48,6 +48,7 @@ import { StreakRanks } from "./streak";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
+import { UndoProvider } from "./undo";
 import { GAME } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
@@ -60,6 +61,11 @@ type Me =
 
 // A player signed in with a username, as the pages inside Signed see them.
 type Player = Extract<Me, { streak: number }>;
+
+// The player's name as their comments show it: the display name, or the username without one (src/comments/comments.ts).
+function nameOf(player: Player): string {
+  return player.displayName ?? player.username;
+}
 
 // The pages without the friends feed's column: Today, the game screen and the admin area have their own, and an invite
 // or a group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
@@ -130,30 +136,33 @@ export function Frame({ children }: { children: ReactNode }) {
   const player = me?.signedIn && me.username !== null ? me : null;
   return (
     <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
-      <Suspense fallback={null}>
-        <FrameParts
-          signedIn={me?.signedIn === true}
-          player={player}
-          timeUp={timeUp}
-          timeUps={timeUps}
-          streakError={streakError}
-          shell={
-            player && (
-              <Shell
-                admin={player.admin}
-                profile={player}
-                streak={player.streak}
-                onChanged={loadMe}
-                // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's
-                // copy (docs/milestones/M14-14b-2c-review-items.md, item 29).
-                onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
-                onSignedOut={() => setMe({ signedIn: false })}
-              />
-            )
-          }
-        />
-      </Suspense>
-      {children}
+      {/* Around the feed's column too, which holds comments (14b-6b). */}
+      <UndoProvider>
+        <Suspense fallback={null}>
+          <FrameParts
+            signedIn={me?.signedIn === true}
+            player={player}
+            timeUp={timeUp}
+            timeUps={timeUps}
+            streakError={streakError}
+            shell={
+              player && (
+                <Shell
+                  admin={player.admin}
+                  profile={player}
+                  streak={player.streak}
+                  onChanged={loadMe}
+                  // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's
+                  // copy (docs/milestones/M14-14b-2c-review-items.md, item 29).
+                  onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
+                  onSignedOut={() => setMe({ signedIn: false })}
+                />
+              )
+            }
+          />
+        </Suspense>
+        {children}
+      </UndoProvider>
     </FrameContext>
   );
 }
@@ -197,7 +206,7 @@ function FrameParts({ signedIn, player, timeUp, timeUps, streakError, shell }: {
       {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
       {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
       {streakError && <p role="alert">{streakError}</p>}
-      {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} timeUps={timeUps} />}
+      {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} name={nameOf(player)} timeUps={timeUps} />}
     </>
   );
 }
@@ -229,7 +238,7 @@ function RedirectError() {
 // Each page's section, with what it needs from the player.
 export function TodayTab() {
   const { player, timeUps } = usePlayer();
-  return <Today username={player.username} skip={player.settings.skipGameScreen} timeUps={timeUps} />;
+  return <Today username={player.username} name={nameOf(player)} skip={player.settings.skipGameScreen} timeUps={timeUps} />;
 }
 
 export function FriendsTab() {
@@ -250,7 +259,7 @@ export function MeTab() {
 
 export function GameTab() {
   const { player, reloadStreak } = usePlayer();
-  return <OffbeatScreen username={player.username} onStarted={reloadStreak} />;
+  return <OffbeatScreen username={player.username} name={nameOf(player)} onStarted={reloadStreak} />;
 }
 
 export function StreakTab() {
@@ -265,7 +274,7 @@ export function AdminTab({ page }: { page: AdminPage }) {
 
 export function GroupTab({ id }: { id: string }) {
   const { player, timeUps } = usePlayer();
-  return <GroupPage id={id} username={player.username} timeUps={timeUps} />;
+  return <GroupPage id={id} username={player.username} name={nameOf(player)} timeUps={timeUps} />;
 }
 
 export function InviteTab({ code }: { code: string }) {
@@ -417,7 +426,7 @@ function PickUsername({ onDone }: { onDone: () => void }) {
 // leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in the right column (SideColumn). The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
-function Today({ username, skip, timeUps }: { username: string; skip: boolean; timeUps: number }) {
+function Today({ username, name, skip, timeUps }: { username: string; name: string; skip: boolean; timeUps: number }) {
   const [runOver, setRunOver] = useState(false);
   const [commentsNudge, setCommentsNudge] = useState(0);
   const nudgeComments = useCallback(() => setCommentsNudge((n) => n + 1), []);
@@ -447,7 +456,7 @@ function Today({ username, skip, timeUps }: { username: string; skip: boolean; t
       </SideColumn>
       <div className={styles.feed}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} runOver={runOver} nudge={commentsNudge} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
       </div>
     </div>
   );
@@ -457,7 +466,7 @@ function Today({ username, skip, timeUps }: { username: string; skip: boolean; t
 // (docs/milestones/M14-14b-2b-1-shell.md, criterion 2; human, 2026-10-26: "The friends feed everywhere (Recommended)").
 // As on Today: locked until today's run is over (M08 8a), nudged by the board's channel (M08 8d), and started again at
 // midnight Pacific (M11 H6), from the run's state.
-function FriendsFeed({ username, timeUps }: { username: string; timeUps: number }) {
+function FriendsFeed({ username, name, timeUps }: { username: string; name: string; timeUps: number }) {
   const [day, setDay] = useState(0);
   const [run, setRun] = useState<{ over: boolean; msToReset: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -492,7 +501,7 @@ function FriendsFeed({ username, timeUps }: { username: string; timeUps: number 
     <SideColumn label="Friends feed">
       <LiveStatus channel={channel} />
       {error && <p role="alert">{error}</p>}
-      {run && <Comments key={`feed-${day}`} username={username} runOver={run.over} nudge={nudge} />}
+      {run && <Comments key={`feed-${day}`} username={username} name={name} runOver={run.over} nudge={nudge} />}
     </SideColumn>
   );
 }

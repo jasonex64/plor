@@ -12,6 +12,7 @@ import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
+import { choose } from "@/reactions/choose";
 import type { Emoji } from "@/reactions/reactions";
 import {
   PAYLOAD_VERSION,
@@ -24,21 +25,33 @@ import { Avatar } from "./avatar";
 import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
-import { Reactions } from "./reactions";
+import { Reactions, reactionText } from "./reactions";
 import { capitalized, caughtText, timedOutText } from "@/game/words";
 import { Line, Skeleton } from "./skeleton";
+import { useHeldChanges, useUndo } from "./undo";
+
+function reacted(board: BoardData | null, change: { friend: string; emoji: Emoji | null }): BoardData | null {
+  if (!board) return board;
+  return {
+    ...board,
+    friends: board.friends.map((f) => (f.username === change.friend && f.reactions ? { ...f, reactions: choose(f.reactions, change.emoji) } : f)),
+  };
+}
 
 // invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
 // holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
 export function Board({ username, invite }: { username: string; invite: boolean }) {
   const [board, setBoard] = useState<BoardData | null>(null);
+  // A reaction on a friend's run shows at once while it's held for Undo and sent
+  // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b).
+  const [shownBoard, showReaction] = useHeldChanges(board, reacted);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const undo = useUndo();
   // Refetches overlap (nudges, a reconnect, a reaction): only the newest answer is shown (M11 H6).
   const [latest] = useState(latestOnly);
 
   const load = useCallback(
-    (reason?: "reconnect") => {
+    (reason?: "reconnect") =>
       latest(
         api<{ board: BoardData }>(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" }),
         (r) => {
@@ -46,11 +59,10 @@ export function Board({ username, invite }: { username: string; invite: boolean 
           setError(null);
         },
         (err) => setError(errorText(err)),
-      );
-    },
+      ),
     [latest],
   );
-  useEffect(load, [load]);
+  useEffect(() => void load(), [load]);
 
   const channel = useBoardChannel({
     joined: (reason) => load(reason === "reconnect" ? "reconnect" : undefined),
@@ -92,47 +104,47 @@ export function Board({ username, invite }: { username: string; invite: boolean 
     });
   }
 
-  async function react(friend: string, emoji: Emoji | null) {
-    setBusy(true);
-    setError(null);
-    try {
-      await api("/api/reactions", { method: "POST", body: { date: board!.date, target: { type: "run", username: friend }, emoji } });
-      load();
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setBusy(false);
-    }
+  // Once sent, the board is loaded again before the shown reaction is let go, so nothing flickers.
+  // Only a friend whose run shows reactions has the buttons.
+  function react(friend: BoardFriend, emoji: Emoji | null) {
+    const day = board!.date;
+    const held = undo.hold({
+      key: `run ${friend.username}`,
+      text: reactionText(friend.reactions!, emoji),
+      failed: "Your reaction wasn't saved",
+      send: (keepalive) => api("/api/reactions", { method: "POST", body: { date: day, target: { type: "run", username: friend.username }, emoji }, keepalive }),
+    });
+    showReaction({ friend: friend.username, emoji }, held.then((sent) => (sent ? load() : undefined)));
   }
 
   return (
     <section aria-label="Friends today">
       <h2>Friends today</h2>
       <LiveStatus channel={channel} />
-      {board?.mine && <WhereEveryoneEnded username={username} mine={board.mine} friends={board.friends} />}
-      {board?.reactionsOnMine && board.reactionsOnMine.counts.length > 0 && (
+      {shownBoard?.mine && <WhereEveryoneEnded username={username} mine={shownBoard.mine} friends={shownBoard.friends} />}
+      {shownBoard?.reactionsOnMine && shownBoard.reactionsOnMine.counts.length > 0 && (
         <p>
-          Reactions on your run: <Reactions reactions={board.reactionsOnMine} />
+          Reactions on your run: <Reactions reactions={shownBoard.reactionsOnMine} />
         </p>
       )}
       {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}
-      {board && board.friends.length === 0 && (
+      {shownBoard && shownBoard.friends.length === 0 && (
         <>
           <h3>Plor is better with friends</h3>
           <p>See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.</p>
         </>
       )}
-      {board && board.friends.length > 0 && (
+      {shownBoard && shownBoard.friends.length > 0 && (
         <ul>
-          {board.friends.map((f) => (
+          {shownBoard.friends.map((f) => (
             <li key={f.username}>
               <Avatar name={f.name} /> {f.name}: {describe(f)}{" "}
-              {f.reactions && <Reactions reactions={f.reactions} busy={busy} onReact={(emoji) => void react(f.username, emoji)} />}
+              {f.reactions && <Reactions reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
             </li>
           ))}
         </ul>
       )}
-      {!board && !error && (
+      {!shownBoard && !error && (
         <Skeleton label="Loading the live board">
           <Line />
         </Skeleton>

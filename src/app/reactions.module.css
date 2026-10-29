@@ -1,0 +1,7 @@
+/* A chip without a count holds the room of one, " 0", drawn by CSS so it's neither shown nor part of the chip's text
+   or name (M14 14b-6b: a chip keeps its width when its count appears). */
+.none::after {
+  content: " 0";
+  white-space: pre;
+  visibility: hidden;
+}

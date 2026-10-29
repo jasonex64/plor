@@ -5,7 +5,7 @@
 // out of the friends thread.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -24,6 +24,9 @@ test.afterAll(async () => {
 });
 
 test("a group is made on the Groups tab and joined by its link", async ({ browser }) => {
+  // Two posts wait out their Undo windows before another player sees them (M14 14b-6b), past the default 30 s on a
+  // cold dev server.
+  test.slow();
   const creator = await (await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await creator.goto("/groups");
   await signInAndPick(creator, "ga");
@@ -113,6 +116,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await thread.getByLabel("Comment", { exact: true }).fill(body);
   await thread.getByRole("button", { name: "Post" }).click();
   await expect(joiner.getByRole("region", { name: "Comments" }).getByRole("listitem").filter({ hasText: body })).toBeVisible();
+  await sent(joiner, "/api/comments");
   await expect(creatorThread.getByRole("listitem").filter({ hasText: body })).toBeVisible();
 
   const ws = await openLive("/");

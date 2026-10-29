@@ -61,3 +61,10 @@ export async function sharedLink(page: Page, button: Locator): Promise<string> {
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   return copied.split("\n").pop()!;
 }
+
+// A comment or reaction shows at once for whoever made it and is sent when its Undo toast's 5 seconds end
+// (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b): another player's screen, or the database, has it only after
+// this send.
+export async function sent(page: Page, path: "/api/comments" | "/api/comments/delete" | "/api/reactions"): Promise<void> {
+  await page.waitForResponse((r) => new URL(r.url()).pathname === path && r.request().method() === "POST" && r.ok());
+}

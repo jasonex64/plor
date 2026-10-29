@@ -8,7 +8,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { gotPastText } from "../src/game/words";
 import { GAME } from "../src/platform/game";
@@ -145,10 +145,13 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(heart).toHaveText("❤️ 1");
   await expect(thumbs).toHaveAttribute("aria-pressed", "false");
   await expect(thumbs).toHaveText("👍");
+  // Two taps on one row are one held action: only the last is sent (docs/milestones/M14-14b-6-feel-and-polish.md, P2).
+  await sent(watcher, "/api/reactions");
   await expect(player.getByText("Reactions on your run: ❤️ 1")).toBeVisible();
   await heart.click();
   await expect(heart).toHaveAttribute("aria-pressed", "false");
   await expect(heart).toHaveText("❤️");
+  await sent(watcher, "/api/reactions");
   await expect(player.getByText("Reactions on your run")).toHaveCount(0);
 
   // The player comments, and it reaches the watcher's open page; the watcher's reaction on it reaches the player's
@@ -162,13 +165,16 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await player.getByRole("button", { name: "Post" }).click();
   const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(playerComment).toBeVisible();
+  await sent(player, "/api/comments");
   const watcherComment = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(watcherComment).toBeVisible();
   await watcherComment.getByRole("button", { name: "😂" }).click();
+  await sent(watcher, "/api/reactions");
   await expect(playerComment.getByRole("button", { name: "😂" })).toHaveText("😂 1");
   const kept = `keep me ${RUN}`;
   await player.getByLabel("Comment to your friends").fill(kept);
   await player.getByRole("button", { name: "Post" }).click();
+  await sent(player, "/api/comments");
   const watcherKept = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept });
   await watcherComment.getByRole("button", { name: "Report" }).click();
   await watcherKept.getByRole("button", { name: "Report" }).click();

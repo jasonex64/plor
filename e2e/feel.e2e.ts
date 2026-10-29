@@ -1,9 +1,12 @@
 // The frame and the skeletons (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6a): the tab bar stays on screen
 // while the player moves between tabs (criterion 1), and a section whose data hasn't landed shows its skeleton, by its
-// label, never "Loading…" text (criterion 2). Numbers and headlines (14b-6d, criterion 5).
+// label, never "Loading…" text (criterion 2). Comments and reactions at once, with Undo (14b-6b, criterion 3). Numbers
+// and headlines (14b-6d, criterion 5).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick } from "./players";
+import { UNDO_SECONDS } from "../src/config/tunables";
+import { GAME } from "../src/platform/game";
+import { RUN, play, sent, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -117,4 +120,83 @@ test("numbers are tabular, headings balanced and paragraphs pretty", async ({ pa
     };
   });
   expect(styles).toEqual({ body: "tabular-nums", h3Numbers: "tabular-nums", headings: ["balance", "balance", "balance"], p: "pretty" });
+});
+
+// A comment shows before it's sent, Undo sends nothing, and the toast's window ending sends it once; a reaction's chip
+// keeps its width; a failed send puts the screen back and says what failed; leaving the page sends at once (criterion 3;
+// design 3, P1).
+test("comments and reactions show at once, with Undo before they're sent", async ({ page }) => {
+  // Five Undo windows are waited out in full (UNDO_SECONDS each), past the default 30 s on a cold dev server.
+  test.slow();
+  await page.goto("/");
+  await signInAndPick(page, "fu");
+  await play(page);
+  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
+  await page.getByRole("button", { name: "Answer" }).click();
+  const thread = page.getByRole("region", { name: `${GAME.name} comments` });
+  const toast = page.getByRole("status").filter({ has: page.getByRole("button", { name: "Undo" }) });
+  const posts: number[] = [];
+  page.on("request", (r) => {
+    if (r.method() === "POST" && new URL(r.url()).pathname === "/api/comments") posts.push(Date.now());
+  });
+
+  // Undone: back in the box, never sent.
+  const box = page.getByLabel("Comment to your friends");
+  await box.fill(`undone ${RUN}`);
+  await page.getByRole("button", { name: "Post" }).click();
+  await expect(thread.getByRole("listitem").filter({ hasText: `undone ${RUN}` })).toBeVisible();
+  await expect(toast).toContainText("Comment posted");
+  await toast.getByRole("button", { name: "Undo" }).click();
+  await expect(thread.getByRole("listitem").filter({ hasText: `undone ${RUN}` })).toHaveCount(0);
+  await expect(box).toHaveValue(`undone ${RUN}`);
+  await page.waitForTimeout(UNDO_SECONDS * 1000);
+  expect(posts).toEqual([]);
+
+  // Kept: sent once when the window ends, then it has its buttons.
+  await box.fill(`kept ${RUN}`);
+  await page.getByRole("button", { name: "Post" }).click();
+  const kept = thread.getByRole("listitem").filter({ hasText: `kept ${RUN}` });
+  await expect(kept).toBeVisible();
+  expect(posts).toEqual([]);
+  await sent(page, "/api/comments");
+  await expect(kept.getByRole("button", { name: "Delete" })).toBeVisible();
+  expect(posts).toHaveLength(1);
+
+  // A chip is as wide with its count as without.
+  const laugh = kept.getByRole("button", { name: "😂" });
+  const before = (await laugh.boundingBox())!.width;
+  await laugh.click();
+  await expect(laugh).toHaveText("😂 1");
+  await expect(toast).toContainText("😂 added");
+  expect((await laugh.boundingBox())!.width).toBe(before);
+  await sent(page, "/api/reactions");
+
+  // A failed delete: the comment goes at once, then comes back with what failed.
+  await page.route("**/api/comments/delete", (route) => route.fulfill({ status: 500, json: { ok: false, error: "internal" } }));
+  await kept.getByRole("button", { name: "Delete" }).click();
+  await expect(kept).toHaveCount(0);
+  await expect(toast).toContainText("Comment deleted");
+  await expect(page.getByRole("status").filter({ hasText: "Your comment wasn't deleted" })).toBeVisible({ timeout: (UNDO_SECONDS + 5) * 1000 });
+  await expect(kept).toBeVisible();
+  await page.unroute("**/api/comments/delete");
+
+  // An earlier day opened while a comment is held stays open after the send, without the comment, and Later day
+  // brings today's back with it (14b-6b review, finding 1).
+  await box.fill(`earlier ${RUN}`);
+  await page.getByRole("button", { name: "Post" }).click();
+  await thread.getByRole("button", { name: "Earlier day" }).click();
+  await expect(thread.getByRole("heading", { level: 2 })).toContainText("Friends' comments on");
+  await expect(thread.getByRole("listitem").filter({ hasText: `earlier ${RUN}` })).toHaveCount(0);
+  await sent(page, "/api/comments");
+  await expect(thread.getByRole("heading", { level: 2 })).toContainText("Friends' comments on");
+  await thread.getByRole("button", { name: "Later day" }).click();
+  await expect(thread.getByRole("listitem").filter({ hasText: `earlier ${RUN}` })).toBeVisible();
+
+  // Leaving the page sends at once, before the window would end.
+  await box.fill(`leaving ${RUN}`);
+  const posted = Date.now();
+  await page.getByRole("button", { name: "Post" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
+  await expect.poll(() => posts.length).toBe(3);
+  expect(posts[2] - posted).toBeLessThan(UNDO_SECONDS * 1000);
 });
