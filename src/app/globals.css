@@ -304,6 +304,20 @@ label {
   display: block;
 }
 
+/* The new look's kit (docs/milestones/M14-14b-8-the-new-look.md; mockup 3, "Nearly square (5px)"): nearly square
+   corners, and borders and hard shadows in the ink, each theme's own text colour. On every element that carries a
+   theme too, so a theme tile draws in its own ink. */
+:root,
+[data-theme] {
+  --ink: var(--text);
+  --r-card: 5px;
+  --r-button: 5px;
+  --r-small: 4px;
+  --shadow-card: 4px 4px 0 var(--ink);
+  --shadow-card-small: 3px 3px 0 var(--ink);
+  --shadow-button: 0 4px 0 var(--ink);
+}
+
 /* The comment box and the pickers take the page's font too (M14 14b-6d: one font for all text); their own sizes stay. */
 textarea,
 select {
@@ -315,9 +329,22 @@ input,
 button {
   font: inherit;
   font-size: 16px;
+}
+
+/* Fields: a 2px ink border and small corners (mockup 3's input, textarea and select). */
+input,
+textarea,
+select {
   color: var(--text);
   background: var(--surface);
-  border: 1.5px solid var(--edge);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-small);
+}
+
+input,
+textarea,
+select {
+  padding: 10px 12px;
 }
 
 input {
@@ -325,16 +352,40 @@ input {
   box-sizing: border-box;
   width: 100%;
   margin: 8px 0;
-  padding: 10px 12px;
-  border-radius: 10px;
 }
 
+/* Buttons: a 2px ink border, a hard shadow below, and a press that drops them onto it (mockup 3's .btn; 14b-8,
+   answer 9). The press is in :where(), so a button with its own class (the gear) can opt out of it. */
 button {
   min-height: 44px;
   margin: 8px 0;
   padding: 0 16px;
-  border-radius: 12px;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-button);
+  box-shadow: var(--shadow-button);
   cursor: pointer;
+  transition:
+    transform 80ms,
+    box-shadow 80ms;
+}
+
+:where(button:active:not(:disabled)) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* Players who ask for less motion get no press (WCAG 2.2, 2.3.3; answer 9). */
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+
+  :where(button:active:not(:disabled)) {
+    transform: none;
+    box-shadow: var(--shadow-button);
+  }
 }
 
 /* A disabled button looks it: muted text, no pointer (the base rules above override the browser's own disabled look). */
