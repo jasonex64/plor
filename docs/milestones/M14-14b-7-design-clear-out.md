@@ -1,6 +1,6 @@
 # M14 14b-7 — Design clear-out: an audit after 14b-6, then a fresh start
 
-**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. Built after 14b-6f, once all of 14b-6 is merged. Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
+**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. **Built after 14b-8, the new look, and its critique** (human, 2026-10-29, answer 2 below). Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
 
 ## Goal
 Once all of 14b-6 is merged to `main` (and so deployed to plor.app), remove every mockup, stored critique and record of past or planned look directions from claude.ai and the live docs, and leave one short as-built note, so the next look is designed from what shipped.
@@ -11,7 +11,7 @@ Once all of 14b-6 is merged to `main` (and so deployed to plor.app), remove ever
 
 ## What the human decided (2026-10-28, on the Windows PC, quoted)
 1. **Which ticket comes first:** "Yes, 14b-6d (Recommended)". The human wrote "16-d"; 14b-6d is what was meant.
-2. **When:** "After all of 14b-6 (Recommended)". 14b-6b to f are built first. The decided but unbuilt square look (handoff item 000: 5px corners, 2px border, 4px ink shadow) is cleared with the rest and not built.
+2. **When:** "After all of 14b-6 (Recommended)", read at first as clearing the decided square look unbuilt. Corrected by the human, 2026-10-29: "im confused, i wanted to go ahead with that shadowed look and square corners, THEN run impeccable", then "Look → critique → clear-out (Recommended)". So 14b-8 builds the look (`docs/milestones/M14-14b-8-the-new-look.md`), a critique runs on it, and only then does this ticket run; mockup 3's page, 14b-8's source, is deleted here after that.
 3. **What goes:** "only remove impeccable stuff if it stored information, i like to keep the skill itself to use it again", "claude.ai mockup pages", "Design history in live docs". Rewriting git history was offered and not chosen.
 4. **What describes the design afterwards:** "A short as-built note (Recommended)".
 5. **Done tickets:** "Leave done tickets alone (Recommended)". Finished tickets are closed records and stay as they are.
