@@ -12,6 +12,7 @@ import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel
 import { LiveStatus } from "./live-status";
 import { Avatar } from "./avatar";
 import { Comments } from "./comments";
+import kit from "./kit.module.css";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
 import { shareLink } from "./share";
@@ -63,11 +64,12 @@ export function Groups() {
   };
 
   return (
-    <section aria-label="Groups">
+    // By analogy with mockup 3 (14b-8, answer 8): a card, the groups as a column of buttons, Create group the accent one.
+    <section aria-label="Groups" className={kit.card}>
       <h2>Groups</h2>
       {groups && groups.length === 0 && <p>No groups yet. Make one and send its link to your group chat.</p>}
       {groups && groups.length > 0 && (
-        <ul>
+        <ul className={kit.rows}>
           {groups.map((g) => (
             <li key={g.id}>
               <ButtonLink href={`/groups/${g.id}`} transitionTypes={FORWARD}>
@@ -82,12 +84,12 @@ export function Groups() {
           <Line />
         </Skeleton>
       )}
-      <form onSubmit={create}>
-        <label>
+      <form onSubmit={create} className={kit.chips}>
+        <label className={kit.grow}>
           New group&apos;s name
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy}>
+        <button type="submit" className={`${kit.primary} ${kit.small}`} disabled={busy}>
           Create group
         </button>
       </form>
@@ -189,44 +191,47 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   const link = group ? `${window.location.origin}/g/${group.inviteCode}` : null;
   return (
     <>
-      <section aria-label="Group">
+      {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the accent small button and the rest
+          minor ones, those that can't be undone in the danger colour. */}
+      <section aria-label="Group" className={kit.card}>
         <LiveStatus channel={channel} />
         {group && link && (
           <>
             <h2>{group.name}</h2>
             {group.creator && (
-              <form onSubmit={rename}>
-                <label>
+              <form onSubmit={rename} className={kit.chips}>
+                <label className={kit.grow}>
                   Group name
                   <input value={draft} onChange={(e) => setDraft(e.target.value)} />
                 </label>
-                <button type="submit" disabled={busy}>
+                <button type="submit" className={kit.small} disabled={busy}>
                   Rename
                 </button>
               </form>
             )}
             <h3>Members</h3>
-            <ul>
+            <ul className={kit.rows}>
               {group.members.map((m) => (
-                <li key={m.username}>
-                  <Avatar name={m.name} /> {m.name}
-                  {m.creator && " (creator)"}
+                <li key={m.username} className={kit.row}>
+                  <Avatar name={m.name} />
+                  <span className={kit.grow}>
+                    {m.name}
+                    {m.creator && " (creator)"}
+                  </span>
                   {group.creator && !m.creator && (
-                    <>
-                      {" "}
-                      <button type="button" disabled={busy} onClick={() => removeMember(m)}>
-                        Remove
-                      </button>
-                    </>
+                    <button type="button" className={kit.link} disabled={busy} onClick={() => removeMember(m)}>
+                      Remove
+                    </button>
                   )}
                 </li>
               ))}
             </ul>
-            <p>
+            <p className={kit.chips}>
               {/* Shared from a button, never shown (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share
                   sheet, or the clipboard where there's none. */}
               <button
                 type="button"
+                className={`${kit.primary} ${kit.small}`}
                 disabled={busy}
                 onClick={() =>
                   act(async () => {
@@ -237,27 +242,23 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                 Share group link
               </button>
               {group.creator && (
-                <>
-                  {" "}
-                  <button type="button" disabled={busy} onClick={resetLink}>
-                    Reset link
-                  </button>
-                </>
+                <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={resetLink}>
+                  Reset link
+                </button>
               )}
               {copied && " Copied."}
               {linkReset && " New link made. The old one no longer works."}
             </p>
-            <button type="button" disabled={busy} onClick={leave}>
-              Leave group
-            </button>
-            {group.creator && (
-              <>
-                {" "}
-                <button type="button" disabled={busy} onClick={deleteGroup}>
+            <p className={kit.chips}>
+              <button type="button" className={kit.link} disabled={busy} onClick={leave}>
+                Leave group
+              </button>
+              {group.creator && (
+                <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={deleteGroup}>
                   Delete group
                 </button>
-              </>
-            )}
+              )}
+            </p>
           </>
         )}
         {!group && !error && (
@@ -304,11 +305,11 @@ export function JoinGroup({ code }: { code: string }) {
     });
 
   return (
-    <section aria-label="Join group">
+    <section aria-label="Join group" className={kit.card}>
       {name && (
         <>
           <h2>Join {name}?</h2>
-          <button type="button" disabled={busy} onClick={join}>
+          <button type="button" className={kit.primary} disabled={busy} onClick={join}>
             Join group
           </button>
         </>

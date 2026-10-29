@@ -10,6 +10,7 @@ import type { Friend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { InviteLink } from "./invite-link";
+import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { Line, Skeleton } from "./skeleton";
 
@@ -41,15 +42,25 @@ export function FriendsList() {
   }
 
   return (
-    <section aria-label="Your friends">
-      <h2>Your friends</h2>
+    // Mockup 3's "Your friends": a card, its count as a chip, a row for each friend with Remove as a minor button.
+    <section aria-label="Your friends" className={kit.card}>
+      <div className={kit.head}>
+        <h2>Your friends</h2>
+        {friends && (
+          <span className={kit.chip}>
+            {friends.length}
+            <span className="sr-only"> {friends.length === 1 ? "friend" : "friends"}</span>
+          </span>
+        )}
+      </div>
       {friends && friends.length === 0 && <p>No friends yet. Send someone your invite link.</p>}
       {friends && friends.length > 0 && (
-        <ul>
+        <ul className={kit.rows}>
           {friends.map((f) => (
-            <li key={f.username}>
-              <Avatar name={f.name} /> {f.name}{" "}
-              <button type="button" disabled={busy} onClick={() => void removeFriend(f)}>
+            <li key={f.username} className={kit.row}>
+              <Avatar name={f.name} />
+              <span className={kit.grow}>{f.name}</span>
+              <button type="button" className={kit.link} disabled={busy} onClick={() => void removeFriend(f)}>
                 Remove
               </button>
             </li>

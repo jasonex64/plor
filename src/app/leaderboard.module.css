@@ -1,4 +1,4 @@
-/* Today's leaderboard card (docs/milestones/M14-14a-2a-today.md; the approved mockups, rounds 5 to 7), a card of the
+/* Today's leaderboard card and the weekly boards (docs/milestones/M14-14a-2a-today.md; the approved mockups, rounds 5 to 7), a card of the
    new look (kit.module.css; M14 14b-8b). */
 
 /* Yesterday / This week as mockup 3's segmented control (.seg): one ink-bordered strip, the chosen half filled in ink;
@@ -56,4 +56,21 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--muted);
+}
+
+/* The weekly board's note and each week (mockup 3's Friends leaderboard): the muted line, the week's 16px heading over
+   its rows, as far apart as the mockup's card spaces them. */
+.note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.week h3 {
+  font-size: 16px;
 }

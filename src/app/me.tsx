@@ -11,6 +11,7 @@ import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { givenText } from "./given";
 import { errorText } from "./messages";
+import kit from "./kit.module.css";
 import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
@@ -35,8 +36,8 @@ export function MeStats({ numbers }: { numbers: boolean }) {
           <h2 className={styles.name}>
             <Line />
           </h2>
-          <section className={styles.section}>
-            <h2 className={styles.heading}>All games</h2>
+          <section className={kit.card}>
+            <h2>All games</h2>
             <Line />
           </section>
         </div>
@@ -44,51 +45,57 @@ export function MeStats({ numbers }: { numbers: boolean }) {
     );
   return (
     <div className={styles.me}>
-      <div className={styles.header}>
+      {/* Mockup 3's Me (M14 14b-8c): the player as a card, the big avatar, the name, when they began as a chip. */}
+      <div className={`${kit.card} ${styles.header}`}>
         <Avatar name={me.username} large />
         <div className={styles.who}>
           <h2 className={styles.name}>{me.username}</h2>
-          <span className={styles.muted}>Playing since {dateText(me.since, { day: "numeric", month: "short", year: "numeric" })}</span>
+          <span className={kit.chip}>Playing since {dateText(me.since, { day: "numeric", month: "short", year: "numeric" })}</span>
         </div>
       </div>
-      <section aria-label="All games" className={styles.section}>
-        <h2 className={styles.heading}>All games</h2>
+      <section aria-label="All games" className={kit.card}>
+        <h2>All games</h2>
         <dl className={styles.totals}>
           <Total value={me.totals.points.toLocaleString("en-US")} label="points all time" />
           <Total value={String(me.totals.daysPlayed)} label="days played" />
-          <Total value={String(me.totals.streak)} label="day streak now" />
+          <Total value={String(me.totals.streak)} label="day streak now" soft />
           <Total value={String(me.totals.longestStreak)} label="longest streak" />
         </dl>
       </section>
       <Calendar month={me.month} numbers={numbers} />
-      <section aria-label={GAME.name} className={styles.card}>
+      {/* The game's card is the screen's one tinted card, its numbers as chips (mockup 3's "Your Updraft"). */}
+      <section aria-label={GAME.name} className={`${kit.card} ${kit.soft}`}>
         <div className={styles.game}>
           {/* Offbeat's plain block until 14c's pixel world draws its chip. */}
-          <span className={styles.chip} aria-hidden="true" />
-          <h2 className={styles.heading}>{GAME.name}</h2>
+          <span className={styles.block} aria-hidden="true" />
+          <h2>{GAME.name}</h2>
         </div>
         <dl className={styles.stats}>
-          <Total value={me.offbeat.best === null ? "–" : me.offbeat.best.toLocaleString("en-US")} label="best score" />
-          <Total value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. stops climbed" />
-          <Total value={String(me.offbeat.fullClimbs)} label="full climbs" />
+          <Chip value={me.offbeat.best === null ? "–" : me.offbeat.best.toLocaleString("en-US")} label="best score" />
+          <Chip value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. stops climbed" />
+          <Chip value={String(me.offbeat.fullClimbs)} label="full climbs" />
         </dl>
         <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
           {GAME.name}&apos;s game screen
         </ButtonLink>
       </section>
-      <section aria-label="Your rarest answers" className={styles.card}>
-        <h2 className={styles.heading}>Your rarest answers</h2>
+      <section aria-label="Your rarest answers" className={kit.card}>
+        <h2>Your rarest answers</h2>
         {me.rarest.length === 0 ? (
           <p className={styles.muted}>None yet. Answers show here once their day is over and enough players have answered.</p>
         ) : (
-          <ol className={styles.rarest}>
-            {me.rarest.map((r) => (
-              <li key={`${r.date} ${r.prompt}`}>
-                {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
-                    docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
-                <strong>{r.answer.name}</strong>{" "}
-                <span className={styles.muted}>
-                  {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
+          <ol className={kit.rows}>
+            {me.rarest.map((r, i) => (
+              <li key={`${r.date} ${r.prompt}`} className={kit.row}>
+                {/* The place as mockup 3's badge, drawn by CSS: the list's order says it (kit.module.css). */}
+                <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
+                <span className={`${kit.grow} ${styles.rare}`}>
+                  {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
+                      docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
+                  <strong>{r.answer.name}</strong>{" "}
+                  <span className={styles.muted}>
+                    {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
+                  </span>
                 </span>
               </li>
             ))}
@@ -99,9 +106,20 @@ export function MeStats({ numbers }: { numbers: boolean }) {
   );
 }
 
-function Total({ value, label }: { value: string; label: string }) {
+// A total as mockup 3's stat tile; soft: the one tinted tile, the streak now.
+function Total({ value, label, soft }: { value: string; label: string; soft?: boolean }) {
   return (
-    <div>
+    <div className={soft ? `${kit.stat} ${kit.soft}` : kit.stat}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
+// A game's number as mockup 3's chip: "17 best score".
+function Chip({ value, label }: { value: string; label: string }) {
+  return (
+    <div className={kit.chip}>
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>
@@ -126,10 +144,10 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
   const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} stops climbed`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
-    <section aria-label="Calendar" className={styles.card}>
-      <div className={styles.titled}>
-        <h2 className={styles.heading}>{dateText(first, { month: "long", year: "numeric" })}</h2>
-        <span className={styles.muted}>
+    <section aria-label="Calendar" className={kit.card}>
+      <div className={kit.head}>
+        <h2>{dateText(first, { month: "long", year: "numeric" })}</h2>
+        <span className={kit.chip}>
           {played} of {sofar.length} days
         </span>
       </div>

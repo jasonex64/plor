@@ -72,8 +72,9 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
     "aria-label",
     `Days played in ${dateText(today, { month: "long" })}: 0 of the ${sofar} days so far`,
   );
+  // Today is outlined 2px outside its edge, as mockup 3's calendar marks it (M14 14b-8c; it was a 2px border before).
   const todayCell = calendar.locator(`[data-date='${today}']`);
-  expect(await todayCell.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("2px");
+  expect(await todayCell.evaluate((el) => `${getComputedStyle(el).outlineStyle} ${getComputedStyle(el).outlineWidth}`)).toBe("solid 2px");
   await expect(total(page, GAME.name, "best score")).toHaveText("–");
   await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: `${GAME.name}'s game screen` })).toHaveAttribute(
     "href",

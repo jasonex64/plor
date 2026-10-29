@@ -1,5 +1,7 @@
 /* The settings sheet (docs/milestones/M14-14a-3b-settings.md), sized from round 7's boards 2 and 3: on phones a sheet
-   at the bottom, from 768px a 440px panel at the right (M14 L44, L42). */
+   at the bottom, from 768px a 440px panel at the right (M14 L44, L42). In the new look (M14 14b-8c, by analogy with
+   mockup 3) its edge is a 2px ink rule, as the tab bar's and the sidebar's are, with the cards' corners and no soft
+   shadow. */
 .dialog {
   box-sizing: border-box;
   width: 100%;
@@ -7,10 +9,10 @@
   margin: auto 0 0;
   padding: 0;
   border: 0;
-  border-radius: 22px 22px 0 0;
+  border-top: 2px solid var(--ink);
+  border-radius: var(--r-card) var(--r-card) 0 0;
   background: var(--bg);
   color: var(--text);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
 }
 
 .dialog::backdrop {
@@ -84,18 +86,11 @@
   color: var(--muted);
 }
 
-/* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), 44px
-   tall to tap (WCAG 2.2 2.5.8). */
-.inline {
+/* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), the kit's
+   small ones, 44px tall to tap (WCAG 2.2 2.5.8); scoped above the kit's small kind, which sets no height. */
+.field .inline {
   min-height: 44px;
   margin: 0 0 0 6px;
-  padding: 0 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .note {
@@ -164,14 +159,11 @@
   background: var(--on-accent);
 }
 
-.about {
-  display: flex;
+/* About and Delete account are the kit's cards; scoped above the kit's .card, which stacks its children. */
+.sheet .about {
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 12px;
   font-size: 14px;
 }
 
@@ -217,7 +209,7 @@
   min-height: 48px;
   overflow: hidden;
   border: 1.5px solid var(--edge);
-  border-radius: 10px;
+  border-radius: var(--r-small);
   cursor: pointer;
 }
 
@@ -255,10 +247,8 @@
   font-weight: 700;
 }
 
-.danger {
-  padding: 12px;
-  border: 1.5px solid var(--danger);
-  border-radius: 12px;
+.sheet .danger {
+  border-color: var(--danger);
   font-size: 14px;
 }
 
@@ -273,11 +263,10 @@
   color: var(--danger);
 }
 
+/* The kit's danger kind, at the sheet's tap height. */
 .dangerButton {
   min-height: 44px;
   padding: 0 12px;
-  border-color: var(--danger);
-  color: var(--danger);
 }
 
 @media (min-width: 768px) {
@@ -286,9 +275,9 @@
     height: 100%;
     max-height: 100%;
     margin: 0 0 0 auto;
-    border-left: 1px solid var(--line);
+    border-top: 0;
+    border-left: 2px solid var(--ink);
     border-radius: 0;
-    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.16);
   }
 
   .sheet {

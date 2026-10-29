@@ -2,7 +2,8 @@
 
 // A weekly leaderboard (docs/milestones/M10-groups.md, 10a and 10c; M09 9b): the player and their friends, or a
 // group's members, highest total first, this week and last week below it (W1). A day's points arrive once that day is
-// over (M09 D9), so loading it once is enough. Plain UI; the look is M14.
+// over (M09 D9), so loading it once is enough. Mockup 3's "Friends leaderboard" card (M14 14b-8c): each week's
+// heading with its first day as a chip, then its badged rows.
 import { useEffect, useState } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
@@ -24,13 +25,13 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
   }, [path]);
 
   return (
-    <section aria-label={title}>
+    <section aria-label={title} className={kit.card}>
       <h2>{title}</h2>
-      <p>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
+      <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
       {board && (
         <>
-          <Standings title={`This week, from ${dayText(board.thisWeek.from)}`} label="This week" week={board.thisWeek} />
-          <Standings title={`Last week, from ${dayText(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
+          <Standings label="This week" week={board.thisWeek} />
+          <Standings label="Last week" week={board.lastWeek} />
         </>
       )}
       {!board && !error && (
@@ -128,10 +129,13 @@ export function LeaderboardCard() {
   );
 }
 
-function Standings({ title, label, week }: { title: string; label: string; week: Week }) {
+function Standings({ label, week }: { label: string; week: Week }) {
   return (
-    <section aria-label={label}>
-      <h3>{title}</h3>
+    <section aria-label={label} className={styles.week}>
+      <div className={kit.head}>
+        <h3>{label}</h3>
+        <span className={kit.chip}>From {dayText(week.from)}</span>
+      </div>
       <Entries entries={week.entries} />
     </section>
   );
