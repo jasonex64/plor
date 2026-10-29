@@ -105,3 +105,18 @@
   color: var(--text);
   font-size: 16px;
 }
+
+/* The prompt with its seconds left beside it (M14 14b-6c), the number as large as the prompt until the game's redesign
+   picks its size (answer 21): the h2's default size and globals.css's heading weight. 16px apart, the page's gutter. */
+.ask {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.clock {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 800;
+}

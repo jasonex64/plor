@@ -140,9 +140,13 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
-export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void }) {
+// onPlaying: whether the run is in progress, when the screen shows only the question (docs/milestones/
+// M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23).
+export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted: () => void; onPlaying: (playing: boolean) => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
+  const playing = run?.status === "in_progress";
+  useEffect(() => onPlaying(playing), [onPlaying, playing]);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -163,10 +167,12 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <div className={styles.game}>
-      <Banner>
-        <p className={styles.line}>{longDate(run.date)}</p>
-        {over && <Score run={run} />}
-      </Banner>
+      {!playing && (
+        <Banner>
+          <p className={styles.line}>{longDate(run.date)}</p>
+          {over && <Score run={run} />}
+        </Banner>
+      )}
       {run.status === "not_started" && (
         <>
           {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
@@ -188,18 +194,16 @@ export function Game({ onStarted, ...hooks }: DayHooks & { onStarted: () => void
         <Reveal run={run} busy={busy} onNext={() => send("/api/run/next")} />
       )}
       {run.status === "in_progress" && run.question && (
-        <>
-          {/* Keyed by each state the server sends, so a retry restarts the count from the server's own time left. */}
-          <Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={load} />
-          <Question
-            key={run.question.index}
-            question={run.question}
-            total={run.total}
-            points={run.points}
-            busy={busy}
-            onAnswer={async (text) => (await send("/api/run/answer", { index: run.question!.index, text }))?.notInList ?? false}
-          />
-        </>
+        <Question
+          key={run.question.index}
+          question={run.question}
+          total={run.total}
+          points={run.points}
+          busy={busy}
+          // Keyed by each state the server sends, so a retry restarts the count from the server's own time left.
+          clock={<Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={load} />}
+          onAnswer={async (text) => (await send("/api/run/answer", { index: run.question!.index, text }))?.notInList ?? false}
+        />
       )}
       {over && <Result run={run} />}
       {error && <p role="alert">{error}</p>}
@@ -268,11 +272,16 @@ function endedText(run: RunState): string {
   return caughtText(run.answered.length);
 }
 
-// Seconds left on the current question. At zero it asks the server again, which decides whether time is up
-// (rule 3); the count itself is only a display.
+// Seconds left on the current question, as a number beside the prompt (14b-6c, answers 20 and 21), named so it's read
+// with its meaning. At zero it asks the server again, which decides whether time is up (rule 3); the count itself is
+// only a display.
 function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
-  return <p role="timer">{seconds === 1 ? "1 second left" : `${seconds} seconds left`}</p>;
+  return (
+    <p role="timer" aria-label="Seconds left" className={styles.clock}>
+      {seconds}
+    </p>
+  );
 }
 
 // Nothing to do at zero: Game's own timer moves the page to the new day.
@@ -319,12 +328,15 @@ function Question({
   total,
   points,
   busy,
+  clock,
   onAnswer,
 }: {
   question: PublicQuestion;
   total: number;
   points: number;
   busy: boolean;
+  // The seconds left, beside the prompt.
+  clock: ReactNode;
   // Resolves true when the text named no entry (the player tries again).
   onAnswer: (text: string) => Promise<boolean>;
 }) {
@@ -361,7 +373,10 @@ function Question({
       <p>
         Stop {question.index + 1} of {total} · {pointsText(points)} so far
       </p>
-      <h2>{question.prompt}</h2>
+      <div className={styles.ask}>
+        <h2>{question.prompt}</h2>
+        {clock}
+      </div>
       {question.stolen.length > 0 && (
         <p>
           The Wind has taken: <strong>{question.stolen.map((l) => l.toUpperCase()).join(" ")}</strong>
