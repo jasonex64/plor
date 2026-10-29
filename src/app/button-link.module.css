@@ -22,3 +22,9 @@
   background: transparent;
   color: var(--on-offbeat);
 }
+
+/* The admin's warning that tomorrow has no puzzle (M14 14b-6f): the danger colour, as the admin pages' .danger. */
+.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
