@@ -11,6 +11,7 @@ import type { DayView } from "@/admin/puzzles";
 import type { ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
 import { ButtonLink } from "../button-link";
+import kit from "../kit.module.css";
 import { errorText } from "../messages";
 import { useMinWidth } from "../min-width";
 import { SideColumn } from "../side-column";
@@ -212,7 +213,7 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
           <span className={styles.muted}>Waiting:</span>
           {/* Tomorrow first: without its puzzle, the game breaks at midnight Pacific (design 7). */}
           {warning && (
-            <ButtonLink href="/admin/puzzles" tone="danger">
+            <ButtonLink href="/admin/puzzles" className={kit.danger}>
               {warning.what}
             </ButtonLink>
           )}

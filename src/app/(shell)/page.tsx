@@ -10,16 +10,19 @@ import { Slide } from "../slide";
 export default function Page() {
   return (
     <Slide>
-      <p>
-        Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
-        midnight Pacific time.
-      </p>
-      <h2>Today&apos;s game: {GAME.name}</h2>
-      <p>
-        Seven stops up the ridge, each asking something like &quot;Name an animal&quot;. At each one, give an answer the
-        Wind didn&apos;t think of: match the Wind and it sends you flying. Unusual answers are your way up. Sign in to
-        play and see how your friends did.
-      </p>
+      {/* For signed-out visitors only: hidden by globals.css once the shell shows (14b-8b, answer 12). */}
+      <div data-signed-out>
+        <p>
+          Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
+          midnight Pacific time.
+        </p>
+        <h2>Today&apos;s game: {GAME.name}</h2>
+        <p>
+          Seven stops up the ridge, each asking something like &quot;Name an animal&quot;. At each one, give an answer
+          the Wind didn&apos;t think of: match the Wind and it sends you flying. Unusual answers are your way up. Sign in
+          to play and see how your friends did.
+        </p>
+      </div>
       <Signed>
         <TodayTab />
       </Signed>

@@ -204,6 +204,12 @@ body[data-shell] main > footer {
   display: none;
 }
 
+/* Today's introduction is for signed-out visitors (and in the served HTML for them, M02 2c); signed in, Today starts
+   with the game (docs/milestones/M14-14b-8-the-new-look.md, answer 12). */
+body[data-shell] [data-signed-out] {
+  display: none;
+}
+
 /* A jump to a part of the page (the result, #result) stops below the top bar, not under it (14b-2c-1, item 14). */
 body[data-shell] main [id] {
   scroll-margin-top: 56px;
@@ -316,6 +322,7 @@ label {
   --shadow-card: 4px 4px 0 var(--ink);
   --shadow-card-small: 3px 3px 0 var(--ink);
   --shadow-button: 0 4px 0 var(--ink);
+  --shadow-button-small: 0 3px 0 var(--ink);
 }
 
 /* The comment box and the pickers take the page's font too (M14 14b-6d: one font for all text); their own sizes stay. */

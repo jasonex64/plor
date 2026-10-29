@@ -214,9 +214,11 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   await expect(clock).toHaveText(/^\d+$/);
   const look = await clock.evaluate((el) => {
     const [mine, theirs] = [getComputedStyle(el), getComputedStyle(document.querySelector("h2")!)];
-    return { numbers: mine.fontVariantNumeric, size: mine.fontSize === theirs.fontSize, weight: mine.fontWeight === theirs.fontWeight };
+    return { numbers: mine.fontVariantNumeric, sizes: [mine.fontSize, theirs.fontSize], weight: mine.fontWeight === theirs.fontWeight };
   });
-  expect(look).toEqual({ numbers: "tabular-nums", size: true, weight: true });
+  // At mockup 3's sizes since 14b-8b: the seconds 64px beside a 30px prompt (docs/milestones/M14-14b-8-the-new-look.md,
+  // answer 11), where 14b-6c had them the prompt's size until the redesign.
+  expect(look).toEqual({ numbers: "tabular-nums", sizes: ["64px", "30px"], weight: true });
   const [p, c] = [(await prompt.boundingBox())!, (await clock.boundingBox())!];
   expect(c.x).toBeGreaterThan(p.x + p.width - 1);
   expect(c.y).toBeLessThan(p.y + p.height);

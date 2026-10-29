@@ -89,7 +89,9 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   }
   // After playing, the score is in the card, and the order is the same.
   await creator.goto("/");
-  await expect(card.getByText("0 points · tipped over at stop 1")).toBeVisible();
+  // The banner's facts as chips since 14b-8b.
+  await expect(card.getByText("0 points", { exact: true })).toBeVisible();
+  await expect(card.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
   await expect.poll(sections("main section")).toEqual([GAME.name, "Feed"]);
   await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);

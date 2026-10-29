@@ -32,16 +32,6 @@
   grid-area: feed;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-}
-
 .heading {
   margin: 0;
   font-size: 20px;
@@ -74,7 +64,6 @@
   flex-direction: column-reverse;
   align-items: center;
   gap: 2px;
-  padding: 8px 2px;
 }
 
 .stats dt {
@@ -133,42 +122,16 @@
   font-weight: 700;
 }
 
-.answers {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
+/* Yesterday's answers as the kit's rows (M14 14b-8b), each a question over the answers. */
 .answers li {
-  display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 1px;
-  padding: 6px 0;
-  border-top: 1px solid var(--line);
   font-size: 14px;
 }
 
-.safe,
-.caught {
-  flex-shrink: 0;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.safe {
-  background: var(--safe-bg);
-  color: var(--safe);
-}
-
-.caught {
-  background: var(--caught-bg);
-  color: var(--caught);
-}
-
 /* Round 3's How to play: 14px between paragraphs, 16px text at 1.45; the page's own column, at most 960px (L43). */
-.how {
+section.how {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -180,12 +143,7 @@
   line-height: 1.45;
 }
 
+/* Start climbing: the kit's main button (kit.module.css's .primary), at the game screen's height. */
 .start {
   min-height: 52px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 20px;
-  font-weight: 800;
 }

@@ -7,7 +7,6 @@
 // Today, Offbeat's banner links in: Play before, the score and the time to the next puzzle after
 // (docs/milestones/M14-14a-2a-today.md); with Skip the game screen on, Play starts the run itself
 // (docs/milestones/M14-14a-3b-settings.md, L39).
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { RunState } from "@/game/runs";
@@ -25,6 +24,7 @@ import { FORWARD } from "./slide";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
+import kit from "./kit.module.css";
 import { shareLink } from "./share";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
@@ -103,13 +103,13 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <>
-      <Banner>
+      <Banner date={run.date}>
         {run.status === "not_started" && !skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops</p>
-            <Link href={GAME.path} transitionTypes={FORWARD} className={styles.play}>
+            <Facts facts={[`${run.total} stops`, "Don't match the Wind"]} />
+            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
               Play
-            </Link>
+            </ButtonLink>
           </>
         )}
         {/* Skipping the game screen skips its rules line too, so the time limit is said here before it runs (WCAG 2.2
@@ -117,8 +117,8 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             (private.question_deadline), so they have no constant here. */}
         {run.status === "not_started" && skip && (
           <>
-            <p className={styles.line}>Don&apos;t match the Wind · {run.total} stops · 20 seconds each</p>
-            <button type="button" className={styles.play} disabled={starting.busy} onClick={() => void starting.start()}>
+            <Facts facts={[`${run.total} stops`, "20 seconds each", "Don't match the Wind"]} />
+            <button type="button" className={`${kit.primary} ${styles.play}`} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
             {starting.error && <p role="alert">{starting.error}</p>}
@@ -126,10 +126,10 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         )}
         {run.status === "in_progress" && (
           <>
-            <p className={styles.line}>Your run is still going</p>
-            <Link href={GAME.path} transitionTypes={FORWARD} className={styles.play}>
+            <Facts facts={["Your run is still going"]} />
+            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
               Continue
-            </Link>
+            </ButtonLink>
           </>
         )}
         {over && <Score run={run} />}
@@ -168,12 +168,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
     <div className={styles.game}>
-      {!playing && (
-        <Banner>
-          <p className={styles.line}>{longDate(run.date)}</p>
-          {over && <Score run={run} />}
-        </Banner>
-      )}
+      {!playing && <Banner date={run.date}>{over && <Score run={run} />}</Banner>}
       {run.status === "not_started" && (
         <>
           {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
@@ -183,12 +178,12 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
             stop you climb is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
-          <button type="button" className={styles.start} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
+          <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
             Start
           </button>
-          <Link href={`${GAME.path}/how-to-play`} transitionTypes={FORWARD} className={styles.secondary}>
+          <ButtonLink href={`${GAME.path}/how-to-play`} transitionTypes={FORWARD}>
             How to play
-          </Link>
+          </ButtonLink>
         </>
       )}
       {run.status === "in_progress" && run.next && (
@@ -215,7 +210,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
 function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
   return (
     <Banner>
-      <p className={styles.line}>There&apos;s no puzzle today.</p>
+      <Facts facts={["There's no puzzle today."]} />
       <ResetCountdown label="A new day starts in" msToReset={msToReset} />
     </Banner>
   );
@@ -226,11 +221,8 @@ function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
 function Score({ run }: { run: RunState }) {
   return (
     <>
-      <p className={styles.line}>
-        {pointsText(run.points)}
-        {earnsBonus(run) && ` + about ${run.bonus} bonus`} · {endedText(run)}
-      </p>
-      <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD} tone="offbeat">
+      <Facts facts={[earnsBonus(run) ? `${pointsText(run.points)} + about ${run.bonus} bonus` : pointsText(run.points), endedText(run)]} />
+      <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
         Result
       </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
@@ -244,7 +236,20 @@ function longDate(date: string): string {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 }
 
-// Offbeat's banner: the game's name, then what the day holds for the player.
+// What the day holds, as the banner's chips (mockup 3, M14 14b-8b).
+function Facts({ facts }: { facts: string[] }) {
+  return (
+    <p className={`${kit.chips} ${styles.facts}`}>
+      {facts.map((f) => (
+        <span key={f} className={`${kit.chip} ${styles.chip}`}>
+          {f}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+// Offbeat's banner: the day as a chip, the game's name, then what the day holds for the player (mockup 3).
 // The banner before today's run loads: the real banner, its title, a line where the day goes.
 function BannerSkeleton() {
   return (
@@ -256,9 +261,10 @@ function BannerSkeleton() {
   );
 }
 
-function Banner({ children }: { children?: ReactNode }) {
+function Banner({ date, children }: { date?: string; children?: ReactNode }) {
   return (
     <div className={styles.banner}>
+      {date && <p className={`${kit.chip} ${styles.chip}`}>{longDate(date)}</p>}
       <h2 className={styles.title}>{GAME.name}</h2>
       {children}
     </div>
@@ -273,15 +279,19 @@ function endedText(run: RunState): string {
   return caughtText(run.answered.length);
 }
 
-// Seconds left on the current question, as a number beside the prompt (14b-6c, answers 20 and 21), named so it's read
-// with its meaning. At zero it asks the server again, which decides whether time is up (rule 3); the count itself is
+// Seconds left on the current question, as a number beside the prompt (14b-6c, answer 20), at mockup 3's size with
+// "seconds left" under it (14b-8, answer 11), named so it's read with its meaning. At zero it asks the server again, which decides whether time is up (rule 3); the count itself is
 // only a display.
 function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   return (
-    <p role="timer" aria-label="Seconds left" className={styles.clock}>
-      {seconds}
-    </p>
+    <div className={styles.clockBox}>
+      <p role="timer" aria-label="Seconds left" className={styles.clock}>
+        {seconds}
+      </p>
+      {/* The timer's own name says this to screen readers. */}
+      <span aria-hidden="true">seconds left</span>
+    </div>
   );
 }
 
@@ -294,7 +304,7 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
   const total = Math.ceil(useCountdown(msToReset, NOTHING) / 1000);
   const two = (n: number) => String(n).padStart(2, "0");
   return (
-    <p role="timer">
+    <p role="timer" className={`${kit.chip} ${styles.chip}`}>
       {label} {Math.floor(total / 3600)}:{two(Math.floor(total / 60) % 60)}:{two(total % 60)}
     </p>
   );
@@ -308,7 +318,7 @@ const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
   const last = run.answered[run.answered.length - 1];
   return (
-    <div>
+    <div className={kit.card}>
       <h2>{gotPastText(last.index + 1)}</h2>
       <p>
         You said {last.answer.name}; the Wind whispered {last.hostAnswers.map((h) => h.name).join(", ")}.
@@ -317,7 +327,7 @@ function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: (
         +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
       </p>
       {run.next!.steals && <p>Next, the Wind steals {run.next!.steals.toUpperCase()}.</p>}
-      <button type="button" autoFocus disabled={busy} onClick={onNext}>
+      <button type="button" className={kit.primary} autoFocus disabled={busy} onClick={onNext}>
         Next
       </button>
     </div>
@@ -370,18 +380,28 @@ function Question({
   }
 
   return (
-    <div>
-      <p>
-        Stop {question.index + 1} of {total} · {pointsText(points)} so far
+    // Mockup 3's question card: the stop and the points as chips, the prompt with the seconds beside it, the stolen
+    // letters as struck tiles, the answer box and Answer (M14 14b-8b; answer 11).
+    <div className={`${kit.card} ${kit.soft}`}>
+      <p className={kit.head}>
+        <span className={`${kit.chip} ${kit.dark}`}>
+          Stop {question.index + 1} of {total}
+        </span>
+        <span className={kit.chip}>{pointsText(points)} so far</span>
       </p>
       <div className={styles.ask}>
-        <h2>{question.prompt}</h2>
+        <h2 className={styles.prompt}>{question.prompt}</h2>
         {clock}
       </div>
       {question.stolen.length > 0 && (
-        <p>
-          The Wind has taken: <strong>{question.stolen.map((l) => l.toUpperCase()).join(" ")}</strong>
-        </p>
+        <div>
+          <p className={styles.taken}>The Wind has taken</p>
+          <p className={styles.letters}>
+            {question.stolen.map((l) => (
+              <span key={l}>{l.toUpperCase()}</span>
+            ))}
+          </p>
+        </div>
       )}
       <form onSubmit={submit}>
         <label>
@@ -397,11 +417,19 @@ function Question({
             onChange={(e) => change(e.target.value)}
           />
         </label>
-        <button type="submit" disabled={busy || typed.trim() === ""}>
+        <button type="submit" className={kit.primary} disabled={busy || typed.trim() === ""}>
           Answer
         </button>
-        {blocked && <p role="status">The Wind took {blocked}. Try a word without it.</p>}
-        {notInList && <p role="status">&quot;{notInList}&quot; isn&apos;t in our list. Try another answer.</p>}
+        {blocked && (
+          <p role="status" className={styles.note}>
+            The Wind took {blocked}. Try a word without it.
+          </p>
+        )}
+        {notInList && (
+          <p role="status" className={styles.note}>
+            &quot;{notInList}&quot; isn&apos;t in our list. Try another answer.
+          </p>
+        )}
       </form>
     </div>
   );
@@ -417,16 +445,16 @@ function Result({ run }: { run: RunState }) {
     if (window.location.hash === "#result") box.current?.scrollIntoView();
   }, []);
   return (
-    <div id="result" ref={box}>
+    <div id="result" ref={box} className={kit.card}>
       <h2>{run.status === "survived" ? "You reached the top!" : capitalized(endedText(run))}</h2>
       <p>
         You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
       <Share run={run} />
-      <ol>
+      <ol className={kit.rows}>
         {run.answered.map((a) => (
-          <li key={a.index}>
+          <li key={a.index} className={kit.row}>
             {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
             {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
           </li>
@@ -451,7 +479,7 @@ function Share({ run }: { run: RunState }) {
 
   return (
     <p>
-      <button type="button" onClick={share}>
+      <button type="button" className={kit.primary} onClick={share}>
         Share
       </button>{" "}
       {note && <span role="status">{note}</span>}

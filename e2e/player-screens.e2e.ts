@@ -140,7 +140,9 @@ test("text that names no entry stays selected in the box, and a catch on stop 1 
   await expect(result).toContainText("You climbed 0 of 7 stops and scored 0 points.");
   await expect(result).not.toContainText("bonus");
   await page.goto("/");
-  await expect(page.getByRole("region", { name: GAME.name })).toContainText("0 points · tipped over at stop 1");
+  // The banner's facts as chips since 14b-8b.
+  await expect(page.getByRole("region", { name: GAME.name }).getByText("tipped over at stop 1", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: GAME.name }).getByText("0 points", { exact: true })).toBeVisible();
 });
 
 // Item 14: Result lands before the run has loaded; the result brings itself into view, below the phone's top bar.

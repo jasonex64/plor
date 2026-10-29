@@ -36,7 +36,9 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // Today's region, which the game screen's has the same name as: each check below first waits for Today's address,
   // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
-  await expect(banner.getByText("Don't match the Wind · 7 stops")).toBeVisible();
+  // The day's facts as chips (docs/milestones/M14-14b-8-the-new-look.md, 14b-8b; mockup 3).
+  await expect(banner.getByText("7 stops", { exact: true })).toBeVisible();
+  await expect(banner.getByText("Don't match the Wind", { exact: true })).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: GAME.name }).locator("..");
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
@@ -57,7 +59,8 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
 
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page).toHaveURL("http://localhost:3000/");
-  await expect(banner.getByText("0 points · tipped over at stop 1")).toBeVisible();
+  await expect(banner.getByText("0 points", { exact: true })).toBeVisible();
+  await expect(banner.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
   await expect(page).toHaveURL(/\/updraft#result$/);
@@ -75,8 +78,9 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await page.goto("/");
   const card = page.getByRole("region", { name: "Leaderboard" });
   await expect(card.getByRole("radio", { name: "Yesterday" })).toBeChecked();
-  // Dated, as "Fri 23 Oct" (L25), and naming no game: the card is shared by every game (14b-4, answer 1).
-  await expect(card.getByRole("region", { name: "Yesterday" })).toContainText(/[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}/);
+  // Dated, as "Fri 23 Oct" (L25), in a chip beside its heading since 14b-8b, and naming no game: the card is shared by
+  // every game (14b-4, answer 1).
+  await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
   await expect(card).not.toContainText(GAME.name);
   await expect(card.getByLabel("Board").locator("option")).toHaveText(["Friends", "Owls"]);
 

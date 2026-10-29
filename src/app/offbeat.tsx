@@ -16,6 +16,7 @@ import { Game, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
+import kit from "./kit.module.css";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
@@ -89,11 +90,11 @@ function OffbeatInfo() {
   if (!info)
     return (
       <Skeleton label={`Loading your ${GAME.name}`}>
-        <section className={styles.card}>
+        <section className={kit.card}>
           <h2 className={styles.heading}>Your {GAME.name}</h2>
           <Line />
         </section>
-        <section className={styles.card}>
+        <section className={kit.card}>
           <h2 className={styles.heading}>Yesterday on the ridge</h2>
           <Line />
         </section>
@@ -120,18 +121,18 @@ function YourOffbeat({ stats }: { stats: Stats }) {
     (d) => `${weekday(d.date)} ${d.survived ?? (d.date === today ? "not played yet" : "not played")}`,
   );
   return (
-    <section aria-label={`Your ${GAME.name}`} className={styles.card}>
+    <section aria-label={`Your ${GAME.name}`} className={kit.card}>
       <h2 className={styles.heading}>Your {GAME.name}</h2>
       <dl className={styles.stats}>
-        <div>
+        <div className={kit.stat}>
           <dt>day streak</dt>
           <dd>{stats.streak}</dd>
         </div>
-        <div>
+        <div className={kit.stat}>
           <dt>best score</dt>
           <dd>{stats.best === null ? "–" : stats.best.toLocaleString("en-US")}</dd>
         </div>
-        <div>
+        <div className={kit.stat}>
           <dt>avg. stops climbed</dt>
           <dd>{stats.average === null ? "–" : `${stats.average.toFixed(1)}/${QUESTIONS_PER_DAY}`}</dd>
         </div>
@@ -157,7 +158,7 @@ function YourOffbeat({ stats }: { stats: Stats }) {
 // answer and how it went where they gave one.
 function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
   return (
-    <section aria-label="Yesterday on the ridge" className={styles.card}>
+    <section aria-label="Yesterday on the ridge" className={kit.card}>
       <div className={styles.titled}>
         <h2 className={styles.heading}>Yesterday on the ridge</h2>
         <span className={styles.muted}>{dateText(yesterday.date, { weekday: "short", day: "numeric", month: "short" })}</span>
@@ -165,15 +166,15 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
       {yesterday.state === "none" && <p>There was no puzzle yesterday.</p>}
       {yesterday.state === "in_play" && <p>Your run from yesterday is still going. Finish it to see the Wind&apos;s answers.</p>}
       {yesterday.state === "shown" && (
-        <ol className={styles.answers}>
+        <ol className={`${kit.rows} ${styles.answers}`}>
           {yesterday.questions.map((q) => (
-            <li key={q.index}>
+            <li key={q.index} className={kit.row}>
               <div className={styles.titled}>
                 <strong>
                   {q.index + 1} · {q.prompt}
                 </strong>
                 {q.yours && (
-                  <span className={q.yours.matched ? styles.caught : styles.safe}>{q.yours.matched ? capitalized(caughtWord(q.index + 1)) : "Climbed"}</span>
+                  <span className={q.yours.matched ? `${kit.chip} ${kit.caught}` : `${kit.chip} ${kit.safe}`}>{q.yours.matched ? capitalized(caughtWord(q.index + 1)) : "Climbed"}</span>
                 )}
               </div>
               <span className={styles.muted}>
@@ -208,7 +209,7 @@ export function HowToPlay() {
   }, []);
 
   return (
-    <section aria-label="How to play" className={styles.how}>
+    <section aria-label="How to play" className={`${kit.card} ${styles.how}`}>
       <p className={styles.back}>
         <ButtonLink href={GAME.path} transitionTypes={BACK}>
           <span aria-hidden="true">‹ </span>
@@ -234,7 +235,7 @@ export function HowToPlay() {
         {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} at the top. Run out of time and the climb ends too.
       </p>
       {run?.status === "not_started" && (
-        <button type="button" className={styles.start} disabled={starting.busy} onClick={() => void starting.start()}>
+        <button type="button" className={`${kit.primary} ${styles.start}`} disabled={starting.busy} onClick={() => void starting.start()}>
           Start climbing
         </button>
       )}

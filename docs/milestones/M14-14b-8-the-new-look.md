@@ -1,6 +1,6 @@
 # M14 14b-8 — The new look: hard ink shadows, nearly square corners, cards, rows and chips
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, done (PR #130); next 14b-8b. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
+**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, done (PR #130); 14b-8b, Today and the game, done (PR #131); next 14b-8c. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
 
 ## Goal
 Plor's player and admin pages take the look the human chose on mockup 3 with its "Nearly square (5px)" setting: hard ink shadows and borders, nearly square corners, sections as bordered cards, lists as bordered rows, facts as chips and badges, in Baloo 2 and each theme's own colours.
@@ -24,6 +24,8 @@ Plor's player and admin pages take the look the human chose on mockup 3 with its
 9. Buttons press down when tapped: "Yes, press down (Recommended)", off under reduced motion.
 10. Data: "add points all time and longest streak": Me already shows both (`me.totals.points`, `me.totals.longestStreak`), so no new data; they take the mockup's stat tiles.
 11. The question's clock: "Mockup's clock, banner stays hidden (Recommended)".
+12. Today's introduction for signed-in players: "Drop it, as drawn (Recommended)"; signed-out visitors keep it, in the served HTML (M02 2c).
+13. Phone Today's invite card: "Show it on phones too, as drawn (Recommended)", when the player has no friends.
 
 ## Source
 - **Mockup 3**, the human's approved drawing: the private claude.ai page "Plor hard-shadow mockup" (https://claude.ai/artifact/PuxmXXNxypRTz8uYGQLUK8), with its "Nearly square (5px)" card shape (`html[data-shape="sq5"]`), no texture, its toolkit CSS (`.tile`, `.btn`, `.chip`, `.badge`, `ul.list li`, `.seg`, `.stat`, `.cal`, `.letters`, `.tabs`, `.side`) and its five screens (Today, a question, Friends, Me, desktop Today). In SOURCES.md since this ticket's approval. It stays until 14b-7, which deletes it after the critique.
@@ -54,8 +56,23 @@ Plor's player and admin pages take the look the human chose on mockup 3 with its
 | 4px, 80 ms | a pressed button's drop and its timing | mockup 3 (`.btn:active`, `transition: transform .08s`); answer 9 |
 | 64px, 30px | the question's seconds and prompt | mockup 3's question screen (`.clock`, `.prompt`); answer 11 |
 | the theme's `--text` | the ink of borders and shadows | mockup 2 ("the ink is each theme's text colour") |
+| 14px; 10px | a card's padding; the gap between its parts (14b-8b) | mockup 3's `.tile` |
+| 8px; 8px 10px; 10px | rows' gap; a row's padding; the gap inside it | mockup 3's `ul.list`, `ul.list li` |
+| 2px 9px, 12px; 4px; 8px | a chip's padding and text; the gap inside it; the gap between chips | mockup 3's `.chip`, `.row` |
+| 24px, 12px | a badge's size and number | mockup 3's `.badge` |
+| 10px 14px | a stat tile's padding | mockup 3's `.stat` |
+| 10px 18px, 17px; 6px 12px, 14px; 4px 10px, 14px | the main, small and minor buttons' padding and text | mockup 3's `.btn`, `.btn.small`, `.link` |
+| 1px 8px, 13px, 44px wide, 6px apart | reaction chips | mockup 3's `.reacts span` |
+| 24px | a reaction chip's least height | WCAG 2.2, 2.5.8 (the 24px minimum target) |
+| the card's corners + 2px | the Updraft banner's corners | mockup 3's `.banner` (`calc(var(--r-tile) + 2px)`) |
+| 12% and 50% of `--on-offbeat` | the banner chips' fill and edge | mockup 3's `.banner .chip` (`#ffffff1f`, `#ffffff80`: its white at those strengths) |
+| 34px by 38px, 18px, 3px; 6px apart; 13px label | the stolen-letter tiles, their letters and strike; the gap; "The Wind has taken" | mockup 3's `.letters span`, `.letters`, its label |
+| 1.5px dashed, 10px 12px, 14px, 600 | a note under the answer box | mockup 3's `.lock` |
+| 64px; 13px label | the comment box's least height; its label, straight above it | mockup 3's `textarea`, its label |
+| 6px | above a comment's reactions; under "The Wind has taken" | mockup 3's reactions (`margin-top:6px`) and that label (`margin-bottom:6px`) |
+| 13px | "seconds left" under the clock | mockup 3's `.muted` under `.clock` |
 
-Every other size (paddings, gaps, font sizes) is read from mockup 3's CSS when built and recorded here, or the human is asked.
+Every other size is read from mockup 3's CSS when built and recorded here, or the human is asked.
 
 ## Acceptance criteria
 1. **The kit:** an e2e reads computed styles on Today in two themes (Paper and Night): a card has a 2px border and a `4px 4px 0` shadow in the theme's text colour and 5px corners; a chip 1.5px and 4px; the main button `0 4px 0` and 5px; under `prefers-reduced-motion: reduce` a pressed button doesn't move.
@@ -81,6 +98,7 @@ One PR each, in order; the human sees each PR's screenshots before it merges:
 
 ## Removes
 - The corner values the kit replaces (`globals.css`'s 10px and 12px, the modules' 7px to 20px corners), and per-page styles a shared card, row, chip or badge replaces; each PR lists its own.
+- **14b-8b:** the banner's `.line` and borderless white Play; the button-link's `offbeat` tone (Result is the banner's Play button now); `game.module.css`'s `.secondary` (How to play is a button-link); the leaderboard card's own card, title and date styles and its 1.5px `--edge` switch and picker; `offbeat.module.css`'s card, list and safe and caught pills (the kit's); `comments.module.css`'s `.locked` list (the kit's rows); the feed's, the board's and the result's plain lists.
 - **14b-8a:** the base controls' 1.5px `--edge` border and their 10px and 12px corners; the button-link's, the Undo toast's and the skeleton line's 12px corners and the toast's `--edge` border; the tab bar's and sidebar's 1px `--line` rules; the streak pill's 999px pill shape and soft fill; the clock bar's 1.5px accent rule.
 
 ---
@@ -92,9 +110,22 @@ One PR each, in order; the human sees each PR's screenshots before it merges:
 | Mockup 3's buttons come in four kinds (`.btn` accent, `.btn.plain`, `.btn.small`, `.link`) | **14b-8a:** the base `button` and the button-link are the mockup's plain big button (2px ink, 5px, `0 4px 0`); the filled, small and link kinds come where the pages that use them are restyled (14b-8b to d) | The app's base buttons are its 44px and 48px controls, the size of the mockup's big button; a kind with no caller yet isn't added (CLAUDE.md, "Build for today") |
 | Mockup 3 draws the gear as a round avatar with a 2px ink border | **14b-8a:** the gear keeps its borderless 44px icon, with no shadow or press | A 44px ink ring beside the streak chip is heavier than the mockup's 30px one, and the gear is an icon, not one of the kit's buttons; 14b-8b's screenshots show it beside the mockup's |
 | Mockup 3's phone top bar has no rule; the clock bar isn't drawn | **14b-8a:** the top bar keeps its 1px `--line` rule; the clock bar's rule is 2px ink, like the tab bar's | The top bar's rule separates it from content scrolling under it, which the mockup's static phone doesn't show; the clock bar takes the tab bar's rule by analogy (answer 8) |
+| Mockup 3's chips, rows and reaction chips have 1.5px edges | **14b-8b:** the CSS says 1.5px; Chromium computes and draws 1px | Chromium floors border widths to whole CSS pixels, at 1x and 2x alike (measured); it drew the mockup the same way. The e2e reads 1px |
+| Mockup 3's segmented control (`.seg`) hides overflow at its corners | **14b-8b:** not clipped | Clipping hid each choice's 3px focus ring (WCAG 2.2, 2.4.7); the inner corners are 4px squarer |
+| Mockup 3's feed steps days with "‹ Mon" and "Wed ›" | **14b-8b:** "Earlier day" and "Later day", as the minor buttons | Their names are what the buttons say (WCAG 2.2, 2.5.3), and the day shown is in the heading; only the look changed |
+| Mockup 3's leaderboard picker has no visible label | **14b-8b:** "Board" stays its label, for screen readers only | The picker needs a name; the mockup shows none |
+| Mockup 3's rank badges hold their number as text | **14b-8b:** the number is drawn by CSS from `data-place`, and a hidden ": " sits between a name and its points; a friend's row keeps a hidden ":" before its state | A list's own order says the place, and the rows still read "name: 3 points" and "name: hasn't played yet" to screen readers and in their text |
 | Mockup 3's reduced-motion rule only drops the press's transition | **14b-8a:** under reduced motion a button doesn't move or lose its shadow | Answer 9: "Yes, press down (Recommended)", whose option said "off under reduced motion" (WCAG 2.2, 2.3.3) |
 
 ## Evidence
+### 14b-8b (2026-10-29, the Windows PC's local stack)
+- **Criterion 1, the kit's second part:** `e2e/look.e2e.ts` "a card and a chip take the kit's border, corners and shadow": Today's Leaderboard card reads a 2px ink border, 5px corners and a `4px 4px 0px 0px` ink shadow; its date chip 1px (Chromium's 1.5px, Source diff) ink, 4px, no shadow: passed. `feel.e2e.ts`'s clock test now reads the seconds at 64px beside a 30px prompt (answer 11).
+- **Criterion 2, seen** (a throwaway e2e, deleted after; a seeded player, removed after), at 390x844 and 1440x900: Today before and after playing, a question, the result and How to play. Today starts with the banner (date chip, "7 stops" and "Don't match the Wind" chips, the accent Play); the leaderboard is a card with its date chip, the ink segmented control and badged rows; the feed a card of comment rows with reaction chips, Delete as a minor button and the full-width box with an accent Post; the question a tinted card with its stop and points chips, the prompt beside the 64px "20" and "seconds left", the accent Answer. Six were sent to the human. Noticed: headings inside cards keep the browser's margins, so the board's "Plor is better with friends" sits apart from its text (for 14b-8c).
+- **Tests changed with the look:** the banner's one-line facts are chips now, so `today`, `settings`, `player-screens` and `groups` read each chip; the leaderboard's date moved into its heading, so `today` reads it on the card. Every other check stands: the leaderboard and friend rows still read "name (you): 0 points" and "name: hasn't played yet" (Source diff). The full run before these: 63 passed, 9 failed on exactly these lines and the rows' text; after: the seven files 33 passed, `groups` 2 passed.
+- `npx tsc --noEmit -p .` and `npx eslint src e2e scripts` clean; `npm test` **470 passed**; `npm run test:db` **280 passed**; `npm run build` compiled, 73 of 73 pages. No test players or puzzles left.
+- **After the review's fixes:** the full `npx playwright test` 72 passed and 2 failed: `feel.e2e.ts`'s chip width (50.27px before a count, 46.27px after: the kit chip's 4px gap opened between the emoji and the count's room, but not around a real count; fixed with no gap in a reaction) and the new look test (its file had no day for the banner's facts; it now adds the fixture day). Rerun, `feel.e2e.ts` caught a posted comment shown twice after Later day (its pending copy beside the loaded one: another load landed before the post's own reload); fixed, `changed` drops a pending post the loaded thread already has. Then `feel`, `look`, `today` and `live-board` 23 passed and 1 failed (`live-board.e2e.ts:169`, the watcher's feed not nudged within 5 s); `live-board.e2e.ts` repeated twice: 16 passed. `npm run build`: the built CSS holds `.banner .chip` (two classes) with the banner's white and tint, so it outranks the kit's chip whatever the load order. `npx tsc`, `npx eslint src e2e scripts`, `npm test` 470, `npm run test:db` 280: clean and passed. No test players or puzzles left.
+- **CI on PR #131 (`dd3b7c7`), both e2e runs:** `shell.e2e.ts:61` and `:148` saw a fourth section on phone Today, phone Today's invite card (answer 13), for their player with no friends; locally the poll had matched the three before the card's data landed. The phone checks now expect the card (`onPhone`); the desktop check, where the board says it instead, is unchanged. `shell.e2e.ts` repeated twice: 18 passed.
+
 ### 14b-8a (2026-10-29, the Windows PC's local stack)
 - **Criterion 1, the kit's first part:** `e2e/look.e2e.ts` (3 tests): in the light and dark colour schemes, the signed-out page's "Email me a sign-in code" button and "About Plor" button-link read a 2px border in the theme's text colour, 5px corners and a `0px 4px 0px 0px` shadow in that colour, and the Email field 2px, 4px and no shadow; pressing the button (mouse down) moves it to `matrix(1, 0, 0, 1, 0, 4)`, and under `reducedMotion: "reduce"` its transform stays `none`; signed in, the tab bar's top border is 2px ink at 390px, and at 1440px the sidebar's right edge is 2px ink and its current item 2px ink, 4px corners, a `3px 3px 0px 0px` ink shadow: passed.
 - **Criterion 2, seen** (a throwaway e2e, deleted after; a seeded player who had played and commented, removed after): Today, Friends and Me at 390×844 and 1440×900. Buttons and button-links carry the ink border, corners and drop shadow; fields their ink border; the tab bar its ink rule, the sidebar's current item its bordered, shadowed box; the streak pill is the green ink-bordered chip. Still the old look until 14b-8b and c: the cards' rounded corners, the reactions as full buttons (heavy with the shadow; 14b-8b makes them the mockup's chips), and the pages' layouts. Four were sent to the human.
@@ -102,6 +133,15 @@ One PR each, in order; the human sees each PR's screenshots before it merges:
 - **After the review's fixes:** `look.e2e.ts` (the gear held down reads transform `none` and shadow `none`), `shell.e2e.ts`, `settings.e2e.ts`, `settings-sheet.e2e.ts` and `feel.e2e.ts`: **27 passed**; `npx tsc` and `npx eslint src e2e` clean.
 
 ## Review
+### 14b-8b (the `reviewer` agent, fresh context, on the uncommitted diff over `23e5ecf`)
+- Blocking findings and how each was fixed:
+  1. **In the production build the kit's `.chip` loaded after the banner's chip rule and won**, so the banner's chips would have lost their navy tint and white text on plor.app (the dev server, which the tests and screenshots use, loaded them the other way); How to play's 14px spacing lost to the kit card's 10px the same way. Fixed: a page's own variant is scoped above the kit's one class (`.banner .chip`, `.banner .facts`, `section.how`, `.group .reaction`), and the kit's button kinds are written on `button` and `a` (`:is(button, a).primary`), so load order can't decide; a new e2e reads a banner chip's white text and non-ink edge.
+  2. **Two modules still drew their own button kind and chip** (`game.module.css`'s `.play` repeating the kit's main button and a third copy of the press; `reactions.module.css`'s chip), against the Styling row this change adds. Fixed: Play, Continue and Result are the kit's `.primary` on a button-link or a button, `.play` keeps only their size; a reaction is the kit's chip plus what a reaction adds. `ButtonLink` takes a kit kind as its `className`; its `danger` tone moved into the kit (`.danger`), used by the admin's tomorrow warning.
+  3. **The game screen's stat tiles kept 8px 2px**, not mockup 3's 10px 14px. Fixed: the override is gone.
+  4. **Five values with no recorded origin.** Fixed: the chip's 4px gap, "seconds left"'s 13px and the 6px under "The Wind has taken" are mockup 3's and in Numbers; the comment's words now have no margin and its reactions sit 6px under them, and the comment label sits straight above its box, as mockup 3 has them. The Numbers table is whole again (a blank line had split it).
+  5. **Answers 12 and 13 had no test.** Fixed: `look.e2e.ts` "signed-in Today: no introduction, the banner's own chips, and the invite card on phones" (the introduction hidden once signed in; the invite card at 390px with no friends, gone at 1440px where the board says it).
+- Deferred to ROADMAP "Next revision" (For M14): phone Today's invite card fetches `/api/friends` twice (the card and its `InviteLink`); signed in, the introduction shows until the shell mounts, then goes (a flash and a shift on each load of `/`); a small button drops 4px onto its 3px shadow (the base press); the accent Play's fill and ink edge are about 1.6:1 on the navy banner (its white label identifies it; for the critique); the game screen's stat tiles are 4px apart with 3px shadows.
+
 ### 14b-8a (the `reviewer` agent, fresh context, on the uncommitted diff over `a84fa40`)
 - Blocking findings and how each was fixed:
   1. **The gear and the sidebar's Settings still pressed down,** and under reduced motion gained a shadow while held: their `transform: none; box-shadow: none` (one class) lost to the base `button:active:not(:disabled)` (two classes and an element). Fixed: the base press rules are in `:where()`, so a button's own class wins; `look.e2e.ts` holds the gear down and reads `none`, `none`.
