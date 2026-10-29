@@ -1,6 +1,6 @@
 # M14 14b-8 — The new look: hard ink shadows, nearly square corners, cards, rows and chips
 
-**Status:** drafted (guided questions answered by the human, 2026-10-28 and 2026-10-29), waiting for approval. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
+**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, in progress. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
 
 ## Goal
 Plor's player and admin pages take the look the human chose on mockup 3 with its "Nearly square (5px)" setting: hard ink shadows and borders, nearly square corners, sections as bordered cards, lists as bordered rows, facts as chips and badges, in Baloo 2 and each theme's own colours.
@@ -26,7 +26,7 @@ Plor's player and admin pages take the look the human chose on mockup 3 with its
 11. The question's clock: "Mockup's clock, banner stays hidden (Recommended)".
 
 ## Source
-- **Mockup 3**, the human's approved drawing: the private claude.ai page "Plor hard-shadow mockup" (https://claude.ai/artifact/PuxmXXNxypRTz8uYGQLUK8), with its "Nearly square (5px)" card shape (`html[data-shape="sq5"]`), no texture, its toolkit CSS (`.tile`, `.btn`, `.chip`, `.badge`, `ul.list li`, `.seg`, `.stat`, `.cal`, `.letters`, `.tabs`, `.side`) and its five screens (Today, a question, Friends, Me, desktop Today). Not yet in SOURCES.md: **to add with this ticket's approval.** It stays until 14b-7, which deletes it after the critique.
+- **Mockup 3**, the human's approved drawing: the private claude.ai page "Plor hard-shadow mockup" (https://claude.ai/artifact/PuxmXXNxypRTz8uYGQLUK8), with its "Nearly square (5px)" card shape (`html[data-shape="sq5"]`), no texture, its toolkit CSS (`.tile`, `.btn`, `.chip`, `.badge`, `ul.list li`, `.seg`, `.stat`, `.cal`, `.letters`, `.tabs`, `.side`) and its five screens (Today, a question, Friends, Me, desktop Today). In SOURCES.md since this ticket's approval. It stays until 14b-7, which deletes it after the critique.
 - **DECISIONS.md, Styling:** CSS Modules and CSS variables, one font, the colour slots; `globals.css` holds the slots and base element styles.
 - **WCAG 2.2** (SOURCES.md): 2.3.3 (the press under reduced motion), 1.4.11 (borders and focus visible on every theme).
 
@@ -72,7 +72,7 @@ Every other size (paddings, gaps, font sizes) is read from mockup 3's CSS when b
 
 ## Plan
 One PR each, in order; the human sees each PR's screenshots before it merges:
-1. **14b-8a, the kit and the shell:** the variables, buttons, inputs, card, rows, chips, badges, the tab bar and sidebar. Every page picks up the corners, borders and buttons at once.
+1. **14b-8a, the kit and the shell:** the variables, the base buttons, links drawn as buttons, inputs, text boxes and pickers, the tab bar, the sidebar, the streak pill, the clock bar, the Undo toast and the skeletons. Every page picks up the buttons and fields at once. The card, row, chip and badge come with 14b-8b, where they're first used, so nothing is added before it has a caller (CLAUDE.md, "Build for today").
 2. **14b-8b, Today and the game:** Today, the question card and clock, the run's result, How to play.
 3. **14b-8c, the other player pages:** Friends, Groups, a group, Me, `/streak`, the settings sheet.
 4. **14b-8d, the admin pages.**
