@@ -132,8 +132,8 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
 });
 
-// 14b-8c: Me's header card lays its avatar beside the name, the totals are stat tiles and the days take the cells'
-// corners; /streak's own rank keeps its thicker edge. The header and the rank are scoped above the kit's card, which
+// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stat tiles and
+// the days take the cells' corners; /streak's own rank keeps its thicker edge. The header and the rank are scoped above the kit's card, which
 // a production CSS order could otherwise let win (14b-8b review).
 test("Me's header, stat tiles and days, and /streak's own rank, in the kit", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
@@ -144,6 +144,7 @@ test("Me's header, stat tiles and days, and /streak's own rank, in the kit", asy
   await expect(header).toBeVisible();
   expect(await header.evaluate((el) => getComputedStyle(el).flexDirection)).toBe("row");
   expect(await look(header)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  expect(await header.locator("[data-initial]").evaluate((el) => `${getComputedStyle(el).borderTopWidth} ${getComputedStyle(el).borderTopColor}`)).toBe(`2px ${color}`);
   const tile = page.getByRole("region", { name: "All games" }).getByText("points all time", { exact: true }).locator("xpath=..");
   expect(await look(tile)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
   expect(await page.getByRole("region", { name: "Calendar" }).locator("[data-date]").first().evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("2px");
