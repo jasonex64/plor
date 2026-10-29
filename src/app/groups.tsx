@@ -16,6 +16,7 @@ import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
 import { shareLink } from "./share";
 import { Line, Skeleton } from "./skeleton";
+import { FORWARD } from "./slide";
 
 type GroupSummary = { id: string; name: string };
 type Member = { username: string; name: string; creator: boolean };
@@ -57,7 +58,7 @@ export function Groups() {
     event.preventDefault();
     void run(async () => {
       const { group } = await api<{ group: GroupSummary }>("/api/groups/create", { method: "POST", body: { name } });
-      router.push(`/groups/${group.id}`);
+      router.push(`/groups/${group.id}`, { transitionTypes: FORWARD });
     });
   };
 
@@ -69,7 +70,9 @@ export function Groups() {
         <ul>
           {groups.map((g) => (
             <li key={g.id}>
-              <ButtonLink href={`/groups/${g.id}`}>{g.name}</ButtonLink>
+              <ButtonLink href={`/groups/${g.id}`} transitionTypes={FORWARD}>
+                {g.name}
+              </ButtonLink>
             </li>
           ))}
         </ul>
@@ -297,7 +300,7 @@ export function JoinGroup({ code }: { code: string }) {
   const join = () =>
     void run(async () => {
       const { group } = await api<{ group: GroupSummary }>("/api/groups/join", { method: "POST", body: { code } });
-      router.push(`/groups/${group.id}`);
+      router.push(`/groups/${group.id}`, { transitionTypes: FORWARD });
     });
 
   return (

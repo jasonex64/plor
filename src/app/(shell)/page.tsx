@@ -1,5 +1,6 @@
 import { Signed, TodayTab } from "../home";
 import { GAME } from "@/platform/game";
+import { Slide } from "../slide";
 
 // The introduction is static, so it is in the served HTML before any script runs: Google's brand verification rejected
 // a home page that showed only a sign-in form, didn't explain the app, and was headed "Offbeat" while the app is "Plor"
@@ -8,7 +9,7 @@ import { GAME } from "@/platform/game";
 // (node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md).
 export default function Page() {
   return (
-    <>
+    <Slide>
       <p>
         Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
         midnight Pacific time.
@@ -22,6 +23,6 @@ export default function Page() {
       <Signed>
         <TodayTab />
       </Signed>
-    </>
+    </Slide>
   );
 }
