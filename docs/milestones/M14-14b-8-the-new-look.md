@@ -1,6 +1,6 @@
 # M14 14b-8 — The new look: hard ink shadows, nearly square corners, cards, rows and chips
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, done; next 14b-8b. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
+**Status:** approved (human, 2026-10-29: "Approve 14b-8 as drafted, including adding mockup 3 to SOURCES.md"); 14b-8a, the kit and the shell, done (PR #130); next 14b-8b. Comes after 14b-6 (done) and before 14b-7, the design clear-out: the look, then an Impeccable critique of it, then the clear-out.
 
 ## Goal
 Plor's player and admin pages take the look the human chose on mockup 3 with its "Nearly square (5px)" setting: hard ink shadows and borders, nearly square corners, sections as bordered cards, lists as bordered rows, facts as chips and badges, in Baloo 2 and each theme's own colours.
