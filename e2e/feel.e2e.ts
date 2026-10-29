@@ -1,6 +1,6 @@
 // The frame and the skeletons (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6a): the tab bar stays on screen
 // while the player moves between tabs (criterion 1), and a section whose data hasn't landed shows its skeleton, by its
-// label, never "Loading…" text (criterion 2).
+// label, never "Loading…" text (criterion 2). Numbers and headlines (14b-6d, criterion 5).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -99,4 +99,22 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
   await expect(page.getByText("Loading…")).toHaveCount(0);
   run();
   await expect(page.getByRole("status", { name: "Loading today's puzzle" })).toHaveCount(0);
+});
+
+// Every number on the page has same-width digits, and headings and paragraphs wrap evenly, from globals.css's base
+// rules (criterion 5): read on Today's real elements, a section's h3 included, so a module overriding them shows here.
+test("numbers are tabular, headings balanced and paragraphs pretty", async ({ page }) => {
+  await page.goto("/");
+  await signInAndPick(page, "fn");
+  await expect(page.locator("h3").first()).toBeVisible();
+  const styles = await page.evaluate(() => {
+    const style = (selector: string) => getComputedStyle(document.querySelector(selector)!);
+    return {
+      body: style("body").fontVariantNumeric,
+      h3Numbers: style("h3").fontVariantNumeric,
+      headings: ["h1", "h2", "h3"].map((h) => style(h).getPropertyValue("text-wrap-style")),
+      p: style("p").getPropertyValue("text-wrap-style"),
+    };
+  });
+  expect(styles).toEqual({ body: "tabular-nums", h3Numbers: "tabular-nums", headings: ["balance", "balance", "balance"], p: "pretty" });
 });

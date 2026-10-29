@@ -9,18 +9,19 @@ export const metadata: Metadata = {
   description: "A daily social word game.",
 };
 
-// The shell's fonts (docs/milestones/M14-look-and-feel.md, L4) as files in the repo, so no build downloads them
-// (docs/milestones/M14-14b-5-local-fonts.md: three CI runs failed when fonts.gstatic.com didn't answer), and exposed
-// as CSS variables (DECISIONS.md: Styling). They're Google Fonts' Latin files with their OFL licences beside them
-// (src/app/fonts/; SOURCES.md, Google Fonts). DM Sans is one variable file, declared at 400 and 700 as Google's CSS
-// declares it.
-const heading = localFont({ src: "./fonts/Baloo2-800-latin.woff2", weight: "800", variable: "--font-heading" });
-const body = localFont({
+// Plor's one font, Baloo 2, for all text (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6d: its digits are
+// tabular, the old body font's weren't), as a file in the repo so no build downloads it
+// (docs/milestones/M14-14b-5-local-fonts.md: three CI runs failed when fonts.gstatic.com didn't answer), exposed as a
+// CSS variable (DECISIONS.md: Styling). It's Google Fonts' one variable Latin file with its OFL licence beside it
+// (src/app/fonts/; SOURCES.md, Google Fonts), declared at 400, 700 and 800 as Google's CSS declares it, so a weight
+// between them renders as it did before.
+const font = localFont({
   src: [
-    { path: "./fonts/DMSans-latin.woff2", weight: "400" },
-    { path: "./fonts/DMSans-latin.woff2", weight: "700" },
+    { path: "./fonts/Baloo2-latin.woff2", weight: "400" },
+    { path: "./fonts/Baloo2-latin.woff2", weight: "700" },
+    { path: "./fonts/Baloo2-latin.woff2", weight: "800" },
   ],
-  variable: "--font-body",
+  variable: "--font",
 });
 
 // The theme a player picked is applied before the first paint from this browser's copy (src/app/theme.ts), so <html>'s
@@ -28,7 +29,7 @@ const body = localFont({
 // before hydration").
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable}`} suppressHydrationWarning>
+    <html lang="en" className={font.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

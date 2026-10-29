@@ -78,10 +78,8 @@
 .totals dd,
 .stats dd {
   margin: 0;
-  font-family: var(--font-heading), system-ui, sans-serif;
   font-weight: 800;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .totals dd {
@@ -154,7 +152,6 @@
   justify-content: center;
   font-size: 13px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
 }
 
 .missed {
