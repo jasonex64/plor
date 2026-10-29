@@ -23,12 +23,14 @@ import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
 import styles from "./admin.module.css";
 import { Line, Skeleton } from "../skeleton";
+import { warningOf, tomorrowOf, type Tomorrow } from "./tomorrow";
 
 export type AdminPage = "puzzles" | "audit" | "reports" | "insights" | "bank" | "base";
 
 // What waits for the admin: drafted days not yet approved (and the first), texts to review, reported comments (and
-// when the first was reported), and the approved days after today (and the last).
-type Counts = { toApprove: string[]; ahead: string[]; review: number; reports: ReportedComment[] };
+// when the first was reported), the approved days after today (and the last), and whether tomorrow has a puzzle
+// (14b-6f).
+type Counts = { toApprove: string[]; ahead: string[]; review: number; reports: ReportedComment[]; tomorrow: Tomorrow };
 
 const TO_DO: { page: AdminPage; name: string; count: (c: Counts) => number }[] = [
   { page: "puzzles", name: "Puzzles", count: (c) => c.toApprove.length },
@@ -58,6 +60,7 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
           ahead: dates((d) => d.live !== null && d.date > puzzles.today),
           review: audit.open,
           reports: reports.reports,
+          tomorrow: tomorrowOf(puzzles.today, puzzles.days),
         });
         setError(null);
       },
@@ -163,6 +166,7 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
     };
   }, [open]);
   const current = TO_DO.find((t) => t.page === page);
+  const warning = counts && warningOf(counts.tomorrow);
   const waiting = counts
     ? [
         { href: "/admin/puzzles", n: counts.toApprove.length, one: "day", many: "days" },
@@ -203,9 +207,15 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
           </p>
         </Skeleton>
       )}
-      {waiting.length > 0 && (
+      {(warning || waiting.length > 0) && (
         <p className={styles.waiting}>
           <span className={styles.muted}>Waiting:</span>
+          {/* Tomorrow first: without its puzzle, the game breaks at midnight Pacific (design 7). */}
+          {warning && (
+            <ButtonLink href="/admin/puzzles" tone="danger">
+              {warning.what}
+            </ButtonLink>
+          )}
           {waiting.map((w) => (
             <ButtonLink key={w.href} href={w.href}>
               {w.n} {w.n === 1 ? w.one : w.many}
@@ -235,7 +245,11 @@ function NeedsYouSkeleton() {
 
 function NeedsYou({ counts }: { counts: Counts }) {
   const first = counts.reports[0];
-  const rows = [
+  const warning = warningOf(counts.tomorrow);
+  const rows: { href: string; n: number | null; what: string; more: string; danger?: boolean }[] = [
+    // When tomorrow has no puzzle, the days-ahead row is this warning, at the top in the danger colour (design 7;
+    // answers 27 and 28), with no number: how many days are ahead says nothing about tomorrow.
+    ...(warning ? [{ href: "/admin/puzzles", n: null, what: warning.what, more: warning.todo, danger: true }] : []),
     {
       href: "/admin/puzzles",
       n: counts.toApprove.length,
@@ -254,12 +268,16 @@ function NeedsYou({ counts }: { counts: Counts }) {
       what: counts.reports.length === 1 ? "reported comment" : "reported comments",
       more: first ? `First reported ${whenText(first.firstReportedAt)}` : "None",
     },
-    {
-      href: "/admin/puzzles",
-      n: counts.ahead.length,
-      what: counts.ahead.length === 1 ? "day approved ahead" : "days approved ahead",
-      more: counts.ahead.length ? `Through ${dayText(counts.ahead[counts.ahead.length - 1])}` : "None yet",
-    },
+    ...(warning
+      ? []
+      : [
+          {
+            href: "/admin/puzzles",
+            n: counts.ahead.length,
+            what: counts.ahead.length === 1 ? "day approved ahead" : "days approved ahead",
+            more: `Through ${dayText(counts.ahead[counts.ahead.length - 1])}`,
+          },
+        ]),
   ];
   return (
     <>
@@ -267,7 +285,7 @@ function NeedsYou({ counts }: { counts: Counts }) {
       <ul className={styles.needs}>
         {rows.map((r, i) => (
           <li key={i}>
-            <Link href={r.href} className={styles.need}>
+            <Link href={r.href} className={r.danger ? `${styles.need} ${styles.danger}` : styles.need}>
               <b className={styles.needNumber}>{r.n}</b>
               <span className={styles.needWhat}>{r.what}</span>
               <span className={styles.muted}>{r.more}</span>

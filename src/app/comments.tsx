@@ -20,19 +20,13 @@ import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
 import { Avatar } from "./avatar";
 import styles from "./comments.module.css";
+import { shiftDay } from "./day-text";
 import { errorText } from "./messages";
 import { Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
-
-// The calendar day before or after a YYYY-MM-DD date.
-function shiftDay(date: string, days: number): string {
-  const d = new Date(`${date}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
 
 // A change shown before the server has it (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b): it lasts while the
 // action is held for Undo and sent, then the thread loaded again shows it for real.
