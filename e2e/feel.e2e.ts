@@ -1,7 +1,7 @@
 // The frame and the skeletons (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6a): the tab bar stays on screen
 // while the player moves between tabs (criterion 1), and a section whose data hasn't landed shows its skeleton, by its
-// label, never "Loading…" text (criterion 2). Comments and reactions at once, with Undo (14b-6b, criterion 3). Numbers
-// and headlines (14b-6d, criterion 5).
+// label, never "Loading…" text (criterion 2). Comments and reactions at once, with Undo (14b-6b, criterion 3). The
+// question's clock (14b-6c, criterion 4). Numbers and headlines (14b-6d, criterion 5).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { UNDO_SECONDS } from "../src/config/tunables";
@@ -199,4 +199,36 @@ test("comments and reactions show at once, with Undo before they're sent", async
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   await expect.poll(() => posts.length).toBe(3);
   expect(posts[2] - posted).toBeLessThan(UNDO_SECONDS * 1000);
+});
+
+// While the run is in progress the game screen holds only the question: the seconds left as a number beside the
+// prompt, as large as it and with tabular figures, and no banner, stats, Yesterday or comments, which come back when
+// the run ends (criterion 4; answers 20–23).
+test("a question shows its seconds beside the prompt, and nothing else until the run ends", async ({ page }) => {
+  await page.goto("/");
+  await signInAndPick(page, "fc");
+  await play(page);
+  const prompt = page.getByRole("heading", { level: 2, name: "Name an animal" });
+  const clock = page.getByRole("timer", { name: "Seconds left" });
+  await expect(clock).toHaveText(/^\d+$/);
+  const look = await clock.evaluate((el) => {
+    const [mine, theirs] = [getComputedStyle(el), getComputedStyle(document.querySelector("h2")!)];
+    return { numbers: mine.fontVariantNumeric, size: mine.fontSize === theirs.fontSize, weight: mine.fontWeight === theirs.fontWeight };
+  });
+  expect(look).toEqual({ numbers: "tabular-nums", size: true, weight: true });
+  const [p, c] = [(await prompt.boundingBox())!, (await clock.boundingBox())!];
+  expect(c.x).toBeGreaterThan(p.x + p.width - 1);
+  expect(c.y).toBeLessThan(p.y + p.height);
+  expect(c.y + c.height).toBeGreaterThan(p.y);
+  const hidden = [
+    page.getByRole("heading", { level: 2, name: GAME.name, exact: true }),
+    page.getByRole("region", { name: `Your ${GAME.name}` }),
+    page.getByRole("region", { name: "Yesterday on the ridge" }),
+    page.getByRole("region", { name: `${GAME.name} comments` }),
+  ];
+  for (const part of hidden) await expect(part).toHaveCount(0);
+
+  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
+  await page.getByRole("button", { name: "Answer" }).click();
+  for (const part of hidden) await expect(part).toBeVisible();
 });

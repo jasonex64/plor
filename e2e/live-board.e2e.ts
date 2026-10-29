@@ -11,7 +11,6 @@ import { execSync } from "node:child_process";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { gotPastText } from "../src/game/words";
-import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -322,13 +321,10 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await openBoard(page, "/updraft");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
-  // Only the reset asks for the game screen's stats again. Every load from the mount is sent before the chart can
-  // draw (Strict Mode sends two in development), so a request sent after the chart is there is the reset's (14a-2c,
-  // criterion 5). The faked clock is the browser's only: the server's day stays the same, so the reload's content
-  // can't show a new day.
-  await expect(page.getByRole("region", { name: `Your ${GAME.name}` }).getByRole("img")).toBeVisible();
-  const moved = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/offbeat");
+  // Past the reset. While the run is in progress the game screen shows only the game (M14 14b-6c, answer 23), so
+  // nothing else on it moves to the new day until the run ends; this used to wait for the stats card's reload as
+  // the sign the reset had fired, and that card is now hidden. fastForward runs every timer due, the reset's among
+  // them; "the reset reloads every section of Today" checks the reset's own reloads.
   await page.clock.fastForward("25:00:00");
-  await moved;
   await expect(page.getByLabel("Your answer")).toHaveValue("half typ");
 });

@@ -23,6 +23,9 @@ import { capitalized, caughtWord } from "@/game/words";
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function OffbeatScreen({ username, name, onStarted }: { username: string; name: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
+  // While the run is in progress the screen holds only the game: the cards and the feed come back when it ends
+  // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6c; answer 23).
+  const [playing, setPlaying] = useState(false);
   // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
   // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
   const [ended, setEnded] = useState(0);
@@ -58,15 +61,19 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
         </ButtonLink>
       </p>
       <section id="offbeat" aria-label={GAME.name} className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} />
+        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} onPlaying={setPlaying} />
       </section>
-      <div className={styles.cards}>
-        <OffbeatInfo key={`info-${day}-${ended}`} />
-      </div>
-      <SideColumn label="Feed" inPlace className={styles.feed}>
-        <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
-      </SideColumn>
+      {!playing && (
+        <>
+          <div className={styles.cards}>
+            <OffbeatInfo key={`info-${day}-${ended}`} />
+          </div>
+          <SideColumn label="Feed" inPlace className={styles.feed}>
+            <LiveStatus channel={channel} />
+            <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
+          </SideColumn>
+        </>
+      )}
     </div>
   );
 }
