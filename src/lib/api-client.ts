@@ -13,9 +13,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(path: string, init: { method: "GET" | "POST"; body?: unknown }): Promise<T> {
+// keepalive: the request outlives the page, for an action sent as the player leaves it (M14 14b-6b, P1).
+export async function api<T>(path: string, init: { method: "GET" | "POST"; body?: unknown; keepalive?: boolean }): Promise<T> {
   const response = await fetch(path, {
     method: init.method,
+    keepalive: init.keepalive,
     headers: { "x-protocol": String(PROTOCOL_VERSION), "content-type": "application/json" },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
   });

@@ -152,3 +152,7 @@ export const RAREST_ANSWERS_SHOWN = 3;
 // 15 and 30 are L26's stages (human, 2026-10-24: "1–4 sprout, 5–14, 15–29, 30+"); 90 is the human's sakura (2026-10-26:
 // "sakura blossom (3 months)", "90 days (Recommended)").
 export const STREAK_RANK_FROM = [0, 1, 5, 15, 30, 90] as const;
+
+// Comments and reactions show at once and are sent when the toast's window ends, unless undone
+// (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b; human, 2026-10-27: "5 seconds").
+export const UNDO_SECONDS = 5;

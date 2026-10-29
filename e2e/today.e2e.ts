@@ -2,7 +2,7 @@
 // the feed before playing (names, no words), and Today's columns from phone to desktop.
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -114,6 +114,7 @@ test("before playing, the feed names who commented and holds none of their words
   await friend.getByRole("button", { name: "Post" }).click();
   // Posted on the game screen, whose feed is `${GAME.name} comments` (14a-2c); Today's below stays "Feed".
   await expect(friend.getByRole("region", { name: `${GAME.name} comments` }).getByText(body)).toBeVisible();
+  await sent(friend, "/api/comments");
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });

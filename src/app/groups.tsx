@@ -95,7 +95,7 @@ export function Groups() {
 
 // A group's page: members, the invite link every member can share, the creator's powers (G1, G6), the group's weekly
 // leaderboard (10c) and its thread, live (10d; G4, G5). username is the signed-in player's.
-export function GroupPage({ id, username, timeUps }: { id: string; username: string; timeUps: number }) {
+export function GroupPage({ id, username, name, timeUps }: { id: string; username: string; name: string; timeUps: number }) {
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
   const [draft, setDraft] = useState("");
@@ -276,7 +276,7 @@ export function GroupPage({ id, username, timeUps }: { id: string; username: str
         />
       )}
       {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}
-      {group && <Comments key={`${day}-${timeUps}`} username={username} runOver={false} nudge={threadNudge} group={id} />}
+      {group && <Comments key={`${day}-${timeUps}`} username={username} name={name} runOver={false} nudge={threadNudge} group={id} />}
     </>
   );
 }

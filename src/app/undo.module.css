@@ -1,0 +1,34 @@
+/* The Undo toast (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b; answer 18): at the foot of the content
+   column, 16px (main's gutter) above the room the page leaves for the tab bar or the clock bar, and clear of the
+   sidebar and the right column (globals.css: --room-bottom, --sidebar, --right-column). It looks like the page's
+   buttons: their corners, edge and sides. */
+.place {
+  position: fixed;
+  right: calc(var(--right-column, 0px) + 16px);
+  bottom: calc(var(--room-bottom, 0px) + 16px);
+  left: calc(var(--sidebar, 0px) + 16px);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--surface);
+  border: 1.5px solid var(--edge);
+  border-radius: 12px;
+  padding: 0 16px;
+}
+
+.toast:empty {
+  border: 0;
+  padding: 0;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+}
