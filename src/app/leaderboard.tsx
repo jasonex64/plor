@@ -11,6 +11,7 @@ import { Avatar } from "./avatar";
 import styles from "./leaderboard.module.css";
 import { dayText } from "./day-text";
 import { errorText } from "./messages";
+import { Line, Skeleton } from "./skeleton";
 
 // title names the board (its heading and region); path is the API route that returns it.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
@@ -31,7 +32,11 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
           <Standings title={`Last week, from ${dayText(board.lastWeek.from)}`} label="Last week" week={board.lastWeek} />
         </>
       )}
-      {!board && !error && <p>Loading…</p>}
+      {!board && !error && (
+        <Skeleton label="Loading scores">
+          <Line />
+        </Skeleton>
+      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );
@@ -109,7 +114,11 @@ export function LeaderboardCard() {
         </p>
         {day && <Entries entries={day.entries} />}
         {week && <Entries entries={week.entries} />}
-        {!day && !week && !error && <p>Loading…</p>}
+        {!day && !week && !error && (
+          <Skeleton label="Loading scores">
+            <Line />
+          </Skeleton>
+        )}
       </section>
       {groupsError && <p role="alert">{groupsError}</p>}
       {error && <p role="alert">{error}</p>}

@@ -11,6 +11,7 @@ import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { InviteLink } from "./invite-link";
 import { errorText } from "./messages";
+import { Line, Skeleton } from "./skeleton";
 
 export function FriendsList() {
   const [friends, setFriends] = useState<Friend[] | null>(null);
@@ -55,7 +56,11 @@ export function FriendsList() {
           ))}
         </ul>
       )}
-      {!friends && !error && <p>Loading…</p>}
+      {!friends && !error && (
+        <Skeleton label="Loading your friends">
+          <Line />
+        </Skeleton>
+      )}
       {error && <p role="alert">{error}</p>}
       <InviteLink canReset />
     </section>

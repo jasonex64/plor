@@ -124,7 +124,10 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
   await nav.getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("main").getByRole("link", { name: "Admin" })).toBeVisible();
   await page.getByRole("main").getByRole("link", { name: "Admin" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/admin");
+  // /admin opens on Puzzles (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 1), so the link ends there; the
+  // bare /admin was only seen when the check ran before the redirect, which the persistent frame's prefetch made rare
+  // (PR #113's pull-request e2e run, 2026-10-27).
+  await expect(page).toHaveURL("http://localhost:3000/admin/puzzles");
   // Back on a desktop, the Me tab leaves it to the sidebar.
   await page.goto("/me");
   await page.setViewportSize({ width: 1440, height: 900 });

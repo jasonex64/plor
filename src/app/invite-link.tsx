@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 import { shareLink } from "./share";
+import { Line, Skeleton } from "./skeleton";
 
 export function InviteLink({ canReset }: { canReset: boolean }) {
   // undefined while loading; null when the player has no link yet.
@@ -72,7 +73,11 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
         )}
         {note && <span role="status"> {note}</span>}
       </p>
-      {code === undefined && !error && <p>Loading…</p>}
+      {code === undefined && !error && (
+        <Skeleton label="Loading your invite link">
+          <Line />
+        </Skeleton>
+      )}
       {error && <p role="alert">{error}</p>}
     </section>
   );

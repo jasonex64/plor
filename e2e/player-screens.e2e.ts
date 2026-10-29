@@ -200,7 +200,7 @@ test("the leaderboard card shows nothing of the old choice while the new one loa
     await route.continue();
   });
   await card.getByText("This week", { exact: true }).click();
-  await expect(card.getByText("Loading…")).toBeVisible();
+  await expect(card.getByRole("status", { name: "Loading scores" })).toBeVisible();
   await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toHaveCount(0);
   release();
   await expect(card.getByText(/^From [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();

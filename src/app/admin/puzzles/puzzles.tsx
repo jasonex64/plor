@@ -14,6 +14,7 @@ import { errorText } from "../../messages";
 import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
 import styles from "./puzzles.module.css";
+import { Line, Skeleton } from "../../skeleton";
 
 type DaysResponse = { today: string; days: DayView[] };
 
@@ -43,7 +44,12 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
   useEffect(load, [load]);
 
   if (error) return <p role="alert">{error}</p>;
-  if (!data) return <p>Loading…</p>;
+  if (!data)
+    return (
+      <Skeleton label="Loading puzzles">
+        <Line />
+      </Skeleton>
+    );
   if (data.days.length === 0) return <p>No days yet: a Claude session drafts them from the question bank.</p>;
   const days = [...data.days].sort((a, b) => a.date.localeCompare(b.date));
   // At first, the first day waiting for approval, else today, else the first day listed.

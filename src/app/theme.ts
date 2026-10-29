@@ -6,7 +6,7 @@ import type { Theme } from "@/lib/profile";
 
 export const THEME_KEY = "plor.theme";
 
-// Storage that can't be read holds no copy, so the page shows the device's theme until the profile loads and Home
+// Storage that can't be read holds no copy, so the page shows the device's theme until the profile loads and the frame
 // applies the account's (the guide's own try/catch).
 export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 

@@ -282,7 +282,7 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
   const [error, setError] = useState<string | null>(null);
   const saves = useRef<Promise<void>>(Promise.resolve());
   const shown: Settings = { ...settings, ...pending };
-  // The theme shown is the one being saved, else the account's (Home applies the account's too, once it's saved).
+  // The theme shown is the one being saved, else the account's (the frame applies the account's too, once it's saved).
   useLayoutEffect(() => applyTheme(shown.theme), [shown.theme]);
 
   function save(change: Partial<Settings>) {

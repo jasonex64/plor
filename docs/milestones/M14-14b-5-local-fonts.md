@@ -1,6 +1,6 @@
 # M14 14b-5 — The fonts committed, loaded with next/font/local
 
-**Status:** in review (2026-10-27), in PR #111 from `m14-look-and-feel`. Built from the human's answers without a separate draft approval, to be merged on green CI (human, 2026-10-25: "Merge on green CI (Recommended)").
+**Status:** done (2026-10-27): merged in PR #111 on green CI (merge commit `8644d9a`, 22:48 UTC), by auto-merge at the human's request ("Yes, turn on auto-merge for PR #111 (merge commit) so it merges on green CI."). Built from the human's answers without a separate draft approval.
 
 ## Goal
 The shell's two fonts are files in the repo, loaded with `next/font/local`, so a build or dev server never downloads them from Google.
@@ -78,7 +78,7 @@ Run on the Mac against the shared local stack, with the M13 session holding off 
 - **Criterion 1:** `ls -l src/app/fonts` → `Baloo2-800-latin.woff2` 18612, `DMSans-latin.woff2` 36980, `OFL-Baloo2.txt` 4384, `OFL-DMSans.txt` 4482; `file` names both fonts "Web Open Font Format (Version 2)"; `shasum -a 256` → `05dada341dc76ec6b755324afb74e998c57db06147c4c6d362d51132050aa6f4` and `468d56b6b25b05b70190b6c233d773f6f1770e8579827ce022a57f03fa8002fb`. The sizes match what fonts.gstatic.com reported before the download (`content-length` 18612 and 36980).
 - **Criteria 2 and 4:** after the swap, `grep -rn "next/font/google" src` finds nothing; `npx playwright test e2e/shell.e2e.ts` → `9 passed`, the faces `{ heading: ["800 loaded"], regular: ["400 loaded"], bold: ["700 loaded"] }`. As a check, Baloo 2 declared at 400 instead: the case failed (`- "800 loaded"`, `+ "400 loaded"`); restored, it passed.
 - **Criterion 3 and the hypothesis:** `rm -rf .next && npm run build` → exit 0, `✓ Compiled successfully`, the two files in `.next/static/media/` (`Baloo2_800_latin-…woff2`, `DMSans_latin-…woff2`). `grep -rlE 'fonts\.(gstatic|googleapis)\.com' .next` → 1 file, a source map holding this ticket's comment (Source diff); with `--exclude='*.map'` → 0, and `https?://fonts…` anywhere → 0. The hypothesis held for requests.
-- **Criterion 5:** `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  43 passed (43)`, `Tests  424 passed (424)`. `npm run test:e2e` → `61 passed (2.1m)`. CI: PR #111.
+- **Criterion 5:** `npx tsc --noEmit -p .`: no output. `npm run lint`: no problems. `npm test`: `Test Files  43 passed (43)`, `Tests  424 passed (424)`. `npm run test:e2e` → `61 passed (2.1m)`. CI, at `3e12717`: runs 40596574364 (pull_request, success) 40596571011 (push, success) passed `check`, `db`, `e2e` and `secrets`.
 
 - **After the review** (the stack free again, the M13 session's word): the check's first run read the heading at weight 500, from Next.js's own 404 page left by the test's `/account` visit, so it now reads on `/`. Then `npx playwright test e2e/shell.e2e.ts -g "a phone gets a bottom tab bar"` → `1 passed`. As a check, Baloo 2's `src` pointed at the DM Sans file: it failed (`- "800 Baloo2_800_latin"`, `+ "800 DMSans_latin"`); restored, it passed.
 

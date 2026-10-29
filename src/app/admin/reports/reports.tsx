@@ -13,6 +13,7 @@ import { errorText } from "../../messages";
 import admin from "../admin.module.css";
 import { dayText, whenText } from "../../day-text";
 import styles from "./reports.module.css";
+import { Line, Skeleton } from "../../skeleton";
 
 export function Reports({ onChanged }: { onChanged: () => void }) {
   const [reports, setReports] = useState<ReportedComment[] | null>(null);
@@ -64,7 +65,11 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
             ))}
           </ul>
         )}
-        {!reports && !error && <p>Loading…</p>}
+        {!reports && !error && (
+          <Skeleton label="Loading reported comments">
+            <Line />
+          </Skeleton>
+        )}
         {error && <p role="alert">{error}</p>}
       </section>
       {decisions && (

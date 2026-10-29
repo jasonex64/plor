@@ -22,6 +22,7 @@ import { Insights } from "./insights";
 import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
 import styles from "./admin.module.css";
+import { Line, Skeleton } from "../skeleton";
 
 export type AdminPage = "puzzles" | "audit" | "reports" | "insights" | "bank" | "base";
 
@@ -86,11 +87,7 @@ function Area({ page }: { page: AdminPage }) {
       {wide ? <SubTabs page={page} counts={counts} /> : <PhoneMenu page={page} counts={counts} />}
       {error && <p role="alert">{error}</p>}
       <Page page={page} onChanged={refresh} />
-      {column && counts && (
-        <SideColumn label="What needs you">
-          <NeedsYou counts={counts} />
-        </SideColumn>
-      )}
+      {column && <SideColumn label="What needs you">{counts ? <NeedsYou counts={counts} /> : <NeedsYouSkeleton />}</SideColumn>}
     </div>
   );
 }
@@ -199,6 +196,13 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
           </ul>
         </div>
       )}
+      {!counts && (
+        <Skeleton label="Loading what's waiting">
+          <p className={styles.waiting}>
+            <Line />
+          </p>
+        </Skeleton>
+      )}
       {waiting.length > 0 && (
         <p className={styles.waiting}>
           <span className={styles.muted}>Waiting:</span>
@@ -210,6 +214,22 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
         </p>
       )}
     </nav>
+  );
+}
+
+// The rail before the counts load: its title and its four rows (NeedsYou), each a line.
+function NeedsYouSkeleton() {
+  return (
+    <Skeleton label="Loading what needs you">
+      <h2 className={styles.needsTitle}>What needs you</h2>
+      <ul className={styles.needs}>
+        {["puzzles", "audit", "reports", "ahead"].map((row) => (
+          <li key={row} className={styles.need}>
+            <Line />
+          </li>
+        ))}
+      </ul>
+    </Skeleton>
   );
 }
 
