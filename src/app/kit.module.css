@@ -65,6 +65,17 @@
   min-width: 0;
 }
 
+/* A row's second line, under its words: reactions and minor actions, wrapping (mockup 3's .reacts, 6px under a
+   comment's words). A comment's and a friend's row on the live board (M14 14b-8e: beside the words, the reactions
+   covered a friend's name on phones). */
+.below {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
 /* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. */
 .chip {
   display: inline-flex;

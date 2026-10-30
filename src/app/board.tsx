@@ -135,17 +135,22 @@ export function Board({ username, invite }: { username: string; invite: boolean 
           <p>{BETTER_WITH_FRIENDS.text}</p>
         </>
       )}
-      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, then the reactions. */}
+      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions on a line under them, as
+          a comment's are (beside them, they covered the name on phones: M14 14b-8e). */}
       {shownBoard && shownBoard.friends.length > 0 && (
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
             <li key={f.username} className={kit.row}>
               <Avatar name={f.name} />
-              <span className={kit.grow}>
+              <div className={kit.grow}>
                 <b>{f.name}</b>
-                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>
-              </span>{" "}
-              {f.reactions && <Reactions reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
+                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>{" "}
+                {f.reactions && (
+                  <div className={kit.below}>
+                    <Reactions reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />
+                  </div>
+                )}
+              </div>
             </li>
           ))}
         </ul>

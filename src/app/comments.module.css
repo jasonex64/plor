@@ -10,15 +10,6 @@
   margin: 0;
 }
 
-/* Reactions, then Delete or Report, on one line that wraps (mockup 3's .reacts). */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-}
-
 /* The comment box, its label above it and full width, Post under it (mockup 3's composer). */
 .compose label {
   display: flex;

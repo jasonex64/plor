@@ -305,7 +305,7 @@ function CommentItem({
         </div>
         <p>{comment.body}</p>
         {!pending && (
-          <div className={styles.actions}>
+          <div className={kit.below}>
             <Reactions reactions={comment.reactions} onReact={onReact} />
             {mine ? (
               <button type="button" className={kit.link} onClick={onDelete}>
