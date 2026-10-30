@@ -22,6 +22,7 @@ const WHY: Record<Exclude<Review["outcome"], "accepted">, string> = {
   held_subset: "Its filter can't be checked",
   rejected: "Names something outside the category",
   near_typo: "One letter from an answer",
+  reported: "From your test run",
 };
 
 type Decide = (id: number, action: Action, thing?: string) => Promise<void>;
@@ -205,15 +206,18 @@ function Row({ head, review: r, cells, children }: { head: string[]; review: Rev
 function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; decide: Decide }) {
   return (
     <>
-      {(r.outcome === "held" || r.outcome === "held_subset") && (
+      {/* A test run's refused text is decided as a held one when it names nothing, and as a rejected one, per meaning,
+          when it names things outside the category (docs/milestones/M14-14b-11c-test-misses-to-audit.md). */}
+      {(r.outcome === "held" || r.outcome === "held_subset" || (r.outcome === "reported" && r.named.length === 0)) && (
         <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept")}>
           {r.outcome === "held_subset" ? "Accept for this category only" : "Accept"}
         </button>
       )}
-      {r.outcome === "rejected" &&
+      {(r.outcome === "rejected" || r.outcome === "reported") &&
         r.named.map((t) => (
           <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
-            Accept {t.name} as {r.category_name}
+            Accept {t.name}
+            {t.kinds.length > 0 && ` (${t.kinds.join(", ")})`} as {r.category_name}
           </button>
         ))}
       {/* A near-typo links to the answer it's a typo of in one click; the search is for any other (round 10, board 3). */}

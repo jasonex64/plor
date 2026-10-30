@@ -128,6 +128,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.reaction delete', 'private.reaction insert', 'private.reaction select',
   -- Logging a miss, and learning from it once enough players typed it (M13 13b, D4).
   'private.record_miss(uuid,text,date,integer,text,text,boolean,boolean,integer,numeric) execute',
+  -- A test run's refused text goes to the audit, admins only (M14 14b-11c).
+  'private.report_test_miss(uuid,jsonb,text) execute',
   -- A format-3 day's answers are resolved against the base, and named, through two guarded read-only functions (M13 13a-2).
   'private.resolve_answer(text,date,integer,text[]) execute',
   'private.resolve_draft_answer(uuid,jsonb,text[]) execute',

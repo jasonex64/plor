@@ -346,10 +346,12 @@ async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: nu
 // ones that named answers so far, in order; open, whether the question after them has been opened with Start or Next;
 // timedOut, whether its time ran out in the browser; text, a new answer to it, if any. The server resolves every text
 // again with play's matching (answer 5) and returns play's state, so the game screen draws it unchanged (answer 3). A
-// text that names nothing is a free retry, as in play, but no miss is logged, so nothing learns from it.
+// text that names nothing is a free retry, as in play, and logs no miss, so players' learning never counts it; unless
+// it's a typo of a member, it waits on the Audit page as the admin's report (docs/milestones/
+// M14-14b-11c-test-misses-to-audit.md).
 export type TestMoves = { texts: string[]; open: boolean; timedOut: boolean; text: string | null };
 
-export async function testRun(db: Db, puzzle: ApprovedPuzzle, lookup: Lookup, moves: TestMoves): Promise<{ run: RunState; notInList: boolean }> {
+export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lookup: Lookup, moves: TestMoves): Promise<{ run: RunState; notInList: boolean }> {
   const total = puzzle.questions.length;
   const stored: StoredEvent[] = [];
   const resolve = async (index: number, typed: string) => {
@@ -372,7 +374,10 @@ export async function testRun(db: Db, puzzle: ApprovedPuzzle, lookup: Lookup, mo
     if (!open || moves.timedOut) throw new AppError("not_open", 409);
     const resolved = await resolve(stored.length, moves.text);
     if (resolved) stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
-    else notInList = true;
+    else {
+      notInList = true;
+      await reportTestMiss(db, userId, puzzle, lookup, stored.length, moves.text);
+    }
   }
   const status: RunStatus = stored.some((e) => e.matched)
     ? "died"
@@ -396,4 +401,15 @@ export async function testRun(db: Db, puzzle: ApprovedPuzzle, lookup: Lookup, mo
   const pooled = await pooledCounts(db, puzzle, false);
   const clock = { status, msLeft: inPlay ? rows[0].ms_left : null, msToReset: rows[0].ms_to_reset };
   return { run: buildState(puzzle.date, puzzle, stored, clock, counts, pooled, names), notInList };
+}
+
+// A test run's refused text, normalized as play's misses are, to the audit for the question's category, unless it's a
+// typo of a member (play's audit would call it a near-typo, not a gap) or holds no letter or digit at all. As play's
+// misses (the database's check on what was typed, `missed_answer_typed_length`), typed text over 40 characters is
+// refused first (M02 ticket, Numbers; docs/milestones/M14-14b-11c-test-misses-to-audit.md, Numbers).
+async function reportTestMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, lookup: Lookup, index: number, typed: string): Promise<void> {
+  if (typed.length > 40) throw new AppError("text_invalid", 400);
+  const text = normalize(typed);
+  if (!text || (await isNearTypo(lookup, index, typed))) return;
+  await db.query("select private.report_test_miss($1, $2, $3)", [userId, puzzle.questions[index], text]);
 }

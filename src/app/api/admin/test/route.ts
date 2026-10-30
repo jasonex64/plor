@@ -31,7 +31,7 @@ export const POST = handle(async (request) => {
     if (rows.length === 0) throw new AppError("no_puzzle", 404);
     const puzzle = rows[0].content;
     if (moves.texts.length > puzzle.questions.length) throw new AppError("bad_request", 400, "texts");
-    return Response.json({ ok: true, ...(await testRun(db, puzzle, dayLookup(db, puzzle), moves)) });
+    return Response.json({ ok: true, ...(await testRun(db, userId, puzzle, dayLookup(db, puzzle), moves)) });
   }
   const draft = readDrafts().get(date);
   if (!draft) throw new AppError("no_draft", 404);
@@ -41,5 +41,5 @@ export const POST = handle(async (request) => {
   const problems = await draftProblems(db, date, puzzle);
   const result = problems.length ? { problems } : await buildPuzzle(db, userId, puzzle);
   if ("problems" in result) return Response.json({ ok: false, error: "puzzle_invalid", problems: result.problems }, { status: 422 });
-  return Response.json({ ok: true, ...(await testRun(db, result.built, draftLookup(db, userId, result.built), moves)) });
+  return Response.json({ ok: true, ...(await testRun(db, userId, result.built, draftLookup(db, userId, result.built), moves)) });
 });
