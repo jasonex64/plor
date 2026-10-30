@@ -21,6 +21,14 @@
   grid-area: game;
 }
 
+/* A test run's label and Restart beside the way back (M14 14b-11), wrapping on a phone. */
+.testBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
 .cards {
   grid-area: cards;
   display: flex;

@@ -13,7 +13,6 @@ const puzzle: ApprovedPuzzle = {
   format: 3,
   game_id: "offbeat",
   date: "2026-10-26",
-  approved_at: "2026-10-25T00:00:00Z",
   questions: [
     question("Q1", animals, ["dog"], ["dog", "cat"]),
     question("Q2", animals, ["cat"], ["cat", "dog"]),

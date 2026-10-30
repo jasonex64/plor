@@ -294,7 +294,7 @@ type Question = Puzzle["questions"][number];
 // past days, as the provisional bonus sees them) of every member the host catches.
 async function catchRate(db: pg.Client, date: string, q: Question, hosts: string[]): Promise<number> {
   const question = { ...q, host_answers: hosts, root: "", member_of: null, members: (await membersOf(db, q.category)).size };
-  const counts = (await pooledCounts(db, { format: 3, game_id: GAME_ID, date, approved_at: "", questions: [question] }, false)).get(0);
+  const counts = (await pooledCounts(db, { format: 3, game_id: GAME_ID, date, questions: [question] }, false)).get(0);
   const caught = await caughtMembers(db, q.category, hosts);
   return caught.reduce((sum, id) => sum + (counts ? blendedShare(firstGuess(question, id), counts.byEntry.get(id) ?? 0, counts.answered) : firstGuess(question, id)), 0);
 }

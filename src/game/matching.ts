@@ -76,23 +76,30 @@ export function answersAmong(candidates: Candidate[]): number {
   return new Set(candidates.map((c) => find(`thing:${c.thing_id}`))).size;
 }
 
-async function candidates(db: Db, gameId: string, date: string, index: number, texts: string[]): Promise<Candidate[]> {
-  const { rows } = await db.query<Candidate>("select alias, thing_id::text, caught, ancestors::text[] from private.resolve_answer($1, $2::date, $3, $4)", [
-    gameId,
-    date,
-    index,
-    texts,
-  ]);
-  return rows;
+// Where a question's members are looked up for some texts: a published day's through private.resolve_answer, or a
+// draft's, which a test run plays as if approved now, through private.resolve_draft_answer, admins only
+// (docs/milestones/M14-14b-11-test-runs.md). Both share one matching in SQL, private.resolve_in.
+export type Lookup = (index: number, texts: string[]) => Promise<Candidate[]>;
+
+const COLUMNS = "alias, thing_id::text, caught, ancestors::text[]";
+
+export function dayLookup(db: Db, puzzle: ApprovedPuzzle): Lookup {
+  return async (index, texts) =>
+    (await db.query<Candidate>(`select ${COLUMNS} from private.resolve_answer($1, $2::date, $3, $4)`, [puzzle.game_id, puzzle.date, index, texts])).rows;
+}
+
+export function draftLookup(db: Db, userId: string, puzzle: ApprovedPuzzle): Lookup {
+  return async (index, texts) =>
+    (await db.query<Candidate>(`select ${COLUMNS} from private.resolve_draft_answer($1, $2, $3)`, [userId, puzzle.questions[index], texts])).rows;
 }
 
 // Whether text that named no answer is within a typo of a member of the question's category, whatever its length and
 // past any stolen letter. Such a miss is a typo, never a new answer: it waits in the audit (M13 13b; human, 2026-10-24:
 // "Audit only (Recommended)").
-export async function isNearTypo(db: Db, puzzle: ApprovedPuzzle, index: number, typed: string): Promise<boolean> {
+export async function isNearTypo(lookup: Lookup, index: number, typed: string): Promise<boolean> {
   const query = normalize(typed);
   if (!query) return false;
-  return (await candidates(db, puzzle.game_id, puzzle.date, index, withinTypo(query))).length > 0;
+  return (await lookup(index, withinTypo(query))).length > 0;
 }
 
 // The answer the typed text names, or null when it names none ("not in our list, try again"). The caller has
@@ -101,13 +108,13 @@ export async function isNearTypo(db: Db, puzzle: ApprovedPuzzle, index: number, 
 // Next revision, M13), only onto a name
 // that avoids every stolen letter (G12: "hors" is not horse once E is gone), and only when exactly one answer is that
 // close (answersAmong): when two are, the server would be guessing which one the player meant.
-export async function resolveTyped(db: Db, puzzle: ApprovedPuzzle, index: number, typed: string, stolen: string[]): Promise<Resolved | null> {
+export async function resolveTyped(lookup: Lookup, puzzle: ApprovedPuzzle, index: number, typed: string, stolen: string[]): Promise<Resolved | null> {
   const query = normalize(typed);
   if (!query) return null;
   const levels = puzzle.questions[index].levels;
-  const exact = await candidates(db, puzzle.game_id, puzzle.date, index, [query]);
+  const exact = await lookup(index, [query]);
   if (exact.length) return pickAnswer(exact, levels);
   if (query.replace(/[^\p{L}]/gu, "").length < TYPO_MIN_LETTERS) return null;
-  const near = (await candidates(db, puzzle.game_id, puzzle.date, index, withinTypo(query))).filter((c) => avoids(c.alias, stolen));
+  const near = (await lookup(index, withinTypo(query))).filter((c) => avoids(c.alias, stolen));
   return answersAmong(near) === 1 ? pickAnswer(near, levels) : null;
 }

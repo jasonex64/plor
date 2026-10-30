@@ -1,6 +1,6 @@
 # M14 14b-9 — The Insights chart's axis fits its chart
 
-**Status:** approved (human, 2026-10-29: "Draft a ticket for the Insights chart axis bug (P1) and fix it now; put the rest in ROADMAP For M14"); in review (PR #136).
+**Status:** approved (human, 2026-10-29: "Draft a ticket for the Insights chart axis bug (P1) and fix it now; put the rest in ROADMAP For M14"); done (PR #136, merged 2026-10-29 on green CI).
 
 ## Goal
 The Insights chart's axis shows at most six labels, each at the height of the rate it names, so the bars can be read against it on any day.

@@ -18,6 +18,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
   type FormEvent,
   type ReactNode,
@@ -41,7 +42,7 @@ import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
-import { OffbeatScreen } from "./offbeat";
+import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
 import { PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
@@ -274,6 +275,28 @@ function BackTo({ href, children }: { href: string; children: ReactNode }) {
       </ButtonLink>
     </p>
   );
+}
+
+// A test run (docs/milestones/M14-14b-11-test-runs.md) of a date: a draft's when hosts holds the host answers its page
+// showed, as JSON (Play test on the admin puzzles page writes it), otherwise the approved day. The route checks the
+// admin, so a player who isn't one gets its refusal and no game.
+export function TestTab({ date, hosts }: { date: string; hosts: string | null }) {
+  // Parsed once per link, so the run isn't sent again on each render.
+  const hostAnswers = useMemo(() => (hosts === null ? null : hostLists(hosts)), [hosts]);
+  if (hostAnswers === undefined) return <p role="alert">This link&apos;s host answers can&apos;t be read. Open Play test from the puzzles page again.</p>;
+  return <TestScreen date={date} hostAnswers={hostAnswers} />;
+}
+
+// The link's host answers, one list of IDs per question, or undefined when it holds something else (a link typed or
+// cut short: user input). The route checks them against the draft.
+function hostLists(text: string): string[][] | undefined {
+  try {
+    const value: unknown = JSON.parse(text);
+    return Array.isArray(value) && value.every((l) => Array.isArray(l) && l.every((id) => typeof id === "string")) ? value : undefined;
+  } catch (err) {
+    if (err instanceof SyntaxError) return undefined;
+    throw err;
+  }
 }
 
 export function StreakTab() {

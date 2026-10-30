@@ -186,8 +186,9 @@ export async function removeTestBase(db: Querier, ids: string, keys: string, sna
 // The fixture's own rows: every source ID and category key starts with "fixture_".
 export const removeFixtureBase = (db: Querier) => removeTestBase(db, "fixture\\_%", "fixture\\_%", "fixture");
 
-// The fixture day for a date, as private.approve_puzzle would store it, approved as of approvedAt.
-export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle {
+// The fixture day for a date, as private.approve_puzzle would store it, approved as of approvedAt (approved_at, which
+// only SQL reads: src/content/puzzle.ts).
+export function fixtureDay(date: string, approvedAt: string): ApprovedPuzzle & { approved_at: string } {
   return {
     format: 3,
     game_id: "offbeat",

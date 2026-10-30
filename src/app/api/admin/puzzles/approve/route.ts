@@ -2,10 +2,9 @@ import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { isAdmin } from "@/insights/queries";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
-import { checkHostNames, checkPuzzle, isCalendarDate } from "@/content/puzzle";
-import { thingNames } from "@/game/payload";
+import { isCalendarDate } from "@/content/puzzle";
 import { withHostAnswers } from "@/admin/puzzle-entry";
-import { approvePuzzle, readDrafts } from "@/admin/puzzles";
+import { approvePuzzle, draftProblems, isHostAnswerLists, readDrafts } from "@/admin/puzzles";
 
 // Approves a drafted day with the host answers the admin chose (docs/milestones/M06-puzzle-entry.md). The result is
 // checked by the same content rules as a file, then the host answers' names against the stolen letters, then against
@@ -23,14 +22,9 @@ export const POST = handle(async (request) => {
   if (!isHostAnswerLists(hostAnswers, draft.questions.length)) throw new AppError("bad_request", 400, "hostAnswers");
   const puzzle = withHostAnswers(draft, hostAnswers);
   const db = getPool();
-  const shape = checkPuzzle(date, puzzle);
-  const problems = shape.length ? shape : checkHostNames(date, puzzle, await thingNames(db, puzzle.questions.flatMap((q) => q.host_answers)));
+  const problems = await draftProblems(db, date, puzzle);
   const found = problems.length ? problems : await approvePuzzle(db, userId, puzzle);
   if (found.length) return Response.json({ ok: false, error: "puzzle_invalid", problems: found }, { status: 422 });
   return Response.json({ ok: true });
 });
 
-// One list of entry IDs per question.
-function isHostAnswerLists(v: unknown, questions: number): v is string[][] {
-  return Array.isArray(v) && v.length === questions && v.every((l) => Array.isArray(l) && l.every((id) => typeof id === "string"));
-}

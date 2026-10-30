@@ -59,3 +59,9 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 - **From 1200px:** a 360px right column (`src/app/side-column.tsx:14`, `src/app/side-column.module.css:10`, `globals.css:245-248`).
 - During a run, the clock bar is 48px with a 2px ink rule (`shell.module.css:243-257`), above the tab bar on phones and at the top from 768px (`globals.css:218-221`, `:237-241`).
 - Detail pages slide 60px over 200 ms, forward to the left and back to the right, and don't move under reduced motion (`globals.css:409-438`, `:487-494`).
+
+## Test runs (admin)
+- `/admin/test/<date>` is the game screen's run, drawn by the same component as play (`src/app/game.tsx:267`), on the game screen's grid (`src/app/offbeat.tsx:87-112`).
+- Above it, in the back link's row: a chip, "Test run: nothing is saved" or "Test run of the draft: nothing is saved", and a plain Restart button (`offbeat.tsx:96-99`), 16px apart and wrapping on a phone (`src/app/offbeat.module.css:25-30`).
+- The result has no Share button (`game.tsx:557`); after the run the game screen's cards show and the comments don't (`offbeat.tsx:105-109`).
+- On `/admin/puzzles`, each day has a Play test link beside Approve (`src/app/admin/puzzles/puzzles.tsx:172-174`), and above the day a date field, "Test an earlier day", up to today, with its own Play test (`puzzles.tsx:106-120`).

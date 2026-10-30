@@ -74,6 +74,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.audit_open_count(uuid) execute',
   -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
   'private.base_lookup(uuid,text) execute',
+  -- A test run builds a draft as approval would and resolves its answers, admins only, writing nothing (M14 14b-11).
+  'private.build_puzzle(uuid,jsonb) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
   'private.clear_auth_attempts(text,text) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
@@ -128,6 +130,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.record_miss(uuid,text,date,integer,text,text,boolean,boolean,integer,numeric) execute',
   -- A format-3 day's answers are resolved against the base, and named, through two guarded read-only functions (M13 13a-2).
   'private.resolve_answer(text,date,integer,text[]) execute',
+  'private.resolve_draft_answer(uuid,jsonb,text[]) execute',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',

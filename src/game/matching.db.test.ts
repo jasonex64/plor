@@ -7,10 +7,10 @@ import { getPool } from "@/lib/db";
 import { fixtureId } from "@/test/answer-fixture";
 import { useLocalStack } from "@/test/local-stack";
 import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
-import { resolveTyped } from "./matching";
+import { dayLookup, resolveTyped } from "./matching";
 
 let puzzle: ApprovedPuzzle;
-const resolve = (index: number, typed: string, stolen: string[] = []) => resolveTyped(getPool(), puzzle, index, typed, stolen);
+const resolve = (index: number, typed: string, stolen: string[] = []) => resolveTyped(dayLookup(getPool(), puzzle), puzzle, index, typed, stolen);
 const animal = (slug: string) => fixtureId(0, slug);
 
 beforeAll(async () => {
