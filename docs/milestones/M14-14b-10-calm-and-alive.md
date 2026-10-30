@@ -1,6 +1,6 @@
 # M14 14b-10 — Calm at rest, alive on touch
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions; 14b-10a in progress. PR #136 (14b-9) merged first. 14b-10a, the still look, then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
+**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions; 14b-10a paused (human, 2026-10-29, relayed by the "Repeatable test puzzle" session: "RIGHT NOW, AND PAUSE 10A'S WORK"), so an admin-only replayable test run of any day is built first; 10a's code so far is in a `git stash` in `C:/Users/jason/RIFF-m14`, "M14 14b-10a WIP (paused 2026-10-29) …" (`git stash list`), with `e2e/look.e2e.ts` still to update. PR #136 (14b-9) merged first. 14b-10a, the still look, then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
 
 ## Goal
 Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon hop, pops, count-ups).
@@ -36,20 +36,27 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 15. Tab icons: "Filled, a little colour (Recommended)" ("Chunky filled shapes with a dark outline and one soft colour each, like the flowers but simpler; the current tab's icon takes the accent").
 16. The split: "Two: kit, then motion (Recommended)" ("First the still look: shadows, 44px controls, round streak, type sizes, tints. Then the moving parts: hovers, the icon hop, pops, count-ups, the redrawn icons").
 
+**Before 14b-10a, after the approval (the code checked against answers 7, 10 and 11):**
+17. When something new counts as seen: "New since your last visit (Recommended)". Superseded by 19.
+18. The reaction chips under answer 7: "Leave them until the menu (Recommended)" ("The reaction chips stay as they are in 14b-10a; the ⋯ menu sub-ticket replaces them, with menu items at 44px").
+19. "Something new", after Claude rephrased it ("anything that appeared since your last visit to that page gets a light accent background for that visit … The next time you open the page, the highlight is gone"): "Drop it" ("No new highlights at all; the tint stays on your row, the game and your streak only").
+20. The streak and Me: "Pill accent, Me's 4 tiles soft" ("The streak pill takes the soft accent tint instead of green, and all four of Me's headline tiles take the soft tint").
+21. Today's game: "Nothing more" ("The banner and Play already stand out; the tint goes only to the other places").
+22. Which numbers are 40px: "Stat tiles and /streak (Recommended)" ("The numbers in stat tiles (Me's four, the game screen's three) and the big number on /streak. List rows (leaderboards, friends) keep their size").
+
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
 
 ## Design
 **14b-10a, the still look:**
 - **Shadows:** only buttons and links drawn as buttons keep theirs (answer 3). Cards, rows, chips, stat tiles, the sidebar's current item and the streak pill go flat. Cards keep the 2px ink border (answer 9).
-- **One control height:** every button, field and select is 44px tall, the kit's small and minor kinds included (answer 7). The small kind's and the minor kind's `min-height: 0` go.
+- **One control height:** every button, field and select is 44px tall, the kit's small and minor kinds included (answer 7). The small kind's and the minor kind's `min-height: 0` go. The reaction chips stay as they are until the ⋯ menu (answer 18).
 - **The streak pill:** fully round (answer 6).
-- **Type:** card headings 24px, key numbers 40px (answer 10). The key numbers are points, streak and rank. Page headings stay at 32px and body at 16px.
-- **Tints at rest,** in the theme's soft accent (answer 11):
+- **Type:** card headings 24px (answer 10); the numbers in stat tiles (Me's four, the game screen's three) and /streak's number 40px (answer 22). Page headings stay at 32px and body at 16px.
+- **Tints at rest,** in the theme's soft accent (answers 11, 19 to 21):
   - your own row on every board and friends list;
-  - Today's Play / Result area;
-  - the streak pill and Me's headline numbers;
-  - anything new since you last looked, remembered in this browser (answer 13).
+  - the streak pill, in place of its green (answer 20);
+  - Me's four headline tiles (answer 20).
 
 **14b-10b, the motion and icons:**
 - **Desktop tabs:** the soft tint on hover, and the icon hops once (answer 8).
@@ -65,7 +72,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 |---|---|---|
 | 44px | Every button, field and select | Answer 7; `docs/DESIGN.md` (buttons, `globals.css:367-380`) |
 | 2px ink border | Cards, flat | Answer 9; `kit.module.css:6-15` |
-| 32px, 24px, 40px, 16px | Page headings, card headings, key numbers, body | Answer 10 |
+| 32px, 24px, 40px, 16px | Page headings, card headings, stat tiles' and /streak's numbers, body | Answers 10, 22 |
 | Fully round | The streak pill | Answer 6 |
 | The theme's `--soft` | Tints at rest and on hover | Answers 8, 11 (`globals.css`, each theme) |
 | 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:409-438`) |
@@ -73,17 +80,15 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 | 90% | A pop's starting size | Answer 14 |
 | 600ms at most | A count-up | Answer 14 |
 | **Open** | How high the icon hops; the motion's easing | Ask before 14b-10b |
-| **Open** | When a new thing counts as seen (shown on screen, or the page visited) | Ask before 14b-10a's tints |
 
 ## Acceptance criteria
 - [ ] **14b-10a:**
   - Only buttons and button links have a box shadow, on every page in each theme (an e2e reads computed styles, as `e2e/look.e2e.ts` does).
-  - Every visible button, field and select is at least 44px tall at 390px and 1440px.
+  - Every visible button, field and select, but the reaction chips, is at least 44px tall at 390px and 1440px.
   - The group name's box and Rename line up, top and bottom.
   - The streak pill is fully round beside the round avatar.
-  - Card headings are 24px and the key numbers 40px.
-  - The four tints show.
-  - Something new loses its tint once seen, and stays untinted after a reload in the same browser.
+  - Card headings are 24px; the stat tiles' and /streak's numbers 40px.
+  - Your row on a board and in the friends list, the streak pill and Me's four headline tiles take the soft tint.
 - [ ] **14b-10b:**
   - A hovered desktop tab takes the tint and its icon moves once.
   - A hovered button lifts 2px; nothing moves under reduced motion.
@@ -100,7 +105,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 - The audit's other For M14 items unless this work closes them: the controls-under-44px items and the cards-inside-cards item close with 14b-10a; the 404, long lines and px font sizes stay.
 
 ## Plan
-1. After PR #136 is resolved: 14b-10a on `m14-look-and-feel`. Steps: kit variables and `kit.module.css` first, then each page's overrides, then the tints and the seen record, then the e2e. Ask the open "seen" question first.
+1. After PR #136 is resolved: 14b-10a on `m14-look-and-feel`. Steps: kit variables and `kit.module.css` first, then each page's overrides, then the tints, then the e2e.
 2. 14b-10b: ask the open motion numbers. Draw the tab icons and show them to the human, then the hovers, pops and count-ups, then the e2e.
 3. After 14b-10b: an Impeccable audit, compared with 2026-10-29's.
 
