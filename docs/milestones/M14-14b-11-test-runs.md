@@ -1,6 +1,6 @@
 # M14 14b-11 — Test runs
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; in review (PR #137, waiting for CI and the human's word to merge). Then 14b-10a resumes from its stash. Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
+**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; done (PR #137, merged 2026-10-30; migration pushed to plor.app the same day: `test db --linked` 32 files, 520 PASS). 14b-11b, the countdown fix, in review (PR #138). Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
 
 ## Goal
 An admin can play any day, past, today, upcoming or still a draft, on the real game screen as often as they like, and nothing is saved.
@@ -133,3 +133,20 @@ The `reviewer` agent, in a fresh context, 2026-10-29.
   - `build_puzzle` not declared `stable`;
   - "Test an earlier day" offering today.
 - **Handled here:** the timer's Source diff row, the untested `survived` status (now reached by Evidence 1) and the ticket's end sections.
+
+## 14b-11b, the countdown fix (2026-10-30)
+The human, testing a draft locally (2026-10-30): "if i type something that isn't in the answer bank, it resets timer". How it lands: "Its own PR now (Recommended)", with 14b-10a stashed meanwhile.
+
+- **Cause:** `useCountdown` (`src/app/countdown.ts`) listed `onZero` among its effect's dependencies. TestGame passes a new time-up function on each render, and a refused answer re-renders, so the count started again from the full 20 seconds. Play passes a stable one, so it wasn't affected.
+- **Fix:** `onZero` is read through `useEffectEvent`, so only a new time left restarts the count. That covers every caller.
+- **Removes:** `onZero` from the effect's dependencies.
+- **Hypothesis:** the new e2e fails before the fix, with the timer back at 20, and passes after it. Confirmed:
+  - `npx playwright test e2e/test-run.e2e.ts -g "keeps the countdown going"` before the fix: `Expected: <= 15`, `Received: 20`, `1 failed`.
+  - After the fix, `npx playwright test e2e/test-run.e2e.ts`: `3 passed (16.2s)`.
+  - The countdown's other users, `npx playwright test e2e/shell.e2e.ts e2e/offbeat.e2e.ts e2e/today.e2e.ts e2e/player-screens.e2e.ts`: `26 passed (2.8m)`.
+- **Also decided in the same rounds**, each its own sub-ticket, drafted next:
+  - A test run's refused answers go to the Audit page, marked as from a test run ("Yes, to the Audit page (Recommended)").
+  - Players browse a finished day's full answer lists ("Players, after the day ends").
+- **Review** (the `reviewer` agent, 2026-10-30):
+  - Blocking: HANDOFF's "Updated" line and the 14b-10a and 14b-11 entries still described the state before #137 merged. Fixed.
+  - Deferred to ROADMAP For M14 ("Found in 14b-11b's review"): `useRun`'s now-stale comment on `load`, the e2e's single read of the timer, and the M14 row's "its code" wording.
