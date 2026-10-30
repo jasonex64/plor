@@ -1,6 +1,6 @@
 # M14 14b-12 — Search a question's answers after your run
 
-**Status:** approved (human, 2026-10-30: "Approve 14b-11c and 14b-12 as drafted, including their security changes (report_test_miss and search_answers, which plor_app may execute). Build 14b-11c first."); planned, after 14b-11c. Built after 14b-11c, before 14b-10a (human, 2026-10-30: "Both test-run tickets first").
+**Status:** approved (human, 2026-10-30: "Approve 14b-11c and 14b-12 as drafted, including their security changes (report_test_miss and search_answers, which plor_app may execute). Build 14b-11c first."); in review (PR #140, waiting for CI and the human's word to merge). Built after 14b-11c, before 14b-10a (human, 2026-10-30: "Both test-run tickets first").
 
 ## Goal
 Once a player's own run is over, each question on their result card has a small search box over every answer that question accepted. Each match shows how common it was and, from 5 players up, how many players gave it.
@@ -33,11 +33,11 @@ Once a player's own run is over, each question on their result card has a small 
 - No table, table-grant, RLS or role changes.
 
 ## Acceptance criteria
-- [ ] A db test, as `plor_app`: a player whose run is in progress, or hasn't started, gets nothing. A finished player gets at most 10 matches for an answered question and is refused for one they didn't reach. After midnight every question opens to a player with no run, and stays shut to a player whose run is still going.
-- [ ] A db test: counts show from the 5th player of a question and not before, the tier comes from the day's levels, and a typed alias finds its thing.
-- [ ] A db test: the list holds exactly what `resolve_answer` accepts for the day (no member added after the day's fixed time).
-- [ ] An e2e: a finished player types in a question's box and sees matches with tiers; a player mid-run sees no box.
-- [ ] `docs/DESIGN.md` describes the box, cited to its file and line.
+- [x] A db test, as `plor_app`: a player whose run is in progress, or hasn't started, gets nothing. A finished player gets at most 10 matches for an answered question and is refused for one they didn't reach. After midnight every question opens to a player with no run, and stays shut to a player whose run is still going.
+- [x] A db test: counts show from the 5th player of a question and not before, the tier comes from the day's levels, and a typed alias finds its thing.
+- [x] A db test: the list holds exactly what `resolve_answer` accepts for the day (no member added after the day's fixed time).
+- [x] An e2e: a finished player types in a question's box and sees matches with tiers; a player mid-run sees no box.
+- [x] `docs/DESIGN.md` describes the box, cited to its file and line.
 
 ## Out of scope
 - Showing lists before a run is over, or for days not yet played.
@@ -64,9 +64,51 @@ Nothing is removed: no part of the game lists a question's answers today. The se
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket: `private.search_answers(p_user, p_game, p_date, p_index, p_text, p_limit)` | A seventh parameter, `p_min_players`, which the caller passes as `ANSWER_SHARE_MIN_PLAYERS` | The minimum stays in `tunables.ts`, its one home, as the result card's shares use it (DECISIONS.md, config) |
+| Ticket design: each match shows its main name | Its main name and, when another of its names matched, that name ("polar bear (ursus maritimus)") | The first build ordered by main name, so "s" listed "24-spot ladybird" first; the matched name explains each match and orders the list |
+| Ticket design: an empty box shows the 10 most given | An empty box lists only answers players gave, the most given first, so it can be shorter than 10, or say none matches | Listing every member to fill 10 would walk categories of 74,092 things on each opening |
+| Ticket design: reading members the way `private.resolve_in` does | Candidates come from the one downward walk (`descendants_now`) from the frozen root, and from every thing whose kind_of link ended after the day's fixed time, with names and acceptances valid then; each candidate is checked by `private.resolve_in` with all its matching names | The review found that candidates from the base as it is now could miss what the day accepted, and that checking one name per thing could drop a thing whose other name passes a letter question. A second, as-of downward walk would break "One tree-walk function" (DECISIONS.md, M13 13e-5) |
 
 ## Evidence
+Run on the Windows PC's local stack, 2026-10-30 (Pacific).
+
+**Hypothesis** (Plan step 1): the list equals what `resolve_answer` accepts. Checked as: every result is accepted by `resolve_in` (each one is), and nothing accepted is missing. The second half failed review twice (current-base candidates; one name per thing) and was fixed. It isn't compared name by name over a whole category; that's under ROADMAP For M14.
+
+1. **Who may search** (pgTAP `supabase/tests/answer_search.test.sql`, 15 tests): mid-run, not played, an unreached question, a day with no puzzle and mid-run on a past day all get OB013. After midnight a player who never played searches. The route test (`src/app/api/answers/route.db.test.ts`, `Tests  3 passed (3)`) adds 401 signed out, 403 `answers_closed` mid-run and for question 2, and 400 for a bad index.
+2. **Counts, tiers, names:** counts are hidden under 5 players and shown with a minimum of 1 (`as cat|as cat|common|1`). The tier comes from the day's levels. "hound" finds `as dog|as hound`. Contains-matches are found. The limit holds, and an empty box lists only answers given.
+3. **Only what the day accepted:** a member added a day after the fixed time isn't listed, and one whose link ended after it still is (the review's case).
+4. **The e2e:**
+   - `npx playwright test e2e/answer-search.e2e.ts e2e/offbeat.e2e.ts` → `6 passed (28.3s)`. A finished player finds "polar bear … rare" and "polar bear (ursus maritimus) rare" from the result card; a player mid-run has no Search answers. On yesterday's card, a player who didn't play yesterday finds polar bear.
+   - `offbeat.e2e.ts`'s yesterday row now reads "…The Wind: bearSearch answers", because the button is in the row.
+5. **`docs/DESIGN.md`:** "Answer search".
+
+**Speed** (realistic: the loaded base, a day per category, `	iming`; CLAUDE.md, Testing):
+
+| Search | Before the fixes | After |
+|---|---|---|
+| "a" in animal (56,169 members) | 0.9 s | 1.45 s |
+| "a" in `animal_w`, a letter subset of a 74,092-thing root | not measured | 1.38 s |
+| "a" in `endangered_animal`, a fact filter on the same root | 7.9 s (filter on every candidate) | 1.38 s |
+| "zz" in `endangered_animal` | not measured | 0.58 s |
+| "v" in `river_k` (40,923) | not measured | 0.63 s |
+| An empty box | 0.7 s | 2 ms |
+
+**The suites:**
+- `npm test`: `Tests  473 passed (473)`.
+- `npx supabase test db`: before the review fixes `Files=34, Tests=549`; after them `Files=34, Tests=551`, `Result: PASS`.
+- `npm run test:e2e`: `82 passed (8.8m)`, `1 failed`. The failure was `live-board.e2e.ts` "a friend's run shows up live", whose `getByText(/· too few players yet$/)` no longer matched, because the result row's sentence ran on into "Search answers". Fixed in the markup: the sentence is its own `<span>`, and the test is unchanged. Then `npx playwright test e2e/live-board.e2e.ts e2e/answer-search.e2e.ts e2e/offbeat.e2e.ts e2e/player-screens.e2e.ts` → `23 passed (2.8m)`.
+- The route tests after the fixes: `npx vitest run src/app/api/answers src/app/api/admin/test --no-file-parallelism` → `Tests  16 passed (16)`.
+- `npm run test:db`: `Test Files  44 passed (44)`, `Tests  297 passed (297)`.
+- `npx tsc --noEmit -p .` and eslint: clean.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent, 2026-10-30.
+- **Blocking findings and how each was fixed** (Source diff and Evidence):
+  - Candidates from the current base could miss what the day accepted. Fixed: candidates come from the base as of the day's fixed time.
+  - One name per thing was checked. Fixed: all of its matching names are checked.
+  - The cost wasn't bounded on narrow questions. Fixed: the letter is applied to the names, and the filter runs inside the loop. Measured above.
+- **Deferred to ROADMAP "Next revision"** (For M14, "Found in 14b-12's review"):
+  - a negative index and the format and `approved_at` checks in the function;
+  - an out-of-range index answering 500;
+  - a request per keystroke and the list key;
+  - the db test's one-question day, and no full-list comparison.

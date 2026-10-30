@@ -22,6 +22,7 @@ import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { FORWARD } from "./slide";
 import { givenText } from "./given";
+import { AnswerSearch } from "./answer-search";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
@@ -188,7 +189,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     answer: async (text) => (await send("/api/run/answer", { index: run!.question!.index, text }))?.notInList ?? false,
     timeUp: load,
   };
-  return <Run runner={runner} onPlaying={onPlaying} share />;
+  return <Run runner={runner} onPlaying={onPlaying} saved />;
 }
 
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
@@ -259,12 +260,12 @@ export function TestGame({ date, hostAnswers, onPlaying }: { date: string; hostA
         </ul>
       </div>
     );
-  return <Run runner={runner} onPlaying={onPlaying} share={false} />;
+  return <Run runner={runner} onPlaying={onPlaying} saved={false} />;
 }
 
-// The game screen's run, whichever runner it comes from. share: the result's Share button, which a test run hasn't
-// (14b-11, answer 6).
-function Run({ runner, onPlaying, share }: { runner: Runner; onPlaying: (playing: boolean) => void; share: boolean }) {
+// The game screen's run, whichever runner it comes from. saved: a played run, whose result has Share and the answer
+// searches; a test run saves nothing, so it has neither (14b-11, answer 6; 14b-12, Out of scope).
+function Run({ runner, onPlaying, saved }: { runner: Runner; onPlaying: (playing: boolean) => void; saved: boolean }) {
   const { run, noPuzzle, error, busy, over } = runner;
   const playing = run?.status === "in_progress";
   useEffect(() => onPlaying(playing), [onPlaying, playing]);
@@ -304,7 +305,7 @@ function Run({ runner, onPlaying, share }: { runner: Runner; onPlaying: (playing
           onAnswer={runner.answer}
         />
       )}
-      {over && <Result run={run} share={share} />}
+      {over && <Result run={run} saved={saved} />}
       {error && <p role="alert">{error}</p>}
     </div>
   );
@@ -541,7 +542,7 @@ function Question({
 // The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14).
-function Result({ run, share }: { run: RunState; share: boolean }) {
+function Result({ run, saved }: { run: RunState; saved: boolean }) {
   const survived = survivedCount(run);
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -554,12 +555,17 @@ function Result({ run, share }: { run: RunState; share: boolean }) {
         You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
-      {share && <Share run={run} />}
+      {saved && <Share run={run} />}
       <ol className={kit.rows}>
         {run.answered.map((a) => (
           <li key={a.index} className={kit.row}>
-            {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
-            {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
+            <div className={kit.grow}>
+              <span>
+                {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
+                {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
+              </span>{" "}
+              {saved && <AnswerSearch date={run.date} index={a.index} prompt={a.prompt} />}
+            </div>
           </li>
         ))}
       </ol>

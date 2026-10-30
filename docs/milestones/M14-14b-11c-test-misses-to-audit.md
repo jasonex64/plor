@@ -1,6 +1,6 @@
 # M14 14b-11c — A test run's refused answers go to the Audit page
 
-**Status:** approved (human, 2026-10-30: "Approve 14b-11c and 14b-12 as drafted, including their security changes (report_test_miss and search_answers, which plor_app may execute). Build 14b-11c first."); in review (PR #139, waiting for CI and the human's word to merge). Built after 14b-11b merges, before 14b-12 and 14b-10a (human, 2026-10-30: "Both test-run tickets first").
+**Status:** approved (human, 2026-10-30: "Approve 14b-11c and 14b-12 as drafted, including their security changes (report_test_miss and search_answers, which plor_app may execute). Build 14b-11c first."); done (PR #139, merged 2026-10-30; its migration pushed to plor.app the same day, `test db --linked` 33 files, 536 PASS). Built after 14b-11b merges, before 14b-12 and 14b-10a (human, 2026-10-30: "Both test-run tickets first").
 
 ## Goal
 An answer refused in an admin's test run waits on the Audit page, marked as from a test run, where the admin accepts it for the category or dismisses it with the page's existing buttons.
