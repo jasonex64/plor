@@ -7,7 +7,7 @@ import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
 import { AppError } from "@/lib/http";
-import { isNearTypo, resolveTyped } from "./matching";
+import { dayLookup, isNearTypo, resolveTyped, type Lookup } from "./matching";
 import { isListed } from "./misses";
 import { dayCounts, pooledCounts } from "./ledger";
 import { hostAnswers, named, publicQuestion, thingNames, type Named, type Names, type PublicQuestion } from "./payload";
@@ -237,7 +237,7 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
-  const resolved = await resolveTyped(db, puzzle, index, typed, stolen);
+  const resolved = await resolveTyped(dayLookup(db, puzzle), puzzle, index, typed, stolen);
   if (!resolved) {
     try {
       await logMiss(db, userId, puzzle, index, typed);
@@ -327,7 +327,7 @@ async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: nu
       index,
       typed,
       text,
-      await isNearTypo(db, puzzle, index, typed),
+      await isNearTypo(dayLookup(db, puzzle), index, typed),
       isListed(text),
       MISS_ACCEPT_MIN_PLAYERS,
       MISS_ACCEPT_SHARE_PERCENT,
@@ -339,4 +339,61 @@ async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: nu
     throw err;
   }
   if (!logged) throw new AppError("not_current_question", 409);
+}
+
+// A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays any day, a draft too, and nothing is saved
+// (human, 2026-10-29, answer 2: "Nothing at all"). The browser holds the run and sends all of it each time: texts, the
+// ones that named answers so far, in order; open, whether the question after them has been opened with Start or Next;
+// timedOut, whether its time ran out in the browser; text, a new answer to it, if any. The server resolves every text
+// again with play's matching (answer 5) and returns play's state, so the game screen draws it unchanged (answer 3). A
+// text that names nothing is a free retry, as in play, but no miss is logged, so nothing learns from it.
+export type TestMoves = { texts: string[]; open: boolean; timedOut: boolean; text: string | null };
+
+export async function testRun(db: Db, puzzle: ApprovedPuzzle, lookup: Lookup, moves: TestMoves): Promise<{ run: RunState; notInList: boolean }> {
+  const total = puzzle.questions.length;
+  const stored: StoredEvent[] = [];
+  const resolve = async (index: number, typed: string) => {
+    // As in play: a stolen letter can't be typed in the answer box (G11).
+    const stolen = stolenLetters(puzzle, index);
+    if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+    return resolveTyped(lookup, puzzle, index, typed, stolen);
+  };
+  const over = () => stored.some((e) => e.matched) || stored.length === total;
+  for (const typed of moves.texts) {
+    if (over()) throw new AppError("bad_request", 400, "texts after the run's end");
+    const resolved = await resolve(stored.length, typed);
+    if (!resolved) throw new AppError("bad_request", 400, "a text that names no answer");
+    // inDay: a test run's answers count as given on their day, so its bonus reads as play's provisional one.
+    stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
+  }
+  const open = moves.open && !over();
+  let notInList = false;
+  if (moves.text !== null) {
+    if (!open || moves.timedOut) throw new AppError("not_open", 409);
+    const resolved = await resolve(stored.length, moves.text);
+    if (resolved) stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
+    else notInList = true;
+  }
+  const status: RunStatus = stored.some((e) => e.matched)
+    ? "died"
+    : stored.length === total
+      ? "survived"
+      : moves.timedOut
+        ? "timed_out"
+        : stored.length === 0 && !open
+          ? "not_started"
+          : "in_progress";
+  // The question in play is open only until it's answered: then the reveal waits for Next, which opens the next one.
+  const inPlay = status === "in_progress" && open && stored.length === moves.texts.length;
+  // A question's 20 seconds from the database's own rule (private.question_deadline), as if opened now: the browser
+  // counts them down, and keeps counting through a retry.
+  const { rows } = await db.query<{ ms_left: number; ms_to_reset: number }>(
+    `select floor(extract(epoch from private.question_deadline(statement_timestamp()) - statement_timestamp()) * 1000)::int as ms_left,
+            floor(extract(epoch from private.next_reset() - statement_timestamp()) * 1000)::int as ms_to_reset`,
+  );
+  const counts = FINISHED.includes(status) ? (await dayCounts(db, [puzzle.date])).get(puzzle.date)! : null;
+  const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
+  const pooled = await pooledCounts(db, puzzle, false);
+  const clock = { status, msLeft: inPlay ? rows[0].ms_left : null, msToReset: rows[0].ms_to_reset };
+  return { run: buildState(puzzle.date, puzzle, stored, clock, counts, pooled, names), notInList };
 }

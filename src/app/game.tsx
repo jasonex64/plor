@@ -14,7 +14,7 @@ import { FINISHED } from "@/game/status";
 import type { PublicQuestion } from "@/game/payload";
 import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
-import { api } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 import { capitalized, caughtText, gotPastText, timedOutText } from "@/game/words";
 import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus } from "./bonus";
@@ -138,6 +138,21 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   );
 }
 
+// What the game screen draws a run from, and what its controls do: play's routes (Game), or a test run that saves
+// nothing (TestGame; docs/milestones/M14-14b-11-test-runs.md). answer: whether the text named no answer, the free
+// retry.
+type Runner = {
+  run: RunState | null;
+  noPuzzle: NoPuzzle | null;
+  error: string | null;
+  busy: boolean;
+  over: boolean;
+  start: () => void;
+  next: () => void;
+  answer: (text: string) => Promise<boolean>;
+  timeUp: () => void;
+};
+
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
@@ -146,8 +161,6 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
 export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted: () => void; onPlaying: (playing: boolean) => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
-  const playing = run?.status === "in_progress";
-  useEffect(() => onPlaying(playing), [onPlaying, playing]);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
     setBusy(true);
@@ -164,6 +177,98 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     }
   }
 
+  const runner: Runner = {
+    run,
+    noPuzzle,
+    error,
+    busy,
+    over,
+    start: () => void send("/api/run/start").then((r) => r && onStarted()),
+    next: () => void send("/api/run/next"),
+    answer: async (text) => (await send("/api/run/answer", { index: run!.question!.index, text }))?.notInList ?? false,
+    timeUp: load,
+  };
+  return <Run runner={runner} onPlaying={onPlaying} share />;
+}
+
+// A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
+// (human, 2026-10-29, answer 2). The browser holds the run, the texts that named answers and whether the next question
+// is open, and sends all of it each time to POST /api/admin/test, which answers with play's state, so this is the same
+// screen (answer 3). hostAnswers: a draft's, as its page shows them (answer 9); null for an approved day. Restart
+// (answer 12) mounts it again. Its 20 seconds count down here alone: nothing is stored for the database to judge.
+type Moves = { texts: string[]; open: boolean; timedOut: boolean };
+const FRESH: Moves = { texts: [], open: false, timedOut: false };
+
+export function TestGame({ date, hostAnswers, onPlaying }: { date: string; hostAnswers: string[][] | null; onPlaying: (playing: boolean) => void }) {
+  const [run, setRun] = useState<RunState | null>(null);
+  const [moves, setMoves] = useState<Moves>(FRESH);
+  const [error, setError] = useState<string | null>(null);
+  // What approval would refuse in a draft, listed as approval lists it (answer 11).
+  const [problems, setProblems] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const body = useCallback((next: Moves, text: string | null) => ({ date, ...(hostAnswers && { hostAnswers }), ...next, text }), [date, hostAnswers]);
+  // The run before it starts, once each time this is mounted.
+  useEffect(() => {
+    api<AnswerResponse>("/api/admin/test", { method: "POST", body: body(FRESH, null) }).then(
+      (r) => setRun(r.run),
+      (err) => {
+        setError(errorText(err));
+        if (err instanceof ApiError) setProblems(err.problems);
+      },
+    );
+  }, [body]);
+
+  // Sends the run with these moves and, for an answer, its text. A free retry keeps the time left the browser was
+  // counting, so the countdown goes on through it, as in play.
+  async function send(next: Moves, text: string | null = null): Promise<AnswerResponse | null> {
+    setBusy(true);
+    setError(null);
+    try {
+      const response = await api<AnswerResponse>("/api/admin/test", { method: "POST", body: body(next, text) });
+      setRun((before) => (response.notInList && before ? { ...response.run, msLeft: before.msLeft } : response.run));
+      setMoves(text !== null && !response.notInList ? { texts: [...next.texts, text], open: false, timedOut: false } : next);
+      return response;
+    } catch (err) {
+      setError(errorText(err));
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const runner: Runner = {
+    run,
+    noPuzzle: null,
+    error,
+    busy,
+    over: run !== null && FINISHED.includes(run.status),
+    start: () => void send({ ...moves, open: true }),
+    next: () => void send({ ...moves, open: true }),
+    answer: async (text) => (await send(moves, text))?.notInList ?? false,
+    timeUp: () => void send({ ...moves, timedOut: true }),
+  };
+  if (problems.length)
+    return (
+      <div role="alert">
+        <p>{error}</p>
+        <ul>
+          {problems.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  return <Run runner={runner} onPlaying={onPlaying} share={false} />;
+}
+
+// The game screen's run, whichever runner it comes from. share: the result's Share button, which a test run hasn't
+// (14b-11, answer 6).
+function Run({ runner, onPlaying, share }: { runner: Runner; onPlaying: (playing: boolean) => void; share: boolean }) {
+  const { run, noPuzzle, error, busy, over } = runner;
+  const playing = run?.status === "in_progress";
+  useEffect(() => onPlaying(playing), [onPlaying, playing]);
+
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
@@ -178,7 +283,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
             stop you climb is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
-          <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={() => void send("/api/run/start").then((r) => r && onStarted())}>
+          <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
             Start
           </button>
           <ButtonLink href={`${GAME.path}/how-to-play`} transitionTypes={FORWARD}>
@@ -186,9 +291,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
           </ButtonLink>
         </>
       )}
-      {run.status === "in_progress" && run.next && (
-        <Reveal run={run} busy={busy} onNext={() => send("/api/run/next")} />
-      )}
+      {run.status === "in_progress" && run.next && <Reveal run={run} busy={busy} onNext={runner.next} />}
       {run.status === "in_progress" && run.question && (
         <Question
           key={run.question.index}
@@ -197,11 +300,11 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
           points={run.points}
           busy={busy}
           // Keyed by each state the server sends, so a retry restarts the count from the server's own time left.
-          clock={<Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={load} />}
-          onAnswer={async (text) => (await send("/api/run/answer", { index: run.question!.index, text }))?.notInList ?? false}
+          clock={<Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={runner.timeUp} />}
+          onAnswer={runner.answer}
         />
       )}
-      {over && <Result run={run} />}
+      {over && <Result run={run} share={share} />}
       {error && <p role="alert">{error}</p>}
     </div>
   );
@@ -438,7 +541,7 @@ function Question({
 // The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14).
-function Result({ run }: { run: RunState }) {
+function Result({ run, share }: { run: RunState; share: boolean }) {
   const survived = survivedCount(run);
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -451,7 +554,7 @@ function Result({ run }: { run: RunState }) {
         You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
-      <Share run={run} />
+      {share && <Share run={run} />}
       <ol className={kit.rows}>
         {run.answered.map((a) => (
           <li key={a.index} className={kit.row}>

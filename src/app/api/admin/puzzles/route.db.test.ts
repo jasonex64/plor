@@ -155,7 +155,7 @@ describe("approving a drafted day", () => {
     const response = await approveDay({ date: draftDate, hostAnswers });
     expect(response.status).toBe(200);
     approvedHere = true;
-    const stored = await getPool().query<{ content: ApprovedPuzzle }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, draftDate]);
+    const stored = await getPool().query<{ content: ApprovedPuzzle & { approved_at: string } }>("select content from private.puzzle where game_id = $1 and puzzle_date = $2::date", [GAME_ID, draftDate]);
     const content = stored.rows[0].content;
     expect(content.questions[0].host_answers).toEqual([other]);
     expect(content.questions[0].host_bank).toContain(other);

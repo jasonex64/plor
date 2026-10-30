@@ -23,15 +23,16 @@ export type Question = {
 };
 export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] };
 
-// What private.approve_puzzle stores: the moment answers are resolved as of, and per question the category's root
-// and member_of as approved, its member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md,
-// Puzzle content format).
+// A day as approval builds it (private.build_puzzle): per question the category's root and member_of as approved, its
+// member count, and a subset's filter as `where` (M13 13e-4a, A1; DECISIONS.md, Puzzle content format). The stored day
+// also holds approved_at, which only SQL reads, so it's left out here and a draft built for a test run is one too
+// (docs/milestones/M14-14b-11-test-runs.md).
 export type Where = { trait: string; values: string[]; via?: "country" } | { number: "population"; at_least: number } | { starts_with: string };
 // members is the category's member count at approval, the rare tier's size in the bonus's first guess (scoring.ts),
 // not the answers the day accepts, which are fixed at the day's start (13b review; 13f-4c; counting it at approval is
 // For M15, with the rare tier).
 export type ApprovedQuestion = Question & { root: string; member_of: string | null; members: number; where?: Where };
-export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[]; approved_at: string };
+export type ApprovedPuzzle = Omit<Puzzle, "questions"> & { questions: ApprovedQuestion[] };
 
 // The letters gone by question `index`: every letter stolen at it or before it.
 export function stolenLetters(puzzle: Pick<Puzzle, "questions">, index: number): string[] {

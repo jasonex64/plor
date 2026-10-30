@@ -11,7 +11,7 @@ import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
-import { resolveTyped } from "./matching";
+import { dayLookup, resolveTyped } from "./matching";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -91,8 +91,8 @@ describe("three players typing the same misses for a category", () => {
 
   it("makes the new word an answer from tomorrow, not today", async () => {
     const { thing_id } = await review(NEW.toLowerCase());
-    expect(await resolveTyped(getPool(), today, 0, NEW, [])).toBeNull();
-    expect(await resolveTyped(getPool(), tomorrow, 0, NEW, [])).toEqual({ thingId: thing_id, caught: false });
+    expect(await resolveTyped(dayLookup(getPool(), today), today, 0, NEW, [])).toBeNull();
+    expect(await resolveTyped(dayLookup(getPool(), tomorrow), tomorrow, 0, NEW, [])).toEqual({ thingId: thing_id, caught: false });
   });
 });
 

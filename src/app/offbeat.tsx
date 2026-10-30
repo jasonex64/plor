@@ -12,7 +12,7 @@ import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
-import { Game, useStartRun } from "./game";
+import { Game, TestGame, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
@@ -75,6 +75,37 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
             <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
           </SideColumn>
         </>
+      )}
+    </div>
+  );
+}
+
+// A test run's screen (docs/milestones/M14-14b-11-test-runs.md): the game screen as players see it (human, 2026-10-29,
+// answer 3: "i need the real screen and animations so i can critique it"), under a "Test run" label and Restart, which
+// stay in view the whole run (answer 12). Back goes to the admin puzzles page, where Play test is. After the run the
+// cards come back as on the game screen; the comments don't (answer 6).
+export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: string[][] | null }) {
+  const [playing, setPlaying] = useState(false);
+  const [restarts, setRestarts] = useState(0);
+  return (
+    <div className={styles.screen}>
+      <div className={`${styles.back} ${styles.testBar}`}>
+        <ButtonLink href="/admin/puzzles" transitionTypes={BACK}>
+          <span aria-hidden="true">← </span>Puzzles
+        </ButtonLink>
+        <span className={kit.chip}>Test run{hostAnswers ? " of the draft" : ""}: nothing is saved</span>
+        <button type="button" onClick={() => setRestarts((n) => n + 1)}>
+          Restart
+        </button>
+      </div>
+      <section aria-label={`${GAME.name} test run`} className={styles.game}>
+        {/* Restart mounts the run again, from the rules (answer 12). */}
+        <TestGame key={restarts} date={date} hostAnswers={hostAnswers} onPlaying={setPlaying} />
+      </section>
+      {!playing && (
+        <div className={styles.cards}>
+          <OffbeatInfo />
+        </div>
       )}
     </div>
   );

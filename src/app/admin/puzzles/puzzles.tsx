@@ -5,12 +5,16 @@
 // (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4): the days as a row, the chosen day as a table whose host
 // answers are checkboxes drawn as chips, Approve at the top. A bank answer with a letter the Wind has stolen is dashed
 // with that letter struck, and can't be ticked; a host answer ticked before is in the danger colour with its problem,
-// and Approve waits until it's unticked (14b-2b-2b).
+// and Approve waits until it's unticked (14b-2b-2b). Play test plays the day on the game screen and saves nothing: a
+// draft with the host answers ticked here, saved or not; an earlier day by its date (docs/milestones/
+// M14-14b-11-test-runs.md, answers 1 and 9).
 import { useCallback, useEffect, useState } from "react";
 import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
+import { ButtonLink } from "../../button-link";
 import { errorText } from "../../messages";
+import { FORWARD } from "../../slide";
 import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
 import kit from "../../kit.module.css";
@@ -78,6 +82,7 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
           );
         })}
       </nav>
+      <EarlierDay today={data.today} />
       {emptyChosen ? (
         // Answer 29: how days get drafted, as the page says when it has none.
         <p>Nothing drafted for {dayText(empty)}. A Claude session drafts days from the question bank.</p>
@@ -94,6 +99,23 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
         />
       )}
     </>
+  );
+}
+
+// A test run of a day before today, which the list doesn't show (14b-11, answer 1: "any day").
+function EarlierDay({ today }: { today: string }) {
+  const [date, setDate] = useState("");
+  return (
+    <p className={styles.approve}>
+      <label>
+        Test an earlier day <input type="date" max={today} value={date} onChange={(e) => setDate(e.target.value)} />
+      </label>
+      {date && (
+        <ButtonLink href={`/admin/test/${date}`} transitionTypes={FORWARD}>
+          Play test
+        </ButtonLink>
+      )}
+    </p>
   );
 }
 
@@ -145,18 +167,24 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
             {editable ? `${state} Tick the host answers (the Wind's) you want. Dashed ones have a letter the Wind has stolen, so players can't type them.` : state}
           </p>
         </div>
-        {editable && (
-          <div className={styles.approve}>
-            <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
-              {day.live ? "Approve again" : "Approve day"}
-            </button>
-            {toFix > 0 && (
-              <span id="fix-first" className={styles.fixFirst}>
-                Fix {toFix} {toFix === 1 ? "question" : "questions"} first
-              </span>
-            )}
-          </div>
-        )}
+        <div className={styles.approve}>
+          {/* A draft is played with the host answers ticked now (answer 9); any other day, as players get it. */}
+          <ButtonLink href={editable ? `/admin/test/${day.date}?hosts=${encodeURIComponent(JSON.stringify(hosts))}` : `/admin/test/${day.date}`} transitionTypes={FORWARD}>
+            Play test
+          </ButtonLink>
+          {editable && (
+            <>
+              <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
+                {day.live ? "Approve again" : "Approve day"}
+              </button>
+              {toFix > 0 && (
+                <span id="fix-first" className={styles.fixFirst}>
+                  Fix {toFix} {toFix === 1 ? "question" : "questions"} first
+                </span>
+              )}
+            </>
+          )}
+        </div>
       </div>
       {note && <p role="status" className={styles.note}>{note}</p>}
       {general.length > 0 && (

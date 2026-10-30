@@ -1,6 +1,6 @@
 # M14 14b-11 — Test runs
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; in progress. Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
+**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; in review (PR #PR, waiting for CI and the human's word to merge). Then 14b-10a resumes from its stash. Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
 
 ## Goal
 An admin can play any day, past, today, upcoming or still a draft, on the real game screen as often as they like, and nothing is saved.
@@ -55,12 +55,12 @@ The ask: "is there a way we can just have a test puzzle i can play over and over
 Neither writes anything. No table, grant on a table, RLS or role changes. The test route checks the admin before reading any date or draft, as the approve route does.
 
 ## Acceptance criteria
-- [ ] A db test (as `plor_app`) runs a full test run of an approved day, today's and an upcoming one, and of a draft. It shows the row counts of `private.run`, `run_event`, `question_open`, `missed_answer`, `miss_review`, the points ledger, `thing_alias` and `category_extra` unchanged.
-- [ ] A db test: a non-admin calling either new function gets OB007, and the route returns 403 `admins_only` before reading the date.
-- [ ] A db test: a draft that approval refuses gets the same problem list from the test route, and approval itself still passes its existing tests (`approve_puzzle`'s pgTAP file unchanged and green).
-- [ ] A unit test: the same typed texts give the same matched results and host answers through the test route as through `answer` on an approved day.
-- [ ] An e2e (`e2e/test-run.e2e.ts`): an admin opens Play test on a draft with a changed host answer, plays to a catch, sees the result card with Share off, taps Restart, and plays again from question 1. A non-admin opening `/admin/test/<date>` sees no game.
-- [ ] `docs/DESIGN.md` describes the test-run page, each value cited to its file and line.
+- [x] A db test (as `plor_app`) runs a full test run of an approved day, today's and an upcoming one, and of a draft. It shows the row counts of `private.run`, `run_event`, `question_open`, `missed_answer`, `miss_review`, the points ledger, `thing_alias` and `category_extra` unchanged.
+- [x] A db test: a non-admin calling either new function gets OB007, and the route returns 403 `admins_only` before reading the date.
+- [x] A db test: a draft that approval refuses gets the same problem list from the test route, and approval itself still passes its existing tests (`approve_puzzle`'s pgTAP file unchanged and green).
+- [x] A db test (it needs the base; the ticket said unit): the same typed texts give the same matched results and host answers through the test route as through `answer` on an approved day.
+- [x] An e2e (`e2e/test-run.e2e.ts`): an admin opens Play test on a draft with a changed host answer, plays to a catch, sees the result card with Share off, taps Restart, and plays again from question 1. A non-admin opening `/admin/test/<date>` sees no game.
+- [x] `docs/DESIGN.md` describes the test-run page, each value cited to its file and line.
 
 ## Out of scope
 - Saving test runs or their history (answer 2).
@@ -82,9 +82,11 @@ No new numbers.
 4. Tests as in the criteria, `docs/DESIGN.md`, then the `reviewer`.
 
 ## Removes
-- `approve_puzzle`'s inline building of each question, moved into the shared builder.
-- `resolve_answer`'s inline matching, moved into the shared core.
-- Nothing else. The test run adds a path that has no duplicate.
+- `approve_puzzle`'s inline checks and building of each question, moved into `private.build_puzzle`.
+- `resolve_answer`'s inline matching, moved into `private.resolve_in`.
+- `approved_at` from the TypeScript `ApprovedPuzzle` type (`src/content/puzzle.ts`): no TypeScript read it; the two fixtures that write it to the database say so in their own types.
+- The approve route's own `isHostAnswerLists` and its inline content and host-name checks, and `approvePuzzle`'s inline OB009 parsing: moved into `src/admin/puzzles.ts` (`isHostAnswerLists`, `draftProblems`, `problemsOf`), which the approve and test routes share.
+- `candidates(db, game, date, …)` in `src/game/matching.ts`: replaced by a lookup (`dayLookup`, `draftLookup`) that `resolveTyped` and `isNearTypo` take, so a draft resolves through the same matching.
 
 ---
 *Fill in the sections below at the end.*
@@ -92,9 +94,42 @@ No new numbers.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| DECISIONS.md, Game 1: Timer: "The database is the judge … The client only displays the time left that the server measured" | A test run's 20 seconds (from `private.question_deadline`) count down in the browser, which says when they ran out | Nothing of a test run is stored for the database to judge (answer 2), and it's the admin's own test; the ticket's design and Out of scope said so, and the human approved it (2026-10-29) |
+| Ticket design: "the board come[s] from the day's real counts" | The result card's "given by" shares and the provisional bonus come from the day's real counts; the game screen's cards show after the run; no friends board | The game screen has no live board (`src/app/offbeat.tsx`, OffbeatScreen: the run, the cards and the comments), so the end screen has none to show; the ticket's "unverified" about reading it for other days is moot |
+| Ticket design: Play test on each day of the puzzles page | Also a "Test an earlier day" date field on that page | The page lists only today and later (`listDays`), and answer 1 is "any day" |
+| Ticket: a unit test compares the test route with play | A db test (`src/app/api/admin/test/route.db.test.ts`, "gives the same results as play") | Both paths read the answer base, so the comparison needs the local stack |
+| Ticket: "*unverified* that `private.ancestors_as_of` takes a future time" | Verified: an upcoming day resolves (pgTAP `test_runs.test.sql` test 10; the route and plor_app db tests) | — |
 
 ## Evidence
+Run on the Windows PC's local stack, 2026-10-29 (Pacific), on the uncommitted tree before the PR.
+
+**Hypotheses.** Step 1 expected every existing pgTAP and db test to pass unchanged after the split. They did, apart from `plor_app_role.test.sql`, whose exact grant list failed on the two new grants (test 15). That failure was expected: the approved security change adds them, so they joined the list. The plor_app test expected the role's existing grants to cover a finished test run. It passed the first time.
+
+1. **As plor_app, full runs and nothing written** (`src/game/runs.plor-app.db.test.ts`, "plays full test runs of today, an upcoming day and a draft, as an admin, and writes nothing"). All three climb all 7 stops to `survived`. A draft's host catches. All nine tables' counts are equal before and after. The route test (`route.db.test.ts`) and pgTAP (`test_runs.test.sql` test 9) compare the same counts as `postgres`.
+   `npx vitest run src/game/runs.plor-app.db.test.ts --no-file-parallelism` → `Test Files  1 passed (1)`, `Tests  3 passed (3)`.
+2. **Admins only.** pgTAP `test_runs.test.sql` tests 1 and 2: OB007 for a non-admin on `build_puzzle` and on `resolve_draft_answer`. `route.db.test.ts` "answers 403 admins_only … before reading the date" sends `date: "not a date"` and gets 403, not 400. `plor_app_role.test.sql` lists plor_app's exact grants.
+3. **A refused draft, and approval unchanged.** `route.db.test.ts` "refuses a draft approval would refuse": the test route's 422 body equals the approve route's. pgTAP test 7 gives the same OB009 message from `build_puzzle`. `puzzle_entry.test.sql` is unchanged and passes.
+4. **Same results as play.** `route.db.test.ts` "gives the same results as play for the same texts": the same answer, matched, host answers, points and bonus as the run routes' run.
+   `npx vitest run src/app/api/admin … --no-file-parallelism` (13 files with the matching and run tests) → `Test Files  13 passed (13)`, `Tests  101 passed (101)`.
+5. **The e2e** (`npx playwright test e2e/test-run.e2e.ts`): `ok 1 … an admin plays a draft as a test run, with a host answer changed on the page, and restarts it (8.0s)`, `ok 2 … a player who isn't an admin sees no game on a test run's page (2.4s)`, `2 passed`. The admin's run count is 0 after both runs.
+6. **`docs/DESIGN.md`**, "Test runs (admin)": each line cites its file and line, and the reviewer checked them.
+
+**The suites:**
+- `npm test`: `Test Files  47 passed (47)`, `Tests  473 passed (473)`.
+- `npx supabase test db`: `Files=32, Tests=520`, `Result: PASS`.
+- `npm run test:db`: `Test Files  43 passed (43)`, `Tests  292 passed (292)`. That run came before the plor_app test grew to full runs; that file passed again after (item 1).
+- `npm run test:e2e`: `77 passed (9.6m)`, `2 failed`. The two were `me.e2e.ts` "names carry an avatar slot…" (the Friends board's empty heading) and `shell.e2e.ts` "away from the game screen, a question in play shows its clock…" (the known flaky clock-bar test, ROADMAP For M14). Neither touches what changed here. `npx playwright test --last-failed` → `2 passed (19.6s)`.
+- `npx tsc --noEmit -p .` and `npm run lint`: clean.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+The `reviewer` agent, in a fresh context, 2026-10-29.
+- **Blocking findings and how each was fixed:**
+  - Criterion 1 wasn't met as written: the plor_app test played one answer and counted only `private.run`, so a missing grant on a finished run's reads would have passed. Fixed: it plays full runs of today, an upcoming day and a draft, and compares all nine counts (Evidence 1).
+- **Deferred to ROADMAP "Next revision"** (For M14, "Found in 14b-11's review"):
+  - a time-up and an answer can cross in the browser;
+  - the route's redundant `texts.length` checks;
+  - `hostLists` repeating `isHostAnswerLists`;
+  - a draft of an approved, played day showing that day's shares;
+  - `build_puzzle` not declared `stable`;
+  - "Test an earlier day" offering today.
+- **Handled here:** the timer's Source diff row, the untested `survived` status (now reached by Evidence 1) and the ticket's end sections.

@@ -4,7 +4,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DatabaseError } from "pg";
-import { avoids, checkPuzzleFile, parsePuzzle, stolenLetters, type Puzzle } from "@/content/puzzle";
+import { avoids, checkHostNames, checkPuzzle, checkPuzzleFile, parsePuzzle, stolenLetters, type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { thingNames, type Names } from "@/game/payload";
 import type { Db } from "@/lib/db";
@@ -103,9 +103,35 @@ export async function approvePuzzle(db: Db, userId: string, puzzle: Puzzle): Pro
     await db.query("select private.approve_puzzle($1, $2)", [userId, puzzle]);
     return [];
   } catch (err) {
-    if (err instanceof DatabaseError && err.code === "OB009") {
-      return (JSON.parse(err.detail!) as string[]).map((p) => p.replace(/^question (\d+):/, `${puzzle.date} q$1:`));
-    }
-    return guarded(err);
+    return problemsOf(err, puzzle.date);
   }
+}
+
+// A drafted day as approval would store it now, without storing it, for a test run; or approval's own problems with
+// it (docs/milestones/M14-14b-11-test-runs.md, answers 10 and 11).
+export async function buildPuzzle(db: Db, userId: string, puzzle: Puzzle): Promise<{ built: ApprovedPuzzle } | { problems: string[] }> {
+  try {
+    return { built: (await db.query<{ built: ApprovedPuzzle }>("select private.build_puzzle($1, $2) as built", [userId, puzzle])).rows[0].built };
+  } catch (err) {
+    return { problems: problemsOf(err, puzzle.date) };
+  }
+}
+
+function problemsOf(err: unknown, date: string): string[] {
+  if (err instanceof DatabaseError && err.code === "OB009") {
+    return (JSON.parse(err.detail!) as string[]).map((p) => p.replace(/^question (\d+):/, `${date} q$1:`));
+  }
+  return guarded(err);
+}
+
+// A drafted day with the admin's host answers, checked before the database's checks: by the same content rules as a
+// file, then the host answers' names against the stolen letters (the approve route's checks, and a test run's).
+export async function draftProblems(db: Db, date: string, puzzle: Puzzle): Promise<string[]> {
+  const shape = checkPuzzle(date, puzzle);
+  return shape.length ? shape : checkHostNames(date, puzzle, await thingNames(db, puzzle.questions.flatMap((q) => q.host_answers)));
+}
+
+// One list of entry IDs per question.
+export function isHostAnswerLists(v: unknown, questions: number): v is string[][] {
+  return Array.isArray(v) && v.length === questions && v.every((l) => Array.isArray(l) && l.every((id) => typeof id === "string"));
 }
