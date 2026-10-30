@@ -13,6 +13,7 @@ import { ApiError, api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
+import kit from "../../kit.module.css";
 import styles from "./puzzles.module.css";
 import { Line, Skeleton } from "../../skeleton";
 import { tomorrowOf } from "../tomorrow";
@@ -25,9 +26,9 @@ type DaysResponse = { today: string; days: DayView[] };
 const SHOWN = 5;
 
 function stateOf(day: DayView): { label: string; tone: string } {
-  if (day.started) return { label: "Live", tone: admin.state };
-  if (day.live) return { label: "Approved", tone: admin.state };
-  return { label: "Draft", tone: admin.decide };
+  if (day.started) return { label: "Live", tone: kit.chip };
+  if (day.live) return { label: "Approved", tone: kit.chip };
+  return { label: "Draft", tone: `${kit.chip} ${admin.decide}` };
 }
 
 export function Puzzles({ onChanged }: { onChanged: () => void }) {
@@ -68,11 +69,11 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
       <nav aria-label="Days" className={styles.days}>
         {slots.map((d) => {
           const picked = typeof d === "string" ? emptyChosen : d === day && !emptyChosen;
-          const { label, tone } = typeof d === "string" ? { label: "Not drafted", tone: admin.danger } : stateOf(d);
+          const { label, tone } = typeof d === "string" ? { label: "Not drafted", tone: `${kit.chip} ${kit.danger}` } : stateOf(d);
           return (
-            <button key={dateOf(d)} type="button" className={picked ? `${styles.day} ${styles.chosen}` : styles.day} aria-pressed={picked} onClick={() => setChosen(dateOf(d))}>
+            <button key={dateOf(d)} type="button" className={picked ? `${kit.small} ${styles.day} ${styles.chosen}` : `${kit.small} ${styles.day}`} aria-pressed={picked} onClick={() => setChosen(dateOf(d))}>
               <span>{dayText(dateOf(d))}</span>
-              <span className={`${admin.tag} ${tone}`}>{label}</span>
+              <span className={tone}>{label}</span>
             </button>
           );
         })}
@@ -134,7 +135,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   const state = day.started ? "Live: players have started it." : day.live ? "Approved." : "Draft, waiting for approval.";
 
   return (
-    <section aria-label={dayText(day.date)} className={admin.card}>
+    <section aria-label={dayText(day.date)} className={kit.card}>
       <div className={styles.dayHead}>
         <div>
           <h3 className={admin.cardTitle}>
@@ -146,7 +147,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
         </div>
         {editable && (
           <div className={styles.approve}>
-            <button type="button" className={admin.primary} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
+            <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || toFix > 0} aria-describedby={toFix > 0 ? "fix-first" : undefined} onClick={approve}>
               {day.live ? "Approve again" : "Approve day"}
             </button>
             {toFix > 0 && (
@@ -183,7 +184,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
                 <br />
                 <span className={admin.muted}>any {q.category.replaceAll("_", " ")}</span>
               </td>
-              <td role="cell" data-label="Steals">{q.steals ? <span className={`${admin.tag} ${admin.state}`}>−{q.steals.toUpperCase()}</span> : <span className={admin.muted}>—</span>}</td>
+              <td role="cell" data-label="Steals">{q.steals ? <span className={kit.chip}>−{q.steals.toUpperCase()}</span> : <span className={admin.muted}>—</span>}</td>
               <td role="cell" data-label="Host answers">
                 {editable ? (
                   <HostChips q={q} chosen={hosts[i]} onChange={(next) => setHosts(hosts.map((h, j) => (j === i ? next : h)))} />
@@ -238,7 +239,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         // and it's drawn as one: in the danger colour while ticked, dashed and muted once unticked.
         if (a.name === null) {
           return (
-            <label key={a.id} className={on ? `${styles.chip} ${styles.bad}` : `${styles.chip} ${styles.blocked}`}>
+            <label key={a.id} className={on ? `${kit.chip} ${styles.chip} ${styles.bad}` : `${kit.chip} ${styles.chip} ${styles.blocked}`}>
               <input
                 type="checkbox"
                 className="sr-only"
@@ -257,7 +258,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
         // either way, unavailable once unticked, so unticking keeps the keyboard's focus on it (item 53).
         if (a.stolen) {
           return (
-            <label key={a.id} className={on ? `${styles.chip} ${styles.bad}` : `${styles.chip} ${styles.blocked}`}>
+            <label key={a.id} className={on ? `${kit.chip} ${styles.chip} ${styles.bad}` : `${kit.chip} ${styles.chip} ${styles.blocked}`}>
               <input
                 type="checkbox"
                 className="sr-only"
@@ -273,7 +274,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
           );
         }
         return (
-          <label key={a.id} className={on ? `${styles.chip} ${styles.checked}` : styles.chip}>
+          <label key={a.id} className={on ? `${kit.chip} ${styles.chip} ${styles.checked}` : `${kit.chip} ${styles.chip}`}>
             <input type="checkbox" className="sr-only" checked={on} onChange={() => onChange(on ? chosen.filter((id) => id !== a.id) : [...chosen, a.id])} />
             {on && (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -286,7 +287,7 @@ function HostChips({ q, chosen, onChange }: { q: QuestionView; chosen: string[];
       })}
       {/* Only when the bank holds more than the first chips, so "Show fewer" always has something to hide. */}
       {order.length > first && (
-        <button type="button" className={`${styles.chip} ${styles.more}`} onClick={() => setAll(!all)}>
+        <button type="button" className={`${kit.link} ${styles.chip} ${styles.more}`} onClick={() => setAll(!all)}>
           {all ? "Show fewer" : `+${more} more`}
         </button>
       )}

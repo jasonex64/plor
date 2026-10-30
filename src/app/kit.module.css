@@ -186,8 +186,9 @@ button.link:active:not(:disabled) {
   box-shadow: none;
 }
 
-/* A warning drawn as a button: the admin's "Tomorrow has no puzzle" (M14 14b-6f), in the danger colour. */
-:is(button, a).danger {
+/* A warning drawn as a button or a chip, in the danger colour: the admin's "Tomorrow has no puzzle" (M14 14b-6f), its
+   "Not drafted" day and its last steps before deleting (14b-8d). */
+:is(button, a, span).danger {
   border-color: var(--danger);
   color: var(--danger);
 }

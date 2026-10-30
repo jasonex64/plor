@@ -2,7 +2,7 @@
 // on real elements. 14b-8a: buttons, links drawn as buttons and fields take the ink border, corners and hard shadow in
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
 // bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard. 14b-8c: Me's
-// cards and /streak's ranks.
+// cards and /streak's ranks. 14b-8d: the admin area.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -153,4 +153,24 @@ test("Me's header, stat tiles and days, and /streak's own rank, in the kit", asy
   const own = page.locator("li[aria-current]");
   await expect(own).toContainText("Your rank");
   expect(await own.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("3px");
+});
+
+// 14b-8d: the admin area's current sub-tab is drawn as the sidebar's current item, a page's section is the kit's card,
+// and the rail's warning row is edged in its own danger colour, not the ink (tomorrow has no puzzle in this file).
+test("the admin area's current sub-tab, a card and the rail's warning, in the kit", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "la");
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-la@example.test`]);
+  await page.goto("/admin/insights");
+  const color = await ink(page);
+  const tab = page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: "Insights" });
+  expect(await look(tab)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+  const card = page.getByRole("region", { name: "Caught per question" });
+  await expect(card).toBeVisible();
+  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  const warning = page.getByRole("complementary", { name: "What needs you" }).getByRole("link", { name: /Tomorrow has no puzzle/ });
+  const [edge, text] = await warning.evaluate((el) => [getComputedStyle(el).borderTopColor, getComputedStyle(el).color]);
+  expect(edge).toBe(text);
+  expect(edge).not.toBe(color);
 });

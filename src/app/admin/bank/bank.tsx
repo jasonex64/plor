@@ -9,6 +9,7 @@ import type { BankView } from "@/admin/bank";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
+import kit from "../../kit.module.css";
 import { dayText } from "../../day-text";
 import { Line, Skeleton } from "../../skeleton";
 
@@ -35,7 +36,7 @@ export function Bank() {
         Read-only: the bank is <code>content/bank.json</code>, changed in pull requests. {bank.questions.length}{" "}
         {bank.questions.length === 1 ? "question" : "questions"}.
       </p>
-      <section aria-label="Questions" className={admin.card}>
+      <section aria-label="Questions" className={kit.card}>
         <label className={admin.field}>
           <span className="sr-only">Filter questions or categories</span>
           <input value={filter} placeholder="Filter questions or categories" onChange={(e) => setFilter(e.target.value)} />
@@ -60,9 +61,9 @@ export function Bank() {
                   <td role="cell" data-label="Category">{q.category}</td>
                   <td role="cell" data-label="Themes">
                     {q.themes.length ? (
-                      <span className={admin.tags}>
+                      <span className={kit.chips}>
                         {q.themes.map((t) => (
-                          <span key={t} className={`${admin.tag} ${admin.state}`}>
+                          <span key={t} className={kit.chip}>
                             {t}
                           </span>
                         ))}
@@ -102,7 +103,7 @@ export function Bank() {
         )}
         {bank.questions.length > 0 && questions.length === 0 && <p>No question or category matches.</p>}
       </section>
-      <section aria-label="Themes" className={admin.card}>
+      <section aria-label="Themes" className={kit.card}>
         <h3 className={admin.cardTitle}>Themes by date</h3>
         {bank.themes.length === 0 ? (
           <p>No themes set.</p>
@@ -113,7 +114,7 @@ export function Bank() {
                 <tr role="row" key={t.date}>
                   <td role="cell" className={admin.nowrap}>{dayText(t.date)}</td>
                   <td role="cell">
-                    <span className={`${admin.tag} ${admin.state}`}>{t.theme}</span>
+                    <span className={kit.chip}>{t.theme}</span>
                   </td>
                 </tr>
               ))}

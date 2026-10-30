@@ -11,6 +11,7 @@ import { api } from "@/lib/api-client";
 import { Avatar } from "../../avatar";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
+import kit from "../../kit.module.css";
 import { dayText, whenText } from "../../day-text";
 import styles from "./reports.module.css";
 import { Line, Skeleton } from "../../skeleton";
@@ -53,13 +54,13 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
         Keep comment leaves it for everyone but the players who reported it; Delete removes it for everyone. Both are logged
         below.
       </p>
-      <section aria-label="Reported comments" className={admin.card}>
+      <section aria-label="Reported comments" className={kit.card}>
         <h3 className={admin.cardTitle}>
-          Reported {reports && reports.length > 0 && <span className={admin.badge}>{reports.length}</span>}
+          Reported {reports && reports.length > 0 && <span className={`${kit.chip} ${admin.decide}`}>{reports.length}</span>}
         </h3>
         {reports && reports.length === 0 && <p>No reported comments.</p>}
         {reports && reports.length > 0 && (
-          <ul className={styles.reported}>
+          <ul className={kit.rows}>
             {reports.map((r) => (
               <Reported key={r.id} report={r} busy={busy} onKeep={() => void decide("keep", r.id)} onDelete={() => void decide("delete", r.id)} />
             ))}
@@ -73,7 +74,7 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
         {error && <p role="alert">{error}</p>}
       </section>
       {decisions && (
-        <section aria-label="Decisions" className={admin.card}>
+        <section aria-label="Decisions" className={kit.card}>
           <h3 className={admin.cardTitle}>Decisions</h3>
           {decisions.length === 0 ? (
             <p>No decisions yet.</p>
@@ -96,7 +97,7 @@ export function Reports({ onChanged }: { onChanged: () => void }) {
                       <time dateTime={d.at}>{whenText(d.at)}</time>
                     </td>
                     <td role="cell" data-label="Decision">
-                      <span className={`${admin.tag} ${admin.state}`}>{d.decision === "deleted" ? "Deleted" : "Kept"}</span>
+                      <span className={kit.chip}>{d.decision === "deleted" ? "Deleted" : "Kept"}</span>
                     </td>
                     <td role="cell" data-label="By">{d.admin ?? `the admin with no username, ${d.adminId}`}</td>
                     <td role="cell" data-label="Author">{d.author}</td>
@@ -129,7 +130,7 @@ function Reported({ report: r, busy, onKeep, onDelete }: { report: ReportedComme
     setAsking(next);
   };
   return (
-    <li className={styles.item}>
+    <li className={`${kit.row} ${styles.item}`}>
       <p className={styles.who}>
         <Avatar name={r.name} /> <strong>{r.name}</strong>{" "}
         <span className={admin.muted}>
@@ -141,19 +142,19 @@ function Reported({ report: r, busy, onKeep, onDelete }: { report: ReportedComme
       {asking ? (
         <div role="group" aria-label="Confirm delete" className={styles.confirm}>
           <strong className={styles.confirmText}>Delete for everyone? This can&apos;t be undone.</strong>
-          <button type="button" className={`${admin.button} ${admin.dangerFill}`} disabled={busy} onClick={onDelete}>
+          <button type="button" className={`${kit.small} ${admin.button} ${kit.danger}`} disabled={busy} onClick={onDelete}>
             Delete
           </button>
-          <button type="button" ref={cancel} className={admin.button} onClick={() => swap(false)}>
+          <button type="button" ref={cancel} className={`${kit.small} ${admin.button}`} onClick={() => swap(false)}>
             Cancel
           </button>
         </div>
       ) : (
-        <div className={styles.buttons}>
-          <button type="button" className={admin.button} disabled={busy} onClick={onKeep}>
+        <div className={kit.chips}>
+          <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={onKeep}>
             Keep comment
           </button>
-          <button type="button" ref={ask} className={`${admin.button} ${admin.danger}`} onClick={() => swap(true)}>
+          <button type="button" ref={ask} className={`${kit.small} ${admin.button} ${kit.danger}`} onClick={() => swap(true)}>
             Delete…
           </button>
         </div>

@@ -12,6 +12,7 @@ import type { ThingView } from "@/admin/base";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
+import kit from "../../kit.module.css";
 import { Line, Skeleton } from "../../skeleton";
 
 // Why a text waits, in words.
@@ -73,16 +74,16 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
         it. A decision counts from now: a day already started keeps its answers.
       </p>
       {error && <p role="alert">{error}</p>}
-      <section aria-label="To review" className={admin.card}>
+      <section aria-label="To review" className={kit.card}>
         <h3 className={admin.cardTitle}>
-          To review {waiting.length > 0 && <span className={admin.badge}>{waiting.length}</span>}
+          To review {waiting.length > 0 && <span className={`${kit.chip} ${admin.decide}`}>{waiting.length}</span>}
         </h3>
         {waiting.length === 0 ? (
           <p>Nothing to review.</p>
         ) : (
           <Table head={WAITING}>
             {waiting.map((r) => (
-              <Row key={r.id} head={WAITING} review={r} cells={[<span key="w" className={`${admin.tag} ${admin.decide}`}>{WHY[r.outcome as keyof typeof WHY]}</span>]}>
+              <Row key={r.id} head={WAITING} review={r} cells={[<span key="w" className={`${kit.chip} ${admin.decide}`}>{WHY[r.outcome as keyof typeof WHY]}</span>]}>
                 <Waiting review={r} busy={busy} decide={decide} />
               </Row>
             ))}
@@ -90,7 +91,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
         )}
         <p className={admin.note}>Dismiss is final: the text stays a miss and isn&apos;t asked about again.</p>
       </section>
-      <section aria-label="Added by players" className={admin.card}>
+      <section aria-label="Added by players" className={kit.card}>
         <h3 className={admin.cardTitle}>Added by players</h3>
         {added.length === 0 ? (
           <p>No answers added.</p>
@@ -98,7 +99,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
           <Table head={ADDED}>
             {added.map((r) => (
               <Row key={r.id} head={ADDED} review={r} cells={[<span key="t">{r.thing?.name ?? "—"}</span>]}>
-                <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "undo")}>
                   Undo
                 </button>
                 <LinkTo review={r} busy={busy} decide={decide} label="Same as another answer…" />
@@ -107,7 +108,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
           </Table>
         )}
       </section>
-      <section aria-label="Decided" className={admin.card}>
+      <section aria-label="Decided" className={kit.card}>
         <h3 className={admin.cardTitle}>Decided</h3>
         {decided.length === 0 ? (
           <p>Nothing decided yet.</p>
@@ -140,7 +141,7 @@ export function Audit({ onChanged }: { onChanged: () => void }) {
                     {/* Every decision that made an answer can be undone (human, 2026-10-24: "Yes, undo anything (Recommended)"). */}
                     {r.decision === "accepted" || r.decision === "linked" ? (
                       <div className={admin.actions}>
-                        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "undo")}>
+                        <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "undo")}>
                           Undo
                         </button>
                       </div>
@@ -205,25 +206,25 @@ function Waiting({ review: r, busy, decide }: { review: Review; busy: boolean; d
   return (
     <>
       {(r.outcome === "held" || r.outcome === "held_subset") && (
-        <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept")}>
+        <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept")}>
           {r.outcome === "held_subset" ? "Accept for this category only" : "Accept"}
         </button>
       )}
       {r.outcome === "rejected" &&
         r.named.map((t) => (
-          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
+          <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "accept_for_category", t.id)}>
             Accept {t.name} as {r.category_name}
           </button>
         ))}
       {/* A near-typo links to the answer it's a typo of in one click; the search is for any other (round 10, board 3). */}
       {r.outcome === "near_typo" &&
         r.near.map((t) => (
-          <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+          <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
             Link to {t.name}
           </button>
         ))}
       {r.outcome === "near_typo" && <LinkTo review={r} busy={busy} decide={decide} label={r.near.length > 0 ? "Different answer…" : "Same as…"} />}
-      <button type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
+      <button type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "dismiss")}>
         Dismiss
       </button>
     </>
@@ -251,7 +252,7 @@ function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: bool
 
   if (!open) {
     return (
-      <button type="button" className={admin.button} onClick={() => setOpen(true)}>
+      <button type="button" className={`${kit.small} ${admin.button}`} onClick={() => setOpen(true)}>
         {label}
       </button>
     );
@@ -262,13 +263,13 @@ function LinkTo({ review: r, busy, decide, label }: { review: Review; busy: bool
         <span className="sr-only">Same as</span>
         <input value={query} placeholder="Same as…" onChange={(e) => setQuery(e.target.value)} />
       </label>
-      <button type="submit" className={admin.button} disabled={busy || query.trim() === ""}>
+      <button type="submit" className={`${kit.small} ${admin.button}`} disabled={busy || query.trim() === ""}>
         Find
       </button>
       {error && <p role="alert">{error}</p>}
       {found && found.length === 0 && <p>No {r.category_name} goes by that name.</p>}
       {found?.map((t) => (
-        <button key={t.id} type="button" className={admin.button} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
+        <button key={t.id} type="button" className={`${kit.small} ${admin.button}`} disabled={busy} onClick={() => void decide(r.id, "link", t.id)}>
           Link to {t.name}
         </button>
       ))}
