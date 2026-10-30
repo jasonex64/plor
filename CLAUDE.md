@@ -81,6 +81,7 @@ Branches and PRs:
 | `docs/milestones/` | One ticket per milestone, plus a file per large sub-ticket (copy `_TEMPLATE.md`) |
 | `docs/SOURCES.md` | The only authoritative sources |
 | `docs/DECISIONS.md` | The single chosen way for each concern, plus the hard-to-reverse designs |
+| `docs/DESIGN.md` | The interface as built, each value cited to its file and line. A PR that changes what it describes updates it |
 | `.claude/agents/reviewer.md` | Independent milestone reviewer |
 | `AGENTS.md` | The Next.js rule that `next dev` writes: read the bundled Next.js docs before writing Next.js code. Imported below so every session loads it |
 
