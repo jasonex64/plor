@@ -27,14 +27,21 @@
   column-gap: 12px;
 }
 
+/* Each label's middle at its rate's height (insights.tsx sets bottom), so the scale lines up with the bars whatever the
+   step (docs/milestones/M14-14b-9-insights-axis.md). */
 .axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  position: relative;
+  /* The columns' rule, unseen, so a label's bottom % measures the same height a bar's does. */
+  border-bottom: 1.5px solid transparent;
   color: var(--muted);
   font-size: 12px;
-  text-align: right;
-  transform: translateY(6px);
+}
+
+.axis span {
+  position: absolute;
+  right: 0;
+  line-height: 1;
+  translate: 0 50%;
 }
 
 .column {
