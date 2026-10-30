@@ -15,7 +15,8 @@ export type Review = {
   category: string;
   category_name: string;
   text: string;
-  outcome: "accepted" | "held" | "held_subset" | "rejected" | "near_typo";
+  // reported: refused in an admin's test run (docs/milestones/M14-14b-11c-test-misses-to-audit.md).
+  outcome: "accepted" | "held" | "held_subset" | "rejected" | "near_typo" | "reported";
   players: number;
   answered: number;
   reached_at: string;
@@ -23,7 +24,8 @@ export type Review = {
   decision: "undone" | "linked" | "accepted" | "dismissed" | null;
   decided_at: string | null;
   chosen: Named | null;
-  named: Named[];
+  // The things the text names outside the category, each with the names of what it's a kind of, to tell meanings apart.
+  named: (Named & { kinds: string[] })[];
   // For a waiting near-typo, the answers it's a typo of, to link it to in one click; otherwise empty.
   near: Named[];
 };
@@ -48,10 +50,10 @@ export async function listReviews(db: Db, adminId: string): Promise<{ reviews: R
       [adminId],
     );
     // Every thing named as screens show it (src/game/payload.ts, shownName).
-    const shown = (n: Named): Named => ({ ...n, name: shownName(n.name) });
+    const shown = <T extends Named>(n: T): T => ({ ...n, name: shownName(n.name) });
     const reviews = await Promise.all(
       rows[0].reviews.map(async (stored) => {
-        const r = { ...stored, thing: stored.thing && shown(stored.thing), chosen: stored.chosen && shown(stored.chosen), named: stored.named.map(shown) };
+        const r = { ...stored, thing: stored.thing && shown(stored.thing), chosen: stored.chosen && shown(stored.chosen), named: stored.named.map((n) => ({ ...shown(n), kinds: n.kinds.map(shownName) })) };
         if (r.outcome !== "near_typo" || r.decision) return { ...r, near: [] };
         // The text is stored normalized (logMiss, src/game/runs.ts), as withinTypo expects.
         const near = await db.query<{ near: Named[] }>("select private.audit_near($1, $2, $3) as near", [adminId, r.id, withinTypo(r.text)]);

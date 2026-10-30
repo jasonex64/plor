@@ -91,7 +91,7 @@ describe("a run as plor_app", () => {
         // One familiar answer per question that the Wind doesn't catch, past the stolen letters: the whole climb.
         const climb = async (p: ApprovedPuzzle, lookup: Lookup) => {
           const texts = p.questions.map((_, i) => typeableName(p, i, safeEntry(p, i))!);
-          return (await testRun(client, p, lookup, { texts: texts.slice(0, -1), open: true, timedOut: false, text: texts[texts.length - 1] })).run;
+          return (await testRun(client, userId, p, lookup, { texts: texts.slice(0, -1), open: true, timedOut: false, text: texts[texts.length - 1] })).run;
         };
         for (const p of [puzzle, upcoming]) {
           const run = await climb(p, dayLookup(client, p));
@@ -103,7 +103,7 @@ describe("a run as plor_app", () => {
         expect((await climb(built.built, draftLookup(client, userId, built.built))).status).toBe("survived");
         // And a draft's host catches, as approval would build it.
         const bear = { texts: [], open: true, timedOut: false, text: typeableName(puzzle, 0, fixtureId(0, "bear"))! };
-        expect((await testRun(client, built.built, draftLookup(client, userId, built.built), bear)).run.status).toBe("died");
+        expect((await testRun(client, userId, built.built, draftLookup(client, userId, built.built), bear)).run.status).toBe("died");
         expect(await counts()).toEqual(before);
       },
       { admin: true },

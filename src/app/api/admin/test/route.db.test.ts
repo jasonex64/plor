@@ -9,6 +9,7 @@ import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as nextRoute } from "@/app/api/run/next/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { POST as approveRoute } from "@/app/api/admin/puzzles/approve/route";
+import { POST as auditRoute } from "@/app/api/admin/audit/route";
 import { type ApprovedPuzzle, type Puzzle } from "@/content/puzzle";
 import type { AnsweredQuestion } from "@/game/runs";
 import { getPool } from "@/lib/db";
@@ -91,6 +92,9 @@ afterAll(async () => {
     rmdirSync(join(process.cwd(), "content"));
   }
   const db = getPool();
+  // This file's audit rows and the acceptance it made, which would refuse taking the fixture base out.
+  await db.query("delete from private.category_extra where category like 'fixture\_%'");
+  await db.query("delete from private.miss_review where category like 'fixture\_%' and outcome = 'reported'");
   // Deleting the auth users cascades to the admin row, the profile and the run played through play's routes.
   await db.query("delete from auth.users where email like $1", [`${RUN}-tr%@example.test`]);
   await removeFixtures();
@@ -123,7 +127,8 @@ describe("a test run of an approved day", () => {
     expect(opened.msLeft).toBeGreaterThan(19_000);
     expect(opened.msLeft).toBeLessThanOrEqual(20_000);
 
-    const retry = (await play(today, { open: true, text: "zzqx not a thing" })).body;
+    // "dgo" is too short for the typo rule, so it's refused; one typo from dog, it isn't sent to the audit (14b-11c).
+    const retry = (await play(today, { open: true, text: "dgo" })).body;
     expect(retry.notInList).toBe(true);
     expect(retry.run).toMatchObject({ status: "in_progress", question: { index: 0 } });
 
@@ -202,5 +207,38 @@ describe("a test run of a draft", () => {
 
   it("answers 404 for a date with no draft", async () => {
     expect((await play(empty, { hostAnswers: drawn() })).body).toEqual({ ok: false, error: "no_draft" });
+  });
+});
+
+// 14b-11c (docs/milestones/M14-14b-11c-test-misses-to-audit.md): a refused text waits on the Audit page as the admin's
+// report, never as a player's miss, and an acceptance there changes what a new test run of a draft accepts.
+describe("a test run's refused answers go to the audit", () => {
+  beforeEach(async () => useSession(await sessionFor("admin")));
+  const reported = async (text: string) =>
+    (await getPool().query<{ id: number; outcome: string }>("select id::int as id, outcome from private.miss_review where category = 'fixture_animal' and text = $1", [text])).rows;
+  const misses = async () => (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer")).rows[0].n;
+
+  it("reports a refused text for an approved day once, and never as a player's miss", async () => {
+    const before = await misses();
+    // apple is a fruit: refused at "Name an animal".
+    expect((await play(today, { open: true, text: "apple" })).body.notInList).toBe(true);
+    expect((await reported("apple")).map((r) => r.outcome)).toEqual(["reported"]);
+    await play(today, { open: true, text: "apple" });
+    expect(await reported("apple")).toHaveLength(1);
+    expect(await misses()).toBe(before);
+  });
+
+  it("reports a draft's refused text, and accepting it for the category makes a new test run accept it", async () => {
+    const drawn = draft.questions.map((q) => q.host_answers);
+    const text = `zz${RUN}`;
+    expect((await play(draftDate, { open: true, text, hostAnswers: drawn })).body.notInList).toBe(true);
+    expect((await reported(text)).map((r) => r.outcome)).toEqual(["reported"]);
+
+    const [{ id }] = await reported("apple");
+    const accepted = await call(auditRoute(apiRequest("/api/admin/audit", { method: "POST", body: { id, action: "accept_for_category", thing: fixtureId(1, "apple") } })));
+    expect(accepted.status).toBe(200);
+    const run = (await play(draftDate, { open: true, text: "apple", hostAnswers: drawn })).body;
+    expect(run.notInList).toBe(false);
+    expect(run.run.answered[0]).toMatchObject({ matched: false, answer: { name: "apple" } });
   });
 });

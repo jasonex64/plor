@@ -33,6 +33,10 @@ test.afterAll(async () => {
     rmdirSync(DRAFTS);
     rmdirSync(join(process.cwd(), "content"));
   }
+  // The audit rows test runs reported and the acceptance made here (14b-11c), which would refuse taking the fixture
+  // base out.
+  await DB.query("delete from private.category_extra where category like 'fixture\_%'");
+  await DB.query("delete from private.miss_review where category like 'fixture\_%' and outcome = 'reported'");
   await DB.query("delete from auth.users where email like $1", [`${RUN}-tr_@example.test`]);
   await DB.end();
 });
@@ -102,4 +106,36 @@ test("a refused answer in a test run keeps the countdown going", async ({ browse
   await admin.getByRole("button", { name: "Answer" }).click();
   await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
   expect(Number(await timer.textContent())).toBeLessThanOrEqual(15);
+});
+
+// 14b-11c (docs/milestones/M14-14b-11c-test-misses-to-audit.md, criterion 4): an answer a test run refuses waits on the
+// Audit page as the admin's report; accepted there for the category, a new test run of the draft accepts it.
+test("a test run's refused answer waits on the Audit page, and accepting it there makes the next test run accept it", async ({ browser }) => {
+  const admin = await (await browser.newContext()).newPage();
+  await admin.goto("/");
+  await signInAndPick(admin, "trd");
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-trd@example.test`]);
+  const hosts = fixtureDraft(ahead).questions.map((q) => q.host_answers);
+  const testRun = `/admin/test/${ahead}?hosts=${encodeURIComponent(JSON.stringify(hosts))}`;
+  const answer = async (text: string) => {
+    await admin.getByRole("button", { name: "Start", exact: true }).click();
+    await admin.getByLabel("Your answer").fill(text);
+    await admin.getByRole("button", { name: "Answer" }).click();
+  };
+
+  // apple is a fruit, so "Name an animal" refuses it.
+  await admin.goto(testRun);
+  await answer("apple");
+  await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
+
+  await admin.goto("/admin/audit");
+  const row = admin.getByRole("region", { name: "To review" }).getByRole("row", { name: "apple" });
+  await expect(row.getByText("From your test run")).toBeVisible();
+  // The fixture's apple, told apart from the real base's apples by what it's a kind of.
+  await row.getByRole("button", { name: "Accept apple (fixture_fruit root) as Name an animal" }).click();
+  await expect(admin.getByRole("region", { name: "To review" }).getByRole("row", { name: "apple" })).toHaveCount(0);
+
+  await admin.goto(testRun);
+  await answer("apple");
+  await expect(admin.getByRole("heading", { name: gotPastText(1) })).toBeVisible();
 });
