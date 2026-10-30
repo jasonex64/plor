@@ -136,6 +136,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
+  -- A finished player searches a question's answers (M14 14b-12).
+  'private.search_answers(uuid,text,date,integer,text,integer,integer) execute',
   'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.thing_names(uuid[]) execute',
   'private.today() execute'], 'plor_app holds exactly the grants the routes need');

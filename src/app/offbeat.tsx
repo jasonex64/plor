@@ -12,6 +12,7 @@ import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
+import { AnswerSearch } from "./answer-search";
 import { Game, TestGame, useStartRun } from "./game";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
@@ -211,6 +212,7 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
               <span className={styles.muted}>
                 {q.yours && `You: ${q.yours.answer.name} · `}The Wind: {q.hostAnswers.map((h) => h.name).join(", ")}
               </span>
+              <AnswerSearch date={yesterday.date} index={q.index} prompt={q.prompt} />
             </li>
           ))}
         </ol>

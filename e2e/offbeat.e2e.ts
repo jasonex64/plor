@@ -110,8 +110,12 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   await expect(yesterday.getByRole("listitem")).toHaveCount(7);
   // The Wind's answers, and nothing of the player's: they didn't play yesterday.
   const first = FIXTURE[0];
-  await expect(yesterday.getByRole("listitem").first()).toHaveText(`1 · ${first.prompt}The Wind: ${first.members[first.host[0]].names[0]}`);
+  await expect(yesterday.getByRole("listitem").first()).toHaveText(`1 · ${first.prompt}The Wind: ${first.members[first.host[0]].names[0]}Search answers`);
   await expect(yesterday.getByText(/^(Climbed|Tipped over|Tumbled|Sent flying)$/)).toHaveCount(0);
+  // Yesterday is over, so its answers can be searched even by a player who didn't play it (M14 14b-12).
+  await yesterday.getByRole("button", { name: "Search answers" }).first().click();
+  await page.getByLabel(`Search the answers to ${first.prompt}`).fill("polar");
+  await expect(yesterday.getByRole("list", { name: `Answers to ${first.prompt}` }).getByRole("listitem").filter({ hasText: "polar bear" })).toBeVisible();
 
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);

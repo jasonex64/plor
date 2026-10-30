@@ -61,8 +61,12 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 - Detail pages slide 60px over 200 ms, forward to the left and back to the right, and don't move under reduced motion (`globals.css:409-438`, `:487-494`).
 
 ## Test runs (admin)
-- `/admin/test/<date>` is the game screen's run, drawn by the same component as play (`src/app/game.tsx:267`), on the game screen's grid (`src/app/offbeat.tsx:87-112`).
-- Above it, in the back link's row: a chip, "Test run: nothing is saved" or "Test run of the draft: nothing is saved", and a plain Restart button (`offbeat.tsx:96-99`), 16px apart and wrapping on a phone (`src/app/offbeat.module.css:25-30`).
-- The result has no Share button (`game.tsx:557`); after the run the game screen's cards show and the comments don't (`offbeat.tsx:105-109`).
+- `/admin/test/<date>` is the game screen's run, drawn by the same component as play (`src/app/game.tsx:268`), on the game screen's grid (`src/app/offbeat.tsx:88-113`).
+- Above it, in the back link's row: a chip, "Test run: nothing is saved" or "Test run of the draft: nothing is saved", and a plain Restart button (`offbeat.tsx:97-100`), 16px apart and wrapping on a phone (`src/app/offbeat.module.css:25-30`).
+- The result has no Share button (`game.tsx:558`); after the run the game screen's cards show and the comments don't (`offbeat.tsx:106-110`).
 - On `/admin/puzzles`, each day has a Play test link beside Approve (`src/app/admin/puzzles/puzzles.tsx:172-174`), and above the day a date field, "Test an earlier day", up to today, with its own Play test (`puzzles.tsx:106-120`).
 - On `/admin/audit`, a text a test run refused waits under To review with the reason chip "From your test run" (`src/app/admin/audit/audit.tsx:25`). It shows Accept when it names nothing (`audit.tsx:211`), or one "Accept <name> (<what it's a kind of>) as <category>" per thing it names, as a rejected text does (`audit.tsx:217-221`), and Dismiss.
+
+## Answer search
+- Once a run is over, each question on its result card has a minor "Search answers" button (`src/app/game.tsx:567`, `src/app/answer-search.tsx:40-44`); so does each question on yesterday's card (`src/app/offbeat.tsx:215`).
+- Opened, it is a search field, "Search the answers" (`answer-search.tsx:49`), over at most 10 matches, 6px apart, the box 8px above them and 6px under the question (`src/app/answer-search.module.css:3-23`). Each match shows its name, the name that matched in muted text when that's another one, its tier as a chip, and "· N players" in muted text once enough players answered (`answer-search.tsx:60-64`). An empty field heads its list "The most given" (`answer-search.tsx:54`).

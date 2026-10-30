@@ -1,0 +1,26 @@
+/* A question's answer search (docs/milestones/M14-14b-12-answer-lists.md): the box and its matches under the
+   question, with the kit's row spacing. */
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.box input {
+  width: 100%;
+}
+
+.found {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+}
