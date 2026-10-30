@@ -1,6 +1,6 @@
 # M14 14b-11 — Test runs
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; in review (PR #PR, waiting for CI and the human's word to merge). Then 14b-10a resumes from its stash. Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
+**Status:** approved (human, 2026-10-29: "Approve 14b-11 as drafted, including the security change (two admin-only read functions plor_app may execute). Build it."), drafted from three rounds of guided questions; in review (PR #137, waiting for CI and the human's word to merge). Then 14b-10a resumes from its stash. Built before 14b-10a, which is paused for it (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"; 10a's code is in `stash@{0}` in `C:/Users/jason/RIFF-m14`).
 
 ## Goal
 An admin can play any day, past, today, upcoming or still a draft, on the real game screen as often as they like, and nothing is saved.
