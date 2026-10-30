@@ -1,6 +1,6 @@
 # M14 14b-7 — Design clear-out: an audit after 14b-6, then a fresh start
 
-**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. Built after 14b-8, the new look, and its critique (human, 2026-10-29, answer 2 below); in review (PR_7). Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
+**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. Built after 14b-8, the new look, and its critique (human, 2026-10-29, answer 2 below); in review (PR #135). Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
 
 ## Goal
 Once all of 14b-6 is merged to `main` (and so deployed to plor.app), remove every mockup, stored critique and record of past or planned look directions from claude.ai and the live docs, and leave one short as-built note, so the next look is designed from what shipped.
