@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { CATCH_TARGETS } from "@/config/tunables";
 import type { DayInsights, QuestionInsights } from "@/insights/report";
 import { api } from "@/lib/api-client";
+import { axisScale } from "./axis";
 import { errorText } from "../messages";
 import admin from "./admin.module.css";
 import kit from "../kit.module.css";
@@ -107,14 +108,12 @@ export function Insights() {
   );
 }
 
-// Bars for the catch rates, a dashed line for each target; the scale reaches the highest of either, rounded up to the
-// next 5% as round 10's axis steps. A question that breaks the day's shape is in the caught colour, and said in words
-// in the table (WCAG 2.2 1.4.1); the chart is described in full for screen readers.
-const STEP = 5;
+// Bars for the catch rates, a dashed line for each target; the scale reaches the highest of either, in steps that keep
+// the axis to six labels (axis.ts), each at its rate's height. A question that breaks the day's shape is in the caught
+// colour, and said in words in the table (WCAG 2.2 1.4.1); the chart is described in full for screen readers.
 function Chart({ questions }: { questions: QuestionInsights[] }) {
   const highest = Math.max(...questions.map((q) => Math.round((q.catchRate ?? 0) * 100)), ...CATCH_TARGETS.map((t) => Math.round(t * 100)));
-  const top = Math.max(STEP, Math.ceil(highest / STEP) * STEP);
-  const ticks = Array.from({ length: top / STEP + 1 }, (_, i) => top - i * STEP);
+  const { top, ticks } = axisScale(highest);
   const described = questions
     .map((q) => `Q${q.index + 1} ${percent(q.catchRate)} (target ${Math.round(CATCH_TARGETS[q.index] * 100)}%)${q.breaksShape ? ", clearly fewer than an earlier question" : ""}`)
     .join("; ");
@@ -123,7 +122,9 @@ function Chart({ questions }: { questions: QuestionInsights[] }) {
       <div role="img" aria-label={`Share of players caught per question, against the Gentle target: ${described}.`} className={styles.chart} style={{ gridTemplateColumns: `40px repeat(${questions.length}, minmax(0, 1fr))` }}>
         <div className={styles.axis} aria-hidden="true">
           {ticks.map((t) => (
-            <span key={t}>{t}%</span>
+            <span key={t} style={{ bottom: `${(t * 100) / top}%` }}>
+              {t}%
+            </span>
           ))}
         </div>
         {questions.map((q) => (
