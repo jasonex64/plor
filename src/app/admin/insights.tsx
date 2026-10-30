@@ -11,6 +11,7 @@ import type { DayInsights, QuestionInsights } from "@/insights/report";
 import { api } from "@/lib/api-client";
 import { errorText } from "../messages";
 import admin from "./admin.module.css";
+import kit from "../kit.module.css";
 import { dayText } from "../day-text";
 import styles from "./insights.module.css";
 import { Line, Skeleton } from "../skeleton";
@@ -55,7 +56,7 @@ export function Insights() {
   return (
     <>
       <div className={styles.picker}>
-        <button type="button" className={admin.button} aria-label="Previous day" disabled={at >= days.length - 1} onClick={() => setDate(days[at + 1])}>
+        <button type="button" aria-label="Previous day" disabled={at >= days.length - 1} onClick={() => setDate(days[at + 1])}>
           ‹
         </button>
         <label className={styles.day}>
@@ -68,13 +69,13 @@ export function Insights() {
             ))}
           </select>
         </label>
-        <button type="button" className={admin.button} aria-label="Next day" disabled={at <= 0} onClick={() => setDate(days[at - 1])}>
+        <button type="button" aria-label="Next day" disabled={at <= 0} onClick={() => setDate(days[at - 1])}>
           ›
         </button>
-        <span className={`${admin.tag} ${admin.state}`}>{report.finished ? "Finished" : "Today, still being played"}</span>
+        <span className={kit.chip}>{report.finished ? "Finished" : "Today, still being played"}</span>
         <span className={admin.muted}>{players === 1 ? "1 player" : `${players} players`}</span>
       </div>
-      <section aria-label="Caught per question" className={admin.card}>
+      <section aria-label="Caught per question" className={kit.card}>
         <h3 className={admin.cardTitle}>Caught per question</h3>
         <p className={admin.note}>
           The Gentle target rises from {Math.round(CATCH_TARGETS[0] * 100)}% at Q1 to {Math.round(CATCH_TARGETS[CATCH_TARGETS.length - 1] * 100)}% at Q
@@ -82,7 +83,7 @@ export function Insights() {
         </p>
         <Chart questions={report.questions} />
       </section>
-      <section aria-label="Questions" className={admin.card}>
+      <section aria-label="Questions" className={kit.card}>
         <table className={admin.table} role="table">
           <thead role="rowgroup" className="sr-only-on-phones">
             <tr role="row">
@@ -188,7 +189,7 @@ function Row({ q }: { q: QuestionInsights }) {
         <td role="cell" data-label="Most typed">{q.topAnswers.length > 0 ? q.topAnswers.map((t) => `${t.answer.name} ${t.count}`).join(", ") : "—"}</td>
         <td role="cell" data-label="Not in list">
           {q.misses.length > 0 ? (
-            <button type="button" className={admin.button} aria-expanded={open} onClick={() => setOpen(!open)}>
+            <button type="button" className={`${kit.small} ${admin.button}`} aria-expanded={open} onClick={() => setOpen(!open)}>
               {q.misses.length} <span className="sr-only">not in the list</span>
               <span aria-hidden="true">{open ? " ▴" : " ▾"}</span>
             </button>

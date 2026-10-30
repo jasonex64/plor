@@ -117,7 +117,7 @@ function Count({ n }: { n: number }) {
   if (n === 0) return null;
   return (
     <>
-      <span className={styles.badge}>{n}</span>
+      <span className={`${kit.chip} ${styles.decide}`}>{n}</span>
       <span className="sr-only"> waiting</span>
     </>
   );
@@ -194,7 +194,7 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
         <span className="sr-only"> (admin pages)</span>
       </button>
       {open && (
-        <div className={styles.menu}>
+        <div className={`${kit.card} ${styles.menu}`}>
           <ul aria-label="To do">{TO_DO.map((t) => item(t.page, t.name, counts ? t.count(counts) : undefined))}</ul>
           <ul aria-label="Look up" className={styles.menuLookUp}>
             {LOOK_UP.map((t) => item(t.page, t.name))}
@@ -232,14 +232,16 @@ function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null })
 function NeedsYouSkeleton() {
   return (
     <Skeleton label="Loading what needs you">
-      <h2 className={styles.needsTitle}>What needs you</h2>
-      <ul className={styles.needs}>
-        {["puzzles", "audit", "reports", "ahead"].map((row) => (
-          <li key={row} className={styles.need}>
-            <Line />
-          </li>
-        ))}
-      </ul>
+      <div className={kit.card}>
+        <h2>What needs you</h2>
+        <ul className={kit.rows}>
+          {["puzzles", "audit", "reports", "ahead"].map((row) => (
+            <li key={row} className={kit.row}>
+              <Line />
+            </li>
+          ))}
+        </ul>
+      </div>
     </Skeleton>
   );
 }
@@ -281,12 +283,13 @@ function NeedsYou({ counts }: { counts: Counts }) {
         ]),
   ];
   return (
-    <>
-      <h2 className={styles.needsTitle}>What needs you</h2>
-      <ul className={styles.needs}>
+    // A card of the kit's rows, as the player pages' right column holds cards; the warning edged in the danger colour.
+    <div className={kit.card}>
+      <h2>What needs you</h2>
+      <ul className={kit.rows}>
         {rows.map((r, i) => (
           <li key={i}>
-            <Link href={r.href} className={r.danger ? `${styles.need} ${styles.danger}` : styles.need}>
+            <Link href={r.href} className={r.danger ? `${kit.row} ${styles.need} ${kit.danger}` : `${kit.row} ${styles.need}`}>
               <b className={styles.needNumber}>{r.n}</b>
               <span className={styles.needWhat}>{r.what}</span>
               <span className={styles.muted}>{r.more}</span>
@@ -294,6 +297,6 @@ function NeedsYou({ counts }: { counts: Counts }) {
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }

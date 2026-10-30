@@ -1,17 +1,9 @@
-/* Reported comments (round 10, board 6): each comment between lines, its text on the page's background, the inline
-   confirmation outlined in the danger colour. */
-.reported {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.item {
-  display: flex;
+/* Reported comments (round 10, board 6): each comment one of the kit's rows (M14 14b-8d), its text on the page's
+   background, the inline confirmation outlined in the danger colour. On li, above the kit's .row, which lays its
+   parts in a line. */
+li.item {
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
+  align-items: stretch;
 }
 
 .who {
@@ -21,14 +13,9 @@
 .body {
   margin: 0;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: var(--r-small);
   background: var(--bg);
   font-size: 15px;
-}
-
-.buttons {
-  display: flex;
-  gap: 8px;
 }
 
 .confirm {
@@ -38,7 +25,7 @@
   gap: 8px;
   padding: 10px 12px;
   border: 1.5px solid var(--danger);
-  border-radius: 10px;
+  border-radius: var(--r-small);
 }
 
 .confirmText {

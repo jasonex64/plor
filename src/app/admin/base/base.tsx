@@ -9,6 +9,7 @@ import type { ThingView } from "@/admin/base";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
 import admin from "../admin.module.css";
+import kit from "../../kit.module.css";
 
 export function AnswerBase() {
   const [query, setQuery] = useState("");
@@ -37,7 +38,7 @@ export function AnswerBase() {
           <span className="sr-only">Name or alias</span>
           <input value={query} placeholder="Name or alias" onChange={(e) => setQuery(e.target.value)} />
         </label>
-        <button type="submit" className={admin.primary} disabled={busy || query.trim() === ""}>
+        <button type="submit" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy || query.trim() === ""}>
           Look up
         </button>
       </form>
@@ -45,7 +46,7 @@ export function AnswerBase() {
       {things && things.length === 0 && <p>Nothing goes by that name.</p>}
       {things && things.length > 0 && <p className={admin.note}>{things.length === 1 ? "1 thing goes" : `${things.length} things go`} by that name.</p>}
       {things?.map((t) => (
-        <article key={t.id} aria-label={t.name} className={admin.card}>
+        <article key={t.id} aria-label={t.name} className={kit.card}>
           <h3 className={admin.cardTitle}>{t.name}</h3>
           <dl className={admin.facts}>
             <dt>Categories</dt>

@@ -1,7 +1,9 @@
 /* The admin area (docs/milestones/M14-14b-2b-2-admin-build.md; round 10, approved 2026-10-26): Plor's look made denser
    for desk work. Sizes are round 10's (the ticket's Numbers); cards and spacing as Me's. Colours are the slots, each
    with one meaning: neutral tags for states, the accent's soft tint for "needs a decision", the danger colour for
-   problems, and the caught colour only for the insights chart's dip. */
+   problems, and the caught colour only for the insights chart's dip. In the new look (M14 14b-8d, by analogy with
+   mockup 3; docs/milestones/M14-14b-8-the-new-look.md, answer 8) its cards, rows, chips and buttons are the kit's
+   (kit.module.css); what's below is the admin's own layout and the kit's admin variants. */
 .area {
   display: flex;
   flex-direction: column;
@@ -38,7 +40,7 @@
   align-items: center;
   gap: 18px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--ink);
 }
 
 .group {
@@ -47,18 +49,21 @@
 }
 
 .divider {
-  width: 1px;
+  width: 2px;
   align-self: stretch;
-  background: var(--line);
+  background: var(--ink);
 }
 
+/* The current tab as the sidebar's current item: the soft fill, a 2px ink border and a small hard shadow. */
 .tab {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 40px;
   padding: 0 12px;
-  border-radius: 10px;
+  border: 2px solid transparent;
+  border-radius: var(--r-small);
   color: var(--muted);
   font-size: 15px;
   font-weight: 700;
@@ -66,26 +71,13 @@
 }
 
 .on {
+  border-color: var(--ink);
   background: var(--soft);
+  box-shadow: var(--shadow-card-small);
   color: var(--text);
 }
 
-.badge {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* On phones: the page menu, 48px tall, and the waiting row. */
+/* On phones: the page menu, 48px tall, and the waiting row. The menu button is the base button; the menu a card. */
 .phone {
   display: flex;
   flex-direction: column;
@@ -99,10 +91,6 @@
   min-height: 48px;
   margin: 0;
   padding: 0 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
   font-size: 16px;
   font-weight: 700;
 }
@@ -113,10 +101,10 @@
   gap: 6px;
 }
 
-.menu {
-  border: 1.5px solid var(--edge);
-  border-radius: 12px;
-  background: var(--surface);
+/* Scoped above the kit's .card, whose padding and gap the menu's full-width items don't take. */
+.phone .menu {
+  gap: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -127,7 +115,7 @@
 }
 
 .menuLookUp {
-  border-top: 1.5px solid var(--edge);
+  border-top: 2px solid var(--ink);
 }
 
 .menuItem {
@@ -153,31 +141,18 @@
   margin: 0;
 }
 
-/* What needs you, in the right column. */
-.needsTitle {
-  margin: 0;
-  font-size: 18px;
-}
-
-.needs {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.need {
+/* What needs you, in the right column: a card of the kit's rows, each a link; its layout on a, above the kit's .row,
+   and its colour on the class alone, below the kit's danger kind, which colours the warning row. */
+a.need {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr);
   gap: 2px 10px;
   align-items: baseline;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  color: var(--text);
-  text-decoration: none;
 }
 
-.needs li:last-child .need {
-  border-bottom: 1px solid var(--line);
+.need {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .needNumber {
@@ -192,17 +167,8 @@
   font-weight: 700;
 }
 
-/* Shared by the pages: cards, tables, tags, chips and buttons. */
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-}
-
+/* Shared by the pages: a card's title with its count, tables, the tint for "needs a decision", the buttons' desk
+   height and fields. */
 .cardTitle {
   display: flex;
   align-items: center;
@@ -249,25 +215,9 @@
   white-space: nowrap;
 }
 
-.tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 22px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.3;
-  box-sizing: border-box;
-}
-
-.state {
-  border: 1px solid var(--edge);
-  color: var(--text);
-  background: var(--surface);
-}
-
-.decide {
+/* A chip (the kit's) that needs a decision: a draft day, an answer held for review, a count waiting. On span, above the
+   kit's .chip. */
+span.decide {
   background: var(--soft);
   color: var(--accent);
 }
@@ -278,39 +228,10 @@
   font-weight: 700;
 }
 
-.button {
+/* The kit's small buttons at round 10's 36px desk height; scoped above the kit's small kind, which sets min-height: 0. */
+.area .button {
   min-height: 36px;
   margin: 0;
-  padding: 0 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.primary {
-  min-height: 40px;
-  margin: 0;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 10px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.danger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.dangerFill {
-  border: 0;
-  background: var(--danger);
-  color: var(--on-accent);
 }
 
 /* An action column: each action a full-width button, stacked (human, 2026-10-26: "each button should for decide should
@@ -333,8 +254,8 @@
   min-height: 40px;
   box-sizing: border-box;
   padding: 0 12px;
-  border: 1.5px solid var(--edge);
-  border-radius: 10px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-small);
   background: var(--surface);
 }
 
@@ -394,12 +315,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
 }
 
 .search {
