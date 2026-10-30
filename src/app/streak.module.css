@@ -1,6 +1,7 @@
-/* /streak (docs/milestones/M14-14b-2a-streak-ranks.md): spaced as Me is (round 7, me.module.css), the ranks as cards
-   like Me's, 8px apart as its totals are, each flower 96px, 128px from 768px (Numbers), wrapping at their own width and
-   sharing each row; the player's rank outlined thick in the page's text colour, as the chosen theme is (M14 L47). */
+/* /streak (docs/milestones/M14-14b-2a-streak-ranks.md): spaced as Me is (round 7, me.module.css), the ranks as the
+   kit's cards (M14 14b-8c), 10px apart as Me's totals now are (mockup 3), each flower 96px, 128px from 768px
+   (Numbers), wrapping at their own width and sharing each row; the player's rank outlined thick in the page's text
+   colour, as the chosen theme is (M14 L47). */
 .streak {
   display: flex;
   flex-direction: column;
@@ -20,7 +21,7 @@
 .ranks {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -28,19 +29,13 @@
 
 .rank {
   flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
   text-align: center;
 }
 
-.current {
-  border: 3px solid var(--text);
+/* Scoped above the kit's .card, whose 2px edge it thickens, so the CSS load order can't decide (14b-8b review). */
+.ranks .current {
+  border-width: 3px;
 }
 
 .name {

@@ -1,4 +1,5 @@
-/* Round 7's slots: 30px by a name, 64px in Me's header, the initial on the soft pill colour. */
+/* Round 7's slots: 30px by a name, 64px in Me's header, the initial on the soft pill colour, ringed in ink as mockup 3's
+   .avatar is (M14 14b-8c; human, 2026-10-29). */
 .slot {
   box-sizing: border-box;
   display: inline-flex;
@@ -7,6 +8,7 @@
   flex-shrink: 0;
   width: 30px;
   height: 30px;
+  border: 2px solid var(--ink);
   border-radius: 15px;
   background: var(--soft);
   color: var(--text);

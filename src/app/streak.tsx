@@ -2,6 +2,7 @@
 // counts, as src/game/streak.ts counts it, and its six ranks, each flower with its name and days, the player's own
 // marked in words as well as by its border (WCAG 2.2 1.4.1).
 import { RANKS, RankFlower, rankDays, rankFor } from "./ranks";
+import kit from "./kit.module.css";
 import styles from "./streak.module.css";
 
 export function StreakRanks({ days }: { days: number }) {
@@ -17,7 +18,7 @@ export function StreakRanks({ days }: { days: number }) {
       <p>Each rank is a flower. Keep playing to grow the next one.</p>
       <ol className={styles.ranks}>
         {RANKS.map((rank) => (
-          <li key={rank.name} className={rank === current ? `${styles.rank} ${styles.current}` : styles.rank} aria-current={rank === current || undefined}>
+          <li key={rank.name} className={rank === current ? `${kit.card} ${styles.rank} ${styles.current}` : `${kit.card} ${styles.rank}`} aria-current={rank === current || undefined}>
             <RankFlower rank={rank} size={96} />
             <span className={styles.name}>{rank.name}</span>
             <span className={styles.days}>{rankDays(rank)}</span>

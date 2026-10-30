@@ -19,14 +19,14 @@
   background: var(--soft);
 }
 
-/* A card's heading, at mockup 3's .tile h2 size. */
-.card > h2,
-.card > h3,
-.head > h2,
-.head > h3 {
+/* No browser margins on a card's own headings and paragraphs, so the card's gap spaces them, as in mockup 3; at no
+   specificity, so a page's own margin still wins (14b-8b: "Plor is better with friends" sat apart from its text).
+   Only a card's own: nested in a block, the margins are what space them. */
+:where(.card, .head) > :where(h2, h3, p) {
   margin: 0;
 }
 
+/* A card's heading, at mockup 3's .tile h2 size. */
 .card > h2,
 .head > h2 {
   font-size: 20px;
@@ -85,6 +85,11 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* A form laid out as a row: its button lines up with the field, not with the field's label above it. */
+form.chips {
+  align-items: flex-end;
 }
 
 .dark {

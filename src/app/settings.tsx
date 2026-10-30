@@ -16,6 +16,7 @@ import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type
 import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
+import kit from "./kit.module.css";
 import styles from "./settings.module.css";
 import { applyTheme } from "./theme";
 
@@ -83,7 +84,7 @@ export function SettingsSheet({
         <Preferences settings={profile.settings} onSettings={onSettings} />
         {/* About and the privacy policy in a box like Delete account's (human, 2026-10-26: "make it a little bubble thing
             like thedelete account"; docs/milestones/M14-14b-2b-1-shell.md, criterion 3). */}
-        <div className={styles.about}>
+        <div className={`${kit.card} ${styles.about}`}>
           <p className={styles.aboutText}>
             <strong>About and privacy</strong>
             <span className={styles.muted}>What Plor is, its credits, and how your data is used.</span>
@@ -125,7 +126,7 @@ function Field({ name, value, action, editing, onEdit, children }: {
         ) : (
           <>
             <strong>{value}</strong>{" "}
-            <button type="button" className={styles.inline} onClick={onEdit}>
+            <button type="button" className={`${kit.small} ${styles.inline}`} onClick={onEdit}>
               {action}
               <span className="sr-only"> {name.toLowerCase()}</span>
             </button>
@@ -392,14 +393,14 @@ function DeleteAccount({ username, onDeleted }: { username: string; onDeleted: (
   }
 
   return (
-    <section aria-label="Delete account" className={styles.danger}>
+    <section aria-label="Delete account" className={`${kit.card} ${styles.danger}`}>
       <div className={styles.dangerHead}>
         <span>
           <strong className={styles.dangerText}>Delete account</strong>
           <span className={styles.line}>You&apos;ll be asked to confirm.</span>
         </span>
         {!open && (
-          <button type="button" className={`${styles.secondary} ${styles.dangerButton}`} onClick={() => setOpen(true)}>
+          <button type="button" className={`${kit.danger} ${styles.dangerButton}`} onClick={() => setOpen(true)}>
             Delete…
           </button>
         )}
@@ -414,7 +415,7 @@ function DeleteAccount({ username, onDeleted }: { username: string; onDeleted: (
             Type your username to confirm
             <input value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" />
           </label>
-          <button type="submit" className={styles.dangerButton} disabled={busy || typed !== username}>
+          <button type="submit" className={`${kit.danger} ${styles.dangerButton}`} disabled={busy || typed !== username}>
             Delete my account
           </button>{" "}
           <button type="button" disabled={busy} onClick={() => setOpen(false)}>

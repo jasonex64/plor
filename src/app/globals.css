@@ -319,6 +319,7 @@ label {
   --r-card: 5px;
   --r-button: 5px;
   --r-small: 4px;
+  --r-cell: 2px;
   --shadow-card: 4px 4px 0 var(--ink);
   --shadow-card-small: 3px 3px 0 var(--ink);
   --shadow-button: 0 4px 0 var(--ink);

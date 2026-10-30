@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
+import kit from "./kit.module.css";
 import { shareLink } from "./share";
 import { Line, Skeleton } from "./skeleton";
 
@@ -57,21 +58,20 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
   return (
     <section aria-label="Invite friends">
       <h3>Invite friends</h3>
-      <p>
-        <button type="button" disabled={busy || code === undefined} onClick={() => void invite()}>
+      {/* Mockup 3: on the Friends tab, the accent small button with Reset as a minor one in the danger colour; under
+          Today's board, the plain small one. */}
+      <p className={kit.chips}>
+        <button type="button" className={canReset ? `${kit.primary} ${kit.small}` : kit.small} disabled={busy || code === undefined} onClick={() => void invite()}>
           Invite a friend
         </button>
         {/* Beside the button, on the Friends tab only, so a stray tap under Today's board can't break a link already sent
             (answer 8). */}
         {canReset && code && (
-          <>
-            {" "}
-            <button type="button" disabled={busy} onClick={() => void reset()}>
-              Reset link
-            </button>
-          </>
+          <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={() => void reset()}>
+            Reset link
+          </button>
         )}
-        {note && <span role="status"> {note}</span>}
+        {note && <span role="status">{note}</span>}
       </p>
       {code === undefined && !error && (
         <Skeleton label="Loading your invite link">

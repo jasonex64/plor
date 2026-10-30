@@ -1,26 +1,30 @@
-/* The Me tab's stats (docs/milestones/M14-14a-3a-me.md), sized from round 7's Me boards. */
+/* The Me tab's stats (docs/milestones/M14-14a-3a-me.md) in mockup 3's look (docs/milestones/M14-14b-8-the-new-look.md):
+   kit cards, stat tiles, chips and badged rows; the sizes below are mockup 3's Me unless they say otherwise. */
 .me {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.header {
-  display: flex;
+/* The header card: the big avatar beside the name and its "Playing since" chip. Scoped above the kit's .card, which
+   stacks its children, so the CSS load order can't decide (14b-8b review). */
+.me .header {
+  flex-direction: row;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
 
 .who {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   min-width: 0;
 }
 
 .name {
   margin: 0;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -29,39 +33,11 @@
   font-size: 14px;
 }
 
-.heading {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.1;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-}
-
-.titled {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-/* The totals: two to a row, each its own box, the number above its label. */
+/* The totals: two to a row, 10px apart, each a stat tile with its number above its label. */
 .totals {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
   margin: 0;
 }
 
@@ -69,49 +45,34 @@
   display: flex;
   flex-direction: column-reverse;
   gap: 2px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
 }
 
 .totals dd,
 .stats dd {
   margin: 0;
+}
+
+.totals dd {
+  font-size: 28px;
   font-weight: 800;
   line-height: 1;
 }
 
-.totals dd {
-  font-size: 26px;
-}
-
 .totals dt {
-  color: var(--muted);
   font-size: 13px;
+  font-weight: 600;
 }
 
-/* A game's card: three stats in a row. */
+/* A game's card: its numbers as chips, value first ("17 best score"). */
 .stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0;
 }
 
-.stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 2px;
-}
-
-.stats dd {
-  font-size: 22px;
-}
-
-.stats dt {
-  color: var(--muted);
-  font-size: 12px;
+.me .stats > div {
+  flex-direction: row-reverse;
 }
 
 .game {
@@ -120,19 +81,26 @@
   gap: 10px;
 }
 
-.chip {
+.game h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+/* Offbeat's plain block beside its name until 14c's art, edged like the kit's tiles. */
+.block {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-small);
   background: var(--offbeat);
 }
 
-/* The calendar: seven columns, 5px apart, square days with 7px corners. */
+/* The calendar: seven columns, 4px apart, square days with the cells' 2px corners. */
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 5px;
+  gap: 4px;
 }
 
 .weekday {
@@ -142,11 +110,13 @@
   text-align: center;
 }
 
-/* A day's number, with Numbers on the calendar on, 13px bold in its shade's number colour (round 7; L46). */
+/* A day's number, with Numbers on the calendar on, 13px bold in its shade's number colour (round 7; L46). A played day
+   is edged in ink, as drawn. */
 .day {
   box-sizing: border-box;
   aspect-ratio: 1 / 1;
-  border-radius: 7px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-cell);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,15 +125,17 @@
 }
 
 .missed {
-  border: 1.5px solid var(--edge);
+  border-color: var(--edge);
 }
 
 .later {
-  border: 1px dashed var(--line);
+  border-color: var(--line);
+  border-style: dashed;
 }
 
 .today {
-  border: 2px solid var(--text);
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
 }
 
 .shade1 {
@@ -196,29 +168,24 @@
 
 .legend i {
   display: inline-block;
+  box-sizing: border-box;
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-cell);
 }
 
-.rarest {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rarest li {
+/* A rare answer's name over its prompt, beside its place badge. */
+.rare {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 8px 0;
-  border-top: 1px solid var(--line);
 }
 
-.rarest strong {
+.rare strong {
   font-size: 17px;
 }
 
-.rarest .muted {
+.rare .muted {
   font-size: 13px;
 }

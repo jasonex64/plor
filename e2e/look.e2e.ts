@@ -1,7 +1,8 @@
 // The new look (docs/milestones/M14-14b-8-the-new-look.md; mockup 3, "Nearly square (5px)"), read from computed styles
 // on real elements. 14b-8a: buttons, links drawn as buttons and fields take the ink border, corners and hard shadow in
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
-// bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard.
+// bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard. 14b-8c: Me's
+// cards and /streak's ranks.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -129,4 +130,27 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(card).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
+});
+
+// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stat tiles and
+// the days take the cells' corners; /streak's own rank keeps its thicker edge. The header and the rank are scoped above the kit's card, which
+// a production CSS order could otherwise let win (14b-8b review).
+test("Me's header, stat tiles and days, and /streak's own rank, in the kit", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await page.goto("/me");
+  await signInAndPick(page, "lm");
+  const color = await ink(page);
+  const header = page.getByText(/^Playing since /).locator("xpath=../..");
+  await expect(header).toBeVisible();
+  expect(await header.evaluate((el) => getComputedStyle(el).flexDirection)).toBe("row");
+  expect(await look(header)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  expect(await header.locator("[data-initial]").evaluate((el) => `${getComputedStyle(el).borderTopWidth} ${getComputedStyle(el).borderTopColor}`)).toBe(`2px ${color}`);
+  const tile = page.getByRole("region", { name: "All games" }).getByText("points all time", { exact: true }).locator("xpath=..");
+  expect(await look(tile)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+  expect(await page.getByRole("region", { name: "Calendar" }).locator("[data-date]").first().evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("2px");
+
+  await page.goto("/streak");
+  const own = page.locator("li[aria-current]");
+  await expect(own).toContainText("Your rank");
+  expect(await own.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("3px");
 });
