@@ -81,3 +81,25 @@ test("a player who isn't an admin sees no game on a test run's page", async ({ b
   await expect(page.getByRole("alert").filter({ hasText: "This page is for admins only." })).toBeVisible();
   await expect(page.getByRole("button", { name: "Start", exact: true })).toHaveCount(0);
 });
+
+// 14b-11b: a refused answer redraws the test run, which once started its countdown again from 20 (the human,
+// 2026-10-30: "if i type something that isn't in the answer bank, it resets timer"). The clock is faked so five seconds
+// pass at once.
+test("a refused answer in a test run keeps the countdown going", async ({ browser }) => {
+  const admin = await (await browser.newContext()).newPage();
+  await admin.clock.install();
+  await admin.goto("/");
+  await signInAndPick(admin, "trc");
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-trc@example.test`]);
+  const hosts = fixtureDraft(ahead).questions.map((q) => q.host_answers);
+  await admin.goto(`/admin/test/${ahead}?hosts=${encodeURIComponent(JSON.stringify(hosts))}`);
+  await admin.getByRole("button", { name: "Start", exact: true }).click();
+  const timer = admin.getByRole("timer", { name: "Seconds left" });
+  await expect(timer).toHaveText("20");
+  await admin.clock.fastForward("00:05");
+  await expect(timer).toHaveText("15");
+  await admin.getByLabel("Your answer").fill("zzqx not a thing");
+  await admin.getByRole("button", { name: "Answer" }).click();
+  await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
+  expect(Number(await timer.textContent())).toBeLessThanOrEqual(15);
+});
