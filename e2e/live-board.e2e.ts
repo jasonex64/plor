@@ -125,6 +125,15 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   ]);
   // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
   await expect(row).toHaveText(`${playerName}: tipped over at stop 1 by "${hostAnswer}" 👍😂😮😢❤️`);
+  // On a phone the reactions sit on a line under the name and how the run stands, not over them (they did: 14b-8's
+  // critique; docs/milestones/M14-14b-8-the-new-look.md, 14b-8e).
+  await watcher.setViewportSize({ width: 390, height: 844 });
+  const reactions = (await row.getByRole("group", { name: "Reactions" }).boundingBox())!;
+  for (const words of [row.locator("b"), row.getByText(/^tipped over/)]) {
+    const box = (await words.boundingBox())!;
+    expect(reactions.y).toBeGreaterThanOrEqual(box.y + box.height);
+  }
+  await watcher.setViewportSize({ width: 1280, height: 720 });
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   await expect(place).toHaveCount(1);
   await expect(place.locator("summary")).toHaveText(`Tipped over at stop 1: You, ${playerName}`);
