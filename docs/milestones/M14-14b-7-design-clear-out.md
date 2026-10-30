@@ -1,6 +1,6 @@
 # M14 14b-7 — Design clear-out: an audit after 14b-6, then a fresh start
 
-**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. **Built after 14b-8, the new look, and its critique** (human, 2026-10-29, answer 2 below). Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
+**Status:** approved (human, 2026-10-28: "Approve 14b-7 as drafted"); drafted from guided questions answered the same day. Built after 14b-8, the new look, and its critique (human, 2026-10-29, answer 2 below); in review (PR_7). Since drafting, 14b-6d made Baloo 2 the one font (human, 2026-10-28: "baloo 2"); `DESIGN.md` describes it like the rest of the code.
 
 ## Goal
 Once all of 14b-6 is merged to `main` (and so deployed to plor.app), remove every mockup, stored critique and record of past or planned look directions from claude.ai and the live docs, and leave one short as-built note, so the next look is designed from what shipped.
@@ -19,6 +19,12 @@ Once all of 14b-6 is merged to `main` (and so deployed to plor.app), remove ever
 7. **Which claude.ai pages:** all four, "Plor hard-shadow mockup", "Plor + Offbeat look directions", "Plor shell layout" and "Plor M14 Catch-up".
 8. **Where the note lives:** "docs/DESIGN.md (Recommended)".
 9. **14c's world:** "Clear it too". The approved direction for the game's world (code-drawn pixel art, the ridge, the Wind, a game look apart from Plor's tabs) is cleared, and 14c starts its guided questions from zero.
+
+**2026-10-29, on the Windows PC, after the inventory (Plan 1):**
+10. **Which claude.ai pages:** "The four + Plor font pick (Recommended)" (the font-pick page was made for 14b-6d, after this ticket was drafted).
+11. **Impeccable's files:** "Yes, keep the consent file (Recommended)": the hook cache and the two critique snapshots go, `config.local.json` stays.
+12. **The temp folders:** "Delete them (Recommended)": the mockup HTML, the look and critique screenshots and the font-pick files; pasted screenshots, walkthroughs and PR drafts stay.
+13. **The live docs and ROADMAP's split:** "Approve as listed (Recommended)": five style-only items go (Reset link and Delete group at the same weight, the streak tiles not lining up, the sidebar's 50px items, a small button's 4px drop onto a 3px shadow, the game screen's stat tiles nearly touching); the bug and accessibility items stay.
 
 ## Source
 No entry in SOURCES.md covers clearing docs. The sources are the human's answers above and the shipped code, which `DESIGN.md` describes (`src/app/globals.css`, the CSS modules, `src/app/fonts/`, the themes). Nothing in the note may come from a mockup or a ticket's plan, only from the code.
@@ -43,13 +49,13 @@ No entry in SOURCES.md covers clearing docs. The sources are the human's answers
 5. **`docs/DESIGN.md`:** a short as-built note covering the colour slots and the five themes, the fonts and type sizes, corners, borders, shadows, spacing, the breakpoints and the shell's layout. Each value cites its file and line. It gives no rationale and no history. A PR that changes what it describes updates it, which goes in the CLAUDE.md Docs table row.
 
 ## Acceptance criteria
-- [ ] 14b-6b to 14b-6f are merged (`gh pr list --state merged --search "14b-6"`), and `main`'s head has a successful Vercel deployment (`gh api repos/jasonex64/plor/commits/<sha>/status`; the check's name is *unverified*).
-- [ ] `Artifact list` shows none of the four URLs in Scope 1.
-- [ ] `.impeccable/hook.cache.json` is gone, and `.claude/skills/impeccable/SKILL.md` is still there.
-- [ ] `rg -n -i "mockup|askmoonlit|ink shadow|hard.shadow|critique|nearly square"` over `docs/HANDOFF.md` (both branches), `docs/ROADMAP.md` and `docs/milestones/M14-look-and-feel.md` finds only what the human kept. Each hit that's left is explained in Evidence.
-- [ ] Every ROADMAP item removed was on the split the human approved; every bug or accessibility item is still there.
-- [ ] `docs/DESIGN.md` exists, each value cites a file and line that holds it, and it is listed in CLAUDE.md's Docs table.
-- [ ] The `reviewer` agent has reviewed the diff.
+- [x] 14b-6b to 14b-6f are merged (`gh pr list --state merged --search "14b-6"`), and `main`'s head has a successful Vercel deployment (`gh api repos/jasonex64/plor/commits/<sha>/status`; the check's name is *unverified*).
+- [x] `Artifact list` shows none of the four URLs in Scope 1.
+- [x] `.impeccable/hook.cache.json` is gone, and `.claude/skills/impeccable/SKILL.md` is still there.
+- [x] `rg -n -i "mockup|askmoonlit|ink shadow|hard.shadow|critique|nearly square"` over `docs/HANDOFF.md` (both branches), `docs/ROADMAP.md` and `docs/milestones/M14-look-and-feel.md` finds only what the human kept. Each hit that's left is explained in Evidence.
+- [x] Every ROADMAP item removed was on the split the human approved; every bug or accessibility item is still there.
+- [x] `docs/DESIGN.md` exists, each value cites a file and line that holds it, and it is listed in CLAUDE.md's Docs table.
+- [x] The `reviewer` agent has reviewed the diff.
 
 ## Out of scope
 - Rewriting git history (offered, not chosen). Old ticket text stays reachable in git.
@@ -80,9 +86,27 @@ None. Every value in `DESIGN.md` is read from the code and cited.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Scope 1 lists four claude.ai pages | Five deleted: the four and "Plor font pick" | Answer 10; the page was made after the ticket was drafted |
+| Scope 2 keeps `config.local.json` and deletes `hook.cache.json` | Also deleted `.impeccable/critique/` (14b-6's and 14b-8's snapshots) | They were made after drafting; "only remove impeccable stuff if it stored information" (answer 3), and answer 11 |
+| Scope 4 names HANDOFF, ROADMAP and the parent ticket | Also SOURCES.md's mockup 3 row | It was 14b-8's source only, to be deleted here after the critique (14b-8's ticket, Source) |
+| Scope 4: ROADMAP's look-direction clauses | The M14 row rewritten whole as a list of what's done, with PRs | The row's history was the look's history; the tickets keep it |
+| Live docs | DECISIONS.md's Styling row (the kit's variables and shared pieces) and the code's comments citing mockup 3 are left | DECISIONS.md records how styles are written, not a direction; changing the shipped code is out of scope |
 
 ## Evidence
+### 2026-10-29, the Windows PC
+- **Criterion 1:** 14b-6's PRs are merged (`gh pr list --state merged --search "14b-6"` lists #113 and #124 to #129). `main`'s head `077618b` (PR #134's merge): `gh api repos/jasonex64/plor/commits/077618b/status` → `{"state":"success","statuses":[{"context":"Vercel","state":"success"}]}`.
+- **Criterion 2:** the five pages deleted one by one, each confirmed by the human (`Artifact delete`): PuxmXXNxypRTz8uYGQLUK8, NQmsChneJ1uew7mBzHuLvc, 9QkZKZZZsEpCJsDVv7VfGZ, 4MUzRGRpjJGdJpvXgbjNQW, Jjr434qu3J1NAiM7tsbD5M. `Artifact list` afterwards shows none of them (only the human's three non-Plor pages).
+- **Criterion 3:** `find .impeccable -type f` in `C:/Users/jason/RIFF` → `.impeccable/config.local.json` only; `.claude/skills/impeccable/SKILL.md` is there. The Mac's snapshots, if any survived its worktree's removal, are unverified (the Mac is idle).
+- **Temp folders:** deleted `cacd53dd…/scratchpad/artifact-files`, `plor-shell` and `plor-m14-catch-up.html`, `d4bbc6dd…/scratchpad/plor-mockup`, and this session's `look8a` to `look8d`, `crit`, `crit8`, `baloo`, `tnum` and `plor-font-pick.html`. A search for `*mockup*`, `*.dc.html`, `plor-*.html` and any `.html` across the temp folders afterwards finds nothing.
+- **Criterion 4:** `rg -n -i "mockup|askmoonlit|ink shadow|hard.shadow|critique|nearly square"` over `docs/HANDOFF.md`, `docs/ROADMAP.md`, `docs/milestones/M14-look-and-feel.md` and `docs/SOURCES.md` finds 12 lines: ROADMAP 444 to 452 and 485 are kept bug and accessibility items whose provenance names the critique that found them (answer 13); HANDOFF 5 and 39 say what this ticket cleared. The parent ticket and SOURCES.md have none. `HANDOFF.md` is one file on `main` and this branch since PR #134's merge.
+- **Criterion 5:** ROADMAP lost exactly the five approved items; the 10 kept critique items and every other For M14 item are there (618 lines, from 623).
+- **Criterion 6:** `docs/DESIGN.md` written from the code, each value with its file and line (`globals.css`, `kit.module.css`, `shell.module.css`, `side-column.*`, `layout.tsx`); the kit's ranges checked against their first and last lines. Listed in CLAUDE.md's Docs table.
 
 ## Review
+### The `reviewer` agent, fresh context, on the diff over `077618b`
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. `DESIGN.md`'s note that Chromium draws 1.5px as 1px had no citation: it cites `e2e/look.e2e.ts:109-110` now.
+  2. Two lines of 14c's cleared direction were left in the parent ticket (Scope 6, "the Wind blows the player off the ridge"; L16, "the pixel art and the game's motion"): both now name no direction.
+- Fixed with them: the parent ticket's "Acceptance criteria" heading, glued to L43's row since before this ticket, is its own line; HANDOFF says the critiques' findings were deferred to the fresh round, not dropped; these checkboxes are ticked.
+- Left as they are: the parent ticket's line 10 quotes the 2026-10-20 ordering ("pixel art included"), a record, not a direction; `C:/Users/jason/RIFF/.impeccable/live/` holds two empty folders, which store nothing.
+- Deferred to ROADMAP "Next revision": none.
