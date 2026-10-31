@@ -48,6 +48,12 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 23. At 40px, "0.0/7" is 96px where a game-screen tile on a 390px phone leaves about 74px, and "12,345" is 131px where Me's tiles at 360px leave about 111px. Asked how they should fit: "Shrink to fit the tile (Recommended)" ("40px wherever it fits, scaling down with the tile's width on narrow phones (CSS container units), so a number never spills").
 24. After the second review asked where "999,999" came from: "999,999 (Recommended)" ("Fits any total under a million: years of daily play … A seven-digit total would spill until it's raised").
 
+**Before 14b-10b (2026-10-30, the human: "Yes, ask them"):**
+25. The tab icon's hop: "3px (Recommended)" ("A small visible lift: clearly a reaction to the pointer without looking like a bounce").
+26. The easing for hovers, the hop, pops and count-ups: "Quick out, soft settle (Recommended)" ("Fast at the start, slowing into place (CSS ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)). Feels responsive and calm; no overshoot").
+27. When numbers count up: "When they've changed (Recommended)" ("Only when a number differs from what this browser last showed you (kept in the browser, like the theme copy): after a run, or a new day's streak").
+28. Which icons are redrawn: "The four tabs (Recommended)" ("Today, Friends, Groups and Me, in the tab bar and the sidebar … The gear and other icons stay as they are").
+
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
 
@@ -69,7 +75,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 - **Numbers:** points, streak and rank count up when they change, over at most 600ms.
 - **Pops:** a new reaction, comment or rank pops in from 90% size.
 - **Reduced motion:** nothing moves; tints still show (answer 8).
-- **Tab icons:** redrawn filled, with one soft colour each; the current tab's icon takes the accent (answer 15). The drawings are shown to the human before they ship.
+- **Tab icons:** redrawn filled, with one soft colour each; the current tab's icon takes the accent (answer 15). The drawings are shown to the human before they ship. First drawings, 2026-10-30, on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8), in the tab bar and sidebar of all five themes with the hop; waiting for the human's word.
 
 ## Numbers
 | Value | Used for | Origin |
@@ -84,7 +90,8 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 | 2px | A button's lift on hover | Answer 14 |
 | 90% | A pop's starting size | Answer 14 |
 | 600ms at most | A count-up | Answer 14 |
-| **Open** | How high the icon hops; the motion's easing | Ask before 14b-10b |
+| 3px | How high the tab icon hops | Answer 25 |
+| `cubic-bezier(0.2, 0.8, 0.2, 1)` | The easing of hovers, the hop, pops and count-ups | Answer 26 |
 
 ## Acceptance criteria
 - [ ] **14b-10a:**
