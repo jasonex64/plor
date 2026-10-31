@@ -1,12 +1,13 @@
-/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: at least 48px tall, on the
-   surface colour, with the buttons' ink border, corners, hard shadow and press (globals.css; M14 14b-8). */
+/* The game screen's secondary button (game.module.css .secondary, round 5) as a link: the buttons' one 44px height
+   (M14 14b-10, answer 7), on the surface colour, with the buttons' ink border, corners, hard shadow and press
+   (globals.css; M14 14b-8). */
 .button {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 48px;
+  min-height: 44px;
   padding: 0 16px;
   border: 2px solid var(--ink);
   border-radius: var(--r-button);

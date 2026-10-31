@@ -81,7 +81,10 @@
 
 .stats dd {
   margin: 0;
-  font-size: 24px;
+  /* 40px where it fits, else 35% of the tile: "1,500", the best score's most, is 2.675 times its size in Baloo 2 at
+     800, plus up to half a pixel a glyph where Chromium rounds glyphs to whole pixels (Linux, CI), down to a 320px
+     phone's 60px tile (M14 14b-10, answers 22 and 23, measured). */
+  font-size: min(40px, 35cqi);
   font-weight: 800;
   line-height: 1;
 }
@@ -151,7 +154,3 @@ section.how {
   line-height: 1.45;
 }
 
-/* Start climbing: the kit's main button (kit.module.css's .primary), at the game screen's height. */
-.start {
-  min-height: 52px;
-}

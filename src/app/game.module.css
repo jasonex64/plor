@@ -1,13 +1,12 @@
 /* Offbeat's banner (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour until 14c's pixel
    world, 230px tall on phones and 240px from 768px (the approved mockups), drawn as mockup 3's banner (M14 14b-8b): the
-   ink border, the card's shadow, corners 2px rounder than a card's. */
+   ink border and corners 2px rounder than a card's, flat as a card is (M14 14b-10, answer 3). */
 .banner {
   box-sizing: border-box;
   min-height: 230px;
   padding: 24px 16px 20px;
   border: 2px solid var(--ink);
   border-radius: calc(var(--r-card) + 2px);
-  box-shadow: var(--shadow-card);
   background: var(--offbeat);
   color: var(--on-offbeat);
   display: flex;
@@ -43,7 +42,6 @@
    (L25), at least 140px wide (M14 14b-8b). Play is a link, or a button with Skip the game screen on (M14 14a-3b). */
 .play {
   min-width: 140px;
-  min-height: 48px;
   margin: 0;
 }
 
@@ -77,10 +75,9 @@
   line-height: 1.4;
 }
 
-/* Start, full width under the stakes: mockup 3's main button (kit.module.css's .primary), at the game screen's height. */
+/* Start, full width under the stakes: mockup 3's main button (kit.module.css's .primary). */
 .start {
   width: 100%;
-  min-height: 52px;
   margin: 0;
 }
 

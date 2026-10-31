@@ -268,7 +268,7 @@ export function HowToPlay() {
         {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} at the top. Run out of time and the climb ends too.
       </p>
       {run?.status === "not_started" && (
-        <button type="button" className={`${kit.primary} ${styles.start}`} disabled={starting.busy} onClick={() => void starting.start()}>
+        <button type="button" className={kit.primary} disabled={starting.busy} onClick={() => void starting.start()}>
           Start climbing
         </button>
       )}

@@ -58,7 +58,7 @@ export function MeStats({ numbers }: { numbers: boolean }) {
         <dl className={styles.totals}>
           <Total value={me.totals.points.toLocaleString("en-US")} label="points all time" />
           <Total value={String(me.totals.daysPlayed)} label="days played" />
-          <Total value={String(me.totals.streak)} label="day streak now" soft />
+          <Total value={String(me.totals.streak)} label="day streak now" />
           <Total value={String(me.totals.longestStreak)} label="longest streak" />
         </dl>
       </section>
@@ -106,10 +106,10 @@ export function MeStats({ numbers }: { numbers: boolean }) {
   );
 }
 
-// A total as mockup 3's stat tile; soft: the one tinted tile, the streak now.
-function Total({ value, label, soft }: { value: string; label: string; soft?: boolean }) {
+// A total as mockup 3's stat tile, in the soft tint: Me's headline numbers are yours (M14 14b-10, answer 20).
+function Total({ value, label }: { value: string; label: string }) {
   return (
-    <div className={soft ? `${kit.stat} ${kit.soft}` : kit.stat}>
+    <div className={`${kit.stat} ${kit.soft}`}>
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>

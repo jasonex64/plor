@@ -52,7 +52,8 @@
 }
 
 /* The streak's pill (round 7's .streak; docs/milestones/M14-14b-2a-streak-ranks.md): the rank's 22px flower and the
-   number, as mockup 3's streak chip (M14 14b-8): the safe colours, a 1.5px ink border, small corners. At 26px tall
+   number, as mockup 3's streak chip (M14 14b-8), with a 1.5px ink border; fully round beside the round avatar, in the
+   soft accent tint (M14 14b-10, answers 6 and 20). At 26px tall
    it is a target above WCAG 2.2 2.5.8's 24px. */
 .streak {
   display: inline-flex;
@@ -60,9 +61,9 @@
   gap: 4px;
   padding: 2px 10px 2px 6px;
   border: 1.5px solid var(--ink);
-  border-radius: var(--r-small);
-  background: var(--safe-bg);
-  color: var(--safe);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--text);
   font-size: 18px;
   font-weight: 800;
   line-height: 22px;
@@ -188,11 +189,10 @@
     font-size: 16px;
   }
 
-  /* The current item, as mockup 3's sidebar draws it: the soft fill, a 2px ink border and a small hard shadow. */
+  /* The current item, as mockup 3's sidebar draws it: the soft fill and a 2px ink border, flat (M14 14b-10, answer 3). */
   .on {
     background: var(--soft);
     border-color: var(--ink);
-    box-shadow: var(--shadow-card-small);
   }
 
   .on .icon {
@@ -233,7 +233,6 @@
     border: 2px solid var(--ink);
     border-radius: var(--r-small);
     background: var(--soft);
-    box-shadow: var(--shadow-card-small);
     color: var(--text);
   }
 }

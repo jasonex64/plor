@@ -18,13 +18,11 @@
   background: var(--surface);
   border: 2px solid var(--ink);
   border-radius: var(--r-card);
-  box-shadow: var(--shadow-card);
   padding: 0 16px;
 }
 
 .toast:empty {
   border: 0;
-  box-shadow: none;
   padding: 0;
 }
 

@@ -73,11 +73,10 @@
 .on {
   border-color: var(--ink);
   background: var(--soft);
-  box-shadow: var(--shadow-card-small);
   color: var(--text);
 }
 
-/* On phones: the page menu, 48px tall, and the waiting row. The menu button is the base button; the menu a card. */
+/* On phones: the page menu, at the buttons' height, and the waiting row. The menu button is the base button; the menu a card. */
 .phone {
   display: flex;
   flex-direction: column;
@@ -88,7 +87,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 48px;
   margin: 0;
   padding: 0 12px;
   font-size: 16px;
@@ -228,9 +226,8 @@ span.decide {
   font-weight: 700;
 }
 
-/* The kit's small buttons at round 10's 36px desk height; scoped above the kit's small kind, which sets min-height: 0. */
+/* The kit's small buttons in the admin area, without the base button's margin. */
 .area .button {
-  min-height: 36px;
   margin: 0;
 }
 
@@ -251,7 +248,7 @@ span.decide {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 44px;
   box-sizing: border-box;
   padding: 0 12px;
   border: 2px solid var(--ink);
@@ -261,7 +258,7 @@ span.decide {
 
 .field input {
   flex-grow: 1;
-  min-height: 36px;
+  min-height: 40px;
   margin: 0;
   padding: 0;
   border: 0;
