@@ -215,6 +215,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - `alive` → **4 passed**. `shell` → all passed.
   - `calm.e2e.ts`'s first test took 96s against `test.slow()`'s 90s, so it now has an explicit 3 minutes. Its assertions are unchanged.
   - `feel.e2e.ts:274` failed once in a slow run and passed alone (17.8s).
+- **CI on PR #142:** `feel.e2e.ts:172` (a chip as wide with its count as without) failed on both runs. The chip measured 43.6px, then 44.2px, because the comment around it was popping (scaling in from 90%) as it was measured. Linux CI's order showed why: the pending copy went in one update and the server's copy came in the next, so the server copy counted as new and popped again. `useArrived` now remembers each pending copy until a comment like it comes back, and it moved from an effect to state kept during render (React's "Storing information from previous renders"), compared by ids. Locally: `feel` and `alive` → 11 passed; `live-board`, `groups`, `today`, `player-screens` and `offbeat` → 27 passed.
 
 ## Review
 ### 14b-10b: the `reviewer` agent, fresh context

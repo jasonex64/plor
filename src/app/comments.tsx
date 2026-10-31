@@ -276,25 +276,35 @@ function ThreadLabel({ comment }: { comment: FeedComment }) {
 
 // The comments that have appeared since a day's thread was first shown: one that arrived, or the player's own as it's
 // posted (14b-10b, answer 12). A posted comment shows at once under a pending id and comes back from the server under its
-// own, for a moment beside the pending copy (ROADMAP For M14, the flicker); that return is the same comment, so it doesn't
-// pop again.
+// own: beside the pending copy for a moment, or a load after it has gone (ROADMAP For M14, the flicker). That return is the
+// same comment, so it doesn't pop again: each pending copy shown is remembered until a comment like it comes back.
 function useArrived(comments: Comment[] | null, day: string | undefined): Set<string> {
-  const [arrived, setArrived] = useState<Set<string>>(new Set());
-  const before = useRef<{ day: string | undefined; comments: Comment[] } | null>(null);
-  useEffect(() => {
-    if (!comments) return;
-    const last = before.current;
-    before.current = { day, comments };
-    if (!last || last.day !== day) {
-      setArrived(new Set());
-      return;
-    }
-    const known = new Set(last.comments.map((c) => c.id));
-    const posted = [...last.comments, ...comments].filter((c) => c.id.startsWith(PENDING));
-    const returned = (c: Comment) => !c.id.startsWith(PENDING) && posted.some((p) => p.username === c.username && p.body === c.body);
-    const fresh = comments.filter((c) => !known.has(c.id) && !returned(c));
-    if (fresh.length > 0) setArrived((a) => new Set([...a, ...fresh.map((c) => c.id)]));
-  }, [comments, day]);
+  // Kept from render to render, and updated while rendering when the comments change (React's "Storing information from
+  // previous renders"): the ids seen, the pending copies not yet back, and the ones that pop. Compared by their ids, as the
+  // list itself is a new array on every render.
+  const [seen, setSeen] = useState<{ ids: string | null; day: string | undefined; known: Set<string>; posted: string[]; arrived: Set<string> }>(
+    { ids: null, day, known: new Set(), posted: [], arrived: new Set() },
+  );
+  const ids = comments?.map((c) => c.id).join(" ") ?? null;
+  if (ids === null || (ids === seen.ids && day === seen.day)) return seen.arrived;
+  if (!comments) return seen.arrived;
+  const key = (c: Comment) => `${c.username}
+${c.body}`;
+  const first = seen.ids === null || seen.day !== day;
+  const known = new Set(first ? [] : seen.known);
+  const posted = first ? [] : [...seen.posted];
+  const arrived = new Set(first ? [] : seen.arrived);
+  for (const c of comments) {
+    if (known.has(c.id)) continue;
+    known.add(c.id);
+    const pending = c.id.startsWith(PENDING);
+    if (pending) posted.push(key(c));
+    if (first) continue;
+    const back = pending ? -1 : posted.indexOf(key(c));
+    if (back >= 0) posted.splice(back, 1);
+    else arrived.add(c.id);
+  }
+  setSeen({ ids, day, known, posted, arrived });
   return arrived;
 }
 
