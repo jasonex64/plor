@@ -3,7 +3,7 @@
 **Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, done (PR #141, merged 2026-10-30 on green CI). Then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
 
 ## Goal
-Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon hop, pops, count-ups).
+Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon turning solid, pops, count-ups).
 
 ## Who uses it / what breaks without it
 - Used by: every player, on every screen.
@@ -54,6 +54,10 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 27. When numbers count up: "When they've changed (Recommended)" ("Only when a number differs from what this browser last showed you (kept in the browser, like the theme copy): after a run, or a new day's streak").
 28. Which icons are redrawn: "The four tabs (Recommended)" ("Today, Friends, Groups and Me, in the tab bar and the sidebar … The gear and other icons stay as they are").
 
+**After the first icon drawings (2026-10-30):**
+29. "the icons should not be colored." Supersedes answer 15's soft colour and accent.
+30. "rather than play a hop animation (goes from a to b to a) it should just be a transition to another state (a - b)", then "maybe like 2 versions of each icon". Supersedes answer 25's 3px hop: each tab icon has an outline version at rest and a solid one, both in the text colour; hovering moves from one to the other and holds it, and the current tab shows the solid one.
+
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
 
@@ -69,13 +73,13 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - Me's four headline tiles (answer 20).
 
 **14b-10b, the motion and icons:**
-- **Desktop tabs:** the soft tint on hover, and the icon hops once (answer 8).
+- **Desktop tabs:** the soft tint on hover, and the icon moves from its outline version to its solid one and holds it while hovered (answers 8 and 30); the current tab shows the solid one.
 - **Buttons:** lift 2px on hover (desktop), then press as now (answer 14).
 - **Rows:** take the soft tint on hover (answer 12).
 - **Numbers:** points, streak and rank count up when they change, over at most 600ms.
 - **Pops:** a new reaction, comment or rank pops in from 90% size.
 - **Reduced motion:** nothing moves; tints still show (answer 8).
-- **Tab icons:** redrawn filled, with one soft colour each; the current tab's icon takes the accent (answer 15). The drawings are shown to the human before they ship. First drawings, 2026-10-30, on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8), in the tab bar and sidebar of all five themes with the hop; waiting for the human's word.
+- **Tab icons:** two versions of each of the four, an outline and a solid one, in the text colour with no tint (answers 28 to 30; answer 15's colour is superseded). The drawings are shown to the human before they ship. The drawings are on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8). Round 1 (2026-10-30) was coloured and hopped; round 2 has the two uncoloured versions (answers 29 and 30). It waits for the human's word.
 
 ## Numbers
 | Value | Used for | Origin |
@@ -86,12 +90,11 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 | 35% and 24% of the tile's width | The game screen's and Me's stat numbers where 40px won't fit | Answer 23; measured in Baloo 2 at 800 with tabular digits: "1,500" (the best score's most: 1,000 for seven stops plus the 500 bonus cap, `src/config/tunables.ts`) is 2.675 times its size, "999,999" points, the widest Me's total must fit (answer 24; a perfect day is at most 1,500), 3.875 times. Each allows half a pixel a glyph where Chromium rounds glyphs to whole pixels (CI's Linux), down to a 320px phone: (60 − 2.5) / 2.675 ≈ 21.5px of a 60px tile, (91 − 3.5) / 3.875 ≈ 22.6px of a 91px tile |
 | Fully round | The streak pill | Answer 6 |
 | The theme's `--soft` | Tints at rest and on hover | Answers 8, 11 (`globals.css`, each theme) |
-| 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:414-443`) |
+| 200ms | Hovers, the icon's change of version, pops | Answers 8, 14, 30 (the slide's timing, `globals.css:414-443`) |
 | 2px | A button's lift on hover | Answer 14 |
 | 90% | A pop's starting size | Answer 14 |
 | 600ms at most | A count-up | Answer 14 |
-| 3px | How high the tab icon hops | Answer 25 |
-| `cubic-bezier(0.2, 0.8, 0.2, 1)` | The easing of hovers, the hop, pops and count-ups | Answer 26 |
+| `cubic-bezier(0.2, 0.8, 0.2, 1)` | The easing of hovers, the icon's change of version, pops and count-ups | Answer 26 |
 
 ## Acceptance criteria
 - [ ] **14b-10a:**
@@ -102,11 +105,11 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - Card headings are 24px; the stat tiles' and /streak's numbers 40px where they fit, and the widest a tile can show fits it on a phone (answer 23).
   - Your row on a board and in the friends list, the streak pill and Me's four headline tiles take the soft tint.
 - [ ] **14b-10b:**
-  - A hovered desktop tab takes the tint and its icon moves once.
+  - A hovered desktop tab takes the tint and shows its icon's solid version until the pointer leaves; the current tab shows its solid version.
   - A hovered button lifts 2px; nothing moves under reduced motion.
   - A count-up ends at the right number within 600ms.
   - A new reaction pops.
-  - The redrawn icons pass contrast in all five themes (`src/app/colors.test.ts`'s way).
+  - Both versions of each icon are in the text colour, with no other colour, in all five themes.
 - [ ] `docs/DESIGN.md` describes the new kit (each PR, CLAUDE.md, Docs).
 - [ ] An Impeccable `audit` after 14b-10b scores no worse than 15/20, and its nested-cards finding is gone.
 - [ ] The `reviewer` agent has reviewed each PR.
