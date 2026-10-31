@@ -187,7 +187,9 @@ const GEAR = icon(
 // review). The frame (Frame, src/app/home.tsx), which renders it, runs only on the client (it reads the address bar
 // behind Suspense). On phones the top bar's wordmark stands for the page's own "Plor" heading, which is then read but
 // not shown twice.
-export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedOut }: {
+export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onSignedOut }: {
+  // On the 404 page no tab is current (docs/milestones/M14-14b-16-not-found.md).
+  lost: boolean;
   admin: boolean;
   profile: Profile;
   streak: number;
@@ -225,7 +227,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
         </div>
         <ul className={styles.tabs}>
           {TABS.map((tab) => {
-            const here = current(path, tab.href, sidebar);
+            const here = lost ? undefined : current(path, tab.href, sidebar);
             return (
               <li key={tab.href}>
                 <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
@@ -237,7 +239,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
           })}
         </ul>
         {admin && (
-          <Link href="/admin" className={styles.admin} aria-current={path === "/admin" || path.startsWith("/admin/") ? "true" : undefined}>
+          <Link href="/admin" className={styles.admin} aria-current={!lost && (path === "/admin" || path.startsWith("/admin/")) ? "true" : undefined}>
             Admin
           </Link>
         )}
