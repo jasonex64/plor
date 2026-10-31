@@ -54,7 +54,8 @@ export function MeStats({ numbers }: { numbers: boolean }) {
           <span className={kit.chip}>Playing since {dateText(me.since, { day: "numeric", month: "short", year: "numeric" })}</span>
         </div>
       </div>
-      <section aria-label="All games" className={kit.card}>
+      {/* Your headline numbers: the screen's one tinted card (14b-15, answers 3 and 7). */}
+      <section aria-label="All games" className={`${kit.card} ${kit.soft}`}>
         <h2>All games</h2>
         <dl className={styles.totals}>
           <Total value={<CountUp name="me.points" value={me.totals.points} />} label="points all time" />
@@ -64,8 +65,8 @@ export function MeStats({ numbers }: { numbers: boolean }) {
         </dl>
       </section>
       <Calendar month={me.month} numbers={numbers} />
-      {/* The game's card is the screen's one tinted card, its numbers as chips (mockup 3's "Your Updraft"). */}
-      <section aria-label={GAME.name} className={`${kit.card} ${kit.soft}`}>
+      {/* The game's card, its numbers as chips (mockup 3's "Your Updraft"); plain since 14b-15 (answer 7). */}
+      <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
           {/* Offbeat's plain block until 14c's pixel world draws its chip. */}
           <span className={styles.block} aria-hidden="true" />
@@ -107,11 +108,11 @@ export function MeStats({ numbers }: { numbers: boolean }) {
   );
 }
 
-// A total as mockup 3's stat tile, in the soft tint: Me's headline numbers are yours (M14 14b-10, answer 20).
+// A total as a stat on its card, which takes the tint that says they're yours (M14 14b-10, answer 20; 14b-15, answer 3).
 // Points and streaks count up when they've changed (14b-10b, answer 27).
 function Total({ value, label }: { value: ReactNode; label: string }) {
   return (
-    <div className={`${kit.stat} ${kit.soft}`}>
+    <div className={kit.stat}>
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>

@@ -58,13 +58,15 @@
   gap: 8px;
 }
 
-/* Three stats side by side: the number above, its label below. */
+/* Three stats side by side: the number above, its label below, a thin --line between neighbours (14b-15, answer 1). */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px;
   margin: 0;
-  text-align: center;
+}
+
+.stats > div + div {
+  border-left: 1px solid var(--line);
 }
 
 .stats div {

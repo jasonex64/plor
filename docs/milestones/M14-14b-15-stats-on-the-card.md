@@ -1,6 +1,6 @@
 # M14 14b-15 — Stats on the card, not tiles in a card
 
-**Status:** drafted, waiting for the human's approval. It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
+**Status:** approved (human, 2026-10-31: "ok sure build now", to building it and showing the screenshots before the PR), in progress. It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
 
 ## Goal
 A stat ("400 best score") sits straight on its card, its number over its label, with thin grey lines between neighbours instead of a bordered tile of its own, on Me and on Updraft's game screen.
@@ -21,6 +21,10 @@ Round 2:
 5. Me's 2×2: "A cross: one line down, one across (Recommended)" ("Four quarters, like a window. Every number clearly has its own cell, the same rule as Updraft's row (lines between neighbours).").
 6. Alignment: "Centred, as Updraft (Recommended)" ("Each number and its label centred in its cell").
 
+While building, after Claude found that Me's Updraft card is already "the one tinted card on a screen" (`kit.module.css` `.soft`, `me.tsx`):
+
+7. "All games tinted, Updraft card plain (Recommended)" ("Your headline numbers become the screen's one tinted card; the Updraft card below goes plain. Keeps the kit's 'one tinted card a screen' rule").
+
 Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't be pressed has a shadow), answer 11 (your own things take the soft tint), answer 20 (Me's headline numbers are yours), and answers 22 to 24 (a number is 40px where it fits, else it shrinks to its cell).
 
 ## Source
@@ -31,7 +35,7 @@ Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't b
 ## Acceptance criteria
 - [ ] No stat has a border, corners or its own fill: `kit.stat` is a cell, its number over its label, centred.
 - [ ] "Your Updraft" (the game screen and the test run): three cells in a row, a 1px `--line` between neighbours, the card the only box.
-- [ ] Me's "All games": four cells 2 by 2 with a 1px `--line` cross between them, no gap; the card itself in the soft tint (`kit.soft`), the cells not tinted.
+- [ ] Me's "All games": four cells 2 by 2 with a 1px `--line` cross between them, no gap; the card itself in the soft tint (`kit.soft`), the cells not tinted; Me's Updraft card plain, so the screen still has one tinted card (answer 7).
 - [ ] Each number is still 40px where it fits and shrinks to its cell otherwise; `calm.e2e.ts`'s fit checks pass ("1,500" on a phone's Updraft, "999,999" on a 360px Me).
 - [ ] Impeccable's detector finds no `nested-cards` on Me, `/updraft` or the test run at 390×844 and 1440×900; 14b-10's audit criterion is then ticked.
 - [ ] The e2e checks that described the tiles (`look.e2e.ts`'s tile border and corners, `calm.e2e.ts`'s tinted tiles) describe the cells and the tinted card instead.
@@ -59,7 +63,7 @@ Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't b
 
 ## Removes
 - The stat tile's border and corners (`kit.module.css`, `.stat`) and the 10px and 4px gaps between tiles (`me.module.css .totals`, `offbeat.module.css .stats`).
-- Each of Me's four tiles' own tint (`me.tsx`, `Total`), which moves to the card.
+- Each of Me's four tiles' own tint (`me.tsx`, `Total`), which moves to the card, and the tint on Me's Updraft card (answer 7).
 - The ROADMAP For M14 cards-in-cards item, once the detector finds none.
 
 ---
