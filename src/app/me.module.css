@@ -33,18 +33,27 @@
   font-size: 14px;
 }
 
-/* The totals: two to a row, 10px apart, each a stat tile with its number above its label. */
+/* The totals: two to a row, each a stat with its number above its label, split by a thin cross of --line (14b-15,
+   answer 5). */
 .totals {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
   margin: 0;
 }
 
 .totals > div {
   display: flex;
   flex-direction: column-reverse;
+  align-items: center;
   gap: 2px;
+}
+
+.totals > :nth-child(even) {
+  border-left: 1px solid var(--line);
+}
+
+.totals > :nth-child(n + 3) {
+  border-top: 1px solid var(--line);
 }
 
 .totals dd,

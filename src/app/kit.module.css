@@ -140,13 +140,14 @@ form.chips {
   color: var(--caught);
 }
 
-/* A number as a stat tile (mockup 3's .stat): the ink border and small corners, flat (14b-10, answer 3). Its width is the
-   size its number scales to, so the number shrinks to fit on a narrow phone (14b-10, answer 23). */
+/* A number as a stat: a cell on its card, its number over its label, centred, with no box of its own, so a card of stats
+   isn't cards in a card; the screen draws the thin lines between cells (docs/milestones/M14-14b-15-stats-on-the-card.md,
+   answers 1 and 6). Its width is the size its number scales to, so the number shrinks to fit on a narrow phone (14b-10,
+   answer 23). */
 .stat {
   container-type: inline-size;
   padding: 10px 14px;
-  border: 2px solid var(--ink);
-  border-radius: var(--r-small);
+  text-align: center;
 }
 
 /* A rank or a stop as a round badge (mockup 3's .badge); the first is the accent one. */

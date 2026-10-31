@@ -1,6 +1,6 @@
 # M14 14b-14 — The leaderboard's graph view
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-14 as drafted?"), in review (PR #144). It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-14 as drafted?"), done (PR #144, merged on green CI at the human's "Merge when green"). It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
 
 ## Goal
 The weekly leaderboards on the Friends tab and each group page get a Graph view beside the List. Each week shows every player's points adding up day by day, so a player can see who's catching up and when someone pulled ahead.

@@ -3,7 +3,7 @@
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
 // bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard. 14b-8c: Me's
 // cards and /streak's ranks. 14b-8d: the admin area. Since 14b-10a (docs/milestones/M14-14b-10-calm-and-alive.md, answer
-// 3) only what can be pressed has a shadow: cards, stat tiles and the current tab or sub-tab are flat (calm.e2e.ts).
+// 3) only what can be pressed has a shadow: cards, stats and the current tab or sub-tab are flat (calm.e2e.ts).
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -133,10 +133,10 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
 });
 
-// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stat tiles and
+// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stats on their card (14b-15) and
 // the days take the cells' corners; /streak's own rank keeps its thicker edge. The header and the rank are scoped above the kit's card, which
 // a production CSS order could otherwise let win (14b-8b review).
-test("Me's header, stat tiles and days, and /streak's own rank, in the kit", async ({ browser }) => {
+test("Me's header, totals and days, and /streak's own rank, in the kit", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await page.goto("/me");
   await signInAndPick(page, "lm");
@@ -146,8 +146,39 @@ test("Me's header, stat tiles and days, and /streak's own rank, in the kit", asy
   expect(await header.evaluate((el) => getComputedStyle(el).flexDirection)).toBe("row");
   expect(await look(header)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
   expect(await header.locator("[data-initial]").evaluate((el) => `${getComputedStyle(el).borderTopWidth} ${getComputedStyle(el).borderTopColor}`)).toBe(`2px ${color}`);
-  const tile = page.getByRole("region", { name: "All games" }).getByText("points all time", { exact: true }).locator("xpath=..");
-  expect(await look(tile)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
+  // 14b-15: the totals are cells on their card, centred, with a thin cross of --line between them; the card is
+  // the screen's one tinted card (docs/milestones/M14-14b-15-stats-on-the-card.md, answers 1, 3, 5, 6 and 7).
+  const totals = page.getByRole("region", { name: "All games" });
+  const cells = totals.locator("dl > div");
+  await expect(cells).toHaveCount(4);
+  const line = await page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--line)";
+    document.body.append(probe);
+    const c = getComputedStyle(probe).color;
+    probe.remove();
+    return c;
+  });
+  const sides = (i: number) =>
+    cells.nth(i).evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { left: `${s.borderLeftWidth} ${s.borderLeftColor}`, top: `${s.borderTopWidth} ${s.borderTopColor}`, corners: s.borderTopLeftRadius, fill: s.backgroundColor, align: s.textAlign };
+    });
+  const none = "0px rgb(26, 26, 24)";
+  expect(await sides(0)).toEqual({ left: none, top: none, corners: "0px", fill: "rgba(0, 0, 0, 0)", align: "center" });
+  expect(await sides(1)).toMatchObject({ left: `1px ${line}`, top: none });
+  expect(await sides(2)).toMatchObject({ left: none, top: `1px ${line}` });
+  expect(await sides(3)).toMatchObject({ left: `1px ${line}`, top: `1px ${line}` });
+  const tinted = await page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.backgroundColor = "var(--soft)";
+    document.body.append(probe);
+    const c = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return c;
+  });
+  const cards = await page.locator("main section").evaluateAll((all, soft) => all.filter((s) => getComputedStyle(s).backgroundColor === soft).map((s) => s.getAttribute("aria-label")), tinted);
+  expect(cards).toEqual(["All games"]);
   expect(await page.getByRole("region", { name: "Calendar" }).locator("[data-date]").first().evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("2px");
 
   await page.goto("/streak");
