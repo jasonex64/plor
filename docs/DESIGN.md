@@ -26,15 +26,15 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 ## Type
 - One font, Baloo 2, from `src/app/fonts/Baloo2-latin.woff2`, declared at 400, 700 and 800 (`src/app/layout.tsx:18-25`) as `--font`, used by `body` (`globals.css:186`).
 - Digits are tabular everywhere (`globals.css:188`). `h1`, `h2` and `h3` balance their lines, `p` avoids a lone last word (`globals.css:289-297`). `h1` and `h2` are 800 (`globals.css:283-286`).
-- Inputs and buttons are 16px (`globals.css:338-342`). A card's heading is 24px (`src/app/kit.module.css:30-33`); a chip and a badge are 12px (`kit.module.css:111`, `:162`).
-- The numbers in stat tiles are 40px where they fit, else a share of the tile's width (the tile is a size container, `src/app/kit.module.css:146`): Me's totals 24% (`src/app/me.module.css:59`), the game screen's stats 35% (`src/app/offbeat.module.css:87`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
+- Inputs and buttons are 16px (`globals.css:338-342`). A card's heading is 24px (`src/app/kit.module.css:30-33`); a chip and a badge are 12px (`kit.module.css:111`, `:163`).
+- The numbers in stats are 40px where they fit, else a share of their cell's width (the cell is a size container, `src/app/kit.module.css:148`): Me's totals 24% (`src/app/me.module.css:68`), the game screen's stats 35% (`src/app/offbeat.module.css:89`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
 
 ## Corners, borders, shadows
 - The ink of borders and shadows is the theme's text colour: `--ink: var(--text)` (`globals.css:318`).
 - Corners: `--r-card` 5px, `--r-button` 5px, `--r-small` 4px, `--r-cell` 2px (`globals.css:319-322`).
-- Only what can be pressed has a shadow: `--shadow-button` `0 4px 0` and `--shadow-button-small` `0 3px 0`, in the ink (`globals.css:323-324`). Cards, rows, chips, stat tiles, the current tab and the streak pill are flat.
+- Only what can be pressed has a shadow: `--shadow-button` `0 4px 0` and `--shadow-button-small` `0 3px 0`, in the ink (`globals.css:323-324`). Cards, rows, chips, stats, the current tab and the streak pill are flat.
 - One control height, 44px: fields and selects have a 2px ink border and the small corners (`globals.css:345-352`), at least 44px tall with 0 12px inside (`globals.css:356-361`); a text area keeps 10px 12px (`globals.css:363-365`).
-- Buttons are at least 44px tall, with a 2px ink border, the button corners and shadow (`globals.css:376-390`), the kit's kinds included (no vertical padding: `kit.module.css:181-222`); pressed, they drop 4px onto the shadow, which goes, in 80 ms (`globals.css:402-406`), and don't move under reduced motion (`globals.css:409-419`). A link drawn as a button is 44px too (`src/app/button-link.module.css:10`). The reaction chips are the one exception until they move behind a menu (14b-10, answer 18).
+- Buttons are at least 44px tall, with a 2px ink border, the button corners and shadow (`globals.css:376-390`), the kit's kinds included (no vertical padding: `kit.module.css:182-223`); pressed, they drop 4px onto the shadow, which goes, in 80 ms (`globals.css:402-406`), and don't move under reduced motion (`globals.css:409-419`). A link drawn as a button is 44px too (`src/app/button-link.module.css:10`). The reaction chips are the one exception until they move behind a menu (14b-10, answer 18).
 - The focus ring is 3px in the accent, 3px out (`globals.css:304-307`).
 
 ## The kit (`src/app/kit.module.css`)
@@ -45,12 +45,12 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 64-66 |
 | A row's second line (`.below`) | 6px gap, 6px above | 93-99 |
 | Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 102-121 |
-| Stat tile | 10px 14px, 2px ink border, small corners, flat, a size container for its number; Me's four take the soft tint (`src/app/me.tsx`, Total) | 145-150 |
-| Badge | 24px round, ink fill, 12px 800; the first in the accent | 153-175 |
-| Main button (`.primary`) | 0 18px, accent fill, 17px | 181-187 |
-| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 191-197 |
-| Minor button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px | 211-222 |
-| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 231-234 |
+| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: Updraft's three in a row (`src/app/offbeat.module.css:68-70`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:58`) | 143-151 |
+| Badge | 24px round, ink fill, 12px 800; the first in the accent | 153-176 |
+| Main button (`.primary`) | 0 18px, accent fill, 17px | 182-188 |
+| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 192-198 |
+| Minor button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px | 212-223 |
+| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 232-235 |
 
 Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
@@ -65,12 +65,12 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
 ## Motion
 - One easing and time: `--ease` `cubic-bezier(0.2, 0.8, 0.2, 1)` and `--quick` 200ms (`globals.css:325-328`). Under reduced motion nothing moves; a state still changes, at once.
-- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:392-400`); a small one's to 5px (`kit.module.css:199-203`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
+- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:392-400`); a small one's to 5px (`kit.module.css:200-204`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
 - **Rows** take the soft tint under the pointer (`kit.module.css:68-83`).
 - **The reactions' popover** pops in from 90%, from its top right corner (`reactions.tsx:101`, `reactions.module.css:66-75`); its emoji and actions take the soft tint under the pointer (`reactions.module.css:120-125`).
 - **Tab icons** have two versions, an outline and a solid one that does something (Today's calendar peels a corner, Friends goes ^ ^ with a grin, Groups turns point-down, Me gains a sparkle), in the tab's own colour, muted at rest and the text colour hovered or current, as its label is (`src/app/shell.tsx:39-164`). The current tab shows the solid one; from 768px a hovered tab takes the soft fill and the solid one, which Groups turns 60° into (`shell.module.css:119-154`, `:242-270`).
-- **Count-ups:** points and streaks (Me's tiles, the game screen's streak and best score, the streak pill) count to their value over 600ms when it differs from what this browser last showed (`src/app/shown.ts:9`, `:50-76`, `src/app/count-up.tsx`).
-- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:243-259`).
+- **Count-ups:** points and streaks (Me's totals, the game screen's streak and best score, the streak pill) count to their value over 600ms when it differs from what this browser last showed (`src/app/shown.ts:9`, `:50-76`, `src/app/count-up.tsx`).
+- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:244-260`).
 
 ## Reactions
 - A comment or a friend's run shows only the reactions used, in the set's order, as 13px text on the row's second line, each with its count; nothing when there are none (`src/app/reactions.tsx:15-41`, `src/app/reactions.module.css:6-17`). The player's own takes the soft tint and an accent edge, and is read as ", yours" (`reactions.module.css:19-22`, `reactions.tsx:34`).

@@ -1,7 +1,7 @@
 // 14b-10a, the still look (docs/milestones/M14-14b-10-calm-and-alive.md): only what can be pressed has a shadow, in
 // each theme; every button, field and select is 44px tall (the reactions too, since 14b-13 put them behind a ⋯), so
 // Rename lines up with the group's name; the streak pill is fully round; card headings 24px and the stat numbers 40px; your own row on a
-// board, the streak pill and Me's four tiles take the soft tint; a stat tile's number shrinks to fit a phone (answer 23).
+// board, the streak pill and Me's "All games" card (since 14b-15) take the soft tint; a stat's number shrinks to fit a phone (answer 23).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
@@ -171,10 +171,14 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   expect(round).toBe(true);
   expect(await pill.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(soft);
 
-  // The game screen's stat tiles, after the run: on a phone the best score's most, "1,500", fits its tile; on a desktop
-  // the numbers are 40px.
+  // The game screen's stats, after the run: on a phone the best score's most, "1,500", fits its cell; on a desktop
+  // the numbers are 40px. They're cells on the card with a 1px --line between neighbours, no tile of their own (14b-15).
   const stats = page.getByRole("region", { name: /^Your / }).locator("dd");
   await expect(stats.first()).toBeVisible();
+  const line = await slot(page, "--line");
+  const edges = await stats.evaluateAll((all) => all.map((dd) => { const s = getComputedStyle(dd.parentElement!); return [s.borderTopWidth, s.borderLeftWidth, s.borderLeftColor]; }));
+  expect(edges.map(([top, left]) => [top, left])).toEqual([["0px", "0px"], ["0px", "1px"], ["0px", "1px"]]);
+  expect(edges[1][2]).toBe(line);
   expect(await fits(stats.nth(1), "1,500")).toBe(true);
   await page.setViewportSize(WIDE);
   await page.reload();
@@ -187,13 +191,14 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   const board = page.getByRole("region", { name: "Leaderboard" });
   expect(await board.getByRole("heading", { name: "Leaderboard" }).evaluate((el) => getComputedStyle(el).fontSize)).toBe("24px");
 
-  // Me: the four headline tiles, tinted; on a 360px phone "999,999" points fits a tile, and on a desktop the numbers are
-  // 40px.
+  // Me: the four headline numbers on their card, which is tinted, not each cell (14b-15, answer 3); on a 360px phone
+  // "999,999" points fits a cell, and on a desktop the numbers are 40px.
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/me");
   const tiles = page.getByRole("region", { name: "All games" }).locator("dd");
   await expect(tiles).toHaveCount(4);
-  for (const tile of await tiles.all()) expect(await tile.evaluate((el) => getComputedStyle(el.parentElement!).backgroundColor)).toBe(soft);
+  expect(await page.getByRole("region", { name: "All games" }).evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(soft);
+  for (const tile of await tiles.all()) expect(await tile.evaluate((el) => getComputedStyle(el.parentElement!).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
   expect(await fits(tiles.first(), "999,999")).toBe(true);
   await page.setViewportSize(WIDE);
   await page.reload();
