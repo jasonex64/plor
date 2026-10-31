@@ -1,6 +1,6 @@
 # M14 14b-15 — Stats on the card, not tiles in a card
 
-**Status:** approved (human, 2026-10-31: "ok sure build now", to building it and showing the screenshots before the PR; then "Looks good, go on" to the screenshots), in review (PR #145). It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
+**Status:** approved (human, 2026-10-31: "ok sure build now", to building it and showing the screenshots before the PR; then "Looks good, go on" to the screenshots), done (PR #145, merged on green CI at the human's "Merge when green"). It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
 
 ## Goal
 A stat ("400 best score") sits straight on its card, its number over its label, with thin grey lines between neighbours instead of a bordered tile of its own, on Me and on Updraft's game screen.
