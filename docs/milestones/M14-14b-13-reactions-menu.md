@@ -1,6 +1,6 @@
 # M14 14b-13 — Reactions behind a ⋯ menu
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Approve 14b-13 with the proposed placement and ⋯ name?"), drafted from two rounds of guided questions and a source question; in progress. It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Approve 14b-13 with the proposed placement and ⋯ name?"), drafted from two rounds of guided questions and a source question; in review (PR #TBD). It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
 
 ## Goal
 Every comment and every friend's run on the board drops its row of five emoji chips. Instead it shows only the reactions people used, as small text, and a ⋯ at its top right opens a small popover with the five emoji and either Delete or Report.
@@ -128,5 +128,8 @@ Earlier answers this ticket keeps: 14b-10's answer 18 ("the ⋯ menu sub-ticket 
   - A friend's run with no reactions is one line with its ⋯.
 
 ## Review
+The `reviewer` agent, fresh context, 2026-10-31, on `63cf897`.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - `alive.e2e.ts` lost two checks with the chips: that the other emoji don't pop, and that 😂 wasn't popping before the pick. Fixed: the friend's 👍 is on the comment before the player's page loads, and the test checks it doesn't pop before or after the player adds 😂. Shown to bite: with `useGrown` popping every emoji on any change, the test fails at `alive.e2e.ts:204` (`expect(await popping(thumbs…)).toBe(false)`); restored, `npx playwright test e2e/alive.e2e.ts -g "tint under the pointer"` → `1 passed (31.0s)`.
+  - HANDOFF and the ROADMAP row still said "waiting for approval". Updated in the same PR.
+- Deferred to ROADMAP "Next revision" (For M14): your own run's line changed after all; the summary has no group name; the admin menu's focus-leaving close untested there; focus after Delete or Report; Delete outside the 44px sweep; the Plan's hook file name; untraced dot geometry, a test bound and a long comment line; a popover over a popping row, unchecked.
