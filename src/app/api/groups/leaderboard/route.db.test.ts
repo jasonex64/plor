@@ -38,12 +38,17 @@ async function call(route: (r: Request) => Promise<Response>, path: string, meth
   return { status: response.status, body: await response.json() };
 }
 
-type Entry = { username: string; name: string; points: number; you: boolean };
+type Entry = { username: string; name: string; points: number; you: boolean; daily: number[] };
 // Each week's [username, points], highest first.
 const totals = (body: { thisWeek: { entries: Entry[] }; lastWeek: { entries: Entry[] } }) => ({
   thisWeek: body.thisWeek.entries.map((e) => [e.username, e.points]),
   lastWeek: body.lastWeek.entries.map((e) => [e.username, e.points]),
 });
+
+// This week's days that are over, Monday first (14b-14), and a player's points on them with `mondays` on Monday.
+const overThisWeek = async (monday: string) =>
+  (await getPool().query<{ n: number }>("select (private.today() - $1::date)::int as n", [monday])).rows[0].n;
+const thisWeekDays = (over: number, mondays: number) => Array.from({ length: over }, (_, i) => (i === 0 ? mondays : 0));
 
 beforeAll(useLocalStack);
 
@@ -106,9 +111,11 @@ describe("a group's leaderboard", () => {
     expect(r.status).toBe(200);
     expect(r.body.ok).toBe(true);
     expect(r.body.thisWeek.from).toBe(monday);
+    const over = await overThisWeek(monday);
+    expect(r.body.thisWeek.days).toBe(over);
     expect(r.body.thisWeek.entries).toEqual([
-      { username: B.username, name: B.username, points: 1000, you: false },
-      { username: A.username, name: A.username, points: 0, you: true },
+      { username: B.username, name: B.username, points: 1000, you: false, daily: thisWeekDays(over, 1000) },
+      { username: A.username, name: A.username, points: 0, you: true, daily: thisWeekDays(over, 0) },
     ]);
     expect(totals(r.body).lastWeek).toEqual([
       [A.username, 0],
@@ -119,10 +126,14 @@ describe("a group's leaderboard", () => {
   it("leaves out a day while the viewer's own run that day is still going (M09 D5), as the friends board does", async () => {
     // B's Monday run, written with no answers, is still in progress, so B's view leaves Monday out, B's 1000 included.
     useSession(B.session);
-    expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body.thisWeek.entries).toEqual([
-      { username: A.username, name: A.username, points: 0, you: false },
-      { username: B.username, name: B.username, points: 0, you: true },
+    const week = (await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body.thisWeek;
+    const over = await overThisWeek(monday);
+    expect(week.entries).toEqual([
+      { username: A.username, name: A.username, points: 0, you: false, daily: thisWeekDays(over, 0) },
+      { username: B.username, name: B.username, points: 0, you: true, daily: thisWeekDays(over, 0) },
     ]);
+    // Monday is marked as the day B is still playing, once it's over (14b-14, answer 28).
+    expect(week.hidden).toEqual(over > 0 ? [0] : []);
   });
 
   it("leaves the friends board friends-only: A's shows C and not B (G2)", async () => {
@@ -166,6 +177,11 @@ describe("a group's leaderboard", () => {
       [club, C.userId, monday],
     );
     useSession(A.session);
+    // C's days too (14b-14): the group's board has none of last week's, the friends board last Monday's 5.
+    const lastDays = async (route: typeof groupBoard, path: string) =>
+      (await call(route, path, "GET")).body.lastWeek.entries.find((e: Entry) => e.username === C.username).daily;
+    expect(await lastDays(groupBoard, `/api/groups/leaderboard?id=${club}`)).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    expect(await lastDays(friendsBoard, "/api/leaderboard")).toEqual([5, 0, 0, 0, 0, 0, 0]);
     expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body)).toEqual({
       thisWeek: [
         [C.username, 10],

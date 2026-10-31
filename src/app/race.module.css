@@ -1,0 +1,262 @@
+/* The leaderboard's Graph view (docs/milestones/M14-14b-14-leaderboard-graph.md): the race, Find a player and the
+   table. Sizes are the approved mockup's (the ticket's Numbers). */
+
+.race {
+  position: relative;
+}
+
+.race svg {
+  display: block;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1px;
+}
+
+.axis,
+.todayName,
+.hiddenName {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+/* Today under its dashed line, in the text colour (the mockup). */
+.todayName {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+/* A day the viewer is still playing, struck through (answer 28). */
+.hiddenName {
+  text-decoration: line-through;
+}
+
+.today {
+  stroke: var(--edge);
+  stroke-width: 1.5px;
+  stroke-dasharray: 3 4;
+}
+
+/* Lines: everyone's in the outline grey, a found player's in ink, yours thicker in the accent (answers 4 and 23). */
+.line {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--edge);
+}
+
+.found .line {
+  stroke: var(--text);
+}
+
+.found .dot {
+  fill: var(--text);
+}
+
+.you .line {
+  stroke: var(--accent);
+  stroke-width: 3px;
+}
+
+.you .dot {
+  fill: var(--accent);
+}
+
+/* The List's first-place badge (kit.module.css .badge.hot), at the leader's end. */
+.badge {
+  fill: var(--accent);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.badgeText {
+  fill: var(--on-accent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.tick {
+  stroke: var(--edge);
+  stroke-width: 1px;
+}
+
+/* End labels, haloed in the card's colour so a line or the Today line under them doesn't cut through. */
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--text);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.youLabel {
+  fill: var(--accent);
+  font-weight: 800;
+}
+
+.foundLabel {
+  font-weight: 800;
+}
+
+/* Find a player: the field with its ✕, its suggestions in the flow under it as the kit's card, and its notes. */
+.findLabel {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.field {
+  position: relative;
+  margin-top: 4px;
+}
+
+.field input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+/* No border, shadow, lift or press: a mark inside the field (the lift and press are in :where(); globals.css). */
+.clear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: var(--muted);
+}
+
+.clear svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.options {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.option + .option {
+  border-top: 1px solid var(--line);
+}
+
+.option[aria-selected="true"] {
+  background: var(--soft);
+}
+
+.none,
+.hint {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.none {
+  font-size: 14px;
+}
+
+.hint {
+  font-size: 12px;
+}
+
+/* A week's head: the date chip and Show table side by side. */
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* This week on a Monday, before any points (answer 5). */
+.empty {
+  padding: 28px 12px;
+  border: 1.5px dashed var(--edge);
+  border-radius: var(--r-small);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* The table scrolls inside its own box with the names held at its left (answer 20). */
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  height: 36px;
+  padding: 0 6px;
+  text-align: right;
+  font-weight: 400;
+}
+
+.table td {
+  min-width: 44px;
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--ink);
+  font-weight: 800;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--line);
+}
+
+.table th:first-child {
+  position: sticky;
+  left: 0;
+  width: 96px;
+  min-width: 96px;
+  padding: 0 10px;
+  border-right: 1.5px solid var(--edge);
+  background: var(--surface);
+  text-align: left;
+}
+
+/* Your row named in the accent, as your line is; a found player's in bold. */
+.table .yourRow th {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.table .foundRow th {
+  font-weight: 800;
+}

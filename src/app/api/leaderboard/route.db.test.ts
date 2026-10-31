@@ -40,9 +40,16 @@ async function call(response: Promise<Response>) {
   return { status: r.status, body: await r.json() };
 }
 const leaderboard = () => call(leaderboardRoute(apiRequest("/api/leaderboard", { method: "GET" })));
-type Entry = { username: string; name: string; points: number; you: boolean };
+type Entry = { username: string; name: string; points: number; you: boolean; daily: number[] };
 // The standings of yesterday's week.
 const standings = async (): Promise<Entry[]> => (await leaderboard()).body[yWeek].entries;
+// Each week's days run Monday to Sunday (14b-14, docs/milestones/M14-14b-14-leaderboard-graph.md): a date's place in
+// its week, the days of a week that are over (all of last week's, this week's before today), and a player's points on
+// each of them, here only yesterday's.
+const dayIndex = (date: string) => (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7;
+const over = (week: "thisWeek" | "lastWeek") => (week === "lastWeek" ? 7 : dayIndex(today));
+const daily = (week: "thisWeek" | "lastWeek", yesterdays: number) =>
+  Array.from({ length: over(week) }, (_, i) => (week === yWeek && i === dayIndex(yesterday) ? yesterdays : 0));
 const ledgerRows = async (ids: string[]) =>
   (await getPool().query("select user_id from private.points_ledger where user_id = any($1::uuid[])", [ids])).rows.length;
 
@@ -130,17 +137,21 @@ describe("the friends leaderboard", () => {
     expect(r.status).toBe(200);
     expect(r.body.ok).toBe(true);
     expect(r.body[yWeek].entries).toEqual([
-      { username: players.b.username, name: players.b.username, points: 75, you: false },
+      { username: players.b.username, name: players.b.username, points: 75, you: false, daily: daily(yWeek, 75) },
       // A and E tie on 25: by name, and "la…" comes before "le…".
-      { username: players.a.username, name: players.a.username, points: 25, you: true },
-      { username: players.e.username, name: players.e.username, points: 25, you: false },
+      { username: players.a.username, name: players.a.username, points: 25, you: true, daily: daily(yWeek, 25) },
+      { username: players.e.username, name: players.e.username, points: 25, you: false, daily: daily(yWeek, 25) },
     ]);
+    // How many of each week's days are over, and none that A is still playing.
+    expect([r.body.thisWeek.days, r.body.lastWeek.days]).toEqual([over("thisWeek"), 7]);
+    expect([r.body.thisWeek.hidden, r.body.lastWeek.hidden]).toEqual([[], []]);
     // The other week has the same players, all on 0.
     expect(r.body[otherWeek].entries.map((x: Entry) => [x.username, x.points])).toEqual([
       [players.a.username, 0],
       [players.b.username, 0],
       [players.e.username, 0],
     ]);
+    expect(r.body[otherWeek].entries.map((x: Entry) => x.daily)).toEqual([0, 1, 2].map(() => daily(otherWeek, 0)));
     // Settled: A's, B's and E's runs from yesterday; C, not shown, isn't; A's run today isn't finished or closed.
     expect(await ledgerRows([players.a.userId, players.b.userId, players.e.userId])).toBe(3);
     expect(await ledgerRows([players.c.userId])).toBe(0);
@@ -152,9 +163,9 @@ describe("the friends leaderboard", () => {
   it("shows each viewer their own friends: B sees A and D, not E; a friend with no points shows 0", async () => {
     useSession(players.b.session);
     expect(await standings()).toEqual([
-      { username: players.b.username, name: players.b.username, points: 75, you: true },
-      { username: players.a.username, name: players.a.username, points: 25, you: false },
-      { username: players.d.username, name: players.d.username, points: 0, you: false },
+      { username: players.b.username, name: players.b.username, points: 75, you: true, daily: daily(yWeek, 75) },
+      { username: players.a.username, name: players.a.username, points: 25, you: false, daily: daily(yWeek, 25) },
+      { username: players.d.username, name: players.d.username, points: 0, you: false, daily: daily(yWeek, 0) },
     ]);
   });
 
@@ -172,6 +183,10 @@ describe("the friends leaderboard", () => {
       [players.b.username, 0],
       [players.d.username, 0],
     ]);
+    // Yesterday is marked as the one D is still playing, and it adds nothing to anyone's days (14b-14, answer 28).
+    const hiding = (await leaderboard()).body[yWeek];
+    expect(hiding.hidden).toEqual([dayIndex(yesterday)]);
+    expect(hiding.entries.map((x: Entry) => x.daily)).toEqual([daily(yWeek, 0), daily(yWeek, 0)]);
     // Once D is caught on question 2, yesterday counts again, D's run included.
     await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [
       players.d.userId,
@@ -182,10 +197,11 @@ describe("the friends leaderboard", () => {
       "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 1, $4, true)",
       [players.d.userId, GAME_ID, yesterday, puzzleYesterday.questions[1].host_answers[0]],
     );
-    expect((await standings()).map((x) => [x.username, x.points])).toEqual([
-      [players.b.username, 75],
-      [players.d.username, 25],
+    expect((await standings()).map((x) => [x.username, x.points, x.daily])).toEqual([
+      [players.b.username, 75, daily(yWeek, 75)],
+      [players.d.username, 25, daily(yWeek, 25)],
     ]);
+    expect((await leaderboard()).body[yWeek].hidden).toEqual([]);
   });
 
   it("shows and orders by the display name when one is set", async () => {
@@ -242,5 +258,9 @@ describe("the friends leaderboard", () => {
         [players.c.username, c("lastWeek")],
       ].sort((x, y) => (y[1] as number) - (x[1] as number)),
     );
+    // F's days: last Monday 10 and last Sunday 100, and this Monday 1000 once it's over.
+    const f = (week: "thisWeek" | "lastWeek") => r[week].entries.find((x: Entry) => x.username === players.f.username).daily;
+    expect(f("lastWeek")).toEqual([10, 0, 0, 0, 0, 0, 100]);
+    expect(f("thisWeek")).toEqual(Array.from({ length: over("thisWeek") }, (_, i) => (i === 0 ? 1000 : 0)));
   });
 });

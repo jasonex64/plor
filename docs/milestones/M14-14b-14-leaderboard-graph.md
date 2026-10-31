@@ -1,6 +1,6 @@
 # M14 14b-14 — The leaderboard's graph view
 
-**Status:** drafted, waiting for the human's word to build. It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-14 as drafted?"), in progress. It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
 
 ## Goal
 The weekly leaderboards on the Friends tab and each group page get a Graph view beside the List. Each week shows every player's points adding up day by day, so a player can see who's catching up and when someone pulled ahead.
@@ -63,6 +63,12 @@ After it:
 26. Scope: "All five issues (Recommended)".
 27. The redrawn mockup, with its new hint "Or choose someone's line on a graph. You'll see them in both weeks.": "Approve, write the ticket (Recommended)".
 
+While building, after the Plan's step 1 hypothesis was disproved:
+
+28. A closed day the viewer left mid-run, which can be any earlier day, since a run waiting at a reveal stays in progress until Next (DECISIONS.md, Game 1: Timer; `private.run_status`, `deadline` null): "Flat through it, marked, with a note (Recommended)". The option read: "Every line goes flat across that day (no one gains), the day's name is struck through, and one muted line under the week says 'Wednesday's points are hidden until you finish that run.' The table shows '–' for that day."
+29. The mockup's points were samples (weeks of 20 to 38); real weeks reach thousands. Grid steps: "1, 2, 2.5 or 5 × 10ⁿ, at most 4 steps (Recommended)" ("The same family as the mockup's 5, 10, 20, 25, 50, carried on… The smallest that keeps 4 steps or fewer above 0").
+30. Long names (usernames run to 20 characters): "Cut at 10 characters with … (Recommended)" ("The right margin grows to fit the widest label, so a short name keeps a short margin.").
+
 Earlier answers this ticket keeps:
 - 14b-10's answer 7: every control is 44px.
 - Answer 11: your own things take the soft tint.
@@ -94,7 +100,8 @@ Earlier answers this ticket keeps:
 - **DESIGN.md** (the kit and colour slots): the card, the switch (`leaderboard.module.css:7-41`), chips, badges, the minor button (`kit.module.css:211-222`), fields (`globals.css:345-361`), `--edge`, `--line`, `--muted`, `--accent`, `--soft`.
 
 ## Acceptance criteria
-- [ ] `/api/leaderboard` and `/api/groups/leaderboard` also send, for each player in each week, their points on each counted day from Monday, so a week's days add up to its total. Same rules as the totals: only days that are over; not a closed day whose own run the viewer is still playing; a group member's days only from the one they joined. A route db test covers a mid-week day, a member who joined on Wednesday, and the viewer still playing yesterday.
+- [ ] `/api/leaderboard` and `/api/groups/leaderboard` also send, for each player in each week, their points on each counted day from Monday, so a week's days add up to its total. Same rules as the totals: only days that are over; not a closed day whose own run the viewer is still playing; a group member's days only from the one they joined. Each week also says how many of its days are over and which of them the viewer is still playing. A route db test covers a mid-week day, a member who joined part-way through the week, and the viewer still playing yesterday.
+- [ ] A day the viewer is still playing (answer 28): every line is flat across it, its day name is struck through, the table shows "–" for it, and one muted line under the week says "<Day>'s points are hidden until you finish that run." ("<Day> and <Day>'s points … those runs" for two or more).
 - [ ] The Friends and group leaderboards have a List / Graph switch under their heading: the same radio strip as Today's period switch, List chosen on load. Today's leaderboard card is unchanged.
 - [ ] In Graph, each week shows its race. For each player:
   - a line through their running total on each counted day, on Monday to Sunday columns;
@@ -140,8 +147,9 @@ Every value below is from the approved mockup unless its row says otherwise. Tha
 | Value | Used for | Origin |
 |---|---|---|
 | 200px tall below 768px, 230px from 768px; drawn at its own width | The graph | The mockup (326 and 608 wide there: the card's inner width at 390px and in a 640px column) |
-| Plot margins: 26 left, 12 top, 26 bottom; 74 right when the week is over, else 14 | Room for the axis numbers, day names and end labels | The mockup; answer 25 ("the empty right margin goes when a week ends early") |
-| Grid step: the smallest of 5, 10, 20, 25, 50 that keeps 4 steps or fewer above 0 | Gridlines in `--line`, numbers in `--muted` | The mockup |
+| Plot margins: 12 top, 26 bottom; left 26, or the widest axis number plus its 6px gap if wider; right 14, or as much as the end labels need past the last day's line if more (74 in the mockup's finished week) | Room for the axis numbers, day names and end labels | The mockup; answers 25 and 30 ("the right margin grows to fit the widest label") |
+| Grid step: the smallest of 1, 2, 2.5 or 5 × 10ⁿ that keeps 4 steps or fewer above 0 | Gridlines in `--line`, numbers in `--muted` | The mockup's 5, 10, 20, 25, 50; answer 29 |
+| 10 characters, then … | A name in an end label | Answer 30 |
 | 3px `--accent` (you); 2px `--text` (found); 2px `--edge` (others); end dots 3.5 / 3.5 / 2.5 radius | Lines | Answers 4 and 23; the mockup |
 | Badge: 8 radius, `--accent` fill, 1.5px `--text` edge, "1" in 11px 800 `--on-accent` | The leader's end | Answer 23 ("the List's numbered '1' badge"); the mockup |
 | Labels: 12px, 800 for you or found, else 700; 14 apart at least; tick when more than 4 from the dot; a 4px `--surface` halo; 13 right of the end | End labels | The mockup |

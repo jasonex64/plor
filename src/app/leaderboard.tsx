@@ -3,8 +3,9 @@
 // A weekly leaderboard (docs/milestones/M10-groups.md, 10a and 10c; M09 9b): the player and their friends, or a
 // group's members, highest total first, this week and last week below it (W1). A day's points arrive once that day is
 // over (M09 D9), so loading it once is enough. Mockup 3's "Friends leaderboard" card (M14 14b-8c): each week's
-// heading with its first day as a chip, then its badged rows.
-import { useEffect, useState } from "react";
+// heading with its first day as a chip, then its badged rows. Since 14b-14 (docs/milestones/M14-14b-14-leaderboard-graph.md)
+// a List / Graph switch shows each week as a race instead, with Find a player over both.
+import { useEffect, useId, useState } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
@@ -12,26 +13,44 @@ import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import styles from "./leaderboard.module.css";
 import { dayText } from "./day-text";
+import { FindPlayer } from "./find-player";
 import { errorText } from "./messages";
+import { Race, RaceTable, hiddenText } from "./race";
+import raceStyles from "./race.module.css";
 import { Line, Skeleton } from "./skeleton";
 
 // title names the board (its heading and region); path is the API route that returns it.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [board, setBoard] = useState<Board | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
+  const [graph, setGraph] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
+  const name = useId();
 
   useEffect(() => {
     api<Board>(path, { method: "GET" }).then(setBoard, (err) => setError(errorText(err)));
   }, [path]);
 
+  const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
   return (
     <section aria-label={title} className={kit.card}>
       <h2>{title}</h2>
+      {/* Today's period switch, once more (answer 3). */}
+      <div role="radiogroup" aria-label="View" className={styles.switch}>
+        {([false, true] as const).map((g) => (
+          <label key={String(g)} className={graph === g ? `${styles.choice} ${styles.on}` : styles.choice}>
+            <input type="radio" name={name} checked={graph === g} onChange={() => setGraph(g)} />
+            {g ? "Graph" : "List"}
+          </label>
+        ))}
+      </div>
+      {graph && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
       <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
       {board && (
         <>
-          <Standings label="This week" week={board.thisWeek} />
-          <Standings label="Last week" week={board.lastWeek} />
+          <Standings label="This week" week={board.thisWeek} graph={graph} picked={picked} onPick={setPicked} />
+          <Standings label="Last week" week={board.lastWeek} graph={graph} picked={picked} onPick={setPicked} />
         </>
       )}
       {!board && !error && (
@@ -129,14 +148,29 @@ export function LeaderboardCard() {
   );
 }
 
-function Standings({ label, week }: { label: string; week: Week }) {
+// A week as its rows or, in Graph, its race (answers 5 and 15), with Show table beside its chip (answers 17 and 25).
+function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void }) {
+  const { label, week, graph, picked, onPick } = props;
+  const [table, setTable] = useState(false);
+  const drawn = graph && week.days > 0;
   return (
     <section aria-label={label} className={styles.week}>
       <div className={kit.head}>
         <h3>{label}</h3>
-        <span className={kit.chip}>From {dayText(week.from)}</span>
+        <div className={raceStyles.tools}>
+          <span className={kit.chip}>From {dayText(week.from)}</span>
+          {drawn && (
+            <button type="button" className={kit.link} aria-expanded={table} onClick={() => setTable(!table)}>
+              {table ? "Hide table" : "Show table"}
+            </button>
+          )}
+        </div>
       </div>
-      <Entries entries={week.entries} />
+      {!graph && <Entries entries={week.entries} />}
+      {graph && !drawn && <p className={raceStyles.empty}>The first points arrive Tuesday, once Monday is over.</p>}
+      {drawn && <Race label={label} week={week} picked={picked} onPick={onPick} />}
+      {drawn && week.hidden.length > 0 && <p className={styles.note}>{hiddenText(week.hidden)}</p>}
+      {drawn && table && <RaceTable label={label} week={week} picked={picked} />}
     </section>
   );
 }
