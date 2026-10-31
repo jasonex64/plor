@@ -27,7 +27,7 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 - One font, Baloo 2, from `src/app/fonts/Baloo2-latin.woff2`, declared at 400, 700 and 800 (`src/app/layout.tsx:18-25`) as `--font`, used by `body` (`globals.css:186`).
 - Digits are tabular everywhere (`globals.css:188`). `h1`, `h2` and `h3` balance their lines, `p` avoids a lone last word (`globals.css:289-297`). `h1` and `h2` are 800 (`globals.css:283-286`).
 - Inputs and buttons are 16px (`globals.css:334-338`). A card's heading is 24px (`src/app/kit.module.css:30-33`); a chip and a badge are 12px (`kit.module.css:94`, `:145`).
-- The numbers in stat tiles are 40px where they fit, else a share of the tile's width (the tile is a size container, `src/app/kit.module.css:129`): Me's totals 25% (`src/app/me.module.css:58`), the game screen's stats 37% (`src/app/offbeat.module.css:86`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
+- The numbers in stat tiles are 40px where they fit, else a share of the tile's width (the tile is a size container, `src/app/kit.module.css:129`): Me's totals 24% (`src/app/me.module.css:59`), the game screen's stats 35% (`src/app/offbeat.module.css:87`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
 
 ## Corners, borders, shadows
 - The ink of borders and shadows is the theme's text colour: `--ink: var(--text)` (`globals.css:318`).

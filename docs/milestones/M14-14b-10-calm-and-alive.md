@@ -77,7 +77,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 | 44px | Every button, field and select | Answer 7; `docs/DESIGN.md` (buttons, `globals.css:372-385`) |
 | 2px ink border | Cards, flat | Answer 9; `kit.module.css:7-15` |
 | 32px, 24px, 40px, 16px | Page headings, card headings, stat tiles' and /streak's numbers, body | Answers 10, 22 |
-| 37% and 25% of the tile's width | The game screen's and Me's stat numbers where 40px won't fit | Answer 23; measured in Baloo 2 at 800 with tabular digits: "1,500" (the best score's most: 1,000 for seven stops plus the 500 bonus cap, `src/config/tunables.ts`) is 2.675 times its size, "999,999" points, the widest Me's total must fit (answer 24; a perfect day is at most 1,500), 3.875 times |
+| 35% and 24% of the tile's width | The game screen's and Me's stat numbers where 40px won't fit | Answer 23; measured in Baloo 2 at 800 with tabular digits: "1,500" (the best score's most: 1,000 for seven stops plus the 500 bonus cap, `src/config/tunables.ts`) is 2.675 times its size, "999,999" points, the widest Me's total must fit (answer 24; a perfect day is at most 1,500), 3.875 times. Each allows half a pixel a glyph where Chromium rounds glyphs to whole pixels (CI's Linux), down to a 320px phone: (60 − 2.5) / 2.675 ≈ 21.5px of a 60px tile, (91 − 3.5) / 3.875 ≈ 22.6px of a 91px tile |
 | Fully round | The streak pill | Answer 6 |
 | The theme's `--soft` | Tints at rest and on hover | Answers 8, 11 (`globals.css`, each theme) |
 | 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:414-443`) |
@@ -144,6 +144,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - On the 10a code: `calm`, `look`, `me`, `streak`, `offbeat`, `player-screens`, `groups`, `settings-sheet`, `settings`, `today`, `admin-area`, `shell` and `test-run` gave **55 passed, 3 failed** (8.3m). The three timed out on a navigation (`player-screens.e2e.ts:77`, `shell.e2e.ts:278`, `test-run.e2e.ts:44`), the first-run timeouts HANDOFF records for this PC. `npx playwright test --last-failed` → **3 passed** (38.1s).
   - `npx tsc --noEmit -p .`, `npx eslint e2e src/app` and `npm test` (47 files, 473) → clean.
 - **The fit checks, red then green (after the second review):** with the game screen's number forced to a flat 40px, `fits("1,500")` failed (`calm.e2e.ts:178`); with Me's forced to 40px, `fits("999,999")` failed (`calm.e2e.ts:197`). Each was restored, and `npx playwright test e2e/calm.e2e.ts` → **2 passed** (1.2m).
+- **CI on PR #141 (Linux):** `calm.e2e.ts:178` failed: "1,500" didn't fit the game screen's phone tile at 37%, which fits on Windows with 0.7px to spare. Hypothesis: Linux Chromium rounds glyph advances to whole pixels, up to half a pixel a glyph. The shares now allow for that down to a 320px phone: 35% and 24%.
 - **Seen** (a throwaway capture, deleted after): Today, `/updraft` after a run, Me, Friends, a group and `/streak` at 390×844 and 1440×900, two friends who played and commented.
   - Cards are flat; buttons keep their shadow.
   - The streak pill is round and tinted beside the round avatar.
