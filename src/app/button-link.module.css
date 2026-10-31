@@ -17,13 +17,22 @@
   font-weight: 700;
   text-decoration: none;
   transition:
-    transform 80ms,
-    box-shadow 80ms;
+    transform var(--quick) var(--ease),
+    box-shadow var(--quick) var(--ease);
+}
+
+/* Lifts on hover as a button does (globals.css; 14b-10, answers 12 and 14). */
+@media (hover: hover) {
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--ink);
+  }
 }
 
 .button:active {
   transform: translateY(4px);
   box-shadow: 0 0 0 var(--ink);
+  transition-duration: 80ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -31,6 +40,7 @@
     transition: none;
   }
 
+  .button:hover,
   .button:active {
     transform: none;
     box-shadow: var(--shadow-button);

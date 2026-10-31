@@ -65,6 +65,23 @@
   background: var(--soft);
 }
 
+/* A row under the pointer takes the soft tint (14b-10, answer 12). */
+@media (hover: hover) {
+  .row {
+    transition: background-color var(--quick) var(--ease);
+  }
+
+  .row:hover {
+    background: var(--soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}
+
 .grow {
   flex: 1;
   min-width: 0;
@@ -179,6 +196,12 @@ form.chips {
   font-weight: 700;
 }
 
+@media (hover: hover) {
+  :is(button, a).small:hover:not(:disabled) {
+    box-shadow: 0 5px 0 var(--ink);
+  }
+}
+
 :is(button, a).small:active:not(:disabled) {
   box-shadow: 0 0 0 var(--ink);
 }
@@ -211,7 +234,26 @@ button.link:active:not(:disabled) {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :is(button, a).small:hover:not(:disabled),
   :is(button, a).small:active:not(:disabled) {
     box-shadow: var(--shadow-button-small);
+  }
+}
+
+/* Something new comes in from 90% of its size (14b-10, answers 12, 14 and 26): a reaction you add, a comment that
+   arrives, a new streak rank. Still under reduced motion. */
+.pop {
+  animation: pop var(--quick) var(--ease);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop {
+    animation: none;
   }
 }

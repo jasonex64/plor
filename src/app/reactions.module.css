@@ -19,9 +19,20 @@
   font-size: 13px;
 }
 
+.group .reaction:hover,
 .group .reaction:active:not(:disabled) {
   transform: none;
   box-shadow: none;
+}
+
+/* The count keeps its leading space: in the chip's flex row a bare text item would lose it (14b-10b). */
+.count {
+  white-space: pre;
+}
+
+/* The emoji is what pops in (kit.module.css .pop): a box, so it can scale. */
+.emoji {
+  display: inline-block;
 }
 
 .group .reaction[aria-pressed="true"] {

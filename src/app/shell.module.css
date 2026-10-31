@@ -109,12 +109,48 @@
 }
 
 .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   width: 48px;
   height: 28px;
   border-radius: 14px;
+}
+
+/* A tab icon's two versions, stacked (src/app/shell.tsx, TabIcon; docs/milestones/M14-14b-10-calm-and-alive.md, answers
+   29 to 33): the outline at rest, the solid one on the current tab and, from 768px, under the pointer, changing in 200ms
+   (answers 26 and 30). Groups turns 60° about its middle as it changes (answer 32). */
+.icon > svg {
+  grid-area: 1 / 1;
+  transition: opacity var(--quick) var(--ease);
+}
+
+.solid,
+.on .outline {
+  opacity: 0;
+}
+
+.on .solid {
+  opacity: 1;
+}
+
+.turn {
+  transform-origin: 12px 13px;
+  transition: transform var(--quick) var(--ease);
+}
+
+.solid .turn {
+  transform: rotate(-60deg);
+}
+
+.on .solid .turn {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon > svg,
+  .turn {
+    transition: none;
+  }
 }
 
 /* The current tab: a box behind the icon and bold text, not colour alone (WCAG 2.2 1.4.1); the box is mockup 3's current
@@ -126,7 +162,6 @@
 
 .on .icon {
   background: var(--soft);
-  color: var(--accent);
   outline: 2px solid var(--ink);
   border-radius: var(--r-small);
 }
@@ -194,6 +229,47 @@
     background: var(--soft);
     border-color: var(--ink);
   }
+
+  /* A tab under the pointer takes the soft fill and its icon's solid version, held while the pointer stays (14b-10,
+     answers 8 and 30). */
+  .tab {
+    transition:
+      background-color var(--quick) var(--ease),
+      color var(--quick) var(--ease);
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) {
+  .tab:hover {
+    background: var(--soft);
+    color: var(--text);
+  }
+
+  .tab:hover .solid {
+    opacity: 1;
+  }
+
+  .tab:hover .outline {
+    opacity: 0;
+  }
+
+  .tab:hover .outline .turn {
+    transform: rotate(60deg);
+  }
+
+  .tab:hover .solid .turn {
+    transform: none;
+  }
+}
+
+/* After the sidebar's own .tab transition, so it wins. */
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}
+
+@media (min-width: 768px) {
 
   .on .icon {
     background: none;

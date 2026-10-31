@@ -66,8 +66,9 @@ const SHOWN: Record<string, string[]> = { "/": ["Post", "Report", "Delete", "Ear
 
 test("only what can be pressed has a shadow, and every control is 44px tall", async ({ browser }) => {
   // Two players who are friends, share a group, and have both played and commented, so the friends list's Remove, the
-  // group's Rename, a comment's Report and Delete, and the feed's Post are all on screen.
-  test.slow();
+  // group's Rename, a comment's Report and Delete, and the feed's Post are all on screen. Two sign-ins, two runs and 23
+  // pages measured took 96s on the Windows PC (2026-10-30), past test.slow()'s 90s.
+  test.setTimeout(3 * 60_000);
   const friend = await (await browser.newContext({ viewport: PHONE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "kb");

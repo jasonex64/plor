@@ -79,6 +79,7 @@ export function Comments({
   const [today, setToday] = useState<string | null>(null);
   const [thread, setThread] = useState<Thread | Feed | null>(null);
   const [shownThread, showChange] = useHeldChanges(thread, changed);
+  const arrived = useArrived(shownThread?.comments ?? null, shownThread?.date);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const undo = useUndo();
@@ -200,6 +201,7 @@ export function Comments({
                 label={"group" in c ? <ThreadLabel comment={c as FeedComment} /> : undefined}
                 mine={c.username === username}
                 pending={c.id.startsWith(PENDING)}
+                arrived={arrived.has(c.id)}
                 onDelete={remove}
                 onReport={() => report(c.id)}
                 onReact={shownThread.canPost ? react : undefined}
@@ -272,11 +274,36 @@ function ThreadLabel({ comment }: { comment: FeedComment }) {
   return <>{comment.group ? comment.group.name : "Friends"}</>;
 }
 
+// The comments that have appeared since a day's thread was first shown: one that arrived, or the player's own as it's
+// posted (14b-10b, answer 12). A posted comment shows at once under a pending id and comes back from the server under its
+// own, for a moment beside the pending copy (ROADMAP For M14, the flicker); that return is the same comment, so it doesn't
+// pop again.
+function useArrived(comments: Comment[] | null, day: string | undefined): Set<string> {
+  const [arrived, setArrived] = useState<Set<string>>(new Set());
+  const before = useRef<{ day: string | undefined; comments: Comment[] } | null>(null);
+  useEffect(() => {
+    if (!comments) return;
+    const last = before.current;
+    before.current = { day, comments };
+    if (!last || last.day !== day) {
+      setArrived(new Set());
+      return;
+    }
+    const known = new Set(last.comments.map((c) => c.id));
+    const posted = [...last.comments, ...comments].filter((c) => c.id.startsWith(PENDING));
+    const returned = (c: Comment) => !c.id.startsWith(PENDING) && posted.some((p) => p.username === c.username && p.body === c.body);
+    const fresh = comments.filter((c) => !known.has(c.id) && !returned(c));
+    if (fresh.length > 0) setArrived((a) => new Set([...a, ...fresh.map((c) => c.id)]));
+  }, [comments, day]);
+  return arrived;
+}
+
 function CommentItem({
   comment,
   label,
   mine,
   pending,
+  arrived,
   onDelete,
   onReport,
   onReact,
@@ -286,6 +313,8 @@ function CommentItem({
   mine: boolean;
   // Posted but held for Undo: nothing to react to, delete or report yet.
   pending: boolean;
+  // Shown since the thread first loaded: it pops in (14b-10b, answer 12).
+  arrived: boolean;
   onDelete: () => void;
   onReport: () => void;
   onReact?: (emoji: Emoji | null) => void;
@@ -293,7 +322,7 @@ function CommentItem({
   // Mockup 3's comment row: the avatar, then the name with its thread and time as a chip, the words, and the reactions
   // and Delete or Report under them (M14 14b-8b).
   return (
-    <li className={`${kit.row} ${styles.comment}`}>
+    <li className={arrived ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}>
       <Avatar name={comment.name} />
       <div className={kit.grow}>
         <div className={kit.head}>

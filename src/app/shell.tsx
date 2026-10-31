@@ -9,7 +9,7 @@
 // phones, under the sidebar's wordmark with the avatar slot from 768px.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
@@ -22,6 +22,9 @@ import { errorText } from "./messages";
 import { useMinWidth } from "./min-width";
 import { RankFlower, rankFor } from "./ranks";
 import { SettingsSheet } from "./settings";
+import { CountUp } from "./count-up";
+import { useNew } from "./shown";
+import kit from "./kit.module.css";
 import styles from "./shell.module.css";
 import { GAME } from "@/platform/game";
 import { capitalized, timedOutText } from "@/game/words";
@@ -33,53 +36,132 @@ const icon = (children: ReactNode) => (
   </svg>
 );
 
-const TABS = [
+// The four tab icons in two versions (docs/milestones/M14-14b-10-calm-and-alive.md, answers 28 to 33; drawn on the
+// human's "Plor Tab Icons" page): the outline at rest, and a solid one, hovered or current, that does something.
+// fill is cut by cut (the negative); extra is drawn on top, uncut. turn: the switch turns it 60° about its middle.
+type TabArt = { outline: ReactNode; fill: ReactNode; cut?: ReactNode; extra?: ReactNode; turn?: boolean };
+
+const TABS: { href: string; label: string; art: TabArt }[] = [
   {
     href: "/",
     label: "Today",
-    icon: icon(
-      <>
-        <rect x="4" y="5" width="16" height="15" rx="3" />
-        <path d="M4 10h16M9 3v4M15 3v4" />
-        <circle cx="12" cy="15" r="1.6" fill="currentColor" />
-      </>,
-    ),
+    // The calendar's corner peels up (answer 31).
+    art: {
+      outline: (
+        <>
+          <rect x="4" y="5" width="16" height="15" rx="3" />
+          <path d="M4 10h16M9 3v4M15 3v4" />
+          <circle cx="12" cy="15" r="1.6" fill="currentColor" />
+        </>
+      ),
+      fill: (
+        <>
+          <path d="M6.5 4h11A3.5 3.5 0 0 1 21 7.5v6.7L14.2 21H6.5A3.5 3.5 0 0 1 3 17.5v-10A3.5 3.5 0 0 1 6.5 4z" />
+          <rect x="8" y="2" width="2" height="5" rx="1" />
+          <rect x="14" y="2" width="2" height="5" rx="1" />
+        </>
+      ),
+      cut: (
+        <>
+          <rect x="5" y="9.6" width="14" height="1.6" />
+          <circle cx="10" cy="15.2" r="1.9" />
+        </>
+      ),
+      extra: <path d="M15.9 21.2v-3.7a1.4 1.4 0 0 1 1.4-1.4H21z" />,
+    },
   },
   {
     href: "/friends",
     label: "Friends",
-    icon: icon(
-      <>
-        <circle cx="12" cy="12" r="8.5" />
-        <circle cx="9" cy="10.5" r="0.9" fill="currentColor" />
-        <circle cx="15" cy="10.5" r="0.9" fill="currentColor" />
-        <path d="M8.5 14.5c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2" />
-      </>,
-    ),
+    // Happy closed eyes, ^ ^, and an open grin (answer 32).
+    art: {
+      outline: (
+        <>
+          <circle cx="12" cy="12" r="8.5" />
+          <circle cx="9" cy="10.5" r="0.9" fill="currentColor" />
+          <circle cx="15" cy="10.5" r="0.9" fill="currentColor" />
+          <path d="M8.5 14.5c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2" />
+        </>
+      ),
+      fill: <circle cx="12" cy="12" r="9.5" />,
+      cut: (
+        <>
+          <path d="M7.4 10.8q1.6-2 3.2 0M13.4 10.8q1.6-2 3.2 0" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M7.8 13.4h8.4a4.2 4.2 0 0 1-8.4 0z" />
+        </>
+      ),
+    },
   },
   {
     href: "/groups",
     label: "Groups",
-    icon: icon(
-      <>
-        <circle cx="12" cy="7" r="3.2" />
-        <circle cx="6.5" cy="16" r="3.2" />
-        <circle cx="17.5" cy="16" r="3.2" />
-      </>,
-    ),
+    // The three turn point-down as they fill (answer 32).
+    art: {
+      turn: true,
+      outline: (
+        <>
+          <circle cx="12" cy="7" r="3.2" />
+          <circle cx="6.5" cy="16" r="3.2" />
+          <circle cx="17.5" cy="16" r="3.2" />
+        </>
+      ),
+      fill: (
+        <>
+          <circle cx="12" cy="19" r="3.9" />
+          <circle cx="6.5" cy="10" r="3.9" />
+          <circle cx="17.5" cy="10" r="3.9" />
+        </>
+      ),
+    },
   },
   {
     href: "/me",
     label: "Me",
-    icon: icon(
-      <>
-        <circle cx="12" cy="12" r="8.5" />
-        <circle cx="12" cy="10" r="3" />
-        <path d="M6.8 18c1.2-2 3-3 5.2-3s4 1 5.2 3" />
-      </>,
-    ),
+    // A sparkle beside the head (answer 33).
+    art: {
+      outline: (
+        <>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5" />
+        </>
+      ),
+      fill: (
+        <>
+          <circle cx="10.5" cy="9.4" r="4.6" />
+          <path d="M2.3 21.5c0-4.6 3.6-7.6 8.2-7.6s8.2 3 8.2 7.6z" />
+        </>
+      ),
+      extra: <path d="M19.8 1.2 20.7 3.3 22.8 4.2 20.7 5.1 19.8 7.2 18.9 5.1 16.8 4.2 18.9 3.3z" />,
+    },
   },
 ];
+
+// Both versions, stacked; shell.module.css shows one (the hover and the current tab show the solid one).
+function TabIcon({ art }: { art: TabArt }) {
+  const mask = useId();
+  const turn = (body: ReactNode) => (art.turn ? <g className={styles.turn}>{body}</g> : body);
+  return (
+    <span className={styles.icon}>
+      <svg className={styles.outline} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {turn(art.outline)}
+      </svg>
+      <svg className={styles.solid} width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+        <mask id={mask}>
+          <rect width="24" height="24" fill="#fff" />
+          <g fill="#000">{art.cut}</g>
+        </mask>
+        {turn(
+          <>
+            <g fill="currentColor" mask={`url(#${mask})`}>
+              {art.fill}
+            </g>
+            <g fill="currentColor">{art.extra}</g>
+          </>,
+        )}
+      </svg>
+    </span>
+  );
+}
 
 // A tab is the current page on its own path, and the current section on a page under it (a group's page is under
 // Groups).
@@ -147,7 +229,7 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
             return (
               <li key={tab.href}>
                 <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
-                  <span className={styles.icon}>{tab.icon}</span>
+                  <TabIcon art={tab.art} />
                   {tab.label}
                 </Link>
               </li>
@@ -171,12 +253,16 @@ export function Shell({ admin, profile, streak, onChanged, onSettings, onSignedO
 }
 
 // The streak and its rank on the soft pill (round 7's .streak), read as "4 day streak, Daisy": the flower is decoration.
+// The number counts up when it has changed, and a new rank's flower pops in (14b-10b, answers 12 and 27).
 function StreakPill({ days }: { days: number }) {
   const rank = rankFor(days);
+  const newRank = useNew("streak.rank", rank.name);
   return (
     <Link href="/streak" transitionTypes={FORWARD} className={styles.streak}>
-      <RankFlower rank={rank} size={22} />
-      {days}
+      <span className={newRank ? kit.pop : undefined}>
+        <RankFlower rank={rank} size={22} />
+      </span>
+      <CountUp name="streak.days" value={days} />
       <span className="sr-only"> day streak, {rank.name}</span>
     </Link>
   );

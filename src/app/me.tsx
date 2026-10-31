@@ -4,7 +4,7 @@
 // calendar of days played, a card per game and the rarest answers, laid out from round 7's Me boards. The account is
 // in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 import { ButtonLink } from "./button-link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Me } from "@/game/me";
 import { api } from "@/lib/api-client";
@@ -12,6 +12,7 @@ import { Avatar } from "./avatar";
 import { givenText } from "./given";
 import { errorText } from "./messages";
 import kit from "./kit.module.css";
+import { CountUp } from "./count-up";
 import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
@@ -56,10 +57,10 @@ export function MeStats({ numbers }: { numbers: boolean }) {
       <section aria-label="All games" className={kit.card}>
         <h2>All games</h2>
         <dl className={styles.totals}>
-          <Total value={me.totals.points.toLocaleString("en-US")} label="points all time" />
+          <Total value={<CountUp name="me.points" value={me.totals.points} />} label="points all time" />
           <Total value={String(me.totals.daysPlayed)} label="days played" />
-          <Total value={String(me.totals.streak)} label="day streak now" />
-          <Total value={String(me.totals.longestStreak)} label="longest streak" />
+          <Total value={<CountUp name="me.streak" value={me.totals.streak} />} label="day streak now" />
+          <Total value={<CountUp name="me.longest" value={me.totals.longestStreak} />} label="longest streak" />
         </dl>
       </section>
       <Calendar month={me.month} numbers={numbers} />
@@ -107,7 +108,8 @@ export function MeStats({ numbers }: { numbers: boolean }) {
 }
 
 // A total as mockup 3's stat tile, in the soft tint: Me's headline numbers are yours (M14 14b-10, answer 20).
-function Total({ value, label }: { value: string; label: string }) {
+// Points and streaks count up when they've changed (14b-10b, answer 27).
+function Total({ value, label }: { value: ReactNode; label: string }) {
   return (
     <div className={`${kit.stat} ${kit.soft}`}>
       <dt>{label}</dt>
