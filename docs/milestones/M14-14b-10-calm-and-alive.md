@@ -1,6 +1,6 @@
 # M14 14b-10 — Calm at rest, alive on touch
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, in review (PR #141). Then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
+**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, done (PR #141, merged 2026-10-30 on green CI). Then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
 
 ## Goal
 Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon hop, pops, count-ups).
