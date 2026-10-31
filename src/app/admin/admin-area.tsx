@@ -13,6 +13,7 @@ import { api } from "@/lib/api-client";
 import { ButtonLink } from "../button-link";
 import kit from "../kit.module.css";
 import { errorText } from "../messages";
+import { useDismiss } from "../dismiss";
 import { useMinWidth } from "../min-width";
 import { SideColumn } from "../side-column";
 import { Audit } from "./audit/audit";
@@ -143,29 +144,13 @@ function SubTabs({ page, counts }: { page: AdminPage; counts: Counts | null }) {
   );
 }
 
-// On phones: one menu in the sub-tabs' order, the groups split by a line, then what's waiting as buttons. Escape or a
-// press outside it closes the open menu, Escape returning the focus to its button (item 41).
+// On phones: one menu in the sub-tabs' order, the groups split by a line, then what's waiting as buttons. It closes the
+// site's one way (dismiss.ts; item 41).
 function PhoneMenu({ page, counts }: { page: AdminPage; counts: Counts | null }) {
   const [open, setOpen] = useState(false);
   const nav = useRef<HTMLElement>(null);
   const button = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setOpen(false);
-      button.current?.focus();
-    };
-    const onPress = (event: PointerEvent) => {
-      if (!nav.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPress);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPress);
-    };
-  }, [open]);
+  useDismiss(open, useCallback(() => setOpen(false), []), nav, button);
   const current = TO_DO.find((t) => t.page === page);
   const warning = counts && warningOf(counts.tomorrow);
   const waiting = counts

@@ -123,8 +123,8 @@ test("numbers are tabular, headings balanced and paragraphs pretty", async ({ pa
   expect(styles).toEqual({ body: "tabular-nums", h3Numbers: "tabular-nums", headings: ["balance", "balance", "balance"], p: "pretty" });
 });
 
-// A comment shows before it's sent, Undo sends nothing, and the toast's window ending sends it once; a reaction's chip
-// keeps its width; a failed send puts the screen back and says what failed; leaving the page sends at once (criterion 3;
+// A comment shows before it's sent, Undo sends nothing, and the toast's window ending sends it once; a reaction shows
+// at once with Undo; a failed send puts the screen back and says what failed; leaving the page sends at once (criterion 3;
 // design 3, P1).
 test("comments and reactions show at once, with Undo before they're sent", async ({ page }) => {
   // Five Undo windows are waited out in full (UNDO_SECONDS each), past the default 30 s on a cold dev server.
@@ -160,20 +160,20 @@ test("comments and reactions show at once, with Undo before they're sent", async
   await expect(kept).toBeVisible();
   expect(posts).toEqual([]);
   await sent(page, "/api/comments");
-  await expect(kept.getByRole("button", { name: "Delete" })).toBeVisible();
+  const more = kept.getByRole("button", { name: /^Actions for / });
+  await expect(more).toBeVisible();
   expect(posts).toHaveLength(1);
 
-  // A chip is as wide with its count as without.
-  const laugh = kept.getByRole("button", { name: "😂" });
-  const before = (await laugh.boundingBox())!.width;
-  await laugh.click();
-  await expect(laugh).toHaveText("😂 1");
+  // A reaction shows at once, with Undo (14b-13: picked from the comment's ⋯).
+  await more.click();
+  await kept.getByRole("button", { name: "😂" }).click();
+  await expect(kept.getByText(/^😂 1/)).toBeVisible();
   await expect(toast).toContainText("😂 added");
-  expect((await laugh.boundingBox())!.width).toBe(before);
   await sent(page, "/api/reactions");
 
   // A failed delete: the comment goes at once, then comes back with what failed.
   await page.route("**/api/comments/delete", (route) => route.fulfill({ status: 500, json: { ok: false, error: "internal" } }));
+  await more.click();
   await kept.getByRole("button", { name: "Delete" }).click();
   await expect(kept).toHaveCount(0);
   await expect(toast).toContainText("Comment deleted");

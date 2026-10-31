@@ -1,33 +1,24 @@
-/* Reactions as mockup 3's chips (.reacts): the kit's chip (kit.module.css), at least 44px wide, a 13px emoji; the
-   player's own in the soft fill with an accent edge, and pressed, not colour alone (aria-pressed). No shadow or press:
-   they're chips, not the kit's buttons (M14 14b-8b). At least 24px tall, WCAG 2.2 2.5.8's minimum target. Scoped to the
-   group, so they outrank the kit's chip whatever order the CSS loads in. */
-.group {
+/* Reactions behind a ⋯ (docs/milestones/M14-14b-13-reactions-menu.md). */
+
+/* The reactions used, as small text under a comment's or run's words (answer 2), at the 13px the chips had (14b-8b,
+   mockup 3's .reacts). Each keeps the chips' room, so the player's own can take the tint and an accent edge (answer 6)
+   without the others moving. */
+.summary {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* No gap inside: the count's room at 0 (below) and a real count must take the same width (14b-6b). */
-.group .reaction {
-  gap: 0;
-  min-width: 44px;
-  min-height: 24px;
-  margin: 0;
-  padding: 1px 8px;
-  box-shadow: none;
   font-size: 13px;
 }
 
-.group .reaction:hover,
-.group .reaction:active:not(:disabled) {
-  transform: none;
-  box-shadow: none;
+.used {
+  padding: 1px 8px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-small);
+  white-space: pre;
 }
 
-/* The count keeps its leading space: in the chip's flex row a bare text item would lose it (14b-10b). */
-.count {
-  white-space: pre;
+.mine {
+  border-color: var(--accent);
+  background: var(--soft);
 }
 
 /* The emoji is what pops in (kit.module.css .pop): a box, so it can scale. */
@@ -35,15 +26,100 @@
   display: inline-block;
 }
 
-.group .reaction[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: var(--soft);
+/* The ⋯ and its popover, at the top right of a comment's or run's row (answer 5). */
+.menu {
+  position: relative;
+  flex: none;
+  align-self: flex-start;
 }
 
-/* A chip without a count holds the room of one, " 0", drawn by CSS so it's neither shown nor part of the chip's text
-   or name (M14 14b-6b: a chip keeps its width when its count appears). */
-.none::after {
-  content: " 0";
-  white-space: pre;
-  visibility: hidden;
+/* Faint at rest, the text's colour under the pointer (answer 5), at the buttons' one 44px (14b-10, answers 7 and 18). No
+   shadow, lift or press: it's a mark on every row, not one of the kit's buttons (the lift and press are in :where(), so
+   these classes outrank them; globals.css). */
+.more {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: var(--muted);
+}
+
+.more[aria-expanded="true"] {
+  color: var(--text);
+}
+
+@media (hover: hover) {
+  .more:hover:not(:disabled) {
+    color: var(--text);
+  }
+}
+
+/* The popover: the kit's card, right under the ⋯ with their right edges lined up (approved placement), over the rows
+   below it. Scoped above the kit's .card, whose padding and gap its full-width items don't take, as the admin phone
+   menu's (admin.module.css .phone .menu). */
+.menu .panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  transform-origin: top right;
+}
+
+.emojis {
+  display: flex;
+}
+
+/* Each emoji and action is 44px (14b-10, answer 18), flat, tinted under the pointer as rows are (14b-10, answer 12). */
+.pick,
+.action {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  color: var(--text);
+}
+
+.pick {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+/* The player's own, pressed: the summary's tint and edge (answer 6), not colour alone (aria-pressed). */
+.pick[aria-pressed="true"] {
+  background: var(--soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* Delete or Report, full width under the emoji, split from them by the admin phone menu's line (admin.module.css
+   .menuLookUp), at the fields' 12px inset (globals.css). */
+.action {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.emojis + .action {
+  border-top: 2px solid var(--ink);
+}
+
+@media (hover: hover) {
+  .pick:hover:not(:disabled),
+  .action:hover:not(:disabled) {
+    background: var(--soft);
+  }
 }

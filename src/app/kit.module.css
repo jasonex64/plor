@@ -87,8 +87,8 @@
   min-width: 0;
 }
 
-/* A row's second line, under its words: reactions and minor actions, wrapping (mockup 3's .reacts, 6px under a
-   comment's words). A comment's and a friend's row on the live board (M14 14b-8e: beside the words, the reactions
+/* A row's second line, under its words: the reactions used, wrapping (mockup 3's .reacts, 6px under a comment's
+   words; Delete and Report moved behind the ⋯ in 14b-13). A comment's and a friend's row on the live board (M14 14b-8e: beside the words, the reactions
    covered a friend's name on phones). */
 .below {
   display: flex;

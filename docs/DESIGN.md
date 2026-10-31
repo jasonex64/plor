@@ -65,11 +65,18 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
 ## Motion
 - One easing and time: `--ease` `cubic-bezier(0.2, 0.8, 0.2, 1)` and `--quick` 200ms (`globals.css:325-328`). Under reduced motion nothing moves; a state still changes, at once.
-- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:392-400`); a small one's to 5px (`kit.module.css:199-203`); a link drawn as a button the same (`button-link.module.css:25-30`). The reaction chips don't lift (`reactions.module.css:22`).
+- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:392-400`); a small one's to 5px (`kit.module.css:199-203`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
 - **Rows** take the soft tint under the pointer (`kit.module.css:68-83`).
+- **The reactions' popover** pops in from 90%, from its top right corner (`reactions.tsx:101`, `reactions.module.css:66-75`); its emoji and actions take the soft tint under the pointer (`reactions.module.css:120-125`).
 - **Tab icons** have two versions, an outline and a solid one that does something (Today's calendar peels a corner, Friends goes ^ ^ with a grin, Groups turns point-down, Me gains a sparkle), in the tab's own colour, muted at rest and the text colour hovered or current, as its label is (`src/app/shell.tsx:39-164`). The current tab shows the solid one; from 768px a hovered tab takes the soft fill and the solid one, which Groups turns 60° into (`shell.module.css:119-154`, `:242-270`).
 - **Count-ups:** points and streaks (Me's tiles, the game screen's streak and best score, the streak pill) count to their value over 600ms when it differs from what this browser last showed (`src/app/shown.ts:9`, `:50-76`, `src/app/count-up.tsx`).
 - **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:243-259`).
+
+## Reactions
+- A comment or a friend's run shows only the reactions used, in the set's order, as 13px text on the row's second line, each with its count; nothing when there are none (`src/app/reactions.tsx:15-41`, `src/app/reactions.module.css:6-17`). The player's own takes the soft tint and an accent edge, and is read as ", yours" (`reactions.module.css:19-22`, `reactions.tsx:34`).
+- Each comment (once sent) and each friend's run has a ⋯ at its row's top right: 44px, three dots on the 24px icon grid at 22px, muted, the text colour while open or hovered (`reactions.tsx:62-133`, `reactions.module.css:30-61`; `src/app/comments.tsx:349-354`, `src/app/board.tsx:151`).
+- It opens a popover in the kit's card right under it, right edges lined up: the five emoji, each 44px, the player's own pressed with the tint and an accent edge, then a comment's Delete or Report, 44px, under a 2px ink line (`reactions.module.css:66-118`). A run has only the emoji.
+- A pick, Escape, a press outside, focus leaving or another ⋯ opening closes it; a pick or Escape puts focus back on the ⋯ (`reactions.tsx:82-86`, `src/app/dismiss.ts`). The admin phone menu closes the same way (`src/app/admin/admin-area.tsx`, `PhoneMenu`).
 
 ## Test runs (admin)
 - `/admin/test/<date>` is the game screen's run, drawn by the same component as play (`src/app/game.tsx:268`), on the game screen's grid (`src/app/offbeat.tsx:88-113`).
