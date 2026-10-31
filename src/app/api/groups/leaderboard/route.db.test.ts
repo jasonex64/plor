@@ -203,4 +203,34 @@ describe("a group's leaderboard", () => {
       ],
     });
   });
+
+  it("counts a member who joins mid-week from that day on: last week's earlier days are 0 and the later ones count (12d; 14b-14)", async () => {
+    // D has 3 on last Monday, 7 on last Wednesday and 11 on last Friday, and joins on last Wednesday at noon Pacific.
+    const { rows } = await getPool().query<{ m: string; w: string; f: string }>(
+      "select ($1::date - 7)::text as m, ($1::date - 5)::text as w, ($1::date - 3)::text as f",
+      [monday],
+    );
+    const { m, w, f } = rows[0];
+    for (const [date, points] of [
+      [m, 3],
+      [w, 7],
+      [f, 11],
+    ] as const) {
+      await ensurePuzzle(date);
+      await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [D.userId, GAME_ID, date]);
+      await getPool().query("insert into private.points_ledger (user_id, game_id, puzzle_date, points, bonus) values ($1, $2, $3::date, $4, 0)", [
+        D.userId,
+        GAME_ID,
+        date,
+        points,
+      ]);
+    }
+    await getPool().query(
+      "insert into private.group_member (group_id, user_id, joined_at) values ($1, $2, ($3::date + time '12:00') at time zone 'America/Los_Angeles')",
+      [club, D.userId, w],
+    );
+    useSession(A.session);
+    const d = (await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body.lastWeek.entries.find((e: Entry) => e.username === D.username);
+    expect([d.points, d.daily]).toEqual([18, [0, 0, 7, 0, 11, 0, 0]]);
+  });
 });

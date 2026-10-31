@@ -1,6 +1,6 @@
 # M14 14b-14 — The leaderboard's graph view
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-14 as drafted?"), in progress. It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-14 as drafted?"), in review (PR #TBD). It was drafted from five rounds of guided questions, a mockup page, and an Impeccable critique of that mockup, whose redraw the human approved (2026-10-31: "Approve, write the ticket (Recommended)"). It follows 14b-13 (PR #143, merged) and is the last feature in the human's 14b-10 notes (14b-10, answer 4). The desktop sidebar's corners were asked about in the same rounds and stay as they are (answer 12), so no sub-ticket was made for them.
 
 ## Goal
 The weekly leaderboards on the Friends tab and each group page get a Graph view beside the List. Each week shows every player's points adding up day by day, so a player can see who's catching up and when someone pulled ahead.
@@ -100,38 +100,38 @@ Earlier answers this ticket keeps:
 - **DESIGN.md** (the kit and colour slots): the card, the switch (`leaderboard.module.css:7-41`), chips, badges, the minor button (`kit.module.css:211-222`), fields (`globals.css:345-361`), `--edge`, `--line`, `--muted`, `--accent`, `--soft`.
 
 ## Acceptance criteria
-- [ ] `/api/leaderboard` and `/api/groups/leaderboard` also send, for each player in each week, their points on each counted day from Monday, so a week's days add up to its total. Same rules as the totals: only days that are over; not a closed day whose own run the viewer is still playing; a group member's days only from the one they joined. Each week also says how many of its days are over and which of them the viewer is still playing. A route db test covers a mid-week day, a member who joined part-way through the week, and the viewer still playing yesterday.
-- [ ] A day the viewer is still playing (answer 28): every line is flat across it, its day name is struck through, the table shows "–" for it, and one muted line under the week says "<Day>'s points are hidden until you finish that run." ("<Day> and <Day>'s points … those runs" for two or more).
-- [ ] The Friends and group leaderboards have a List / Graph switch under their heading: the same radio strip as Today's period switch, List chosen on load. Today's leaderboard card is unchanged.
-- [ ] In Graph, each week shows its race. For each player:
+- [x] `/api/leaderboard` and `/api/groups/leaderboard` also send, for each player in each week, their points on each counted day from Monday, so a week's days add up to its total. Same rules as the totals: only days that are over; not a closed day whose own run the viewer is still playing; a group member's days only from the one they joined. Each week also says how many of its days are over and which of them the viewer is still playing. A route db test covers a mid-week day, a member who joined on a Wednesday, and the viewer still playing yesterday.
+- [x] A day the viewer is still playing (answer 28): every line is flat across it, its day name is struck through, the table shows "–" for it, and one muted line under the week says "<Day>'s points are hidden until you finish that run." ("<Day> and <Day>'s points … those runs" for two or more).
+- [x] The Friends and group leaderboards have a List / Graph switch under their heading: the same radio strip as Today's period switch, List chosen on load. Today's leaderboard card is unchanged.
+- [x] In Graph, each week shows its race. For each player:
   - a line through their running total on each counted day, on Monday to Sunday columns;
   - yours 3px in `--accent`, a found player's 2px in `--text`, everyone else's 2px in `--edge`;
   - the leader's end carries the accent "1" badge.
-- [ ] The labels at the line ends:
+- [x] The labels at the line ends:
   - You, the leader and a found player are named at their line's end with their total.
   - A tie shares one label ("You & Fay 20").
   - A label moved more than 4px from its dot has a tick back to it, and no label leaves the graph.
-- [ ] The graph is drawn at the width it shows at, so its 12px text measures 12px at 390px and at 1440px. Days read "Mo Tu We…" below 768px and "Mon Tue…" from 768px.
-- [ ] This week marks today with a dashed `--edge` line and "Today" under it. It keeps room for names past its last day only when the week is over.
-- [ ] On a Monday, This week shows "The first points arrive Tuesday, once Monday is over." and Last week shows its finished race.
-- [ ] A tap or click anywhere on a graph picks the player whose line is nearest to it on that day's column, never yourself. An e2e clicks just off a friend's line and sees them named. Picking the found player again clears them.
-- [ ] Find a player sits under the switch, with the hint under it. It follows the APG Combobox:
+- [x] The graph is drawn at the width it shows at, so its 12px text measures 12px at 390px and at 1440px. Days read "Mo Tu We…" below 768px and "Mon Tue…" from 768px.
+- [x] This week marks today with a dashed `--edge` line and "Today" under it. It keeps room for names past its last day only when the week is over.
+- [ ] *(Unverified: the e2e checks it only when run on a Monday; built 2026-10-31, a Saturday)* On a Monday, This week shows "The first points arrive Tuesday, once Monday is over." and Last week shows its finished race.
+- [x] A tap or click anywhere on a graph picks the player whose line is nearest to it on that day's column, never yourself. An e2e clicks just off a friend's line and sees them named. Picking the found player again clears them.
+- [x] Find a player sits under the switch, with the hint under it. It follows the APG Combobox:
   - typing shows the players whose names start with it (not yourself, any case), the first selected (`aria-activedescendant`);
   - Down and Up move and wrap;
   - Enter, or leaving the field, takes the selected one;
   - Escape closes the list, and a second Escape clears the field;
   - a 44px ✕ clears it;
   - a name that matches nobody says "No player called “…” here."
-- [ ] Finding a player lights and names their line in both weeks and bolds their table row.
-- [ ] Each week with a graph has a 44px "Show table" / "Hide table" button beside its date chip, with `aria-expanded`. It opens a table under the graph:
+- [x] Finding a player lights and names their line in both weeks and bolds their table row.
+- [x] Each week with a graph has a 44px "Show table" / "Hide table" button beside its date chip, with `aria-expanded`. It opens a table under the graph:
   - a real `<table>` with `<th scope>`, players by place, each counted day's running total;
   - if it's wider than the card, it scrolls inside its own box, with the 96px name column fixed;
   - at 320px and 390px the page never scrolls sideways.
-- [ ] Each graph is `role="img"`, named "<week>, day by day: <leader> leads with N; you have M." (or "you lead with N").
-- [ ] `--edge` on `--surface` reaches 3:1 in all five themes, checked by `src/app/colors.test.ts`. If a theme falls short (the critique estimated Ink at about 3.04:1, unverified), stop and ask.
-- [ ] Nothing in the graph animates (no motion is added).
-- [ ] DESIGN.md describes the graph, Find and the table, with file and line citations.
-- [ ] The `reviewer` agent has reviewed the diff.
+- [x] Each graph is `role="img"`, named "<week>, day by day: <leader> leads with N; you have M." (or "you lead with N").
+- [x] `--edge` on `--surface` reaches 3:1 in all five themes, checked by `src/app/colors.test.ts`. If a theme falls short (the critique estimated Ink at about 3.04:1, unverified), stop and ask.
+- [x] Nothing in the graph animates (no motion is added).
+- [x] DESIGN.md describes the graph, Find and the table, with file and line citations.
+- [x] The `reviewer` agent has reviewed the diff.
 
 ## Out of scope
 - Today's leaderboard card (answer 2).
@@ -171,7 +171,9 @@ Every value below is from the approved mockup unless its row says otherwise. Tha
 6. **Review and record.** The `reviewer` agent; fix blocking findings; the Status line, the ROADMAP row and HANDOFF in the PR.
 
 ## Removes
-Nothing. The graph is a second view of the same board, and the List stays the default (answer 3). The data adds a field and changes none.
+- The board query's per-range sums (`totals` in `src/friends/leaderboard.ts`): one query now gives each player's points by day, and each week's and yesterday's totals are summed from it.
+- Its in-progress subquery: the viewer's days in play are read once (`playing`) and both leave them out of every total and mark them on the graph.
+- Nothing in the view: the graph is a second view of the same board, and the List stays the default (answer 3).
 
 ---
 *Fill in the sections below at the end.*
@@ -180,7 +182,33 @@ Nothing. The graph is a second view of the same board, and the List stays the de
 | Source says | We built | Why different |
 |---|---|---|
 | APG Combobox example: no suggestion is selected when the list appears | The first suggestion is selected, and Enter or leaving the field takes it | The pattern's item 3, list autocomplete with automatic selection, as the approved mockup draws it |
+| Answer 29's option: "the smallest that keeps 4 steps or fewer above 0", with the example "0 / 2500 / 5000 / 7500 for a 6,800-point week" | 2000 for 6,800 (0 / 2000 / 4000 / 6000 / 8000) | The option contradicts itself: by its rule, 2000 is smaller and keeps 4 steps. Claude's example was wrong; the rule is followed, and the human is told |
+| The mockup: a 28px initial in each suggestion | The site's avatar slot (`avatar.tsx`), 30px with a 2px ink ring | One way to draw a player's initial |
+| The mockup: the table's name column 96px | 96px at least; a longer name widens it | A table column grows to its content; names aren't cut in the table (answer 30 cuts them only on the graph) |
+| Plan step 1: only yesterday can be left out while the viewer plays | Any earlier day can be | Disproved by DECISIONS.md, Game 1: Timer and `private.run_status`; the human chose how to show it (answer 28) |
 
 ## Evidence
+- **The day-by-day data, red first** (2026-10-31): the new assertions in `src/app/api/leaderboard/route.db.test.ts` and `src/app/api/groups/leaderboard/route.db.test.ts` before the query changed → `Tests 7 failed | 7 passed (14)`, each on the missing `daily`, `days` or `hidden` (`expected undefined to deeply equal [ 4 ]` for yesterday as hidden). After: `npx vitest run src/app/api/leaderboard src/app/api/groups/leaderboard --no-file-parallelism` → `Test Files 4 passed (4)`, `Tests 22 passed (22)` (the yesterday board's two files included). After the review's mid-week join test, the group file → `Tests 8 passed (8)`.
+- **Plan step 1's hypothesis disproved** by reading, not running: DECISIONS.md, Game 1: Timer ("a run left at a reveal stays in progress until the player taps Next") and `private.run_status` (`deadline` null at a reveal). Stopped and asked (answer 28).
+- **Plan step 2:** `colors.test.ts` already checked "the control outline on surface is at least 3:1" in every theme; `npx vitest run src/app/colors.test.ts -t "control outline"` → `Tests 10 passed | 123 skipped (133)` (five themes, two backgrounds), Ink included. A comment now names the graph's lines as its other user.
+- **The view, red first:** `npx playwright test e2e/leaderboard-graph.e2e.ts` before building → `2 failed`, at `getByRole('radiogroup', { name: 'View' }).getByRole('radio', { name: 'List' })`: element(s) not found.
+- **The layout's unit tests:** `npx vitest run src/app/race-layout.test.ts` → `Tests 16 passed (16)` (two expectations corrected first: Source diff, answer 29).
+- **Green:** `npx playwright test e2e/leaderboard-graph.e2e.ts --reporter=line` → `2 passed (14.3s)`, with no `unhandled route error` in the dev server's log. On the way:
+  - the tap missed: Last week's graph is below the fold at 390px, so the test scrolls it into view before clicking at its box (hypothesis: off-screen; confirmed by the next run);
+  - the 320px check caught the graph one frame before its resize observer redrew it, so that check polls.
+- **The e2e files that show the boards:** `npx playwright test e2e/live-board.e2e.ts e2e/groups.e2e.ts e2e/me.e2e.ts e2e/calm.e2e.ts e2e/look.e2e.ts e2e/player-screens.e2e.ts --reporter=line` → `31 passed (6.4m)`.
+- **Unit tests:** `npm test` → `Test Files 49 passed (49)`, `Tests 493 passed (493)`. `npx tsc --noEmit -p .` and `npx eslint` on the changed files: no output.
+- **Impeccable's detector** on the open Friends page through a DevTools port (a throwaway spec, deleted after): `impeccable detect --cdp 9333 --target friends --json` → `[]` at 390×844 and at 1440×900.
+- **Screens** (the same throwaway spec; images in the session's scratchpad, not committed): the Friends leaderboard in Graph with a long-named friend found and Last week's table open, at 390px and 1440px in Paper and Night. The lines, the "1" badge on the leader's end, "You 925" in the accent, "Benedict_l… 500" cut at 10 characters, Today dashed at Saturday and the table's held name column all show as drawn.
+- **Nothing animates:** `race.module.css` has no `transition` or `animation`.
 
 ## Review
+The `reviewer` agent, fresh context, 2026-10-31, on `00a7782`.
+- Blocking findings and how each was fixed:
+  - The still-playing e2e wrote a made-up answer id, so routes that name answers errored while it passed. It now writes question 1's safe answer (`fixtureId(0, "dog")`); the log shows no route errors.
+  - The criterion "a member who joined on Wednesday" had been loosened to "part-way through the week" with no test of a mid-week join. Restored, and a group db test has D join on last Wednesday: last week's days read `[0, 0, 7, 0, 11, 0, 0]`, total 18.
+  - The ROADMAP row and HANDOFF still said "waiting to build". Updated in this PR.
+  - Evidence and the ticked criteria were missing. Filled in.
+  - Answer 29's option contradicted itself (rule and example). Recorded in the Source diff and told to the human.
+  - Also from the review: the e2e checks that a found player is named in This week too and that their table row is bold.
+- Deferred to ROADMAP "Next revision" (For M14): a tied label wider than the graph at 320px; a full name that's also the start of another; the Find and table spacings' origins; the group board not covered by the graph e2e.

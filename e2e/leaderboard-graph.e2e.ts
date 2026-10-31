@@ -4,7 +4,7 @@
 // written straight into the database, last week's on every day and this week's on the days that are over.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool, type PoolClient } from "pg";
-import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
+import { fixtureDay, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -181,6 +181,12 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   await expect(find).toHaveValue("Ben");
   await expect(find).toHaveAttribute("aria-expanded", "false");
   expect(await texts(last)).toContain("Ben 25");
+  // Found in both weeks (answer 18).
+  if (thisOver > 0) {
+    const benThisWeek = THIS.Ben.slice(0, thisOver).reduce((a, b) => a + b, 0);
+    // Named last on its label, alone or after a tie ("You & Ben 20").
+    expect(await texts(week(page, "This week").getByRole("img"))).toEqual(expect.arrayContaining([expect.stringMatching(new RegExp(`Ben ${benThisWeek}$`))]));
+  }
   // Escape closes the list, then clears the field.
   await find.fill("c");
   await expect(list.getByRole("option")).toHaveText(["Cleo"]);
@@ -211,6 +217,10 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   await expect(table.getByRole("row").nth(1)).toHaveText(["Ana", "5", "11", "14", "18", "24", "31", "36"].join(""));
   await expect(table.getByRole("row").nth(2)).toHaveText(["You", "4", "7", "13", "18", "22", "28", "35"].join(""));
   expect(await table.getByRole("rowheader").first().evaluate((th) => getComputedStyle(th).position)).toBe("sticky");
+  // A found player's row is bold.
+  await find.fill("Cleo");
+  expect(await table.getByRole("rowheader", { name: "Cleo" }).evaluate((th) => getComputedStyle(th).fontWeight)).toBe("800");
+  expect(await table.getByRole("rowheader", { name: "Bea" }).evaluate((th) => getComputedStyle(th).fontWeight)).toBe("400");
   expect(await table.evaluate((t) => t.parentElement!.scrollWidth > t.parentElement!.clientWidth)).toBe(true);
   expect(await noSidewaysScroll(page)).toBe(true);
   // The graph is redrawn at the new width once its resize observer reports it, a frame later.
@@ -242,8 +252,9 @@ test("a day the viewer is still playing is flat, struck through and noted, and '
   await written(async (client) => {
     await client.query("delete from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [viewer, wednesday]);
     await client.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, 'offbeat', $2::date, 0, 'fixture', false)",
-      [viewer, wednesday],
+      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, 'offbeat', $2::date, 0, $3, false)",
+      // Question 1's safe answer (e2e/puzzle.ts): a real entry, so the screens that name it can.
+      [viewer, wednesday, fixtureId(0, "dog")],
     );
   });
   await page.reload();
