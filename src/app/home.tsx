@@ -105,7 +105,8 @@ function usePlayer(): { player: Player; timeUps: number; reloadStreak: () => voi
 // (node_modules/next/dist/docs/01-app/03-api-reference/04-functions/use-search-params.md, Prerendering; use-pathname.md,
 // Cache Components). The parts that read it are FrameParts, behind their own boundary, and RedirectError, shown only
 // on the client; what depends on the session waits inside Signed.
-export function Frame({ children }: { children: ReactNode }) {
+// lost: the 404 page's frame, where the address is no tab's page, whatever it starts with (14b-16 review).
+export function Frame({ children, lost = false }: { children: ReactNode; lost?: boolean }) {
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -150,6 +151,7 @@ export function Frame({ children }: { children: ReactNode }) {
             shell={
               player && (
                 <Shell
+                  lost={lost}
                   admin={player.admin}
                   profile={player}
                   streak={player.streak}

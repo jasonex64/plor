@@ -8,11 +8,12 @@ import { Frame } from "./home";
 // loading.js: "Shared layouts remain interactive while new route segments load"). The heading, the page's static parts
 // and the footer are in the served HTML before any script runs (M02 2c); the frame keeps what reads the session or the
 // address bar on the client (src/app/home.tsx, Frame).
-export function Shell({ children }: { children: ReactNode }) {
+// lost: the 404 page, where no tab is current (Frame).
+export function Shell({ children, lost = false }: { children: ReactNode; lost?: boolean }) {
   return (
     <main>
       <h1>Plor</h1>
-      <Frame>{children}</Frame>
+      <Frame lost={lost}>{children}</Frame>
       <Footer />
     </main>
   );

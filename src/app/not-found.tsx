@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (
-    <Shell>
+    <Shell lost>
       <section className={kit.card}>
         <h2>Page not found</h2>
         <p>There&apos;s nothing at this address.</p>

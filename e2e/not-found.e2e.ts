@@ -56,3 +56,18 @@ test("signed in, the old /offbeat address shows the page inside the sidebar shel
   await expect(nav.locator("[aria-current]")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
+
+// An unknown address under a tab's own path is still no tab's page: no tab, nor Admin, is marked current (14b-16 review).
+test("signed in on a phone, unknown addresses under a tab's path mark no tab current", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "ng");
+  const nav = page.getByRole("navigation", { name: "Main" });
+  for (const path of ["/friends/nope", "/me/nope", "/updraft/nope"]) {
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(404);
+    await expect(page.getByRole("main").getByRole("heading", { level: 2, name: "Page not found" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Today" })).toBeVisible();
+    await expect(nav.locator("[aria-current]"), path).toHaveCount(0);
+  }
+});
