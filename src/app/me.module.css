@@ -53,7 +53,9 @@
 }
 
 .totals dd {
-  font-size: 28px;
+  /* 40px where it fits, else 25% of the tile: "999,999", the widest total it fits, is 3.875 times its size in Baloo 2
+     at 800 (M14 14b-10, answers 22 to 24, measured). */
+  font-size: min(40px, 25cqi);
   font-weight: 800;
   line-height: 1;
 }

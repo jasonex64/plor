@@ -2,7 +2,8 @@
 // on real elements. 14b-8a: buttons, links drawn as buttons and fields take the ink border, corners and hard shadow in
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
 // bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard. 14b-8c: Me's
-// cards and /streak's ranks. 14b-8d: the admin area.
+// cards and /streak's ranks. 14b-8d: the admin area. Since 14b-10a (docs/milestones/M14-14b-10-calm-and-alive.md, answer
+// 3) only what can be pressed has a shadow: cards, stat tiles and the current tab or sub-tab are flat (calm.e2e.ts).
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -93,16 +94,16 @@ test("the tab bar and the sidebar's current item take the ink rules", async ({ b
 
   await page.setViewportSize({ width: 1440, height: 900 });
   expect(await nav.evaluate((el) => `${getComputedStyle(el).borderRightWidth} ${getComputedStyle(el).borderRightColor}`)).toBe(`2px ${color}`);
-  expect(await look(nav.getByRole("link", { name: "Today" }))).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+  expect(await look(nav.getByRole("link", { name: "Today" }))).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
 });
 
-test("a card and a chip take the kit's border, corners and shadow", async ({ browser }) => {
+test("a card and a chip take the kit's border and corners, flat", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await page.goto("/");
   await signInAndPick(page, "lc");
   const color = await ink(page);
   const card = page.getByRole("region", { name: "Leaderboard" });
-  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
   // The card's date chip, once its scores have loaded.
   const chip = card.getByText(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+ \w+$|^From /).first();
   await expect(chip).toBeVisible();
@@ -143,10 +144,10 @@ test("Me's header, stat tiles and days, and /streak's own rank, in the kit", asy
   const header = page.getByText(/^Playing since /).locator("xpath=../..");
   await expect(header).toBeVisible();
   expect(await header.evaluate((el) => getComputedStyle(el).flexDirection)).toBe("row");
-  expect(await look(header)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  expect(await look(header)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
   expect(await header.locator("[data-initial]").evaluate((el) => `${getComputedStyle(el).borderTopWidth} ${getComputedStyle(el).borderTopColor}`)).toBe(`2px ${color}`);
   const tile = page.getByRole("region", { name: "All games" }).getByText("points all time", { exact: true }).locator("xpath=..");
-  expect(await look(tile)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+  expect(await look(tile)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
   expect(await page.getByRole("region", { name: "Calendar" }).locator("[data-date]").first().evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("2px");
 
   await page.goto("/streak");
@@ -165,10 +166,10 @@ test("the admin area's current sub-tab, a card and the rail's warning, in the ki
   await page.goto("/admin/insights");
   const color = await ink(page);
   const tab = page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: "Insights" });
-  expect(await look(tab)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: `${color} 3px 3px 0px 0px` });
+  expect(await look(tab)).toEqual({ border: `2px ${color}`, corners: "4px", shadow: "none" });
   const card = page.getByRole("region", { name: "Caught per question" });
   await expect(card).toBeVisible();
-  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: `${color} 4px 4px 0px 0px` });
+  expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
   const warning = page.getByRole("complementary", { name: "What needs you" }).getByRole("link", { name: /Tomorrow has no puzzle/ });
   const [edge, text] = await warning.evaluate((el) => [getComputedStyle(el).borderTopColor, getComputedStyle(el).color]);
   expect(edge).toBe(text);

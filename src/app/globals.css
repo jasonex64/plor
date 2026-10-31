@@ -320,8 +320,6 @@ label {
   --r-button: 5px;
   --r-small: 4px;
   --r-cell: 2px;
-  --shadow-card: 4px 4px 0 var(--ink);
-  --shadow-card-small: 3px 3px 0 var(--ink);
   --shadow-button: 0 4px 0 var(--ink);
   --shadow-button-small: 0 3px 0 var(--ink);
 }
@@ -349,9 +347,16 @@ select {
   border-radius: var(--r-small);
 }
 
-input,
-textarea,
+/* Fields and selects at the buttons' one height, 44px, so a button beside a field lines up with it
+   (docs/milestones/M14-14b-10-calm-and-alive.md, answer 7). */
+input:not([type="checkbox"], [type="radio"]),
 select {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+textarea {
   padding: 10px 12px;
 }
 

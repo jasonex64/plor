@@ -229,7 +229,7 @@ function WhereEveryoneEnded({ username, mine, friends }: { username: string; min
       <h3>Where everyone ended</h3>
       <ul className={kit.rows}>
         {placeRows(mine, friends).map((row) => (
-          <li key={placeLabel(row.place)} className={kit.row}>
+          <li key={placeLabel(row.place)} className={row.you ? `${kit.row} ${kit.you}` : kit.row}>
             <details>
               <summary>
                 {placeLabel(row.place)}: {[...(row.you ? ["You"] : []), ...row.named.map((p) => p.name)].join(", ")}

@@ -9,7 +9,9 @@ export function StreakRanks({ days }: { days: number }) {
   const current = rankFor(days);
   return (
     <section aria-label="Streak" className={styles.streak}>
-      <h2 className={styles.heading}>Your streak: {days === 1 ? "1 day" : `${days} days`}</h2>
+      <h2 className={styles.heading}>
+        Your streak: <span className={styles.number}>{days}</span> {days === 1 ? "day" : "days"}
+      </h2>
       <p>
         Your streak is the days in a row you&apos;ve played, finished or not. Today counts once you start, and until then
         your streak runs to yesterday, so it doesn&apos;t drop to 0 overnight. A day with no puzzle neither counts nor

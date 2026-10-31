@@ -87,9 +87,8 @@
 }
 
 /* Change and Set are buttons, as round 10 draws them (no text links: docs/milestones/M14-14b-2b-1-shell.md), the kit's
-   small ones, 44px tall to tap (WCAG 2.2 2.5.8); scoped above the kit's small kind, which sets no height. */
+   small ones. */
 .field .inline {
-  min-height: 44px;
   margin: 0 0 0 6px;
 }
 
@@ -241,7 +240,6 @@
 }
 
 .secondary {
-  min-height: 48px;
   margin: 0;
   font-size: 16px;
   font-weight: 700;
@@ -263,9 +261,8 @@
   color: var(--danger);
 }
 
-/* The kit's danger kind, at the sheet's tap height. */
+/* The kit's danger kind, with a small button's padding. */
 .dangerButton {
-  min-height: 44px;
   padding: 0 12px;
 }
 

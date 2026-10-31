@@ -17,7 +17,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
+  /* With the strip's 2px border, 44px: a field's and a button's height (M14 14b-10, answer 7). */
+  min-height: 40px;
   background: var(--surface);
   color: var(--muted);
   font-size: 14px;
@@ -47,7 +48,6 @@
 .board select {
   display: block;
   width: 100%;
-  min-height: 40px;
   margin-top: 4px;
   font-size: 16px;
 }

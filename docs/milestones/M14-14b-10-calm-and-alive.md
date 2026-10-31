@@ -1,6 +1,6 @@
 # M14 14b-10 — Calm at rest, alive on touch
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions; 14b-10a paused (human, 2026-10-29, relayed by the "Repeatable test puzzle" session: "RIGHT NOW, AND PAUSE 10A'S WORK"), so 14b-11, test runs (`docs/milestones/M14-14b-11-test-runs.md`), is built first; 10a's code so far is in a `git stash` in `C:/Users/jason/RIFF-m14`, "M14 14b-10a WIP (paused 2026-10-29) …" (`git stash list`), with `e2e/look.e2e.ts` still to update. PR #136 (14b-9) merged first. 14b-10a, the still look, then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
+**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, in review (PR #TBD). Then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
 
 ## Goal
 Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon hop, pops, count-ups).
@@ -44,6 +44,10 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 21. Today's game: "Nothing more" ("The banner and Play already stand out; the tint goes only to the other places").
 22. Which numbers are 40px: "Stat tiles and /streak (Recommended)" ("The numbers in stat tiles (Me's four, the game screen's three) and the big number on /streak. List rows (leaderboards, friends) keep their size").
 
+**During 14b-10a, after the review measured the numbers (2026-10-29):**
+23. At 40px, "0.0/7" is 96px where a game-screen tile on a 390px phone leaves about 74px, and "12,345" is 131px where Me's tiles at 360px leave about 111px. Asked how they should fit: "Shrink to fit the tile (Recommended)" ("40px wherever it fits, scaling down with the tile's width on narrow phones (CSS container units), so a number never spills").
+24. After the second review asked where "999,999" came from: "999,999 (Recommended)" ("Fits any total under a million: years of daily play … A seven-digit total would spill until it's raised").
+
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
 
@@ -52,7 +56,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 - **Shadows:** only buttons and links drawn as buttons keep theirs (answer 3). Cards, rows, chips, stat tiles, the sidebar's current item and the streak pill go flat. Cards keep the 2px ink border (answer 9).
 - **One control height:** every button, field and select is 44px tall, the kit's small and minor kinds included (answer 7). The small kind's and the minor kind's `min-height: 0` go. The reaction chips stay as they are until the ⋯ menu (answer 18).
 - **The streak pill:** fully round (answer 6).
-- **Type:** card headings 24px (answer 10); the numbers in stat tiles (Me's four, the game screen's three) and /streak's number 40px (answer 22). Page headings stay at 32px and body at 16px.
+- **Type:** card headings 24px (answer 10); the numbers in stat tiles (Me's four, the game screen's three) and /streak's number 40px (answer 22). A tile's number shrinks with the tile where 40px won't fit (answer 23). Page headings stay at 32px and body at 16px.
 - **Tints at rest,** in the theme's soft accent (answers 11, 19 to 21):
   - your own row on every board and friends list;
   - the streak pill, in place of its green (answer 20);
@@ -70,12 +74,13 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 ## Numbers
 | Value | Used for | Origin |
 |---|---|---|
-| 44px | Every button, field and select | Answer 7; `docs/DESIGN.md` (buttons, `globals.css:367-380`) |
-| 2px ink border | Cards, flat | Answer 9; `kit.module.css:6-15` |
+| 44px | Every button, field and select | Answer 7; `docs/DESIGN.md` (buttons, `globals.css:372-385`) |
+| 2px ink border | Cards, flat | Answer 9; `kit.module.css:7-15` |
 | 32px, 24px, 40px, 16px | Page headings, card headings, stat tiles' and /streak's numbers, body | Answers 10, 22 |
+| 37% and 25% of the tile's width | The game screen's and Me's stat numbers where 40px won't fit | Answer 23; measured in Baloo 2 at 800 with tabular digits: "1,500" (the best score's most: 1,000 for seven stops plus the 500 bonus cap, `src/config/tunables.ts`) is 2.675 times its size, "999,999" points, the widest Me's total must fit (answer 24; a perfect day is at most 1,500), 3.875 times |
 | Fully round | The streak pill | Answer 6 |
 | The theme's `--soft` | Tints at rest and on hover | Answers 8, 11 (`globals.css`, each theme) |
-| 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:409-438`) |
+| 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:414-443`) |
 | 2px | A button's lift on hover | Answer 14 |
 | 90% | A pop's starting size | Answer 14 |
 | 600ms at most | A count-up | Answer 14 |
@@ -87,7 +92,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - Every visible button, field and select, but the reaction chips, is at least 44px tall at 390px and 1440px.
   - The group name's box and Rename line up, top and bottom.
   - The streak pill is fully round beside the round avatar.
-  - Card headings are 24px; the stat tiles' and /streak's numbers 40px.
+  - Card headings are 24px; the stat tiles' and /streak's numbers 40px where they fit, and the widest a tile can show fits it on a phone (answer 23).
   - Your row on a board and in the friends list, the streak pill and Me's four headline tiles take the soft tint.
 - [ ] **14b-10b:**
   - A hovered desktop tab takes the tint and its icon moves once.
@@ -123,9 +128,57 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answer 7: every button, field and select 44px | Buttons, links drawn as buttons, text fields and selects at 44px; the theme tiles (48px), the host-answer checkboxes, the admin sub-tabs and menu rows, and the board's disclosure rows keep their sizes | They are choice tiles, chips, links and rows, not buttons, fields or selects; the ones under 44px stay on ROADMAP's For M14 item |
+| Answer 3: cards, rows, chips, stat tiles, the current tab and the streak pill go flat | The Undo toast went flat too | It held a card's shadow and can't be pressed (only its Undo can) |
+| Answer 7 names buttons, fields and selects | The leaderboard's Yesterday / This week strip is 44px too (its choices 40px inside a 2px border) | It's a two-choice control that sits above the board's select, so it takes the same height |
 
 ## Evidence
+### 14b-10a, 2026-10-29 and 30 (Pacific), the Windows PC (`C:/Users/jason/RIFF-m14`)
+- **First version of the e2e:** `npx playwright test e2e/calm.e2e.ts e2e/look.e2e.ts` → 9 passed (2.8m). Then, on the old code (10a's `src` changes held in a stash), `calm.e2e.ts` → 2 failed. Your row's background was `rgb(255, 255, 255)` where the soft tint `rgba(36, 87, 214, 0.1)` was expected, and the streak pill wasn't round.
+- **The review found that run proved less than it claimed.** The red run stopped at the tint, before the shadow and height loop, and the loop asserted only empty lists, so it could have passed on a page still loading. The test now:
+  - runs the loop first, after every section has loaded (no "Loading…" status left);
+  - checks that each page's small controls are on screen (Post, Report, Delete and Earlier day on Today; Remove on Friends; Create group on Groups; Rename on the group);
+  - requires at least one shadowed button and one measured control per page.
+- **Red, then green (2026-10-30, after 14b-11b, 14b-11c and 14b-12 merged and the stash was popped onto `d2d393b`):**
+  - On the old code (10a's `src` in a stash), the first run failed at the Rename check, which came before the loop: 11px apart. The check now runs after the loop. The second red run failed in the loop at its first page, Today at 390px, listing the game banner, the Leaderboard card and the Feed card as non-buttons with a shadow. Both tests failed.
+  - On the 10a code: `calm`, `look`, `me`, `streak`, `offbeat`, `player-screens`, `groups`, `settings-sheet`, `settings`, `today`, `admin-area`, `shell` and `test-run` gave **55 passed, 3 failed** (8.3m). The three timed out on a navigation (`player-screens.e2e.ts:77`, `shell.e2e.ts:278`, `test-run.e2e.ts:44`), the first-run timeouts HANDOFF records for this PC. `npx playwright test --last-failed` → **3 passed** (38.1s).
+  - `npx tsc --noEmit -p .`, `npx eslint e2e src/app` and `npm test` (47 files, 473) → clean.
+- **The fit checks, red then green (after the second review):** with the game screen's number forced to a flat 40px, `fits("1,500")` failed (`calm.e2e.ts:178`); with Me's forced to 40px, `fits("999,999")` failed (`calm.e2e.ts:197`). Each was restored, and `npx playwright test e2e/calm.e2e.ts` → **2 passed** (1.2m).
+- **Seen** (a throwaway capture, deleted after): Today, `/updraft` after a run, Me, Friends, a group and `/streak` at 390×844 and 1440×900, two friends who played and commented.
+  - Cards are flat; buttons keep their shadow.
+  - The streak pill is round and tinted beside the round avatar.
+  - Your row is tinted on the leaderboard and on the group's boards, and Me's four tiles are tinted with 40px numbers.
+  - Rename sits level with the group's name box.
+  - "0.0/7" fits its tile at 40px on a desktop.
+  - The minor buttons (Report, Delete, Earlier day, Leave group) are visibly bigger at 44px, as answer 7 chose.
+- **The 40px numbers, measured:** the review computed that they overflow phone tiles. A Playwright page with Baloo 2 at 800 and tabular digits measured "0.0/7" at 96px, "1,500" at 107px and "999,999" at 155px, against about 74px in a game-screen tile at 390px. The human chose to shrink to fit (answer 23). The e2e writes the widest number into a tile on a phone and checks that it fits, and checks for 40px on a desktop.
+- **What the new e2e covers:**
+  - No shadow on anything but a button or a link (also checked by a grep of the CSS: `box-shadow` is set only on buttons and links drawn as buttons), on nine pages (Today, Friends, Groups, a group, Me, `/streak`, `/updraft`, admin Puzzles and Insights) at 390×844 and 1440×900, and on Today in all five themes.
+  - Every visible button, link drawn as a button, text field and select is at least 44px tall on the same pages and sizes. The reaction chips are left out (answer 18). The two players are friends, share a group, and have played and commented, so Remove, Rename, Report, Delete and Post are on screen.
+  - The group's name and Rename line up within 0.5px, top and bottom.
+  - The streak pill is round and in the soft tint.
+  - Your row is in the soft tint, on the leaderboard and in "Where everyone ended".
+  - A card's heading is 24px. The game screen's stat numbers, Me's four totals and `/streak`'s number are 40px, and Me's four tiles are in the soft tint.
+- **`e2e/look.e2e.ts`:** its six shadow expectations (a card, Me's header card, a stat tile, the sidebar's current tab, the admin's current sub-tab, the Insights card) now expect `none`, as answer 3 sets. That's the spec changing, not a weaker check.
+- `npm test` → 47 files, 473 passed. `npx tsc --noEmit -p .` and `npx eslint e2e/calm.e2e.ts e2e/look.e2e.ts src/app` → clean.
+- **`docs/DESIGN.md`:** updated, with each new citation read at its line.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+### 14b-10a: the `reviewer` agent, twice, fresh context each time
+- **First review, blocking findings and how each was fixed:**
+  1. The 40px numbers would overflow phone tiles (computed). Measured, confirmed, and fixed by answer 23: they shrink to fit.
+  2. `calm.e2e.ts` could pass without measuring. It now waits for the sections, checks the small controls are visible, counts what it measured, and runs its loop first. Shown red on the old code.
+  3. ROADMAP's M14 row and HANDOFF were stale. Both rewritten.
+  4. The red run's `test-results/` was left behind. Deleted.
+- **Second review, blocking findings and how each was fixed:**
+  1. The game screen's fit check measured the number against itself, since its `dd` shrinks to its text. It now measures the text against the room inside the tile.
+  2. "999,999" had no origin. The human chose it (answer 24).
+  3. HANDOFF's list of what's left and its 14c step were stale. Both rewritten.
+- **Fixed with them** (slips in this diff):
+  - DESIGN.md's sidebar citation, one line off since the streak pill's comment grew;
+  - this ticket's Numbers citations;
+  - a double blank line in `calm.e2e.ts`.
+- **Left as they are:** the unapproved 14c-2 draft rides in this PR as a docs file, so the repo holds it while 14c is postponed.
+- **Deferred to ROADMAP "Next revision" (For M14):**
+  - the admin field's inner input ties on specificity with the global 44px input rule;
+  - the streak pill's comment says 26px where For M14 measured 28px.

@@ -148,7 +148,7 @@ function Entries({ entries }: { entries: LeaderboardEntry[] }) {
   return (
     <ol className={kit.rows}>
       {entries.map((e, i) => (
-        <li key={e.username} className={kit.row}>
+        <li key={e.username} className={e.you ? `${kit.row} ${kit.you}` : kit.row}>
           <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
           <Avatar name={e.name} />
           <span className={kit.grow}>
