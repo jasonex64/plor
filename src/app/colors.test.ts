@@ -128,6 +128,7 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     expect(ratio(rgb(t.caught), rgb(t.surface))).toBeGreaterThanOrEqual(4.5);
   });
 
+  // Also the other players' lines on the leaderboard graph, on its card (docs/milestones/M14-14b-14-leaderboard-graph.md).
   it.each(["bg", "surface"])("the control outline on %s is at least 3:1", (bg) => {
     expect(ratio(rgb(t.edge), rgb(t[bg]))).toBeGreaterThanOrEqual(3);
   });

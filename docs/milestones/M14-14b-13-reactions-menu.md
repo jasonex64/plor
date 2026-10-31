@@ -1,6 +1,6 @@
 # M14 14b-13 — Reactions behind a ⋯ menu
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Approve 14b-13 with the proposed placement and ⋯ name?"), drafted from two rounds of guided questions and a source question; in review (PR #143). It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Approve 14b-13 with the proposed placement and ⋯ name?"), drafted from two rounds of guided questions and a source question; done (PR #143, merged on green CI at the human's "Merge when green"). It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
 
 ## Goal
 Every comment and every friend's run on the board drops its row of five emoji chips. Instead it shows only the reactions people used, as small text, and a ⋯ at its top right opens a small popover with the five emoji and either Delete or Report.
