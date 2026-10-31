@@ -322,6 +322,10 @@ label {
   --r-cell: 2px;
   --shadow-button: 0 4px 0 var(--ink);
   --shadow-button-small: 0 3px 0 var(--ink);
+  /* 14b-10b's motion: 200ms, quick out with a soft settle (docs/milestones/M14-14b-10-calm-and-alive.md, answers 14
+     and 26). */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --quick: 200ms;
 }
 
 /* The comment box and the pickers take the page's font too (M14 14b-6d: one font for all text); their own sizes stay. */
@@ -379,14 +383,26 @@ button {
   border-radius: var(--r-button);
   box-shadow: var(--shadow-button);
   cursor: pointer;
+  /* The lift takes --quick; the press sets --move to its own 80ms (below). */
   transition:
-    transform 80ms,
-    box-shadow 80ms;
+    transform var(--move, var(--quick)) var(--ease),
+    box-shadow var(--move, var(--quick)) var(--ease);
+}
+
+/* On a device that hovers, a button lifts 2px toward the pointer, its shadow 2px longer so its foot stays put (14b-10,
+   answers 12 and 14). In :where(), like the press, so a button with its own class (the gear) can opt out; the shadow
+   changes through --shadow-button, which the rule above reads, as a box-shadow here would lose to it. */
+@media (hover: hover) {
+  :where(button:hover:not(:disabled)) {
+    --shadow-button: 0 6px 0 var(--ink);
+    transform: translateY(-2px);
+  }
 }
 
 :where(button:active:not(:disabled)) {
+  --shadow-button: 0 0 0 var(--ink);
+  --move: 80ms;
   transform: translateY(4px);
-  box-shadow: 0 0 0 var(--ink);
 }
 
 /* Players who ask for less motion get no press (WCAG 2.2, 2.3.3; answer 9). */
@@ -395,9 +411,10 @@ button {
     transition: none;
   }
 
+  :where(button:hover:not(:disabled)),
   :where(button:active:not(:disabled)) {
+    --shadow-button: 0 4px 0 var(--ink);
     transform: none;
-    box-shadow: var(--shadow-button);
   }
 }
 

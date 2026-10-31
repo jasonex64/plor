@@ -18,6 +18,7 @@ import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
 import kit from "./kit.module.css";
+import { CountUp } from "./count-up";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
@@ -158,11 +159,13 @@ function YourOffbeat({ stats }: { stats: Stats }) {
       <dl className={styles.stats}>
         <div className={kit.stat}>
           <dt>day streak</dt>
-          <dd>{stats.streak}</dd>
+          <dd>
+            <CountUp name="updraft.streak" value={stats.streak} />
+          </dd>
         </div>
         <div className={kit.stat}>
           <dt>best score</dt>
-          <dd>{stats.best === null ? "–" : stats.best.toLocaleString("en-US")}</dd>
+          <dd>{stats.best === null ? "–" : <CountUp name="updraft.best" value={stats.best} />}</dd>
         </div>
         <div className={kit.stat}>
           <dt>avg. stops climbed</dt>

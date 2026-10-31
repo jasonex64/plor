@@ -1,9 +1,9 @@
 # M14 14b-10 — Calm at rest, alive on touch
 
-**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, in review (PR #141). Then 14b-10b, the motion and icons, each its own PR. The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
+**Status:** approved (human, 2026-10-29: "Approve 14b-10 as drafted"), drafted from four rounds of guided questions. 14b-10a was paused for 14b-11, test runs (human, 2026-10-29: "RIGHT NOW, AND PAUSE 10A'S WORK"), and resumed once PR #137 merged (human, relayed: "Merge PR #137 once every CI check is green, then resume 14b-10a"); 14b-10a, the still look, done (PR #141, merged 2026-10-30 on green CI). 14b-10b, the motion and icons, in review (PR #142). The two features in the human's notes (reactions behind a ⋯ menu, a leaderboard graph) are later sub-tickets, each with its own questions.
 
 ## Goal
-Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon hop, pops, count-ups).
+Plor reads simple when nothing is touched (strong type, a touch of colour, shadows only on what can be pressed, controls one height) and comes alive when touched or changed (hovers, an icon turning solid, pops, count-ups).
 
 ## Who uses it / what breaks without it
 - Used by: every player, on every screen.
@@ -48,6 +48,19 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 23. At 40px, "0.0/7" is 96px where a game-screen tile on a 390px phone leaves about 74px, and "12,345" is 131px where Me's tiles at 360px leave about 111px. Asked how they should fit: "Shrink to fit the tile (Recommended)" ("40px wherever it fits, scaling down with the tile's width on narrow phones (CSS container units), so a number never spills").
 24. After the second review asked where "999,999" came from: "999,999 (Recommended)" ("Fits any total under a million: years of daily play … A seven-digit total would spill until it's raised").
 
+**Before 14b-10b (2026-10-30, the human: "Yes, ask them"):**
+25. The tab icon's hop: "3px (Recommended)" ("A small visible lift: clearly a reaction to the pointer without looking like a bounce").
+26. The easing for hovers, the hop, pops and count-ups: "Quick out, soft settle (Recommended)" ("Fast at the start, slowing into place (CSS ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)). Feels responsive and calm; no overshoot").
+27. When numbers count up: "When they've changed (Recommended)" ("Only when a number differs from what this browser last showed you (kept in the browser, like the theme copy): after a run, or a new day's streak").
+28. Which icons are redrawn: "The four tabs (Recommended)" ("Today, Friends, Groups and Me, in the tab bar and the sidebar … The gear and other icons stay as they are").
+
+**After the first icon drawings (2026-10-30):**
+29. "the icons should not be colored." Supersedes answer 15's soft colour and accent.
+30. "rather than play a hop animation (goes from a to b to a) it should just be a transition to another state (a - b)", then "maybe like 2 versions of each icon". Supersedes answer 25's 3px hop: each tab icon has an outline version at rest and a solid one, both in the text colour; hovering moves from one to the other and holds it, and the current tab shows the solid one.
+31. On round 2's drawings: "i like that it goes negative, but there should be a bit of a different look to each icon as well (i.e the today tab's calender maybe opens, etc. focus on simplistic complexity)". Each solid version does something: the calendar's corner peels up, the face winks and grins, the three huddle in, the person waves.
+32. On round 3: "i like the calendar, but friends i dont like the wink, something symetrical (think ^ ^) and then the groups should maybe rotational? and i just straight up dont like the me one". Round 4: Friends closes both eyes happily (^ ^) and grins; Groups turns 60° about its middle as it switches, ending point-down; Me has three options (a close-up, a smile, a sparkle) for the human to pick.
+33. Me's solid version: "C, a sparkle" ("The solid person with a small four-point sparkle beside the head: 'this is you'").
+
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
 
@@ -63,13 +76,13 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
   - Me's four headline tiles (answer 20).
 
 **14b-10b, the motion and icons:**
-- **Desktop tabs:** the soft tint on hover, and the icon hops once (answer 8).
+- **Desktop tabs:** the soft tint on hover, and the icon moves from its outline version to its solid one and holds it while hovered (answers 8 and 30); the current tab shows the solid one.
 - **Buttons:** lift 2px on hover (desktop), then press as now (answer 14).
 - **Rows:** take the soft tint on hover (answer 12).
 - **Numbers:** points, streak and rank count up when they change, over at most 600ms.
 - **Pops:** a new reaction, comment or rank pops in from 90% size.
 - **Reduced motion:** nothing moves; tints still show (answer 8).
-- **Tab icons:** redrawn filled, with one soft colour each; the current tab's icon takes the accent (answer 15). The drawings are shown to the human before they ship.
+- **Tab icons:** two versions of each of the four, an outline and a solid one, in the text colour with no tint (answers 28 to 30; answer 15's colour is superseded). The solid one does something: Today's calendar peels a corner (answer 31), Friends closes its eyes happily, ^ ^, and grins, and Groups turns 60° as it switches, ending point-down (answer 32). Me gets a small sparkle beside the head (answer 33). The drawings are shown to the human before they ship. The drawings are on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8). Round 1 (2026-10-30) was coloured and hopped; round 2 has the two uncoloured versions (answers 29 and 30); round 3 gives each solid version its own gesture (answer 31). It waits for the human's word.
 
 ## Numbers
 | Value | Used for | Origin |
@@ -80,27 +93,27 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 | 35% and 24% of the tile's width | The game screen's and Me's stat numbers where 40px won't fit | Answer 23; measured in Baloo 2 at 800 with tabular digits: "1,500" (the best score's most: 1,000 for seven stops plus the 500 bonus cap, `src/config/tunables.ts`) is 2.675 times its size, "999,999" points, the widest Me's total must fit (answer 24; a perfect day is at most 1,500), 3.875 times. Each allows half a pixel a glyph where Chromium rounds glyphs to whole pixels (CI's Linux), down to a 320px phone: (60 − 2.5) / 2.675 ≈ 21.5px of a 60px tile, (91 − 3.5) / 3.875 ≈ 22.6px of a 91px tile |
 | Fully round | The streak pill | Answer 6 |
 | The theme's `--soft` | Tints at rest and on hover | Answers 8, 11 (`globals.css`, each theme) |
-| 200ms | Hovers, the icon hop, pops | Answers 8, 14 (the slide's timing, `globals.css:414-443`) |
+| 200ms | Hovers, the icon's change of version, pops | Answers 8, 14, 30 (the slide's timing, `globals.css:414-443`) |
 | 2px | A button's lift on hover | Answer 14 |
 | 90% | A pop's starting size | Answer 14 |
 | 600ms at most | A count-up | Answer 14 |
-| **Open** | How high the icon hops; the motion's easing | Ask before 14b-10b |
+| `cubic-bezier(0.2, 0.8, 0.2, 1)` | The easing of hovers, the icon's change of version, pops and count-ups | Answer 26 |
 
 ## Acceptance criteria
-- [ ] **14b-10a:**
+- [x] **14b-10a:**
   - Only buttons and button links have a box shadow, on every page in each theme (an e2e reads computed styles, as `e2e/look.e2e.ts` does).
   - Every visible button, field and select, but the reaction chips, is at least 44px tall at 390px and 1440px.
   - The group name's box and Rename line up, top and bottom.
   - The streak pill is fully round beside the round avatar.
   - Card headings are 24px; the stat tiles' and /streak's numbers 40px where they fit, and the widest a tile can show fits it on a phone (answer 23).
   - Your row on a board and in the friends list, the streak pill and Me's four headline tiles take the soft tint.
-- [ ] **14b-10b:**
-  - A hovered desktop tab takes the tint and its icon moves once.
+- [x] **14b-10b:**
+  - A hovered desktop tab takes the tint and shows its icon's solid version until the pointer leaves; the current tab shows its solid version.
   - A hovered button lifts 2px; nothing moves under reduced motion.
   - A count-up ends at the right number within 600ms.
   - A new reaction pops.
-  - The redrawn icons pass contrast in all five themes (`src/app/colors.test.ts`'s way).
-- [ ] `docs/DESIGN.md` describes the new kit (each PR, CLAUDE.md, Docs).
+  - Both versions of each icon are in the tab's own colour, with no other colour, in all five themes.
+- [x] `docs/DESIGN.md` describes the new kit (each PR, CLAUDE.md, Docs).
 - [ ] An Impeccable `audit` after 14b-10b scores no worse than 15/20, and its nested-cards finding is gone.
 - [ ] The `reviewer` agent has reviewed each PR.
 
@@ -128,6 +141,12 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 14b-10b. Answer 12: points, streak *and rank* count up | Points and streaks count up; a new streak rank pops in (its flower) | A rank is a name and a flower, not a number to count; answer 12's "pops on add" covers it |
+| Answer 30: the outline version is "the shapes you know now" | Me's outline is a bare person, as drawn on the approved page, where the old icon was a person in a circle | The drawings the human approved show the bare person; noticed while building |
+| Answer 30: both versions "in the text colour" | In the tab's own colour, as its label: muted at rest, the text colour hovered or current | Answer 29's "not colored" means no tint; the label beside it is muted at rest, and an icon darker than its label would stand out |
+| Answer 12: buttons lift on hover | Every button with the hard shadow lifts; reaction chips, the gear and the minor kind don't | They have no shadow to lift from; the chips wait for the ⋯ menu (answer 18) |
+| Answer 12: a reaction pops | The emoji inside the chip pops, not the chip | Remounting the button would take keyboard focus away |
+| The press drops a button onto its shadow (14b-8, answer 9) | The press now removes the shadow too, through `--shadow-button` | Its `box-shadow` lost to the base rule since 14b-8; moving hover and press to the custom property fixes both |
 | Answer 7: every button, field and select 44px | Buttons, links drawn as buttons, text fields and selects at 44px; the theme tiles (48px), the host-answer checkboxes, the admin sub-tabs and menu rows, and the board's disclosure rows keep their sizes | They are choice tiles, chips, links and rows, not buttons, fields or selects; the ones under 44px stay on ROADMAP's For M14 item |
 | Answer 3: cards, rows, chips, stat tiles, the current tab and the streak pill go flat | The Undo toast went flat too | It held a card's shadow and can't be pressed (only its Undo can) |
 | Answer 7 names buttons, fields and selects | The leaderboard's Yesterday / This week strip is 44px too (its choices 40px inside a 2px border) | It's a two-choice control that sits above the board's select, so it takes the same height |
@@ -164,7 +183,55 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 - `npm test` → 47 files, 473 passed. `npx tsc --noEmit -p .` and `npx eslint e2e/calm.e2e.ts e2e/look.e2e.ts src/app` → clean.
 - **`docs/DESIGN.md`:** updated, with each new citation read at its line.
 
+### 14b-10b, 2026-10-30 (Pacific), the Windows PC
+- **The new e2e, `e2e/alive.e2e.ts`:**
+  - Red on the old code (`src` held in a stash): **4 failed**, one per test.
+  - On the 10b code: **4 passed**.
+  - What it checks:
+    - A hovered desktop tab takes the soft tint and its solid icon until the pointer leaves, and the current tab shows its solid one.
+    - Groups' solid version turns from -60° to upright.
+    - Both versions are in the tab's own colour, in all five themes.
+    - The Start button lifts to `matrix(1, 0, 0, 1, 0, -2)` with a `0 6px 0` shadow, and doesn't move under reduced motion.
+    - A friend's leaderboard row takes the tint under the pointer.
+    - Me's points count from the 40 this browser last showed to 0 in at most 600ms plus a frame either side, and not at all under reduced motion. The new value is kept afterwards.
+    - A comment that arrives and a reaction added pop in, and the comments already there don't.
+- **Fixed while testing:**
+  - The test's first run found the hover shadow lost to the base `button` rule (moved to `--shadow-button`).
+  - Its own selector picked the mask's group.
+  - It read storage before the count's last frame.
+- **The e2e files the change touches:** `alive`, `calm`, `look`, `shell`, `me`, `streak`, `offbeat`, `live-board`, `player-screens`, `today`, `groups`, `settings-sheet`, `settings`, `admin-area`, `test-run` and `feel` gave **71 passed, 6 failed**. Four failures were 10b's:
+  - Me's and the game screen's numbers read "00", and the streak pill "00 day streak", because the screen-reader copy stayed after the count. The copy now shows only while counting.
+  - A reaction chip lost its count's space in its flex row, so its width changed (`feel.e2e.ts:172`). The count keeps its space.
+  - The other two were the known flaky ones: the reconnect refetch and the clock bar's time-up.
+  - After the fixes, the six files with failures plus `alive` gave **35 passed**.
+- `npm test` → 48 files, 477 passed (`src/app/shown.test.ts`: the curve checked against values found by bisection, 0.3967 at a tenth and 0.9461 at half). `tsc` and eslint → clean.
+- **Seen** at 1440×900: Today current with its peeled calendar, Groups hovered turned point-down and solid, Me hovered with its sparkle, all in the text colour with the soft tint. The capture's last two shots (the lifted Start, the phone tab bar) didn't run, since the capture failed at the Start button. The lift is covered by the e2e.
+
+- **After the review (below):**
+  - `alive.e2e.ts` now also checks that the press takes 80ms and the release 200ms.
+  - It checks that your own comment pops as it's posted and not when the server's copy replaces it.
+  - It checks that the comment already there stays still when another arrives.
+  - The review's fixes first broke the own-comment pop twice: the server's copy came beside the pending one, then the pending copy matched itself. Both are fixed.
+  - `alive` → **4 passed**. `shell` → all passed.
+  - `calm.e2e.ts`'s first test took 96s against `test.slow()`'s 90s, so it now has an explicit 3 minutes. Its assertions are unchanged.
+  - `feel.e2e.ts:274` failed once in a slow run and passed alone (17.8s).
+- **CI on PR #142:** `feel.e2e.ts:172` (a chip as wide with its count as without) failed on both runs. The chip measured 43.6px, then 44.2px, because the comment around it was popping (scaling in from 90%) as it was measured. Linux CI's order showed why: the pending copy went in one update and the server's copy came in the next, so the server copy counted as new and popped again. `useArrived` now remembers each pending copy until a comment like it comes back, and it moved from an effect to state kept during render (React's "Storing information from previous renders"), compared by ids. Locally: `feel` and `alive` → 11 passed; `live-board`, `groups`, `today`, `player-screens` and `offbeat` → 27 passed.
+
 ## Review
+### 14b-10b: the `reviewer` agent, fresh context
+- **Blocking findings and how each was fixed:**
+  1. The press took 200ms, not 80ms: its `transition-duration` in `:where()` lost to the base rule. The base transition now reads `--move`, which the press sets to 80ms.
+  2. Reduced motion didn't stop the desktop tab's fade: its rule came before the 768px `.tab` transition. It now comes after.
+  3. Your own comment not popping twice was untested: `alive.e2e.ts` now watches the pending copy replaced (above).
+  4. The icons are in the tab's own colour (muted at rest), not "the text colour": the criterion and DESIGN.md say so, with a Source diff row.
+- **Fixed with them:** the Status line's stale sentence.
+- **Deferred to ROADMAP "Next revision" (For M14):**
+  - the new-rank pop (`useNew`) is untested and pops once per page;
+  - reduced motion repeats the button shadow's value;
+  - the 768px block in `shell.module.css` is split in three;
+  - `alive.e2e.ts` doesn't check a phone tab ignoring hover, rows under reduced motion, a hard-coded icon fill, or the masks' cut-outs;
+  - the streak pill's two copies share storage keys.
+
 ### 14b-10a: the `reviewer` agent, twice, fresh context each time
 - **First review, blocking findings and how each was fixed:**
   1. The 40px numbers would overflow phone tiles (computed). Measured, confirmed, and fixed by answer 23: they shrink to fit.
