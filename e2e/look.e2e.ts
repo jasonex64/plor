@@ -3,7 +3,7 @@
 // each theme's ink (its text colour), buttons press down unless the player asks for less motion, and the shell's tab
 // bar and sidebar take the ink rules (criterion 1). 14b-8b: a card and a chip, on Today's leaderboard. 14b-8c: Me's
 // cards and /streak's ranks. 14b-8d: the admin area. Since 14b-10a (docs/milestones/M14-14b-10-calm-and-alive.md, answer
-// 3) only what can be pressed has a shadow: cards, stat tiles and the current tab or sub-tab are flat (calm.e2e.ts).
+// 3) only what can be pressed has a shadow: cards, stats and the current tab or sub-tab are flat (calm.e2e.ts).
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
@@ -133,10 +133,10 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
 });
 
-// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stat tiles and
+// 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stats on their card (14b-15) and
 // the days take the cells' corners; /streak's own rank keeps its thicker edge. The header and the rank are scoped above the kit's card, which
 // a production CSS order could otherwise let win (14b-8b review).
-test("Me's header, stat tiles and days, and /streak's own rank, in the kit", async ({ browser }) => {
+test("Me's header, totals and days, and /streak's own rank, in the kit", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await page.goto("/me");
   await signInAndPick(page, "lm");

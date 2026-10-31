@@ -1,7 +1,7 @@
 // 14b-10a, the still look (docs/milestones/M14-14b-10-calm-and-alive.md): only what can be pressed has a shadow, in
 // each theme; every button, field and select is 44px tall (the reactions too, since 14b-13 put them behind a ⋯), so
 // Rename lines up with the group's name; the streak pill is fully round; card headings 24px and the stat numbers 40px; your own row on a
-// board, the streak pill and Me's four tiles take the soft tint; a stat tile's number shrinks to fit a phone (answer 23).
+// board, the streak pill and Me's "All games" card (since 14b-15) take the soft tint; a stat's number shrinks to fit a phone (answer 23).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
