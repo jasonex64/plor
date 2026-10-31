@@ -63,6 +63,9 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 - During a run, the clock bar is 48px with a 2px ink rule (`shell.module.css:318-334`), above the tab bar on phones and at the top from 768px (`globals.css:218-221`, `:237-241`).
 - Detail pages slide 60px over 200 ms, forward to the left and back to the right, and don't move under reduced motion (`globals.css:431-460`, `:509-516`).
 
+- The shell (the `main`, its "Plor" `h1`, the frame with the top bar, tab bar or sidebar, and the footer) is one component, `Shell` (`src/app/shell-page.tsx:11-19`), drawn by the player pages' layout (`src/app/(shell)/layout.tsx`) and the 404 page.
+- **The 404 page:** any address that isn't a page, in the shell, signed in or out, with no tab current: one kit card, "Page not found", "There's nothing at this address." and a main button link "Go to Today"; the browser tab reads "Page not found" (`src/app/not-found.tsx:9-22`).
+
 ## Motion
 - One easing and time: `--ease` `cubic-bezier(0.2, 0.8, 0.2, 1)` and `--quick` 200ms (`globals.css:325-328`). Under reduced motion nothing moves; a state still changes, at once.
 - **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:392-400`); a small one's to 5px (`kit.module.css:200-204`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).

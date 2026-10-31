@@ -1,6 +1,6 @@
 # M14 14b-16 — A proper 404 page
 
-**Status:** drafted, waiting for the human's approval. It was drafted from one round of guided questions (2026-10-31) on the Impeccable audit's 404 item.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-16 as drafted, with the tab title \"Page not found\"?"), in progress. It was drafted from one round of guided questions (2026-10-31) on the Impeccable audit's 404 item.
 
 ## Goal
 An address that isn't a page shows "Page not found" inside Plor's own shell, in the player's theme and font, with one button to Today, and still answers 404.
