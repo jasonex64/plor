@@ -1,18 +1,19 @@
 /* Round 7's slots: 30px by a name, 64px in Me's header, the initial on the soft pill colour, ringed in ink as mockup 3's
-   .avatar is (M14 14b-8c; human, 2026-10-29). */
+   .avatar is (M14 14b-8c; human, 2026-10-29). In rem, so a slot grows with its initial at a bigger browser text size
+   (docs/milestones/M14-14b-17-lines-and-text-size.md, answer 6). */
 .slot {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
   border: 2px solid var(--ink);
-  border-radius: 15px;
+  border-radius: 50%;
   background: var(--soft);
   color: var(--text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   vertical-align: middle;
 }
@@ -22,8 +23,8 @@
 }
 
 .large {
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
-  font-size: 26px;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  font-size: 1.625rem;
 }

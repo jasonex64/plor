@@ -43,7 +43,7 @@
 
 .title {
   margin: 0;
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.1;
 }
 
@@ -70,7 +70,7 @@
   gap: 8px;
   padding: 10px 0;
   border-top: 1px solid var(--line);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .field dd {
@@ -95,7 +95,7 @@
 .note {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .switchRow {
@@ -105,7 +105,7 @@
   gap: 12px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 /* The switches are spaced as the sheet's other rows are. */
@@ -118,7 +118,7 @@
 .line {
   display: block;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* A switch: the off knob at the left in the muted colour; on, the track in the accent and the knob at the right. */
@@ -163,7 +163,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .aboutText {
@@ -191,7 +191,7 @@
 
 .themes legend {
   padding: 0 0 6px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 
@@ -229,7 +229,7 @@
   padding: 0 10px;
   background: var(--bg);
   color: var(--accent);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -241,13 +241,13 @@
 
 .secondary {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
 }
 
 .sheet .danger {
   border-color: var(--danger);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .dangerHead {
@@ -289,7 +289,7 @@
   }
 
   .title {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 
   /* Sign out and Delete account sit at the panel's foot (round 7, board 3). */

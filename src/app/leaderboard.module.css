@@ -21,7 +21,7 @@
   min-height: 40px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
@@ -49,11 +49,11 @@
   display: block;
   width: 100%;
   margin-top: 4px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .board {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--muted);
 }
@@ -62,7 +62,7 @@
    its rows, as far apart as the mockup's card spaces them. */
 .note {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .week {
@@ -72,5 +72,20 @@
 }
 
 .week h3 {
-  font-size: 16px;
+  font-size: 1rem;
+}
+
+/* A board's row keeps its name whole beside the points, and the points drop under it, still at the right, when the two
+   don't fit side by side, as at a bigger browser text size (docs/milestones/M14-14b-17-lines-and-text-size.md,
+   answer 6); without it the name was squeezed to a letter a line. */
+.entry {
+  flex-wrap: wrap;
+}
+
+.entry .name {
+  flex-basis: auto;
+}
+
+.entry b {
+  margin-left: auto;
 }

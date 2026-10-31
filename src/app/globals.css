@@ -186,6 +186,9 @@ body {
   font-family: var(--font), system-ui, sans-serif;
   /* Every digit the same width, so counting and lined-up numbers don't shift (M14 14b-6d; MDN font-variant-numeric). */
   font-variant-numeric: tabular-nums;
+  /* A word too long for its box, such as a 20-character username at a bigger text size, breaks rather than push the
+     page sideways (docs/milestones/M14-14b-17-lines-and-text-size.md, answer 6). */
+  overflow-wrap: anywhere;
 }
 
 /* The room the page leaves for the shell, the clock bar and the right column, flagged by them on <body> while shown
@@ -292,8 +295,22 @@ h3 {
   text-wrap: balance;
 }
 
+/* A paragraph stops at about 70 letters however wide the column: 55ch, as Baloo 2's wide zero makes a ch worth about
+   1.3 letters (docs/milestones/M14-14b-17-lines-and-text-size.md, answers 1, 2 and 8, measured on Privacy). */
 p {
+  max-width: 55ch;
   text-wrap: pretty;
+}
+
+/* On the reading pages (Privacy, About, signed-out Today) a list item is running text too, held to the same measure
+   (answer 9); elsewhere a list item is a row, as wide as its board. And a heading starts what follows it: more space
+   above than below (answer 3); card headings keep their card's spacing. */
+.reading li {
+  max-width: 55ch;
+}
+
+.reading h2 {
+  margin: 40px 0 10px;
 }
 
 a {
@@ -338,7 +355,7 @@ select {
 input,
 button {
   font: inherit;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 /* Fields: a 2px ink border and small corners (mockup 3's input, textarea and select). */

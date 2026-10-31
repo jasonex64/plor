@@ -6,7 +6,7 @@ import { gridStep, layout, shortName, type RacePlayer } from "./race-layout";
 // Each character 6px wide, whatever the weight.
 const measure = (text: string) => [...text].length * 6;
 const player = (key: string, daily: number[], you = false): RacePlayer => ({ key, name: you ? "You" : key, you, daily });
-const base = { days: 7, hidden: [], picked: null, width: 326, height: 200, long: false, measure };
+const base = { days: 7, hidden: [], picked: null, width: 326, height: 200, long: false, text: 12, measure };
 
 describe("gridStep", () => {
   it.each([

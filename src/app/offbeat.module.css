@@ -42,13 +42,13 @@
 
 .heading {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.1;
 }
 
 .muted {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .titled {
@@ -78,7 +78,7 @@
 
 .stats dt {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .stats dd {
@@ -86,7 +86,7 @@
   /* 40px where it fits, else 35% of the tile: "1,500", the best score's most, is 2.675 times its size in Baloo 2 at
      800, plus up to half a pixel a glyph where Chromium rounds glyphs to whole pixels (Linux, CI), down to a 320px
      phone's 60px tile (M14 14b-10, answers 22 and 23, measured). */
-  font-size: min(40px, 35cqi);
+  font-size: min(2.5rem, 35cqi);
   font-weight: 800;
   line-height: 1;
 }
@@ -100,7 +100,7 @@
 
 .chart figcaption {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* Seven bars, each as tall as the questions survived out of 7; a day not played has none, and a dash. */
@@ -120,7 +120,7 @@
   gap: 3px;
   height: 100%;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 
 .bars i {
@@ -140,7 +140,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: 1px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Round 3's How to play: 14px between paragraphs, 16px text at 1.45; the page's own column, at most 960px (L43). */
@@ -152,7 +152,7 @@ section.how {
 
 .how p {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.45;
 }
 

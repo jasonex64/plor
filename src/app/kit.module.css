@@ -29,12 +29,14 @@
 /* A card's heading, 24px (14b-10, answer 10). */
 .card > h2,
 .head > h2 {
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
-/* A heading with something beside it, such as a chip (mockup 3's .row.between). */
+/* A heading with something beside it, such as a chip (mockup 3's .row.between); the chip drops under the heading when
+   they don't fit side by side, as with a bigger browser text size (14b-17, answer 6). */
 .head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -98,7 +100,8 @@
   margin-top: 6px;
 }
 
-/* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. */
+/* A fact as a chip (mockup 3's .chip), and its dark, safe and caught kinds. Its text wraps rather than push the page
+   sideways when it can't fit (14b-17, answer 6). */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -108,9 +111,8 @@
   border-radius: var(--r-small);
   background: var(--surface);
   color: var(--text);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
-  white-space: nowrap;
 }
 
 .chips {
@@ -150,17 +152,19 @@ form.chips {
   text-align: center;
 }
 
-/* A rank or a stop as a round badge (mockup 3's .badge); the first is the accent one. */
+/* A rank or a stop as a round badge (mockup 3's .badge); the first is the accent one. Sized in rem, so it grows with its
+   number at a bigger browser text size (docs/milestones/M14-14b-17-lines-and-text-size.md, answer 6): 24px at the
+   default. */
 .badge {
   display: grid;
   flex: none;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   background: var(--ink);
   color: var(--bg);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
 }
 
@@ -183,7 +187,7 @@ form.chips {
   padding: 0 18px;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
 }
 
@@ -193,7 +197,7 @@ form.chips {
   padding: 0 12px;
   border-radius: var(--r-small);
   box-shadow: var(--shadow-button-small);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -218,7 +222,7 @@ button.link {
   box-shadow: none;
   transform: none;
   color: var(--text);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 

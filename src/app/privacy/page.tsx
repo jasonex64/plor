@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Plor privacy policy" };
 // ticket's Numbers table. Update "Last updated" whenever the text changes.
 export default function Privacy() {
   return (
-    <main>
+    <main className="reading">
       <h1>Plor privacy policy</h1>
       <p>Last updated: 2026-10-25</p>
       <p>

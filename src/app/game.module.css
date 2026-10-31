@@ -19,7 +19,7 @@
 
 .title {
   margin: 0;
-  font-size: 40px;
+  font-size: 2.5rem;
   line-height: 1;
 }
 
@@ -57,7 +57,7 @@
   }
 
   .title {
-    font-size: 46px;
+    font-size: 2.875rem;
   }
 }
 
@@ -71,7 +71,7 @@
 
 .rules {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.4;
 }
 
@@ -92,19 +92,19 @@
 
 .prompt {
   margin: 0;
-  font-size: 30px;
+  font-size: 1.875rem;
 }
 
 .clockBox {
   text-align: right;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .clock {
   margin: 0;
   color: var(--text);
-  font-size: 64px;
+  font-size: 4rem;
   font-weight: 800;
   line-height: 1;
 }
@@ -114,7 +114,7 @@
 .taken {
   margin: 0 0 6px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -133,7 +133,7 @@
   border-radius: var(--r-small);
   background: var(--caught-bg);
   color: var(--caught);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 800;
   text-decoration: line-through;
   text-decoration-color: var(--danger);
@@ -146,6 +146,6 @@
   padding: 10px 12px;
   border: 1.5px dashed var(--ink);
   border-radius: var(--r-small);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }

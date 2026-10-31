@@ -24,13 +24,13 @@
 
 .name {
   margin: 0;
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
 .muted {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* The totals: two to a row, each a stat with its number above its label, split by a thin cross of --line (14b-15,
@@ -65,13 +65,13 @@
   /* 40px where it fits, else 24% of the tile: "999,999", the widest total it fits, is 3.875 times its size in Baloo 2
      at 800, plus up to half a pixel a glyph where Chromium rounds glyphs to whole pixels (Linux, CI), down to a 320px
      phone's 91px tile (M14 14b-10, answers 22 to 24, measured). */
-  font-size: min(40px, 24cqi);
+  font-size: min(2.5rem, 24cqi);
   font-weight: 800;
   line-height: 1;
 }
 
 .totals dt {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -95,7 +95,7 @@
 
 .game h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 /* Offbeat's plain block beside its name until 14c's art, edged like the kit's tiles. */
@@ -117,7 +117,7 @@
 
 .weekday {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   text-align: center;
 }
@@ -132,7 +132,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -175,7 +175,7 @@
   align-items: center;
   gap: 4px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .legend i {
@@ -195,9 +195,9 @@
 }
 
 .rare strong {
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 
 .rare .muted {
-  font-size: 13px;
+  font-size: 0.8125rem;
 }

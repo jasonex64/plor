@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "About Plor" };
 // on the privacy page.
 export default function About() {
   return (
-    <main>
+    <main className="reading">
       <h1>About Plor</h1>
       <p>
         Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
