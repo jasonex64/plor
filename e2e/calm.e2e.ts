@@ -1,12 +1,11 @@
 // 14b-10a, the still look (docs/milestones/M14-14b-10-calm-and-alive.md): only what can be pressed has a shadow, in
-// each theme; every button, field and select is 44px tall but the reaction chips (answer 18), so Rename lines up with
-// the group's name; the streak pill is fully round; card headings 24px and the stat numbers 40px; your own row on a
+// each theme; every button, field and select is 44px tall (the reactions too, since 14b-13 put them behind a ⋯), so
+// Rename lines up with the group's name; the streak pill is fully round; card headings 24px and the stat numbers 40px; your own row on a
 // board, the streak pill and Me's four tiles take the soft tint; a stat tile's number shrinks to fit a phone (answer 23).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { REACTIONS } from "../src/config/tunables";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -44,14 +43,13 @@ const shadowed = (page: Page) =>
     return { pressable: pressable.length, stray };
   });
 
-// Buttons, links drawn as buttons (the ones with a shadow), text fields and selects under 44px tall, but the reactions.
-const short = (page: Page, reactions: readonly string[]) =>
-  page.evaluate((reactions) => {
+// Buttons, links drawn as buttons (the ones with a shadow), text fields and selects under 44px tall.
+const short = (page: Page) =>
+  page.evaluate(() => {
     const controls = [...document.querySelectorAll("button, a, input, select")].filter((el) => {
       if (el.getClientRects().length === 0) return false;
       if (el.tagName === "A") return getComputedStyle(el).boxShadow !== "none";
       if (el.tagName === "INPUT") return !["checkbox", "radio", "hidden"].includes((el as HTMLInputElement).type);
-      if (el.tagName === "BUTTON") return !reactions.some((r) => (el.textContent ?? "").trim().startsWith(r));
       return true;
     });
     const low = controls
@@ -59,10 +57,11 @@ const short = (page: Page, reactions: readonly string[]) =>
       .filter(({ height }) => height < 43.5)
       .map(({ el, height }) => `${el.tagName.toLowerCase()} "${(el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 30)}" ${height}px`);
     return { measured: controls.length, low };
-  }, reactions);
+  });
 
 // Controls each page must show before it's measured: the small kinds that were under 44px before 14b-10a.
-const SHOWN: Record<string, string[]> = { "/": ["Post", "Report", "Delete", "Earlier day"], "/friends": ["Remove"], "/groups": ["Create group"] };
+// A comment's Report and Delete are behind its ⋯ since 14b-13; the ⋯ itself is measured.
+const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /, "Earlier day"], "/friends": ["Remove"], "/groups": ["Create group"] };
 
 test("only what can be pressed has a shadow, and every control is 44px tall", async ({ browser }) => {
   // Two players who are friends, share a group, and have both played and commented, so the friends list's Remove, the
@@ -106,7 +105,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
       const shadows = await shadowed(page);
       expect(shadows.stray, where).toEqual([]);
       expect(shadows.pressable, where).toBeGreaterThan(0);
-      const heights = await short(page, REACTIONS);
+      const heights = await short(page);
       expect(heights.low, where).toEqual([]);
       expect(heights.measured, where).toBeGreaterThan(0);
     }

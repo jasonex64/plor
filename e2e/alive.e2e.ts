@@ -179,7 +179,7 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await expect(mine).toBeVisible();
   expect(await popping(mine)).toBe(true);
   await sent(page, "/api/comments");
-  await expect(mine.getByRole("button", { name: "Delete" })).toBeVisible();
+  await expect(mine.getByRole("button", { name: /^Actions for / })).toBeVisible();
   expect(await popping(mine)).toBe(false);
 
   // The player's Today is open when the friend's comment arrives: it pops; the comment already there doesn't.
@@ -192,11 +192,10 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   expect(await popping(theirs)).toBe(true);
   expect(await popping(mine)).toBe(false);
 
-  // A reaction added pops its emoji in; the others don't.
-  const laugh = theirs.getByRole("button", { name: "😂" });
-  expect(await popping(laugh.locator("span").first())).toBe(false);
-  await laugh.click();
-  await expect(laugh).toHaveText("😂 1");
+  // A reaction added pops its emoji in, in the comment's summary (14b-13: picked from its ⋯).
+  await theirs.getByRole("button", { name: /^Actions for / }).click();
+  await theirs.getByRole("button", { name: "😂" }).click();
+  const laugh = theirs.getByText(/^😂 1/);
+  await expect(laugh).toBeVisible();
   expect(await popping(laugh.locator("span").first())).toBe(true);
-  expect(await popping(theirs.getByRole("button", { name: "👍" }).locator("span").first())).toBe(false);
 });

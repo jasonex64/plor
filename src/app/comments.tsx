@@ -23,7 +23,7 @@ import kit from "./kit.module.css";
 import styles from "./comments.module.css";
 import { shiftDay } from "./day-text";
 import { errorText } from "./messages";
-import { Reactions, reactionText } from "./reactions";
+import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
@@ -330,7 +330,7 @@ function CommentItem({
   onReact?: (emoji: Emoji | null) => void;
 }) {
   // Mockup 3's comment row: the avatar, then the name with its thread and time as a chip, the words, and the reactions
-  // and Delete or Report under them (M14 14b-8b).
+  // used under them (M14 14b-8b); its ⋯ at the top right holds the reactions and Delete or Report (14b-13, answer 1).
   return (
     <li className={arrived ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}>
       <Avatar name={comment.name} />
@@ -343,21 +343,16 @@ function CommentItem({
           </span>
         </div>
         <p>{comment.body}</p>
-        {!pending && (
-          <div className={kit.below}>
-            <Reactions reactions={comment.reactions} onReact={onReact} />
-            {mine ? (
-              <button type="button" className={kit.link} onClick={onDelete}>
-                Delete
-              </button>
-            ) : (
-              <button type="button" className={kit.link} onClick={onReport}>
-                Report
-              </button>
-            )}
-          </div>
-        )}
+        <Reactions reactions={comment.reactions} below />
       </div>
+      {!pending && (
+        <ReactMenu
+          label={`Actions for ${comment.name}'s comment`}
+          reactions={comment.reactions}
+          onReact={onReact}
+          actions={[mine ? { name: "Delete", run: onDelete } : { name: "Report", run: onReport }]}
+        />
+      )}
     </li>
   );
 }

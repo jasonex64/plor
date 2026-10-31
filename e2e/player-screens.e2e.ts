@@ -161,8 +161,8 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await expect.poll(at).toEqual({ top: 56, scrolled: true });
 });
 
-// Answer 8, and item 10: your own link says so; then, friends who have both played see each other's reaction buttons,
-// and a 320px phone still doesn't scroll sideways.
+// Answer 8, and item 10: your own link says so; then, friends who have both played see each other's reactions (behind
+// a ⋯ since 14b-13), and a 320px phone still doesn't scroll sideways with its popover open.
 test("your own invite link says it's yours, and a board with reactions fits 320px", async ({ browser }) => {
   test.slow();
   const host = await player(browser, "xf", PHONE);
@@ -186,6 +186,7 @@ test("your own invite link says it's yours, and a board with reactions fits 320p
   await host.setViewportSize({ width: 320, height: 640 });
   await host.goto("/friends");
   const row = host.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: `xg${RUN}` });
+  await row.getByRole("button", { name: /^React to / }).click();
   await expect(row.getByRole("group", { name: "Reactions" }).getByRole("button").first()).toBeVisible();
   expect(await host.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

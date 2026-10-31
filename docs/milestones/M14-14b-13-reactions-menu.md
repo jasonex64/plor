@@ -1,6 +1,6 @@
 # M14 14b-13 — Reactions behind a ⋯ menu
 
-**Status:** drafted from two rounds of guided questions and a source question (2026-10-31), waiting for the human's approval. It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Approve 14b-13 with the proposed placement and ⋯ name?"), drafted from two rounds of guided questions and a source question; in progress. It follows 14b-10b (PR #142, merged) and comes before the leaderboard's graph view (14b-10's answer 4).
 
 ## Goal
 Every comment and every friend's run on the board drops its row of five emoji chips. Instead it shows only the reactions people used, as small text, and a ⋯ at its top right opens a small popover with the five emoji and either Delete or Report.
@@ -53,17 +53,17 @@ Earlier answers this ticket keeps: 14b-10's answer 18 ("the ⋯ menu sub-ticket 
 - **The admin phone menu** (`src/app/admin/admin-area.tsx`, `PhoneMenu`, 14b-2c-3): it closes on Escape (focus back to its button) or on a press outside. The ⋯ closes the same way, and both take it from one shared hook.
 
 ## Acceptance criteria
-- [ ] No comment and no friend's run shows an emoji button until its ⋯ is opened. At 390px and 1440px a comment nobody reacted to has no line under its words (the feed, a group, Today).
-- [ ] A comment or run with reactions shows them under its words in 13px text, each emoji with its count, in the set's order (`👍 2 ❤️ 1`). It shows nothing when there are none.
-- [ ] Your own reaction in that summary has the soft tint, plus a cue that isn't colour (proposed: an accent edge, as the pressed chip has now). A screen reader hears it as yours (proposed: "😂 3, yours").
-- [ ] Every comment (except one still held for Undo) and every friend's run has a ⋯ button at its top right, at least 44×44px. It has a name screen readers hear, and `aria-expanded` false.
-- [ ] Opening the ⋯ sets `aria-expanded` true and shows a popover next to it. The popover holds the five emoji as buttons, each at least 44×44px with yours pressed (`aria-pressed`), then Delete on your own comment or Report on someone else's. A run has no Delete or Report. No counts are shown.
-- [ ] Picking an emoji reacts as now (replace, or remove when it's yours), closes the popover, shows the "😂 added · Undo" toast, and the summary's emoji pops (14b-10b). Delete and Report behave as they do now.
-- [ ] Escape closes the popover and focus returns to its ⋯. A press outside it closes it. Tab past the last item closes it. Opening another ⋯ closes the first.
-- [ ] The admin phone menu still closes on Escape and on a press outside, through the same shared hook.
-- [ ] Under reduced motion nothing in the popover or summary animates.
-- [ ] The e2e tests that pressed chips (`feel`, `alive`, `live-board`) press the ⋯, then the emoji, and still check what they checked. `feel.e2e.ts`'s "a chip is as wide with its count as without" goes with the chips; the summary and popover have their own checks.
-- [ ] DESIGN.md describes the summary, the ⋯ and the popover, with file and line citations.
+- [x] No comment and no friend's run shows an emoji button until its ⋯ is opened. At 390px and 1440px a comment nobody reacted to has no line under its words (the feed, a group, Today).
+- [x] A comment or run with reactions shows them under its words in 13px text, each emoji with its count, in the set's order (`👍 2 ❤️ 1`). It shows nothing when there are none.
+- [x] Your own reaction in that summary has the soft tint, plus a cue that isn't colour (proposed: an accent edge, as the pressed chip has now). A screen reader hears it as yours (proposed: "😂 3, yours").
+- [x] Every comment (except one still held for Undo) and every friend's run has a ⋯ button at its top right, at least 44×44px. It has a name screen readers hear, and `aria-expanded` false.
+- [x] Opening the ⋯ sets `aria-expanded` true and shows a popover next to it. The popover holds the five emoji as buttons, each at least 44×44px with yours pressed (`aria-pressed`), then Delete on your own comment or Report on someone else's. A run has no Delete or Report. No counts are shown.
+- [x] Picking an emoji reacts as now (replace, or remove when it's yours), closes the popover, shows the "😂 added · Undo" toast, and the summary's emoji pops (14b-10b). Delete and Report behave as they do now.
+- [x] Escape closes the popover and focus returns to its ⋯. A press outside it closes it. Tab past the last item closes it. Opening another ⋯ closes the first.
+- [x] The admin phone menu still closes on Escape and on a press outside, through the same shared hook.
+- [x] Under reduced motion nothing in the popover or summary animates.
+- [x] The e2e tests that pressed chips (`feel`, `alive`, `live-board`) press the ⋯, then the emoji, and still check what they checked. `feel.e2e.ts`'s "a chip is as wide with its count as without" goes with the chips; the summary and popover have their own checks.
+- [x] DESIGN.md describes the summary, the ⋯ and the popover, with file and line citations.
 
 ## Out of scope
 - The APG example's optional arrow, Home and End keys. Tab and Escape cover the pattern, and the admin menu doesn't use them either.
@@ -80,8 +80,8 @@ Earlier answers this ticket keeps: 14b-10's answer 18 ("the ⋯ menu sub-ticket 
 | `--soft` and `--accent` | Your own reaction's tint and edge in the summary | Answer 6; the pressed chip's look now (`reactions.module.css`) |
 | 200ms, `--ease`, from 90% | The popover pops in (kit `.pop`), none under reduced motion | 14b-10 answers 12, 14 and 26 |
 | The kit card's border and corners | The popover's panel | The admin phone menu's panel (`kit.card` + `.menu`) |
-| **Blank, needs the human:** the popover's gap below the ⋯ and its alignment | Placing it | Claude's proposal: right edges aligned, directly under the button (0 gap), so no new spacing value; please confirm or give one |
-| **Blank, needs the human:** the ⋯'s spoken name | Screen readers | Claude's proposal: "Actions for <name>'s comment" / "React to <name>'s run" |
+| Right edges aligned, directly under the ⋯ (0 gap) | Placing the popover | Claude's proposal, approved by the human, 2026-10-31 ("Approve, build it") |
+| "Actions for <name>'s comment" / "React to <name>'s run" | The ⋯'s spoken name | Claude's proposal, approved by the human, 2026-10-31 ("Approve, build it") |
 
 ## Plan
 1. Add the APG Disclosure pattern and its navigation example to SOURCES.md (answer 9).
@@ -103,8 +103,29 @@ Earlier answers this ticket keeps: 14b-10's answer 18 ("the ⋯ menu sub-ticket 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| APG Disclosure: `aria-controls` names the panel (optional) | Set only while the popover is open | The popover isn't in the page while closed, and an `aria-controls` naming nothing is a broken reference |
+| APG navigation example: Escape closes the dropdown "if focus is inside the navigation region" | Escape closes the open menu wherever focus is, and puts focus back on its ⋯ | Unchanged from the admin phone menu (14b-2c-3), whose behaviour the shared hook keeps; only one menu is ever open |
+| APG navigation example: nothing on a mouse press outside | A press outside closes it | The admin phone menu's behaviour (14b-2c-3) and answer 9's wording ("Escape or a tap outside closes it") |
+| APG navigation example: arrow, Home and End keys (optional) | Not built | Out of scope: Tab and Escape cover the pattern, as in the admin menu |
+| APG Disclosure: focus moving out closes the panel | Also now true of the admin phone menu, which before closed only on Escape or a press outside | One shared hook, one way (the ticket's "Removes"); `admin-area.e2e.ts` passes unchanged |
+| 14b-10 answer 12: "a reaction pops" | The summary's emoji pops when its count grows, the summary kept mounted while empty so the first reaction pops too | Mounted only once there were reactions, it had no earlier count to grow from (the red run caught it) |
+| Answer 4: the popover is "next to the button" | Right under it, right edges lined up | The placement the human approved (Numbers) |
 
 ## Evidence
+- **Red first** (2026-10-31): `npx playwright test e2e/reactions-menu.e2e.ts` before building → 2 failed: `Expected: 0 Received: 2` at `for (const emoji of REACTIONS) await expect(page.getByRole("button", { name: emoji })).toHaveCount(0)` (the chips were there), and the reduced-motion test timed out finding `React to rc…'s run`.
+- **The shared hook first** (hypothesis: `admin-area.e2e.ts` passes unchanged; disproved if a phone-menu step failed): `npx playwright test e2e/admin-area.e2e.ts` → `4 passed (24.6s)`.
+- **Green**: `npx playwright test e2e/reactions-menu.e2e.ts` → `2 passed (36.2s)`. On the way:
+  - an emoji measured 42.26px, mid-pop (96% of 44), so the test waits for the popover's animations to finish before measuring;
+  - the ⋯ was measured before the click scrolled the page, so it is measured again after opening;
+  - an open popover lies over the ⋯ of the row below it, so "another ⋯ closes the first" opens the lower row's first;
+  - the summary's first reaction didn't pop (Source diff).
+- **The e2e files that pressed chips, Delete or Report**: `npx playwright test e2e/feel.e2e.ts e2e/alive.e2e.ts e2e/live-board.e2e.ts e2e/player-screens.e2e.ts e2e/admin-area.e2e.ts` → `32 passed (3.7m)`.
+- **The 44px check and the other screens that show comments**: `npx playwright test e2e/calm.e2e.ts e2e/groups.e2e.ts e2e/today.e2e.ts e2e/offbeat.e2e.ts e2e/look.e2e.ts` → `19 passed (2.0m)`. `calm.e2e.ts` no longer leaves the reactions out of "every button is 44px".
+- **Unit tests**: `npm test` → `Test Files 48 passed (48)`, `Tests 477 passed (477)`. `npx tsc --noEmit` and `npx eslint src e2e`: no output.
+- **Screens** (a throwaway spec, deleted after; images in the session's scratchpad, not committed): the feed and Friends today at 390px and 1440px in Paper and Night, closed and open.
+  - Closed, a comment shows its words and, under them, `❤️ 1` tinted with an accent edge (the viewer's) or `😂 1` plain, and a muted ⋯ at the top right.
+  - Open, the popover sits right under the ⋯ with five emoji, ❤️ pressed, and Report under a line, over the next row.
+  - A friend's run with no reactions is one line with its ⋯.
 
 ## Review
 - Blocking findings and how each was fixed:

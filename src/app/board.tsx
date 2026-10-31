@@ -26,7 +26,7 @@ import kit from "./kit.module.css";
 import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
-import { Reactions, reactionText } from "./reactions";
+import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { capitalized, caughtText, timedOutText } from "@/game/words";
 import { Line, Skeleton } from "./skeleton";
 import { useHeldChanges, useUndo } from "./undo";
@@ -135,8 +135,9 @@ export function Board({ username, invite }: { username: string; invite: boolean 
           <p>{BETTER_WITH_FRIENDS.text}</p>
         </>
       )}
-      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions on a line under them, as
-          a comment's are (beside them, they covered the name on phones: M14 14b-8e). */}
+      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions used on a line under
+          them, as a comment's are (beside them, they covered the name on phones: M14 14b-8e); the ⋯ to react at the top
+          right (14b-13, answer 3). */}
       {shownBoard && shownBoard.friends.length > 0 && (
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
@@ -144,13 +145,10 @@ export function Board({ username, invite }: { username: string; invite: boolean 
               <Avatar name={f.name} />
               <div className={kit.grow}>
                 <b>{f.name}</b>
-                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>{" "}
-                {f.reactions && (
-                  <div className={kit.below}>
-                    <Reactions reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />
-                  </div>
-                )}
+                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>
+                {f.reactions && <Reactions reactions={f.reactions} below />}
               </div>
+              {f.reactions && <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
             </li>
           ))}
         </ul>

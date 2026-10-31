@@ -123,15 +123,17 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
     `${playerName}: 0 points`,
     `${watcherName} (you): 0 points`,
   ]);
-  // The row ends with the reaction buttons (M08 8b), which appear only now that the watcher has finished.
-  await expect(row).toHaveText(`${playerName}: tipped over at stop 1 by "${hostAnswer}" 👍😂😮😢❤️`);
-  // On a phone the reactions sit on a line under the name and how the run stands, not over them (they did: 14b-8's
-  // critique; docs/milestones/M14-14b-8-the-new-look.md, 14b-8e).
+  // The row ends with its ⋯ for reacting (M08 8b; 14b-13), which appears only now that the watcher has finished.
+  const more = row.getByRole("button", { name: `React to ${playerName}'s run` });
+  await expect(row).toHaveText(`${playerName}: tipped over at stop 1 by "${hostAnswer}"`);
+  await expect(more).toBeVisible();
+  // On a phone the ⋯ sits beside the name and how the run stands, not over them (reactions did: 14b-8's critique;
+  // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e).
   await watcher.setViewportSize({ width: 390, height: 844 });
-  const reactions = (await row.getByRole("group", { name: "Reactions" }).boundingBox())!;
+  const dots = (await more.boundingBox())!;
   for (const words of [row.locator("b"), row.getByText(/^tipped over/)]) {
     const box = (await words.boundingBox())!;
-    expect(reactions.y).toBeGreaterThanOrEqual(box.y + box.height);
+    expect(dots.x).toBeGreaterThanOrEqual(box.x + box.width);
   }
   await watcher.setViewportSize({ width: 1280, height: 720 });
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
@@ -143,22 +145,26 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // The watcher reacts to the friend's run by tapping (M08 8b): another emoji replaces the first, and the same one
   // again removes it. The player's open board shows each change without a reload (8d).
   await openBoard(player);
-  const thumbs = row.getByRole("button", { name: "👍" });
-  const heart = row.getByRole("button", { name: "❤️" });
-  await thumbs.click();
-  await expect(thumbs).toHaveAttribute("aria-pressed", "true");
-  await expect(thumbs).toHaveText("👍 1");
-  await heart.click();
-  await expect(heart).toHaveAttribute("aria-pressed", "true");
-  await expect(heart).toHaveText("❤️ 1");
-  await expect(thumbs).toHaveAttribute("aria-pressed", "false");
-  await expect(thumbs).toHaveText("👍");
+  // Each pick is from the run's ⋯ (14b-13), whose popover shows the watcher's own pressed; the counts are in the row's
+  // summary.
+  const pick = async (emoji: string) => {
+    await more.click();
+    await row.getByRole("button", { name: emoji }).click();
+  };
+  await pick("👍");
+  await expect(row.getByText(/^👍 1/)).toHaveText("👍 1, yours");
+  await pick("❤️");
+  await expect(row.getByText(/^❤️ 1/)).toHaveText("❤️ 1, yours");
+  await expect(row.getByText(/^👍/)).toHaveCount(0);
+  await more.click();
+  await expect(row.getByRole("button", { name: "❤️" })).toHaveAttribute("aria-pressed", "true");
+  await expect(row.getByRole("button", { name: "👍" })).toHaveAttribute("aria-pressed", "false");
+  await watcher.keyboard.press("Escape");
   // Two taps on one row are one held action: only the last is sent (docs/milestones/M14-14b-6-feel-and-polish.md, P2).
   await sent(watcher, "/api/reactions");
   await expect(player.getByText("Reactions on your run: ❤️ 1")).toBeVisible();
-  await heart.click();
-  await expect(heart).toHaveAttribute("aria-pressed", "false");
-  await expect(heart).toHaveText("❤️");
+  await pick("❤️");
+  await expect(row.getByText(/^❤️/)).toHaveCount(0);
   await sent(watcher, "/api/reactions");
   await expect(player.getByText("Reactions on your run")).toHaveCount(0);
 
@@ -176,16 +182,19 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await sent(player, "/api/comments");
   const watcherComment = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
   await expect(watcherComment).toBeVisible();
+  await watcherComment.getByRole("button", { name: /^Actions for / }).click();
   await watcherComment.getByRole("button", { name: "😂" }).click();
   await sent(watcher, "/api/reactions");
-  await expect(playerComment.getByRole("button", { name: "😂" })).toHaveText("😂 1");
+  await expect(playerComment.getByText(/^😂 1/)).toHaveText("😂 1");
   const kept = `keep me ${RUN}`;
   await player.getByLabel("Comment to your friends").fill(kept);
   await player.getByRole("button", { name: "Post" }).click();
   await sent(player, "/api/comments");
   const watcherKept = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept });
-  await watcherComment.getByRole("button", { name: "Report" }).click();
-  await watcherKept.getByRole("button", { name: "Report" }).click();
+  for (const c of [watcherComment, watcherKept]) {
+    await c.getByRole("button", { name: /^Actions for / }).click();
+    await c.getByRole("button", { name: "Report" }).click();
+  }
   await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
   await watcher.goto("/admin/reports");
