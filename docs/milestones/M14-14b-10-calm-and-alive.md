@@ -58,6 +58,7 @@ Plor reads simple when nothing is touched (strong type, a touch of colour, shado
 29. "the icons should not be colored." Supersedes answer 15's soft colour and accent.
 30. "rather than play a hop animation (goes from a to b to a) it should just be a transition to another state (a - b)", then "maybe like 2 versions of each icon". Supersedes answer 25's 3px hop: each tab icon has an outline version at rest and a solid one, both in the text colour; hovering moves from one to the other and holds it, and the current tab shows the solid one.
 31. On round 2's drawings: "i like that it goes negative, but there should be a bit of a different look to each icon as well (i.e the today tab's calender maybe opens, etc. focus on simplistic complexity)". Each solid version does something: the calendar's corner peels up, the face winks and grins, the three huddle in, the person waves.
+32. On round 3: "i like the calendar, but friends i dont like the wink, something symetrical (think ^ ^) and then the groups should maybe rotational? and i just straight up dont like the me one". Round 4: Friends closes both eyes happily (^ ^) and grins; Groups turns 60° about its middle as it switches, ending point-down; Me has three options (a close-up, a smile, a sparkle) for the human to pick.
 
 ## Source
 No entry in SOURCES.md covers the look. The sources are the answers above and 14b-8's answers 15 and 16 (`docs/milestones/M14-14b-8-the-new-look.md`). What exists today is `docs/DESIGN.md`, which each PR updates.
@@ -80,7 +81,7 @@ No entry in SOURCES.md covers the look. The sources are the answers above and 14
 - **Numbers:** points, streak and rank count up when they change, over at most 600ms.
 - **Pops:** a new reaction, comment or rank pops in from 90% size.
 - **Reduced motion:** nothing moves; tints still show (answer 8).
-- **Tab icons:** two versions of each of the four, an outline and a solid one, in the text colour with no tint (answers 28 to 30; answer 15's colour is superseded). The solid one does something: Today's calendar peels a corner, Friends winks and grins, Groups huddles in, Me waves (answer 31). The drawings are shown to the human before they ship. The drawings are on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8). Round 1 (2026-10-30) was coloured and hopped; round 2 has the two uncoloured versions (answers 29 and 30); round 3 gives each solid version its own gesture (answer 31). It waits for the human's word.
+- **Tab icons:** two versions of each of the four, an outline and a solid one, in the text colour with no tint (answers 28 to 30; answer 15's colour is superseded). The solid one does something: Today's calendar peels a corner (answer 31), Friends closes its eyes happily, ^ ^, and grins, and Groups turns 60° as it switches, ending point-down (answer 32). Me's is still to pick. The drawings are shown to the human before they ship. The drawings are on the private claude.ai page "Plor Tab Icons" (https://claude.ai/artifact/UASkNjQtFAVqRn1XfukTF8). Round 1 (2026-10-30) was coloured and hopped; round 2 has the two uncoloured versions (answers 29 and 30); round 3 gives each solid version its own gesture (answer 31). It waits for the human's word.
 
 ## Numbers
 | Value | Used for | Origin |
