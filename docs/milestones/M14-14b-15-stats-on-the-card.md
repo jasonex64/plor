@@ -1,6 +1,6 @@
 # M14 14b-15 — Stats on the card, not tiles in a card
 
-**Status:** approved (human, 2026-10-31: "ok sure build now", to building it and showing the screenshots before the PR), in progress. It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
+**Status:** approved (human, 2026-10-31: "ok sure build now", to building it and showing the screenshots before the PR; then "Looks good, go on" to the screenshots), in review (PR #TBD). It was drafted from two rounds of guided questions (2026-10-31), after the Impeccable audit of the same day found the stat tiles still read as cards inside cards. It closes 14b-10's last criterion.
 
 ## Goal
 A stat ("400 best score") sits straight on its card, its number over its label, with thin grey lines between neighbours instead of a bordered tile of its own, on Me and on Updraft's game screen.
@@ -33,14 +33,14 @@ Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't b
 - **14b-10** (`docs/milestones/M14-14b-10-calm-and-alive.md`), answers 3, 11, 20 and 22 to 24, as above.
 
 ## Acceptance criteria
-- [ ] No stat has a border, corners or its own fill: `kit.stat` is a cell, its number over its label, centred.
-- [ ] "Your Updraft" (the game screen and the test run): three cells in a row, a 1px `--line` between neighbours, the card the only box.
-- [ ] Me's "All games": four cells 2 by 2 with a 1px `--line` cross between them, no gap; the card itself in the soft tint (`kit.soft`), the cells not tinted; Me's Updraft card plain, so the screen still has one tinted card (answer 7).
-- [ ] Each number is still 40px where it fits and shrinks to its cell otherwise; `calm.e2e.ts`'s fit checks pass ("1,500" on a phone's Updraft, "999,999" on a 360px Me).
-- [ ] Impeccable's detector finds no `nested-cards` on Me, `/updraft` or the test run at 390×844 and 1440×900; 14b-10's audit criterion is then ticked.
-- [ ] The e2e checks that described the tiles (`look.e2e.ts`'s tile border and corners, `calm.e2e.ts`'s tinted tiles) describe the cells and the tinted card instead.
-- [ ] Screenshots of Me and Updraft before and after, at 390px and 1440px in Paper and Night, shown to the human before the PR (answer 4).
-- [ ] DESIGN.md's kit table and Me's line describe the cells; the `reviewer` agent has reviewed the diff.
+- [x] No stat has a border, corners or its own fill: `kit.stat` is a cell, its number over its label, centred.
+- [x] "Your Updraft" (the game screen and the test run): three cells in a row, a 1px `--line` between neighbours, the card the only box.
+- [x] Me's "All games": four cells 2 by 2 with a 1px `--line` cross between them, no gap; the card itself in the soft tint (`kit.soft`), the cells not tinted; Me's Updraft card plain, so the screen still has one tinted card (answer 7).
+- [x] Each number is still 40px where it fits and shrinks to its cell otherwise; `calm.e2e.ts`'s fit checks pass ("1,500" on a phone's Updraft, "999,999" on a 360px Me).
+- [x] Impeccable's detector finds no `nested-cards` on Me, `/updraft` or the test run at 390×844 and 1440×900; 14b-10's audit criterion is then ticked.
+- [x] The e2e checks that described the tiles (`look.e2e.ts`'s tile border and corners, `calm.e2e.ts`'s tinted tiles) describe the cells and the tinted card instead.
+- [x] Screenshots of Me and Updraft before and after, at 390px and 1440px in Paper and Night, shown to the human before the PR (answer 4).
+- [x] DESIGN.md's kit table and Me's line describe the cells; the `reviewer` agent has reviewed the diff.
 
 ## Out of scope
 - Me's per-game cards, whose numbers are chips ("17 best score"): not stat tiles.
@@ -52,7 +52,7 @@ Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't b
 |---|---|---|
 | 1px `--line` | The lines between cells | Answer 1 ("thin grey lines"); the kit's thin dividers (the leaderboard table, the suggestions) |
 | 0 between cells | Me's grid and Updraft's row, so the lines meet as a cross or a row | Answer 5 ("one line down, one across") |
-| 10px 14px | A cell's room inside its lines | The tile's padding now (`kit.module.css:147`) |
+| 10px 14px | A cell's room inside its lines | The tile's padding (`kit.module.css:149`) |
 | 40px, else 24% (Me) or 35% (Updraft) of the cell | The numbers | 14b-10 answers 22 to 24, unchanged (`me.module.css`, `offbeat.module.css`) |
 
 ## Plan
@@ -72,7 +72,17 @@ Earlier answers this ticket keeps: 14b-10's answer 3 (flat, nothing that can't b
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answer 3: the whole "All games" card tinted, as "the kit's one tinted card" | It is, and Me's Updraft card goes plain | Me's Updraft card was already the screen's one tinted card; the human chose which keeps it (answer 7) |
 
 ## Evidence
+- **Red first** (2026-10-31): `look.e2e.ts`'s and `calm.e2e.ts`'s checks rewritten for cells, run against the tiles: `npx playwright test e2e/calm.e2e.ts -g "streak pill"` → `1 failed` at `expect(edges.map(…)).toEqual([["0px", "0px"], ["0px", "1px"], ["0px", "1px"]])` (the tiles' 2px borders); `npx playwright test e2e/look.e2e.ts -g "Me's header"` → `1 failed` at `expect(await sides(0)).toEqual({ left: none, top: none, corners: "0px", fill: "rgba(0, 0, 0, 0)", align: "center" })`.
+- **Green:** `npx playwright test e2e/calm.e2e.ts e2e/look.e2e.ts e2e/me.e2e.ts e2e/offbeat.e2e.ts e2e/test-run.e2e.ts --reporter=line` → `20 passed (3.1m)`; the reviewer reran calm and look → `9 passed (1.1m)`. `npm test` → `Tests 493 passed (493)`; `npx tsc --noEmit -p .` and `npx eslint` on the changed files: no output.
+- **Impeccable's detector** over a DevTools port on Me, `/updraft` and the test run at 390×844 and 1440×900 in Paper (a throwaway spec, deleted after), the same spec run with the change stashed and then restored: before, `nested-cards` 4 on Me, 3 on `/updraft` and 3 on the test run at each width (20); after, `[]` on all six.
+- **Screens** (the same spec; images in the session's scratchpad, not committed): Me and Updraft before and after at 390px and 1440px in Paper and Night, shown to the human: "Looks good, go on". Updraft's three numbers sit centred on the card between two thin lines; Me's four sit behind a thin cross on the tinted "All games" card, with the Updraft card plain below.
 
 ## Review
+The `reviewer` agent, fresh context, 2026-10-31, on `24e4da1`.
+- Blocking findings and how each was fixed:
+  - DESIGN.md's `kit.module.css` citations below the stat block were one line off (the block grew by a line): the badge, the buttons, `.primary`, `.small`, `.link`, `.danger`, the hover and the pops. Each moved by one and checked against the file.
+  - The ROADMAP row and HANDOFF still said "waiting for approval"; the Evidence, Source diff, Review and ticks were empty; the For M14 cards-in-cards item and 14b-10's audit criterion were open. All done in this PR.
+- Deferred to ROADMAP "Next revision" (For M14): "tile" left in comments and two measured widths now out of date; the look test's hard-coded zero-border colour and copied probes; Updraft's cells' corners and fill asserted only through Me's.
