@@ -21,7 +21,7 @@ import type { Held } from "@/lib/hold";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import styles from "./comments.module.css";
-import { shiftDay } from "./day-text";
+import { dayText, shiftDay } from "./day-text";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
@@ -149,7 +149,7 @@ export function Comments({
     <section aria-label={group ? "Comments" : title} className={kit.card}>
       <h2>
         {group ? "Comments" : isToday || !shown ? title : "Friends' comments"}
-        {shown && !isToday && ` on ${shown}`}
+        {shown && !isToday && ` on ${dayText(shown)}`}
       </h2>
       {shown && (
         <p>

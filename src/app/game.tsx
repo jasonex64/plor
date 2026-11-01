@@ -26,7 +26,7 @@ import { AnswerSearch } from "./answer-search";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
-import { shareLink } from "./share";
+import { CopyField, shareLink } from "./share";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
 
@@ -573,25 +573,34 @@ function Result({ run, saved }: { run: RunState; saved: boolean }) {
   );
 }
 
-// Share (M05, S4), by the share sheet or the clipboard (src/app/share.ts). The link is today's game at the site's root
+// Share (M05, S4), by the share sheet or the clipboard (src/app/share.tsx). The link is today's game at the site's root
 // (S3), from the page's own origin so it's right on any deployment.
 function Share({ run }: { run: RunState }) {
   const [note, setNote] = useState<string | null>(null);
+  const [copy, setCopy] = useState<string | null>(null);
 
   async function share() {
+    setCopy(null);
+    const text = shareText(run);
+    const url = `${window.location.origin}/`;
     try {
-      if (await shareLink(shareText(run), `${window.location.origin}/`)) setNote("Copied");
+      const shared = await shareLink(text, url);
+      if (shared === "copied") setNote("Copied");
+      if (shared === "refused") setCopy(`${text}\n${url}`);
     } catch (err) {
       setNote(`Couldn't share: ${String(err)}`);
     }
   }
 
   return (
-    <p>
-      <button type="button" className={kit.primary} onClick={share}>
-        Share
-      </button>{" "}
-      {note && <span role="status">{note}</span>}
-    </p>
+    <>
+      <p>
+        <button type="button" className={kit.primary} onClick={share}>
+          Share
+        </button>{" "}
+        {note && <span role="status">{note}</span>}
+      </p>
+      {copy && <CopyField value={copy} />}
+    </>
   );
 }

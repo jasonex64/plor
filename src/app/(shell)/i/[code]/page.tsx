@@ -9,7 +9,8 @@ import { PageSkeleton } from "../../../skeleton";
 export default function Page({ params }: PageProps<"/i/[code]">) {
   return (
     <>
-      <p>A friend invited you to Plor, a small site with a daily word game where friends see each other&apos;s runs.</p>
+      {/* Not on the player's own link (globals.css, body[data-own-invite]). */}
+      <p data-invite-line>A friend invited you to Plor, a small site with a daily word game where friends see each other&apos;s runs.</p>
       <Suspense fallback={<PageSkeleton />}>
         <WithCode params={params} />
       </Suspense>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { KeepTheme } from "./keep-theme";
+import { SIGNED_IN_SCRIPT } from "./signed-in";
 import { THEME_SCRIPT } from "./theme";
 
 export const metadata: Metadata = {
@@ -26,12 +27,13 @@ const font = localFont({
 
 // The theme a player picked is applied before the first paint from this browser's copy (src/app/theme.ts), so <html>'s
 // data-theme may differ from the server's render, which suppressHydrationWarning accepts (Next.js, "Preventing flash
-// before hydration").
+// before hydration"). The sign-in mark is applied the same way (src/app/signed-in.ts).
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={font.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: SIGNED_IN_SCRIPT }} />
       </head>
       <body>
         <KeepTheme />

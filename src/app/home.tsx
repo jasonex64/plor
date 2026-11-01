@@ -46,6 +46,8 @@ import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
 import { PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
+import { useBodyFlag } from "./body-flag";
+import { markSignedIn } from "./signed-in";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
@@ -71,9 +73,10 @@ function nameOf(player: Player): string {
 
 // The pages without the friends feed's column: Today, the game screen and the admin area have their own, and an invite
 // or a group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
-// docs/milestones/M14-14b-2c-review-items.md, answer 12).
-function feedBeside(path: string): boolean {
-  return path !== "/" && path !== GAME.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
+// docs/milestones/M14-14b-2c-review-items.md, answer 12); and the 404, which stands alone (docs/milestones/
+// M14-14b-18-headings-today-invites-words.md, answer 11).
+function feedBeside(path: string, lost: boolean): boolean {
+  return !lost && path !== "/" && path !== GAME.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
 }
 
 // Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
@@ -135,6 +138,10 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   useLayoutEffect(() => {
     if (me && !accountTheme) applyTheme(null);
   }, [me, accountTheme]);
+  // The sign-in mark, from the profile once it's read (src/app/signed-in.ts).
+  useLayoutEffect(() => {
+    if (me) markSignedIn(me.signedIn);
+  }, [me]);
 
   const player = me?.signedIn && me.username !== null ? me : null;
   return (
@@ -143,6 +150,7 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
       <UndoProvider>
         <Suspense fallback={null}>
           <FrameParts
+            lost={lost}
             signedIn={me?.signedIn === true}
             player={player}
             timeUp={timeUp}
@@ -173,7 +181,8 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
 
 // The frame's parts that read the address: the shell (its current tab), the clock bar away from the game screen, the
 // friends feed's column, and the invite remembered across a Google sign-in.
-function FrameParts({ signedIn, player, timeUp, timeUps, streakError, shell }: {
+function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shell }: {
+  lost: boolean;
   signedIn: boolean;
   player: Player | null;
   timeUp: () => void;
@@ -208,9 +217,9 @@ function FrameParts({ signedIn, player, timeUp, timeUps, streakError, shell }: {
     <>
       {shell}
       {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-      {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
+      {path !== GAME.path && <ClockBar up={path.startsWith(`${GAME.path}/`)} onTimeUp={timeUp} />}
       {streakError && <p role="alert">{streakError}</p>}
-      {feedBeside(path) && feedColumn && <FriendsFeed username={player.username} name={nameOf(player)} timeUps={timeUps} />}
+      {feedBeside(path, lost) && feedColumn && <FriendsFeed username={player.username} name={nameOf(player)} timeUps={timeUps} />}
     </>
   );
 }
@@ -267,12 +276,12 @@ export function GameTab() {
 }
 
 // The detail pages' way back up, which slides back (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6e, answer 25),
-// as the game screen's "← Today" does.
+// as the game screen's "‹ Today" does.
 function BackTo({ href, children }: { href: string; children: ReactNode }) {
   return (
     <p>
       <ButtonLink href={href} transitionTypes={BACK}>
-        <span aria-hidden="true">← </span>
+        <span aria-hidden="true">‹ </span>
         {children}
       </ButtonLink>
     </p>
@@ -606,6 +615,8 @@ function AcceptInvite({ code, username }: { code: string; username: string }) {
       (err) => setError(errorText(err)),
     );
   }, [code]);
+  const own = inviter?.username === username;
+  useBodyFlag("own-invite", own);
 
   async function addFriend() {
     setBusy(true);
@@ -620,10 +631,11 @@ function AcceptInvite({ code, username }: { code: string; username: string }) {
     }
   }
 
-  if (inviter?.username === username) {
+  if (own) {
     return (
       <section aria-label="Invite">
         <h2>This is your invite link</h2>
+        <p>Send it to a friend.</p>
         <InviteLink canReset={false} />
         <p>
           <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>

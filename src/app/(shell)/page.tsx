@@ -10,7 +10,8 @@ import { Slide } from "../slide";
 export default function Page() {
   return (
     <Slide>
-      {/* For signed-out visitors only: hidden by globals.css once the shell shows (14b-8b, answer 12). */}
+      {/* For signed-out visitors only: hidden by globals.css when <html data-signed-in>, set before the first paint
+          (src/app/signed-in.ts; 14b-8b, answer 12; 14b-18, answer 6). */}
       <div data-signed-out className="reading">
         <p>
           Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at

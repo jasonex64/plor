@@ -208,9 +208,35 @@ body[data-shell] main > footer {
 }
 
 /* Today's introduction is for signed-out visitors (and in the served HTML for them, M02 2c); signed in, Today starts
-   with the game (docs/milestones/M14-14b-8-the-new-look.md, answer 12). */
-body[data-shell] [data-signed-out] {
+   with the game, from the first paint and on the pick-username step too (docs/milestones/M14-14b-8-the-new-look.md,
+   answer 12; docs/milestones/M14-14b-18-headings-today-invites-words.md, answer 6; src/app/signed-in.ts). */
+html[data-signed-in] [data-signed-out] {
   display: none;
+}
+
+/* An invite page's "A friend invited you…" isn't for the link's owner (docs/milestones/
+   M14-14b-18-headings-today-invites-words.md, answer 10; src/app/home.tsx, AcceptInvite). */
+body[data-own-invite] [data-invite-line] {
+  display: none;
+}
+
+/* The page's name in its "Plor" heading, with the shell, at the card heading's size and muted so "Plor" stays loudest
+   (docs/milestones/M14-14b-18-headings-today-invites-words.md, answers 5 and 17; src/app/shell.tsx, PageName). Below
+   768px the heading is read but not shown (below). */
+main > h1 .page-name {
+  display: none;
+}
+
+/* Inline and of no size, so its comma is read with "Plor" without a space before it or a mark on screen. */
+body[data-shell] main > h1 .page-name {
+  display: inline;
+  font-size: 0;
+}
+
+main > h1 .page-name > :last-child {
+  display: block;
+  color: var(--muted);
+  font-size: 1.5rem;
 }
 
 /* A jump to a part of the page (the result, #result) stops below the top bar, not under it (14b-2c-1, item 14). */

@@ -20,12 +20,13 @@ export function Reactions({ reactions, below = false }: { reactions: ReactionsDa
   if (reactions.counts.length === 0) return null;
   const summary = (
     <span className={styles.summary}>
-      {REACTIONS.map((emoji) => {
-        const count = reactions.counts.find((c) => c.emoji === emoji)?.count;
-        if (!count) return null;
+      {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
+        const count = reactions.counts.find((c) => c.emoji === emoji)!.count;
         const mine = reactions.mine === emoji;
         return (
           <span key={emoji} className={mine ? `${styles.used} ${styles.mine}` : styles.used}>
+            {/* Read "😂 1, ❤️ 2", not run together (docs/milestones/M14-14b-18-headings-today-invites-words.md). */}
+            {i > 0 && <span className="sr-only">, </span>}
             {/* Keyed by how often its count has grown, so each new reaction pops it in again (14b-10b, answer 12). */}
             <span key={grown[emoji] ?? 0} className={grown[emoji] ? `${styles.emoji} ${kit.pop}` : styles.emoji}>
               {emoji}
