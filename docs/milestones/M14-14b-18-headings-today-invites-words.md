@@ -225,6 +225,7 @@ All on the Windows PC against the local stack, `next dev` on :3000, 2026-10-31.
   - DESIGN.md's `shell.tsx:182-201` (now `:182-199`);
   - the pill test, which now probes the area's edges for any other control;
   - the reactions regex, which now expects the comma.
+- **CI on PR #148:** both e2e jobs failed `alive.e2e.ts:208`, `expect(laugh).toBeVisible()`, element not found. The hidden ", " sat inside the second reaction's span, so its text no longer began "😂 1" and its first inner span was the comma, not the emoji. My local runs had left `alive.e2e.ts` out. Fixed: the comma sits between the reaction spans (`reactions.tsx`). Then all seven e2e files that touch reactions (alive, calm, feel, headings-invites, live-board, player-screens, reactions-menu) gave `40 passed (6.7m)`.
 - **Deferred to ROADMAP "Next revision":**
   - the own-invite line before the preview loads;
   - the `shell.e2e.ts` focus-ring timeout under load.
