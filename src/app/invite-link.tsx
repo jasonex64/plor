@@ -2,13 +2,14 @@
 
 // The player's own invite link (docs/milestones/M07-friends-and-live-board.md, 7b), under Today's board and in the
 // Friends tab's friends list (docs/milestones/M12-12f-review-fixes.md, F1; docs/milestones/M14-14a-3b-settings.md),
-// shared from a button and never shown (docs/milestones/M14-14b-3-invite-button.md). Sharing is the share sheet or the
-// clipboard, as the result's Share (src/app/share.ts). Reset is offered only where canReset is set, the friends list.
+// shared from a button and shown only when the clipboard refuses it (docs/milestones/M14-14b-3-invite-button.md;
+// M14-14b-18-headings-today-invites-words.md, answer 9). Sharing is the share sheet or the
+// clipboard, as the result's Share (src/app/share.tsx). Reset is offered only where canReset is set, the friends list.
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 import kit from "./kit.module.css";
-import { shareLink } from "./share";
+import { CopyField, shareLink } from "./share";
 import { Line, Skeleton } from "./skeleton";
 
 export function InviteLink({ canReset }: { canReset: boolean }) {
@@ -16,6 +17,8 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
   const [code, setCode] = useState<string | null | undefined>(undefined);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  // The link to copy by hand when the clipboard refused it (src/app/share.tsx).
+  const [copy, setCopy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,6 +32,7 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
     setBusy(true);
     setError(null);
     setNote(null);
+    setCopy(null);
     try {
       await action();
     } catch (err) {
@@ -46,7 +50,10 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
     run(async () => {
       const current = code ?? (await api<{ inviteCode: string }>("/api/friends/invite", { method: "POST", body: { reset: false } })).inviteCode;
       setCode(current);
-      if (await shareLink("Add me as a friend on Plor", linkOf(current))) setNote("Copied.");
+      const link = linkOf(current);
+      const shared = await shareLink("Add me as a friend on Plor", link);
+      if (shared === "copied") setNote("Copied.");
+      if (shared === "refused") setCopy(link);
     });
   const reset = () =>
     run(async () => {
@@ -73,6 +80,7 @@ export function InviteLink({ canReset }: { canReset: boolean }) {
         )}
         {note && <span role="status">{note}</span>}
       </p>
+      {copy && <CopyField value={copy} />}
       {code === undefined && !error && (
         <Skeleton label="Loading your invite link">
           <Line />

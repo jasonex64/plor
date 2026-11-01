@@ -7,7 +7,7 @@
 // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b), so no button waits.
 import { REACTIONS } from "@/config/tunables";
 import type { Emoji, Reactions as ReactionsData } from "@/reactions/reactions";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useDismiss } from "./dismiss";
 import kit from "./kit.module.css";
 import styles from "./reactions.module.css";
@@ -20,19 +20,23 @@ export function Reactions({ reactions, below = false }: { reactions: ReactionsDa
   if (reactions.counts.length === 0) return null;
   const summary = (
     <span className={styles.summary}>
-      {REACTIONS.map((emoji) => {
-        const count = reactions.counts.find((c) => c.emoji === emoji)?.count;
-        if (!count) return null;
+      {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
+        const count = reactions.counts.find((c) => c.emoji === emoji)!.count;
         const mine = reactions.mine === emoji;
         return (
-          <span key={emoji} className={mine ? `${styles.used} ${styles.mine}` : styles.used}>
-            {/* Keyed by how often its count has grown, so each new reaction pops it in again (14b-10b, answer 12). */}
-            <span key={grown[emoji] ?? 0} className={grown[emoji] ? `${styles.emoji} ${kit.pop}` : styles.emoji}>
-              {emoji}
+          <Fragment key={emoji}>
+            {/* Read "😂 1, ❤️ 2", not run together; between the counts, so each count's own text is as it was
+                (docs/milestones/M14-14b-18-headings-today-invites-words.md). */}
+            {i > 0 && <span className="sr-only">, </span>}
+            <span className={mine ? `${styles.used} ${styles.mine}` : styles.used}>
+              {/* Keyed by how often its count has grown, so each new reaction pops it in again (14b-10b, answer 12). */}
+              <span key={grown[emoji] ?? 0} className={grown[emoji] ? `${styles.emoji} ${kit.pop}` : styles.emoji}>
+                {emoji}
+              </span>
+              {` ${count}`}
+              {mine && <span className="sr-only">, yours</span>}
             </span>
-            {` ${count}`}
-            {mine && <span className="sr-only">, yours</span>}
-          </span>
+          </Fragment>
         );
       })}
     </span>

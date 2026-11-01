@@ -61,7 +61,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
     <div className={styles.screen}>
       <p className={styles.back}>
         <ButtonLink href="/" transitionTypes={BACK}>
-          <span aria-hidden="true">← </span>Today
+          <span aria-hidden="true">‹ </span>Today
         </ButtonLink>
       </p>
       <section id="offbeat" aria-label={GAME.name} className={styles.game}>
@@ -93,7 +93,7 @@ export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: s
     <div className={styles.screen}>
       <div className={`${styles.back} ${styles.testBar}`}>
         <ButtonLink href="/admin/puzzles" transitionTypes={BACK}>
-          <span aria-hidden="true">← </span>Puzzles
+          <span aria-hidden="true">‹ </span>Puzzles
         </ButtonLink>
         <span className={kit.chip}>Test run{hostAnswers ? " of the draft" : ""}: nothing is saved</span>
         <button type="button" onClick={() => setRestarts((n) => n + 1)}>

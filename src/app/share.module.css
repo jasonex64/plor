@@ -1,0 +1,20 @@
+/* The text to copy when the clipboard refused it (src/app/share.tsx, CopyField): its label above it and the field full
+   width, as the comment box's (comments.module.css, .compose; mockup 3's composer). */
+.copy {
+  display: flex;
+  flex-direction: column;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.copy :is(input, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.copy textarea {
+  resize: vertical;
+}

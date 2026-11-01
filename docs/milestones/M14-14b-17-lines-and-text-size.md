@@ -1,6 +1,6 @@
 # M14 14b-17 — Readable lines, spaced headings, text that follows the browser's size
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-17 as drafted?"), in review (PR #147). It was drafted from two rounds of guided questions (2026-10-31) on the Impeccable audit's long lines, heading spacing and px font sizes.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-17 as drafted?"), done (PR #147, merged on green CI at the human's "Merge when green", 2026-10-31). It was drafted from two rounds of guided questions (2026-10-31) on the Impeccable audit's long lines, heading spacing and px font sizes.
 
 ## Goal
 No paragraph runs wider than about 70 characters; on the reading pages each heading sits closer to the text it starts than to the text before it; and every font size grows with the player's browser text size, with the layouts still holding at 200%.

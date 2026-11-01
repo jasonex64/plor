@@ -15,7 +15,7 @@ import { Comments } from "./comments";
 import kit from "./kit.module.css";
 import { Leaderboard } from "./leaderboard";
 import { errorText } from "./messages";
-import { shareLink } from "./share";
+import { CopyField, shareLink, type Shared } from "./share";
 import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
 
@@ -104,7 +104,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
   const [draft, setDraft] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState<Shared | null>(null);
   const { busy, error, setError, run } = useAction();
   // Counts nudges that this group's thread changed; the page has no game, so the thread opens once loaded after the
   // player's run is over.
@@ -144,7 +144,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   }, [reset]);
 
   const act = (action: () => Promise<void>) => {
-    setCopied(false);
+    setShared(null);
     setLinkReset(false);
     void run(action);
   };
@@ -227,15 +227,15 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
               ))}
             </ul>
             <p className={kit.chips}>
-              {/* Shared from a button, never shown (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share
-                  sheet, or the clipboard where there's none. */}
+              {/* Shared from a button (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share sheet, or the
+                  clipboard where there's none; shown only when the clipboard refuses it (14b-18, answer 9). */}
               <button
                 type="button"
                 className={`${kit.primary} ${kit.small}`}
                 disabled={busy}
                 onClick={() =>
                   act(async () => {
-                    if (await shareLink(`Join ${group.name} on Plor`, link)) setCopied(true);
+                    setShared(await shareLink(`Join ${group.name} on Plor`, link));
                   })
                 }
               >
@@ -246,9 +246,10 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                   Reset link
                 </button>
               )}
-              {copied && " Copied."}
+              {shared === "copied" && " Copied."}
               {linkReset && " New link made. The old one no longer works."}
             </p>
+            {shared === "refused" && <CopyField value={link} />}
             <p className={kit.chips}>
               <button type="button" className={kit.link} disabled={busy} onClick={leave}>
                 Leave group

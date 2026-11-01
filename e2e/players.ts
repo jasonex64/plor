@@ -6,7 +6,7 @@ import { expect, type Locator, type Page } from "@playwright/test";
 const MAILPIT = "http://127.0.0.1:54324";
 export const RUN = Date.now().toString(36);
 
-async function emailedCode(email: string): Promise<string> {
+export async function emailedCode(email: string): Promise<string> {
   let code: string | undefined;
   await expect
     .poll(async () => {
@@ -53,7 +53,7 @@ export async function play(page: Page): Promise<void> {
 }
 
 // The link a share button gives (M14 14b-3: invite links are shared, never shown). These browsers have no share sheet,
-// so it's copied (src/app/share.ts) as its text, a line break and the URL; this presses the button and returns the URL.
+// so it's copied (src/app/share.tsx) as its text, a line break and the URL; this presses the button and returns the URL.
 export async function sharedLink(page: Page, button: Locator): Promise<string> {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await button.click();
