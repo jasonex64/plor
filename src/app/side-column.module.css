@@ -22,3 +22,9 @@
 .contents {
   display: contents;
 }
+
+/* A hidden column (SideColumn's hidden) stays mounted but isn't shown: .column's flex would otherwise outrank the
+   browser's own [hidden] rule. Below 1200px its place sets no display, so the browser's rule hides it. */
+.column[hidden] {
+  display: none;
+}

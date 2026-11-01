@@ -14,6 +14,7 @@ import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
 import { AnswerSearch } from "./answer-search";
 import { Game, TestGame, useStartRun } from "./game";
+import { expectingPlay } from "./to-play";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
@@ -28,8 +29,12 @@ import { capitalized, caughtWord } from "@/game/words";
 export function OffbeatScreen({ username, name, onStarted }: { username: string; name: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
   // While the run is in progress the screen holds only the game: the cards and the feed come back when it ends
-  // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6c; answer 23).
-  const [playing, setPlaying] = useState(false);
+  // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6c; answer 23). Until the run loads, it's what the way in expects
+  // (src/app/to-play.ts), so opened onto a run in play the cards and feed don't show for a moment, and opened before or
+  // after one they're there from the first paint, the feed's column with them (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
+  // Both stay mounted, hidden: the cards load with the page, not after the run's state (14a-2c, criterion 3), and a
+  // draft in the feed and the day it shows stay across the run (answer 2).
+  const [playing, setPlaying] = useState(expectingPlay);
   // How many runs ended during this visit: the cards load again for each, so today's run counts in them at once. A
   // run already over when the page opened is in their first load (docs/milestones/M14-14a-2c-review-fixes.md).
   const [ended, setEnded] = useState(0);
@@ -67,17 +72,13 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
       <section id="offbeat" aria-label={GAME.name} className={styles.game}>
         <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} onPlaying={setPlaying} />
       </section>
-      {!playing && (
-        <>
-          <div className={styles.cards}>
-            <OffbeatInfo key={`info-${day}-${ended}`} />
-          </div>
-          <SideColumn label="Feed" inPlace className={styles.feed}>
-            <LiveStatus channel={channel} />
-            <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
-          </SideColumn>
-        </>
-      )}
+      <div className={styles.cards} hidden={playing}>
+        <OffbeatInfo key={`info-${day}-${ended}`} />
+      </div>
+      <SideColumn label="Feed" inPlace className={styles.feed} hidden={playing}>
+        <LiveStatus channel={channel} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
+      </SideColumn>
     </div>
   );
 }
