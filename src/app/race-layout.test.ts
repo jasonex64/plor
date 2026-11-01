@@ -94,6 +94,22 @@ describe("layout", () => {
     expect(view.nearest(sunday("me").x, sunday("me").y)).toBe("Fay");
   });
 
+  it("at twice the text size, keeps twice the room for text and spaces its labels twice as far apart (14b-17)", () => {
+    const one = layout({ ...base, players });
+    const two = layout({ ...base, players, text: 24 });
+    // The plot's foot: 26px of day names, then 52px.
+    expect(one.today).toBeNull();
+    expect(two.names[0].y).toBe(200 - 12);
+    expect(Math.max(...two.grid.map((g) => g.y))).toBe(200 - 52);
+    // Labels at least 28 apart; Ana's and yours 1 point apart, so yours is pushed down to 28 under hers, with a tick.
+    expect(two.labels[1].y - two.labels[0].y).toBeGreaterThanOrEqual(28);
+    expect(two.ticks).toHaveLength(1);
+    expect(two.ticks[0].y2).toBe(two.labels[1].y - 8);
+    // The badge and the axis numbers' baseline.
+    expect(two.badge.r).toBe(16);
+    expect(two.grid[0].ty - two.grid[0].y).toBe(8);
+  });
+
   it("draws your line last and a found one above the rest", () => {
     expect(layout({ ...base, players, picked: "Ben" }).lines.map((l) => [l.key, l.role])).toEqual([
       ["Ana", "other"],

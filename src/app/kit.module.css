@@ -35,6 +35,8 @@
 /* A heading with something beside it, such as a chip (mockup 3's .row.between); the chip drops under the heading when
    they don't fit side by side, as with a bigger browser text size (14b-17, answer 6). */
 .head {
+  /* A row as wide as its card, even as a <p>, not a paragraph held to 55ch (14b-17 review). */
+  max-width: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

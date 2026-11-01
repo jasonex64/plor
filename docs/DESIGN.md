@@ -26,39 +26,39 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 ## Type
 - One font, Baloo 2, from `src/app/fonts/Baloo2-latin.woff2`, declared at 400, 700 and 800 (`src/app/layout.tsx:18-25`) as `--font`, used by `body` (`globals.css:186`).
 - Digits are tabular everywhere (`globals.css:188`). `h1`, `h2` and `h3` balance their lines, `p` avoids a lone last word (`globals.css:291-303`). `h1` and `h2` are 800 (`globals.css:286-289`).
-- Every font size is in rem, 16px = 1rem, so text follows the player's browser text size; the px sizes in this file are at the browser's default (docs/milestones/M14-14b-17-lines-and-text-size.md). Paddings, gaps, borders, the 44px controls and the breakpoints stay px; the badge and the avatar slots are in rem too, so they grow with their letters (`kit.module.css:155-169`, `src/app/avatar.module.css`).
+- Every font size is in rem, 16px = 1rem, so text follows the player's browser text size; the px sizes in this file are at the browser's default (docs/milestones/M14-14b-17-lines-and-text-size.md). Paddings, gaps, borders, the 44px controls and the breakpoints stay px; the badge and the avatar slots are in rem too, so they grow with their letters (`kit.module.css:157-171`, `src/app/avatar.module.css`).
 - A paragraph stops at 55ch, about 70 letters in Baloo 2 (`globals.css:298-303`). On the reading pages (Privacy, About and signed-out Today, marked `.reading`) a list item stops there too and an `h2` has 40px above it and 10px below (`globals.css:305-314`). A word too long for its box breaks (`globals.css:189-191`).
-- Inputs and buttons are 16px (`globals.css:355-359`). A card's heading is 24px (`src/app/kit.module.css:30-33`); a chip and a badge are 12px (`kit.module.css:114`, `:167`).
-- The numbers in stats are 40px where they fit, else a share of their cell's width (the cell is a size container, `src/app/kit.module.css:150`): Me's totals 24% (`src/app/me.module.css:68`), the game screen's stats 35% (`src/app/offbeat.module.css:89`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
+- Inputs and buttons are 16px (`globals.css:355-359`). A card's heading is 24px (`src/app/kit.module.css:30-33`); a chip and a badge are 12px (`kit.module.css:116`, `:169`).
+- The numbers in stats are 40px where they fit, else a share of their cell's width (the cell is a size container, `src/app/kit.module.css:152`): Me's totals 24% (`src/app/me.module.css:68`), the game screen's stats 35% (`src/app/offbeat.module.css:89`); so is the number in `/streak`'s heading (`src/app/streak.module.css:18-20`).
 
 ## Corners, borders, shadows
 - The ink of borders and shadows is the theme's text colour: `--ink: var(--text)` (`globals.css:335`).
 - Corners: `--r-card` 5px, `--r-button` 5px, `--r-small` 4px, `--r-cell` 2px (`globals.css:336-339`).
 - Only what can be pressed has a shadow: `--shadow-button` `0 4px 0` and `--shadow-button-small` `0 3px 0`, in the ink (`globals.css:340-341`). Cards, rows, chips, stats, the current tab and the streak pill are flat.
 - One control height, 44px: fields and selects have a 2px ink border and the small corners (`globals.css:362-369`), at least 44px tall with 0 12px inside (`globals.css:373-378`); a text area keeps 10px 12px (`globals.css:380-382`).
-- Buttons are at least 44px tall, with a 2px ink border, the button corners and shadow (`globals.css:393-407`), the kit's kinds included (no vertical padding: `kit.module.css:186-227`); pressed, they drop 4px onto the shadow, which goes, in 80 ms (`globals.css:419-423`), and don't move under reduced motion (`globals.css:426-436`). A link drawn as a button is 44px too (`src/app/button-link.module.css:10`). The reaction chips are the one exception until they move behind a menu (14b-10, answer 18).
+- Buttons are at least 44px tall, with a 2px ink border, the button corners and shadow (`globals.css:393-407`), the kit's kinds included (no vertical padding: `kit.module.css:188-229`); pressed, they drop 4px onto the shadow, which goes, in 80 ms (`globals.css:419-423`), and don't move under reduced motion (`globals.css:426-436`). A link drawn as a button is 44px too (`src/app/button-link.module.css:10`). The reaction chips are the one exception until they move behind a menu (14b-10, answer 18).
 - The focus ring is 3px in the accent, 3px out (`globals.css:321-324`).
 
 ## The kit (`src/app/kit.module.css`)
 | Piece | Values | Lines |
 |---|---|---|
 | Card | 14px padding, 10px gap, 2px ink border, card corners, flat | 7-15 |
-| Rows | 8px apart; each 8px 10px, 10px gap, 1.5px ink border, small corners | 46-63 |
-| Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 66-68 |
-| A row's second line (`.below`) | 6px gap, 6px above | 95-101 |
-| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 105-123 |
-| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: Updraft's three in a row (`src/app/offbeat.module.css:68-70`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:58`) | 145-153 |
-| Badge | 24px round, ink fill, 12px 800; the first in the accent | 155-180 |
-| Main button (`.primary`) | 0 18px, accent fill, 17px | 186-192 |
-| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 196-202 |
-| Minor button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px | 216-227 |
-| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 236-239 |
+| Rows | 8px apart; each 8px 10px, 10px gap, 1.5px ink border, small corners | 48-65 |
+| Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 68-70 |
+| A row's second line (`.below`) | 6px gap, 6px above | 97-103 |
+| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 107-125 |
+| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: Updraft's three in a row (`src/app/offbeat.module.css:68-70`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:58`) | 147-155 |
+| Badge | 24px round, ink fill, 12px 800; the first in the accent | 157-182 |
+| Main button (`.primary`) | 0 18px, accent fill, 17px | 188-194 |
+| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 198-204 |
+| Minor button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px | 218-229 |
+| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 238-241 |
 
 Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
 ## Spacing and layout
 - A page's content is one column at most 960px wide with 16px padding (`globals.css:279-284`).
-- Nothing pushes the page sideways when text is bigger: a card's head lets its chip drop under the heading (`kit.module.css:35-43`), a chip's text wraps (`:103-116`), a week's head on the leaderboard graph wraps (`src/app/race.module.css:194-201`), a board's row drops its points under the name (`src/app/leaderboard.module.css:78-91`), and Today's column is as wide as the screen (`src/app/today.module.css:7`).
+- Nothing pushes the page sideways when text is bigger: a card's head lets its chip drop under the heading (`kit.module.css:35-45`), a chip's text wraps (`:105-118`), a week's head on the leaderboard graph wraps (`src/app/race.module.css:194-201`), a board's row drops its points under the name (`src/app/leaderboard.module.css:78-91`), and Today's column is as wide as the screen (`src/app/today.module.css:7`).
 - **Below 768px:** a 56px top bar (`src/app/shell.module.css:25-32`) and a 64px tab bar at the foot with a 2px ink top rule (`shell.module.css:3-13`); the page leaves that room (`globals.css:200-204`).
 - **From 768px:** a 280px sidebar with a 2px ink right rule and no top bar (`shell.module.css:171-188`, `globals.css:227-234`).
 - **From 1200px:** a 360px right column (`src/app/side-column.tsx:14`, `src/app/side-column.module.css:10`, `globals.css:248-251`).
@@ -71,12 +71,12 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
 ## Motion
 - One easing and time: `--ease` `cubic-bezier(0.2, 0.8, 0.2, 1)` and `--quick` 200ms (`globals.css:342-345`). Under reduced motion nothing moves; a state still changes, at once.
-- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:409-417`); a small one's to 5px (`kit.module.css:204-208`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
-- **Rows** take the soft tint under the pointer (`kit.module.css:70-85`).
+- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:409-417`); a small one's to 5px (`kit.module.css:206-210`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
+- **Rows** take the soft tint under the pointer (`kit.module.css:72-87`).
 - **The reactions' popover** pops in from 90%, from its top right corner (`reactions.tsx:101`, `reactions.module.css:66-75`); its emoji and actions take the soft tint under the pointer (`reactions.module.css:120-125`).
 - **Tab icons** have two versions, an outline and a solid one that does something (Today's calendar peels a corner, Friends goes ^ ^ with a grin, Groups turns point-down, Me gains a sparkle), in the tab's own colour, muted at rest and the text colour hovered or current, as its label is (`src/app/shell.tsx:39-164`). The current tab shows the solid one; from 768px a hovered tab takes the soft fill and the solid one, which Groups turns 60° into (`shell.module.css:119-154`, `:242-270`).
 - **Count-ups:** points and streaks (Me's totals, the game screen's streak and best score, the streak pill) count to their value over 600ms when it differs from what this browser last showed (`src/app/shown.ts:9`, `:50-76`, `src/app/count-up.tsx`).
-- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:248-264`).
+- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:250-266`).
 
 ## Reactions
 - A comment or a friend's run shows only the reactions used, in the set's order, as 13px text on the row's second line, each with its count; nothing when there are none (`src/app/reactions.tsx:15-41`, `src/app/reactions.module.css:6-17`). The player's own takes the soft tint and an accent edge, and is read as ", yours" (`reactions.module.css:19-22`, `reactions.tsx:34`).
@@ -86,7 +86,7 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
 ## The leaderboard graph
 - The Friends and group leaderboards have a List / Graph switch under their heading, Today's period strip again, List on every load (`src/app/leaderboard.tsx:40-47`). Today's leaderboard card has no graph.
-- In Graph, each week is a race: every player's running total on each day that's over, Monday to Sunday columns, drawn at the width it shows (200px tall, 230px from 768px) so its 12px text stays 12px (`src/app/race.tsx:45-105`). This week marks today with a dashed `--edge` line and "Today" in the text colour; a Monday's week says "The first points arrive Tuesday, once Monday is over." (`src/app/race.module.css:26-41`, `:203-213`; `leaderboard.tsx:170`).
+- In Graph, each week is a race: every player's running total on each day that's over, Monday to Sunday columns, drawn at the width it shows (200px tall, 230px from 768px) so its text isn't scaled: 12px at the default, growing with the browser's text size, with its labels' spacing and the room kept for text (`src/app/race-layout.ts`, `k`) (`src/app/race.tsx:45-105`). This week marks today with a dashed `--edge` line and "Today" in the text colour; a Monday's week says "The first points arrive Tuesday, once Monday is over." (`src/app/race.module.css:26-41`, `:203-213`; `leaderboard.tsx:170`).
 - Lines are 2px `--edge`, a found player's 2px `--text`, yours 3px `--accent`, drawn last; the leader's end carries the List's accent "1" badge (`race.module.css:43-84`).
 - You, the leader and a found player are named at their line's end with their total in 12px, a name cut at 10 characters, ties sharing one label ("You & Fay 20"), labels at least 14px apart with a tick back to a dot they moved off, haloed in `--surface` (`src/app/race-layout.ts:62-138`, `race.module.css:86-109`). Gridlines step by 1, 2, 2.5 or 5 × 10ⁿ, at most 4 above 0, in `--line` with `--muted` numbers (`race-layout.ts:36-47`, `race.module.css:14-24`).
 - A tap or click anywhere on a graph picks the player whose line passes nearest on that day's column, never you; picking them again clears them (`race-layout.ts:127-137`, `race.tsx:58-62`).

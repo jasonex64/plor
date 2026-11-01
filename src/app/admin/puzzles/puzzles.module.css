@@ -102,6 +102,8 @@
 }
 
 .approve {
+  /* Its button at the row's right edge, even as a <p>, not a paragraph held to 55ch (14b-17 review). */
+  max-width: none;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

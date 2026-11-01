@@ -95,3 +95,9 @@ While building, after measuring that Baloo 2's wide zero makes 70ch hold about 8
 - **Screens** shown to the human: Privacy at 1440px before (2026-10-31's audit) and after; Today, Me and the Friends graph at 390px at 200%.
 
 ## Review
+The `reviewer` agent, fresh context, 2026-10-31, on `d21d62e`.
+- Blocking findings and how each was fixed:
+  - The site-wide `p { max-width: 55ch }` also caught `<p>`s that are layout boxes: the question card's head (its points chip moved to mid-card at 1440px, 383px short), the admin Reports body box and the admin Puzzles approve column. Each now sets `max-width: none`; a new e2e checks the question card's head is as wide as its card, failing without the fix (`Expected: < 1`, `Received: 382.96875`) and passing with it (`npx playwright test e2e/text-size.e2e.ts` → `4 passed`).
+  - The graph's text scaling (`k`) had no test: a unit case at twice the size checks the room for day names, the labels' spacing, the tick, the badge and the axis numbers (`race-layout.test.ts` → `17 passed`).
+  - The ROADMAP row, the For M14 long-lines, px-fonts and two chip-`nowrap` items, and HANDOFF were not yet updated. Done in this PR; DESIGN.md's citations into `kit.module.css` were remapped again after the fix, and its graph line no longer says the text stays 12px.
+- Deferred to ROADMAP "Next revision" (For M14): `overflow-wrap: anywhere` on `body`; a board's row at the default size; the graph's 0.75 in two places; no static guard against px font sizes; the badge and avatars in rem, for the human to confirm; Privacy's list items' lone last words.

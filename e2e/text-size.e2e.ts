@@ -3,6 +3,18 @@
 // what's above it and 10px over what follows; and font sizes follow the browser's default text size (here doubled to
 // 32px, WCAG 2.2 1.4.4's 200%).
 import { expect, test, type Page } from "@playwright/test";
+import { Pool } from "pg";
+import { RUN, play, signInAndPick } from "./players";
+import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+
+const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+let puzzle: TodayPuzzle | null = null;
+
+test.afterAll(async () => {
+  await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
+  if (puzzle) await removePuzzle(DB, puzzle);
+  await DB.end();
+});
 
 // The browser's default text size, as a player sets it in their settings.
 async function textSize(page: Page, px: number) {
@@ -57,4 +69,22 @@ test("font sizes double when the browser's text size doubles", async ({ page }) 
   await page.reload();
   const after = await sizes();
   expect(after).toEqual(before.map((px) => px * 2));
+});
+
+// A <p> that's a row, not running text, keeps its card's width: the question card's head, its points chip at the
+// card's right edge (14b-17 review).
+test("on a desktop, the question card's head stays as wide as its card", async ({ page }) => {
+  puzzle = await todayPuzzle(DB);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await signInAndPick(page, "ts");
+  await play(page);
+  const head = page.getByText(/^Stop 1 of /).locator("xpath=..");
+  await expect(head).toBeVisible();
+  const [row, card] = await head.evaluate((el) => {
+    const box = el.parentElement!;
+    const s = getComputedStyle(box);
+    return [el.getBoundingClientRect().width, box.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight)];
+  });
+  expect(Math.abs(row - card)).toBeLessThan(1);
 });
