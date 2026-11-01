@@ -1,6 +1,6 @@
 # M14 14b-18 — Headings, signed-in Today, invites and words
 
-**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-18 as drafted, with the proposed page names and name style?"), in review (PR not opened yet). It was drafted from five rounds of guided questions (2026-10-31) on ROADMAP For M14's open items. 14b-18 is the first of two player-screen PRs (answer 13); 14b-19, controls, layout jumps, lost taps and stale state, follows once this one is merged.
+**Status:** approved (human, 2026-10-31: "Approve, build it", to "Build 14b-18 as drafted, with the proposed page names and name style?"), in review (PR #148). It was drafted from five rounds of guided questions (2026-10-31) on ROADMAP For M14's open items. 14b-18 is the first of two player-screen PRs (answer 13); 14b-19, controls, layout jumps, lost taps and stale state, follows once this one is merged.
 
 ## Goal
 On every page a player can see where they are, a signed-in player never sees the signed-out introduction, the invite links say the right thing and still work when copying is blocked, and the words, dates and back arrows read one way.
