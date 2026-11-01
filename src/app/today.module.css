@@ -3,6 +3,8 @@
    (src/app/side-column.tsx). */
 .today {
   display: grid;
+  /* As wide as the column, whatever the content's longest word, so bigger text wraps inside it (14b-17, answer 6). */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   grid-template-areas:
     "game"

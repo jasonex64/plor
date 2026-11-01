@@ -4,14 +4,14 @@ import { Slide } from "../slide";
 
 // The introduction is static, so it is in the served HTML before any script runs: Google's brand verification rejected
 // a home page that showed only a sign-in form, didn't explain the app, and was headed "Offbeat" while the app is "Plor"
-// (human, 2026-10-19; M02 ticket, 2c). The heading and the privacy link are the layout's
-// (src/app/(shell)/layout.tsx). Everything that depends on the session or the address bar renders on the client
+// (human, 2026-10-19; M02 ticket, 2c). The heading and the privacy link are the shell's
+// (src/app/shell-page.tsx). Everything that depends on the session or the address bar renders on the client
 // (node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md).
 export default function Page() {
   return (
     <Slide>
       {/* For signed-out visitors only: hidden by globals.css once the shell shows (14b-8b, answer 12). */}
-      <div data-signed-out>
+      <div data-signed-out className="reading">
         <p>
           Plor is a small site with a daily word game. Everyone gets the same puzzle each day, and a new one starts at
           midnight Pacific time.

@@ -16,7 +16,9 @@ export type RaceInput = {
   height: number;
   // From 768px: the days' three-letter names.
   long: boolean;
-  // A text's width in px at 12px in the given weight.
+  // The graph's text size in px: 12 at the browser's default, bigger when the player's text size is (0.75rem; 14b-17).
+  text: number;
+  // A text's width in px at that size in the given weight.
   measure: (text: string, weight: number) => number;
 };
 
@@ -57,7 +59,9 @@ export function running(daily: number[]): number[] {
 export type Role = "you" | "found" | "other";
 type Point = { x: number; y: number };
 
-export function layout({ players, days, hidden, picked, width, height, long, measure }: RaceInput) {
+export function layout({ players, days, hidden, picked, width, height, long, text, measure }: RaceInput) {
+  // The room kept for text, and the labels' spacing, grow with it (14b-17, answer 6); the mockup's values are at 12px.
+  const k = text / 12;
   const cum = new Map(players.map((p) => [p.key, running(p.daily)]));
   const total = (p: RacePlayer) => cum.get(p.key)![days - 1];
   const max = Math.max(1, ...players.map(total));
@@ -83,20 +87,20 @@ export function layout({ players, days, hidden, picked, width, height, long, mea
   // no margin past Sunday for them unless the labels need it (answers 25 and 30).
   const room = width - LABEL_GAP - Math.max(...labels.map((l) => l.width));
   const right = days === 7 ? Math.min(width - RIGHT, room) : days > 1 ? Math.min(width - RIGHT, left + (6 * (room - left)) / (days - 1)) : width - RIGHT;
-  const bottom = height - BOTTOM;
+  const bottom = height - BOTTOM * k;
   const col = (right - left) / 6;
   const x = (i: number) => left + i * col;
-  const y = (v: number) => bottom - (v / (steps * step)) * (bottom - TOP);
+  const y = (v: number) => bottom - (v / (steps * step)) * (bottom - TOP * k);
   const last = x(days - 1);
 
-  const placed = labels.map((l) => ({ ...l, dot: y(l.points), x: last + LABEL_GAP, y: y(l.points) + 4 })).sort((a, b) => a.y - b.y);
+  const placed = labels.map((l) => ({ ...l, dot: y(l.points), x: last + LABEL_GAP, y: y(l.points) + 4 * k })).sort((a, b) => a.y - b.y);
   placed.forEach((l, i) => {
-    if (i > 0 && l.y - placed[i - 1].y < LABEL_STEP) l.y = placed[i - 1].y + LABEL_STEP;
+    if (i > 0 && l.y - placed[i - 1].y < LABEL_STEP * k) l.y = placed[i - 1].y + LABEL_STEP * k;
   });
-  let limit = bottom + 4;
+  let limit = bottom + 4 * k;
   for (let i = placed.length - 1; i >= 0; i--) {
     placed[i].y = Math.min(placed[i].y, limit);
-    limit = placed[i].y - LABEL_STEP;
+    limit = placed[i].y - LABEL_STEP * k;
   }
 
   const role = (p: RacePlayer): Role => (p.you ? "you" : p === found ? "found" : "other");
@@ -106,19 +110,19 @@ export function layout({ players, days, hidden, picked, width, height, long, mea
     .map((p) => ({ key: p.key, role: role(p), points: cum.get(p.key)!.map((v, i): Point => ({ x: x(i), y: y(v) })) }));
 
   return {
-    grid: values.map((v) => ({ y: y(v), text: String(v), x: left - AXIS_GAP, from: left, to: right })),
+    grid: values.map((v) => ({ y: y(v), ty: y(v) + 4 * k, text: String(v), x: left - AXIS_GAP, from: left, to: right })),
     names: (long ? LONG_DAYS : SHORT_DAYS).map((text, i) => ({
       x: x(i),
-      y: height - 6,
+      y: height - 6 * k,
       text: i === days ? "Today" : text,
       today: i === days,
       hidden: hidden.includes(i),
     })),
-    today: days < 7 ? { x: x(days), from: TOP, to: bottom } : null,
+    today: days < 7 ? { x: x(days), from: TOP * k, to: bottom } : null,
     lines,
-    badge: { x: last, y: y(total(leader)) },
+    badge: { x: last, y: y(total(leader)), r: 8 * k, ty: y(total(leader)) + 4 * k },
     labels: placed,
-    ticks: placed.filter((l) => Math.abs(l.y - 4 - l.dot) > TICK_FROM).map((l) => ({ x1: last + 4, y1: l.dot, x2: l.x - 2, y2: l.y - 4 })),
+    ticks: placed.filter((l) => Math.abs(l.y - 4 * k - l.dot) > TICK_FROM * k).map((l) => ({ x1: last + 4, y1: l.dot, x2: l.x - 2, y2: l.y - 4 * k })),
     // The player, never the viewer, whose line passes nearest a point on that point's day (answer 24).
     nearest(px: number, py: number): string | null {
       const day = Math.max(0, Math.min(days - 1, Math.round((px - left) / col)));

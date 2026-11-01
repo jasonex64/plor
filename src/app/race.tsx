@@ -22,12 +22,15 @@ function summary(label: string, week: Week): string {
   return `${label}, day by day: ${leader.you ? `you lead with ${you.points}` : `${leader.name} leads with ${leader.points}; you have ${you.points}`}.`;
 }
 
-// The width of 12px text in the page's one font (body's, which the graph inherits). Only called once the graph has a
-// width, so only in the browser.
+// The graph's text size: 0.75rem (race.module.css), 12px at the browser's default and more when the player sets a bigger
+// text size (14b-17). Read, like the measuring, only once the graph has a width, so only in the browser.
+const textSize = () => parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.75;
+
+// The width of a text in the graph's size, in the page's one font (body's, which the graph inherits).
 let canvas: CanvasRenderingContext2D | null = null;
 function measure(text: string, weight: number): number {
   canvas ??= document.createElement("canvas").getContext("2d")!;
-  canvas.font = `${weight} 12px ${getComputedStyle(document.body).fontFamily}`;
+  canvas.font = `${weight} ${textSize()}px ${getComputedStyle(document.body).fontFamily}`;
   return canvas.measureText(text).width;
 }
 
@@ -50,7 +53,7 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
   const long = useMinWidth(768);
   const height = long ? 230 : 200;
   useFontLoaded();
-  const view = width > 0 ? layout({ players: players(week), days: week.days, hidden: week.hidden, picked, width, height, long, measure }) : null;
+  const view = width > 0 ? layout({ players: players(week), days: week.days, hidden: week.hidden, picked, width, height, long, text: textSize(), measure }) : null;
 
   function tap(event: MouseEvent<SVGSVGElement>) {
     const at = event.currentTarget.getBoundingClientRect();
@@ -65,7 +68,7 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
           {view.grid.map((g) => (
             <g key={g.text}>
               <line className={styles.grid} x1={g.from} x2={g.to} y1={g.y} y2={g.y} />
-              <text className={styles.axis} x={g.x} y={g.y + 4} textAnchor="end">
+              <text className={styles.axis} x={g.x} y={g.ty} textAnchor="end">
                 {g.text}
               </text>
             </g>
@@ -83,8 +86,8 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
             </g>
           ))}
           {/* The leader's end carries the List's first-place badge (answer 23). */}
-          <circle className={styles.badge} cx={view.badge.x} cy={view.badge.y} r={8} />
-          <text className={styles.badgeText} x={view.badge.x} y={view.badge.y + 4} textAnchor="middle">
+          <circle className={styles.badge} cx={view.badge.x} cy={view.badge.y} r={view.badge.r} />
+          <text className={styles.badgeText} x={view.badge.x} y={view.badge.ty} textAnchor="middle">
             1
           </text>
           {view.ticks.map((t, i) => (

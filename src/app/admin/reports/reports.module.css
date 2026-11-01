@@ -11,11 +11,13 @@ li.item {
 }
 
 .body {
+  /* A box as wide as its row, not a paragraph held to 55ch (14b-17 review). */
+  max-width: none;
   margin: 0;
   padding: 10px 12px;
   border-radius: var(--r-small);
   background: var(--bg);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .confirm {

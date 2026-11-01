@@ -182,10 +182,10 @@ function Entries({ entries }: { entries: LeaderboardEntry[] }) {
   return (
     <ol className={kit.rows}>
       {entries.map((e, i) => (
-        <li key={e.username} className={e.you ? `${kit.row} ${kit.you}` : kit.row}>
+        <li key={e.username} className={e.you ? `${kit.row} ${kit.you} ${styles.entry}` : `${kit.row} ${styles.entry}`}>
           <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
           <Avatar name={e.name} />
-          <span className={kit.grow}>
+          <span className={`${kit.grow} ${styles.name}`}>
             {e.name}
             {e.you && " (you)"}
             <span className="sr-only">: </span>
