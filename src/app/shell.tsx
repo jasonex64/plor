@@ -8,8 +8,8 @@
 // The streak's pill shows its rank and opens /streak (docs/milestones/M14-14b-2a-streak-ranks.md): beside the gear on
 // phones, under the sidebar's wordmark with the avatar slot from 768px.
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { RunState } from "@/game/runs";
 import type { Profile, Settings } from "@/lib/profile";
@@ -29,6 +29,7 @@ import styles from "./shell.module.css";
 import { GAME } from "@/platform/game";
 import { capitalized, timedOutText } from "@/game/words";
 import { BACK, FORWARD } from "./slide";
+import { markToPlay } from "./to-play";
 
 const icon = (children: ReactNode) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -223,6 +224,8 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
   const path = usePathname();
   const sidebar = useMinWidth(768);
   useBodyFlag("shell", true);
+  const nav = useRef<HTMLElement>(null);
+  useSlideTaps(nav);
   const dialog = useRef<HTMLDialogElement>(null);
   const open = () => dialog.current?.showModal();
   return createPortal(
@@ -240,7 +243,7 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
           </button>
         </div>
       </header>
-      <nav aria-label="Main" className={styles.nav} style={{ viewTransitionName: "plor-nav" }}>
+      <nav ref={nav} aria-label="Main" className={styles.nav} style={{ viewTransitionName: "plor-nav" }}>
         <span className={styles.word} aria-hidden="true">
           Plor
         </span>
@@ -275,6 +278,35 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
     </>,
     document.body,
   );
+}
+
+// A tap on the navigation while a page slides: the navigation is named for the slide, so it stays put, and a named part
+// isn't hit-tested until the slide ends (Next.js, view-transitions guide, "Keeping the page interactive"); the tap falls
+// through the overlay (globals.css, ::view-transition) to the page under it. Caught here before that page sees it,
+// it opens the link that was under the finger (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 5). :active-view-transition matches
+// the root while a view transition runs (MDN).
+function useSlideTaps(nav: RefObject<HTMLElement | null>) {
+  const router = useRouter();
+  useEffect(() => {
+    function tap(event: MouseEvent) {
+      if (!document.documentElement.matches(":active-view-transition")) return;
+      // A press: a keyboard's click has no count (detail 0) and no point; a modified one opens elsewhere; one in a dialog
+      // or popover is that dialog's, whatever lies under it.
+      if (event.detail === 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      if ((event.target as Element).closest("dialog[open], :popover-open")) return;
+      // Only a link that's shown: a hidden one (the sidebar's pill on a phone) has an empty box at 0, 0.
+      const link = [...nav.current!.querySelectorAll("a")].find((a) => {
+        const at = a.getBoundingClientRect();
+        return at.width > 0 && event.clientX >= at.left && event.clientX <= at.right && event.clientY >= at.top && event.clientY <= at.bottom;
+      });
+      if (!link) return;
+      event.preventDefault();
+      event.stopPropagation();
+      router.push(link.getAttribute("href")!);
+    }
+    document.addEventListener("click", tap, true);
+    return () => document.removeEventListener("click", tap, true);
+  }, [nav, router]);
 }
 
 // The streak and its rank on the soft pill (round 7's .streak), read as "4 day streak, Daisy": the flower is decoration.
@@ -333,7 +365,7 @@ function Clock({ index, msLeft, up, onTimeUp }: { index: number; msLeft: number;
           <span role="timer">
             Stop {index + 1} · {seconds}s left
           </span>
-          <ButtonLink href={GAME.path} transitionTypes={up ? BACK : FORWARD}>
+          <ButtonLink href={GAME.path} transitionTypes={up ? BACK : FORWARD} onClick={markToPlay}>
             Back
           </ButtonLink>
         </>

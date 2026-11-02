@@ -34,13 +34,17 @@ const slot = (page: Page, name: string) =>
   }, name);
 
 // What's drawn with a shadow: the buttons and links among it counted (so a page with none shows nothing was measured),
-// anything else listed.
+// anything else listed. A disabled button can't be pressed, so it's flat too and listed if it isn't
+// (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 6); checked counts the controls looked at, pressable
+// or disabled, so a page whose only buttons are disabled (Insights with one day) is still measured.
 const shadowed = (page: Page) =>
   page.evaluate(() => {
-    const all = [...document.querySelectorAll("body *")].filter((el) => el.getClientRects().length > 0 && getComputedStyle(el).boxShadow !== "none");
-    const pressable = all.filter((el) => el.tagName === "BUTTON" || el.tagName === "A");
+    const shown = [...document.querySelectorAll("body *")].filter((el) => el.getClientRects().length > 0);
+    const all = shown.filter((el) => getComputedStyle(el).boxShadow !== "none");
+    const pressable = all.filter((el) => (el.tagName === "BUTTON" && !(el as HTMLButtonElement).disabled) || el.tagName === "A");
+    const disabled = shown.filter((el) => el.tagName === "BUTTON" && (el as HTMLButtonElement).disabled);
     const stray = all.filter((el) => !pressable.includes(el)).map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? "").trim().slice(0, 40)}"`);
-    return { pressable: pressable.length, stray };
+    return { checked: pressable.length + disabled.length, stray };
   });
 
 // Buttons, links drawn as buttons (the ones with a shadow), text fields and selects under 44px tall.
@@ -104,7 +108,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
       const where = `${path} at ${viewport.width}px`;
       const shadows = await shadowed(page);
       expect(shadows.stray, where).toEqual([]);
-      expect(shadows.pressable, where).toBeGreaterThan(0);
+      expect(shadows.checked, where).toBeGreaterThan(0);
       const heights = await short(page);
       expect(heights.low, where).toEqual([]);
       expect(heights.measured, where).toBeGreaterThan(0);
@@ -140,7 +144,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
     await expect(page.getByRole("status", { name: /^Loading/ })).toHaveCount(0);
     const shadows = await shadowed(page);
     expect(shadows.stray, theme).toEqual([]);
-    expect(shadows.pressable, theme).toBeGreaterThan(0);
+    expect(shadows.checked, theme).toBeGreaterThan(0);
   }
 });
 

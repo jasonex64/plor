@@ -61,7 +61,7 @@ import { GAME } from "@/platform/game";
 type Me =
   | { signedIn: false }
   | { signedIn: true; username: null; admin: boolean }
-  | ({ signedIn: true; admin: boolean; streak: number } & Profile);
+  | ({ signedIn: true; admin: boolean; streak: number; msToReset: number } & Profile);
 
 // A player signed in with a username, as the pages inside Signed see them.
 type Player = Extract<Me, { streak: number }>;
@@ -113,10 +113,17 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   const [me, setMe] = useState<Me | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  function loadMe() {
-    api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setLoadError(errorText(err)));
-  }
-  useEffect(loadMe, []);
+  // When the daily reset comes, as a moment, from each profile the server sends: a profile changed here (a setting saved)
+  // keeps the moment it was read with.
+  const [resetAt, setResetAt] = useState<number | null>(null);
+  const read = useCallback((profile: Me) => {
+    setMe(profile);
+    setResetAt(profile.signedIn && profile.username !== null ? Date.now() + profile.msToReset : null);
+  }, []);
+  const loadMe = useCallback(() => {
+    api<Me>("/api/profile", { method: "GET" }).then(read, (err) => setLoadError(errorText(err)));
+  }, [read]);
+  useEffect(loadMe, [loadMe]);
   // Again once the game screen's Start begins today's run, which counts in the streak at once
   // (docs/milestones/M14-14b-2a-streak-ranks.md). A failure here is shown beside the page, not instead of it: the
   // run's question is already being timed (14b-2a review).
@@ -126,10 +133,10 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   // read it again then (docs/milestones/M14-14b-2c-review-items.md, items 6 and 46).
   const [timeUps, setTimeUps] = useState(0);
   const timeUp = useCallback(() => setTimeUps((n) => n + 1), []);
-  function reloadStreak() {
+  const reloadStreak = useCallback(() => {
     setStreakError(null);
-    api<Me>("/api/profile", { method: "GET" }).then(setMe, (err) => setStreakError(errorText(err)));
-  }
+    api<Me>("/api/profile", { method: "GET" }).then(read, (err) => setStreakError(errorText(err)));
+  }, [read]);
   // Signed out, or before a username, no theme is picked, and this browser's copy is cleared (the copy itself is
   // re-applied on every page by KeepTheme, src/app/keep-theme.tsx). Signed in, the settings sheet, which the shell
   // always holds, applies the theme it shows: the account's, or the one being saved, so a profile reload or another
@@ -138,6 +145,13 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   useLayoutEffect(() => {
     if (me && !accountTheme) applyTheme(null);
   }, [me, accountTheme]);
+  // The streak again at the daily reset, a day over and a new one begun, with the tab still open
+  // (docs/milestones/M14-14b-19-controls-layout-and-state.md; 14b-18, answer 16). Each read brings the next reset.
+  useEffect(() => {
+    if (resetAt === null) return;
+    const timer = setTimeout(reloadStreak, resetAt - Date.now());
+    return () => clearTimeout(timer);
+  }, [resetAt, reloadStreak]);
   // The sign-in mark, from the profile once it's read (src/app/signed-in.ts).
   useLayoutEffect(() => {
     if (me) markSignedIn(me.signedIn);
@@ -260,11 +274,11 @@ export function FriendsTab() {
 }
 
 export function MeTab() {
-  const { player } = usePlayer();
+  const { player, timeUps } = usePlayer();
   return (
     <>
       {/* Only the stats (L45); the account is in the settings sheet (14a-3b). */}
-      <MeStats numbers={player.settings.calendarNumbers} />
+      <MeStats numbers={player.settings.calendarNumbers} timeUps={timeUps} />
       {player.admin && <MeAdminLink />}
     </>
   );

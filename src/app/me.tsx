@@ -23,12 +23,14 @@ const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 
 // numbers: the player's Numbers on the calendar setting (L46).
-export function MeStats({ numbers }: { numbers: boolean }) {
+// timeUps: the frame's count of questions timed out away from the game screen; each one ends a run, so the numbers are
+// read again (docs/milestones/M14-14b-19-controls-layout-and-state.md).
+export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: number }) {
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     api<{ me: Me }>("/api/me", { method: "GET" }).then((r) => setMe(r.me), (err) => setError(errorText(err)));
-  }, []);
+  }, [timeUps]);
   if (error) return <p role="alert">{error}</p>;
   if (!me)
     return (

@@ -29,6 +29,7 @@ import kit from "./kit.module.css";
 import { CopyField, shareLink } from "./share";
 import { GAME } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
+import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -86,6 +87,7 @@ export function useStartRun(direction: string[]) {
     setError(null);
     try {
       await api("/api/run/start", { method: "POST" });
+      markToPlay();
       router.push(GAME.path, { transitionTypes: direction });
     } catch (err) {
       setError(errorText(err));
@@ -128,7 +130,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
         {run.status === "in_progress" && (
           <>
             <Facts facts={["Your run is still going"]} />
-            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+            <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`} onClick={markToPlay}>
               Continue
             </ButtonLink>
           </>
@@ -158,7 +160,7 @@ type Runner = {
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 // onPlaying: whether the run is in progress, when the screen shows only the question (docs/milestones/
-// M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23).
+// M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
 export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted: () => void; onPlaying: (playing: boolean) => void }) {
   const { run, setRun, noPuzzle, error, setError, over, load } = useRun(hooks);
   const [busy, setBusy] = useState(false);
@@ -268,10 +270,17 @@ export function TestGame({ date, hostAnswers, onPlaying }: { date: string; hostA
 function Run({ runner, onPlaying, saved }: { runner: Runner; onPlaying: (playing: boolean) => void; saved: boolean }) {
   const { run, noPuzzle, error, busy, over } = runner;
   const playing = run?.status === "in_progress";
-  useEffect(() => onPlaying(playing), [onPlaying, playing]);
+  const known = run !== null || noPuzzle !== null || error !== null;
+  useEffect(() => {
+    if (known) onPlaying(playing);
+  }, [onPlaying, playing, known]);
+  // Read once, at mount (an initializer, so the development server's second render reads it too), and spent after
+  // (src/app/to-play.ts).
+  const [expectPlay] = useState(expectingPlay);
+  useEffect(spendToPlay, []);
 
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
-  if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
+  if (!run) return error ? <p role="alert">{error}</p> : expectPlay ? <QuestionSkeleton /> : <BannerSkeleton />;
   return (
     <div className={styles.game}>
       {!playing && <Banner date={run.date}>{over && <Score run={run} />}</Banner>}
@@ -350,6 +359,18 @@ function Facts({ facts }: { facts: string[] }) {
         </span>
       ))}
     </p>
+  );
+}
+
+// A question card before the run in play loads: its soft card, a line for its stops and one for its prompt.
+function QuestionSkeleton() {
+  return (
+    <Skeleton label="Loading your question">
+      <div className={`${kit.card} ${kit.soft}`}>
+        <Line />
+        <Line />
+      </div>
+    </Skeleton>
   );
 }
 

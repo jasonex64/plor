@@ -36,6 +36,12 @@
   gap: 16px;
 }
 
+/* Mounted but not shown while the run is in play (src/app/offbeat.tsx): the flex above would
+   otherwise outrank the browser's own [hidden] rule. */
+.cards[hidden] {
+  display: none;
+}
+
 .feed {
   grid-area: feed;
 }

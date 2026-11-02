@@ -129,10 +129,14 @@ select pg_temp.load('ls', 'B');
 select is((select removed_at > now() from private.thing_alias where thing_id = pg_temp.id('ls-a') and alias = 'ls alpha'), true,
   'a load that never finishes brings back nothing its files don''t give');
 -- Then midnight passes (the ended rows' times moved a day back): a load keeps them a day more, for a run finished late.
+-- A day is a Pacific calendar day, as the load's cutoff counts it (private.load_begin), not 24 hours: on the day the
+-- clocks go back it's 25 (docs/milestones/M14-14b-19a-sql-tests-calendar-days.md).
+create function pg_temp.days_back(t timestamptz, n int) returns timestamptz language sql
+  return ((t at time zone 'America/Los_Angeles') - make_interval(days => n)) at time zone 'America/Los_Angeles';
 create function pg_temp.pass_a_day() returns void language sql begin atomic
-  update private.thing_alias set added_at = added_at - interval '1 day', removed_at = removed_at - interval '1 day' where removed_at > now() - interval '1 day';
-  update private.fact set added_at = added_at - interval '1 day', removed_at = removed_at - interval '1 day' where removed_at > now() - interval '1 day';
-  update private.number_fact set added_at = added_at - interval '1 day', removed_at = removed_at - interval '1 day' where removed_at > now() - interval '1 day';
+  update private.thing_alias set added_at = pg_temp.days_back(added_at, 1), removed_at = pg_temp.days_back(removed_at, 1) where removed_at > pg_temp.days_back(now(), 1);
+  update private.fact set added_at = pg_temp.days_back(added_at, 1), removed_at = pg_temp.days_back(removed_at, 1) where removed_at > pg_temp.days_back(now(), 1);
+  update private.number_fact set added_at = pg_temp.days_back(added_at, 1), removed_at = pg_temp.days_back(removed_at, 1) where removed_at > pg_temp.days_back(now(), 1);
 end;
 select pg_temp.pass_a_day();
 select private.load_begin();
@@ -265,8 +269,8 @@ select is(private.load_finish(pg_temp.categories(array['ls_root', 'ls_extra', 'l
 -- 7 and 8. Today's day and tomorrow's, approved two days ago, name ls-a as a host answer; the base's ls rows date from
 -- before today began. A load whose files no longer give ls-a names tomorrow's day, not today's, and the name it ends
 -- still resolves today but not tomorrow.
-update private.thing_alias set added_at = added_at - interval '2 days' where thing_id in (select id from private.thing where name like 'ls %');
-update private.fact set added_at = added_at - interval '2 days' where thing_id in (select id from private.thing where name like 'ls %');
+update private.thing_alias set added_at = pg_temp.days_back(added_at, 2) where thing_id in (select id from private.thing where name like 'ls %');
+update private.fact set added_at = pg_temp.days_back(added_at, 2) where thing_id in (select id from private.thing where name like 'ls %');
 create function pg_temp.day(d date) returns jsonb language sql return jsonb_build_object('format', 3, 'game_id', 'offbeat',
   'date', d::text, 'approved_at', now() - interval '2 days', 'questions', jsonb_build_array(jsonb_build_object(
     'prompt', 'Name an ls', 'category', 'ls_root', 'host_bank', jsonb_build_array(pg_temp.id('ls-a')),

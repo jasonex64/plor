@@ -128,6 +128,10 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
   await expect(nav.getByRole("link", { name: "Admin" })).toBeHidden();
   await nav.getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("main").getByRole("link", { name: "Admin" })).toBeVisible();
+  // Once the tab's transition is over: during it the tab bar isn't hit-tested, so a click Playwright aims at the link
+  // could land where the tab bar covers it, and that's a tap on the tab (docs/milestones/
+  // M14-14b-19-controls-layout-and-state.md, answer 5).
+  await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
   await page.getByRole("main").getByRole("link", { name: "Admin" }).click();
   // /admin opens on Puzzles (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 1), so the link ends there; the
   // bare /admin was only seen when the check ran before the redirect, which the persistent frame's prefetch made rare

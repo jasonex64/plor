@@ -49,7 +49,6 @@
   display: block;
   width: 100%;
   margin-top: 4px;
-  font-size: 1rem;
 }
 
 .board {
@@ -88,4 +87,28 @@
 
 .entry b {
   margin-left: auto;
+}
+
+/* At the default text size a long name is cut with an ellipsis and the points stay on its row
+   (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 4); with a bigger browser text size it isn't, and the
+   points drop under it as above (answer 9). 20em is the narrowest width the site is checked at, 320px, at the default
+   16px; an em in a media query is the browser's own text size, so a 390px phone at 200% text is 12.2em and keeps the
+   whole name. */
+@media (min-width: 20em) {
+  .entry {
+    flex-wrap: nowrap;
+  }
+
+  .entry .name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* The name gives way, the points don't: "0 points" stays on one line. */
+  .entry b {
+    flex: none;
+    white-space: nowrap;
+  }
 }
