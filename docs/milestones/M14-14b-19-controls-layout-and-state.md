@@ -174,6 +174,7 @@ All on the Windows PC against the local stack, `next dev` on :3000, 2026-10-31 a
   - `npm test`: 494 passed.
   - The profile route's db test: 12 passed.
   - `tsc` and `eslint --max-warnings 0`: clean.
+- **PR #149's first CI:** one `e2e` job failed `shell.e2e.ts`'s "from 768px the tabs are a sidebar" (`Received: "http://localhost:3000/"`). Clicking Me's Admin mid-transition, Playwright aimed under the tab bar, which isn't hit-tested then, and the tap went to Today, as answer 5 designed. The test now waits for the transition to end (`e32a0cd`). The `db` jobs' failure was `load_sync.test.sql`'s 24-hour day, on `main` too, fixed by 14b-19a.
 - **Candidates sheet:** each look on the real Friends page in Paper and Night, before the build (answers 6 to 8).
 
 ## Review
