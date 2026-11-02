@@ -12,7 +12,6 @@
   box-sizing: border-box;
   width: 100%;
   color: var(--text);
-  font-size: 1rem;
 }
 
 .copy textarea {

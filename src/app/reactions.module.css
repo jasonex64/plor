@@ -96,10 +96,10 @@
   padding: 0;
 }
 
-/* The player's own, pressed: the summary's tint and edge (answer 6), not colour alone (aria-pressed). */
+/* The player's own, pressed: filled with the accent (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 7), and said by
+   aria-pressed, not colour alone. */
 .pick[aria-pressed="true"] {
-  background: var(--soft);
-  box-shadow: inset 0 0 0 1.5px var(--accent);
+  background: var(--accent);
 }
 
 /* Delete or Report, full width under the emoji, split from them by the admin phone menu's line (admin.module.css
@@ -121,5 +121,10 @@
   .pick:hover:not(:disabled),
   .action:hover:not(:disabled) {
     background: var(--soft);
+  }
+
+  /* Your own stays filled under the pointer, where you'd tap to take it back (14b-19 review). */
+  .pick[aria-pressed="true"]:hover:not(:disabled) {
+    background: var(--accent);
   }
 }

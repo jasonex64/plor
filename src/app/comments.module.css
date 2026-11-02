@@ -25,7 +25,6 @@
   min-height: 64px;
   resize: vertical;
   color: var(--text);
-  font-size: 1rem;
 }
 
 /* Filler, not words: blurred so it reads as hidden text, and aria-hidden so it isn't read out. */

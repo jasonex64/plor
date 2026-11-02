@@ -67,7 +67,7 @@
     --on-shade-2: var(--on-accent);
     --on-shade-3: var(--on-accent);
     --on-shade-4: var(--on-accent);
-    --danger: #ff8a8a;
+    --danger: #ff5c5c;
   }
 }
 
@@ -94,7 +94,7 @@
   --on-shade-2: var(--on-accent);
   --on-shade-3: var(--on-accent);
   --on-shade-4: var(--on-accent);
-  --danger: #ff8a8a;
+  --danger: #ff5c5c;
 }
 
 /* Sky, Moonlit and Ink: the Themes board's colours (L21; Moonlit's are monkeytype's "rose pine moon", from Rosé Pine,
@@ -150,7 +150,7 @@
   --on-shade-2: #000000;
   --on-shade-3: var(--on-accent);
   --on-shade-4: var(--on-accent);
-  --danger: #ff8a8a;
+  --danger: #ff5c5c;
 }
 
 [data-theme="ink"] {
@@ -176,7 +176,7 @@
   --on-shade-2: var(--on-accent);
   --on-shade-3: var(--on-accent);
   --on-shade-4: var(--on-accent);
-  --danger: #ff8a8a;
+  --danger: #ff5c5c;
 }
 
 body {
@@ -333,6 +333,7 @@ p {
    above than below (answer 3); card headings keep their card's spacing. */
 .reading li {
   max-width: 55ch;
+  text-wrap: pretty;
 }
 
 .reading h2 {
@@ -371,10 +372,12 @@ label {
   --quick: 200ms;
 }
 
-/* The comment box and the pickers take the page's font too (M14 14b-6d: one font for all text); their own sizes stay. */
+/* The comment box and the pickers take the page's font (M14 14b-6d: one font for all text) at the inputs' 16px, so iOS
+   doesn't zoom into them either (docs/milestones/M14-14b-19-controls-layout-and-state.md). */
 textarea,
 select {
   font-family: inherit;
+  font-size: 1rem;
 }
 
 /* 16px text in inputs, so iOS doesn't zoom into them. */
@@ -461,8 +464,13 @@ button {
   }
 }
 
-/* A disabled button looks it: muted text, no pointer (the base rules above override the browser's own disabled look). */
-button:disabled {
+/* A disabled button looks it: flat, a grey edge on the surface, muted text, no pointer, whatever its kind (docs/milestones/M14-14b-19-controls-layout-and-state.md,
+   answer 6). :root lifts it over the kit's kinds (kit.module.css, :is(button, a).primary and the rest), which it used to
+   tie with, so the look depended on the order the CSS loaded in. */
+:root button:disabled {
+  border-color: var(--edge);
+  background: var(--surface);
+  box-shadow: none;
   color: var(--muted);
   cursor: default;
 }
