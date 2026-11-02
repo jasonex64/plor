@@ -169,6 +169,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] On a day with no puzzle, the feed still says "Finish today's puzzle to read them and join in." (`src/app/comments.tsx`, `Preview`). Found in M12 12f (implementation).
 
 **For M13 (answer lists and content):**
+- [ ] `supabase/tests/load_sync.test.sql` assumes a day is 24 hours: it moves rows back by `interval '1 day'` and reads `private.today()`, the Pacific day, so on a day the clocks change it fails tests 18 to 21, 44 and 45 (seen 2026-11-01, when US daylight saving ended and the Pacific day was 25 hours: PR #149's `db` jobs, and `main`'s run 41280608477 re-run at 04:36 UTC on 2026-11-02 failed the same six). It blocks every merge on those days. Found in M14 14b-19's CI (2026-11-01).
 - [x] *(Closed in 13f-3b-2 as obsolete: no `bd:slice` or OFFSET paging remains, since `byIds` reads by key (13e-4c).)* **The import's slices** (scripts/base.ts):
   - if a predicate's row count is an exact multiple of the slice size, the last request asks past the end, and the service fails with a 500, loud but misleading;
   - slices of a live index could skip rows changed between requests (repeats are absorbed). Whether bd:slice order is stable is *unverified*; comparing the row count against a count query would show it.
