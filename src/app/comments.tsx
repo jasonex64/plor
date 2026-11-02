@@ -148,15 +148,34 @@ export function Comments({
 
   function report(id: string) {
     setError(null);
-    api("/api/comments/report", { method: "POST", body: { id } }).then(load, (err) => setError(errorText(err)));
+    api("/api/comments/report", { method: "POST", body: { id } }).then(load, (err) => {
+      // The comment stays, so focus has nowhere to move to.
+      leaving.current = null;
+      setError(errorText(err));
+    });
   }
+
+  // After Delete or Report, once the comment has left the list: focus on the next comment's ⋯, or the one before if it
+  // was the last, or the feed's heading if none is left (docs/milestones/M14-14b-21-screen-readers.md, answer 4).
+  const heading = useRef<HTMLHeadingElement>(null);
+  const list = useRef<HTMLUListElement>(null);
+  const leaving = useRef<{ id: string; day: string; next: string | null } | null>(null);
+  useEffect(() => {
+    const gone = leaving.current;
+    if (!gone || !shownThread || shownThread.comments?.some((c) => c.id === gone.id)) return;
+    leaving.current = null;
+    // Another day shown first (Earlier day): the comment didn't leave, the list changed; focus stays where it is.
+    if (shownThread.date !== gone.day) return;
+    const next = gone.next && list.current?.querySelector<HTMLElement>(`li[data-comment="${gone.next}"] button[aria-expanded]`);
+    (next || heading.current!).focus();
+  }, [shownThread]);
 
   const shown = shownThread?.date ?? null;
   const isToday = shown !== null && shown === today;
   const preview = shownThread && "preview" in shownThread ? shownThread.preview : null;
   return (
     <section aria-label={group ? "Comments" : title} className={kit.card}>
-      <h2>
+      <h2 ref={heading} tabIndex={-1}>
         {group ? "Comments" : isToday || !shown ? title : "Friends' comments"}
         {shown && !isToday && ` on ${dayText(shown)}`}
       </h2>
@@ -180,9 +199,10 @@ export function Comments({
       )}
       {shownThread?.comments && shownThread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
       {shownThread?.comments && shownThread.comments.length > 0 && (
-        <ul className={kit.rows}>
-          {shownThread.comments.map((c) => {
+        <ul ref={list} className={kit.rows}>
+          {shownThread.comments.map((c, i, all) => {
             const day = shownThread.date;
+            const leave = () => (leaving.current = { id: c.id, day, next: (all[i + 1] ?? all[i - 1])?.id ?? null });
             const react = (emoji: Emoji | null) =>
               act(
                 { date: day, type: "react", id: c.id, emoji },
@@ -211,8 +231,14 @@ export function Comments({
                 mine={c.username === username}
                 pending={c.id.startsWith(PENDING)}
                 arrived={arrived.has(c.id)}
-                onDelete={remove}
-                onReport={() => report(c.id)}
+                onDelete={() => {
+                  leave();
+                  remove();
+                }}
+                onReport={() => {
+                  leave();
+                  report(c.id);
+                }}
                 onReact={shownThread.canPost ? react : undefined}
               />
             );
@@ -364,7 +390,7 @@ function CommentItem({
   // Mockup 3's comment row: the avatar, then the name with its thread and time as a chip, the words, and the reactions
   // used under them (M14 14b-8b); its ⋯ at the top right holds the reactions and Delete or Report (14b-13, answer 1).
   return (
-    <li className={arrived ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}>
+    <li data-comment={comment.id} className={arrived ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}>
       <Avatar name={comment.name} />
       <div className={kit.grow}>
         <div className={kit.head}>

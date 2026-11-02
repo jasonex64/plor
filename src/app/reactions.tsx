@@ -19,7 +19,8 @@ export function Reactions({ reactions, below = false }: { reactions: ReactionsDa
   const grown = useGrown(reactions);
   if (reactions.counts.length === 0) return null;
   const summary = (
-    <span className={styles.summary}>
+    // Named for screen readers, "Reactions: 😂 1, ❤️ 2" (docs/milestones/M14-14b-21-screen-readers.md, answer 6).
+    <span role="group" aria-label="Reactions" className={styles.summary}>
       {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
         const count = reactions.counts.find((c) => c.emoji === emoji)!.count;
         const mine = reactions.mine === emoji;

@@ -14,7 +14,9 @@ import { PageName } from "./shell";
 export function Shell({ children, lost = false }: { children: ReactNode; lost?: boolean }) {
   return (
     <main>
-      <h1>
+      {/* Focusable by the page's code only: where focus goes when the place it should go back to is gone
+          (docs/milestones/M14-14b-21-screen-readers.md, answer 5). */}
+      <h1 tabIndex={-1}>
         Plor
         <Suspense fallback={null}>
           <PageName lost={lost} />

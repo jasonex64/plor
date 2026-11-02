@@ -103,7 +103,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
     for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/updraft", "/admin/puzzles", "/admin/insights"]) {
       await page.goto(path);
       // Measured once every section has loaded: no skeleton left, and the page's own small controls on screen.
-      await expect(page.getByRole("status", { name: /^Loading/ })).toHaveCount(0);
+      await expect(page.locator("[data-loading]")).toHaveCount(0);
       for (const name of SHOWN[path] ?? (path === group ? ["Rename"] : [])) await expect(page.getByRole("button", { name, exact: true }).first()).toBeVisible();
       const where = `${path} at ${viewport.width}px`;
       const shadows = await shadowed(page);
@@ -141,7 +141,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
     await DB.query("update private.profile set theme = $1 where user_id = (select id from auth.users where email = $2)", [theme, `${RUN}-ka@example.test`]);
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-    await expect(page.getByRole("status", { name: /^Loading/ })).toHaveCount(0);
+    await expect(page.locator("[data-loading]")).toHaveCount(0);
     const shadows = await shadowed(page);
     expect(shadows.stray, theme).toEqual([]);
     expect(shadows.checked, theme).toBeGreaterThan(0);

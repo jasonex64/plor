@@ -167,7 +167,7 @@ test("Continue shows the question's skeleton, never the cards, until the run loa
   });
   await page.getByRole("link", { name: "Continue" }).click();
   await expect(page).toHaveURL(new RegExp(`${GAME.path}$`));
-  await expect(page.getByRole("status", { name: "Loading your question" })).toBeVisible();
+  await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
   await expect(page.getByRole("heading", { name: `Your ${GAME.name}` })).toHaveCount(0);
   await expect(page.getByRole("region", { name: `${GAME.name} comments` })).toHaveCount(0);
   release();
@@ -189,7 +189,7 @@ test("the clock bar's Back also opens on the question's skeleton", async ({ page
     await route.continue();
   });
   await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page.getByRole("status", { name: "Loading your question" })).toBeVisible();
+  await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
   release();
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
@@ -218,11 +218,11 @@ test("the countdown keeps its width from two digits to one, so the prompt doesn'
   await page.goto("/");
   await signInAndPick(page, "ck");
   await play(page);
-  const clock = page.getByRole("timer", { name: "Seconds left" });
-  await expect(clock).toHaveText(/^\d\d$/);
+  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
+  await expect(clock).toHaveText(/^\d\d seconds left$/);
   const two = (await clock.boundingBox())!.width;
   await page.clock.fastForward("00:12");
-  await expect(clock).toHaveText(/^\d$/);
+  await expect(clock).toHaveText(/^\d seconds left$/);
   expect(Math.abs((await clock.boundingBox())!.width - two)).toBeLessThan(0.5);
 });
 

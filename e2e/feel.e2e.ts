@@ -78,7 +78,7 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
   // Before the profile loads, the page shows a skeleton of itself.
   const profile = await hold(page, "/api/profile");
   await page.goto("/");
-  await expect(page.getByRole("status", { name: "Loading Plor" })).toBeVisible();
+  await expect(page.locator('[data-loading="Loading Plor"]')).toBeVisible();
   await expect(page.getByText("Loading…")).toHaveCount(0);
   profile();
   await signInAndPick(page, "fs");
@@ -91,19 +91,19 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
   ]) {
     const release = await hold(page, path);
     await nav.getByRole("link", { name: tab }).click();
-    await expect(page.getByRole("status", { name: label })).toBeVisible();
+    await expect(page.locator(`[data-loading="${label}"]`)).toBeVisible();
     await expect(page.getByText("Loading…")).toHaveCount(0);
     release();
-    await expect(page.getByRole("status", { name: label })).toHaveCount(0);
+    await expect(page.locator(`[data-loading="${label}"]`)).toHaveCount(0);
   }
 
   // Today was open before (Next.js keeps a visited page with its data), so its banner's skeleton shows on a fresh load.
   const run = await hold(page, "/api/run");
   await page.goto("/");
-  await expect(page.getByRole("status", { name: "Loading today's puzzle" })).toBeVisible();
+  await expect(page.locator(`[data-loading="Loading today's puzzle"]`)).toBeVisible();
   await expect(page.getByText("Loading…")).toHaveCount(0);
   run();
-  await expect(page.getByRole("status", { name: "Loading today's puzzle" })).toHaveCount(0);
+  await expect(page.locator(`[data-loading="Loading today's puzzle"]`)).toHaveCount(0);
 });
 
 // Every number on the page has same-width digits, and headings and paragraphs wrap evenly, from globals.css's base
@@ -178,7 +178,7 @@ test("comments and reactions show at once, with Undo before they're sent", async
   await kept.getByRole("button", { name: "Delete" }).click();
   await expect(kept).toHaveCount(0);
   await expect(toast).toContainText("Comment deleted");
-  await expect(page.getByRole("status").filter({ hasText: "Your comment wasn't deleted" })).toBeVisible({ timeout: (UNDO_SECONDS + 5) * 1000 });
+  await expect(page.getByRole("alert").filter({ hasText: "Your comment wasn't deleted" })).toBeVisible({ timeout: (UNDO_SECONDS + 5) * 1000 });
   await expect(kept).toBeVisible();
   await page.unroute("**/api/comments/delete");
 
@@ -211,8 +211,8 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   await signInAndPick(page, "fc");
   await play(page);
   const prompt = page.getByRole("heading", { level: 2, name: "Name an animal" });
-  const clock = page.getByRole("timer", { name: "Seconds left" });
-  await expect(clock).toHaveText(/^\d+$/);
+  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
+  await expect(clock).toHaveText(/^\d+ seconds left$/);
   const look = await clock.evaluate((el) => {
     const [mine, theirs] = [getComputedStyle(el), getComputedStyle(document.querySelector("h2")!)];
     return { numbers: mine.fontVariantNumeric, sizes: [mine.fontSize, theirs.fontSize], weight: mine.fontWeight === theirs.fontWeight };

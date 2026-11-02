@@ -21,7 +21,8 @@
   padding: 0 16px;
 }
 
-.toast:empty {
+/* Nothing to say: its two live regions are there, empty (src/app/undo.tsx), and the card isn't drawn. */
+.toast:not(:has(p)) {
   border: 0;
   padding: 0;
 }

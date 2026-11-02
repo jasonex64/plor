@@ -44,7 +44,7 @@ import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
 import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
-import { PageSkeleton } from "./skeleton";
+import { LoadingStatus, PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
 import { useBodyFlag } from "./body-flag";
 import { markSignedIn } from "./signed-in";
@@ -160,35 +160,38 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   const player = me?.signedIn && me.username !== null ? me : null;
   return (
     <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
-      {/* Around the feed's column too, which holds comments (14b-6b). */}
-      <UndoProvider>
-        <Suspense fallback={null}>
-          <FrameParts
-            lost={lost}
-            signedIn={me?.signedIn === true}
-            player={player}
-            timeUp={timeUp}
-            timeUps={timeUps}
-            streakError={streakError}
-            shell={
-              player && (
-                <Shell
-                  lost={lost}
-                  admin={player.admin}
-                  profile={player}
-                  streak={player.streak}
-                  onChanged={loadMe}
-                  // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's
-                  // copy (docs/milestones/M14-14b-2c-review-items.md, item 29).
-                  onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
-                  onSignedOut={() => setMe({ signedIn: false })}
-                />
-              )
-            }
-          />
-        </Suspense>
-        {children}
-      </UndoProvider>
+      {/* The page's one "Loading", for every skeleton in it (src/app/skeleton.tsx). */}
+      <LoadingStatus>
+        {/* Around the feed's column too, which holds comments (14b-6b). */}
+        <UndoProvider>
+          <Suspense fallback={null}>
+            <FrameParts
+              lost={lost}
+              signedIn={me?.signedIn === true}
+              player={player}
+              timeUp={timeUp}
+              timeUps={timeUps}
+              streakError={streakError}
+              shell={
+                player && (
+                  <Shell
+                    lost={lost}
+                    admin={player.admin}
+                    profile={player}
+                    streak={player.streak}
+                    onChanged={loadMe}
+                    // The updater form: a profile reload landing while a setting saves isn't overwritten by this render's
+                    // copy (docs/milestones/M14-14b-2c-review-items.md, item 29).
+                    onSettings={(settings) => setMe((m) => (m?.signedIn && m.username !== null ? { ...m, settings } : m))}
+                    onSignedOut={() => setMe({ signedIn: false })}
+                  />
+                )
+              }
+            />
+          </Suspense>
+          {children}
+        </UndoProvider>
+      </LoadingStatus>
     </FrameContext>
   );
 }

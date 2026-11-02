@@ -98,14 +98,14 @@ test("a refused answer in a test run keeps the countdown going", async ({ browse
   const hosts = fixtureDraft(ahead).questions.map((q) => q.host_answers);
   await admin.goto(`/admin/test/${ahead}?hosts=${encodeURIComponent(JSON.stringify(hosts))}`);
   await admin.getByRole("button", { name: "Start", exact: true }).click();
-  const timer = admin.getByRole("timer", { name: "Seconds left" });
-  await expect(timer).toHaveText("20");
+  const timer = admin.getByRole("timer").filter({ hasText: /seconds left/ });
+  await expect(timer).toHaveText("20 seconds left");
   await admin.clock.fastForward("00:05");
-  await expect(timer).toHaveText("15");
+  await expect(timer).toHaveText("15 seconds left");
   await admin.getByLabel("Your answer").fill("zzqx not a thing");
   await admin.getByRole("button", { name: "Answer" }).click();
   await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
-  expect(Number(await timer.textContent())).toBeLessThanOrEqual(15);
+  expect(parseInt((await timer.textContent())!)).toBeLessThanOrEqual(15);
 });
 
 // 14b-11c (docs/milestones/M14-14b-11c-test-misses-to-audit.md, criterion 4): an answer a test run refuses waits on the
