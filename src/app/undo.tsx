@@ -5,7 +5,7 @@
 // so a held action outlives the section that made it; leaving the page, by another address or by closing the tab,
 // sends it at once (P1).
 import { usePathname } from "next/navigation";
-import { createContext, Suspense, use, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, Suspense, use, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { UNDO_SECONDS } from "@/config/tunables";
 import { createHolder, type Holder, type Toast } from "@/lib/hold";
 import { errorText } from "./messages";
@@ -22,6 +22,36 @@ export function useUndo(): Holder {
 export function UndoProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<Toast>({ held: null, error: null });
   const [holder] = useState(() => createHolder(UNDO_SECONDS * 1000, setToast, errorText));
+  // Each hold draws its line anew, so a live region reads the same words again ("Comment posted" twice)
+  // (docs/milestones/M14-14b-21-screen-readers.md).
+  const [holds, setHolds] = useState(0);
+  const value = useMemo<Holder>(
+    () => ({
+      ...holder,
+      hold: (action) => {
+        setHolds((n) => n + 1);
+        return holder.hold(action);
+      },
+    }),
+    [holder],
+  );
+  // Where the player was before the toast, so Undo and Close put focus back there, or on the page's heading if it's
+  // gone (answers 2 and 5): the last thing focused outside the toast.
+  const toastBox = useRef<HTMLDivElement>(null);
+  const before = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const seen = (event: FocusEvent) => {
+      if (event.target instanceof HTMLElement && !toastBox.current?.contains(event.target)) before.current = event.target;
+    };
+    document.addEventListener("focusin", seen);
+    return () => document.removeEventListener("focusin", seen);
+  }, []);
+  function back(action: () => void) {
+    action();
+    const place = before.current;
+    if (place?.isConnected && place.checkVisibility()) place.focus();
+    else document.querySelector<HTMLElement>("main > h1")!.focus();
+  }
   useEffect(() => {
     const leave = () => holder.flush(true);
     window.addEventListener("pagehide", leave);
@@ -31,34 +61,39 @@ export function UndoProvider({ children }: { children: ReactNode }) {
     };
   }, [holder]);
   return (
-    <UndoContext value={holder}>
+    <UndoContext value={value}>
       {children}
       {/* Reads the address bar, so behind its own Suspense: the frame itself mustn't (src/app/home.tsx, Frame). */}
       <Suspense fallback={null}>
         <SendOnLeaving holder={holder} />
       </Suspense>
-      <div className={styles.place}>
-        {/* Always in the page, so screen readers announce what appears in it (WCAG 2.2, 4.1.3 Status messages). */}
-        <div role="status" className={styles.toast}>
-          {toast.error && (
-            <p className={styles.line}>
-              <span>{toast.error}</span>
-              <button type="button" onClick={holder.dismiss}>
-                Close
-              </button>
-            </p>
-          )}
-          {toast.held && (
-            <p className={styles.line}>
-              <span>
-                {toast.held}
-                <span aria-hidden="true"> ·</span>
-              </span>
-              <button type="button" onClick={holder.undo}>
-                Undo
-              </button>
-            </p>
-          )}
+      <div ref={toastBox} className={styles.place}>
+        {/* Both always in the page, so screen readers announce what appears in them (WCAG 2.2, 4.1.3 Status messages):
+            a failure at once, as an alert; what's held, as a status (answer 3). */}
+        <div className={styles.toast}>
+          <div role="alert">
+            {toast.error && (
+              <p className={styles.line}>
+                <span>{toast.error}</span>
+                <button type="button" onClick={() => back(holder.dismiss)}>
+                  Close
+                </button>
+              </p>
+            )}
+          </div>
+          <div role="status">
+            {toast.held && (
+              <p key={holds} className={styles.line}>
+                <span>
+                  {toast.held}
+                  <span aria-hidden="true"> ·</span>
+                </span>
+                <button type="button" onClick={() => back(holder.undo)}>
+                  Undo
+                </button>
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </UndoContext>

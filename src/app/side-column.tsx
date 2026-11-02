@@ -29,11 +29,19 @@ export function SideColumn({ label, inPlace, className, hidden = false, children
     return div;
   });
   const place = useRef<HTMLDivElement>(null);
+  // What had focus in the box as it moved, focused again once it's in its new place: moving an element drops its focus
+  // (WCAG 2.2 2.4.3; docs/milestones/M14-14b-21-screen-readers.md).
+  const focused = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     const parent = wide ? document.body : place.current;
     if (!parent) return;
     parent.appendChild(box);
-    return () => box.remove();
+    focused.current?.focus();
+    focused.current = null;
+    return () => {
+      if (document.activeElement instanceof HTMLElement && box.contains(document.activeElement)) focused.current = document.activeElement;
+      box.remove();
+    };
   }, [wide, box]);
   if (!wide && !inPlace) return null;
   return (

@@ -405,16 +405,18 @@ function endedText(run: RunState): string {
 }
 
 // Seconds left on the current question, as a number beside the prompt (14b-6c, answer 20), at mockup 3's size with
-// "seconds left" under it (14b-8, answer 11), named so it's read with its meaning. At zero it asks the server again, which decides whether time is up (rule 3); the count itself is
-// only a display.
+// "seconds left" under it (14b-8, answer 11). The words are in the timer's own text for screen readers, which some
+// skip in an aria-label (docs/milestones/M14-14b-21-screen-readers.md). At zero it asks the server again, which decides whether time is up
+// (rule 3); the count itself is only a display.
 function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   return (
     <div className={styles.clockBox}>
-      <p role="timer" aria-label="Seconds left" className={styles.clock}>
+      <p role="timer" className={styles.clock}>
         {seconds}
+        <span className="sr-only"> seconds left</span>
       </p>
-      {/* The timer's own name says this to screen readers. */}
+      {/* Shown under the number; the timer's own text says it to screen readers. */}
       <span aria-hidden="true">seconds left</span>
     </div>
   );
