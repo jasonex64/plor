@@ -1,6 +1,6 @@
 # M14 14b-20 — Comments and Undo
 
-**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-20 as drafted, with \"N too many\" past the limit?"), in review (PR not opened yet). It was drafted from three rounds of guided questions (2026-11-01, Pacific) on the player-facing items left in ROADMAP For M14 after 14b-19. M14 waits for all four groups, one PR each, and this group goes first (answers 1, 2, 4 and 5); 14c-2 follows them.
+**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-20 as drafted, with \"N too many\" past the limit?"), in review (PR #150). It was drafted from three rounds of guided questions (2026-11-01, Pacific) on the player-facing items left in ROADMAP For M14 after 14b-19. M14 waits for all four groups, one PR each, and this group goes first (answers 1, 2, 4 and 5); 14c-2 follows them.
 
 ## Goal
 What a player writes or taps in the feed is never shown as sent and then lost:
