@@ -364,7 +364,8 @@ test("after a time-up away from the game, Me reads its numbers again", async ({ 
   page.on("request", (r) => {
     if (new URL(r.url()).pathname === "/api/me") reads++;
   });
+  // Past the question's 20 seconds on this page's clock: the clock bar's time-up (its own words are shell.e2e.ts's to
+  // check; the server, on its real clock, may still give the question seconds when the bar reads the run again).
   await page.clock.fastForward("00:25");
-  await expect(page.getByRole("region", { name: "Stop in play" })).toContainText("at stop 1");
   await expect.poll(() => reads).toBeGreaterThanOrEqual(1);
 });
