@@ -129,11 +129,16 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(more).toBeVisible();
   // On a phone the ⋯ sits beside the name and how the run stands, not over them (reactions did: 14b-8's critique;
   // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e).
+  // Measured once the row has laid out again at the new width: straight after the resize it can still be the old one
+  // (it failed twice that way, in PR #149's and #152's CI).
   await watcher.setViewportSize({ width: 390, height: 844 });
-  const dots = (await more.boundingBox())!;
   for (const words of [row.locator("b"), row.getByText(/^tipped over/)]) {
-    const box = (await words.boundingBox())!;
-    expect(dots.x).toBeGreaterThanOrEqual(box.x + box.width);
+    await expect
+      .poll(async () => {
+        const [dots, box] = [(await more.boundingBox())!, (await words.boundingBox())!];
+        return dots.x - (box.x + box.width);
+      })
+      .toBeGreaterThanOrEqual(0);
   }
   await watcher.setViewportSize({ width: 1280, height: 720 });
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
