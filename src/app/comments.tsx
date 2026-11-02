@@ -26,6 +26,7 @@ import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
 import { GAME } from "@/platform/game";
+import { COMMENT_MAX_LENGTH } from "@/config/tunables";
 import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
 
@@ -81,6 +82,8 @@ export function Comments({
   const [shownThread, showChange] = useHeldChanges(thread, changed);
   const arrived = useArrived(shownThread?.comments ?? null, shownThread?.date);
   const [draft, setDraft] = useState("");
+  // Why Post did nothing, until the box changes (docs/milestones/M14-14b-20-comments-and-undo.md, answer 6).
+  const [refused, setRefused] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const undo = useUndo();
   // Loads overlap (nudges, "Earlier day", the run ending): only the newest answer is shown (M11 H6).
@@ -122,6 +125,12 @@ export function Comments({
     event.preventDefault();
     if (!thread) return;
     const body = draft.trim();
+    // Stopped here, as the database would refuse it once sent (comment_body_format), so nothing shows and then fails.
+    const length = characters(body);
+    if (length === 0 || length > COMMENT_MAX_LENGTH) {
+      setRefused(length === 0 ? "Write something first" : `${COMMENT_MAX_LENGTH} characters at most`);
+      return;
+    }
     const day = thread.date;
     setDraft("");
     const comment = { id: `${PENDING}-${posted.current++}`, username, name, body, createdAt: new Date().toISOString(), reactions: { counts: [], mine: null } };
@@ -215,8 +224,16 @@ export function Comments({
           <label>
             {/* The feed's box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
             {group ? "Comment" : "Comment to your friends"}
-            <textarea value={draft} required onChange={(e) => setDraft(e.target.value)} />
+            <textarea
+              value={draft}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                setRefused(null);
+              }}
+            />
           </label>
+          <Count text={draft} />
+          {refused && <p role="alert">{refused}</p>}
           <button type="submit" className={`${kit.primary} ${kit.small}`}>
             Post
           </button>
@@ -229,6 +246,21 @@ export function Comments({
       )}
       {error && <p role="alert">{error}</p>}
     </section>
+  );
+}
+
+// Characters as the database counts them (char_length): by code point, so an emoji is one (14b-6b dropped maxLength
+// for counting it as two). Trimmed, as the comment is sent.
+const characters = (text: string) => Array.from(text.trim()).length;
+
+// The count under the box, from 20 left (docs/milestones/M14-14b-20-comments-and-undo.md, answer 9); past the limit, how many too many, in
+// the danger colour. A status, so screen readers hear it without leaving the box (WCAG 2.2, 4.1.3).
+function Count({ text }: { text: string }) {
+  const left = COMMENT_MAX_LENGTH - characters(text);
+  return (
+    <p role="status" className={left < 0 ? `${styles.count} ${styles.over}` : styles.count}>
+      {left <= 20 && (left >= 0 ? `${left} left` : `${-left} too many`)}
+    </p>
   );
 }
 

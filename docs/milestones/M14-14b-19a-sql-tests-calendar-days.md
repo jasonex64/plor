@@ -1,6 +1,6 @@
 # M14 14b-19a — SQL tests move time by Pacific calendar days
 
-**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-19a as drafted?"), in review (PR #149). It was drafted from one round of guided questions (2026-11-01, Pacific) after PR #149's `db` check failed on the day US daylight saving ended. It rides PR #149 as its own commit (answer 1).
+**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-19a as drafted?"), done (PR #149, merged on green CI at the human's "Merge when green", 2026-11-01). It was drafted from one round of guided questions (2026-11-01, Pacific) after PR #149's `db` check failed on the day US daylight saving ended. It rides PR #149 as its own commit (answer 1).
 
 ## Goal
 Every SQL test that moves a time "a day" back or forward moves it by a Pacific calendar day, as the database counts days, so the tests pass on 23- and 25-hour days too.
@@ -93,7 +93,10 @@ Every SQL test that moves a time "a day" back or forward moves it by a Pacific c
   - Two 24-hour shifts left it an hour after the cutoff (the start of yesterday), so it wasn't erased.
   - Two calendar days put it on the cutoff, so it is.
   - Tests 44 and 45 are most likely knock-on failures of those rows staying; they pass with them erased.
-- **Local runs:** none. Docker Desktop isn't running, so the local stack is down.
+- **Local runs**, once the human freed the ports Windows had reserved (`net stop winnat`, `net start winnat`), at 05:36 UTC on 2026-11-02, still the 25-hour day:
+  - `main`'s `load_sync.test.sql` gave `Failed tests: 18-21, 44-45`, `Result: FAIL`.
+  - The fixed one gave `load_sync.test.sql .. ok`, `Result: PASS`.
+  - All SQL tests gave `Files=34, Tests=551`, `Result: PASS`.
 
 ## Review
 - **Reviewer** (`reviewer` agent, fresh context, 2026-11-01):

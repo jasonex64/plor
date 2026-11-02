@@ -27,6 +27,23 @@
   color: var(--text);
 }
 
+/* The count under the box (src/app/comments.tsx, Count), in the composer label's muted 13px; past the limit, the danger
+   colour (docs/milestones/M14-14b-20-comments-and-undo.md, answer 9). Empty, it takes no room. */
+.count {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.count:empty {
+  display: none;
+}
+
+.over {
+  color: var(--danger);
+}
+
 /* Filler, not words: blurred so it reads as hidden text, and aria-hidden so it isn't read out. */
 .filler {
   color: var(--muted);

@@ -19,6 +19,7 @@ import { errorText } from "./messages";
 import kit from "./kit.module.css";
 import styles from "./settings.module.css";
 import { applyTheme } from "./theme";
+import { useUndo } from "./undo";
 
 // Whether a pointer is outside the dialog's own box, on the dimmed page.
 function onBackdrop(dialog: HTMLDialogElement, event: { clientX: number; clientY: number }): boolean {
@@ -348,23 +349,53 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
 }
 
 // Signs out of this device (M12 A3).
+// A post or reaction still held for Undo goes first, as signed out it would fail; if it doesn't go, the player stays
+// signed in and chooses (docs/milestones/M14-14b-20-comments-and-undo.md, answers 7 and 10).
 function SignOut({ onSignedOut }: { onSignedOut: () => void }) {
+  const undo = useUndo();
   const [error, setError] = useState<string | null>(null);
+  const [unsent, setUnsent] = useState(false);
+  // One sign-out at a time: a second tap while the first waits on a send does nothing.
+  const running = useRef(false);
 
-  async function signOut() {
+  async function signOut(withHeld: boolean) {
+    if (running.current) return;
+    running.current = true;
+    setError(null);
+    setUnsent(false);
     try {
+      if (withHeld && !(await undo.sendNow())) {
+        setUnsent(true);
+        return;
+      }
+      if (!withHeld) undo.discard();
       await api("/api/auth/sign-out", { method: "POST" });
       onSignedOut();
     } catch (err) {
       setError(errorText(err));
+    } finally {
+      running.current = false;
     }
   }
 
   return (
     <>
-      <button type="button" className={styles.secondary} onClick={signOut}>
+      <button type="button" className={styles.secondary} onClick={() => void signOut(true)}>
         Sign out
       </button>
+      {unsent && (
+        <div role="alert">
+          <p>Your post didn&apos;t send. Try again, or sign out without it.</p>
+          <p className={kit.chips}>
+            <button type="button" className={kit.small} onClick={() => void signOut(true)}>
+              Try again
+            </button>
+            <button type="button" className={kit.link} onClick={() => void signOut(false)}>
+              Sign out without it
+            </button>
+          </p>
+        </div>
+      )}
       {error && <p role="alert">{error}</p>}
     </>
   );
