@@ -1,6 +1,6 @@
 # M14 14b-21 — Screen readers
 
-**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-21 as drafted, including the test-only network exposure?"), in review (PR not opened yet). It was drafted from two rounds of guided questions (2026-11-01, Pacific). It's the second of the four groups M14 waits for (14b-20, answers 1, 2 and 4), checked by the human with a screen reader on their phone (14b-20, answer 3).
+**Status:** approved (human, 2026-11-01: "Approve, build it", to "Build 14b-21 as drafted, including the test-only network exposure?"), in review (PR #151). It was drafted from two rounds of guided questions (2026-11-01, Pacific). It's the second of the four groups M14 waits for (14b-20, answers 1, 2 and 4), checked by the human with a screen reader on their phone (14b-20, answer 3).
 
 ## Goal
 A screen-reader player is told once that a page is loading, hears a failed send at once, is never dropped at the top of the page after Undo, Delete, Report or the feed moving, and hears each reaction list and the countdown by name.
