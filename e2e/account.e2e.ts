@@ -104,9 +104,10 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
   const friends = inviter.getByRole("region", { name: "Your friends" });
   await expect(friends.getByText("No friends yet. Send someone your invite link.")).toBeVisible();
   const invite = friends.getByRole("region", { name: "Invite friends" });
-  // One button shares the link, made the first time, and the link is never shown (M14 14b-3, criterion 1); Reset sits
-  // beside it once there's a link to reset (answer 8).
-  await expect(invite.getByRole("button", { name: "Reset link" })).toHaveCount(0);
+  // One button shares the link, which is never shown (M14 14b-3, criterion 1); the link is made as soon as the button
+  // shows, so Reset sits beside it from the start (answer 8; docs/milestones/M14-14b-22-settings-and-invites.md,
+  // answer 1).
+  await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();
   const link = await sharedLink(inviter, invite.getByRole("button", { name: "Invite a friend" }));
   expect(link).toMatch(/^http:\/\/localhost:3000\/i\/[A-Za-z0-9_-]{10}$/);
   await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();

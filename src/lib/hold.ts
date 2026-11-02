@@ -27,6 +27,9 @@ export type Holder = {
   sendNow: () => Promise<boolean>;
   // Sign out without it: what's held is undone and what failed is dropped.
   discard: () => void;
+  // A failure from outside the holder, said in the toast's alert with Close: a settings form's refusal that lands after
+  // the sheet closed (docs/milestones/M14-14b-22-settings-and-invites.md, answer 3).
+  fail: (message: string) => void;
   dismiss: () => void;
 };
 
@@ -144,6 +147,10 @@ export function createHolder(
     discard() {
       take()?.settle(false);
       unsent = [];
+      report();
+    },
+    fail(message) {
+      error = message;
       report();
     },
     dismiss() {
