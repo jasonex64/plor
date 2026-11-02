@@ -1,6 +1,6 @@
 # M14 14b-22 — Settings and invites
 
-**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14b-22 as drafted?"), in review (PR not opened yet). It was drafted from one round of guided questions (2026-11-02, Pacific), with 14b-20's answer 8 ("Make the link earlier"). It's the third of the four groups M14 waits for (14b-20, answers 1, 2 and 4).
+**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14b-22 as drafted?"), in review (PR #152). It was drafted from one round of guided questions (2026-11-02, Pacific), with 14b-20's answer 8 ("Make the link earlier"). It's the third of the four groups M14 waits for (14b-20, answers 1, 2 and 4).
 
 ## Goal
 Inviting works on the first tap everywhere, and every invite button shares the same live link. The settings sheet never closes by itself, never flicks a switch back, and never loses a refused name. Your own invite link never says a friend invited you.
