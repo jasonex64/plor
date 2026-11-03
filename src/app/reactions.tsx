@@ -14,13 +14,14 @@ import styles from "./reactions.module.css";
 
 // The reactions used, in the set's order, each with its count: nothing if there are none (answer 2). The player's own is
 // tinted, edged and said to be theirs, so it isn't colour alone (answer 6; WCAG 2.2 1.4.1). below: on a row's second
-// line (kit .below), as under a comment or a friend's run. Kept mounted while there are none, so the first reaction pops.
-export function Reactions({ reactions, below = false }: { reactions: ReactionsData; below?: boolean }) {
+// line (kit .below), as under a comment or a friend's run. name: the group's, for a line whose visible label names it.
+// Kept mounted while there are none, so the first reaction pops.
+export function Reactions({ reactions, below = false, name = "Reactions" }: { reactions: ReactionsData; below?: boolean; name?: string }) {
   const grown = useGrown(reactions);
   if (reactions.counts.length === 0) return null;
   const summary = (
     // Named for screen readers, "Reactions: 😂 1, ❤️ 2" (docs/milestones/M14-14b-21-screen-readers.md, answer 6).
-    <span role="group" aria-label="Reactions" className={styles.summary}>
+    <span role="group" aria-label={name} className={styles.summary}>
       {REACTIONS.filter((emoji) => reactions.counts.some((c) => c.emoji === emoji && c.count > 0)).map((emoji, i) => {
         const count = reactions.counts.find((c) => c.emoji === emoji)!.count;
         const mine = reactions.mine === emoji;

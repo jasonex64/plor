@@ -25,7 +25,7 @@ export function FindPlayer({ players, picked, onPick }: { players: Findable[]; p
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const typed = text.trim().toLowerCase();
-  const matches = typed && text !== pickedName ? players.filter((p) => p.name.toLowerCase().startsWith(typed)) : [];
+  const matches = typed ? players.filter((p) => p.name.toLowerCase().startsWith(typed)) : [];
   const listed = open && matches.length > 0;
 
   function pick(player: Findable | null) {
@@ -35,7 +35,8 @@ export function FindPlayer({ players, picked, onPick }: { players: Findable[]; p
     onPick(player?.key ?? null);
   }
 
-  // A name typed in full is picked as it's typed; anything else clears the pick until a suggestion is taken.
+  // A name typed in full is picked as it's typed, and the list still offers every name it starts ("Al" and "Alice";
+  // docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 3); anything else clears the pick until a suggestion is taken.
   function type(value: string) {
     const exact = players.find((p) => p.name.toLowerCase() === value.trim().toLowerCase()) ?? null;
     setText(value);

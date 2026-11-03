@@ -63,21 +63,34 @@ test("a loading page says Loading once, however many parts load", async ({ page 
 });
 
 test("after Undo focus goes back where the player was, or to the page's heading when that's gone", async ({ page }) => {
+  // On a phone, so the page scrolls: focus moves without scrolling it (docs/milestones/
+  // M14-14b-23-small-jumps-and-finds.md, answer 8).
+  await page.setViewportSize({ width: 390, height: 844 });
+  const scrolled = () => page.evaluate(() => window.scrollY);
   await page.goto("/");
   await signInAndPick(page, "qu");
   await caught(page);
   await post(page, "Undo me.");
   const undo = page.getByRole("button", { name: "Undo" });
   await undo.focus();
+  // At the top, with Post below the screen, so focusing it would scroll.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.getByRole("button", { name: "Post" })).not.toBeInViewport();
   await page.keyboard.press("Enter");
   expect(await focused(page)).toBe("button Post");
+  expect(await scrolled()).toBe(0);
 
   await post(page, "Undo me again.");
   // The Post button gone from the page by the time Undo is pressed.
   await page.getByRole("button", { name: "Post" }).evaluate((b) => b.remove());
   await undo.focus();
+  // Just past the heading, so focusing it would scroll; not to the bottom, which Undo's shorter feed would pull up.
+  await page.evaluate(() => window.scrollTo(0, window.scrollY + document.querySelector("main > h1")!.getBoundingClientRect().bottom + 1));
+  const before = await scrolled();
+  expect(before).toBeGreaterThan(0);
   await page.keyboard.press("Enter");
   expect(await focused(page)).toMatch(/^h1 Plor/);
+  expect(await scrolled()).toBe(before);
 });
 
 test("a failed send is an alert, read at once, and the same words twice are announced twice", async ({ page }) => {

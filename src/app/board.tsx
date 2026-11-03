@@ -124,8 +124,10 @@ export function Board({ username, invite }: { username: string; invite: boolean 
       <LiveStatus channel={channel} />
       {shownBoard?.mine && <WhereEveryoneEnded username={username} mine={shownBoard.mine} friends={shownBoard.friends} />}
       {shownBoard?.reactionsOnMine && shownBoard.reactionsOnMine.counts.length > 0 && (
+        // Read once, as the group's name: "Reactions on your run, 😂 1" (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 6).
         <p>
-          Reactions on your run: <Reactions reactions={shownBoard.reactionsOnMine} />
+          <span aria-hidden>Reactions on your run: </span>
+          <Reactions reactions={shownBoard.reactionsOnMine} name="Reactions on your run" />
         </p>
       )}
       {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}

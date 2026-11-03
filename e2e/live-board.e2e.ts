@@ -140,9 +140,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
       })
       .toBeGreaterThanOrEqual(0);
   }
-  await watcher.setViewportSize({ width: 1280, height: 720 });
+  // Each row opens by a 44px summary, at both widths (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4).
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
+  expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await watcher.setViewportSize({ width: 1280, height: 720 });
   await expect(place).toHaveCount(1);
+  expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await expect(place.locator("summary")).toHaveText(`Tipped over at stop 1: You, ${playerName}`);
   await place.locator("summary").click();
   await expect(place.getByRole("listitem")).toHaveText(["You", playerName]);
@@ -168,6 +171,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Two taps on one row are one held action: only the last is sent (docs/milestones/M14-14b-6-feel-and-polish.md, P2).
   await sent(watcher, "/api/reactions");
   await expect(player.getByText("Reactions on your run: ❤️ 1")).toBeVisible();
+  // Read once: "Reactions on your run, ❤️ 1"; a friend's row keeps "Reactions" (14b-23, answer 6).
+  const mineRead = player.getByRole("region", { name: "Friends today" }).getByRole("paragraph").filter({ hasText: "Reactions on your run" });
+  await expect(mineRead).toMatchAriaSnapshot(`- paragraph:\n  - group "Reactions on your run": ❤️ 1`);
+  await expect(row.getByRole("group", { name: "Reactions", exact: true })).toBeVisible();
   await pick("❤️");
   await expect(row.getByText(/^❤️/)).toHaveCount(0);
   await sent(watcher, "/api/reactions");

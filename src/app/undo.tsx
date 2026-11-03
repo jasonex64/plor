@@ -49,8 +49,9 @@ export function UndoProvider({ children }: { children: ReactNode }) {
   function back(action: () => void) {
     action();
     const place = before.current;
-    if (place?.isConnected && place.checkVisibility()) place.focus();
-    else document.querySelector<HTMLElement>("main > h1")!.focus();
+    // Without scrolling, so the page stays where the player was (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 8).
+    if (place?.isConnected && place.checkVisibility()) place.focus({ preventScroll: true });
+    else document.querySelector<HTMLElement>("main > h1")!.focus({ preventScroll: true });
   }
   useEffect(() => {
     const leave = () => holder.flush(true);
