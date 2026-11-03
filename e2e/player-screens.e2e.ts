@@ -151,7 +151,7 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await caught(page);
   await page.goto("/");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/updraft#result$/);
+  await expect(page).toHaveURL(/\/play#result$/);
   await expect(page.locator("#result")).toBeVisible();
   const at = () =>
     page.evaluate(() => ({

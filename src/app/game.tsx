@@ -1,6 +1,6 @@
 "use client";
 
-// Offbeat's run (docs/milestones/M14-14a-2b-game-screen.md): on its game screen, /offbeat, the rules and Start, then
+// The game's run (docs/milestones/M14-14a-2b-game-screen.md): on its game screen, GAME.path, the rules and Start, then
 // one question at a time, answered by typing (no list, no suggestions: the server reads the text; human, 2026-10-21),
 // a free retry for text that names no entry, 20 seconds per question, a reveal after each answer that waits for Next,
 // points as you go, and a result with how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). On

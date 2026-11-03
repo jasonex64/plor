@@ -100,7 +100,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
 
   for (const viewport of [PHONE, WIDE]) {
     await page.setViewportSize(viewport);
-    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/updraft", "/admin/puzzles", "/admin/insights"]) {
+    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/play", "/admin/puzzles", "/admin/insights"]) {
       await page.goto(path);
       // Measured once every section has loaded: no skeleton left, and the page's own small controls on screen.
       await expect(page.locator("[data-loading]")).toHaveCount(0);

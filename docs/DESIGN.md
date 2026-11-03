@@ -48,7 +48,7 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 68-70 |
 | A row's second line (`.below`) | 6px gap, 6px above | 97-103 |
 | Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 107-125 |
-| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: Updraft's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:60`) | 147-155 |
+| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: the game screen's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:60`) | 147-155 |
 | Badge | 24px round, ink fill, 12px 800; the first in the accent | 157-182 |
 | Main button (`.primary`) | 0 18px, accent fill, 17px | 188-194 |
 | Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 198-204 |

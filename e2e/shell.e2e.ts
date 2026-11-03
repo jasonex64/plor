@@ -168,13 +168,13 @@ test("a question in play is still there after a visit to another tab", async ({ 
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/updraft");
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
 // Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
 // and links to the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6; 14a-2b moved the game to
-// /updraft). The clock is faked so zero comes at once.
+// /play). The clock is faked so zero comes at once.
 test("away from the game screen, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
   await page.clock.install();
@@ -189,7 +189,7 @@ test("away from the game screen, a question in play shows its clock above the ta
   await nav.getByRole("link", { name: "Friends" }).click();
 
   await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
-  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/updraft");
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/play");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
@@ -202,7 +202,7 @@ test("away from the game screen, a question in play shows its clock above the ta
   // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
   await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
-  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/updraft#result");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/play#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {
@@ -328,7 +328,7 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   expect(await underlined(), "the settings sheet").toEqual([]);
   await page.keyboard.press("Escape");
 
-  for (const path of ["/updraft/how-to-play", "/streak"]) {
+  for (const path of ["/play/how-to-play", "/streak"]) {
     await page.goto(path);
     await expect(nav).toBeVisible();
     await page.waitForLoadState("networkidle");

@@ -48,7 +48,7 @@ test("the result comes into view when Result is tapped, and not again by itself 
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Result" }).click();
   const result = page.locator("#result");
   await expect(result).toBeInViewport();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
 
   // Scrolled back up, away and back: the game page shown again stays where it was.
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -63,7 +63,7 @@ test("the result comes into view when Result is tapped, and not again by itself 
   // otherwise add it, and Back would bring the jump back).
   await page.getByRole("main").getByRole("link", { name: "Result" }).click();
   await expect(result).toBeInViewport();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
 });
 
 test("a time-up on the Friends tab reloads the board alone (answer 7)", async ({ browser }) => {

@@ -67,7 +67,7 @@ export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: numbe
         </dl>
       </section>
       <Calendar month={me.month} numbers={numbers} />
-      {/* The game's card, its numbers as chips (mockup 3's "Your Updraft"); plain since 14b-15 (answer 7). */}
+      {/* The game's card, its numbers as chips (mockup 3's "Your <game>" card); plain since 14b-15 (answer 7). */}
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
           {/* The game's plain block beside its name. */}

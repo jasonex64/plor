@@ -111,7 +111,7 @@ async function flip(page: Page, name: string, on: boolean) {
 test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
   await page.goto("/");
   const banner = page.getByRole("region", { name: GAME.name });
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/updraft");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
   await expect(banner).not.toContainText("20 seconds each");
 
   await flip(page, "Skip the game screen", true);
@@ -121,7 +121,7 @@ test("Skip the game screen makes Play start question 1, and says the time limit 
   await expect(banner.getByText("20 seconds each", { exact: true })).toBeVisible();
   await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
   await banner.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 

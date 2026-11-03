@@ -159,12 +159,12 @@ function YourOffbeat({ stats }: { stats: Stats }) {
         <div className={kit.stat}>
           <dt>day streak</dt>
           <dd>
-            <CountUp name="updraft.streak" value={stats.streak} />
+            <CountUp name="offbeat.streak" value={stats.streak} />
           </dd>
         </div>
         <div className={kit.stat}>
           <dt>best score</dt>
-          <dd>{stats.best === null ? "–" : <CountUp name="updraft.best" value={stats.best} />}</dd>
+          <dd>{stats.best === null ? "–" : <CountUp name="offbeat.best" value={stats.best} />}</dd>
         </div>
         <div className={kit.stat}>
           <dt>avg. survived</dt>

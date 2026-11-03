@@ -1,6 +1,6 @@
 # M14 14c-2 — Neutral words: the host again, no Wind
 
-**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR #154). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
+**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR #154); round 4's rename built and reviewed after the PR opened (one blocking item, this Evidence). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
 
 ## Goal
 The game speaks in plain words again, those it had before 14c-1, and nothing in the code or the forward-looking docs names the Wind or the climb. The human can then design the game from scratch in another session without being steered.
@@ -25,7 +25,7 @@ Round 1:
 
 Round 2:
 
-6. The name: "we dont need to change it as long as calude isnt influenced by it when desingin from scratch". So "Updraft" and `/updraft` stay, as a working name the docs say carries no theme.
+6. The name: "we dont need to change it as long as calude isnt influenced by it when desingin from scratch". So "Updraft" and `/updraft` stayed, as a working name; round 4 replaced them (answers 12 and 13).
 7. Stolen letters: "No one takes them (Recommended)" ("\"Letters taken: E\", \"Next question: E is taken\", \"One of those letters is taken. Try another answer.\" Fully neutral; nothing to rename when your design names a character.").
 8. The reach: "All current code and pages (Recommended)" ("Player screens, admin pages, comments and tests in src/ and e2e/. Applied migrations and the content bank's history stay untouched.").
 9. The banner: "Keep the navy, plain comment (Recommended)".
@@ -35,12 +35,18 @@ Round 3:
 10. The share line: "Exactly as before 14c-1 (Recommended)" ("🟩 for each question got past, ⬜ for the rest.").
 11. The two claude.ai pages ("Updraft Pixel Fonts", "Updraft Play Screen"): "Unlink, keep them (Recommended)". The repo stops pointing at them; deleting them stays the human's to do.
 
+Round 4 (2026-11-02, after PR #154 opened; the human: "wait can we delete the name updraft too or is that too hoard"):
+
+12. The name: "game number 1" (written "Game number 1", as it starts headings such as "Game number 1 comments").
+13. The address: "/play (Recommended)" ("Short, neutral, and fits any name the design picks later. /updraft then answers 404, as /offbeat does now.").
+14. Where: "Into #154 (Recommended)" ("Same ticket and PR, before it merges: one merge leaves main fully neutral for your new session.").
+
 ## Source
 - **The words before 14c-1:** the code at `a504b56^1`, the commit before 14c-1's merge. Its words table (`docs/milestones/M14-14c-1-name-and-words.md`, "The words", column "Today") lists them. This is the source for every reverted line, How to play and the home page's introduction included.
 - **The share line:** M05 S1 as built before 14c-1 (`src/game/share.ts` at `a504b56^1`): 🟩 per question survived, ⬜ for the rest, then `n/7`.
 - **The stolen letters' words:** answer 7.
 - **Kept, not changed:**
-  - the name record (`src/platform/game.ts`, 14b-4): "Updraft", `/updraft`, ID `offbeat` (answer 6);
+  - the name record's ID (`src/platform/game.ts`, 14b-4): `offbeat`, which never changes; its name and address are answers 12 and 13;
   - the game's mechanics (M04): 7 questions, 20 seconds, stolen letters on 2, 4, 5 and 7, the rarity bonus.
 
 ## Acceptance criteria
@@ -58,13 +64,14 @@ Round 3:
   - the reveal reads "Next question: E is taken";
   - the refusal reads "One of those letters is taken. Try another answer.";
   - the admin's puzzle page gives the reason without the Wind.
-- [ ] **The share line (answer 10):** `Updraft · Nov 2`, then 🟩 for each question survived and ⬜ for the rest, then `3/7`.
-- [ ] **Unchanged (answers 6 and 9):** the name, the address, the navy banner, the mechanics. Only the navy's comment changes.
+- [ ] **The share line (answer 10):** `Game number 1 · Nov 2`, then 🟩 for each question survived and ⬜ for the rest, then `3/7`.
+- [ ] **The name and the address (answers 12 and 13):** the game is "Game number 1" at `/play`; `/updraft` and `/offbeat` answer 404, with no redirect (as 14c-1 left `/offbeat`); the ID stays `offbeat`. No "Updraft" or `updraft` is left in `src/` or `e2e/`.
+- [ ] **Unchanged (answer 9):** the navy banner and the mechanics. Only the navy's comment changes.
 - [ ] **Docs (answers 4 and 11):**
   - deleted: the old 14c-2 draft (`docs/milestones/M14-14c-2-the-game-world.md`), and the world notes in `docs/milestones/M14-look-and-feel.md`, ROADMAP's Product section and M14 row, HANDOFF, DECISIONS.md's standing rows and DESIGN.md;
   - 14c-1's ticket gets a one-line note that its words were reverted here;
   - the two claude.ai pages' links are gone;
-  - HANDOFF says "Updraft" is a working name that carries no theme for the design.
+  - HANDOFF says "Game number 1" and `/play` are a working name and address that carry no theme for the design.
 - [ ] **Checks:**
   - the unit and e2e tests these touch pass, updated to the plain words;
   - types and lint clean;
@@ -72,7 +79,7 @@ Round 3:
 
 ## Out of scope
 - **The game's new design:** the human's next session, from scratch.
-- **The name and the address:** kept (answer 6).
+- **The game's real name:** the design session's (answer 12 is a working name).
 - **Merged tickets' history:** kept, with 14c-1's one-line note (answer 4).
 - **Applied migrations and the content bank:** answer 8.
 - **The two claude.ai pages:** the human deletes them if they want (answer 11).
@@ -101,6 +108,7 @@ None. The revert removes the tier bands (stops 1–2, 3–5, 6–7, 14c-1's) and
 - The climb's words everywhere in `src/` and `e2e/`.
 - The share's 🟪, 💨 and ❄️.
 - The old 14c-2 draft ticket.
+- The name "Updraft" and the address `/updraft` (round 4), and the route folder `src/app/(shell)/updraft/` (now `play/`).
 - The world notes in the forward-looking docs.
 
 ---
@@ -118,6 +126,8 @@ None. The revert removes the tier bands (stops 1–2, 3–5, 6–7, 14c-1's) and
 | The blocked-key note ("The Wind took E") had no answer of its own | "E is taken. Try a word without it." | Answer 7's "taken" |
 | Comments naming 14c's coming look ("until 14c's pixel world", "until 14c's art", "the game's own look comes with 14c", "the ridge's navy") | Removed; the navy's comment says "a navy with white text" (answer 9) | Answer 1: "any sort of mention of how the game will be designed" |
 | Answer 4: the world notes out of the forward-looking docs | Out of HANDOFF, ROADMAP (the Product section, the M04 and M14 rows), the M14 ticket, DECISIONS.md's two standing rows and DESIGN.md. Kept: DECISIONS.md's Log rows of 2026-10-21 and 2026-10-25 (dated history), and the M14 ticket's L26, which quotes the streak's candidates ("a ridge flag") | Answer 4 keeps history; L26 records the streak's decision, not the game's |
+| Answer 12: "game number 1" | "Game number 1" | It starts headings and names ("Game number 1 comments", "Today's game: Game number 1"), as the record's name always has |
+| 14b-10b's count-up keys named the game (`plor.shown.updraft.streak`, `.best`) | Keyed on the ID: `plor.shown.offbeat.streak`, `.best` | The ID never changes, so a later rename leaves them alone. A browser that already showed the numbers misses one count-up and keeps two unused entries; harmless while the app is local-only |
 | The 14b-* words made after 14c-1 | "Question in play", "Yesterday's answers", "the host's answers"; an e2e comment's "Bear, first stop." is "Bear, first question." | The plan's step 2 |
 
 ## Evidence
@@ -145,6 +155,12 @@ grep -rniE "wind([^o]|$)|ridge|stops?|stop [0-9N]|climb|steady|holding on|stil
   - `me.e2e.ts:109` ("20% gave this", got 17%) and `offbeat.e2e.ts:97` (yesterday's answer search) still fail locally.
 - **The three failures on 2 Nov aren't this change's.** Hypothesis: the local stack's 2026-11-02 holds the phone test's leftover day (HANDOFF already says so), so yesterday isn't the tests' own. Checked: `private.puzzle` has a fixture day on 2026-11-02 that `offbeat.e2e.ts` didn't add, with one run by a gmail.com account and one answer; one extra answer makes 1 of 5 into 1 of 6 (17%) and the db test's 6 of 6 into 6 of 7 (0.857). None of these tests reads a word this change touched (`me/route.db.test.ts` only renames `fullClimbs`). Proof waits on CI's fresh database; the local day is the human's test account's, so it isn't deleted without their word.
 
+**Round 4, the rename (2026-11-03, Pacific night):**
+- `grep -rniI "updraft" src e2e`: three lines, each naming the old address as gone: the 404 test's name and its `["/offbeat", "/updraft"]` (`e2e/offbeat.e2e.ts:166-167`) and `not-found.tsx`'s comment on old links.
+- `npx tsc --noEmit -p .` (after deleting `.next/dev` and `npx next typegen` for the moved route) and `npx eslint src e2e`: clean. `npx vitest run --exclude "**/*.db.test.ts"`: 48 files, 500 passed.
+- `npx playwright test` (the whole suite): 144 passed, 4 failed (18.3 min): `me.e2e.ts:109` and `offbeat.e2e.ts:97` (the 2 Nov local data above; both passed on PR #154's CI, whose `db` job also passed), `controls-and-state.e2e.ts:355` and `player-screens.e2e.ts:51`. Rerun: `npx playwright test e2e/controls-and-state.e2e.ts:355 e2e/player-screens.e2e.ts:51 e2e/screen-readers.e2e.ts e2e/offbeat.e2e.ts:166 e2e/not-found.e2e.ts`: 14 passed, among them "the old addresses /offbeat and /updraft answer 404" and `/play/nope`'s 404.
+- **PR #154's CI** at `39047e6`: `check`, `db` and `secrets` passed, and one of its two `e2e` runs passed. The other failed once in `screen-readers.e2e.ts:96`, which read focus straight after Enter on Close and got "button Close". It now polls for the Friends tab (`expect.poll`), and the file passed whole on the rerun above; the file's five other reads of that kind are in ROADMAP.
+
 ## Review
 The `reviewer` agent (medium effort), on the uncommitted diff.
 - Blocking findings and how each was fixed:
@@ -153,3 +169,7 @@ The `reviewer` agent (medium effort), on the uncommitted diff.
   - The Evidence was empty: filled in above.
 - Also fixed, as climb wording this ticket's goal rules out or a slip of this change: `board.tsx`'s chip comment ("safe at the top"), `settings.e2e.ts`'s "Caught on the question 1", and the question card comment's width.
 - Deferred to ROADMAP "Next revision": the share's placeholder symbols are open again for the game's design; DESIGN.md's `offbeat.tsx:214` citation, one line off since before this change.
+
+The `reviewer` agent again (medium effort), on round 4's rename.
+- Blocking findings and how each was fixed: no Evidence for the new criterion, and a Status line and HANDOFF that called the PR reviewed before the rename was: the Evidence above, and both lines updated.
+- Also fixed: `not-found.tsx`'s comment names `/updraft` too, `game.tsx`'s header no longer says `/offbeat`, and the Source diff has the capital G and the count-up keys.
