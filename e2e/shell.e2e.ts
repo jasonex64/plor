@@ -102,6 +102,37 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   });
 });
 
+// A control scrolled to, by the keyboard's focus or a script, stops above the tab bar, not under it (WCAG 2.2 2.4.11;
+// docs/milestones/M14-14c-2-neutral-words.md, answer 15): a tap there reached the Groups tab (PR #154's CI).
+test("on a phone, a control scrolled into view stops above the tab bar", async ({ browser }) => {
+  // A small phone (iPhone SE, 320 by 568: the 320px reflow floor), where Reset starts below the screen.
+  const { page, nav } = await player(browser, "tx", { width: 320, height: 568 });
+  await nav.getByRole("link", { name: "Friends" }).click();
+  const reset = page.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Reset link" });
+  await expect(reset).toBeVisible();
+  const bar = (await nav.boundingBox())!.y;
+  const bottom = async () => {
+    const box = (await reset.boundingBox())!;
+    return box.y + box.height;
+  };
+  // Resting on the screen's bottom edge, under the bar, as the CI run's tap found it: in the viewport, so a scroll "if
+  // needed" saw no need. Set up, scrolled and measured again until one go holds: the page can still be growing as its
+  // parts load (a go that didn't start under the bar counts as a miss). Without the fix every go ends under it.
+  const height = page.viewportSize()!.height;
+  for (const scroll of [() => reset.focus(), () => reset.scrollIntoViewIfNeeded()]) {
+    await expect
+      .poll(async () => {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.evaluate((by) => window.scrollBy(0, by), (await bottom()) - height);
+        const before = await bottom();
+        await reset.blur();
+        await scroll();
+        return before > bar && before <= height + 1 ? await bottom() : Infinity;
+      })
+      .toBeLessThanOrEqual(bar);
+  }
+});
+
 test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ browser }) => {
   for (const viewport of [
     { width: 768, height: 1024 },

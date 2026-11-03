@@ -1,6 +1,6 @@
 # M14 14c-2 — Neutral words: the host again, no Wind
 
-**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR #154); round 4's rename built and reviewed after the PR opened (one blocking item, this Evidence). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
+**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR #154); round 4's rename built and reviewed after the PR opened (one blocking item, this Evidence); round 5's fix for controls scrolled under the phone tab bar built and reviewed (two blocking items: a player name another file used, and this Status line and the ROADMAP row). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
 
 ## Goal
 The game speaks in plain words again, those it had before 14c-1, and nothing in the code or the forward-looking docs names the Wind or the climb. The human can then design the game from scratch in another session without being steered.
@@ -41,6 +41,10 @@ Round 4 (2026-11-02, after PR #154 opened; the human: "wait can we delete the na
 13. The address: "/play (Recommended)" ("Short, neutral, and fits any name the design picks later. /updraft then answers 404, as /offbeat does now.").
 14. Where: "Into #154 (Recommended)" ("Same ticket and PR, before it merges: one merge leaves main fully neutral for your new session.").
 
+Round 5 (2026-11-03; PR #154's e2e failed at `2d1b786` in two tests 14c-2 doesn't touch, and the session stopped and asked):
+
+15. "Fix the tab bar overlap" (offered as: "Add room for the tab bar when the page scrolls to an element, on phones, so the tap reaches the button. This changes the shell, not just a test. I'd also add trace uploads to CI so I can see why the screen-reader test fails there."). The trace upload was left out: see the Source diff.
+
 ## Source
 - **The words before 14c-1:** the code at `a504b56^1`, the commit before 14c-1's merge. Its words table (`docs/milestones/M14-14c-1-name-and-words.md`, "The words", column "Today") lists them. This is the source for every reverted line, How to play and the home page's introduction included.
 - **The share line:** M05 S1 as built before 14c-1 (`src/game/share.ts` at `a504b56^1`): 🟩 per question survived, ⬜ for the rest, then `n/7`.
@@ -66,6 +70,7 @@ Round 4 (2026-11-02, after PR #154 opened; the human: "wait can we delete the na
   - the admin's puzzle page gives the reason without the Wind.
 - [ ] **The share line (answer 10):** `Game number 1 · Nov 2`, then 🟩 for each question survived and ⬜ for the rest, then `3/7`.
 - [ ] **The name and the address (answers 12 and 13):** the game is "Game number 1" at `/play`; `/updraft` and `/offbeat` answer 404, with no redirect (as 14c-1 left `/offbeat`); the ID stays `offbeat`. No "Updraft" or `updraft` is left in `src/` or `e2e/`.
+- [ ] **Nothing scrolled to hides under the tab bar (answer 15; WCAG 2.2 2.4.11, Level AA, SOURCES.md):** on a phone, a control the page scrolls to by focus or a script while it rests under the tab bar ends above it, with the room the shell already leaves (`--room-bottom`, 64px, 112px with the clock bar; 0 from 768px). `e2e/shell.e2e.ts` checks it, red without the fix.
 - [ ] **Unchanged (answer 9):** the navy banner and the mechanics. Only the navy's comment changes.
 - [ ] **Docs (answers 4 and 11):**
   - deleted: the old 14c-2 draft (`docs/milestones/M14-14c-2-the-game-world.md`), and the world notes in `docs/milestones/M14-look-and-feel.md`, ROADMAP's Product section and M14 row, HANDOFF, DECISIONS.md's standing rows and DESIGN.md;
@@ -109,6 +114,7 @@ None. The revert removes the tier bands (stops 1–2, 3–5, 6–7, 14c-1's) and
 - The share's 🟪, 💨 and ❄️.
 - The old 14c-2 draft ticket.
 - The name "Updraft" and the address `/updraft` (round 4), and the route folder `src/app/(shell)/updraft/` (now `play/`).
+- `body`'s own `--room-bottom` declarations (round 5): the value lives on `<html>` once, for both the padding and the scroll padding.
 - The world notes in the forward-looking docs.
 
 ---
@@ -128,6 +134,8 @@ None. The revert removes the tier bands (stops 1–2, 3–5, 6–7, 14c-1's) and
 | Answer 4: the world notes out of the forward-looking docs | Out of HANDOFF, ROADMAP (the Product section, the M04 and M14 rows), the M14 ticket, DECISIONS.md's two standing rows and DESIGN.md. Kept: DECISIONS.md's Log rows of 2026-10-21 and 2026-10-25 (dated history), and the M14 ticket's L26, which quotes the streak's candidates ("a ridge flag") | Answer 4 keeps history; L26 records the streak's decision, not the game's |
 | Answer 12: "game number 1" | "Game number 1" | It starts headings and names ("Game number 1 comments", "Today's game: Game number 1"), as the record's name always has |
 | 14b-10b's count-up keys named the game (`plor.shown.updraft.streak`, `.best`) | Keyed on the ID: `plor.shown.offbeat.streak`, `.best` | The ID never changes, so a later rename leaves them alone. A browser that already showed the numbers misses one count-up and keeps two unused entries; harmless while the app is local-only |
+| Answer 15's trace upload to CI | Not built | The repo is public, and a Playwright trace holds every request, the CI stack's publishable key included, which the e2e job masks in its log (`.github/workflows/ci.yml`); publishing it unmasked is a change to secret handling, which needs the human (CLAUDE.md, Security). In ROADMAP for their call |
+| WCAG 2.4.11 asks that a focused control isn't entirely hidden | `scroll-padding-bottom: var(--room-bottom)` on `<html>`, where `--room-bottom` now lives (body inherits it); a scroll by script stops above the bar too | One value for the room, read by the padding, the scroll padding and the Undo toast; a tap on a control the test scrolled to reached the Groups tab behind it |
 | The 14b-* words made after 14c-1 | "Question in play", "Yesterday's answers", "the host's answers"; an e2e comment's "Bear, first stop." is "Bear, first question." | The plan's step 2 |
 
 ## Evidence
@@ -161,6 +169,12 @@ grep -rniE "wind([^o]|$)|ridge|stops?|stop [0-9N]|climb|steady|holding on|stil
 - `npx playwright test` (the whole suite): 144 passed, 4 failed (18.3 min): `me.e2e.ts:109` and `offbeat.e2e.ts:97` (the 2 Nov local data above; both passed on PR #154's CI, whose `db` job also passed), `controls-and-state.e2e.ts:355` and `player-screens.e2e.ts:51`. Rerun: `npx playwright test e2e/controls-and-state.e2e.ts:355 e2e/player-screens.e2e.ts:51 e2e/screen-readers.e2e.ts e2e/offbeat.e2e.ts:166 e2e/not-found.e2e.ts`: 14 passed, among them "the old addresses /offbeat and /updraft answer 404" and `/play/nope`'s 404.
 - **PR #154's CI** at `39047e6`: `check`, `db` and `secrets` passed, and one of its two `e2e` runs passed. The other failed once in `screen-readers.e2e.ts:96`, which read focus straight after Enter on Close and got "button Close". It now polls for the Friends tab (`expect.poll`), and the file passed whole on the rerun above; the file's five other reads of that kind are in ROADMAP.
 
+**Round 5, the tab bar overlap (2026-11-03):**
+- **Cause, from the CI failure's local repeat** (`npx playwright test e2e/settings-and-invites.e2e.ts:38 --repeat-each 3`: 2 failed): its trace's tap on Reset link was at (197.96, 822.21) in a 390 by 844 page, inside the 64px tab bar, on Groups, and the page ended on `/groups`. Playwright's log: "element is visible, enabled and stable", "click action done". Not the rename: with the name set back to "Updraft" it failed 1 of 4.
+- **Red:** `npx playwright test e2e/shell.e2e.ts -g "stops above the tab bar"` with HEAD's `globals.css`: `Expected: <= 504`, `Received: 568.4375` (Reset left resting under the bar). **Green** with the fix: `--repeat-each 5`, 5 passed.
+- `npx playwright test e2e/settings-and-invites.e2e.ts:38 --repeat-each 6`: 6 passed. `npx playwright test e2e/shell.e2e.ts e2e/screen-readers.e2e.ts e2e/calm.e2e.ts e2e/comments-and-undo.e2e.ts`: 23 passed, 1 failed, `shell.e2e.ts:209`'s time-up ("Question 1 · 14s left" after a faked 21 s): the fake-clock flake ROADMAP has. HEAD's `globals.css` fails it too: `--repeat-each 8`, 2 failed, 6 passed.
+- **Still open:** `screen-readers.e2e.ts:96` kept focus on Close for 5 s in 2 of 3 CI runs at `39047e6` and `2d1b786`, polling or not, and passes every time locally (whole file, twice). With no trace from CI its cause is unknown; in ROADMAP.
+
 ## Review
 The `reviewer` agent (medium effort), on the uncommitted diff.
 - Blocking findings and how each was fixed:
@@ -173,3 +187,7 @@ The `reviewer` agent (medium effort), on the uncommitted diff.
 The `reviewer` agent again (medium effort), on round 4's rename.
 - Blocking findings and how each was fixed: no Evidence for the new criterion, and a Status line and HANDOFF that called the PR reviewed before the rename was: the Evidence above, and both lines updated.
 - Also fixed: `not-found.tsx`'s comment names `/updraft` too, `game.tsx`'s header no longer says `/offbeat`, and the Source diff has the capital G and the count-up keys.
+
+The `reviewer` agent a third time (medium effort), on round 5's tab bar fix. It ran the new test red itself (`html { scroll-padding-bottom: 0 !important }` injected: `before=568.4375 after=568.4375`, bar 504) and green (3 passed).
+- Blocking findings and how each was fixed: the new test's player "tg" was `today.e2e.ts`'s too (`npx vitest run e2e/players.test.ts` failed): now "tx", and the check passes; this Status line and the ROADMAP row didn't name round 5: both do now.
+- Deferred to ROADMAP "Next revision": nothing keeps a control scrolled up to (Shift+Tab) from under the 56px top bar on phones or the 48px clock bar from 768px; the comment's "the bars" now says the tab bar and the clock bar at the foot.
