@@ -238,6 +238,25 @@ test("the Friends leaderboard switches to each week's race; a tap or Find picks 
   await expect(page.getByRole("region", { name: "Leaderboard" }).getByRole("radio", { name: "Graph" })).toHaveCount(0);
 });
 
+// With Cleo shown as "Be", typing "Be" picks Be and still lists Bea and Ben (docs/milestones/
+// M14-14b-23-small-jumps-and-finds.md, answer 3).
+test("a name typed in full that starts others picks it and still lists them all", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: PHONE })).newPage();
+  await withFriends(page, "gf");
+  await DB.query("update private.profile set display_name = 'Be' where username = $1", [`gfcleo${RUN}`]);
+  await page.reload();
+  await board(page).getByRole("radiogroup", { name: "View" }).getByText("Graph", { exact: true }).click();
+  const find = board(page).getByRole("combobox", { name: "Find a player" });
+  await find.fill("Be");
+  const last = week(page, "Last week").getByRole("img");
+  await expect.poll(() => texts(last)).toContain("Be 21");
+  const list = board(page).getByRole("listbox", { name: "Players" });
+  await expect.poll(async () => (await list.getByRole("option").allTextContents()).sort()).toEqual(["Be", "Bea", "Ben"]);
+  await list.getByRole("option", { name: "Bea" }).click();
+  await expect(find).toHaveValue("Bea");
+  await expect.poll(() => texts(last)).toContain("Bea 12");
+});
+
 test("a day the viewer is still playing is flat, struck through and noted, and '–' in the table (answer 28)", async ({ browser }) => {
   test.slow();
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();

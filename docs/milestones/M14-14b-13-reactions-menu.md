@@ -68,7 +68,7 @@ Earlier answers this ticket keeps: 14b-10's answer 18 ("the ⋯ menu sub-ticket 
 ## Out of scope
 - The APG example's optional arrow, Home and End keys. Tab and Escape cover the pattern, and the admin menu doesn't use them either.
 - Who reacted (names). M08 doesn't show them and nothing stores them for display.
-- The "Reactions on your run" line on your own board row. It's already this summary's text form and stays as it is (your own run has no ⋯).
+- The "Reactions on your run" line on your own board row: it has no ⋯ (your own run). *(Corrected in 14b-23, `docs/milestones/M14-14b-23-small-jumps-and-finds.md`, answer 5: it took this summary's look, and keeps it.)*
 - The leaderboard's graph view (next sub-ticket, its own questions).
 
 ## Numbers

@@ -63,8 +63,9 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(banner.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/updraft#result$/);
-  await expect(page.locator("#result")).toBeVisible();
+  // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
+  await expect(page.locator("#result")).toBeInViewport();
+  await expect(page).toHaveURL(/\/updraft$/);
 });
 
 // Criterion 3.

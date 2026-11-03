@@ -606,12 +606,13 @@ function Friends({ username, timeUps }: { username: string; timeUps: number }) {
     return () => clearTimeout(timer);
   }, [reset]);
 
-  // The boards start again when the clock bar's time runs out too: how friends' runs ended shows once the player's is
-  // over (src/friends/board.ts).
+  // The board starts again when the clock bar's time runs out too: how friends' runs ended shows once the player's is
+  // over (src/friends/board.ts). Nothing else on the tab changes then, so only the board does (docs/milestones/M14-14b-23-small-jumps-and-finds.md,
+  // answer 7).
   return (
-    <Fragment key={`${day}-${timeUps}`}>
+    <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
-      <Board username={username} invite={false} />
+      <Board key={timeUps} username={username} invite={false} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
       <FriendsList />
     </Fragment>

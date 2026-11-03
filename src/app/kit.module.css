@@ -64,6 +64,24 @@
   background: var(--surface);
 }
 
+/* A row that opens (the board's "Where everyone ended"): its summary is the whole row, 44px tall for one line, the
+   controls' height (docs/DESIGN.md; docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4). */
+.row:has(> details) {
+  padding-block: 0;
+}
+
+.row > details {
+  flex: 1;
+}
+
+.row > details > summary {
+  padding-block: calc((44px - 1lh) / 2);
+}
+
+.row > details[open] {
+  padding-bottom: 8px;
+}
+
 /* The player's own row on a board, in the soft tint (14b-10, answer 11). */
 .row.you {
   background: var(--soft);

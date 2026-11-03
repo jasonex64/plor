@@ -330,12 +330,21 @@ function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
 }
 
 // A finished run in the banner: the score, how it ended, the result's details and the time to the next puzzle. The
-// details are on the game screen, under #result.
+// details are on the game screen, under #result. With the result already drawn and shown (the game screen's own
+// banner; a game screen visited before stays in the document, hidden, under Today), Result scrolls to it without
+// putting #result in the address, as Result does once it's drawn (docs/milestones/M14-14b-23-small-jumps-and-finds.md,
+// answer 2).
 function Score({ run }: { run: RunState }) {
+  function toDrawn(event: { preventDefault: () => void }) {
+    const drawn = document.getElementById("result");
+    if (!drawn?.checkVisibility()) return;
+    event.preventDefault();
+    drawn.scrollIntoView();
+  }
   return (
     <>
       <Facts facts={[earnsBonus(run) ? `${pointsText(run.points)} + about ${run.bonus} bonus` : pointsText(run.points), endedText(run)]} />
-      <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
+      <ButtonLink href={`${GAME.path}#result`} onClick={toDrawn} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
         Result
       </ButtonLink>
       <ResetCountdown label="Next puzzle in" msToReset={run.msToReset} />
@@ -564,12 +573,16 @@ function Question({
 
 // The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
-// so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14).
+// so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14). Then
+// #result leaves the address, so the page shown again or reloaded later stays where the player left it
+// (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
 function Result({ run, saved }: { run: RunState; saved: boolean }) {
   const survived = survivedCount(run);
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (window.location.hash === "#result") box.current?.scrollIntoView();
+    if (window.location.hash !== "#result") return;
+    box.current?.scrollIntoView();
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
   }, []);
   return (
     <div id="result" ref={box} className={kit.card}>
