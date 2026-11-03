@@ -132,6 +132,18 @@ Nothing: these are review pages outside the repo, and the game screen is unchang
 |---|---|---|
 
 ## Evidence
+The six pages, private to the human (published 2026-11-03; their source files live in the session's scratchpad, not the repo):
+
+| | Name | Link |
+|---|---|---|
+| A | Wide Berth | https://claude.ai/artifact/TWgQzhAj6fKvDMTySXuPiK |
+| B | Off the Menu | https://claude.ai/artifact/6yJYfY4NgFMZqd7pBWokrY |
+| C | Fathom | https://claude.ai/artifact/EVJHiV85N1fKbd2w5p7Vrs |
+| D | Purrhaps | https://claude.ai/artifact/LuAMod1pX3fkxcJ7HgjJnW |
+| E | Off the Board | https://claude.ai/artifact/G1uuFm9krjohTkt4Nha5Ue |
+| F | Outlier | https://claude.ai/artifact/AHct29WGWzMuRdzueg649b |
+
+Each builder checked its page in Chrome at 1920×1080 and 390×844 (deviceScaleFactor 3) at Q1, Q3 and Q6: no console errors; draw time per frame 0.3–8.5 ms (E on the phone the slowest, cause not found). Known gaps, from the builders: palettes run 33–40 colours in four of the six (the brief said roughly 16–32); body pixel fonts sit near, not exactly on, the `--u` grid; on a phone the text window covers part of each scene's lower half.
 
 ## Review
 - Blocking findings and how each was fixed:
