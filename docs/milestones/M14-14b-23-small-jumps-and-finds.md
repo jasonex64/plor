@@ -1,6 +1,6 @@
 # M14 14b-23 — Small jumps and finds
 
-**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14b-23 as drafted?"), built and reviewed, in review (PR not opened yet). It was drafted from two rounds of guided questions (2026-11-02, Pacific). It's the last of the four groups M14 waits for (14b-20, answers 1, 2 and 4); 14c-2 follows it.
+**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14b-23 as drafted?"), built and reviewed, in review (PR #153). It was drafted from two rounds of guided questions (2026-11-02, Pacific). It's the last of the four groups M14 waits for (14b-20, answers 1, 2 and 4); 14c-2 follows it.
 
 ## Goal
 Nothing on the page moves by itself, and nothing a player looks for is out of reach:
