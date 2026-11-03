@@ -1,6 +1,6 @@
 # M14 14c-2 — Neutral words: the host again, no Wind
 
-**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR not opened yet). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
+**Status:** approved (human, 2026-11-02: "Approve, build it", to "Build 14c-2 (neutral words) as drafted?"), built, reviewed (three blocking items fixed), in review (PR #154). It was drafted from three rounds of guided questions (2026-11-02, Pacific). It replaces the earlier 14c-2 draft, "The game's world", which the human set aside: "we're starting over".
 
 ## Goal
 The game speaks in plain words again, those it had before 14c-1, and nothing in the code or the forward-looking docs names the Wind or the climb. The human can then design the game from scratch in another session without being steered.
