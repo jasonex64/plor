@@ -1,4 +1,4 @@
-// A question's answer search (docs/milestones/M14-14b-12-answer-lists.md, criterion 4): a player caught at stop 1 opens
+// A question's answer search (docs/milestones/M14-14b-12-answer-lists.md, criterion 4): a player caught on question 1 opens
 // Search answers on their result card and finds the answers that question accepted, with their tiers; a player mid-run
 // has no search. On the fixture day under today (e2e/puzzle.ts).
 import { expect, test } from "@playwright/test";

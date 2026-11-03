@@ -60,7 +60,7 @@ describe("searching a question's answers", () => {
   it("finds a finished player's answers by any name, and refuses a question they didn't reach", async () => {
     useSession(await signInPlayer("done"));
     await startRun("done");
-    // Caught at question 1 by the Wind's own answer.
+    // Caught at question 1 by the host's own answer.
     await call(answerRoute(apiRequest("/api/run/answer", { method: "POST", body: { index: 0, text: hostName(puzzle, 0) } })));
     const found = await search("0", "Polar");
     expect(found.status).toBe(200);

@@ -147,7 +147,7 @@ test("the clock bar's Back on How to play slides back up to the game screen", as
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await page.goto(`${GAME.path}/how-to-play`);
   const slides = await watchSlides(page);
-  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
   await expect(page).toHaveURL(new RegExp(`${GAME.path}$`));
   expect((await slideOf(slides, 1)).types).toEqual(["nav-back"]);
 });

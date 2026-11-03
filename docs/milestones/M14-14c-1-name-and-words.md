@@ -2,6 +2,8 @@
 
 **Status:** done (2026-10-27): merged in PR #99 on green CI (merge commit `a504b56`, 02:13 UTC; runs 40436433417 and 40436427479 at `47bc98e`). Before that: approved (human, 2026-10-27: "Approve the 14c-1 ticket as recorded and build it now"); built and reviewed in PR #99, set to auto-merge on green CI on the human's word (2026-10-27: "Yes, turn on auto-merge for PR #99 so it merges on green CI, then mark 14c-1 done");  Guided questions answered 2026-10-25 (rounds 1–5) and 2026-10-27 (rounds 6–10, below).
 
+**Reverted (2026-11-02):** its words, the tiers (`src/game/words.ts`) and the share line's symbols were taken back to the words before it by 14c-2 (`docs/milestones/M14-14c-2-neutral-words.md`); the name Updraft and `/updraft` stay, as a working name.
+
 ## Goal
 Give game 1 a name and a set of words that speak its world (the ridge, the Wind, the signs) instead of "Offbeat", "safe", "caught", "answer" and "host".
 

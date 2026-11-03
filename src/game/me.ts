@@ -18,7 +18,7 @@ export type Me = {
   since: string;
   totals: { points: number; daysPlayed: number; streak: number; longestStreak: number };
   month: { today: string; days: { date: string; survived: number | null }[] };
-  offbeat: { best: number | null; average: number | null; fullClimbs: number };
+  offbeat: { best: number | null; average: number | null; fullRuns: number };
   rarest: { answer: Named; prompt: string; date: string; share: number }[];
 };
 
@@ -34,7 +34,7 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
     username: string;
     since: string;
     days_played: number;
-    full_climbs: number;
+    full_runs: number;
     longest: number;
     today: string;
     month: Me["month"]["days"];
@@ -52,7 +52,7 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
      select p.username::text,
             private.day_of(p.created_at)::text as since,
             (select count(*) from finished)::int as days_played,
-            (select count(*) from finished where status = 'survived')::int as full_climbs,
+            (select count(*) from finished where status = 'survived')::int as full_runs,
             (select coalesce(max(n), 0) from (select count(*)::int as n from groups where played group by g) as runs)::int as longest,
             $4::text as today,
             (select json_agg(json_build_object('date', m.day::text, 'survived', f.survived) order by m.day)
@@ -69,12 +69,12 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
     since: row.since,
     totals: { points, daysPlayed: row.days_played, streak: stats.streak, longestStreak: row.longest },
     month: { today: row.today, days: row.month },
-    offbeat: { best: stats.best, average: stats.average, fullClimbs: row.full_climbs },
+    offbeat: { best: stats.best, average: stats.average, fullRuns: row.full_runs },
     rarest: await rarestAnswers(db, userId, day),
   };
 }
 
-// The player's answers that survived (a caught one is the Wind's, not theirs: human, 2026-10-25, "Leave caught out
+// The player's answers that survived (a caught one is the host's, not theirs: human, 2026-10-25, "Leave caught out
 // (Recommended)"; docs/milestones/M14-14a-3b-settings.md), given before their day's midnight on closed days, by their
 // share of that question's answers then, lowest first: the counts the result's shares use (dayCounts; M11 H5), so a
 // share here is the one the result showed once the day was over. Only questions at least ANSWER_SHARE_MIN_PLAYERS

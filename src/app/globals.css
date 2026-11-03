@@ -35,8 +35,7 @@
   --on-shade-4: var(--on-accent);
   /* Delete account (round 7's palettes). */
   --danger: #b4232f;
-  /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
-     text. 14c's pixel world replaces the plain block. */
+  /* The game's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour"), a navy with white text. */
   --offbeat: #2f3d5c;
   --on-offbeat: #ffffff;
 }

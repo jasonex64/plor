@@ -227,7 +227,7 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   const hidden = [
     page.getByRole("heading", { level: 2, name: GAME.name, exact: true }),
     page.getByRole("region", { name: `Your ${GAME.name}` }),
-    page.getByRole("region", { name: "Yesterday on the ridge" }),
+    page.getByRole("region", { name: "Yesterday's answers" }),
     page.getByRole("region", { name: `${GAME.name} comments` }),
   ];
   for (const part of hidden) await expect(part).toHaveCount(0);

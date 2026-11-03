@@ -86,12 +86,12 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   await page.getByRole("region", { name: "Groups" }).getByRole("button", { name: "Create group" }).click();
   await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const group = new URL(page.url()).pathname;
-  for (const [player, body] of [[friend, "Bear, first stop."], [page, "Bear for me too."]] as const) {
+  for (const [player, body] of [[friend, "Bear, first question."], [page, "Bear for me too."]] as const) {
     await player.goto("/");
     await play(player);
     await player.getByLabel("Your answer").fill(puzzle.hostAnswer);
     await player.getByRole("button", { name: "Answer" }).click();
-    await expect(player.locator("#result")).toContainText("You climbed 0 of 7 stops");
+    await expect(player.locator("#result")).toContainText("You survived 0 of 7 questions");
     await player.goto("/");
     await player.getByLabel("Comment to your friends").fill(body);
     await player.getByRole("button", { name: "Post" }).click();
@@ -167,7 +167,7 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   const soft = await slot(page, "--soft");
 
   const pill = page.getByRole("banner").getByRole("link", { name: /day streak/ });

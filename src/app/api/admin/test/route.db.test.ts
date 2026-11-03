@@ -188,7 +188,7 @@ describe("a test run of a draft", () => {
 
   it("plays the draft with the host answers the page shows, saved or not, and writes nothing", async () => {
     const before = await counts();
-    // As drawn, the Wind says bear; with dog chosen on the page instead, bear climbs and dog is caught (answer 9).
+    // As drawn, the host says bear; with dog chosen on the page instead, bear is safe and dog is caught (answer 9).
     expect((await play(draftDate, { open: true, text: bear(), hostAnswers: drawn() })).body.run.answered[0].matched).toBe(true);
     const changed = [[fixtureId(0, "dog")], ...drawn().slice(1)];
     expect((await play(draftDate, { open: true, text: bear(), hostAnswers: changed })).body.run.answered[0].matched).toBe(false);

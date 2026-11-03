@@ -167,7 +167,7 @@ test("a question in play is still there after a visit to another tab", async ({ 
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
-  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
   await expect(page).toHaveURL("http://localhost:3000/updraft");
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
@@ -183,12 +183,12 @@ test("away from the game screen, a question in play shows its clock above the ta
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   // Not on the game screen itself, which shows the question's own countdown.
-  const clock = page.getByRole("region", { name: "Stop in play" });
+  const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
 
-  await expect(clock.getByRole("timer")).toHaveText(/^Stop 1 · \d+s left$/);
+  await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
   await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/updraft");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
@@ -201,7 +201,7 @@ test("away from the game screen, a question in play shows its clock above the ta
 
   // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
-  await expect(clock.getByRole("status")).toHaveText("Dozed off at stop 1");
+  await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
   await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/updraft#result");
 });
 
@@ -347,6 +347,6 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await nav.getByRole("link", { name: "Friends" }).click();
-  await expect(page.getByRole("region", { name: "Stop in play" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   expect(await underlined(), "the clock bar").toEqual([]);
 });

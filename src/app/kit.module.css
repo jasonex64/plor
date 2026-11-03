@@ -172,7 +172,7 @@ form.chips {
   text-align: center;
 }
 
-/* A rank or a stop as a round badge (mockup 3's .badge); the first is the accent one. Sized in rem, so it grows with its
+/* A rank or a number as a round badge (mockup 3's .badge); the first is the accent one. Sized in rem, so it grows with its
    number at a bigger browser text size (docs/milestones/M14-14b-17-lines-and-text-size.md, answer 6): 24px at the
    default. */
 .badge {

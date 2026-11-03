@@ -37,8 +37,8 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
   // The day's facts as chips (docs/milestones/M14-14b-8-the-new-look.md, 14b-8b; mockup 3).
-  await expect(banner.getByText("7 stops", { exact: true })).toBeVisible();
-  await expect(banner.getByText("Don't match the Wind", { exact: true })).toBeVisible();
+  await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
+  await expect(banner.getByText("Don't match the host", { exact: true })).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: GAME.name }).locator("..");
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
@@ -55,12 +55,12 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(page).toHaveURL("http://localhost:3000/updraft");
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("0 points", { exact: true })).toBeVisible();
-  await expect(banner.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
+  await expect(banner.getByText("caught on question 1", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
   // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).

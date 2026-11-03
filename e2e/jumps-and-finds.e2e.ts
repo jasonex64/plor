@@ -36,7 +36,7 @@ async function inPlayOnFriends(page: Page) {
 
 // The question's 20 seconds, run out on the clock bar.
 const timedOut = (page: Page) =>
-  expect(page.getByRole("region", { name: "Stop in play" }).getByRole("status")).toHaveText("Dozed off at stop 1", { timeout: 30_000 });
+  expect(page.getByRole("region", { name: "Question in play" }).getByRole("status")).toHaveText("Time's up on question 1", { timeout: 30_000 });
 
 test("the result comes into view when Result is tapped, and not again by itself (answer 2)", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
@@ -45,7 +45,7 @@ test("the result comes into view when Result is tapped, and not again by itself 
   await signInAndPick(page, "zr");
   await inPlayOnFriends(page);
   await timedOut(page);
-  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Result" }).click();
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Result" }).click();
   const result = page.locator("#result");
   await expect(result).toBeInViewport();
   await expect(page).toHaveURL(/\/updraft$/);

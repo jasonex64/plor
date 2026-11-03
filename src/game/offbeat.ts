@@ -24,7 +24,7 @@ export type YesterdayQuestion = { index: number; prompt: string; hostAnswers: Na
 
 // "none": no puzzle yesterday. "in_play": the player's own run yesterday is still going, so its answers stay hidden
 // until they finish it (human, 2026-10-25: "Hide from that player (Recommended)"). "shown": every question, with the
-// Wind's answers, and the player's own where they gave one (L34).
+// host's answers, and the player's own where they gave one (L34).
 export type Yesterday =
   | { date: string; state: "none" | "in_play" }
   | { date: string; state: "shown"; questions: YesterdayQuestion[] };

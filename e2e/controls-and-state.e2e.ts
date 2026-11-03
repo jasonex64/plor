@@ -188,7 +188,7 @@ test("the clock bar's Back also opens on the question's skeleton", async ({ page
     if (new URL(page.url()).pathname === GAME.path) await held;
     await route.continue();
   });
-  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
   await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
   release();
   await expect(page.getByLabel("Your answer")).toBeVisible();
@@ -359,7 +359,7 @@ test("after a time-up away from the game, Me reads its numbers again", async ({ 
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
-  await expect(page.getByRole("region", { name: "Stop in play" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   let reads = 0;
   page.on("request", (r) => {
     if (new URL(r.url()).pathname === "/api/me") reads++;

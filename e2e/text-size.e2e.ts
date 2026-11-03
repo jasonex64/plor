@@ -79,7 +79,7 @@ test("on a desktop, the question card's head stays as wide as its card", async (
   await page.goto("/");
   await signInAndPick(page, "ts");
   await play(page);
-  const head = page.getByText(/^Stop 1 of /).locator("xpath=..");
+  const head = page.getByText(/^Question 1 of /).locator("xpath=..");
   await expect(head).toBeVisible();
   const [row, card] = await head.evaluate((el) => {
     const box = el.parentElement!;

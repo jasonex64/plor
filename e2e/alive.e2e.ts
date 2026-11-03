@@ -49,7 +49,7 @@ async function caught(page: Page) {
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 
 test("a desktop tab changes to its solid icon on hover and holds it, in the tab's colour in every theme", async ({ browser }) => {

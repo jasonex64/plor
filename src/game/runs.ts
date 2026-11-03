@@ -42,7 +42,7 @@ export type RunState = {
   // Milliseconds left on that question's timer, measured by the database when this state was read; null when
   // there is no question. The client counts down from it, and the database stays the judge.
   msLeft: number | null;
-  // While the reveal waits for Next (G5): the letter the Wind steals at the next question, or null for none.
+  // While the reveal waits for Next (G5): the letter taken at the next question, or null for none.
   next: { steals: string | null } | null;
   // Points so far: the sum over answered questions, and the provisional rarity bonus so far (capped, M09).
   points: number;

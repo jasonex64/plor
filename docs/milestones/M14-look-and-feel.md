@@ -1,6 +1,6 @@
 # M14 — Look and feel
 
-**Status:** in progress, alongside M13 (human, 2026-10-24: "while the other session works on database and answer generating can we do the layout stuff here"). 14a (structure and UX) and 14b (the visual system) are built; ROADMAP's M14 row lists the sub-tickets and PRs, and `docs/DESIGN.md` describes what shipped. 14c, the game's world, starts from guided questions (14b-7, answer 9: "Clear it too"). L7 is answered by M04's G5. L11 is still open (M04's G6 is open and moved to M13 answer lists).
+**Status:** in progress, alongside M13 (human, 2026-10-24: "while the other session works on database and answer generating can we do the layout stuff here"). 14a (structure and UX) and 14b (the visual system) are built; ROADMAP's M14 row lists the sub-tickets and PRs, and `docs/DESIGN.md` describes what shipped. The game's own design starts from scratch in its own session, from guided questions (14c-2, `docs/milestones/M14-14c-2-neutral-words.md`; human, 2026-11-02: "we're starting over"). L7 is answered by M04's G5. L11 is still open (M04's G6 is open and moved to M13 answer lists).
 
 ## Goal
 Give every screen a finished, phone-first look, once every screen works.
@@ -19,7 +19,7 @@ The look comes after every functional milestone (human, 2026-10-21), so the scop
 1. Sign-in (Google and email code; the privacy link; the intro that Google's brand check needs, M02 2c).
 2. Pick a username.
 3. Signed-in home and start.
-4. Question (built in M04): the typed answer box with no list, the 20-second countdown, the stolen-letters line and the blocked-key message ("The Wind took X"), and the "isn't in our list" retry.
+4. Question (built in M04): the typed answer box with no list, the 20-second countdown, the stolen-letters line and the blocked-key message ("X is taken"), and the "isn't in our list" retry.
 5. Reveal: the points and the next steal, with Next.
 6. Caught: the run ends at a question.
 7. Result: caught, time's up or survived; the reset countdown; the Share button (M05) and its placeholder symbols (ROADMAP Next revision).
@@ -38,7 +38,7 @@ The look comes after every functional milestone (human, 2026-10-21), so the scop
 | L10 | Accessibility source: pin WCAG 2.2 in SOURCES.md (only a human adds a source). Contrast ratios and tap-target sizes come from it | "Yes, WCAG 2.2 AA" (human, 2026-10-24); pinned in SOURCES.md |
 | L11 | Puzzles while building: preview with the `content-rehearsal` days locally, or put real days back on the calendar now. Each day published now is one fewer left for the beta (M15) | |
 | L13 | Add the Google sign-in branding guidelines to SOURCES.md (only a human adds a source) | |
-| L16 | What this pass covers | "14a + 14b visual system" now; 14c, the game's world, after (human, 2026-10-24) |
+| L16 | What this pass covers | "14a + 14b visual system" now; 14c, the game's own design, after (human, 2026-10-24) |
 | L17 | How a player moves around | "bottom tab bar for the mobile but desktop should have a more desktop friendly layout (shouldn't be just mobile layout copy pasted and wider)". Tabs: "Today, Friends, Groups, Account". Desktop: "Sidebar + columns" (navigation left, the game in the middle, the friends board and feed on the right) (human, 2026-10-24) |
 | L18 | Navigation during a run | "Navigation stays". Tapping another tab mid-question: "Just go, timer runs". Kept once Claude pointed out that a timeout ends the run: "Keep it, show the clock", so the bar to return shows the seconds left (human, 2026-10-24). Built in 14a-2 (human, 2026-10-25: "Yes, put L18's clock … in 14a-2") |
 | L19 | The admin pages | "Yes, same pass" (human, 2026-10-24) |
@@ -90,7 +90,7 @@ Each sub-ticket carries its own criteria, in its file in `docs/milestones/`.
 | Reflow floor: 320px | Layout | WCAG 2.2, 1.4.10 (SOURCES.md) |
 
 ## Plan
-1. 14c, the game's world, and the fresh design round start from guided questions (CLAUDE.md, "Ask before designing").
+1. The game's own design starts from scratch in its own session, from guided questions (CLAUDE.md, "Ask before designing"; 14c-2).
 2. One sub-ticket file and one PR at a time.
 
 ## Removes

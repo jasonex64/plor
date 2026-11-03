@@ -77,7 +77,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creatorFeed.getByText("No comments yet.")).toBeVisible();
   await expect(creatorFeed.getByText("Finish today's game to join in.")).toBeVisible();
 
-  // Both are tipped over at stop 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
+  // Both are caught on question 1 (10d). The joiner's comment in the group's thread reaches the creator's open group
   // page without a reload (G5). A second reaches the creator's open home page, in the feed, labelled with the group
   // (M11 11b).
   for (const page of [creator, joiner]) {
@@ -85,13 +85,13 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
     await play(page);
     await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
     await page.getByRole("button", { name: "Answer" }).click();
-    await expect(page.getByText(/^You climbed 0 of 7 stops/)).toBeVisible();
+    await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
   // After playing, the score is in the card, and the order is the same.
   await creator.goto("/");
   // The banner's facts as chips since 14b-8b.
   await expect(card.getByText("0 points", { exact: true })).toBeVisible();
-  await expect(card.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
+  await expect(card.getByText("caught on question 1", { exact: true })).toBeVisible();
   await expect.poll(sections("main section")).toEqual([GAME.name, "Feed"]);
   await expect.poll(sections("aside[aria-label='Your circle'] section")).toEqual(["Friends today", "Leaderboard"]);
   // Opens a page on the creator's side and waits until its board channel has joined (Realtime replies ok to the join);

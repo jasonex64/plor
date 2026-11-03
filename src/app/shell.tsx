@@ -27,7 +27,6 @@ import { useNew } from "./shown";
 import kit from "./kit.module.css";
 import styles from "./shell.module.css";
 import { GAME } from "@/platform/game";
-import { capitalized, timedOutText } from "@/game/words";
 import { BACK, FORWARD } from "./slide";
 import { markToPlay } from "./to-play";
 
@@ -359,11 +358,11 @@ function Clock({ index, msLeft, up, onTimeUp }: { index: number; msLeft: number;
   const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
   // A timer isn't read out as it changes; the end is, once, as a status (WCAG 2.2 4.1.2).
   return (
-    <section aria-label="Stop in play" className={styles.clock} style={{ viewTransitionName: "plor-clock" }}>
+    <section aria-label="Question in play" className={styles.clock} style={{ viewTransitionName: "plor-clock" }}>
       {seconds > 0 ? (
         <>
           <span role="timer">
-            Stop {index + 1} · {seconds}s left
+            Question {index + 1} · {seconds}s left
           </span>
           <ButtonLink href={GAME.path} transitionTypes={up ? BACK : FORWARD} onClick={markToPlay}>
             Back
@@ -371,7 +370,7 @@ function Clock({ index, msLeft, up, onTimeUp }: { index: number; msLeft: number;
         </>
       ) : (
         <>
-          <span role="status">{capitalized(timedOutText(index + 1))}</span>
+          <span role="status">Time&apos;s up on question {index + 1}</span>
           <ButtonLink href={`${GAME.path}#result`} transitionTypes={FORWARD}>
             Result
           </ButtonLink>

@@ -119,7 +119,7 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   await page.goto("/");
   await signInAndPick(page, "lt");
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
-  const chip = banner.getByText("7 stops", { exact: true });
+  const chip = banner.getByText("7 questions", { exact: true });
   await expect(chip).toBeVisible();
   await expect(page.getByText("Plor is a small site with a daily word game.")).toBeHidden();
   expect(await chip.evaluate((el) => getComputedStyle(el).color)).toBe("rgb(255, 255, 255)");
