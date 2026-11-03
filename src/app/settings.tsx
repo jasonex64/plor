@@ -12,7 +12,7 @@
 // side panel's own border, leaves it open (closedby="any" isn't in Safari; docs/milestones/M14-14b-2c-review-items.md,
 // item 26).
 import { ButtonLink } from "./button-link";
-import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
@@ -60,9 +60,14 @@ export function SettingsSheet({
       onPointerDown={(event) => {
         pressedOutside.current = onBackdrop(event.currentTarget, event);
       }}
+      // A press that became a scroll never ends in a click, so it's forgotten here
+      // (docs/milestones/M14-14b-22-settings-and-invites.md).
+      onPointerCancel={() => {
+        pressedOutside.current = false;
+      }}
       onClick={(event) => {
-        // A click from the keyboard has no press before it, so it never closes the sheet here.
-        if (pressedOutside.current && onBackdrop(event.currentTarget, event)) close();
+        // A click from the keyboard has no press and no count (detail 0), so it never closes the sheet.
+        if (event.detail > 0 && pressedOutside.current && onBackdrop(event.currentTarget, event)) close();
         pressedOutside.current = false;
       }}
     >
@@ -144,7 +149,7 @@ function Username({ username, changeableAt, onChanged }: { username: string; cha
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useRefusal();
 
   async function change(event: FormEvent) {
     event.preventDefault();
@@ -202,7 +207,7 @@ function DisplayName({ name, onChanged }: { name: string | null; onChanged: () =
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name ?? "");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useRefusal();
 
   async function send(displayName: string | null) {
     setBusy(true);
@@ -283,11 +288,17 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
   const [pending, setPending] = useState<Partial<Settings>>({});
   const [error, setError] = useState<string | null>(null);
   const saves = useRef<Promise<void>>(Promise.resolve());
+  // Each setting's newest save, so an older one landing doesn't take a newer value off the switch (on, off, on)
+  // (docs/milestones/M14-14b-22-settings-and-invites.md).
+  const newest = useRef<Partial<Record<keyof Settings, number>>>({});
+  const count = useRef(0);
   const shown: Settings = { ...settings, ...pending };
   // The theme shown is the one being saved, else the account's (the frame applies the account's too, once it's saved).
   useLayoutEffect(() => applyTheme(shown.theme), [shown.theme]);
 
   function save(change: Partial<Settings>) {
+    const mine = ++count.current;
+    for (const key of Object.keys(change) as (keyof Settings)[]) newest.current[key] = mine;
     setPending((p) => ({ ...p, ...change }));
     setError(null);
     saves.current = saves.current.then(async () => {
@@ -300,7 +311,7 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
       // This change is no longer pending, unless a later one of the same setting is.
       setPending((p) => {
         const left = { ...p };
-        for (const key of Object.keys(change) as (keyof Settings)[]) if (left[key] === change[key]) delete left[key];
+        for (const key of Object.keys(change) as (keyof Settings)[]) if (newest.current[key] === mine) delete left[key];
         return left;
       });
     });
@@ -346,6 +357,21 @@ function Preferences({ settings, onSettings }: { settings: Settings; onSettings:
       {error && <p role="alert">{error}</p>}
     </div>
   );
+}
+
+// An account form's refusal: in the form while it's shown; once the sheet has closed (which starts the forms again),
+// in the toast's alert, so a taken name is never lost (docs/milestones/M14-14b-22-settings-and-invites.md, answer 3).
+function useRefusal(): [string | null, (message: string | null) => void] {
+  const undo = useUndo();
+  const [error, setError] = useState<string | null>(null);
+  const shown = useRef(true);
+  useEffect(() => {
+    shown.current = true;
+    return () => {
+      shown.current = false;
+    };
+  }, []);
+  return [error, (message) => (shown.current || message === null ? setError(message) : undo.fail(message))];
 }
 
 // Signs out of this device (M12 A3).

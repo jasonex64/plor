@@ -21,6 +21,10 @@ export async function shareLink(text: string, url: string): Promise<Shared> {
   try {
     await navigator.share({ text, url });
   } catch (err) {
+    // A cancelled sheet isn't a failure (MDN). A refused one, as Safari refuses a sheet opened without the tap's
+    // activation (NotAllowedError, MDN), shows the text to copy, as a refused clipboard does
+    // (docs/milestones/M14-14b-22-settings-and-invites.md, answer 2).
+    if (err instanceof DOMException && err.name === "NotAllowedError") return "refused";
     if (!(err instanceof DOMException && err.name === "AbortError")) throw err;
   }
   return "shared";

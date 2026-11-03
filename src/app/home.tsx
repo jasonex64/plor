@@ -36,7 +36,7 @@ import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
 import { GroupPage } from "./groups";
-import { InviteLink } from "./invite-link";
+import { InviteCodeProvider, InviteLink } from "./invite-link";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
@@ -189,7 +189,8 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
               }
             />
           </Suspense>
-          {children}
+          {/* The pages' one invite code, the signed-in player's (src/app/invite-link.tsx). */}
+          <InviteCodeProvider owner={player?.username ?? null}>{children}</InviteCodeProvider>
         </UndoProvider>
       </LoadingStatus>
     </FrameContext>
@@ -633,7 +634,7 @@ function AcceptInvite({ code, username }: { code: string; username: string }) {
     );
   }, [code]);
   const own = inviter?.username === username;
-  useBodyFlag("own-invite", own);
+  useBodyFlag("friend-invite", inviter !== null && !own);
 
   async function addFriend() {
     setBusy(true);
