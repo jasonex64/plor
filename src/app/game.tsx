@@ -1,6 +1,6 @@
 "use client";
 
-// Offbeat's run (docs/milestones/M14-14a-2b-game-screen.md): on its game screen, /offbeat, the rules and Start, then
+// The game's run (docs/milestones/M14-14a-2b-game-screen.md): on its game screen, GAME.path, the rules and Start, then
 // one question at a time, answered by typing (no list, no suggestions: the server reads the text; human, 2026-10-21),
 // a free retry for text that names no entry, 20 seconds per question, a reveal after each answer that waits for Next,
 // points as you go, and a result with how many players gave each answer (docs/milestones/M11-home-screen.md, 11a). On
@@ -15,7 +15,6 @@ import type { PublicQuestion } from "@/game/payload";
 import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api, ApiError } from "@/lib/api-client";
-import { capitalized, caughtText, gotPastText, timedOutText } from "@/game/words";
 import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus } from "./bonus";
 import { ButtonLink } from "./button-link";
@@ -76,7 +75,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   return { run, setRun, noPuzzle, error, setError, over, load };
 }
 
-// Starts today's run and opens the game screen with question 1 in play: Start climbing on How to play, and Play on
+// Starts today's run and opens the game screen with question 1 in play: Start playing on How to play, and Play on
 // Today with Skip the game screen on. direction: the slide, back up from How to play, forward from Today (14b-6e).
 export function useStartRun(direction: string[]) {
   const router = useRouter();
@@ -109,7 +108,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
       <Banner date={run.date}>
         {run.status === "not_started" && !skip && (
           <>
-            <Facts facts={[`${run.total} stops`, "Don't match the Wind"]} />
+            <Facts facts={[`${run.total} questions`, "Don't match the host"]} />
             <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
               Play
             </ButtonLink>
@@ -120,7 +119,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             (private.question_deadline), so they have no constant here. */}
         {run.status === "not_started" && skip && (
           <>
-            <Facts facts={[`${run.total} stops`, "20 seconds each", "Don't match the Wind"]} />
+            <Facts facts={[`${run.total} questions`, "20 seconds each", "Don't match the host"]} />
             <button type="button" className={`${kit.primary} ${styles.play}`} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
@@ -289,8 +288,8 @@ function Run({ runner, onPlaying, saved }: { runner: Runner; onPlaying: (playing
           {/* The 20 seconds are judged in SQL (private.question_deadline; DECISIONS.md, Config and tunables), so they
               have no constant here; the points come from tunables.ts. */}
           <p className={styles.rules}>
-            <strong>{run.total} stops · 20 seconds each.</strong> Give an answer the Wind didn&apos;t think of. Each
-            stop you climb is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
+            <strong>{run.total} questions · 20 seconds each.</strong> Give an answer the host didn&apos;t pick. Each
+            question you survive is worth more: {POINTS_PER_QUESTION[0]} points up to{" "}
             {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]}.
           </p>
           <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
@@ -371,7 +370,7 @@ function Facts({ facts }: { facts: string[] }) {
   );
 }
 
-// A question card before the run in play loads: its soft card, a line for its stops and one for its prompt.
+// A question card before the run in play loads: its soft card, a line for its chips and one for its prompt.
 function QuestionSkeleton() {
   return (
     <Skeleton label="Loading your question">
@@ -405,12 +404,11 @@ function Banner({ date, children }: { date?: string; children?: ReactNode }) {
   );
 }
 
-// How a finished run ended, as the banner and the result say it, in Updraft's words by the stop's tier
-// (docs/milestones/M14-14c-1-name-and-words.md, "The words").
+// How a finished run ended, as the banner says it.
 function endedText(run: RunState): string {
-  if (run.status === "survived") return "reached the top";
-  if (run.status === "timed_out") return timedOutText(run.answered.length + 1);
-  return caughtText(run.answered.length);
+  if (run.status === "survived") return `survived all ${run.total}`;
+  if (run.status === "timed_out") return `time's up on question ${run.answered.length + 1}`;
+  return `caught on question ${run.answered.length}`;
 }
 
 // Seconds left on the current question, as a number beside the prompt (14b-6c, answer 20), at mockup 3's size with
@@ -448,21 +446,22 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
-// After a stop climbed (G5): its tier's line, your answer next to the Wind's, the points it earned with its estimated rarity bonus (M09:
-// from the expected popularity alone; the final bonus is worked out once the day is over), and the letter the Wind
-// steals at the next question. The next question and its 20 seconds start on Next.
+// After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
+// from the expected popularity alone; the final bonus is worked out once the day is over), and the letter taken at the
+// next question (docs/milestones/M14-14c-2-neutral-words.md, answer 7). The next question and its 20 seconds start on
+// Next.
 function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
   const last = run.answered[run.answered.length - 1];
   return (
     <div className={kit.card}>
-      <h2>{gotPastText(last.index + 1)}</h2>
+      <h2>Safe!</h2>
       <p>
-        You said {last.answer.name}; the Wind whispered {last.hostAnswers.map((h) => h.name).join(", ")}.
+        You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
       </p>
       <p>
         +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
       </p>
-      {run.next!.steals && <p>Next, the Wind steals {run.next!.steals.toUpperCase()}.</p>}
+      {run.next!.steals && <p>Next question: {run.next!.steals.toUpperCase()} is taken.</p>}
       <button type="button" className={kit.primary} autoFocus disabled={busy} onClick={onNext}>
         Next
       </button>
@@ -516,12 +515,12 @@ function Question({
   }
 
   return (
-    // Mockup 3's question card: the stop and the points as chips, the prompt with the seconds beside it, the stolen
-    // letters as struck tiles, the answer box and Answer (M14 14b-8b; answer 11).
+    // Mockup 3's question card: the question's number and the points as chips, the prompt with the seconds beside it,
+    // the stolen letters as struck tiles, the answer box and Answer (M14 14b-8b; answer 11).
     <div className={`${kit.card} ${kit.soft}`}>
       <p className={kit.head}>
         <span className={`${kit.chip} ${kit.dark}`}>
-          Stop {question.index + 1} of {total}
+          Question {question.index + 1} of {total}
         </span>
         <span className={kit.chip}>{pointsText(points)} so far</span>
       </p>
@@ -531,7 +530,7 @@ function Question({
       </div>
       {question.stolen.length > 0 && (
         <div>
-          <p className={styles.taken}>The Wind has taken</p>
+          <p className={styles.taken}>Letters taken</p>
           <p className={styles.letters}>
             {question.stolen.map((l) => (
               <span key={l}>{l.toUpperCase()}</span>
@@ -558,7 +557,7 @@ function Question({
         </button>
         {blocked && (
           <p role="status" className={styles.note}>
-            The Wind took {blocked}. Try a word without it.
+            {blocked} is taken. Try a word without it.
           </p>
         )}
         {notInList && (
@@ -586,9 +585,15 @@ function Result({ run, saved }: { run: RunState; saved: boolean }) {
   }, []);
   return (
     <div id="result" ref={box} className={kit.card}>
-      <h2>{run.status === "survived" ? "You reached the top!" : capitalized(endedText(run))}</h2>
+      <h2>
+        {run.status === "survived"
+          ? `You survived all ${run.total}!`
+          : run.status === "timed_out"
+            ? `Time's up on question ${run.answered.length + 1}`
+            : `Caught on question ${run.answered.length}`}
+      </h2>
       <p>
-        You climbed {survived} of {run.total} stops and scored {pointsText(run.points)}
+        You survived {survived} of {run.total} questions and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
       {saved && <Share run={run} />}
@@ -597,8 +602,8 @@ function Result({ run, saved }: { run: RunState; saved: boolean }) {
           <li key={a.index} className={kit.row}>
             <div className={kit.grow}>
               <span>
-                {a.prompt}: you said {a.answer.name}, the Wind whispered {a.hostAnswers.map((h) => h.name).join(", ")}
-                {a.matched ? ` (${caughtText(a.index + 1)})` : ` (climbed, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
+                {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
+                {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
               </span>{" "}
               {saved && <AnswerSearch date={run.date} index={a.index} prompt={a.prompt} />}
             </div>

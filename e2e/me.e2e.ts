@@ -78,26 +78,26 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   await expect(total(page, GAME.name, "best score")).toHaveText("–");
   await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: `${GAME.name}'s game screen` })).toHaveAttribute(
     "href",
-    "/updraft",
+    "/play",
   );
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
-  // Tipped over at stop 1: a finished run with 0 survived, shaded at the first step.
+  // Caught on question 1: a finished run with 0 survived, shaded at the first step.
   await page.goto("/");
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   await page.goto("/me");
   await expect(total(page, "All games", "days played")).toHaveText("1");
   await expect(total(page, "All games", "day streak now")).toHaveText("1");
-  await expect(total(page, GAME.name, "avg. stops climbed")).toHaveText("0.0/7");
-  await expect(total(page, GAME.name, "full climbs")).toHaveText("0");
+  await expect(total(page, GAME.name, "avg. survived")).toHaveText("0.0/7");
+  await expect(total(page, GAME.name, "full runs")).toHaveText("0");
   await expect(calendar.getByText(`1 of ${sofar} days`)).toBeVisible();
   // The text alternative names the day and how far it went (docs/milestones/M14-14a-3b-settings.md, criterion 6).
   await expect(calendar.getByRole("img")).toHaveAttribute(
     "aria-label",
-    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 stops climbed`,
+    `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 survived`,
   );
   // Paper's first shade, the accent at alpha 0xa5, the lightest reaching 3:1 on the card (14a-3b).
   expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(36, 87, 214, 0.647)");

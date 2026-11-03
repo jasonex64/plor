@@ -93,7 +93,7 @@ test("the insights axis fits its chart on a day a question catches everyone", as
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport);
     await page.goto("/admin/insights");

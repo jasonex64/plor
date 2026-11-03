@@ -178,7 +178,7 @@ describe("Offbeat's game screen", () => {
     });
   });
 
-  it("gives yesterday's questions with the Wind's answers, and P's own answer and how it went (criterion 5)", async () => {
+  it("gives yesterday's questions with the host's answers, and P's own answer and how it went (criterion 5)", async () => {
     useSession(P.session);
     const r = await call();
     const p = fixture(day[1]);
@@ -201,7 +201,7 @@ describe("Offbeat's game screen", () => {
     expect(JSON.stringify(r.body)).not.toContain(TODAY_MARK);
   });
 
-  it("gives a player who didn't play the Wind's answers alone, and empty stats", async () => {
+  it("gives a player who didn't play the host's answers alone, and empty stats", async () => {
     useSession(N.session);
     const r = await call();
     expect(r.body.stats).toEqual({ streak: 0, best: null, average: null, days: [6, 5, 4, 3, 2, 1, 0].map((k) => ({ date: day[k], survived: null })) });

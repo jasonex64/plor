@@ -3,8 +3,8 @@
 // Puzzle entry (docs/milestones/M06-puzzle-entry.md): an admin reviews each day a Claude session drafted from the
 // question bank (M13 13d), changes the drawn host answers if they like, and approves it. Laid out as round 10 draws it
 // (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 4): the days as a row, the chosen day as a table whose host
-// answers are checkboxes drawn as chips, Approve at the top. A bank answer with a letter the Wind has stolen is dashed
-// with that letter struck, and can't be ticked; a host answer ticked before is in the danger colour with its problem,
+// answers are checkboxes drawn as chips, Approve at the top. A bank answer with a letter taken by then is dashed with
+// that letter struck, and can't be ticked; a host answer ticked before is in the danger colour with its problem,
 // and Approve waits until it's unticked (14b-2b-2b). Play test plays the day on the game screen and saves nothing: a
 // draft with the host answers ticked here, saved or not; an earlier day by its date (docs/milestones/
 // M14-14b-11-test-runs.md, answers 1 and 9).
@@ -164,7 +164,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
             {dayText(day.date)} <span className="sr-only">({label})</span>
           </h3>
           <p className={admin.note}>
-            {editable ? `${state} Tick the host answers (the Wind's) you want. Dashed ones have a letter the Wind has stolen, so players can't type them.` : state}
+            {editable ? `${state} Tick the host answers you want. Dashed ones have a letter taken by then, so players can't type them.` : state}
           </p>
         </div>
         <div className={styles.approve}>
@@ -225,7 +225,7 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
                       {a.name === null ? (
                         <>&ldquo;{a.id}&rdquo; isn&rsquo;t in the answer database: pick another host answer.</>
                       ) : (
-                        <>&ldquo;{a.name}&rdquo; has the {a.stolen!.toUpperCase()} the Wind steals: pick another host answer.</>
+                        <>&ldquo;{a.name}&rdquo; has the {a.stolen!.toUpperCase()} taken at this question: pick another host answer.</>
                       )}
                     </p>
                   ))}

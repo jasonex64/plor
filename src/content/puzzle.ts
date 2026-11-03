@@ -18,7 +18,7 @@ export type Question = {
   host_bank: string[];
   host_answers: string[];
   levels: Record<string, Level>;
-  // The letter the Wind steals at this question (M04 13c-3). It stays gone for the rest of the run.
+  // The letter taken at this question (M04 13c-3). It stays gone for the rest of the run.
   steals?: string;
 };
 export type Puzzle = { format: 3; game_id: typeof GAME_ID; date: string; questions: Question[] };

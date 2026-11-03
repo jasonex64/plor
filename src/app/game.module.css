@@ -1,5 +1,5 @@
-/* Offbeat's banner (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour until 14c's pixel
-   world, 230px tall on phones and 240px from 768px (the approved mockups), drawn as mockup 3's banner (M14 14b-8b): the
+/* Offbeat's banner (docs/milestones/M14-14a-2a-today.md): a plain block in the game's own colour, 230px tall on
+   phones and 240px from 768px (the approved mockups), drawn as mockup 3's banner (M14 14b-8b): the
    ink border and corners 2px rounder than a card's, flat as a card is (M14 14b-10, answer 3). */
 .banner {
   box-sizing: border-box;

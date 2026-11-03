@@ -49,7 +49,7 @@ async function caught(page: Page) {
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 
 test("a desktop tab changes to its solid icon on hover and holds it, in the tab's colour in every theme", async ({ browser }) => {
@@ -95,7 +95,7 @@ test("a hovered button lifts 2px, and stays put under reduced motion", async ({ 
     const page = await (await browser.newContext({ viewport: WIDE, reducedMotion })).newPage();
     await page.goto("/");
     await signInAndPick(page, reducedMotion === "reduce" ? "vc" : "vb");
-    await page.goto("/updraft");
+    await page.goto("/play");
     const start = page.getByRole("button", { name: "Start", exact: true });
     await start.hover();
     const lift = () => start.evaluate((b) => [getComputedStyle(b).transform, getComputedStyle(b).boxShadow.replace(/^rgba?\([^)]*\) /, "")]);

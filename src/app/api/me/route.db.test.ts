@@ -5,7 +5,7 @@
 //   P: T-8 survived all 7 (ledger 1000); T-5 caught on question 3 (2 survived, 125); T-3 time ran out on question 5
 //      (4, 400); T-2 caught on question 1 (0, settled to 0 by the route); T-1 caught on question 2 (1, 25); T one safe
 //      answer, waiting at the reveal (in progress). Points 1000 + 125 + 400 + 0 + 25 = 1550; 5 days played (finished
-//      runs); 1 full climb; best 1000; average (7 + 2 + 4 + 0 + 1) / 5 = 2.8. Streak and longest streak: T-9 wasn't
+//      runs); 1 full run; best 1000; average (7 + 2 + 4 + 0 + 1) / 5 = 2.8. Streak and longest streak: T-9 wasn't
 //      played, then T-8 to T all were, 6 puzzle days.
 //   L: started T-12, T-11, T-10 and T-1 and answered nothing (each timed out): longest streak 3, streak 1 (T-9
 //      unplayed; T not played yet, so it counts back from T-1).
@@ -170,7 +170,7 @@ describe("the Me tab's stats", () => {
       username: P.username,
       since: day[0],
       totals: { points: 1550, daysPlayed: 5, streak: 6, longestStreak: 6 },
-      offbeat: { best: 1000, average: 2.8, fullClimbs: 1 },
+      offbeat: { best: 1000, average: 2.8, fullRuns: 1 },
     });
   });
 

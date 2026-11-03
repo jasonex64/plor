@@ -104,7 +104,7 @@ export function UndoProvider({ children }: { children: ReactNode }) {
 // Changes shown over a section's loaded data while their actions are held and sent, each let go when its action
 // settles: sent (after the section has loaded the data again, so nothing flickers), undone, replaced or failed. This
 // is what useOptimistic does, without a transition left open for the window: React batches pending transitions, so a
-// held one kept a navigation from finishing until the window ended (14b-6b's e2e: the address stayed on /updraft).
+// held one kept a navigation from finishing until the window ended (14b-6b's e2e: the address stayed on the game screen's).
 export function useHeldChanges<T, C>(base: T, apply: (value: T, change: C) => T): [T, (change: C, settled: Promise<unknown>) => void] {
   const [changes, setChanges] = useState<{ key: number; change: C }[]>([]);
   const next = useRef(0);

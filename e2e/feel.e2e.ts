@@ -227,7 +227,7 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   const hidden = [
     page.getByRole("heading", { level: 2, name: GAME.name, exact: true }),
     page.getByRole("region", { name: `Your ${GAME.name}` }),
-    page.getByRole("region", { name: "Yesterday on the ridge" }),
+    page.getByRole("region", { name: "Yesterday's answers" }),
     page.getByRole("region", { name: `${GAME.name} comments` }),
   ];
   for (const part of hidden) await expect(part).toHaveCount(0);
@@ -248,7 +248,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   const nav = page.getByRole("navigation", { name: "Main" });
   expect(await nav.evaluate((el) => getComputedStyle(el).viewTransitionName)).toBe("plor-nav");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
   expect(await slideOf(slides, 1)).toEqual({ types: ["nav-forward"], slide: 200 });
   expect((await slides())[0].animations.filter((a) => a.pseudo.includes("plor-"))).toEqual([]);
 
@@ -268,7 +268,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   await page.emulateMedia({ reducedMotion: "reduce" });
   const count = (await slides()).length + 1;
   await page.getByRole("link", { name: `${GAME.name}'s game screen` }).click();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
   await expect.poll(async () => (await slides()).length).toBeGreaterThanOrEqual(count);
   await expect.poll(async () => (await slides())[count - 1].types).toEqual(["nav-forward"]);
   const still = (await slides())[count - 1].animations.filter((a) => a.name === "slide");

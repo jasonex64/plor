@@ -63,7 +63,7 @@ test("signed in on a phone, unknown addresses under a tab's path mark no tab cur
   await page.goto("/");
   await signInAndPick(page, "ng");
   const nav = page.getByRole("navigation", { name: "Main" });
-  for (const path of ["/friends/nope", "/me/nope", "/updraft/nope"]) {
+  for (const path of ["/friends/nope", "/me/nope", "/play/nope"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
     await expect(page.getByRole("main").getByRole("heading", { level: 2, name: "Page not found" })).toBeVisible();

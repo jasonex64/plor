@@ -143,7 +143,7 @@ describe("a run, step by step", () => {
         inDay: true,
       },
     ]);
-    // The reveal: no question and no clock until Next, and the letter the Wind steals at question 2.
+    // The reveal: no question and no clock until Next, and the letter taken at question 2.
     expect(body.run).toMatchObject({
       status: "in_progress",
       question: null,

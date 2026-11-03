@@ -8,7 +8,6 @@ import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { fixtureDraft, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/day-text";
-import { capitalized, caughtText, gotPastText } from "../src/game/words";
 import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -52,7 +51,7 @@ test("an admin plays a draft as a test run, with a host answer changed on the pa
   const name = dayText(ahead);
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
   const day = admin.getByRole("region", { name });
-  // Question 1's Wind is drawn as bear; dog is ticked instead, and not approved (answer 9).
+  // Question 1's host answer is drawn as bear; dog is ticked instead, and not approved (answer 9).
   const chip = (choice: string) => day.locator("label").filter({ has: admin.getByRole("checkbox", { name: choice, exact: true }) }).first();
   await chip("bear").click();
   await chip("dog").click();
@@ -62,16 +61,16 @@ test("an admin plays a draft as a test run, with a host answer changed on the pa
   await admin.getByRole("button", { name: "Start", exact: true }).click();
   await admin.getByLabel("Your answer").fill("dog");
   await admin.getByRole("button", { name: "Answer" }).click();
-  // Caught at stop 1 by the dog the page chose; the result has no Share (answer 6).
-  await expect(admin.getByRole("heading", { name: capitalized(caughtText(1)) })).toBeVisible();
+  // Caught on question 1 by the dog the page chose; the result has no Share (answer 6).
+  await expect(admin.getByRole("heading", { name: "Caught on question 1" })).toBeVisible();
   await expect(admin.getByRole("button", { name: "Share" })).toHaveCount(0);
 
-  // Restart starts again from the rules (answer 12); bear, the Wind's no longer, climbs.
+  // Restart starts again from the rules (answer 12); bear, the host's no longer, is safe.
   await admin.getByRole("button", { name: "Restart" }).click();
   await admin.getByRole("button", { name: "Start", exact: true }).click();
   await admin.getByLabel("Your answer").fill("bear");
   await admin.getByRole("button", { name: "Answer" }).click();
-  await expect(admin.getByRole("heading", { name: gotPastText(1) })).toBeVisible();
+  await expect(admin.getByRole("heading", { name: "Safe!" })).toBeVisible();
   // Nothing of either run was saved (answer 2).
   expect(await runs()).toBe(0);
 });
@@ -137,5 +136,5 @@ test("a test run's refused answer waits on the Audit page, and accepting it ther
 
   await admin.goto(testRun);
   await answer("apple");
-  await expect(admin.getByRole("heading", { name: gotPastText(1) })).toBeVisible();
+  await expect(admin.getByRole("heading", { name: "Safe!" })).toBeVisible();
 });

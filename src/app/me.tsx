@@ -67,17 +67,17 @@ export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: numbe
         </dl>
       </section>
       <Calendar month={me.month} numbers={numbers} />
-      {/* The game's card, its numbers as chips (mockup 3's "Your Updraft"); plain since 14b-15 (answer 7). */}
+      {/* The game's card, its numbers as chips (mockup 3's "Your <game>" card); plain since 14b-15 (answer 7). */}
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
-          {/* Offbeat's plain block until 14c's pixel world draws its chip. */}
+          {/* The game's plain block beside its name. */}
           <span className={styles.block} aria-hidden="true" />
           <h2>{GAME.name}</h2>
         </div>
         <dl className={styles.stats}>
           <Chip value={me.offbeat.best === null ? "–" : me.offbeat.best.toLocaleString("en-US")} label="best score" />
-          <Chip value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. stops climbed" />
-          <Chip value={String(me.offbeat.fullClimbs)} label="full climbs" />
+          <Chip value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. survived" />
+          <Chip value={String(me.offbeat.fullRuns)} label="full runs" />
         </dl>
         <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
           {GAME.name}&apos;s game screen
@@ -146,7 +146,7 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
   const days = sofar.filter((d) => d.survived !== null);
   const played = days.length;
   const name = dateText(first, { month: "long" });
-  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} stops climbed`);
+  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} survived`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
     <section aria-label="Calendar" className={kit.card}>
@@ -188,7 +188,7 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
         {[1, 2, 3, 4].map((k) => (
           <i key={k} className={styles[`shade${k}`]} />
         ))}
-        <span>More climbed</span>
+        <span>More survived</span>
       </div>
     </section>
   );

@@ -5,7 +5,7 @@
 import { stolenLetters, type ApprovedPuzzle, type Question } from "@/content/puzzle";
 import type { Db } from "@/lib/db";
 
-// stolen: the letters the Wind has taken by this question, which the answer box refuses (M04 13c-3).
+// stolen: the letters taken by this question, which the answer box refuses (M04 13c-3).
 export type PublicQuestion = { index: number; prompt: string; stolen: string[] };
 export type Named = { id: string; name: string };
 export type Names = Map<string, string>;

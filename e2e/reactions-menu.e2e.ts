@@ -27,7 +27,7 @@ async function caught(page: Page) {
   await play(page);
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 
 async function comment(page: Page, body: string) {

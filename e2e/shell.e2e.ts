@@ -102,6 +102,37 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   });
 });
 
+// A control scrolled to, by the keyboard's focus or a script, stops above the tab bar, not under it (WCAG 2.2 2.4.11;
+// docs/milestones/M14-14c-2-neutral-words.md, answer 15): a tap there reached the Groups tab (PR #154's CI).
+test("on a phone, a control scrolled into view stops above the tab bar", async ({ browser }) => {
+  // A small phone (iPhone SE, 320 by 568: the 320px reflow floor), where Reset starts below the screen.
+  const { page, nav } = await player(browser, "tx", { width: 320, height: 568 });
+  await nav.getByRole("link", { name: "Friends" }).click();
+  const reset = page.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Reset link" });
+  await expect(reset).toBeVisible();
+  const bar = (await nav.boundingBox())!.y;
+  const bottom = async () => {
+    const box = (await reset.boundingBox())!;
+    return box.y + box.height;
+  };
+  // Resting on the screen's bottom edge, under the bar, as the CI run's tap found it: in the viewport, so a scroll "if
+  // needed" saw no need. Set up, scrolled and measured again until one go holds: the page can still be growing as its
+  // parts load (a go that didn't start under the bar counts as a miss). Without the fix every go ends under it.
+  const height = page.viewportSize()!.height;
+  for (const scroll of [() => reset.focus(), () => reset.scrollIntoViewIfNeeded()]) {
+    await expect
+      .poll(async () => {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.evaluate((by) => window.scrollBy(0, by), (await bottom()) - height);
+        const before = await bottom();
+        await reset.blur();
+        await scroll();
+        return before > bar && before <= height + 1 ? await bottom() : Infinity;
+      })
+      .toBeLessThanOrEqual(bar);
+  }
+});
+
 test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ browser }) => {
   for (const viewport of [
     { width: 768, height: 1024 },
@@ -167,14 +198,14 @@ test("a question in play is still there after a visit to another tab", async ({ 
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
-  await page.getByRole("region", { name: "Stop in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/updraft");
+  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await expect(page.getByLabel("Your answer")).toBeVisible();
 });
 
 // Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
 // and links to the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6; 14a-2b moved the game to
-// /updraft). The clock is faked so zero comes at once.
+// /play). The clock is faked so zero comes at once.
 test("away from the game screen, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
   await page.clock.install();
@@ -183,13 +214,13 @@ test("away from the game screen, a question in play shows its clock above the ta
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   // Not on the game screen itself, which shows the question's own countdown.
-  const clock = page.getByRole("region", { name: "Stop in play" });
+  const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
   await nav.getByRole("link", { name: "Friends" }).click();
 
-  await expect(clock.getByRole("timer")).toHaveText(/^Stop 1 · \d+s left$/);
-  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/updraft");
+  await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/play");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
@@ -201,8 +232,8 @@ test("away from the game screen, a question in play shows its clock above the ta
 
   // Past the question's 20 seconds: announced once, as a status.
   await page.clock.fastForward("00:21");
-  await expect(clock.getByRole("status")).toHaveText("Dozed off at stop 1");
-  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/updraft#result");
+  await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/play#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {
@@ -328,7 +359,7 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   expect(await underlined(), "the settings sheet").toEqual([]);
   await page.keyboard.press("Escape");
 
-  for (const path of ["/updraft/how-to-play", "/streak"]) {
+  for (const path of ["/play/how-to-play", "/streak"]) {
     await page.goto(path);
     await expect(nav).toBeVisible();
     await page.waitForLoadState("networkidle");
@@ -347,6 +378,6 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   await play(page);
   await expect(page.getByLabel("Your answer")).toBeVisible();
   await nav.getByRole("link", { name: "Friends" }).click();
-  await expect(page.getByRole("region", { name: "Stop in play" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   expect(await underlined(), "the clock bar").toEqual([]);
 });

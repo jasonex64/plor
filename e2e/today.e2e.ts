@@ -37,14 +37,14 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   // so it can't pass on the game screen's banner before the navigation lands (seen on CI, 2026-10-25).
   const banner = page.getByRole("region", { name: GAME.name, exact: true });
   // The day's facts as chips (docs/milestones/M14-14b-8-the-new-look.md, 14b-8b; mockup 3).
-  await expect(banner.getByText("7 stops", { exact: true })).toBeVisible();
-  await expect(banner.getByText("Don't match the Wind", { exact: true })).toBeVisible();
+  await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
+  await expect(banner.getByText("Don't match the host", { exact: true })).toBeVisible();
   // Offbeat's own colour, #2F3D5C, whatever the theme.
   const block = banner.getByRole("heading", { name: GAME.name }).locator("..");
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
 
   // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/updraft");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
   await play(page);
   // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff).
   const nav = page.getByRole("navigation", { name: "Main" });
@@ -52,20 +52,20 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/updraft");
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.locator("#result")).toContainText("You climbed 0 of 7 stops");
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
   await nav.getByRole("link", { name: "Today" }).click();
   await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("0 points", { exact: true })).toBeVisible();
-  await expect(banner.getByText("tipped over at stop 1", { exact: true })).toBeVisible();
+  await expect(banner.getByText("caught on question 1", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");
   await banner.getByRole("link", { name: "Result" }).click();
   // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
   await expect(page.locator("#result")).toBeInViewport();
-  await expect(page).toHaveURL(/\/updraft$/);
+  await expect(page).toHaveURL(/\/play$/);
 });
 
 // Criterion 3.
@@ -123,7 +123,7 @@ test("before playing, the feed names who commented and holds none of their words
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/updraft");
+  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/play");
   const item = feed.getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);

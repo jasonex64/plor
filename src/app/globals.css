@@ -35,8 +35,7 @@
   --on-shade-4: var(--on-accent);
   /* Delete account (round 7's palettes). */
   --danger: #b4232f;
-  /* Offbeat's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour", the ridge's navy), with white
-     text. 14c's pixel world replaces the plain block. */
+  /* The game's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour"), a navy with white text. */
   --offbeat: #2f3d5c;
   --on-offbeat: #ffffff;
 }
@@ -196,9 +195,19 @@ body {
    page's own "Plor" heading, read but not shown twice (below, .sr-only-on-phones); About and the privacy policy are in
    the settings sheet, so the page footer isn't shown (M14 14a-1, 14a-3b and 14b-2b-1, Numbers and criterion 3). The
    clock bar, 112px above the tab bar's foot (14a-2a). --room-bottom and --sidebar name the room, for what sits above
-   it, such as the Undo toast (src/app/undo.module.css). */
-body[data-shell] {
+   it, such as the Undo toast (src/app/undo.module.css). On <html>, as its scroll padding, it keeps what the page
+   scrolls to, by focus or a script, above the tab bar and a clock bar at the foot, not under them (WCAG 2.2 2.4.11;
+   docs/milestones/M14-14c-2-neutral-words.md, answer 15); <body> inherits it. */
+html:has(> body[data-shell]) {
   --room-bottom: 64px;
+  scroll-padding-bottom: var(--room-bottom);
+}
+
+html:has(> body[data-clock]) {
+  --room-bottom: 112px;
+}
+
+body[data-shell] {
   padding-top: 56px;
   padding-bottom: var(--room-bottom);
 }
@@ -251,14 +260,17 @@ body[data-shell] main [id] {
 }
 
 body[data-clock] {
-  --room-bottom: 112px;
   padding-bottom: var(--room-bottom);
 }
 
 /* From 768px, the 280px sidebar (L42; human, 2026-10-26: "280px") and no top bar; the clock bar, 48px at the top. */
 @media (min-width: 768px) {
-  body[data-shell] {
+  html:has(> body[data-shell]),
+  html:has(> body[data-clock]) {
     --room-bottom: 0px;
+  }
+
+  body[data-shell] {
     --sidebar: 280px;
     padding-top: 0;
     padding-bottom: var(--room-bottom);
@@ -270,7 +282,6 @@ body[data-clock] {
   }
 
   body[data-clock] {
-    --room-bottom: 0px;
     padding-bottom: var(--room-bottom);
     padding-top: 48px;
   }

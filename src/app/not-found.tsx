@@ -3,7 +3,7 @@ import { ButtonLink } from "./button-link";
 import kit from "./kit.module.css";
 import { Shell } from "./shell-page";
 
-// Any address that isn't a page, old /offbeat links included (14c-1: no redirect), as Plor's own page in its shell,
+// Any address that isn't a page, old /offbeat and /updraft links included (14c-1, 14c-2: no redirect), as Plor's own page in its shell,
 // signed in or out, with one way home (docs/milestones/M14-14b-16-not-found.md, answers 1 to 4). Next.js answers 404
 // and keeps it out of search (not-found.js, "Good to know").
 export const metadata: Metadata = { title: "Page not found" };

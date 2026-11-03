@@ -97,7 +97,7 @@ export const ANSWER_SHARE_MIN_PLAYERS = 5;
 export const ANSWER_SEARCH_LIMIT = 10;
 
 // Stolen letters, schedule A (human, 2026-10-21, G8; docs/milestones/M04-game-mechanics.md, "Rules to build", rule 4):
-// the tier the Wind steals from at each question, or null for no theft. Tiers are the M04 ticket's measured grouping
+// the tier a letter is taken from at each question, or null for none. Tiers are the M04 ticket's measured grouping
 // (the share of a category's answers one letter removes): medium C P H U B D M G; heavy consonants R N L T S; vowels
 // E A I O.
 export const LETTER_TIERS = { medium: "cphubdmg", heavy_consonant: "rnlts", vowel: "eaio" } as const;

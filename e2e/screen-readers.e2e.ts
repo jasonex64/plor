@@ -113,7 +113,8 @@ test("a failed send is an alert, read at once, and the same words twice are anno
   // Close puts focus back where the player was: the Friends tab they went to (answer 2).
   await page.getByRole("button", { name: "Close" }).focus();
   await page.keyboard.press("Enter");
-  expect(await focused(page)).toMatch(/^a .*Friends$/);
+  // Focus moves once the alert's close has rendered, which can come after the key press returns (PR #154's CI).
+  await expect.poll(() => focused(page)).toMatch(/^a .*Friends$/);
 });
 
 test("after Delete focus moves to the next comment's ⋯, then the one before, then the feed's heading", async ({ page }) => {
