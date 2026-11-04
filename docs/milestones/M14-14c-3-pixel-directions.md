@@ -86,6 +86,13 @@ Round 4
 Approval
 17. To the five proposals A–E: "5 concrerte 1 abstract": build A–E and add an abstract sixth, F.
 
+Round 5 (after trying the six pages)
+18. The answer moment and a tracker, for every direction: "when we type the answer for the question, right now the text box simply displays if we were caught. rather than that, i want it to focus on the word being typed and showing a score/based off the result (attatched examples as pics). additionally a creative way to keep track of points (this system uses a line, but we can do differently/better) that matches the theme." (The pictures were krillion.io's dive game.)
+19. Five more directions: "generate 5 more prompts (ill give you two ideas, you do another 3). for the last 3 try to do some more experimental ones like fantasy settings. my two ideas are 'newsflash' - some host/journalist looking for a 'scoop' primarily greyscale with touches of color and one where its a sculptor in like renessaince era chiseling a block to get a finished result." Claude chose the three: Dragon's Hoard, Star Chart, Cauldron.
+20. "the ones i dont go with we can save for inspo for other games."
+21. After the reveal: "Themed continue button (Recommended)".
+22. Caught: "Run-over card (Recommended)".
+
 ## The six directions
 | | Direction | World | Shifts at Q3, Q6 | Frame rate (answer 14) | Font |
 |---|---|---|---|---|---|
@@ -114,6 +121,8 @@ Approval
 | Shifts at questions 3 and 6 | Escalation | Human, 2026-11-03 (answer 13) |
 | 30, 12/30, 30, 12, 60, 15 fps | A–F frame rates | Proposed by Claude per direction under the human's "Vary per direction" (answer 14); A–E shown in the approved proposal (answer 17), F's 15 fps stated with it |
 | 7 questions, 20 s | The mock's question count and clock | Existing rules (answer 1) |
+| Points 25/50/75/100/150/250/350; rarity bonus up to 0.5 of the question's points, 0 at a 20% share; letters taken at Q2, Q4, Q5, Q7 and gone for the run | The mocks' scoring and letters | `src/config/tunables.ts` (POINTS_PER_QUESTION, RARITY_BONUS_FRACTION, RARITY_ZERO_SHARE, LETTER_SCHEDULE); M04 rule 4 |
+| Rare below a 5% share; an unlisted answer counts as a 1% share; the sample questions, host picks and shares | The mocks' tiers and sample data | Proposed by Claude for the mocks only (`game-mock.js`); the game has no tier names yet |
 | 2 s for a shift to sweep in; the game column at most 300 source px wide | The review pages only | Proposed by Claude for the mocks, for the human to judge on the pages; not carried into the app without the human's word |
 
 ## Plan
@@ -142,6 +151,13 @@ The six pages, private to the human (published 2026-11-03; their source files li
 | D | Purrhaps | https://claude.ai/artifact/LuAMod1pX3fkxcJ7HgjJnW |
 | E | Off the Board | https://claude.ai/artifact/G1uuFm9krjohTkt4Nha5Ue |
 | F | Outlier | https://claude.ai/artifact/AHct29WGWzMuRdzueg649b |
+| G | The Scoop (newsroom) | https://claude.ai/artifact/LzfXxwtRaxW2zJhTZ84QD9 |
+| H | Marmo (sculptor) | https://claude.ai/artifact/ADNEdjnPPKG7zKKZ59VFej |
+| I | Uncounted (dragon's hoard) | https://claude.ai/artifact/SeRqWdpqotxEmFpcMGHfb6 |
+| J | Asterism (star chart) | https://claude.ai/artifact/A7HoTgBVbxmmqtWE5LrJJf |
+| K | Moonbrew (cauldron) | https://claude.ai/artifact/ALkTxwAZd9SkBbijbSNCSN |
+
+Round 5 (answers 18–22): A–F were republished at the same links (version 2) and G–K published, each with a playable run on the shared `game-mock.js`: the typed answer animates in the theme, a result card with the tier, share and points, a themed continue button, a run-over card when caught or out of time, a finale after Q7, and a themed tracker. Each builder ran a scripted run in Chrome at 1920×1080 and 390×844: no console errors. Known gap in the sample data: on Q3 and Q7 every host pick contains a taken letter, so those questions can't be caught. Each builder chose its own animation timings; they are mock values for review.
 
 Each builder checked its page in Chrome at 1920×1080 and 390×844 (deviceScaleFactor 3) at Q1, Q3 and Q6: no console errors; draw time per frame 0.3–8.5 ms (E on the phone the slowest, cause not found). Known gaps, from the builders: palettes run 33–40 colours in four of the six (the brief said roughly 16–32); body pixel fonts sit near, not exactly on, the `--u` grid; on a phone the text window covers part of each scene's lower half.
 
