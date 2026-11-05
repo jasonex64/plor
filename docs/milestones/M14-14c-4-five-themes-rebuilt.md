@@ -134,6 +134,12 @@ Hypothesis (`fonts/measure.mjs`): most candidates have fixed-width digits, and e
 
 Shortlist: the size that keeps one font pixel equal to one art pixel is 56/3 art pixels for Jersey 10 and 8 for Tiny5. Jersey 20's is 34, too large for a phone. Both have lowercase and tabular digits. Phone line length as measured by the page: Jersey 10 about 17 letters, Tiny5 about 34. `fonts/check.mjs` at 1000×900 and 390×844: no console errors, screenshots read by eye. It ran the page before the phone table fix; after that fix the page was rebuilt and published without a second run. The phone view in that run was at scale 7, not 8, because the page's 16px gutters leave 358px for the stage.
 
+Round 5 of questions, after the first page (human, 2026-11-05): "dont really like either". Put off by: "Too heavy or blocky,Hard to read". Feel: "Clean and elegant". The one-font-pixel-to-one-art-pixel rule: "Loosen it (Recommended)", so a font may use finer pixels than the art. Next: "Wider sheet (Recommended)".
+
+The page at the same link now shows eight fonts on all five themes, the human naming favourites by number: Galmuri 11, 9 and 14, DotGothic16, Handjet, VT323, Doto, Bitcount Single. The top two then go on the wide and phone test.
+
+Hypothesis (`fonts/sheet2.mjs`): the Galmuri faces and DotGothic16 read cleanest and have one-width digits; the thin variable fonts lose letter shapes. Held by eye for Doto and Bitcount Single; Handjet held its shapes, and is on the sheet. Bitcount Prop Single (two digit widths) and Pixelify Sans (two, and heavy) are out. Galmuri is OFL-1.1 (`fonts/outside/Galmuri-LICENSE.txt`, package `galmuri` 2.40.3 from npm via jsDelivr); its files carry Korean glyphs at 430 to 565 KB each, so a build into the app needs a Latin subset. The other seven fonts' licences are unverified. Six other open pixel fonts were looked up by name on npm and not found there, so the sheet has one family from outside Google, fewer than planned. `fonts/check.mjs` at 1200×1500 and 390×844, after the card height fix: no console errors, no sideways scroll, no HUD overlapping a question box. Its font-loaded check reports DotGothic16 as not loaded, while the screenshot shows it rendered; the check is unreliable for that font, cause not found.
+
 ## Review
 - Blocking findings and how each was fixed:
 - Deferred to ROADMAP "Next revision":
