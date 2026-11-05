@@ -140,6 +140,10 @@ The page at the same link now shows eight fonts on all five themes, the human na
 
 Hypothesis (`fonts/sheet2.mjs`): the Galmuri faces and DotGothic16 read cleanest and have one-width digits; the thin variable fonts lose letter shapes. Held by eye for Doto and Bitcount Single; Handjet held its shapes, and is on the sheet. Bitcount Prop Single (two digit widths) and Pixelify Sans (two, and heavy) are out. Galmuri is OFL-1.1 (`fonts/outside/Galmuri-LICENSE.txt`, package `galmuri` 2.40.3 from npm via jsDelivr); its files carry Korean glyphs at 430 to 565 KB each, so a build into the app needs a Latin subset. The other seven fonts' licences are unverified. Six other open pixel fonts were looked up by name on npm and not found there, so the sheet has one family from outside Google, fewer than planned. `fonts/check.mjs` at 1200×1500 and 390×844, after the card height fix: no console errors, no sideways scroll, no HUD overlapping a question box. Its font-loaded check reports DotGothic16 as not loaded, while the screenshot shows it rendered; the check is unreliable for that font, cause not found.
 
+The human's favourites from the sheet (2026-11-05): "i like handjet, vt323, and galmuri9". All three went on the wide and phone test at the same link, on all five themes, with a heavier Handjet (weight 400) added for the human to compare.
+
+Hypothesis (`fonts/check.mjs`): all three fit every panel at both sizes; Handjet at weight 300 is at risk on Marmo's light panel. Fit held: no panel overlaps the HUD or leaves its stage, for all four options at 1000×900 and 390×844, no sideways scroll, no console errors. The risk held by eye: at weight 300 on Marmo, Handjet is faint, and on a 1× display it shows coloured fringes from the browser's text smoothing; that smoothing isn't in the page's control on Windows. Phone line length as measured by the page: Galmuri 9 about 26 letters, Handjet about 27, VT323 about 21 (at weight 300 for Handjet; the heavier one wasn't measured). All three have one-width digits; licences read: Galmuri, Handjet and VT323 are OFL 1.1.
+
 ## Review
 - Blocking findings and how each was fixed:
 - Deferred to ROADMAP "Next revision":
