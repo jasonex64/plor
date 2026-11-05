@@ -128,6 +128,11 @@ Experiment, step 3. Expected: 60 fps stays under 16.7 ms on average, because 14c
 |---|---|---|
 
 ## Evidence
+**The font test page, waiting for the human's pick:** https://claude.ai/artifact/WKxNEsxefS4QGiUYsTYuHr (private, published 2026-11-05). Scripts: `fonts/measure.mjs`, `sheet.mjs`, `capture.mjs`, `build.mjs` and `check.mjs` in `C:/Users/jason/RIFF-mocks`.
+
+Hypothesis (`fonts/measure.mjs`): most candidates have fixed-width digits, and each has one native grid. Half disproved: of 13 Google pixel fonts, 7 have proportional digits by default. Jersey's digits are fixed once `tnum` is on, and Pixelify Sans's and Silkscreen's stay proportional, which fails the rule that a new font needs tabular figures in Google's file (HANDOFF, Fonts).
+
+Shortlist: the size that keeps one font pixel equal to one art pixel is 56/3 art pixels for Jersey 10 and 8 for Tiny5. Jersey 20's is 34, too large for a phone. Both have lowercase and tabular digits. Phone line length as measured by the page: Jersey 10 about 17 letters, Tiny5 about 34. `fonts/check.mjs` at 1000×900 and 390×844: no console errors, screenshots read by eye. It ran the page before the phone table fix; after that fix the page was rebuilt and published without a second run. The phone view in that run was at scale 7, not 8, because the page's 16px gutters leave 358px for the stage.
 
 ## Review
 - Blocking findings and how each was fixed:
