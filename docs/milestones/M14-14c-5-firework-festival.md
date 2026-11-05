@@ -50,6 +50,17 @@ Round 4
 14. Caught: "Dud (Recommended)".
 15. Finale: "Palace grand show".
 
+Round 5, the human's notes on the still comp
+> its not bad but i was thinking of a type of style where the colors are closer to each other and more simple in terms of color: https://pin.it/1MMjoUoPF
+> idk if u can see that link but the entire hue is very similar in color even though a windmill isnt red. maybe not to this degree of same-ness. also i think the escalation isnt quite doing it for me. maybe at first theres nothing lit, then more gets lit and its bright at the end
+
+The link shows a windmill landscape in red-orange to peach, separated by lightness and distance. It's saved as `references/14c-5/8-windmill-palette.jpg` in the mocks folder, for palette only.
+
+16. Colour range: "One family, wider (Recommended)".
+17. Colour mood: "Plum dusk to amber (Recommended)". This replaces answer 5.
+18. What lights the street: "Question number (Recommended)". Everyone sees the same dark start and bright palace; answers don't change it.
+19. Detail: "id like to see a simple version as well as a detailed". The comp shows both, and the one not chosen is deleted.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -62,6 +73,9 @@ Round 4
 | Harbour, sun, keeper, launch tube | All gone | Brief 1, 2 |
 | A shift at Q3 and Q6 only | A tiny step forward every question, and major shifts at Q3 and Q6 | Answer 1 |
 | Sky marks | Sky lanterns | Answer 12 |
+| 63 colours across violet, green, teal, red and gold | One family of neighbouring hues, plum through rose to amber | Round 5, answers 16 and 17 |
+| Dusk into golden night, with lanterns lit from Q1 | Nothing lit at Q1. Lights come on question by question, and the palace at Q7 is the brightest frame | Round 5, answers 17 and 18 |
+| A stage is only a camera position | A stage is a camera position and a set of lit lights | Round 5 |
 
 Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a quiet centre behind the prompt, every change having a visible cause, idle motion, and art made by code only.
 
@@ -69,10 +83,12 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 **The street.** You stand on a lantern-lit stone street. Tall decorated buildings rise up both sides with curved tiled roofs, balconies, shop signs and food stalls at street level. Paper lanterns hang on strings across the street, and a small crowd stands far off, seen from behind. The middle stays calmer, so the prompt reads.
 
 **The walk.** After every answer, as the view drifts down, you land a little further along. Q1 to Q2 and similar steps are tiny.
-- **Q1 to Q2:** violet dusk, a calm street. The palace is a small shape far ahead.
-- **Q3:** a major shift. You pass under a big gate, the sky deepens, and many more lanterns light up.
-- **Q6:** a major shift. Golden night, a crowded festival, and the palace fills the end of the street.
-- **Q7:** you arrive at the palace.
+- **Q1:** plum dusk, and nothing is lit. No lantern, window or stall lamp is on. The palace is a small shape far ahead.
+- **Q2:** the first few lights come on, far ahead. A very small change.
+- **Q3:** a major shift. You pass under a big gate and the lanterns overhead come on. The picture starts to warm.
+- **Q4 and Q5:** small steps, with a few more lights each.
+- **Q6:** a major shift. Windows and stalls are lit, the crowd is out, the colour has reached amber, and the palace fills the end of the street.
+- **Q7:** you arrive at the palace, the brightest frame of the walk.
 
 **The prompt.** The question sits in a text box whose border is a fuse. It burns around the box in step with the 20 s clock, beside the seconds number. Near the end, the sparks grow and the box shakes.
 
@@ -91,7 +107,9 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 **Detail.** Light comes from real sources, with soft multi-colour glows instead of dots, and reflections that ripple instead of straight lines. Lanterns, roofs and side areas are drawn to the level of references 5 and 7, and sparks use the star shapes in reference 6.
 
 ## Acceptance criteria
-- [ ] A still comp of the street at Q1, Q6 and the palace, wide and phone, is approved by the human before any motion is built.
+- [ ] A still comp of the street at all seven questions, wide and phone, is approved by the human before any motion is built, with one of the simple and detailed versions chosen.
+- [ ] Nothing is lit at Q1, and each question's frame is brighter than the one before, with the biggest jumps at Q3 and Q6: a script reports the mean brightness of all seven.
+- [ ] Every colour sits in the plum to amber family: a script lists each colour's hue, and each frame's colour count.
 - [ ] Afterglow's page shows the festival at https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, with no harbour, keeper or tube.
 - [ ] On a phone and on 1920×1080, the buildings hold the edges and the middle widens: screenshots at both, nothing stretched.
 - [ ] Each question lands further along the street, and Q3 and Q6 are clearly major: screenshots at all seven.
@@ -118,7 +136,8 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | 60 fps, 16.7 ms, Handjet 400, 20 s, 7 questions, the points | Unchanged | 14c-4 and the game's rules |
 | Q3 and Q6 | The major shifts | Human, 2026-11-05 (answer 1) |
 | About 292 art pixels across on a 390-wide phone | The art's detail | The figure in the question the human answered (answer 4); to be judged on the comp |
-| 960×540 on 1920×1080 (2 device pixels per art pixel), 63 colours | The desktop art size and the palette | Proposed by Claude for the human to judge on the comp |
+| 960×540 on 1920×1080 (2 device pixels per art pixel) | The desktop art size | Proposed by Claude for the human to judge on the comp |
+| About 32 colours per frame detailed, about 16 simple; hues from plum through red to amber, none outside | The tighter palette | Proposed by Claude for the human to judge on the comp |
 | Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
 
 ## Plan
@@ -131,6 +150,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers can be pre-drawn. Reason for doubt: a full-screen smooth zoom at finer art costs far more than the last build. Disproved by: an average over 16.7 ms at either size. If so, stop and ask.
 
 ## Removes
+- The comp's multi-hue palette, and whichever of the simple and detailed versions the human doesn't choose.
 - Afterglow's harbour, sun, keeper, launch tube and sky marks.
 - The result card, on this theme.
 - `wordMove`'s size change, on this theme.
@@ -145,7 +165,18 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 |---|---|---|
 
 ## Evidence
-**The still comp, waiting for the human's approval:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw (private, published 2026-11-05; source `themes/festival/` in the mocks folder). Four stages, wide at 960×540 and phone at 292×633: 63 colours, no forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. Pre-draw 60 to 191 ms; a still frame 0.2 to 0.6 ms. The smooth zoom isn't measured yet.
+**The still comp, waiting for the human's approval and their choice of version:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw, version 2 (private, 2026-11-05; source `themes/festival/` in the mocks folder, brief `BRIEF-2.md`). `node themes/festival/shots.mjs` ended "all checks pass". Mean brightness, Rec. 601 luma over the whole frame, Q1 to Q7:
+
+| Size and version | Mean brightness | Colours per frame | Pre-draw | Frame |
+|---|---|---|---|---|
+| Wide detailed | 43.1 45.4 66.5 67.1 74.6 93.7 109.9 | 24 to 32 | 119-188 ms | 0.53-0.68 ms |
+| Wide simple | 44.3 48.3 67.6 74.9 82.9 104.1 119.5 | 12 to 16 | 106-140 ms | 0.53-0.85 ms |
+| Phone detailed | 44.7 47.5 62.0 63.4 70.3 99.4 109.0 | 24 to 32 | 56-76 ms | 0.19-0.21 ms |
+| Phone simple | 47.4 51.9 63.2 70.2 79.0 109.5 119.2 | 12 to 16 | 56-66 ms | 0.18-0.20 ms |
+
+Brightness rises at every step, the biggest jumps are at Q3 and Q6, and Q7 is highest, in all four. Wide detailed Q3 to Q4 is only +0.5, so that step is nearly flat. Hues run 300.0° through 0° to 48.3°, none outside plum to amber. No forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. The smooth zoom isn't measured yet.
+
+**The first still comp, replaced after the human's round 5 notes:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw (private, published 2026-11-05; source `themes/festival/` in the mocks folder). Four stages, wide at 960×540 and phone at 292×633: 63 colours, no forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. Pre-draw 60 to 191 ms; a still frame 0.2 to 0.6 ms. The smooth zoom isn't measured yet.
 
 ## Review
 - Blocking findings and how each was fixed:
