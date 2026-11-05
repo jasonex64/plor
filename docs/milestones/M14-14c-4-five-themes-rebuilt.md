@@ -1,6 +1,6 @@
 # M14 — 14c-4, five themes rebuilt to the human's spec
 
-**Status:** in review (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
+**Status:** done, the human chose Afterglow, 2026-11-05: "final direction will be afterglow, keep the rest for future endeavors" (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
 
 ## Goal
 Rebuild Off the Menu, Afterglow (Asterism until now), Uncounted, Marmo and Moonbrew on their private claude.ai pages to the human's spec, so the human can choose the one theme that becomes the game.
@@ -77,7 +77,7 @@ Unchanged: 640×360 with whole-number nearest-neighbour scaling, fill and crop, 
 - [x] Scene art sits on the grid: a script logs every drawing call and finds none off the art grid. (The first wording, sampling the screen, couldn't fail: Review.)
 - [x] Panels and the word's landing sit on the grid: a script reports each one's position as a whole multiple of the scale. (Reworded: Source diff.)
 - [x] At 390×844, each theme's mascot and key prop are visible and clear of the prompt, in screenshots at Q1, Q3 and Q6.
-- [ ] A clip per theme shows the answer beat: foreground still, backdrop moving. (Frame strips exist, and a script proves the clocks; video doesn't. Waits on the human: Source diff.)
+- [ ] A clip per theme shows the answer beat: foreground still, backdrop moving. (Frame strips exist, and a script proves the clocks; video doesn't. Moot: the human chose Afterglow and 14c-5 redesigns it.)
 - [x] No console errors in a scripted run at either size.
 
 ## Out of scope
@@ -134,7 +134,7 @@ Experiment, step 3. Expected: 60 fps stays under 16.7 ms on average, because 14c
 |---|---|---|
 | Ticket: republished at the existing links | Five new private pages; the old links still show the 14c-3 versions | The publish tool refuses a replacement until each old page is read whole, and the five were too large for one session (about 40,000 tokens each). The human keeps the new links (2026-11-05: "Keep the new links") |
 | Ticket: each text box on the grid | Panels and the word's landing on the grid; text inside a panel isn't | Handjet's pixels are finer than the art's (round 5, "Loosen it"), so a text box's grid position means nothing to its letters; the human said text "can technically move around and maybe itll break the grid a bit" (answer 7) |
-| Ticket: a clip per theme | Frame strips in the human's doc, plus a script proving the clocks | The live pages show the motion. Waits on the human |
+| Ticket: a clip per theme | Frame strips in the human's doc, plus a script proving the clocks | The live pages show the motion. Moot since 14c-5 redesigns the chosen theme |
 | Ticket: the scene tracker as the only themed progress | Moonbrew adds seven studs on the pot | The builder's addition, so each step reads clearly |
 | Plan: Moonbrew's pot among the backdrop's idle motion | The pot's rock and jolt run on the foreground clock, and only its surface, steam and fire on the backdrop's | Review: the pot carries the tracker, so it's foreground |
 
