@@ -68,7 +68,7 @@ Unchanged: 640×360 with whole-number nearest-neighbour scaling, fill and crop, 
 **Art.** Drawn by code only, with no generated sprites: boxy characters with 3+ colour ramps, depth layers and varied silhouettes. Every motion stays a function of time and a seeded index, so nothing accumulates over long runs.
 
 ## Acceptance criteria
-- [ ] A private font test page shows two candidates on prompt, answer and HUD across all five themes, and the human picks one before the rebuild starts.
+- [x] A private font test page shows the candidates on prompt, answer and HUD across all five themes, and the human picks one before the rebuild starts. (Four options on the last page, after two rounds; the Evidence has them.)
 - [ ] All five pages are republished at their existing links, and J's page is titled Afterglow.
 - [ ] Every box in the spec's Acceptance checklist has pass or fail per theme, with a screenshot or clip, in a results table in the human's doc.
 - [ ] Each theme's palette is written as hex in the human's doc; the human's existing words are unchanged.
@@ -101,6 +101,8 @@ Unchanged: 640×360 with whole-number nearest-neighbour scaling, fill and crop, 
 | Points, 7 questions, 20 s, sample data | The mock's run | 14c-3's Numbers (unchanged) |
 | The word's move, tracker and backdrop timings; the portrait mascot's position | The review pages only | **Proposed by Claude for the human to judge on the pages**, like 14c-3's mock timings; not carried into the app without the human's word |
 | Two font candidates | The font test page | Human's spec, Type: "Shortlist 1–2 candidates" |
+| Handjet at weight 400, 15 × 2 or 3 CSS px | The one font and its sizes | Human, 2026-11-05 ("Handjet heavier"); the size is proposed by Claude, on the test page the human chose from |
+| 380 art pixels (stack below), 300 art pixels (card), 0.9 s (react), 36% of the visible height (the stacked prompt's top) | The review pages' layout and pacing | Proposed by Claude for the human to judge on the pages; not carried into the app without the human's word |
 
 ## Plan
 1. Make `C:/Users/jason/RIFF-mocks` outside the repo, with its own local git, and copy in the five pages and the shared harness and game script from the temp folder. A Node script builds each theme into one self-contained HTML file. The handoff records the path. This folder lives on this PC only.
@@ -143,6 +145,8 @@ Hypothesis (`fonts/sheet2.mjs`): the Galmuri faces and DotGothic16 read cleanest
 The human's favourites from the sheet (2026-11-05): "i like handjet, vt323, and galmuri9". All three went on the wide and phone test at the same link, on all five themes, with a heavier Handjet (weight 400) added for the human to compare.
 
 Hypothesis (`fonts/check.mjs`): all three fit every panel at both sizes; Handjet at weight 300 is at risk on Marmo's light panel. Fit held: no panel overlaps the HUD or leaves its stage, for all four options at 1000×900 and 390×844, no sideways scroll, no console errors. The risk held by eye: at weight 300 on Marmo, Handjet is faint, and on a 1× display it shows coloured fringes from the browser's text smoothing; that smoothing isn't in the page's control on Windows. Phone line length as measured by the page: Galmuri 9 about 26 letters, Handjet about 27, VT323 about 21 (at weight 300 for Handjet; the heavier one wasn't measured). All three have one-width digits; licences read: Galmuri, Handjet and VT323 are OFL 1.1.
+
+**The game's one font: Handjet, weight 400** (human, 2026-11-05: "Handjet heavier"). This settles the spec's first open decision.
 
 ## Review
 - Blocking findings and how each was fixed:
