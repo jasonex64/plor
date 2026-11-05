@@ -132,7 +132,7 @@ Experiment, step 3. Expected: 60 fps stays under 16.7 ms on average, because 14c
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
-| Ticket: republished at the existing links | Five new private pages; the old links still show the 14c-3 versions | The publish tool refuses a replacement until each old page is read whole, and the five were too large for one session (about 40,000 tokens each). The human decides whether to keep the new links |
+| Ticket: republished at the existing links | Five new private pages; the old links still show the 14c-3 versions | The publish tool refuses a replacement until each old page is read whole, and the five were too large for one session (about 40,000 tokens each). The human keeps the new links (2026-11-05: "Keep the new links") |
 | Ticket: each text box on the grid | Panels and the word's landing on the grid; text inside a panel isn't | Handjet's pixels are finer than the art's (round 5, "Loosen it"), so a text box's grid position means nothing to its letters; the human said text "can technically move around and maybe itll break the grid a bit" (answer 7) |
 | Ticket: a clip per theme | Frame strips in the human's doc, plus a script proving the clocks | The live pages show the motion. Waits on the human |
 | Ticket: the scene tracker as the only themed progress | Moonbrew adds seven studs on the pot | The builder's addition, so each step reads clearly |
