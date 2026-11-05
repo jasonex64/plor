@@ -73,6 +73,8 @@ Round 6, the human's notes after playing the build
 22. Border: "Sparkler fuse (Recommended)". A twisted cord spitting sparks along its length, with a big burning head, still the timer.
 23. Flight: "Rocket wobble (Recommended)". A swaying S-curve with a spark trail, truer and faster for better answers, speeding up off the ground and slowing to a hang at the top.
 24. Linger: "Hanging glitter (Recommended)". The burst blooms once, then its shape stays as sparks that twinkle, fall and are replaced, until the button is pressed.
+25. Colour count, measured at 23 to 43 per frame and up to 70 briefly as the lights come on: "color count is fine".
+26. The early camera steps, where Q1 to Q2 moves as far as Q2 to Q3: "looks fine". The camera stays as approved; Q3 and Q6 are major through light, composition and walk time.
 
 ## What this changes
 | Was | Now | Why |
@@ -158,7 +160,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | Q3 and Q6 | The major shifts | Human, 2026-11-05 (answer 1) |
 | About 292 art pixels across on a 390-wide phone | The art's detail | The figure in the question the human answered (answer 4); to be judged on the comp |
 | 960×540 on 1920×1080 (2 device pixels per art pixel) | The desktop art size | Proposed by Claude for the human to judge on the comp |
-| About 32 colours per frame detailed, about 16 simple; hues from plum through red to amber, none outside | The tighter palette | Proposed by Claude for the human to judge on the comp |
+| About 23 to 43 colours per frame, up to 70 briefly on arrival; hues from plum through red to amber, none outside | The tighter palette | Measured; human, 2026-11-05 (answer 25) |
 | Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
 
 ## Plan
@@ -206,5 +208,5 @@ Brightness rises at every step, the biggest jumps are at Q3 and Q6, and Q7 is hi
   - B2, play-again after a finale hid the result's answer line. Open.
   - B3 and B4, the harbour theme and the Simple comp files remain. Auto mode refused their deletion; waits on the human. `drawStreet`'s dead code is open.
   - B5 to B9, check lines that claim more than they measure: burst on screen, walk zoom actually drawn, fuse against the seconds shown, the word during a time-out, colour on every phase, one font, Q1's tower. Open.
-  - B10, no live script lists hues and per-frame colours; the canvas measured 23 to 70 colours per frame against "about 32". Open, and the number needs the human.
+  - B10, no live script lists hues and per-frame colours; the canvas measured 23 to 70 colours per frame against "about 32". Open; the number is settled (answer 25).
 - Deferred to ROADMAP "Next revision":
