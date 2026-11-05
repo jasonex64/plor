@@ -60,6 +60,19 @@ The link shows a windmill landscape in red-orange to peach, separated by lightne
 17. Colour mood: "Plum dusk to amber (Recommended)". This replaces answer 5.
 18. What lights the street: "Question number (Recommended)". Everyone sees the same dark start and bright palace; answers don't change it.
 19. Detail: "id like to see a simple version as well as a detailed". The comp shows both, and the one not chosen is deleted.
+20. The comp, version 2: "lets see the detailed version thru for mow". Detailed goes forward and motion starts. Because that's "for now", Simple is deleted from the code but stays recoverable at commit 62fc436 in the mocks folder.
+
+Round 6, the human's notes after playing the build
+> okay 1: the text boxes are both too square and also the border isnt playful enough (can be more firework themed.).
+>
+> 2: the word shooting up is weak. i change my mind about only the textbox rumbling: the whole entity should rumble as to prepare for takeoff, and then the path upward shoudlnt just be straight up with no wiggle or motion: also, there should be some sort of acceleration and deceleration. at the top as long as the player doesnt click “next” the firework effext should be built in a way that lingers endlessly. lastly when descending back to ground theres some lack of cohesion of the builidings (looks like a section got chopped off)
+>
+> also color for text should be diff for rarities as well as the animation slightly
+
+21. Box shape: "Rounded pill".
+22. Border: "Sparkler fuse (Recommended)". A twisted cord spitting sparks along its length, with a big burning head, still the timer.
+23. Flight: "Rocket wobble (Recommended)". A swaying S-curve with a spark trail, truer and faster for better answers, speeding up off the ground and slowing to a hang at the top.
+24. Linger: "Hanging glitter (Recommended)". The burst blooms once, then its shape stays as sparks that twinkle, fall and are replaced, until the button is pressed.
 
 ## What this changes
 | Was | Now | Why |
@@ -73,6 +86,10 @@ The link shows a windmill landscape in red-orange to peach, separated by lightne
 | Harbour, sun, keeper, launch tube | All gone | Brief 1, 2 |
 | A shift at Q3 and Q6 only | A tiny step forward every question, and major shifts at Q3 and Q6 | Answer 1 |
 | Sky marks | Sky lanterns | Answer 12 |
+| Only the word's box wiggles (answer 2) | The whole word and box rumble before takeoff. The lettering still never stretches or scales | Round 6 |
+| The lettering looks the same for every answer (answer 2) | Its colour differs by rarity, inside the plum to amber family | Round 6 |
+| Square boxes, a plain cord | Rounded pills with a sparkler fuse | Answers 21, 22 |
+| A burst that fades | A burst that lingers until the button | Answer 24 |
 | 63 colours across violet, green, teal, red and gold | One family of neighbouring hues, plum through rose to amber | Round 5, answers 16 and 17 |
 | Dusk into golden night, with lanterns lit from Q1 | Nothing lit at Q1. Lights come on question by question, and the palace at Q7 is the brightest frame | Round 5, answers 17 and 18 |
 | A stage is only a camera position | A stage is a camera position and a set of lit lights | Round 5 |
@@ -93,9 +110,9 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 **The prompt.** The question sits in a text box whose border is a fuse. It burns around the box in step with the 20 s clock, beside the seconds number. Near the end, the sparks grow and the box shakes.
 
 **The climb.** The typed word comes to the front of the screen.
-1. It charges up at street level: the box wiggles and sparks gather. A better answer charges longer.
-2. It shoots up. The view rises with it, and the buildings' floors rush past, faster for a better answer.
-3. Everything reaches open sky. The word bursts behind the lettering, with its shape from the rarity and its size from the points.
+1. It charges up at street level: the whole word and box rumble and sparks gather. A better answer charges longer. The word's colour and its rumble, flight and burst differ a little by rarity.
+2. It shoots up on a swaying path with a spark trail, speeding up off the ground and slowing to a hang at the top. The view rises with it, and the buildings' floors rush past, faster for a better answer.
+3. Everything reaches open sky. The word bursts behind the lettering, with its shape from the rarity and its size from the points, and the burst keeps glittering until the button.
 4. The result sits on screen, a sky lantern joins the others, and a themed button appears.
 5. On the button, the view drifts down with falling embers and lands further along the street.
 
@@ -107,13 +124,17 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 **Detail.** Light comes from real sources, with soft multi-colour glows instead of dots, and reflections that ripple instead of straight lines. Lanterns, roofs and side areas are drawn to the level of references 5 and 7, and sparks use the star shapes in reference 6.
 
 ## Acceptance criteria
-- [ ] A still comp of the street at all seven questions, wide and phone, is approved by the human before any motion is built, with one of the simple and detailed versions chosen.
+- [x] A still comp of the street at all seven questions, wide and phone, is approved by the human before any motion is built, with one of the simple and detailed versions chosen.
 - [ ] Nothing is lit at Q1, and each question's frame is brighter than the one before, with the biggest jumps at Q3 and Q6: a script reports the mean brightness of all seven.
 - [ ] Every colour sits in the plum to amber family: a script lists each colour's hue, and each frame's colour count.
 - [ ] Afterglow's page shows the festival at https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, with no harbour, keeper or tube.
 - [ ] On a phone and on 1920×1080, the buildings hold the edges and the middle widens: screenshots at both, nothing stretched.
 - [ ] Each question lands further along the street, and Q3 and Q6 are clearly major: screenshots at all seven.
 - [ ] The lettering's shape and size don't change through the charge, climb and burst: a script compares it.
+- [ ] The word's colour differs by rarity, and its rumble and flight differ a little: a script reports them for common, uncommon and rare.
+- [ ] The climb accelerates and then decelerates, on a path that sways: a script reports speed and sideways motion through the climb.
+- [ ] The burst lingers with visible change for as long as the button waits: a script compares frames over at least a minute.
+- [ ] Coming down, the buildings join with no chopped-off section: frames through the descent at both sizes, checked by a person.
 - [ ] A rare answer charges longer and climbs faster than a common one: a script reports both durations.
 - [ ] The burst differs by rarity in shape and by points in size: frames at common and rare, Q1 and Q7.
 - [ ] The fuse burns in step with the clock, and its sparks and shake grow near the end: a script reads its position at three times.
@@ -141,7 +162,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
 
 ## Plan
-1. Add portrait, edge-anchored layout to the mocks folder's core, for Afterglow only.
+1. Give Afterglow its own portrait, edge-anchored game file in `themes/festival/`, sharing the mock rules in `core/game-mock.js`. The four kept themes stay on the shared core, untouched.
 2. Draw the street at Q1, Q6 and the palace as stills, wide and phone, and publish them as a comp for the human.
 3. After approval, build the walk, the fuse, the climb, the bursts, the ends and the tracker. Publish to Afterglow's page.
 4. Rewrite the checks for these rules, and prove them with broken builds.
@@ -150,12 +171,13 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers can be pre-drawn. Reason for doubt: a full-screen smooth zoom at finer art costs far more than the last build. Disproved by: an average over 16.7 ms at either size. If so, stop and ask.
 
 ## Removes
-- The comp's multi-hue palette, and whichever of the simple and detailed versions the human doesn't choose.
+- The comp's multi-hue palette, and the Simple version's code (recoverable at commit 62fc436 in the mocks folder).
 - Afterglow's harbour, sun, keeper, launch tube and sky marks.
 - The result card, on this theme.
 - `wordMove`'s size change, on this theme.
 - 14c-4's rule that foreground stills in the beat, on this theme.
 - The fixed 640×360 buffer, on this theme.
+- `themes/afterglow/`, the old harbour theme (recoverable from git in the mocks folder).
 
 ---
 *Fill in the sections below at the end.*
@@ -179,5 +201,10 @@ Brightness rises at every step, the biggest jumps are at Q3 and Q6, and Q7 is hi
 **The first still comp, replaced after the human's round 5 notes:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw (private, published 2026-11-05; source `themes/festival/` in the mocks folder). Four stages, wide at 960×540 and phone at 292×633: 63 colours, no forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. Pre-draw 60 to 191 ms; a still frame 0.2 to 0.6 ms. The smooth zoom isn't measured yet.
 
 ## Review
-- Blocking findings and how each was fixed:
+- Blocking findings and how each was fixed (first review, 2026-11-05: 10 blockers; a build with 11 defects passed every check line, so the checks must be rebuilt):
+  - B1, skipping all seven questions crashed the page. Open.
+  - B2, play-again after a finale hid the result's answer line. Open.
+  - B3 and B4, the harbour theme and the Simple comp files remain. Auto mode refused their deletion; waits on the human. `drawStreet`'s dead code is open.
+  - B5 to B9, check lines that claim more than they measure: burst on screen, walk zoom actually drawn, fuse against the seconds shown, the word during a time-out, colour on every phase, one font, Q1's tower. Open.
+  - B10, no live script lists hues and per-frame colours; the canvas measured 23 to 70 colours per frame against "about 32". Open, and the number needs the human.
 - Deferred to ROADMAP "Next revision":
