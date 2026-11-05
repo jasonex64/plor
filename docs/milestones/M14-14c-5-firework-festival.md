@@ -118,6 +118,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | 60 fps, 16.7 ms, Handjet 400, 20 s, 7 questions, the points | Unchanged | 14c-4 and the game's rules |
 | Q3 and Q6 | The major shifts | Human, 2026-11-05 (answer 1) |
 | About 292 art pixels across on a 390-wide phone | The art's detail | The figure in the question the human answered (answer 4); to be judged on the comp |
+| 960×540 on 1920×1080 (2 device pixels per art pixel), 63 colours | The desktop art size and the palette | Proposed by Claude for the human to judge on the comp |
 | Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
 
 ## Plan
@@ -144,6 +145,7 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 |---|---|---|
 
 ## Evidence
+**The still comp, waiting for the human's approval:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw (private, published 2026-11-05; source `themes/festival/` in the mocks folder). Four stages, wide at 960×540 and phone at 292×633: 63 colours, no forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. Pre-draw 60 to 191 ms; a still frame 0.2 to 0.6 ms. The smooth zoom isn't measured yet.
 
 ## Review
 - Blocking findings and how each was fixed:
