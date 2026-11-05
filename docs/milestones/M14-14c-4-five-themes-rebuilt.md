@@ -1,6 +1,6 @@
 # M14 — 14c-4, five themes rebuilt to the human's spec
 
-**Status:** in progress (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
+**Status:** in review (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
 
 ## Goal
 Rebuild Off the Menu, Afterglow (Asterism until now), Uncounted, Marmo and Moonbrew on their private claude.ai pages to the human's spec, so the human can choose the one theme that becomes the game.
@@ -69,16 +69,16 @@ Unchanged: 640×360 with whole-number nearest-neighbour scaling, fill and crop, 
 
 ## Acceptance criteria
 - [x] A private font test page shows the candidates on prompt, answer and HUD across all five themes, and the human picks one before the rebuild starts. (Four options on the last page, after two rounds; the Evidence has them.)
-- [ ] All five pages are republished at their existing links, and J's page is titled Afterglow.
-- [ ] Every box in the spec's Acceptance checklist has pass or fail per theme, with a screenshot or clip, in a results table in the human's doc.
-- [ ] Each theme's palette is written as hex in the human's doc; the human's existing words are unchanged.
-- [ ] A script reports one font family across every screen of every theme.
-- [ ] Each page runs at 60 fps time steps, and its average draw time stays under 16.7 ms at 1920×1080 and 390×844 in a scripted run; worst frames are reported too. This is desktop Chrome, not proof for a real phone, so the human checks on their phone.
-- [ ] Scene art sits on the grid: a script samples the canvas and finds every source pixel a uniform block at the current scale.
-- [ ] Text at rest sits on the grid: a script reports each text box's position as a whole multiple of the scale.
-- [ ] At 390×844, each theme's mascot and key prop are visible and clear of the prompt, in screenshots at Q1, Q3 and Q6.
-- [ ] A clip per theme shows the answer beat: foreground still, backdrop moving.
-- [ ] No console errors in a scripted run at either size.
+- [x] All five pages are published and J's page is titled Afterglow. (At new links, not the existing ones: Source diff.)
+- [x] Every box in the spec's Acceptance checklist has pass or fail per theme, with screenshots, in a results table in the human's doc.
+- [x] Each theme's palette is written as hex in the human's doc; the human's existing words are unchanged. (The font decision's box is ticked; the palettes wait for the human to lock.)
+- [x] A script reports one font family across every screen of every theme.
+- [x] Each page runs at 60 fps time steps, and its average draw time stays under 16.7 ms at 1920×1080 and 390×844 in a scripted run; worst frames are reported too. This is desktop Chrome, not proof for a real phone, so the human checks on their phone.
+- [x] Scene art sits on the grid: a script logs every drawing call and finds none off the art grid. (The first wording, sampling the screen, couldn't fail: Review.)
+- [x] Panels and the word's landing sit on the grid: a script reports each one's position as a whole multiple of the scale. (Reworded: Source diff.)
+- [x] At 390×844, each theme's mascot and key prop are visible and clear of the prompt, in screenshots at Q1, Q3 and Q6.
+- [ ] A clip per theme shows the answer beat: foreground still, backdrop moving. (Frame strips exist, and a script proves the clocks; video doesn't. Waits on the human: Source diff.)
+- [x] No console errors in a scripted run at either size.
 
 ## Out of scope
 - Building any theme into `/play` (the next sub-ticket, after the human picks). WCAG 2.2.2 and the rest of answer 12 in 14c-3 go to DECISIONS.md then.
@@ -99,10 +99,14 @@ Unchanged: 640×360 with whole-number nearest-neighbour scaling, fill and crop, 
 | Top-right | The HUD | Human's spec, default, Layout |
 | 640×360, whole-number scale, shifts at Q3 and Q6, 390×844 and 1920×1080 checks | Every theme | 14c-3 (answers 8, 10, 13, and its Evidence) |
 | Points, 7 questions, 20 s, sample data | The mock's run | 14c-3's Numbers (unchanged) |
+| 24 art pixels, 0.25, four tf steps of 0.37, 1.1, 2.3 and 4.7 s | `themes/check.mjs`: the region around a mascot, the share of its changed pixels that may follow the backdrop clock, and how far the foreground clock is stepped | Proposed by Claude; measured 0 to 5% on all five |
+| 0.1 | The share of foreground pixels that may also move with the backdrop clock, in `themes/check.mjs` (a spark passing a mascot is fine; a moving mascot isn't) | Proposed by Claude; measured 0 to 7% on all five |
+| Art-pixel spacing in the core (EDGE 6, the side mascot zone 40, 60, 8, 2, the prompt offsets 34 and 24), the refused-letter shake (2, −2, 1, 0 art pixels at 40 ms), type sizes 13 and 20 × K, line heights 1.15 and 1.05, panel padding and gaps | The review pages only | Proposed by Claude for the human to judge on the pages; not carried into the app without the human's word |
+| K = min(3, height ÷ 375, width ÷ 195) | The type scale, so the card stays under 35% | Worked out from the spec's 35% with the longest sample answer at six more screen sizes |
 | The word's move, tracker and backdrop timings; the portrait mascot's position | The review pages only | **Proposed by Claude for the human to judge on the pages**, like 14c-3's mock timings; not carried into the app without the human's word |
 | Two font candidates | The font test page | Human's spec, Type: "Shortlist 1–2 candidates" |
-| Handjet at weight 400, 15 × 2 or 3 CSS px | The one font and its sizes | Human, 2026-11-05 ("Handjet heavier"); the size is proposed by Claude, on the test page the human chose from |
-| 380 art pixels (stack below), 300 art pixels (card), 0.9 s (react), 36% of the visible height (the stacked prompt's top) | The review pages' layout and pacing | Proposed by Claude for the human to judge on the pages; not carried into the app without the human's word |
+| Handjet at weight 400, 15 × K CSS px | The one font and its sizes | Human, 2026-11-05 ("Handjet heavier"); the size is proposed by Claude, on the test page the human chose from |
+| 380 art pixels (stack below), 300 art pixels (card), 0.9 s (react), 36% of the visible height (the stacked prompt's top), 256 (the column, the spec's 40% of 640) | The review pages' layout and pacing | Proposed by Claude for the human to judge on the pages; not carried into the app without the human's word |
 
 ## Plan
 1. Make `C:/Users/jason/RIFF-mocks` outside the repo, with its own local git, and copy in the five pages and the shared harness and game script from the temp folder. A Node script builds each theme into one self-contained HTML file. The handoff records the path. This folder lives on this PC only.
@@ -128,6 +132,11 @@ Experiment, step 3. Expected: 60 fps stays under 16.7 ms on average, because 14c
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Ticket: republished at the existing links | Five new private pages; the old links still show the 14c-3 versions | The publish tool refuses a replacement until each old page is read whole, and the five were too large for one session (about 40,000 tokens each). The human decides whether to keep the new links |
+| Ticket: each text box on the grid | Panels and the word's landing on the grid; text inside a panel isn't | Handjet's pixels are finer than the art's (round 5, "Loosen it"), so a text box's grid position means nothing to its letters; the human said text "can technically move around and maybe itll break the grid a bit" (answer 7) |
+| Ticket: a clip per theme | Frame strips in the human's doc, plus a script proving the clocks | The live pages show the motion. Waits on the human |
+| Ticket: the scene tracker as the only themed progress | Moonbrew adds seven studs on the pot | The builder's addition, so each step reads clearly |
+| Plan: Moonbrew's pot among the backdrop's idle motion | The pot's rock and jolt run on the foreground clock, and only its surface, steam and fire on the backdrop's | Review: the pot carries the tracker, so it's foreground |
 
 ## Evidence
 **The font test page, waiting for the human's pick:** https://claude.ai/artifact/WKxNEsxefS4QGiUYsTYuHr (private, published 2026-11-05). Scripts: `fonts/measure.mjs`, `sheet.mjs`, `capture.mjs`, `build.mjs` and `check.mjs` in `C:/Users/jason/RIFF-mocks`.
@@ -148,6 +157,28 @@ Hypothesis (`fonts/check.mjs`): all three fit every panel at both sizes; Handjet
 
 **The game's one font: Handjet, weight 400** (human, 2026-11-05: "Handjet heavier"). This settles the spec's first open decision.
 
+**The build (2026-11-05).** The source is in `C:/Users/jason/RIFF-mocks/themes/`. The new pages, private: Off the Menu https://claude.ai/artifact/HCtwNQQWYyXbdGyNzZdYWp, Afterglow https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, Uncounted https://claude.ai/artifact/QC2yRYk5SzDrdEn3hxzD3w, Marmo https://claude.ai/artifact/GFdWVG8UNQ9dta1tBUYbox, Moonbrew https://claude.ai/artifact/KNhC1G8FttiSHVtBeHtSQV.
+
+`node themes/check.mjs <id>`, run one theme at a time on the final builds: ALL PASS on all five. Average draw time 0.61 to 4.51 ms and worst frame 11.90 ms (Uncounted, wide, Q6) against the 16.7 ms budget, 60 fps; result card at most 34% with the longest answer on every end at 1366×768, 1440×900, 1024×768, 375×667, 360×640 and 844×390. Desktop headless Chrome only: a real phone is untried.
+
+`node themes/mutants.mjs`: nine broken builds, all caught. On Afterglow: foreground never stops (6 FAIL lines), backdrop stops in the beat (6), off-grid drawing (2), card too big (6), taken letters allowed (2), HUD moves (2), second font (2). The reviewer repeated those seven on Uncounted with the same counts. On Moonbrew: foreground drawn on the backdrop clock (12), and taken letters stripped mid-composition (2), which gave the reviewer's "lemlemolemon".
+
+Hypothesis, step 3: held. Draw times stayed well inside 60 fps.
+
+Proof sheets, palettes and the per-theme results are in the human's doc. By eye, in the screenshots: the mascot's place, repeated shapes, and each Q3 shift. From the builders' reports only: each Q6 shift, and the 3+ colour ramps. Motion hasn't been watched live.
+
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (the reviewer's 11, 2026-11-05):
+  1. "Mascot still" couldn't see a moving foreground: replaced by a check that the foreground clock stops, and a redraw comparing what follows each clock.
+  2. "Backdrop moving" counted the word's own effects: same redraw.
+  3. The grid check couldn't fail, as an upscale is always uniform: replaced by logging every drawing call. The art was clean on the reviewer's own hook.
+  4. Text at rest off the grid: criterion reworded (Source diff).
+  5. The font checks passed with no font: Handjet is now inside each page, a missing face shows on screen and logs an error (a corrupt one only logs), and the check needs a loaded face. A real Google Fonts timeout hit this in testing.
+  6. Console errors unwatched during a run: fixed.
+  7. Result card up to 61% on common screens: the type scale now follows the screen, checked at six more sizes on every end.
+  8. Moonbrew's pot moved in the beat: now on the foreground clock.
+  9. Moonbrew's centre column was busy: the cauldron stands right of the prompt on wide.
+  10. A taken letter got in through non-cancelable input: the input event now strips it, with a check.
+  11. Numbers without an origin, and the ticket's stale state: Numbers and this file are updated.
+- Blocking findings from the reviewer's second pass, both fixed: the check still passed Moonbrew's old pot and a mascot on the wrong clock, so it now compares each clock's pixels around the mascot and on the pot's belly; and the taken-letter fix scrambled text during a composition, so letters now leave when the composition ends and at submit, tested with real composition events. The reviewer confirmed the other fixes (card, pot, digits) and Handjet's one-width digits; these last two fixes are proved by the broken builds above, not by a third review.
+- Deferred to ROADMAP "Next revision": seven items, under "Found in 14c-4's review".
