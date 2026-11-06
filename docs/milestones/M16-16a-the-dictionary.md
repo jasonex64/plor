@@ -1,6 +1,6 @@
 # M16 — 16a, the dictionary
 
-**Status:** in review in PR #155 (approved 2026-11-05: "Approve, start dictionary"). 256,476 words built, its database size to be measured in 16b.
+**Status:** done, PR #155 merged on green CI, 2026-11-06, at the human's "Merge when green" (approved 2026-11-05: "Approve, start dictionary"). 256,476 words built, its database size to be measured in 16b.
 
 ## Goal
 One filtered word list that game 2 judges every typed word against and picks each day's substrings from, built by a script from pinned open sources.
@@ -126,6 +126,10 @@ The same pass's own check found another bug: a drop held only by ENABLE or Moby 
 | `test-run.e2e.ts:60`: not visible in 5 s, twice | **Likely, not proven:** the printed page shows Play test's click still on `/admin/puzzles`, and the server first rendered the route at that moment, so the first visit outran the 5 s. Claude first called this disproved by a warm-up's 685 ms, but that timed a signed-out `fetch` to its headers, not a browser's load, so it proved nothing. The test never failed in the warm-up's two runs | The test opens the route once in the browser before the click, and logs the time. No limit grew | The log shows a first visit near or past 5 s | A short first visit in the log, or the same failure after this |
 | `player-screens.e2e.ts:112`, both runs of `268350e`: the board never showed | **Inferred:** test 92 of 149, a 20-second wait, ran at about 08:00 UTC, midnight Pacific, in two runs started 15 s apart, so the day reset under it | None: it needs a run on that test at that moment. Recorded in ROADMAP | Passes off midnight | Fails again away from midnight |
 | `shell.e2e.ts:236`: the Result link was gone | **Seen on the printed page:** "Question 1 · 15s left" after a faked 21 s. The browser's clock reached zero and the server, on its real clock, gave the question 15 seconds back | The run moves back 21 seconds in the database too, as `player-screens.e2e.ts` already did. The assertions don't change | Passes | The same "15s left" page after this |
+
+Each commit also ran e2e twice, once for the push and once for the pull request, so an unreliable test had two chances to block a merge. It now runs once (human, 2026-11-06: "Yes, once per commit"; DECISIONS.md Log).
+
+**After the fix:** six e2e runs logged `/admin/test`'s first visit at 1,359 to 4,240 ms, close to expect's 5 seconds, and none of the six failed on it, so that reading held. Two of those runs, on superseded commits, failed on other tests, in ROADMAP For M16. PR #155's own head passed all its checks.
 
 The warm-up's deletion leaves ROADMAP's "Clicks that don't navigate under load" as it was, open.
 
