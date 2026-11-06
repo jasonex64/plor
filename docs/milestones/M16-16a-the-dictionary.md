@@ -117,6 +117,15 @@ Plan step 4's expectation **held**: the first full build gave 258,305 words, ins
 The same pass's own check found another bug: a drop held only by ENABLE or Moby stayed in, as the last filter looked only at listed words. `buildDictionary` now checks the drop list there too, with a test.
 
 **The final list:** 256,476 words, 2.65 MB as plain text, manifest SHA-256 `58af970abfaadcc8`…, the same over two runs. The snapshot's own checks: 0 words outside a to z or under 3 letters, 0 duplicates, sorted, 0 listed words, 0 of the 313 drops, and every sample innocent word kept. 967 three-letter substrings sit in 500 or more words, and 736 in 100 to 200. `vitest run scripts src/game/misses.test.ts`, without the database tests: 6 files, 131 tests passed.
+**CI failures on PR #155.** Three different jobs failed on one commit, none in code this PR changed. Reruns would only have moved the failure, so each was traced and fixed, each as a cause that would recur at random.
+
+| Failure | Cause | Fix | Expected in CI | Disproved by |
+|---|---|---|---|---|
+| `db` and `e2e`: "address already in use" on 54322, 54324, before any test | Those ports sit in Linux's outgoing range, so an image pull can hold one. **Inferred:** the range is printed by the fix, and no failing run was caught holding the port | Reserve 54320 to 54329, the ports in `supabase/config.toml`, before the stack starts | The step prints a range holding 54320 to 54329 | The same error after this |
+| `alive.e2e.ts:209`: the pop was false | `useGrown` adds the class in an effect, a render after the count shows, and the test read once. **Read from the code** | Poll for the same class, which stays once added. The assertion is unchanged and fails if it never pops | Passes | Fails: the pop never came |
+| `test-run.e2e.ts:60`: not visible in 5 s | The dev server compiles a route on first request, and this test is the first to reach `/admin/test`. **Inferred** from the log and test order | `e2e/warm-routes.ts` asks for every route once before the tests. No limit grew | The run's log shows routes taking seconds, `/admin/test/warm` among them | Every route under about a second: compiling isn't the cause |
+
+ROADMAP's "Clicks that don't navigate under load" may share the third cause (*unverified*), so it stays open until runs show otherwise.
 
 ## Review
 - Blocking findings and how each was fixed: the first pass's four, in Evidence, "The review's blockers, fixed", all closed on the recheck. The recheck's two were ticket text: criterion 4's rewording, put to the human (answer 8), and a wrong claim about `oldsquaw`, corrected (answer 9).

@@ -41,6 +41,13 @@ jobs:
           node-version-file: package.json
           cache: npm
       - run: npm ci
+      # Linux gives outgoing connections ports from a range that holds the stack's (printed below), so an image pull could
+      # take one and the stack's start fail "address already in use" (PR #155: 54322, 54324). These are the ports in
+      # supabase/config.toml, 54320 to 54329.
+      - name: Keep outgoing connections off the stack's ports
+        run: |
+          sysctl net.ipv4.ip_local_port_range
+          sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54329
       # The stack prints a table of its local keys on stdout, so stdout is dropped (CLAUDE.md: Secrets never leave
       # their home). A word filter missed the "Publishable" row on the first run. Errors go to stderr and still
       # fail the step. Realtime runs too: the live board's trigger sends to realtime.messages, whose daily
@@ -60,6 +67,13 @@ jobs:
           node-version-file: package.json
           cache: npm
       - run: npm ci
+      # Linux gives outgoing connections ports from a range that holds the stack's (printed below), so an image pull could
+      # take one and the stack's start fail "address already in use" (PR #155: 54322, 54324). These are the ports in
+      # supabase/config.toml, 54320 to 54329.
+      - name: Keep outgoing connections off the stack's ports
+        run: |
+          sysctl net.ipv4.ip_local_port_range
+          sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54329
       - name: Start the local Supabase stack
         run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
       # The dev server reads .env.local. The publishable key comes from the running stack and is masked, never
