@@ -66,7 +66,12 @@ describe("parseScowl", () => {
 
 describe("buildDictionary", () => {
   it("merges, normalizes, removes duplicates and sorts", () => {
-    expect(keys(buildDictionary([["zebra", "apple\r"], ["apple", "it's"]], parseScowl("60: mango <n>\n")))).toEqual(["apple", "its", "mango", "zebra"]);
+    expect(buildDictionary([["zebra", "apple\r"], ["apple", "it's"]], parseScowl("60: mango <n>\n"))).toEqual([
+      { key: "apple", spelling: "apple" },
+      { key: "its", spelling: "it's" },
+      { key: "mango", spelling: "mango" },
+      { key: "zebra", spelling: "zebra" },
+    ]);
   });
 
   it("holds the shortest word at 3 letters", () => {

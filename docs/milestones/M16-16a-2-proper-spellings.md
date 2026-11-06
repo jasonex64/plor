@@ -31,7 +31,7 @@ The pinned files downloaded to the session's scratchpad, outside the repo, with 
 - **The build's output** becomes pairs, one per proper spelling: (`word_key`, `spelling`), where `word_key` is `normalize`'s form, as today, and `spelling` is the source's spelling, lower-case. ENABLE's and Moby's words give a pair whose spelling is their own text. SCOWL's forms give their spelling as the table writes it, after `bare` takes the marks off.
 - **The set of keys doesn't change.** Every filter (size, misspellings, proper nouns, word parts, the offensive lists, the drop file, the 3-letter minimum) still works on the key, so the build keeps exactly today's 256,476 keys. A pair is kept only if its key is.
 - **The shown spelling** (DECISIONS.md, Game 2, updated in this ticket's PR), worked out in the database from a key's spellings:
-  1. If the typed text, lower-cased and trimmed, has no accents and one of the key's accented spellings equals it once its own accents are taken off, show that accented spelling (answer 2): "cafe" shows café, "abbes" shows abbés, and "abbe's" shows abbé's.
+  1. If the typed text, lower-cased and trimmed, has no accents and one of the key's accented spellings equals it once its own accents are taken off, show that accented spelling, the first in code-point order if several fit (answer 2; review, 2026-11-06): "cafe" shows café, "abbes" shows abbés, and "abbe's" shows abbé's.
   2. Otherwise, show the typed text, lower-cased and trimmed, if it's one of the key's spellings.
   3. Otherwise, show the first spelling in code-point order.
   
@@ -41,7 +41,8 @@ The pinned files downloaded to the session's scratchpad, outside the repo, with 
 ## Acceptance criteria
 - [ ] `buildDictionary` returns (key, spelling) pairs, checked by `scripts/dictionary.test.ts` on hand-made input: `it's` and `its` give two spellings for `its`; `well-known` gives `wellknown` → `well-known`; ENABLE's `cafe` and SCOWL's `café` give two spellings for `cafe`.
 - [ ] The existing filter tests pass unchanged: a blocked or dropped key loses every spelling.
-- [ ] A fetch on the Windows PC gives exactly 256,476 keys, the same as 16a's manifest, and reports the pair count. *Hypothesis:* the same keys, with more pairs than keys. *Disproved by:* any change in the key count.
+- [ ] A fetch on the Windows PC gives exactly 256,476 keys, the same as 16a's manifest, and reports the pair count. The manifest's `items` now counts pairs, not keys (it counted keys in 16a, when each key was one item), so the keys are counted from the snapshot, on that PC after the fetch:
+  `node -e "const f=require('fs');const m=JSON.parse(f.readFileSync('data/manifests/dictionary.json','utf8'));const s=JSON.parse(f.readFileSync('data/snapshots/dictionary/'+m.snapshot+'.json','utf8'));console.log('pairs',s.length,'keys',new Set(s.map(e=>e.key)).size)"` *Hypothesis:* the same keys, with more pairs than keys. *Disproved by:* any change in the key count.
 - [ ] The three spelling steps above are in DECISIONS.md's Game 2 section.
 
 ## Out of scope
@@ -78,5 +79,8 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
 **Still to come:** the fetch on the Windows PC, with Moby, against 16a's 256,476 keys.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (the `reviewer` agent, 2026-11-06):
+  1. "merges, normalizes, removes duplicates and sorts" read the keys through a `Set`, so a duplicate pair would have passed: it asserts the full pairs again.
+  2. Step 1 had no order when several accented spellings fit: the first in code-point order, in the ticket and DECISIONS.md.
+  3. The fetch prints only the pair count, and the manifest's `items` changed meaning: acceptance criterion 3 says so and names the command that counts keys.
+- Deferred to ROADMAP "Next revision": the six items under "For M16" marked "Found in M16 16a-2 (review)".

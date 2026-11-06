@@ -692,6 +692,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 16b's judging order doesn't say whether an S10 duplicate, an empty try or a non-letter try counts as a rejection for the lockout. Found in M16 16b (review).
 - [ ] 16b calls per-game format numbers "Claude's reading" where the audit lists it as the human's decision; the human's "yes thats fine" covers it, and the ticket could say so. Found in M16 16b (review).
 - [ ] `normalize` drops `\p{P}` but not `\p{S}`: "it´s" (U+00B4) becomes "it s" and a backtick survives. An S19 edge for 16d's tests. Found in M16 16b (review).
+- [ ] 16a-2's shown-spelling rule doesn't say the typed text is NFC'd before step 2 (stored spellings are NFC), nor what "accents" means for æ, œ, ø and ß, which `normalize` folds but a mark-strip doesn't ("encyclopædia"). For 16d, which builds the comparison. Found in M16 16a-2 (review, 2026-11-06).
+- [ ] `scripts/dictionary.test.ts`'s order-independence test uses only one-spelling keys, so the spelling order under shuffled inputs isn't tested; the comparator is total. Found in M16 16a-2 (review).
+- [ ] A plain-list line keeps its punctuation as its spelling (a Moby "a.m." would be spelling "a.m.", key "am"): look at Moby's pairs after the Windows fetch. Found in M16 16a-2 (review).
+- [ ] 16b's ticket (`M16-16b-run-model-and-format.md`, `dictionary_word`) still calls the sources' punctuation and accents unverified; 16a-2 measured ENABLE and SCOWL. Found in M16 16a-2 (review).
+- [ ] The BMP comment in `scripts/dictionary.ts` rests, for SCOWL, on 16a-2's one measurement (0 characters past U+FFFF); ENABLE and Moby are Latin-1 by construction. Found in M16 16a-2 (review).
+- [ ] HANDOFF had two "Now:" sections; fixed in the session's closing rewrite. Found in M16 16a-2 (review).
 
 - [x] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test opens the route first; six runs logged a first visit of 1,359 to 4,240 ms and none failed on it. "Clicks that don't navigate under load" above may be the same thing (*unverified*). Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
