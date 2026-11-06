@@ -106,6 +106,9 @@ test("a failed send is an alert, read at once, and the same words twice are anno
   // A new line, not the same one left in place: a live region reads what's added.
   expect(await first!.evaluate((el) => el.isConnected)).toBe(false);
 
+  // "Second." waits out its Undo window first: still held, it would be sent into the failing route by the next post, for
+  // two failures and an alert that can come back around the Close below. By its text, as sent() could match "First."'s.
+  await page.waitForResponse((r) => new URL(r.url()).pathname === "/api/comments" && (r.request().postData() ?? "").includes("Second."));
   await page.route("**/api/comments", (route) => (route.request().method() === "POST" ? route.abort("failed") : route.continue()));
   await post(page, "This one fails.");
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Friends" }).click();

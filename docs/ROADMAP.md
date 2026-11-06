@@ -690,7 +690,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [x] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test opens the route first; six runs logged a first visit of 1,359 to 4,240 ms and none failed on it. "Clicks that don't navigate under load" above may be the same thing (*unverified*). Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
 
-- [ ] Two more e2e tests failed once each on PR #155's superseded commits, each passing in the other run: `screen-readers.e2e.ts:96`, a failed send's focus (`:117`, run 42192409397), and `controls-and-state.e2e.ts:311`, the streak pill's read at the daily reset (`:328`, run 42192360456). Not traced; CI prints each failed test's page. Found in M16 16a (CI, 2026-11-06).
+- [ ] `e2e/controls-and-state.e2e.ts:311`, the streak pill's read at the daily reset, failed once on PR #155's superseded commits (`:328`, run 42192360456), and passed in the other runs. Not traced; CI prints each failed test's page. Found in M16 16a (CI, 2026-11-06).
+- [ ] `e2e/screen-readers.e2e.ts:96` kept focus on Close after Enter (`:117`), in PR #154's, PR #155's and PR #156's CI. The test sent two failures where it meant one, as "Second." was still held when the route began failing, and that's fixed; whether it was the cause isn't proven, so reopen this if it fails again. Printed pages can show another test's open page, as this one's did. Found in M16 16a (CI, 2026-11-06).
 - [ ] Dependabot's minimatch update failed on `main` (run 42195374679, 2026-11-06), a job of its own, not CI. Its cause isn't read. Found in M16 16a (CI, 2026-11-06).
 
 **For M15 (launch):**
