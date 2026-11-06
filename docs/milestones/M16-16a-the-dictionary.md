@@ -1,6 +1,6 @@
 # M16 — 16a, the dictionary
 
-**Status:** in review (approved 2026-11-05: "Approve, start dictionary"). 256,476 words built, its database size to be measured in 16b.
+**Status:** in review in PR #155 (approved 2026-11-05: "Approve, start dictionary"). 256,476 words built, its database size to be measured in 16b.
 
 ## Goal
 One filtered word list that game 2 judges every typed word against and picks each day's substrings from, built by a script from pinned open sources.
