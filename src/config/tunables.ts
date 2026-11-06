@@ -160,3 +160,9 @@ export const STREAK_RANK_FROM = [0, 1, 5, 15, 30, 90] as const;
 // Comments and reactions show at once and are sent when the toast's window ends, unless undone
 // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b; human, 2026-10-27: "5 seconds").
 export const UNDO_SECONDS = 5;
+
+// Game 2's dictionary (docs/milestones/M16-16a-the-dictionary.md). DICTIONARY_MAX_SIZE: the rarest words it takes, the
+// English Speller Database's size (human, 2026-11-05: "About 239,000 words (Recommended)"). DICTIONARY_MIN_LETTERS: the
+// shortest word (human, 2026-11-05: "3 letters or more (Recommended)").
+export const DICTIONARY_MAX_SIZE = 85;
+export const DICTIONARY_MIN_LETTERS = 3;

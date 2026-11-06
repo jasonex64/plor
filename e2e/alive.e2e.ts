@@ -206,6 +206,7 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await theirs.getByRole("button", { name: "😂" }).click();
   const laugh = theirs.getByText(/^😂 1/);
   await expect(laugh).toBeVisible();
-  expect(await popping(laugh.locator("span").first())).toBe(true);
+  // The count shows a render before useGrown's effect adds the pop, so one read can land between them (PR #155's CI).
+  await expect.poll(() => popping(laugh.locator("span").first())).toBe(true);
   expect(await popping(thumbs.locator("span").first())).toBe(false);
 });

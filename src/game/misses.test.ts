@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { isListed, isPlorListed } from "./misses";
+import { normalize } from "../content/puzzle";
+import { LDNOOBW_EN } from "./ldnoobw-en";
+import { isListed, isListedWord, isPlorListed } from "./misses";
+import { PLOR_LISTED } from "./plor-listed";
 
 // The held-word check (human, 2026-10-24: "Hold listed words (Recommended)") matches whole words of the normalized
 // text, so a listed word inside a harmless one doesn't hold it.
@@ -27,5 +30,17 @@ describe("isPlorListed", () => {
   it("holds Plor's words and not LDNOOBW's", () => {
     expect(isPlorListed("kaffir pox")).toBe(true);
     expect(isPlorListed("butt")).toBe(false);
+  });
+});
+
+describe("isListedWord", () => {
+  it("agrees with isListed on every one-word entry and on a word that only holds one", () => {
+    const onePerList = [...LDNOOBW_EN, ...PLOR_LISTED].map(normalize).filter((w) => w !== "" && !w.includes(" "));
+    for (const word of onePerList) expect(isListedWord(word)).toBe(isListed(word));
+    expect(isListedWord("button")).toBe(isListed("button"));
+  });
+
+  it("holds a listed phrase joined up, as normalize leaves a hyphenated spelling", () => {
+    expect(isListedWord(normalize("ambulance-chaser"))).toBe(true);
   });
 });

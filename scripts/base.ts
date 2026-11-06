@@ -8,6 +8,7 @@
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
+// Game 2's dictionary is fetched the same way, `npm run base -- fetch dictionary` (M16 16a), and nothing loads it yet.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -23,6 +24,7 @@ import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
+import { DICTIONARY_METHOD, fetchDictionary } from "./dictionary.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
@@ -41,7 +43,9 @@ export type Item = {
 // The sources, written once: the type and the hand files' ref check both read it (13e-9b review; 13f-4c).
 const SOURCES = ["wikidata", "oewn", "usda"] as const;
 type Source = (typeof SOURCES)[number];
+const WORD_LISTS = "word-lists";
 type SetDef<T = Item> = { source: Source; method: string; fetch: () => Promise<T[]> };
+type FetchDef<T> = Omit<SetDef<T>, "source"> & { source: Source | typeof WORD_LISTS };
 
 // --- aliases ---
 
@@ -1025,7 +1029,7 @@ const SETS: Record<string, SetDef> = {
 
 // --- snapshots, manifests, loading and review ---
 
-type Manifest = { set: string; source: Source; snapshot: string; retrieved_at: string; method: string; items: number; sha256: string };
+type Manifest = { set: string; source: Source | typeof WORD_LISTS; snapshot: string; retrieved_at: string; method: string; items: number; sha256: string };
 const manifestPath = (set: string) => join("data", "manifests", `${set}.json`);
 const snapshotPath = (set: string, snapshot: string) => join("data", "snapshots", set, `${snapshot}.json`);
 
@@ -1041,7 +1045,7 @@ function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] }
   return { manifest, items: JSON.parse(text) as T[] };
 }
 
-async function fetchSet<T>(set: string, def: SetDef<T>): Promise<void> {
+async function fetchSet<T>(set: string, def: FetchDef<T>): Promise<void> {
   const items = await def.fetch();
   const snapshot = new Date().toISOString().slice(0, 10);
   const text = JSON.stringify(items);
@@ -1500,6 +1504,8 @@ export function withMerges(items: Item[], into: Map<string, string>): Item[] {
 }
 
 const MARKS_SET = "wikidata-sameness";
+const DICTIONARY_SET = "dictionary";
+const DICTIONARY: FetchDef<string> = { source: WORD_LISTS, method: DICTIONARY_METHOD, fetch: () => fetchDictionary(download) };
 const wikidataSets = () => Object.entries(SETS).filter(([, d]) => d.source === "wikidata").map(([set]) => set);
 
 // Each loaded Wikidata item's set and name, read once, and whether that name is its scientific name.
@@ -1830,9 +1836,10 @@ async function main(): Promise<void> {
     }
   }
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
+  if (command === "fetch" && name === DICTIONARY_SET) return fetchSet(DICTIONARY_SET, DICTIONARY);
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);

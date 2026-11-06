@@ -230,7 +230,13 @@ test("away from the game screen, a question in play shows its clock above the ta
   expect([wide.y, wide.x]).toEqual([0, side.x + side.width]);
   await page.setViewportSize({ width: 360, height: 800 });
 
-  // Past the question's 20 seconds: announced once, as a status.
+  // Past the question's 20 seconds: announced once, as a status. The browser's clock is faked, the database's isn't, so
+  // the run moves back too; otherwise the bar reads the run again, the server gives it seconds, and the countdown comes
+  // back over the Result link (PR #155's CI: "15s left" after a faked 21 s).
+  await DB.query(
+    "update private.run set started_at = started_at - interval '21 seconds' where user_id = (select id from auth.users where email = $1)",
+    [`${RUN}-sh@example.test`],
+  );
   await page.clock.fastForward("00:21");
   await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
   await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/play#result");
