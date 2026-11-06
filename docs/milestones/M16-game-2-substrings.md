@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** planned, before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1 and S15–S19 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** in progress (16a, `docs/milestones/M16-16a-the-dictionary.md`; approved 2026-11-05: "Approve, start dictionary"), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1 and S15–S19 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
