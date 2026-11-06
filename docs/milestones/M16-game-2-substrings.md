@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** in progress (16a done in PR #155; 16b next), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1 and S15–S19 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, designed 2026-11-06 and waiting on the human's approval), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1 and S15–S19 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -37,11 +37,11 @@ The human's question: "if theres no actual risk or bottleneck we should start on
 ## Decisions
 | # | Decision | Answer (origin) |
 |---|---|---|
-| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **Open.** The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
+| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is open.** The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
 | S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **Picked** (human, 2026-11-05): "ENABLE + Moby + SCOWL (Recommended)": see "The dictionary" below |
 | S3 | "Never impossible or too hard" | Difficulty narrows through the run (human, 2026-10-22): "the first couple rounds only have 2 characters in the substring", a "middle round" uses substrings in more than 500 words, the "last round maybe ~100-200", "never anything too difficult". The rounds in between are S18 |
 | S4 | Substring length | 2 letters in the first rounds (human, 2026-10-22, with S3). The length for the later rounds is S18 |
-| S5 | Rounds per day | 7, the same as Offbeat, "but open to suggestions. maybe i should just try and switch it up as well" (human, 2026-10-22) |
+| S5 | Rounds per day | 7, the same as Offbeat, "but open to suggestions. maybe i should just try and switch it up as well" (human, 2026-10-22). Fixed in the format: "Always 7" (human, 2026-11-06, 16b) |
 | S6 | Time limit per substring | 20 seconds "for now" (human, 2026-10-22) |
 | S7 | How a run ends | No elimination: a miss or a timeout scores nothing for that round, and the run goes on to the next (human, 2026-10-22: "no elimination or 'run'") |
 | S8 | Scoring | Its own system (human, 2026-10-22): more points for longer words, a bonus for using lots of different letters across the run, and a highlighted letter that earns a bonus on each word that uses it. The numbers are S15; one highlighted letter per day or per round is S16 |
@@ -52,7 +52,7 @@ The human's question: "if theres no actual risk or bottleneck we should start on
 | S13 | When the platform/game split happens | Right before game 2 (human, 2026-10-22) |
 | S14 | Solo or multiplayer | A daily solo game, not live rooms (human, 2026-10-22: "yes, that is right") |
 | S15 | Scoring numbers: points per letter of word length, the letter-variety bonus (per distinct letter, or at thresholds?), the highlighted-letter bonus | Open (human numbers) |
-| S16 | One highlighted letter for the whole day, or a new one each round? | Open |
+| S16 | One highlighted letter for the whole day, or a new one each round? | "One per day" (human, 2026-11-06, 16b) |
 | S17 | How every game weighs the same in an overall score | Open. Claude's proposal is under "Comparing games" below |
 | S18 | Difficulty per round, all 7: which rounds use 2 letters, which 3, and each round's word-count band. Does a 2-letter substring also need a minimum count? Are the 500 and 100–200 counted in the S2 list (a bigger list gives every substring more words)? | Open (human numbers) |
 | S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Dropped before matching and not counted toward word length, so "it's" contains "ts" and scores as 3 letters: "Yes, ignore it (Recommended)" (human, 2026-11-05) |
