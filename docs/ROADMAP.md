@@ -687,6 +687,9 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The misspelt-line check fails on `Ax {1}`, as `{1}` is one of its tokens: none today. Found in M16 16a (review).
 - [ ] **For the human:** SOURCES.md's SCOWL row doesn't cite the README in `en-wl/wordlist` that 16a reads the table by; only a human adds a source. Found in M16 16a (review).
 
+- [ ] `e2e/test-run.e2e.ts:60`'s page didn't show in 5 s once (PR #155's CI, run 42178319621), and its cause is unknown: a first compile was ruled out (slowest route 685 ms). CI now prints a failed test's page. Found in M16 16a (CI, 2026-11-06).
+- [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
+
 **For M15 (launch):**
 - [ ] **A name or fact given back after its midnight** (from M13 13f-4b; the human, 2026-10-28: "Leave the gap, note it (Recommended)"): the files drop it and give it again a day later, while its ended row waits to be erased; one key holds one row, so it comes back only at the load after the erase, up to about a day missing where a fresh load has it. Matters for hosted loads; the fix lets an ended row sit beside a current one, a change to every insert's uniqueness.
 - [ ] **The player-side scans, for the load test** (from M13 13f-4a; the human, 2026-10-28: "Split by kind (Recommended)", the beta at "Tens a day"): `private.record_miss` reads every miss and answer of its category's days on each miss (two scans, plus one more `resolve_answer` call for the near-typo flag), where an index on `(game_id, puzzle_date, question_idx)` or a running count would do; `pooledCounts` scans the game's format-3 answers on every run-state read, through a JSON path with no index. Measure both in the load test at the beta's size and fix what it shows.

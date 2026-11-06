@@ -7,7 +7,6 @@ export default defineConfig({
   testDir: "e2e",
   // *.e2e.ts, so Vitest's default *.test / *.spec pattern never picks these up.
   testMatch: "*.e2e.ts",
-  globalSetup: "./e2e/warm-routes.ts",
   // The tests share one local database, like the *.db.test.ts files.
   workers: 1,
   use: { baseURL: "http://localhost:3000", trace: "retain-on-failure" },

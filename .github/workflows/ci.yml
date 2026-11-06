@@ -86,6 +86,11 @@ jobs:
           printf 'DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_PUBLISHABLE_KEY=%s\n' "$key" > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      # What a failed test's page showed, as text: CI-only failures can't otherwise be read, as a trace holds the stack's
+      # publishable key and stays off a public repo (ROADMAP, "Waits on the human"). This snapshot holds the page, not requests.
+      - name: Show the page each failed test ended on
+        if: failure()
+        run: find test-results -name error-context.md -exec cat {} +
 
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
   # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a
