@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** planned, after launch (M15). Draft ticket for the human's approval, 2026-10-22. The human answered S1–S14 the same day; S1, S2's pick and S15–S19 are still open. No code, migration or content comes before those answers and the end of the MVP (human, 2026-10-21: the MVP is M00 to M12, "all working features first").
+**Status:** planned, before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1 and S15–S19 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -9,7 +9,7 @@ Add Plor's second daily game, a substring game inspired by JKLM: the player gets
 
 ## Who uses it / what breaks without it
 - Used by: every player, once the site has more than one game. Plor "is built to hold more than one game later, and ships with one" (ROADMAP, Product).
-- Breaks without it: nothing today. That's why it comes after launch. Until game 2 exists, the platform/game boundary has nothing to separate. The ROADMAP pulls that boundary out "at game 2", and the home screen (M11) and the leaderboards (M09, M10) are built for one game.
+- Breaks without it: the human wants two games at launch (2026-11-05: "ideally i want to have 2 games on launch"), and the beta is the first time players try them. Until game 2 exists, the platform/game boundary has nothing to separate. The ROADMAP pulls that boundary out "at game 2", and the home screen (M11) and the leaderboards (M09, M10) are built for one game.
 
 ## Source
 No entry in `docs/SOURCES.md` covers a word list, word frequencies or this game's rules, and only a human can add one (SOURCES.md, Rules). S2 asks for the word list. Until it exists, this ticket follows:
@@ -26,11 +26,19 @@ No entry in `docs/SOURCES.md` covers a word list, word frequencies or this game'
 - Every game shows progression as the player survives or scores more (human, 2026-10-20; M14).
 - **The look** (human, 2026-10-22, for after the functional work, as M14 is for Offbeat): a witch tossing the player's words into a cauldron to brew something, and the brew gets "more and more violent" as the run goes on.
 
+## Answers (human, 2026-11-05)
+The human's question: "if theres no actual risk or bottleneck we should start on the second game since ideally i want to have 2 games on launch". Claude's reply named no blocker and these costs: the split shares files with the `/play` build, the run model is hard to reverse, the open decisions and a second design need the human's time, and the dictionary's size isn't measured.
+1. When: "Both in the beta (Recommended)". The beta tests both games, and the split happens before any real player data exists. This replaces "after launch".
+2. The look: "Moonbrew (Recommended)". The cauldron theme kept from M14 14c-3, on its private mocks page; it still needs rebuilding to Afterglow's standard.
+3. The dictionary: "ENABLE + Moby + SCOWL (Recommended)".
+4. Order against the `/play` build, asked twice: first "wait why is game 2 two separate games??" (Claude's "split" meant separating Plor's shared parts from game 1's rules; game 2 is one game), then "im not very technically versed but can't we build like the stuff besides the visuals first for game 2 simultaneous.ly". **Claude's reading, for approval:** yes. The dictionary, the database, the server's word check and a plain play screen go on alongside M14; the screens shared with game 1 wait for the `/play` build. Whether the server work avoids that build's files is *unverified*: it has no ticket yet.
+5. Profiles, search and friend requests come after this milestone, before the beta (M17).
+
 ## Decisions
 | # | Decision | Answer (origin) |
 |---|---|---|
 | S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **Open.** The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
-| S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **The pick is open:** see "The dictionary" below |
+| S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **Picked** (human, 2026-11-05): "ENABLE + Moby + SCOWL (Recommended)": see "The dictionary" below |
 | S3 | "Never impossible or too hard" | Difficulty narrows through the run (human, 2026-10-22): "the first couple rounds only have 2 characters in the substring", a "middle round" uses substrings in more than 500 words, the "last round maybe ~100-200", "never anything too difficult". The rounds in between are S18 |
 | S4 | Substring length | 2 letters in the first rounds (human, 2026-10-22, with S3). The length for the later rounds is S18 |
 | S5 | Rounds per day | 7, the same as Offbeat, "but open to suggestions. maybe i should just try and switch it up as well" (human, 2026-10-22) |
@@ -94,7 +102,6 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 
 ## Out of scope
 - Games 3 to 6 (ROADMAP, Later). The word chain needs a different list of two-word phrases.
-- The look (the witch and the cauldron): it comes after the functional work, as M14 does for Offbeat.
 - Live multiplayer rooms (S14).
 - The script that makes days by itself (S11, later).
 
@@ -111,13 +118,18 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 | Minimum players before a percentile is shown | Comparing games | S17, open |
 
 ## Plan
-Draft sub-tickets, for the human to reorder once the open decisions are answered:
-1. **16a, sources:** the word lists and an offensive-word list added to SOURCES.md by the human; a script that builds the filtered dictionary, run through the task runner (DECISIONS.md). Measure its size, then settle S18's bands.
-2. **16b, platform/game split** (S13): game-2 content format and run-event design written and reviewed first (Hard to reverse), then the split with no change to how Offbeat plays.
+Draft sub-tickets, for the human to reorder once the open decisions are answered.
+
+**Alongside M14's game design (no game-screen files):**
+1. **16a, sources:** the word lists added to SOURCES.md by the human, with LDNOOBW already there; a script that builds the filtered dictionary, run through the task runner (DECISIONS.md). Measure its size against the hosted plan, then settle S18's bands.
+2. **16b, the database and server split** (S13): the game-2 content format and run model written and reviewed first (Hard to reverse), then the split with no change to how game 1 plays.
 3. **16c, the daily picker:** a script that proposes the day's substrings and highlighted letter within S18's bands, and the admin page approval (S11).
-4. **16d, play:** the routes, the server-side word check, the timer and the no-elimination rounds.
+4. **16d, play on a plain screen:** the routes, the server-side word check, the timer and the no-elimination rounds.
 5. **16e, points, ranks and leaderboards:** game 2's ledger rows, its own leaderboard, the percentile and friends' rank (S9), and the overall score (S17).
-6. **16f, the social pieces** (S12: all of them).
+
+**After M14's `/play` build merges (shared screens):**
+6. **16f, the shared screens and social pieces** (S12: all of them): Today with two games, Me, the live board, comments, reactions, groups and Share.
+7. **16g, Moonbrew:** the game's look, as M14 14c did for game 1.
 
 ## Removes
 Nothing yet: this is a draft ticket with no code. The split (16b) is where something gets removed, such as the single `GAME_ID` constant as the only game.
