@@ -34,6 +34,8 @@ One filtered word list that game 2 judges every typed word against and picks eac
 5. Words with an ordinary meaning and a slur meaning, such as chink, dyke, retard, nonce, homo and niggardly: "Drop them all (Recommended)". **Claude's reading:** words like those. Everyday words whose slur sense is rare stay, so the word list isn't hollowed out: spade, slope, slant, nip, fairy, hoe, knob, prick, sod, shag, cripple, moron, imbecile, hunky and fruitcake, and queer, as an identity word (answer 6).
 6. Adult words that aren't insults: "Keep identity and medical (Recommended)". Identity words (bisexual, asexual, queer) and medical words (vaginal, testicle) stay; explicit ones (erotica, pornographic, orgasmic) go.
 7. The real count: "Keep 258,000 (Recommended)", told that the first measurement skipped lines of the table.
+8. After the review, told the list was now 256,476 words and that criterion 4 had been reworded, as no check can prove no form remains: "Accept both (Recommended)".
+9. `blackcock`, a bird name the joined-phrase check took out: "Leave it out (Recommended)".
 
 ## Design
 - **`npm run base -- fetch dictionary`,** beside the answer base's sets (DECISIONS.md, Answer database imports), so there is one way to fetch outside data: pinned downloads checked against their SHA-256, a snapshot in `data/snapshots/`, a committed manifest. The parsing and merging are pure functions in `scripts/dictionary.ts`.
@@ -47,7 +49,7 @@ One filtered word list that game 2 judges every typed word against and picks eac
 - [x] `npm run base -- fetch dictionary` writes the snapshot and manifest, and refuses a download whose checksum differs.
 - [x] Every word is lowercase a to z, 3 letters or more, with no duplicates (`scripts/dictionary.test.ts`).
 - [x] Two runs give the same checksum.
-- [x] No listed word, no word SCOWL marks offensive or vulgar and no word in the drop file is in the list, and the form scans below were read. **This can't prove no offensive word remains:** see "What it can't prove".
+- [x] No listed word, no word SCOWL marks offensive or vulgar and no word in the drop file is in the list, and the form scans below were read. **This can't prove no offensive word remains:** see "What it can't prove". Reworded from "No listed word, form of one, or word SCOWL marks offensive or vulgar is in the list", which no check can prove (answer 8).
 - [x] Claude has read the near-matches, and doubtful ones are put to the human.
 
 ## Out of scope
@@ -105,17 +107,17 @@ Plan step 4's expectation **held**: the first full build gave 258,305 words, ins
 - **Speed:** the first build ran over 300 s, as `isListed` walks both lists per call; `isListedWord` looks one word up in a set.
 - **SCOWL's own notes:** 75 lines carry `offensive` or `vulgar` notes, all taken out with their groups.
 - **The read:** 2,396 words holding a listed word were read, and most are innocent (`assess`, `therapist`, `basement`). A probe for slurs and vulgar words no list names found more, so the drop list isn't only forms of listed words.
-- **What it can't prove:** nobody has read all 258,000 words, so an unlisted offensive word may remain. A word found later goes in the drop file, followed by a fetch.
+- **What it can't prove:** nobody has read all 256,476 words, so an unlisted offensive word may remain. A word found later goes in the drop file, followed by a fetch.
 **The review's blockers, fixed.** The reviewer's first pass found criterion 4 ticked but false, and all four findings held up when checked:
 1. A leading `!` marks the whole group (README, "Database structure"; libscowl's `group_rank`), where Claude had read it as the lemma alone. About 1,450 words left the list. The count the human approved at "Keep 258,000" included them.
-2. A listed phrase hyphenated in the table reached the check joined up, so a slur got through. `isListedWord` now holds phrases joined up, which also takes `goddamn` and its spellings and the old bird name `oldsquaw`.
+2. A listed phrase hyphenated in the table reached the check joined up, so a slur got through. `isListedWord` now holds phrases joined up, which also takes `goddamn` and its spellings and the bird name `blackcock` and its plural (answer 9).
 3. `all` didn't hold `!` forms though its comment said so. They stay out, as they'd block innocent words such as `spiced`, so the comment changed, and the words are caught by the group mark or the drop file.
-4. Forms in another group or a plain list survived, so a form scan was added: 168 words looked like forms of a listed or dropped word, and 18 went in the drop file.
+4. Forms in another group or a plain list survived, so a form scan was added: 168 words looked like forms of a listed or dropped word, Claude read them, and 18 went in the drop file. The rest are mostly lookalikes (`butter`, `spices`, `rapier`). A few kept ones are judgement calls, and answer 5's rule was applied: mild or rare offence stays.
 
 The same pass's own check found another bug: a drop held only by ENABLE or Moby stayed in, as the last filter looked only at listed words. `buildDictionary` now checks the drop list there too, with a test.
 
 **The final list:** 256,476 words, 2.65 MB as plain text, manifest SHA-256 `58af970abfaadcc8`…, the same over two runs. The snapshot's own checks: 0 words outside a to z or under 3 letters, 0 duplicates, sorted, 0 listed words, 0 of the 313 drops, and every sample innocent word kept. 967 three-letter substrings sit in 500 or more words, and 736 in 100 to 200. `vitest run scripts src/game/misses.test.ts`, without the database tests: 6 files, 131 tests passed.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: the first pass's four, in Evidence, "The review's blockers, fixed", all closed on the recheck. The recheck's two were ticket text: criterion 4's rewording, put to the human (answer 8), and a wrong claim about `oldsquaw`, corrected (answer 9).
+- Deferred to ROADMAP "Next revision": five items under "For M16", one of them for the human.
