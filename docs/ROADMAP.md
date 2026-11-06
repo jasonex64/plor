@@ -687,7 +687,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] The misspelt-line check fails on `Ax {1}`, as `{1}` is one of its tokens: none today. Found in M16 16a (review).
 - [ ] **For the human:** SOURCES.md's SCOWL row doesn't cite the README in `en-wl/wordlist` that 16a reads the table by; only a human adds a source. Found in M16 16a (review).
 
-- [ ] `e2e/test-run.e2e.ts:60`'s page didn't show in 5 s once (PR #155's CI, run 42178319621), and its cause is unknown: a first compile was ruled out (slowest route 685 ms). CI now prints a failed test's page. Found in M16 16a (CI, 2026-11-06).
+- [ ] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test now opens the route first and logs the time, to confirm the cause. If it's confirmed, "Clicks that don't navigate under load" above may be the same thing. Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
 
 **For M15 (launch):**
