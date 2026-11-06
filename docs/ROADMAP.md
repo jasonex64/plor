@@ -686,6 +686,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] A table line the head pattern doesn't match is skipped silently: none today, but re-pinning a new file could hide a new shape. Found in M16 16a (review).
 - [ ] The misspelt-line check fails on `Ax {1}`, as `{1}` is one of its tokens: none today. Found in M16 16a (review).
 - [ ] **For the human:** SOURCES.md's SCOWL row doesn't cite the README in `en-wl/wordlist` that 16a reads the table by; only a human adds a source. Found in M16 16a (review).
+- [ ] 16b's security Log row covers the three tables but not the other grants the migration needs: `plor_app`'s EXECUTE on the judge function, the per-table RLS policies, and the change to `question_open`'s trigger. Put to the human before that migration. Found in M16 16b (review, 2026-11-06).
+- [ ] 16b's Source diff doesn't list answer 11 ("Always use the latest") against Game 1's "fixed when the day starts"; and a dictionary load that isn't one transaction could show a partial dictionary mid-day (the loader or 16d). Found in M16 16b (review).
+- [ ] H4, the dictionary's size in Postgres, has no acceptance criterion in 16b, a design ticket; it moves to the ticket that builds `dictionary_word`. Found in M16 16b (review).
+- [ ] 16b's judging order doesn't say whether an S10 duplicate, an empty try or a non-letter try counts as a rejection for the lockout. Found in M16 16b (review).
+- [ ] 16b calls per-game format numbers "Claude's reading" where the audit lists it as the human's decision; the human's "yes thats fine" covers it, and the ticket could say so. Found in M16 16b (review).
+- [ ] `normalize` drops `\p{P}` but not `\p{S}`: "it´s" (U+00B4) becomes "it s" and a backtick survives. An S19 edge for 16d's tests. Found in M16 16b (review).
 
 - [x] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test opens the route first; six runs logged a first visit of 1,359 to 4,240 ms and none failed on it. "Clicks that don't navigate under load" above may be the same thing (*unverified*). Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
