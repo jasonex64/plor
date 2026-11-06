@@ -1,6 +1,6 @@
 # M16 16b — Game 2's run model and content format
 
-**Status:** in progress. Design approved 2026-11-06 ("yes thats fine"), with its security change ("Yes, approved"); reviewed by the `reviewer` agent, its four blocking findings fixed; no code. Both parts are "Hard to reverse" (DECISIONS.md), so they're decided and reviewed before the first code that depends on them. The platform/game split (S13) follows once this is approved.
+**Status:** done (PR #157, merged at the human's word, "merge", 2026-11-06). Design approved ("yes thats fine") with its security change ("Yes, approved"), reviewed by the `reviewer` agent, its four blocking findings fixed and re-checked; no code. The platform/game split (S13) is next, after 16a's build keeps proper spellings.
 
 ## Goal
 Decide how a game-2 day is stored and how a player's run is recorded, so 16c (the picker) and 16d (play) have a fixed shape to build on.
