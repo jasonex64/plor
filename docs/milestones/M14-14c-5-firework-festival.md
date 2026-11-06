@@ -76,11 +76,23 @@ Round 6, the human's notes after playing the build
 25. Colour count, measured at 23 to 43 per frame and up to 70 briefly as the lights come on: "color count is fine".
 26. The early camera steps, where Q1 to Q2 moves as far as Q2 to Q3: "looks fine". The camera stays as approved; Q3 and Q6 are major through light, composition and walk time.
 
+Round 7, the human's notes after playing version 5
+> so it looks better, but the movement is still a bit lackluster. idk how hard it is to make it seem like its travelling more, and the words being diff colors when scoring different rarities. In addition, its a little bit choppy. lastly, there needs to be a good visual way to show that a letter is being taken, not just it appearing in the next question.
+
+27. Travel: "Longer, faster climb (Recommended)". Many more floors at a much higher top speed, about a second longer.
+28. Rarity colour: "only the background needed to be similar in palette. the text can be any color and more contrast is better for it". This narrows answers 16 and 25 to the background: street, sky, clouds and panels.
+29. Choppy: "Slow camera moves tick". Measured first: this PC's screen runs at 360 Hz and the game draws about 72 frames a second on it, so frame rate is not the cause here.
+30. Taken letter: "Lantern snuffed out".
+31. Smoothness: "Glide between art pixels (Recommended)". The picture slides by single screen pixels while the art stays crisp and unscaled.
+32. Text colours for common, uncommon and rare: "Sky blue, lime, gold", on the word, the tier name and the points.
+33. Burst colour: "Burst matches the text (Recommended)".
+34. Lantern's size: "Lowered to centre, with caption (Recommended)". A big lantern with the letter on it lowers to mid-screen, sputters dark and drops, with a short line such as "P is out", taking about 2 seconds. The new question's timer waits until it finishes.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
 | 640×360 cropped to a 146-pixel slice on phones (14c-3, answers 8, 10) | One portrait design with finer art. Buildings stay at the edges and the middle widens with the screen | Answer 4 |
-| Spec: no half pixels, art on the grid | Still true at rest and in the climb. During the walk's zoom, pixels may shimmer | Answer 9 |
+| Spec: no half pixels, art on the grid | The art is never scaled or resampled and its pixels stay whole, but the view, its layers and the word may sit on any screen pixel (answer 31). During the walk's zoom, pixels may shimmer | Answers 9, 31 |
 | Spec: result card | No card. The result sits on screen in the sky, with a themed button | Brief 4, answer 8 |
 | Spec: the word moves and nothing else does | The whole view climbs with the word | Brief 2 |
 | The word changes size in its move (14c-4) | The lettering never changes shape or size. Its box may wiggle | Answer 2 |
@@ -89,10 +101,12 @@ Round 6, the human's notes after playing the build
 | A shift at Q3 and Q6 only | A tiny step forward every question, and major shifts at Q3 and Q6 | Answer 1 |
 | Sky marks | Sky lanterns | Answer 12 |
 | Only the word's box wiggles (answer 2) | The whole word and box rumble before takeoff. The lettering still never stretches or scales | Round 6 |
-| The lettering looks the same for every answer (answer 2) | Its colour differs by rarity, inside the plum to amber family | Round 6 |
+| The lettering looks the same for every answer (answer 2) | Word, tier name and points are sky blue, lime or gold by rarity, outside the plum to amber family | Round 6, answers 28, 32 |
+| Fireworks in the warm family | The firework follows its answer's text colour: burst, glitter, trail, takeoff blast, and the sparks round the word | Answer 33 |
+| A taken letter just appears in the next question | A big lantern bearing the letter lowers to mid-screen, sputters dark and drops, with a caption, before the box and its timer | Answers 30, 34 |
 | Square boxes, a plain cord | Rounded pills with a sparkler fuse | Answers 21, 22 |
 | A burst that fades | A burst that lingers until the button | Answer 24 |
-| 63 colours across violet, green, teal, red and gold | One family of neighbouring hues, plum through rose to amber | Round 5, answers 16 and 17 |
+| 63 colours across violet, green, teal, red and gold | One family of neighbouring hues, plum through rose to amber, in the background; rarity's text and fireworks stand apart from it | Round 5, answers 16, 17, 28, 33 |
 | Dusk into golden night, with lanterns lit from Q1 | Nothing lit at Q1. Lights come on question by question, and the palace at Q7 is the brightest frame | Round 5, answers 17 and 18 |
 | A stage is only a camera position | A stage is a camera position and a set of lit lights | Round 5 |
 
@@ -128,7 +142,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 ## Acceptance criteria
 - [x] A still comp of the street at all seven questions, wide and phone, is approved by the human before any motion is built, with one of the simple and detailed versions chosen.
 - [ ] Nothing is lit at Q1, and each question's frame is brighter than the one before, with the biggest jumps at Q3 and Q6: a script reports the mean brightness of all seven.
-- [ ] Every colour sits in the plum to amber family: a script lists each colour's hue, and each frame's colour count.
+- [ ] Every background colour sits in the plum to amber family, and rarity's three colour ramps appear only on that rarity's text and firework: a script lists each colour's hue, and each frame's colour count.
 - [ ] Afterglow's page shows the festival at https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, with no harbour, keeper or tube.
 - [ ] On a phone and on 1920×1080, the buildings hold the edges and the middle widens: screenshots at both, nothing stretched.
 - [ ] Each question lands further along the street, and Q3 and Q6 are clearly major: screenshots at all seven.
@@ -142,7 +156,10 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 - [ ] The fuse burns in step with the clock, and its sparks and shake grow near the end: a script reads its position at three times.
 - [ ] A dud, a time-out and the finale each play through: frames of each.
 - [ ] There's no result card: the result is page text over the sky, and it fits on 390×844 and 1920×1080.
-- [ ] Art sits on the grid at rest and in the climb: the drawing-call log shows nothing off grid. Scaling is allowed only in the walk.
+- [ ] Art is never scaled outside the walk, and its pixels stay whole: the drawing-call log shows it. The view, each layer and the word land on whole screen pixels and glide through the slow parts of the climb and landing: a script reports the steps between frames at both ends of each.
+- [ ] The climb is longer and much faster: a script reports its seconds, floors and peak speed against version 5.
+- [ ] Word, tier name and points use one colour per rarity, and the burst matches: a script reports them, with each text colour's contrast against its outline.
+- [ ] Each newly taken letter gets its lantern, once, before the box and with the timer waiting, and its caption fits: frames at both sizes, for Q2, Q4, Q5 and Q7, and none at Q1, Q3 or Q6.
 - [ ] 60 fps in desktop Chrome at both sizes, under 16.7 ms on average, and the human checks a real phone.
 - [ ] No console errors, one font, and the checks are proved with broken builds.
 
