@@ -700,7 +700,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `pg` defaults to `connectionTimeoutMillis: 0` (no timeout), so a hung pooler would hang `/api/health` and every route. Pick a value in the load test (a human number). Found in M00 (implementation).
 - [ ] Hosted Auth settings (SMTP, templates, URLs, providers) are typed by hand into the Supabase dashboard; two hand-typed mistakes reached production in M02. Consider applying them from the repo with a remote-only config. Found in M02 (staging).
 - [ ] The legacy HS256 JWT secret is still trusted as "previously used" since the rotation to ES256 on 2026-10-17. Revoking it first needs the legacy `anon` and `service_role` keys disabled. A dashboard action and a security change, for the human. Found in M02 (2f, A1).
-- [ ] The 7 people who answered the M02 2g survey have seen the days dated 2026-10-26 to 10-28: those days get new prompts, or the people are told, before the beta. Found in the 2026-10-21 docs audit.
+- [x] *(Closed by the human, 2026-11-05: "the 7 survey people arent even playing remotely the same game u can close that".)* The 7 people who answered the M02 2g survey have seen the days dated 2026-10-26 to 10-28: those days get new prompts, or the people are told, before the beta. Found in the 2026-10-21 docs audit.
 - [ ] Where a browser has `navigator.share` but no share targets, Share rejects with `AbortError`, the same as a cancel (MDN), so nothing happens. Found in M05 (implementation).
 
 **Correctness (pull in when the area is touched):**
