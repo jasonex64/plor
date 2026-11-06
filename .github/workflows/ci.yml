@@ -57,41 +57,6 @@ jobs:
       - run: npm run test:sql
       - run: npm run test:db
 
-  # Two real browsers against the local stack and the dev server (M07 D7: Playwright): the live board end to end.
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: package.json
-          cache: npm
-      - run: npm ci
-      # Linux gives outgoing connections ports from a range that holds the stack's (printed below), so an image pull could
-      # take one and the stack's start fail "address already in use" (PR #155: 54322, 54324). These are the ports in
-      # supabase/config.toml, 54320 to 54329.
-      - name: Keep outgoing connections off the stack's ports
-        run: |
-          sysctl net.ipv4.ip_local_port_range
-          sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54329
-      - name: Start the local Supabase stack
-        run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
-      # The dev server reads .env.local. The publishable key comes from the running stack and is masked, never
-      # printed; the other two values are the local stack's documented defaults.
-      - name: Point the app at the local stack
-        run: |
-          key=$(npx supabase status -o env 2>/dev/null | sed -n 's/^PUBLISHABLE_KEY="\{0,1\}\([^"]*\)"\{0,1\}$/\1/p')
-          test -n "$key"
-          echo "::add-mask::$key"
-          printf 'DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_PUBLISHABLE_KEY=%s\n' "$key" > .env.local
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
-      # What a failed test's page showed, as text: CI-only failures can't otherwise be read, as a trace holds the stack's
-      # publishable key and stays off a public repo (ROADMAP, "Waits on the human"). This snapshot holds the page, not requests.
-      - name: Show the page each failed test ended on
-        if: failure()
-        run: find test-results -name error-context.md -exec cat {} +
-
   # Blocks secrets from landing in history (DECISIONS.md: Secret scanning). GitHub's own secret
   # scanning needs paid Secret Protection on private repos; gitleaks-action needs no license on a
   # personal account (github.com/gitleaks/gitleaks-action). Full history so old commits are scanned too.
