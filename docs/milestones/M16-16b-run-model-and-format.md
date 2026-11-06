@@ -1,6 +1,6 @@
 # M16 16b — Game 2's run model and content format
 
-**Status:** planned. Design proposed 2026-11-06 for the human's approval; no code. Both parts are "Hard to reverse" (DECISIONS.md), so they're decided and reviewed before the first code that depends on them. The platform/game split (S13) follows once this is approved.
+**Status:** in progress. Design approved 2026-11-06 ("yes thats fine"), with its security change ("Yes, approved"); waiting on the `reviewer` agent; no code. Both parts are "Hard to reverse" (DECISIONS.md), so they're decided and reviewed before the first code that depends on them. The platform/game split (S13) follows once this is approved.
 
 ## Goal
 Decide how a game-2 day is stored and how a player's run is recorded, so 16c (the picker) and 16d (play) have a fixed shape to build on.
@@ -34,7 +34,13 @@ Round 3:
 10. The game's permanent ID: "substrings (Recommended)".
 11. A rebuilt dictionary and days already approved: "Always use the latest".
 
-**What they settle:** one accepted word per round and no stored rejected words; a server-enforced 0.5 s lockout after each rejected try; Next between rounds; exactly 7 rounds; one bonus letter per day; `game_id` `substrings`; days are judged against whatever dictionary is loaded.
+Round 4, after "yes thats fine" approved the design:
+12. "if the word has hyphenation u can drop it when checking internallly but what is shown on screen should be the proper word".
+13. A stripped form with several spellings (`its`, `it's`): "Theirs if it's real (Recommended)": the player's spelling if it's one of the dictionary's, else the dictionary's, the first alphabetically if there are several.
+14. Accents: "Yes, same rule (Recommended)": typing "cafe" matches and shows "café".
+15. The security change: "Yes, approved".
+
+**What they settle:** one accepted word per round and no stored rejected words; a server-enforced 0.5 s lockout after each rejected try; Next between rounds; exactly 7 rounds; one bonus letter per day; `game_id` `substrings`; days are judged against whatever dictionary is loaded; matching drops case, accents and punctuation, and the screen shows the proper spelling.
 
 ## Proposed design (Claude, for approval)
 
@@ -47,10 +53,10 @@ Round 3:
 ### Run model
 - **`private.run`, unchanged:** one per player per game per day, its date pinned at the start.
 - **`private.question_open`, reused:** Next on rounds 2 to 7 writes its row, and round 1 starts with the run, as in game 1. One way to open a round, not two.
-- **New `private.round_word`:** (user, game, date, `round_idx` 0–6, `word`, `created_at`), append-only. Its primary key on (user, game, date, `round_idx`) allows one accepted word per round. A unique key on (user, game, date, `word`) enforces S10: no word twice in a run. Sending the same word again returns the stored result, and a different word for a round that already has one gets `409 already_answered`, as §5 does for game 1.
+- **New `private.round_word`:** (user, game, date, `round_idx` 0–6, `word_key`, `word`, `created_at`), append-only: `word_key` is `normalize`'s form and `word` the spelling shown (answers 12–14). Its primary key on (user, game, date, `round_idx`) allows one accepted word per round. A unique key on (user, game, date, `word_key`) enforces S10: no word twice in a run. Sending the same word again returns the stored result, and a different word for a round that already has one gets `409 already_answered`, as §5 does for game 1.
 - **New `private.round_reject`:** (user, game, date, `round_idx`, `rejected_at`), append-only, with **no word** (answer 2). It exists only for the lockout: a try within 0.5 s of the round's latest rejection is refused as `locked` and not judged.
-- **New `private.dictionary_word`:** one row per word, loaded from 16a's snapshot. H4, its size in Postgres, gets measured here.
-- **The judge is the database**, as in game 1. One function checks a try in order: the round is open and within its 20 seconds, not locked, punctuation dropped (S19), the word is in the dictionary, it contains the round's substring, and it hasn't been used earlier in the run. A pass writes `round_word`; a fail writes `round_reject` and gives the reason. The client never receives the word list.
+- **New `private.dictionary_word`:** (`word_key`, `spelling`), one row per proper spelling, keyed on both, loaded from 16a's snapshot. H4, its size in Postgres, gets measured here. **16a's build changes for this:** it keeps only `normalize`'s form today (`scripts/dictionary.ts`, `buildDictionary`), so it must also keep each source spelling (answer 12). Whether every source list carries apostrophes, hyphens and accents in its spellings is *unverified*: measured when the build changes.
+- **The judge is the database**, as in game 1. One function checks a try in order: the round is open and within its 20 seconds, not locked, case, accents and punctuation dropped by `normalize` (S19, answer 14), the stripped form is in the dictionary, it contains the round's substring, and it hasn't been used earlier in the run. A pass writes `round_word` with the spelling chosen by answer 13; a fail writes `round_reject` and gives the reason. The client never receives the word list.
 - **How a run ends:** after round 7's word or round 7's timeout. A round that times out has no `round_word` row and scores nothing (S7). Leaving mid-round lets the clock run out; a reload resumes at the next Next, as in game 1.
 - **Scoring is not stored here:** S15 is still open, and points are derived from `round_word` when 16e writes the ledger.
 
@@ -58,13 +64,13 @@ Round 3:
 A dictionary rebuild can change which words count on a day that's already approved, and can move a day's substring outside its S18 band. The human chose that over re-approving days (answer 11).
 
 ### Security change
-Three new tables and `plor_app`'s grants on them (read and insert only, append-only as §7 says) change grants. Per CLAUDE.md, Security, that needs the human's approval and a DECISIONS.md Log entry before any migration is written.
+Three new tables and `plor_app`'s grants: read and insert on `round_word` and `round_reject` (append-only, §7), read only on `dictionary_word`, which only the loader writes (narrower than the question put to the human). Approved, "Yes, approved", and recorded in DECISIONS.md's Log, 2026-11-06.
 
 ## Acceptance criteria
 For the design, before any code:
-- [ ] The human approves the content format and the run model above, quoted here.
-- [ ] The human approves the security change (the three tables and their grants), recorded in DECISIONS.md's Log.
-- [ ] DECISIONS.md's "Puzzle content format" and "Run events" rows gain game 2's entries, and "Game 1" gets a game-2 sibling section with its ID, timer, lockout and S10.
+- [x] The human approves the content format and the run model above, quoted here: "yes thats fine" (2026-11-06), with round 4's change.
+- [x] The human approves the security change (the three tables and their grants), recorded in DECISIONS.md's Log: "Yes, approved" (2026-11-06).
+- [x] DECISIONS.md's "Puzzle content format" and "Run events" rows gain game 2's entries, and "Game 1" gets a game-2 sibling section with its ID, timer, lockout, S10 and the spelling rule.
 - [ ] The `reviewer` agent has reviewed the design against this ticket and DECISIONS.md.
 
 ## Out of scope
@@ -75,14 +81,15 @@ For the design, before any code:
 ## Numbers
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
+| First alphabetically | The shown spelling when several fit | human, 2026-11-06: "Theirs if it's real (Recommended)" |
 | 7 rounds | `rounds` length, `round_idx` 0–6 | human, 2026-10-22 (S5), fixed 2026-11-06: "Always 7" |
 | 20 seconds per round | The round's deadline | human, 2026-10-22 (S6: "for now") |
 | 0.5 s lockout after a rejected try | `locked` refusal | human, 2026-11-06: "0.5 seconds" |
 | 1 bonus letter per day | `bonus_letter` | human, 2026-11-06: "One per day" (S16) |
 
 ## Plan
-1. The human approves the design and the security change (above).
-2. DECISIONS.md updated (acceptance criteria 3), then the `reviewer` agent.
+1. Done: the human approved the design and the security change.
+2. Done: DECISIONS.md updated. Next, the `reviewer` agent.
 3. The split's guided questions, from a fresh grep of the boundary.
 
 ## Removes
