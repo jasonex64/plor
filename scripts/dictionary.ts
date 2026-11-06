@@ -24,7 +24,8 @@ export const DICTIONARY_DROP_FILE = "data/dictionary-drop.json";
 export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out`;
 
 // One group is one sense of a word (the table's README, "GROUP"). `words` are the ones a player may type; `all` is
-// every spelling on its lines, kept so one listed word takes its whole group with it.
+// every spelling the table stands behind, kept so one listed word takes its whole group with it. A form marked "!"
+// isn't in `all`: it would block a real word that shares a group with one, and a "!" lemma's group is out of play anyway.
 export type ScowlGroup = { words: string[]; all: string[]; marked: boolean };
 
 // Not words a player would type (README, "POSes"), and classes that mark proper nouns the capital check can miss.
@@ -35,7 +36,8 @@ const OFFENSIVE_NOTE = /\((offensive|vulgar)-\d\)/;
 const VARIANT = /^((?:[ABZCD_][.=?v~V@x-]? ?)+(?:\{\d+\})?|\+): (.*)$/;
 
 // A word with its marks taken off, or null when the marks say to leave it out: "!" is "nearly non-existent", and "-"
-// alone holds a missing form's place (README, "ANNOTATION"). "-", "@", "~" and "*" stay, as answer 1 chose breadth.
+// alone holds a missing form's place (README, "ANNOTATION"). "-", "@", "~" and "*" stay, as answer 1 chose breadth. A
+// leading "!" on a lemma marks its whole group (README, "Database structure"; libscowl's group_rank): see parseScowl.
 function bare(token: string): string | null {
   const word = token.trim().replace(/†/g, "");
   if (word === "-" || word === "" || word.startsWith("!") || word.endsWith("!")) return null;
@@ -68,7 +70,7 @@ function playable(word: string): string | null {
   return /^[a-z]+$/.test(text) && text.length >= DICTIONARY_MIN_LETTERS ? text : null;
 }
 
-function readLine(line: string): { words: string[]; all: string[]; marked: boolean } | null {
+function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const text = line.split("#")[0].trimEnd();
   const head = /^(\d[^:]*): (.*)$/.exec(text);
   if (!head) return null;
@@ -79,7 +81,9 @@ function readLine(line: string): { words: string[]; all: string[]; marked: boole
   const lemmaInfo = colon < 0 ? rest.replace(/:$/, "") : rest.slice(0, colon);
   const entries = colon < 0 ? "" : rest.slice(colon + 2);
   const [, pos, posClass] = /<([^>/]+)(?:\/([^>]+))?>/.exec(lemmaInfo) ?? [];
-  const lemma = bare(lemmaInfo.replace(/ [<{(].*$/, ""));
+  const lemmaText = lemmaInfo.replace(/ [<{(].*$/, "");
+  const lemma = bare(lemmaText);
+  const outOfPlay = lemmaText.trim().startsWith("!");
   const forms = spellings(lemma, entries);
   const all = forms.map((w) => normalize(w)).filter((w) => w !== "");
   const marked = OFFENSIVE_NOTE.test(lemmaInfo);
@@ -87,19 +91,24 @@ function readLine(line: string): { words: string[]; all: string[]; marked: boole
   // A word at two sizes reads "70 [moby] 85 [ukacd]": it's in the list from the smaller one.
   const size = Math.min(...[...info.replace(/\[[^\]]*\]/g, " ").matchAll(/\d+/g)].map((m) => Number(m[0])));
   const misspelt = variant !== null && variant[1].split(" ").every((v) => v.endsWith("x"));
-  const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaInfo.replace(/ [<{(].*$/, ""));
-  if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked };
+  const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaText);
+  if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked, outOfPlay };
   const words = forms.filter((w) => !/[A-Z]/.test(w)).flatMap((w) => playable(w) ?? []);
-  return { words, all, marked };
+  return { words, all, marked, outOfPlay };
 }
 
 export function parseScowl(text: string): ScowlGroup[] {
   const groups: ScowlGroup[] = [];
   let group: ScowlGroup = { words: [], all: [], marked: false };
+  let outOfPlay = false;
+  const close = () => {
+    if (group.all.length) groups.push(outOfPlay ? { ...group, words: [] } : group);
+    group = { words: [], all: [], marked: false };
+    outOfPlay = false;
+  };
   for (const line of text.split(/\r?\n/)) {
     if (line.trim() === "") {
-      if (group.all.length) groups.push(group);
-      group = { words: [], all: [], marked: false };
+      close();
       continue;
     }
     const read = readLine(line);
@@ -107,8 +116,9 @@ export function parseScowl(text: string): ScowlGroup[] {
     group.words.push(...read.words);
     group.all.push(...read.all);
     group.marked ||= read.marked;
+    outOfPlay ||= read.outOfPlay;
   }
-  if (group.all.length) groups.push(group);
+  close();
   return groups;
 }
 
@@ -132,7 +142,7 @@ export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], dr
   for (const group of groups) for (const word of group.words) words.add(word);
   const unused = drops.filter((word) => !words.has(word));
   if (unused.length) throw new Error(`${DICTIONARY_DROP_FILE}: ${unused.join(", ")} matched nothing`);
-  return [...words].filter((word) => !blocked.has(word) && !isListedWord(word)).sort();
+  return [...words].filter((word) => !blocked.has(word) && !held(word)).sort();
 }
 
 // The download goes through scripts/base.ts's one `download`, passed in as that file imports this one.

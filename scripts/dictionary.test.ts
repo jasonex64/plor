@@ -22,8 +22,13 @@ describe("parseScowl", () => {
     expect(words("60: gleam <v>: (gleamed | x: gleemed), -, gleaming\n")).toEqual(["gleam", "gleamed", "gleaming"]);
   });
 
-  it("leaves out forms marked nearly non-existent, but keeps the group's other forms", () => {
-    expect(words("85 [ukacd]: !plotter <v>: plottered, plottering!\n")).toEqual(["plottered"]);
+  it("leaves out a form marked nearly non-existent, and keeps the rest of its group", () => {
+    expect(words("60: gleam <v>: gleamed, gleaming!\n")).toEqual(["gleam", "gleamed"]);
+  });
+
+  it("leaves a whole group out when its lemma is marked, its other lines too", () => {
+    expect(words("85 [ukacd]: !plotter <v>: plottered, plottering, plotters\n\n60: calm <n>\n")).toEqual(["calm"]);
+    expect(words("50 [ukacd]: !twank <m>: -, -, twanks\n85 [ukacd]: - <m>: twanked, twanking, -\n")).toEqual([]);
   });
 
   it("leaves out proper nouns, abbreviations and word parts", () => {
@@ -66,6 +71,11 @@ describe("buildDictionary", () => {
     expect(buildDictionary([["ambulancechaser", "calm"]], groups)).toEqual(["calm"]);
   });
 
+  it("takes a listed phrase's group out when the table hyphenates it", () => {
+    const groups = parseScowl("85 [ukacd]: ambulance-chaser <n>: ambulance-chasers\n");
+    expect(buildDictionary([["ambulancechaser", "calm"]], groups)).toEqual(["calm"]);
+  });
+
   it("keeps out a group SCOWL marks, even a form only rarer lines hold", () => {
     const groups = parseScowl("99: blorp <n> (offensive-1): blorps\n");
     expect(buildDictionary([["blorps", "calm"]], groups)).toEqual(["calm"]);
@@ -74,6 +84,10 @@ describe("buildDictionary", () => {
   it("takes a dropped word's whole group out, from every source", () => {
     const groups = parseScowl("60: blorp <n>: blorps, blorped\n");
     expect(buildDictionary([["blorp", "blorps", "calm"]], groups, ["blorp"])).toEqual(["calm"]);
+  });
+
+  it("takes a dropped word out when only a plain list holds it", () => {
+    expect(buildDictionary([["blorp", "calm"]], [], ["blorp"])).toEqual(["calm"]);
   });
 
   it("stops on a drop that matches nothing, so a typo can't leave a word in", () => {

@@ -1,6 +1,6 @@
 # M16 — 16a, the dictionary
 
-**Status:** in review (approved 2026-11-05: "Approve, start dictionary"). 257,968 words built, its database size to be measured in 16b.
+**Status:** in review (approved 2026-11-05: "Approve, start dictionary"). 256,476 words built, its database size to be measured in 16b.
 
 ## Goal
 One filtered word list that game 2 judges every typed word against and picks each day's substrings from, built by a script from pinned open sources.
@@ -38,7 +38,7 @@ One filtered word list that game 2 judges every typed word against and picks eac
 ## Design
 - **`npm run base -- fetch dictionary`,** beside the answer base's sets (DECISIONS.md, Answer database imports), so there is one way to fetch outside data: pinned downloads checked against their SHA-256, a snapshot in `data/snapshots/`, a committed manifest. The parsing and merging are pure functions in `scripts/dictionary.ts`.
 - **`normalize`** is the one normalization, and LDNOOBW and `PLOR_LISTED` are the one offensive list.
-- **SCOWL's table is read as its README defines it.** Left out: size above 85, any capitalized lemma (proper nouns), abbreviations, prefixes, suffixes, multi-word parts, non-words, spellings marked `x` (misspellings) and forms marked `!` ("nearly non-existent").
+- **SCOWL's table is read as its README defines it.** Left out: size above 85, any capitalized lemma (proper nouns), abbreviations, prefixes, suffixes, multi-word parts, non-words, spellings marked `x` (misspellings), forms marked `!` ("nearly non-existent"), and a whole group whose lemma is marked `!`.
 - **Forms come from SCOWL's groups,** not a guess at endings: if any word in a group is listed, or the group carries SCOWL's own offensive or vulgar note, every word in that group is out of the whole dictionary, ENABLE's and Moby's copies too. A word sharing a spelling with an offensive group goes with it: the human accepted losing a few innocent words.
 - **`data/dictionary-drop.json`:** the words Claude took out after reading the near-matches and testing for slurs no list names. It isn't Plor's list because that list also drops names from the answer base at load, and game 1's data shouldn't change for game 2. A dropped word takes its SCOWL group with it, and a drop that matches nothing stops the build.
 - **No database table yet:** 16b creates it, and H4 is measured there.
@@ -47,7 +47,7 @@ One filtered word list that game 2 judges every typed word against and picks eac
 - [x] `npm run base -- fetch dictionary` writes the snapshot and manifest, and refuses a download whose checksum differs.
 - [x] Every word is lowercase a to z, 3 letters or more, with no duplicates (`scripts/dictionary.test.ts`).
 - [x] Two runs give the same checksum.
-- [x] No listed word, form of one, or word SCOWL marks offensive or vulgar is in the list.
+- [x] No listed word, no word SCOWL marks offensive or vulgar and no word in the drop file is in the list, and the form scans below were read. **This can't prove no offensive word remains:** see "What it can't prove".
 - [x] Claude has read the near-matches, and doubtful ones are put to the human.
 
 ## Out of scope
@@ -76,7 +76,6 @@ Nothing: this is the first dictionary. It adds no second fetch path, normalizer 
 | Source says | We built | Why different |
 |---|---|---|
 | The README's grammar has one size per line | A word at two sizes takes the smaller | The file itself has lines like `70 [moby] 85 [ukacd]`: the word is in the list from size 70 |
-| `!` marks forms "nearly non-existent" | A lemma marked `!` is left out, and its other forms stay | **Claude's reading:** the README doesn't say what a group annotation does to the group's other forms |
 | POS classes "can't be used to reliably filter out proper nouns" | Capitalized lemmas go, as well as those classes | The README says so itself |
 | SCOWL's note marks "only the worst offenders" | The note, Plor's lists and a drop file | The README says so itself |
 
@@ -107,7 +106,15 @@ Plan step 4's expectation **held**: the first full build gave 258,305 words, ins
 - **SCOWL's own notes:** 75 lines carry `offensive` or `vulgar` notes, all taken out with their groups.
 - **The read:** 2,396 words holding a listed word were read, and most are innocent (`assess`, `therapist`, `basement`). A probe for slurs and vulgar words no list names found more, so the drop list isn't only forms of listed words.
 - **What it can't prove:** nobody has read all 258,000 words, so an unlisted offensive word may remain. A word found later goes in the drop file, followed by a fetch.
-**The final list:** 257,968 words, 2.67 MB as plain text, manifest SHA-256 `775a32e09b88c935`…, the same over two runs. The snapshot's own checks: 0 words outside a to z or under 3 letters, 0 duplicates, sorted, 0 listed words, 0 of the 290 drops. 969 three-letter substrings sit in 500 or more words, and 732 in 100 to 200. `vitest run scripts src/game/misses.test.ts`, without the database tests: 6 files, 127 tests passed.
+**The review's blockers, fixed.** The reviewer's first pass found criterion 4 ticked but false, and all four findings held up when checked:
+1. A leading `!` marks the whole group (README, "Database structure"; libscowl's `group_rank`), where Claude had read it as the lemma alone. About 1,450 words left the list. The count the human approved at "Keep 258,000" included them.
+2. A listed phrase hyphenated in the table reached the check joined up, so a slur got through. `isListedWord` now holds phrases joined up, which also takes `goddamn` and its spellings and the old bird name `oldsquaw`.
+3. `all` didn't hold `!` forms though its comment said so. They stay out, as they'd block innocent words such as `spiced`, so the comment changed, and the words are caught by the group mark or the drop file.
+4. Forms in another group or a plain list survived, so a form scan was added: 168 words looked like forms of a listed or dropped word, and 18 went in the drop file.
+
+The same pass's own check found another bug: a drop held only by ENABLE or Moby stayed in, as the last filter looked only at listed words. `buildDictionary` now checks the drop list there too, with a test.
+
+**The final list:** 256,476 words, 2.65 MB as plain text, manifest SHA-256 `58af970abfaadcc8`…, the same over two runs. The snapshot's own checks: 0 words outside a to z or under 3 letters, 0 duplicates, sorted, 0 listed words, 0 of the 313 drops, and every sample innocent word kept. 967 three-letter substrings sit in 500 or more words, and 736 in 100 to 200. `vitest run scripts src/game/misses.test.ts`, without the database tests: 6 files, 131 tests passed.
 
 ## Review
 - Blocking findings and how each was fixed:

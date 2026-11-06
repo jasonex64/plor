@@ -39,4 +39,8 @@ describe("isListedWord", () => {
     for (const word of onePerList) expect(isListedWord(word)).toBe(isListed(word));
     expect(isListedWord("button")).toBe(isListed("button"));
   });
+
+  it("holds a listed phrase joined up, as normalize leaves a hyphenated spelling", () => {
+    expect(isListedWord(normalize("ambulance-chaser"))).toBe(true);
+  });
 });

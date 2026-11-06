@@ -16,8 +16,9 @@ const holds = (list: string[], text: string) => list.some((w) => ` ${text} `.inc
 export const isListed = (text: string): boolean => holds(LISTED, text);
 
 // The same answer for one word, for a whole dictionary: `isListed` walks both lists per call, which took minutes over
-// game 2's words (M16 16a).
-const LISTED_WORDS = new Set(LISTED);
+// game 2's words (M16 16a). A listed phrase counts joined up too, as `normalize` joins a hyphen: a list that spells it
+// with one reaches here as one word (16a review).
+const LISTED_WORDS = new Set(LISTED.flatMap((w) => [w, w.replaceAll(" ", "")]));
 export const isListedWord = (word: string): boolean => LISTED_WORDS.has(word);
 
 // Whether it holds a word on Plor's list, which the load drops from every set (13e-9b). LDNOOBW's words are dropped
