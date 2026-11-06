@@ -1,6 +1,6 @@
 # M16 — 16a, the dictionary
 
-**Status:** in progress (approved 2026-11-05: "Approve, start dictionary"). Measuring first; the design follows the human's answers to what the measurements leave open.
+**Status:** in review (approved 2026-11-05: "Approve, start dictionary"). 257,968 words built, its database size to be measured in 16b.
 
 ## Goal
 One filtered word list that game 2 judges every typed word against and picks each day's substrings from, built by a script from pinned open sources.
@@ -26,8 +26,29 @@ One filtered word list that game 2 judges every typed word against and picks eac
 | H5 | Plenty of substrings fit S3's bands: more than 500 words in the middle round, 100 to 200 in the last | Common letter pairs and triples appear in thousands of words | Too few two- or three-letter substrings in a band to last the beta |
 | H6 | LDNOOBW and Plor's list remove under 1,000 words, and forms of those words survive | LDNOOBW is short and matches whole words, so plurals and compounds slip past it | No surviving forms |
 
+## Answers (human, 2026-11-05)
+1. Size: "About 239,000 words (Recommended)". That is SCOWL's size 85, with ENABLE and Moby's crossword list, and it brings UKACD's notice.
+2. Offensive words: "Catch forms, Claude checks (Recommended)". Forms go automatically, and Claude reads the near-matches and flags anything doubtful.
+3. Shortest word: "3 letters or more (Recommended)".
+4. Punctuation (M16 S19): "Yes, ignore it (Recommended)". `it's` is `its`, and hyphenated words also count typed joined up.
+5. Words with an ordinary meaning and a slur meaning, such as chink, dyke, retard, nonce, homo and niggardly: "Drop them all (Recommended)". **Claude's reading:** words like those. Everyday words whose slur sense is rare stay, so the word list isn't hollowed out: spade, slope, slant, nip, fairy, hoe, knob, prick, sod, shag, cripple, moron, imbecile, hunky and fruitcake, and queer, as an identity word (answer 6).
+6. Adult words that aren't insults: "Keep identity and medical (Recommended)". Identity words (bisexual, asexual, queer) and medical words (vaginal, testicle) stay; explicit ones (erotica, pornographic, orgasmic) go.
+7. The real count: "Keep 258,000 (Recommended)", told that the first measurement skipped lines of the table.
+
+## Design
+- **`npm run base -- fetch dictionary`,** beside the answer base's sets (DECISIONS.md, Answer database imports), so there is one way to fetch outside data: pinned downloads checked against their SHA-256, a snapshot in `data/snapshots/`, a committed manifest. The parsing and merging are pure functions in `scripts/dictionary.ts`.
+- **`normalize`** is the one normalization, and LDNOOBW and `PLOR_LISTED` are the one offensive list.
+- **SCOWL's table is read as its README defines it.** Left out: size above 85, any capitalized lemma (proper nouns), abbreviations, prefixes, suffixes, multi-word parts, non-words, spellings marked `x` (misspellings) and forms marked `!` ("nearly non-existent").
+- **Forms come from SCOWL's groups,** not a guess at endings: if any word in a group is listed, or the group carries SCOWL's own offensive or vulgar note, every word in that group is out of the whole dictionary, ENABLE's and Moby's copies too. A word sharing a spelling with an offensive group goes with it: the human accepted losing a few innocent words.
+- **`data/dictionary-drop.json`:** the words Claude took out after reading the near-matches and testing for slurs no list names. It isn't Plor's list because that list also drops names from the answer base at load, and game 1's data shouldn't change for game 2. A dropped word takes its SCOWL group with it, and a drop that matches nothing stops the build.
+- **No database table yet:** 16b creates it, and H4 is measured there.
+
 ## Acceptance criteria
-Drafted after the design answers.
+- [x] `npm run base -- fetch dictionary` writes the snapshot and manifest, and refuses a download whose checksum differs.
+- [x] Every word is lowercase a to z, 3 letters or more, with no duplicates (`scripts/dictionary.test.ts`).
+- [x] Two runs give the same checksum.
+- [x] No listed word, form of one, or word SCOWL marks offensive or vulgar is in the list.
+- [x] Claude has read the near-matches, and doubtful ones are put to the human.
 
 ## Out of scope
 - Game 2's routes, the picker and the database's game tables (16b to 16d).
@@ -35,15 +56,18 @@ Drafted after the design answers.
 ## Numbers
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
-| The SCOWL size | How far down the list of rarer words to go | Open: a human number, after the measurement |
+| 85 | SCOWL size: how far down the list of rarer words to go | Human, 2026-11-05, answer 1 |
+| 3 | Fewest letters in a word | Human, 2026-11-05, answer 3 |
 
 ## Plan
-1. Measure with a throwaway script, against the hypothesis.
-2. Ask the human what the numbers leave open.
-3. Then write the design, the script and its tests.
+1. Measure with a throwaway script, against the hypothesis. Done.
+2. Ask the human what the numbers leave open. Done.
+3. The script and its tests. Done.
+4. Check the real count. The measurement skipped about 47,000 SCOWL lines it couldn't read (a word at two sizes, or with spelling codes). **Expected:** 250,000 to 320,000 words, as those lines add mostly rare words. **Disproved by:** a count outside that range. Either way the human hears the real number, since they chose "about 239,000".
+5. Read the near-matches. Independent review.
 
 ## Removes
-Nothing yet: nothing is built.
+Nothing: this is the first dictionary. It adds no second fetch path, normalizer or game-wide offensive list: it runs through `npm run base -- fetch`, `normalize` and `isListed`'s lists. The drop file is the one new list, for the reason in Design.
 
 ---
 *Fill in the sections below at the end.*
@@ -51,6 +75,10 @@ Nothing yet: nothing is built.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The README's grammar has one size per line | A word at two sizes takes the smaller | The file itself has lines like `70 [moby] 85 [ukacd]`: the word is in the list from size 70 |
+| `!` marks forms "nearly non-existent" | A lemma marked `!` is left out, and its other forms stay | **Claude's reading:** the README doesn't say what a group annotation does to the group's other forms |
+| POS classes "can't be used to reliably filter out proper nouns" | Capitalized lemmas go, as well as those classes | The README says so itself |
+| SCOWL's note marks "only the worst offenders" | The note, Plor's lists and a drop file | The README says so itself |
 
 ## Evidence
 **The measurement, 2026-11-05.** A throwaway script in the session's scratchpad, printing counts only, over the pinned files in SOURCES.md, with `normalize`, LDNOOBW and `PLOR_LISTED` from this branch. Words are a to z after `normalize`, 2 letters or more, with SCOWL's name, place, upper-case and abbreviation entries left out.
@@ -67,10 +95,19 @@ Nothing yet: nothing is built.
 | H1 | Held: 172,823 |
 | H2 | **Disproved** for the crossword list: 174,571 to 239,410 at every size, because 117,065 of Moby's 117,969 crossword words are already in ENABLE, so it adds about 900. Moby's big list, `single.txt`, reaches the range but adds 170,172 words SCOWL and ENABLE don't have, and a sample of 24 was mostly obscure or archaic |
 | H3 | Held: 2.44 MB at size 85 |
-| H4 | **Not measured:** Docker was off |
+| H4 | **Not measured, moved to 16b:** Docker was off, and 16b creates the table |
 | H5 | Held, at size 85: 333 two-letter and 897 three-letter substrings in 500 or more words; 43 two-letter and 735 three-letter in 100 to 200 words |
 | H6 | Held: the lists remove 173 words at size 85, and up to 391 near-forms survive. That count is an upper limit, as a close prefix can be an innocent word |
 
+**The build, 2026-11-05.** Pacific; the snapshot's date is UTC. `npm run base -- fetch dictionary` took 11 s after the fix below.
+
+Plan step 4's expectation **held**: the first full build gave 258,305 words, inside 250,000 to 320,000, where the throwaway script's 239,410 had skipped about 47,000 table lines. At that size, 969 three-letter substrings sit in 500 or more words, and 732 in 100 to 200.
+
+- **Speed:** the first build ran over 300 s, as `isListed` walks both lists per call; `isListedWord` looks one word up in a set.
+- **SCOWL's own notes:** 75 lines carry `offensive` or `vulgar` notes, all taken out with their groups.
+- **The read:** 2,396 words holding a listed word were read, and most are innocent (`assess`, `therapist`, `basement`). A probe for slurs and vulgar words no list names found more, so the drop list isn't only forms of listed words.
+- **What it can't prove:** nobody has read all 258,000 words, so an unlisted offensive word may remain. A word found later goes in the drop file, followed by a fetch.
+**The final list:** 257,968 words, 2.67 MB as plain text, manifest SHA-256 `775a32e09b88c935`…, the same over two runs. The snapshot's own checks: 0 words outside a to z or under 3 letters, 0 duplicates, sorted, 0 listed words, 0 of the 290 drops. 969 three-letter substrings sit in 500 or more words, and 732 in 100 to 200. `vitest run scripts src/game/misses.test.ts`, without the database tests: 6 files, 127 tests passed.
 
 ## Review
 - Blocking findings and how each was fixed:

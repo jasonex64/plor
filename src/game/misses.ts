@@ -15,6 +15,11 @@ const holds = (list: string[], text: string) => list.some((w) => ` ${text} `.inc
 // isn't (human, 2026-10-24: "Hold listed words (Recommended)"; Plor's list, 13e-9b).
 export const isListed = (text: string): boolean => holds(LISTED, text);
 
+// The same answer for one word, for a whole dictionary: `isListed` walks both lists per call, which took minutes over
+// game 2's words (M16 16a).
+const LISTED_WORDS = new Set(LISTED);
+export const isListedWord = (word: string): boolean => LISTED_WORDS.has(word);
+
 // Whether it holds a word on Plor's list, which the load drops from every set (13e-9b). LDNOOBW's words are dropped
 // only from the items data/listed.json names, as real titles and band names hold some of them.
 export const isPlorListed = (text: string): boolean => holds(PLOR, text);

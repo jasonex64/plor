@@ -1,0 +1,9 @@
+{
+  "set": "dictionary",
+  "source": "word-lists",
+  "snapshot": "2026-11-06",
+  "retrieved_at": "2026-11-06T06:32:31.790Z",
+  "method": "ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size 85 (SOURCES.md, pinned by SHA-256), through normalize; a to z, 3 letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in data/dictionary-drop.json, or an offensive or vulgar note is out",
+  "items": 257968,
+  "sha256": "775a32e09b88c9353c9057b9822eae5204effb69a802b74b934c240ccc4ccc19"
+}

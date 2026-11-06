@@ -55,7 +55,7 @@ The human's question: "if theres no actual risk or bottleneck we should start on
 | S16 | One highlighted letter for the whole day, or a new one each round? | Open |
 | S17 | How every game weighs the same in an overall score | Open. Claude's proposal is under "Comparing games" below |
 | S18 | Difficulty per round, all 7: which rounds use 2 letters, which 3, and each round's word-count band. Does a 2-letter substring also need a minimum count? Are the 500 and 100–200 counted in the S2 list (a bigger list gives every substring more words)? | Open (human numbers) |
-| S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Claude's reading: they are dropped before matching and don't count toward word length, so "it's" contains "ts" and scores as 3 letters. Confirm | Open |
+| S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Dropped before matching and not counted toward word length, so "it's" contains "ts" and scores as 3 letters: "Yes, ignore it (Recommended)" (human, 2026-11-05) |
 
 ## The dictionary (S2)
 Read on 2026-10-22; none of these is in SOURCES.md yet, and only a human adds one.
@@ -98,6 +98,7 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 - [ ] Two players get the same substrings and highlighted letter on the same day (DECISIONS.md, Day boundary).
 - [ ] The score follows S15 and S16, checked by tests on hand-worked runs.
 - [ ] The human approves each day before it goes live (S11).
+- [ ] Before game 2 goes live, the About page shows UKACD's notice prominently with its text verbatim, and ESDB's notice (SOURCES.md, 16a).
 - [ ] Offbeat plays exactly as before the split: its existing unit, database and e2e tests pass unchanged.
 
 ## Out of scope
