@@ -1,6 +1,6 @@
 # M14 — 14c-5, Afterglow becomes a firework festival
 
-**Status:** in progress (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
+**Status:** in progress, version 6 (round 7) published to the private page 2026-11-06; fresh review, Source diff and the human's phone test still to come (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
 
 ## Goal
 Redesign Afterglow on its private page as a walk through a firework festival, where each answer charges up and rockets the view into the sky, so the human can approve the game's look before it goes into `/play`.
@@ -218,6 +218,14 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 Brightness rises at every step, the biggest jumps are at Q3 and Q6, and Q7 is highest, in all four. Wide detailed Q3 to Q4 is only +0.5, so that step is nearly flat. Hues run 300.0° through 0° to 48.3°, none outside plum to amber. No forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. The smooth zoom isn't measured yet.
 
 **The first still comp, replaced after the human's round 5 notes:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw (private, published 2026-11-05; source `themes/festival/` in the mocks folder). Four stages, wide at 960×540 and phone at 292×633: 63 colours, no forbidden drawing calls, no console errors, no sideways scroll at 390 px, in headless Chromium. Pre-draw 60 to 191 ms; a still frame 0.2 to 0.6 ms. The smooth zoom isn't measured yet.
+
+Version 6, round 7, final state (page sha256 `cbe101b9b0ec7dd8…`, 2026-11-06), run by the main session, not the builder:
+- `node themes/festival/check.mjs` (headless, nothing else running): 208 of 208, exit 0. At both sizes, 390×844 at DPR 3 included: frame interval 16.67 ms avg, 60.0 fps, worst 33.4 ms.
+- `CHROME_CHANNEL=chrome node themes/festival/check.mjs _cr` (real Chrome, this PC): 206 of 208, exit 1, 60.0 fps at both sizes, worst interval 22.2 ms. **Two lines fail, twice, the same way**: `phone 60 fps with raster paid inside the frame` 23.04 ms avg against 16.7 (wide passes at 15.73), and `phone lettering never changes shape or size` (Q6 climb 0.5, 11736 px against 11738). The raster line forces `g.getImageData` every frame, which on a GPU canvas of 1172×2532 pays a readback real play doesn't. That reading is *unverified*. Neither line has been waved through, and no target was adjusted. Real phones are unmeasured.
+- Climb, version 5 to 6: 2.7 / 2.3 / 1.9 s to 3.7 / 3.3 / 2.9 s, 6 to 30 floors, peak wide 1186 / 1396 / 1697 to 2095 / 2350 / 2669 art px/s, phone 1394 / 1639 / 1982 to 2459 / 2759 / 3134.
+- Frame cap, simulated: 60 Hz 60.0 fps, 75 Hz 59.9, 90 Hz 59.9, 120 Hz 60.0, 144 Hz 60.0, 360 Hz 60.0, never half rate.
+- Mutants: `node themes/festival/mutants.mjs`, 4 at a time (8 made the PC unusable): 75 of 77 caught. Of the 2 missed, "the glitter thins away" is caught run alone (a flow timeout under load). "the rumble off whole art pixels" exposed a real blind spot: the line compared neighbouring frames, and `placeWord`'s rounding to screen pixels left whole steps between two off-grid places. The line now measures each frame against the word's rest place: real page 0 of 20 frames off, mutant 20 of 20, both sizes. All 5 rumble mutants then pass. The other 72 ran on the check before that one line changed; the line can't affect them. The earlier claim that all five misses of the run before were check faults was the builder's, and it was wrong for this one.
+- Stills read by the main session: lantern at Q2 phone and Q7 wide, bursts, seven stages, finale: they hold. Motion is judged only from stills and numbers; the glide can only be judged on a real screen.
 
 ## Review
 - Blocking findings and how each was fixed (first review, 2026-11-05: 10 blockers; a build with 11 defects passed every check line, so the checks must be rebuilt):
