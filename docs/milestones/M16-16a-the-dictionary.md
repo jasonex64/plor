@@ -126,6 +126,8 @@ The same pass's own check found another bug: a drop held only by ENABLE or Moby 
 | `test-run.e2e.ts:60`: not visible in 5 s | **Unknown.** Claude guessed the dev server's first compile, and added a warm-up that logged every route's time | The warm-up is deleted: the guess was disproved. CI now prints the page a failed test ended on | Every route under about a second disproved the guess, and that's what ran: the slowest was 685 ms | Failed once in 8 e2e runs of this commit range; passes otherwise |
 | `player-screens.e2e.ts:112`, both runs of `268350e`: the board never showed | **Inferred:** test 92 of 149, a 20-second wait, ran at about 08:00 UTC, midnight Pacific, in two runs started 15 s apart, so the day reset under it | None: it needs a run on that test at that moment. Recorded in ROADMAP | Passes off midnight | Fails again away from midnight |
 
+| `shell.e2e.ts:236`: the Result link was gone | **Seen on the printed page:** "Question 1 · 15s left" after a faked 21 s. The browser's clock reached zero and the server, on its real clock, gave the question 15 seconds back | The run moves back 21 seconds in the database too, as `player-screens.e2e.ts` already did. The assertions don't change | Passes | The same "15s left" page after this |
+
 The warm-up's deletion leaves ROADMAP's "Clicks that don't navigate under load" as it was, open.
 
 ## Review
