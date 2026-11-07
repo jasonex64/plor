@@ -35,11 +35,13 @@ The pinned files downloaded to the session's scratchpad, outside the repo, with 
 ## Design (Claude, for approval)
 - **The build's output** becomes pairs, one per proper spelling: (`word_key`, `spelling`), where `word_key` is `normalize`'s form, as today, and `spelling` is the source's spelling, lower-case. ENABLE's and Moby's words give a pair whose spelling is their own text. SCOWL's forms give their spelling as the table writes it, after `bare` takes the marks off.
 - **Keeping spellings doesn't change the set of keys.** Every filter (size, misspellings, proper nouns, word parts, the offensive lists, the drop file, the 3-letter minimum) still works on the key, and the first fetch kept exactly 16a's 256,476 keys. A pair is kept only if its key is.
-- **Two fixes then take 43 keys out** (answer 3). `readLine` read a class only with a part of speech before its slash, so `</abbr?>` was never seen and `PROPER_CLASSES`' `abbr?` never fired: the part of speech may now be empty, which takes 40 abbreviations out. `com`, `andor` and `dba`, on lines with no tag at all, go on the drop list.
+- **Three fixes then take 43 keys out** (answer 3). `readLine` read a class only with a part of speech before its slash, so `</abbr?>` was never seen and `PROPER_CLASSES`' `abbr?` never fired: the part of speech may now be empty, which takes 40 abbreviations out. `.com`, on a line with no tag at all, goes on the drop list. `playable` now refuses a slash, as it does a space, which takes out `and/or`, `d/b/a` and `s/he`, the last a spelling of `she` that `she` itself keeps.
 - **The shown spelling** (DECISIONS.md, Game 2, updated in this ticket's PR), worked out in the database from a key's spellings:
-  1. If the typed text, lower-cased and trimmed, has no accents and one of the key's accented spellings equals it once its own accents are taken off, show that accented spelling, the first in code-point order if several fit (answer 2; review, 2026-11-06): "cafe" shows café, "abbes" shows abbés, and "abbe's" shows abbé's.
-  2. Otherwise, show the typed text, lower-cased and trimmed, if it's one of the key's spellings.
-  3. Otherwise, show the first spelling in code-point order.
+  The steps read the typed text lower-cased and trimmed, with everything but letters, apostrophes and hyphens taken out, so "caf3e" reads as cafe (answer 3; Claude's reading, review, 2026-11-06).
+  1. If that text has no accents and one of the key's accented spellings equals it once its own accents are taken off, show that accented spelling, the first in code-point order if several fit (answer 2; review, 2026-11-06): "cafe" shows café, "abbes" shows abbés, and "abbe's" shows abbé's.
+  2. Otherwise, if that text has no accents and the key has an accented spelling, show the first of those in code-point order: "papier mache" shows papier-mâché, "ca-fe" shows café (Claude's reading of answers 2 and 3, as "should all be the same" has to hold for accents too; review, 2026-11-06).
+  3. Otherwise, show that text, if it's one of the key's spellings.
+  4. Otherwise, show the first spelling in code-point order.
   
   Step 1 compares with only the accents taken off, so the player's apostrophes and hyphens stand. The first wording, "the first accented spelling in code-point order", would have shown the possessive "abbé's" for a typed "abbes", as `'` sorts before `s`: found by the measurement below, and fixed here to keep answer 2's "Hyphens and apostrophes stay theirs if real".
 - **The snapshot and manifest** change shape, which changes the manifest's checksum. Only the Windows PC fetches (HANDOFF; human, 2026-10-26). The human runs `npm run base -- fetch dictionary` there, and copies the snapshot by hand to any other machine.
@@ -50,8 +52,8 @@ The pinned files downloaded to the session's scratchpad, outside the repo, with 
 - [x] A fetch on the Windows PC gives exactly 256,476 keys, the same as 16a's manifest, and reports the pair count, before answer 3's fixes (Evidence, fetch 1). The manifest's `items` now counts pairs, not keys (it counted keys in 16a, when each key was one item), so the keys are counted from the snapshot, on that PC after the fetch:
   `node -e "const f=require('fs');const m=JSON.parse(f.readFileSync('data/manifests/dictionary.json','utf8'));const s=JSON.parse(f.readFileSync('data/snapshots/dictionary/'+m.snapshot+'.json','utf8'));console.log('pairs',s.length,'keys',new Set(s.map(e=>e.key)).size)"` *Hypothesis:* the same keys, with more pairs than keys. *Disproved by:* any change in the key count.
 - [x] A fetch with answer 3's fixes gives 256,433 keys: fetch 1's, less the 40 abbreviations and the 3 drops, with none added (answer 3; Evidence, fetch 2).
-- [x] A class with no part of speech is read, checked by `scripts/dictionary.test.ts`.
-- [x] The three spelling steps above are in DECISIONS.md's Game 2 section, with answer 3's letters-only matching.
+- [x] A class with no part of speech is read, and a slashed form is left out, checked by `scripts/dictionary.test.ts`.
+- [x] The four spelling steps above are in DECISIONS.md's Game 2 section, with answer 3's letters-only matching, and each example in them gives that result on the snapshot (Evidence, the rule).
 
 ## Out of scope
 - The `dictionary_word` table and its load, and so H4 (the dictionary's size in Postgres): they belong to the ticket that builds the table (16b's deferred item, ROADMAP For M16).
@@ -67,7 +69,7 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
 4. The `reviewer` agent.
 
 ## Removes
-`buildDictionary`'s keys-only output, replaced by pairs, with no second output kept beside it. 43 keys and 23 dotted spellings on words that stay (`apt.`, `sec.`).
+`buildDictionary`'s keys-only output, replaced by pairs, with no second output kept beside it. 43 keys, 23 dotted spellings on words that stay (`apt.`, `sec.`), and `s/he`.
 
 ---
 *Fill in the sections below at the end.*
@@ -76,6 +78,7 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
 | Source says | We built | Why different |
 |---|---|---|
 | This ticket: "the build keeps exactly today's 256,476 keys" | 256,433 keys | The human's answer 3. Keeping spellings alone did keep them (fetch 1) |
+| 16b's and this ticket's three spelling steps | Four steps, reading a cleaned text | Answer 3 lets digits, symbols and spaces into a try, so the steps needed a text to read and accents had to win through them. Claude's reading, for the human to overrule |
 | 16a's ticket: abbreviations left out | They are, since this ticket | `</abbr?>` wasn't read until now. 16a's own acceptance criteria didn't check for it |
 
 ## Evidence
@@ -95,13 +98,22 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
 
 **Fetch 2, with the fix and the 3 drops** (2026-11-06): `FETCHED dictionary: 273233 items, snapshot 2026-11-07`.
 - *Hypothesis:* 256,476 − 40 − 3 = 256,433 keys, none added. *Disproved by:* any other count, or another key removed.
-- *Result:* `pairs: 273233, keys: 256433`, `removed 43: adj adv andor approx arr asst attn bldg com cont contd dba deg dep dept div doz enc encl esp est ext fwd gov govt incl int lbs masc mfg misc ono pct pkg pres recd std tbs tbsp tsp vol wkly yrs`, `added 0`, `strictly sorted, no duplicates true`. Held. The one spelling left outside letters, `'` and `-` is `s/he`, a second spelling of `she`, which the matching rule's cleaning means no typed text shows.
+- *Result:* `pairs: 273233, keys: 256433`, `removed 43: adj adv andor approx arr asst attn bldg com cont contd dba deg dep dept div doz enc encl esp est ext fwd gov govt incl int lbs masc mfg misc ono pct pkg pres recd std tbs tbsp tsp vol wkly yrs`, `added 0`, `strictly sorted, no duplicates true`. Held. One spelling stayed outside letters, `'` and `-`: `s/he`, beside `she`.
 
-**Tests:** the new test failed before the fix (`expected [ 'etcet', 'ono', 'lowname' ] to deeply equal []`), then `npx vitest run scripts/dictionary.test.ts`: 25 passed. `npx eslint` on both files and `npx tsc --noEmit -p .` are clean (the worktree needed `npx next typegen` first).
+**Fetch 3, with a slash refused and `andor` and `dba` off the drop list, which would otherwise stop the build as matching nothing** (2026-11-06): `FETCHED dictionary: 273232 items, snapshot 2026-11-07`. *Hypothesis:* the same 256,433 keys, one pair fewer. *Disproved by:* any key changing, or another pair lost. *Result:* `pairs: 273232, keys: 256433`, `removed 0`, `added 0`, the one pair lost `s/he`, none left outside letters, `'` and `-`. Held. The manifest's checksum is `a14ddfb1…`.
+
+**The rule, run over this snapshot** (a throwaway script, 16d builds the real one): 26 tries, each with its result written down first, `disagreements 0 of 26`: `app3le` apple; `wellknown`, `well---known` and `well known` well-known; `caf3e` and `ca-fe` café; `papier mache` and `papiermache` papier-mâché; `aide--memoire` aide-mémoire; `s-he` she; `c4fe`, `com`, `adj` and `123` not words. Of the 428 keys with an accented spelling, none shows an unaccented one when only its letters are typed.
+
+**Tests:** the two new tests each failed before their fix (`expected [ 'etcet', 'ono', 'lowname' ] to deeply equal []`; `expected [ 'she', 'andor' ] to deeply equal []`), then `npx vitest run scripts/dictionary.test.ts`: 26 passed. `npx eslint` on both files and `npx tsc --noEmit -p .` are clean (the worktree needed `npx next typegen` first).
 
 ## Review
 - Blocking findings and how each was fixed (the `reviewer` agent, 2026-11-06):
   1. "merges, normalizes, removes duplicates and sorts" read the keys through a `Set`, so a duplicate pair would have passed: it asserts the full pairs again.
   2. Step 1 had no order when several accented spellings fit: the first in code-point order, in the ticket and DECISIONS.md.
   3. The fetch prints only the pair count, and the manifest's `items` changed meaning: acceptance criterion 3 says so and names the command that counts keys.
-- Deferred to ROADMAP "Next revision": the six items under "For M16" marked "Found in M16 16a-2 (review)".
+- Blocking findings from the second review (the `reviewer` agent, 2026-11-06, on the fetch's fix), each fixed:
+  1. DECISIONS.md's example "c4fe shows café" was wrong: dropping the digit leaves `cfe`, not a word. It's "caf3e" now.
+  2. "No typed text shows `s/he`" was false: "s-he" showed it, by step 3 as it then was. A slash is refused in the build, so that spelling is gone.
+  3. The ticket's steps and DECISIONS.md's had drifted apart, with the cleaning unmarked: they match now, marked as Claude's reading, with a Source diff row.
+  4. Accents didn't win through junk: "papier mache" showed papier-mache, and 13 keys showed no accent on their bare letters. Step 2 is new; it's checked on all 428 keys.
+- Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16a-2 (review)".

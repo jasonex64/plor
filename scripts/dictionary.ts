@@ -66,10 +66,11 @@ function derived(entries: string): string[] {
 
 const spellings = (lemma: string | null, entries: string) => (lemma === null ? [] : [lemma]).concat(entries ? derived(entries) : []);
 
-// A word a player may type, or null. A space means a phrase; anything else `normalize` leaves outside a to z (a
-// digit) isn't a word. The spelling is NFC so one accented word has one spelling, whichever way its source encodes it.
+// A word a player may type, or null. A space means a phrase and a slash two words at once (`and/or`, `s/he`); anything
+// else `normalize` leaves outside a to z (a digit) isn't a word. The spelling is NFC so one accented word has one
+// spelling, whichever way its source encodes it.
 function playable(word: string): DictionaryEntry | null {
-  if (/\s/.test(word)) return null;
+  if (/[\s/]/.test(word)) return null;
   const key = normalize(word);
   return /^[a-z]+$/.test(key) && key.length >= DICTIONARY_MIN_LETTERS ? { key, spelling: word.normalize("NFC").toLowerCase() } : null;
 }

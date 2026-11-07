@@ -43,6 +43,10 @@ describe("parseScowl", () => {
     expect(words("70 [3of6]: -etcet. </abbr?>\n\n60: o.n.o. </abbr?>\n\n60: lowname </name?>\n")).toEqual([]);
   });
 
+  it("takes out a slashed form, as more than one word", () => {
+    expect(words("60: s/he\n\n60: and/or\n")).toEqual([]);
+  });
+
   it("takes phrases out, and joins hyphens as answer 4 says", () => {
     expect(words("60: ice cream <n>: ice creams\n\n60: well-known <aj>\n")).toEqual(["wellknown"]);
   });

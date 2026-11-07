@@ -681,7 +681,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 14b-12's db test uses a one-question day, so "every question after midnight" isn't exercised above question 1, and the search's full list isn't compared with what `resolve_answer` accepts for every name. Found in 14b-12's review (2026-10-30).
 
 **For M16 (game 2):**
-- [x] *(Closed in 16a-2: all three dropped, as the human answered, "No, remove them (Recommended)".)* `com`, `andor` and `dba` are in the dictionary from table lines with no part of speech; two are abbreviations, which 16a leaves out. Three drop entries fix it. Found in M16 16a (review, 2026-11-05).
+- [x] *(Closed in 16a-2: all three out, as the human answered, "No, remove them (Recommended)": `com` on the drop list, the other two as the build refuses a slash.)* `com`, `andor` and `dba` are in the dictionary from table lines with no part of speech; two are abbreviations, which 16a leaves out. Three drop entries fix it. Found in M16 16a (review, 2026-11-05).
 - [ ] A definition note holding `: ` is cut at the wrong colon (`scripts/dictionary.ts`, 5 table lines); the list isn't affected, and the file is pinned. Found in M16 16a (review).
 - [ ] A table line the head pattern doesn't match is skipped silently: none today, but re-pinning a new file could hide a new shape. Found in M16 16a (review).
 - [ ] The misspelt-line check fails on `Ax {1}`, as `{1}` is one of its tokens: none today. Found in M16 16a (review).
@@ -698,6 +698,11 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 16b's ticket (`M16-16b-run-model-and-format.md`, `dictionary_word`) still calls the sources' punctuation and accents unverified; 16a-2 measured ENABLE and SCOWL. Found in M16 16a-2 (review).
 - [ ] The BMP comment in `scripts/dictionary.ts` rests, for SCOWL, on 16a-2's one measurement (0 characters past U+FFFF); ENABLE and Moby are Latin-1 by construction. Found in M16 16a-2 (review).
 - [ ] HANDOFF had two "Now:" sections; fixed in the session's closing rewrite. Found in M16 16a-2 (review).
+- [ ] DECISIONS.md's Game 2 cleaning doesn't say whether the curly apostrophe (U+2019) counts as an apostrophe: if it's cleaned out, "it’s" shows `its`, and 11,105 keys hold both a plain and an apostrophe spelling. Whether phones send it in this app is *unverified*. For 16d. Found in M16 16a-2 (second review, 2026-11-06).
+- [ ] `M16-16b-run-model-and-format.md` lines 56 and 59 still give `word_key` as `normalize`'s form and the old two-step spelling; its amendment note points only at the key. DECISIONS.md wins. Found in M16 16a-2 (second review).
+- [ ] `M16-16a-2-proper-spellings.md`, Source: "the build, its filters and the drop list, none of which change" stopped being true at answer 3. Found in M16 16a-2 (second review).
+- [ ] The M16 ticket's S19 row, "Widened to everything but letters, digits, symbols and spaces too", can be read as keeping digits. Found in M16 16a-2 (second review).
+- [ ] "Letters alone" drops everything outside a to z, so non-Latin letters too, where the human said "non alphabetic": harmless, and the rule's wording is explicit. Found in M16 16a-2 (second review).
 
 - [x] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test opens the route first; six runs logged a first visit of 1,359 to 4,240 ms and none failed on it. "Clicks that don't navigate under load" above may be the same thing (*unverified*). Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
