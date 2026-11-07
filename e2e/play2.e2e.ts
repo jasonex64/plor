@@ -79,6 +79,21 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(reason).toHaveText("Needs the letters qk.");
   await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
+  // Letters typed while a refusal is on its way are the next word, and stay.
+  let answer = () => {};
+  const answered = new Promise<void>((resolve) => (answer = resolve));
+  await page.route("**/api/substrings/try", async (route) => {
+    await answered;
+    await route.continue();
+  });
+  await box.fill("zzzqqqzz");
+  await box.press("Enter");
+  await box.fill("aq");
+  answer();
+  await expect(reason).toHaveText("Not in the dictionary.");
+  await expect(box).toHaveValue("aq");
+  await page.unroute("**/api/substrings/try");
+  await page.waitForTimeout(600);
   // What doesn't register clears too, and costs no lockout, as the word after it shows.
   for (const nothing of ["123", "  "]) {
     await box.fill(nothing);

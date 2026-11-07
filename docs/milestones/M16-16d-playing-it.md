@@ -122,7 +122,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 ## Evidence
 ### 16d-2
-**The box (answer 9):** written before the fix, `npx playwright test e2e/play2.e2e.ts -g "a whole day" --retries=0` passed every refusal's `toHaveValue("")` and failed at `e2e/play2.e2e.ts:86`, on `123`, as expected: tries with no letters left their text. After it, `npx playwright test e2e/play2.e2e.ts --retries=0`: 5 passed. Taking out only the line that clears a box of spaces fails the same check again, so both paths are tested. `npm test`: 603 passed, and `npx tsc --noEmit -p .` is clean.
+**The box (answer 9):** written before the fix, `npx playwright test e2e/play2.e2e.ts -g "a whole day" --retries=0` passed every refusal's `toHaveValue("")` and failed at `e2e/play2.e2e.ts:86`, on `123`, as expected: tries with no letters left their text. After it, `npx playwright test e2e/play2.e2e.ts --retries=0`: 5 passed. Taking out only the line that clears a box of spaces fails the same check again, so both paths are tested. The re-check found no test for text typed on while a refusal is on its way, which stays: added, and with that line changed to always clear, the same test fails at its `toHaveValue("aq")`. `npm test`: 603 passed, and `npx tsc --noEmit -p .` is clean.
 
 **Tests:** the first route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first; the review's were added after, and it showed by mutation what they had missed. `npx vitest run src/app/api/substrings --no-file-parallelism`: 20 passed. `npx playwright test e2e/play2.e2e.ts`: 5 passed: signed out, no puzzle, a whole day with each reason and both ways a clock ends, a tab left between rounds, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 21 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
 
@@ -143,6 +143,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
   1. A tab left between rounds past midnight stranded the player: a refusal meaning the screen is behind reads the day again, and any other error is shown, both by e2e. The first fix reloaded on every error, which hid real ones: found on the re-check.
   2. A double submit hid why a word failed behind "Too quick": one try at a time, by e2e.
   3. Focus was lost between rounds, so Enter did nothing and a screen reader heard nothing: Next takes the focus and is described by how the round ended, by e2e.
+  1a. Second re-check, of the last two fixes: letters typed while a refusal is on its way stay, but nothing tested it. Added to the e2e. Its other notes are in ROADMAP, For M16.
   4. "Each reason shown ... a timeout" was ticked but not met: "Already used.", a try past the clock, and the clock reaching zero with no reload are all in the e2e now.
   5. Mutations showed paths untested: each player's words are told apart, and Next during round 1, `no_run`, `no_puzzle_today`, `client_outdated`, `already_answered`, `already_used` and a run left yesterday all have tests.
   6. Two exclusions in `home.tsx` weren't in the ticket, and one changed M14 L18: game 1's clock bar is back, and the feed's is in the Design.
