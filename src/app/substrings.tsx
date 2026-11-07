@@ -7,7 +7,7 @@
 // until 16e.
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { SubstringRun, TryOutcome } from "@/game/substring-state";
-import { api } from "@/lib/api-client";
+import { ApiError, api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
 import { useCountdown } from "./countdown";
 import kit from "./kit.module.css";
@@ -16,6 +16,10 @@ import { LoadingStatus } from "./skeleton";
 import styles from "./substrings.module.css";
 
 type RunResponse = { run: SubstringRun | null };
+
+// A refusal that means this screen is behind the server: a tab left between rounds overnight has no clock to bring it
+// back, and its run isn't today's. Anything else is a failure, and is shown.
+const BEHIND = ["no_run", "no_puzzle_today", "run_over", "round_running"];
 
 export function SubstringsScreen() {
   const [run, setRun] = useState<SubstringRun | null | undefined>(undefined);
@@ -36,10 +40,9 @@ export function SubstringsScreen() {
     try {
       setRun((await api<RunResponse>(path, { method: "POST" })).run);
       setError(null);
-    } catch {
-      // The screen is behind the server: a tab left between rounds overnight has no clock to bring it back, and its run
-      // isn't today's. Reading the day shows where things stand, or the error if that fails too.
-      load();
+    } catch (err) {
+      if (err instanceof ApiError && BEHIND.includes(err.code)) load();
+      else setError(errorText(err));
     }
   };
 

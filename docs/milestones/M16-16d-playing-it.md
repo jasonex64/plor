@@ -136,7 +136,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 ## Review
 - Blocking findings and how each was fixed (16d-2, the `reviewer` agent, 2026-11-07):
-  1. A tab left between rounds past midnight stranded the player: a refused Start or Next reads the day again, by e2e.
+  1. A tab left between rounds past midnight stranded the player: a refusal meaning the screen is behind reads the day again, and any other error is shown, both by e2e. The first fix reloaded on every error, which hid real ones: found on the re-check.
   2. A double submit hid why a word failed behind "Too quick": one try at a time, by e2e.
   3. Focus was lost between rounds, so Enter did nothing and a screen reader heard nothing: Next takes the focus and is described by how the round ended, by e2e.
   4. "Each reason shown ... a timeout" was ticked but not met: "Already used.", a try past the clock, and the clock reaching zero with no reload are all in the e2e now.

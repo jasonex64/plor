@@ -41,8 +41,12 @@ test("a day with no puzzle says so", async ({ browser }) => {
   await expect(page.getByText("There's no puzzle today.")).toBeVisible();
 });
 
+// Each test that plays adds the day itself, as a retry runs in a new worker, whose cleanup took it away.
+const addDay = () =>
+  DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2) on conflict do nothing", [today, { format: 1, game_id: "substrings", date: today, rounds: ROUNDS, bonus_letter: "j" }]);
+
 test("a whole day: a word, each reason, a lockout, a timeout, Next and the results", async ({ browser }) => {
-  await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2)", [today, { format: 1, game_id: "substrings", date: today, rounds: ROUNDS, bonus_letter: "j" }]);
+  await addDay();
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "pl");
@@ -124,7 +128,8 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(results.getByRole("listitem").last()).toContainText("aqyzb, aqyzc, aqyzd");
 });
 
-test("a tab left between rounds finds the day it's in", async ({ browser }) => {
+test("a tab left between rounds finds the day it's in, and a real failure says so", async ({ browser }) => {
+  await addDay();
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "pm");
@@ -134,7 +139,14 @@ test("a tab left between rounds finds the day it's in", async ({ browser }) => {
   await box.fill("aqkb");
   await box.press("Enter");
   const game = page.getByRole("region", { name: "Game number 2" });
-  await expect(game.getByRole("button", { name: "Next", exact: true })).toBeVisible();
+  const next = game.getByRole("button", { name: "Next", exact: true });
+  await expect(next).toBeVisible();
+  // The server failing isn't the screen being behind: it's said, and the player can try again.
+  await page.route("**/api/substrings/next", (route) => route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ ok: false, error: "internal" }) }));
+  await next.click();
+  await expect(game.getByRole("alert")).toBeVisible();
+  await expect(next).toBeVisible();
+  await page.unroute("**/api/substrings/next");
   // As a new day leaves it: the run this screen shows isn't today's any more.
   await DB.query("delete from private.run where game_id = 'substrings' and user_id = (select id from auth.users where email = $1)", [`${RUN}-pm@example.test`]);
   await game.getByRole("button", { name: "Next", exact: true }).click();
