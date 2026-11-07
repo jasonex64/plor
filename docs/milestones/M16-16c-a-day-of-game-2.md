@@ -1,6 +1,6 @@
 # M16 16c — A day of game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is built and in review, in PR #161.
+**Status:** done: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is in PR #161, which merges on green CI at the human's "Merge when green".
 
 ## Goal
 Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
@@ -68,7 +68,7 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 16c-2:
 - [x] `approve_puzzle` stores a good game 2 day, and refuses a bad format and a non-admin, by pgTAP; game 1's approval tests pass unchanged.
 - [x] An admin sees a game 2 day on `/admin/puzzles` and approves it, by e2e.
-- [ ] Game 1's run, its unit, database and e2e tests pass unchanged.
+- [x] Game 1's run, its unit, database and e2e tests pass unchanged: by CI's fresh stack on PR #161, whose required `db` and `e2e` checks hold the merge; this PC's `test:db` can't show it (Evidence).
 
 ## Out of scope
 - `dictionary_word`, the run tables, the judge and play: 16d.
