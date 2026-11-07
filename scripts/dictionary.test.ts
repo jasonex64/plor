@@ -16,6 +16,10 @@ describe("parseScowl", () => {
     expect(words("60: baker's\n\n60: chemist's <n>\n\n60: he's <s>\n\n60: don't <s>\n")).toEqual(["hes", "dont"]);
   });
 
+  it("keeps a pronoun's form, which can be a contraction", () => {
+    expect(words("35: something <pn>: -, -, -, something's\n")).toEqual(["something", "somethings"]);
+  });
+
   it("reads a word at two sizes from the smaller, and leaves out one past the limit", () => {
     expect(words("70 [moby] 85 [ukacd]: gimbal <n>\n\n99: zzxjoanw <n>\n")).toEqual(["gimbal"]);
   });

@@ -43,9 +43,9 @@ const PROPER_CLASSES = new Set(["person", "surname", "place", "name", "name?", "
 const PROPER_TAGS = /\[(name|lcacr|ucacr)\]/;
 const OFFENSIVE_NOTE = /\((offensive|vulgar)-\d\)/;
 // Possessives aren't accepted (M16 S20), whether a noun's form or their own lemma ("baker's"). The table tags a
-// contraction <s>, which is how "he's" stays.
+// contraction <s>, which is how "he's" stays, and a pronoun's form can be one: "something's wrong" (16a-3, answer 5).
 const POSSESSIVE = /('s|s')$/;
-const CONTRACTION = "s";
+const KEEPS_ITS_APOSTROPHE = new Set(["s", "pn"]);
 const VARIANT = /^((?:[ABZCD_][.=?v~V@x-]? ?)+(?:\{\d+\})?|\+): (.*)$/;
 
 // A word with its marks taken off, or null when the marks say to leave it out: "!" is "nearly non-existent", and "-"
@@ -113,7 +113,7 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const misspelt = variant !== null && variant[1].split(" ").every((v) => v.endsWith("x"));
   const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaText);
   if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked, outOfPlay };
-  const words = forms.filter((w) => !/[A-Z]/.test(w) && (pos === CONTRACTION || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []);
+  const words = forms.filter((w) => !/[A-Z]/.test(w) && (KEEPS_ITS_APOSTROPHE.has(pos ?? "") || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []);
   return { words, all, marked, outOfPlay };
 }
 
