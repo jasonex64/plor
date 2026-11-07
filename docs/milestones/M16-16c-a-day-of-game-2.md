@@ -1,0 +1,110 @@
+# M16 16c — A day of game 2
+
+**Status:** draft, waiting on the human's approval.
+
+## Goal
+Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
+
+## Who uses it / what breaks without it
+- Used by: the human, who approves days (S11), and 16d, which plays a stored day.
+- Breaks without it: 16d has no day to play. The first file under `content/substrings/` fails CI (audit, TOOL-11), and `approve_puzzle` refuses anything but format 3 for every game (FUT-6).
+
+## Source
+- `docs/DECISIONS.md`, Game 2; Puzzle approval; Puzzle drafting; Puzzle content format.
+- `docs/milestones/M16-game-2-substrings.md`, S11, S16, S18, S20, S21, the split's answers.
+- `docs/milestones/M16-16b-run-model-and-format.md`, "Content format": `format: 1`, `game_id`, `date`, `rounds`, `bonus_letter`, and the validator choosing its checks by `game_id`.
+- `docs/SOURCES.md`, the four pinned word lists. Game 2's rules are the human's, not a source's.
+
+## The human's answers (2026-11-06 and 2026-11-07)
+1. How days are made: "A batch at a time (Recommended)". One command drafts several days in one PR.
+2. The batch: "7 days (Recommended)".
+3. The bonus letter: "Any letter at random", then, shown that it could land in the day's letters: "Avoid the day's letters (Recommended)".
+4. Sets of letters within a day: "Avoid overlap (Recommended)". No set sits inside another that day.
+5. Review: "Counts in the PR, approve on page (Recommended)".
+6. Approving: "Each day on its own (Recommended)".
+7. Before these, in the M16 ticket: letters 2, 2, 3, 3, 3, 3, 3; the steady climb; a 30-day repeat; a floor of 5 everyday words, an everyday word being SCOWL size 35 or less.
+
+## What Claude measured (2026-11-07)
+On the 254,477-word snapshot, in a throwaway script, with the rules below. The everyday mark there reads the table loosely, so this ticket's real mark may move these numbers a little.
+- **Can every day be filled?** *Hypothesis:* yes, as the pools are 95 to 662. *Disproved by:* a day with no pick. *Result:* 3,650 simulated days, `stuck: 0`, and `minChoicesLeftAnyRound: 65`. Held. Pools for rounds 1 to 7: 126, 95, 283, 519, 505, 417, 662.
+- **The bonus letter leans rare,** as the rule keeps out the day's letters: at least 9 letters to choose from, a median of 14. Over 3,650 days, `q` 278, `j` 259, `v` 226, `x` 221, down to `a` 42, `e` 38. So `q` or `j` is the bonus on about 1 day in 7, and few words can use them. It follows from answer 3, for the human to see before approving.
+- **Five sets are refused as offensive:** `sm`, `ass`, `tit`, `cum`, `sex` (Claude's rule: a set of letters on the screen shouldn't spell a listed word, so the approval isn't the only guard).
+
+## Design (Claude, for approval)
+**The everyday mark.** `DictionaryEntry` gains `everyday`, true when the word is on a table line of size 35 or less. It's read by the picker alone, and players never see it. The manifest's checksum changes with it, so the fetch runs on the Windows PC.
+
+**The day's format,** `src/content/substrings.ts`, as 16b set it: `{ format: 1, game_id: "substrings", date, rounds, bonus_letter }`. The checks: exactly 7 rounds of lower-case letters, 2, 2, 3, 3, 3, 3, 3 long; no round inside another; one lower-case bonus letter that's in no round; the path matches `game_id` and `date`.
+
+**CI.** `scripts/content-validate.ts` chooses its checks by each file's folder, and adds the 30-day repeat across `content/substrings/`. A folder that's neither game stops it, so a typo can't skip the checks.
+
+**The picker,** `npm run substrings -- draft <first date>`, in `scripts/substrings.ts`.
+- It reads the snapshot and the existing day files, with no database, and draws seven days in date order. The draw is seeded by the date, so a run can be repeated, using `seed` from `src/content/bank.ts`.
+- For each round, it takes the sets of that round's length in its band, drops any with fewer than 5 everyday words, on an offensive list, used in the last 30 days, or overlapping that day's sets, and draws one. The bonus is drawn from the letters left.
+- A day with no pick stops the run loudly.
+- It writes `content/substrings/<date>.json` and prints a table for the PR: each round's set, word count, everyday count and sample words.
+- **A veto:** `--not <set>,…` redraws around sets the human turned down.
+
+**Approval.**
+- `/admin/puzzles` lists both games' days. A game 2 day shows its 7 sets and bonus letter, with the same Approve button; the admin page isn't a player screen, so this stays clear of the `/play` build.
+- `private.approve_puzzle` chooses by `game_id`, in a migration: game 1's branch doesn't change, and game 2's checks format 1 and stores the day with `approved_at`. **Security:** it's a `security definer` function, so the change goes to the human with this ticket. No grants change.
+- `content/substrings/*.json` joins the routes' file traces in `next.config.ts`, as `content/offbeat` is.
+
+**One name for the game.** `src/platform/game.ts` gains game 2's permanent ID. Its shown name and address wait for 16d, which is their first caller.
+
+**PRs.** 16c-1: the mark, the format, CI and the picker. 16c-2: approval, which needs Docker running for its database tests.
+
+**No days are committed.** Nothing here publishes a day (human, "App first, no publishing"): 16c's evidence is drafted into a scratch folder. The human asks for the first real batch when they want one.
+
+## Acceptance criteria
+16c-1:
+- [ ] `checkSubstringsFile` refuses each of: 6 rounds, a round of the wrong length, a capital, a round inside another, a bonus letter in a round, a wrong date, checked by tests.
+- [ ] `content:validate` passes a good day under `content/substrings/`, fails a bad one, fails a repeat within 30 days, and fails an unknown folder, checked by tests.
+- [ ] The picker refuses a set outside its band, one under the floor, one on an offensive list, a repeat and an overlap, each checked with a set just outside the rule on a hand-made word list.
+- [ ] The same date and word list give the same day, and `--not` changes only what it must.
+- [ ] A fetch on the Windows PC keeps 254,477 keys and 259,968 pairs, and reports how many are everyday, about 40,000.
+- [ ] A real 7-day draft into a scratch folder passes `content:validate`, and its table is in the Evidence.
+
+16c-2:
+- [ ] `approve_puzzle` stores a good game 2 day, and refuses a bad format and a non-admin, by pgTAP; game 1's approval tests pass unchanged.
+- [ ] An admin sees a game 2 day on `/admin/puzzles` and approves it, by e2e.
+- [ ] Game 1's run, its unit, database and e2e tests pass unchanged.
+
+## Out of scope
+- `dictionary_word`, the run tables, the judge and play: 16d.
+- Anyone playing a stored day: 16d.
+- Any change to a day's stored shape beyond 16b's format.
+- A script that makes days by itself (S11, later).
+
+## Numbers
+| Value | Used for | Origin (source section / person + date) |
+|---|---|---|
+| 7 days a batch | The picker | Human, 2026-11-07: "7 days (Recommended)" |
+| 2, 2, 3, 3, 3, 3, 3 letters | The format, the picker | Human, 2026-11-06, S18 |
+| Bands: 5,000+ / 2,000-5,000 / 1,000-2,000 / 500-1,000 / 300-500 / 200-300 / 100-200 | The picker | Human, 2026-11-06, S18. **Claude's reading, for the human:** the bands touch, so each holds its lower number and not its upper, and the last is 100 to 199 |
+| 5 everyday words | The picker | Human, 2026-11-06, S21 |
+| Everyday: SCOWL size 35 or less | The mark | Human, 2026-11-06, S21 |
+| 30 days before a set returns | The picker, CI | Human, 2026-11-06, S18 |
+| 7 rounds, 1 bonus letter | The format | Human, 2026-11-06, S5, S16 |
+
+## Plan
+1. The human approves this ticket, with the migration's security note.
+2. 16c-1, tests first, then a fetch on this PC, a review and a PR.
+3. 16c-2, with Docker running, tests first, a review and a PR.
+
+## Removes
+- `readDrafts`'s one hard-coded folder and `approve_puzzle`'s refusal of every other game.
+- `content-validate`'s treating every file as format 3.
+- From 16b, `check_question_open` and `run_status` stay for 16d.
+
+---
+*Fill in the sections below at the end.*
+
+## Source diff
+| Source says | We built | Why different |
+|---|---|---|
+
+## Evidence
+
+## Review
+- Blocking findings and how each was fixed:
+- Deferred to ROADMAP "Next revision":
