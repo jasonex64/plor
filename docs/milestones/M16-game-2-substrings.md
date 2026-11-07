@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, built, waiting on the fetch on the Windows PC), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, 256,433 words), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -55,7 +55,7 @@ The human's question: "if theres no actual risk or bottleneck we should start on
 | S16 | One highlighted letter for the whole day, or a new one each round? | "One per day" (human, 2026-11-06, 16b) |
 | S17 | How every game weighs the same in an overall score | Open. Claude's proposal is under "Comparing games" below |
 | S18 | Difficulty per round, all 7: which rounds use 2 letters, which 3, and each round's word-count band. Does a 2-letter substring also need a minimum count? Are the 500 and 100–200 counted in the S2 list (a bigger list gives every substring more words)? | Open (human numbers) |
-| S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Dropped before matching and not counted toward word length, so "it's" contains "ts" and scores as 3 letters: "Yes, ignore it (Recommended)" (human, 2026-11-05) |
+| S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Dropped before matching and not counted toward word length, so "it's" contains "ts" and scores as 3 letters: "Yes, ignore it (Recommended)" (human, 2026-11-05). Widened to everything but letters, digits, symbols and spaces too: "app3le" is apple (human, 2026-11-06; DECISIONS.md, Game 2) |
 
 ## The dictionary (S2)
 Read on 2026-10-22; none of these is in SOURCES.md yet, and only a human adds one.
@@ -93,7 +93,7 @@ What a split would touch, read from the code on 2026-10-22 (`main` at `fd134f7`,
 ## Acceptance criteria
 Filled in once the open decisions are answered. Draft shape, for the human to change:
 - [ ] The daily substring picker refuses any substring outside its round's S18 word-count band, checked by a test with a substring just outside the band.
-- [ ] A typed word is accepted only if it is in the dictionary, contains the round's substring once punctuation is dropped (S19) and hasn't been used earlier in the run (S10), judged by the server; the client never receives the word list.
+- [ ] A typed word is accepted only if it is in the dictionary, contains the round's substring once everything but letters is dropped (S19) and hasn't been used earlier in the run (S10), judged by the server; the client never receives the word list.
 - [ ] A miss or a timeout scores nothing for that round and the run goes on to the next (S7).
 - [ ] Two players get the same substrings and highlighted letter on the same day (DECISIONS.md, Day boundary).
 - [ ] The score follows S15 and S16, checked by tests on hand-worked runs.
@@ -125,7 +125,7 @@ Draft sub-tickets, for the human to reorder once the open decisions are answered
 1. **16a, sources:** the word lists added to SOURCES.md by the human, with LDNOOBW already there; a script that builds the filtered dictionary, run through the task runner (DECISIONS.md). Measure its size against the hosted plan, then settle S18's bands.
 2. **16b, the database and server split** (S13): the game-2 content format and run model written and reviewed first (Hard to reverse), then the split with no change to how game 1 plays.
 3. **16c, the daily picker:** a script that proposes the day's substrings and highlighted letter within S18's bands, and the admin page approval (S11).
-4. **16d, play on a plain screen:** the routes, the server-side word check, the timer and the no-elimination rounds.
+4. **16d, play on a plain screen:** the routes, the server-side word check (a try's letters alone, and the shown spelling: DECISIONS.md, Game 2), the timer and the no-elimination rounds.
 5. **16e, points, ranks and leaderboards:** game 2's ledger rows, its own leaderboard, the percentile and friends' rank (S9), and the overall score (S17).
 
 **After M14's `/play` build merges (shared screens):**

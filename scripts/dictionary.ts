@@ -89,7 +89,8 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const colon = rest.indexOf(": ");
   const lemmaInfo = colon < 0 ? rest.replace(/:$/, "") : rest.slice(0, colon);
   const entries = colon < 0 ? "" : rest.slice(colon + 2);
-  const [, pos, posClass] = /<([^>/]+)(?:\/([^>]+))?>/.exec(lemmaInfo) ?? [];
+  // The part of speech can be empty: the table writes "</abbr?>" where it isn't sure of one (M16 16a-2).
+  const [, pos, posClass] = /<([^>/]*)(?:\/([^>]+))?>/.exec(lemmaInfo) ?? [];
   const lemmaText = lemmaInfo.replace(/ [<{(].*$/, "");
   const lemma = bare(lemmaText);
   const outOfPlay = lemmaText.trim().startsWith("!");

@@ -39,6 +39,10 @@ describe("parseScowl", () => {
     expect(words(table)).toEqual([]);
   });
 
+  it("reads a class that has no part of speech before its slash", () => {
+    expect(words("70 [3of6]: -etcet. </abbr?>\n\n60: o.n.o. </abbr?>\n\n60: lowname </name?>\n")).toEqual([]);
+  });
+
   it("takes phrases out, and joins hyphens as answer 4 says", () => {
     expect(words("60: ice cream <n>: ice creams\n\n60: well-known <aj>\n")).toEqual(["wellknown"]);
   });
