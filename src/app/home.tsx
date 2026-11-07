@@ -53,7 +53,7 @@ import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
 import { BACK } from "./slide";
-import { GAME } from "@/platform/game";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
 // sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
@@ -76,7 +76,7 @@ function nameOf(player: Player): string {
 // docs/milestones/M14-14b-2c-review-items.md, answer 12); and the 404, which stands alone (docs/milestones/
 // M14-14b-18-headings-today-invites-words.md, answer 11).
 function feedBeside(path: string, lost: boolean): boolean {
-  return !lost && path !== "/" && path !== GAME.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
+  return !lost && path !== "/" && path !== GAME.path && path !== SUBSTRINGS.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
 }
 
 // Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
