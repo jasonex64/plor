@@ -24,7 +24,7 @@ import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
-import { DICTIONARY_METHOD, fetchDictionary } from "./dictionary.ts";
+import { DICTIONARY_METHOD, type DictionaryEntry, fetchDictionary } from "./dictionary.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
@@ -1505,7 +1505,7 @@ export function withMerges(items: Item[], into: Map<string, string>): Item[] {
 
 const MARKS_SET = "wikidata-sameness";
 const DICTIONARY_SET = "dictionary";
-const DICTIONARY: FetchDef<string> = { source: WORD_LISTS, method: DICTIONARY_METHOD, fetch: () => fetchDictionary(download) };
+const DICTIONARY: FetchDef<DictionaryEntry> = { source: WORD_LISTS, method: DICTIONARY_METHOD, fetch: () => fetchDictionary(download) };
 const wikidataSets = () => Object.entries(SETS).filter(([, d]) => d.source === "wikidata").map(([set]) => set);
 
 // Each loaded Wikidata item's set and name, read once, and whether that name is its scientific name.

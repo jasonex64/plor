@@ -1,8 +1,11 @@
 // Game 2's dictionary (scripts/dictionary.ts): what the English Speller Database's table becomes, and what stays out.
 import { describe, expect, it } from "vitest";
-import { buildDictionary, fetchDictionary, parseScowl } from "./dictionary.ts";
+import { buildDictionary, type DictionaryEntry, fetchDictionary, parseScowl } from "./dictionary.ts";
 
-const words = (table: string) => parseScowl(table).flatMap((g) => g.words);
+const words = (table: string) => parseScowl(table).flatMap((g) => g.words.map((w) => w.key));
+// The keys a build keeps, once each, in its order: what a player's stripped try is matched against (16a-2).
+const keys = (entries: DictionaryEntry[]) => [...new Set(entries.map((e) => e.key))];
+const spellingsOf = (entries: DictionaryEntry[], key: string) => entries.filter((e) => e.key === key).map((e) => e.spelling);
 
 describe("parseScowl", () => {
   it("reads a lemma, its forms and a possessive through normalize", () => {
@@ -36,6 +39,14 @@ describe("parseScowl", () => {
     expect(words(table)).toEqual([]);
   });
 
+  it("reads a class that has no part of speech before its slash", () => {
+    expect(words("70 [3of6]: -etcet. </abbr?>\n\n60: o.n.o. </abbr?>\n\n60: lowname </name?>\n")).toEqual([]);
+  });
+
+  it("takes out a slashed form, as more than one word", () => {
+    expect(words("60: s/he\n\n60: and/or\n")).toEqual([]);
+  });
+
   it("takes phrases out, and joins hyphens as answer 4 says", () => {
     expect(words("60: ice cream <n>: ice creams\n\n60: well-known <aj>\n")).toEqual(["wellknown"]);
   });
@@ -50,48 +61,77 @@ describe("parseScowl", () => {
   it("keeps a too-rare or proper line's spellings for the blocking, not for play", () => {
     expect(parseScowl("99: sawbones <n>: sawboneses\n")[0]).toEqual({ words: [], all: ["sawbones", "sawboneses"], marked: false });
   });
+
+  it("keeps each form's proper spelling beside its key: an apostrophe, a hyphen, an accent", () => {
+    expect(parseScowl("60: it's <pn>\n\n60: well-known <aj>\n\n60: café <n>: cafés\n").flatMap((g) => g.words)).toEqual([
+      { key: "its", spelling: "it's" },
+      { key: "wellknown", spelling: "well-known" },
+      { key: "cafe", spelling: "café" },
+      { key: "cafes", spelling: "cafés" },
+    ]);
+  });
 });
 
 describe("buildDictionary", () => {
   it("merges, normalizes, removes duplicates and sorts", () => {
-    expect(buildDictionary([["zebra", "apple\r"], ["apple", "it's"]], parseScowl("60: mango <n>\n"))).toEqual(["apple", "its", "mango", "zebra"]);
+    expect(buildDictionary([["zebra", "apple\r"], ["apple", "it's"]], parseScowl("60: mango <n>\n"))).toEqual([
+      { key: "apple", spelling: "apple" },
+      { key: "its", spelling: "it's" },
+      { key: "mango", spelling: "mango" },
+      { key: "zebra", spelling: "zebra" },
+    ]);
   });
 
   it("holds the shortest word at 3 letters", () => {
-    expect(buildDictionary([["at", "ate"]], [])).toEqual(["ate"]);
+    expect(keys(buildDictionary([["at", "ate"]], []))).toEqual(["ate"]);
   });
 
   it("keeps out a listed word, every form in its group, and ENABLE's copy of them", () => {
     const groups = parseScowl("60: sawbones <n>: sawboneses\n");
-    expect(buildDictionary([["sawboneses", "sawbones", "calm"]], groups)).toEqual(["calm"]);
+    expect(keys(buildDictionary([["sawboneses", "sawbones", "calm"]], groups))).toEqual(["calm"]);
   });
 
   it("takes a phrase's listed group out too, whichever word of it the group's lines spell", () => {
     const groups = parseScowl("60: ambulance chaser <n>: ambulancechaser\n");
-    expect(buildDictionary([["ambulancechaser", "calm"]], groups)).toEqual(["calm"]);
+    expect(keys(buildDictionary([["ambulancechaser", "calm"]], groups))).toEqual(["calm"]);
   });
 
   it("takes a listed phrase's group out when the table hyphenates it", () => {
     const groups = parseScowl("85 [ukacd]: ambulance-chaser <n>: ambulance-chasers\n");
-    expect(buildDictionary([["ambulancechaser", "calm"]], groups)).toEqual(["calm"]);
+    expect(keys(buildDictionary([["ambulancechaser", "calm"]], groups))).toEqual(["calm"]);
   });
 
   it("keeps out a group SCOWL marks, even a form only rarer lines hold", () => {
     const groups = parseScowl("99: blorp <n> (offensive-1): blorps\n");
-    expect(buildDictionary([["blorps", "calm"]], groups)).toEqual(["calm"]);
+    expect(keys(buildDictionary([["blorps", "calm"]], groups))).toEqual(["calm"]);
   });
 
   it("takes a dropped word's whole group out, from every source", () => {
     const groups = parseScowl("60: blorp <n>: blorps, blorped\n");
-    expect(buildDictionary([["blorp", "blorps", "calm"]], groups, ["blorp"])).toEqual(["calm"]);
+    expect(keys(buildDictionary([["blorp", "blorps", "calm"]], groups, ["blorp"]))).toEqual(["calm"]);
   });
 
   it("takes a dropped word out when only a plain list holds it", () => {
-    expect(buildDictionary([["blorp", "calm"]], [], ["blorp"])).toEqual(["calm"]);
+    expect(keys(buildDictionary([["blorp", "calm"]], [], ["blorp"]))).toEqual(["calm"]);
   });
 
   it("stops on a drop that matches nothing, so a typo can't leave a word in", () => {
     expect(() => buildDictionary([["calm"]], [], ["clam"])).toThrow(/clam matched nothing/);
+  });
+
+  it("gives a key every proper spelling its sources hold, in code-point order (16a-2)", () => {
+    const groups = parseScowl("60: it's <pn>\n\n60: well-known <aj>\n\n60: café <n>\n");
+    const built = buildDictionary([["its", "cafe", "wellknown"]], groups);
+    expect(spellingsOf(built, "its")).toEqual(["it's", "its"]);
+    expect(spellingsOf(built, "wellknown")).toEqual(["well-known", "wellknown"]);
+    expect(spellingsOf(built, "cafe")).toEqual(["cafe", "café"]);
+  });
+
+  it("keeps a hyphen's spelling when no plain list joins it up", () => {
+    expect(buildDictionary([["calm"]], parseScowl("60: well-known <aj>\n"))).toEqual([
+      { key: "calm", spelling: "calm" },
+      { key: "wellknown", spelling: "well-known" },
+    ]);
   });
 
   it("is the same list whatever order its sources come in", () => {

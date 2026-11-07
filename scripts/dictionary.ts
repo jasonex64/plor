@@ -21,12 +21,16 @@ export const DICTIONARY_FILES = {
 // list also drops names from the answer base at load, and game 1's data shouldn't change for game 2.
 export const DICTIONARY_DROP_FILE = "data/dictionary-drop.json";
 
-export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out`;
+export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out`;
 
 // One group is one sense of a word (the table's README, "GROUP"). `words` are the ones a player may type; `all` is
 // every spelling the table stands behind, kept so one listed word takes its whole group with it. A form marked "!"
 // isn't in `all`: it would block a real word that shares a group with one, and a "!" lemma's group is out of play anyway.
-export type ScowlGroup = { words: string[]; all: string[]; marked: boolean };
+export type ScowlGroup = { words: DictionaryEntry[]; all: string[]; marked: boolean };
+
+// A word a player may type: `key` is what a try is matched on, `spelling` the proper word the screen shows
+// (docs/milestones/M16-16a-2-proper-spellings.md; DECISIONS.md, Game 2, "Matching and showing").
+export type DictionaryEntry = { key: string; spelling: string };
 
 // Not words a player would type (README, "POSes"), and classes that mark proper nouns the capital check can miss.
 const NOT_WORDS = new Set(["abbr", "pre", "suf", "wp", "we", "x"]);
@@ -62,13 +66,19 @@ function derived(entries: string): string[] {
 
 const spellings = (lemma: string | null, entries: string) => (lemma === null ? [] : [lemma]).concat(entries ? derived(entries) : []);
 
-// A normalized word a player may type, or null. A space means a phrase; anything else `normalize` leaves outside a to
-// z (a digit) isn't a word.
-function playable(word: string): string | null {
-  if (/\s/.test(word)) return null;
-  const text = normalize(word);
-  return /^[a-z]+$/.test(text) && text.length >= DICTIONARY_MIN_LETTERS ? text : null;
+// A word a player may type, or null. A space means a phrase and a slash two words at once (`and/or`, `s/he`); anything
+// else `normalize` leaves outside a to z (a digit) isn't a word. The spelling is NFC so one accented word has one
+// spelling, whichever way its source encodes it.
+function playable(word: string): DictionaryEntry | null {
+  if (/[\s/]/.test(word)) return null;
+  const key = normalize(word);
+  return /^[a-z]+$/.test(key) && key.length >= DICTIONARY_MIN_LETTERS ? { key, spelling: word.normalize("NFC").toLowerCase() } : null;
 }
+
+// Code-point order on the key, then the spelling, so two runs give the same checksum. Every character a kept word
+// has is in the Basic Multilingual Plane, where JavaScript's comparison and SQL's `collate "C"` agree.
+const byKeyThenSpelling = (a: DictionaryEntry, b: DictionaryEntry) =>
+  a.key < b.key ? -1 : a.key > b.key ? 1 : a.spelling < b.spelling ? -1 : a.spelling > b.spelling ? 1 : 0;
 
 function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const text = line.split("#")[0].trimEnd();
@@ -80,7 +90,8 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const colon = rest.indexOf(": ");
   const lemmaInfo = colon < 0 ? rest.replace(/:$/, "") : rest.slice(0, colon);
   const entries = colon < 0 ? "" : rest.slice(colon + 2);
-  const [, pos, posClass] = /<([^>/]+)(?:\/([^>]+))?>/.exec(lemmaInfo) ?? [];
+  // The part of speech can be empty: the table writes "</abbr?>" where it isn't sure of one (M16 16a-2).
+  const [, pos, posClass] = /<([^>/]*)(?:\/([^>]+))?>/.exec(lemmaInfo) ?? [];
   const lemmaText = lemmaInfo.replace(/ [<{(].*$/, "");
   const lemma = bare(lemmaText);
   const outOfPlay = lemmaText.trim().startsWith("!");
@@ -122,31 +133,34 @@ export function parseScowl(text: string): ScowlGroup[] {
   return groups;
 }
 
-// One list, sorted so two runs give the same checksum. A blocked word leaves ENABLE's and Moby's copies too, and a word
+// One list of (key, spelling) pairs. A blocked word leaves ENABLE's and Moby's copies too, and a word
 // that shares its spelling with an offensive group goes with it: answer 2 accepted losing a few innocent words. A drop
 // that matches nothing stops the build, so a typo can't leave the word in the game.
-export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], drops: string[] = []): string[] {
+export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], drops: string[] = []): DictionaryEntry[] {
   const dropped = new Set(drops);
   const held = (text: string) => dropped.has(text) || (text.includes(" ") ? isListed(text) : isListedWord(text));
   const blocked = new Set<string>();
   for (const group of groups) {
     if (group.marked || group.all.some(held)) for (const word of group.all) blocked.add(word);
   }
-  const words = new Set<string>();
+  const entries = new Map<string, DictionaryEntry>();
+  const add = (entry: DictionaryEntry) => entries.set(`${entry.key} ${entry.spelling}`, entry);
   for (const list of plainLists) {
     for (const line of list) {
-      const word = line.trim() === "" ? null : playable(line.trim());
-      if (word !== null) words.add(word);
+      const entry = line.trim() === "" ? null : playable(line.trim());
+      if (entry !== null) add(entry);
     }
   }
-  for (const group of groups) for (const word of group.words) words.add(word);
-  const unused = drops.filter((word) => !words.has(word));
+  for (const group of groups) for (const entry of group.words) add(entry);
+  const keys = new Set([...entries.values()].map((entry) => entry.key));
+  const unused = drops.filter((word) => !keys.has(word));
   if (unused.length) throw new Error(`${DICTIONARY_DROP_FILE}: ${unused.join(", ")} matched nothing`);
-  return [...words].filter((word) => !blocked.has(word) && !held(word)).sort();
+  // Filters judge the key, so a word kept or left out is the same as before 16a-2, with all its spellings or none.
+  return [...entries.values()].filter((entry) => !blocked.has(entry.key) && !held(entry.key)).sort(byKeyThenSpelling);
 }
 
 // The download goes through scripts/base.ts's one `download`, passed in as that file imports this one.
-export async function fetchDictionary(download: (url: string) => Promise<Buffer>): Promise<string[]> {
+export async function fetchDictionary(download: (url: string) => Promise<Buffer>): Promise<DictionaryEntry[]> {
   const pinned = async ({ url, sha256 }: { url: string; sha256: string }) => {
     const file = await download(url);
     const got = createHash("sha256").update(file).digest("hex");
