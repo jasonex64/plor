@@ -154,8 +154,12 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 - **Routes:** `npx vitest run src/app/api/substrings --no-file-parallelism`, 21 passed. A route test compared rounds exactly and failed on the new fields, as expected; it now checks a word's points, the bonus letter's 120 (`aqmjb`), and the end score, 70 + 120 + 65 = 255 for six letters.
 - **Screen:** `npx playwright test e2e/play2.e2e.ts --retries=0`, 5 passed: the tracker's count from 0 to 6, "You played aqmjb: 30 points, and 120 for the bonus letter.", and the end score's four numbers. The first two runs each had a failure in a step this change doesn't touch (sign-in's email poll, the lockout, a 30 s timeout on Today), with every test taking about twice as long as earlier; each passed when run again, alone or in full.
 - **Game 1 unchanged:** `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts --retries=0`: 19 passed, 2 failed in `shell.e2e.ts` waiting on a first visit to `/admin/puzzles` and a group's page; `npx playwright test e2e/shell.e2e.ts --retries=0` then passed 10 of 10.
+- **Review's two blockers** (below): `npx vitest run src/app/api/substrings --no-file-parallelism`, 21 passed, and `npx playwright test e2e/play2.e2e.ts --retries=0`, 5 passed. Each check was then broken on purpose and failed: the word's points read from its spelling (1 failed), the bonus letter read from its spelling (1 failed), and every letter marked (`e2e/play2.e2e.ts:113`).
 - `npm test`: 615 passed. `npm run build` lists `/play2`, `check:client-bundle` is OK, and `npx tsc --noEmit -p .` and `npx eslint` are clean.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (16e-1, the `reviewer` agent, 2026-11-07):
+  1. The e2e checked the tracker's count, not which letters it marks: it now checks the marked letters after each word.
+  2. No test proved a word scores by its letters alone, as every test word's spelling was its key: a route test word is now spelled `aqm-ǰb`, with a hyphen and a j with a caron, and scores 30 with the bonus letter's 120.
+- Deferred to ROADMAP "Next revision" (For M16): 1 and 2 different letters scoring the same, a stale header comment, the tracker's letters for a screen reader, and a mid-run total that already holds the different letters.
+- The reviewer found the formula reproduces both tables and every worked run, nothing leaking before its time, and game 1 untouched.

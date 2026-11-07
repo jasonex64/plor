@@ -734,6 +734,10 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] DECISIONS.md and DESIGN.md say the box clears, but it keeps text typed on since, and text whose try failed with an error, as nothing was judged. Found in M16 16d-2 (second re-check).
 - [ ] A box of spaces sent while another try is on its way doesn't clear. Harmless. Found in M16 16d-2 (second re-check).
 - [ ] After `123` or a box of spaces the last reason stays, so "Not in the dictionary." can read as the verdict on `123`. Worth asking the human only if it looks wrong in play. Found in M16 16d-2 (second re-check).
+- [ ] 1 and 2 different letters both score 35, as rounding flattens that step; likely unreachable, as a word holds its round's letters, though 16e's Source diff says the rule scores "every count down to 1". Found in M16 16e-1 (review).
+- [ ] `src/app/substrings.tsx`'s header still says "There are no points until 16e". Found in M16 16e-1 (review).
+- [ ] The tracker tells a screen reader how many letters are used, not which, while the eye sees which: a visually hidden list would close it. Found in M16 16e-1 (review).
+- [ ] Mid-run, `score.letters` and `total` already hold the different letters cashed in, where the Design says "at the end"; no leak, as the player's own words give it. 16e-2 decides if a mid-run total is read. Found in M16 16e-1 (review).
 - [ ] A run left unfinished reads `in_progress` forever in `run_status`: 16e and 16f must treat a past day's as stopped. Found in M16 16d-2 (review).
 - [ ] `nextRound`'s comment says the database refuses Next while a clock runs, but past round 1 that's a repeat returning the same state, and its `OB014` and `OB002` mappings can't be reached from this route. Found in M16 16d-2 (review).
 - [ ] `route.db.test.ts` and `play2.e2e.ts` run clocks out on every game 2 row and delete today's game 2 day, so they'd fail, and could erase it, once a day is approved locally. Found in M16 16d-2 (review).
