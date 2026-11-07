@@ -1,6 +1,6 @@
 # M14 — 14c-5, Afterglow becomes a firework festival
 
-**Status:** in progress, version 6 (round 7) published to the private page 2026-11-06; fresh review, Source diff and the human's phone test still to come (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
+**Status:** in progress, version 7 (round 8) published to the private page 2026-11-06; the human's look at it, the new broken-build tests, a fresh review, the Source diff and the human's phone test still to come (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
 
 ## Goal
 Redesign Afterglow on its private page as a walk through a firework festival, where each answer charges up and rockets the view into the sky, so the human can approve the game's look before it goes into `/play`.
@@ -88,6 +88,23 @@ Round 7, the human's notes after playing version 5
 33. Burst colour: "Burst matches the text (Recommended)".
 34. Lantern's size: "Lowered to centre, with caption (Recommended)". A big lantern with the letter on it lowers to mid-screen, sputters dark and drops, with a short line such as "P is out", taking about 2 seconds. The new question's timer waits until it finishes.
 
+### Round 8 (human, 2026-11-06, criticisms of version 6)
+> i think the text borders need to be different per color as well, and since everything else is kinda yellow-y, having the highest tier rarity word also just be yellow feels a bit lackluster maybe switch the colors around. There doesnt' need to be a "finale" after the final submit, should smoothly transition to the results page.
+
+35. Colour order, common, uncommon, rare: "1: gold, lime, sky (Recommended)". This changes answer 32. Each tier sits further from the amber street than the one before; the fireworks follow, by answer 33.
+36. "Borders": "by border i mean the little container that holds the text, not the text itself". Word box: "P: coloured cord", the same twisted cord in each rarity's colour. The prompt's fuse doesn't change.
+37. Letter outline: "Dark own-colour (Recommended)", on the word, the tier name, the points and the recap's rows. The swatch showed step 1 of each ramp, which gives about 5 to 6:1 and fails the check's 7:1 floor, so it is step 0.
+38. Ending: "Stay in the sky (Recommended)". This replaces answer 15. No finale; Q7's button leads to the results, which fade in over Q7's own burst.
+39. Results text: "Add a run recap". Heading, flavour line, total and button, as the option described, with the run's answers listed. "Every ending (Recommended)": duds and time-outs list theirs too. "Answer and points (Recommended)": each row is the answer in its rarity colour with its points.
+40. Names, after "do some research on actual firework shapes, both american and other countries and lets decide naming.": "Peony, Chrysanthemum, Kamuro". Today's bursts stay.
+
+Research behind answer 40 (2026-11-06), from retail and trade glossaries that disagree with each other; one says outright that effect names are tradition, not a standard. Peony, chrysanthemum and willow are shared by American, Chinese and Japanese naming (botan, kiku, yanagi), and real willows are silver or gold. Kamuro is a dense, glittering, hanging burst named after a Japanese hairstyle, though one glossary defines it differently. Senrin, crossette, palm, horsetail and dahlia were offered or considered. These aren't entries in `docs/SOURCES.md`: the names are the human's choice, not a sourced fact.
+- https://fireworks.com/safety/glossary
+- https://www.liuyangfireworks.net/blog/fireworks-effects-types-encyclopedia.html
+- https://blog.gaijinpot.com/four-types-of-japanese-fireworks/
+- https://epicfireworks.com/blogs/news/the-art-and-science-of-the-kamuro-firework-effect
+- https://www.mentalfloss.com/article/31097/names-10-fireworks-effects
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -101,10 +118,13 @@ Round 7, the human's notes after playing version 5
 | A shift at Q3 and Q6 only | A tiny step forward every question, and major shifts at Q3 and Q6 | Answer 1 |
 | Sky marks | Sky lanterns | Answer 12 |
 | Only the word's box wiggles (answer 2) | The whole word and box rumble before takeoff. The lettering still never stretches or scales | Round 6 |
-| The lettering looks the same for every answer (answer 2) | Word, tier name and points are sky blue, lime or gold by rarity, outside the plum to amber family | Round 6, answers 28, 32 |
+| The lettering looks the same for every answer (answer 2) | Word, tier name and points are gold, lime or sky blue by rarity, each outlined in its own darkest shade | Round 6, answers 28, 35, 37 |
 | Fireworks in the warm family | The firework follows its answer's text colour: burst, glitter, trail, takeoff blast, and the sparks round the word | Answer 33 |
 | A taken letter just appears in the next question | A big lantern bearing the letter lowers to mid-screen, sputters dark and drops, with a caption, before the box and its timer | Answers 30, 34 |
-| Square boxes, a plain cord | Rounded pills with a sparkler fuse | Answers 21, 22 |
+| Square boxes, a plain cord | Rounded pills with a sparkler fuse. The launched word's cord takes its rarity's colour | Answers 21, 22, 36 |
+| A palace firework show after Q7 | No show. Q7's results fade in over its own burst | Answers 38, 39 |
+| An ending with the total only | Every ending lists the run's answers and points | Answer 39 |
+| Rare is Golden Willow | Rare is Kamuro, in sky blue | Answers 35, 40 |
 | A burst that fades | A burst that lingers until the button | Answer 24 |
 | 63 colours across violet, green, teal, red and gold | One family of neighbouring hues, plum through rose to amber, in the background; rarity's text and fireworks stand apart from it | Round 5, answers 16, 17, 28, 33 |
 | Dusk into golden night, with lanterns lit from Q1 | Nothing lit at Q1. Lights come on question by question, and the palace at Q7 is the brightest frame | Round 5, answers 17 and 18 |
@@ -135,7 +155,7 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 **Ends.**
 - **Caught:** a dud. It charges, lifts a little, sputters and falls back in smoke.
 - **Time's up:** the fuse runs out and the word never leaves the ground.
-- **Finale:** after Q7, the palace erupts in one grand firework show, then the total appears.
+- **Results:** after Q7, the button reads See results. Q7's text fades out and the results fade in over the same glittering burst, with no walk down. Every ending lists the run's answers and points, in their rarity colours, with the total.
 
 **Detail.** Light comes from real sources, with soft multi-colour glows instead of dots, and reflections that ripple instead of straight lines. Lanterns, roofs and side areas are drawn to the level of references 5 and 7, and sparks use the star shapes in reference 6.
 
@@ -154,8 +174,10 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 - [ ] A rare answer charges longer and climbs faster than a common one: a script reports both durations.
 - [ ] The burst differs by rarity in shape and by points in size: frames at common and rare, Q1 and Q7.
 - [ ] The fuse burns in step with the clock, and its sparks and shake grow near the end: a script reads its position at three times.
-- [ ] A dud, a time-out and the finale each play through: frames of each.
-- [ ] There's no result card: the result is page text over the sky, and it fits on 390×844 and 1920×1080.
+- [ ] A dud, a time-out and a full run each reach the results: frames of each. A full run goes from Q7's result to the results in the same sky, with no descent: a script reads the phases and the burst.
+- [ ] There's no result card: the result is page text over the sky, and it fits on 390×844 and 1920×1080, the recap's seven rows included.
+- [ ] The launched word's cord is drawn from its rarity's ramp, and the prompt's fuse is unchanged: a script reads the cord's colours.
+- [ ] Every ending lists the run's answers, each row in its rarity's colour and outline with its points: a script reads the rows at a full run and a dud.
 - [ ] Art is never scaled outside the walk, and its pixels stay whole: the drawing-call log shows it. The view, each layer and the word land on whole screen pixels and glide through the slow parts of the climb and landing: a script reports the steps between frames at both ends of each.
 - [ ] The climb is longer and much faster: a script reports its seconds, floors and peak speed against version 5.
 - [ ] Word, tier name and points use one colour per rarity, and the burst matches: a script reports them, with each text colour's contrast against its outline.
@@ -179,6 +201,10 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | 960×540 on 1920×1080 (2 device pixels per art pixel) | The desktop art size | Proposed by Claude for the human to judge on the comp |
 | About 23 to 43 colours per frame, up to 70 briefly on arrival; hues from plum through red to amber, none outside | The tighter palette | Measured; human, 2026-11-05 (answer 25) |
 | Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
+| Each text's outline at step 0 of its rarity's ramp | 7:1 or better against its text | The existing check's floor; the swatch's step 1 gave about 5 to 6:1 (answer 37) |
+| Cord in steps 0, 1 and 3 of its rarity's ramp | The word's box | Row P of the swatch the human chose (answer 36) |
+| 0.5 s out, 0.5 s in | Q7's text fading to the results | **Proposed by Claude for the human to judge on the page** |
+| "See results", "Show's over", "Seven shells up, and the street stayed to watch." | The button, heading and line at a full run's end | **Proposed by Claude for the human to judge on the page**; "Show's over" was the example in the question (answer 39) |
 
 ## Plan
 1. Give Afterglow its own portrait, edge-anchored game file in `themes/festival/`, sharing the mock rules in `core/game-mock.js`. The four kept themes stay on the shared core, untouched.
@@ -197,6 +223,7 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 - 14c-4's rule that foreground stills in the beat, on this theme.
 - The fixed 640×360 buffer, on this theme.
 - `themes/afterglow/`, the old harbour theme (recoverable from git in the mocks folder).
+- Round 8: the finale, its shells, flash and constants, `glowFor`'s steps option, and the check lines and mutants that tested them.
 
 ---
 *Fill in the sections below at the end.*
@@ -227,10 +254,20 @@ Version 6, round 7, final state (page sha256 `cbe101b9b0ec7dd8…`, 2026-11-06),
 - Mutants: `node themes/festival/mutants.mjs`, 4 at a time (8 made the PC unusable): 75 of 77 caught. Of the 2 missed, "the glitter thins away" is caught run alone (a flow timeout under load). "the rumble off whole art pixels" exposed a real blind spot: the line compared neighbouring frames, and `placeWord`'s rounding to screen pixels left whole steps between two off-grid places. The line now measures each frame against the word's rest place: real page 0 of 20 frames off, mutant 20 of 20, both sizes. All 5 rumble mutants then pass. The other 72 ran on the check before that one line changed; the line can't affect them. The earlier claim that all five misses of the run before were check faults was the builder's, and it was wrong for this one.
 - Stills read by the main session: lantern at Q2 phone and Q7 wide, bursts, seven stages, finale: they hold. Motion is judged only from stills and numbers; the glide can only be judged on a real screen.
 
+Version 7, round 8, final state (page sha256 `e8c915f6773ef5c3…`, mocks commit `6ef974e`, 2026-11-06), run by the main session on a PC in use:
+- `node themes/festival/check.mjs` (headless): 222 lines pass, 2 fail, exit 1, on 224 lines. Both are `pre-draw never stalls a frame`: wide worst slice 26.2 ms, phone 17.3 ms.
+- Baseline for those two: version 6, rebuilt from mocks commit `7740042`, run straight before it on the same PC: wide fails the same way (26.7 ms), phone passes (16.0 ms). So wide is not new today. Phone is close either way and not cleared: load is a likely reason, *unverified*. Version 6 passed both on a quiet PC. No target was moved.
+- Two earlier runs of this build also failed `60 fps, whole run` at phone size (53.2 and 53.3 fps) and one failed `Q3 and Q6 are major` on wide (the scripted answer missed the sped-up clock, shown by a 0.9 s "walk", the ending's button delay). Neither failed on the last run, where whole-run fps was 58.9 wide and 56.0 phone. Discord, NZXT CAM and Opera were running.
+- Round 8's own lines pass at both sizes. Phases `burst > result > leaving > over`, no descent. Burst still on screen behind the results (rare 625 px wide, 513 px phone, 0 off its ramp). Fade read at 0.50 out, 0.60 and 0.50 in. Seven recap rows with their colours and outlines. Results fit: text 260 to 810 of 1080, 203 to 611 of 844, under the HUD. Contrast on own outline 8.4, 10.1 and 10.4:1. Cords in their ramps. A dud's ending lists the run, its own row at 0.
+- Check helper changed: `buttonUp` now reads the button's `hidden` and the section's, since the button keeps its room while hidden. An earlier run failed 11 lines on that helper, not on the game.
+- Mutants: **not run this round** (the handoff's rule, the PC was in use). 83 mutants, every edit matched against the built page by a dry check. 8 are new, 5 were rewritten and 2 removed for round 8.
+- Stills read by the main session: `wide-results-end`, `phone-results-end`, `phone-q5-charge`: they hold. The fade and the feel of the ending can only be judged on a real screen.
+- The live page was compared byte for byte with a rebuild of version 6 before publishing: identical inside the publisher's wrapper, so nothing of anyone else's was overwritten.
+
 ## Review
 - Blocking findings and how each was fixed (first review, 2026-11-05: 10 blockers; a build with 11 defects passed every check line, so the checks must be rebuilt):
-  - B1, skipping all seven questions crashed the page. Open.
-  - B2, play-again after a finale hid the result's answer line. Open.
+  - B1, skipping all seven crashed the page. The finale's code that crashed is gone in version 7, and the check passes (`skipping all seven reaches the results`); the fresh review confirms.
+  - B2, play-again after a finale hid the result's answer line. The check passes in version 7 (`after a full run, a result keeps its answer line`); the fresh review confirms.
   - B3 and B4, the harbour theme and the Simple comp files remain. Auto mode refused their deletion; waits on the human. `drawStreet`'s dead code is open.
   - B5 to B9, check lines that claim more than they measure: burst on screen, walk zoom actually drawn, fuse against the seconds shown, the word during a time-out, colour on every phase, one font, Q1's tower. Open.
   - B10, no live script lists hues and per-frame colours; the canvas measured 23 to 70 colours per frame against "about 32". Open; the number is settled (answer 25).
