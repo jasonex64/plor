@@ -1,6 +1,6 @@
 # M16 16d — Playing game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is in review; 16d-2, the routes and the screen, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is done, in PR #162, which merges on green CI at the human's "Merge when green"; 16d-2, the routes and the screen, is next.
 
 ## Goal
 Make a stored day of game 2 playable from start to end at `/play2`, on a plain screen, with every try judged by the database.
@@ -132,4 +132,5 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
   4. Mutations showed the "four steps" criterion and several rules weren't really tested: `private.shown_spelling` is its own function with each step tested alone, including code-point order; both other rejections are checked to lock; a stored retry past the clock, a word ending round 7 and a run as `plor_app` itself are tested.
   5. `SUBSTRING_LOCKOUT_MS` gave the number a second home with no real caller: removed, with its origin in the SQL.
   6. HANDOFF still said the grants waited on the human: removed.
+  The re-check (same agent, same day) found nothing blocking.
 - Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16d-1 (review)".
