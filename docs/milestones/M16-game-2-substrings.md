@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, 256,433 words), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, merged on green CI 2026-11-06, 256,433 words; the split's questions answered, its order waiting on the human), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -33,6 +33,17 @@ The human's question: "if theres no actual risk or bottleneck we should start on
 3. The dictionary: "ENABLE + Moby + SCOWL (Recommended)".
 4. Order against the `/play` build, asked twice: first "wait why is game 2 two separate games??" (Claude's "split" meant separating Plor's shared parts from game 1's rules; game 2 is one game), then "im not very technically versed but can't we build like the stuff besides the visuals first for game 2 simultaneous.ly". **Claude's reading, for approval:** yes. The dictionary, the database, the server's word check and a plain play screen go on alongside M14; the screens shared with game 1 wait for the `/play` build. Whether the server work avoids that build's files is *unverified*: it has no ticket yet.
 5. Profiles, search and friend requests come after this milestone, before the beta (M17).
+
+## Answers on the split (human, 2026-11-06)
+Asked from a fresh grep at `98609f5`: `GAME_ID` is imported by 18 non-test files, game 1's name appears on 64 lines in 25 files of `src`, `scripts` and `next.config.ts` and in 13 e2e files, and the shared run rules, `approve_puzzle` and the feed, streak and Me all mean game 1 (audit, DB-3, FUT-5, FUT-6, FUT-11, APP-6).
+1. What Plor is: "Two games, one account". Each game stands alone, with the streak, the feed and the overall board below as what's shared.
+2. The streak: "One shared streak (Recommended)". The word "Finish any one game (Recommended)" came from Claude's question, which misdescribed today's rule (M11 H4 counts a day on starting a run). Asked again: "Started counts (Recommended)". Starting either game counts the day, and game 1's rule doesn't change.
+3. Comments: "Each game its own (Recommended)", opened by finishing that game.
+4. The friends feed: "One mixed feed, labelled". All friends' activity in one list, each item tagged with its game, and items for a game the viewer hasn't played blurred.
+5. The overall leaderboard: "Yes, keep the overall one (Recommended)", as S17 still has to weigh, after each game's own board works.
+6. How: "Piece by piece (Recommended)". Each part is separated when game 2 first needs it, clear of the `/play` build's screens; some of game 1's names stay for a while.
+
+**Claude's reading:** Me keeps L45's "Totals across games, A card per game" (M14), which answer 1 doesn't change. How a day with no approved day in one game counts for the shared streak is for 16f.
 
 ## Decisions
 | # | Decision | Answer (origin) |
@@ -121,16 +132,17 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 ## Plan
 Draft sub-tickets, for the human to reorder once the open decisions are answered.
 
-**Alongside M14's game design (no game-screen files):**
-1. **16a, sources:** the word lists added to SOURCES.md by the human, with LDNOOBW already there; a script that builds the filtered dictionary, run through the task runner (DECISIONS.md). Measure its size against the hosted plan, then settle S18's bands.
-2. **16b, the database and server split** (S13): the game-2 content format and run model written and reviewed first (Hard to reverse), then the split with no change to how game 1 plays.
-3. **16c, the daily picker:** a script that proposes the day's substrings and highlighted letter within S18's bands, and the admin page approval (S11).
-4. **16d, play on a plain screen:** the routes, the server-side word check (a try's letters alone, and the shown spelling: DECISIONS.md, Game 2), the timer and the no-elimination rounds.
-5. **16e, points, ranks and leaderboards:** game 2's ledger rows, its own leaderboard, the percentile and friends' rank (S9), and the overall score (S17).
+**Claude's proposal, for the human's approval (2026-11-06), piece by piece (answer 6):** each piece has its first caller in the piece, as a format or table with no caller breaks "Build for today". The first draft's 16b-to-16g order put the split before anything that uses it.
 
-**After M14's `/play` build merges (shared screens):**
-6. **16f, the shared screens and social pieces** (S12: all of them): Today with two games, Me, the live board, comments, reactions, groups and Share.
-7. **16g, Moonbrew:** the game's look, as M14 14c did for game 1.
+Non-visual, alongside M14:
+1. **16a, the dictionary,** done. **16b, the run model and format,** done. **16a-2, proper spellings,** done.
+2. **16c, a day of game 2.** Needs S18 first. The substring picker, the format 1 validator it writes for, `content:validate` reading each game's folder (the first game-2 file fails CI today, audit TOOL-11), `approve_puzzle` choosing its checks by game (it refuses all but format 3, FUT-6), and the admin page's approval (S11).
+3. **16d, playing it.** `dictionary_word` and its load, with H4 (Docker running); `round_word`, `round_reject` and the judge; `check_question_open` and `run_status` choosing by game (DB-3, FUT-5), game 1's branch unchanged; a plain play screen with the letters-only word check. Before the migration, the extra grants go to the human (ROADMAP, For M16). Needs the game's working name and address.
+4. **16e, points and boards.** Needs S15 and S17. Game 2's ledger rows, its own leaderboard, the percentile and friends' rank (S9), then the overall board (answer 5).
+
+After M14's `/play` build merges (shared screens):
+5. **16f, the shared pieces.** Today with two games, the shared streak (answer 2), each game's comments and reactions (answer 3), the labelled mixed feed (answer 4), Me, the live board, groups and Share (S12).
+6. **16g, Moonbrew:** the game's look, as M14 14c did for game 1.
 
 ## Removes
 Nothing yet: this is a draft ticket with no code. The split (16b) is where something gets removed, such as the single `GAME_ID` constant as the only game.

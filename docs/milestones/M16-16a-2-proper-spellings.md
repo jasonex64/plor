@@ -1,6 +1,6 @@
 # M16 16a-2 — The dictionary keeps proper spellings
 
-**Status:** done: built, measured on the Windows PC and reviewed, in PR #158, which merges on green CI at the human's word ("Merge when green (Recommended)", 2026-11-06).
+**Status:** done (PR #158, merged on green CI at the human's "Merge when green (Recommended)", 2026-11-06).
 
 ## Goal
 Make the dictionary build keep each word's proper spelling (`it's`, `well-known`, `café`) beside the stripped form it matches on, so game 2 can show the proper word (16b, answers 12–14). The fetch this needed also found 43 entries that aren't words, and this ticket took them out (answer 3).
