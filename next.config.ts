@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
   // M06-puzzle-entry.md), so the files must be in those routes' server traces (next.config.js "output",
   // outputFileTracingIncludes).
   outputFileTracingIncludes: {
-    "/api/admin/puzzles": ["./content/offbeat/*.json"],
+    "/api/admin/puzzles": ["./content/offbeat/*.json", "./content/substrings/*.json"],
+    "/api/admin/puzzles/substrings": ["./content/substrings/*.json"],
     "/api/admin/puzzles/approve": ["./content/offbeat/*.json"],
     // The question bank page reads the bank and the drafted days it ran on (M13 13d).
     "/api/admin/bank": ["./content/bank.json", "./content/offbeat/*.json"],

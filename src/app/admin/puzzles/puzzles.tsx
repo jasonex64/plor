@@ -10,6 +10,7 @@
 // M14-14b-11-test-runs.md, answers 1 and 9).
 import { useCallback, useEffect, useState } from "react";
 import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
+import type { SubstringDayView } from "@/admin/substrings";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
 import { ButtonLink } from "../../button-link";
@@ -21,10 +22,11 @@ import kit from "../../kit.module.css";
 import styles from "./puzzles.module.css";
 import { Line, Skeleton } from "../../skeleton";
 import { tomorrowOf } from "../tomorrow";
+import { SubstringDays } from "./substring-days";
 
 const dateOf = (slot: DayView | string) => (typeof slot === "string" ? slot : slot.date);
 
-type DaysResponse = { today: string; days: DayView[] };
+type DaysResponse = { today: string; days: DayView[]; substringDays: SubstringDayView[] };
 
 // Host answers shown before "+N more": round 10's five, the checked ones always among them.
 const SHOWN = 5;
@@ -58,7 +60,22 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
         <Line />
       </Skeleton>
     );
-  if (data.days.length === 0) return <p>No days yet: a Claude session drafts them from the question bank.</p>;
+  const gameTwo = (
+    <SubstringDays
+      days={data.substringDays}
+      onApproved={() => {
+        load();
+        onChanged();
+      }}
+    />
+  );
+  if (data.days.length === 0)
+    return (
+      <>
+        <p>No game 1 days yet: a Claude session drafts them from the question bank.</p>
+        {gameTwo}
+      </>
+    );
   const days = [...data.days].sort((a, b) => a.date.localeCompare(b.date));
   // At first, the first day waiting for approval, else today, else the first day listed.
   const first = days.find((d) => d.draft && !d.live) ?? days.find((d) => d.date === data.today) ?? days[0];
@@ -98,6 +115,7 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
           }}
         />
       )}
+      {gameTwo}
     </>
   );
 }

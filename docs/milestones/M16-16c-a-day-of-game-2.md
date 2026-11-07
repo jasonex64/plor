@@ -1,6 +1,6 @@
 # M16 16c — A day of game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done, in PR #160, which merges on green CI at the human's "Merge when green"; 16c-2, approval, is next and needs Docker running.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is built and in review.
 
 ## Goal
 Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
@@ -66,8 +66,8 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 - [x] A real 7-day draft into a scratch folder passes `content:validate`, and its table is in the Evidence.
 
 16c-2:
-- [ ] `approve_puzzle` stores a good game 2 day, and refuses a bad format and a non-admin, by pgTAP; game 1's approval tests pass unchanged.
-- [ ] An admin sees a game 2 day on `/admin/puzzles` and approves it, by e2e.
+- [x] `approve_puzzle` stores a good game 2 day, and refuses a bad format and a non-admin, by pgTAP; game 1's approval tests pass unchanged.
+- [x] An admin sees a game 2 day on `/admin/puzzles` and approves it, by e2e.
 - [ ] Game 1's run, its unit, database and e2e tests pass unchanged.
 
 ## Out of scope
@@ -108,6 +108,13 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 | This ticket's first plan: draw with `seed` from `src/content/bank.ts` | A SHA-256 of date, round and choice, lowest wins | `seed` steps evenly from date to date, and the tests showed a modulus draw changes other days after a veto |
 
 ## Evidence
+### 16c-2
+**Tests:** written first. `npx supabase test db` failed on `puzzle_invalid: format 3 expected` until the migration. Then `Files=35, Tests=560`, `Result: PASS`, with `supabase/tests/puzzle_entry.test.sql`, game 1's approval tests, not edited. `npx vitest run src/app/api/admin/puzzles --no-file-parallelism`: 14 passed, including a list with no `content/substrings/` folder at all, as `readDrafts`' way of reading would have thrown there and taken the whole admin page down. `npx playwright test e2e/substring-days.e2e.ts e2e/approve-and-play.e2e.ts`: game 2's day seen and approved in a real browser, and game 1's approve-and-play passes unchanged. `npx eslint` and `npx tsc --noEmit -p .` are clean. `npm run content:validate` still shows `content` holding 1 day, so the tests left nothing behind.
+
+**`npm run test:db` here isn't evidence:** it fails on this PC in `offbeat` and `me`, with `expected [ { puzzle_date: '2026-11-01' } ] to deeply equal []`: the phone test's leftover days (HANDOFF), not this change. They weren't deleted, as that's the human's local data. CI's `db` job runs `test:sql` and `test:db` on a fresh stack, and is this ticket's evidence for Game 1's tests passing unchanged.
+
+**Seen on screen,** a throwaway test's screenshots at 1280 and 390 wide: two drafted days as cards, seven chips each, and the admin home's "2 days to approve". They showed "No days yet" above game 2's days, now "No game 1 days yet".
+
 ### 16c-1
 **Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 92 passed at the first review's fixes, and the re-check's `=` lines added to one test. `npm test`: `Test Files 51 passed (51)`, `Tests 577 passed (577)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
 

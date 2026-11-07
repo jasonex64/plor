@@ -117,7 +117,7 @@ export async function buildPuzzle(db: Db, userId: string, puzzle: Puzzle): Promi
   }
 }
 
-function problemsOf(err: unknown, date: string): string[] {
+export function problemsOf(err: unknown, date: string): string[] {
   if (err instanceof DatabaseError && err.code === "OB009") {
     return (JSON.parse(err.detail!) as string[]).map((p) => p.replace(/^question (\d+):/, `${date} q$1:`));
   }
