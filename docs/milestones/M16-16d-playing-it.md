@@ -122,7 +122,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 ## Evidence
 ### 16d-2
-**The box (answer 9):** written before the fix, `npx playwright test e2e/play2.e2e.ts -g "a whole day" --retries=0` passed every refusal's `toHaveValue("")` and failed at `e2e/play2.e2e.ts:86`, on `123`, as expected: tries with no letters left their text. After it, `npx playwright test e2e/play2.e2e.ts --retries=0`: 5 passed.
+**The box (answer 9):** written before the fix, `npx playwright test e2e/play2.e2e.ts -g "a whole day" --retries=0` passed every refusal's `toHaveValue("")` and failed at `e2e/play2.e2e.ts:86`, on `123`, as expected: tries with no letters left their text. After it, `npx playwright test e2e/play2.e2e.ts --retries=0`: 5 passed. Taking out only the line that clears a box of spaces fails the same check again, so both paths are tested. `npm test`: 603 passed, and `npx tsc --noEmit -p .` is clean.
 
 **Tests:** the first route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first; the review's were added after, and it showed by mutation what they had missed. `npx vitest run src/app/api/substrings --no-file-parallelism`: 20 passed. `npx playwright test e2e/play2.e2e.ts`: 5 passed: signed out, no puzzle, a whole day with each reason and both ways a clock ends, a tab left between rounds, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 21 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
 
