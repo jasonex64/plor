@@ -188,5 +188,8 @@ export const SUBSTRING_EVERYDAY_FLOOR = 5;
 export const SUBSTRING_REPEAT_GAP_DAYS = 30;
 // Days one draft makes (human, 2026-11-07: "7 days (Recommended)").
 export const SUBSTRING_BATCH_DAYS = 7;
+// After a rejected try, the server refuses the next for this long (human, 2026-11-06: "0.5 seconds"). private.judge_word
+// holds the same number, and src/game/substring-judge.db.test.ts checks the two agree.
+export const SUBSTRING_LOCKOUT_MS = 500;
 // Sample words each round shows in the PR's table (human, 2026-11-07: "4 words (Recommended)").
 export const SUBSTRING_SAMPLE_WORDS = 4;

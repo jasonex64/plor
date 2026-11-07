@@ -25,6 +25,7 @@ import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
 import { DICTIONARY_METHOD, type DictionaryEntry, fetchDictionary } from "./dictionary.ts";
+import { plainText } from "../src/game/substring-try.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
@@ -1076,6 +1077,27 @@ export async function localClient(): Promise<pg.Client> {
   return client;
 }
 
+// Game 2's word list, replaced in one transaction, so a day never sees half of it, and a failed load leaves the old list
+// (M16 16d; ROADMAP, For M16). The days use whatever is loaded (16b, answer 11).
+export async function loadDictionary(client: pg.Client, items: DictionaryEntry[]): Promise<void> {
+  const BATCH = 5000;
+  await client.query("begin");
+  try {
+    await client.query("delete from private.dictionary_word");
+    for (let i = 0; i < items.length; i += BATCH) {
+      const rows = items.slice(i, i + BATCH);
+      await client.query(
+        "insert into private.dictionary_word (word_key, spelling, plain, everyday) select * from unnest($1::text[], $2::text[], $3::text[], $4::boolean[])",
+        [rows.map((e) => e.key), rows.map((e) => e.spelling), rows.map((e) => plainText(e.spelling)), rows.map((e) => e.everyday === true)],
+      );
+    }
+    await client.query("commit");
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
+  }
+}
+
 async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<void> {
   const { manifest, items: read } = readSnapshot(set);
   const name = (id: string) => loadedWikidata().names.get(mergePlan().into.get(id) ?? id);
@@ -1837,9 +1859,20 @@ async function main(): Promise<void> {
   }
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
   if (command === "fetch" && name === DICTIONARY_SET) return fetchSet(DICTIONARY_SET, DICTIONARY);
+  if (command === "load" && name === DICTIONARY_SET) {
+    const { items } = readSnapshot<DictionaryEntry>(DICTIONARY_SET);
+    const client = await localClient();
+    try {
+      await loadDictionary(client, items);
+      console.log(`LOADED dictionary: ${items.length} spellings`);
+    } finally {
+      await client.end();
+    }
+    return;
+  }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${DICTIONARY_SET}\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);
