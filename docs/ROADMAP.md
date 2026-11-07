@@ -710,6 +710,13 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `<s>` isn't only a contraction tag (`dunno`, `kinda`, `gonna`): harmless, as all its lemmas ending in `'s` are contractions. The README isn't pinned, so that reading rests on the table. Found in M16 16a-3 (review).
 - [ ] 16a-3's "Step 2 now never decides a word that has an accented spelling" holds for unaccented tries only: a typed "café" is decided by step 2. Found in M16 16a-3 (review).
 - [ ] No unit test holds a word both listed and allowed (`finger` is only group-blocked); the same branch runs, and `smut` proves it in the real build. Found in M16 16a-3 (review).
+- [ ] `--not` isn't remembered, so a second veto without the first brings the first set back; a typo or a set not in the batch does nothing silently; a space after a comma defeats the match. Found in M16 16c-1 (review).
+- [ ] A mistyped `--root` finds no days, so no repeat check runs. Found in M16 16c-1 (review).
+- [ ] A redraft overwrites a day's file with no check that it's approved or past, so `private.puzzle` could differ from the file: for 16c-2 to decide. Found in M16 16c-1 (review).
+- [ ] `draftBatch`'s `others` filter has no test that fails without it, as `setsNear` does most of its work. Found in M16 16c-1 (review).
+- [ ] `readDays` and `--not`'s parsing have no tests; `content-validate`'s unknown-folder test asserts only `errors.length > 0`. Found in M16 16c-1 (review).
+- [ ] Also in the pools, all ordinary words: `hoe`, `pee`, `poo`, `pus`, `die`, `war`. The human sees each day before approving it. Found in M16 16c-1 (review).
+- [ ] **For the human:** the table's README is read from `en-wl/wordlist`, branch `v2`, unpinned, and it isn't in SOURCES.md; only a human adds a source (with the SCOWL row's item above). Found in M16 16c-1.
 - [ ] **After the beta:** real results correct what counts as a hard substring, starting from the word-list measure (human, 2026-11-06: "Yes, after the beta (Recommended)"; M16 S21). Accepted words are kept in `round_word`, so the data exists once 16d does.
 - [ ] `M16-16a-2-proper-spellings.md`'s criterion for 256,433 keys still says "the 3 drops": the build now does that with `com` on the drop list and a slash refused. Wording only. Found in M16 16a-2 (re-check).
 

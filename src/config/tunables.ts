@@ -188,3 +188,5 @@ export const SUBSTRING_EVERYDAY_FLOOR = 5;
 export const SUBSTRING_REPEAT_GAP_DAYS = 30;
 // Days one draft makes (human, 2026-11-07: "7 days (Recommended)").
 export const SUBSTRING_BATCH_DAYS = 7;
+// Sample words each round shows in the PR's table (human, 2026-11-07: "4 words (Recommended)").
+export const SUBSTRING_SAMPLE_WORDS = 4;

@@ -138,6 +138,27 @@ describe("buildDictionary", () => {
     ]);
   });
 
+  it("keeps the mark whichever order a word's lines come in", () => {
+    for (const table of ["35: apple <n>\n\n70: apple <v>\n", "70: apple <v>\n\n35: apple <n>\n"]) {
+      expect(buildDictionary([], parseScowl(table))).toEqual([{ key: "apple", spelling: "apple", everyday: true }]);
+    }
+  });
+
+  it("marks only a size 35 line's main spellings, as the README's default list has them", () => {
+    const table = [
+      "35: clip <v>: clipped, (clipped | ~: clipt), clips",
+      "35: AV: sirup <n>: sirups",
+      "35: A Cv DV: color <n>",
+      "35: B C D: colour <n>",
+      "35: A.: axe <n>",
+      "35: AV Bv: adaptor <n>",
+      "35: fish <n>: (fish | fishes*)",
+      "35: dig <v>: dug, digged@, diggings-",
+    ].join("\n\n");
+    const marked = buildDictionary([], parseScowl(table)).filter((e) => e.everyday).map((e) => e.spelling);
+    expect(marked).toEqual(["axe", "clip", "clipped", "clips", "color", "colour", "dig", "dug", "fish", "fishes"]);
+  });
+
   it("keeps an allowed word its list and group would take out, and only that word", () => {
     const table = parseScowl("60: finger <n>: fingers\n60: fingering <n>\n");
     const built = keys(buildDictionary([["finger", "fingers", "fingering"]], table, [], ["finger", "fingers"]));

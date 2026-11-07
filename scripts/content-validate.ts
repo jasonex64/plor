@@ -36,8 +36,8 @@ export function validateRoot(root: string, categoriesFile: string): { files: num
   const strays = all.filter((p) => !p.endsWith(".json")).map((p) => `${p}: not a .json file; every file under the content root must be a puzzle or the bank`);
   if (files.length === 0) return { files: 0, errors: [...strays, `${root}: no puzzle files found`] };
   const allTexts = files.map((file) => ({ file, text: readFileSync(join(root, file), "utf8") }));
-  // Each game's folder holds it to that game's rules. A folder that's neither fails game 1's path check, so a typo can't
-  // skip the checks (M16 16c).
+  // Each game's folder holds it to that game's rules. A folder that's neither fails game 1's checks, so a typo can't skip
+  // them (M16 16c).
   const secondGame = allTexts.filter(({ file }) => file.startsWith(`${SUBSTRINGS_ID}/`));
   const texts = allTexts.filter(({ file }) => !file.startsWith(`${SUBSTRINGS_ID}/`));
   const errors = [...strays, ...texts.flatMap(({ file, text }) => checkPuzzleFile(file, text)), ...secondGame.flatMap(({ file, text }) => checkSubstringsFile(file, text))];

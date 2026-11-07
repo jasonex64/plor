@@ -31,6 +31,13 @@ describe("setStats", () => {
     expect(counted.get("nan")).toEqual({ words: 1, everyday: 1 });
   });
 
+  it("counts a word as everyday if any spelling is, in either order", () => {
+    const plain = { key: "broadminded", spelling: "broadminded" };
+    const marked = { key: "broadminded", spelling: "broad-minded", everyday: true as const };
+    expect(setStats([plain, marked]).get("bro")).toEqual({ words: 1, everyday: 1 });
+    expect(setStats([marked, plain]).get("bro")).toEqual({ words: 1, everyday: 1 });
+  });
+
   it("counts a word once though its spellings are two", () => {
     const counted = setStats([
       { key: "its", spelling: "it's", everyday: true },
@@ -64,6 +71,15 @@ describe("eligibleSets", () => {
   it("leaves out a set of the wrong length, whatever its count", () => {
     const counted: SetStats = new Map([["ab", { words: round.atLeast, everyday: 9 }]]);
     expect(eligibleSets(6, counted)).toEqual([]);
+  });
+
+  it("leaves out a set refused by name", () => {
+    const counted: SetStats = new Map([
+      ["abo", { words: round.atLeast, everyday: 9 }],
+      ["nig", { words: round.atLeast, everyday: 9 }],
+      ["abe", { words: round.atLeast, everyday: 9 }],
+    ]);
+    expect(eligibleSets(6, counted)).toEqual(["abe"]);
   });
 
   it("leaves out a set that spells a listed word", () => {

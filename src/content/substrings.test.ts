@@ -1,6 +1,6 @@
 // Game 2's day (src/content/substrings.ts): one valid day, then that day with a single rule broken per case.
 import { describe, expect, it } from "vitest";
-import { checkSubstringsFile, substringGapProblems, type SubstringDay } from "./substrings.ts";
+import { checkSubstringsFile, setsNear, substringGapProblems, type SubstringDay } from "./substrings.ts";
 
 const FILE = "substrings/2026-12-01.json";
 const valid = (): SubstringDay => ({
@@ -63,6 +63,19 @@ describe("checkSubstringsFile", () => {
 
   it("refuses a path that doesn't match the day", () => {
     expect(check(valid(), "substrings/2026-12-02.json").join("\n")).toMatch(/path must be substrings\/2026-12-01\.json/);
+  });
+});
+
+describe("setsNear", () => {
+  const on = (date: string): SubstringDay => ({ ...valid(), date, rounds: [date.slice(-2), ...valid().rounds.slice(1)] });
+
+  it("holds a set for 29 days either side, frees it at 30, and leaves the date's own day out", () => {
+    const sets = setsNear("2026-12-31", [on("2026-12-01"), on("2026-12-02"), on("2026-12-31"), on("2027-01-29"), on("2027-01-30")]);
+    expect(sets.has("02")).toBe(true);
+    expect(sets.has("29")).toBe(true);
+    expect(sets.has("01")).toBe(false);
+    expect(sets.has("30")).toBe(false);
+    expect(sets.has("31")).toBe(false);
   });
 });
 

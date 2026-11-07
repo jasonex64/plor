@@ -26,7 +26,7 @@ export const DICTIONARY_DROP_FILE = "data/dictionary-drop.json";
 // so the answer base and misses stay as strict as they were.
 export const DICTIONARY_ALLOW_FILE = "data/dictionary-allow.json";
 
-export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out, but for the words in ${DICTIONARY_ALLOW_FILE}; a word on a line of size ${DICTIONARY_EVERYDAY_SIZE} or less is marked everyday`;
+export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out, but for the words in ${DICTIONARY_ALLOW_FILE}; a main spelling on a line of size ${DICTIONARY_EVERYDAY_SIZE} or less is marked everyday`;
 
 // One group is one sense of a word (the table's README, "GROUP"). `words` are the ones a player may type; `all` is
 // every spelling the table stands behind, kept so one listed word takes its whole group with it. A form marked "!"
@@ -59,23 +59,33 @@ function bare(token: string): string | null {
   return word.replace(/^[-@]/, "").replace(/[*\-@~]$/, "");
 }
 
+// A spelling a player can type (`bare`), and whether it's a main one. The README's default list takes no variant level
+// but "." ("VARIANT-LEVEL"), and each code speaks for one English, so "A Cv DV: color" is main because it is in
+// American. "-", "@" and "~" mark an uncommon, archaic or inapplicable form ("ANNOTATION"); "*" only says a plural can
+// match its singular, so "rhinoceroses*" is a main form. The everyday mark reads this.
+type Form = { word: string; main: boolean };
+const RARE_MARK = /^[-@]|[\-@~]†?$/;
+const mainVariants = (infos: string[]) => infos.length === 0 || infos.some((info) => /^[ABZCD_]?\.?$/.test(info));
+
 // The derived forms after a lemma, with "(A: one | B: other)" alternatives opened up. Commas inside parentheses
 // don't split, and a form whose variant level is "x" is a misspelling (README, "VARIANT-LEVEL").
-function derived(entries: string): string[] {
-  const out: string[] = [];
+function derived(entries: string): Form[] {
+  const out: Form[] = [];
   for (const entry of entries.split(/,\s*(?![^()]*\))/)) {
     const open = entry.trim().replace(/^\(|\)$/g, "");
     for (const alternative of open.split("|")) {
       const colon = alternative.lastIndexOf(":");
-      if (colon >= 0 && alternative.slice(0, colon).split(" ").some((info) => info.endsWith("x"))) continue;
-      const word = bare(alternative.slice(colon + 1));
-      if (word !== null) out.push(word);
+      const infos = colon < 0 ? [] : alternative.slice(0, colon).trim().split(" ");
+      if (infos.some((info) => info.endsWith("x"))) continue;
+      const token = alternative.slice(colon + 1).trim();
+      const word = bare(token);
+      if (word !== null) out.push({ word, main: mainVariants(infos) && !RARE_MARK.test(token) });
     }
   }
   return out;
 }
 
-const spellings = (lemma: string | null, entries: string) => (lemma === null ? [] : [lemma]).concat(entries ? derived(entries) : []);
+const spellings = (lemma: Form | null, entries: string): Form[] => (lemma === null ? [] : [lemma]).concat(entries ? derived(entries) : []);
 
 // A word a player may type, or null. A space means a phrase and a slash two words at once (`and/or`, `s/he`); anything
 // else `normalize` leaves outside a to z (a digit) isn't a word. The spelling is NFC so one accented word has one
@@ -106,8 +116,10 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const lemmaText = lemmaInfo.replace(/ [<{(].*$/, "");
   const lemma = bare(lemmaText);
   const outOfPlay = lemmaText.trim().startsWith("!");
-  const forms = spellings(lemma, entries);
-  const all = forms.map((w) => normalize(w)).filter((w) => w !== "");
+  // "+" overrides a line's sizes and carries no variant level (README, "Grammar").
+  const mainLine = variant === null || variant[1] === "+" || mainVariants(variant[1].replace(/\{\d+\}/, "").trim().split(" "));
+  const forms = spellings(lemma === null ? null : { word: lemma, main: !RARE_MARK.test(lemmaText.trim()) }, entries);
+  const all = forms.map((f) => normalize(f.word)).filter((w) => w !== "");
   const marked = OFFENSIVE_NOTE.test(lemmaInfo);
 
   // A word at two sizes reads "70 [moby] 85 [ukacd]": it's in the list from the smaller one.
@@ -115,7 +127,13 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const misspelt = variant !== null && variant[1].split(" ").every((v) => v.endsWith("x"));
   const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaText);
   if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked, outOfPlay };
-  const words = forms.filter((w) => !/[A-Z]/.test(w) && (KEEPS_ITS_APOSTROPHE.has(pos ?? "") || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []).map((entry) => (size <= DICTIONARY_EVERYDAY_SIZE ? { ...entry, everyday: true as const } : entry));
+  const words = forms
+    .filter((f) => !/[A-Z]/.test(f.word) && (KEEPS_ITS_APOSTROPHE.has(pos ?? "") || !POSSESSIVE.test(f.word)))
+    .flatMap((f) => {
+      const entry = playable(f.word);
+      if (entry === null) return [];
+      return size <= DICTIONARY_EVERYDAY_SIZE && mainLine && f.main ? [{ ...entry, everyday: true as const }] : [entry];
+    });
   return { words, all, marked, outOfPlay };
 }
 

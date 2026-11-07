@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { SUBSTRING_BATCH_DAYS, SUBSTRING_EVERYDAY_FLOOR, SUBSTRING_ROUNDS } from "../src/config/tunables.ts";
+import { SUBSTRING_BATCH_DAYS, SUBSTRING_EVERYDAY_FLOOR, SUBSTRING_ROUNDS, SUBSTRING_SAMPLE_WORDS } from "../src/config/tunables.ts";
 import { isCalendarDate } from "../src/content/puzzle.ts";
 import { checkSubstringDay, checkSubstringsFile, setsNear, type SubstringDay } from "../src/content/substrings.ts";
 import { isListedWord } from "../src/game/misses.ts";
@@ -21,6 +21,8 @@ export type SetStat = { words: number; everyday: number };
 export type SetStats = Map<string, SetStat>;
 
 const LENGTHS = [...new Set(SUBSTRING_ROUNDS.map((r) => r.letters))];
+// Short forms of slurs that no offensive list holds as words (human, 2026-11-07: "Refuse those two (Recommended)").
+const REFUSED_SETS = new Set(["abo", "nig"]);
 
 // How many words hold each set, and how many of those are everyday. A key with two spellings is one word.
 export function setStats(entries: DictionaryEntry[]): SetStats {
@@ -39,12 +41,12 @@ export function setStats(entries: DictionaryEntry[]): SetStats {
   return stats;
 }
 
-// The sets a round may draw from, in code-point order so a draw can be repeated. A set that spells a listed word
-// stays off the screen, whatever its counts (Claude's rule, in the ticket).
+// The sets a round may draw from, in code-point order so a draw can be repeated. A set that spells a listed word, or
+// is refused by name, stays off the screen, whatever its counts.
 export function eligibleSets(round: number, stats: SetStats): string[] {
   const { letters, atLeast, below } = SUBSTRING_ROUNDS[round];
   return [...stats.entries()]
-    .filter(([set, s]) => set.length === letters && s.words >= atLeast && s.words < below && s.everyday >= SUBSTRING_EVERYDAY_FLOOR && !isListedWord(set))
+    .filter(([set, s]) => set.length === letters && s.words >= atLeast && s.words < below && s.everyday >= SUBSTRING_EVERYDAY_FLOOR && !isListedWord(set) && !REFUSED_SETS.has(set))
     .map(([set]) => set)
     .sort();
 }
@@ -103,8 +105,6 @@ function readDays(root: string): SubstringDay[] {
   });
 }
 
-const SAMPLE_WORDS = 4;
-
 function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: { not: { type: "string", default: "" }, root: { type: "string", default: "content" } } });
   const [command, first] = positionals;
@@ -121,7 +121,7 @@ function main() {
     console.log(`\n**${day.date}**, bonus letter \`${day.bonus_letter}\`\n\n| Round | Letters | Words | Everyday | Samples |\n|---|---|---|---|---|`);
     day.rounds.forEach((set, i) => {
       const { words, everyday } = stats.get(set) as SetStat;
-      console.log(`| ${i + 1} | \`${set}\` | ${words} | ${everyday} | ${samples(set, items, SAMPLE_WORDS).join(", ")} |`);
+      console.log(`| ${i + 1} | \`${set}\` | ${words} | ${everyday} | ${samples(set, items, SUBSTRING_SAMPLE_WORDS).join(", ")} |`);
     });
   }
   console.log(`\nDRAFTED ${days.length} days, ${days[0].date} to ${days[days.length - 1].date}, in ${join(values.root, SUBSTRINGS_ID)}`);

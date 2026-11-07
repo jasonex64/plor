@@ -22,7 +22,8 @@ Make a real day of game 2: a command drafts a week of days under the human's rul
 4. Sets of letters within a day: "Avoid overlap (Recommended)". No set sits inside another that day.
 5. Review: "Counts in the PR, approve on page (Recommended)".
 6. Approving: "Each day on its own (Recommended)".
-7. Before these, in the M16 ticket: letters 2, 2, 3, 3, 3, 3, 3; the steady climb; a 30-day repeat; a floor of 5 everyday words, an everyday word being SCOWL size 35 or less.
+7. After the review (2026-11-07): `abo` and `nig`: "Refuse those two (Recommended)". British-only spellings as everyday words: "Yes, they count (Recommended)". Sample words in the PR: "4 words (Recommended)".
+8. Before these, in the M16 ticket: letters 2, 2, 3, 3, 3, 3, 3; the steady climb; a 30-day repeat; a floor of 5 everyday words, an everyday word being SCOWL size 35 or less.
 
 ## What Claude measured (2026-11-07)
 On the 254,477-word snapshot, in a throwaway script, with the rules below. The everyday mark there reads the table loosely, so this ticket's real mark may move these numbers a little.
@@ -31,17 +32,17 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 - **Five sets are refused as offensive:** `sm`, `ass`, `tit`, `cum`, `sex` (Claude's rule: a set of letters on the screen shouldn't spell a listed word, so the approval isn't the only guard).
 
 ## Design (Claude, for approval)
-**The everyday mark.** `DictionaryEntry` gains `everyday`, true when the word is on a table line of size 35 or less. It's read by the picker alone, and players never see it. The manifest's checksum changes with it, so the fetch runs on the Windows PC.
+**The everyday mark.** `DictionaryEntry` gains `everyday`, set on a main spelling on a table line of size 35 or less, which the README calls "small". A main spelling has no variant level, or `.`, in at least one English, as each code speaks for one (`A Cv DV: color` is main in American, and `AV Bv: adaptor` nowhere), and no `-`, `@` or `~` mark; `*` only says a plural can match its singular. A key is everyday if any spelling is. It's read by the picker alone, and players never see it. The manifest's checksum changes with it, so the fetch runs on the Windows PC.
 
 **The day's format,** `src/content/substrings.ts`, as 16b set it: `{ format: 1, game_id: "substrings", date, rounds, bonus_letter }`. The checks: exactly 7 rounds of lower-case letters, 2, 2, 3, 3, 3, 3, 3 long; no round inside another; one lower-case bonus letter that's in no round; the path matches `game_id` and `date`.
 
-**CI.** `scripts/content-validate.ts` chooses its checks by each file's folder, and adds the 30-day repeat across `content/substrings/`. A file in a folder that's neither game fails game 1's path check, so a typo can't skip the checks.
+**CI.** `scripts/content-validate.ts` chooses its checks by each file's folder, and adds the 30-day repeat across `content/substrings/`. A file in a folder that's neither game fails game 1's checks, so a typo can't skip them.
 
 **The picker,** `npm run substrings -- draft <first date>`, in `scripts/substrings.ts`.
 - It reads the snapshot and the existing day files, with no database, and draws seven days in date order. Each draw gives every choice a SHA-256 of the date, round and choice, and takes the lowest, so a run can be repeated and a veto changes a draw only if the vetoed set had won. `seed` in `src/content/bank.ts` was the first plan, but its rolling sum moves by the same step from one date to the next, and a modulus reshuffles a round's every draw when one set goes.
-- For each round, it takes the sets of that round's length in its band, drops any with fewer than 5 everyday words, on an offensive list, used in the last 30 days, or overlapping that day's sets, and draws one. The bonus is drawn from the letters left.
+- For each round, it takes the sets of that round's length in its band, drops any with fewer than 5 everyday words, on an offensive list or refused by name (`abo`, `nig`), used in the last 30 days, or overlapping that day's sets, and draws one. The bonus is drawn from the letters left.
 - A day with no pick stops the run loudly.
-- It writes `content/substrings/<date>.json` and prints a table for the PR: each round's set, word count, everyday count and sample words.
+- It writes `content/substrings/<date>.json` and prints a table for the PR: each round's set, word count, everyday count and 4 sample words.
 - **A veto:** `--not <set>,…` redraws around sets the human turned down. **`--root <folder>`** writes elsewhere, so a trial leaves no day in `content/`.
 
 **Approval.**
@@ -82,7 +83,8 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 | 2, 2, 3, 3, 3, 3, 3 letters | The format, the picker | Human, 2026-11-06, S18 |
 | Bands: 5,000+ / 2,000-5,000 / 1,000-2,000 / 500-1,000 / 300-500 / 200-300 / 100-200 | The picker | Human, 2026-11-06, S18. **Claude's reading, for the human:** the bands touch, so each holds its lower number and not its upper, and the last is 100 to 199 |
 | 5 everyday words | The picker | Human, 2026-11-06, S21 |
-| Everyday: SCOWL size 35 or less | The mark | Human, 2026-11-06, S21 |
+| Everyday: a main spelling at SCOWL size 35 or less | The mark | Human, 2026-11-06, S21; what "main" means is the README's default list |
+| 4 sample words | The PR's table | Human, 2026-11-07: "4 words (Recommended)" |
 | 30 days before a set returns | The picker, CI | Human, 2026-11-06, S18 |
 | 7 rounds, 1 bonus letter | The format | Human, 2026-11-06, S5, S16 |
 
@@ -102,13 +104,16 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| S21: "SCOWL size 35 or less" | Main spellings at that size only | The size alone made `clipt`, `thru` and `digged` everyday, and let `rhi`, the human's one miss, past the floor at 5 (review). The README's default list leaves such variants out |
 | This ticket's first plan: draw with `seed` from `src/content/bank.ts` | A SHA-256 of date, round and choice, lowest wins | `seed` steps evenly from date to date, and the tests showed a modulus draw changes other days after a veto |
 
 ## Evidence
 ### 16c-1
-**Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 87 passed. `npm test`: `Test Files 51 passed (51)`, `Tests 572 passed (572)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
+**Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 92 passed. `npm test`: `Test Files 51 passed (51)`, `Tests 577 passed (577)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
 
-**The fetch, on the Windows PC** (2026-11-07): `FETCHED dictionary: 259968 items, snapshot 2026-11-07`. *Hypothesis:* the same keys and pairs, about 40,000 everyday. *Disproved by:* any key or pair moving. *Result:* `pairs: 259968, keys: 254477, everydayKeys: 40956, sameAsBefore: true`. Held. The manifest's checksum is `d598956c…`.
+**The fetch, on the Windows PC** (2026-11-07): `FETCHED dictionary: 259968 items, snapshot 2026-11-07`. *Hypothesis:* the same keys and pairs, about 40,000 everyday. *Disproved by:* any key or pair moving. *Result:* `pairs: 259968, keys: 254477, everydayKeys: 40956, sameAsBefore: true`. Held.
+
+**The fetch with the mark's fix** (2026-11-07). *Hypothesis:* `rhi` falls under the floor, and the everyday words fall by under 2%. *Disproved by:* `rhi` staying at 5, or a much larger fall. *Result:* `pairs: 259968, keys: 254477, sameWords: true, everydayKeys: 40098`, 858 fewer, or 2.1%, so a little over. `rhi` is at 4: `rhino rhinos rhinoceros rhinoceroses`. Six sets left the pools: `ogo`, `iru`, `pae`, `rah`, `rhi`, `ryn`. The first rule, that every code must be main, took `color` and `armor` too: found by reading real words after the count, and corrected. The manifest's checksum is `852a0264…`.
 
 **A real week, into a scratch folder:** `npm run substrings -- draft 2026-12-01 --root <scratch>`: `DRAFTED 7 days, 2026-12-01 to 2026-12-07`, and `npm run content:validate -- <scratch>`, with `content/offbeat` and the bank copied in: `CONTENT OK`. `npm run content:validate` on the repo: `CONTENT OK content: 1 file(s)`, so no day was committed. One of the seven:
 
@@ -116,16 +121,22 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 
 | Round | Letters | Words | Everyday | Samples |
 |---|---|---|---|---|
-| 1 | `nt` | 18126 | 2811 | ant, ants, aunt, bent |
-| 2 | `mu` | 2889 | 359 | mud, mug, mum, much |
-| 3 | `cen` | 1494 | 203 | cent, cents, scene, scent |
-| 4 | `bin` | 694 | 112 | bin, bind, bins, binds |
-| 5 | `agr` | 327 | 44 | agree, agreed, agrees, meagre |
-| 6 | `ipt` | 262 | 46 | clipt, dript, gript, script |
-| 7 | `iru` | 126 | 5 | sirup, virus, sirups, viruses |
+| 1 | `nt` | 18126 | 2761 | ant, ants, aunt, bent |
+| 2 | `mu` | 2889 | 356 | mud, mug, mum, much |
+| 3 | `cen` | 1494 | 196 | cent, cents, scene, scent |
+| 4 | `bin` | 694 | 111 | bin, bind, bins, binds |
+| 5 | `agr` | 327 | 40 | agree, agreed, agrees, meagre |
+| 6 | `ipt` | 262 | 41 | script, tiptoe, receipt, scripts |
+| 7 | `vio` | 188 | 40 | viola, savior, violas, violet |
 
-**A real year, in memory, with the real code:** 52 batches, `days: 364, invalid: 0, gapProblems: 0`. *Hypothesis:* it fills, as the throwaway simulation did. Held. Pools for rounds 1 to 7: 126, 95, 283, 519, 505, 418, 664.
+**A real year, in memory, with the real code:** 52 batches, `days: 364, invalid: 0, gapProblems: 0`. *Hypothesis:* it fills, as the throwaway simulation did. Held. Pools for rounds 1 to 7: 126, 95, 283, 518, 505, 416, 659.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (16c-1, the `reviewer` agent, 2026-11-07):
+  1. The mark covered rare variants, so `rhi` passed the floor: main spellings only, from the README, with a fetch.
+  2. `add`'s merge had no test that could fail it: one for either order of a word's lines.
+  3. The repeat's edge wasn't tested through `setsNear`: 29 and 30 days, either side.
+  4. `setStats`'s any-spelling rule was untested: mixed marks, in either order.
+  5. `SAMPLE_WORDS` had no origin: the human's answer, in tunables and Numbers.
+  Also put to the human: `abo` and `nig`, and British spellings.
+- Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16c-1 (review)".
