@@ -39,8 +39,8 @@ The pinned files downloaded to the session's scratchpad, outside the repo, with 
 - **The shown spelling** (DECISIONS.md, Game 2, updated in this ticket's PR), worked out in the database from a key's spellings:
   The steps read the typed text lower-cased and trimmed, with everything but letters, apostrophes and hyphens taken out, so "caf3e" reads as cafe (answer 3; Claude's reading, review, 2026-11-06).
   1. If that text has no accents and one of the key's accented spellings equals it once its own accents are taken off, show that accented spelling, the first in code-point order if several fit (answer 2; review, 2026-11-06): "cafe" shows café, "abbes" shows abbés, and "abbe's" shows abbé's.
-  2. Otherwise, if that text has no accents and the key has an accented spelling, show the first of those in code-point order: "papier mache" shows papier-mâché, "ca-fe" shows café (Claude's reading of answers 2 and 3, as "should all be the same" has to hold for accents too; review, 2026-11-06).
-  3. Otherwise, show that text, if it's one of the key's spellings.
+  2. Otherwise, show that text, if it's one of the key's spellings: "chateaus" stays chateaus.
+  3. Otherwise, if that text has no accents and the key has an accented spelling, show the first of those in code-point order: "papier mache" shows papier-mâché, "ca-fe" shows café (Claude's reading of answers 2 and 3, as "should all be the same" has to hold for accents too; review, 2026-11-06).
   4. Otherwise, show the first spelling in code-point order.
   
   Step 1 compares with only the accents taken off, so the player's apostrophes and hyphens stand. The first wording, "the first accented spelling in code-point order", would have shown the possessive "abbé's" for a typed "abbes", as `'` sorts before `s`: found by the measurement below, and fixed here to keep answer 2's "Hyphens and apostrophes stay theirs if real".
@@ -102,7 +102,7 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
 
 **Fetch 3, with a slash refused and `andor` and `dba` off the drop list, which would otherwise stop the build as matching nothing** (2026-11-06): `FETCHED dictionary: 273232 items, snapshot 2026-11-07`. *Hypothesis:* the same 256,433 keys, one pair fewer. *Disproved by:* any key changing, or another pair lost. *Result:* `pairs: 273232, keys: 256433`, `removed 0`, `added 0`, the one pair lost `s/he`, none left outside letters, `'` and `-`. Held. The manifest's checksum is `a14ddfb1…`.
 
-**The rule, run over this snapshot** (a throwaway script, 16d builds the real one): 26 tries, each with its result written down first, `disagreements 0 of 26`: `app3le` apple; `wellknown`, `well---known` and `well known` well-known; `caf3e` and `ca-fe` café; `papier mache` and `papiermache` papier-mâché; `aide--memoire` aide-mémoire; `s-he` she; `c4fe`, `com`, `adj` and `123` not words. Of the 428 keys with an accented spelling, none shows an unaccented one when only its letters are typed.
+**The rule, run over this snapshot** (a throwaway script, 16d builds the real one): 29 tries, each with its result written down first, `disagreements 0 of 29`: `app3le` apple; `wellknown`, `well---known` and `well known` well-known; `caf3e` and `ca-fe` café; `papier mache` and `papiermache` papier-mâché; `aide--memoire` aide-mémoire; `s-he` she; `chateaus` chateaus; `chateau's` château's; `c4fe`, `com`, `adj` and `123` not words. Of the 428 keys with an accented spelling, one shows no accent when only its letters are typed: `chateaus`, a real spelling, so it stands. Of those keys' 454 unaccented spellings, typing one never changes its punctuation (`unaccented spellings on those keys 454 whose punctuation changes 0`).
 
 **Tests:** the two new tests each failed before their fix (`expected [ 'etcet', 'ono', 'lowname' ] to deeply equal []`; `expected [ 'she', 'andor' ] to deeply equal []`), then `npx vitest run scripts/dictionary.test.ts`: 26 passed. `npx eslint` on both files and `npx tsc --noEmit -p .` are clean (the worktree needed `npx next typegen` first).
 
@@ -115,5 +115,6 @@ None new. The 3-letter minimum and size 85 are 16a's (`src/config/tunables.ts`).
   1. DECISIONS.md's example "c4fe shows café" was wrong: dropping the digit leaves `cfe`, not a word. It's "caf3e" now.
   2. "No typed text shows `s/he`" was false: "s-he" showed it, by step 3 as it then was. A slash is refused in the build, so that spelling is gone.
   3. The ticket's steps and DECISIONS.md's had drifted apart, with the cleaning unmarked: they match now, marked as Claude's reading, with a Source diff row.
-  4. Accents didn't win through junk: "papier mache" showed papier-mache, and 13 keys showed no accent on their bare letters. Step 2 is new; it's checked on all 428 keys.
+  4. Accents didn't win through junk: "papier mache" showed papier-mache, and 13 keys showed no accent on their bare letters. A step for it is new, checked on all 428 keys.
+- Blocking finding from the re-check (the same agent, 2026-11-06): that new step, then step 2, ran before "that text, if it's one of the key's spellings", so "chateaus" showed the possessive `château's`, against answer 2. The two steps swapped; the simulation's check was too weak to see it, and now judges every unaccented spelling's punctuation.
 - Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16a-2 (review)".

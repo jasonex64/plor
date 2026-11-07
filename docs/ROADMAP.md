@@ -703,6 +703,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `M16-16a-2-proper-spellings.md`, Source: "the build, its filters and the drop list, none of which change" stopped being true at answer 3. Found in M16 16a-2 (second review).
 - [ ] The M16 ticket's S19 row, "Widened to everything but letters, digits, symbols and spaces too", can be read as keeping digits. Found in M16 16a-2 (second review).
 - [ ] "Letters alone" drops everything outside a to z, so non-Latin letters too, where the human said "non alphabetic": harmless, and the rule's wording is explicit. Found in M16 16a-2 (second review).
+- [ ] A try holding some accents gets fewer, as steps 1 and 3 of the shown spelling need none: "café-" shows `cafe`, and "résume" shows `resume` while plain "resume" shows an accented spelling. Rare. For 16d. Found in M16 16a-2 (re-check, 2026-11-06).
+- [ ] `M16-16a-2-proper-spellings.md`'s criterion for 256,433 keys still says "the 3 drops": the build now does that with `com` on the drop list and a slash refused. Wording only. Found in M16 16a-2 (re-check).
 
 - [x] `e2e/test-run.e2e.ts:60`: Play test's click stayed on the page past 5 s twice in PR #155's CI, each time as the route first rendered. The test opens the route first; six runs logged a first visit of 1,359 to 4,240 ms and none failed on it. "Clicks that don't navigate under load" above may be the same thing (*unverified*). Found in M16 16a (CI, 2026-11-06).
 - [ ] An e2e run on a test as Pacific midnight passes can fail it, as the day resets underneath: `player-screens.e2e.ts:112` did in both of `268350e`'s runs. Rare, and a rerun clears it. Found in M16 16a (CI, 2026-11-06).
