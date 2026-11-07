@@ -7,6 +7,7 @@ import type { SubstringDay } from "@/content/substrings";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { SUBSTRINGS_ID } from "@/platform/game";
+import { bonusPoints, scoreRun, wordPoints } from "./substring-scoring";
 import type { PlayedRound, SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
 
@@ -33,17 +34,26 @@ async function stateOf(db: Db, userId: string, date: string, day: SubstringDay):
      from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
     [userId, SUBSTRINGS_ID, date],
   );
-  if (rows.length === 0) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null };
+  if (rows.length === 0) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null, score: null };
   const { status, answered, ms_left: msLeft } = rows[0];
   const finished = status === "survived";
-  const words = await db.query<{ round_idx: number; word: string }>(
-    "select round_idx, word from private.round_word where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
+  const words = await db.query<{ round_idx: number; word_key: string; word: string }>(
+    "select round_idx, word_key, word from private.round_word where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
     [userId, SUBSTRINGS_ID, date],
   );
-  const wordOf = new Map(words.rows.map((r) => [r.round_idx, r.word]));
+  const wordOf = new Map(words.rows.map((r) => [r.round_idx, r]));
   const examples = finished ? await db.query<{ round_idx: number; words: string[] }>("select round_idx, words from private.round_examples($1, $2::date)", [userId, date]) : null;
   const examplesOf = new Map(examples?.rows.map((r) => [r.round_idx, r.words]) ?? []);
-  const rounds: PlayedRound[] = day.rounds.slice(0, answered).map((letters, i) => ({ letters, word: wordOf.get(i) ?? null, examples: examplesOf.get(i) ?? [] }));
+  const rounds: PlayedRound[] = day.rounds.slice(0, answered).map((letters, i) => {
+    const played = wordOf.get(i);
+    return {
+      letters,
+      word: played?.word ?? null,
+      points: played ? wordPoints(played.word_key) : 0,
+      bonus: played ? bonusPoints(played.word_key, day.bonus_letter) : 0,
+      examples: examplesOf.get(i) ?? [],
+    };
+  });
   return {
     date,
     status: finished ? "finished" : "in_progress",
@@ -51,6 +61,7 @@ async function stateOf(db: Db, userId: string, date: string, day: SubstringDay):
     bonusLetter: day.bonus_letter,
     rounds,
     open: msLeft === null ? null : { index: answered, letters: day.rounds[answered], msLeft },
+    score: scoreRun(words.rows.map((r) => r.word_key), day.bonus_letter),
   };
 }
 

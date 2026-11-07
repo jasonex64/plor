@@ -1,6 +1,9 @@
 // What a game 2 run looks like to a player (docs/milestones/M16-16d-playing-it.md). No server imports, as the screen is
 // client code. A round's letters are here only once it's open, and examples only once the run has ended.
-export type PlayedRound = { letters: string; word: string | null; examples: string[] };
+import type { RunScore } from "./substring-scoring";
+
+// points: the word's, and bonus: the bonus letter's, both 0 for a missed round (M16 16e).
+export type PlayedRound = { letters: string; word: string | null; points: number; bonus: number; examples: string[] };
 export type OpenRound = { index: number; letters: string; msLeft: number };
 export type SubstringRun = {
   date: string;
@@ -11,6 +14,8 @@ export type SubstringRun = {
   rounds: PlayedRound[];
   // The round with its clock going; null between rounds, where Next opens the next.
   open: OpenRound | null;
+  // The score so far, its different letters cashed in at the end (M16 16e); null before the start.
+  score: RunScore | null;
 };
 
 export type TryOutcome = "accepted" | "empty" | "locked" | "not_a_word" | "needs_letters" | "already_used" | "already_answered" | "time_up";

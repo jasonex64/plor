@@ -6,7 +6,7 @@ import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
-const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqyzb", "aqyzc", "aqyzd"];
+const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqmjb", "aqyzb", "aqyzc", "aqyzd"];
 let today = "";
 
 const runOut = async () => {
@@ -58,6 +58,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(page.getByText("qk", { exact: true })).toBeVisible();
   await expect(page.getByText("Bonus letter j")).toBeVisible();
   await expect(page.getByRole("timer")).toBeVisible();
+  await expect(page.getByText("Letters used: 0 of 26")).toBeVisible();
 
   // A second Enter on the way doesn't hide the reason behind the lockout's.
   await box.fill("zzzqqqzz");
@@ -103,8 +104,13 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await box.fill("aqkqmb");
   await box.press("Enter");
 
-  // Between rounds there's no clock and no letters yet, and Next has the focus, so Enter goes on.
-  await expect(page.getByText("You played aqkqmb")).toBeVisible();
+  // Between rounds there's no clock and no letters yet, and Next has the focus, so Enter goes on. The word's points
+  // show, and the tracker has its letters (M16 16e, answer 20).
+  await expect(page.getByText("You played aqkqmb: 40 points.")).toBeVisible();
+  await expect(page.getByText("Letters used: 5 of 26")).toBeVisible();
+  // The row of letters marks just those: a marked letter is the only one with a class.
+  const marked = page.getByRole("region", { name: "Game number 2" }).locator('p[aria-hidden="true"] span[class]');
+  await expect(marked).toHaveText(["a", "b", "k", "m", "q"]);
   await expect(page.getByRole("timer")).toBeHidden();
   await expect(page.getByText("qm", { exact: true })).toBeHidden();
   const next = page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next", exact: true });
@@ -117,6 +123,14 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(reason).toHaveText("Already used.");
   await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
+  // A word holding the bonus letter earns its points too, once.
+  await box.fill("aqmjb");
+  await box.press("Enter");
+  await expect(page.getByText("You played aqmjb: 30 points, and 120 for the bonus letter.")).toBeVisible();
+  await expect(page.getByText("Letters used: 6 of 26")).toBeVisible();
+  await expect(marked).toHaveText(["a", "b", "j", "k", "m", "q"]);
+  await next.click();
+  await expect(page.getByText("qnp", { exact: true })).toBeVisible();
 
   // A try past the clock moves the screen on, as the server says.
   await runOut();
@@ -124,18 +138,18 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await box.press("Enter");
   await expect(page.getByText("Time's up.")).toBeVisible();
   await next.click();
-  await expect(page.getByText("qnp", { exact: true })).toBeVisible();
-
-  // So does the clock reaching zero, with no reload. Six seconds are left, as the reload has to land inside them.
-  await DB.query("update private.question_open set opened_at = opened_at - interval '14 seconds' where game_id = 'substrings' and question_idx = 2");
-  await page.reload();
-  await expect(page.getByText("qnp", { exact: true })).toBeVisible();
-  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 8000 });
-  await next.click();
   await expect(page.getByText("qrs", { exact: true })).toBeVisible();
 
+  // So does the clock reaching zero, with no reload. Six seconds are left, as the reload has to land inside them.
+  await DB.query("update private.question_open set opened_at = opened_at - interval '14 seconds' where game_id = 'substrings' and question_idx = 3");
+  await page.reload();
+  await expect(page.getByText("qrs", { exact: true })).toBeVisible();
+  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 8000 });
+  await next.click();
+  await expect(page.getByText("qtv", { exact: true })).toBeVisible();
+
   // The rest run out.
-  for (let i = 3; i < 6; i++) {
+  for (let i = 4; i < 6; i++) {
     await runOut();
     await page.reload();
     await expect(page.getByText("Time's up.")).toBeVisible();
@@ -147,8 +161,13 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
 
   const results = page.getByRole("list", { name: "Your rounds" });
   await expect(results.getByRole("listitem")).toHaveCount(7);
-  await expect(results.getByRole("listitem").first()).toContainText("aqkqmb");
+  await expect(results.getByRole("listitem").first()).toContainText("aqkqmb, 40 points");
+  await expect(results.getByRole("listitem").nth(1)).toContainText("aqmjb, 30 points, and 120 for the bonus letter");
   await expect(results.getByRole("listitem").last()).toContainText("aqyzb, aqyzc, aqyzd");
+  // The score: two words, one with the bonus letter, and six different letters cashed in.
+  await expect(page.getByRole("definition")).toHaveText(["70", "120", "65", "255"]);
+  await expect(page.getByText("Bonus letter j, in 1 word")).toBeVisible();
+  await expect(page.getByText("Different letters, 6 of 26")).toBeVisible();
 });
 
 test("a tab left between rounds finds the day it's in, and a real failure says so", async ({ browser }) => {

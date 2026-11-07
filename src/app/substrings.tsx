@@ -6,7 +6,7 @@
 // starts the clock (16d, answer 5). The end shows each round's word, and examples for one missed. There are no points
 // until 16e.
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import type { SubstringRun, TryOutcome } from "@/game/substring-state";
+import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-state";
 import { ApiError, api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
 import { useCountdown } from "./countdown";
@@ -124,6 +124,7 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
       <p className={styles.letters}>{open.letters}</p>
       <Clock key={open.msLeft} msLeft={open.msLeft} onTimeUp={onTimeUp} />
       <p className={styles.progress}>Bonus letter {run.bonusLetter}</p>
+      <Tracker used={run.score!.used} />
       <form onSubmit={submit} className={styles.form}>
         <label>
           Your word
@@ -160,8 +161,9 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
         Round {run.rounds.length} of {run.total}
       </p>
       <p id="round-end" role="status">
-        {last.word === null ? "Time's up." : `You played ${last.word}`}
+        {last.word === null ? "Time's up." : `You played ${last.word}: ${scored(last)}.`}
       </p>
+      <Tracker used={run.score!.used} />
       {/* Focus moves here as the box goes, so Enter goes on and a screen reader hears how the round ended. */}
       <button type="button" className={kit.primary} autoFocus aria-describedby="round-end" onClick={onNext}>
         Next
@@ -170,14 +172,50 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
   );
 }
 
+// A word's points, with the bonus letter's when it holds it (M16 16e, answer 20).
+const scored = (round: PlayedRound) => `${round.points} points${round.bonus > 0 ? `, and ${round.bonus} for the bonus letter` : ""}`;
+
+// The letters the run has used, cashed in at its end (answer 6). The row of letters is for the eye; the count says it.
+function Tracker({ used }: { used: string }) {
+  return (
+    <div className={styles.tracker}>
+      <p className={styles.progress}>
+        Letters used: {used.length} of {ALPHABET.length}
+      </p>
+      <p aria-hidden="true" className={styles.alphabet}>
+        {[...ALPHABET].map((letter) => (
+          <span key={letter} className={used.includes(letter) ? styles.used : undefined}>
+            {letter}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
+}
+
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+
 function Results({ run }: { run: SubstringRun }) {
+  const score = run.score!;
+  const bonusWords = run.rounds.filter((round) => round.bonus > 0).length;
   return (
     <>
+      <h3 className={styles.heading}>Your score</h3>
+      <dl className={styles.score}>
+        <dt>Words</dt>
+        <dd>{score.words}</dd>
+        <dt>Bonus letter {run.bonusLetter}, in {bonusWords === 1 ? "1 word" : `${bonusWords} words`}</dt>
+        <dd>{score.bonus}</dd>
+        <dt>Different letters, {score.used.length} of {ALPHABET.length}</dt>
+        <dd>{score.letters}</dd>
+        <dt>Total</dt>
+        <dd className={styles.total}>{score.total}</dd>
+      </dl>
       <h3 className={styles.heading}>Your rounds</h3>
       <ol aria-label="Your rounds" className={styles.results}>
         {run.rounds.map((round) => (
           <li key={round.letters}>
-            <span className={kit.chip}>{round.letters}</span> {round.word ?? "Missed"}
+            <span className={kit.chip}>{round.letters}</span> {round.word === null ? "Missed" : `${round.word}, ${scored(round)}`}
             {round.examples.length > 0 && <p className={styles.progress}>You could have played {round.examples.join(", ")}</p>}
           </li>
         ))}

@@ -17,7 +17,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 
 const RUN = Date.now().toString(36);
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
-const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqnpb", "aqrsb", "aqtvb", "aqwxb", "aqyzb", "aqyzc", "aqyzd", "aqyzeeee"];
+const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqmjb", "aqnpb", "aqrsb", "aqtvb", "aqwxb", "aqyzb", "aqyzc", "aqyzd", "aqyzeeee"];
 let today = "";
 const sessions = new Map<string, Map<string, string>>();
 
@@ -100,6 +100,9 @@ describe("a day of game 2", () => {
     const db = getPool();
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [SUBSTRINGS_ID, today, { format: 1, game_id: SUBSTRINGS_ID, date: today, rounds: ROUNDS, bonus_letter: "j" }]);
     await db.query("insert into private.dictionary_word (word_key, spelling, plain, everyday) select w, w, w, true from unnest($1::text[]) as w on conflict do nothing", [WORDS]);
+    // One spelling isn't its letters: a hyphen and a j with a caron, so a score read from the spelling would be wrong
+    // twice over (6 letters, and no plain j).
+    await db.query("update private.dictionary_word set spelling = $2, plain = 'aqm-jb' where word_key = $1", ["aqmjb", "aqm-ǰb"]);
     const { run } = await state();
     expect(run).toMatchObject({ status: "not_started", total: 7, bonusLetter: null, open: null, rounds: [] });
     for (const letters of ROUNDS) expect(JSON.stringify(run)).not.toContain(`"${letters}"`);
@@ -198,8 +201,15 @@ describe("a day of game 2", () => {
     await unlock();
   });
 
+  it("scores a word by its letters alone as it's accepted, with the bonus letter's points when it holds it", async () => {
+    expect((await sent("aqmjb")).outcome).toBe("accepted");
+    const { run } = await state();
+    expect(run!.rounds[1]).toEqual({ letters: "qm", word: "aqm-ǰb", points: 30, bonus: 120, examples: [] });
+    expect(run!.score).toEqual({ words: 70, bonus: 120, letters: 65, used: "abjkmq", total: 255 });
+  });
+
   it("keeps examples back until the run ends, then shows a missed round's", async () => {
-    // Round 2 to 6 run out, and round 7 is the one with examples.
+    // Next opens round 3, rounds 3 to 6 run out, and round 7 is the one with examples.
     for (let i = 1; i < 6; i++) {
       await timeOut();
       await nextRound();
@@ -212,8 +222,10 @@ describe("a day of game 2", () => {
     expect(ended.status).toBe("finished");
     expect(ended.open).toBeNull();
     expect(ended.rounds).toHaveLength(7);
-    expect(ended.rounds[0]).toEqual({ letters: "qk", word: "aqkqmb", examples: [] });
-    expect(ended.rounds[6]).toEqual({ letters: "qyz", word: null, examples: ["aqyzb", "aqyzc", "aqyzd"] });
+    expect(ended.rounds[0]).toEqual({ letters: "qk", word: "aqkqmb", points: 40, bonus: 0, examples: [] });
+    expect(ended.rounds[6]).toEqual({ letters: "qyz", word: null, points: 0, bonus: 0, examples: ["aqyzb", "aqyzc", "aqyzd"] });
+    // Six letters, a to q, are cashed in at the end, and the missed rounds score nothing.
+    expect(ended.score).toEqual({ words: 70, bonus: 120, letters: 65, used: "abjkmq", total: 255 });
   });
 
   it("answers run_over to Next once it has ended", async () => {
