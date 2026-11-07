@@ -1,6 +1,6 @@
 # M16 16d — Playing game 2
 
-**Status:** done: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is done (PR #162, merged on green CI, 2026-11-07); 16d-2, the record, the routes and the screen, is done (PR #163, merging on green CI at the human's "Merge when green").
+**Status:** done: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is done (PR #162, merged on green CI, 2026-11-07); 16d-2, the record, the routes and the screen, is done (PR #163, merged on green CI, 2026-11-07).
 
 ## Goal
 Make a stored day of game 2 playable from start to end at `/play2`, on a plain screen, with every try judged by the database.
