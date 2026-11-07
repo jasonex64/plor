@@ -2,8 +2,8 @@
   "set": "dictionary",
   "source": "word-lists",
   "snapshot": "2026-11-07",
-  "retrieved_at": "2026-11-07T07:34:06.479Z",
-  "method": "ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size 85 (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, 3 letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in data/dictionary-drop.json, or an offensive or vulgar note is out, but for the words in data/dictionary-allow.json",
+  "retrieved_at": "2026-11-07T08:48:57.570Z",
+  "method": "ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size 85 (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, 3 letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in data/dictionary-drop.json, or an offensive or vulgar note is out, but for the words in data/dictionary-allow.json; a main spelling on a line of size 35 or less is marked everyday",
   "items": 259968,
-  "sha256": "c733819bcfd418c580ea525e06b9031c94d3290f329d76ffb368b61482a7ac20"
+  "sha256": "852a026457fd476f18c78d90c8ffb3b4a1fcf35781ce0bae1f6902a53aefcc4f"
 }
