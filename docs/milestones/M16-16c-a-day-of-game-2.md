@@ -1,6 +1,6 @@
 # M16 16c — A day of game 2
 
-**Status:** done: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is in PR #161, which merges on green CI at the human's "Merge when green".
+**Status:** done: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is done (PR #161, merged on green CI, 2026-11-07).
 
 ## Goal
 Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
