@@ -109,7 +109,7 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 
 ## Evidence
 ### 16c-1
-**Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 92 passed. `npm test`: `Test Files 51 passed (51)`, `Tests 577 passed (577)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
+**Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 92 passed at the first review's fixes, and the re-check's `=` lines added to one test. `npm test`: `Test Files 51 passed (51)`, `Tests 577 passed (577)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
 
 **The fetch, on the Windows PC** (2026-11-07): `FETCHED dictionary: 259968 items, snapshot 2026-11-07`. *Hypothesis:* the same keys and pairs, about 40,000 everyday. *Disproved by:* any key or pair moving. *Result:* `pairs: 259968, keys: 254477, everydayKeys: 40956, sameAsBefore: true`. Held.
 
@@ -139,4 +139,5 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
   4. `setStats`'s any-spelling rule was untested: mixed marks, in either order.
   5. `SAMPLE_WORDS` had no origin: the human's answer, in tunables and Numbers.
   Also put to the human: `abo` and `nig`, and British spellings.
+  The re-check (same agent, same day) found one more: the `=` level had no test, and 7 real keys rest on it. Fixed. It also confirmed "main in any code" against the README.
 - Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16c-1 (review)".

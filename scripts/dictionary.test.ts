@@ -152,11 +152,13 @@ describe("buildDictionary", () => {
       "35: B C D: colour <n>",
       "35: A.: axe <n>",
       "35: AV Bv: adaptor <n>",
+      "35: A= B: ambience <n>",
+      "35: A=: analog <n>",
       "35: fish <n>: (fish | fishes*)",
       "35: dig <v>: dug, digged@, diggings-",
     ].join("\n\n");
     const marked = buildDictionary([], parseScowl(table)).filter((e) => e.everyday).map((e) => e.spelling);
-    expect(marked).toEqual(["axe", "clip", "clipped", "clips", "color", "colour", "dig", "dug", "fish", "fishes"]);
+    expect(marked).toEqual(["ambience", "axe", "clip", "clipped", "clips", "color", "colour", "dig", "dug", "fish", "fishes"]);
   });
 
   it("keeps an allowed word its list and group would take out, and only that word", () => {

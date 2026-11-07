@@ -715,6 +715,8 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] A redraft overwrites a day's file with no check that it's approved or past, so `private.puzzle` could differ from the file: for 16c-2 to decide. Found in M16 16c-1 (review).
 - [ ] `draftBatch`'s `others` filter has no test that fails without it, as `setsNear` does most of its work. Found in M16 16c-1 (review).
 - [ ] `readDays` and `--not`'s parsing have no tests; `content-validate`'s unknown-folder test asserts only `errors.length > 0`. Found in M16 16c-1 (review).
+- [ ] The main-spelling test has no case for a `†` after a mark, a `~` mark or a leading `-`: mutating those moves no everyday key on the pinned table, but a future table could. Found in M16 16c-1 (re-check).
+- [ ] 16c's "What Claude measured" still says five sets are refused: it's dated, and the Design has the two more. The human's answer on British spellings didn't name the 20 keys main only in Z, C or D (`bandana`, `dreamt`, `racquet`), which count too. Found in M16 16c-1 (re-check).
 - [ ] Also in the pools, all ordinary words: `hoe`, `pee`, `poo`, `pus`, `die`, `war`. The human sees each day before approving it. Found in M16 16c-1 (review).
 - [ ] **For the human:** the table's README is read from `en-wl/wordlist`, branch `v2`, unpinned, and it isn't in SOURCES.md; only a human adds a source (with the SCOWL row's item above). Found in M16 16c-1.
 - [ ] **After the beta:** real results correct what counts as a hard substring, starting from the word-list measure (human, 2026-11-06: "Yes, after the beta (Recommended)"; M16 S21). Accepted words are kept in `round_word`, so the data exists once 16d does.
