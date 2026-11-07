@@ -2,8 +2,8 @@
   "set": "dictionary",
   "source": "word-lists",
   "snapshot": "2026-11-07",
-  "retrieved_at": "2026-11-07T05:28:26.828Z",
-  "method": "ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size 85 (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, 3 letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in data/dictionary-drop.json, or an offensive or vulgar note is out",
-  "items": 273232,
-  "sha256": "a14ddfb1954180d96ab012d03fcd22fbfb77d55b6f3ca053cea66c0ed92d743f"
+  "retrieved_at": "2026-11-07T07:18:41.348Z",
+  "method": "ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size 85 (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, 3 letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in data/dictionary-drop.json, or an offensive or vulgar note is out, but for the words in data/dictionary-allow.json",
+  "items": 259955,
+  "sha256": "3107c6f743b7048dd4376fd3b0ce0b65353ad571501e416b37c2e546ca271f15"
 }

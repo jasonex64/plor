@@ -21,7 +21,12 @@ export const DICTIONARY_FILES = {
 // list also drops names from the answer base at load, and game 1's data shouldn't change for game 2.
 export const DICTIONARY_DROP_FILE = "data/dictionary-drop.json";
 
-export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out`;
+// Words game 2 keeps though a list or a group would take them out: everyday ones caught by accident and mild ones the
+// human approved word by word (docs/milestones/M16-16a-3-possessives-and-mild-words.md). Game 1 doesn't read this file,
+// so the answer base and misses stay as strict as they were.
+export const DICTIONARY_ALLOW_FILE = "data/dictionary-allow.json";
+
+export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out, but for the words in ${DICTIONARY_ALLOW_FILE}`;
 
 // One group is one sense of a word (the table's README, "GROUP"). `words` are the ones a player may type; `all` is
 // every spelling the table stands behind, kept so one listed word takes its whole group with it. A form marked "!"
@@ -37,6 +42,10 @@ const NOT_WORDS = new Set(["abbr", "pre", "suf", "wp", "we", "x"]);
 const PROPER_CLASSES = new Set(["person", "surname", "place", "name", "name?", "demonym", "trademark", "abbr", "abbr?", "upper", "upper?"]);
 const PROPER_TAGS = /\[(name|lcacr|ucacr)\]/;
 const OFFENSIVE_NOTE = /\((offensive|vulgar)-\d\)/;
+// Possessives aren't accepted (M16 S20), whether a noun's form or their own lemma ("baker's"). The table tags a
+// contraction <s>, which is how "he's" stays.
+const POSSESSIVE = /('s|s')$/;
+const CONTRACTION = "s";
 const VARIANT = /^((?:[ABZCD_][.=?v~V@x-]? ?)+(?:\{\d+\})?|\+): (.*)$/;
 
 // A word with its marks taken off, or null when the marks say to leave it out: "!" is "nearly non-existent", and "-"
@@ -104,7 +113,7 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const misspelt = variant !== null && variant[1].split(" ").every((v) => v.endsWith("x"));
   const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaText);
   if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked, outOfPlay };
-  const words = forms.filter((w) => !/[A-Z]/.test(w)).flatMap((w) => playable(w) ?? []);
+  const words = forms.filter((w) => !/[A-Z]/.test(w) && (pos === CONTRACTION || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []);
   return { words, all, marked, outOfPlay };
 }
 
@@ -135,9 +144,12 @@ export function parseScowl(text: string): ScowlGroup[] {
 
 // One list of (key, spelling) pairs. A blocked word leaves ENABLE's and Moby's copies too, and a word
 // that shares its spelling with an offensive group goes with it: answer 2 accepted losing a few innocent words. A drop
-// that matches nothing stops the build, so a typo can't leave the word in the game.
-export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], drops: string[] = []): DictionaryEntry[] {
+// that matches nothing stops the build, so a typo can't leave the word in the game. An allowed word comes through all
+// of that, and only it: its group's other words stay out. One that isn't blocked stops the build too, so the file can't
+// go stale.
+export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], drops: string[] = [], allows: string[] = []): DictionaryEntry[] {
   const dropped = new Set(drops);
+  const allowed = new Set(allows);
   const held = (text: string) => dropped.has(text) || (text.includes(" ") ? isListed(text) : isListedWord(text));
   const blocked = new Set<string>();
   for (const group of groups) {
@@ -155,8 +167,17 @@ export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], dr
   const keys = new Set([...entries.values()].map((entry) => entry.key));
   const unused = drops.filter((word) => !keys.has(word));
   if (unused.length) throw new Error(`${DICTIONARY_DROP_FILE}: ${unused.join(", ")} matched nothing`);
-  // Filters judge the key, so a word kept or left out is the same as before 16a-2, with all its spellings or none.
-  return [...entries.values()].filter((entry) => !blocked.has(entry.key) && !held(entry.key)).sort(byKeyThenSpelling);
+  const out = (key: string) => blocked.has(key) || held(key);
+  const stale = allows.filter((word) => !keys.has(word) || !out(word) || dropped.has(word));
+  if (stale.length) throw new Error(`${DICTIONARY_ALLOW_FILE}: ${stale.join(", ")} isn't a blocked word, or is also dropped`);
+  // Filters judge the key, so a word kept or left out goes with all its spellings or none.
+  return [...entries.values()].filter((entry) => allowed.has(entry.key) || !out(entry.key)).sort(byKeyThenSpelling);
+}
+
+function wordList(file: string): string[] {
+  const words: unknown = JSON.parse(readFileSync(file, "utf8"));
+  if (!Array.isArray(words) || !words.every((word) => typeof word === "string")) throw new Error(`${file}: not a list of words`);
+  return words;
 }
 
 // The download goes through scripts/base.ts's one `download`, passed in as that file imports this one.
@@ -169,7 +190,5 @@ export async function fetchDictionary(download: (url: string) => Promise<Buffer>
   };
   const { enable, mobyCrossword, mobyDelta, scowl } = DICTIONARY_FILES;
   const plain = await Promise.all([enable, mobyCrossword, mobyDelta].map(async (file) => (await pinned(file)).toString("latin1").split(/\r?\n/)));
-  const drops: unknown = JSON.parse(readFileSync(DICTIONARY_DROP_FILE, "utf8"));
-  if (!Array.isArray(drops) || !drops.every((word) => typeof word === "string")) throw new Error(`${DICTIONARY_DROP_FILE}: not a list of words`);
-  return buildDictionary(plain, parseScowl((await pinned(scowl)).toString("utf8")), drops);
+  return buildDictionary(plain, parseScowl((await pinned(scowl)).toString("utf8")), wordList(DICTIONARY_DROP_FILE), wordList(DICTIONARY_ALLOW_FILE));
 }

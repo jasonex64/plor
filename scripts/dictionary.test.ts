@@ -8,8 +8,12 @@ const keys = (entries: DictionaryEntry[]) => [...new Set(entries.map((e) => e.ke
 const spellingsOf = (entries: DictionaryEntry[], key: string) => entries.filter((e) => e.key === key).map((e) => e.spelling);
 
 describe("parseScowl", () => {
-  it("reads a lemma, its forms and a possessive through normalize", () => {
-    expect(words("60: tuba <n>: tubas, tuba's, tubas'\n")).toEqual(["tuba", "tubas", "tubas", "tubas"]);
+  it("reads a lemma and its forms through normalize, and leaves out possessives", () => {
+    expect(words("60: tuba <n>: tubas, tuba's, tubas'\n")).toEqual(["tuba", "tubas"]);
+  });
+
+  it("leaves out a possessive standing as its own lemma, and keeps a contraction", () => {
+    expect(words("60: baker's\n\n60: chemist's <n>\n\n60: he's <s>\n\n60: don't <s>\n")).toEqual(["hes", "dont"]);
   });
 
   it("reads a word at two sizes from the smaller, and leaves out one past the limit", () => {
@@ -63,7 +67,7 @@ describe("parseScowl", () => {
   });
 
   it("keeps each form's proper spelling beside its key: an apostrophe, a hyphen, an accent", () => {
-    expect(parseScowl("60: it's <pn>\n\n60: well-known <aj>\n\n60: café <n>: cafés\n").flatMap((g) => g.words)).toEqual([
+    expect(parseScowl("60: it's <s>\n\n60: well-known <aj>\n\n60: café <n>: cafés\n").flatMap((g) => g.words)).toEqual([
       { key: "its", spelling: "it's" },
       { key: "wellknown", spelling: "well-known" },
       { key: "cafe", spelling: "café" },
@@ -119,8 +123,21 @@ describe("buildDictionary", () => {
     expect(() => buildDictionary([["calm"]], [], ["clam"])).toThrow(/clam matched nothing/);
   });
 
+  it("keeps an allowed word its list and group would take out, and only that word", () => {
+    const table = parseScowl("60: finger <n>: fingers\n60: fingering <n>\n");
+    const built = keys(buildDictionary([["finger", "fingers", "fingering"]], table, [], ["finger", "fingers"]));
+    expect(built).toEqual(["finger", "fingers"]);
+  });
+
+  it("stops on an allow entry that matches nothing, isn't blocked or is also dropped", () => {
+    const table = parseScowl("60: mango <n>\n");
+    expect(() => buildDictionary([["mango"]], table, [], ["zzzzz"])).toThrow(/zzzzz/);
+    expect(() => buildDictionary([["mango"]], table, [], ["mango"])).toThrow(/mango/);
+    expect(() => buildDictionary([["mango"]], table, ["mango"], ["mango"])).toThrow(/mango/);
+  });
+
   it("gives a key every proper spelling its sources hold, in code-point order (16a-2)", () => {
-    const groups = parseScowl("60: it's <pn>\n\n60: well-known <aj>\n\n60: café <n>\n");
+    const groups = parseScowl("60: it's <s>\n\n60: well-known <aj>\n\n60: café <n>\n");
     const built = buildDictionary([["its", "cafe", "wellknown"]], groups);
     expect(spellingsOf(built, "its")).toEqual(["it's", "its"]);
     expect(spellingsOf(built, "wellknown")).toEqual(["well-known", "wellknown"]);
