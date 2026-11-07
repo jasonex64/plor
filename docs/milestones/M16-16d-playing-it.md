@@ -109,11 +109,13 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 | Source says | We built | Why different |
 |---|---|---|
 | 16b: `plor_app` reads and inserts `round_word` and `round_reject`, and reads `dictionary_word` | It reads `round_word` and nothing else there | Narrower: the judge and `round_examples` are the only ways in |
+| 16d's Design: `dictionary_word (word_key, spelling)` in 16b | With `plain` and `everyday` | The shown spelling's steps and answer 5's examples need them. In the approved Design |
+| 16b's outcomes | With `no_run`, and `empty` | A try on no run, and answer 4 |
 | 16b's judge takes "the try as typed and its `normalize` form" | The letters-only key, the cleaned text and that text with accents off | DECISIONS.md, Game 2, as 16a-2 changed it |
 
 ## Evidence
 ### 16d-1
-**Tests:** written first, and they failed (`relation "private.dictionary_word" does not exist`; `Cannot find module './substring-try'`). `npx supabase test db`: `Files=36, Tests=597`, `Result: PASS`, with game 1's test files unchanged but one: `plor_app_role.test.sql`'s exact grant list gains the three approved grants, which is that test's purpose. `npx vitest run src/game/substring-try.test.ts src/game/substring-judge.db.test.ts --no-file-parallelism`: 20 passed. `npm test`: `Test Files 53 passed (53)`, `Tests 602 passed (602)`. `npx eslint` and `npx tsc --noEmit -p .` are clean.
+**Tests:** written first, and they failed (`relation "private.dictionary_word" does not exist`; `Cannot find module './substring-try'`). `npx supabase test db`: `Files=36, Tests=616`, `Result: PASS`, with game 1's test files unchanged but one: `plor_app_role.test.sql`'s exact grant list gains the three approved grants, which is that test's purpose. `npx vitest run src/game/substring-try.test.ts src/game/substring-judge.db.test.ts --no-file-parallelism`: 22 passed. `npm test`: `Test Files 53 passed (53)`, `Tests 603 passed (603)`. `npx eslint` and `npx tsc --noEmit -p .` are clean.
 
 **Parallel tries:** 8 at once gave `not_a_word` once and `locked` 7 times, with 1 rejection stored.
 
@@ -123,5 +125,11 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (16d-1, the `reviewer` agent, 2026-11-07):
+  1. A player with a word or a rejection couldn't delete their account: the foreign keys now cascade, as every other child of `run` does, tested through deleting the account.
+  2. A second tap on Next raised `OB002`: the trigger lets it through to the route's `on conflict`, tested as a repeat.
+  3. A phone's curly apostrophe made "he’s" show `hes`: `cleanedTry` reads it as an apostrophe.
+  4. Mutations showed the "four steps" criterion and several rules weren't really tested: `private.shown_spelling` is its own function with each step tested alone, including code-point order; both other rejections are checked to lock; a stored retry past the clock, a word ending round 7 and a run as `plor_app` itself are tested.
+  5. `SUBSTRING_LOCKOUT_MS` gave the number a second home with no real caller: removed, with its origin in the SQL.
+  6. HANDOFF still said the grants waited on the human: removed.
+- Deferred to ROADMAP "Next revision": the items under "For M16" marked "Found in M16 16d-1 (review)".

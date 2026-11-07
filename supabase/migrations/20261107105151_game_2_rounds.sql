@@ -25,7 +25,7 @@ create table private.round_word (
   created_at timestamptz not null default statement_timestamp(),
   primary key (user_id, game_id, puzzle_date, round_idx),
   unique (user_id, game_id, puzzle_date, word_key),
-  foreign key (user_id, game_id, puzzle_date) references private.run (user_id, game_id, puzzle_date)
+  foreign key (user_id, game_id, puzzle_date) references private.run (user_id, game_id, puzzle_date) on delete cascade
 );
 
 -- Only for the lockout: when, with no word (16b, answer 2).
@@ -36,7 +36,7 @@ create table private.round_reject (
   round_idx smallint not null check (round_idx >= 0),
   rejected_at timestamptz not null default statement_timestamp(),
   primary key (user_id, game_id, puzzle_date, round_idx, rejected_at),
-  foreign key (user_id, game_id, puzzle_date) references private.run (user_id, game_id, puzzle_date)
+  foreign key (user_id, game_id, puzzle_date) references private.run (user_id, game_id, puzzle_date) on delete cascade
 );
 
 alter table private.dictionary_word enable row level security;
@@ -66,6 +66,10 @@ begin
       where p.game_id = new.game_id and p.puzzle_date = new.puzzle_date;
     if new.question_idx >= questions then
       raise exception 'run_over' using errcode = 'OB003';
+    end if;
+    -- A second tap on Next: the route's on conflict do nothing takes it, as for game 1.
+    if new.question_idx = opened then
+      return new;
     end if;
     if new.question_idx <> opened + 1 then
       raise exception 'out_of_order: expected round %', opened + 1 using errcode = 'OB002';
@@ -149,6 +153,24 @@ cross join lateral (
 ) d
 where r.game_id = 'substrings';
 
+-- The shown spelling's four steps (DECISIONS.md, Game 2, "Matching and showing"), with code-point order. On its own so
+-- each step can be tested. A key with no spelling gives null: the judge has checked it has one.
+create function private.shown_spelling(p_key text, p_clean text, p_plain text) returns text
+  language sql stable security definer set search_path = ''
+as $$
+  select coalesce(
+    (select w.spelling from private.dictionary_word w
+     where p_clean = p_plain and w.word_key = p_key and w.spelling <> w.plain and w.plain = p_clean
+     order by w.spelling collate "C" limit 1),
+    (select w.spelling from private.dictionary_word w where w.word_key = p_key and w.spelling = p_clean),
+    (select w.spelling from private.dictionary_word w
+     where p_clean = p_plain and w.word_key = p_key and w.spelling <> w.plain
+     order by w.spelling collate "C" limit 1),
+    (select w.spelling from private.dictionary_word w where w.word_key = p_key order by w.spelling collate "C" limit 1));
+$$;
+
+revoke all on function private.shown_spelling(text, text, text) from public, anon, authenticated, service_role;
+
 -- The judge (16b, "Run model"; M16 16d). The route passes the try's letters-only key, its cleaned text, and that text
 -- with its accents off, all from src/game/substring-try.ts, so there's one normalizer. A row lock on the run takes tries
 -- one at a time, so parallel ones can't all pass the lockout. Each rejection stores when, with no word.
@@ -161,7 +183,7 @@ declare
   stored private.round_word;
   last_reject timestamptz;
   reason text;
-  shown text;
+  word text;
 begin
   perform from private.run r where r.user_id = p_user and r.game_id = 'substrings' and r.puzzle_date = p_date for update;
   if not found then
@@ -186,7 +208,7 @@ begin
   end if;
   select max(x.rejected_at) into last_reject from private.round_reject x
     where x.user_id = p_user and x.game_id = 'substrings' and x.puzzle_date = p_date and x.round_idx = idx;
-  -- 0.5 seconds: SUBSTRING_LOCKOUT_MS in src/config/tunables.ts, and src/game/substring-judge.db.test.ts holds them equal.
+  -- The human, 2026-11-06: "0.5 seconds" (M16 16b, answer 9). The server enforces it, so the number lives here alone.
   if statement_timestamp() < last_reject + interval '0.5 seconds' then
     return jsonb_build_object('outcome', 'locked');
   end if;
@@ -205,24 +227,10 @@ begin
     values (p_user, 'substrings', p_date, idx, statement_timestamp());
     return jsonb_build_object('outcome', reason);
   end if;
-  -- The shown spelling's four steps (DECISIONS.md, Game 2, "Matching and showing"), with code-point order.
-  if p_clean = p_plain then
-    select w.spelling into shown from private.dictionary_word w
-      where w.word_key = p_key and w.spelling <> w.plain and w.plain = p_clean order by w.spelling collate "C" limit 1;
-  end if;
-  if shown is null then
-    select w.spelling into shown from private.dictionary_word w where w.word_key = p_key and w.spelling = p_clean;
-  end if;
-  if shown is null and p_clean = p_plain then
-    select w.spelling into shown from private.dictionary_word w
-      where w.word_key = p_key and w.spelling <> w.plain order by w.spelling collate "C" limit 1;
-  end if;
-  if shown is null then
-    select w.spelling into shown from private.dictionary_word w where w.word_key = p_key order by w.spelling collate "C" limit 1;
-  end if;
+  word := private.shown_spelling(p_key, p_clean, p_plain);
   insert into private.round_word (user_id, game_id, puzzle_date, round_idx, word_key, word)
-  values (p_user, 'substrings', p_date, idx, p_key, shown);
-  return jsonb_build_object('outcome', 'accepted', 'word', shown);
+  values (p_user, 'substrings', p_date, idx, p_key, word);
+  return jsonb_build_object('outcome', 'accepted', 'word', word);
 end;
 $$;
 

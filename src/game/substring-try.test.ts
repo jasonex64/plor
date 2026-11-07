@@ -32,6 +32,13 @@ describe("cleanedTry", () => {
     expect(cleanedTry("s/he")).toBe("she");
   });
 
+  it("reads a phone's curly apostrophe as an apostrophe", () => {
+    expect(cleanedTry("he\u2019s")).toBe("he's");
+    expect(cleanedTry("can\u2019t")).toBe("can't");
+    expect(cleanedTry("it\u2018s")).toBe("it's");
+    expect(cleanedTry("won\u02BCt")).toBe("won't");
+  });
+
   it("keeps accents, in one form however they were typed", () => {
     expect(cleanedTry("café")).toBe("café");
     expect(cleanedTry("CAFÉ")).toBe("café");

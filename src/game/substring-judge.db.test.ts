@@ -5,7 +5,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import pg from "pg";
 import { loadDictionary } from "../../scripts/base.ts";
 import { LOCAL_DATABASE_URL } from "@/test/local-stack";
-import { SUBSTRING_LOCKOUT_MS } from "@/config/tunables";
 import { SUBSTRINGS_ID } from "@/platform/game";
 
 const RUN = Date.now().toString(36);
@@ -38,13 +37,40 @@ describe("the judge", () => {
     expect(rejected.rowCount).toBe(1);
   });
 
-  it("holds the lockout to the tunable, as the database and the app must agree", async () => {
-    await db.query("update private.round_reject set rejected_at = statement_timestamp() - make_interval(secs => $2::float / 1000) where user_id = $1", [user, SUBSTRING_LOCKOUT_MS - 100]);
+  it("holds the lockout at 0.5 seconds", async () => {
+    await db.query("update private.round_reject set rejected_at = statement_timestamp() - make_interval(secs => $2::float / 1000) where user_id = $1", [user, 400]);
     const held = await db.query<{ r: { outcome: string } }>("select private.judge_word($1, $2::date, 'zzzqqq', 'zzzqqq', 'zzzqqq') as r", [user, day]);
     expect(held.rows[0].r.outcome).toBe("locked");
-    await db.query("update private.round_reject set rejected_at = statement_timestamp() - make_interval(secs => $2::float / 1000) where user_id = $1", [user, SUBSTRING_LOCKOUT_MS + 100]);
+    await db.query("update private.round_reject set rejected_at = statement_timestamp() - make_interval(secs => $2::float / 1000) where user_id = $1", [user, 600]);
     const freed = await db.query<{ r: { outcome: string } }>("select private.judge_word($1, $2::date, 'zzzqqq', 'zzzqqq', 'zzzqqq') as r", [user, day]);
     expect(freed.rows[0].r.outcome).toBe("not_a_word");
+  });
+});
+
+describe("a run as plor_app", () => {
+  it("reads its status, tries a word, and moves to the next round", async () => {
+    const other = (await db.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [`${RUN}-app@example.test`])).rows[0].id;
+    await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [other, SUBSTRINGS_ID, day]);
+    await db.query("insert into private.dictionary_word (word_key, spelling, plain) values ('qckq', 'qckq', 'qckq') on conflict do nothing");
+    // Locally the routes connect as postgres, which can't take this role (src/game/runs.plor-app.db.test.ts).
+    const app = new pg.Client({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres" });
+    await app.connect();
+    try {
+      await app.query("set role plor_app");
+      const tried = await app.query<{ r: { outcome: string } }>("select private.judge_word($1, $2::date, 'qckq', 'qckq', 'qckq') as r", [other, day]);
+      expect(tried.rows[0].r.outcome).toBe("accepted");
+      const status = await app.query("select answered, status from private.run_status where user_id = $1 and game_id = $2", [other, SUBSTRINGS_ID]);
+      expect(status.rows).toEqual([{ answered: 1, status: "in_progress" }]);
+      const next = `insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1) on conflict do nothing`;
+      await app.query(next, [other, SUBSTRINGS_ID, day]);
+      await app.query(next, [other, SUBSTRINGS_ID, day]);
+      const words = await app.query("select word from private.round_word where user_id = $1", [other]);
+      expect(words.rows).toEqual([{ word: "qckq" }]);
+    } finally {
+      await app.end();
+      await db.query("delete from private.dictionary_word where word_key = 'qckq'");
+      await db.query("delete from auth.users where id = $1", [other]);
+    }
   });
 });
 
