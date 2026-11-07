@@ -1,6 +1,6 @@
 # M16 16d — Playing game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is done, in PR #162, which merges on green CI at the human's "Merge when green"; 16d-2, the routes and the screen, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16d-1, the database, is done (PR #162, merged on green CI, 2026-11-07); 16d-2, the record, the routes and the screen, is in review.
 
 ## Goal
 Make a stored day of game 2 playable from start to end at `/play2`, on a plain screen, with every try judged by the database.
@@ -55,6 +55,8 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 **The routes,** `/api/substrings`: `GET` today's state, `start`, `try`, `next`, each with what may be shown and no more: a round's letters are sent only once it's open (answer 6), and the word list never leaves the server. After the run, the state adds 3 everyday words for each missed round, shortest first (answer 5).
 
+**A run belongs to its day** (Claude, found building it; the human can overrule): a run left unfinished at midnight stops there, unlike game 1's. Game 1's clock ends a left run, but a game 2 run left between rounds has none, so it would otherwise block the next day.
+
 **The screen,** `/play2`, `src/app/substrings.tsx`, plain and using the kit, with no Moonbrew: the letters, the 20-second clock, the bonus letter, a text box that stays usable through the lockout, and the reason a try failed. Next between rounds. At the end, the plain results of answer 5, with no points (16e). A day with no game 2 puzzle says so. Signed out goes to sign-in, as `/play` does.
 
 **PRs.** 16d-1: `dictionary_word`, the load, the tables, the round rules and the judge. 16d-2: the record, the routes and the screen. The first plan's three became two, as the table's first caller is the judge.
@@ -73,12 +75,12 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 - [x] The letters-only key is tested: `app3le`, `well---known`, `well known`, `it´s`, a backtick, `123`.
 
 16d-2:
-- [ ] Each route uses only the signed-in player's ID, so no player reaches another's run or words.
-- [ ] A round's letters aren't in any response before it opens, checked on the routes.
-- [ ] Example words aren't in any response before the run ends.
-- [ ] A whole day played at `/play2` in a browser: an accepted word, each reason shown, a lockout with the box still usable, a timeout, Next, the results.
-- [ ] A signed-out visit to `/play2`, and a day with no puzzle, each behave, by e2e.
-- [ ] Today, `/play` and game 1's run don't change: game 1's e2e passes unchanged.
+- [x] Each route uses only the signed-in player's ID, so no player reaches another's run or words.
+- [x] A round's letters aren't in any response before it opens, checked on the routes.
+- [x] Example words aren't in any response before the run ends.
+- [x] A whole day played at `/play2` in a browser: an accepted word, each reason shown, a lockout with the box still usable, a timeout, Next, the results.
+- [x] A signed-out visit to `/play2`, and a day with no puzzle, each behave, by e2e.
+- [x] Today, `/play` and game 1's run don't change: game 1's e2e passes unchanged, by CI's whole suite on the PR, with `offbeat`, `approve-and-play` and `shell` run here.
 
 ## Out of scope
 - Points, the bonus letter's effect, boards and the ledger: 16e, with S15 and S17.
@@ -110,10 +112,16 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 |---|---|---|
 | 16b: `plor_app` reads and inserts `round_word` and `round_reject`, and reads `dictionary_word` | It reads `round_word` and nothing else there | Narrower: the judge and `round_examples` are the only ways in |
 | 16d's Design: `dictionary_word (word_key, spelling)` in 16b | With `plain` and `everyday` | The shown spelling's steps and answer 5's examples need them. In the approved Design |
+| DECISIONS.md, Game 1: a run started before midnight can be finished after it | A game 2 run stops at midnight | No clock ends a run left between rounds, so it would block the next day |
 | 16b's outcomes | With `no_run`, and `empty` | A try on no run, and answer 4 |
 | 16b's judge takes "the try as typed and its `normalize` form" | The letters-only key, the cleaned text and that text with accents off | DECISIONS.md, Game 2, as 16a-2 changed it |
 
 ## Evidence
+### 16d-2
+**Tests:** the route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first: `npx vitest run src/app/api/substrings --no-file-parallelism`, 14 passed, at their first run. `npx playwright test e2e/play2.e2e.ts`: 4 passed: signed out, no puzzle, a whole day, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 20 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
+
+**Seen on screen,** with the real dictionary, at 1280 and 390 wide, from throwaway tests: `Plant` accepted and shown `plant`; `well---` refused with "Needs the letters nt."; a missed round offering `viola, savior, violas`. They showed two top-level headings, now one.
+
 ### 16d-1
 **Tests:** written first, and they failed (`relation "private.dictionary_word" does not exist`; `Cannot find module './substring-try'`). `npx supabase test db`: `Files=36, Tests=616`, `Result: PASS`, with game 1's test files unchanged but one: `plor_app_role.test.sql`'s exact grant list gains the three approved grants, which is that test's purpose. `npx vitest run src/game/substring-try.test.ts src/game/substring-judge.db.test.ts --no-file-parallelism`: 22 passed. `npm test`: `Test Files 53 passed (53)`, `Tests 603 passed (603)`. `npx eslint` and `npx tsc --noEmit -p .` are clean.
 
