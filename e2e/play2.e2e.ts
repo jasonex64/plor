@@ -126,11 +126,11 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await next.click();
   await expect(page.getByText("qnp", { exact: true })).toBeVisible();
 
-  // So does the clock reaching zero, with no reload.
-  await DB.query("update private.question_open set opened_at = opened_at - interval '18 seconds' where game_id = 'substrings' and question_idx = 2");
+  // So does the clock reaching zero, with no reload. Six seconds are left, as the reload has to land inside them.
+  await DB.query("update private.question_open set opened_at = opened_at - interval '14 seconds' where game_id = 'substrings' and question_idx = 2");
   await page.reload();
   await expect(page.getByText("qnp", { exact: true })).toBeVisible();
-  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 6000 });
+  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 8000 });
   await next.click();
   await expect(page.getByText("qrs", { exact: true })).toBeVisible();
 
