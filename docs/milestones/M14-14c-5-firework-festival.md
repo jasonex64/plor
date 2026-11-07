@@ -1,6 +1,6 @@
 # M14 — 14c-5, Afterglow becomes a firework festival
 
-**Status:** in progress, version 7 (round 8) published to the private page 2026-11-06; the human's look at it is done for now (human, 2026-11-07: "mark it done and then move on, i might revisit it alter"), and the broken-build tests are run; a fresh review, the Source diff and the human's phone test still to come (drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start").
+**Status:** in progress. Version 7.1 is on the private page (2026-11-07), reviewed twice, with the second review's 8 blockers fixed or settled by the human (answers 41 to 44). Waits on the human: a real-phone test, and `git rm` of the three files in B3 and B4. Then the build into `/play`, the next sub-ticket. (Drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start".)
 
 ## Goal
 Redesign Afterglow on its private page as a walk through a firework festival, where each answer charges up and rockets the view into the sky, so the human can approve the game's look before it goes into `/play`.
@@ -105,6 +105,14 @@ Research behind answer 40 (2026-11-06), from retail and trade glossaries that di
 - https://epicfireworks.com/blogs/news/the-art-and-science-of-the-kamuro-firework-effect
 - https://www.mentalfloss.com/article/31097/names-10-fireworks-effects
 
+### Round 9 (human, 2026-11-07, after the second review)
+Version 7: "mark it done and then move on, i might revisit it alter".
+
+41. Frame rate: "59+ in real Chrome (Recommended)". `60 fps, whole run` is judged in real Chrome only, at 59 fps or more; headless prints its number and doesn't judge it. The line that adds a canvas read to every frame prints its number in real Chrome, where the read itself costs 30 ms or more, and is judged headless. This replaces the check's own 55 fps, which had no origin.
+42. Pre-draw stall: "Do it in the /play build (Recommended)". The 16.7 ms limit stays. Its failure on a PC in use is recorded as known, and the heavy steps are split when Afterglow goes into `/play`.
+43. Outline: "Keep the darker outline (Recommended)". Step 0 and the 7:1 floor are the human's (answer 37 took them from the check).
+44. The descent's buildings: "Accept it for now". Accepted without watching; the review's still frames and the check's edge line are all that has looked at it.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -161,29 +169,29 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 
 ## Acceptance criteria
 - [x] A still comp of the street at all seven questions, wide and phone, is approved by the human before any motion is built, with one of the simple and detailed versions chosen.
-- [ ] Nothing is lit at Q1, and each question's frame is brighter than the one before, with the biggest jumps at Q3 and Q6: a script reports the mean brightness of all seven.
-- [ ] Every background colour sits in the plum to amber family, and rarity's three colour ramps appear only on that rarity's text and firework: a script lists each colour's hue, and each frame's colour count.
-- [ ] Afterglow's page shows the festival at https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, with no harbour, keeper or tube.
-- [ ] On a phone and on 1920×1080, the buildings hold the edges and the middle widens: screenshots at both, nothing stretched.
-- [ ] Each question lands further along the street, and Q3 and Q6 are clearly major: screenshots at all seven.
-- [ ] The lettering's shape and size don't change through the charge, climb and burst: a script compares it.
-- [ ] The word's colour differs by rarity, and its rumble and flight differ a little: a script reports them for common, uncommon and rare.
-- [ ] The climb accelerates and then decelerates, on a path that sways: a script reports speed and sideways motion through the climb.
-- [ ] The burst lingers with visible change for as long as the button waits: a script compares frames over at least a minute.
-- [ ] Coming down, the buildings join with no chopped-off section: frames through the descent at both sizes, checked by a person.
-- [ ] A rare answer charges longer and climbs faster than a common one: a script reports both durations.
-- [ ] The burst differs by rarity in shape and by points in size: frames at common and rare, Q1 and Q7.
-- [ ] The fuse burns in step with the clock, and its sparks and shake grow near the end: a script reads its position at three times.
-- [ ] A dud, a time-out and a full run each reach the results: frames of each. A full run goes from Q7's result to the results in the same sky, with no descent: a script reads the phases and the burst.
-- [ ] There's no result card: the result is page text over the sky, and it fits on 390×844 and 1920×1080, the recap's seven rows included.
-- [ ] The launched word's cord is drawn from its rarity's ramp, and the prompt's fuse is unchanged: a script reads the cord's colours.
-- [ ] Every ending lists the run's answers, each row in its rarity's colour and outline with its points: a script reads the rows at a full run and a dud.
-- [ ] Art is never scaled outside the walk, and its pixels stay whole: the drawing-call log shows it. The view, each layer and the word land on whole screen pixels and glide through the slow parts of the climb and landing: a script reports the steps between frames at both ends of each.
-- [ ] The climb is longer and much faster: a script reports its seconds, floors and peak speed against version 5.
-- [ ] Word, tier name and points use one colour per rarity, and the burst matches: a script reports them, with each text colour's contrast against its outline.
-- [ ] Each newly taken letter gets its lantern, once, before the box and with the timer waiting, and its caption fits: frames at both sizes, for Q2, Q4, Q5 and Q7, and none at Q1, Q3 or Q6.
-- [ ] 60 fps in desktop Chrome at both sizes, under 16.7 ms on average, and the human checks a real phone.
-- [ ] No console errors, one font, and the checks are proved with broken builds.
+- [x] Nothing is lit at Q1, and each question's frame is brighter than the one before, with the biggest jumps at Q3 and Q6: a script reports the mean brightness of all seven.
+- [x] Every background colour sits in the plum to amber family, and rarity's three colour ramps appear only on that rarity's text and firework: a script lists each colour's hue, and each frame's colour count.
+- [x] Afterglow's page shows the festival at https://claude.ai/artifact/D6rt1tR2oi463Zf5WxJ8yk, with no harbour, keeper or tube.
+- [x] On a phone and on 1920×1080, the buildings hold the edges and the middle widens: screenshots at both, nothing stretched.
+- [x] Each question lands further along the street, and Q3 and Q6 are clearly major: screenshots at all seven.
+- [x] The lettering's shape and size don't change through the charge, climb and burst: a script compares it.
+- [x] The word's colour differs by rarity, and its rumble and flight differ a little: a script reports them for common, uncommon and rare.
+- [x] The climb accelerates and then decelerates, on a path that sways: a script reports speed and sideways motion through the climb.
+- [x] The burst lingers with visible change for as long as the button waits: a script compares frames over at least a minute.
+- [ ] Coming down, the buildings join with no chopped-off section: frames through the descent at both sizes, checked by a person. *Accepted for now without being watched (answer 44); the check's edge line passes at both sizes.*
+- [x] A rare answer charges longer and climbs faster than a common one: a script reports both durations.
+- [x] The burst differs by rarity in shape and by points in size: frames at common and rare, Q1 and Q7.
+- [x] The fuse burns in step with the clock, and its sparks and shake grow near the end: a script reads its position at three times.
+- [x] A dud, a time-out and a full run each reach the results: frames of each. A full run goes from Q7's result to the results in the same sky, with no descent: a script reads the phases and the burst.
+- [x] There's no result card: the result is page text over the sky, and it fits on 390×844 and 1920×1080, the recap's seven rows included.
+- [x] The launched word's cord is drawn from its rarity's ramp, and the prompt's fuse is unchanged: a script reads the cord's colours.
+- [x] Every ending lists the run's answers, each row in its rarity's colour and outline with its points: a script reads the rows at a full run and a dud.
+- [x] Art is never scaled outside the walk, and its pixels stay whole: the drawing-call log shows it. The view, each layer and the word land on whole screen pixels and glide through the slow parts of the climb and landing: a script reports the steps between frames at both ends of each.
+- [x] The climb is longer and much faster: a script reports its seconds, floors and peak speed against version 5.
+- [x] Word, tier name and points use one colour per rarity, and the burst matches: a script reports them, with each text colour's contrast against its outline.
+- [x] Each newly taken letter gets its lantern, once, before the box and with the timer waiting, and its caption fits: frames at both sizes, for Q2, Q4, Q5 and Q7, and none at Q1, Q3 or Q6.
+- [ ] 60 fps in desktop Chrome at both sizes, under 16.7 ms on average, and the human checks a real phone. *Real Chrome: 59.9 and 60.0 fps (Evidence). The phone test waits on the human.*
+- [x] No console errors, one font, and the checks are proved with broken builds.
 
 ## Out of scope
 - Building it into `/play` (the next sub-ticket).
@@ -196,12 +204,13 @@ Unchanged: the rules, the fixed HUD on its opaque panel, Handjet 400, 60 fps, a 
 | Value | Used for | Origin |
 |---|---|---|
 | 60 fps, 16.7 ms, Handjet 400, 20 s, 7 questions, the points | Unchanged | 14c-4 and the game's rules |
+| 59 fps or more, in real Chrome | Passing `60 fps, whole run` | Human, 2026-11-07 (answer 41) |
 | Q3 and Q6 | The major shifts | Human, 2026-11-05 (answer 1) |
 | About 292 art pixels across on a 390-wide phone | The art's detail | The figure in the question the human answered (answer 4); to be judged on the comp |
 | 960×540 on 1920×1080 (2 device pixels per art pixel) | The desktop art size | Proposed by Claude for the human to judge on the comp |
-| About 23 to 43 colours per frame, up to 70 briefly on arrival; hues from plum through red to amber, none outside | The tighter palette | Measured; human, 2026-11-05 (answer 25) |
-| Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
-| Each text's outline at step 0 of its rarity's ramp | 7:1 or better against its text | The existing check's floor; the swatch's step 1 gave about 5 to 6:1 (answer 37) |
+| About 23 to 43 colours per frame, up to 70 briefly on arrival; hues from plum through red to amber, none outside | The tighter palette | Measured on version 5; human, 2026-11-05 (answer 25). Version 7.1 measures 24 to 47 per frame, 54 to 70 on arrival, 254 across the run, hues 300° through 0° to 48.3° (`canvas colours listed`, 2026-11-07) |
+| Desktop art pixel size, building width, charge times, climb speeds, burst sizes, drift time, step distances, when the fuse's sparks grow, and every other constant marked "proposed, ticket 14c-5" in `game.js`, `street.js` and `check.mjs` (the ramps' hexes and `WORD_INK`, `RUMBLE`, `WOBBLE`, `GLITTER_*`, `TRAIL_*`, `LETTER_*`, `LANTERN_INK`, `POP_STEPS`, `PREDRAW_SLICE_MS`, `FRAME_SLACK_MS`, `EDGE_RUN` and the rest) | The review page only | **Proposed by Claude for the human to judge on the page**; not carried into the app without the human's word |
+| Each text's outline at step 0 of its rarity's ramp | 7:1 or better against its text | Human, 2026-11-07 (answer 43). Before that it was the check's own floor, with no origin; the swatch's step 1 gave about 5 to 6:1 (answer 37) |
 | Cord in steps 0, 1 and 3 of its rarity's ramp | The word's box | Row P of the swatch the human chose (answer 36) |
 | 0.5 s out, 0.5 s in | Q7's text fading to the results | **Proposed by Claude for the human to judge on the page** |
 | "See results", "Show's over", "Seven shells up, and the street stayed to watch." | The button, heading and line at a full run's end | **Proposed by Claude for the human to judge on the page**; "Show's over" was the example in the question (answer 39) |
@@ -224,6 +233,7 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 - The fixed 640×360 buffer, on this theme.
 - `themes/afterglow/`, the old harbour theme (recoverable from git in the mocks folder).
 - Round 8: the finale, its shells, flash and constants, `glowFor`'s steps option, and the check lines and mutants that tested them.
+- Version 7.1: the word box's pill outliving the run, the check's 55 fps floor (no origin), its swallowed answer errors, and stale outputs in the mocks folder's `themes/dist` (`tmp`, `tmp-review`, `_cr-*`, `_test*`, the harbour theme's check, shots and proof).
 
 ---
 *Fill in the sections below at the end.*
@@ -231,6 +241,12 @@ Experiment, step 3. Expected: 60 fps holds on desktop, because the art layers ca
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answer 37: the outline in the swatch's shade (step 1) | Step 0, the ramp's darkest | Step 1 reaches 5 to 6:1; the human kept the darker one and the 7:1 floor (answer 43) |
+| 14c-4: 60 fps, every frame under 16.7 ms | 59.9 to 60.0 fps in real Chrome, but a pre-draw slice reaches 17 to 42 ms with the PC in use (14 ms quiet) | The human moved splitting the heavy steps into the `/play` build (answer 42); `pre-draw never stalls a frame` stays red on a busy PC until then |
+| 14c-4: 60 fps, checked by script | Judged in real Chrome only, at 59 fps or more; headless prints its number | Answer 41: headless reads 52 to 58 fps on a busy PC while real Chrome holds 60 |
+| This ticket: the buildings join coming down, checked by a person | Full-size edge strips under the near buildings' scaled top; a check line measures it | Not watched by a person; accepted for now (answer 44) |
+| The criterion "each frame's colour count" | Count per frame, given as each phase's lowest and highest over the frames the check stops on | The check stops on frames; it doesn't read every frame drawn |
+| 14c-4's real-phone test | Not done | Waits on the human |
 
 ## Evidence
 **The still comp, waiting for the human's approval and their choice of version:** https://claude.ai/artifact/PGtsJ3r3ktqTHp9fcaoYVw, version 2 (private, 2026-11-05; source `themes/festival/` in the mocks folder, brief `BRIEF-2.md`). `node themes/festival/shots.mjs` ended "all checks pass". Mean brightness, Rec. 601 luma over the whole frame, Q1 to Q7:
@@ -268,11 +284,29 @@ Version 7, round 8, final state (page sha256 `e8c915f6773ef5c3…`, mocks commit
 - Stills read by the main session: `wide-results-end`, `phone-results-end`, `phone-q5-charge`: they hold. The fade and the feel of the ending can only be judged on a real screen.
 - The live page was compared byte for byte with a rebuild of version 6 before publishing: identical inside the publisher's wrapper, so nothing of anyone else's was overwritten.
 
+Version 7.1, after the second review (page sha256 `941ccc65a42cf0a6…`, mocks commit `fcc11e4`, published 2026-11-07; PC in use, Discord, NZXT CAM and Opera running):
+- `node themes/festival/check.mjs` (headless, final build): **227 pass, 1 fail, 2 printed, exit 1**. The fail is `wide pre-draw never stalls a frame`, worst 17.1 ms (answer 42). Printed, by answer 41: `60 fps, whole run` 59.9 fps wide, 57.4 phone.
+- `CHROME_CHANNEL=chrome node themes/festival/check.mjs _cr` (real Chrome, on the build before the last change, which only moves when the check's stop is tried): **226 pass, 2 fail, 2 printed**. `60 fps, whole run`: 59.9 fps wide (worst interval 52.8 ms), 60.0 phone (44.3 ms). The 2 fails are `pre-draw never stalls a frame`, 35.3 and 27.0 ms (answer 42). Printed: the frame with a canvas read added, 23.2 and 30.3 ms. An earlier real-Chrome run of 7.1 also failed phone `lettering never changes shape or size` (11736 px against 11738, as in version 6) and wide `Q3 and Q6 are major` (its answer timed out, fixed since); both pass on this run.
+- Each criterion ticked above has passing lines at both sizes in the final headless run. Among them: `brighter every step, biggest at Q3 and Q6, Q7 highest`, `each question lands further along`, `lettering never changes shape or size`, `the rumble differs by rarity`, `the path sways in an S-curve`, `the climb accelerates off the ground and slows to a hang`, `the burst lingers: frames still change after a minute` (66 s), `a better answer charges longer` (common 0.72 s, rare 1.94 s), `a better answer climbs faster`, `burst size follows points`, `the fuse burns in step with the seconds on screen`, `sparks grow near the end`, `the box shakes only near the end`, `a full run goes from Q7's result to the results, in the same sky`, `dud: charges, lifts a little, falls back, ends`, `time-out: ends on the street with play again`, `no result card: text on the sky`, `the results fit under the HUD`, `the word's box cord is drawn from its rarity's ramp`, `the recap lists all seven`, `each recap row wears its rarity's colour and outline`, `a dud's recap keeps the run's colours and outlines`, `grid: no forbidden call`, `glide: at the slow ends every layer steps under an art pixel`, `the climb is longer and much faster than version 5`, `the word's colour differs by rarity, readable` (8.4 to 10.4:1), `a lantern shows once at each newly taken letter`, `one font, in every element and every phase`, and the four `no console errors` lines. Full output: `themes/dist/game-check.json` in the mocks folder.
+- Mutants (`node themes/festival/mutants.mjs <name>`): the 3 new ones are caught. In their first run, under load, 2 were missed because the scripted run ended early ("ended on Q4 burst", "ended on asking Q7"). Cause, fixed in the check: at 3 to 4 times speed one long frame could carry a short phase past its stop or use up a question's timer. The check now plays at real speed into each answer, and the game's test stop is also tried before a tick that would end the phase. Re-run: both caught. With round 8's 83, that makes 86. The 83 were not run again on the check as changed today; its changes hold the run's stops and tighten lines rather than loosen them.
+- The second review's crash repro (a dud, New show, rotate, kite, Walk on): 337 page errors before the fix, 0 after.
+
 ## Review
 - Blocking findings and how each was fixed (first review, 2026-11-05: 10 blockers; a build with 11 defects passed every check line, so the checks must be rebuilt):
-  - B1, skipping all seven crashed the page. The finale's code that crashed is gone in version 7, and the check passes (`skipping all seven reaches the results`); the fresh review confirms.
-  - B2, play-again after a finale hid the result's answer line. The check passes in version 7 (`after a full run, a result keeps its answer line`); the fresh review confirms.
-  - B3 and B4, the harbour theme and the Simple comp files remain. Auto mode refused their deletion; waits on the human. `drawStreet`'s dead code is open.
-  - B5 to B9, check lines that claim more than they measure: burst on screen, walk zoom actually drawn, fuse against the seconds shown, the word during a time-out, colour on every phase, one font, Q1's tower. Open.
-  - B10, no live script lists hues and per-frame colours; the canvas measured 23 to 70 colours per frame against "about 32". Open; the number is settled (answer 25).
+  - B1 to B10, as the first review listed them: skipping all seven crashed; play-again hid the answer line; the harbour theme and comp files remained; five check lines claimed more than they measured; no script listed hues and per-frame colours. Their state is under the second review below.
+- Second review (fresh `reviewer`, 2026-11-07, on version 7): 8 blocking findings, each fixed or settled. Its check run gave 222 of 224, which disproved the "224 of 224" recorded in the round 8 Evidence.
+  - Resizing or rotating after a dud or typed time-out and New show killed the game (337 page errors in its repro). `playAgain` now clears the word box's pill with the answer. New line `a new size after New show plays on`, mutant "the box outlives the run". The repro gives 0 errors.
+  - `pre-draw never stalls a frame` fails with the PC in use, and "were load on the PC" was an inference. Measured per step (wide, PC in use): the deck's clouds 21.6 ms, a cloud 14.9, the palace 13.8, the lights 11.7, a building 11.1. Settled by answer 42: a known failure, fixed in the `/play` build.
+  - `60 fps, whole run` passed at 55 fps, a number with no origin. Settled by answer 41.
+  - No real-Chrome evidence for version 7. Run: 59.9 and 60.0 fps (Evidence).
+  - Coming down, the near buildings ended in a hard vertical edge: `game.js` drew their scaled layer above the frame with no edge margin. Fixed with full-size edge strips, as below the frame. New line `the near buildings reach the screen's edges coming down`: the longest run of rows stopping short is 9 to 32 with the strips, 99 to 152 without. Mutant "the near buildings stop short coming down". The person's look: answer 44.
+  - 7:1 had no origin: answer 43.
+  - About 60 constants marked "proposed" weren't in the Numbers: the catch-all row now names them.
+  - A dud's recap was read only at Q1, where it has one row. New line `a dud's recap keeps the run's colours and outlines` reads a dud after a safe answer, mutant "a dud's recap goes one colour".
+  - The Source diff, the ticks, this section and the handoff were stale: done here.
+- The first review's blockers, as the second review found them:
+  - B1, B2: fixed (`skipping all seven reaches the results`, `after a full run, a result keeps its answer line`).
+  - B3, B4: open, waiting on the human's `git rm` of `themes/afterglow/theme.js`, `themes/festival/comp.src.html` and `themes/festival/shots.mjs`. The last two call `drawStreet`, which no longer exists, so they are dead. Until then `node themes/build.mjs afterglow` would overwrite the festival's page with the harbour.
+  - B5 to B9: fixed. The lines read canvas pixels: the burst against the held sky, the walk's zoom fitted from pixels, the fuse's burnt cells against the seconds shown, the word and street held still in a time-out, colour sampled at 13 phases, every element's font, every lit piece at Q1.
+  - B10: fixed in substance, by `canvas colours listed` and `game-colours.json`; the wording is in the Source diff.
 - Deferred to ROADMAP "Next revision":
