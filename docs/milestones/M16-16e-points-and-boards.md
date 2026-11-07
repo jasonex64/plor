@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** planned: drafted from five rounds of the human's answers (2026-11-07), waiting for approval.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is in review.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -46,6 +46,10 @@ Round 5, the collisions:
 19. When places show: "Live, final at midnight". At once as "so far today", settled at midnight.
 20. During a run: "Word points and tracker". Each word's points right after it's accepted, and the letters used so far filling a tracker.
 
+On the draft:
+21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, to confirm before 16e-2:** every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
+22. This ticket: "Approve, build it".
+
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
 - Different letters in 7 random everyday words of 5 to 8 letters, 500 runs: 13 at least, 16 at the 10th percentile, 18 in the middle, 20 at the 90th, 22 at most. With 9 to 12 letters the middle is 19, at most 24.
@@ -59,15 +63,15 @@ These are random words, not real play: a real run's numbers come with the beta.
 - **Bonus letter:** 120 for each word holding it, once per word (answers 7, 11).
 - **Rounded** means two significant figures, and under 100 to the nearest 5, which gives the approved table (answer 13):
 
-  | Word letters | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
-  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-  | Points | 15 | 20 | 25 | 30 | 40 | 50 | 60 | 75 | 95 | 120 | 150 | 190 | 230 | 290 | 360 | 450 | 570 |
+  | Word letters | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | Points | 20 | 25 | 30 | 40 | 50 | 60 | 75 | 95 | 120 | 150 | 190 | 230 | 290 | 360 | 450 | 570 |
 
   | Different letters | 13 | 14 | 15 | 18 | 20 | 22 | 23 | 24 | 26 |
   |---|---|---|---|---|---|---|---|---|---|
   | Points | 170 | 200 | 230 | 350 | 460 | 610 | 700 | 810 | 1100 |
 
-  The sizes 20, 350 and 120 are Claude's (answer 12), so that a typical run, taken as 7 words of 7 letters with 18 different letters and the bonus letter in 3 words, splits about a third each: 350 + 350 + 360 = 1060. The 2-letter row and words over 18 letters follow the same rule; the table the human saw started at 3.
+  The sizes 20, 350 and 120 are Claude's (answer 12), so that a typical run, taken as 7 words of 7 letters with 18 different letters and the bonus letter in 3 words, splits about a third each: 350 + 350 + 360 = 1060. Words over 18 letters (the dictionary's shortest is 3, `DICTIONARY_MIN_LETTERS`) and fewer than 13 different letters follow the same rule.
 - Every round scores the same (answer 8), and a missed round scores nothing (S7).
 
 **During a run** (answer 20): after an accepted word, its points, with the bonus letter's 120 when it holds it, and a tracker of the 26 letters, those used so far marked. At the end: the words' points, the different letters cashed in, the bonus letter, and the total.
@@ -88,8 +92,8 @@ These are random words, not real play: a real run's numbers come with the beta.
 **Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 
 **PRs:**
-- **16e-1, the score:** the scoring function and its tests on hand-worked runs, the tunables, game 2's ledger rows, and the word points, tracker and end score on `/play2`.
-- **16e-2, places and game 2's boards:** the percentile and friend rank at the end of a run, and game 2's friends and group boards.
+- **16e-1, the score:** the scoring function and its tests on hand-worked runs, the tunables, and the word points, tracker and end score on `/play2`.
+- **16e-2, places and game 2's boards:** game 2's ledger rows, the percentile and friend rank at the end of a run, and game 2's friends and group boards. The ledger rows moved here from 16e-1 on building it, as their first reader is a board ("Build for today").
 - **16e-3, the overall board:** both views on the friends page and each group's.
 
 ## Acceptance criteria
@@ -97,10 +101,10 @@ These are random words, not real play: a real run's numbers come with the beta.
 - [ ] The score of each worked run in "Numbers" comes out exactly, by unit tests, and so does every cell of both tables above.
 - [ ] A word's points and the bonus letter's 120 show right after it's accepted, and the tracker marks its letters, by e2e.
 - [ ] The end of a run shows its three parts and total, by e2e, and they match the scoring function's.
-- [ ] A finished run and one left unfinished at midnight each get one ledger row with their total once the day is closed, and settling again writes nothing, by db tests.
-- [ ] Game 1's scoring, ledger and boards don't change: their tests pass unchanged.
+- [ ] Game 1's scoring and screens don't change: their tests pass unchanged.
 
 16e-2:
+- [ ] A finished run and one left unfinished at midnight each get one ledger row with their total once the day is closed, and settling again writes nothing, by db tests.
 - [ ] The percentile and its tie rule on hand-made days, live and final, by db tests: under 10 players the line is hidden, at 10 it shows.
 - [ ] Friend rank counts only the viewer and their friends who played that day, by route tests.
 - [ ] Game 2's friends and group boards add up daily percentiles, a group's from the day each member joined, by route tests.
@@ -141,8 +145,16 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 16e-1 writes game 2's ledger rows | 16e-2 does | Their first reader is a board ("Build for today"), noted under Design |
+| The tables stop at 18 letters and start at 13 different letters | The rule scores longer words and every count down to 1 | The full dictionary holds words over 18 letters, and a run can use fewer than 13 letters; the rule the tables came from covers them |
 
 ## Evidence
+### 16e-1
+- **Scoring,** written before the function: `npx vitest run src/game/substring-scoring.test.ts` failed (`Cannot find module './substring-scoring'`), then 12 passed: both tables cell by cell, the seven worked runs, a run with no word, and a word holding the bonus letter three times.
+- **Routes:** `npx vitest run src/app/api/substrings --no-file-parallelism`, 21 passed. A route test compared rounds exactly and failed on the new fields, as expected; it now checks a word's points, the bonus letter's 120 (`aqmjb`), and the end score, 70 + 120 + 65 = 255 for six letters.
+- **Screen:** `npx playwright test e2e/play2.e2e.ts --retries=0`, 5 passed: the tracker's count from 0 to 6, "You played aqmjb: 30 points, and 120 for the bonus letter.", and the end score's four numbers. The first two runs each had a failure in a step this change doesn't touch (sign-in's email poll, the lockout, a 30 s timeout on Today), with every test taking about twice as long as earlier; each passed when run again, alone or in full.
+- **Game 1 unchanged:** `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts --retries=0`: 19 passed, 2 failed in `shell.e2e.ts` waiting on a first visit to `/admin/puzzles` and a group's page; `npx playwright test e2e/shell.e2e.ts --retries=0` then passed 10 of 10.
+- `npm test`: 615 passed. `npm run build` lists `/play2`, `check:client-bundle` is OK, and `npx tsc --noEmit -p .` and `npx eslint` are clean.
 
 ## Review
 - Blocking findings and how each was fixed:
