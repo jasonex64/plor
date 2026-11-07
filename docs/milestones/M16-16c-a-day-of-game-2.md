@@ -94,7 +94,7 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 3. 16c-2, with Docker running, tests first, a review and a PR.
 
 ## Removes
-- `readDrafts`'s one hard-coded folder and `approve_puzzle`'s refusal of every other game.
+- `approve_puzzle`'s refusal of every other game.
 - `content-validate`'s treating every file as format 3.
 - From 16b, `check_question_open` and `run_status` stay for 16d.
 
@@ -104,12 +104,13 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| This ticket's Removes: `readDrafts`'s one hard-coded folder | `readSubstringDrafts` beside it | The two read different formats, and game 2's folder can be missing, as no day is committed, where game 1's can't. A shared reader would hold only the loop |
 | S21: "SCOWL size 35 or less" | Main spellings at that size only | The size alone made `clipt`, `thru` and `digged` everyday, and let `rhi`, the human's one miss, past the floor at 5 (review). The README's default list leaves such variants out |
 | This ticket's first plan: draw with `seed` from `src/content/bank.ts` | A SHA-256 of date, round and choice, lowest wins | `seed` steps evenly from date to date, and the tests showed a modulus draw changes other days after a veto |
 
 ## Evidence
 ### 16c-2
-**Tests:** written first. `npx supabase test db` failed on `puzzle_invalid: format 3 expected` until the migration. Then `Files=35, Tests=560`, `Result: PASS`, with `supabase/tests/puzzle_entry.test.sql`, game 1's approval tests, not edited. `npx vitest run src/app/api/admin/puzzles --no-file-parallelism`: 14 passed, including a list with no `content/substrings/` folder at all, as `readDrafts`' way of reading would have thrown there and taken the whole admin page down. `npx playwright test e2e/substring-days.e2e.ts e2e/approve-and-play.e2e.ts`: game 2's day seen and approved in a real browser, and game 1's approve-and-play passes unchanged. `npx eslint` and `npx tsc --noEmit -p .` are clean. `npm run content:validate` still shows `content` holding 1 day, so the tests left nothing behind.
+**Tests:** written first. `npx supabase test db` failed on `puzzle_invalid: format 3 expected` until the migration. Then `Files=35, Tests=560`, `Result: PASS`, with `supabase/tests/puzzle_entry.test.sql`, game 1's approval tests, not edited. `npx vitest run src/app/api/admin/puzzles --no-file-parallelism`: 14 passed. `npx vitest run src/admin/substrings.test.ts`: 8 passed, including no `content/substrings/` folder at all, as `readDrafts`' way of reading would have thrown there and taken the whole admin page down. `npx playwright test e2e/substring-days.e2e.ts e2e/approve-and-play.e2e.ts`: game 2's day seen and approved in a real browser, and game 1's approve-and-play passes unchanged. `npx eslint` and `npx tsc --noEmit -p .` are clean. `npm run content:validate` still shows `content` holding 1 day, so the tests left nothing behind.
 
 **`npm run test:db` here isn't evidence:** it fails on this PC in `offbeat` and `me`, with `expected [ { puzzle_date: '2026-11-01' } ] to deeply equal []`: the phone test's leftover days (HANDOFF), not this change. They weren't deleted, as that's the human's local data. CI's `db` job runs `test:sql` and `test:db` on a fresh stack, and is this ticket's evidence for Game 1's tests passing unchanged.
 
@@ -139,6 +140,12 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 **A real year, in memory, with the real code:** 52 batches, `days: 364, invalid: 0, gapProblems: 0`. *Hypothesis:* it fills, as the throwaway simulation did. Held. Pools for rounds 1 to 7: 126, 95, 283, 518, 505, 416, 659.
 
 ## Review
+- Blocking findings and how each was fixed (16c-2, the `reviewer` agent, 2026-11-07):
+  1. A redrafted day read "Approved." above letters players wouldn't get: the card shows the approved day, the redraft beside it and says so, by e2e.
+  2. The listing's branches had no test that could fail: `viewDays`, tested alone, and a route test for a started and a past day.
+  3. The missing-folder test would have failed once the first batch was committed: it runs in an empty temporary folder.
+  4. This ticket's Removes claimed a change not made: corrected, with a Source diff row.
+  The fix's first shape imported server code into the page, and `npm run build` refused it: `src/admin/substring-sets.ts` holds what both share.
 - Blocking findings and how each was fixed (16c-1, the `reviewer` agent, 2026-11-07):
   1. The mark covered rare variants, so `rhi` passed the floor: main spellings only, from the README, with a fetch.
   2. `add`'s merge had no test that could fail it: one for either order of a word's lines.

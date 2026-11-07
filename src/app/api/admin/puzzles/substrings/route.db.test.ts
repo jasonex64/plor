@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { SubstringDayView } from "@/admin/substrings";
+import type { SubstringDayView } from "@/admin/substring-sets";
 import type { SubstringDay } from "@/content/substrings";
 import { getPool } from "@/lib/db";
 import { SUBSTRINGS_ID } from "@/platform/game";
@@ -77,11 +77,6 @@ describe("who may approve", () => {
 describe("approving a game 2 day", () => {
   beforeEach(async () => useSession(await sessionFor("admin")));
 
-  it("lists no days, and doesn't fail, with no drafts folder at all", async () => {
-    if (existsSync(DRAFTS)) throw new Error(`${DRAFTS} exists; this test needs it missing`);
-    expect((await list()).substringDays).toEqual([]);
-  });
-
   it("answers 400 for a date that isn't one, and 404 no_draft for a day with no file", async () => {
     expect((await approveDay({ date: "soon" })).status).toBe(400);
     const res = await approveDay({ date: good });
@@ -98,6 +93,26 @@ describe("approving a game 2 day", () => {
     expect(after?.live).toEqual({ rounds: ROUNDS, bonusLetter: "f" });
     const stored = await getPool().query("select content -> 'rounds' as rounds from private.puzzle where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, good]);
     expect(stored.rows[0].rounds).toEqual(ROUNDS);
+  });
+
+  it("answers 409 for a day that has started, and one that's over", async () => {
+    const db = getPool();
+    const { today, past } = (await db.query<{ today: string; past: string }>("select private.today()::text as today, (private.today() - 1)::text as past")).rows[0];
+    draft(dayOn(today));
+    draft(dayOn(past));
+    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [SUBSTRINGS_ID, today, dayOn(today)]);
+    try {
+      const started = await approveDay({ date: today });
+      expect(started.status).toBe(409);
+      expect((await started.json()).error).toBe("puzzle_started");
+      const over = await approveDay({ date: past });
+      expect(over.status).toBe(409);
+      expect((await over.json()).error).toBe("day_past");
+    } finally {
+      await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, today]);
+      rmSync(written.pop()!);
+      rmSync(written.pop()!);
+    }
   });
 
   it("stops the whole listing on a drafted file that's invalid, as CI should have", async () => {

@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { DayView } from "@/admin/puzzles";
-import type { SubstringDayView } from "@/admin/substrings";
+import type { SubstringDayView } from "@/admin/substring-sets";
 import type { ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
 import { ButtonLink } from "../button-link";

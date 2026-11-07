@@ -717,6 +717,10 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] `readDays` and `--not`'s parsing have no tests; `content-validate`'s unknown-folder test asserts only `errors.length > 0`. Found in M16 16c-1 (review).
 - [ ] The main-spelling test has no case for a `†` after a mark, a `~` mark or a leading `-`: mutating those moves no everyday key on the pinned table, but a future table could. Found in M16 16c-1 (re-check).
 - [ ] 16c's "What Claude measured" still says five sets are refused: it's dated, and the Design has the two more. The human's answer on British spellings didn't name the 20 keys main only in Z, C or D (`bandana`, `dreamt`, `racquet`), which count too. Found in M16 16c-1 (re-check).
+- [ ] `tomorrowOf` and the days-ahead count stay game 1 only, so a missing game 2 day warns nobody: sound until 16d lets anyone play one. For 16d. Found in M16 16c-2 (review).
+- [ ] "Live: players have started it." on a game 2 card isn't true before 16d. Found in M16 16c-2 (review).
+- [ ] The 30-day repeat reads files only, so a day's sets changed after approval leave the old approved ones out of view while they stay stored. Found in M16 16c-2 (review).
+- [ ] `approve_puzzle` holds a game 2 day to its format only, and a JSON string "1" passes too: the route is the only caller. `next.config.ts`'s comment above the file traces still names only `content/offbeat`. Found in M16 16c-2 (review).
 - [ ] Also in the pools, all ordinary words: `hoe`, `pee`, `poo`, `pus`, `die`, `war`. The human sees each day before approving it. Found in M16 16c-1 (review).
 - [ ] **For the human:** the table's README is read from `en-wl/wordlist`, branch `v2`, unpinned, and it isn't in SOURCES.md; only a human adds a source (with the SCOWL row's item above). Found in M16 16c-1.
 - [ ] **After the beta:** real results correct what counts as a hard substring, starting from the word-list measure (human, 2026-11-06: "Yes, after the beta (Recommended)"; M16 S21). Accepted words are kept in `round_word`, so the data exists once 16d does.

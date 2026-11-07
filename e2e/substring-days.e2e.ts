@@ -10,15 +10,17 @@ import { RUN, signInAndPick } from "./players";
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const DRAFTS = join(process.cwd(), "content", "substrings");
 const ROUNDS = ["ou", "lu", "att", "yin", "odo", "hec", "vet"];
+const REDRAFT = ["nt", "mu", "cen", "bin", "agr", "ipt", "vio"];
 let ahead = "";
 let draftFile = "";
+const dayFile = (rounds: string[], bonus_letter: string) => JSON.stringify({ format: 1, game_id: "substrings", date: ahead, rounds, bonus_letter });
 
 test.beforeAll(async () => {
   ahead = (await DB.query<{ d: string }>("select (private.today() + 430)::text as d")).rows[0].d;
   mkdirSync(DRAFTS, { recursive: true });
   draftFile = join(DRAFTS, `${ahead}.json`);
   if (existsSync(draftFile)) throw new Error(`${draftFile} exists; this test writes its own draft there`);
-  writeFileSync(draftFile, JSON.stringify({ format: 1, game_id: "substrings", date: ahead, rounds: ROUNDS, bonus_letter: "f" }));
+  writeFileSync(draftFile, dayFile(ROUNDS, "f"));
 });
 
 test.afterAll(async () => {
@@ -49,5 +51,18 @@ test("an admin sees a drafted game 2 day and approves it", async ({ browser }) =
   expect(stored.rows[0].bonus).toBe("f");
 
   await admin.reload();
-  await expect(games.getByRole("group", { name: dayText(ahead) }).getByText("Approved.")).toBeVisible();
+  const again = games.getByRole("group", { name: dayText(ahead) });
+  await expect(again.getByText("Approved.")).toBeVisible();
+
+  // A redraft of an approved day doesn't pass as approved: players get the approved letters until it's approved again.
+  writeFileSync(draftFile, dayFile(REDRAFT, "z"));
+  await admin.reload();
+  await expect(again.getByText("Approved, but it has been redrafted.", { exact: false })).toBeVisible();
+  await expect(again.getByText("Bonus letter f")).toBeVisible();
+  await expect(again.getByText("Bonus letter z")).toBeVisible();
+  await again.getByRole("button", { name: "Approve again" }).click();
+  await expect(again.getByRole("status")).toHaveText("Approved.");
+  await expect(again.getByText("Bonus letter f")).toBeHidden();
+  const replaced = await DB.query("select content ->> 'bonus_letter' as bonus from private.puzzle where game_id = 'substrings' and puzzle_date = $1::date", [ahead]);
+  expect(replaced.rows[0].bonus).toBe("z");
 });

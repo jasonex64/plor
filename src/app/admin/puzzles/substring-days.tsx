@@ -4,7 +4,7 @@
 // letters and its bonus letter, approved one day at a time (human, 2026-11-07: "Each day on its own (Recommended)").
 // The word counts are in the batch's PR ("Counts in the PR, approve on page (Recommended)").
 import { useState } from "react";
-import type { SubstringDayView } from "@/admin/substrings";
+import { setsDiffer, type SubstringDayView, type SubstringSets } from "@/admin/substring-sets";
 import { ApiError, api } from "@/lib/api-client";
 import { dayText } from "../../day-text";
 import { errorText } from "../../messages";
@@ -26,11 +26,19 @@ export function SubstringDays({ days, onApproved }: { days: SubstringDayView[]; 
 
 function Day({ day, onApproved }: { day: SubstringDayView; onApproved: () => void }) {
   const editable = day.draft !== null && !day.started;
-  const shown = editable ? day.draft! : (day.live ?? day.draft)!;
+  // What players get is what's approved: a redraft shows beside it, and only Approve again makes it theirs.
+  const stored = day.live ?? day.draft!;
+  const redrafted = editable && day.live !== null && setsDiffer(day.live, day.draft!);
   const [problems, setProblems] = useState<string[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const state = day.started ? "Live: players have started it." : day.live ? "Approved." : "Draft, waiting for approval.";
+  const state = day.started
+    ? "Live: players have started it."
+    : redrafted
+      ? "Approved, but it has been redrafted. Players get the approved letters until you approve again."
+      : day.live
+        ? "Approved."
+        : "Draft, waiting for approval.";
 
   async function approve() {
     setBusy(true);
@@ -71,12 +79,22 @@ function Day({ day, onApproved }: { day: SubstringDayView; onApproved: () => voi
           ))}
         </ul>
       )}
+      <Sets label={redrafted ? "Approved" : null} sets={stored} />
+      {redrafted && <Sets label="Redrafted" sets={day.draft!} />}
+    </div>
+  );
+}
+
+function Sets({ label, sets }: { label: string | null; sets: SubstringSets }) {
+  return (
+    <>
+      {label && <p className={admin.note}>{label}</p>}
       <ol className={styles.rounds}>
-        {shown.rounds.map((set) => (
+        {sets.rounds.map((set) => (
           <li key={set} className={kit.chip}>{set}</li>
         ))}
       </ol>
-      <p className={admin.note}>Bonus letter {shown.bonusLetter}</p>
-    </div>
+      <p className={admin.note}>Bonus letter {sets.bonusLetter}</p>
+    </>
   );
 }

@@ -10,7 +10,7 @@
 // M14-14b-11-test-runs.md, answers 1 and 9).
 import { useCallback, useEffect, useState } from "react";
 import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
-import type { SubstringDayView } from "@/admin/substrings";
+import type { SubstringDayView } from "@/admin/substring-sets";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
 import { ButtonLink } from "../../button-link";

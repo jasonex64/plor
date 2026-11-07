@@ -8,9 +8,7 @@ import { checkSubstringsFile, parseSubstringDay, type SubstringDay } from "@/con
 import type { Db } from "@/lib/db";
 import { SUBSTRINGS_ID } from "@/platform/game";
 import { problemsOf } from "./puzzles";
-
-export type SubstringSets = { rounds: string[]; bonusLetter: string };
-export type SubstringDayView = { date: string; draft: SubstringSets | null; live: SubstringSets | null; started: boolean };
+import type { SubstringDayView, SubstringSets } from "./substring-sets";
 
 // Every drafted day in the deployment, by date. The folder is missing until the first day is drafted, which isn't a
 // fault; a file CI should have refused is, so it throws. The path is written out in full so the build can trace it
@@ -32,19 +30,22 @@ export function readSubstringDrafts(): Map<string, SubstringDay> {
 const sets = (day: SubstringDay): SubstringSets => ({ rounds: day.rounds, bonusLetter: day.bonus_letter });
 
 // Every day from today on that has a draft or an approved day, oldest first.
-export async function listSubstringDays(db: Db, drafts: Map<string, SubstringDay>): Promise<SubstringDayView[]> {
-  const today = (await db.query<{ today: string }>("select private.today()::text as today")).rows[0].today;
-  const live = await db.query<{ date: string; content: SubstringDay }>(
-    "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date >= private.today()",
-    [SUBSTRINGS_ID],
-  );
-  const approved = new Map(live.rows.map((r) => [r.date, r.content]));
+export function viewDays(today: string, drafts: Map<string, SubstringDay>, approved: Map<string, SubstringDay>): SubstringDayView[] {
   const dates = new Set([...approved.keys(), ...[...drafts.keys()].filter((d) => d >= today)]);
   return [...dates].sort().map((date) => {
     const draft = drafts.get(date);
     const day = approved.get(date);
     return { date, draft: draft ? sets(draft) : null, live: day ? sets(day) : null, started: day !== undefined && date <= today };
   });
+}
+
+export async function listSubstringDays(db: Db, drafts: Map<string, SubstringDay>): Promise<SubstringDayView[]> {
+  const today = (await db.query<{ today: string }>("select private.today()::text as today")).rows[0].today;
+  const live = await db.query<{ date: string; content: SubstringDay }>(
+    "select puzzle_date::text as date, content from private.puzzle where game_id = $1 and puzzle_date >= private.today()",
+    [SUBSTRINGS_ID],
+  );
+  return viewDays(today, drafts, new Map(live.rows.map((r) => [r.date, r.content])));
 }
 
 export async function approveSubstringDay(db: Db, userId: string, day: SubstringDay): Promise<string[]> {
