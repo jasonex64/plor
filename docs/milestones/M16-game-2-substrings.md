@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, merged on green CI 2026-11-06, 256,433 words; the split's questions answered, its order waiting on the human), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, merged on green CI 2026-11-06, 256,433 words; the split's questions answered and the order approved, "Approve, ask S18"; S18 partly settled), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Draft ticket for the human's approval. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name, S15, S17 and S18 are still open, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -65,8 +65,17 @@ Asked from a fresh grep at `98609f5`: `GAME_ID` is imported by 18 non-test files
 | S15 | Scoring numbers: points per letter of word length, the letter-variety bonus (per distinct letter, or at thresholds?), the highlighted-letter bonus | Open (human numbers) |
 | S16 | One highlighted letter for the whole day, or a new one each round? | "One per day" (human, 2026-11-06, 16b) |
 | S17 | How every game weighs the same in an overall score | Open. Claude's proposal is under "Comparing games" below |
-| S18 | Difficulty per round, all 7: which rounds use 2 letters, which 3, and each round's word-count band. Does a 2-letter substring also need a minimum count? Are the 500 and 100–200 counted in the S2 list (a bigger list gives every substring more words)? | Open (human numbers) |
+| S18 | Difficulty per round | **Partly settled (human, 2026-11-06).** Letters: "2, 2, then five of 3 (Recommended)". Words fitting rounds 1 to 7, counted in the S2 list: 5,000+ / 2,000-5,000 / 1,000-2,000 / 500-1,000 / 300-500 / 200-300 / 100-200: "steady climb, but this one doesnt have a penalty as in "end run" it just doesnt count for points yfm". A substring comes back after: "30 days (Recommended)". **Open:** S21, whether a floor of common words applies |
 | S19 | Punctuation: "punctuation shoudln't affect anything" and apostrophes and hyphens are accepted (human, 2026-10-22). Dropped before matching and not counted toward word length, so "it's" contains "ts" and scores as 3 letters: "Yes, ignore it (Recommended)" (human, 2026-11-05). Widened to everything but letters, digits, symbols and spaces too: "app3le" is apple (human, 2026-11-06; DECISIONS.md, Game 2) |
+| S20 | Possessives | "Not accepted at all" (human, 2026-11-06), to a question about `boss's` making "sss" look like a round. Possessive-only words leave the dictionary. **Still to settle:** contractions (`he's`, `that's`) look the same in the spellings, so the 2,126 possessive-only keys measured include them; whether the table tells them apart is *unverified* |
+| S21 | What "common" means here, and whether it's a floor | Open. The human (2026-11-06): "how would we determine what is "common" or "not common" especially if very few people play the game? can we set a baseline that makes sense? or should we just do it based off of length/# of unique letters", and asked for how it would be implemented. Real results correct it after the beta ("Yes, after the beta (Recommended)"). See "Measuring common words" below |
+
+## Measuring common words (S21)
+Measured 2026-11-06 on the 256,433-word snapshot, with throwaway scripts, on the steady climb's bands. "Everyday" means SCOWL size 35 or less, about 40,000 words; the sizes' meaning is from memory, and the README isn't read here, so it's *unverified*.
+- **The band alone isn't enough.** `cya` has 106 words and 1 everyday, `myc` 141 and 0, `oec` 118 and 0, so all three pass the 100-200 band. "iur" has 48 words and is outside it.
+- **Length and unique letters are weak stand-ins.** *Hypothesis:* they rank fragments differently from a known-word list. *Disproved by:* a length rule picking out the hard fragments as well as the list. *Result:* across the 732 fragments of the 100-200 band, rank agreement with the everyday count is 0.35 for words of 7 letters or fewer and 0.31 for 6 or fewer unique letters (1.0 would be the same order). Held. Short words are only somewhat more often everyday: 39% at 3 letters, 31% at 5, 18% at 8. Length does catch the extremes (`cya` 15 short words, `izz` 86), but it ranks `fly` with `izz` at 12 everyday words against 47, and `cyanate` and `cyanite` count as short.
+- **Possessives inflated counts.** *Hypothesis:* `sss` and `tys` stand high through possessives. *Result:* `sss` 158 to 7 words, `tys` 137 to 23, `shs` 126 to 13. Held. The other pools barely move.
+- **What each floor leaves,** with possessive-only words out, for the last round (100-200): any 732, 5 everyday words 663, 10 547, 15 412, 20 287, 30 96; for round 6 (200-300): 427, 418, 392, 349, 305, 217. Rounds 3 to 5 lose little at 20 or under. Samples, last round: 1-4 everyday `dys`, `myo`, `viz`; 5-9 `cht`, `gad`, `nep`; 10-14 `dup`, `lew`, `nil`; 15-19 `dry`, `sip`, `uds`; 20-29 `fee`, `pay`, `twe`.
 
 ## The dictionary (S2)
 Read on 2026-10-22; none of these is in SOURCES.md yet, and only a human adds one.
@@ -122,17 +131,17 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 |---|---|---|
 | Rounds per day | The day | 7 (human, 2026-10-22, S5; may change) |
 | Seconds per substring | Timer | 20 (human, 2026-10-22, S6: "for now") |
-| Substring length, first rounds | Picking substrings | 2 letters, "the first couple rounds" (human, 2026-10-22, S3); which rounds exactly is S18 |
-| Words containing a middle round's substring | Difficulty | more than 500 (human, 2026-10-22, S3); which round is S18 |
-| Words containing the last round's substring | Difficulty | "~100-200" (human, 2026-10-22, S3) |
-| The other rounds' lengths and bands | Difficulty | S18, open |
+| Letters per round | Picking substrings | 2, 2, 3, 3, 3, 3, 3 (human, 2026-11-06, S18: "2, 2, then five of 3 (Recommended)") |
+| Words fitting rounds 1 to 7 | Difficulty | 5,000+ / 2,000-5,000 / 1,000-2,000 / 500-1,000 / 300-500 / 200-300 / 100-200 (human, 2026-11-06, S18: "steady climb") |
+| Days before a substring returns | Picking substrings | 30 (human, 2026-11-06, S18: "30 days (Recommended)") |
+| Common words a substring must have | Difficulty | S21, open |
 | Points per letter, letter-variety bonus, highlighted-letter bonus | Scoring | S15, open |
 | Minimum players before a percentile is shown | Comparing games | S17, open |
 
 ## Plan
 Draft sub-tickets, for the human to reorder once the open decisions are answered.
 
-**Claude's proposal, for the human's approval (2026-11-06), piece by piece (answer 6):** each piece has its first caller in the piece, as a format or table with no caller breaks "Build for today". The first draft's 16b-to-16g order put the split before anything that uses it.
+**Claude's proposal, approved by the human (2026-11-06: "Approve, ask S18"), piece by piece (answer 6):** each piece has its first caller in the piece, as a format or table with no caller breaks "Build for today". The first draft's 16b-to-16g order put the split before anything that uses it.
 
 Non-visual, alongside M14:
 1. **16a, the dictionary,** done. **16b, the run model and format,** done. **16a-2, proper spellings,** done.
