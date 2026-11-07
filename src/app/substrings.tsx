@@ -90,21 +90,25 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (text.trim() === "" || trying.current) return;
+    if (trying.current) return;
+    if (text.trim() === "") {
+      setText("");
+      return;
+    }
     trying.current = true;
     const sent = text;
     try {
       const result = await api<RunResponse & { outcome: TryOutcome }>("/api/substrings/try", { method: "POST", body: { text: sent } });
       setError(null);
-      if (result.outcome === "empty") return;
       const why = WHY[result.outcome];
       if (why) {
         setReason(why(open.letters));
-        // The box clears for the next word, unless they've typed on since.
-        setText((now) => (now === sent ? "" : now));
-      } else {
+      } else if (result.outcome !== "empty") {
         onChange(result.run!);
+        return;
       }
+      // A try that didn't count leaves the box empty for the next word, unless they've typed on since (DECISIONS.md, Game 2).
+      setText((now) => (now === sent ? "" : now));
     } catch (err) {
       setError(errorText(err));
     } finally {

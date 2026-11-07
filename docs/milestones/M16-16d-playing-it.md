@@ -25,6 +25,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 6. Between rounds: "Hidden until Next (Recommended)". The letters appear with the clock.
 7. **Security,** the three things beyond 16b's tables: "Yes, approved (Recommended)". (1) `plor_app` may run the judge. (2) Each player sees and adds only their own words. (3) `check_question_open` learns game 2's rule, game 1's unchanged.
 8. This ticket: "Approve, build it".
+9. The box, asked on PR #163: "typing a refused word or something that doesn't register should clear the box". So a refused try clears it, a `locked` one included, and so does one with no letters, which used to stay.
 
 **A correction to answer 7, part (2):** Claude's question called these database rules. The app connects as one role, `plor_app`, as in game 1, so the database can't tell players apart: it's the routes, using the signed-in player's ID, that keep each to their own words. Built tighter than asked in one way: `plor_app` can read `round_word` but write neither it nor `round_reject`, so a word can only be added through the judge. Told to the human in the report on this PR.
 
@@ -114,12 +115,15 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 |---|---|---|
 | 16b: `plor_app` reads and inserts `round_word` and `round_reject`, and reads `dictionary_word` | It reads `round_word` and nothing else there | Narrower: the judge and `round_examples` are the only ways in |
 | 16d's Design: `dictionary_word (word_key, spelling)` in 16b | With `plain` and `everyday` | The shown spelling's steps and answer 5's examples need them. In the approved Design |
+| Game 1 keeps a refused text, selected | Game 2 clears the box | The human's answer 9 |
 | DECISIONS.md, Game 1: a run started before midnight can be finished after it | A game 2 run stops at midnight | No clock ends a run left between rounds, so it would block the next day |
 | 16b's outcomes | With `no_run`, and `empty` | A try on no run, and answer 4 |
 | 16b's judge takes "the try as typed and its `normalize` form" | The letters-only key, the cleaned text and that text with accents off | DECISIONS.md, Game 2, as 16a-2 changed it |
 
 ## Evidence
 ### 16d-2
+**The box (answer 9):** written before the fix, `npx playwright test e2e/play2.e2e.ts -g "a whole day" --retries=0` passed every refusal's `toHaveValue("")` and failed at `e2e/play2.e2e.ts:86`, on `123`, as expected: tries with no letters left their text. After it, `npx playwright test e2e/play2.e2e.ts --retries=0`: 5 passed.
+
 **Tests:** the first route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first; the review's were added after, and it showed by mutation what they had missed. `npx vitest run src/app/api/substrings --no-file-parallelism`: 20 passed. `npx playwright test e2e/play2.e2e.ts`: 5 passed: signed out, no puzzle, a whole day with each reason and both ways a clock ends, a tab left between rounds, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 21 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
 
 **Seen on screen,** with the real dictionary, at 1280 and 390 wide, from throwaway tests: `Plant` accepted and shown `plant`; `well---` refused with "Needs the letters nt."; a missed round offering `viola, savior, violas`. They showed two top-level headings, now one.

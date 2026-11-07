@@ -66,18 +66,25 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
     input.form!.requestSubmit();
   });
   await expect(reason).toHaveText("Not in the dictionary.");
+  await expect(box).toHaveValue("");
   // Within the lockout the box stays usable, and a try is refused unjudged.
   await box.fill("aqkb");
   await expect(box).toBeEnabled();
   await box.press("Enter");
   await expect(reason).toHaveText("Too quick. Try again in a moment.");
+  await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
   await box.fill("aqmb");
   await box.press("Enter");
   await expect(reason).toHaveText("Needs the letters qk.");
+  await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
-  await box.fill("  ");
-  await box.press("Enter");
+  // What doesn't register clears too, and costs no lockout, as the word after it shows.
+  for (const nothing of ["123", "  "]) {
+    await box.fill(nothing);
+    await box.press("Enter");
+    await expect(box).toHaveValue("");
+  }
   await box.fill("aqkqmb");
   await box.press("Enter");
 
@@ -93,6 +100,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await box.fill("aqkqmb");
   await box.press("Enter");
   await expect(reason).toHaveText("Already used.");
+  await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
 
   // A try past the clock moves the screen on, as the server says.
