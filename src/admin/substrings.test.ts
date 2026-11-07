@@ -19,8 +19,11 @@ describe("readSubstringDrafts", () => {
   it("finds no days, and doesn't fail, with no drafts folder at all", () => {
     const empty = mkdtempSync(join(tmpdir(), "plor-no-drafts-"));
     vi.spyOn(process, "cwd").mockReturnValue(empty);
-    expect(readSubstringDrafts().size).toBe(0);
-    rmSync(empty, { recursive: true });
+    try {
+      expect(readSubstringDrafts().size).toBe(0);
+    } finally {
+      rmSync(empty, { recursive: true });
+    }
   });
 });
 

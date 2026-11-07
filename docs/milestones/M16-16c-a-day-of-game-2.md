@@ -1,6 +1,6 @@
 # M16 16c — A day of game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is built and in review.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is done (PR #160, merged on green CI, 2026-11-07); 16c-2, approval, is built and in review, in PR #161.
 
 ## Goal
 Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
@@ -146,6 +146,7 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
   3. The missing-folder test would have failed once the first batch was committed: it runs in an empty temporary folder.
   4. This ticket's Removes claimed a change not made: corrected, with a Source diff row.
   The fix's first shape imported server code into the page, and `npm run build` refused it: `src/admin/substring-sets.ts` holds what both share.
+  The re-check (same agent, same day) found one more: the new 409 test wrote real files, so a committed batch would have broken CI's `db` job once its days reached today. The route's tests run in a temporary folder.
 - Blocking findings and how each was fixed (16c-1, the `reviewer` agent, 2026-11-07):
   1. The mark covered rare variants, so `rhi` passed the floor: main spellings only, from the README, with a fetch.
   2. `add`'s merge had no test that could fail it: one for either order of a word's lines.

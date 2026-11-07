@@ -1,6 +1,8 @@
 // Approving a day of game 2 against the local stack (`npm run test:db`; docs/milestones/M16-16c-a-day-of-game-2.md):
-// who may, and what's checked. The days are written to content/substrings for this file and removed afterwards.
-import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
+// who may, and what's checked. The days are written to a temporary folder, standing in for the deployment's, so a real
+// batch under content/substrings can't collide with today's or tomorrow's test day.
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SubstringDayView } from "@/admin/substring-sets";
@@ -16,7 +18,8 @@ vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextH
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
-const DRAFTS = join(process.cwd(), "content", SUBSTRINGS_ID);
+const ROOT = mkdtempSync(join(tmpdir(), "plor-substrings-"));
+const DRAFTS = join(ROOT, "content", SUBSTRINGS_ID);
 const ROUNDS = ["ou", "lu", "att", "yin", "odo", "hec", "vet"];
 let good = "";
 let bad = "";
@@ -29,9 +32,7 @@ const list = async () => (await (await GET(apiRequest("/api/admin/puzzles", { me
 const approveDay = (body: unknown) => approve(apiRequest("/api/admin/puzzles/substrings", { method: "POST", body }));
 
 function draft(day: SubstringDay) {
-  mkdirSync(DRAFTS, { recursive: true });
   const file = join(DRAFTS, `${day.date}.json`);
-  if (existsSync(file)) throw new Error(`${file} exists; this test writes its own draft there`);
   writeFileSync(file, JSON.stringify(day));
   written.push(file);
 }
@@ -45,14 +46,18 @@ async function sessionFor(role: "admin" | "player"): Promise<Map<string, string>
 }
 
 beforeAll(async () => {
+  mkdirSync(DRAFTS, { recursive: true });
+  // The listing reads game 1's folder too.
+  mkdirSync(join(ROOT, "content", "offbeat"));
+  vi.spyOn(process, "cwd").mockReturnValue(ROOT);
   useLocalStack();
   const dates = (await getPool().query<{ good: string; bad: string }>("select (private.today() + 420)::text as good, (private.today() + 421)::text as bad")).rows[0];
   ({ good, bad } = dates);
 });
 
 afterAll(async () => {
-  for (const file of written) rmSync(file);
-  if (existsSync(DRAFTS) && readdirSync(DRAFTS).length === 0) rmdirSync(DRAFTS);
+  vi.restoreAllMocks();
+  rmSync(ROOT, { recursive: true });
   const db = getPool();
   await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = any($2::date[])", [SUBSTRINGS_ID, [good, bad]]);
   await db.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
