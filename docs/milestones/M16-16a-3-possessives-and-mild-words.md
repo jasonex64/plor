@@ -1,6 +1,6 @@
 # M16 16a-3 — Possessives out, ordinary and mild words back
 
-**Status:** in review: approved ("Approve, build it", 2026-11-06), built, fetched on the Windows PC.
+**Status:** done: approved ("Approve, build it", 2026-11-06), built, fetched on the Windows PC and reviewed, in PR #159, which merges on green CI at the human's "Merge when green".
 
 ## Goal
 Finish game 2's word list: take possessives out, keep contractions, and bring back the ordinary and mild words the offensive filter caught.
