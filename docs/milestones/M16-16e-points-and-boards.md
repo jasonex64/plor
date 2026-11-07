@@ -47,7 +47,7 @@ Round 5, the collisions:
 20. During a run: "Word points and tracker". Each word's points right after it's accepted, and the letters used so far filling a tracker.
 
 On the draft:
-21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, to confirm before 16e-2:** every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
+21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, confirmed** ("yes thats right"): every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
 22. This ticket: "Approve, build it".
 
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
@@ -85,9 +85,9 @@ These are random words, not real play: a real run's numbers come with the beta.
 
 **The boards** (answers 4, 15, 18):
 - Game 1's friends board, group boards and yesterday's standings stay as they are, adding up raw points.
-- Game 2 gets the same boards, each day counting as that day's percentile, 0 to 100, added up over the week. A day under 10 players still counts (answer 17).
+- Game 2 gets the same boards, each day counting as that day's percentile, 0 to 100, added up over the week, from that day's midnight (answer 21). A day under 10 players still counts (answer 17).
 - The overall board, on the friends page and each group's, shows both views (answer 2): **Sum** adds each day's percentile in each game played, so playing both games counts; **Average** divides that by the number of game-days played.
-- **For the human (a collision):** answer 19 asks for places live. Game 2's live places are cheap, as its score is final once a word is in. But game 1's points, including its rarity bonus, only become final at midnight, so the overall board would mix final and moving numbers. **Claude's proposal:** game 2's own board shows today "so far"; the overall board, like game 1's, counts a day from midnight on.
+- **For the human (a collision):** answer 19 asks for places live. Game 2's live places are cheap, as its score is final once a word is in. But game 1's points, including its rarity bonus, only become final at midnight, so the overall board would mix final and moving numbers. **Settled** (answer 21): every board, game 2's own included, counts a day from midnight on, like game 1's; the end of a run's "better than X%" and friend rank are the live "so far" numbers.
 
 **Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 
