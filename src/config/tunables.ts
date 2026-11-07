@@ -166,3 +166,25 @@ export const UNDO_SECONDS = 5;
 // shortest word (human, 2026-11-05: "3 letters or more (Recommended)").
 export const DICTIONARY_MAX_SIZE = 85;
 export const DICTIONARY_MIN_LETTERS = 3;
+// A word is everyday from this size down, which is what keeps a round fair: players never see it (human, 2026-11-06,
+// M16 S21: the everyday list, "Yes, use that").
+export const DICTIONARY_EVERYDAY_SIZE = 35;
+
+// A day of game 2 (docs/milestones/M16-16c-a-day-of-game-2.md, Numbers). Each round's letters and how many dictionary
+// words hold its set (human, 2026-11-06, S18: "2, 2, then five of 3 (Recommended)", "steady climb"). A band holds its
+// lower number and not its upper, as the human's bands touch (Claude's reading, in the ticket).
+export const SUBSTRING_ROUNDS = [
+  { letters: 2, atLeast: 5000, below: Infinity },
+  { letters: 2, atLeast: 2000, below: 5000 },
+  { letters: 3, atLeast: 1000, below: 2000 },
+  { letters: 3, atLeast: 500, below: 1000 },
+  { letters: 3, atLeast: 300, below: 500 },
+  { letters: 3, atLeast: 200, below: 300 },
+  { letters: 3, atLeast: 100, below: 200 },
+] as const;
+// The fewest everyday words a set must have (human, 2026-11-06, S21: "At least 5 (Recommended)").
+export const SUBSTRING_EVERYDAY_FLOOR = 5;
+// The fewest days between two uses of a set (human, 2026-11-06, S18: "30 days (Recommended)").
+export const SUBSTRING_REPEAT_GAP_DAYS = 30;
+// Days one draft makes (human, 2026-11-07: "7 days (Recommended)").
+export const SUBSTRING_BATCH_DAYS = 7;

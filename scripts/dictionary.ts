@@ -3,7 +3,7 @@
 // Sources are untrusted input from the network, so a changed file stops the fetch instead of changing the game.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { DICTIONARY_MAX_SIZE, DICTIONARY_MIN_LETTERS } from "../src/config/tunables.ts";
+import { DICTIONARY_EVERYDAY_SIZE, DICTIONARY_MAX_SIZE, DICTIONARY_MIN_LETTERS } from "../src/config/tunables.ts";
 import { normalize } from "../src/content/puzzle.ts";
 import { isListed, isListedWord } from "../src/game/misses.ts";
 
@@ -26,7 +26,7 @@ export const DICTIONARY_DROP_FILE = "data/dictionary-drop.json";
 // so the answer base and misses stay as strict as they were.
 export const DICTIONARY_ALLOW_FILE = "data/dictionary-allow.json";
 
-export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out, but for the words in ${DICTIONARY_ALLOW_FILE}`;
+export const DICTIONARY_METHOD = `ENABLE, Moby's crosswd.txt and crswd-d.txt, and the English Speller Database's scowl.txt to size ${DICTIONARY_MAX_SIZE} (SOURCES.md, pinned by SHA-256), through normalize, each word kept with every proper spelling its sources hold, lower-case; a to z, ${DICTIONARY_MIN_LETTERS} letters or more; no proper nouns, abbreviations, possessives, word parts or misspellings; every SCOWL group holding a listed word, a word in ${DICTIONARY_DROP_FILE}, or an offensive or vulgar note is out, but for the words in ${DICTIONARY_ALLOW_FILE}; a word on a line of size ${DICTIONARY_EVERYDAY_SIZE} or less is marked everyday`;
 
 // One group is one sense of a word (the table's README, "GROUP"). `words` are the ones a player may type; `all` is
 // every spelling the table stands behind, kept so one listed word takes its whole group with it. A form marked "!"
@@ -35,7 +35,9 @@ export type ScowlGroup = { words: DictionaryEntry[]; all: string[]; marked: bool
 
 // A word a player may type: `key` is what a try is matched on, `spelling` the proper word the screen shows
 // (docs/milestones/M16-16a-2-proper-spellings.md; DECISIONS.md, Game 2, "Matching and showing").
-export type DictionaryEntry = { key: string; spelling: string };
+// `everyday` is set only on a word from a table line of size DICTIONARY_EVERYDAY_SIZE or less: the picker's measure of
+// a fair round, never shown (M16 S21).
+export type DictionaryEntry = { key: string; spelling: string; everyday?: true };
 
 // Not words a player would type (README, "POSes"), and classes that mark proper nouns the capital check can miss.
 const NOT_WORDS = new Set(["abbr", "pre", "suf", "wp", "we", "x"]);
@@ -113,7 +115,7 @@ function readLine(line: string): (ScowlGroup & { outOfPlay: boolean }) | null {
   const misspelt = variant !== null && variant[1].split(" ").every((v) => v.endsWith("x"));
   const proper = PROPER_TAGS.test(info) || PROPER_CLASSES.has(posClass ?? "") || /[A-Z]/.test(lemmaText);
   if (size > DICTIONARY_MAX_SIZE || misspelt || proper || NOT_WORDS.has(pos ?? "")) return { words: [], all, marked, outOfPlay };
-  const words = forms.filter((w) => !/[A-Z]/.test(w) && (KEEPS_ITS_APOSTROPHE.has(pos ?? "") || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []);
+  const words = forms.filter((w) => !/[A-Z]/.test(w) && (KEEPS_ITS_APOSTROPHE.has(pos ?? "") || !POSSESSIVE.test(w))).flatMap((w) => playable(w) ?? []).map((entry) => (size <= DICTIONARY_EVERYDAY_SIZE ? { ...entry, everyday: true as const } : entry));
   return { words, all, marked, outOfPlay };
 }
 
@@ -156,7 +158,10 @@ export function buildDictionary(plainLists: string[][], groups: ScowlGroup[], dr
     if (group.marked || group.all.some(held)) for (const word of group.all) blocked.add(word);
   }
   const entries = new Map<string, DictionaryEntry>();
-  const add = (entry: DictionaryEntry) => entries.set(`${entry.key} ${entry.spelling}`, entry);
+  const add = (entry: DictionaryEntry) => {
+    const id = `${entry.key} ${entry.spelling}`;
+    entries.set(id, entries.get(id)?.everyday ? { ...entry, everyday: true } : entry);
+  };
   for (const list of plainLists) {
     for (const line of list) {
       const entry = line.trim() === "" ? null : playable(line.trim());

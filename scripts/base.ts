@@ -1033,7 +1033,7 @@ type Manifest = { set: string; source: Source | typeof WORD_LISTS; snapshot: str
 const manifestPath = (set: string) => join("data", "manifests", `${set}.json`);
 const snapshotPath = (set: string, snapshot: string) => join("data", "snapshots", set, `${snapshot}.json`);
 
-function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
+export function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
   const manifest = JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
   // A machine without the snapshots is told what to do, not given ENOENT (13e-5 second review; 13f-4c).
   if (!existsSync(snapshotPath(set, manifest.snapshot))) {
@@ -1504,7 +1504,7 @@ export function withMerges(items: Item[], into: Map<string, string>): Item[] {
 }
 
 const MARKS_SET = "wikidata-sameness";
-const DICTIONARY_SET = "dictionary";
+export const DICTIONARY_SET = "dictionary";
 const DICTIONARY: FetchDef<DictionaryEntry> = { source: WORD_LISTS, method: DICTIONARY_METHOD, fetch: () => fetchDictionary(download) };
 const wikidataSets = () => Object.entries(SETS).filter(([, d]) => d.source === "wikidata").map(([set]) => set);
 

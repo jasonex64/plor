@@ -127,6 +127,17 @@ describe("buildDictionary", () => {
     expect(() => buildDictionary([["calm"]], [], ["clam"])).toThrow(/clam matched nothing/);
   });
 
+  it("marks a word everyday from a table line of size 35 or less, whichever list also holds it", () => {
+    const groups = parseScowl("35: apple <n>\n\n36: mango <n>\n\n70 [moby] 35: kiwi <n>\n");
+    const built = buildDictionary([["apple", "plum"]], groups);
+    expect(built).toEqual([
+      { key: "apple", spelling: "apple", everyday: true },
+      { key: "kiwi", spelling: "kiwi", everyday: true },
+      { key: "mango", spelling: "mango" },
+      { key: "plum", spelling: "plum" },
+    ]);
+  });
+
   it("keeps an allowed word its list and group would take out, and only that word", () => {
     const table = parseScowl("60: finger <n>: fingers\n60: fingering <n>\n");
     const built = keys(buildDictionary([["finger", "fingers", "fingering"]], table, [], ["finger", "fingers"]));

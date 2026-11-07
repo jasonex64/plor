@@ -1,6 +1,6 @@
 # M16 16c — A day of game 2
 
-**Status:** draft, waiting on the human's approval.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16c-1, the mark, the format, CI and the picker, is in review; 16c-2, approval, is next and needs Docker running.
 
 ## Goal
 Make a real day of game 2: a command drafts a week of days under the human's rules, CI checks them, and the human approves each on the admin page, so they're stored in `private.puzzle`.
@@ -35,14 +35,14 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 
 **The day's format,** `src/content/substrings.ts`, as 16b set it: `{ format: 1, game_id: "substrings", date, rounds, bonus_letter }`. The checks: exactly 7 rounds of lower-case letters, 2, 2, 3, 3, 3, 3, 3 long; no round inside another; one lower-case bonus letter that's in no round; the path matches `game_id` and `date`.
 
-**CI.** `scripts/content-validate.ts` chooses its checks by each file's folder, and adds the 30-day repeat across `content/substrings/`. A folder that's neither game stops it, so a typo can't skip the checks.
+**CI.** `scripts/content-validate.ts` chooses its checks by each file's folder, and adds the 30-day repeat across `content/substrings/`. A file in a folder that's neither game fails game 1's path check, so a typo can't skip the checks.
 
 **The picker,** `npm run substrings -- draft <first date>`, in `scripts/substrings.ts`.
-- It reads the snapshot and the existing day files, with no database, and draws seven days in date order. The draw is seeded by the date, so a run can be repeated, using `seed` from `src/content/bank.ts`.
+- It reads the snapshot and the existing day files, with no database, and draws seven days in date order. Each draw gives every choice a SHA-256 of the date, round and choice, and takes the lowest, so a run can be repeated and a veto changes a draw only if the vetoed set had won. `seed` in `src/content/bank.ts` was the first plan, but its rolling sum moves by the same step from one date to the next, and a modulus reshuffles a round's every draw when one set goes.
 - For each round, it takes the sets of that round's length in its band, drops any with fewer than 5 everyday words, on an offensive list, used in the last 30 days, or overlapping that day's sets, and draws one. The bonus is drawn from the letters left.
 - A day with no pick stops the run loudly.
 - It writes `content/substrings/<date>.json` and prints a table for the PR: each round's set, word count, everyday count and sample words.
-- **A veto:** `--not <set>,…` redraws around sets the human turned down.
+- **A veto:** `--not <set>,…` redraws around sets the human turned down. **`--root <folder>`** writes elsewhere, so a trial leaves no day in `content/`.
 
 **Approval.**
 - `/admin/puzzles` lists both games' days. A game 2 day shows its 7 sets and bonus letter, with the same Approve button; the admin page isn't a player screen, so this stays clear of the `/play` build.
@@ -57,12 +57,12 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 
 ## Acceptance criteria
 16c-1:
-- [ ] `checkSubstringsFile` refuses each of: 6 rounds, a round of the wrong length, a capital, a round inside another, a bonus letter in a round, a wrong date, checked by tests.
-- [ ] `content:validate` passes a good day under `content/substrings/`, fails a bad one, fails a repeat within 30 days, and fails an unknown folder, checked by tests.
-- [ ] The picker refuses a set outside its band, one under the floor, one on an offensive list, a repeat and an overlap, each checked with a set just outside the rule on a hand-made word list.
-- [ ] The same date and word list give the same day, and `--not` changes only what it must.
-- [ ] A fetch on the Windows PC keeps 254,477 keys and 259,968 pairs, and reports how many are everyday, about 40,000.
-- [ ] A real 7-day draft into a scratch folder passes `content:validate`, and its table is in the Evidence.
+- [x] `checkSubstringsFile` refuses each of: 6 rounds, a round of the wrong length, a capital, a round inside another, a bonus letter in a round, a wrong date, checked by tests.
+- [x] `content:validate` passes a good day under `content/substrings/`, fails a bad one, fails a repeat within 30 days, and fails an unknown folder, checked by tests.
+- [x] The picker refuses a set outside its band, one under the floor, one on an offensive list, a repeat and an overlap, each checked with a set just outside the rule on a hand-made word list.
+- [x] The same date and word list give the same day, and `--not` changes only what it must.
+- [x] A fetch on the Windows PC keeps 254,477 keys and 259,968 pairs, and reports how many are everyday, about 40,000.
+- [x] A real 7-day draft into a scratch folder passes `content:validate`, and its table is in the Evidence.
 
 16c-2:
 - [ ] `approve_puzzle` stores a good game 2 day, and refuses a bad format and a non-admin, by pgTAP; game 1's approval tests pass unchanged.
@@ -102,8 +102,29 @@ On the 254,477-word snapshot, in a throwaway script, with the rules below. The e
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| This ticket's first plan: draw with `seed` from `src/content/bank.ts` | A SHA-256 of date, round and choice, lowest wins | `seed` steps evenly from date to date, and the tests showed a modulus draw changes other days after a veto |
 
 ## Evidence
+### 16c-1
+**Tests:** written first, and all failed (the modules didn't exist; `expected [ { key: 'apple', …(1) }, …(3) ] to deeply equal`). Two then caught real bugs in the first picker: a redraft counted the batch's own old days against it, and a veto reshuffled that round on every other day. Both are fixed, not the tests. `npx vitest run scripts/dictionary.test.ts scripts/content-validate.test.ts scripts/substrings.test.ts src/content/substrings.test.ts`: 87 passed. `npm test`: `Test Files 51 passed (51)`, `Tests 572 passed (572)`. `npx eslint` on `scripts`, `src/content`, `src/config` and `src/platform`, and `npx tsc --noEmit -p .`, are clean.
+
+**The fetch, on the Windows PC** (2026-11-07): `FETCHED dictionary: 259968 items, snapshot 2026-11-07`. *Hypothesis:* the same keys and pairs, about 40,000 everyday. *Disproved by:* any key or pair moving. *Result:* `pairs: 259968, keys: 254477, everydayKeys: 40956, sameAsBefore: true`. Held. The manifest's checksum is `d598956c…`.
+
+**A real week, into a scratch folder:** `npm run substrings -- draft 2026-12-01 --root <scratch>`: `DRAFTED 7 days, 2026-12-01 to 2026-12-07`, and `npm run content:validate -- <scratch>`, with `content/offbeat` and the bank copied in: `CONTENT OK`. `npm run content:validate` on the repo: `CONTENT OK content: 1 file(s)`, so no day was committed. One of the seven:
+
+**2026-12-06**, bonus letter `x`
+
+| Round | Letters | Words | Everyday | Samples |
+|---|---|---|---|---|
+| 1 | `nt` | 18126 | 2811 | ant, ants, aunt, bent |
+| 2 | `mu` | 2889 | 359 | mud, mug, mum, much |
+| 3 | `cen` | 1494 | 203 | cent, cents, scene, scent |
+| 4 | `bin` | 694 | 112 | bin, bind, bins, binds |
+| 5 | `agr` | 327 | 44 | agree, agreed, agrees, meagre |
+| 6 | `ipt` | 262 | 46 | clipt, dript, gript, script |
+| 7 | `iru` | 126 | 5 | sirup, virus, sirups, viruses |
+
+**A real year, in memory, with the real code:** 52 batches, `days: 364, invalid: 0, gapProblems: 0`. *Hypothesis:* it fills, as the throwaway simulation did. Held. Pools for rounds 1 to 7: 126, 95, 283, 519, 505, 418, 664.
 
 ## Review
 - Blocking findings and how each was fixed:
