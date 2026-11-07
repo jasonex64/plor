@@ -5,7 +5,7 @@
 // enforces it and a player can still type (M16 16b, answer 6). Between rounds the next letters stay hidden until Next
 // starts the clock (16d, answer 5). The end shows each round's word, and examples for one missed. There are no points
 // until 16e.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { SubstringRun, TryOutcome } from "@/game/substring-state";
 import { api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
@@ -36,8 +36,10 @@ export function SubstringsScreen() {
     try {
       setRun((await api<RunResponse>(path, { method: "POST" })).run);
       setError(null);
-    } catch (err) {
-      setError(errorText(err));
+    } catch {
+      // The screen is behind the server: a tab left between rounds overnight has no clock to bring it back, and its run
+      // isn't today's. Reading the day shows where things stand, or the error if that fails too.
+      load();
     }
   };
 
@@ -79,9 +81,14 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
   const [text, setText] = useState("");
   const [reason, setReason] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // A ref, not state: two Enters in one tick must see it. One try at a time, or the second comes back "locked" and hides
+  // why the first failed (16d, answer 3).
+  const trying = useRef(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (text.trim() === "" || trying.current) return;
+    trying.current = true;
     const sent = text;
     try {
       const result = await api<RunResponse & { outcome: TryOutcome }>("/api/substrings/try", { method: "POST", body: { text: sent } });
@@ -97,6 +104,8 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
       }
     } catch (err) {
       setError(errorText(err));
+    } finally {
+      trying.current = false;
     }
   }
 
@@ -143,8 +152,11 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
       <p className={styles.progress}>
         Round {run.rounds.length} of {run.total}
       </p>
-      <p>{last.word === null ? "Time's up." : `You played ${last.word}`}</p>
-      <button type="button" className={kit.primary} onClick={onNext}>
+      <p id="round-end" role="status">
+        {last.word === null ? "Time's up." : `You played ${last.word}`}
+      </p>
+      {/* Focus moves here as the box goes, so Enter goes on and a screen reader hears how the round ended. */}
+      <button type="button" className={kit.primary} autoFocus aria-describedby="round-end" onClick={onNext}>
         Next
       </button>
     </>

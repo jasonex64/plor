@@ -235,7 +235,7 @@ function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shel
     <>
       {shell}
       {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-      {path !== GAME.path && path !== SUBSTRINGS.path && <ClockBar up={path.startsWith(`${GAME.path}/`)} onTimeUp={timeUp} />}
+      {path !== GAME.path && <ClockBar up={path.startsWith(`${GAME.path}/`)} onTimeUp={timeUp} />}
       {streakError && <p role="alert">{streakError}</p>}
       {feedBeside(path, lost) && feedColumn && <FriendsFeed username={player.username} name={nameOf(player)} timeUps={timeUps} />}
     </>

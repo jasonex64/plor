@@ -6,7 +6,7 @@ import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
-const WORDS = ["aqkb", "aqmb", "aqyzb", "aqyzc", "aqyzd"];
+const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqyzb", "aqyzc", "aqyzd"];
 let today = "";
 
 const runOut = async () => {
@@ -55,8 +55,12 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(page.getByText("Bonus letter j")).toBeVisible();
   await expect(page.getByRole("timer")).toBeVisible();
 
+  // A second Enter on the way doesn't hide the reason behind the lockout's.
   await box.fill("zzzqqqzz");
-  await box.press("Enter");
+  await box.evaluate((input: HTMLInputElement) => {
+    input.form!.requestSubmit();
+    input.form!.requestSubmit();
+  });
   await expect(reason).toHaveText("Not in the dictionary.");
   // Within the lockout the box stays usable, and a try is refused unjudged.
   await box.fill("aqkb");
@@ -70,27 +74,45 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await page.waitForTimeout(600);
   await box.fill("  ");
   await box.press("Enter");
-  await box.fill("aqkb");
+  await box.fill("aqkqmb");
   await box.press("Enter");
 
-  // Between rounds there's no clock and no letters yet.
-  await expect(page.getByText("You played aqkb")).toBeVisible();
+  // Between rounds there's no clock and no letters yet, and Next has the focus, so Enter goes on.
+  await expect(page.getByText("You played aqkqmb")).toBeVisible();
   await expect(page.getByRole("timer")).toBeHidden();
   await expect(page.getByText("qm", { exact: true })).toBeHidden();
-  await page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next", exact: true }).click();
+  const next = page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next", exact: true });
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Enter");
   await expect(page.getByText("qm", { exact: true })).toBeVisible();
 
-  await box.fill("aqkb");
+  await box.fill("aqkqmb");
   await box.press("Enter");
-  await expect(reason).toHaveText("Needs the letters qm.");
+  await expect(reason).toHaveText("Already used.");
   await page.waitForTimeout(600);
 
-  // The rest run out, and the screen moves on when its clock reaches zero or on a reload.
-  for (let i = 1; i < 6; i++) {
+  // A try past the clock moves the screen on, as the server says.
+  await runOut();
+  await box.fill("aqmb");
+  await box.press("Enter");
+  await expect(page.getByText("Time's up.")).toBeVisible();
+  await next.click();
+  await expect(page.getByText("qnp", { exact: true })).toBeVisible();
+
+  // So does the clock reaching zero, with no reload.
+  await DB.query("update private.question_open set opened_at = opened_at - interval '18 seconds' where game_id = 'substrings' and question_idx = 2");
+  await page.reload();
+  await expect(page.getByText("qnp", { exact: true })).toBeVisible();
+  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 6000 });
+  await next.click();
+  await expect(page.getByText("qrs", { exact: true })).toBeVisible();
+
+  // The rest run out.
+  for (let i = 3; i < 6; i++) {
     await runOut();
     await page.reload();
     await expect(page.getByText("Time's up.")).toBeVisible();
-    await page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next", exact: true }).click();
+    await next.click();
     await expect(page.getByText(ROUNDS[i + 1], { exact: true })).toBeVisible();
   }
   await runOut();
@@ -98,8 +120,25 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
 
   const results = page.getByRole("list", { name: "Your rounds" });
   await expect(results.getByRole("listitem")).toHaveCount(7);
-  await expect(results.getByRole("listitem").first()).toContainText("aqkb");
+  await expect(results.getByRole("listitem").first()).toContainText("aqkqmb");
   await expect(results.getByRole("listitem").last()).toContainText("aqyzb, aqyzc, aqyzd");
+});
+
+test("a tab left between rounds finds the day it's in", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "pm");
+  await page.goto("/play2");
+  await page.getByRole("button", { name: "Start" }).click();
+  const box = page.getByLabel("Your word");
+  await box.fill("aqkb");
+  await box.press("Enter");
+  const game = page.getByRole("region", { name: "Game number 2" });
+  await expect(game.getByRole("button", { name: "Next", exact: true })).toBeVisible();
+  // As a new day leaves it: the run this screen shows isn't today's any more.
+  await DB.query("delete from private.run where game_id = 'substrings' and user_id = (select id from auth.users where email = $1)", [`${RUN}-pm@example.test`]);
+  await game.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(game.getByRole("button", { name: "Start" })).toBeVisible();
 });
 
 test("game 1 stays as it was", async ({ browser }) => {

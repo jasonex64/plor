@@ -57,6 +57,8 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 **A run belongs to its day** (Claude, found building it; the human can overrule): a run left unfinished at midnight stops there, unlike game 1's. Game 1's clock ends a left run, but a game 2 run left between rounds has none, so it would otherwise block the next day.
 
+**The feed:** `/play2` shows no feed column, as `/play` doesn't (`feedBeside`, `src/app/home.tsx`), since the feed is game 1's until 16f. Game 1's clock bar stays, so a question left in play keeps its clock (M14 L18).
+
 **The screen,** `/play2`, `src/app/substrings.tsx`, plain and using the kit, with no Moonbrew: the letters, the 20-second clock, the bonus letter, a text box that stays usable through the lockout, and the reason a try failed. Next between rounds. At the end, the plain results of answer 5, with no points (16e). A day with no game 2 puzzle says so. Signed out goes to sign-in, as `/play` does.
 
 **PRs.** 16d-1: `dictionary_word`, the load, the tables, the round rules and the judge. 16d-2: the record, the routes and the screen. The first plan's three became two, as the table's first caller is the judge.
@@ -118,7 +120,7 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 ## Evidence
 ### 16d-2
-**Tests:** the route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first: `npx vitest run src/app/api/substrings --no-file-parallelism`, 14 passed, at their first run. `npx playwright test e2e/play2.e2e.ts`: 4 passed: signed out, no puzzle, a whole day, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 20 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
+**Tests:** the first route and e2e tests were written alongside the routes, not before them, so they weren't seen to fail first; the review's were added after, and it showed by mutation what they had missed. `npx vitest run src/app/api/substrings --no-file-parallelism`: 20 passed. `npx playwright test e2e/play2.e2e.ts`: 5 passed: signed out, no puzzle, a whole day with each reason and both ways a clock ends, a tab left between rounds, and Today showing no second game. `npx playwright test e2e/play2.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts e2e/shell.e2e.ts`: 21 passed. `npm test`: 603 passed. `npx supabase test db`: `Files=36, Tests=616`, PASS. `npm run build` and `check:client-bundle` pass, and the build lists `/play2`.
 
 **Seen on screen,** with the real dictionary, at 1280 and 390 wide, from throwaway tests: `Plant` accepted and shown `plant`; `well---` refused with "Needs the letters nt."; a missed round offering `viola, savior, violas`. They showed two top-level headings, now one.
 
@@ -133,6 +135,13 @@ Make a stored day of game 2 playable from start to end at `/play2`, on a plain s
 
 
 ## Review
+- Blocking findings and how each was fixed (16d-2, the `reviewer` agent, 2026-11-07):
+  1. A tab left between rounds past midnight stranded the player: a refused Start or Next reads the day again, by e2e.
+  2. A double submit hid why a word failed behind "Too quick": one try at a time, by e2e.
+  3. Focus was lost between rounds, so Enter did nothing and a screen reader heard nothing: Next takes the focus and is described by how the round ended, by e2e.
+  4. "Each reason shown ... a timeout" was ticked but not met: "Already used.", a try past the clock, and the clock reaching zero with no reload are all in the e2e now.
+  5. Mutations showed paths untested: each player's words are told apart, and Next during round 1, `no_run`, `no_puzzle_today`, `client_outdated`, `already_answered`, `already_used` and a run left yesterday all have tests.
+  6. Two exclusions in `home.tsx` weren't in the ticket, and one changed M14 L18: game 1's clock bar is back, and the feed's is in the Design.
 - Blocking findings and how each was fixed (16d-1, the `reviewer` agent, 2026-11-07):
   1. A player with a word or a rejection couldn't delete their account: the foreign keys now cascade, as every other child of `run` does, tested through deleting the account.
   2. A second tap on Next raised `OB002`: the trigger lets it through to the route's `on conflict`, tested as a repeat.

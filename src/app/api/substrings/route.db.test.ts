@@ -17,7 +17,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 
 const RUN = Date.now().toString(36);
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
-const WORDS = ["aqkb", "aqmb", "aqnpb", "aqrsb", "aqtvb", "aqwxb", "aqyzb", "aqyzc", "aqyzd", "aqyzeeee"];
+const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqnpb", "aqrsb", "aqtvb", "aqwxb", "aqyzb", "aqyzc", "aqyzd", "aqyzeeee"];
 let today = "";
 const sessions = new Map<string, Map<string, string>>();
 
@@ -64,6 +64,19 @@ describe("who may play", () => {
     for (const res of [await GET(apiRequest("/api/substrings", { method: "GET" })), await startRun(), await send("x"), await nextRound()]) expect(res.status).toBe(401);
   });
 
+  it("answers client_outdated without the protocol header, on every route", async () => {
+    useSession(await sessionFor("a"));
+    const old = { protocol: null };
+    for (const res of [
+      await GET(apiRequest("/api/substrings", { method: "GET", ...old })),
+      await start(apiRequest("/api/substrings/start", { method: "POST", ...old })),
+      await tryWord(apiRequest("/api/substrings/try", { method: "POST", body: { text: "x" }, ...old })),
+      await next(apiRequest("/api/substrings/next", { method: "POST", ...old })),
+    ]) {
+      expect((await res.json()).error).toBe("client_outdated");
+    }
+  });
+
   it("answers 409 no_profile to a player with no username yet", async () => {
     useSession((await signIn(`${RUN}-new@example.test`)).session);
     const res = await startRun();
@@ -77,9 +90,10 @@ describe("a day of game 2", () => {
 
   it("says when there's no puzzle, and refuses to start", async () => {
     expect((await state()).run).toBeNull();
-    const res = await startRun();
-    expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("no_puzzle_today");
+    for (const res of [await startRun(), await send("x"), await nextRound()]) {
+      expect(res.status).toBe(404);
+      expect((await res.json()).error).toBe("no_puzzle_today");
+    }
   });
 
   it("shows nothing of the day before the run starts", async () => {
@@ -89,6 +103,13 @@ describe("a day of game 2", () => {
     const { run } = await state();
     expect(run).toMatchObject({ status: "not_started", total: 7, bonusLetter: null, open: null, rounds: [] });
     for (const letters of ROUNDS) expect(JSON.stringify(run)).not.toContain(`"${letters}"`);
+  });
+
+  it("answers no_run to a try or Next before the start", async () => {
+    for (const res of [await send("aqkb"), await nextRound()]) {
+      expect(res.status).toBe(404);
+      expect((await res.json()).error).toBe("no_run");
+    }
   });
 
   it("starts, with round 1's letters and no others", async () => {
@@ -103,6 +124,12 @@ describe("a day of game 2", () => {
   it("starting again returns the same run", async () => {
     const before = (await (await startRun()).json()) as Body;
     expect(before.run!.open!.index).toBe(0);
+  });
+
+  it("refuses Next during round 1", async () => {
+    const res = await nextRound();
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toBe("round_running");
   });
 
   it("answers 400 for a try that isn't text", async () => {
@@ -120,12 +147,16 @@ describe("a day of game 2", () => {
   it("ignores a try with no letters", async () => {
     expect((await sent("")).outcome).toBe("empty");
     expect((await sent("123")).outcome).toBe("empty");
-    expect((await sent("aqkb")).outcome).toBe("accepted");
+    expect((await sent("aqkqmb")).outcome).toBe("accepted");
+  });
+
+  it("refuses another word for a round that has one", async () => {
+    expect((await sent("aqkb")).outcome).toBe("already_answered");
   });
 
   it("hides the next letters until Next, and gives no clock between rounds", async () => {
     const { run } = await state();
-    expect(run).toMatchObject({ status: "in_progress", open: null, rounds: [{ letters: "qk", word: "aqkb", examples: [] }] });
+    expect(run).toMatchObject({ status: "in_progress", open: null, rounds: [{ letters: "qk", word: "aqkqmb", examples: [] }] });
     for (const letters of ROUNDS.slice(1)) expect(JSON.stringify(run)).not.toContain(`"${letters}"`);
   });
 
@@ -134,10 +165,25 @@ describe("a day of game 2", () => {
     await startRun();
     expect((await sent("aqkb")).word).toBe("aqkb");
     await nextRound();
+    expect((await state()).run!.rounds[0].word).toBe("aqkb");
     useSession(await sessionFor("a"));
-    expect((await state()).run!.open).toBeNull();
-    const words = await getPool().query("select count(*)::int as n from private.round_word w join auth.users u on u.id = w.user_id where u.email = $1", [`${RUN}-a@example.test`]);
-    expect(words.rows[0].n).toBe(1);
+    const { run } = await state();
+    expect(run!.open).toBeNull();
+    expect(run!.rounds[0].word).toBe("aqkqmb");
+  });
+
+  it("a run left unfinished yesterday leaves today fresh", async () => {
+    const db = getPool();
+    const yesterday = (await db.query<{ d: string }>("select (private.today() - 1)::text as d")).rows[0].d;
+    useSession(await sessionFor("c"));
+    await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [SUBSTRINGS_ID, yesterday, { format: 1, game_id: SUBSTRINGS_ID, date: yesterday, rounds: ROUNDS, bonus_letter: "j" }]);
+    await db.query("insert into private.run (user_id, game_id, puzzle_date) select id, $2, $3::date from auth.users where email = $1", [`${RUN}-c@example.test`, SUBSTRINGS_ID, yesterday]);
+    try {
+      expect((await state()).run).toMatchObject({ date: today, status: "not_started" });
+    } finally {
+      await db.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, yesterday]);
+      await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, yesterday]);
+    }
   });
 
   it("refuses Next while a round runs, and takes a second tap", async () => {
@@ -145,6 +191,11 @@ describe("a day of game 2", () => {
     expect(opened.open).toMatchObject({ index: 1, letters: "qm" });
     const again = ((await (await nextRound()).json()) as Body).run!;
     expect(again.open!.index).toBe(1);
+  });
+
+  it("says a word was already used this run", async () => {
+    expect((await sent("aqkqmb")).outcome).toBe("already_used");
+    await unlock();
   });
 
   it("keeps examples back until the run ends, then shows a missed round's", async () => {
@@ -161,7 +212,7 @@ describe("a day of game 2", () => {
     expect(ended.status).toBe("finished");
     expect(ended.open).toBeNull();
     expect(ended.rounds).toHaveLength(7);
-    expect(ended.rounds[0]).toEqual({ letters: "qk", word: "aqkb", examples: [] });
+    expect(ended.rounds[0]).toEqual({ letters: "qk", word: "aqkqmb", examples: [] });
     expect(ended.rounds[6]).toEqual({ letters: "qyz", word: null, examples: ["aqyzb", "aqyzc", "aqyzd"] });
   });
 
