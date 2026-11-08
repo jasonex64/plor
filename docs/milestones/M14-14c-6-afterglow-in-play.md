@@ -66,6 +66,9 @@ Round 8
 27. Approval: "Approve, start 6b-1 (Recommended)".
 28. Shake: "Same shake (Recommended)". Off-list text shakes the box as a refused taken letter does.
 
+Round 9 (a collision found while building)
+29. Q7's button: "Q7 says \"Walk on\" (Recommended)". After a safe Q7 the sky result's button is Walk on, as on Q1 to Q6, and the ending list fades in over the burst as in the mock; only the ending list's button says See results (answer 21), so a survivor doesn't tap See results twice.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
