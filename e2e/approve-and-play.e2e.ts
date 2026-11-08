@@ -106,10 +106,12 @@ test("a player survives all seven questions of a day, past the stolen letters", 
     await safe(page, answers[i]);
     if (i < answers.length - 1) await walkOn(page, FIXTURE[i + 1].prompt);
   }
-  // Q7's Walk on fades in the ending list (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 29); See results
-  // opens the cards.
+  // Q7's Walk on fades in the ending list, Show's over with all seven answers (docs/milestones/M14-14c-6-afterglow-in-play.md,
+  // answer 29); See results opens the cards.
   await skyResult(page).click();
   await expect(seeResults(page)).toBeVisible({ timeout: LAST_MS });
+  await expect(page.getByRole("heading", { name: "Show's over" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Your answers" }).getByRole("listitem")).toHaveCount(answers.length);
   await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
   // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
