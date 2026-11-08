@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); next 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); next 14c-6d, How to play, approved (answers 30 to 43), then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -18,6 +18,8 @@ Play the real game, every day's run, as Afterglow, the firework festival approve
 - Playwright (SOURCES.md), for the game's check moved into `e2e/`.
 - MDN, `prefers-reduced-motion` (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion), for the calm version (answer 18). It covers the setting and its `reduce` value, not reading it from script.
 - **Gap, for 14c-6c:** reading the setting from script needs `Window.matchMedia`, which neither that page nor SOURCES.md covers. Ask the human before 6c.
+- MDN `<dialog>` (SOURCES.md), for How to play's panel (14c-6d), as the settings sheet uses it.
+- WAI-ARIA APG Carousel pattern (SOURCES.md, added at answer 42), for How to play's chunks: "Terms", "WAI-ARIA Roles, States, and Properties", "Keyboard Interaction".
 
 ## Answers (human, 2026-11-07)
 Round 1
@@ -69,6 +71,30 @@ Round 8
 Round 9 (a collision found while building)
 29. Q7's button: "Q7 says \"Walk on\" (Recommended)". After a safe Q7 the sky result's button is Walk on, as on Q1 to Q6, and the ending list fades in over the burst as in the mock; only the ending list's button says See results (answer 21), so a survivor doesn't tap See results twice.
 
+For 14c-6d, How to play (human, 2026-11-08: "we also need a how to play button somewhere, maybe on the main game page. infomation should be displayed in concise chunks that have next arrows > to view the rest of it")
+
+Round 10
+30. Where: "Before Start, as now" and "On Today's game banner". The game screen keeps its How to play before Start, and Today's banner gets one, so a player with Skip the game screen on reaches it too.
+31. Chunks: "‹ › with dots (Recommended)". One chunk at a time, › for next and ‹ for back, dots for how many and where, and a close on the last.
+32. Look: "Afterglow's look (Recommended)". Pixel panels in Handjet, like the game.
+33. Words: "Today's rules, cut short (Recommended)". The same facts as the current page, one idea per chunk, plain words, drafted by Claude for the human's OK.
+
+Round 11
+34. Opens as: "A panel over the page". It opens over Today or the game screen without leaving it, closed by ×, with no address of its own.
+35. Backdrop: "Afterglow's plain dark". The game's background colour and the panel only, no street.
+36. Last chunk: "Only a close". How to play never starts the run.
+37. Order: "Before 6b-2 (Recommended)". Its own sub-ticket, 14c-6d, next.
+
+Round 12
+38. Chunk words: "Fewer, four chunks". The host and the run; time and typos; taken letters; points.
+39. Old page: "404, no redirect (Recommended)". `/afterglow/how-to-play` goes, as `/play`, `/offbeat` and `/updraft` did.
+40. On Today: "Under Play, smaller (Recommended)". A minor button under Play, before the run only.
+
+Round 13
+41. Approval: "Approve, start 6d (Recommended)".
+42. Source: "Yes, add the APG Carousel (Recommended)". Read 2026-11-08; in SOURCES.md.
+43. Words: "Use these four (Recommended)". The four chunks in Design, as drafted.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -109,6 +135,14 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 
 **The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build. The mock's Preview bar (its "skip ›" button) was a review aid and goes, with play again.
 
+**How to play (14c-6d).** One panel, opened by a How to play button before today's run has started: on the game screen above Start (in place of today's link) and on Today's banner under Play, smaller (answers 30, 40). It is a modal `<dialog>`, as the settings sheet is (MDN `<dialog>`, SOURCES.md): the page behind is inert, Escape or the × closes it, and focus goes back to the button that opened it (answer 34). It has Afterglow's look on Afterglow's plain dark: one pixel panel like the question box, at the box's width and type scale, in Handjet (answers 32, 35). Inside, four chunks, one at a time (answer 38), with ‹ and › and a dot for each, ‹ unavailable on the first, and on the last a Close where › was (answers 31, 36). Following the APG Carousel pattern (answer 42): each chunk is a group with `aria-roledescription="slide"` named "1 of 4" and so on, the chunks' wrapper is `aria-live="polite"` and `aria-atomic="false"` (nothing rotates by itself), and ‹ › are native buttons that don't move focus. The pattern names no buttons and says nothing about the ends, so these are *Claude's reading*, approved with the design (answer 41): the buttons are named Previous and Next; ‹ is unavailable on the first chunk; the dots only mark the place, hidden from screen readers since each chunk's name says it, not the pattern's slide picker. The words (answers 33, 38 and 43), each number from `tunables.ts`:
+1. "The host has picked a few answers to each question. Say one and your run ends. 7 questions, one run a day."
+2. "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going."
+3. "On questions 2, 4, 5 and 7 a letter is taken. Answer without it."
+4. "Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: 25 points for the first, 350 for the last. Run out of time and your run ends."
+
+`/afterglow/how-to-play` answers 404, with no redirect (answer 39).
+
 **The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
 
 ## Acceptance criteria
@@ -124,6 +158,15 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - [ ] The short check runs in CI on the PR and passes; the full check passes by hand, its fps lines in real Chrome at 59 or more (14c-5 answer 41), and `pre-draw never stalls a frame` passes.
 - [ ] The mutants carried from 14c-5 are each caught by the full check.
 - [x] `docs/DESIGN.md` describes `/afterglow` as built.
+
+14c-6d, How to play:
+- [ ] How to play opens the panel from the game screen before Start and from Today's banner under Play before the run, with Skip the game screen off and on; neither shows once the run has started.
+- [ ] The panel shows the four approved chunks one at a time: › and ‹ move through them, ‹ is unavailable on the first, the dots mark the place, and the last has Close where › was.
+- [ ] Close, the × and Escape each close it, focus goes back to the button that opened it, and the page behind can't be reached while it's open.
+- [ ] Screen readers hear a dialog named How to play, each chunk as a slide named "N of 4", announced politely as it changes, and the buttons as Previous, Next and Close.
+- [ ] It's in Handjet on Afterglow's dark at 375×812 and 1440×900, with no sideways scroll at 320px, and every button at least 24px each way (WCAG 2.2 2.5.8).
+- [ ] `/afterglow/how-to-play` answers 404.
+- [ ] `docs/DESIGN.md` describes the panel.
 
 ## Out of scope
 - The rest of the app's look (answer 4).
@@ -141,20 +184,25 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | "A few minutes" | The short check's CI time | Answer 15 |
 | The off-list shake's length and size | Answer 9 | Answer 28: the mock's shake for a refused taken letter (`refuse()` in `game.js` at `fcc11e4`: steps of 2, −2, 1 and 0 art pixels, 40 ms each), so every refused input shakes the same way (CLAUDE.md, "One way to do each thing") |
 | The calm version's fade length | Answer 8 | The walk's descent time from 14c-5 (answer 19) |
+| 4 chunks | How to play | Answer 38 |
+| The panel's width and type scale | How to play | The question box's: `AFTERGLOW.PROMPT_W` at the scene's type scale (14c-5), so the panel matches the box |
+| 24 px | How to play's buttons, at least, each way | WCAG 2.2 2.5.8, as the game's × |
 
 ## Plan
-Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`.
+Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`.
 1. **14c-6a, the name.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), which the share, the boards' game switch and every heading follow; the game page's browser tab says Afterglow (answer 12). Small and reviewable alone.
 2. **14c-6b, the game,** in two PRs (answer 20):
    - **6b-1, the game plays.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, coming back to the cards, test runs and the pre-draw split, with browser tests for the rules, and DESIGN.md for the new screen (CLAUDE.md, Docs): every acceptance criterion but the two on the check and the mutants.
    - **6b-2, the check.** `check.mjs` in `e2e/`, its short set in CI, the full set and the mutants by hand through `scripts/`: the criteria on the short and full check and the mutants. Until it merges the look is checked by the human's eye, not by machine.
-3. **14c-6c, the calm version** for Reduce motion.
+3. **14c-6d, How to play** (answers 30 to 40), before 6b-2 (answer 37): the panel, its two buttons, the four chunks, the old page removed.
+4. **14c-6c, the calm version** for Reduce motion.
 
 ## Removes
 - `/play` and the name "Game number 1".
 - In `src/app/game.tsx`: the `Question` and `Reveal` cards and the in-run countdown, replaced by Afterglow; with their CSS in `game.module.css` and `offbeat.module.css`.
 - From the moved code: `MOCK_QS`, play again ("New show"), the page's own font loading and anything else only the private page needed.
 - In RIFF-mocks, the human retires `themes/festival/` once the move is merged (an agent's delete there was refused before; not routed round).
+- 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
 - 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
 
 ---
