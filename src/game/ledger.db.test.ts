@@ -138,9 +138,12 @@ describe("settling runs into the points ledger", () => {
       }
       await client.query("set local session_replication_role = origin");
 
-      // As the app: settle the six players.
+      // As the app: settle every player's runs (M16 16e-3b, answer 27).
       await client.query("set local role plor_app");
-      expect(await settleRuns(client, [a, b, c, d, e, f, g])).toBe(7);
+      await settleRuns(client);
+      // Every run of the closed day, the 11 strangers' too: a, b, c, d, e and g, and the 11 (F's day isn't closed).
+      const { rows: day } = await client.query("select from private.points_ledger where game_id = $1 and puzzle_date = $2::date", [GAME_ID, DAY]);
+      expect(day).toHaveLength(17);
       const ledger = "select user_id, puzzle_date::text as date, points, bonus from private.points_ledger where user_id = any($1::uuid[]) order by user_id, puzzle_date";
       const { rows } = await client.query<{ user_id: string; date: string; points: number; bonus: number }>(ledger, [[a, b, c, d, e, f, g]]);
       const row = (id: string, date = DAY) => rows.find((r) => r.user_id === id && r.date === date);
@@ -175,18 +178,18 @@ describe("settling runs into the points ledger", () => {
       expect([withDay.answered, withDay.byEntry.get(t(0, "aardvark-genus"))]).toEqual([17, 2]);
 
       // Settling again writes nothing and changes nothing.
-      expect(await settleRuns(client, [a, b, c, d, e, f, g])).toBe(0);
+      expect(await settleRuns(client)).toBe(0);
       const { rows: again } = await client.query(ledger, [[a, b, c, d, e, f, g]]);
       expect(again).toEqual(rows);
     });
   });
 
-  it("does nothing for players with no runs on a closed day", async () => {
+  it("gives no row to a player with no runs on a closed day", async () => {
     await inRolledBackTransaction(async (client) => {
       const nobody = await newUser(client);
       await client.query("set local role plor_app");
-      expect(await settleRuns(client, [nobody])).toBe(0);
-      expect(await settleRuns(client, [])).toBe(0);
+      await settleRuns(client);
+      expect((await client.query("select from private.points_ledger where user_id = $1", [nobody])).rows).toEqual([]);
     });
   });
 });

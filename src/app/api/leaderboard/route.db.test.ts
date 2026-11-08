@@ -167,9 +167,10 @@ describe("the friends leaderboard", () => {
       [players.e.username, 0],
     ]);
     expect(r.body[otherWeek].entries.map((x: Entry) => x.daily)).toEqual([0, 1, 2].map(() => daily(otherWeek, 0)));
-    // Settled: A's, B's and E's runs from yesterday; C, not shown, isn't; A's run today isn't finished or closed.
+    // Settled: A's, B's and E's runs from yesterday, and C's too, though not shown, as a day's place needs every player
+    // (M16 16e-3b, answer 27); A's run today isn't finished or closed.
     expect(await ledgerRows([players.a.userId, players.b.userId, players.e.userId])).toBe(3);
-    expect(await ledgerRows([players.c.userId])).toBe(0);
+    expect(await ledgerRows([players.c.userId])).toBe(1);
     // Again: nothing new, the same totals.
     expect(await leaderboard()).toEqual(r);
     expect(await ledgerRows([players.a.userId, players.b.userId, players.e.userId])).toBe(3);

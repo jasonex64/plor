@@ -19,3 +19,7 @@ export function dayPercentiles(scores: Map<string, number>): Map<string, number>
 
 // Days' places added up, kept to one decimal, as adding decimals in floating point drifts.
 export const placeTotal = (places: number[]) => oneDecimal(places.reduce((sum, p) => sum + p, 0));
+
+// The overall board's Average (M16 16e-3b, answer 2): the places over the game-days played, to one decimal like a place
+// (answer 26), and 0 with none.
+export const placeAverage = (places: number[]) => (places.length === 0 ? 0 : oneDecimal(places.reduce((sum, p) => sum + p, 0) / places.length));
