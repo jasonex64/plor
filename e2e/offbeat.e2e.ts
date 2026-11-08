@@ -61,7 +61,8 @@ async function player(browser: Browser, name: string, viewport = PHONE) {
 test("Play opens the game screen: the day, the stakes, Start and How to play", async ({ browser }) => {
   const page = await player(browser, "oa");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("http://localhost:3000/afterglow");
+  await expect(page).toHaveTitle(GAME.name);
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
 
@@ -74,7 +75,7 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   await expect(game.getByRole("button", { name: "Start", exact: true })).toBeVisible();
 
   await game.getByRole("link", { name: "How to play" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play/how-to-play");
+  await expect(page).toHaveURL("http://localhost:3000/afterglow/how-to-play");
   const how = page.getByRole("region", { name: "How to play" });
   await expect(how).toContainText("The host has already picked a few answers to every question.");
   await expect(how).toContainText(`${QUESTIONS_PER_DAY} questions, one run.`);
@@ -83,11 +84,11 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
   // Start playing starts the run, on the game screen.
   await how.getByRole("button", { name: "Start playing" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("http://localhost:3000/afterglow");
   await expect(page.getByLabel("Your answer")).toBeVisible();
   // Once the run has started, How to play offers no start (14a-2c, criterion 2). Its text shows before the run's
   // state does, and the clock bar asks for the run too, so the check waits until every request has answered.
-  await page.goto("/play/how-to-play");
+  await page.goto("/afterglow/how-to-play");
   await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   await page.waitForLoadState("networkidle");
   await expect(page.getByRole("region", { name: "How to play" })).toContainText("The host has already picked");
@@ -97,7 +98,7 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
 // Criteria 4 and 5: a player who never played, then plays and is caught on question 1.
 test("Your Offbeat counts the run once it's over, and yesterday's answers show the host's", async ({ browser }) => {
   const page = await player(browser, "ob");
-  await page.goto("/play");
+  await page.goto("/afterglow");
   const stats = page.getByRole("region", { name: `Your ${GAME.name}` });
   const stat = (label: string) => stats.locator("div", { has: page.getByText(label, { exact: true }) }).locator("dd");
   await expect(stat("day streak")).toHaveText("0");
@@ -131,7 +132,7 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   // Opened again on the finished run, the stats load with the page and not again once the run's state arrives
   // (14a-2c, criterion 3).
   const seen = timeline(page);
-  await page.goto("/play");
+  await page.goto("/afterglow");
   await expect(page.locator("#result")).toBeVisible();
   await expect(stat("day streak")).toHaveText("1");
   await page.waitForLoadState("networkidle");
@@ -144,7 +145,7 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
 // Criteria 6 and 7.
 test("the feed sits beside the game from 1200px and below it on phones, with no sideways scroll at 320px", async ({ browser }) => {
   const wide = await player(browser, "oc", { width: 1440, height: 900 });
-  await wide.goto("/play");
+  await wide.goto("/afterglow");
   const box = async (page: typeof wide, name: string) => (await page.getByRole("region", { name, exact: true }).boundingBox())!;
   // The game screen heads the feed as round 5 does (14a-2c, criterion 4).
   await expect(wide.getByRole("region", { name: `${GAME.name} comments` }).getByRole("heading", { name: `${GAME.name} comments` })).toBeVisible();
@@ -154,7 +155,7 @@ test("the feed sits beside the game from 1200px and below it on phones, with no 
   expect(feed.y).toBeLessThan(game.y + game.height);
 
   const narrow = await player(browser, "od", { width: 320, height: 640 });
-  await narrow.goto("/play");
+  await narrow.goto("/afterglow");
   await expect(narrow.getByRole("region", { name: "Yesterday's answers" })).toBeVisible();
   const [game2, cards, feed2] = [await box(narrow, GAME.name), await box(narrow, "Yesterday's answers"), await box(narrow, `${GAME.name} comments`)];
   expect(feed2.y).toBeGreaterThanOrEqual(cards.y + cards.height);
@@ -179,7 +180,7 @@ test("a run resumed after its midnight says its answers don't count for the boar
     [id, date, fixtureId(0, "dog")],
   );
 
-  await page.goto("/play");
+  await page.goto("/afterglow");
   const game = page.getByRole("region", { name: GAME.name, exact: true });
   await expect(game.getByRole("heading", { name: "Safe!" })).toBeVisible();
   await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
@@ -197,10 +198,11 @@ test("a run resumed after its midnight says its answers don't count for the boar
   await expect(game.getByText(PAST_MIDNIGHT)).toHaveCount(1);
 });
 
-// 14c-1's and 14c-2's renames moved the game to a new address with no redirect (14b-4, "The new name";
-// docs/milestones/M14-14c-2-neutral-words.md, answer 13), so the old ones are gone.
-test("the old addresses /offbeat and /updraft answer 404", async ({ page }) => {
-  for (const path of ["/offbeat", "/updraft"]) {
+// 14c-1's, 14c-2's and 14c-6's renames moved the game to a new address with no redirect (14b-4, "The new name";
+// docs/milestones/M14-14c-2-neutral-words.md, answer 13; docs/milestones/M14-14c-6-afterglow-in-play.md, answer 13),
+// so the old ones are gone.
+test("the old addresses /offbeat, /updraft and /play answer 404", async ({ page }) => {
+  for (const path of ["/offbeat", "/updraft", "/play"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

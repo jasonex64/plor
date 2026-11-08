@@ -95,7 +95,7 @@ test("a hovered button lifts 2px, and stays put under reduced motion", async ({ 
     const page = await (await browser.newContext({ viewport: WIDE, reducedMotion })).newPage();
     await page.goto("/");
     await signInAndPick(page, reducedMotion === "reduce" ? "vc" : "vb");
-    await page.goto("/play");
+    await page.goto("/afterglow");
     const start = page.getByRole("button", { name: "Start", exact: true });
     await start.hover();
     const lift = () => start.evaluate((b) => [getComputedStyle(b).transform, getComputedStyle(b).boxShadow.replace(/^rgba?\([^)]*\) /, "")]);

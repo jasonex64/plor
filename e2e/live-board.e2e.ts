@@ -347,7 +347,7 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page, "/play");
+  await openBoard(page, "/afterglow");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByLabel("Your answer").fill("half typ");
   // Past the reset. While the run is in progress the game screen shows only the game (M14 14b-6c, answer 23), so
