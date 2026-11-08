@@ -201,6 +201,7 @@ Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - The whole suite (`npx playwright test --reporter=line`): `1 failed`, `162 passed (27.1m)`. The failure, `streak.e2e.ts:38`, looked for the top bar's pill just after Start, which Afterglow hides (answer 3); it now reads the pill back on Today: `streak.e2e.ts` and `text-size.e2e.ts`, `6 passed (16.3s)`.
 - Screenshots at 390×844 and 1440×900 (the question, the wait, the sky result, a lantern, a taken letter, off-list text, a dud's ending list) looked as the mock does; they are in the session's scratchpad, not in the repo.
 - Not checked: a real phone, real Chrome's frame rate and Reduce motion (6b-2's check and 6c).
+- PR #169's first CI e2e run (run 42531148650 at 1ad2b21): `1 failed`, `2 flaky`, `160 passed (27.9m)`. The failure, `afterglow.e2e.ts`'s failed-Next test, found two alerts: the scene's error and Next.js's own route announcer, which in CI held "Plor, Today"; the test now looks in the game's region. `test-run.e2e.ts`'s first test ran past Playwright's 30 s on its first try, since 6b-1 has it play a second run; it's now `test.slow()`. The other flaky one was `play2.e2e.ts:51` (ROADMAP, For M14). Both fixed tests locally: `4 passed (58.7s)`.
 
 ## Review
 14c-6b-1, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff origin/main...HEAD` at 3de8c14:

@@ -43,6 +43,9 @@ test.afterAll(async () => {
 });
 
 test("an admin plays a draft as a test run, with a host answer changed on the page, and restarts it", async ({ browser }) => {
+  // Two test runs and a third start since 14c-6b-1 (each way back to the puzzles page): past Playwright's 30 s in CI's
+  // first try on PR #169, so Playwright's own tripling.
+  test.slow();
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
   await signInAndPick(admin, "tra");

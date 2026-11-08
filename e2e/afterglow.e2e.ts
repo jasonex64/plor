@@ -5,6 +5,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { AFTERGLOW } from "../src/config/tunables";
 import { WORD_INK } from "../src/afterglow/scene";
+import { GAME } from "../src/platform/game";
 import { play, RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { answerBox, asked, box, caught, lightIt, safe, seeResults, skyResult, walkOn, WALK_MS } from "./afterglow";
@@ -125,7 +126,9 @@ test("a Next that fails says so and shows the way out", async ({ browser }) => {
   await safe(page, puzzle.safeAnswer);
   await page.route("**/api/run/next", (route) => route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ ok: false, error: "internal" }) }));
   await skyResult(page).click();
-  await expect(page.getByRole("alert").filter({ hasText: /\S/ })).toBeVisible({ timeout: WALK_MS });
+  // The error over the scene, in the game's own region: Next.js keeps an alert of its own for route changes, which in
+  // CI held "Plor, Today" (PR #169's first e2e run).
+  await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("alert").filter({ hasText: /\S/ })).toBeVisible({ timeout: WALK_MS });
   await expect(wayOut(page)).toBeVisible();
   await wayOut(page).click();
   await expect(page).toHaveURL(/\/$/);
