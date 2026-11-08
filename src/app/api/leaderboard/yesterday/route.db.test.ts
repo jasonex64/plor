@@ -8,7 +8,7 @@ import { GAME_ID } from "@/platform/game";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
-import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
+import { ensurePuzzle, removeFixtures, safeEntry } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as yesterdayRoute } from "./route";
 
@@ -126,6 +126,42 @@ describe("yesterday's standings", () => {
     ]);
   });
 
+  // M16 16e-3a (answers 35, 36): D, V's friend from now, survived question 1 at yesterday's noon and question 2 only
+  // after its midnight, then was caught on question 3: D's yesterday is question 1's 25, not 75.
+  it("counts a friend's run played past its midnight only up to it", async () => {
+    const db = getPool();
+    await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [
+      V.userId,
+      D.userId,
+    ]);
+    const puzzle = await ensurePuzzle(yesterday);
+    const answer = (index: number, entryId: string, matched: boolean, onTheDay: boolean) =>
+      db.query(
+        `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+         values ($1, $2, $3::date, $4, $5, $6, case when $7 then (($3::date + time '12:00') at time zone 'America/Los_Angeles') else statement_timestamp() end)`,
+        [D.userId, GAME_ID, yesterday, index, entryId, matched, onTheDay],
+      );
+    const open = (index: number) =>
+      db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
+        D.userId,
+        GAME_ID,
+        yesterday,
+        index,
+      ]);
+    await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [D.userId, GAME_ID, yesterday]);
+    await answer(0, safeEntry(puzzle, 0), false, true);
+    await open(1);
+    await answer(1, safeEntry(puzzle, 1), false, false);
+    await open(2);
+    await answer(2, puzzle.questions[2].host_answers[0], true, false);
+    useSession(V.session);
+    expect(await points("/api/leaderboard/yesterday")).toEqual([
+      [F.username, 300, false],
+      [D.username, 25, false],
+      [V.username, 0, true],
+    ]);
+  });
+
   it("leaves yesterday out while the viewer's own run that day is still going (M09 D5)", async () => {
     // V started yesterday's run and hasn't finished it: a run can be finished after midnight.
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [
@@ -135,6 +171,7 @@ describe("yesterday's standings", () => {
     ]);
     useSession(V.session);
     expect(await points("/api/leaderboard/yesterday")).toEqual([
+      [D.username, 0, false],
       [F.username, 0, false],
       [V.username, 0, true],
     ]);

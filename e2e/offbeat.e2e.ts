@@ -4,7 +4,8 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/config/tunables";
-import { FIXTURE, fixtureDay, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
+import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
+import { PAST_MIDNIGHT } from "../src/app/bonus";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
@@ -159,6 +160,41 @@ test("the feed sits beside the game from 1200px and below it on phones, with no 
   expect(feed2.y).toBeGreaterThanOrEqual(cards.y + cards.height);
   expect(cards.y).toBeGreaterThanOrEqual(game2.y + game2.height);
   expect(await narrow.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+// M16 16e-3a (docs/milestones/M16-16e-points-and-boards.md, answers 35, 37 and 39): yesterday's run resumed after its
+// midnight says its answers from then on don't count for the boards, while it's played and on its result, whose score
+// stays the full run's.
+test("a run resumed after its midnight says its answers don't count for the boards", async ({ browser }) => {
+  const page = await player(browser, "oe");
+  const { rows } = await DB.query<{ id: string; date: string }>("select id::text, (private.today() - 1)::text as date from auth.users where email = $1", [
+    `${RUN}-oe@example.test`,
+  ]);
+  const [{ id, date }] = rows;
+  // Yesterday's run: safe on question 1 at yesterday's noon, then left at its reveal.
+  await DB.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, 'offbeat', $2::date)", [id, date]);
+  await DB.query(
+    `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+     values ($1, 'offbeat', $2::date, 0, $3, false, ($2::date + time '12:00') at time zone 'America/Los_Angeles')`,
+    [id, date, fixtureId(0, "dog")],
+  );
+
+  await page.goto("/play");
+  const game = page.getByRole("region", { name: GAME.name, exact: true });
+  await expect(game.getByRole("heading", { name: "Safe!" })).toBeVisible();
+  await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
+  await game.getByRole("button", { name: "Next" }).click();
+  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
+  // Safe on question 2 (fruit; the host said apple), then caught on question 3 (color; the host said red).
+  await page.getByLabel("Your answer").fill("banana");
+  await page.getByRole("button", { name: "Answer" }).click();
+  await game.getByRole("button", { name: "Next" }).click();
+  await page.getByLabel("Your answer").fill("red");
+  await page.getByRole("button", { name: "Answer" }).click();
+  // The full run's score, 25 + 50, though the boards count question 1's 25 alone; the line once, on the result.
+  await expect(page.locator("#result")).toContainText(/You survived 2 of 7 questions and scored 75 points\b.* Past midnight: answers from now on don't count for the boards\./);
+  await expect(game.getByText(PAST_MIDNIGHT)).toHaveCount(1);
 });
 
 // 14c-1's and 14c-2's renames moved the game to a new address with no redirect (14b-4, "The new name";

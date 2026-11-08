@@ -1,6 +1,8 @@
 // The friends leaderboard against the local stack (run with `npm run test:db`; docs/milestones/M09-points-and-leaderboard.md,
 // 9b; weekly since docs/milestones/M10-groups.md, 10a). Real players sign in; yesterday's runs are written directly
-// (yesterday can't be played now) and, answered today, earn no rarity bonus (D8), so each total is its ladder.
+// (yesterday can't be played now), answered at its noon, as an answer after its midnight counts nothing (M16 16e-3a).
+// Each safe answer is the fixture's common one, whose share is never under RARITY_ZERO_SHARE, so it earns no rarity
+// bonus (M09 N2) and each total is its ladder.
 // Yesterday falls in this week or, on a Monday, in last week, so those totals are read from yesterday's week. A is the
 // viewer; B and E are A's friends; C is no one's friend but F's; D is B's friend but not A's.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -53,8 +55,8 @@ const daily = (week: "thisWeek" | "lastWeek", yesterdays: number) =>
 const ledgerRows = async (ids: string[]) =>
   (await getPool().query("select user_id from private.points_ledger where user_id = any($1::uuid[])", [ids])).rows.length;
 
-// Yesterday's run, written directly: safe answers to the first `survived` questions, then caught on the next. Its
-// ladder is the sum of POINTS_PER_QUESTION for the safe ones; answered today, it earns no bonus.
+// Yesterday's run, written directly: safe answers to the first `survived` questions, then caught on the next, all at
+// yesterday's noon. Its ladder is the sum of POINTS_PER_QUESTION for the safe ones, and it earns no bonus.
 async function playedYesterday(p: Player, survived: number) {
   const db = getPool();
   await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [p.userId, GAME_ID, yesterday]);
@@ -69,7 +71,8 @@ async function playedYesterday(p: Player, survived: number) {
     }
     const caught = i === survived;
     await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, $4, $5, $6)",
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       values ($1, $2, $3::date, $4, $5, $6, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
       [p.userId, GAME_ID, yesterday, i, caught ? puzzleYesterday.questions[i].host_answers[0] : safeEntry(puzzleYesterday, i), caught],
     );
   }
@@ -175,7 +178,8 @@ describe("the friends leaderboard", () => {
     const db = getPool();
     await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [players.d.userId, GAME_ID, yesterday]);
     await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       values ($1, $2, $3::date, 0, $4, false, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
       [players.d.userId, GAME_ID, yesterday, safeEntry(puzzleYesterday, 0)],
     );
     useSession(players.d.session);
@@ -187,16 +191,24 @@ describe("the friends leaderboard", () => {
     const hiding = (await leaderboard()).body[yWeek];
     expect(hiding.hidden).toEqual([dayIndex(yesterday)]);
     expect(hiding.entries.map((x: Entry) => x.daily)).toEqual([daily(yWeek, 0), daily(yWeek, 0)]);
-    // Once D is caught on question 2, yesterday counts again, D's run included.
-    await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [
-      players.d.userId,
-      GAME_ID,
-      yesterday,
-    ]);
-    await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 1, $4, true)",
-      [players.d.userId, GAME_ID, yesterday, puzzleYesterday.questions[1].host_answers[0]],
-    );
+    // D survives question 2 now, after yesterday's midnight, and is caught on question 3: once D's run is over,
+    // yesterday counts again, D's run with what it scored by that midnight, question 1's 25 and not question 2's 50
+    // (M16 16e-3a, answer 35).
+    const answerNow = async (index: number, entryId: string, matched: boolean) => {
+      await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
+        players.d.userId,
+        GAME_ID,
+        yesterday,
+        index,
+      ]);
+      await db.query(
+        "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, $4, $5, $6)",
+        [players.d.userId, GAME_ID, yesterday, index, entryId, matched],
+      );
+    };
+    await answerNow(1, safeEntry(puzzleYesterday, 1), false);
+    expect((await leaderboard()).body[yWeek].hidden).toEqual([dayIndex(yesterday)]);
+    await answerNow(2, puzzleYesterday.questions[2].host_answers[0], true);
     expect((await standings()).map((x) => [x.username, x.points, x.daily])).toEqual([
       [players.b.username, 75, daily(yWeek, 75)],
       [players.d.username, 25, daily(yWeek, 25)],

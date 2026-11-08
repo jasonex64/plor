@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39), for approval.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39) and approved (answer 40); 16e-3a, game 1's midnight rule, is in review.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -76,6 +76,7 @@ Round 3:
 Round 4:
 38. A game 1 run with nothing scored by midnight, or never finished: "A played day at 0 (Recommended)".
 39. The result screen of a run finished after midnight: "The full run's score". It shows everything the run earned, with the line saying only part of it counts on the boards.
+40. The 16e-3 design: "Approve, build it" (2026-11-08).
 
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
@@ -125,7 +126,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 **16e-3 in detail** (Claude's readings of answers 27 to 39, for approval):
 - **Game 1 counts what a run scored by midnight** (answers 34 to 39). This replaces M09 D1's "a run's points count whenever it's finished" and "one never finished never scores" (DECISIONS.md, Game 1: Timer, and the Log rows of 2026-10-22).
   - A run's ledger row holds the questions it survived with answers given before its day's midnight, plus their rarity bonus, which already counts only those answers (M09 D8); the bonus cap counts the same questions.
-  - Every game 1 run of a closed day gets its row, finished or not, every player's, as a place needs the whole day (answer 27); the first board read after midnight settles them, as game 2's. So a run left at a reveal counts what it had by midnight (answer 38), and a closed day is final at midnight in both games. A run can still be played to its end after midnight (DECISIONS.md, Timer); it adds nothing to the boards.
+  - Every game 1 run of a closed day gets its row, finished or not; every player's from 16e-3b, as a place needs the whole day (answer 27), and until then the players a board, card or Me shows, as now. So a run left at a reveal counts what it had by midnight (answer 38), and a closed day is final at midnight in both games. A run can still be played to its end after midnight (DECISIONS.md, Timer); it adds nothing to the boards.
   - Game 1's friends and group boards and yesterday's standings read those rows, so they follow (answers 34, 36). A closed day stays hidden from the viewer while their own run of it goes on, as now (M09 D5).
   - **Me's best and all-time points** read the same rows, so they count what a run scored by midnight too (Claude's reading: one record of a day's points).
   - On game 1's screen, a run resumed after its day's midnight shows one line, during the run and on its result: "Past midnight: answers from now on don't count for the boards." (Claude's words, answer 37). The result's score stays the full run's (answer 39).
@@ -162,9 +163,9 @@ These are random words, not real play: a real run's numbers come with the beta.
 - [ ] A player sees nothing about another player's run beyond what the boards show, by route tests.
 
 16e-3a:
-- [ ] A game 1 run finished after midnight, one left at a reveal and one with nothing by midnight each get one row for what they scored by midnight, ladder and bonus, every player's, by db tests; settling again writes nothing.
-- [ ] Game 1's weekly boards, yesterday's card and Me's points read that score, and a closed day still hides while the viewer's run of it goes on, by route tests.
-- [ ] A run resumed after midnight shows the line, and its result the full score, by e2e.
+- [x] A game 1 run finished after midnight, one left at a reveal and one with nothing by midnight each get one row for what they scored by midnight, ladder and bonus, by db tests; settling again writes nothing. Every player's comes with 16e-3b.
+- [x] Game 1's weekly boards, yesterday's card and Me's points read that score, and a closed day still hides while the viewer's run of it goes on, by route tests (Me's by `allTimePoints`, what its route reads).
+- [x] A run resumed after midnight shows the line, and its result the full score, by e2e.
 
 16e-3b:
 - [ ] Both overall views on hand-made weeks, by route tests: sum, average, a player who played one game, a day at 0, and a group member who joined mid-week.
@@ -204,10 +205,18 @@ Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one mea
 | Source says | We built | Why different |
 |---|---|---|
 | "Live, final at midnight" for places (answer 19) | The boards count a day from midnight; only the end of a run is "so far" | Answer 21, "keep it consistent", confirmed ("yes thats right") |
+| 16e-3a settles every player's game 1 runs (16e-3 in detail) | 16e-3b does; 16e-3a settles the players each board, card or Me reads, as before | Their first reader is the overall board's places ("Build for today") |
 | 16e-1 writes game 2's ledger rows | 16e-2 does | Their first reader is a board ("Build for today"), noted under Design |
 | The tables stop at 18 letters and start at 13 different letters | The rule scores longer words and every count down to 1 | The full dictionary holds words over 18 letters, and a run can use fewer than 13 letters; the rule the tables came from covers them |
 
 ## Evidence
+### 16e-3a
+- **Settling:** `npx vitest run src/game/ledger.db.test.ts --no-file-parallelism`: first 1 failed, as predicted, writing 6 rows where the old test wanted 5 (D, left at a reveal, now counts); updated, 2 passed: E, finished after midnight, 31 (horse 25 and its bonus 6, kiwi after midnight 0; was 81); D, left at its reveal, 81; G, answering only after midnight, 0; settling again writes nothing. Broken on purpose, the midnight filter out: 1 failed (E 81).
+- **Boards, card and Me:** `npx vitest run src/app/api/leaderboard/route.db.test.ts src/app/api/leaderboard/yesterday src/game/all-time-points.db.test.ts --no-file-parallelism`, 16 passed. The past days' fixture answers are now given at that day's noon, and every total stayed as it was, as predicted (each safe answer is the fixture's common one, with no bonus). New: D survives question 2 after midnight while yesterday stays hidden from D, then counts 25, not 75; on yesterday's card a friend's late run counts 25, not 75; Me's all-time points add 25, not 75, for one: 1150. Broken on purpose: the midnight filter out, 2 failed (1200, and the card's 75); the finished-runs-only filter back, 1 failed (5 rows of 7).
+- **Screen:** `npx playwright test e2e/offbeat.e2e.ts --retries=0`, 5 passed: yesterday's run resumed at its reveal shows the line, and again on question 2; the result says "You survived 2 of 7 questions and scored 75 points" and the line once. With the line taken off the screen during play, it failed on the reveal. `npx vitest run src/app/bonus.test.ts`, 8 passed, with when a run is past its midnight.
+- On this PC, `src/app/api/offbeat/route.db.test.ts` and `src/app/api/me/route.db.test.ts` fail before and after this change, on the phone test's leftover day 2026-11-01 (HANDOFF): 17 failures before the change, the same files after it; CI's fresh stack is the check.
+- `npm test`, 638 passed; `npx tsc --noEmit -p .` and `npx eslint src e2e` clean.
+
 ### 16e-2
 - **Places:** `npx vitest run src/game/percentile.test.ts`, 6 passed: the share beaten, a tie as half, one decimal, 100 alone, a day's places, a week's total. Written beside the function, not before; then broken on purpose and seen to fail: a tie counted as a win (2 failed), 0 for a lone player (1 failed).
 - **Ledger rows and the end of a run:** `npx vitest run src/game/substring-places.db.test.ts --no-file-parallelism`, 3 passed: a closed day's finished run (420) and unfinished one (65) get one row each, settling again writes none, today's waits; the standing is hidden at 9 finished and 50 at 10, with a tie and an unfinished run that doesn't count, and a friend rank only once a friend has finished.
