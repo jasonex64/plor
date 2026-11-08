@@ -6,6 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sent, sharedLink, signInAndPick } from "./players";
+import { box, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -24,8 +25,7 @@ test.afterAll(async () => {
 async function caught(page: Page) {
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
   await page.goto("/");
 }
@@ -193,8 +193,10 @@ test("the countdown says what it counts in its own text, and fits at 320px", asy
   await page.goto("/");
   await signInAndPick(page, "qc");
   await play(page);
-  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
-  await expect(clock).toHaveText(/^\d+ seconds left$/);
+  // Afterglow's box shows "20 s"; the " s" is hidden from screen readers, which read the words in its place
+  // (src/afterglow/afterglow.tsx), so the check is the accessibility tree's text, not the shown one.
+  const clock = box(page).getByRole("timer");
+  await expect(clock).toMatchAriaSnapshot("- timer: /^\\d+ seconds left$/");
   expect(await clock.getAttribute("aria-label")).toBeNull();
   const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(fits).toBe(true);

@@ -352,3 +352,11 @@
     border-bottom: 2px solid var(--ink);
   }
 }
+
+/* Afterglow full screen hides the top bar, the tab bar or sidebar and the clock bar, on every screen size
+   (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 10; body[data-game], src/app/body-flag.ts). */
+:global(body[data-game]) .top,
+:global(body[data-game]) .nav,
+:global(body[data-game]) .clock {
+  display: none;
+}

@@ -5,6 +5,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, play, signInAndPick } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -85,8 +86,7 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   // Caught on question 1: a finished run with 0 survived, shaded at the first step.
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   await page.goto("/me");
   await expect(total(page, "All games", "days played")).toHaveText("1");
@@ -171,8 +171,7 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
   // A comment, once the run is over.
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await page.getByLabel("Comment to your friends").fill(`slots ${RUN}`);
   await page.getByRole("button", { name: "Post" }).click();
   const comment = page.getByRole("region", { name: `${GAME.name} comments` }).getByRole("listitem").filter({ hasText: `slots ${RUN}` });

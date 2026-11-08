@@ -6,6 +6,7 @@
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -83,8 +84,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   for (const page of [creator, joiner]) {
     await page.goto("/");
     await play(page);
-    await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-    await page.getByRole("button", { name: "Answer" }).click();
+    await caughtToCards(page, puzzle.hostAnswer);
     await expect(page.getByText(/^You survived 0 of 7 questions/)).toBeVisible();
   }
   // After playing, the score is in the card, and the order is the same.

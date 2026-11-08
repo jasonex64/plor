@@ -9,6 +9,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { answerBox, caughtToCards, safe } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -84,8 +85,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await player.goto("/");
   await play(player);
   await expect(row).toHaveText(started);
-  await player.getByLabel("Your answer").fill(hostAnswer);
-  await player.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(player, hostAnswer);
   await expect(player.getByText("You survived 0 of 7 questions")).toBeVisible();
   // The board as the server gives it, and every frame that reached the watcher: by now the catch has been sent
   // wherever it goes, and the watcher's frames hold only the start.
@@ -99,8 +99,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // (7d): the watcher first, then the friend, with the full list behind the row.
   await watcher.goto("/");
   await play(watcher);
-  await watcher.getByLabel("Your answer").fill(hostAnswer);
-  await watcher.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(watcher, hostAnswer);
   // Caught on question 1: no survived answers, so no rarity bonus and no bonus line (M09 9a; 14b-2c answer 7).
   await expect(watcher.getByText("You survived 0 of 7 questions and scored 0 points.")).toBeVisible();
   // Beside the one answer, its share: two players answered question 1, under the minimum of 5 (H5).
@@ -243,17 +242,18 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   expect(received).not.toContain(kept);
 });
 
-// After a safe answer, the reveal shows the points it earned and its estimated rarity bonus (M09 9a). The number
-// itself is the route test's (src/game/runs.db.test.ts); this checks the reveal shows it.
-test("the reveal shows a safe answer's estimated rarity bonus", async ({ browser }) => {
+// After a safe answer, the sky result shows the points it earned, and the score corner the points so far (M09 9a;
+// docs/milestones/M14-14c-6-afterglow-in-play.md, answers 7 and 24). The rarity bonus's estimate is no longer shown
+// there (answer 7: "the bonus estimate and the running total stay off it"). The numbers themselves are the route
+// test's (src/game/runs.db.test.ts); this checks the page shows them.
+test("the sky result shows a safe answer's points, and the score corner the points so far", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "s");
   await play(page);
-  await page.getByLabel("Your answer").fill(safeAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
-  await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
+  await safe(page, safeAnswer);
+  await expect(page.getByText("+25", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Score")).toHaveText("Q1/725");
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted
@@ -349,11 +349,11 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await signInAndPick(page, "q");
   await openBoard(page, "/afterglow");
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await page.getByLabel("Your answer").fill("half typ");
+  await answerBox(page).fill("half typ");
   // Past the reset. While the run is in progress the game screen shows only the game (M14 14b-6c, answer 23), so
   // nothing else on it moves to the new day until the run ends; this used to wait for the stats card's reload as
   // the sign the reset had fired, and that card is now hidden. fastForward runs every timer due, the reset's among
   // them; "the reset reloads every section of Today" checks the reset's own reloads.
   await page.clock.fastForward("25:00:00");
-  await expect(page.getByLabel("Your answer")).toHaveValue("half typ");
+  await expect(answerBox(page)).toHaveValue("half typ");
 });

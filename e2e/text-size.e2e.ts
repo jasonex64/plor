@@ -73,7 +73,9 @@ test("font sizes double when the browser's text size doubles", async ({ page }) 
 
 // A <p> that's a row, not running text, keeps its card's width: the question card's head, its points chip at the
 // card's right edge (14b-17 review).
-test("on a desktop, the question card's head stays as wide as its card", async ({ page }) => {
+// Afterglow's question box (docs/milestones/M14-14c-6-afterglow-in-play.md) took the question card's place: its head
+// row, the question's number and seconds, spans the box as the card's did.
+test("on a desktop, the question box's head stays as wide as its box", async ({ page }) => {
   puzzle = await todayPuzzle(DB);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");

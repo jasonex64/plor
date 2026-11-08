@@ -7,6 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sharedLink, signInAndPick } from "./players";
+import { answerBox, box, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -40,8 +41,7 @@ const slot = (page: Page, name: string, property = "color") =>
 async function caught(page: Page) {
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
 }
 
@@ -153,11 +153,15 @@ test("the comment box and the pickers are 16px, and follow the browser's text si
   expect(await box.evaluate((el) => getComputedStyle(el).fontSize)).toBe("32px");
 });
 
-test("Continue shows the question's skeleton, never the cards, until the run loads", async ({ page }) => {
+// Afterglow's dark, full screen, is what shows until the run loads, in place of the question's skeleton
+// (src/afterglow/afterglow.tsx, AfterglowLoading; docs/milestones/M14-14c-6-afterglow-in-play.md, Removes).
+const loading = (page: Page) => page.getByRole("status").filter({ hasText: `Loading ${GAME.name}` });
+
+test("Continue shows Afterglow loading, never the cards, until the run loads", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "cc");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   await page.goto("/");
   let release: () => void = () => {};
   const held = new Promise<void>((resolve) => (release = resolve));
@@ -167,19 +171,19 @@ test("Continue shows the question's skeleton, never the cards, until the run loa
   });
   await page.getByRole("link", { name: "Continue" }).click();
   await expect(page).toHaveURL(new RegExp(`${GAME.path}$`));
-  await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
+  await expect(loading(page)).toBeVisible();
   await expect(page.getByRole("heading", { name: `Your ${GAME.name}` })).toHaveCount(0);
   await expect(page.getByRole("region", { name: `${GAME.name} comments` })).toHaveCount(0);
   release();
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   await expect(page.getByRole("heading", { name: `Your ${GAME.name}` })).toHaveCount(0);
 });
 
-test("the clock bar's Back also opens on the question's skeleton", async ({ page }) => {
+test("the clock bar's Back also opens on Afterglow loading", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "cq");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   // Opened from its address, so the game screen isn't already in the page, kept hidden from the visit above.
   await page.goto("/friends");
   let release: () => void = () => {};
@@ -189,9 +193,9 @@ test("the clock bar's Back also opens on the question's skeleton", async ({ page
     await route.continue();
   });
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
+  await expect(loading(page)).toBeVisible();
   release();
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
 });
 
 test("from 1200px the game screen's feed column is there from the first paint, not after the run loads", async ({ page }) => {
@@ -213,17 +217,22 @@ test("from 1200px the game screen's feed column is there from the first paint, n
   expect(await page.evaluate(() => (window as unknown as { gone: number }).gone)).toBe(0);
 });
 
-test("the countdown keeps its width from two digits to one, so the prompt doesn't move", async ({ page }) => {
+// In Afterglow the seconds sit in the box's top row, apart from the prompt's own line (src/afterglow/afterglow.tsx). The
+// timer's text is the number, the " s" shown after it and the words screen readers hear.
+test("the countdown going from two digits to one doesn't move the prompt", async ({ page }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "ck");
   await play(page);
-  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
-  await expect(clock).toHaveText(/^\d\d seconds left$/);
-  const two = (await clock.boundingBox())!.width;
+  const clock = box(page).getByRole("timer");
+  const prompt = box(page).getByText("Name an animal", { exact: true });
+  await expect(clock).toHaveText(/^\d\d s seconds left$/);
+  const two = (await prompt.boundingBox())!;
   await page.clock.fastForward("00:12");
-  await expect(clock).toHaveText(/^\d seconds left$/);
-  expect(Math.abs((await clock.boundingBox())!.width - two)).toBeLessThan(0.5);
+  await expect(clock).toHaveText(/^\d s seconds left$/);
+  const one = (await prompt.boundingBox())!;
+  expect(Math.abs(one.x - two.x)).toBeLessThan(0.5);
+  expect(Math.abs(one.y - two.y)).toBeLessThan(0.5);
 });
 
 test("a long name on a board row is cut at the default text size, and shown whole with the points under it at 200%", async ({ page }) => {
@@ -275,8 +284,7 @@ test("the game screen's feed keeps the day it shows across Start and the run", a
   await expect(earlier).toBeVisible();
   const shown = await earlier.textContent();
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: shown! })).toBeVisible();
 });
@@ -357,7 +365,10 @@ test("after a time-up away from the game, Me reads its numbers again", async ({ 
   await page.goto("/");
   await signInAndPick(page, "cm");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
+  // Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and
+  // 5): Back to Today, whose tabs lead on.
+  await page.goBack();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   let reads = 0;

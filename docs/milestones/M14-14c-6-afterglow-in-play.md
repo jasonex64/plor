@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merging on green CI at the human's "Merge when green"); next 14c-6b, the game. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); next 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -49,6 +49,26 @@ Round 5
 18. Source: "Yes, add MDN (Recommended)". MDN's `prefers-reduced-motion` page, read 2026-11-07 (last modified 2026-06-10).
 19. The calm fade: "The walk's descent time". Each of the calm version's fades lasts as long as 14c-5's descent.
 
+For 14c-6b (human, 2026-11-08)
+
+Round 6
+20. PR size: "Two PRs (Recommended)". 6b-1: the game plays a real day full screen, with browser tests for the rules (timing, off-list, reload, the way out). 6b-2: the full visual check, its CI short set and the mutants.
+21. End button: "See results (Recommended)". The mock's own words; it replaces the proposed "Done".
+22. Way out: "× icon (Recommended)". Screen readers hear "Back to Today".
+23. Off-list: "Today's line (Recommended)". "\"wolfe\" isn't in our list. Try another answer."
+
+Round 7
+24. Score corner: "Keep it (Recommended)". As the approved mock: the question number and the points so far, real points from the database. The sky result itself still shows only the firework, its flavour and "The host said …" (answer 7).
+25. Coming back: "The cards (Recommended)". A run that is over opens on today's result, share, facts and comments; the ending list is seen once, at the end of the run.
+26. Test run: "Back to that admin page (Recommended)". A test run's × and See results return to the admin page it started from.
+
+Round 8
+27. Approval: "Approve, start 6b-1 (Recommended)".
+28. Shake: "Same shake (Recommended)". Off-list text shakes the box as a refused taken letter does.
+
+Round 9 (a collision found while building)
+29. Q7's button: "Q7 says \"Walk on\" (Recommended)". After a safe Q7 the sky result's button is Walk on, as on Q1 to Q6, and the ending list fades in over the burst as in the mock; only the ending list's button says See results (answer 21), so a survivor doesn't tap See results twice.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -66,43 +86,44 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 ## Design (proposed)
 **Before and after the run.** The day's banner, Start, the no-puzzle and signed-out cards, and the result, share, facts and comments after the run, are today's cards, at `/afterglow`. Start goes full screen into Q1.
 
-**Full screen.** From Start to the ending list the shell's top bar, tab bar, sidebar and clock bar are hidden, on every screen size, and Afterglow fills the window. A small way-out button sits in a corner, shown only while no fuse burns: during the sky result, the walk, and the ending list. It goes to Today. Coming back to `/afterglow` mid-run picks up where the run is: a run waiting for Next shows that question's sky result again.
+**Full screen.** From Start to the ending list the shell's top bar, tab bar, sidebar and clock bar are hidden, on every screen size, and Afterglow fills the window. A small way-out button, a × that screen readers hear as "Back to Today" (answer 22), sits in a corner, shown only while no fuse burns: during the sky result, the walk, and the ending list. It goes to Today. Coming back to `/afterglow` mid-run picks up where the run is: a run waiting for Next shows that question's sky result again. A run that is over opens on the cards (answer 25). The score corner shows the question number and the points so far, as in the mock (answer 24).
 
 **A question.** The box, its fuse and the seconds come from the run's `msLeft`, so a reload shows the time the database has left. Taken letters work as today: the key does nothing and a line says the letter is taken.
 
 **Light it.** The word steps forward and rumbles plainly at once. The reply decides:
 - **Safe:** the word takes its rarity's colour (the answer's level: common Peony gold, uncommon Chrysanthemum lime, rare Kamuro sky blue), its charge runs on, and it climbs and bursts as in 14c-5. The sky result adds one line, "The host said …".
 - **Caught:** the dud, as in 14c-5, and the run ends.
-- **Off-list:** the word drops back into the box, which shakes; a line under it says it isn't in the list, and the text stays selected. The fuse never stopped.
+- **Off-list:** the word drops back into the box, which shakes; under it, today's line, "\"wolfe\" isn't in our list. Try another answer." (answer 23), and the text stays selected. The fuse never stopped.
 - **Time's up** (the database refused a late answer, or the fuse ran out): the fuse-out ending, as in 14c-5.
 - **Any other error** is shown, as today; nothing is retried.
 
 **Between questions.** Walk on plays the descent and the walk; the next box appears after any taken-letter lantern, and only then is Next sent, which starts that question's 20 s. The box shows no time until the database answers.
 
-**The end.** After Q7, or a dud or fuse out, the ending list fades in as in 14c-5. Its button, **Done** (proposed wording), leaves full screen and shows today's result cards.
+**The end.** After Q7, or a dud or fuse out, the ending list fades in as in 14c-5. Its button, **See results** (answer 21), leaves full screen and shows today's result cards.
 
 **Reduce motion.** No shake, rumble or sway; the charge, climb and walk become one short fade each between still frames; bursts, glitter and the fuse still draw.
 
-**Test runs.** The admin's test run uses the same screen, fed by its test runner.
+**Test runs.** The admin's test run uses the same screen, fed by its test runner; its × and See results return to the admin page it started from (answer 26).
 
 **Screen readers.** The prompt, box, seconds, result, host's answers and ending list are real text in the page, as in the mock, and keep 14b-21's announcements.
 
-**The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build.
+**The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build. The mock's Preview bar (its "skip ›" button) was a review aid and goes, with play again.
 
 **The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
 
 ## Acceptance criteria
 - [x] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
-- [ ] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, Done, the cards.
-- [ ] A dud and a fuse out each end the run with the ending list.
-- [ ] No question loses time to the walk: the database's open time for question k+1 is after its box appears (e2e, from the run's events).
-- [ ] The bars, sidebar and clock bar are hidden from Start to Done at 375×812 and 1440×900; the way-out button shows only while no fuse burns, and goes to Today.
+- [x] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, See results, the cards.
+- [x] A dud and a fuse out each end the run with the ending list.
+- [x] No question loses time to the walk: Next goes to the database after the box appears, and its reply leaves more than 19 of the question's 20 seconds (e2e; the browser's and the database's clocks aren't compared, as they may differ).
+- [x] The bars, sidebar and clock bar are hidden from Start to See results at 375×812 and 1440×900; the × shows only while no fuse burns, and goes to Today (a test run's, to its admin page).
+- [x] A run that is over opens `/afterglow` on the cards, not the ending list.
 - [ ] With Reduce motion on, no frame shakes and the climb and walk are fades (e2e with `reducedMotion: "reduce"`).
-- [ ] An admin's test run plays in Afterglow.
-- [ ] The share text says Afterglow, with 🟩 and ⬜.
+- [x] An admin's test run plays in Afterglow.
+- [x] The share text says Afterglow, with 🟩 and ⬜.
 - [ ] The short check runs in CI on the PR and passes; the full check passes by hand, its fps lines in real Chrome at 59 or more (14c-5 answer 41), and `pre-draw never stalls a frame` passes.
 - [ ] The mutants carried from 14c-5 are each caught by the full check.
-- [ ] `docs/DESIGN.md` describes `/afterglow` as built.
+- [x] `docs/DESIGN.md` describes `/afterglow` as built.
 
 ## Out of scope
 - The rest of the app's look (answer 4).
@@ -118,13 +139,15 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | 59 fps in real Chrome | The full check's fps lines | 14c-5 answer 41 |
 | 16.7 ms | A pre-draw slice | 14c-4 (60 fps), 14c-5 answer 42 |
 | "A few minutes" | The short check's CI time | Answer 15 |
-| The off-list shake's length and size | Answer 9 | **Proposed:** the fuse's end-of-time shake from 14c-5, reused |
+| The off-list shake's length and size | Answer 9 | Answer 28: the mock's shake for a refused taken letter (`refuse()` in `game.js` at `fcc11e4`: steps of 2, −2, 1 and 0 art pixels, 40 ms each), so every refused input shakes the same way (CLAUDE.md, "One way to do each thing") |
 | The calm version's fade length | Answer 8 | The walk's descent time from 14c-5 (answer 19) |
 
 ## Plan
-Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M16's PRs #155 to #165 have merged since).
+Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`.
 1. **14c-6a, the name.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), which the share, the boards' game switch and every heading follow; the game page's browser tab says Afterglow (answer 12). Small and reviewable alone.
-2. **14c-6b, the game.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, test runs, the pre-draw split, and the check in `e2e/` with its CI subset and hand scripts.
+2. **14c-6b, the game,** in two PRs (answer 20):
+   - **6b-1, the game plays.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, coming back to the cards, test runs and the pre-draw split, with browser tests for the rules, and DESIGN.md for the new screen (CLAUDE.md, Docs): every acceptance criterion but the two on the check and the mutants.
+   - **6b-2, the check.** `check.mjs` in `e2e/`, its short set in CI, the full set and the mutants by hand through `scripts/`: the criteria on the short and full check and the mutants. Until it merges the look is checked by the human's eye, not by machine.
 3. **14c-6c, the calm version** for Reduce motion.
 
 ## Removes
@@ -132,13 +155,35 @@ Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M1
 - In `src/app/game.tsx`: the `Question` and `Reveal` cards and the in-run countdown, replaced by Afterglow; with their CSS in `game.module.css` and `offbeat.module.css`.
 - From the moved code: `MOCK_QS`, play again ("New show"), the page's own font loading and anything else only the private page needed.
 - In RIFF-mocks, the human retires `themes/festival/` once the move is merged (an agent's delete there was refused before; not routed round).
+- 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
 
 ---
 *Fill in the sections below at the end.*
 
 ## Source diff
+14c-6b-1, against the mock (RIFF-mocks `themes/festival/` at `fcc11e4`) and this ticket's Design:
+
 | Source says | We built | Why different |
 |---|---|---|
+| The mock judges answers itself, from made-up questions and shares | Every answer, Next and time-up goes to the server through the runner (`src/app/game.tsx`, `Run`); the scene waits on the reply | DECISIONS.md, Game 1: the database is the judge |
+| The mock's charge knows the tier from the start | A `wait` phase first: the word steps forward with the plain ink and an unramped cord, rumbling as a common charge does at its start (amplitude 1, its first step rate), until the reply; then the tier's charge runs from where the word is | Answer 16. *Claude's reading* of "a plain rumble": a charge held at its start, so no new number |
+| `Q_SECONDS = 20` in the mock | The fuse's length from `RunState.msQuestion`, which SQL measures from `private.question_deadline` | DECISIONS.md, Config: the 20 seconds live in SQL alone |
+| The mock's next question opens at once after the walk | The box opens empty (`open` phase, its cord unlit), Next is sent then, and the prompt and seconds come with the reply. If Next fails, the box stays empty with the error over the scene and the ×'s way out; a reload shows the sky result again | DECISIONS.md, Game 1: Timer; Error handling (nothing retried) |
+| The mock's sky result: "“answer”, N% of players" and "+points · +bonus rarity" | "“answer”", "The host said …", "+points" | Answer 7; a question's share isn't known while the run goes on (M11 H5) |
+| The mock's HUD, ending total and recap count points plus bonus | Points only, from the server; the burst's size still uses points plus the provisional bonus, as the mock's did | Answers 7 and 24; the size is 14c-5's look (its answer 11) |
+| Q7's button "See results", the ending's "New show" | Walk on on every question; the ending's See results leaves full screen for the cards | Answers 21, 29; one run a day (DECISIONS.md, Game 1) |
+| The mock's Preview bar and its "skip ›" | Gone; the × sits where the bar was, at the foot on the left | Answers 5, 22; the place is *Claude's reading*, clear of the HUD and the box |
+| A refused taken letter only shakes the box | It shakes and says "X is taken. Try a word without it." | Design: taken letters work as today |
+| The mock's check hooks (`__core`, the phase log, frame counters, rate and freeze) | Not in 6b-1 | CLAUDE.md, Build for today: 6b-2 brings back what the check reads |
+| "Their numbers move to `src/config/tunables.ts`" | `game.js`'s 131 named values are `AFTERGLOW` there, less `Q_SECONDS` and `AGAIN_S`, plus answer 28's shake; the numbers inside the drawing code (`street.ts` whole, and the drawing functions in `scene.ts`) stay with the art | *Claude's reading*: they are the drawing, as its colours are (DECISIONS.md, Styling), and moving hundreds of coordinates would hide the art in a list |
+| The mock's `:root` variables and ids | On the game's layer, and `data-part` names | The page already has `#result`; the rest of the app keeps its theme |
+| The mock writes "FONT FAILED" into the name if Handjet doesn't load | The page shows the error over the scene (`Io.fault`), and the scene goes on in the fallback | CLAUDE.md, Fail loudly; DECISIONS.md, Error handling: the client shows the error |
+| 14b-11 answer 12: the test run's label and Restart stay in view the whole run | Over the scene, among its notices, during the run | Answers 11 and 26 put the test run full screen; *Claude's reading* keeps both |
+| — | `RunState.next` also carries `stolen`, the letters taken at the next question | The "Damp fuses" line after a reload on the sky result |
+| 14b-11 answer 6: after a test run the game screen's cards come back | A test run's See results goes back to `/admin/puzzles`, as its × does, and restarts it (a reopened test page would otherwise resume the old run's moves) | Answer 26 replaces it; the restart is *Claude's reading*, found when the e2e left and came back |
+| Answer 22: the × is read "Back to Today" | A test run's × is read "Back to Puzzles", where it goes | Answer 26 sends it there |
+| Design: "Coming back to `/afterglow` mid-run picks up where the run is" | A game screen Next.js kept hidden waits for the run to load again before the scene starts, and forgets that the run was played there | A run whose time ran out away from the page reopened on its stale question (found by `jumps-and-finds.e2e.ts`); answer 25 |
+| `street.js` | `src/afterglow/street.ts`, five unused locals dropped (lint), output byte for byte the same in 36 sizes and stages (Evidence) | — |
 
 ## Evidence
 **14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
@@ -148,6 +193,25 @@ Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M1
 - `e2e/offbeat.e2e.ts` checks `/afterglow`'s tab title (`toHaveTitle(GAME.name)`) and that `/offbeat`, `/updraft` and `/play` answer 404.
 - The earlier runs' 11 failures are not explained: some of them ran against `RIFF-m16`'s dev server, which held port 3000, and the "has no name" errors' cause is *unverified* (perhaps the base changing mid-run).
 
+**14c-6b-1, the game plays** (2026-11-08, Windows PC, this worktree's own `next dev`, local stack):
+- `street.ts` against the mock's `street.js` in Chromium, 36 sizes, stages and cameras, every canvas and number compared: `configs=36 canvases=756 pixelBytes=161343432 numbers=8562 otherLeaves=0 mismatches=0`; with one number changed on purpose the same harness reported `mismatches=305`, so it catches a difference.
+- `npx vitest run src/game/runs.db.test.ts --no-file-parallelism`: 34 passed (the tier, `msQuestion` of exactly 20000, `next.stolen`); `src/app/api/admin/test/route.db.test.ts`: 13 passed.
+- `npm run lint`: clean. `npx tsc --noEmit`: clean. `npm test`: 640 passed (`share.test.ts`: the share says Afterglow with 🟩 and ⬜, criterion 8).
+- `e2e/afterglow.e2e.ts`: a whole day (Kamuro, Chrysanthemum and Peony in their colours with "The host said …", Q2's lantern, a taken letter, off-list text kept selected, a reload on the sky result and mid-question, Next sent after the box shows with more than 19 s left, a dud's ending list, See results, the cards), a fuse out, and full screen with the × at 375×812 and 1440×900, a finished run opening on the cards: 4 passed. Surviving all seven, Show's over and its seven answers: `approve-and-play.e2e.ts`, 2 passed (with afterglow.e2e.ts, `6 passed (3.5m)`). An admin's test run, its label and Restart over the scene, its × and See results back to the puzzles page: `test-run.e2e.ts`, `4 passed (46.7s)`.
+- The whole suite (`npx playwright test --reporter=line`): `1 failed`, `162 passed (27.1m)`. The failure, `streak.e2e.ts:38`, looked for the top bar's pill just after Start, which Afterglow hides (answer 3); it now reads the pill back on Today: `streak.e2e.ts` and `text-size.e2e.ts`, `6 passed (16.3s)`.
+- Screenshots at 390×844 and 1440×900 (the question, the wait, the sky result, a lantern, a taken letter, off-list text, a dud's ending list) looked as the mock does; they are in the session's scratchpad, not in the repo.
+- Not checked: a real phone, real Chrome's frame rate and Reduce motion (6b-2's check and 6c).
+- PR #169's first CI e2e run (run 42531148650 at 1ad2b21): `1 failed`, `2 flaky`, `160 passed (27.9m)`. The failure, `afterglow.e2e.ts`'s failed-Next test, found two alerts: the scene's error and Next.js's own route announcer, which in CI held "Plor, Today"; the test now looks in the game's region. `test-run.e2e.ts`'s first test ran past Playwright's 30 s on its first try, since 6b-1 has it play a second run; it's now `test.slow()`. The other flaky one was `play2.e2e.ts:51` (ROADMAP, For M14). Both fixed tests locally: `4 passed (58.7s)`.
+
 ## Review
+14c-6b-1, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff origin/main...HEAD` at 3de8c14:
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. A failed Next left the box empty with the × hidden, and a failed time-up left the box refusing input: the player was held full screen with no way out. Fixed: either failure leaves its error over the scene and shows the × (`scene.ts`, `stranded`); `afterglow.e2e.ts` "a Next that fails says so and shows the way out".
+  2. Two silent stalls: a Next reply with no question, and a time-up that found no run. Fixed: each is an error the page shows (`game.tsx`, `Run`'s `fault` and `Game`'s `timeUp`).
+  3. A page shown again whose new load failed showed Afterglow's dark for good, hiding the error. Fixed: the error shows instead.
+  4. Handjet failing to load was an unhandled rejection the player never saw. Fixed: `Io.fault`, shown over the scene.
+  5. HANDOFF and the ROADMAP row were stale. Rewritten.
+  6. DESIGN.md's new citations pointed at moved lines. Recomputed from the code, older ones in `game.tsx` too.
+  7. `useRun`'s `load` was returned with no caller left. Removed, its comment fixed.
+- Evidence after the fixes: `npx tsc --noEmit` and `npm run lint` clean; `npx playwright test e2e/afterglow.e2e.ts e2e/test-run.e2e.ts e2e/jumps-and-finds.e2e.ts --reporter=line`: `11 passed (4.0m)`.
+- Deferred to ROADMAP "Next revision" (For M14): the full-screen test's top bar and `h1`, the off-list shake (6b-2), the weak reload-seconds check, a test run left by Back, the HUD's `aria-label` on a plain `div`, the new prompt not announced, the "Name a firework…" placeholder (for the human), and DECISIONS.md's Styling sentence order.

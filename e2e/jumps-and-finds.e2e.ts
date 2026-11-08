@@ -7,6 +7,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
+import { answerBox } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -25,10 +26,13 @@ test.afterAll(async () => {
 
 const tab = (page: Page, name: string) => page.getByRole("navigation", { name: "Main" }).getByRole("link", { name });
 
-// Signed in on Today: starts question 1, then goes to the Friends tab, where its clock bar counts down.
+// Signed in on Today: starts question 1, then goes to the Friends tab, where its clock bar counts down. Mid-question
+// the game is full screen with no tabs (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 5), so the way
+// out is the browser's Back to Today, whose tabs lead on.
 async function inPlayOnFriends(page: Page) {
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
+  await page.goBack();
   await tab(page, "Friends").click();
   await expect(page.getByRole("region", { name: "Friends leaderboard" })).toBeVisible();
   await page.waitForLoadState("networkidle");

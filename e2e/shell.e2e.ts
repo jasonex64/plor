@@ -4,6 +4,7 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
+import { answerBox } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -189,18 +190,23 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
   }
 });
 
-// The tabs stay during a run, and leaving lets the timer run (M14 L18): back on the game screen, the question is still
-// in play. On the game screen the Today tab is current, as the page it opens from (14a-2b).
+// Leaving lets the timer run (M14 L18): back on the game screen, the question is still in play. On the game screen the
+// Today tab is current, as the page it opens from (14a-2b). Since 14c-6 the tabs hide while a question is in play, the
+// game full screen with no × (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 5), so the way to
+// another tab is the browser's Back to Today.
 test("a question in play is still there after a visit to another tab", async ({ browser }) => {
   const { page, nav } = await player(browser, "se", { width: 360, height: 800 });
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
-  await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
+  await expect(answerBox(page)).toBeVisible();
+  // The tabs are hidden while the question is in play; that Today is the current tab on the game screen is checked
+  // before Start by offbeat.e2e.ts ("Play opens the game screen").
+  await expect(nav).toBeHidden();
+  await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
   await expect(page).toHaveURL("http://localhost:3000/afterglow");
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
 });
 
 // Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
@@ -212,11 +218,13 @@ test("away from the game screen, a question in play shows its clock above the ta
   await page.goto("/");
   await signInAndPick(page, "sh");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   // Not on the game screen itself, which shows the question's own countdown.
   const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
+  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
 
   await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
@@ -382,7 +390,9 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
 
   await page.goto("/");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
+  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
   expect(await underlined(), "the clock bar").toEqual([]);

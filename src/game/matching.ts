@@ -2,7 +2,7 @@
 // The player types free text and the server alone turns it into a thing of the question's category, as the answer
 // database stood when the day was approved (private.resolve_answer). The only runtime rule is the deterministic
 // one-typo auto-correct (human, 2026-10-21; M04 "Rules to build", rule 2).
-import { avoids, normalize, type ApprovedPuzzle, type Level } from "../content/puzzle.ts";
+import { avoids, normalize, tierOf, type ApprovedPuzzle, type Level, type Tier } from "../content/puzzle.ts";
 import { TYPO_MAX_EDITS, TYPO_MIN_LETTERS } from "../config/tunables.ts";
 import type { Db } from "../lib/db.ts";
 
@@ -44,7 +44,7 @@ export function withinTypo(text: string): string[] {
   return [...all];
 }
 
-const RANK: Record<Level | "rare", number> = { common: 0, uncommon: 1, rare: 2 };
+const RANK: Record<Tier, number> = { common: 0, uncommon: 1, rare: 2 };
 
 // The one answer some candidates of the same alias are. A host who catches any meaning of the name catches it (human,
 // 2026-10-24: "Caught if any meaning is"); a name on one line of the tree is its highest member, which covers the rest;
@@ -56,7 +56,7 @@ export function pickAnswer(candidates: Candidate[], levels: Record<string, Level
   const ids = new Set(pool.map((c) => c.thing_id));
   const tops = pool.filter((c) => !c.ancestors.some((a) => a !== c.thing_id && ids.has(a)));
   const [best] = tops.sort(
-    (a, b) => RANK[levels[a.thing_id] ?? "rare"] - RANK[levels[b.thing_id] ?? "rare"] || a.thing_id.localeCompare(b.thing_id),
+    (a, b) => RANK[tierOf(levels, a.thing_id)] - RANK[tierOf(levels, b.thing_id)] || a.thing_id.localeCompare(b.thing_id),
   );
   return { thingId: best.thing_id, caught };
 }

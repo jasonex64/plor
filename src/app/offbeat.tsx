@@ -63,7 +63,8 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
 
   return (
     <div className={styles.screen}>
-      <p className={styles.back}>
+      {/* In a run the game is full screen, with its own way out (docs/milestones/M14-14c-6-afterglow-in-play.md). */}
+      <p className={styles.back} hidden={playing}>
         <ButtonLink href="/" transitionTypes={BACK}>
           <span aria-hidden="true">‹ </span>Today
         </ButtonLink>
@@ -84,25 +85,44 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
 
 // A test run's screen (docs/milestones/M14-14b-11-test-runs.md): the game screen as players see it (human, 2026-10-29,
 // answer 3: "i need the real screen and animations so i can critique it"), under a "Test run" label and Restart, which
-// stay in view the whole run (answer 12). Back goes to the admin puzzles page, where Play test is. After the run the
-// cards come back as on the game screen; the comments don't (answer 6).
+// stay in view the whole run (answer 12): in a run they ride over Afterglow's scene, whose × goes back to the admin
+// puzzles page (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 11 and 26). Back goes to the admin puzzles
+// page, where Play test is. After the run the cards come back as on the game screen; the comments don't (answer 6).
 export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: string[][] | null }) {
   const [playing, setPlaying] = useState(false);
   const [restarts, setRestarts] = useState(0);
+  const label = `Test run${hostAnswers ? " of the draft" : ""}: nothing is saved`;
+  const again = () => setRestarts((n) => n + 1);
+  const restart = (
+    <button type="button" onClick={again}>
+      Restart
+    </button>
+  );
   return (
     <div className={styles.screen}>
-      <div className={`${styles.back} ${styles.testBar}`}>
-        <ButtonLink href="/admin/puzzles" transitionTypes={BACK}>
-          <span aria-hidden="true">‹ </span>Puzzles
-        </ButtonLink>
-        <span className={kit.chip}>Test run{hostAnswers ? " of the draft" : ""}: nothing is saved</span>
-        <button type="button" onClick={() => setRestarts((n) => n + 1)}>
-          Restart
-        </button>
-      </div>
+      {!playing && (
+        <div className={`${styles.back} ${styles.testBar}`}>
+          <ButtonLink href="/admin/puzzles" transitionTypes={BACK}>
+            <span aria-hidden="true">‹ </span>Puzzles
+          </ButtonLink>
+          <span className={kit.chip}>{label}</span>
+          {restart}
+        </div>
+      )}
       <section aria-label={`${GAME.name} test run`} className={styles.game}>
         {/* Restart mounts the run again, from the rules (answer 12). */}
-        <TestGame key={restarts} date={date} hostAnswers={hostAnswers} onPlaying={setPlaying} />
+        <TestGame
+          key={restarts}
+          date={date}
+          hostAnswers={hostAnswers}
+          onPlaying={setPlaying}
+          onRestart={again}
+          label={
+            <p>
+              {label} {restart}
+            </p>
+          }
+        />
       </section>
       {!playing && (
         <div className={styles.cards}>
