@@ -173,8 +173,11 @@ describe("Offbeat's game screen", () => {
       await client.query("set local session_replication_role = replica");
       await client.query("delete from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [P.userId, day[2]]);
       await client.query("set local session_replication_role = origin");
-      expect(await settleRuns(client, [P.userId], day[2])).toBe(0);
-      expect(await settleRuns(client, [P.userId], day[1])).toBe(1);
+      const row = async () => (await client.query("select points from private.points_ledger where user_id = $1 and puzzle_date = $2::date", [P.userId, day[2]])).rows;
+      await settleRuns(client, day[2]);
+      expect(await row()).toEqual([]);
+      await settleRuns(client, day[1]);
+      expect(await row()).toEqual([{ points: 0 }]);
     });
   });
 

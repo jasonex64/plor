@@ -4,12 +4,15 @@
 // group's members, highest total first, this week and last week below it (W1). A day's points arrive once that day is
 // over (M09 D9), so loading it once is enough. Mockup 3's "Friends leaderboard" card (M14 14b-8c): each week's
 // heading with its first day as a chip, then its badged rows. Since 14b-14 (docs/milestones/M14-14b-14-leaderboard-graph.md)
-// a List / Graph switch shows each week as a race instead, with Find a player over both.
+// a List / Graph switch shows each week as a race instead, with Find a player over both. Since M16 16e-2 a Game switch
+// picks game 1's board or game 2's, and since 16e-3b the overall one, list only, by Sum or Average
+// (docs/milestones/M16-16e-points-and-boards.md, answers 23, 29 and 33).
 import { useEffect, useId, useState } from "react";
-import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
+import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallWeek, Week } from "@/friends/leaderboard";
+import { ranked } from "@/friends/rank";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
-import { GAME, SUBSTRINGS } from "@/platform/game";
+import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import styles from "./leaderboard.module.css";
@@ -20,26 +23,31 @@ import { Race, RaceTable, hiddenText } from "./race";
 import raceStyles from "./race.module.css";
 import { Line, Skeleton } from "./skeleton";
 
-// The games a board switches between (M16 16e-2, answer 23), game 1 first, as on every load.
-const GAMES = [GAME, SUBSTRINGS] as const;
+// The games a board switches between (M16 16e-2, answer 23), game 1 first, as on every load, then the overall board
+// (16e-3b, answer 29).
+const GAMES = [GAME, SUBSTRINGS, OVERALL] as const;
 
 // title names the board (its heading and region); path is the API route that returns it, which the game is added to.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
-  const [board, setBoard] = useState<Board | null>(null);
+  const [board, setBoard] = useState<Board | OverallBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
+  // The overall board's Sum on every load, or its Average (answer 29).
+  const [average, setAverage] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const name = useId();
   const gameName = useId();
+  const countName = useId();
   // Switching games faster than the answers come back shows only the newest game's (M11 H6).
   const [latest] = useState(latestOnly);
   const places = game === SUBSTRINGS.id;
+  const overall = game === OVERALL.id;
 
   useEffect(() => {
     const url = `${path}${path.includes("?") ? "&" : "?"}game=${game}`;
-    latest(api<Board>(url, { method: "GET" }), (b) => (setBoard(b), setError(null)), (err) => setError(errorText(err)));
+    latest(api<Board | OverallBoard>(url, { method: "GET" }), (b) => (setBoard(b), setError(null)), (err) => setError(errorText(err)));
   }, [path, game, latest]);
 
   const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
@@ -62,23 +70,43 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
           </label>
         ))}
       </div>
-      {/* Today's period switch, once more (answer 3). */}
-      <div role="radiogroup" aria-label="View" className={styles.switch}>
-        {([false, true] as const).map((g) => (
-          <label key={String(g)} className={graph === g ? `${styles.choice} ${styles.on}` : styles.choice}>
-            <input type="radio" name={name} checked={graph === g} onChange={() => setGraph(g)} />
-            {g ? "Graph" : "List"}
-          </label>
-        ))}
-      </div>
-      {graph && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
+      {/* The overall board is a list (answer 33): Sum or Average in the place of List or Graph. */}
+      {overall ? (
+        <div role="radiogroup" aria-label="Count" className={styles.switch}>
+          {([false, true] as const).map((a) => (
+            <label key={String(a)} className={average === a ? `${styles.choice} ${styles.on}` : styles.choice}>
+              <input type="radio" name={countName} checked={average === a} onChange={() => setAverage(a)} />
+              {a ? "Average" : "Sum"}
+            </label>
+          ))}
+        </div>
+      ) : (
+        // Today's period switch, once more (answer 3).
+        <div role="radiogroup" aria-label="View" className={styles.switch}>
+          {([false, true] as const).map((g) => (
+            <label key={String(g)} className={graph === g ? `${styles.choice} ${styles.on}` : styles.choice}>
+              <input type="radio" name={name} checked={graph === g} onChange={() => setGraph(g)} />
+              {g ? "Graph" : "List"}
+            </label>
+          ))}
+        </div>
+      )}
+      {graph && !overall && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
       <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
-      {/* A game 2 week adds up places, not points (answer 24). */}
+      {/* A game 2 week adds up places, not points (answer 24); the overall board's notes are Claude's words, approved with
+          the design (16e-3 in detail). */}
       {places && <p className={styles.note}>Each day adds the % of players you beat.</p>}
-      {board && (
+      {overall && <p className={styles.note}>{average ? "Your average % of players beaten, per game played." : "Each day adds the % of players you beat, in each game."}</p>}
+      {board && overall && (
         <>
-          <Standings label="This week" week={board.thisWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
-          <Standings label="Last week" week={board.lastWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
+          <OverallStandings label="This week" week={(board as OverallBoard).thisWeek} average={average} />
+          <OverallStandings label="Last week" week={(board as OverallBoard).lastWeek} average={average} />
+        </>
+      )}
+      {board && !overall && (
+        <>
+          <Standings label="This week" week={(board as Board).thisWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
+          <Standings label="Last week" week={(board as Board).lastWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
         </>
       )}
       {!board && !error && (
@@ -200,6 +228,21 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
       {drawn && <Race label={label} week={week} picked={picked} onPick={onPick} />}
       {drawn && week.hidden.length > 0 && <p className={styles.note}>{hiddenText(week.hidden)}</p>}
       {drawn && table && <RaceTable label={label} week={week} picked={picked} />}
+    </section>
+  );
+}
+
+// An overall week (answer 29): its rows by Sum, as the server ranks them, or by Average, ranked again here, each a
+// plain number like game 2's (answer 24).
+function OverallStandings({ label, week, average }: { label: string; week: OverallWeek; average: boolean }) {
+  const entries = average ? ranked(week.entries.map((e) => ({ ...e, points: e.average })), (e) => e.points) : week.entries;
+  return (
+    <section aria-label={label} className={styles.week}>
+      <div className={kit.head}>
+        <h3>{label}</h3>
+        <span className={kit.chip}>From {dayText(week.from)}</span>
+      </div>
+      <Entries entries={entries} places />
     </section>
   );
 }
