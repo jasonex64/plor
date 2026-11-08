@@ -29,7 +29,7 @@ No entry in `docs/SOURCES.md` covers a word list, word frequencies or this game'
 ## Answers (human, 2026-11-05)
 The human's question: "if theres no actual risk or bottleneck we should start on the second game since ideally i want to have 2 games on launch". Claude's reply named no blocker and these costs: the split shares files with the `/play` build, the run model is hard to reverse, the open decisions and a second design need the human's time, and the dictionary's size isn't measured.
 1. When: "Both in the beta (Recommended)". The beta tests both games, and the split happens before any real player data exists. This replaces "after launch".
-2. The look: "Moonbrew (Recommended)". The cauldron theme kept from M14 14c-3, on its private mocks page; it still needs rebuilding to Afterglow's standard.
+2. The look: "Moonbrew (Recommended)". The cauldron theme kept from M14 14c-3, on its private mocks page; it still needs rebuilding to Afterglow's standard. **Replaced** (human, 2026-11-07, 16g-1 answer 1: "Game 2, replace Moonbrew"): game 2 gets a low-poly 3D look from polyfork.dev's models (`docs/milestones/M16-16g-1-low-poly-mocks.md`).
 3. The dictionary: "ENABLE + Moby + SCOWL (Recommended)".
 4. Order against the `/play` build, asked twice: first "wait why is game 2 two separate games??" (Claude's "split" meant separating Plor's shared parts from game 1's rules; game 2 is one game), then "im not very technically versed but can't we build like the stuff besides the visuals first for game 2 simultaneous.ly". **Claude's reading, for approval:** yes. The dictionary, the database, the server's word check and a plain play screen go on alongside M14; the screens shared with game 1 wait for the `/play` build. Whether the server work avoids that build's files is *unverified*: it has no ticket yet.
 5. Profiles, search and friend requests come after this milestone, before the beta (M17).
@@ -154,7 +154,7 @@ Non-visual, alongside M14:
 
 After M14's `/play` build merges (shared screens):
 5. **16f, the shared pieces.** Today with two games, the shared streak (answer 2), each game's comments and reactions (answer 3), the labelled mixed feed (answer 4), Me, the live board, groups and Share (S12).
-6. **16g, Moonbrew:** the game's look, as M14 14c did for game 1.
+6. **16g, the game's look,** as M14 14c did for game 1: a low-poly 3D look, not Moonbrew (16g-1 answer 1). **16g-1,** two playable mocks, Midnight Brew and Bug's-Eye Garden, built and published, waits on the human's pick (`docs/milestones/M16-16g-1-low-poly-mocks.md`); then **16g-2** builds the pick into `/play2`.
 
 ## Removes
 Nothing yet: this is a draft ticket with no code. The split (16b) is where something gets removed, such as the single `GAME_ID` constant as the only game.
