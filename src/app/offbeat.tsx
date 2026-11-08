@@ -5,15 +5,14 @@
 // SideColumn). Laid out from round 5's mockup.
 import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/config/tunables";
+import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Stats, Yesterday } from "@/game/offbeat";
-import type { RunState } from "@/game/runs";
 import { api } from "@/lib/api-client";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
 import { Comments } from "./comments";
 import { AnswerSearch } from "./answer-search";
-import { Game, TestGame, useStartRun } from "./game";
+import { Game, TestGame } from "./game";
 import { expectingPlay } from "./to-play";
 import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
@@ -239,59 +238,6 @@ function YesterdaysAnswers({ yesterday }: { yesterday: Yesterday }) {
           ))}
         </ol>
       )}
-    </section>
-  );
-}
-
-// The questions where a letter is taken, from tunables.ts: "2, 4, 5 and 7".
-const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
-  LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
-);
-
-// How to play, from round 3's wording (L29; provisional, L32) in the host's and neutral words since 14c-2
-// (docs/milestones/M14-14c-2-neutral-words.md), with the game's numbers from tunables.ts (the 20 seconds are judged in
-// SQL, private.question_deadline). Start playing starts the run and goes to the game screen, as Start does there, and
-// shows only before today's run has started (docs/milestones/M14-14a-2c-review-fixes.md).
-export function HowToPlay() {
-  const starting = useStartRun(BACK);
-  const [error, setError] = useState<string | null>(null);
-  const [run, setRun] = useState<RunState | null>(null);
-  useEffect(() => {
-    api<{ run: RunState | null }>("/api/run", { method: "GET" }).then(
-      (r) => setRun(r.run),
-      (err) => setError(errorText(err)),
-    );
-  }, []);
-
-  return (
-    <section aria-label="How to play" className={`${kit.card} ${styles.how}`}>
-      <p className={styles.back}>
-        <ButtonLink href={GAME.path} transitionTypes={BACK}>
-          <span aria-hidden="true">‹ </span>
-          {GAME.name}
-        </ButtonLink>
-      </p>
-      <h2 className={styles.heading}>How to play</h2>
-      <p>The host has already picked a few answers to every question. Say one of them and your run ends.</p>
-      <p>{QUESTIONS_PER_DAY} questions, one run. You get 20 seconds for each.</p>
-      <p>
-        Think off the beaten path. If the host didn&apos;t pick it, you&apos;re safe, and the rarer your answer, the
-        bigger your bonus.
-      </p>
-      <p>Typo? No harm done. If it isn&apos;t a real answer, just try again.</p>
-      <p>
-        Watch your letters. On questions {STEALS} a letter is taken, so you&apos;ll have to answer without it.
-      </p>
-      <p>
-        Each question is worth more than the last: {POINTS_PER_QUESTION[0]} points for the first,{" "}
-        {POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} for the last. Run out of time and the run ends too.
-      </p>
-      {run?.status === "not_started" && (
-        <button type="button" className={kit.primary} disabled={starting.busy} onClick={() => void starting.start()}>
-          Start playing
-        </button>
-      )}
-      {(error ?? starting.error) && <p role="alert">{error ?? starting.error}</p>}
     </section>
   );
 }

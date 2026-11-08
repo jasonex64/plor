@@ -26,6 +26,7 @@ import kit from "./kit.module.css";
 import { CopyField, shareLink } from "./share";
 import { GAME } from "@/platform/game";
 import { Afterglow, AfterglowLoading } from "@/afterglow/afterglow";
+import { HowToPlay } from "@/afterglow/how-to-play";
 import type { Asked, Reply, Result as Shown, Start } from "@/afterglow/scene";
 import { Line, Skeleton } from "./skeleton";
 import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
@@ -75,9 +76,9 @@ function useRun({ onOver, onDayOver }: DayHooks) {
   return { run, setRun, noPuzzle, error, setError, over };
 }
 
-// Starts today's run and opens the game screen with question 1 in play: Start playing on How to play, and Play on
-// Today with Skip the game screen on. direction: the slide, back up from How to play, forward from Today (14b-6e).
-export function useStartRun(direction: string[]) {
+// Starts today's run and opens the game screen with question 1 in play, sliding forward from Today (14b-6e): Play on
+// Today with Skip the game screen on.
+function useStartRun() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +88,7 @@ export function useStartRun(direction: string[]) {
     try {
       await api("/api/run/start", { method: "POST" });
       markToPlay();
-      router.push(GAME.path, { transitionTypes: direction });
+      router.push(GAME.path, { transitionTypes: FORWARD });
     } catch (err) {
       setError(errorText(err));
       setBusy(false);
@@ -100,7 +101,7 @@ export function useStartRun(direction: string[]) {
 // after it, the score, how it ended, the result and the time to the next puzzle.
 export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
   const { run, noPuzzle, error, over } = useRun(hooks);
-  const starting = useStartRun(FORWARD);
+  const starting = useStartRun();
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : <BannerSkeleton />;
   return (
@@ -112,6 +113,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
               Play
             </ButtonLink>
+            <HowToPlay className={kit.small} />
           </>
         )}
         {/* Skipping the game screen skips its rules line too, so the time limit is said here before it runs (WCAG 2.2
@@ -123,6 +125,8 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             <button type="button" className={`${kit.primary} ${styles.play}`} disabled={starting.busy} onClick={() => void starting.start()}>
               Play
             </button>
+            {/* Under Play, smaller, before the run, with or without Skip the game screen (14c-6 answers 30 and 40). */}
+            <HowToPlay className={kit.small} />
             {starting.error && <p role="alert">{starting.error}</p>}
           </>
         )}
@@ -410,9 +414,8 @@ function Run({
           <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
             Start
           </button>
-          <ButtonLink href={`${GAME.path}/how-to-play`} transitionTypes={FORWARD}>
-            How to play
-          </ButtonLink>
+          {/* Opens over the screen (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 30 and 34). */}
+          <HowToPlay />
         </>
       )}
       {over && <Result run={run} saved={saved} />}

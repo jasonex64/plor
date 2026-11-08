@@ -1,15 +1,14 @@
 // 14b-18, headings, signed-in Today, invites and words (docs/milestones/M14-14b-18-headings-today-invites-words.md):
 // from 768px the page's name sits under "Plor" in its one heading; a signed-in player never sees Today's introduction;
-// the streak pill is a 44px target; Back from How to play slides back; a refused clipboard shows the link to copy; your
+// the streak pill is a 44px target; a refused clipboard shows the link to copy; your
 // own invite link doesn't say a friend invited you; the 404 has no feed beside it; dates, bullets, reactions and back
 // arrows read one way.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, emailedCode, forwardPlayerIp, play, sharedLink, signInAndPick } from "./players";
-import { answerBox, caughtToCards } from "./afterglow";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { slideOf, watchSlides } from "./slides";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const PHONE = { width: 390, height: 844 };
@@ -43,7 +42,6 @@ test("from 768px the page's name sits under Plor in its heading, by the tab it's
   const named = [
     ["/", "Today"],
     [GAME.path, "Today"],
-    [`${GAME.path}/how-to-play`, "Today"],
     ["/friends", "Friends"],
     ["/groups", "Groups"],
     ["/me", "Me"],
@@ -139,18 +137,6 @@ test("the streak pill is a 44px target in the top bar and the sidebar, and looks
       }), points);
     expect(reach, `${size.width}px`).toEqual(points.map(() => ({ top: "/streak", others: 0 })));
   }
-});
-
-test("the clock bar's Back on How to play slides back up to the game screen", async ({ page }) => {
-  await page.goto("/");
-  await signInAndPick(page, "hb");
-  await play(page);
-  await expect(answerBox(page)).toBeVisible();
-  await page.goto(`${GAME.path}/how-to-play`);
-  const slides = await watchSlides(page);
-  await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL(new RegExp(`${GAME.path}$`));
-  expect((await slideOf(slides, 1)).types).toEqual(["nav-back"]);
 });
 
 test("a refused clipboard shows the link to copy, for an invite, a group and the result", async ({ page }) => {
@@ -255,7 +241,7 @@ test("the feed's past day reads like every other date, comments have no bullets,
   await feed.getByRole("button", { name: "Earlier day" }).click();
   await expect(page.getByRole("heading", { level: 2, name: /^Friends' comments on (Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d{1,2} [A-Z][a-z]{2}$/ })).toBeVisible();
 
-  for (const path of [GAME.path, `${GAME.path}/how-to-play`, "/streak"]) {
+  for (const path of [GAME.path, "/streak"]) {
     await page.goto(path);
     await expect(page.getByRole("main").getByRole("link").first()).toBeVisible();
     expect(await page.getByRole("main").innerText(), path).not.toContain("←");
