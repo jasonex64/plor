@@ -8,6 +8,7 @@
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
+// Game 2's dictionary is fetched the same way, `npm run base -- fetch dictionary` (M16 16a), and nothing loads it yet.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -23,6 +24,8 @@ import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory
 import { normalize } from "../src/content/puzzle.ts";
 import { thingId } from "../src/content/thing-id.ts";
 import { isListed, isPlorListed } from "../src/game/misses.ts";
+import { DICTIONARY_METHOD, type DictionaryEntry, fetchDictionary } from "./dictionary.ts";
+import { plainText } from "../src/game/substring-try.ts";
 
 export type Alias = { alias: string; kind: "name" | "synonym" | "plural" | "scientific" };
 // The facts subsets filter on (13e-4a, O2: "A core few") ride on an item beside its tree: thing-valued ones as source
@@ -41,7 +44,9 @@ export type Item = {
 // The sources, written once: the type and the hand files' ref check both read it (13e-9b review; 13f-4c).
 const SOURCES = ["wikidata", "oewn", "usda"] as const;
 type Source = (typeof SOURCES)[number];
+const WORD_LISTS = "word-lists";
 type SetDef<T = Item> = { source: Source; method: string; fetch: () => Promise<T[]> };
+type FetchDef<T> = Omit<SetDef<T>, "source"> & { source: Source | typeof WORD_LISTS };
 
 // --- aliases ---
 
@@ -1025,11 +1030,11 @@ const SETS: Record<string, SetDef> = {
 
 // --- snapshots, manifests, loading and review ---
 
-type Manifest = { set: string; source: Source; snapshot: string; retrieved_at: string; method: string; items: number; sha256: string };
+type Manifest = { set: string; source: Source | typeof WORD_LISTS; snapshot: string; retrieved_at: string; method: string; items: number; sha256: string };
 const manifestPath = (set: string) => join("data", "manifests", `${set}.json`);
 const snapshotPath = (set: string, snapshot: string) => join("data", "snapshots", set, `${snapshot}.json`);
 
-function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
+export function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] } {
   const manifest = JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
   // A machine without the snapshots is told what to do, not given ENOENT (13e-5 second review; 13f-4c).
   if (!existsSync(snapshotPath(set, manifest.snapshot))) {
@@ -1041,7 +1046,7 @@ function readSnapshot<T = Item>(set: string): { manifest: Manifest; items: T[] }
   return { manifest, items: JSON.parse(text) as T[] };
 }
 
-async function fetchSet<T>(set: string, def: SetDef<T>): Promise<void> {
+async function fetchSet<T>(set: string, def: FetchDef<T>): Promise<void> {
   const items = await def.fetch();
   const snapshot = new Date().toISOString().slice(0, 10);
   const text = JSON.stringify(items);
@@ -1070,6 +1075,27 @@ export async function localClient(): Promise<pg.Client> {
   const client = new pg.Client(database);
   await client.connect();
   return client;
+}
+
+// Game 2's word list, replaced in one transaction, so a day never sees half of it, and a failed load leaves the old list
+// (M16 16d; ROADMAP, For M16). The days use whatever is loaded (16b, answer 11).
+export async function loadDictionary(client: pg.Client, items: DictionaryEntry[]): Promise<void> {
+  const BATCH = 5000;
+  await client.query("begin");
+  try {
+    await client.query("delete from private.dictionary_word");
+    for (let i = 0; i < items.length; i += BATCH) {
+      const rows = items.slice(i, i + BATCH);
+      await client.query(
+        "insert into private.dictionary_word (word_key, spelling, plain, everyday) select * from unnest($1::text[], $2::text[], $3::text[], $4::boolean[])",
+        [rows.map((e) => e.key), rows.map((e) => e.spelling), rows.map((e) => plainText(e.spelling)), rows.map((e) => e.everyday === true)],
+      );
+    }
+    await client.query("commit");
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
+  }
 }
 
 async function loadSet(client: pg.Client, set: string, def: SetDef): Promise<void> {
@@ -1500,6 +1526,8 @@ export function withMerges(items: Item[], into: Map<string, string>): Item[] {
 }
 
 const MARKS_SET = "wikidata-sameness";
+export const DICTIONARY_SET = "dictionary";
+const DICTIONARY: FetchDef<DictionaryEntry> = { source: WORD_LISTS, method: DICTIONARY_METHOD, fetch: () => fetchDictionary(download) };
 const wikidataSets = () => Object.entries(SETS).filter(([, d]) => d.source === "wikidata").map(([set]) => set);
 
 // Each loaded Wikidata item's set and name, read once, and whether that name is its scientific name.
@@ -1830,9 +1858,21 @@ async function main(): Promise<void> {
     }
   }
   if (command === "fetch" && name === MARKS_SET) return fetchSet(MARKS_SET, MARKS);
+  if (command === "fetch" && name === DICTIONARY_SET) return fetchSet(DICTIONARY_SET, DICTIONARY);
+  if (command === "load" && name === DICTIONARY_SET) {
+    const { items } = readSnapshot<DictionaryEntry>(DICTIONARY_SET);
+    const client = await localClient();
+    try {
+      await loadDictionary(client, items);
+      console.log(`LOADED dictionary: ${items.length} spellings`);
+    } finally {
+      await client.end();
+    }
+    return;
+  }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}\n       npm run base -- load all\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${DICTIONARY_SET}\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);

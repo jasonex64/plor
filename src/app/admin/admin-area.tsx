@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { DayView } from "@/admin/puzzles";
+import type { SubstringDayView } from "@/admin/substring-sets";
 import type { ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
 import { ButtonLink } from "../button-link";
@@ -51,14 +52,15 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
   const [error, setError] = useState<string | null>(null);
   const refresh = useCallback(() => {
     Promise.all([
-      api<{ today: string; days: DayView[] }>("/api/admin/puzzles", { method: "GET" }),
+      api<{ today: string; days: DayView[]; substringDays: SubstringDayView[] }>("/api/admin/puzzles", { method: "GET" }),
       api<{ open: number }>("/api/admin/audit?count", { method: "GET" }),
       api<{ reports: ReportedComment[] }>("/api/admin/reports", { method: "GET" }),
     ]).then(
       ([puzzles, audit, reports]) => {
         const dates = (keep: (d: DayView) => boolean) => puzzles.days.filter(keep).map((d) => d.date).sort();
         setCounts({
-          toApprove: dates((d) => d.draft !== null && d.live === null),
+          // Both games' days, so a drafted game 2 day can't sit unnoticed (M16 16c-2).
+          toApprove: [...dates((d) => d.draft !== null && d.live === null), ...puzzles.substringDays.filter((d) => d.draft !== null && d.live === null).map((d) => d.date)].sort(),
           ahead: dates((d) => d.live !== null && d.date > puzzles.today),
           review: audit.open,
           reports: reports.reports,

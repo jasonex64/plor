@@ -45,6 +45,12 @@ test("an admin plays a draft as a test run, with a host answer changed on the pa
   await admin.goto("/");
   await signInAndPick(admin, "tra");
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-tra@example.test`]);
+  // The route's first visit, in the browser, so Play test's click isn't the one waiting on `next dev`: it stayed on this
+  // page past expect's 5 seconds twice in PR #155's CI, each time as the route first rendered. The time is logged to
+  // test that reading (docs/milestones/M16-16a-the-dictionary.md).
+  const opened = Date.now();
+  await admin.goto(`/admin/test/${ahead}`);
+  console.log(`/admin/test's first visit took ${Date.now() - opened} ms`);
   const runs = async () => (await DB.query<{ n: number }>("select count(*)::int as n from private.run r join auth.users u on u.id = r.user_id where u.email = $1", [`${RUN}-tra@example.test`])).rows[0].n;
 
   await admin.goto("/admin/puzzles");

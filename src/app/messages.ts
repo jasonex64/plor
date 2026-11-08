@@ -59,6 +59,7 @@ const MESSAGES: Record<string, string> = {
   no_puzzle_today: "There's no puzzle today yet. Check back later.",
   no_run: "Start today's puzzle first.",
   run_over: "This run is already over.",
+  round_running: "Finish this round first.",
   out_of_order: "That question isn't the current one. Reload the page.",
   already_answered: "You already answered that question. Reload the page.",
   stolen_letter: "One of those letters is taken. Try another answer.",

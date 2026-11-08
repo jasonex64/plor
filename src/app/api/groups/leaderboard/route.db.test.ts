@@ -107,7 +107,7 @@ describe("a group's leaderboard", () => {
 
   it("shows the group's members, friends or not, and no one else (G2, G3)", async () => {
     useSession(A.session);
-    const r = await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET");
+    const r = await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET");
     expect(r.status).toBe(200);
     expect(r.body.ok).toBe(true);
     expect(r.body.thisWeek.from).toBe(monday);
@@ -126,7 +126,7 @@ describe("a group's leaderboard", () => {
   it("leaves out a day while the viewer's own run that day is still going (M09 D5), as the friends board does", async () => {
     // B's Monday run, written with no answers, is still in progress, so B's view leaves Monday out, B's 1000 included.
     useSession(B.session);
-    const week = (await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body.thisWeek;
+    const week = (await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).body.thisWeek;
     const over = await overThisWeek(monday);
     expect(week.entries).toEqual([
       { username: A.username, name: A.username, points: 0, you: false, daily: thisWeekDays(over, 0) },
@@ -138,7 +138,7 @@ describe("a group's leaderboard", () => {
 
   it("leaves the friends board friends-only: A's shows C and not B (G2)", async () => {
     useSession(A.session);
-    expect(totals((await call(friendsBoard, "/api/leaderboard", "GET")).body).thisWeek).toEqual([
+    expect(totals((await call(friendsBoard, "/api/leaderboard?game=offbeat", "GET")).body).thisWeek).toEqual([
       [C.username, 10],
       [A.username, 0],
     ]);
@@ -147,18 +147,18 @@ describe("a group's leaderboard", () => {
   it("refuses anyone who isn't a member, and an ID that isn't a group, with the group page's 404", async () => {
     const notFound = { status: 404, body: { ok: false, error: "group_not_found" } };
     useSession(D.session);
-    expect(await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).toEqual(notFound);
+    expect(await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).toEqual(notFound);
     useSession(A.session);
-    expect(await call(groupBoard, "/api/groups/leaderboard?id=not-a-group", "GET")).toEqual(notFound);
-    expect(await call(groupBoard, "/api/groups/leaderboard?id=00000000-0000-0000-0000-000000000001", "GET")).toEqual(notFound);
+    expect(await call(groupBoard, "/api/groups/leaderboard?id=not-a-group&game=offbeat", "GET")).toEqual(notFound);
+    expect(await call(groupBoard, "/api/groups/leaderboard?id=00000000-0000-0000-0000-000000000001&game=offbeat", "GET")).toEqual(notFound);
   });
 
   it("drops a member once the creator removes them (G6)", async () => {
     useSession(A.session);
     expect((await call(remove, "/api/groups/remove", "POST", { id: club, username: B.username })).status).toBe(200);
-    expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body).thisWeek).toEqual([[A.username, 0]]);
+    expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).body).thisWeek).toEqual([[A.username, 0]]);
     useSession(B.session);
-    expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).status).toBe(404);
+    expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).status).toBe(404);
   });
 
   it("counts a member only from the puzzle day they joined, that day included, and the friends board their whole week (12d)", async () => {
@@ -180,9 +180,9 @@ describe("a group's leaderboard", () => {
     // C's days too (14b-14): the group's board has none of last week's, the friends board last Monday's 5.
     const lastDays = async (route: typeof groupBoard, path: string) =>
       (await call(route, path, "GET")).body.lastWeek.entries.find((e: Entry) => e.username === C.username).daily;
-    expect(await lastDays(groupBoard, `/api/groups/leaderboard?id=${club}`)).toEqual([0, 0, 0, 0, 0, 0, 0]);
-    expect(await lastDays(friendsBoard, "/api/leaderboard")).toEqual([5, 0, 0, 0, 0, 0, 0]);
-    expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body)).toEqual({
+    expect(await lastDays(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`)).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    expect(await lastDays(friendsBoard, "/api/leaderboard?game=offbeat")).toEqual([5, 0, 0, 0, 0, 0, 0]);
+    expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).body)).toEqual({
       thisWeek: [
         [C.username, 10],
         [A.username, 0],
@@ -192,7 +192,7 @@ describe("a group's leaderboard", () => {
         [C.username, 0],
       ],
     });
-    expect(totals((await call(friendsBoard, "/api/leaderboard", "GET")).body)).toEqual({
+    expect(totals((await call(friendsBoard, "/api/leaderboard?game=offbeat", "GET")).body)).toEqual({
       thisWeek: [
         [C.username, 10],
         [A.username, 0],
@@ -230,7 +230,7 @@ describe("a group's leaderboard", () => {
       [club, D.userId, w],
     );
     useSession(A.session);
-    const d = (await call(groupBoard, `/api/groups/leaderboard?id=${club}`, "GET")).body.lastWeek.entries.find((e: Entry) => e.username === D.username);
+    const d = (await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).body.lastWeek.entries.find((e: Entry) => e.username === D.username);
     expect([d.points, d.daily]).toEqual([18, [0, 0, 7, 0, 11, 0, 0]]);
   });
 });

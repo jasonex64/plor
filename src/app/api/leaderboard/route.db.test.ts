@@ -39,7 +39,7 @@ async function call(response: Promise<Response>) {
   const r = await response;
   return { status: r.status, body: await r.json() };
 }
-const leaderboard = () => call(leaderboardRoute(apiRequest("/api/leaderboard", { method: "GET" })));
+const leaderboard = () => call(leaderboardRoute(apiRequest("/api/leaderboard?game=offbeat", { method: "GET" })));
 type Entry = { username: string; name: string; points: number; you: boolean; daily: number[] };
 // The standings of yesterday's week.
 const standings = async (): Promise<Entry[]> => (await leaderboard()).body[yWeek].entries;

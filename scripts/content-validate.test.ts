@@ -9,6 +9,8 @@ import type { Puzzle } from "../src/content/puzzle.ts";
 import { validateRoot } from "./content-validate.ts";
 
 const FILE = "offbeat/2026-11-02.json";
+const GAME_2_FILE = "substrings/2026-11-03.json";
+const game2Day = (date: string, first = "ou") => ({ format: 1, game_id: "substrings", date, rounds: [first, "lu", "att", "yin", "odo", "hec", "vet"], bonus_letter: "f" });
 const id = (n: number) => `00000000-0000-5000-8000-${String(n).padStart(12, "0")}`;
 // Schedule A: Q2 and Q4 steal a medium letter, Q5 a heavy consonant, Q7 a vowel (M04 G8).
 const STEALS: (string | undefined)[] = [undefined, "c", undefined, "p", "r", undefined, "o"];
@@ -129,5 +131,27 @@ describe("content:validate with the bank and the gap", () => {
     expect(withBank([q])).toEqual([]);
     expect(withBank([{ ...q, category: "no_such_category" }])).toEqual([`bank.json question "name-a-x": category "no_such_category" is not in ${CATS}`]);
     expect(withBank([{ ...q, host_bank: ["a", "b"] }])).toEqual(['bank.json question "name-a-x": "host_bank" lists 2 names, at least 3 needed']);
+  });
+});
+
+// M16 16c: each game's folder is held to that game's rules.
+describe("content:validate on game 2's days", () => {
+  it("passes a good day beside game 1's, and counts both", () => {
+    expect(validateRoot(root({ [FILE]: JSON.stringify(valid()), [GAME_2_FILE]: JSON.stringify(game2Day("2026-11-03")) }), CATS)).toEqual({ files: 2, errors: [] });
+  });
+
+  it("holds a game 2 day to game 2's rules", () => {
+    const errors = validateRoot(root({ [GAME_2_FILE]: JSON.stringify({ ...game2Day("2026-11-03"), rounds: ["ou"] }) }), CATS).errors;
+    expect(errors.join("\n")).toMatch(/7 rounds/);
+  });
+
+  it("refuses a set back within 30 days", () => {
+    const days = { "substrings/2026-11-03.json": JSON.stringify(game2Day("2026-11-03")), "substrings/2026-11-04.json": JSON.stringify(game2Day("2026-11-04")) };
+    expect(validateRoot(root(days), CATS).errors.join("\n")).toMatch(/"ou" is used on 2026-11-03 and 2026-11-04/);
+  });
+
+  it("refuses a day in a folder that's no game's", () => {
+    const errors = validateRoot(root({ "substring/2026-11-03.json": JSON.stringify(game2Day("2026-11-03")) }), CATS).errors;
+    expect(errors.length).toBeGreaterThan(0);
   });
 });

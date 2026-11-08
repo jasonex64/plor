@@ -160,3 +160,46 @@ export const STREAK_RANK_FROM = [0, 1, 5, 15, 30, 90] as const;
 // Comments and reactions show at once and are sent when the toast's window ends, unless undone
 // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b; human, 2026-10-27: "5 seconds").
 export const UNDO_SECONDS = 5;
+
+// Game 2's dictionary (docs/milestones/M16-16a-the-dictionary.md). DICTIONARY_MAX_SIZE: the rarest words it takes, the
+// English Speller Database's size (human, 2026-11-05: "About 239,000 words (Recommended)"). DICTIONARY_MIN_LETTERS: the
+// shortest word (human, 2026-11-05: "3 letters or more (Recommended)").
+export const DICTIONARY_MAX_SIZE = 85;
+export const DICTIONARY_MIN_LETTERS = 3;
+// A word is everyday from this size down, which is what keeps a round fair: players never see it (human, 2026-11-06,
+// M16 S21: the everyday list, "Yes, use that").
+export const DICTIONARY_EVERYDAY_SIZE = 35;
+
+// A day of game 2 (docs/milestones/M16-16c-a-day-of-game-2.md, Numbers). Each round's letters and how many dictionary
+// words hold its set (human, 2026-11-06, S18: "2, 2, then five of 3 (Recommended)", "steady climb"). A band holds its
+// lower number and not its upper, as the human's bands touch (Claude's reading, in the ticket).
+export const SUBSTRING_ROUNDS = [
+  { letters: 2, atLeast: 5000, below: Infinity },
+  { letters: 2, atLeast: 2000, below: 5000 },
+  { letters: 3, atLeast: 1000, below: 2000 },
+  { letters: 3, atLeast: 500, below: 1000 },
+  { letters: 3, atLeast: 300, below: 500 },
+  { letters: 3, atLeast: 200, below: 300 },
+  { letters: 3, atLeast: 100, below: 200 },
+] as const;
+// The fewest everyday words a set must have (human, 2026-11-06, S21: "At least 5 (Recommended)").
+export const SUBSTRING_EVERYDAY_FLOOR = 5;
+// The fewest days between two uses of a set (human, 2026-11-06, S18: "30 days (Recommended)").
+export const SUBSTRING_REPEAT_GAP_DAYS = 30;
+// Days one draft makes (human, 2026-11-07: "7 days (Recommended)").
+export const SUBSTRING_BATCH_DAYS = 7;
+// Sample words each round shows in the PR's table (human, 2026-11-07: "4 words (Recommended)").
+export const SUBSTRING_SAMPLE_WORDS = 4;
+
+// Game 2's score (docs/milestones/M16-16e-points-and-boards.md, Numbers). Each part grows by `growth` a step from
+// `points` at `at`: a word by its letters, about 25% a letter (human, 2026-11-07: "kinda like 25 percent but round"),
+// and the run's different letters at its end, about 15% a letter ("15, but again round to nice numbers"). The sizes,
+// and the bonus letter's points for each word holding it, are Claude's so a typical run splits about a third each,
+// approved with their tables and worked runs ("Approve these sizes").
+export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25 } as const;
+export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const;
+export const SUBSTRING_BONUS_LETTER_POINTS = 120;
+
+// Players a day of a game needs before "Better than X% of players" shows (human, 2026-11-07: "10 players";
+// docs/milestones/M16-16e-points-and-boards.md, answer 16). A smaller day still counts on the boards (answer 17).
+export const PERCENTILE_MIN_PLAYERS = 10;

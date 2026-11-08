@@ -99,6 +99,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
+  'private.judge_word(uuid,date,text,text,text) execute',
   'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
   'private.missed_answer select',
@@ -133,6 +134,10 @@ select is(pg_temp.grants('plor_app'), array[
   -- A format-3 day's answers are resolved against the base, and named, through two guarded read-only functions (M13 13a-2).
   'private.resolve_answer(text,date,integer,text[]) execute',
   'private.resolve_draft_answer(uuid,jsonb,text[]) execute',
+  -- Game 2's words go through the judge alone, and a finished run's examples through round_examples; the status view
+  -- reads round_word as plor_app (M16 16d).
+  'private.round_examples(uuid,date) execute',
+  'private.round_word select',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
   'private.run_status select',
