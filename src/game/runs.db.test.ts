@@ -159,7 +159,7 @@ describe("a run, step by step", () => {
       points: POINTS_PER_QUESTION[0],
       bonus: answerBonus(0, firstGuess(q, entryId)),
     });
-    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
+    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null, stolen: publicQuestion(puzzle, 1).stolen });
   });
 
   it("refuses an answer before Next, then Next opens question 2 with its own 20 seconds, once", async () => {

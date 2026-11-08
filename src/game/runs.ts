@@ -48,8 +48,10 @@ export type RunState = {
   // A question's whole time, from the same rule (private.question_deadline), so Afterglow's fuse can burn the part
   // that's gone without a second copy of the 20 seconds (DECISIONS.md, Config and tunables).
   msQuestion: number;
-  // While the reveal waits for Next (G5): the letter taken at the next question, or null for none.
-  next: { steals: string | null } | null;
+  // While the reveal waits for Next (G5): the letter taken at the next question, or null for none, and every letter taken
+  // by then (that one included), so Afterglow's box shows them before Next's reply
+  // (docs/milestones/M14-14c-6-afterglow-in-play.md).
+  next: { steals: string | null; stolen: string[] } | null;
   // Points so far: the sum over answered questions, and the provisional rarity bonus so far (capped, M09).
   points: number;
   bonus: number;
@@ -141,7 +143,7 @@ function buildState(
     question,
     msLeft: question ? clock.msLeft : null,
     msQuestion: clock.msQuestion,
-    next: waiting ? { steals: puzzle.questions[stored.length].steals ?? null } : null,
+    next: waiting ? { steals: puzzle.questions[stored.length].steals ?? null, stolen: stolenLetters(puzzle, stored.length) } : null,
     points: answered.reduce((sum, a) => sum + a.points, 0),
     bonus: score.bonus,
     msToReset: clock.msToReset,

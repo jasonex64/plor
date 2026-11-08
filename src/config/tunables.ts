@@ -203,3 +203,226 @@ export const SUBSTRING_BONUS_LETTER_POINTS = 120;
 // Players a day of a game needs before "Better than X% of players" shows (human, 2026-11-07: "10 players";
 // docs/milestones/M16-16e-points-and-boards.md, answer 16). A smaller day still counts on the boards (answer 17).
 export const PERCENTILE_MIN_PLAYERS = 10;
+
+// Afterglow's look and motion (docs/milestones/M14-14c-6-afterglow-in-play.md): each value moved unchanged from the
+// approved mock, RIFF-mocks `themes/festival/game.js` at fcc11e4 (docs/milestones/M14-14c-5-firework-festival.md, its
+// Numbers), with the origin it gave there; "proposed" values are Claude's, approved with the look in 14c-5 and still
+// open to the human. Units: art pixels, seconds, or parts of the screen, as each says. The art's colours stay with the
+// art in src/afterglow/scene.ts (DECISIONS.md, Styling: drawn art keeps its own colours).
+export const AFTERGLOW = {
+  // human, 2026-11-05 (ticket 14c-4, answer 9)
+  FPS: 60,
+  // proposed, ticket 14c-5: how early a screen's frame may come and still be drawn, so a 60 Hz screen's jitter skips nothing
+  FRAME_SLACK_MS: 1,
+  // ticket 14c-5: art rows on a tall and a wide screen
+  REF_TALL: 633,
+  REF_WIDE: 540,
+  // proposed, ticket 14c-5: art pixels from the screen's edge
+  EDGE: 6,
+  // proposed, ticket 14c-5: the box's top, as a part of the height
+  PROMPT_Y: .24,
+  // proposed, ticket 14c-5: the box's width at type scale 1, in CSS px
+  PROMPT_W: 230,
+  // proposed, ticket 14c-5: when the sparks grow and the box shakes
+  LATE_SECONDS: 5,
+  // proposed, ticket 14c-5: the cord's thickness at type scale 1 in CSS px, and never under this many art pixels
+  FUSE_CSS: 3,
+  FUSE_MIN: 4,
+  // proposed, ticket 14c-5: the prompt pill's corner at type scale 1, in CSS px
+  PROMPT_R: 18,
+  // proposed, ticket 14c-5: art pixels in each step of a pill's corner
+  PILL_STEP: 2,
+  // proposed, ticket 14c-5: art pixels along the cord for one turn of its twist
+  TWIST: 8,
+  // proposed, ticket 14c-5: art pixels of still-glowing cord behind the spark
+  FUSE_HOT: 20,
+  // proposed, ticket 14c-5: the burning head's arm in art pixels, before and at the end of the last seconds
+  SPARK_EARLY: 5,
+  SPARK_LATE: 13,
+  // proposed, ticket 14c-5: the head's stepped glow, in art pixels
+  HEAD_GLOW: 13,
+  // proposed, ticket 14c-5: sparks spraying from the head, likewise
+  FLY_EARLY: 10,
+  FLY_LATE: 30,
+  // proposed, ticket 14c-5: how far they fly, in art pixels, and how long they last
+  FLY_REACH: 18,
+  FLY_LIFE: .5,
+  // proposed, ticket 14c-5: sparks spat all along the unburnt cord, before and at the end
+  SPIT_EARLY: 26,
+  SPIT_LATE: 60,
+  // proposed, ticket 14c-5: how far out they spit, and how long they last
+  SPIT_REACH: 13,
+  SPIT_LIFE: .42,
+  // proposed, ticket 14c-5: the box's shake, in whole art pixels, and how often it steps
+  SHAKE_MAX: 2,
+  SHAKE_HZ: 14,
+  // proposed, ticket 14c-5: clouds wander this many art pixels each way, over this many seconds
+  CLOUD_DRIFT: 18,
+  CLOUD_PERIOD: 90,
+  // proposed, ticket 14c-5: the part of the climb in which they come back to centre
+  CLOUD_HOME: .1,
+  // proposed, ticket 14c-5: how often a lit lantern may change, and how many are bright at once
+  FLICKER_HZ: 7,
+  FLICKER_SHARE: .3,
+  // proposed, ticket 14c-5: rising sparks at full light, their seconds, their art pixels
+  IDLE_SPARKS: 28,
+  IDLE_SPARK_LIFE: 2.6,
+  IDLE_SPARK_RISE: 46,
+  // proposed, ticket 14c-5: the launched word's type at scale 1, in CSS px; set once per word and never changed
+  WORD_SIZE: 42,
+  // proposed, ticket 14c-5: the most of the screen's width the word may take
+  WORD_MARGIN: .92,
+  // proposed, ticket 14c-5: the word's centre at street level and in the sky
+  CHARGE_Y: .64,
+  BURST_Y: .36,
+  // proposed, ticket 14c-5: seconds for the typed word to reach the front
+  WORD_ENTER: .22,
+  // proposed, ticket 14c-5: art pixels between the word and the ends of its pill
+  BOX_PAD: 12,
+  // proposed, ticket 14c-5: the rumble of word and box, in whole art pixels at full charge, and its steps per second at the start and end of the charge, so it tightens
+  RUMBLE: { common: { amp: 2, hz: [7, 18] }, uncommon: { amp: 3, hz: [8, 23] }, rare: { amp: 4, hz: [9, 30] }, caught: { amp: 2, hz: [7, 11] } },
+  // proposed, ticket 14c-5: the word sits down this many art pixels from this part of the charge, before it goes
+  DIP: 5,
+  DIP_FROM: .86,
+  // proposed, ticket 14c-5: a better answer charges longer
+  CHARGE_S: { common: .7, uncommon: 1.2, rare: 1.9 },
+  // proposed, ticket 14c-5: sparks gathering at full charge
+  CHARGE_SPARKS: { common: 14, uncommon: 26, rare: 44 },
+  // proposed, ticket 14c-5 (answer 27): about a second longer than version 5, the same distance, sooner for a better answer
+  CLIMB_S: { common: 3.7, uncommon: 3.3, rare: 2.9 },
+  // proposed, ticket 14c-5: floors of tower between the street and open sky
+  CLIMB_FLOORS: 30,
+  // proposed, ticket 14c-5: the launch's ease in and its slowing to a hang
+  CLIMB_IN: 2.2,
+  CLIMB_OUT: 3,
+  // proposed, ticket 14c-5: the part of the climb in which the word reaches its height in the frame
+  WORD_RISE: .62,
+  // proposed, ticket 14c-5: the sway, as a part of the screen's width: a better answer flies truer
+  WOBBLE: { common: .2, uncommon: .12, rare: .05 },
+  // proposed, ticket 14c-5: swings of the S-curve in a climb
+  SWAY_TURNS: { common: 1.6, uncommon: 1.3, rare: 1 },
+  // proposed, ticket 14c-5: the part of the climb after which the path is straight, hanging
+  SWAY_END: .84,
+  // proposed, ticket 14c-5: CSS px the box keeps from the screen's edge when it sways
+  WORD_EDGE: 8,
+  // proposed, ticket 14c-5: sparks blown out at takeoff, their seconds, and their reach as a part of the height
+  BLAST_N: { common: 18, uncommon: 28, rare: 44 },
+  BLAST_S: .5,
+  BLAST_R: .2,
+  // proposed, ticket 14c-5: the street jolts this many art pixels at takeoff, dying away over these seconds
+  LAUNCH_SHAKE: 4,
+  LAUNCH_SHAKE_S: .3,
+  // proposed, ticket 14c-5: how far the view has risen, as a part of the height, when the tower has closed in from the screen's edges
+  TOWER_IN: .22,
+  // proposed, ticket 14c-5: the back strip's floors against the front's
+  BACK_RATE: .6,
+  // proposed, ticket 14c-5: how far the sky has slid by the top, as a part of the height, so it is slower and the clouds sit below
+  SKY_END: .72,
+  // proposed, ticket 14c-5: how far the cloud bank rises behind the street, as a part of the height, and the part of the climb it takes
+  DECK_UP: .2,
+  DECK_START: .12,
+  // proposed, ticket 14c-5: points of the spark trail, and the seconds between them
+  TRAIL_N: { common: 260, uncommon: 340, rare: 440 },
+  TRAIL_STEP: .0035,
+  // proposed, ticket 14c-5: its width in art pixels
+  TRAIL_SPREAD: { common: 7, uncommon: 9, rare: 13 },
+  // proposed, ticket 14c-5: its colours, tail to head, as steps of EMBER
+  TRAIL_INK: { common: [2, 3, 4], uncommon: [3, 4, 5], rare: [4, 6, 7] },
+  // proposed, ticket 14c-5
+  BURST_S: { common: 2.1, uncommon: 2.5, rare: 3.6 },
+  // proposed, ticket 14c-5: seconds to open
+  BLOOM_S: { common: .55, uncommon: .7, rare: 1.1 },
+  // proposed, ticket 14c-5: radius at the fewest and the most points, as a part of BURST_ROOM
+  BURST_R: [.22, .62],
+  // proposed, ticket 14c-5: a burst's room is the smaller of these parts of the width and the height
+  BURST_ROOM_W: .8,
+  BURST_ROOM_H: .62,
+  // proposed, ticket 14c-5: stars in each shape
+  PEONY_N: 220,
+  CHRYS_N: 52,
+  WILLOW_N: 30,
+  // proposed, ticket 14c-5: the chrysanthemum's inner ring
+  CHRYS_RING: .5,
+  // proposed, ticket 14c-5: how far the willow's tips fall, as a part of its radius
+  WILLOW_DROP: 2,
+  // proposed, ticket 14c-5: points along each willow strand, and where along its flight it starts
+  WILLOW_TRAIL: 64,
+  WILLOW_FROM: .18,
+  // proposed, ticket 14c-5: the hanging glitter: sparks, seconds each lives, seconds after opening it starts, seconds to fill, twinkles per second, and fall as a part of the radius
+  GLITTER_N: { common: 170, uncommon: 150, rare: 190 },
+  GLITTER_LIFE: [1.6, 3.4],
+  GLITTER_FROM: { common: .9, uncommon: 1.1, rare: 1.6 },
+  GLITTER_IN: 1,
+  GLITTER_HZ: 6,
+  GLITTER_FALL: .12,
+  // proposed, ticket 14c-5: a burst's glow, as a part of its radius, and the part of its life it lasts
+  GLOW_R: .85,
+  GLOW_FOR: .36,
+  // proposed, ticket 14c-5: the glow's rings, outer to inner, as steps of EMBER
+  GLOW: { common: [1, 1, 2], uncommon: [1, 2, 2], rare: [2, 2, 3] },
+  // proposed, ticket 14c-5: seconds after the burst lands
+  RESULT_AT: .7,
+  COUNT_S: .9,
+  BUTTON_AT: 1.6,
+  // proposed, ticket 14c-5: a sky lantern's half-width by rarity
+  LANTERN_R: { common: 4, uncommon: 6, rare: 9 },
+  // proposed, ticket 14c-5: sky lanterns' float
+  BOB_PX: 2,
+  BOB_S: 3.4,
+  // proposed, ticket 14c-5: the way down, longer before a major step
+  DRIFT_S: { tiny: 2.7, major: 4.2 },
+  // proposed, ticket 14c-5: floors of tower on the way down
+  DESCENT_FLOORS: 2,
+  // proposed, ticket 14c-5: the part of the descent at which the street is home; the walk runs on after it
+  LAND_AT: .86,
+  // proposed, ticket 14c-5: how far back the walk starts, as a part of the near layer's scale
+  WALK_ZOOM: { tiny: .035, major: .17 },
+  // proposed, ticket 14c-5
+  WALK_PARALLAX: { street: .85, palace: .12, far: .45, near: 1, strings: 1.08 },
+  // proposed, ticket 14c-5: lights coming on as you arrive
+  ARRIVE_S: { tiny: .55, major: 1.3 },
+  // human, 2026-11-05 (answer 1): the questions you reach by a long walk
+  MAJOR: [3, 6],
+  // proposed, ticket 14c-5: steps of the lights coming on, and the width of their edge
+  LIGHT_STEPS: 14,
+  LIGHT_BAND: .22,
+  // proposed, ticket 14c-5: embers falling on the way down
+  EMBERS: 70,
+  // proposed, ticket 14c-5
+  DUD_CHARGE_S: 1,
+  DUD_LIFT_S: .55,
+  DUD_FALL_S: .6,
+  DUD_SMOKE_S: 1.1,
+  // proposed, ticket 14c-5: how far it lifts, as a part of the height
+  DUD_LIFT: .13,
+  // proposed, ticket 14c-5: seconds of smoke before the end text
+  TIMEUP_S: 1.7,
+  // proposed, ticket 14c-5
+  SMOKE_PUFFS: 16,
+  SMOKE_LIFE: 1.5,
+  SMOKE_RISE: 90,
+  // proposed, ticket 14c-5: seconds for Q7's text to fade out, and again for the results to fade in
+  RESULTS_FADE_S: .5,
+  // proposed, ticket 14c-5: seconds before an ending's button
+  OVER_BUTTON_AT: .9,
+  // proposed, ticket 14c-5 (answer 34): the snuffed lantern. Seconds lowering, burning, sputtering and dropping; its half-width as parts of the width and the height; where it hangs
+  LETTER_LOWER: .55,
+  LETTER_BURN: .45,
+  LETTER_SPUTTER: .5,
+  LETTER_DROP: .5,
+  LETTER_RX: [.26, .16],
+  LETTER_Y: .4,
+  // proposed, ticket 14c-5: its flicker steps per second, smoke puffs and dying sparks
+  LETTER_FLICKER: 12,
+  LETTER_SMOKE: 10,
+  LETTER_SPARKS: 12,
+  // proposed, ticket 14c-5: the struck letter's pop, in whole art pixels, and the seconds of each step
+  POP_STEPS: [-5, -4, -3, -2, -1],
+  POP_STEP_S: .07,
+  // proposed, ticket 14c-5: pre-draw time per frame
+  PREDRAW_SLICE_MS: 4,
+  // The box's shake when it refuses input, a taken letter or (14c-6 answer 28) text that names no answer: whole art
+  // pixels, then the milliseconds of each step (`refuse()` in the mock, proposed in 14c-5).
+  REFUSE_STEPS: [2, -2, 1, 0],
+  REFUSE_STEP_MS: 40,
+} as const;
