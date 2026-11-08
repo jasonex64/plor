@@ -203,3 +203,21 @@ test("game 1 stays as it was", async ({ browser }) => {
   await expect(page.getByRole("region", { name: "Game number 1" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Game number 2" })).toHaveCount(0);
 });
+
+// The Friends page's leaderboard switches between the games (M16 16e-2, answers 23 and 24), and game 2's adds up places.
+test("the friends leaderboard switches to game 2", async ({ browser }) => {
+  const page = await (await browser.newContext()).newPage();
+  await page.goto("/");
+  await signInAndPick(page, "pb");
+  await page.goto("/friends");
+  const board = page.getByRole("region", { name: "Friends leaderboard" });
+  const games = board.getByRole("radiogroup", { name: "Game" });
+  await expect(games.getByRole("radio", { name: "Game number 1" })).toBeChecked();
+  await expect(board.getByText("Each day adds the % of players you beat.")).toHaveCount(0);
+  await games.getByText("Game number 2").click();
+  await expect(games.getByRole("radio", { name: "Game number 2" })).toBeChecked();
+  await expect(board.getByText("Each day adds the % of players you beat.")).toBeVisible();
+  // A new player's week: their own row, a plain 0, as places aren't points.
+  await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).toContainText("(you)");
+  await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).not.toContainText("points");
+});

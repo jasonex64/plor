@@ -50,6 +50,12 @@ On the draft:
 21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, confirmed** ("yes thats right"): every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
 22. This ticket: "Approve, build it".
 
+Before 16e-2:
+23. Game 2's board beside game 1's: "A game switch on one board". One card with a switch, Game 1 / Game 2, and Overall in 16e-3.
+24. A game 2 week's number: "Plain total, explained", with the line "Each day adds the % of players you beat."
+25. A day only one player played: "100, top of the day".
+26. A day's percentile: "One decimal", so 87.5 stays 87.5.
+
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
 - Different letters in 7 random everyday words of 5 to 8 letters, 500 runs: 13 at least, 16 at the 10th percentile, 18 in the middle, 20 at the 90th, 22 at most. With 9 to 12 letters the middle is 19, at most 24.
@@ -88,6 +94,12 @@ These are random words, not real play: a real run's numbers come with the beta.
 - Game 2 gets the same boards, each day counting as that day's percentile, 0 to 100, added up over the week, from that day's midnight (answer 21). A day under 10 players still counts (answer 17).
 - The overall board, on the friends page and each group's, shows both views (answer 2): **Sum** adds each day's percentile in each game played, so playing both games counts; **Average** divides that by the number of game-days played.
 - **For the human (a collision):** answer 19 asks for places live. Game 2's live places are cheap, as its score is final once a word is in. But game 1's points, including its rarity bonus, only become final at midnight, so the overall board would mix final and moving numbers. **Settled** (answer 21): every board, game 2's own included, counts a day from midnight on, like game 1's; the end of a run's "better than X%" and friend rank are the live "so far" numbers.
+
+**16e-2 in detail** (Claude's readings of answers 14 to 26, for the human to overrule):
+- **Ledger rows:** a board read first gives every game 2 run on a closed day its row, every player's, not only the board's, as a percentile needs the whole day. A game 2 day never hides from a board while the viewer's run goes on, as game 1's does, since a game 2 run stops at midnight.
+- **The percentile:** (others beaten + half the others tied) ÷ others, to one decimal (answer 26), and 100 with no others (answer 25). On a board it uses every row of that day, whoever's board it is.
+- **The end of a run:** "Better than 87.5% of players so far today" among the runs finished so far, shown from 10 of them (answer 16); and "2nd of 6 with your friends so far today", the viewer and their friends who've finished, shown once a friend has.
+- **The routes:** the friends and group boards take `game`, `offbeat` or `substrings`, which they need, so one way asks for each; a request without it is refused, and the protocol goes from 6 to 7, as the request changed (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
 
 **Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 

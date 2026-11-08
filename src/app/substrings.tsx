@@ -195,6 +195,28 @@ function Tracker({ used }: { used: string }) {
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
+// Where the run stands so far today (M16 16e-2, answers 3 and 19): among the day's finished players once there are
+// enough, and among the player's friends who've finished.
+function Standing({ standing }: { standing: NonNullable<SubstringRun["standing"]> }) {
+  return (
+    <>
+      {standing.percent !== null && <p>Better than {standing.percent}% of players so far today.</p>}
+      {standing.friends && (
+        <p>
+          {ordinal(standing.friends.rank)} of {standing.friends.of} with your friends so far today.
+        </p>
+      )}
+    </>
+  );
+}
+
+// 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st.
+function ordinal(n: number): string {
+  const teen = n % 100 >= 11 && n % 100 <= 13;
+  const suffix = teen ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
+  return `${n}${suffix}`;
+}
+
 function Results({ run }: { run: SubstringRun }) {
   const score = run.score!;
   const bonusWords = run.rounds.filter((round) => round.bonus > 0).length;
@@ -211,6 +233,7 @@ function Results({ run }: { run: SubstringRun }) {
         <dt>Total</dt>
         <dd className={styles.total}>{score.total}</dd>
       </dl>
+      {run.standing && <Standing standing={run.standing} />}
       <h3 className={styles.heading}>Your rounds</h3>
       <ol aria-label="Your rounds" className={styles.results}>
         {run.rounds.map((round) => (

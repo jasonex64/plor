@@ -7,6 +7,7 @@ import type { SubstringDay } from "@/content/substrings";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { SUBSTRINGS_ID } from "@/platform/game";
+import { standingToday } from "./substring-places";
 import { bonusPoints, scoreRun, wordPoints } from "./substring-scoring";
 import type { PlayedRound, SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
@@ -34,7 +35,7 @@ async function stateOf(db: Db, userId: string, date: string, day: SubstringDay):
      from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
     [userId, SUBSTRINGS_ID, date],
   );
-  if (rows.length === 0) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null, score: null };
+  if (rows.length === 0) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null, score: null, standing: null };
   const { status, answered, ms_left: msLeft } = rows[0];
   const finished = status === "survived";
   const words = await db.query<{ round_idx: number; word_key: string; word: string }>(
@@ -62,6 +63,7 @@ async function stateOf(db: Db, userId: string, date: string, day: SubstringDay):
     rounds,
     open: msLeft === null ? null : { index: answered, letters: day.rounds[answered], msLeft },
     score: scoreRun(words.rows.map((r) => r.word_key), day.bonus_letter),
+    standing: finished ? await standingToday(db, userId, date) : null,
   };
 }
 

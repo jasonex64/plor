@@ -199,3 +199,7 @@ export const SUBSTRING_SAMPLE_WORDS = 4;
 export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25 } as const;
 export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const;
 export const SUBSTRING_BONUS_LETTER_POINTS = 120;
+
+// Players a day of a game needs before "Better than X% of players" shows (human, 2026-11-07: "10 players";
+// docs/milestones/M16-16e-points-and-boards.md, answer 16). A smaller day still counts on the boards (answer 17).
+export const PERCENTILE_MIN_PLAYERS = 10;
