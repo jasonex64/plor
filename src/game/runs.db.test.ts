@@ -85,6 +85,9 @@ describe("a run, step by step", () => {
           answered: [],
           question: null,
           msLeft: null,
+          // A question's whole 20 seconds, from private.question_deadline (DECISIONS.md, Game 1: Timer), sent before
+          // any question opens, for Afterglow's fuse (docs/milestones/M14-14c-6-afterglow-in-play.md).
+          msQuestion: 20_000,
           next: null,
           points: 0,
           bonus: 0,

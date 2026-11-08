@@ -45,6 +45,9 @@ export type RunState = {
   // Milliseconds left on that question's timer, measured by the database when this state was read; null when
   // there is no question. The client counts down from it, and the database stays the judge.
   msLeft: number | null;
+  // A question's whole time, from the same rule (private.question_deadline), so Afterglow's fuse can burn the part
+  // that's gone without a second copy of the 20 seconds (DECISIONS.md, Config and tunables).
+  msQuestion: number;
   // While the reveal waits for Next (G5): the letter taken at the next question, or null for none.
   next: { steals: string | null } | null;
   // Points so far: the sum over answered questions, and the provisional rarity bonus so far (capped, M09).
@@ -86,7 +89,7 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number; dayOver: boolean };
+type Clock = { status: RunStatus | null; msLeft: number | null; msQuestion: number; msToReset: number; dayOver: boolean };
 
 // The share of the question's players who gave this entry, or null below the minimum (H5).
 function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
@@ -137,6 +140,7 @@ function buildState(
     answered,
     question,
     msLeft: question ? clock.msLeft : null,
+    msQuestion: clock.msQuestion,
     next: waiting ? { steals: puzzle.questions[stored.length].steals ?? null } : null,
     points: answered.reduce((sum, a) => sum + a.points, 0),
     bonus: score.bonus,
@@ -155,22 +159,23 @@ export async function msToReset(db: Db): Promise<number> {
 
 async function stateOf(db: Db, userId: string, date: string, puzzle: ApprovedPuzzle): Promise<RunState> {
   // One statement, so the time left and the time to the reset are measured at the same instant.
-  const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number; day_over: boolean }>(
+  const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_question: number; ms_to_reset: number; day_over: boolean }>(
     `select s.status,
             case when s.deadline is null then null
                  else greatest(0, floor(extract(epoch from s.deadline - statement_timestamp()) * 1000))::int end as ms_left,
+            floor(extract(epoch from private.question_deadline(statement_timestamp()) - statement_timestamp()) * 1000)::int as ms_question,
             floor(extract(epoch from private.next_reset() - statement_timestamp()) * 1000)::int as ms_to_reset,
             $3::date < private.today() as day_over
      from (select 1) as one
      left join private.run_status s on s.user_id = $1 and s.game_id = $2 and s.puzzle_date = $3::date`,
     [userId, GAME_ID, date],
   );
-  const { status, ms_left, ms_to_reset, day_over } = rows[0];
+  const { status, ms_left, ms_question, ms_to_reset, day_over } = rows[0];
   const stored = status === null ? [] : await events(db, userId, date);
   const counts = status !== null && FINISHED.includes(status) ? (await dayCounts(db, [date])).get(date)! : null;
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
   const pooled = await pooledCounts(db, puzzle, false);
-  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset, dayOver: day_over }, counts, pooled, names);
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msQuestion: ms_question, msToReset: ms_to_reset, dayOver: day_over }, counts, pooled, names);
 }
 
 // The player's run in progress, if any, otherwise today's puzzle. After midnight it can be yesterday's, waiting at a
@@ -408,7 +413,7 @@ export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lo
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
   const pooled = await pooledCounts(db, puzzle, false);
   // As its answers count as given on their day, a test run's day is never over.
-  const clock = { status, msLeft: inPlay ? rows[0].ms_left : null, msToReset: rows[0].ms_to_reset, dayOver: false };
+  const clock = { status, msLeft: inPlay ? rows[0].ms_left : null, msQuestion: rows[0].ms_left, msToReset: rows[0].ms_to_reset, dayOver: false };
   return { run: buildState(puzzle.date, puzzle, stored, clock, counts, pooled, names), notInList };
 }
 

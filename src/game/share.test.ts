@@ -30,6 +30,7 @@ function finished(status: RunState["status"], outcomes: boolean[]): RunState {
     answered: outcomes.map((matched, i) => answered(i, matched)),
     question: null,
     msLeft: null,
+    msQuestion: 20_000,
     next: null,
     points: 0,
     bonus: 0,
