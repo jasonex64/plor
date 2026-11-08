@@ -9,12 +9,25 @@
 // review, like M08 8a's past-day thread). A group's boards count each member only from the puzzle day they joined,
 // that day included (M12 12d, docs/milestones/M12-12d-decided-fixes.md); a friend's whole week counts. Each week
 // also gives every player's points on each of its days that are over, for the graph view
-// (docs/milestones/M14-14b-14-leaderboard-graph.md).
-import { GAME_ID } from "@/platform/game";
+// (docs/milestones/M14-14b-14-leaderboard-graph.md). Each board is one game's (M16 16e-2,
+// docs/milestones/M16-16e-points-and-boards.md): game 1's adds up points, and game 2's each day's place, the % of that
+// day's players beaten, counted from the day's midnight like game 1's points (answers 15 and 21).
+import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { settleRuns } from "@/game/ledger";
+import { dayPercentiles, placeTotal } from "@/game/percentile";
+import { settleSubstringRuns } from "@/game/substring-places";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { circleSql, groupCircleSql } from "./circle";
+
+// The games a board can be for.
+export type BoardGame = typeof GAME_ID | typeof SUBSTRINGS_ID;
+
+// A board names its game, as each game's board counts differently: there's no board for both until the overall one.
+export function readBoardGame(input: unknown): BoardGame {
+  if (input === GAME_ID || input === SUBSTRINGS_ID) return input;
+  throw new AppError("unknown_game", 400);
+}
 
 // name is the display name if set, else the username (M07 7a); you marks the viewer.
 export type LeaderboardEntry = { username: string; name: string; points: number; you: boolean };
@@ -49,9 +62,9 @@ function daysFrom(from: string, day: string): number {
 // A player's ledger points by puzzle day ("2026-10-22" → points).
 type Row = { user_id: string; username: string; name: string; days: Record<string, number> };
 
-// A player's points from (included) to (excluded).
+// A player's points from (included) to (excluded). Game 2's are places with one decimal, so the sum keeps one.
 function total(row: Row, from: string, to: string): number {
-  return Object.entries(row.days).reduce((sum, [day, points]) => (day >= from && day < to ? sum + points : sum), 0);
+  return placeTotal(Object.entries(row.days).flatMap(([day, points]) => (day >= from && day < to ? [points] : [])));
 }
 
 function entry(row: Row, viewerId: string, points: number): LeaderboardEntry {
@@ -63,14 +76,14 @@ function ranked<T extends LeaderboardEntry>(entries: T[]): T[] {
   return entries.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name) || a.username.localeCompare(b.username));
 }
 
-export async function getLeaderboard(db: Db, viewerId: string): Promise<Leaderboard> {
+export async function getLeaderboard(db: Db, viewerId: string, game: BoardGame): Promise<Leaderboard> {
   // Never null: the friends circle always holds the viewer.
-  return (await weeklyBoard(db, viewerId, circleSql("$1"), [viewerId], null))!;
+  return (await weeklyBoard(db, viewerId, game, circleSql("$1"), [viewerId], null))!;
 }
 
 // A group's board, for its members only; anyone else gets the group page's 404 (10b).
-export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: string): Promise<Leaderboard> {
-  const board = await weeklyBoard(db, viewerId, groupCircleSql("$1", "$2"), [viewerId, groupId], groupId);
+export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: string, game: BoardGame): Promise<Leaderboard> {
+  const board = await weeklyBoard(db, viewerId, game, groupCircleSql("$1", "$2"), [viewerId, groupId], groupId);
   if (!board) throw new AppError("group_not_found", 404);
   return board;
 }
@@ -83,22 +96,40 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
       ? await circleOf(db, circleSql("$1"), [viewerId])
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
   if (!circle) throw new AppError("group_not_found", 404);
+  await settleRuns(db, circle.ids);
   const yesterday = daysBefore(circle.today, 1);
   const skip = await playing(db, viewerId, yesterday, circle.today);
-  const rows = await ledger(db, circle.ids, groupId, yesterday, circle.today, skip);
+  const rows = await ledger(db, GAME_ID, circle.ids, groupId, yesterday, circle.today, skip);
   return { date: yesterday, entries: ranked(rows.map((r) => entry(r, viewerId, total(r, yesterday, circle.today)))) };
 }
 
 // groupId: the group whose members players lists, or null for the friends board.
-async function weeklyBoard(db: Db, viewerId: string, players: string, params: unknown[], groupId: string | null): Promise<Leaderboard | null> {
+async function weeklyBoard(
+  db: Db,
+  viewerId: string,
+  game: BoardGame,
+  players: string,
+  params: unknown[],
+  groupId: string | null,
+): Promise<Leaderboard | null> {
   const circle = await circleOf(db, players, params);
   if (!circle) return null;
   const today = circle.today;
   const thisWeek = weekStart(today);
   const lastWeek = daysBefore(thisWeek, 7);
   const nextWeek = daysBefore(thisWeek, -7);
-  const skip = await playing(db, viewerId, lastWeek, nextWeek);
-  const rows = await ledger(db, circle.ids, groupId, lastWeek, nextWeek, skip);
+  let rows: Row[];
+  let skip: string[] = [];
+  if (game === GAME_ID) {
+    await settleRuns(db, circle.ids);
+    skip = await playing(db, viewerId, lastWeek, nextWeek);
+    rows = await ledger(db, game, circle.ids, groupId, lastWeek, nextWeek, skip);
+  } else {
+    // A game 2 run stops at midnight, so no closed day waits on the viewer's own run. A place needs the whole day, so
+    // every run is settled, not only the board's.
+    await settleSubstringRuns(db);
+    rows = await places(db, await ledger(db, game, circle.ids, groupId, lastWeek, nextWeek, skip), lastWeek, nextWeek);
+  }
   const week = (from: string, to: string, days: number): Week => ({
     from,
     days,
@@ -113,17 +144,29 @@ async function weeklyBoard(db: Db, viewerId: string, players: string, params: un
   return { thisWeek: week(thisWeek, nextWeek, daysFrom(thisWeek, today)), lastWeek: week(lastWeek, thisWeek, 7) };
 }
 
-// The players a board shows and today's date, with their finished runs on closed days settled into the ledger, or
-// null when players lists no one. players is SQL listing user_ids, with its own parameters.
+// The players a board shows and today's date, or null when players lists no one. players is SQL listing user_ids,
+// with its own parameters. The caller settles their game's runs on closed days into the ledger.
 async function circleOf(db: Db, players: string, params: unknown[]): Promise<{ ids: string[]; today: string } | null> {
   const { rows: people } = await db.query<{ user_id: string; today: string }>(
     `select c.user_id::text, private.today()::text as today from (${players}) c`,
     params,
   );
   if (people.length === 0) return null;
-  const ids = people.map((p) => p.user_id);
-  await settleRuns(db, ids);
-  return { ids, today: people[0].today };
+  return { ids: people.map((p) => p.user_id), today: people[0].today };
+}
+
+// The board's rows with each day's points turned into that day's place among every player of game 2 that day, as the
+// circle is only part of the day (answers 15, 25, 26).
+async function places(db: Db, rows: Row[], from: string, to: string): Promise<Row[]> {
+  const { rows: all } = await db.query<{ user_id: string; day: string; points: number }>(
+    `select user_id::text, puzzle_date::text as day, points from private.points_ledger
+     where game_id = $1 and puzzle_date >= $2::date and puzzle_date < $3::date`,
+    [SUBSTRINGS_ID, from, to],
+  );
+  const byDay = new Map<string, Map<string, number>>();
+  for (const r of all) byDay.set(r.day, (byDay.get(r.day) ?? new Map()).set(r.user_id, r.points));
+  const placed = new Map([...byDay].map(([day, scores]) => [day, dayPercentiles(scores)]));
+  return rows.map((r) => ({ ...r, days: Object.fromEntries(Object.keys(r.days).map((day) => [day, placed.get(day)!.get(r.user_id)!])) }));
 }
 
 // The puzzle days from (included) to (excluded) whose own run the viewer is still playing, in order: a run can be
@@ -140,7 +183,7 @@ async function playing(db: Db, viewerId: string, from: string, to: string): Prom
 
 // Each player's ledger points on each puzzle day from (included) to (excluded), but none on the days in skip. In a
 // group's board (groupId), only the days from the one each member joined on.
-async function ledger(db: Db, ids: string[], groupId: string | null, from: string, to: string, skip: string[]): Promise<Row[]> {
+async function ledger(db: Db, game: BoardGame, ids: string[], groupId: string | null, from: string, to: string, skip: string[]): Promise<Row[]> {
   const { rows } = await db.query<Row>(
     `select p.user_id::text, p.username::text as username, coalesce(p.display_name, p.username::text) as name,
             coalesce(jsonb_object_agg(l.puzzle_date::text, l.points) filter (where l.puzzle_date is not null), '{}'::jsonb) as days
@@ -152,7 +195,7 @@ async function ledger(db: Db, ids: string[], groupId: string | null, from: strin
                                                      where m.group_id = $6::uuid and m.user_id = p.user_id))
      where p.user_id = any($1::uuid[])
      group by p.user_id, p.username, p.display_name`,
-    [ids, GAME_ID, from, to, skip, groupId],
+    [ids, game, from, to, skip, groupId],
   );
   return rows;
 }

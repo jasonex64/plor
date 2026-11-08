@@ -198,7 +198,7 @@ test("the leaderboard card shows nothing of the old choice while the new one loa
   await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
   let release!: () => void;
   const held = new Promise<void>((resolve) => (release = resolve));
-  await page.route("**/api/leaderboard", async (route) => {
+  await page.route(/\/api\/leaderboard\?/, async (route) => {
     await held;
     await route.continue();
   });

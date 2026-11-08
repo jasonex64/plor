@@ -9,6 +9,7 @@ import { useEffect, useId, useState } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, Week } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import styles from "./leaderboard.module.css";
@@ -19,23 +20,48 @@ import { Race, RaceTable, hiddenText } from "./race";
 import raceStyles from "./race.module.css";
 import { Line, Skeleton } from "./skeleton";
 
-// title names the board (its heading and region); path is the API route that returns it.
+// The games a board switches between (M16 16e-2, answer 23), game 1 first, as on every load.
+const GAMES = [GAME, SUBSTRINGS] as const;
+
+// title names the board (its heading and region); path is the API route that returns it, which the game is added to.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [board, setBoard] = useState<Board | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const name = useId();
+  const gameName = useId();
+  // Switching games faster than the answers come back shows only the newest game's (M11 H6).
+  const [latest] = useState(latestOnly);
+  const places = game === SUBSTRINGS.id;
 
   useEffect(() => {
-    api<Board>(path, { method: "GET" }).then(setBoard, (err) => setError(errorText(err)));
-  }, [path]);
+    const url = `${path}${path.includes("?") ? "&" : "?"}game=${game}`;
+    latest(api<Board>(url, { method: "GET" }), (b) => (setBoard(b), setError(null)), (err) => setError(errorText(err)));
+  }, [path, game, latest]);
 
   const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
   return (
     <section aria-label={title} className={kit.card}>
       <h2>{title}</h2>
+      <div role="radiogroup" aria-label="Game" className={styles.switch}>
+        {GAMES.map((g) => (
+          <label key={g.id} className={game === g.id ? `${styles.choice} ${styles.on}` : styles.choice}>
+            <input
+              type="radio"
+              name={gameName}
+              checked={game === g.id}
+              onChange={() => {
+                setBoard(null);
+                setGame(g.id);
+              }}
+            />
+            {g.name}
+          </label>
+        ))}
+      </div>
       {/* Today's period switch, once more (answer 3). */}
       <div role="radiogroup" aria-label="View" className={styles.switch}>
         {([false, true] as const).map((g) => (
@@ -47,10 +73,12 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
       </div>
       {graph && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
       <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
+      {/* A game 2 week adds up places, not points (answer 24). */}
+      {places && <p className={styles.note}>Each day adds the % of players you beat.</p>}
       {board && (
         <>
-          <Standings label="This week" week={board.thisWeek} graph={graph} picked={picked} onPick={setPicked} />
-          <Standings label="Last week" week={board.lastWeek} graph={graph} picked={picked} onPick={setPicked} />
+          <Standings label="This week" week={board.thisWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
+          <Standings label="Last week" week={board.lastWeek} graph={graph} picked={picked} onPick={setPicked} places={places} />
         </>
       )}
       {!board && !error && (
@@ -100,7 +128,8 @@ export function LeaderboardCard() {
       const path = group === null ? "/api/leaderboard/yesterday" : `/api/leaderboard/yesterday?group=${encodeURIComponent(group)}`;
       latest(api<{ day: Day }>(path, { method: "GET" }), (r) => (setDay(r.day), setWeek(null), setError(null)), failed);
     } else {
-      const path = group === null ? "/api/leaderboard" : `/api/groups/leaderboard?id=${encodeURIComponent(group)}`;
+      // Today's card is game 1's until both games come to Today (M16 16f).
+      const path = group === null ? `/api/leaderboard?game=${GAME.id}` : `/api/groups/leaderboard?id=${encodeURIComponent(group)}&game=${GAME.id}`;
       latest(api<Board>(path, { method: "GET" }), (r) => (setWeek(r.thisWeek), setDay(null), setError(null)), failed);
     }
   }, [group, period, latest]);
@@ -149,8 +178,8 @@ export function LeaderboardCard() {
 }
 
 // A week as its rows or, in Graph, its race (answers 5 and 15), with Show table beside its chip (answers 17 and 25).
-function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void }) {
-  const { label, week, graph, picked, onPick } = props;
+function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void; places: boolean }) {
+  const { label, week, graph, picked, onPick, places } = props;
   const [table, setTable] = useState(false);
   const drawn = graph && week.days > 0;
   return (
@@ -166,7 +195,7 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
           )}
         </div>
       </div>
-      {!graph && <Entries entries={week.entries} />}
+      {!graph && <Entries entries={week.entries} places={places} />}
       {graph && !drawn && <p className={raceStyles.empty}>The first points arrive Tuesday, once Monday is over.</p>}
       {drawn && <Race label={label} week={week} picked={picked} onPick={onPick} />}
       {drawn && week.hidden.length > 0 && <p className={styles.note}>{hiddenText(week.hidden)}</p>}
@@ -177,8 +206,9 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
 
 // Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
 // is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
-// the row's text; a hidden ": " keeps the row read as "name: 3 points".
-function Entries({ entries }: { entries: LeaderboardEntry[] }) {
+// the row's text; a hidden ": " keeps the row read as "name: 3 points". A game 2 week's number is its places added up,
+// the plain total the note explains (answer 24).
+function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; places?: boolean }) {
   return (
     <ol className={kit.rows}>
       {entries.map((e, i) => (
@@ -190,7 +220,7 @@ function Entries({ entries }: { entries: LeaderboardEntry[] }) {
             {e.you && " (you)"}
             <span className="sr-only">: </span>
           </span>
-          <b>{e.points === 1 ? "1 point" : `${e.points} points`}</b>
+          <b>{places ? e.points : e.points === 1 ? "1 point" : `${e.points} points`}</b>
         </li>
       ))}
     </ol>

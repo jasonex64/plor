@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merging on green CI at the human's "Merge when green"); 16e-2, ledger rows, places and game 2's boards, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merging on green CI at the human's "Merge when green"); 16e-3, the overall board, is next.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -47,8 +47,14 @@ Round 5, the collisions:
 20. During a run: "Word points and tracker". Each word's points right after it's accepted, and the letters used so far filling a tracker.
 
 On the draft:
-21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, to confirm before 16e-2:** every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
+21. The overall board and today, after the collision below was put: "keep it consistent". **Claude's reading, confirmed** ("yes thats right"): every board counts a day from midnight, as game 1's do, game 2's own board included; the live "so far" numbers are the end of a run's "better than X%" and friend rank.
 22. This ticket: "Approve, build it".
+
+Before 16e-2:
+23. Game 2's board beside game 1's: "A game switch on one board". One card with a switch, Game 1 / Game 2, and Overall in 16e-3.
+24. A game 2 week's number: "Plain total, explained", with the line "Each day adds the % of players you beat."
+25. A day only one player played: "100, top of the day".
+26. A day's percentile: "One decimal", so 87.5 stays 87.5.
 
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
@@ -85,9 +91,15 @@ These are random words, not real play: a real run's numbers come with the beta.
 
 **The boards** (answers 4, 15, 18):
 - Game 1's friends board, group boards and yesterday's standings stay as they are, adding up raw points.
-- Game 2 gets the same boards, each day counting as that day's percentile, 0 to 100, added up over the week. A day under 10 players still counts (answer 17).
+- Game 2 gets the same boards, each day counting as that day's percentile, 0 to 100, added up over the week, from that day's midnight (answer 21). A day under 10 players still counts (answer 17).
 - The overall board, on the friends page and each group's, shows both views (answer 2): **Sum** adds each day's percentile in each game played, so playing both games counts; **Average** divides that by the number of game-days played.
-- **For the human (a collision):** answer 19 asks for places live. Game 2's live places are cheap, as its score is final once a word is in. But game 1's points, including its rarity bonus, only become final at midnight, so the overall board would mix final and moving numbers. **Claude's proposal:** game 2's own board shows today "so far"; the overall board, like game 1's, counts a day from midnight on.
+- **For the human (a collision):** answer 19 asks for places live. Game 2's live places are cheap, as its score is final once a word is in. But game 1's points, including its rarity bonus, only become final at midnight, so the overall board would mix final and moving numbers. **Settled** (answer 21): every board, game 2's own included, counts a day from midnight on, like game 1's; the end of a run's "better than X%" and friend rank are the live "so far" numbers.
+
+**16e-2 in detail** (Claude's readings of answers 14 to 26, for the human to overrule):
+- **Ledger rows:** a board read first gives every game 2 run on a closed day its row, every player's, not only the board's, as a percentile needs the whole day. A game 2 day never hides from a board while the viewer's run goes on, as game 1's does, since a game 2 run stops at midnight.
+- **The percentile:** (others beaten + half the others tied) ÷ others, to one decimal (answer 26), and 100 with no others (answer 25). On a board it uses every row of that day, whoever's board it is.
+- **The end of a run:** "Better than 87.5% of players so far today" among the runs finished so far, shown from 10 of them (answer 16); and "2nd of 6 with your friends so far today", the viewer and their friends who've finished, shown once a friend has.
+- **The routes:** the friends and group boards take `game`, `offbeat` or `substrings`, which they need, so one way asks for each; a request without it is refused, and the protocol goes from 6 to 7, as the request changed (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
 
 **Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 
@@ -137,7 +149,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 2. Each PR updates this ticket's Status, the M16 ticket's status line and the ROADMAP row.
 
 ## Removes
-Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, if anything, when built; game 1's boards are kept by answer 18.
+Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3 lists its own.
 
 ---
 *Fill in the sections below at the end.*
@@ -145,10 +157,20 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| "Live, final at midnight" for places (answer 19) | The boards count a day from midnight; only the end of a run is "so far" | Answer 21, "keep it consistent", confirmed ("yes thats right") |
 | 16e-1 writes game 2's ledger rows | 16e-2 does | Their first reader is a board ("Build for today"), noted under Design |
 | The tables stop at 18 letters and start at 13 different letters | The rule scores longer words and every count down to 1 | The full dictionary holds words over 18 letters, and a run can use fewer than 13 letters; the rule the tables came from covers them |
 
 ## Evidence
+### 16e-2
+- **Places:** `npx vitest run src/game/percentile.test.ts`, 6 passed: the share beaten, a tie as half, one decimal, 100 alone, a day's places, a week's total. Written beside the function, not before; then broken on purpose and seen to fail: a tie counted as a win (2 failed), 0 for a lone player (1 failed).
+- **Ledger rows and the end of a run:** `npx vitest run src/game/substring-places.db.test.ts --no-file-parallelism`, 3 passed: a closed day's finished run (420) and unfinished one (65) get one row each, settling again writes none, today's waits; the standing is hidden at 9 finished and 50 at 10, with a tie and an unfinished run that doesn't count, and a friend rank only once a friend has finished.
+- **Boards:** `npx vitest run src/app/api/leaderboard src/app/api/groups/leaderboard --no-file-parallelism`, 28 passed. The new `substrings.db.test.ts`: a board without a game, or `chess`, is refused with `unknown_game`; game 2's friends board shows B 66.7 and A 33.3, places among four players yesterday, two of them strangers whose runs were settled too; a group member who joined today counts 0; game 1's board stays at 0. Game 1's own board tests now name `game=offbeat`.
+- **Screens:** `npx playwright test e2e/play2.e2e.ts e2e/player-screens.e2e.ts e2e/leaderboard-graph.e2e.ts e2e/today.e2e.ts --retries=0`, 22 passed, with the Friends board's switch to game 2, its note, and a total that isn't in points. `player-screens.e2e.ts`'s held route now matches the board's query.
+- **Review's blockers** (below): `npx vitest run src/app/ordinal.test.ts`, 13 passed (1st, 2nd, 3rd, 11th to 13th, 21st, 111th, 112th); `npx vitest run src/app/api/substrings src/app/api/leaderboard/substrings.db.test.ts --no-file-parallelism`, 27 passed, with `standing` null mid-run, no friend rank before a friend finishes, then 1st and 2nd of 2 for both players at the route, and a board response holding only the circle's names, places and days; `npx playwright test e2e/play2.e2e.ts --retries=0`, 6 passed, with "1st of 2 with your friends so far today." on screen.
+- **Game 1's wider e2e:** `npx playwright test e2e/groups.e2e.ts e2e/live-board.e2e.ts e2e/jumps-and-finds.e2e.ts e2e/me.e2e.ts e2e/shell.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts --retries=0`: 30 passed, 1 failed, `live-board.e2e.ts`'s "a reconnect refetches the board", waiting for the reconnect's request; run alone, `--repeat-each=2`, 2 passed. 16e-2 doesn't touch the live board.
+- `npm test`, `npx tsc --noEmit -p .`, `npx eslint src e2e`, `npm run build` and `check:client-bundle` pass.
+
 ### 16e-1
 - **Scoring,** written before the function: `npx vitest run src/game/substring-scoring.test.ts` failed (`Cannot find module './substring-scoring'`), then 12 passed: both tables cell by cell, the seven worked runs, a run with no word, and a word holding the bonus letter three times.
 - **Routes:** `npx vitest run src/app/api/substrings --no-file-parallelism`, 21 passed. A route test compared rounds exactly and failed on the new fields, as expected; it now checks a word's points, the bonus letter's 120 (`aqmjb`), and the end score, 70 + 120 + 65 = 255 for six letters.
@@ -161,5 +183,6 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 - Blocking findings and how each was fixed (16e-1, the `reviewer` agent, 2026-11-07):
   1. The e2e checked the tracker's count, not which letters it marks: it now checks the marked letters after each word.
   2. No test proved a word scores by its letters alone, as every test word's spelling was its key: a route test word is now spelled `aqm-ǰb`, with a hyphen and a j with a caron, and scores 30 with the bonus letter's 120.
+- 16e-2, the `reviewer` agent, 2026-11-07: (1) friend rank and "nothing beyond the boards" were tested only below the routes: route tests now check `standing` and the board response's fields; (2) the end of a run's standing text and its 1st/2nd/12th had no test: `src/app/ordinal.ts` has its own, and the e2e shows a friend rank. It found the places, privacy and game 1's boards correct. Deferred to ROADMAP, For M16: cost at scale, a midnight window, the docs on what a board reads, three untested ties and sums, points wording in Graph, a DESIGN citation, and a test that needs yesterday free.
 - Deferred to ROADMAP "Next revision" (For M16): 1 and 2 different letters scoring the same, a stale header comment, the tracker's letters for a screen reader, and a mid-run total that already holds the different letters.
 - The reviewer found the formula reproduces both tables and every worked run, nothing leaking before its time, and game 1 untouched.

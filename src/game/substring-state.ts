@@ -16,6 +16,12 @@ export type SubstringRun = {
   open: OpenRound | null;
   // The score so far, its different letters cashed in at the end (M16 16e); null before the start.
   score: RunScore | null;
+  // Where a finished run stands so far today (16e-2); null until it's finished.
+  standing: Standing | null;
 };
+
+// percent: better than this share of today's other finished players, null under the day's minimum; friends: the
+// player's rank among themselves and their friends who've finished, null until a friend has.
+export type Standing = { percent: number | null; friends: { rank: number; of: number } | null };
 
 export type TryOutcome = "accepted" | "empty" | "locked" | "not_a_word" | "needs_letters" | "already_used" | "already_answered" | "time_up";

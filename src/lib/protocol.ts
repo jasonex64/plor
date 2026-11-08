@@ -2,5 +2,6 @@
 // typed text instead of entry IDs (M04 13c-1). 3: a reveal waits for Next before the next question (M04 13c-4).
 // 4: the leaderboard is this week and last week instead of one all-time list (M10 10a). 5: the board shows a friend
 // as started, not their question or finished, until the viewer has finished (M12 12d). 6: GET /api/run answers run
-// null on a day with no puzzle, instead of 404 (M12 12f, F2).
-export const PROTOCOL_VERSION = 6;
+// null on a day with no puzzle, instead of 404 (M12 12f, F2). 7: the weekly boards name their game, `game`, and are
+// refused without it (M16 16e-2).
+export const PROTOCOL_VERSION = 7;
