@@ -127,7 +127,10 @@ describe("yesterday's standings", () => {
   });
 
   // M16 16e-3a (answers 35, 36): D, V's friend from now, survived question 1 at yesterday's noon and question 2 only
-  // after its midnight, then was caught on question 3: D's yesterday is question 1's 25, not 75.
+  // after its midnight, then was caught on question 3: D's yesterday is question 1's 25, not 75, plus the bonus D's row
+  // holds. That answer is the fixture's common one, at a first-guess share of exactly RARITY_ZERO_SHARE, so its bonus is
+  // 0 unless other fixture days' answers left in the pool lower its share (M09 N1, N2); settling's own test works the
+  // bonus by hand (src/game/ledger.db.test.ts).
   it("counts a friend's run played past its midnight only up to it", async () => {
     const db = getPool();
     await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [
@@ -155,9 +158,14 @@ describe("yesterday's standings", () => {
     await open(2);
     await answer(2, puzzle.questions[2].host_answers[0], true, false);
     useSession(V.session);
-    expect(await points("/api/leaderboard/yesterday")).toEqual([
+    const standings = await points("/api/leaderboard/yesterday");
+    const { rows } = await db.query<{ bonus: number }>(
+      "select bonus from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
+      [D.userId, GAME_ID, yesterday],
+    );
+    expect(standings).toEqual([
       [F.username, 300, false],
-      [D.username, 25, false],
+      [D.username, 25 + rows[0].bonus, false],
       [V.username, 0, true],
     ]);
   });

@@ -2,8 +2,11 @@
 // where the account page showed them; Me's totals since M14 14a-3a, which moved this case from GET /api/account's test
 // in 14a-3b). A real player signs in; their runs are written directly (yesterday can't be played now), as the friends
 // leaderboard test does. A closed day's are answered at its noon, as an answer after its midnight counts nothing
-// (M16 16e-3a); each safe answer is the fixture's common one, which earns no rarity bonus (M09 N2), so each total is its
-// ladder.
+// (M16 16e-3a).
+// Each safe answer is the fixture's common one: its first-guess share is 0.2, exactly RARITY_ZERO_SHARE, so it earns
+// no rarity bonus unless other fixture days' answers left in the pool lower its share (M09 N1, N2). So the expected
+// totals add the bonus each ledger row holds, which settling's own test works by hand (src/game/ledger.db.test.ts),
+// and what's checked here is the ladder of the answers before midnight.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { type ApprovedPuzzle } from "@/content/puzzle";
@@ -30,6 +33,10 @@ const days: Record<"today" | "yesterday" | "twoAgo" | "earlier" | "longAgo", str
 };
 
 const ledgerRows = async () => (await getPool().query("select from private.points_ledger where user_id = $1", [userId])).rows.length;
+// The bonus the rows settled from runs hold: the two written directly hold none.
+const bonuses = async () =>
+  (await getPool().query<{ bonus: number }>("select coalesce(sum(bonus), 0)::int as bonus from private.points_ledger where user_id = $1", [userId])).rows[0]
+    .bonus;
 
 // A run on that day: safe on question 1, then caught by the host on question 2, so its ladder is question 1's points.
 // A past day's answers are given at its noon, today's now.
@@ -120,11 +127,12 @@ describe("all-time points", () => {
     expect(await ledgerRows()).toBe(2);
 
     // 1000 + 100 + yesterday's 25 (question 1's points) + two days ago's 25, not 75, as its question 2 came after its
-    // midnight; today's 25 waits for midnight.
-    expect(await allTimePoints(getPool(), userId)).toBe(1150);
+    // midnight, and their bonus; today's 25 waits for midnight.
+    const total = await allTimePoints(getPool(), userId);
+    expect(total).toBe(1150 + (await bonuses()));
     expect(await ledgerRows()).toBe(4);
     // Again: the same total, and nothing settled twice.
-    expect(await allTimePoints(getPool(), userId)).toBe(1150);
+    expect(await allTimePoints(getPool(), userId)).toBe(total);
     expect(await ledgerRows()).toBe(4);
   });
 });
