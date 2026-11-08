@@ -78,7 +78,7 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   await expect(total(page, GAME.name, "best score")).toHaveText("–");
   await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: `${GAME.name}'s game screen` })).toHaveAttribute(
     "href",
-    "/play",
+    "/afterglow",
   );
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 

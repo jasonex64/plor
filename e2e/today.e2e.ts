@@ -44,7 +44,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
 
   // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/afterglow");
   await play(page);
   // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff).
   const nav = page.getByRole("navigation", { name: "Main" });
@@ -52,7 +52,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("http://localhost:3000/afterglow");
   await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
   await page.getByRole("button", { name: "Answer" }).click();
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
@@ -65,7 +65,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await banner.getByRole("link", { name: "Result" }).click();
   // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
   await expect(page.locator("#result")).toBeInViewport();
-  await expect(page).toHaveURL(/\/play$/);
+  await expect(page).toHaveURL(/\/afterglow$/);
 });
 
 // Criterion 3.
@@ -123,7 +123,7 @@ test("before playing, the feed names who commented and holds none of their words
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/play");
+  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/afterglow");
   const item = feed.getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);

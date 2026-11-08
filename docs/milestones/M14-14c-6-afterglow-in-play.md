@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a built and committed, its e2e not yet verified (see HANDOFF), no PR yet. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -92,7 +92,7 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 **The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
 
 ## Acceptance criteria
-- [ ] `/afterglow` serves the game; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
+- [ ] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
 - [ ] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, Done, the cards.
 - [ ] A dud and a fuse out each end the run with the ending list.
 - [ ] No question loses time to the walk: the database's open time for question k+1 is after its box appears (e2e, from the run's events).
@@ -123,8 +123,8 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 
 ## Plan
 Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M16's PRs #155 to #165 have merged since).
-1. **14c-6a, the name and the data.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), the share's name; the run state gains each answered question's level. Small and reviewable alone.
-2. **14c-6b, the game.** The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, test runs, the pre-draw split, and the check in `e2e/` with its CI subset and hand scripts.
+1. **14c-6a, the name.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), which the share, the boards' game switch and every heading follow; the game page's browser tab says Afterglow (answer 12). Small and reviewable alone.
+2. **14c-6b, the game.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, test runs, the pre-draw split, and the check in `e2e/` with its CI subset and hand scripts.
 3. **14c-6c, the calm version** for Reduce motion.
 
 ## Removes

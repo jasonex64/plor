@@ -1,6 +1,6 @@
 # M14 — 14c-5, Afterglow becomes a firework festival
 
-**Status:** in progress. Version 7.1 is on the private page (2026-11-07), reviewed twice, with the second review's 8 blockers fixed or settled by the human (answers 41 to 44). Waits on the human: a real-phone test, and `git rm` of the three files in B3 and B4. Then the build into `/play`, the next sub-ticket. (Drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start".)
+**Status:** done for now (the human, 2026-11-07: "mark it done and then move on, i might revisit it alter"). Version 7.1 is on the private page (2026-11-07), reviewed twice, with the second review's 8 blockers fixed or settled by the human (answers 41 to 44). Waits on the human: a real-phone test, and `git rm` of the three files in B3 and B4. The build into the app is 14c-6, at `/afterglow` (`docs/milestones/M14-14c-6-afterglow-in-play.md`). (Drafted 2026-11-05 from four rounds of guided questions; approved 2026-11-05: "Approve, start".)
 
 ## Goal
 Redesign Afterglow on its private page as a walk through a firework festival, where each answer charges up and rockets the view into the sky, so the human can approve the game's look before it goes into `/play`.

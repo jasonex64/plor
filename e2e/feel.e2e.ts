@@ -248,7 +248,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   const nav = page.getByRole("navigation", { name: "Main" });
   expect(await nav.evaluate((el) => getComputedStyle(el).viewTransitionName)).toBe("plor-nav");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
+  await expect(page).toHaveURL(/\/afterglow$/);
   expect(await slideOf(slides, 1)).toEqual({ types: ["nav-forward"], slide: 200 });
   expect((await slides())[0].animations.filter((a) => a.pseudo.includes("plor-"))).toEqual([]);
 
@@ -268,7 +268,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   await page.emulateMedia({ reducedMotion: "reduce" });
   const count = (await slides()).length + 1;
   await page.getByRole("link", { name: `${GAME.name}'s game screen` }).click();
-  await expect(page).toHaveURL(/\/play$/);
+  await expect(page).toHaveURL(/\/afterglow$/);
   await expect.poll(async () => (await slides()).length).toBeGreaterThanOrEqual(count);
   await expect.poll(async () => (await slides())[count - 1].types).toEqual(["nav-forward"]);
   const still = (await slides())[count - 1].animations.filter((a) => a.name === "slide");
