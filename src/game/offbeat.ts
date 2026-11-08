@@ -44,7 +44,7 @@ export async function getStats(db: Db, userId: string): Promise<Stats> {
   // The ledger has a day's row only once a read after its midnight settles it (DECISIONS.md, Points ledger). The day
   // is read first, so the settling and the stats are of the same one (readStats).
   const { rows } = await db.query<{ day: string }>("select private.today()::text as day");
-  await settleRuns(db, [userId], rows[0].day);
+  await settleRuns(db, rows[0].day);
   return readStats(db, userId, rows[0].day);
 }
 

@@ -1,6 +1,10 @@
 // The friends leaderboard against the local stack (run with `npm run test:db`; docs/milestones/M09-points-and-leaderboard.md,
 // 9b; weekly since docs/milestones/M10-groups.md, 10a). Real players sign in; yesterday's runs are written directly
-// (yesterday can't be played now) and, answered today, earn no rarity bonus (D8), so each total is its ladder.
+// (yesterday can't be played now), answered at its noon, as an answer after its midnight counts nothing (M16 16e-3a).
+// Each safe answer is the fixture's common one: its first-guess share is 0.2, exactly RARITY_ZERO_SHARE, so it earns
+// no rarity bonus unless other fixture days' answers left in the pool lower its share (M09 N1, N2). So the expected
+// totals add the bonus each ledger row holds, which settling's own test works by hand (src/game/ledger.db.test.ts),
+// and what's checked here is the ladder of the answers before midnight.
 // Yesterday falls in this week or, on a Monday, in last week, so those totals are read from yesterday's week. A is the
 // viewer; B and E are A's friends; C is no one's friend but F's; D is B's friend but not A's.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -53,8 +57,17 @@ const daily = (week: "thisWeek" | "lastWeek", yesterdays: number) =>
 const ledgerRows = async (ids: string[]) =>
   (await getPool().query("select user_id from private.points_ledger where user_id = any($1::uuid[])", [ids])).rows.length;
 
-// Yesterday's run, written directly: safe answers to the first `survived` questions, then caught on the next. Its
-// ladder is the sum of POINTS_PER_QUESTION for the safe ones; answered today, it earns no bonus.
+// Yesterday's run, written directly: safe answers to the first `survived` questions, then caught on the next, all at
+// yesterday's noon. Its ladder is the sum of POINTS_PER_QUESTION for the safe ones.
+async function playedYesterdayBonus(p: Player): Promise<number> {
+  const { rows } = await getPool().query<{ bonus: number }>(
+    "select coalesce(sum(bonus), 0)::int as bonus from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
+    [p.userId, GAME_ID, yesterday],
+  );
+  return rows[0].bonus;
+}
+// A player's yesterday on the board: that ladder plus the bonus their row holds, once it's settled.
+const yesterdays = async (p: Player, ladder: number) => ladder + (await playedYesterdayBonus(p));
 async function playedYesterday(p: Player, survived: number) {
   const db = getPool();
   await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [p.userId, GAME_ID, yesterday]);
@@ -69,7 +82,8 @@ async function playedYesterday(p: Player, survived: number) {
     }
     const caught = i === survived;
     await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, $4, $5, $6)",
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       values ($1, $2, $3::date, $4, $5, $6, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
       [p.userId, GAME_ID, yesterday, i, caught ? puzzleYesterday.questions[i].host_answers[0] : safeEntry(puzzleYesterday, i), caught],
     );
   }
@@ -136,11 +150,12 @@ describe("the friends leaderboard", () => {
     const r = await leaderboard();
     expect(r.status).toBe(200);
     expect(r.body.ok).toBe(true);
+    const [b, a, e] = [await yesterdays(players.b, 75), await yesterdays(players.a, 25), await yesterdays(players.e, 25)];
     expect(r.body[yWeek].entries).toEqual([
-      { username: players.b.username, name: players.b.username, points: 75, you: false, daily: daily(yWeek, 75) },
-      // A and E tie on 25: by name, and "la…" comes before "le…".
-      { username: players.a.username, name: players.a.username, points: 25, you: true, daily: daily(yWeek, 25) },
-      { username: players.e.username, name: players.e.username, points: 25, you: false, daily: daily(yWeek, 25) },
+      { username: players.b.username, name: players.b.username, points: b, you: false, daily: daily(yWeek, b) },
+      // A and E tie, with the same answers: by name, and "la…" comes before "le…".
+      { username: players.a.username, name: players.a.username, points: a, you: true, daily: daily(yWeek, a) },
+      { username: players.e.username, name: players.e.username, points: e, you: false, daily: daily(yWeek, e) },
     ]);
     // How many of each week's days are over, and none that A is still playing.
     expect([r.body.thisWeek.days, r.body.lastWeek.days]).toEqual([over("thisWeek"), 7]);
@@ -152,9 +167,10 @@ describe("the friends leaderboard", () => {
       [players.e.username, 0],
     ]);
     expect(r.body[otherWeek].entries.map((x: Entry) => x.daily)).toEqual([0, 1, 2].map(() => daily(otherWeek, 0)));
-    // Settled: A's, B's and E's runs from yesterday; C, not shown, isn't; A's run today isn't finished or closed.
+    // Settled: A's, B's and E's runs from yesterday, and C's too, though not shown, as a day's place needs every player
+    // (M16 16e-3b, answer 27); A's run today isn't finished or closed.
     expect(await ledgerRows([players.a.userId, players.b.userId, players.e.userId])).toBe(3);
-    expect(await ledgerRows([players.c.userId])).toBe(0);
+    expect(await ledgerRows([players.c.userId])).toBe(1);
     // Again: nothing new, the same totals.
     expect(await leaderboard()).toEqual(r);
     expect(await ledgerRows([players.a.userId, players.b.userId, players.e.userId])).toBe(3);
@@ -162,9 +178,10 @@ describe("the friends leaderboard", () => {
 
   it("shows each viewer their own friends: B sees A and D, not E; a friend with no points shows 0", async () => {
     useSession(players.b.session);
+    const [b, a] = [await yesterdays(players.b, 75), await yesterdays(players.a, 25)];
     expect(await standings()).toEqual([
-      { username: players.b.username, name: players.b.username, points: 75, you: true, daily: daily(yWeek, 75) },
-      { username: players.a.username, name: players.a.username, points: 25, you: false, daily: daily(yWeek, 25) },
+      { username: players.b.username, name: players.b.username, points: b, you: true, daily: daily(yWeek, b) },
+      { username: players.a.username, name: players.a.username, points: a, you: false, daily: daily(yWeek, a) },
       { username: players.d.username, name: players.d.username, points: 0, you: false, daily: daily(yWeek, 0) },
     ]);
   });
@@ -175,7 +192,8 @@ describe("the friends leaderboard", () => {
     const db = getPool();
     await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [players.d.userId, GAME_ID, yesterday]);
     await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       values ($1, $2, $3::date, 0, $4, false, (($3::date + time '12:00') at time zone 'America/Los_Angeles'))`,
       [players.d.userId, GAME_ID, yesterday, safeEntry(puzzleYesterday, 0)],
     );
     useSession(players.d.session);
@@ -187,19 +205,29 @@ describe("the friends leaderboard", () => {
     const hiding = (await leaderboard()).body[yWeek];
     expect(hiding.hidden).toEqual([dayIndex(yesterday)]);
     expect(hiding.entries.map((x: Entry) => x.daily)).toEqual([daily(yWeek, 0), daily(yWeek, 0)]);
-    // Once D is caught on question 2, yesterday counts again, D's run included.
-    await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [
-      players.d.userId,
-      GAME_ID,
-      yesterday,
-    ]);
-    await db.query(
-      "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 1, $4, true)",
-      [players.d.userId, GAME_ID, yesterday, puzzleYesterday.questions[1].host_answers[0]],
-    );
-    expect((await standings()).map((x) => [x.username, x.points, x.daily])).toEqual([
-      [players.b.username, 75, daily(yWeek, 75)],
-      [players.d.username, 25, daily(yWeek, 25)],
+    // D survives question 2 now, after yesterday's midnight, and is caught on question 3: once D's run is over,
+    // yesterday counts again, D's run with what it scored by that midnight, question 1's 25 and not question 2's 50
+    // (M16 16e-3a, answer 35).
+    const answerNow = async (index: number, entryId: string, matched: boolean) => {
+      await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [
+        players.d.userId,
+        GAME_ID,
+        yesterday,
+        index,
+      ]);
+      await db.query(
+        "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, $4, $5, $6)",
+        [players.d.userId, GAME_ID, yesterday, index, entryId, matched],
+      );
+    };
+    await answerNow(1, safeEntry(puzzleYesterday, 1), false);
+    expect((await leaderboard()).body[yWeek].hidden).toEqual([dayIndex(yesterday)]);
+    await answerNow(2, puzzleYesterday.questions[2].host_answers[0], true);
+    const standing = await standings();
+    const [b, d] = [await yesterdays(players.b, 75), await yesterdays(players.d, 25)];
+    expect(standing.map((x) => [x.username, x.points, x.daily])).toEqual([
+      [players.b.username, b, daily(yWeek, b)],
+      [players.d.username, d, daily(yWeek, d)],
     ]);
     expect((await leaderboard()).body[yWeek].hidden).toEqual([]);
   });
@@ -208,10 +236,11 @@ describe("the friends leaderboard", () => {
     await getPool().query("update private.profile set display_name = 'Zed' where user_id = $1", [players.a.userId]);
     useSession(players.a.session);
     // A, now Zed, sorts after E in their tie.
+    const [b, e, a] = [await yesterdays(players.b, 75), await yesterdays(players.e, 25), await yesterdays(players.a, 25)];
     expect((await standings()).map((x) => [x.name, x.points])).toEqual([
-      [players.b.username, 75],
-      [players.e.username, 25],
-      ["Zed", 25],
+      [players.b.username, b],
+      [players.e.username, e],
+      ["Zed", a],
     ]);
   });
 

@@ -16,7 +16,7 @@ import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api, ApiError } from "@/lib/api-client";
 import { normalize } from "@/content/puzzle";
-import { bonusNote, earnsBonus } from "./bonus";
+import { bonusNote, earnsBonus, PAST_MIDNIGHT, pastMidnight } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
 import { FORWARD } from "./slide";
@@ -300,6 +300,7 @@ function Run({ runner, onPlaying, saved }: { runner: Runner; onPlaying: (playing
           </ButtonLink>
         </>
       )}
+      {playing && pastMidnight(run) && <p className={styles.note}>{PAST_MIDNIGHT}</p>}
       {run.status === "in_progress" && run.next && <Reveal run={run} busy={busy} onNext={runner.next} />}
       {run.status === "in_progress" && run.question && (
         <Question

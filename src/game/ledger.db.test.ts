@@ -64,7 +64,8 @@ async function run(client: PoolClient, userId: string, date: string, startedAt: 
 }
 
 describe("settling runs into the points ledger", () => {
-  it("writes one row per finished run of a closed day, with that day's ladder and final rarity bonus, and nothing twice", async () => {
+  // M16 16e-3a: a run counts what it scored by its day's midnight, finished or not (answers 35 and 38).
+  it("writes one row per run of a closed day, with the ladder and final rarity bonus of its answers before midnight, and nothing twice", async () => {
     await inRolledBackTransaction(async (client) => {
       await client.query("set local session_replication_role = replica");
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, DAY, fixture(DAY)]);
@@ -77,7 +78,15 @@ describe("settling runs into the points ledger", () => {
         fixture(today),
       ]);
 
-      const [a, b, c, d, e, f] = [await newUser(client), await newUser(client), await newUser(client), await newUser(client), await newUser(client), await newUser(client)];
+      const [a, b, c, d, e, f, g] = [
+        await newUser(client),
+        await newUser(client),
+        await newUser(client),
+        await newUser(client),
+        await newUser(client),
+        await newUser(client),
+        await newUser(client),
+      ];
       // A: dog, banana and blue (all host bank), then caught by italy.
       await run(client, a, DAY, at("20:00:00"), [
         { q: 0, entry: t(0, "dog"), at: at("20:00:05") },
@@ -105,7 +114,7 @@ describe("settling runs into the points ledger", () => {
         q: 2,
         at: at("20:00:40"),
       });
-      // D waits at the reveal after question 2, so its run is still in progress.
+      // D waits at the reveal after question 2, so its run is still in progress, and counts what it has.
       await run(client, d, DAY, at("20:00:00"), [{ q: 0, entry: t(0, "fish"), at: at("20:00:05") }, { q: 1, entry: t(1, "kiwi"), at: at("20:00:30") }]);
       // E starts before midnight and finishes after it: horse before, kiwi after, then caught by red after.
       await run(client, e, DAY, at("23:59:40"), [
@@ -113,6 +122,8 @@ describe("settling runs into the points ledger", () => {
         { q: 1, entry: t(1, "kiwi"), at: afterMidnight("00:00:10") },
         { q: 2, entry: t(2, "red"), matched: true, at: afterMidnight("00:00:40") },
       ]);
+      // G starts before midnight and answers only after it: dog, safe, then waits at the reveal.
+      await run(client, g, DAY, at("23:59:55"), [{ q: 0, entry: t(0, "dog"), at: afterMidnight("00:00:05") }]);
       // F is caught today: finished, but its day isn't closed.
       await run(client, f, today, new Date().toISOString(), []);
       await client.query(
@@ -127,11 +138,14 @@ describe("settling runs into the points ledger", () => {
       }
       await client.query("set local session_replication_role = origin");
 
-      // As the app: settle the six players.
+      // As the app: settle every player's runs (M16 16e-3b, answer 27).
       await client.query("set local role plor_app");
-      expect(await settleRuns(client, [a, b, c, d, e, f])).toBe(5);
+      await settleRuns(client);
+      // Every run of the closed day, the 11 strangers' too: a, b, c, d, e and g, and the 11 (F's day isn't closed).
+      const { rows: day } = await client.query("select from private.points_ledger where game_id = $1 and puzzle_date = $2::date", [GAME_ID, DAY]);
+      expect(day).toHaveLength(17);
       const ledger = "select user_id, puzzle_date::text as date, points, bonus from private.points_ledger where user_id = any($1::uuid[]) order by user_id, puzzle_date";
-      const { rows } = await client.query<{ user_id: string; date: string; points: number; bonus: number }>(ledger, [[a, b, c, d, e, f]]);
+      const { rows } = await client.query<{ user_id: string; date: string; points: number; bonus: number }>(ledger, [[a, b, c, d, e, f, g]]);
       const row = (id: string, date = DAY) => rows.find((r) => r.user_id === id && r.date === date);
       // The first day's question 1 pools 16 answers (the second day comes after it, so it isn't pooled): dog's share is
       // (10 × 0.2 + 8) / 26 = 38.5%, so 0; an uncommon animal one player gave, (10 × 0.4/3 + 1) / 26 = 8.97%, so
@@ -145,12 +159,15 @@ describe("settling runs into the points ledger", () => {
       expect(row(a, DAY2)).toMatchObject({ points: 32, bonus: 7 });
       // C: 25 + 50 = 75, aardvark 9, banana 0.
       expect(row(c)).toMatchObject({ points: 84, bonus: 9 });
-      // E: 25 + 50 = 75 (the late answer counts on the ladder, D1). Horse, before midnight: 6. Kiwi, after: 0 (D8).
-      expect(row(e)).toMatchObject({ points: 81, bonus: 6 });
+      // E: only horse was before midnight, 25 and its bonus 6; kiwi, after it, scores nothing (16e-3a, answer 35).
+      expect(row(e)).toMatchObject({ points: 31, bonus: 6 });
+      // D, left at the reveal: 25 + 50 = 75, fish (uncommon, one player) 6, kiwi 0 (answer 38).
+      expect(row(d)).toMatchObject({ points: 81, bonus: 6 });
+      // G scored nothing by midnight, and still gets its row: a played day at 0 (answer 38).
+      expect(row(g)).toMatchObject({ points: 0, bonus: 0 });
       // B: the full ladder, 1000, plus cat 6, kiwi 0, green 0, france 33, lead 25, boxing 41, knee 58: 163.
       expect(row(b)).toMatchObject({ points: 1163, bonus: 163 });
-      // D is still in progress; F's day isn't closed.
-      expect(row(d)).toBeUndefined();
+      // F's day isn't closed.
       expect(row(f)).toBeUndefined();
 
       // The provisional bonus pools past days only, the final one the day itself too (human, 2026-10-24: "Past days only
@@ -161,18 +178,18 @@ describe("settling runs into the points ledger", () => {
       expect([withDay.answered, withDay.byEntry.get(t(0, "aardvark-genus"))]).toEqual([17, 2]);
 
       // Settling again writes nothing and changes nothing.
-      expect(await settleRuns(client, [a, b, c, d, e, f])).toBe(0);
-      const { rows: again } = await client.query(ledger, [[a, b, c, d, e, f]]);
+      expect(await settleRuns(client)).toBe(0);
+      const { rows: again } = await client.query(ledger, [[a, b, c, d, e, f, g]]);
       expect(again).toEqual(rows);
     });
   });
 
-  it("does nothing for players with no finished runs on a closed day", async () => {
+  it("gives no row to a player with no runs on a closed day", async () => {
     await inRolledBackTransaction(async (client) => {
       const nobody = await newUser(client);
       await client.query("set local role plor_app");
-      expect(await settleRuns(client, [nobody])).toBe(0);
-      expect(await settleRuns(client, [])).toBe(0);
+      await settleRuns(client);
+      expect((await client.query("select from private.points_ledger where user_id = $1", [nobody])).rows).toEqual([]);
     });
   });
 });

@@ -8,10 +8,19 @@ export function earnsBonus(run: RunState): boolean {
   return run.answered.some((a) => !a.matched && a.inDay);
 }
 
-// The line after the bonus: that answers after midnight earn none, for a run with a survived one; otherwise, while a
-// bonus can be earned, when the final one comes; nothing when there's no bonus to earn.
+// A run played past its day's midnight counts on the boards only what it scored before it (M16 16e-3a,
+// docs/milestones/M16-16e-points-and-boards.md, answers 35 and 37): one answered after it, or one still going after it.
+export function pastMidnight(run: RunState): boolean {
+  return run.answered.some((a) => !a.inDay) || (run.dayOver && run.status === "in_progress");
+}
+
+// Claude's words, approved with the design (answer 37).
+export const PAST_MIDNIGHT = "Past midnight: answers from now on don't count for the boards.";
+
+// The line after the bonus: for a run played past midnight, that those answers don't count, bonus included; otherwise,
+// while a bonus can be earned, when the final one comes; nothing when there's no bonus to earn.
 export function bonusNote(run: RunState): string {
-  if (run.answered.some((a) => !a.matched && !a.inDay)) return "Answers after midnight earn no bonus.";
+  if (pastMidnight(run)) return PAST_MIDNIGHT;
   if (earnsBonus(run)) return "The final bonus is worked out once the day is over.";
   return "";
 }

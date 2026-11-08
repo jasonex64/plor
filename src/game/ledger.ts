@@ -1,7 +1,10 @@
 // Settling runs into the points ledger (docs/milestones/M09-points-and-leaderboard.md, D3, D9, D10; M00-data-design.md
-// §6): a run gets its one row once it's finished and its day is closed, with the ladder and the final rarity bonus.
-// A day closes at its midnight Pacific; nothing is scheduled. The leaderboard settles the players it shows just before
-// it sums, which is also how runs from before M09 get their rows.
+// §6): a run gets its one row once its day is closed, with what it scored by that day's midnight, the ladder and the
+// final rarity bonus of the answers given before it, finished or not (M16 16e-3a, docs/milestones/
+// M16-16e-points-and-boards.md, answers 35 and 38; it replaced M09 D1's full score whenever finished). A day closes at
+// its midnight Pacific; nothing is scheduled. Every read of a board, Me or the game screen's stats settles every
+// player's runs first, as a day's place needs the whole day (M16 16e-3b, answer 27), which is also how runs from
+// before M09 get their rows.
 // Relative imports with extensions: scripts/draft.ts runs this module on plain Node, which knows no "@/" paths.
 import { type ApprovedPuzzle } from "../content/puzzle.ts";
 import { GAME_ID } from "../platform/game.ts";
@@ -10,19 +13,18 @@ import { scoreRun, type DayCounts, type ScoredEvent } from "./scoring.ts";
 
 type EventRow = { user_id: string; date: string; question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
-// Writes the missing rows for these players' finished runs on closed days, and returns how many it wrote. Settling
-// again writes nothing. The final bonus counts only answers given before the day's midnight, so it doesn't depend on
-// when this runs. day: the day it settles before, when the caller reads its day once for several reads
+// Writes the missing rows for every player's runs on closed days, and returns how many it wrote. Settling again writes
+// nothing. Only answers given before the day's midnight count, so a row doesn't depend on when this runs, and a run
+// still being played after its midnight gets the row it will keep. day: the day it settles before, when the caller reads its day once for several reads
 // (src/game/me.ts, getMe); otherwise today.
-export async function settleRuns(db: Db, userIds: string[], day: string | null = null): Promise<number> {
+export async function settleRuns(db: Db, day: string | null = null): Promise<number> {
   const { rows: runs } = await db.query<{ user_id: string; date: string }>(
     `select s.user_id::text, s.puzzle_date::text as date
-     from private.run_status s
-     where s.user_id = any($1::uuid[]) and s.game_id = $2 and s.puzzle_date < coalesce($3::date, private.today())
-       and s.status in ('died', 'survived', 'timed_out')
+     from private.run s
+     where s.game_id = $1 and s.puzzle_date < coalesce($2::date, private.today())
        and not exists (select from private.points_ledger l
                        where l.user_id = s.user_id and l.game_id = s.game_id and l.puzzle_date = s.puzzle_date)`,
-    [userIds, GAME_ID, day],
+    [GAME_ID, day],
   );
   if (runs.length === 0) return 0;
   const dates = [...new Set(runs.map((r) => r.date))];
@@ -46,7 +48,7 @@ export async function settleRuns(db: Db, userIds: string[], day: string | null =
   const scored = runs.map((r) => {
     const puzzle = puzzles.find((p) => p.date === r.date)!.content;
     const own: ScoredEvent[] = events
-      .filter((e) => e.user_id === r.user_id && e.date === r.date)
+      .filter((e) => e.user_id === r.user_id && e.date === r.date && e.in_day)
       .map((e) => ({ index: e.question_idx, entryId: e.entry_id, matched: e.matched, inDay: e.in_day }));
     const { ladder, bonus } = scoreRun(puzzle, own, countsByDate.get(r.date)!);
     return { ...r, points: ladder + bonus, bonus };
@@ -108,10 +110,10 @@ export async function dayCounts(db: Db, dates: string[]): Promise<Map<string, Da
   return counts;
 }
 
-// A player's all-time points: the sum of their ledger rows, once their finished runs on closed days are settled
+// A player's all-time points: the sum of their ledger rows, once the runs on closed days are settled
 // (docs/milestones/M12-account.md, 12a; ROADMAP "Design review", 2). Today's run counts once the day closes (M09 D9).
 export async function allTimePoints(db: Db, userId: string, day: string | null = null): Promise<number> {
-  await settleRuns(db, [userId], day);
+  await settleRuns(db, day);
   const { rows } = await db.query<{ total: number }>(
     "select coalesce(sum(points), 0)::int as total from private.points_ledger where user_id = $1 and game_id = $2",
     [userId, GAME_ID],

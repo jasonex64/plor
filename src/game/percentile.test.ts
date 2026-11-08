@@ -1,6 +1,6 @@
 // A day's place (docs/milestones/M16-16e-points-and-boards.md, answers 25 and 26, and "16e-2 in detail").
 import { describe, expect, it } from "vitest";
-import { dayPercentiles, percentile, placeTotal } from "./percentile";
+import { dayPercentiles, percentile, placeAverage, placeTotal } from "./percentile";
 
 describe("percentile", () => {
   it("is the share of the others beaten", () => {
@@ -34,5 +34,17 @@ describe("placeTotal", () => {
   it("adds a week's places, to one decimal", () => {
     expect(placeTotal([33.3, 33.3, 33.4])).toBe(100);
     expect(placeTotal([0.1, 0.2])).toBe(0.3);
+  });
+});
+
+// The overall board's Average (M16 16e-3b, answer 2).
+describe("placeAverage", () => {
+  it("averages places over the game-days played, to one decimal", () => {
+    expect(placeAverage([66.7, 0, 0, 75])).toBe(35.4);
+    expect(placeAverage([100])).toBe(100);
+  });
+
+  it("is 0 with no game-day", () => {
+    expect(placeAverage([])).toBe(0);
   });
 });

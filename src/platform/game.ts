@@ -16,3 +16,7 @@ export const GAME_ID = GAME.id;
 export const SUBSTRINGS = { id: "substrings", name: "Game number 2", path: "/play2" } as const;
 
 export const SUBSTRINGS_ID = SUBSTRINGS.id;
+
+// The overall board, both games' places (M16 16e-3b, docs/milestones/M16-16e-points-and-boards.md, answer 29): a
+// board's third choice beside the two games, not a game.
+export const OVERALL = { id: "overall", name: "Overall" } as const;
