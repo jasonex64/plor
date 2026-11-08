@@ -13,6 +13,7 @@ function answered(index: number, matched: boolean): AnsweredQuestion {
     prompt: PROMPTS[index],
     answer: { id: `you${index}`, name: `youranswer${index}` },
     matched,
+    tier: "rare",
     hostAnswers: [{ id: `host${index}`, name: `hostanswer${index}` }],
     points: 0,
     bonus: 0,

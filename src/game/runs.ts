@@ -2,7 +2,7 @@
 // (one run per day, order, the day boundary, append-only); this module asks it and shapes the responses.
 // Dates are always read as text: "today" is decided by private.today() alone, never by TypeScript (§8).
 import { DatabaseError } from "pg";
-import { avoids, normalize, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
+import { avoids, normalize, stolenLetters, tierOf, type ApprovedPuzzle, type Tier } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
@@ -19,12 +19,15 @@ import { FINISHED, type RunStatus } from "./status";
 // run is over, the fraction of the players who answered this question before the day's midnight who gave this answer,
 // from the counts the bonus uses (docs/milestones/M11-home-screen.md, H5); null while the run goes on, or while fewer
 // than ANSWER_SHARE_MIN_PLAYERS have answered it, so a share can't give away one player's answer. inDay: given before
-// the run's day ended at midnight; an answer after it earns no rarity bonus (M09 D8), which the result says.
+// the run's day ended at midnight; an answer after it earns no rarity bonus (M09 D8), which the result says. tier: the
+// answer's tier from the day's levels, which picks Afterglow's firework (docs/milestones/M14-14c-6-afterglow-in-play.md,
+// answer 6).
 export type AnsweredQuestion = {
   index: number;
   prompt: string;
   answer: Named;
   matched: boolean;
+  tier: Tier;
   hostAnswers: Named[];
   points: number;
   bonus: number;
@@ -115,6 +118,7 @@ function buildState(
       prompt: question.prompt,
       answer: named(names, e.entry_id),
       matched: e.matched,
+      tier: tierOf(question.levels, e.entry_id),
       hostAnswers: hostAnswers(question, names),
       points: e.matched ? 0 : POINTS_PER_QUESTION[e.question_idx],
       bonus: score.bonuses[i],

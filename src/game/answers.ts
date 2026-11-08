@@ -2,7 +2,7 @@
 // which decides who may (a player whose run of the day is over, for the questions they answered; after the day's
 // midnight, anyone whose run of it isn't still going: OB013 otherwise) and reads only what the day accepted.
 import { DatabaseError } from "pg";
-import { normalize } from "@/content/puzzle";
+import { normalize, type Tier } from "@/content/puzzle";
 import { ANSWER_SEARCH_LIMIT, ANSWER_SHARE_MIN_PLAYERS } from "@/config/tunables";
 import { shownName } from "./payload";
 import { GAME_ID } from "@/platform/game";
@@ -11,7 +11,7 @@ import { AppError } from "@/lib/http";
 
 // An answer the question accepted: its main name, the name the search matched when that's another of its names,
 // its tier from the day's levels, and how many players gave it, or null while too few answered the question (M11 H5).
-export type FoundAnswer = { name: string; matched: string | null; tier: "common" | "uncommon" | "rare"; players: number | null };
+export type FoundAnswer = { name: string; matched: string | null; tier: Tier; players: number | null };
 
 export async function searchAnswers(db: Db, userId: string, date: string, index: number, typed: string): Promise<FoundAnswer[]> {
   try {
