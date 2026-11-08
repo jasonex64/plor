@@ -160,6 +160,8 @@ describe("a day of game 2", () => {
   it("hides the next letters until Next, and gives no clock between rounds", async () => {
     const { run } = await state();
     expect(run).toMatchObject({ status: "in_progress", open: null, rounds: [{ letters: "qk", word: "aqkqmb", examples: [] }] });
+    // Where the run stands comes only once it's finished (16e-2).
+    expect(run!.standing).toBeNull();
     for (const letters of ROUNDS.slice(1)) expect(JSON.stringify(run)).not.toContain(`"${letters}"`);
   });
 
@@ -232,5 +234,29 @@ describe("a day of game 2", () => {
     const res = await nextRound();
     expect(res.status).toBe(409);
     expect((await res.json()).error).toBe("run_over");
+  });
+
+  // 16e-2: a finished run's standing so far today, and nothing in it of anyone else's run but the rank.
+  it("ranks a finished run among the friends who've finished, once one has", async () => {
+    const db = getPool();
+    const ids = (await db.query<{ email: string; id: string }>("select email, id::text from auth.users where email = any($1)", [[`${RUN}-a@example.test`, `${RUN}-b@example.test`]])).rows;
+    const id = (name: string) => ids.find((r) => r.email === `${RUN}-${name}@example.test`)!.id;
+    await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [id("a"), id("b")]);
+    // b's run has one round played, so no rank yet: fewer than 10 have finished, and b hasn't.
+    expect((await state()).run!.standing).toEqual({ percent: null, friends: null });
+
+    // b finishes, with aqkb: 25 for the word and 50 for its four letters, under a's 255.
+    useSession(await sessionFor("b"));
+    for (let i = 1; i < 7; i++) {
+      await timeOut();
+      await nextRound();
+    }
+    await timeOut();
+    const b = (await state()).run!;
+    expect(b.status).toBe("finished");
+    expect(b.score!.total).toBe(75);
+    expect(b.standing).toEqual({ percent: null, friends: { rank: 2, of: 2 } });
+    useSession(await sessionFor("a"));
+    expect((await state()).run!.standing).toEqual({ percent: null, friends: { rank: 1, of: 2 } });
   });
 });

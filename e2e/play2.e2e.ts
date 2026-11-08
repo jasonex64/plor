@@ -5,6 +5,8 @@ import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+// A friend's finished run is written with the round rules off, which needs the local superuser.
+const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqmjb", "aqyzb", "aqyzc", "aqyzd"];
 let today = "";
@@ -24,6 +26,7 @@ test.afterAll(async () => {
   await DB.query("delete from private.puzzle where game_id = 'substrings' and puzzle_date = $1::date", [today]);
   await DB.query("delete from private.dictionary_word where word_key = any($1)", [WORDS]);
   await DB.end();
+  await ADMIN.end();
 });
 
 test("a signed-out visit shows sign-in", async ({ browser }) => {
@@ -156,8 +159,22 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
     await next.click();
     await expect(page.getByText(ROUNDS[i + 1], { exact: true })).toBeVisible();
   }
+  // A friend has finished today with no word, so the end ranks the run among friends (M16 16e-2).
+  const client = await ADMIN.connect();
+  try {
+    await client.query("begin");
+    await client.query("set local session_replication_role = replica");
+    const friend = (await client.query<{ id: string }>("insert into auth.users (id, email) values (gen_random_uuid(), $1) returning id", [`${RUN}-plf@example.test`])).rows[0].id;
+    await client.query("insert into private.friendship (user_a, user_b) select least($1::uuid, id), greatest($1::uuid, id) from auth.users where email = $2", [friend, `${RUN}-pl@example.test`]);
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'substrings', $2::date, now() - interval '1 hour')", [friend, today]);
+    await client.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx, opened_at) values ($1, 'substrings', $2::date, 6, now() - interval '1 hour')", [friend, today]);
+    await client.query("commit");
+  } finally {
+    client.release();
+  }
   await runOut();
   await page.reload();
+  await expect(page.getByText("1st of 2 with your friends so far today.")).toBeVisible();
 
   const results = page.getByRole("list", { name: "Your rounds" });
   await expect(results.getByRole("listitem")).toHaveCount(7);

@@ -149,7 +149,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 2. Each PR updates this ticket's Status, the M16 ticket's status line and the ROADMAP row.
 
 ## Removes
-Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, if anything, when built; game 1's boards are kept by answer 18.
+Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3 lists its own.
 
 ---
 *Fill in the sections below at the end.*
@@ -167,7 +167,9 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 - **Ledger rows and the end of a run:** `npx vitest run src/game/substring-places.db.test.ts --no-file-parallelism`, 3 passed: a closed day's finished run (420) and unfinished one (65) get one row each, settling again writes none, today's waits; the standing is hidden at 9 finished and 50 at 10, with a tie and an unfinished run that doesn't count, and a friend rank only once a friend has finished.
 - **Boards:** `npx vitest run src/app/api/leaderboard src/app/api/groups/leaderboard --no-file-parallelism`, 28 passed. The new `substrings.db.test.ts`: a board without a game, or `chess`, is refused with `unknown_game`; game 2's friends board shows B 66.7 and A 33.3, places among four players yesterday, two of them strangers whose runs were settled too; a group member who joined today counts 0; game 1's board stays at 0. Game 1's own board tests now name `game=offbeat`.
 - **Screens:** `npx playwright test e2e/play2.e2e.ts e2e/player-screens.e2e.ts e2e/leaderboard-graph.e2e.ts e2e/today.e2e.ts --retries=0`, 22 passed, with the Friends board's switch to game 2, its note, and a total that isn't in points. `player-screens.e2e.ts`'s held route now matches the board's query.
-- `npm test`, `npx tsc --noEmit -p .` and `npx eslint src e2e` pass.
+- **Review's blockers** (below): `npx vitest run src/app/ordinal.test.ts`, 13 passed (1st, 2nd, 3rd, 11th to 13th, 21st, 111th, 112th); `npx vitest run src/app/api/substrings src/app/api/leaderboard/substrings.db.test.ts --no-file-parallelism`, 27 passed, with `standing` null mid-run, no friend rank before a friend finishes, then 1st and 2nd of 2 for both players at the route, and a board response holding only the circle's names, places and days; `npx playwright test e2e/play2.e2e.ts --retries=0`, 6 passed, with "1st of 2 with your friends so far today." on screen.
+- **Game 1's wider e2e:** `npx playwright test e2e/groups.e2e.ts e2e/live-board.e2e.ts e2e/jumps-and-finds.e2e.ts e2e/me.e2e.ts e2e/shell.e2e.ts e2e/offbeat.e2e.ts e2e/approve-and-play.e2e.ts --retries=0`: 30 passed, 1 failed, `live-board.e2e.ts`'s "a reconnect refetches the board", waiting for the reconnect's request; run alone, `--repeat-each=2`, 2 passed. 16e-2 doesn't touch the live board.
+- `npm test`, `npx tsc --noEmit -p .`, `npx eslint src e2e`, `npm run build` and `check:client-bundle` pass.
 
 ### 16e-1
 - **Scoring,** written before the function: `npx vitest run src/game/substring-scoring.test.ts` failed (`Cannot find module './substring-scoring'`), then 12 passed: both tables cell by cell, the seven worked runs, a run with no word, and a word holding the bonus letter three times.
@@ -181,5 +183,6 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 - Blocking findings and how each was fixed (16e-1, the `reviewer` agent, 2026-11-07):
   1. The e2e checked the tracker's count, not which letters it marks: it now checks the marked letters after each word.
   2. No test proved a word scores by its letters alone, as every test word's spelling was its key: a route test word is now spelled `aqm-ǰb`, with a hyphen and a j with a caron, and scores 30 with the bonus letter's 120.
+- 16e-2, the `reviewer` agent, 2026-11-07: (1) friend rank and "nothing beyond the boards" were tested only below the routes: route tests now check `standing` and the board response's fields; (2) the end of a run's standing text and its 1st/2nd/12th had no test: `src/app/ordinal.ts` has its own, and the e2e shows a friend rank. It found the places, privacy and game 1's boards correct. Deferred to ROADMAP, For M16: cost at scale, a midnight window, the docs on what a board reads, three untested ties and sums, points wording in Graph, a DESIGN citation, and a test that needs yesterday free.
 - Deferred to ROADMAP "Next revision" (For M16): 1 and 2 different letters scoring the same, a stale header comment, the tracker's letters for a screen reader, and a mid-run total that already holds the different letters.
 - The reviewer found the formula reproduces both tables and every worked run, nothing leaking before its time, and game 1 untouched.

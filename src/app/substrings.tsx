@@ -12,6 +12,7 @@ import { SUBSTRINGS } from "@/platform/game";
 import { useCountdown } from "./countdown";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
+import { ordinal } from "./ordinal";
 import { LoadingStatus } from "./skeleton";
 import styles from "./substrings.module.css";
 
@@ -208,13 +209,6 @@ function Standing({ standing }: { standing: NonNullable<SubstringRun["standing"]
       )}
     </>
   );
-}
-
-// 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st.
-function ordinal(n: number): string {
-  const teen = n % 100 >= 11 && n % 100 <= 13;
-  const suffix = teen ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
-  return `${n}${suffix}`;
 }
 
 function Results({ run }: { run: SubstringRun }) {

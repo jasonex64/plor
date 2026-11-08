@@ -81,6 +81,9 @@ describe("game 2's boards", () => {
 
   it("adds up places among every player of the day, showing only the viewer's circle", async () => {
     const { body } = await call(friendsBoard, "/api/leaderboard?game=substrings");
+    // Only the circle's rows, and nothing in them but a place, the days it came from, and who: no score of anyone's.
+    expect(Object.keys(body).sort()).toEqual(["lastWeek", "ok", "thisWeek"]);
+    for (const e of body[week].entries) expect(Object.keys(e).sort()).toEqual(["daily", "name", "points", "username", "you"]);
     // Of the three others, A beat D, and B beat A and D.
     expect(standings(body)).toEqual([
       [B.username, 66.7],
