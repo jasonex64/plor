@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merging on green CI at the human's "Merge when green"); next 14c-6b, the game. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 28); 6b-1, the game plays, being built. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -49,6 +49,23 @@ Round 5
 18. Source: "Yes, add MDN (Recommended)". MDN's `prefers-reduced-motion` page, read 2026-11-07 (last modified 2026-06-10).
 19. The calm fade: "The walk's descent time". Each of the calm version's fades lasts as long as 14c-5's descent.
 
+For 14c-6b (human, 2026-11-08)
+
+Round 6
+20. PR size: "Two PRs (Recommended)". 6b-1: the game plays a real day full screen, with browser tests for the rules (timing, off-list, reload, the way out). 6b-2: the full visual check, its CI short set and the mutants.
+21. End button: "See results (Recommended)". The mock's own words; it replaces the proposed "Done".
+22. Way out: "× icon (Recommended)". Screen readers hear "Back to Today".
+23. Off-list: "Today's line (Recommended)". "\"wolfe\" isn't in our list. Try another answer."
+
+Round 7
+24. Score corner: "Keep it (Recommended)". As the approved mock: the question number and the points so far, real points from the database. The sky result itself still shows only the firework, its flavour and "The host said …" (answer 7).
+25. Coming back: "The cards (Recommended)". A run that is over opens on today's result, share, facts and comments; the ending list is seen once, at the end of the run.
+26. Test run: "Back to that admin page (Recommended)". A test run's × and See results return to the admin page it started from.
+
+Round 8
+27. Approval: "Approve, start 6b-1 (Recommended)".
+28. Shake: "Same shake (Recommended)". Off-list text shakes the box as a refused taken letter does.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -66,37 +83,38 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 ## Design (proposed)
 **Before and after the run.** The day's banner, Start, the no-puzzle and signed-out cards, and the result, share, facts and comments after the run, are today's cards, at `/afterglow`. Start goes full screen into Q1.
 
-**Full screen.** From Start to the ending list the shell's top bar, tab bar, sidebar and clock bar are hidden, on every screen size, and Afterglow fills the window. A small way-out button sits in a corner, shown only while no fuse burns: during the sky result, the walk, and the ending list. It goes to Today. Coming back to `/afterglow` mid-run picks up where the run is: a run waiting for Next shows that question's sky result again.
+**Full screen.** From Start to the ending list the shell's top bar, tab bar, sidebar and clock bar are hidden, on every screen size, and Afterglow fills the window. A small way-out button, a × that screen readers hear as "Back to Today" (answer 22), sits in a corner, shown only while no fuse burns: during the sky result, the walk, and the ending list. It goes to Today. Coming back to `/afterglow` mid-run picks up where the run is: a run waiting for Next shows that question's sky result again. A run that is over opens on the cards (answer 25). The score corner shows the question number and the points so far, as in the mock (answer 24).
 
 **A question.** The box, its fuse and the seconds come from the run's `msLeft`, so a reload shows the time the database has left. Taken letters work as today: the key does nothing and a line says the letter is taken.
 
 **Light it.** The word steps forward and rumbles plainly at once. The reply decides:
 - **Safe:** the word takes its rarity's colour (the answer's level: common Peony gold, uncommon Chrysanthemum lime, rare Kamuro sky blue), its charge runs on, and it climbs and bursts as in 14c-5. The sky result adds one line, "The host said …".
 - **Caught:** the dud, as in 14c-5, and the run ends.
-- **Off-list:** the word drops back into the box, which shakes; a line under it says it isn't in the list, and the text stays selected. The fuse never stopped.
+- **Off-list:** the word drops back into the box, which shakes; under it, today's line, "\"wolfe\" isn't in our list. Try another answer." (answer 23), and the text stays selected. The fuse never stopped.
 - **Time's up** (the database refused a late answer, or the fuse ran out): the fuse-out ending, as in 14c-5.
 - **Any other error** is shown, as today; nothing is retried.
 
 **Between questions.** Walk on plays the descent and the walk; the next box appears after any taken-letter lantern, and only then is Next sent, which starts that question's 20 s. The box shows no time until the database answers.
 
-**The end.** After Q7, or a dud or fuse out, the ending list fades in as in 14c-5. Its button, **Done** (proposed wording), leaves full screen and shows today's result cards.
+**The end.** After Q7, or a dud or fuse out, the ending list fades in as in 14c-5. Its button, **See results** (answer 21), leaves full screen and shows today's result cards.
 
 **Reduce motion.** No shake, rumble or sway; the charge, climb and walk become one short fade each between still frames; bursts, glitter and the fuse still draw.
 
-**Test runs.** The admin's test run uses the same screen, fed by its test runner.
+**Test runs.** The admin's test run uses the same screen, fed by its test runner; its × and See results return to the admin page it started from (answer 26).
 
 **Screen readers.** The prompt, box, seconds, result, host's answers and ending list are real text in the page, as in the mock, and keep 14b-21's announcements.
 
-**The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build.
+**The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build. The mock's Preview bar (its "skip ›" button) was a review aid and goes, with play again.
 
 **The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
 
 ## Acceptance criteria
 - [x] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
-- [ ] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, Done, the cards.
+- [ ] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, See results, the cards.
 - [ ] A dud and a fuse out each end the run with the ending list.
 - [ ] No question loses time to the walk: the database's open time for question k+1 is after its box appears (e2e, from the run's events).
-- [ ] The bars, sidebar and clock bar are hidden from Start to Done at 375×812 and 1440×900; the way-out button shows only while no fuse burns, and goes to Today.
+- [ ] The bars, sidebar and clock bar are hidden from Start to See results at 375×812 and 1440×900; the × shows only while no fuse burns, and goes to Today (a test run's, to its admin page).
+- [ ] A run that is over opens `/afterglow` on the cards, not the ending list.
 - [ ] With Reduce motion on, no frame shakes and the climb and walk are fades (e2e with `reducedMotion: "reduce"`).
 - [ ] An admin's test run plays in Afterglow.
 - [ ] The share text says Afterglow, with 🟩 and ⬜.
@@ -118,13 +136,15 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | 59 fps in real Chrome | The full check's fps lines | 14c-5 answer 41 |
 | 16.7 ms | A pre-draw slice | 14c-4 (60 fps), 14c-5 answer 42 |
 | "A few minutes" | The short check's CI time | Answer 15 |
-| The off-list shake's length and size | Answer 9 | **Proposed:** the fuse's end-of-time shake from 14c-5, reused |
+| The off-list shake's length and size | Answer 9 | Answer 28: the mock's shake for a refused taken letter (`refuse()` in `game.js` at `fcc11e4`: steps of 2, −2, 1 and 0 art pixels, 40 ms each), so every refused input shakes the same way (CLAUDE.md, "One way to do each thing") |
 | The calm version's fade length | Answer 8 | The walk's descent time from 14c-5 (answer 19) |
 
 ## Plan
-Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M16's PRs #155 to #165 have merged since).
+Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`.
 1. **14c-6a, the name.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), which the share, the boards' game switch and every heading follow; the game page's browser tab says Afterglow (answer 12). Small and reviewable alone.
-2. **14c-6b, the game.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, test runs, the pre-draw split, and the check in `e2e/` with its CI subset and hand scripts.
+2. **14c-6b, the game,** in two PRs (answer 20):
+   - **6b-1, the game plays.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, coming back to the cards, test runs and the pre-draw split, with browser tests for the rules, and DESIGN.md for the new screen (CLAUDE.md, Docs): every acceptance criterion but the two on the check and the mutants.
+   - **6b-2, the check.** `check.mjs` in `e2e/`, its short set in CI, the full set and the mutants by hand through `scripts/`: the criteria on the short and full check and the mutants. Until it merges the look is checked by the human's eye, not by machine.
 3. **14c-6c, the calm version** for Reduce motion.
 
 ## Removes
