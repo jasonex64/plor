@@ -89,6 +89,7 @@ export function Afterglow({ start, io, notices, out }: { start: () => Start; io:
       timeUp: () => now().timeUp(),
       seeResults: () => now().seeResults(),
       leave: () => now().leave(),
+      fault: (err) => now().fault(err),
     });
   }, []);
   return (

@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, built, its e2e passing (Evidence), in review; no PR yet. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, built and reviewed, its blocking findings fixed, its e2e passing (Evidence); not pushed, no PR yet. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -177,7 +177,7 @@ Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 | The mock's check hooks (`__core`, the phase log, frame counters, rate and freeze) | Not in 6b-1 | CLAUDE.md, Build for today: 6b-2 brings back what the check reads |
 | "Their numbers move to `src/config/tunables.ts`" | `game.js`'s 131 named values are `AFTERGLOW` there, less `Q_SECONDS` and `AGAIN_S`, plus answer 28's shake; the numbers inside the drawing code (`street.ts` whole, and the drawing functions in `scene.ts`) stay with the art | *Claude's reading*: they are the drawing, as its colours are (DECISIONS.md, Styling), and moving hundreds of coordinates would hide the art in a list |
 | The mock's `:root` variables and ids | On the game's layer, and `data-part` names | The page already has `#result`; the rest of the app keeps its theme |
-| The mock writes "FONT FAILED" into the name if Handjet doesn't load | The scene throws | CLAUDE.md, Fail loudly |
+| The mock writes "FONT FAILED" into the name if Handjet doesn't load | The page shows the error over the scene (`Io.fault`), and the scene goes on in the fallback | CLAUDE.md, Fail loudly; DECISIONS.md, Error handling: the client shows the error |
 | 14b-11 answer 12: the test run's label and Restart stay in view the whole run | Over the scene, among its notices, during the run | Answers 11 and 26 put the test run full screen; *Claude's reading* keeps both |
 | — | `RunState.next` also carries `stolen`, the letters taken at the next question | The "Damp fuses" line after a reload on the sky result |
 | 14b-11 answer 6: after a test run the game screen's cards come back | A test run's See results goes back to `/admin/puzzles`, as its × does, and restarts it (a reopened test page would otherwise resume the old run's moves) | Answer 26 replaces it; the restart is *Claude's reading*, found when the e2e left and came back |
@@ -203,5 +203,14 @@ Four PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - Not checked: a real phone, real Chrome's frame rate and Reduce motion (6b-2's check and 6c).
 
 ## Review
+14c-6b-1, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff origin/main...HEAD` at 3de8c14:
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  1. A failed Next left the box empty with the × hidden, and a failed time-up left the box refusing input: the player was held full screen with no way out. Fixed: either failure leaves its error over the scene and shows the × (`scene.ts`, `stranded`); `afterglow.e2e.ts` "a Next that fails says so and shows the way out".
+  2. Two silent stalls: a Next reply with no question, and a time-up that found no run. Fixed: each is an error the page shows (`game.tsx`, `Run`'s `fault` and `Game`'s `timeUp`).
+  3. A page shown again whose new load failed showed Afterglow's dark for good, hiding the error. Fixed: the error shows instead.
+  4. Handjet failing to load was an unhandled rejection the player never saw. Fixed: `Io.fault`, shown over the scene.
+  5. HANDOFF and the ROADMAP row were stale. Rewritten.
+  6. DESIGN.md's new citations pointed at moved lines. Recomputed from the code, older ones in `game.tsx` too.
+  7. `useRun`'s `load` was returned with no caller left. Removed, its comment fixed.
+- Evidence after the fixes: `npx tsc --noEmit` and `npm run lint` clean; `npx playwright test e2e/afterglow.e2e.ts e2e/test-run.e2e.ts e2e/jumps-and-finds.e2e.ts --reporter=line`: `11 passed (4.0m)`.
+- Deferred to ROADMAP "Next revision" (For M14): the full-screen test's top bar and `h1`, the off-list shake (6b-2), the weak reload-seconds check, a test run left by Back, the HUD's `aria-label` on a plain `div`, the new prompt not announced, the "Name a firework…" placeholder (for the human), and DECISIONS.md's Styling sentence order.

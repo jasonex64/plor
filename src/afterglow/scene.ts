@@ -88,6 +88,8 @@ export type Io = {
   timeUp(): Promise<Asked | "over" | null>;
   seeResults(): void;
   leave(): void;
+  // Something the scene can't go on from, for the page to show (DECISIONS.md, Error handling: the client shows the error).
+  fault(err: unknown): void;
 };
 // Where a run picks up: a question in play, or a safe answer's sky result waiting for Walk on (14c-6, Design: a run
 // waiting for Next shows that question's sky result again).
@@ -575,7 +577,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     go("open");
     fit();
     answerBox.focus({ preventScroll: true });
-    void io.next().then((asked) => { if (asked) ask(asked); });
+    void io.next().then((asked) => { if (asked) ask(asked); else stranded(); });
   }
   // A question the database has opened: its prompt, the letters it takes, and its time left (msLeft, measured there).
   function ask(asked: Asked) {
@@ -802,8 +804,12 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       if (phase !== "ask") return;
       if (r === "over") startTimeup();
       else if (r) ask(r);
+      else stranded();
     });
   }
+  // A reply that failed leaves the scene where it was, its error shown over it by the page, and nothing is retried
+  // (DECISIONS.md, Error handling); the way out shows, so the player isn't held full screen with nothing to do.
+  function stranded() { $("out").hidden = false; }
 
   // ---------- Input, as in core: taken letters are refused, stripped, and left alone mid-composition ----------
   let refuseTimer = 0;
@@ -1275,12 +1281,16 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     showResult();
   }
   addEventListener("resize", onResize);
-  // Measured once Handjet is in: until then the box and the HUD would be sized in the fallback.
-  void document.fonts.load(`400 30px ${fontFamily}`).then((faces) => {
-    if (stopped) return;
-    if (!faces.length) throw new Error("Handjet did not load");
-    fit();
-  });
+  // Measured once Handjet is in: until then the box and the HUD would be sized in the fallback. If it doesn't load, the
+  // page says so and the scene goes on in the fallback.
+  void document.fonts.load(`400 30px ${fontFamily}`).then(
+    (faces) => {
+      if (stopped) return;
+      if (!faces.length) io.fault(new Error("Afterglow's font didn't load"));
+      fit();
+    },
+    (err) => { if (!stopped) io.fault(err); },
+  );
   raf = requestAnimationFrame(frame);
 
   return () => {

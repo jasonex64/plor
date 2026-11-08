@@ -56,7 +56,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
     if (loaded) onOver(over);
   }, [onOver, loaded, over]);
 
-  // Stable, so the countdown below doesn't restart when the component re-renders.
+  // Stable, so the run loads once each time the page shows, not on every render.
   const load = useCallback(() => {
     api<RunResponse>("/api/run", { method: "GET" }).then(
       (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset })),
@@ -72,7 +72,7 @@ function useRun({ onOver, onDayOver }: DayHooks) {
     const timer = setTimeout(() => onDayOver(run?.status === "in_progress"), msToReset);
     return () => clearTimeout(timer);
   }, [run, noPuzzle, onDayOver]);
-  return { run, setRun, noPuzzle, error, setError, over, load };
+  return { run, setRun, noPuzzle, error, setError, over };
 }
 
 // Starts today's run and opens the game screen with question 1 in play: Start playing on How to play, and Play on
@@ -180,11 +180,13 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     }
   }
 
-  // At zero the server is asked again, and decides whether time is up (rule 3).
+  // At zero the server is asked again, and decides whether time is up (rule 3). The run in play can't vanish, so no run
+  // at all is an error, shown as any other.
   async function timeUp(): Promise<RunState | null> {
     try {
       const response = await api<RunResponse>("/api/run", { method: "GET" });
-      if (response.run) setRun(response.run);
+      if (!response.run) throw new Error("the run in play is gone");
+      setRun(response.run);
       return response.run;
     } catch (err) {
       setError(errorText(err));
@@ -333,6 +335,8 @@ function Run({
   // Hiding the page forgets it, so a run that ends while the page is away opens on the cards.
   const [seen, setSeen] = useState(false);
   const [done, setDone] = useState(false);
+  // What the scene couldn't go on from that the runner didn't report: a reply with no question, a font that didn't load.
+  const [fault, setFault] = useState<string | null>(null);
   useEffect(
     () => () => {
       setSeen(false);
@@ -353,7 +357,8 @@ function Run({
 
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : expectPlay ? <AfterglowLoading /> : <BannerSkeleton />;
-  if (stale) return <AfterglowLoading />;
+  // Its new load failing is said, not hidden behind the loading layer.
+  if (stale) return error ? <p role="alert">{error}</p> : <AfterglowLoading />;
   if (inGame)
     return (
       <Afterglow
@@ -361,8 +366,16 @@ function Run({
         start={() => startOf(run)}
         io={{
           answer: (text) => runner.answer(text).then(replyOf),
-          next: () => runner.next().then((r) => r && askedOf(r.run)),
+          next: async () => {
+            const response = await runner.next();
+            if (!response) return null;
+            // Next opens the next question (src/game/runs.ts); a reply without one is said, not waited on.
+            const asked = askedOf(response.run);
+            if (!asked) setFault(errorText(new Error("Next opened no question")));
+            return asked;
+          },
           timeUp: () => runner.timeUp().then((r) => r && (r.status === "in_progress" && r.question ? askedOf(r) : "over")),
+          fault: (err) => setFault(errorText(err)),
           seeResults: () => {
             setDone(true);
             onResults?.();
@@ -377,6 +390,7 @@ function Run({
             {label}
             {pastMidnight(run) && <p>{PAST_MIDNIGHT}</p>}
             {error && <p role="alert">{error}</p>}
+            {fault && <p role="alert">{fault}</p>}
           </>
         }
       />

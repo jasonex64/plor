@@ -115,6 +115,22 @@ test("a whole day: each rarity's colour and the host's answer, off-list text, a 
   await expect(shell(page)).toBeVisible();
 });
 
+// A Next that fails leaves the box empty with its error over the scene, nothing retried, and the × shows, so the player
+// isn't held full screen (DECISIONS.md, Error handling; 14c-6b-1's review).
+test("a Next that fails says so and shows the way out", async ({ browser }) => {
+  test.slow();
+  const page = await player(browser, "nextfail");
+  await play(page);
+  await asked(page, "Name an animal");
+  await safe(page, puzzle.safeAnswer);
+  await page.route("**/api/run/next", (route) => route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ ok: false, error: "internal" }) }));
+  await skyResult(page).click();
+  await expect(page.getByRole("alert").filter({ hasText: /\S/ })).toBeVisible({ timeout: WALK_MS });
+  await expect(wayOut(page)).toBeVisible();
+  await wayOut(page).click();
+  await expect(page).toHaveURL(/\/$/);
+});
+
 // Criterion 3: the fuse burns out, the database agrees time is up, and the run ends with its ending list.
 test("a question whose fuse burns out ends the run with Fuse out", async ({ browser }) => {
   test.slow();
