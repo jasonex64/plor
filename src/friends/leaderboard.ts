@@ -2,8 +2,8 @@
 // (docs/milestones/M11-home-screen.md, H7): the viewer and their friends, not friends of friends (M09 D4), or a
 // group's members (10c), each with the sum of their ledger rows this week, Monday to Sunday by puzzle day, and last
 // week's below it (W1), or yesterday's: a day's points arrive only once it closes (M09 D9), so Sunday's land after
-// Monday's reset. The players shown are settled first, so their finished runs on
-// closed days have their rows (M09 D3, D10). A closed day also stays out of every total while the viewer's own run
+// Monday's reset. The players shown are settled first, so their runs on closed days have their rows, with what each
+// scored by its midnight (M09 D3, D10; M16 16e-3a). A closed day also stays out of every total while the viewer's own run
 // that day is still going, since a run can be finished after midnight (DECISIONS.md, Game 1: Timer): otherwise a
 // friend's total would tell the viewer how far the friend got on questions the viewer hasn't answered (M09 D5; 9b
 // review, like M08 8a's past-day thread). A group's boards count each member only from the puzzle day they joined,

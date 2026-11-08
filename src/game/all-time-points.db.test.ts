@@ -1,7 +1,12 @@
 // A player's all-time points against the local stack (run with `npm run test:db`; docs/milestones/M12-account.md, 12a,
 // where the account page showed them; Me's totals since M14 14a-3a, which moved this case from GET /api/account's test
 // in 14a-3b). A real player signs in; their runs are written directly (yesterday can't be played now), as the friends
-// leaderboard test does, and answered today, so they earn no rarity bonus (M09 D8) and each total is its ladder.
+// leaderboard test does. A closed day's are answered at its noon, as an answer after its midnight counts nothing
+// (M16 16e-3a).
+// Each safe answer is the fixture's common one: its first-guess share is 0.2, exactly RARITY_ZERO_SHARE, so it earns
+// no rarity bonus unless other fixture days' answers left in the pool lower its share (M09 N1, N2). So the expected
+// totals add the bonus each ledger row holds, which settling's own test works by hand (src/game/ledger.db.test.ts),
+// and what's checked here is the ladder of the answers before midnight.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { type ApprovedPuzzle } from "@/content/puzzle";
@@ -19,16 +24,28 @@ const RUN = Date.now().toString(36);
 const email = `${RUN}-acct@example.test`;
 const username = `acct${RUN}`;
 let userId = "";
-const days: Record<"today" | "yesterday" | "earlier" | "longAgo", string> = { today: "", yesterday: "", earlier: "", longAgo: "" };
+const days: Record<"today" | "yesterday" | "twoAgo" | "earlier" | "longAgo", string> = {
+  today: "",
+  yesterday: "",
+  twoAgo: "",
+  earlier: "",
+  longAgo: "",
+};
 
 const ledgerRows = async () => (await getPool().query("select from private.points_ledger where user_id = $1", [userId])).rows.length;
+// The bonus the rows settled from runs hold: the two written directly hold none.
+const bonuses = async () =>
+  (await getPool().query<{ bonus: number }>("select coalesce(sum(bonus), 0)::int as bonus from private.points_ledger where user_id = $1", [userId])).rows[0]
+    .bonus;
 
 // A run on that day: safe on question 1, then caught by the host on question 2, so its ladder is question 1's points.
+// A past day's answers are given at its noon, today's now.
 async function survivedOne(date: string, puzzle: ApprovedPuzzle) {
   const db = getPool();
   await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [userId, GAME_ID, date]);
   await db.query(
-    "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, false)",
+    `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+     values ($1, $2, $3::date, 0, $4, false, least(statement_timestamp(), (($3::date + time '12:00') at time zone 'America/Los_Angeles')))`,
     [userId, GAME_ID, date, safeEntry(puzzle, 0)],
   );
   await db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [
@@ -37,9 +54,30 @@ async function survivedOne(date: string, puzzle: ApprovedPuzzle) {
     date,
   ]);
   await db.query(
-    "insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 1, $4, true)",
+    `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+     values ($1, $2, $3::date, 1, $4, true, least(statement_timestamp(), (($3::date + time '12:00') at time zone 'America/Los_Angeles')))`,
     [userId, GAME_ID, date, puzzle.questions[1].host_answers[0]],
   );
+}
+
+// A run played past its day's midnight: safe on question 1 at the day's noon, safe on question 2 after its midnight,
+// then caught on question 3. It counts question 1's points alone (M16 16e-3a, answer 35).
+async function lateTwo(date: string, puzzle: ApprovedPuzzle) {
+  const db = getPool();
+  const answer = (index: number, entryId: string, matched: boolean, onTheDay: boolean) =>
+    db.query(
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       values ($1, $2, $3::date, $4, $5, $6, case when $7 then (($3::date + time '12:00') at time zone 'America/Los_Angeles') else statement_timestamp() end)`,
+      [userId, GAME_ID, date, index, entryId, matched, onTheDay],
+    );
+  const open = (index: number) =>
+    db.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, $4)", [userId, GAME_ID, date, index]);
+  await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [userId, GAME_ID, date]);
+  await answer(0, safeEntry(puzzle, 0), false, true);
+  await open(1);
+  await answer(1, safeEntry(puzzle, 1), false, false);
+  await open(2);
+  await answer(2, puzzle.questions[2].host_answers[0], true, false);
 }
 
 // A run and its ledger row written directly, as if settled long ago.
@@ -55,7 +93,8 @@ async function settled(date: string, points: number) {
 beforeAll(async () => {
   useLocalStack();
   const { rows } = await getPool().query<{ today: string; yesterday: string; earlier: string; longAgo: string }>(
-    `select private.today()::text as today, (private.today() - 1)::text as yesterday, (private.today() - 3)::text as earlier,
+    `select private.today()::text as today, (private.today() - 1)::text as yesterday, (private.today() - 2)::text as "twoAgo",
+            (private.today() - 3)::text as earlier,
             (private.today() - 40)::text as "longAgo"`,
   );
   Object.assign(days, rows[0]);
@@ -83,14 +122,17 @@ describe("all-time points", () => {
     await settled(days.longAgo, 1000);
     await settled(days.earlier, 100);
     await survivedOne(days.yesterday, await ensurePuzzle(days.yesterday));
+    await lateTwo(days.twoAgo, await ensurePuzzle(days.twoAgo));
     await survivedOne(days.today, await ensurePuzzle(days.today));
     expect(await ledgerRows()).toBe(2);
 
-    // 1000 + 100 + yesterday's 25 (question 1's points); today's 25 waits for midnight.
-    expect(await allTimePoints(getPool(), userId)).toBe(1125);
-    expect(await ledgerRows()).toBe(3);
+    // 1000 + 100 + yesterday's 25 (question 1's points) + two days ago's 25, not 75, as its question 2 came after its
+    // midnight, and their bonus; today's 25 waits for midnight.
+    const total = await allTimePoints(getPool(), userId);
+    expect(total).toBe(1150 + (await bonuses()));
+    expect(await ledgerRows()).toBe(4);
     // Again: the same total, and nothing settled twice.
-    expect(await allTimePoints(getPool(), userId)).toBe(1125);
-    expect(await ledgerRows()).toBe(3);
+    expect(await allTimePoints(getPool(), userId)).toBe(total);
+    expect(await ledgerRows()).toBe(4);
   });
 });

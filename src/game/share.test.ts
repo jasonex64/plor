@@ -33,6 +33,7 @@ function finished(status: RunState["status"], outcomes: boolean[]): RunState {
     points: 0,
     bonus: 0,
     msToReset: 0,
+    dayOver: false,
   };
 }
 

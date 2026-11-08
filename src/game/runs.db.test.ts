@@ -88,6 +88,7 @@ describe("a run, step by step", () => {
           points: 0,
           bonus: 0,
           msToReset: expect.any(Number),
+          dayOver: false,
         },
       },
     });

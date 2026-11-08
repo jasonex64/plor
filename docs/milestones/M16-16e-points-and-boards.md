@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merging on green CI at the human's "Merge when green"); 16e-3, the overall board, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39) and approved (answer 40); 16e-3a, game 1's midnight rule, is done (PR #166, merging on green CI at the human's "Merge when green"); 16e-3b, the overall board, is next.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -56,6 +56,28 @@ Before 16e-2:
 25. A day only one player played: "100, top of the day".
 26. A day's percentile: "One decimal", so 87.5 stays 87.5.
 
+Before 16e-3 (2026-11-08), round 1:
+27. A game 1 day's percentile, among whom: "Everyone who played (Recommended)". The % of all that day's game 1 players beaten, as in game 2.
+28. A game 1 run finished after midnight, on the overall board: "Late runs don't count". Refined by 35.
+29. The two views: "Overall, then a Sum / Average switch (Recommended)". Overall is the Game switch's third choice, with Sum / Average under it, the list ranked by the one picked.
+30. A minimum of days for Average: "No minimum (Recommended)".
+
+Round 2:
+31. A late run's day on Average: "Not a game-day (Recommended)". Replaced by 35 and 38, once a late run counts what it scored by midnight.
+32. Spoilers: "Hide that day's game 1 part (Recommended)". While the viewer's own game 1 run of a closed day goes on, the overall board leaves out every game 1 place of that day; game 2's still count.
+33. A graph on Overall: "List only on Overall".
+34. Game 1's own board and late runs: "Drop late runs there too". This reverses M09 D1 (human, 2026-10-22: "a run's points count whenever it's finished"), so round 3 put it back to the human.
+
+Round 3:
+35. What a game 1 run finished after midnight counts, on game 1's boards and the overall one: "What it scored by midnight".
+36. Yesterday's standings on Today: "Same rule (Recommended)".
+37. Telling the player who resumes a run after midnight: "Yes, one line (Recommended)".
+
+Round 4:
+38. A game 1 run with nothing scored by midnight, or never finished: "A played day at 0 (Recommended)".
+39. The result screen of a run finished after midnight: "The full run's score". It shows everything the run earned, with the line saying only part of it counts on the boards.
+40. The 16e-3 design: "Approve, build it" (2026-11-08).
+
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
 - Different letters in 7 random everyday words of 5 to 8 letters, 500 runs: 13 at least, 16 at the 10th percentile, 18 in the middle, 20 at the 90th, 22 at most. With 9 to 12 letters the middle is 19, at most 24.
@@ -101,12 +123,30 @@ These are random words, not real play: a real run's numbers come with the beta.
 - **The end of a run:** "Better than 87.5% of players so far today" among the runs finished so far, shown from 10 of them (answer 16); and "2nd of 6 with your friends so far today", the viewer and their friends who've finished, shown once a friend has.
 - **The routes:** the friends and group boards take `game`, `offbeat` or `substrings`, which they need, so one way asks for each; a request without it is refused, and the protocol goes from 6 to 7, as the request changed (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
 
-**Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
+**16e-3 in detail** (Claude's readings of answers 27 to 39, for approval):
+- **Game 1 counts what a run scored by midnight** (answers 34 to 39). This replaces M09 D1's "a run's points count whenever it's finished" and "one never finished never scores" (DECISIONS.md, Game 1: Timer, and the Log rows of 2026-10-22).
+  - A run's ledger row holds the questions it survived with answers given before its day's midnight, plus their rarity bonus, which already counts only those answers (M09 D8); the bonus cap counts the same questions.
+  - Every game 1 run of a closed day gets its row, finished or not; every player's from 16e-3b, as a place needs the whole day (answer 27), and until then the players a board, card or Me shows, as now. So a run left at a reveal counts what it had by midnight (answer 38), and a closed day is final at midnight in both games. A run can still be played to its end after midnight (DECISIONS.md, Timer); it adds nothing to the boards.
+  - Game 1's friends and group boards and yesterday's standings read those rows, so they follow (answers 34, 36). A closed day stays hidden from the viewer while their own run of it goes on, as now (M09 D5).
+  - **Me's best and all-time points** read the same rows, so they count what a run scored by midnight too (Claude's reading: one record of a day's points).
+  - On game 1's screen, a run resumed after its day's midnight shows one line, during the run and on its result: "Past midnight: answers from now on don't count for the boards." (Claude's words, answer 37). The result's score stays the full run's (answer 39).
+- **The overall board** (answers 2, 27, 29, 30, 32, 33, 38):
+  - A game 1 day's place is worked out like game 2's: (others beaten + half the others tied) ÷ others, to one decimal, and 100 alone, among every game 1 row of that day.
+  - A player's game-days are the days they have a row in either game, each counting its place, 0 included (answer 38).
+  - **Sum** adds the week's places in both games; **Average** divides that by the game-days, to one decimal (answer 26's rule). A player with no game-day shows 0 in both.
+  - Overall is the Game switch's third choice, Game 1 / Game 2 / Overall, on the Friends page and each group's; under it a Sum / Average switch, Sum on every load, the list ranked by the one picked (answer 29). No Graph switch on Overall (answer 33). The notes, Claude's words: "Each day adds the % of players you beat, in each game." under Sum, and "Your average % of players beaten, per game played." under Average.
+  - While the viewer's own game 1 run of a closed day goes on, every game 1 place of that day is left out, and game 2's still count (answer 32).
+  - A group counts each member from the day they joined, in both games, as now.
+  - The routes take `game=overall`, and each entry carries its average beside its sum, so the request and the response change: protocol 8 (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
+- **Security:** none expected. Settling and the rarity counts already read every player's game 1 `run_event` rows as `plor_app`, and game 2's board already reads every ledger row. *Unverified until built:* if a query needs more, it goes to the human first.
+- **PRs:** **16e-3a, game 1's midnight rule:** settling every game 1 run of a closed day by its answers before midnight, the boards, yesterday's card and Me following, and the line on the game screen. **16e-3b, the overall board.** One PR each.
+
+**Security (16e-1, 16e-2):** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 
 **PRs:**
 - **16e-1, the score:** the scoring function and its tests on hand-worked runs, the tunables, and the word points, tracker and end score on `/play2`.
 - **16e-2, places and game 2's boards:** game 2's ledger rows, the percentile and friend rank at the end of a run, and game 2's friends and group boards. The ledger rows moved here from 16e-1 on building it, as their first reader is a board ("Build for today").
-- **16e-3, the overall board:** both views on the friends page and each group's.
+- **16e-3, the overall board:** both views on the friends page and each group's, in two PRs (16e-3 in detail, above).
 
 ## Acceptance criteria
 16e-1:
@@ -122,8 +162,14 @@ These are random words, not real play: a real run's numbers come with the beta.
 - [ ] Game 2's friends and group boards add up daily percentiles, a group's from the day each member joined, by route tests.
 - [ ] A player sees nothing about another player's run beyond what the boards show, by route tests.
 
-16e-3:
-- [ ] Both overall views on hand-made weeks, by route tests: sum, average, a player who played one game, and a group member who joined mid-week.
+16e-3a:
+- [x] A game 1 run finished after midnight, one left at a reveal and one with nothing by midnight each get one row for what they scored by midnight, ladder and bonus, by db tests; settling again writes nothing. Every player's comes with 16e-3b.
+- [x] Game 1's weekly boards, yesterday's card and Me's points read that score, and a closed day still hides while the viewer's run of it goes on, by route tests (Me's by `allTimePoints`, what its route reads).
+- [x] A run resumed after midnight shows the line, and its result the full score, by e2e.
+
+16e-3b:
+- [ ] Both overall views on hand-made weeks, by route tests: sum, average, a player who played one game, a day at 0, and a group member who joined mid-week.
+- [ ] A game 1 place on a day the viewer is still playing is left out, and game 2's kept, by a route test.
 - [ ] Both views show on the friends page and a group's page, by e2e.
 
 ## Out of scope
@@ -142,6 +188,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 | 18 different letters, 7 letters a word, 3 bonus words | The typical run the sizes balance | Claude, from the measurements above; not real play |
 | 10 players | Before "better than X%" shows | Human, answer 16 |
 | A tie counts as half | The percentile | Claude's proposal in "Comparing games", for approval here |
+| One decimal | The overall Average | Answer 26's rule for a place, applied by Claude |
 | Worked runs: typical 7×7, 18, 3 = 1060; short 7×5, 15, 2 = 680; long 7×10, 20, 3 = 1485; wide 7×7, 23, 3 = 1410; an `e` day with the bonus in all 7 = 1540; a `j` day with none = 700; two misses, 5×7, 14, 1 = 570 | The scoring tests | Approved, answer 13 |
 
 ## Plan
@@ -149,7 +196,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 2. Each PR updates this ticket's Status, the M16 ticket's status line and the ROADMAP row.
 
 ## Removes
-Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3 lists its own.
+Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3a removes M09 D1's rules that a run finished after midnight counts in full and one never finished counts nothing, and game 1's settling of only the board's players. 16e-3b removes protocol 7.
 
 ---
 *Fill in the sections below at the end.*
@@ -158,10 +205,20 @@ Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one mea
 | Source says | We built | Why different |
 |---|---|---|
 | "Live, final at midnight" for places (answer 19) | The boards count a day from midnight; only the end of a run is "so far" | Answer 21, "keep it consistent", confirmed ("yes thats right") |
+| 16e-3a settles every player's game 1 runs (16e-3 in detail) | 16e-3b does; 16e-3a settles the players each board, card or Me reads, as before | Their first reader is the overall board's places ("Build for today") |
 | 16e-1 writes game 2's ledger rows | 16e-2 does | Their first reader is a board ("Build for today"), noted under Design |
 | The tables stop at 18 letters and start at 13 different letters | The rule scores longer words and every count down to 1 | The full dictionary holds words over 18 letters, and a run can use fewer than 13 letters; the rule the tables came from covers them |
 
 ## Evidence
+### 16e-3a
+- **Settling:** `npx vitest run src/game/ledger.db.test.ts --no-file-parallelism`: first 1 failed, as predicted, writing 6 rows where the old test wanted 5 (D, left at a reveal, now counts); updated, 2 passed: E, finished after midnight, 31 (horse 25 and its bonus 6, kiwi after midnight 0; was 81); D, left at its reveal, 81; G, answering only after midnight, 0; settling again writes nothing. Broken on purpose, the midnight filter out: 1 failed (E 81).
+- **Boards, card and Me:** `npx vitest run src/app/api/leaderboard/route.db.test.ts src/app/api/leaderboard/yesterday src/game/all-time-points.db.test.ts --no-file-parallelism`, 16 passed. The past days' fixture answers are now given at that day's noon, and every total stayed as it was, as predicted (each safe answer is the fixture's common one, with no bonus). New: D survives question 2 after midnight while yesterday stays hidden from D, then counts 25, not 75; on yesterday's card a friend's late run counts 25, not 75; Me's all-time points add 25, not 75, for one: 1150. Broken on purpose: the midnight filter out, 2 failed (1200, and the card's 75); the finished-runs-only filter back, 1 failed (5 rows of 7).
+- **Screen:** `npx playwright test e2e/offbeat.e2e.ts --retries=0`, 5 passed: yesterday's run resumed at its reveal shows the line, and again on question 2; the result says "You survived 2 of 7 questions and scored 75 points" and the line once. With the line taken off the screen during play, it failed on the reveal. `npx vitest run src/app/bonus.test.ts`, 8 passed, with when a run is past its midnight.
+- **Review's blocker** (below): `npx vitest run src/app/api/leaderboard/route.db.test.ts src/app/api/leaderboard/yesterday src/game/all-time-points.db.test.ts src/game/ledger.db.test.ts src/game/runs.db.test.ts --no-file-parallelism`, 52 passed, with each expected total adding the bonus its settled row holds.
+- **Game 1's wider e2e:** `npx playwright test e2e/me.e2e.ts e2e/today.e2e.ts e2e/leaderboard-graph.e2e.ts e2e/player-screens.e2e.ts e2e/groups.e2e.ts e2e/approve-and-play.e2e.ts e2e/test-run.e2e.ts --retries=0`: 23 passed, 4 failed in `today.e2e.ts` and `test-run.e2e.ts`, while the reviewer's db tests ran on the same stack. The page said "bear" isn't in our list: the fixture's answer base was gone under a leftover fixture day for today, and Today's banner test failed the same way on the code before 16e-3a. With the two empty leftover fixture days (11-06, 11-07) removed, `npx playwright test e2e/today.e2e.ts e2e/test-run.e2e.ts e2e/offbeat.e2e.ts --retries=0`: 13 passed.
+- On this PC, `src/app/api/offbeat/route.db.test.ts` and `src/app/api/me/route.db.test.ts` fail before and after this change, on the phone test's leftover day 2026-11-01 (HANDOFF); CI's fresh stack is the check.
+- `npm test`, 638 passed; `npx tsc --noEmit -p .` and `npx eslint src e2e` clean.
+
 ### 16e-2
 - **Places:** `npx vitest run src/game/percentile.test.ts`, 6 passed: the share beaten, a tie as half, one decimal, 100 alone, a day's places, a week's total. Written beside the function, not before; then broken on purpose and seen to fail: a tie counted as a win (2 failed), 0 for a lone player (1 failed).
 - **Ledger rows and the end of a run:** `npx vitest run src/game/substring-places.db.test.ts --no-file-parallelism`, 3 passed: a closed day's finished run (420) and unfinished one (65) get one row each, settling again writes none, today's waits; the standing is hidden at 9 finished and 50 at 10, with a tie and an unfinished run that doesn't count, and a friend rank only once a friend has finished.
@@ -180,6 +237,7 @@ Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one mea
 - `npm test`: 615 passed. `npm run build` lists `/play2`, `check:client-bundle` is OK, and `npx tsc --noEmit -p .` and `npx eslint` are clean.
 
 ## Review
+- 16e-3a, the `reviewer` agent, 2026-11-08: one blocker, in the tests. They claimed the fixture's common answer never earns a rarity bonus, but its first-guess share is exactly the cut-off, and other fixture days left in the pool could lower it and give B 76: the board, card and Me tests now add the bonus each settled row holds, and settling's own test keeps the hand-worked bonus. It found settling, the line and the docs correct. Deferred to ROADMAP, For M16: the line on a late run's result that times out, the line before Next across midnight, a stale comment, and Me's days played.
 - Blocking findings and how each was fixed (16e-1, the `reviewer` agent, 2026-11-07):
   1. The e2e checked the tracker's count, not which letters it marks: it now checks the marked letters after each word.
   2. No test proved a word scores by its letters alone, as every test word's spelling was its key: a route test word is now spelled `aqm-ǰb`, with a hyphen and a j with a caron, and scores 30 with the bonus letter's 120.
