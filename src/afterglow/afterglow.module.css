@@ -403,6 +403,7 @@
 /* Every chunk in one cell, the others hidden, so the panel is as tall as its longest and ‹ › don't move between them. */
 .howtoChunks {
   display: grid;
+  /* The question box's own top and bottom padding (.window). */
   margin: calc(var(--k) * 5px) 0;
 }
 
@@ -424,7 +425,8 @@
 
 .howtoDots {
   display: flex;
-  gap: calc(var(--k) * 3px);
+  /* The question box's own gap between its rows (.window). */
+  gap: calc(var(--u) * 3);
   color: var(--ink-dim);
 }
 

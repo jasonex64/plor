@@ -1,6 +1,6 @@
 "use client";
 
-// The game's screen, at its record's address (src/platform/game.ts), and its How to play (docs/milestones/M14-14a-2b-game-screen.md; L25, L29, L34, L35):
+// The game's screen, at its record's address (src/platform/game.ts) (docs/milestones/M14-14a-2b-game-screen.md; L25, L29, L34, L35):
 // the run, the player's stats, yesterday's answers and the feed; from 1200px the feed in the right column (L42;
 // SideColumn). Laid out from round 5's mockup.
 import { ButtonLink } from "./button-link";

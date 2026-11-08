@@ -149,16 +149,4 @@
   font-size: 0.875rem;
 }
 
-/* Round 3's How to play: 14px between paragraphs, 16px text at 1.45; the page's own column, at most 960px (L43). */
-section.how {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.how p {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.45;
-}
 

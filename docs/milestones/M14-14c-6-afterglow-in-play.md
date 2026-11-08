@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); 14c-6d, How to play, built and its e2e passing (Evidence), in review; then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); 14c-6d, How to play, built, reviewed and its blocking findings fixed, its e2e passing (Evidence); not pushed (its PR opens after #169 merges); then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -135,7 +135,7 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 
 **The code.** `game.js` and `street.js` become TypeScript modules under `src/afterglow/`: the street's art, the scene and its phases, the HUD as React components, driven by the run state from `useRun`. Their numbers move to `src/config/tunables.ts` with the origins 14c-5 gave them (DECISIONS.md, Config). The pre-draw's heavy steps are split so no slice passes 16.7 ms (14c-5 answer 42). The mock's test hooks (`__core`) stay, loaded only by the e2e build. The mock's Preview bar (its "skip ›" button) was a review aid and goes, with play again.
 
-**How to play (14c-6d).** One panel, opened by a How to play button before today's run has started: on the game screen above Start (in place of today's link) and on Today's banner under Play, smaller (answers 30, 40). It is a modal `<dialog>`, as the settings sheet is (MDN `<dialog>`, SOURCES.md): the page behind is inert, Escape or the × closes it, and focus goes back to the button that opened it (answer 34). It has Afterglow's look on Afterglow's plain dark: one pixel panel like the question box, at the box's width and type scale, in Handjet (answers 32, 35). Inside, four chunks, one at a time (answer 38), with ‹ and › and a dot for each, ‹ unavailable on the first, and on the last a Close where › was (answers 31, 36). Following the APG Carousel pattern (answer 42): each chunk is a group with `aria-roledescription="slide"` named "1 of 4" and so on, the chunks' wrapper is `aria-live="polite"` and `aria-atomic="false"` (nothing rotates by itself), and ‹ › are native buttons that don't move focus. The pattern names no buttons and says nothing about the ends, so these are *Claude's reading*, approved with the design (answer 41): the buttons are named Previous and Next; ‹ is unavailable on the first chunk; the dots only mark the place, hidden from screen readers since each chunk's name says it, not the pattern's slide picker. The words (answers 33, 38 and 43), each number from `tunables.ts`:
+**How to play (14c-6d).** One panel, opened by a How to play button before today's run has started: on the game screen under Start, where its link was ("as now") and on Today's banner under Play, smaller (answers 30, 40). It is a modal `<dialog>`, as the settings sheet is (MDN `<dialog>`, SOURCES.md): the page behind is inert, Escape or the × closes it, and focus goes back to the button that opened it (answer 34). It has Afterglow's look on Afterglow's plain dark: one pixel panel like the question box, at the box's width and type scale, in Handjet (answers 32, 35). Inside, four chunks, one at a time (answer 38), with ‹ and › and a dot for each, ‹ unavailable on the first, and on the last a Close where › was (answers 31, 36). Following the APG Carousel pattern (answer 42): each chunk is a group with `aria-roledescription="slide"` named "1 of 4" and so on, the chunks' wrapper is `aria-live="polite"` and `aria-atomic="false"` (nothing rotates by itself), and ‹ › are native buttons that don't move focus. The pattern names no buttons and says nothing about the ends, so these are *Claude's reading*, approved with the design (answer 41): the buttons are named Previous and Next; ‹ is unavailable on the first chunk; the dots only mark the place, hidden from screen readers since each chunk's name says it, not the pattern's slide picker. The words (answers 33, 38 and 43), each number from `tunables.ts`:
 1. "The host has picked a few answers to each question. Say one and your run ends. 7 questions, one run a day."
 2. "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going."
 3. "On questions 2, 4, 5 and 7 a letter is taken. Answer without it."
@@ -160,7 +160,7 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - [x] `docs/DESIGN.md` describes `/afterglow` as built.
 
 14c-6d, How to play:
-- [x] How to play opens the panel from the game screen before Start and from Today's banner under Play before the run, with Skip the game screen off and on; neither shows once the run has started.
+- [x] How to play opens the panel from the game screen under Start and from Today's banner under Play before the run, with Skip the game screen off and on; neither shows once the run has started.
 - [x] The panel shows the four approved chunks one at a time: › and ‹ move through them, ‹ is unavailable on the first, the dots mark the place, and the last has Close where › was.
 - [x] Close, the × and Escape each close it, focus goes back to the button that opened it, and the page behind can't be reached while it's open.
 - [x] Screen readers hear a dialog named How to play, each chunk as a slide named "N of 4", announced politely as it changes, and the buttons as Previous, Next and Close.
@@ -187,6 +187,9 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | 4 chunks | How to play | Answer 38 |
 | The panel's width and type scale | How to play | The question box's: `AFTERGLOW.PROMPT_W` at the scene's type scale (14c-5), so the panel matches the box |
 | 24 px | How to play's buttons, at least, each way | WCAG 2.2 2.5.8, as the game's × |
+| The panel's padding, the chunks' margin and the dots' gap | How to play | The question box's own (`.window` in `afterglow.module.css`: its padding, and its gap between rows), from the mock's `page.html` at `fcc11e4` |
+| The ‹ › and Close buttons' padding | How to play | The game's own buttons' (`.answer button`, the mock's) |
+| The gaps in the title row and the button row; the ×'s padding | How to play | The HUD's gap (`.hud`, the mock's); the game's × (`.out`, 14c-6b-1) |
 
 ## Plan
 Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`.
@@ -202,7 +205,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - In `src/app/game.tsx`: the `Question` and `Reveal` cards and the in-run countdown, replaced by Afterglow; with their CSS in `game.module.css` and `offbeat.module.css`.
 - From the moved code: `MOCK_QS`, play again ("New show"), the page's own font loading and anything else only the private page needed.
 - In RIFF-mocks, the human retires `themes/festival/` once the move is merged (an agent's delete there was refused before; not routed round).
-- 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
+- 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx` and its `.how` CSS in `offbeat.module.css`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
 - 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
 
 ---
@@ -279,3 +282,14 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
   7. `useRun`'s `load` was returned with no caller left. Removed, its comment fixed.
 - Evidence after the fixes: `npx tsc --noEmit` and `npm run lint` clean; `npx playwright test e2e/afterglow.e2e.ts e2e/test-run.e2e.ts e2e/jumps-and-finds.e2e.ts --reporter=line`: `11 passed (4.0m)`.
 - Deferred to ROADMAP "Next revision" (For M14): the full-screen test's top bar and `h1`, the off-list shake (6b-2), the weak reload-seconds check, a test run left by Back, the HUD's `aria-label` on a plain `div`, the new prompt not announced, the "Name a firework…" placeholder (for the human), and DECISIONS.md's Styling sentence order.
+
+14c-6d, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff 1ad2b21..HEAD` at 8db1e19:
+- Blocking findings and how each was fixed:
+  1. HANDOFF and 2. the ROADMAP row didn't match the ticket's Status. Rewritten.
+  3. DESIGN.md's citations into `afterglow.module.css` and the font had moved. Recomputed from the files.
+  4. The Design, criterion 1 and DESIGN.md said How to play sits above Start; it sits under it, where its link was, as answer 30's "as now" says. The docs fixed.
+  5. The old page's `.how` CSS in `offbeat.module.css` was dead. Removed, and in Removes.
+  6. Comments in `offbeat.tsx` and `to-play.ts` still described the old page. Fixed.
+  7. The panel's spacings had no recorded origin. Each is the game's own (the box's padding and gap, the HUD's gap, the game's buttons and ×), now cited in the CSS and the Numbers table.
+- Evidence after the fixes: lint and types clean, `npm test` 640 passed, `npx playwright test e2e/how-to-play.e2e.ts e2e/offbeat.e2e.ts e2e/headings-invites.e2e.ts e2e/shell.e2e.ts --reporter=line`: `27 passed (2.6m)`.
+- Deferred to ROADMAP "Next revision" (For M14): the panel's `--u` at its default, the weak Tab check, Plan step 3's "30 to 40", `shell.e2e.ts`'s one-path loop, and 6d built while #169 was open.
