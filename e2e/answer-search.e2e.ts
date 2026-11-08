@@ -4,6 +4,7 @@
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
+import { answerBox, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -24,8 +25,7 @@ test("a player whose run is over searches a question's answers from the result c
   await page.goto("/");
   await signInAndPick(page, "sra");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   const result = page.locator("#result");
   await result.getByRole("button", { name: "Search answers" }).click();
   await page.getByLabel("Search the answers to Name an animal").fill("polar");
@@ -41,6 +41,6 @@ test("a player mid-run has no answer search", async ({ browser }) => {
   await page.goto("/");
   await signInAndPick(page, "srb");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   await expect(page.getByRole("button", { name: "Search answers" })).toHaveCount(0);
 });

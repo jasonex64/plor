@@ -10,6 +10,7 @@ import { Pool } from "pg";
 import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
+import { asked, LAST_MS, safe, seeResults, SKY_MS, skyResult, walkOn, WALK_MS } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -90,6 +91,9 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
 });
 
 test("a player survives all seven questions of a day, past the stolen letters", async ({ browser }) => {
+  // Seven sky results and six walks, at the longest each can take (e2e/afterglow.ts), past Playwright's own 30 s for a
+  // test, as afterglow.e2e.ts's seven.
+  test.setTimeout(FIXTURE.length * (SKY_MS + WALK_MS) + LAST_MS + 30_000);
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "ap");
@@ -97,14 +101,16 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   // A familiar answer per question the host doesn't catch, avoiding every letter stolen by then (C at Q2, P at Q4, R at
   // Q5, O at Q7).
   const answers = ["cat", "kiwi", "green", "Kenya", "lead", "boxing", "knee"];
+  await asked(page, FIXTURE[0].prompt);
   for (let i = 0; i < answers.length; i++) {
-    await page.getByLabel("Your answer").fill(answers[i]);
-    await page.getByRole("button", { name: "Answer" }).click();
-    if (i < answers.length - 1) {
-      await expect(page.getByRole("heading", { name: "Safe!" })).toBeVisible();
-      await page.getByRole("button", { name: "Next", exact: true }).click();
-    }
+    await safe(page, answers[i]);
+    if (i < answers.length - 1) await walkOn(page, FIXTURE[i + 1].prompt);
   }
+  // Q7's Walk on fades in the ending list (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 29); See results
+  // opens the cards.
+  await skyResult(page).click();
+  await expect(seeResults(page)).toBeVisible({ timeout: LAST_MS });
+  await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
   // Three host answers on question 7 (human, 2026-10-24: "1 1 1 1 2 2 3").
   await expect(page.getByText("Name a body part: you said knee, the host said hand, head, leg")).toBeVisible();

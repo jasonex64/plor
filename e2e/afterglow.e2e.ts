@@ -7,7 +7,7 @@ import { AFTERGLOW } from "../src/config/tunables";
 import { WORD_INK } from "../src/afterglow/scene";
 import { play, RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { answerBox, asked, box, caught, lightIt, safe, seeResults, skyResult, walkOn, WALK_MS } from "./afterglow";
+import { answerBox, asked, box, caught, LAST_MS, lightIt, safe, seeResults, SKY_MS, skyResult, walkOn, WALK_MS } from "./afterglow";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -113,6 +113,36 @@ test("a whole day: each rarity's colour and the host's answer, off-list text, a 
   await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "Caught on question 4" })).toBeVisible();
   await expect(shell(page)).toBeVisible();
+});
+
+// Criterion 2's Q7: all seven survived, Q7's Walk on (answer 29) fades its sky result out and the ending list in, Show's
+// over, and See results opens the cards. Each answer avoids the letters taken by then (Q2 C, Q4 P, Q5 R, Q7 O).
+const SEVEN = [
+  ["Name an animal", "dog"],
+  ["Name a fruit", "banana"],
+  ["Name a color", "blue"],
+  ["Name a country", "kenya"],
+  ["Name a metal", "lead"],
+  ["Name a sport", "judo"],
+  ["Name a body part", "knee"],
+] as const;
+
+test("surviving all seven ends with Show's over after Q7's Walk on", async ({ browser }) => {
+  // Seven sky results and six walks, at the longest each can take, past Playwright's own 30 s for a test.
+  test.setTimeout(SEVEN.length * (SKY_MS + WALK_MS) + LAST_MS + 30_000);
+  const page = await player(browser, "seven");
+  await play(page);
+  await asked(page, SEVEN[0][0]);
+  for (const [i, [, answer]] of SEVEN.entries()) {
+    await safe(page, answer);
+    if (i + 1 < SEVEN.length) await walkOn(page, SEVEN[i + 1][0]);
+  }
+  await skyResult(page).click();
+  await expect(seeResults(page)).toBeVisible({ timeout: LAST_MS });
+  await expect(page.getByRole("heading", { name: "Show's over" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Your answers" }).getByRole("listitem")).toHaveCount(SEVEN.length);
+  await seeResults(page).click();
+  await expect(page.getByRole("heading", { name: `You survived all ${SEVEN.length}!` })).toBeVisible();
 });
 
 // Criterion 3: the fuse burns out, the database agrees time is up, and the run ends with its ending list.

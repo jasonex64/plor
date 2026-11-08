@@ -16,8 +16,9 @@ import styles from "./afterglow.module.css";
 // variable font. Blocked, as the mock had it, so no text shows in the fallback before the scene measures it.
 const handjet = localFont({ src: "../app/fonts/Handjet.woff2", weight: "100 900", display: "block", variable: "--afterglow-font" });
 
-// The mock's markup, drawn once: the scene writes into it, and React never renders it again.
-const Stage = memo(function Stage() {
+// The mock's markup, drawn once: the scene writes into it, and React never renders it again. out: what the × says to
+// screen readers, where it goes.
+const Stage = memo(function Stage({ out }: { out: string }) {
   return (
     <>
       <canvas data-part="screen" className={styles.screen} aria-hidden="true" />
@@ -60,8 +61,9 @@ const Stage = memo(function Stage() {
         <p data-part="lett" className={styles.lett} aria-hidden="true" hidden />
         <p data-part="caption" className={styles.caption} aria-hidden="true" hidden />
         <p data-part="verdict" className="sr-only" aria-live="polite" />
-        {/* The way out: a × that screen readers hear as Back to Today (answer 22), shown while no fuse burns (answer 5). */}
-        <button type="button" data-part="out" className={styles.out} aria-label="Back to Today" hidden>
+        {/* The way out: a × that screen readers hear as where it goes, Back to Today (answer 22), shown while no fuse burns
+            (answer 5). */}
+        <button type="button" data-part="out" className={styles.out} aria-label={out} hidden>
           ×
         </button>
       </div>
@@ -71,8 +73,8 @@ const Stage = memo(function Stage() {
 
 // start: where the run picks up, read when the scene starts, again each time the page shows it (a page Next.js keeps
 // hidden stops its effects). io: what the scene's moves do, the latest each time. notices: the page's own lines over the
-// scene, such as an error, the past-midnight note and a test run's label.
-export function Afterglow({ start, io, notices }: { start: () => Start; io: Io; notices: ReactNode }) {
+// scene, such as an error, the past-midnight note and a test run's label. out: where the × goes, as screen readers hear it.
+export function Afterglow({ start, io, notices, out }: { start: () => Start; io: Io; notices: ReactNode; out: string }) {
   useBodyFlag("game", true);
   const root = useRef<HTMLDivElement>(null);
   const latest = useRef({ start, io });
@@ -91,7 +93,7 @@ export function Afterglow({ start, io, notices }: { start: () => Start; io: Io; 
   }, []);
   return (
     <div ref={root} className={`${styles.afterglow} ${handjet.variable}`}>
-      <Stage />
+      <Stage out={out} />
       <div className={styles.notices}>{notices}</div>
     </div>
   );

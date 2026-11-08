@@ -7,6 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, emailedCode, forwardPlayerIp, play, sharedLink, signInAndPick } from "./players";
+import { answerBox, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { slideOf, watchSlides } from "./slides";
 
@@ -144,7 +145,7 @@ test("the clock bar's Back on How to play slides back up to the game screen", as
   await page.goto("/");
   await signInAndPick(page, "hb");
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   await page.goto(`${GAME.path}/how-to-play`);
   const slides = await watchSlides(page);
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
@@ -175,8 +176,7 @@ test("a refused clipboard shows the link to copy, for an invite, a group and the
 
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
   await check("Share", /http:\/\/localhost:3000\/$/);
 });
@@ -224,8 +224,7 @@ test("the feed's past day reads like every other date, comments have no bullets,
   for (const p of [friend, page]) {
     await p.goto("/");
     await play(p);
-    await p.getByLabel("Your answer").fill(puzzle.hostAnswer);
-    await p.getByRole("button", { name: "Answer" }).click();
+    await caughtToCards(p, puzzle.hostAnswer);
     await expect(p.locator("#result")).toBeVisible();
   }
   // The friend's comment, with a reaction from each of them, written straight to the database: the reaction rules

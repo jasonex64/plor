@@ -7,6 +7,7 @@ import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { PAST_MIDNIGHT } from "../src/app/bonus";
 import { RUN, signInAndPick } from "./players";
+import { answerBox, caught, caughtToCards, safe, seeResults, skyResult, walkOn } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -85,7 +86,7 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   // Start playing starts the run, on the game screen.
   await how.getByRole("button", { name: "Start playing" }).click();
   await expect(page).toHaveURL("http://localhost:3000/afterglow");
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   // Once the run has started, How to play offers no start (14a-2c, criterion 2). Its text shows before the run's
   // state does, and the clock bar asks for the run too, so the check waits until every request has answered.
   await page.goto("/afterglow/how-to-play");
@@ -120,8 +121,7 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   await expect(yesterday.getByRole("list", { name: `Answers to ${first.prompt}` }).getByRole("listitem").filter({ hasText: "polar bear" })).toBeVisible();
 
   await page.getByRole("button", { name: "Start", exact: true }).click();
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   // Today's run counts now in the streak, the average and the chart; its points only once the day closes (M09 D9).
   await expect(stat("day streak")).toHaveText("1");
@@ -182,17 +182,16 @@ test("a run resumed after its midnight says its answers don't count for the boar
 
   await page.goto("/afterglow");
   const game = page.getByRole("region", { name: GAME.name, exact: true });
-  await expect(game.getByRole("heading", { name: "Safe!" })).toBeVisible();
+  // Back on question 1's sky result, over which the line shows while the run is played.
+  await expect(skyResult(page)).toBeVisible();
   await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
-  await game.getByRole("button", { name: "Next" }).click();
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await walkOn(page, "Name a fruit");
   await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
   // Safe on question 2 (fruit; the host said apple), then caught on question 3 (color; the host said red).
-  await page.getByLabel("Your answer").fill("banana");
-  await page.getByRole("button", { name: "Answer" }).click();
-  await game.getByRole("button", { name: "Next" }).click();
-  await page.getByLabel("Your answer").fill("red");
-  await page.getByRole("button", { name: "Answer" }).click();
+  await safe(page, "banana");
+  await walkOn(page, "Name a color");
+  await caught(page, "red");
+  await seeResults(page).click();
   // The full run's score, 25 + 50, though the boards count question 1's 25 alone; the line once, on the result.
   await expect(page.locator("#result")).toContainText(/You survived 2 of 7 questions and scored 75 points\b.* Past midnight: answers from now on don't count for the boards\./);
   await expect(game.getByText(PAST_MIDNIGHT)).toHaveCount(1);

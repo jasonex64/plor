@@ -203,7 +203,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     answer: (text) => send("/api/run/answer", { index: run!.question!.index, text }),
     timeUp,
   };
-  return <Run runner={runner} onPlaying={onPlaying} saved onLeave={() => router.push("/", { transitionTypes: BACK })} />;
+  return <Run runner={runner} onPlaying={onPlaying} saved out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })} />;
 }
 
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
@@ -221,11 +221,13 @@ export function TestGame({
   hostAnswers,
   onPlaying,
   label,
+  onRestart,
 }: {
   date: string;
   hostAnswers: string[][] | null;
   onPlaying: (playing: boolean) => void;
   label: ReactNode;
+  onRestart: () => void;
 }) {
   const router = useRouter();
   const [run, setRun] = useState<RunState | null>(null);
@@ -287,34 +289,58 @@ export function TestGame({
         </ul>
       </div>
     );
-  // A test run's × and See results go back to the admin puzzles page it started from (14c-6 answer 26).
-  return <Run runner={runner} onPlaying={onPlaying} saved={false} label={label} onLeave={() => router.push("/admin/puzzles", { transitionTypes: BACK })} />;
+  // A test run's × and See results go back to the admin puzzles page it started from (14c-6 answer 26), and restart it:
+  // Next.js keeps this page hidden, so its next Play test would otherwise pick up this run's moves.
+  const back = () => {
+    onRestart();
+    router.push("/admin/puzzles", { transitionTypes: BACK });
+  };
+  return <Run runner={runner} onPlaying={onPlaying} saved={false} label={label} out="Back to Puzzles" onLeave={back} onResults={back} />;
 }
 
 // The game screen's run, whichever runner it comes from. saved: a played run, whose result has Share and the answer
 // searches; a test run saves nothing, so it has neither (14b-11, answer 6; 14b-12, Out of scope). From Start to See
 // results the run is Afterglow, full screen (docs/milestones/M14-14c-6-afterglow-in-play.md): a run already over when
 // the screen opens shows the cards at once (answer 25), and one that ends here shows its ending list until See results.
-// onLeave: where the × goes (answers 22, 26). label: a line Afterglow keeps over the scene, a test run's.
+// onLeave: where the × goes (answers 22, 26), and out what it says to screen readers; onResults: where See results goes,
+// if not to the cards here (a test run's, answer 26). label: a line Afterglow keeps over the scene, a test run's.
 function Run({
   runner,
   onPlaying,
   saved,
+  out,
   onLeave,
+  onResults,
   label,
 }: {
   runner: Runner;
   onPlaying: (playing: boolean) => void;
   saved: boolean;
+  out: string;
   onLeave: () => void;
+  onResults?: () => void;
   label?: ReactNode;
 }) {
   const { run, noPuzzle, error, busy, over } = runner;
   const playing = run?.status === "in_progress";
+  // A page Next.js kept hidden shows again with the run as it last had it, while the run loads again (useRun's load is an
+  // effect, which runs each time the page shows). A run that was in play then may have ended elsewhere meanwhile, its
+  // time up away from the page, so the scene waits for the new state rather than start from the old one (answer 25).
+  const [hiddenWith, setHiddenWith] = useState<RunState | null>(null);
+  useEffect(() => () => setHiddenWith(run), [run]);
+  const stale = playing && run === hiddenWith;
   // Played here, and its ending list not yet left: the scene stays up after the run is over, until See results or the ×.
+  // Hiding the page forgets it, so a run that ends while the page is away opens on the cards.
   const [seen, setSeen] = useState(false);
   const [done, setDone] = useState(false);
-  if (playing && !seen) setSeen(true);
+  useEffect(
+    () => () => {
+      setSeen(false);
+      setDone(false);
+    },
+    [],
+  );
+  if (playing && !stale && !seen) setSeen(true);
   const inGame = playing || (seen && !done);
   const known = run !== null || noPuzzle !== null || error !== null;
   useEffect(() => {
@@ -327,15 +353,20 @@ function Run({
 
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
   if (!run) return error ? <p role="alert">{error}</p> : expectPlay ? <AfterglowLoading /> : <BannerSkeleton />;
+  if (stale) return <AfterglowLoading />;
   if (inGame)
     return (
       <Afterglow
+        out={out}
         start={() => startOf(run)}
         io={{
           answer: (text) => runner.answer(text).then(replyOf),
           next: () => runner.next().then((r) => r && askedOf(r.run)),
           timeUp: () => runner.timeUp().then((r) => r && (r.status === "in_progress" && r.question ? askedOf(r) : "over")),
-          seeResults: () => setDone(true),
+          seeResults: () => {
+            setDone(true);
+            onResults?.();
+          },
           leave: () => {
             if (!playing) setDone(true);
             onLeave();

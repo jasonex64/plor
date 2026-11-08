@@ -6,6 +6,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { REACTIONS } from "../src/config/tunables";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -25,8 +26,7 @@ test.afterAll(async () => {
 async function caught(page: Page) {
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 

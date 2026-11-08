@@ -8,6 +8,7 @@ import { Pool } from "pg";
 import { UNDO_SECONDS } from "../src/config/tunables";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sent, signInAndPick } from "./players";
+import { box, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { slideOf, watchSlides } from "./slides";
 
@@ -133,8 +134,7 @@ test("comments and reactions show at once, with Undo before they're sent", async
   await page.goto("/");
   await signInAndPick(page, "fu");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   const thread = page.getByRole("region", { name: `${GAME.name} comments` });
   const toast = page.getByRole("status").filter({ has: page.getByRole("button", { name: "Undo" }) });
   const posts: number[] = [];
@@ -203,27 +203,18 @@ test("comments and reactions show at once, with Undo before they're sent", async
   expect(posts[2] - posted).toBeLessThan(UNDO_SECONDS * 1000);
 });
 
-// While the run is in progress the game screen holds only the question: the seconds left as a number beside the
-// prompt, as large as it and with tabular figures, and no banner, stats, Yesterday or comments, which come back when
-// the run ends (criterion 4; answers 20–23).
-test("a question shows its seconds beside the prompt, and nothing else until the run ends", async ({ page }) => {
+// While the run is in progress the game screen holds only the question: the seconds left with the prompt, and no
+// banner, stats, Yesterday or comments, which come back when the run ends (criterion 4; answers 20–23). Since 14c-6
+// the question is Afterglow's box, whose seconds sit in its top row in the game's own look
+// (docs/milestones/M14-14c-6-afterglow-in-play.md, Removes: the in-run countdown), so 14b-8's sizes and place beside
+// the prompt are gone.
+test("a question shows its seconds with the prompt, and nothing else until the run ends", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "fc");
   await play(page);
-  const prompt = page.getByRole("heading", { level: 2, name: "Name an animal" });
-  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
-  await expect(clock).toHaveText(/^\d+ seconds left$/);
-  const look = await clock.evaluate((el) => {
-    const [mine, theirs] = [getComputedStyle(el), getComputedStyle(document.querySelector("h2")!)];
-    return { numbers: mine.fontVariantNumeric, sizes: [mine.fontSize, theirs.fontSize], weight: mine.fontWeight === theirs.fontWeight };
-  });
-  // At mockup 3's sizes since 14b-8b: the seconds 64px beside a 30px prompt (docs/milestones/M14-14b-8-the-new-look.md,
-  // answer 11), where 14b-6c had them the prompt's size until the redesign.
-  expect(look).toEqual({ numbers: "tabular-nums", sizes: ["64px", "30px"], weight: true });
-  const [p, c] = [(await prompt.boundingBox())!, (await clock.boundingBox())!];
-  expect(c.x).toBeGreaterThan(p.x + p.width - 1);
-  expect(c.y).toBeLessThan(p.y + p.height);
-  expect(c.y + c.height).toBeGreaterThan(p.y);
+  await expect(box(page).getByText("Name an animal", { exact: true })).toBeVisible();
+  // The number, the " s" shown after it, and the words screen readers hear.
+  await expect(box(page).getByRole("timer")).toHaveText(/^\d+ s seconds left$/);
   const hidden = [
     page.getByRole("heading", { level: 2, name: GAME.name, exact: true }),
     page.getByRole("region", { name: `Your ${GAME.name}` }),
@@ -232,8 +223,7 @@ test("a question shows its seconds beside the prompt, and nothing else until the
   ];
   for (const part of hidden) await expect(part).toHaveCount(0);
 
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   for (const part of hidden) await expect(part).toBeVisible();
 });
 

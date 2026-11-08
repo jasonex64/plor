@@ -50,3 +50,10 @@ export async function caught(page: Page, text: string): Promise<void> {
   await lightIt(page, text);
   await expect(seeResults(page)).toBeVisible({ timeout: DUD_MS });
 }
+
+// A caught answer, then See results: the run is over and the page is back on today's cards, as most files that only
+// need a finished run get there.
+export async function caughtToCards(page: Page, text: string): Promise<void> {
+  await caught(page, text);
+  await seeResults(page).click();
+}

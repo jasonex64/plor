@@ -5,6 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -89,8 +90,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   for (const [player, body] of [[friend, "Bear, first question."], [page, "Bear for me too."]] as const) {
     await player.goto("/");
     await play(player);
-    await player.getByLabel("Your answer").fill(puzzle.hostAnswer);
-    await player.getByRole("button", { name: "Answer" }).click();
+    await caughtToCards(player, puzzle.hostAnswer);
     await expect(player.locator("#result")).toContainText("You survived 0 of 7 questions");
     await player.goto("/");
     await player.getByLabel("Comment to your friends").fill(body);
@@ -165,8 +165,7 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   await page.goto("/");
   await signInAndPick(page, "kc");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   const soft = await slot(page, "--soft");
 

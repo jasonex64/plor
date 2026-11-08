@@ -92,8 +92,9 @@ export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: s
   const [playing, setPlaying] = useState(false);
   const [restarts, setRestarts] = useState(0);
   const label = `Test run${hostAnswers ? " of the draft" : ""}: nothing is saved`;
+  const again = () => setRestarts((n) => n + 1);
   const restart = (
-    <button type="button" onClick={() => setRestarts((n) => n + 1)}>
+    <button type="button" onClick={again}>
       Restart
     </button>
   );
@@ -115,6 +116,7 @@ export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: s
           date={date}
           hostAnswers={hostAnswers}
           onPlaying={setPlaying}
+          onRestart={again}
           label={
             <p>
               {label} {restart}
