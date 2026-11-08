@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a built, checked (Evidence) and in review, PR #168. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merging on green CI at the human's "Merge when green"); next 14c-6b, the game. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
