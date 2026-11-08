@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39) and approved (answer 40); 16e-3a, game 1's midnight rule, is done (PR #166, merged on green CI 2026-11-08); 16e-3b, the overall board, is in review (PR #167).
+**Status:** done: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39) and approved (answer 40); 16e-3a, game 1's midnight rule, is done (PR #166, merged on green CI 2026-11-08); 16e-3b, the overall board, is done (PR #167, merging on green CI at the human's "Merge when green"), so 16e is done.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
