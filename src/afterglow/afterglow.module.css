@@ -375,6 +375,8 @@
   background: var(--panel);
   border: var(--u) solid var(--edge);
   border-radius: 0;
+  /* Centred as the game's question is (.q), whatever the page it opens from centres or not. */
+  text-align: center;
 }
 
 .howto::backdrop {

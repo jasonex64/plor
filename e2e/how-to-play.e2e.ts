@@ -69,8 +69,10 @@ test("Today's How to play opens four chunks one at a time, and Close, × and Esc
   await expect(next).toHaveCount(0);
   for (let i = CHUNKS.length - 1; i > 0; i--) await previous.click();
   await expect(dialog.getByRole("group", { name: `1 of ${CHUNKS.length}` })).toBeVisible();
-  // ‹ on the first chunk does nothing.
-  await previous.click();
+  // ‹ on the first chunk does nothing. It stays in the tab order (aria-disabled), so it's pressed from the keyboard:
+  // Playwright's click waits for an enabled button.
+  await previous.focus();
+  await page.keyboard.press("Enter");
   await expect(dialog.getByRole("group", { name: `1 of ${CHUNKS.length}` })).toBeVisible();
 
   // Screen readers: a dialog named How to play, its chunks a carousel of slides, announced politely (criterion 4).
@@ -78,11 +80,12 @@ test("Today's How to play opens four chunks one at a time, and Close, × and Esc
   await expect(dialog.locator('[aria-live="polite"]')).toHaveCount(1);
   await expect(dialog.getByRole("group", { name: "1 of 4" })).toHaveAttribute("aria-roledescription", "slide");
 
-  // The page behind is out of reach: Tab goes once round the panel's buttons and on, and stays in the panel.
+  // The page behind is out of reach: Tab goes once round the panel's buttons and on, and never lands on the page. Past
+  // the last button it leaves for the browser's own controls (the document's body), as a modal dialog lets it.
   const stops = await dialog.getByRole("button").count();
   for (let i = 0; i <= stops; i++) {
     await page.keyboard.press("Tab");
-    expect(await dialog.evaluate((d) => d.contains(document.activeElement))).toBe(true);
+    expect(await dialog.evaluate((d) => d.contains(document.activeElement) || document.activeElement === document.body)).toBe(true);
   }
 
   // Close on the last chunk, the × and Escape each close it, and focus goes back to the button (criterion 3).
@@ -135,10 +138,11 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP], ["32
     await banner(page).getByRole("button", { name: "How to play" }).click();
     const dialog = panel(page);
     await expect(dialog).toBeVisible();
-    // In the game's font: the family next/font gave Handjet comes first.
-    const [family, font] = await dialog.evaluate((d) => [getComputedStyle(d).getPropertyValue("--afterglow-font").trim(), getComputedStyle(d).fontFamily]);
-    expect(family).not.toBe("");
-    expect(font.startsWith(family)).toBe(true);
+    // In the game's font: the family next/font gave Handjet comes first (each list's first name, without its quotes).
+    const first = (list: string) => list.split(",")[0].trim().replace(/^["']|["']$/g, "");
+    const [family, font] = await dialog.evaluate((d) => [getComputedStyle(d).getPropertyValue("--afterglow-font"), getComputedStyle(d).fontFamily]);
+    expect(first(family)).not.toBe("");
+    expect(first(font)).toBe(first(family));
     // On Afterglow's plain dark (answer 35), the game's own background colour.
     const [backdrop, dark] = await dialog.evaluate((d) => [getComputedStyle(d, "::backdrop").backgroundColor, getComputedStyle(d).getPropertyValue("--bg").trim()]);
     expect(backdrop).toBe(`rgb(${[1, 3, 5].map((i) => parseInt(dark.slice(i, i + 2), 16)).join(", ")})`);

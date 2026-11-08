@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); next 14c-6d, How to play, approved (answers 30 to 43), then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merging on green CI at the human's "Merge when green"); 14c-6d, How to play, built and its e2e passing (Evidence), in review; then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -160,13 +160,13 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - [x] `docs/DESIGN.md` describes `/afterglow` as built.
 
 14c-6d, How to play:
-- [ ] How to play opens the panel from the game screen before Start and from Today's banner under Play before the run, with Skip the game screen off and on; neither shows once the run has started.
-- [ ] The panel shows the four approved chunks one at a time: › and ‹ move through them, ‹ is unavailable on the first, the dots mark the place, and the last has Close where › was.
-- [ ] Close, the × and Escape each close it, focus goes back to the button that opened it, and the page behind can't be reached while it's open.
-- [ ] Screen readers hear a dialog named How to play, each chunk as a slide named "N of 4", announced politely as it changes, and the buttons as Previous, Next and Close.
-- [ ] It's in Handjet on Afterglow's dark at 375×812 and 1440×900, with no sideways scroll at 320px, and every button at least 24px each way (WCAG 2.2 2.5.8).
-- [ ] `/afterglow/how-to-play` answers 404.
-- [ ] `docs/DESIGN.md` describes the panel.
+- [x] How to play opens the panel from the game screen before Start and from Today's banner under Play before the run, with Skip the game screen off and on; neither shows once the run has started.
+- [x] The panel shows the four approved chunks one at a time: › and ‹ move through them, ‹ is unavailable on the first, the dots mark the place, and the last has Close where › was.
+- [x] Close, the × and Escape each close it, focus goes back to the button that opened it, and the page behind can't be reached while it's open.
+- [x] Screen readers hear a dialog named How to play, each chunk as a slide named "N of 4", announced politely as it changes, and the buttons as Previous, Next and Close.
+- [x] It's in Handjet on Afterglow's dark at 375×812 and 1440×900, with no sideways scroll at 320px, and every button at least 24px each way (WCAG 2.2 2.5.8).
+- [x] `/afterglow/how-to-play` answers 404.
+- [x] `docs/DESIGN.md` describes the panel.
 
 ## Out of scope
 - The rest of the app's look (answer 4).
@@ -233,6 +233,15 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 | Design: "Coming back to `/afterglow` mid-run picks up where the run is" | A game screen Next.js kept hidden waits for the run to load again before the scene starts, and forgets that the run was played there | A run whose time ran out away from the page reopened on its stale question (found by `jumps-and-finds.e2e.ts`); answer 25 |
 | `street.js` | `src/afterglow/street.ts`, five unused locals dropped (lint), output byte for byte the same in 36 sizes and stages (Evidence) | — |
 
+14c-6d, against its Design and the APG Carousel pattern:
+
+| Source says | We built | Why different |
+|---|---|---|
+| The approved words: "On questions 2, 4, 5 and 7" | The list is made with `Intl.ListFormat("en-GB")` | US English's list adds a comma before "and" ("2, 4, 5, and 7"), which the old page had too; found by the e2e |
+| "the page behind is inert" | The page behind can't be reached; Tab past the panel's last button goes to the browser's own controls, as a modal `<dialog>` lets it, then back into the panel | MDN `<dialog>`: the rest of the document is inert, the browser's own controls aren't part of it |
+| — | The panel's text is centred | The question's text in the game is centred (`.q`), and the dialog otherwise took whatever the page round its button did (Today's banner centres, the game screen doesn't) |
+| APG: previous and next don't move focus | ‹ stays in its place, `aria-disabled` on the first chunk; › is one button that becomes Close, so focus stays on it | The pattern says nothing about the ends; *Claude's reading* (Design), approved with it (answer 41) |
+
 ## Evidence
 **14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
 - `npm run lint`: clean. `npm test`: 634 passed.
@@ -250,6 +259,13 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - Screenshots at 390×844 and 1440×900 (the question, the wait, the sky result, a lantern, a taken letter, off-list text, a dud's ending list) looked as the mock does; they are in the session's scratchpad, not in the repo.
 - Not checked: a real phone, real Chrome's frame rate and Reduce motion (6b-2's check and 6c).
 - PR #169's first CI e2e run (run 42531148650 at 1ad2b21): `1 failed`, `2 flaky`, `160 passed (27.9m)`. The failure, `afterglow.e2e.ts`'s failed-Next test, found two alerts: the scene's error and Next.js's own route announcer, which in CI held "Plor, Today"; the test now looks in the game's region. `test-run.e2e.ts`'s first test ran past Playwright's 30 s on its first try, since 6b-1 has it play a second run; it's now `test.slow()`. The other flaky one was `play2.e2e.ts:51` (ROADMAP, For M14). Both fixed tests locally: `4 passed (58.7s)`.
+
+**14c-6d, How to play** (2026-11-08, Windows PC, this worktree's own `next dev`, local stack):
+- `npm run lint` and `npx tsc --noEmit`: clean. `npm test`: 640 passed.
+- Handjet's file has the panel's glyphs: drawn in Chromium in Handjet-then-serif against serif alone, ‹ › • × · differ (present), ○ ● don't (absent, so not used), "A" differs (the control).
+- First run (`npx playwright test e2e/how-to-play.e2e.ts e2e/offbeat.e2e.ts e2e/headings-invites.e2e.ts e2e/shell.e2e.ts --reporter=line`): `4 failed`, `23 passed (2.9m)`. The chunk read "2, 4, 5, and 7" (fixed, Source diff); the font check compared the family names with their quotes, which differ between the variable and the computed style (the test fixed); a click on ‹ at the first chunk waited for it to be enabled, which `aria-disabled` never is (pressed from the keyboard instead); Tab past the last button left the document for the browser's controls (the check now says the page behind is never reached).
+- After the fixes: `npx playwright test e2e/how-to-play.e2e.ts e2e/offbeat.e2e.ts`: `10 passed (1.0m)` (the four chunks in turn and back, ‹ doing nothing on the first, Close, × and Escape with focus back, the carousel and slide names, before Start and on Today with Skip on and off, gone once the run starts, Handjet on the dark at 375×812, 1440×900 and 320px, buttons 24px or more; `/afterglow/how-to-play` answers 404).
+- Screenshots at 390×844: Today's banner with How to play under Play, and the panel's first chunk; in the session's scratchpad, not the repo.
 
 ## Review
 14c-6b-1, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff origin/main...HEAD` at 3de8c14:

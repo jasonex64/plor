@@ -12,8 +12,9 @@ import { handjet } from "./font";
 import { typeScale } from "./scene";
 import styles from "./afterglow.module.css";
 
-// The questions where a letter is taken, from tunables.ts: "2, 4, 5 and 7".
-const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
+// The questions where a letter is taken, from tunables.ts: "2, 4, 5 and 7", with no comma before "and", as the human
+// approved the words (answer 43), which British English's list leaves out.
+const STEALS = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(
   LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
 );
 const [FIRST, LAST] = [POINTS_PER_QUESTION[0], POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]];
