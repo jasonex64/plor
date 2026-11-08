@@ -216,6 +216,7 @@ Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one mea
 - **Every player settled:** `npx vitest run src/game/ledger.db.test.ts src/app/api/leaderboard src/app/api/groups/leaderboard src/game/all-time-points.db.test.ts --no-file-parallelism`: the friends board's check that C, not on A's board, stays unsettled failed, as predicted, and now checks C is settled; the ledger test counts all 17 rows of its closed day, the 11 strangers' included. Then `npx vitest run src/app/api/leaderboard src/app/api/groups/leaderboard src/game src/app/api/substrings --no-file-parallelism`, 200 passed.
 - **Average:** `npx vitest run src/game/percentile.test.ts`, 8 passed, with 35.4 from 66.7, 0, 0 and 75, and 0 for no game-day.
 - **Screens:** `npx playwright test e2e/overall-board.e2e.ts --retries=0`, 1 passed: on the Friends page and a group's, Overall, Sum first, Y 200 then X 100; Average, X 100 then Y 66.7, with each note. Broken on purpose, Average not ranked again on screen: it failed.
+- **Wider e2e:** `npx playwright test e2e/leaderboard-graph.e2e.ts e2e/play2.e2e.ts e2e/player-screens.e2e.ts e2e/groups.e2e.ts e2e/today.e2e.ts e2e/me.e2e.ts e2e/offbeat.e2e.ts e2e/overall-board.e2e.ts --retries=0`: 33 passed.
 - `npm test`, 640 passed; `npm run build` and `check:client-bundle` OK; `npx tsc --noEmit -p .` and `npx eslint src e2e` clean.
 
 ### 16e-3a
@@ -245,6 +246,7 @@ Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one mea
 - `npm test`: 615 passed. `npm run build` lists `/play2`, `check:client-bundle` is OK, and `npx tsc --noEmit -p .` and `npx eslint` are clean.
 
 ## Review
+- 16e-3b, the `reviewer` agent, 2026-11-08: no blockers. It reworked the hand numbers of both tests, checked every caller of settling, the response's fields, the spoiler rule for game 1 alone, and protocol 7 against DECISIONS.md, Network messages; an old-format day can't break settling on the data, by HANDOFF (plor.app rebuilt from the baseline), not queried. Deferred to ROADMAP, For M16: the Log row credits protocol 7 to the human, cost at scale, rounding an exact half, untested overall ties, and a DESIGN citation.
 - 16e-3a, the `reviewer` agent, 2026-11-08: one blocker, in the tests. They claimed the fixture's common answer never earns a rarity bonus, but its first-guess share is exactly the cut-off, and other fixture days left in the pool could lower it and give B 76: the board, card and Me tests now add the bonus each settled row holds, and settling's own test keeps the hand-worked bonus. It found settling, the line and the docs correct. Deferred to ROADMAP, For M16: the line on a late run's result that times out, the line before Next across midnight, a stale comment, and Me's days played.
 - Blocking findings and how each was fixed (16e-1, the `reviewer` agent, 2026-11-07):
   1. The e2e checked the tracker's count, not which letters it marks: it now checks the marked letters after each word.
