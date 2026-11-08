@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a built and committed, its e2e not yet verified (see HANDOFF), no PR yet. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a built, committed and checked (Evidence), not pushed, no PR yet. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -92,7 +92,7 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 **The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
 
 ## Acceptance criteria
-- [ ] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
+- [x] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
 - [ ] A whole day played in a browser against the local stack: a safe answer of each level shows its rarity's colour and "The host said …", an off-list text shakes and stays selected, a taken letter, a reload mid-question and mid-result, Next, Q7's ending list, Done, the cards.
 - [ ] A dud and a fuse out each end the run with the ending list.
 - [ ] No question loses time to the walk: the database's open time for question k+1 is after its box appears (e2e, from the run's events).
@@ -141,6 +141,12 @@ Three PRs from `m14-look-and-feel`, after bringing it up to date with `main` (M1
 |---|---|---|
 
 ## Evidence
+**14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
+- `npm run lint`: clean. `npm test`: 634 passed.
+- The 14 e2e files 6a touched (`npx playwright test e2e/alive.e2e.ts … e2e/play2.e2e.ts --reporter=line`): `2 failed`, `66 passed (15.3m)`. Hypothesis written before the run: all pass except database-state failures ("thing … has no name"); a failure tied to `/afterglow` would disprove it. No "has no name" error came back (the three stored puzzles' 33 host answers all have names, checked with `private.thing_names`), and `feel.e2e.ts:242`, which failed in the earlier runs, passed.
+- The two failures, rerun alone (`npx playwright test e2e/play2.e2e.ts:51 e2e/shell.e2e.ts:355`): `2 passed (52.0s)`. Under the full run's load, `play2.e2e.ts:51`'s second try landed after the lockout ("You played aqkb: 25 points." where "Too quick. Try again in a moment." was expected), and `shell.e2e.ts:379`'s Create group was still "Loading" when its 5 s wait ran out. Neither touches the renamed route; both are in ROADMAP, For M14.
+- `e2e/offbeat.e2e.ts` checks `/afterglow`'s tab title (`toHaveTitle(GAME.name)`) and that `/offbeat`, `/updraft` and `/play` answer 404.
+- The earlier runs' 11 failures are not explained: some of them ran against `RIFF-m16`'s dev server, which held port 3000, and the "has no name" errors' cause is *unverified* (perhaps the base changing mid-run).
 
 ## Review
 - Blocking findings and how each was fixed:
