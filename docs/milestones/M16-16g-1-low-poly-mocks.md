@@ -1,6 +1,6 @@
 # M16 — 16g-1, two low-poly 3D mocks for game 2's look
 
-**Status:** in review (drafted and approved 2026-11-07, Pacific, from three rounds of guided questions: "Approve, build mocks"; both pages built and published; waits on the human to try them and pick).
+**Status:** in review (drafted and approved 2026-11-07, Pacific, from three rounds of guided questions: "Approve, build mocks"; revision 2, 2026-11-08, after the human tried the first two pages: more movement, a zoomed-out diorama, and two more worlds, Office Tower and Freight Line, from two more rounds; all four built, reviewed and published; waits on the human to try them and pick).
 
 ## Goal
 Two playable, animated, low-poly 3D mocks of game 2's look, built from polyfork.dev's models, each a private claude.ai page, so the human can pick game 2's look before anything goes into `/play2`.
@@ -38,6 +38,31 @@ Round 3
 
 Approval
 13. To "Approve the 16g-1 ticket and add polyfork's licensing page as a source?": "Approve, build mocks".
+
+## Revision 2 (human, 2026-11-08), after trying the first two pages
+The human's feedback, quoted whole: "i feel like its not the theming thats the problem, but that theres not enough of a movement dynamic. i believe we should zoom out a bit, have more details from a diorama/birds eye view of a large area and have more drastic movement as the game progresses. i.e, elevators moving up and going to different office floors? etc. maybe suggest 3 more themes while fixing these two"
+
+Round 4
+14. The movement: "try mix of jourey and the place transforming, dont incorporate both in one right now". One world travels to a new spot each round; the other stays put and transforms; never both in one world.
+15. Pacing: "Same size every round". Every round moves the world one equal step; this replaces answer 6's shifts at rounds 3 and 6.
+16. The view: "use your judgement, consider what it looks like on phone and desktop (want to make sure it looks good for both)".
+17. New themes: "Pitch, you pick, then build".
+
+Round 5 (Claude pitched Office Tower, Freight Line and Moon Base)
+18. Which way round: "Garden travels, Brew transforms (Recommended)".
+19. New themes to build: "Office Tower (travels up),Freight Line (travels across)". Moon Base stays an idea.
+
+**Claude's reading of answer 16, as built:** a tilted miniature: the camera high and far back with a narrow lens, so a whole area reads as a model on a table; no depth blur, as a blur pass costs frame rate on phones. On a phone a travelling world is framed tall around its current stop, and the transforming world on the busy middle of the diorama.
+
+| | Bug's-Eye Garden | Midnight Brew | Office Tower | Freight Line |
+|---|---|---|---|---|
+| Movement (answers 14, 18, 19) | travels down: round 1 is the meadow above the nest; each sent word is hauled one chamber deeper (seed store, nursery, fungus garden, dew well, treasure hall, root hall) and the camera rides down with it; the finale reaches the queen's chamber | transforms: a wide view of a witch's hill village on a round diorama base; after each round the brew's magic changes one part: round 2 the lanterns, 3 the pumpkin patch, 4 the moon, fog and bats, 5 the graves, 6 the haunted house, 7 the trick-or-treaters; the finale a column of light and fireworks | travels up: a cut-away skyscraper; each word sends the glass elevator up a floor, ending at the rooftop | travels across: a long countryside diorama; each word couples a wagon and the train runs on to the next station |
+| Kits | Insect World and the unkitted bugs | Halloween Night, Dungeon & Crypt | Office, Open Plan | Countryside Railway, Cozy Farm, Alpine and Snow |
+| The sent word | letter blocks drop into the chamber and ants lift them onto their backs; on Continue they carry them down the tunnel, and the letters stay as a pile in the chamber they reach | letter blocks arc into the cauldron and splash, as in revision 1 | letter blocks hop into the glass lift; on Continue the lift rises a floor and the letters are delivered onto that floor as a pile | letter crates are loaded onto a newly coupled wagon; on Continue the train runs 140 m to the next station |
+| A time-up | the chamber floor crumbles and the letters tumble away | the letters fizzle into smoke, the cat arches, the witch crouches | the lift doors slam on the letters and they crumple into paper | the crates fall onto the track and the arriving wagon bowls them away; it couples on empty |
+| The finale | the last load reaches the queen's chamber | a column of light and fireworks, everyone dances | the lift reaches the roof and a helicopter lands | the train runs into the terminus's engine shed and fireworks start |
+
+Built by Claude: Bug's-Eye Garden and Midnight Brew in this session; Office Tower and Freight Line by two subagents on the same harness, each checked by Claude before publishing. Office Tower's sky was first built going from day to night as the lift climbed; the review found that made it travel and transform at once (answer 14), so the sky is held at one late-afternoon look.
 
 ## The two worlds (Claude's proposal, for approval)
 | | Midnight Brew | Bug's-Eye Garden |
@@ -87,6 +112,7 @@ Shared by both:
 | Animation timings, camera punch and shake sizes, particle counts, colours, the frame rate (the browser's own) | The mock pages only | Proposed by Claude for the human to judge on the pages; not carried into the app without the human's word |
 | The tracker's full mark, a total of 2,000; the garden store's 24 seeds | The brew's level and the store's fill | Proposed by Claude for the mocks only (`FULL`, `STORE` in each page's `scene.js`); the game has no such mark yet |
 | Sample sets RE, AN, ION, BLE, OCK, IGH, OUN and bonus letter P | The mocks' sample run | Proposed by Claude for the mocks only (`SAMPLE` in `harness.js`), shaped by `SUBSTRING_ROUNDS`; any letters holding the set are accepted, as the mock has no dictionary |
+| Revision 2's layouts and timings: the colony's 10-unit chamber step and 2.8 s descent; the village's 3.6 s change per round; the tower's 3.4 m floors, 2.6 s ride and tracker mark of 1,500; the railway's 140 m between stations and 6.5 s run; each world's camera poses (fov 28–30) and Office Tower's fixed late-afternoon sky (`SKY_FIXED` 3.6) | The four mock pages only | Proposed by Claude and the two building subagents for the human to judge on the pages; not carried into the app without the human's word |
 
 ## Plan
 1. The human approves this ticket and OKs polyfork.dev's licensing page as a source.
@@ -149,6 +175,57 @@ What the screenshots showed (read after the runs):
 - The page frame on claude.ai itself is *unverified*: the browser pane isn't signed in to claude.ai, so the human's first open is the first run there.
 - A real phone is *unverified*: the 390×844 runs were the PC's GPU at a phone's size.
 
+### Revision 2 (2026-11-08)
+| | Link | Bundle |
+|---|---|---|
+| Bug's-Eye Garden (travels down) | https://claude.ai/artifact/133QHpaNVLBoNz88JaxGu4 (version 3) | 9.65 MB `models.json` |
+| Midnight Brew (transforms) | https://claude.ai/artifact/CRVWtWk9NBgnWymHzkbhiP (version 4) | 9.31 MB `models.json`, 5 CC0 clips (Arms folded, Interact, Dance, Crouch, Jog) |
+| Office Tower (travels up) | https://claude.ai/artifact/VcEq4hTKBfPcutzDoyuu9a (version 1) | 6.40 MB `models.json`, 10 CC0 clips |
+| Freight Line (travels across) | https://claude.ai/artifact/8TcvDRPpQcTHUWzge6fVjD (version 1) | 9.82 MB `models.json`, 4 CC0 clips |
+
+The harness now calls each world's `onAdvance(round)` after every Continue (one equal step, answer 15) instead of the round 3 and 6 levels, moves the camera between stops with `stage.travel`, and starts a round only once every camera move has ended (`stage.settled`, answer 9); `setPose` on a jump or Play again cuts any move still running. After the review's fixes, from the scratchpad, `sh check.sh` (all four worlds, served by `python -I serve.py mocks/dist 8773`) gave, with the renderer and `"overflowX": false` lines left out:
+
+```
+== brew 1920 1080 1 idle { "scenario": "idle", "stats": "59 fps · 1.8 ms draw", "errors": [] }
+== brew 390 844 3 idle { "scenario": "idle", "stats": "58 fps · 1.0 ms draw", "errors": [] }
+== brew 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 1.8 ms", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 390 844 3 play prepare { "scenario": "play", "stats": "58 fps · 1.1 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 1.2 ms draw", "errors": [] }
+== brew 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 1.9 ms draw", "errors": [] }
+== brew 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 1.4 ms", "errors": [] }
+== brew 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 1.6 ms", "errors": [] }
+== brew 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 1.6 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+== garden 1920 1080 1 idle { "scenario": "idle", "stats": "60 fps · 2.1 ms draw", "errors": [] }
+== garden 390 844 3 idle { "scenario": "idle", "stats": "60 fps · 4.4 ms draw", "errors": [] }
+== garden 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 1.8 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== garden 390 844 3 play prepare { "scenario": "play", "stats": "60 fps · 1.9 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== garden 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 1.5 ms draw", "errors": [] }
+== garden 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 1.7 ms draw", "errors": [] }
+== garden 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 2.7 ms", "errors": [] }
+== garden 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 1.7 ms draw", "errors": [] }
+== garden 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 2.0 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+== office 1920 1080 1 idle { "scenario": "idle", "stats": "58 fps · 2.8 ms draw", "errors": [] }
+== office 390 844 3 idle { "scenario": "idle", "stats": "59 fps · 5.2 ms draw", "errors": [] }
+== office 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 3.0 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== office 390 844 3 play prepare { "scenario": "play", "stats": "58 fps · 4.1 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== office 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 3.7 ms draw", "errors": [] }
+== office 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 4.0 ms draw", "errors": [] }
+== office 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 2.8 ms draw", "errors": [] }
+== office 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 2.9 ms", "errors": [] }
+== office 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 2.5 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+== freight 1920 1080 1 idle { "scenario": "idle", "stats": "59 fps · 1.2 ms draw", "errors": [] }
+== freight 390 844 3 idle { "scenario": "idle", "stats": "59 fps · 1.4 ms draw", "errors": [] }
+== freight 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 1.2 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== freight 390 844 3 play prepare { "scenario": "play", "stats": "59 fps · 1.1 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== freight 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 1.1 ms draw", "errors": [] }
+== freight 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 1.9 ms draw", "errors": [] }
+== freight 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 1.1 ms", "errors": [] }
+== freight 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 2.4 ms draw", "errors": [] }
+== freight 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 1.0 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+```
+
+The screenshots were read after the runs: the garden's ants carry the word down the tunnel with the camera riding along and leave it as a pile in the next chamber, the queen in the last; the brew's magic streaks to each part of the village in turn; Office Tower's lift and camera rise a floor together and the floor wakes; Freight Line's train runs to the next station with the camera following. Still *unverified*: claude.ai's own frame (the browser pane isn't signed in) and a real phone.
+
 ## Review
 The `reviewer` agent, in a fresh context, 2026-11-07, on the ticket, the docs diff and the pages' source.
 - Blocking findings and how each was fixed:
@@ -161,3 +238,9 @@ The `reviewer` agent, in a fresh context, 2026-11-07, on the ticket, the docs di
   7. `docs/HANDOFF.md` didn't mention 16g-1. Rewritten in this commit.
 - Deferred to ROADMAP "Next revision" (For M16): a word over 12 letters sharing an ant; the swallowed font-load failure; the rim values, ant and seed counts missing from Numbers; Source diff row 2's wording and the sample sets listed twice in Numbers; the single credit line; the camera re-framing when an Android keyboard resizes the page; whether polyfork's JSON re-bakes of the Quaternius clips stay CC0.
 - Answered from what was read: the 38 models are the catalog's free low-poly GLBs from `https://polyfork.dev/cdn/<id>.glb` (polyfork's llms.txt: "every low poly model" is free, the HD editions are the paid part), so the pages host them under CC BY 4.0; none comes from a private kit (each is listed in the public catalog). The clips inside the cat, ant, ladybird and bee GLBs are part of those mesh files.
+
+Revision 2: the `reviewer` agent, in a fresh context, 2026-11-08, on the four worlds, the harness and the ticket.
+- Blocking findings and how each was fixed:
+  1. Office Tower travelled and transformed at once: its sky, lights and city went from day to night as the lift climbed (answer 14), in unequal keyframe steps (answer 15). The sky now holds one late-afternoon look (`SKY_FIXED`, a mock value).
+  2. Midnight Brew's `onAdvance` resolved on wall-clock time while its camera punch ran on stage time, 0.1 s apart, so a slow frame could start the round with the camera still moving (answer 9). The harness now waits for `stage.settled()` before every round, for all four worlds.
+- Deferred to ROADMAP "Next revision" (For M16): the pumpkin kid's doubled clip speed; the garden's bigger first step and missing in-scene tracker; Brew's round-4 step changing more than the others; the phone cost of point lights, shadows, the per-frame sky recolour and 6–10 MB downloads; the unused marble, Office Tower's fixed-step tumble and phone framing, `build.py`'s stale clips, Brew's credit wording. `setPose` keeping moves after a jump, which the review listed as non-blocking, was fixed with blocking item 2, as it is the same rule.
