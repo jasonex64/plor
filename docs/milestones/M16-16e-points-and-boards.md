@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merging on green CI at the human's "Merge when green"); 16e-3, the overall board, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is done (PR #165, merged on green CI 2026-11-08); 16e-3, the overall board, is designed from four rounds of the human's answers (27 to 39), for approval.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -56,6 +56,27 @@ Before 16e-2:
 25. A day only one player played: "100, top of the day".
 26. A day's percentile: "One decimal", so 87.5 stays 87.5.
 
+Before 16e-3 (2026-11-08), round 1:
+27. A game 1 day's percentile, among whom: "Everyone who played (Recommended)". The % of all that day's game 1 players beaten, as in game 2.
+28. A game 1 run finished after midnight, on the overall board: "Late runs don't count". Refined by 35.
+29. The two views: "Overall, then a Sum / Average switch (Recommended)". Overall is the Game switch's third choice, with Sum / Average under it, the list ranked by the one picked.
+30. A minimum of days for Average: "No minimum (Recommended)".
+
+Round 2:
+31. A late run's day on Average: "Not a game-day (Recommended)". Replaced by 35 and 38, once a late run counts what it scored by midnight.
+32. Spoilers: "Hide that day's game 1 part (Recommended)". While the viewer's own game 1 run of a closed day goes on, the overall board leaves out every game 1 place of that day; game 2's still count.
+33. A graph on Overall: "List only on Overall".
+34. Game 1's own board and late runs: "Drop late runs there too". This reverses M09 D1 (human, 2026-10-22: "a run's points count whenever it's finished"), so round 3 put it back to the human.
+
+Round 3:
+35. What a game 1 run finished after midnight counts, on game 1's boards and the overall one: "What it scored by midnight".
+36. Yesterday's standings on Today: "Same rule (Recommended)".
+37. Telling the player who resumes a run after midnight: "Yes, one line (Recommended)".
+
+Round 4:
+38. A game 1 run with nothing scored by midnight, or never finished: "A played day at 0 (Recommended)".
+39. The result screen of a run finished after midnight: "The full run's score". It shows everything the run earned, with the line saying only part of it counts on the boards.
+
 ## What Claude measured (2026-11-07, local stack, 40,098 everyday words)
 - Word length (letters alone): the middle is 8, 90% are 11 or fewer, the longest is 18.
 - Different letters in 7 random everyday words of 5 to 8 letters, 500 runs: 13 at least, 16 at the 10th percentile, 18 in the middle, 20 at the 90th, 22 at most. With 9 to 12 letters the middle is 19, at most 24.
@@ -101,12 +122,30 @@ These are random words, not real play: a real run's numbers come with the beta.
 - **The end of a run:** "Better than 87.5% of players so far today" among the runs finished so far, shown from 10 of them (answer 16); and "2nd of 6 with your friends so far today", the viewer and their friends who've finished, shown once a friend has.
 - **The routes:** the friends and group boards take `game`, `offbeat` or `substrings`, which they need, so one way asks for each; a request without it is refused, and the protocol goes from 6 to 7, as the request changed (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
 
-**Security:** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
+**16e-3 in detail** (Claude's readings of answers 27 to 39, for approval):
+- **Game 1 counts what a run scored by midnight** (answers 34 to 39). This replaces M09 D1's "a run's points count whenever it's finished" and "one never finished never scores" (DECISIONS.md, Game 1: Timer, and the Log rows of 2026-10-22).
+  - A run's ledger row holds the questions it survived with answers given before its day's midnight, plus their rarity bonus, which already counts only those answers (M09 D8); the bonus cap counts the same questions.
+  - Every game 1 run of a closed day gets its row, finished or not, every player's, as a place needs the whole day (answer 27); the first board read after midnight settles them, as game 2's. So a run left at a reveal counts what it had by midnight (answer 38), and a closed day is final at midnight in both games. A run can still be played to its end after midnight (DECISIONS.md, Timer); it adds nothing to the boards.
+  - Game 1's friends and group boards and yesterday's standings read those rows, so they follow (answers 34, 36). A closed day stays hidden from the viewer while their own run of it goes on, as now (M09 D5).
+  - **Me's best and all-time points** read the same rows, so they count what a run scored by midnight too (Claude's reading: one record of a day's points).
+  - On game 1's screen, a run resumed after its day's midnight shows one line, during the run and on its result: "Past midnight: answers from now on don't count for the boards." (Claude's words, answer 37). The result's score stays the full run's (answer 39).
+- **The overall board** (answers 2, 27, 29, 30, 32, 33, 38):
+  - A game 1 day's place is worked out like game 2's: (others beaten + half the others tied) ÷ others, to one decimal, and 100 alone, among every game 1 row of that day.
+  - A player's game-days are the days they have a row in either game, each counting its place, 0 included (answer 38).
+  - **Sum** adds the week's places in both games; **Average** divides that by the game-days, to one decimal (answer 26's rule). A player with no game-day shows 0 in both.
+  - Overall is the Game switch's third choice, Game 1 / Game 2 / Overall, on the Friends page and each group's; under it a Sum / Average switch, Sum on every load, the list ranked by the one picked (answer 29). No Graph switch on Overall (answer 33). The notes, Claude's words: "Each day adds the % of players you beat, in each game." under Sum, and "Your average % of players beaten, per game played." under Average.
+  - While the viewer's own game 1 run of a closed day goes on, every game 1 place of that day is left out, and game 2's still count (answer 32).
+  - A group counts each member from the day they joined, in both games, as now.
+  - The routes take `game=overall`, and each entry carries its average beside its sum, so the request and the response change: protocol 8 (DECISIONS.md, Network messages). Today's card stays game 1's (16f).
+- **Security:** none expected. Settling and the rarity counts already read every player's game 1 `run_event` rows as `plor_app`, and game 2's board already reads every ledger row. *Unverified until built:* if a query needs more, it goes to the human first.
+- **PRs:** **16e-3a, game 1's midnight rule:** settling every game 1 run of a closed day by its answers before midnight, the boards, yesterday's card and Me following, and the line on the game screen. **16e-3b, the overall board.** One PR each.
+
+**Security (16e-1, 16e-2):** none expected. `plor_app` already reads `round_word` and reads and inserts ledger rows (DECISIONS.md, Log, 2026-10-22 and 2026-11-07), and a percentile reads the day's rows, as a board already does. *Unverified until built:* if a query needs more, it goes to the human first.
 
 **PRs:**
 - **16e-1, the score:** the scoring function and its tests on hand-worked runs, the tunables, and the word points, tracker and end score on `/play2`.
 - **16e-2, places and game 2's boards:** game 2's ledger rows, the percentile and friend rank at the end of a run, and game 2's friends and group boards. The ledger rows moved here from 16e-1 on building it, as their first reader is a board ("Build for today").
-- **16e-3, the overall board:** both views on the friends page and each group's.
+- **16e-3, the overall board:** both views on the friends page and each group's, in two PRs (16e-3 in detail, above).
 
 ## Acceptance criteria
 16e-1:
@@ -122,8 +161,14 @@ These are random words, not real play: a real run's numbers come with the beta.
 - [ ] Game 2's friends and group boards add up daily percentiles, a group's from the day each member joined, by route tests.
 - [ ] A player sees nothing about another player's run beyond what the boards show, by route tests.
 
-16e-3:
-- [ ] Both overall views on hand-made weeks, by route tests: sum, average, a player who played one game, and a group member who joined mid-week.
+16e-3a:
+- [ ] A game 1 run finished after midnight, one left at a reveal and one with nothing by midnight each get one row for what they scored by midnight, ladder and bonus, every player's, by db tests; settling again writes nothing.
+- [ ] Game 1's weekly boards, yesterday's card and Me's points read that score, and a closed day still hides while the viewer's run of it goes on, by route tests.
+- [ ] A run resumed after midnight shows the line, and its result the full score, by e2e.
+
+16e-3b:
+- [ ] Both overall views on hand-made weeks, by route tests: sum, average, a player who played one game, a day at 0, and a group member who joined mid-week.
+- [ ] A game 1 place on a day the viewer is still playing is left out, and game 2's kept, by a route test.
 - [ ] Both views show on the friends page and a group's page, by e2e.
 
 ## Out of scope
@@ -142,6 +187,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 | 18 different letters, 7 letters a word, 3 bonus words | The typical run the sizes balance | Claude, from the measurements above; not real play |
 | 10 players | Before "better than X%" shows | Human, answer 16 |
 | A tie counts as half | The percentile | Claude's proposal in "Comparing games", for approval here |
+| One decimal | The overall Average | Answer 26's rule for a place, applied by Claude |
 | Worked runs: typical 7×7, 18, 3 = 1060; short 7×5, 15, 2 = 680; long 7×10, 20, 3 = 1485; wide 7×7, 23, 3 = 1410; an `e` day with the bonus in all 7 = 1540; a `j` day with none = 700; two misses, 5×7, 14, 1 = 570 | The scoring tests | Approved, answer 13 |
 
 ## Plan
@@ -149,7 +195,7 @@ These are random words, not real play: a real run's numbers come with the beta.
 2. Each PR updates this ticket's Status, the M16 ticket's status line and the ROADMAP row.
 
 ## Removes
-Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3 lists its own.
+Nothing in 16e-1: game 2 had no points. 16e-2 removes the weekly boards' one meaning, game 1 alone, and protocol 6: a board names its game. Game 1's boards are kept by answer 18. 16e-3a removes M09 D1's rules that a run finished after midnight counts in full and one never finished counts nothing, and game 1's settling of only the board's players. 16e-3b removes protocol 7.
 
 ---
 *Fill in the sections below at the end.*
