@@ -208,7 +208,7 @@ test("game 1 stays as it was", async ({ browser }) => {
 test("the friends leaderboard switches to game 2", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
-  await signInAndPick(page, "pb");
+  await signInAndPick(page, "qb");
   await page.goto("/friends");
   const board = page.getByRole("region", { name: "Friends leaderboard" });
   const games = board.getByRole("radiogroup", { name: "Game" });

@@ -1,6 +1,6 @@
 # M16 16e — Points and boards for game 2
 
-**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merging on green CI at the human's "Merge when green"); 16e-2, ledger rows, places and game 2's boards, is next.
+**Status:** in progress: approved ("Approve, build it", 2026-11-07). 16e-1, the score, is done (PR #164, merged on green CI, 2026-11-07); 16e-2, ledger rows, places and game 2's boards, is in review.
 
 ## Goal
 Give a game 2 run its points, show each player where they stand that day, and add game 2's own boards and the overall board beside game 1's.
@@ -157,10 +157,18 @@ Nothing in 16e-1: game 2 had no points. 16e-2 and 16e-3 list what they replace, 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| "Live, final at midnight" for places (answer 19) | The boards count a day from midnight; only the end of a run is "so far" | Answer 21, "keep it consistent", confirmed ("yes thats right") |
 | 16e-1 writes game 2's ledger rows | 16e-2 does | Their first reader is a board ("Build for today"), noted under Design |
 | The tables stop at 18 letters and start at 13 different letters | The rule scores longer words and every count down to 1 | The full dictionary holds words over 18 letters, and a run can use fewer than 13 letters; the rule the tables came from covers them |
 
 ## Evidence
+### 16e-2
+- **Places:** `npx vitest run src/game/percentile.test.ts`, 6 passed: the share beaten, a tie as half, one decimal, 100 alone, a day's places, a week's total. Written beside the function, not before; then broken on purpose and seen to fail: a tie counted as a win (2 failed), 0 for a lone player (1 failed).
+- **Ledger rows and the end of a run:** `npx vitest run src/game/substring-places.db.test.ts --no-file-parallelism`, 3 passed: a closed day's finished run (420) and unfinished one (65) get one row each, settling again writes none, today's waits; the standing is hidden at 9 finished and 50 at 10, with a tie and an unfinished run that doesn't count, and a friend rank only once a friend has finished.
+- **Boards:** `npx vitest run src/app/api/leaderboard src/app/api/groups/leaderboard --no-file-parallelism`, 28 passed. The new `substrings.db.test.ts`: a board without a game, or `chess`, is refused with `unknown_game`; game 2's friends board shows B 66.7 and A 33.3, places among four players yesterday, two of them strangers whose runs were settled too; a group member who joined today counts 0; game 1's board stays at 0. Game 1's own board tests now name `game=offbeat`.
+- **Screens:** `npx playwright test e2e/play2.e2e.ts e2e/player-screens.e2e.ts e2e/leaderboard-graph.e2e.ts e2e/today.e2e.ts --retries=0`, 22 passed, with the Friends board's switch to game 2, its note, and a total that isn't in points. `player-screens.e2e.ts`'s held route now matches the board's query.
+- `npm test`, `npx tsc --noEmit -p .` and `npx eslint src e2e` pass.
+
 ### 16e-1
 - **Scoring,** written before the function: `npx vitest run src/game/substring-scoring.test.ts` failed (`Cannot find module './substring-scoring'`), then 12 passed: both tables cell by cell, the seven worked runs, a run with no word, and a word holding the bonus letter three times.
 - **Routes:** `npx vitest run src/app/api/substrings --no-file-parallelism`, 21 passed. A route test compared rounds exactly and failed on the new fields, as expected; it now checks a word's points, the bonus letter's 120 (`aqmjb`), and the end score, 70 + 120 + 65 = 255 for six letters.

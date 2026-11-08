@@ -51,7 +51,7 @@ describe("game 2's boards", () => {
   it("signs in four players who all played yesterday", async () => {
     const db = getPool();
     for (const p of [A, B, C, D]) {
-      useSession((await signIn(p.email)).session);
+      await signIn(p.email);
       await db.query("insert into private.profile (user_id, username) select id, $2 from auth.users where email = $1 ", [p.email, p.username]);
       p.userId = (await db.query<{ id: string }>("select id from auth.users where email = $1", [p.email])).rows[0].id;
     }
