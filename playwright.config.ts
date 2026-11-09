@@ -13,6 +13,8 @@ export default defineConfig({
   // test of 149. A test that needed it is listed as flaky in the log; a retry there is a lead, not a pass to forget.
   retries: process.env.CI ? 1 : 0,
   use: { baseURL: "http://localhost:3000", trace: "retain-on-failure" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Game 2's village draws with WebGL (M16 16g-2); CI's runners have no GPU, so Chromium's software WebGL is switched on,
+  // for this test browser only (DECISIONS.md, log, 2026-11-08; 16g-2 answer 17).
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], launchOptions: { args: ["--enable-unsafe-swiftshader"] } } }],
   webServer: { command: "npm run dev", url: "http://localhost:3000", reuseExistingServer: !process.env.CI },
 });
