@@ -1,6 +1,6 @@
 # M16 — 16g-1, two low-poly 3D mocks for game 2's look
 
-**Status:** in review (drafted and approved 2026-11-07, Pacific, from three rounds of guided questions: "Approve, build mocks"; revision 2, 2026-11-08, after the human tried the first two pages: more movement, a zoomed-out diorama, and two more worlds, Office Tower and Freight Line, from two more rounds; all four built, reviewed and published; waits on the human to try them and pick).
+**Status:** in review (approved 2026-11-07, Pacific: "Approve, build mocks"; revision 2, 2026-11-08: four moving worlds; revision 3, 2026-11-08: the human picked Midnight Brew and asked for big-word impact, more detail and more idle life, built, reviewed and published; waits on the human to try it; then 16g-2 builds it into `/play2`).
 
 ## Goal
 Two playable, animated, low-poly 3D mocks of game 2's look, built from polyfork.dev's models, each a private claude.ai page, so the human can pick game 2's look before anything goes into `/play2`.
@@ -84,6 +84,19 @@ Shared by both:
 - **Text:** Baloo 2, Plor's one font (HANDOFF, Fonts), so no new font is added.
 - **Rendering:** three.js (WebGL), the library polyfork's README targets, pinned to the version its example uses, three@0.180.0, loaded from cdnjs or jsdelivr on the mock pages.
 - **The model files on the mock pages:** copied onto each page, as a claude.ai page can fetch only its own files, with the credit line "Models by Polyfork, CC BY 4.0" (answer 12). As built, see Source diff.
+
+## Revision 3 (human, 2026-11-08): Midnight Brew is the pick
+The human's message, quoted whole: "lets go with the midnight brew, but change a couple things: 1. the way that the letters fall into the cauldron should change if the word is exceptionally high scoring somehow, cauisng more impact. 2. i think the world needs to be more detailed 3. more movement passively in the world while player is waiting to put in the word, as well as possibly more characters like a cat"
+
+20. The pick: Midnight Brew (the message above). Office Tower, Freight Line and Bug's-Eye Garden stay as published pages, kept as inspiration (14c-3 answer 20's rule).
+
+Round 6
+21. A big word: "Tiers (Recommended)". Good from 6 letters, great from 8, huge from 10 (word points 40, 60 and 95, `src/config/tunables.ts:199`), and the bonus letter adds a level, up to huge.
+22. The impact: "Letters slam in,Eruption and shockwave,Camera slam". Not picked: the characters reacting.
+23. The detail: "More buildings,Denser props,Ground and edges,Small lights".
+24. The idle life: "More animals,Moving things". Not picked: wandering villagers, the witch fidgeting.
+
+**As built (Claude's mapping of answers 21 and 22, for the human to judge):** a normal word arcs in as before; good: the letters, a third bigger, rise into a ring over the pot, glow and slam straight down trailing sparks; great: the slam, then the cauldron erupts, a shockwave ring sweeps the base (lamps flare, pumpkins hop, leaves fly; the crows don't react, as answer 22 left out the characters reacting) and the camera slams in; huge: all of it bigger, a second shockwave, a flash in the sky and a harder slam. The detail: a tavern, a thatched cottage, a two-storey house, a well, a stream with a bridge, barrels, crates, signposts, walls, fences, a haystack, stumps, rocks, 70 grass tufts, mushrooms, steles and candles on the graves, an alchemy bench with potions, a brazier; a rocky cliff with roots round the base; window glows, fireflies, candle flicker. The idle life: a stray cat that wanders and sits, four crows hopping between perches, an owl on the mausoleum turning its head, two rats darting between barrels, a wolf on the edge howling at the moon, chimney smoke, swaying oaks, a hearse rolling round the rim with its headlights on, three faint wisps drifting. The animal files are trimmed to the clips they play, at half the keyframes (`trim_glb.py` in the scratchpad), and the credit line says so (CC BY asks to say if files were changed).
 
 ## Acceptance criteria
 - [x] Two private claude.ai pages, Midnight Brew and Bug's-Eye Garden, each linked in this ticket.
@@ -226,6 +239,26 @@ The harness now calls each world's `onAdvance(round)` after every Continue (one 
 
 The screenshots were read after the runs: the garden's ants carry the word down the tunnel with the camera riding along and leave it as a pile in the next chamber, the queen in the last; the brew's magic streaks to each part of the village in turn; Office Tower's lift and camera rise a floor together and the floor wakes; Freight Line's train runs to the next station with the camera following. Still *unverified*: claude.ai's own frame (the browser pane isn't signed in) and a real phone.
 
+### Revision 3 (2026-11-08)
+Midnight Brew: https://claude.ai/artifact/CRVWtWk9NBgnWymHzkbhiP (version 5). 65 models, 13 MB of GLBs before packing, served as three parts of 6.96, 7.92 and 1.87 MB (`models-1.json` to `models-3.json`, with `models.json` as their index), as a claude.ai page serves no text file over 16 MB (the Artifact tool's own rule, read in its description). Five animals trimmed by `trim_glb.py`: the cat 1,804 to 1,028 KB, the crow 2,870 to 1,482 KB, the owl 1,642 to 929 KB, the rat 1,328 to 838 KB, the wolf 1,418 to 884 KB. Point lights: 10 (revision 2 had 22). After the review's fixes, from the scratchpad, `WORLDS=brew PORT=8774 sh check.sh`, then the play scenario with a word at tiers 0, 1 and 3 ("tree", "refers", "rearranges"; "prepare" is tier 2), gave:
+
+```
+== brew 1920 1080 1 idle { "scenario": "idle", "stats": "60 fps · 2.5 ms draw", "errors": [] }
+== brew 390 844 3 idle { "scenario": "idle", "stats": "60 fps · 2.7 ms draw", "errors": [] }
+== brew 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 2.2 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 390 844 3 play prepare { "scenario": "play", "stats": "58 fps · 3.5 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 2.3 ms draw", "errors": [] }
+== brew 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 2.5 ms draw", "errors": [] }
+== brew 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 2.2 ms", "errors": [] }
+== brew 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 2.6 ms draw", "errors": [] }
+== brew 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 2.2 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+== brew 1280 800 1 play tree { "scenario": "play", "stats": "60 fps · 2.6 ms", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 play refers { "scenario": "play", "stats": "60 fps · 2.3 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 play rearranges { "scenario": "play", "stats": "60 fps · 1.9 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+```
+
+The screenshots were read: the slam ring of green letters over the pot (tier 1); the eruption, the shockwave ring and the camera slam (tier 3); the stray cat, the crows, the hearse with its headlights, the stream and bridge, the new buildings, on desktop and phone. Still *unverified*: claude.ai's own frame and a real phone.
+
 ## Review
 The `reviewer` agent, in a fresh context, 2026-11-07, on the ticket, the docs diff and the pages' source.
 - Blocking findings and how each was fixed:
@@ -244,3 +277,10 @@ Revision 2: the `reviewer` agent, in a fresh context, 2026-11-08, on the four wo
   1. Office Tower travelled and transformed at once: its sky, lights and city went from day to night as the lift climbed (answer 14), in unequal keyframe steps (answer 15). The sky now holds one late-afternoon look (`SKY_FIXED`, a mock value).
   2. Midnight Brew's `onAdvance` resolved on wall-clock time while its camera punch ran on stage time, 0.1 s apart, so a slow frame could start the round with the camera still moving (answer 9). The harness now waits for `stage.settled()` before every round, for all four worlds.
 - Deferred to ROADMAP "Next revision" (For M16): the pumpkin kid's doubled clip speed; the garden's bigger first step and missing in-scene tracker; Brew's round-4 step changing more than the others; the phone cost of point lights, shadows, the per-frame sky recolour and 6–10 MB downloads; the unused marble, Office Tower's fixed-step tumble and phone framing, `build.py`'s stale clips, Brew's credit wording. `setPose` keeping moves after a jump, which the review listed as non-blocking, was fixed with blocking item 2, as it is the same rule.
+
+Revision 3: the `reviewer` agent, in a fresh context, 2026-11-08, on the brew, the harness, the trimmer and the ticket.
+- Blocking findings and how each was fixed:
+  1. After a great or huge word the camera punch outlasted `onSend` by up to 1.3 s, and a round started from a jump or Play again didn't wait for it, while the brew's `onJump` never reset the camera (answer 9). The harness's Start button now waits for `stage.settled()`, and the brew's jump returns the camera to its pose, cutting any move.
+  2. The ticket's Status, Evidence and Review and the handoff weren't written yet. Written in this commit.
+- Taken out for the human's answer: the crows took off at the shockwave, a character reacting, which answer 22 left out. They now only hop on their own timer.
+- Deferred to ROADMAP "Next revision" (For M16): the second shockwave drawn without its own ring; the hearse's path through props near its circle; two crows able to share a perch; per-frame allocations in `update()`; the particle pool overflowing at huge; the trimmer's unhandled cases (morph weights, STEP samplers, sparse accessors); the tier thresholds and part size missing from Numbers.
