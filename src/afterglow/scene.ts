@@ -33,7 +33,7 @@ const {
 } = AFTERGLOW;
 
 // ---------- The art's own colours (DECISIONS.md, Styling: drawn art keeps its colours), as the mock had them ----------
-type Ink = Tier | "caught" | "timeup";
+export type Ink = Tier | "caught" | "timeup";
 // proposed, ticket 14c-5 (answers 28, 35): gold, lime, sky blue, each further from the amber street; a dud and a time-out aren't rarities, and stay ash
 export const WORD_INK: Record<Ink, string> = { common: "#ffd23c", uncommon: "#b6f23c", rare: "#6fd0ff", caught: "#d9a99c", timeup: "#d9a99c" };
 // proposed, ticket 14c-5 (answer 33): each rarity's firework, dark to near white, built on its WORD_INK at step 4. These replace EMBER on the burst, trail, blast and the sparks round the word's box.
@@ -106,21 +106,21 @@ const PART_NAMES = [
 ] as const;
 type PartName = (typeof PART_NAMES)[number];
 
-type Phase = "letter" | "open" | "ask" | "wait" | "charge" | "dud" | "climb" | "burst" | "result" | "leaving" | "descent" | "arrive" | "timeup" | "over";
+export type Phase = "letter" | "open" | "ask" | "wait" | "charge" | "dud" | "climb" | "burst" | "result" | "leaving" | "descent" | "arrive" | "timeup" | "over";
 // The way out shows while no fuse burns: on the sky result, the walk, a lantern and the ending list (answer 5).
 const WAY_OUT: ReadonlySet<Phase> = new Set(["result", "leaving", "descent", "arrive", "letter", "over"]);
 type Walk = "tiny" | "major";
 type Ending = "caught" | "timeup" | "complete";
-type Pill = { panel: HTMLCanvasElement; cord: HTMLCanvasElement; burnt: HTMLCanvasElement; cells: [number, number][]; w: number; h: number; a: number; T: number; ox: number; oy: number };
-type Fuse = Pill & { x0: number; y0: number; now: HTMLCanvasElement; nx: CanvasRenderingContext2D; r: number; done: number };
-type Burst = { tier: Tier; R: number; cx: number; cy: number; seed: number; glow: HTMLCanvasElement[]; linger: boolean; at: number };
+export type Pill = { panel: HTMLCanvasElement; cord: HTMLCanvasElement; burnt: HTMLCanvasElement; cells: [number, number][]; w: number; h: number; a: number; T: number; ox: number; oy: number };
+export type Fuse = Pill & { x0: number; y0: number; now: HTMLCanvasElement; nx: CanvasRenderingContext2D; r: number; done: number };
+export type Burst = { tier: Tier; R: number; cx: number; cy: number; seed: number; glow: HTMLCanvasElement[]; linger: boolean; at: number };
 type Flight = { sway: number; turns: number; tier: Tier; dur: number };
 // The word on its way: pending until the reply lands, then the answer; timeup for the word left in the box at the end.
-type Word = { kind: "pending" | "safe" | "caught" | "timeup"; answer: string; tier: Tier; total: number; points: number };
+export type Word = { kind: "pending" | "safe" | "caught" | "timeup"; answer: string; tier: Tier; total: number; points: number };
 type Dissolve = { c: HTMLCanvasElement; x: CanvasRenderingContext2D; px: Uint32Array; outward: boolean; out: Uint32Array; image: ImageData; step: number };
-type LetterState = "lit" | "low" | "dark";
-type LetterNow = { L: string; y: number; state: LetterState; sputter?: number; drop?: number };
-type Lantern = { sprites: Record<LetterState, HTMLCanvasElement>; w: number; h: number; rx: number; cx0: number; glow: HTMLCanvasElement; font: number };
+export type LetterState = "lit" | "low" | "dark";
+export type LetterNow = { L: string; y: number; state: LetterState; sputter?: number; drop?: number };
+export type Lantern = { sprites: Record<LetterState, HTMLCanvasElement>; w: number; h: number; rx: number; cx0: number; glow: HTMLCanvasElement; font: number };
 
 const fract = (x: number) => x - Math.floor(x);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -141,10 +141,38 @@ const ABOVE_KEYS = ["palace", "far", "near", "strings"] as const;
 // The check's way in (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6b-2, answer 45): what the mock's `__core` and
 // its page-wide variables gave check.mjs at fcc11e4. Only the test page passes one; with none, the clock runs at its own
 // speed and never stops, as for every player.
-export type Probe = { attach(core: object): void };
+export type Probe = { attach(core: Core): void };
 // A stop the check sets: the clock freezes in that phase once it is k of the way through, or t seconds in, or both.
-type Stop = { phase: Phase; k?: number; t?: number } | null;
-type Timing = { n: number; sum: number; max: number; iv: number; ivMax: number };
+export type Stop = { phase: Phase; k?: number; t?: number } | null;
+export type Timing = { n: number; sum: number; max: number; iv: number; ivMax: number };
+type Box = { x: number; y: number; w: number; h: number };
+export type LogEntry = { phase: Phase; at: number; dur: number; q: number } & Record<string, unknown>;
+// What the probe is handed: the mock's __core, then what check.mjs read from the mock's page-wide variables.
+export type Core = {
+  readonly phase: Phase; readonly t: number; readonly k: number; readonly q: number;
+  readonly view: { hud: Box; prompt: Box; sky: { x0: number; x1: number; y0: number; y1: number } };
+  log: LogEntry[]; place(): { S: number; DPR: number; AW: number; AH: number; U: number; K: number };
+  rate(x: number): void; freezeAt(f: Stop): void; thaw(): void; readonly frozen: boolean;
+  readonly letter: LetterNow | null; readonly fuse: { head: number; size: number; flies: number } | null; readonly burst: Burst | null;
+  readonly shake: { x: number; y: number }; readonly rumble: { x: number; y: number; amp: number };
+  predraw: { slices: number; ms: number; maxSlice: number; finishedEarly: number };
+  perf(): { avg: number; max: number; n: number; ivAvg: number; ivMax: number; phases: Record<string, Timing> };
+  memory(): { bytes: number; scene: boolean; next: boolean; before: boolean; held: boolean };
+  readonly rateNow: number; readonly scene: Street | null; readonly before: Street | null; readonly held: HTMLCanvasElement | null;
+  readonly camNow: number; readonly skyNow: { off: number; dx: number; deck: number }; readonly towerNow: { back: number; front: number };
+  readonly lantern: Lantern | null; readonly letterNow: LetterNow | null; readonly qStart: number; readonly answer: Word | null;
+  readonly boxPill: Pill | null; readonly fuseBox: Fuse | null;
+  run: { q: number; taken: string[]; results: Result[]; over: boolean }; runScore(): number;
+  trackerSlot(i: number): { x: number; y: number }; boxAt(): { x: number; y: number };
+  layer(w: number, h: number, read?: boolean): [HTMLCanvasElement, CanvasRenderingContext2D]; frameGate(ms: number): boolean; nextDraw: number;
+  g: CanvasRenderingContext2D; screen: HTMLCanvasElement;
+  drawSky: (x: CanvasRenderingContext2D, sc: Street, skyOff: number, dx: number) => void;
+  drawTower: (sc: Street, camY: number, floors: number) => void;
+  drawWalk: (sc: Street, camY: number, skyOff: number, dx: number, w: number, floors: number) => void;
+  draw: () => void;
+  RAMP: Record<Tier, readonly string[]>; WORD_INK: Record<Ink, string>; EMBER: readonly string[];
+  LANTERN_INK: Record<LetterState, readonly string[]>; Q_SECONDS: number; QUESTIONS: number;
+};
 
 // Starts the scene in root, the page's Afterglow layer, where start says, and returns its stop. fontFamily: the family
 // next/font gave Handjet, loaded before the text is measured. Everything it draws or writes is inside root.
@@ -494,7 +522,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // At zero the server is asked whether time is up; until it says, the fuse stays out and the box takes nothing.
   let expiring = false;
   // Every phase as it starts, with what the check reads of it (the mock's phase log).
-  const phaseLog: ({ phase: Phase; at: number; dur: number; q: number } & Record<string, unknown>)[] = [];
+  const phaseLog: LogEntry[] = [];
   function go(p: Phase, dur = 0, info?: Record<string, unknown>) {
     phase = p; phaseAt = clockT; phaseDur = dur;
     phaseLog.push({ phase: p, at: +clockT.toFixed(3), dur, q: run.q, ...info });
@@ -1331,7 +1359,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     get drawWalk() { return drawWalk; }, set drawWalk(v: typeof drawWalk) { drawWalk = v; },
     get draw() { return draw; }, set draw(v: typeof draw) { draw = v; },
     RAMP, WORD_INK, EMBER, LANTERN_INK, Q_SECONDS, QUESTIONS,
-  });
+  } satisfies Core);
 
   // ---------- Where the run picks up ----------
   $<HTMLButtonElement>("submit").textContent = WORDS.submit;

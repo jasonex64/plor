@@ -156,6 +156,15 @@
   white-space: nowrap;
 }
 
+/* The game's buttons are the mock's, flat on the art: not the app's (src/app/globals.css, Buttons), whose hard shadow, in
+   the app's ink, isn't in the game's colours, and whose lift and press the mock never had. Found by the look check's
+   "every pixel plum to amber" (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6b-2a). .go's ring is its own
+   box-shadow, untouched. */
+:is(.afterglow, .howto) button {
+  --shadow-button: none;
+  transform: none;
+}
+
 .afterglow :is(button, input):focus-visible {
   outline: var(--u) solid var(--ink);
   outline-offset: var(--u);
