@@ -7,7 +7,7 @@
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import { GAME } from "@/platform/game";
 import { useBodyFlag } from "@/app/body-flag";
-import { startScene, type Io, type Start } from "./scene";
+import { startScene, type Io, type Probe, type Start } from "./scene";
 import styles from "./afterglow.module.css";
 import { handjet } from "./font";
 
@@ -70,12 +70,13 @@ const Stage = memo(function Stage({ out }: { out: string }) {
 // start: where the run picks up, read when the scene starts, again each time the page shows it (a page Next.js keeps
 // hidden stops its effects). io: what the scene's moves do, the latest each time. notices: the page's own lines over the
 // scene, such as an error, the past-midnight note and a test run's label. out: where the × goes, as screen readers hear it.
-export function Afterglow({ start, io, notices, out }: { start: () => Start; io: Io; notices: ReactNode; out: string }) {
+// probe: the check's way in, passed only by the test page at /check/afterglow (14c-6b-2, answer 45).
+export function Afterglow({ start, io, notices, out, probe }: { start: () => Start; io: Io; notices: ReactNode; out: string; probe?: Probe }) {
   useBodyFlag("game", true);
   const root = useRef<HTMLDivElement>(null);
-  const latest = useRef({ start, io });
+  const latest = useRef({ start, io, probe });
   useEffect(() => {
-    latest.current = { start, io };
+    latest.current = { start, io, probe };
   });
   useEffect(() => {
     const now = () => latest.current.io;
@@ -86,7 +87,7 @@ export function Afterglow({ start, io, notices, out }: { start: () => Start; io:
       seeResults: () => now().seeResults(),
       leave: () => now().leave(),
       fault: (err) => now().fault(err),
-    });
+    }, latest.current.probe);
   }, []);
   return (
     <div ref={root} className={`${styles.afterglow} ${handjet.variable}`}>
