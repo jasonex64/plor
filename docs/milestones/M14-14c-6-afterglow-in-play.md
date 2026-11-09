@@ -17,7 +17,7 @@ Play the real game, every day's run, as Afterglow, the firework festival approve
 - Next.js (SOURCES.md, App Router) and the bundled docs in `node_modules/next/dist/docs/` (AGENTS.md), for the route's rename. To read before building.
 - Playwright (SOURCES.md), for the game's check moved into `e2e/`. **For 6b-2, in SOURCES.md (answer 55):** test projects (https://playwright.dev/docs/test-projects), tags (https://playwright.dev/docs/test-annotations), soft assertions (https://playwright.dev/docs/test-assertions), modifying responses (https://playwright.dev/docs/network), and the Chrome channel (https://playwright.dev/docs/browsers), all for @playwright/test 1.64.1; and Next.js's environment variables guide (`node_modules/next/dist/docs/01-app/02-guides/environment-variables.md`, read 2026-11-09), for `NODE_ENV` under `next dev` and `next build`.
 - MDN, `prefers-reduced-motion` (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion), for the calm version (answer 18). It covers the setting and its `reduce` value, not reading it from script.
-- **Gap, for 14c-6c:** reading the setting from script needs `Window.matchMedia`, which neither that page nor SOURCES.md covers. Ask the human before 6c.
+- **Gap, for 14c-6c:** reading the setting from script needs `Window.matchMedia`, which neither that page nor SOURCES.md covers. Ask the human before 6c. Since 2026-11-08 SOURCES.md has MDN `Window.matchMedia()` (added for M16 16g-2), which 6c can cite.
 - MDN `<dialog>` (SOURCES.md), for How to play's panel (14c-6d), as the settings sheet uses it.
 - WAI-ARIA APG Carousel pattern (SOURCES.md, added at answer 42), for How to play's chunks: "Terms", "WAI-ARIA Roles, States, and Properties", "Keyboard Interaction".
 
