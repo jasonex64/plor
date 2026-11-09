@@ -100,7 +100,7 @@ for (const [size, opts] of SIZES) {
     const f = await p.evaluate(() => __core.perf()), pre = await p.evaluate(() => __core.predraw), mem = await p.evaluate(() => window.__mem);
     (realChrome() ? (n: string, d: string) => say(size, n, f.avg < 16.7 && 1000 / f.ivAvg >= FPS_FLOOR, d) : (n: string, d: string) => note(size, n, d))("60 fps, whole run", `script ${f.avg.toFixed(2)} ms avg, ${f.max.toFixed(1)} ms worst; frame interval ${f.ivAvg.toFixed(2)} ms avg (${(1000 / f.ivAvg).toFixed(1)} fps), ${f.ivMax.toFixed(1)} ms worst; ${f.n} frames`);
     for (const [k, v] of Object.entries(f.phases)) console.log(`     ${size} ${k.padEnd(8)} script ${(v.sum / v.n).toFixed(2)} ms avg ${v.max.toFixed(1)} worst, interval ${(v.iv / v.n).toFixed(2)} avg ${v.ivMax.toFixed(1)} worst, ${v.n} frames`);
-    say(size, "pre-draw never stalls a frame", pre.maxSlice < HITCH_LIMIT && pre.finishedEarly === 0, `${pre.slices} slices, ${pre.ms.toFixed(0)} ms in all, worst ${pre.maxSlice.toFixed(1)} ms; finished early ${pre.finishedEarly} times`);
+    say(size, "pre-draw never stalls a frame", pre.maxSlice < HITCH_LIMIT && pre.finishedEarly === 0, `${pre.slices} slices, ${pre.ms.toFixed(0)} ms in all, worst ${pre.maxSlice.toFixed(1)} ms; finished early ${pre.finishedEarly} times; slowest step ${pre.maxStep.toFixed(1)} ms, ${pre.where}`);
     say(size, "memory bounded: two scenes at most", mem.most <= 2, `at most ${mem.most} scenes, ${(mem.max / 1048576).toFixed(1)} MB in canvases at the peak`);
     await c.close();
     // The same moments again, this time paying for raster inside the frame. The mock played again; here a new page.
@@ -552,12 +552,15 @@ for (const [size, opts] of SIZES) {
         say(size, "taken letter leaves a composition cleanly", typed === "lemon", typed);
         await p.fill(A, ""); await p.focus(A); await p.keyboard.type("pear");
         say(size, "taken letter refused on the keyboard", (await p.inputValue(A)) === "ear", await p.inputValue(A));
-        // Added (answer 56): off-list text shakes the box as a refused taken letter does (answer 28), in the same steps.
+        // Added (answer 56): off-list text shakes the box as a refused taken letter does (answer 28), in the same steps. Every
+        // step the box is set to, from Enter on: read per frame, a shake still running from the "pear" above blurred into it.
         await p.fill(A, "wolfe");
-        const shook = p.evaluate(async () => { const a = __part("answer"), U = __core.place().U, seen: number[] = []; for (let n = 0; n < 30; n++) { seen.push(+(new DOMMatrixReadOnly(getComputedStyle(a).transform).e / U).toFixed(3)); await new Promise((f) => requestAnimationFrame(f)); } return seen; });
+        await p.waitForTimeout(AFTERGLOW.REFUSE_STEP_MS * AFTERGLOW.REFUSE_STEPS.length);   // "pear"'s shake done
+        await p.evaluate(() => { const a = __part("answer"), U = __core.place().U; window.__steps = []; new MutationObserver(() => window.__steps.push(+(new DOMMatrixReadOnly(a.style.transform).e / U).toFixed(3))).observe(a, { attributeFilter: ["style"] }); });
         await p.press(A, "Enter");
-        const off = await shook, line = await p.textContent('[data-part="note"]');
-        say(size, "off-list text shakes the box, in whole art pixels, as a taken letter does", AFTERGLOW.REFUSE_STEPS.every((s) => off.includes(s)) && off.every((v) => Number.isInteger(v)) && line === `"wolfe" isn't in our list. Try another answer.` && (await p.inputValue(A)) === "wolfe", `steps ${[...new Set(off)].join(",")}; ${line}`);
+        const stepped = await p.waitForFunction((n) => window.__steps.length >= n, AFTERGLOW.REFUSE_STEPS.length, { timeout: 5000 }).then(() => true, () => false);
+        const off = await p.evaluate(() => window.__steps), line = await p.textContent('[data-part="note"]');
+        say(size, "off-list text shakes the box, in whole art pixels, as a taken letter does", stepped && off.join() === AFTERGLOW.REFUSE_STEPS.join() && line === `"wolfe" isn't in our list. Try another answer.` && (await p.inputValue(A)) === "wolfe", `steps ${off.join(",")}; ${line}`);
         endsErrs.push(...errs);
         say(size, "no console errors in the ends", !endsErrs.length, endsErrs.slice(0, 2).join(" | "));
         await c.close();

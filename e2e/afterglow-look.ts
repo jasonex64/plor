@@ -28,6 +28,7 @@ declare global {
   var __camMax: number;
   var __band0: number | null;
   var __bandOk: boolean;
+  var __steps: number[];
   var __decode: (b64: string) => Promise<{ w: number; h: number; d: Uint8ClampedArray }>;
   var __hueOf: (r: number, g: number, b: number) => number | null;
 }

@@ -155,7 +155,7 @@ export type Core = {
   rate(x: number): void; freezeAt(f: Stop): void; thaw(): void; readonly frozen: boolean;
   readonly letter: LetterNow | null; readonly fuse: { head: number; size: number; flies: number } | null; readonly burst: Burst | null;
   readonly shake: { x: number; y: number }; readonly rumble: { x: number; y: number; amp: number };
-  predraw: { slices: number; ms: number; maxSlice: number; finishedEarly: number };
+  predraw: { slices: number; ms: number; maxSlice: number; finishedEarly: number; maxStep: number; where: string };
   perf(): { avg: number; max: number; n: number; ivAvg: number; ivMax: number; phases: Record<string, Timing> };
   memory(): { bytes: number; scene: boolean; next: boolean; before: boolean; held: boolean };
   readonly rateNow: number; readonly scene: Street | null; readonly before: Street | null; readonly held: HTMLCanvasElement | null;
@@ -263,7 +263,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // stage's camera with this stage's lights, what you see walking there: it keeps its separate layers for the zoom, and the other two flatten theirs.
   let scene: Street | null = null, next: Street | null = null, before: Street | null = null, held: HTMLCanvasElement | null = null;
   type Want = { stage: number; cam: number; keepLayers: boolean; take: (s: Street) => void };
-  let job: (Want & { it: Generator<undefined, Street, undefined> }) | null = null;
+  let job: (Want & { it: Generator<undefined, Street, undefined>; n: number }) | null = null;
   const waiting: Want[] = [];
   function settle(sc: Street, keepLayers: boolean) {
     if (!keepLayers) {
@@ -277,16 +277,18 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   }
   function want(stage: number, cam: number, keepLayers: boolean, take: (s: Street) => void) { waiting.push({ stage, cam, keepLayers, take }); }
   // What the pre-draw cost, for the check's "pre-draw never stalls a frame" (14c-5 answer 42), as the mock counted it.
-  const predraw = { slices: 0, ms: 0, maxSlice: 0, finishedEarly: 0 };
+  // The slowest single step, and which: a step can't be cut, so it is what a slice can't keep under its budget.
+  const predraw = { slices: 0, ms: 0, maxSlice: 0, finishedEarly: 0, maxStep: 0, where: "" };
   function pump(budget: number) {
     const t0 = performance.now();
     for (;;) {
       if (!job) {
         const w = waiting.shift();
         if (!w) break;
-        job = { ...w, it: sceneSteps(AW, AH, w.stage, w.cam) };
+        job = { ...w, it: sceneSteps(AW, AH, w.stage, w.cam), n: 0 };
       }
-      const s = job.it.next();
+      const s0 = performance.now(), s = job.it.next(), step = performance.now() - s0;
+      job.n++; if (step > predraw.maxStep) { predraw.maxStep = step; predraw.where = `stage ${job.stage}, step ${job.n}`; }
       if (s.done) { const j = job; job = null; j.take(settle(s.value, j.keepLayers)); }
       if (performance.now() - t0 >= budget) break;
     }
@@ -682,6 +684,10 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     makeBoxPill();
     const box = answerBox.getBoundingClientRect();
     WORD.from = { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+    // At the box now, where the wait's first frame puts it: the charge starts from where the word is, and a reply that
+    // lands before that frame would otherwise start it from the last word's place, the top left on Q1 (found by the
+    // look check's dud line, 14c-6b-2a).
+    placeWord(WORD.from.x, WORD.from.y);
     $("ask").hidden = true; $("ask").style.transform = ""; shake = { x: 0, y: 0 };
     answerBox.blur();
     note(null);

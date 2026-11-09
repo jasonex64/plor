@@ -122,6 +122,10 @@ Round 18 (2026-11-09, from the CI set's first run: 40 of its 42 lines passed, th
 57. Dev badge: "Hide it in the check (Recommended)". Next's dev-tools badge, which only `next dev` draws, is hidden on the check's pages before it looks; the colour line had caught its white and greys.
 58. CSS warning: "Pass over that one (Recommended)". The check ignores, by its text, the warning Next's dev build gives on every page (/about and /privacy too) for a preloaded stylesheet it doesn't use; any other warning or error still fails. The warning goes in ROADMAP for the app.
 
+Round 19 (2026-11-09, from the full set's two runs in real Chrome: 217 and then 219 of 222 lines)
+59. Pre-draw: "Split now, in 6b-2a (Recommended)". Answer 42 of 14c-5 put the split in the game's build and 6b-1 didn't do it: no step of the pre-draw longer than the slice's own budget (`PREDRAW_SLICE_MS`, 4 ms), the street's output checked byte for byte against today's.
+60. Lettering: "Look into it first (Recommended)". Why real Chrome draws the phone's Q6 word 2 pixels differently at mid-climb (11,736 against 11,738, as the mock did in 14c-5), then a fix or what was found.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -316,6 +320,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 | `offGridBlocks` | Not carried | Defined in the mock and never called |
 | `game-check.json`, `game-colours.json`, `themes/dist/game-shots/` | The lines in Playwright's report and output; `<size>-colours.json` and the frames and strips in each test's `test-results/…/shots/` | Answer 53 |
 | — | The game's and How to play's buttons drop the app's hard shadow, lift and press (`afterglow.module.css`) | The colour line caught the ×'s shadow in the app's ink, `#1a1a18`, which isn't the game's; the mock's buttons are flat (14c-5) |
+| — | Light it places the word at the box as the wait starts (`scene.ts`, `startWait`) | 6b-1 started the charge from where the wait left the word, which a reply landing before the wait's first frame left at the last word's place: the dud line caught Q1's word flying in from the top left. The mock had no wait (answer 16) |
 
 ## Evidence
 **14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
