@@ -4,7 +4,7 @@
 // page (docs/milestones/M14-14a-1-shell.md), kept across navigations so a tab switch swaps only the page's own section
 // (docs/milestones/M14-14b-6-feel-and-polish.md, design 1; Next.js, "Preserving UI state"). Each page wraps its section
 // in Signed: sign-in, then picking a username, then the section: Today (Offbeat's banner and the feed), Friends, Groups
-// or Me; Offbeat's game screen and How to play (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak,
+// or Me; Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak,
 // docs/milestones/M14-14b-2a-streak-ranks.md); the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
 // or, on an invite link (/i/<code>), the friend request; on a group's link (/g/<code>), joining it; on a group's page
 // (/groups/<id>), the group. Every step goes through the API; errors are shown to the player and never retried
@@ -235,7 +235,7 @@ function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shel
     <>
       {shell}
       {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
-      {path !== GAME.path && <ClockBar up={path.startsWith(`${GAME.path}/`)} onTimeUp={timeUp} />}
+      {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
       {streakError && <p role="alert">{streakError}</p>}
       {feedBeside(path, lost) && feedColumn && <FriendsFeed username={player.username} name={nameOf(player)} timeUps={timeUps} />}
     </>
