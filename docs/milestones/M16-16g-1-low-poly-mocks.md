@@ -107,6 +107,7 @@ Round 7
 26. The last round: "if there's a finale, it should be very short no need to have a button to get there it should be automatica".
 27. A time-up: "Yes, it still casts (Recommended)".
 28. The light: "Warm village glow,Brew-coloured wash,Brighter moonlight". Not picked: a sky glow.
+29. The finale's light column under the end card: "Keep it lit" (asked after the review of revision 4). It stays lit until a jump or Play again.
 
 **As built:** after a word or a time-up the result card shows at once, its button reading "Casting the spell…" and disabled while the next part of the village changes; then it reads "Next question" and only starts the next round. After round 7 the finale (a column of light and a burst, about 1.4 s) plays straight away and the end card follows. The light builds in six equal steps, a sixth after each of rounds 1 to 6, so round 1 starts dark and round 7 at full (set instantly on a jump): windows light up one by one and glow bigger, candles brighten, the lanterns get stronger, a wash of the brew's colour from above the cauldron grows over the whole village, and the moonlight and ambient light brighten.
 
