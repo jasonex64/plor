@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merged on green CI at the human's "Merge when green"); 6b-2, the check, designed from answers 44 to 56 (Design, "The checks") and approved ("Approve, start 6b-2a (Recommended)"): 6b-2a, the look check, done (Evidence, Review; PR #172, merged on green CI at the human's "Merge when green"); next 6b-2b, the mutants, its details settled with the human first. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merged on green CI at the human's "Merge when green"); 6b-2, the check, designed from answers 44 to 56 (Design, "The checks") and approved ("Approve, start 6b-2a (Recommended)"): 6b-2a, the look check, done (Evidence, Review; PR #172, merged on green CI at the human's "Merge when green"); next 6b-2b, the mutants, designed from answers 61 to 66 (Design, "The checks"), waiting for approval. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -126,6 +126,16 @@ Round 19 (2026-11-09, from the full set's two runs in real Chrome: 217 and then 
 59. Pre-draw: "Split now, in 6b-2a (Recommended)". Answer 42 of 14c-5 put the split in the game's build and 6b-1 didn't do it: no step of the pre-draw longer than the slice's own budget (`PREDRAW_SLICE_MS`, 4 ms), the street's output checked byte for byte against today's.
 60. Lettering: "Look into it first (Recommended)". Why real Chrome draws the phone's Q6 word 2 pixels differently at mid-climb (11,736 against 11,738, as the mock did in 14c-5), then a fix or what was found.
 
+Round 20 (2026-11-09, starting 6b-2b, after PR #172 merged)
+61. New mutants: "New line and bugs (Recommended)". Beyond the carried 83, one mutant for the off-list line (answer 56) and one for each bug 6b-2a's check found: the buttons' app shadow, the word charging from the last word's place, the pre-draw stall, the word's own GPU layer, and the font's NetworkError.
+62. Per mutant: "Both sizes, as the mock (Recommended)". Each mutant runs the whole check at both sizes, as `mutants.mjs` did; 83 took about 3 hours, four at a time, in 14c-5 (the real game's time unmeasured).
+63. Sharing the PC: "Own server, own port (Recommended)". The mutants start their own dev server on their own port and need no database, so game 2's session keeps port 3000 and the local stack.
+64. Load misses: "Fix the stall, then re-run (Recommended)". A mutant missed because the run ended early is a check bug: why it ended is found and fixed in 6b-2b (answer 52), then that mutant re-runs.
+
+Round 21
+65. Port: "3001 (Recommended)".
+66. The stall mutant: "Run alone, with the fps test (Recommended)". The pre-draw stall is caught only by `pre-draw never stalls a frame`, in the fps test the four-at-once runs skip, so after the batch that one mutant runs by itself with the fps test.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -180,7 +190,11 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - **The lines** (answer 46): each of `check.mjs`'s named lines is a named check, a soft assertion so one failure doesn't hide the rest, carried as written. The ones about what the game dropped are rewritten to the game's version where it has one (play again becomes See results), or dropped with the reason in Source diff (the skip link, New show).
 - **The short set** (answers 47, 50): one scripted run at the phone size, 390×844 at device pixel ratio 3 (the mock's), with that flow's lines, among them those answer 47 lists, runs in CI's `e2e` job with the rest of `npm run test:e2e`. Its time is measured and recorded against "a few minutes" (answer 15).
 - **The full set:** both sizes, the fps run, the flights, the ends and the minute of glitter, by hand through `npm run check:afterglow`, in real Chrome (14c-5 answer 41), as its own Playwright project that `npm run test:e2e` leaves out. Its frames and strips go to `test-results/` (answer 53).
-- **The mutants (6b-2b, answers 48, 51):** the 83 from `mutants.mjs` at `fcc11e4`, each rewritten for the game's compiled code, run by hand through `npm run check:afterglow-mutants`, four at a time. The check intercepts the dev server's response for the scene's code and serves a broken copy (Playwright, network: modify responses), so no file on disk changes; a break that no longer matches stops the script. 6b-2b's details are settled before it starts.
+- **The mutants (6b-2b, answers 48, 51, 61 to 66),** proof that the full check can fail, run by hand through `npm run check:afterglow-mutants [name pattern]` (`scripts/afterglow-mutants.ts`, DECISIONS.md, Task runner):
+  - **The list,** `e2e/afterglow-mutants.ts`: each mutant has a name, its breaks (a text in the dev server's compiled code and what replaces it), the pattern its own lines' names match, and how many of them must fail (1, or 9 for the combination of the reviewer's eleven, as `mutants.mjs`). The 83 of `mutants.mjs` at `fcc11e4`, each rewritten for the game's compiled code; those whose lines were dropped (the skip link, New show) go, each in Source diff. Added (answer 61): one for the off-list line, and one each for the five bugs 6b-2a found.
+  - **A broken copy** (answer 48): with `AFTERGLOW_MUTANT` naming a mutant, the check's pages route the compiled chunks the dev server sends (`/_next/static/chunks/`, scripts and stylesheets) through its breaks (Playwright, network: modify responses), so no file on disk changes. Each break must match exactly once in what the page loaded; none, or more than one, fails the run with the mutant's name and the text.
+  - **Before any mutant runs,** the script loads the test page once and checks every chosen mutant's breaks match exactly once, so a compiler update stops it at the start, not hours in.
+  - **The run:** its own `next dev` on port 3001 with no database (answers 63, 65), stopped at the end; four mutants at once, each the whole check at both sizes in real Chrome without the fps test (answers 48, 62); then the pre-draw stall's mutant alone with the fps test (answer 66). A mutant is caught when at least its number of its own lines fail, as `mutants.mjs` judged. A run that ends early (a wait runs out) is reported as stalled, neither caught nor missed: a check bug, fixed in 6b-2b and the mutant re-run (answer 64). One line per mutant (caught, MISSED or STALLED, with its failing lines), its test output removed after it, and a last line with the count; the script fails unless every mutant is caught.
 
 ## Acceptance criteria
 - [x] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
@@ -197,7 +211,11 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - [x] 6b-2a: every named line of `check.mjs` at `fcc11e4` is a named check in `e2e/`, or is in Source diff as rewritten or dropped, with its reason.
 - [x] 6b-2a: the short check runs in CI's `e2e` job on the PR and passes, its time recorded.
 - [x] 6b-2a: the full check passes by hand in real Chrome, its fps lines at 59 or more (14c-5 answer 41) and `pre-draw never stalls a frame` among them, and leaves its frames and strips in `test-results/`.
-- [ ] 6b-2b: the mutants carried from 14c-5 are each caught by the full check, with no file on disk changed; any not carried are in Source diff with their reason.
+- [ ] 6b-2b: in one run of `npm run check:afterglow-mutants`, every mutant (those carried from 14c-5, the off-list line's and the five bugs') is caught, the stall's in its solo run with the fps test; none missed, none stalled; its time recorded.
+- [ ] 6b-2b: no file on disk changes during the run (`git status` and the hashes of `src/` the same before and after), and the run leaves no server or test output behind.
+- [ ] 6b-2b: a break that no longer matches stops the script before any mutant runs, naming the mutant and the text (shown with one changed on purpose).
+- [ ] 6b-2b: the run uses its own server on port 3001, with whatever holds port 3000 untouched.
+- [ ] 6b-2b: every mutant of `mutants.mjs` at `fcc11e4` not carried is in Source diff with its reason.
 - [x] `docs/DESIGN.md` describes `/afterglow` as built.
 
 14c-6d, How to play:
@@ -228,6 +246,8 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | Every constant in `check.mjs` at `fcc11e4` (`EDGE_RUN` 40, `ARC`, `DOWN`, `FAST` 3, `LINGER_S` 62, `HITCH_LIMIT` 16.7 ms, `AGES`, `V5`, the scripted `RUN`) | The check (6b-2a) | Carried unchanged with the origin each has there (14c-5) |
 | 1920×1080 at device pixel ratio 1, 390×844 at 3 | The check's two sizes; the short set uses the second (answer 47) | `SIZES` in `check.mjs` at `fcc11e4` |
 | 4 mutants at once | 6b-2b | `mutants.mjs` at `fcc11e4` ("eight made the PC unusable"), answer 48 |
+| Port 3001 | 6b-2b, the mutants' own dev server | Answers 63, 65 |
+| 1 of a mutant's own lines failing, 9 for the combination | 6b-2b, caught | `mutants.mjs` at `fcc11e4` (`need`) |
 | 4 chunks | How to play | Answer 38 |
 | The panel's width and type scale | How to play | The question box's: `AFTERGLOW.PROMPT_W` at the scene's type scale (14c-5), so the panel matches the box |
 | 24 px | How to play's buttons, at least, each way | WCAG 2.2 2.5.8, as the game's × |
@@ -242,7 +262,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
    - **6b-1, the game plays.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, coming back to the cards, test runs and the pre-draw split, with browser tests for the rules, and DESIGN.md for the new screen (CLAUDE.md, Docs): every acceptance criterion but the two on the check and the mutants.
    - **6b-2, the check,** in two PRs (answer 52). Until 6b-2a merges the look is checked by the human's eye, not by machine.
      - **6b-2a:** the test page, the probe, `check.mjs`'s lines in `e2e/`, the short set in CI and the full set by `npm run check:afterglow`; the 6b-2a criteria.
-     - **6b-2b:** the mutants by `npm run check:afterglow-mutants`, and any check fixes they force; the 6b-2b criterion.
+     - **6b-2b:** the mutants by `npm run check:afterglow-mutants`, and any check fixes they force; the 6b-2b criteria. In order: the route and the match check on two mutants; the script with its server on 3001; every mutant rewritten, its breaks matched; one mutant run by name to measure a mutant's time; the whole run, then the fixes it forces and the re-runs; review.
 3. **14c-6d, How to play** (answers 30 to 40), before 6b-2 (answer 37): the panel, its two buttons, the four chunks, the old page removed.
 4. **14c-6c, the calm version** for Reduce motion.
 
@@ -254,6 +274,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx` and its `.how` CSS in `offbeat.module.css`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
 - 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
 - 6b-2a removed: the mock's lines on the skip link and New show (Source diff); the game's buttons' inherited app shadow, lift and press; ROADMAP's "Nothing checks that off-list text shakes the box", closed by the added line (answer 56). Nothing in `e2e/afterglow.e2e.ts`: it plays the game against the server (the rules, reloads, Next's timing), and its one overlap with the look check, each rarity's colour, is in the full set only, so CI would lose it. `check.mjs` and `mutants.mjs` stay in RIFF-mocks until the human retires `themes/festival/`.
+- 6b-2b removes: in this repo, nothing; it adds the mutants the check never had. Once it merges, `mutants.mjs` has no use left, so RIFF-mocks' `themes/festival/` is the human's to retire.
 
 ---
 *Fill in the sections below at the end.*
