@@ -9,8 +9,8 @@
 //   Game 1: Timer); the box shows no time until the reply.
 // - The fuse burns from the database's time left; at zero the server is asked, and decides (DECISIONS.md, Game 1).
 // - A way out, the ×, shows only while no fuse burns (answers 5, 22).
-// Gone with the mock's rules: its questions, play again, the Preview bar and the counters only its check read (14c-6b-2
-// brings back what the check needs).
+// Gone with the mock's rules: its questions, play again and the Preview bar. Its check's hooks are back as an optional
+// probe, which only the test page at /check/afterglow passes (14c-6b-2, answer 45).
 // Every motion is a function of the game clock and seeded indices, so nothing accumulates and a frame can be drawn from
 // the clock alone.
 import { AFTERGLOW, POINTS_PER_QUESTION, RARITY_BONUS_FRACTION } from "@/config/tunables";
@@ -33,7 +33,7 @@ const {
 } = AFTERGLOW;
 
 // ---------- The art's own colours (DECISIONS.md, Styling: drawn art keeps its colours), as the mock had them ----------
-type Ink = Tier | "caught" | "timeup";
+export type Ink = Tier | "caught" | "timeup";
 // proposed, ticket 14c-5 (answers 28, 35): gold, lime, sky blue, each further from the amber street; a dud and a time-out aren't rarities, and stay ash
 export const WORD_INK: Record<Ink, string> = { common: "#ffd23c", uncommon: "#b6f23c", rare: "#6fd0ff", caught: "#d9a99c", timeup: "#d9a99c" };
 // proposed, ticket 14c-5 (answer 33): each rarity's firework, dark to near white, built on its WORD_INK at step 4. These replace EMBER on the burst, trail, blast and the sparks round the word's box.
@@ -106,21 +106,21 @@ const PART_NAMES = [
 ] as const;
 type PartName = (typeof PART_NAMES)[number];
 
-type Phase = "letter" | "open" | "ask" | "wait" | "charge" | "dud" | "climb" | "burst" | "result" | "leaving" | "descent" | "arrive" | "timeup" | "over";
+export type Phase = "letter" | "open" | "ask" | "wait" | "charge" | "dud" | "climb" | "burst" | "result" | "leaving" | "descent" | "arrive" | "timeup" | "over";
 // The way out shows while no fuse burns: on the sky result, the walk, a lantern and the ending list (answer 5).
 const WAY_OUT: ReadonlySet<Phase> = new Set(["result", "leaving", "descent", "arrive", "letter", "over"]);
 type Walk = "tiny" | "major";
 type Ending = "caught" | "timeup" | "complete";
-type Pill = { panel: HTMLCanvasElement; cord: HTMLCanvasElement; burnt: HTMLCanvasElement; cells: [number, number][]; w: number; h: number; a: number; T: number; ox: number; oy: number };
-type Fuse = Pill & { x0: number; y0: number; now: HTMLCanvasElement; nx: CanvasRenderingContext2D; r: number; done: number };
-type Burst = { tier: Tier; R: number; cx: number; cy: number; seed: number; glow: HTMLCanvasElement[]; linger: boolean; at: number };
+export type Pill = { panel: HTMLCanvasElement; cord: HTMLCanvasElement; burnt: HTMLCanvasElement; cells: [number, number][]; w: number; h: number; a: number; T: number; ox: number; oy: number };
+export type Fuse = Pill & { x0: number; y0: number; now: HTMLCanvasElement; nx: CanvasRenderingContext2D; r: number; done: number };
+export type Burst = { tier: Tier; R: number; cx: number; cy: number; seed: number; glow: HTMLCanvasElement[]; linger: boolean; at: number };
 type Flight = { sway: number; turns: number; tier: Tier; dur: number };
 // The word on its way: pending until the reply lands, then the answer; timeup for the word left in the box at the end.
-type Word = { kind: "pending" | "safe" | "caught" | "timeup"; answer: string; tier: Tier; total: number; points: number };
+export type Word = { kind: "pending" | "safe" | "caught" | "timeup"; answer: string; tier: Tier; total: number; points: number };
 type Dissolve = { c: HTMLCanvasElement; x: CanvasRenderingContext2D; px: Uint32Array; outward: boolean; out: Uint32Array; image: ImageData; step: number };
-type LetterState = "lit" | "low" | "dark";
-type LetterNow = { L: string; y: number; state: LetterState; sputter?: number; drop?: number };
-type Lantern = { sprites: Record<LetterState, HTMLCanvasElement>; w: number; h: number; rx: number; cx0: number; glow: HTMLCanvasElement; font: number };
+export type LetterState = "lit" | "low" | "dark";
+export type LetterNow = { L: string; y: number; state: LetterState; sputter?: number; drop?: number };
+export type Lantern = { sprites: Record<LetterState, HTMLCanvasElement>; w: number; h: number; rx: number; cx0: number; glow: HTMLCanvasElement; font: number };
 
 const fract = (x: number) => x - Math.floor(x);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -138,9 +138,45 @@ const FRAME_KEYS = ["street", "palace", "far", "near", "strings"] as const;
 export const typeScale = () => Math.min(3, innerHeight / 375, innerWidth / 195);
 const ABOVE_KEYS = ["palace", "far", "near", "strings"] as const;
 
+// The check's way in (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6b-2, answer 45): what the mock's `__core` and
+// its page-wide variables gave check.mjs at fcc11e4. Only the test page passes one; with none, the clock runs at its own
+// speed and never stops, as for every player.
+export type Probe = { attach(core: Core): void };
+// A stop the check sets: the clock freezes in that phase once it is k of the way through, or t seconds in, or both.
+export type Stop = { phase: Phase; k?: number; t?: number } | null;
+export type Timing = { n: number; sum: number; max: number; iv: number; ivMax: number };
+type Box = { x: number; y: number; w: number; h: number };
+export type LogEntry = { phase: Phase; at: number; dur: number; q: number } & Record<string, unknown>;
+// What the probe is handed: the mock's __core, then what check.mjs read from the mock's page-wide variables.
+export type Core = {
+  readonly phase: Phase; readonly t: number; readonly k: number; readonly q: number;
+  readonly view: { hud: Box; prompt: Box; sky: { x0: number; x1: number; y0: number; y1: number } };
+  log: LogEntry[]; place(): { S: number; DPR: number; AW: number; AH: number; U: number; K: number };
+  rate(x: number): void; freezeAt(f: Stop): void; thaw(): void; readonly frozen: boolean;
+  readonly letter: LetterNow | null; readonly fuse: { head: number; size: number; flies: number } | null; readonly burst: Burst | null;
+  readonly shake: { x: number; y: number }; readonly rumble: { x: number; y: number; amp: number };
+  predraw: { slices: number; ms: number; maxSlice: number; finishedEarly: number; maxStep: number; where: string };
+  perf(): { avg: number; max: number; n: number; ivAvg: number; ivMax: number; phases: Record<string, Timing> };
+  memory(): { bytes: number; scene: boolean; next: boolean; before: boolean; held: boolean };
+  readonly rateNow: number; readonly scene: Street | null; readonly before: Street | null; readonly held: HTMLCanvasElement | null;
+  readonly camNow: number; readonly skyNow: { off: number; dx: number; deck: number }; readonly towerNow: { back: number; front: number };
+  readonly lantern: Lantern | null; readonly letterNow: LetterNow | null; readonly qStart: number; readonly answer: Word | null;
+  readonly boxPill: Pill | null; readonly fuseBox: Fuse | null;
+  run: { q: number; taken: string[]; results: Result[]; over: boolean }; runScore(): number;
+  trackerSlot(i: number): { x: number; y: number }; boxAt(): { x: number; y: number };
+  layer(w: number, h: number, read?: boolean): [HTMLCanvasElement, CanvasRenderingContext2D]; frameGate(ms: number): boolean; nextDraw: number;
+  g: CanvasRenderingContext2D; screen: HTMLCanvasElement;
+  drawSky: (x: CanvasRenderingContext2D, sc: Street, skyOff: number, dx: number) => void;
+  drawTower: (sc: Street, camY: number, floors: number) => void;
+  drawWalk: (sc: Street, camY: number, skyOff: number, dx: number, w: number, floors: number) => void;
+  draw: () => void;
+  RAMP: Record<Tier, readonly string[]>; WORD_INK: Record<Ink, string>; EMBER: readonly string[];
+  LANTERN_INK: Record<LetterState, readonly string[]>; Q_SECONDS: number; QUESTIONS: number;
+};
+
 // Starts the scene in root, the page's Afterglow layer, where start says, and returns its stop. fontFamily: the family
 // next/font gave Handjet, loaded before the text is measured. Everything it draws or writes is inside root.
-export function startScene(root: HTMLElement, fontFamily: string, start: Start, io: Io): () => void {
+export function startScene(root: HTMLElement, fontFamily: string, start: Start, io: Io, probe?: Probe): () => void {
   const parts = Object.fromEntries(PART_NAMES.map((n) => {
     const el = root.querySelector<HTMLElement>(`[data-part="${n}"]`);
     if (!el) throw new Error(`Afterglow is missing its ${n}`);
@@ -148,7 +184,8 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   })) as Record<PartName, HTMLElement>;
   const $ = <T extends HTMLElement = HTMLElement>(n: PartName) => parts[n] as T;
   const screen = $<HTMLCanvasElement>("screen"), answerBox = $<HTMLInputElement>("answer"), rBtn = $<HTMLButtonElement>("rBtn");
-  const g = screen.getContext("2d", { alpha: false })!;
+  // A let, as the mock's was: the check draws the walk's near layer alone into a canvas of its own through it.
+  let g = screen.getContext("2d", { alpha: false })!;
   const QUESTIONS = start.total, Q_SECONDS = start.msQuestion / 1000;
   function rc(x: number, y: number, w: number, h: number, c: string) { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), w, h); }
 
@@ -226,7 +263,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // stage's camera with this stage's lights, what you see walking there: it keeps its separate layers for the zoom, and the other two flatten theirs.
   let scene: Street | null = null, next: Street | null = null, before: Street | null = null, held: HTMLCanvasElement | null = null;
   type Want = { stage: number; cam: number; keepLayers: boolean; take: (s: Street) => void };
-  let job: (Want & { it: Generator<undefined, Street, undefined> }) | null = null;
+  let job: (Want & { it: Generator<undefined, Street, undefined>; n: number }) | null = null;
   const waiting: Want[] = [];
   function settle(sc: Street, keepLayers: boolean) {
     if (!keepLayers) {
@@ -239,32 +276,42 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     return sc;
   }
   function want(stage: number, cam: number, keepLayers: boolean, take: (s: Street) => void) { waiting.push({ stage, cam, keepLayers, take }); }
+  // What the pre-draw cost, for the check's "pre-draw never stalls a frame" (14c-5 answer 42), as the mock counted it.
+  // The slowest single step, and which: a step can't be cut, so it is what a slice can't keep under its budget.
+  const predraw = { slices: 0, ms: 0, maxSlice: 0, finishedEarly: 0, maxStep: 0, where: "" };
   function pump(budget: number) {
     const t0 = performance.now();
     for (;;) {
       if (!job) {
         const w = waiting.shift();
         if (!w) break;
-        job = { ...w, it: sceneSteps(AW, AH, w.stage, w.cam) };
+        job = { ...w, it: sceneSteps(AW, AH, w.stage, w.cam), n: 0 };
       }
-      const s = job.it.next();
+      const s0 = performance.now(), s = job.it.next(), step = performance.now() - s0;
+      job.n++; if (step > predraw.maxStep) { predraw.maxStep = step; predraw.where = `stage ${job.stage}, step ${job.n}`; }
       if (s.done) { const j = job; job = null; j.take(settle(s.value, j.keepLayers)); }
       if (performance.now() - t0 >= budget) break;
     }
+    const ms = performance.now() - t0;
+    if (ms > .01) { predraw.slices++; predraw.ms += ms; if (ms > predraw.maxSlice) predraw.maxSlice = ms; }
   }
-  // Needed now and not ready: finish it here, which stalls.
-  function finishPredraw() { if (job || waiting.length) pump(Infinity); }
+  // Needed now and not ready: finish it here, which stalls, and count it so the check sees it.
+  function finishPredraw() { if (job || waiting.length) { predraw.finishedEarly++; pump(Infinity); } }
   const planNext = () => { if (!next) { const st = stageOf(Math.min(run.q + 1, QUESTIONS)); want(st, st, false, (s) => { next = s; }); } };
   const sceneNow = () => scene!;
 
   // ---------- Layers on the art canvas ----------
-  function drawSky(x: CanvasRenderingContext2D, sc: Street, skyOff: number, dx: number) {
+  // This frame's view and layers, for the check (as the mock's camNow, skyNow and towerNow).
+  let camNow = 0, skyNow = { off: 0, dx: 0, deck: 0 }, towerNow = { back: 0, front: 0 };
+  // drawSky, drawTower, drawWalk and draw are lets, as the mock's functions could be swapped: the check swaps them.
+  let drawSky = function drawSky(x: CanvasRenderingContext2D, sc: Street, skyOff: number, dx: number) {
+    if (x === g) skyNow = { off: skyOff, dx, deck: 0 };
     if (skyOff > 0) x.drawImage(sc.high, 0, skyOff - sc.ext);
     x.drawImage(sc.layers.skyBase, 0, skyOff);
     x.drawImage(sc.clouds, dx, skyOff + sc.cloudsAt);
     // The bank starts below the horizon, hidden by the street, and comes up behind it as the view rises.
-    if (skyOff > 0) { const v = skyOff + sc.vp[1] + 24 - DECK_UP * AH * clamp01(skyOff / skyTop() / DECK_START), top = x === g ? dev(v) : Math.round(v); x.drawImage(sc.deck, 0, top); }
-  }
+    if (skyOff > 0) { const v = skyOff + sc.vp[1] + 24 - DECK_UP * AH * clamp01(skyOff / skyTop() / DECK_START), top = x === g ? dev(v) : Math.round(v); if (x === g) skyNow.deck = top; x.drawImage(sc.deck, 0, top); }
+  };
   function drawGround(sc: Street, camY: number) {
     if (sc.ground) { g.drawImage(sc.ground, 0, camY); return; }
     for (const k of FRAME_KEYS) g.drawImage(sc.layers[k]!, 0, camY);
@@ -279,12 +326,13 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   }
   // The tower stands behind the street, not on top of it: its foot is at the horizon, so the street's own roofs always stand in front of it and it can never
   // float clear of them. It closes in from the screen's edges as the view rises, because at rest none of it is there.
-  function drawTower(sc: Street, camY: number, floors: number) {
+  let drawTower = function drawTower(sc: Street, camY: number, floors: number) {
     const t = sc.tower, r0 = clamp01(camY / (TOWER_IN * AH)), r = r0 * r0 * (3 - 2 * r0), foot = Math.min(AH, camY + sc.vp[1]);
     if (r <= 0) return;
     const heightF = sc.ext + floors * t.floor, topF = camY - heightF, topB = camY - sc.ext - Math.round(floors * t.floor * .8);
     if (topF - t.capH >= AH) return;
     const scroll = dev(camY * BACK_RATE), inB = dev(t.back * r), inF = dev(t.front * r);
+    towerNow = { back: scroll, front: camY };
     t.sides.forEach((s, i) => {
       const x = i ? AW - inB : inB - t.back;
       tile(s.back, x, Math.max(0, topB), foot, scroll, t.backPeriod);
@@ -295,9 +343,10 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       tile(s.front, x, Math.max(0, topF), foot, camY, t.frontPeriod);
       g.drawImage(s.crownFront, x, topF - t.capH + 3);
     });
-  }
+  };
   // The whole world at a height: camY rows of it have dropped out of the bottom of the frame.
   function drawWorld(sc: Street, camY: number, skyOff: number, dx: number, floors: number, jolt = 0) {
+    camNow = camY;
     drawSky(g, sc, skyOff, dx);
     if (floors) drawTower(sc, camY, floors);
     if (camY < AH) drawGround(sc, camY + jolt);
@@ -308,7 +357,8 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // The way down and the walk: each layer scaled about the vanishing point, the near ones most, and each layer's part above the frame scaled with it, so no row
   // parts from the one below. w is how much of the walk is left. The only scaling in the game (answer 9). A layer shrunk off the frame's edge leaves a margin,
   // so its own edge pixels stay under it there.
-  function drawWalk(sc: Street, camY: number, skyOff: number, dx: number, w: number, floors: number) {
+  let drawWalk = function drawWalk(sc: Street, camY: number, skyOff: number, dx: number, w: number, floors: number) {
+    camNow = camY;
     drawSky(g, sc, skyOff, dx);
     drawTower(sc, camY, floors);
     const [vx, vy] = sc.vp, mx = Math.ceil(w * vx) + 1, my = Math.ceil(w * (AH - vy)) + 1;
@@ -329,7 +379,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
         g.drawImage(up, vx * (1 - sl), top, AW * sl, sc.ext * sl);
       }
     }
-  }
+  };
 
   // ---------- Small art ----------
   function star(x: number, y: number, n: number, c: string, c2: string) {   // Four-point stars after reference 6.
@@ -432,6 +482,8 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     }
   }
   let fuse: Fuse | null = null, headGlow: HTMLCanvasElement | null = null;
+  // The fuse as last drawn: its head's cell, its spark's size and the sparks flying off it, for the check.
+  let fuseState: { head: number; size: number; flies: number } | null = null;
   function buildFuse() {
     const p = view.prompt, T = fuseW, r = Math.min(Math.round(PROMPT_R * K / U), (p.h >> 1) + T), pill = pillOf(p.w + T * 2, p.h + T * 2, r, T);
     const [now, nx] = layer(pill.w, pill.h);
@@ -451,6 +503,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     }
     spit(f, x0, y0, head, Math.round(lerp(SPIT_EARLY, SPIT_LATE, late)), t, SPIT_REACH * (1 + late));
     const h = f.cells[head], hx = x0 + h[0], hy = y0 + h[1], size = Math.round(lerp(SPARK_EARLY, SPARK_LATE, late)), fl = Math.floor(t * 18), flies = Math.round(lerp(FLY_EARLY, FLY_LATE, late));
+    fuseState = { head, size, flies };
     g.drawImage(headGlow!, hx - (headGlow!.width >> 1), hy - (headGlow!.height >> 1));
     for (let i = 0; i < flies; i++) {
       const p = t / FLY_LIFE + hash(i, 31), u = fract(p), c = Math.floor(p), an = hash(c, i + 40) * 6.2832, d = u * FLY_REACH * (1 + late), b = i % 3 === 0 ? 2 : 1;
@@ -463,14 +516,18 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
 
   // ---------- The run ----------
   const WORD = { el: $("word"), w: 0, h: 0, cx: 0, cy: 0, from: { x: 0, y: 0 } };
-  let clockT = 0;
+  // rate and the stop are the check's, through the probe; for a player the clock runs at 1 and never stops.
+  let clockT = 0, rate = 1, frozen = false, stopAt: Stop = null;
   let phase: Phase = "ask", phaseAt = 0, phaseDur = 0;
   let shown = runScore(), shownFrom = shown, qStart = 0, atQ = run.q, walkKind: Walk = "tiny", walkStart = 0;
-  let answer: Word | null = null, burst: Burst | null = null, ending: Ending | null = null, climbD = 0, shake = { x: 0, y: 0 }, boxPill: Pill | null = null, flight: Flight | null = null, smokeAt: number | null = null, dissolve: Dissolve | null = null;
+  let answer: Word | null = null, burst: Burst | null = null, ending: Ending | null = null, climbD = 0, shake = { x: 0, y: 0 }, rumbleNow = { x: 0, y: 0, amp: 0 }, boxPill: Pill | null = null, flight: Flight | null = null, smokeAt: number | null = null, dissolve: Dissolve | null = null;
   // At zero the server is asked whether time is up; until it says, the fuse stays out and the box takes nothing.
   let expiring = false;
-  function go(p: Phase, dur = 0) {
+  // Every phase as it starts, with what the check reads of it (the mock's phase log).
+  const phaseLog: LogEntry[] = [];
+  function go(p: Phase, dur = 0, info?: Record<string, unknown>) {
     phase = p; phaseAt = clockT; phaseDur = dur;
+    phaseLog.push({ phase: p, at: +clockT.toFixed(3), dur, q: run.q, ...info });
     $("out").hidden = !WAY_OUT.has(p);
   }
   const phaseT = () => clockT - phaseAt;
@@ -492,7 +549,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     $("caption").textContent = `${L} is out`; $("caption").hidden = false;
     $("verdict").textContent = `${L} is out.`;
     letterNow = { L, state: "lit", y: -lantern!.h };
-    go("letter", LETTER_LOWER + LETTER_BURN + LETTER_SPUTTER + LETTER_DROP);
+    go("letter", LETTER_LOWER + LETTER_BURN + LETTER_SPUTTER + LETTER_DROP, { letter: L });
     placeLetter(0);
   }
   // Where the lantern is and how lit, at seconds into the phase: lowers, burns, sputters dark, drops.
@@ -627,6 +684,10 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     makeBoxPill();
     const box = answerBox.getBoundingClientRect();
     WORD.from = { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+    // At the box now, where the wait's first frame puts it: the charge starts from where the word is, and a reply that
+    // lands before that frame would otherwise start it from the last word's place, the top left on Q1 (found by the
+    // look check's dud line, 14c-6b-2a).
+    placeWord(WORD.from.x, WORD.from.y);
     $("ask").hidden = true; $("ask").style.transform = ""; shake = { x: 0, y: 0 };
     answerBox.blur();
     note(null);
@@ -659,7 +720,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     makeBoxPill();
     WORD.from = { x: WORD.cx, y: WORD.cy };
     const dud = r.caught;
-    go("charge", dud ? DUD_CHARGE_S : CHARGE_S[r.tier]);
+    go("charge", dud ? DUD_CHARGE_S : CHARGE_S[r.tier], { kind: answer.kind, tier: r.tier });
     if (!dud) burst = makeBurst(r.tier, r.total);
   }
   // Shape from rarity, size from points (answer 11): the root widens the small end, so Q1's and Q7's are plainly apart without Q7's filling the screen.
@@ -673,7 +734,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     climbD = climbDistance(sceneNow());
     const room = Math.max(0, (innerWidth - boxPill!.w * U) / 2 - WORD_EDGE), tier = answer!.tier;
     flight = { sway: Math.min(WOBBLE[tier] * innerWidth, room), turns: SWAY_TURNS[tier], tier, dur: CLIMB_S[tier] };
-    go("climb", CLIMB_S[tier]);
+    go("climb", CLIMB_S[tier], { distance: climbD, floors: CLIMB_FLOORS, floorPx: sceneNow().tower.floor });
   }
   function startBurst() {
     // The sky holds still from here. Everything of the street can go, so only the next stage's scenes are kept.
@@ -729,7 +790,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     $("verdict").textContent = `${e.name}. Total ${runScore()}.`;
     WORD.el.hidden = true; $("ask").hidden = true;
     ending = kind; shown = runScore(); $("hudScore").textContent = fmt(shown);
-    go("over", OVER_BUTTON_AT);
+    go("over", OVER_BUTTON_AT, { ending: kind });
     $("result").hidden = false; placeResult();
     // Nothing else needs drawing.
     waiting.length = 0; job = null; next = null;
@@ -745,7 +806,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     const dur = DRIFT_S[walkKind];
     let kWalk: number = LAND_AT; for (let k = 0; k < LAND_AT; k += .01) if (dist * (1 - easeOut(k / LAND_AT, 3)) < before!.ext) { kWalk = k; break; }
     walkStart = kWalk;
-    go("descent", dur);
+    go("descent", dur, { walk: walkKind, zoom: WALK_ZOOM[walkKind], distance: dist });
     burst = null; held = null; climbD = dist;
   }
   // No finale (answers 38, 39): Q7's text fades out, and the results fade in over the same burst.
@@ -762,7 +823,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     const old = before!; before = null; atQ = run.q;
     if (same) { finishWalk(); return; }
     dissolve = makeDissolve((x) => { x.drawImage(old.layers.skyBase, 0, 0); x.drawImage(old.clouds, Math.round(cloudX(clockT)), old.cloudsAt); for (const k of FRAME_KEYS) x.drawImage(old.layers[k]!, 0, 0); }, false);
-    go("arrive", ARRIVE_S[walkKind]);
+    go("arrive", ARRIVE_S[walkKind], { walk: walkKind });
   }
   function finishWalk() {
     dissolve = null;
@@ -877,6 +938,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       }
       case "charge": {
         const k = clamp01(t / phaseDur), e = easeOut(t / WORD_ENTER, 3), r = rumbleAt(t, phaseDur, answer!.kind === "caught" ? "caught" : answer!.tier), dip = Math.round(clamp01((k - DIP_FROM) / (1 - DIP_FROM)) * DIP);
+        rumbleNow = r;
         placeWord(lerp(WORD.from.x, innerWidth / 2, e) + r.x * U, lerp(WORD.from.y, innerHeight * CHARGE_Y, e) + (r.y + dip) * U);
         if (k >= 1) { if (answer!.kind === "caught") go("dud", DUD_LIFT_S + DUD_FALL_S + DUD_SMOKE_S); else startClimb(); }
         break;
@@ -945,7 +1007,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     return f < 1 ? up * (1 - f * f) : 0;
   }
 
-  function draw() {
+  let draw = function draw() {
     const dx = cloudX(clockT), t = phaseT();
     switch (phase) {
       case "letter":
@@ -1042,7 +1104,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
         break;
       }
     }
-  }
+  };
   // Lit lanterns flicker and sparks rise from them; a stage with no light does neither (Q1).
   function idle(sc: Street) {
     const L = sc.lights, n = L.length;
@@ -1213,15 +1275,40 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     nextDraw = ms - nextDraw > step ? ms + step : nextDraw + step;   // a stall is forgiven, not made up
     return true;
   }
+  // Each frame's script time and the gap since the last, in all and by phase, for the check's fps lines (14c-5 answer 41).
+  const blank = (): Timing => ({ n: 0, sum: 0, max: 0, iv: 0, ivMax: 0 });
+  let perf = { ...blank(), ivN: 0, phases: {} as Record<string, Timing> };
   function frame(ms: number) {
     raf = requestAnimationFrame(frame);
     if (!frameGate(ms)) return;
-    if (lastMs) clockT += (ms - lastMs) / 1000;
+    const f = (perf.phases[phase] ||= blank());
+    if (lastMs) {
+      const iv = ms - lastMs;
+      perf.iv += iv; perf.ivN++; if (iv > perf.ivMax) perf.ivMax = iv;
+      f.iv += iv; if (iv > f.ivMax) f.ivMax = iv;
+      if (!frozen) clockT += iv / 1000 * rate;
+    }
     lastMs = ms;
     if (relayout) rebuild();
-    tick();
+    const c0 = performance.now();
+    // The check's stop, tried after the tick, and before it only when the tick would end the phase: one long frame can
+    // carry a short phase past its stop (the mock's, at fcc11e4). Before the tick in general, the text the tick writes,
+    // such as the seconds, would lag the frame drawn.
+    const stopHere = () => {
+      if (frozen || !stopAt || phase !== stopAt.phase) return;
+      if (stopAt.k !== undefined && phaseT() / (phaseDur || 1) < stopAt.k) return;
+      if (stopAt.t !== undefined && phaseT() < stopAt.t) return;
+      frozen = true; stopAt = null;
+    };
+    if (phaseDur && phaseT() >= phaseDur) stopHere();
+    if (!frozen) tick();
+    stopHere();
     draw();
     pump(PREDRAW_SLICE_MS);
+    const d = performance.now() - c0;
+    perf.n++; perf.sum += d; if (d > perf.max) perf.max = d;
+    const after = (perf.phases[phase] ||= blank());   // the phase the frame ended in, as the mock counted it
+    after.n++; after.sum += d; if (d > after.max) after.max = d;
   }
   // A new size draws everything again at it. Mid-walk it lands at once, because the walk's own scene is gone.
   function rebuild() {
@@ -1252,6 +1339,33 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     }
   }
   const onResize = () => { relayout = true; };
+
+  // ---------- The check's view, through the probe ----------
+  // The mock's __core at fcc11e4, and below it what check.mjs read from the mock's page-wide variables, here closure
+  // locals: the getters read them live; the setters are the swaps the check makes (g, drawSky, drawTower, drawWalk, draw).
+  if (probe) probe.attach({
+    get phase() { return phase; }, get t() { return clockT; }, get k() { return phaseT() / (phaseDur || 1); }, get q() { return run.q; }, get view() { return view; },
+    log: phaseLog, place: () => ({ S, DPR, AW, AH, U, K }),
+    rate(x: number) { rate = x; }, freezeAt(f: Stop) { stopAt = f; }, thaw() { frozen = false; }, get frozen() { return frozen; },
+    get letter() { return letterNow; }, get fuse() { return fuseState; }, get burst() { return burst; }, get shake() { return shake; }, get rumble() { return rumbleNow; }, predraw,
+    perf() { const p = { avg: perf.sum / (perf.n || 1), max: perf.max, n: perf.n, ivAvg: perf.iv / (perf.ivN || 1), ivMax: perf.ivMax, phases: perf.phases }; perf = { ...blank(), ivN: 0, phases: {} }; return p; },
+    memory() {
+      const seen = new Set<object>(), walk = (o: unknown) => { if (!o || typeof o !== "object") return; if (o instanceof HTMLCanvasElement) { seen.add(o); return; } if (seen.has(o)) return; seen.add(o); for (const v of Array.isArray(o) ? o : Object.values(o)) walk(v); };
+      walk([scene, next, before, held]);
+      let bytes = 0; for (const o of seen) if (o instanceof HTMLCanvasElement) bytes += o.width * o.height * 4;
+      return { bytes, scene: !!scene, next: !!next, before: !!before, held: !!held };
+    },
+    get rateNow() { return rate; },
+    get scene() { return scene; }, get before() { return before; }, get held() { return held; }, get camNow() { return camNow; }, get skyNow() { return skyNow; }, get towerNow() { return towerNow; },
+    get lantern() { return lantern; }, get letterNow() { return letterNow; }, get qStart() { return qStart; }, get answer() { return answer; }, get boxPill() { return boxPill; }, get fuseBox() { return fuse; },
+    run, runScore, trackerSlot, boxAt, layer, frameGate, set nextDraw(v: number) { nextDraw = v; },
+    get g() { return g; }, set g(v: CanvasRenderingContext2D) { g = v; }, screen,
+    get drawSky() { return drawSky; }, set drawSky(v: typeof drawSky) { drawSky = v; },
+    get drawTower() { return drawTower; }, set drawTower(v: typeof drawTower) { drawTower = v; },
+    get drawWalk() { return drawWalk; }, set drawWalk(v: typeof drawWalk) { drawWalk = v; },
+    get draw() { return draw; }, set draw(v: typeof draw) { draw = v; },
+    RAMP, WORD_INK, EMBER, LANTERN_INK, Q_SECONDS, QUESTIONS,
+  } satisfies Core);
 
   // ---------- Where the run picks up ----------
   $<HTMLButtonElement>("submit").textContent = WORDS.submit;

@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merging on green CI at the human's "Merge when green"); next 6b-2, the check; then 6b-2, the check. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merged on green CI at the human's "Merge when green"); 6b-2, the check, designed from answers 44 to 56 (Design, "The checks") and approved ("Approve, start 6b-2a (Recommended)"): 6b-2a, the look check, in review (PR #172), then 6b-2b. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -15,9 +15,9 @@ Play the real game, every day's run, as Afterglow, the firework festival approve
 - `docs/DECISIONS.md`, "Game 1: Don't Match the Host": 7 questions, 20 seconds each from Start or from Next, the database the judge; and the log rows of 2026-10-21 (the reveal waits for Next, which starts the next question's 20 s).
 - WCAG 2.2 (SOURCES.md), 2.3.3 Animation from Interactions, as `src/app/globals.css` already cites it for reduced motion; 1.4.3 contrast and 2.5.8 target size for the way-out button.
 - Next.js (SOURCES.md, App Router) and the bundled docs in `node_modules/next/dist/docs/` (AGENTS.md), for the route's rename. To read before building.
-- Playwright (SOURCES.md), for the game's check moved into `e2e/`.
+- Playwright (SOURCES.md), for the game's check moved into `e2e/`. **For 6b-2, in SOURCES.md (answer 55):** test projects (https://playwright.dev/docs/test-projects), tags (https://playwright.dev/docs/test-annotations), soft assertions (https://playwright.dev/docs/test-assertions), modifying responses (https://playwright.dev/docs/network), and the Chrome channel (https://playwright.dev/docs/browsers), all for @playwright/test 1.64.1; and Next.js's environment variables guide (`node_modules/next/dist/docs/01-app/02-guides/environment-variables.md`, read 2026-11-09), for `NODE_ENV` under `next dev` and `next build`.
 - MDN, `prefers-reduced-motion` (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion), for the calm version (answer 18). It covers the setting and its `reduce` value, not reading it from script.
-- **Gap, for 14c-6c:** reading the setting from script needs `Window.matchMedia`, which neither that page nor SOURCES.md covers. Ask the human before 6c.
+- **Gap, for 14c-6c:** reading the setting from script needs `Window.matchMedia`, which neither that page nor SOURCES.md covers. Ask the human before 6c. Since 2026-11-08 SOURCES.md has MDN `Window.matchMedia()` (added for M16 16g-2), which 6c can cite.
 - MDN `<dialog>` (SOURCES.md), for How to play's panel (14c-6d), as the settings sheet uses it.
 - WAI-ARIA APG Carousel pattern (SOURCES.md, added at answer 42), for How to play's chunks: "Terms", "WAI-ARIA Roles, States, and Properties", "Keyboard Interaction".
 
@@ -95,6 +95,37 @@ Round 13
 42. Source: "Yes, add the APG Carousel (Recommended)". Read 2026-11-08; in SOURCES.md.
 43. Words: "Use these four (Recommended)". The four chunks in Design, as drafted.
 
+For 14c-6b-2, the check (human, 2026-11-09)
+
+Round 14
+44. Plays on: "A test page (Recommended)". A page only the check opens runs the real scene with scripted replies: no database, the clock can run fast, the mutants work. It skips the server, which 6b-1's tests already cover.
+45. Hooks: "Only on the test page (Recommended)". The test page hands them to the scene, so players' pages never have them; one optional argument on the scene.
+46. Mock lines: "Rewrite where it fits (Recommended)". Each line about a dropped feature (New show, the skip link) becomes the game's version where there is one, and is dropped where nothing replaces it, each listed with its reason.
+47. CI set: "One run, phone size (Recommended)". One scripted run at 390×844: the font, the colours, the pixel grid, the fuse with the seconds, a burst per rarity, no console errors.
+
+Round 15
+48. Mutants: "A broken copy in the browser (Recommended)". The check takes the game's compiled code from the dev server and gives each mutant a broken copy, as the mock did; the files on disk are never touched; four at once. If a compiler update stops a break matching, the script stops loudly.
+49. Test page: "404 in production (Recommended)". Served only by the dev server the tests use.
+50. CI job: "Inside the e2e job (Recommended)". No setting to change; its minutes add to the e2e job's.
+51. Which: "The carried ones (Recommended)". The mock's 83, each rewritten for the game's code; those for dropped features go with their lines.
+
+Round 16
+52. PRs: "Two PRs (Recommended)". 6b-2a: the test page, the hooks, the full check and its CI set. 6b-2b: the mutants, and any check fixes they force.
+53. Frames: "Keep them (Recommended)". The full check saves its frames and strips to `test-results/` (not committed), as in 14c-5.
+
+Round 17
+54. Approval: "Approve, start 6b-2a (Recommended)".
+55. Sources: "Yes, add them (Recommended)". The five Playwright pages and Next.js's environment variables guide, in SOURCES.md.
+56. Off-list: "Yes, one line (Recommended)". 6b-2a adds one line beyond the mock's, checking off-list text shakes the box as a refused taken letter does (answer 28); it closes ROADMAP's item.
+
+Round 18 (2026-11-09, from the CI set's first run: 40 of its 42 lines passed, the other two failing on the dev server's own badge and warning)
+57. Dev badge: "Hide it in the check (Recommended)". Next's dev-tools badge, which only `next dev` draws, is hidden on the check's pages before it looks; the colour line had caught its white and greys.
+58. CSS warning: "Pass over that one (Recommended)". The check ignores, by its text, the warning Next's dev build gives on every page (/about and /privacy too) for a preloaded stylesheet it doesn't use; any other warning or error still fails. The warning goes in ROADMAP for the app.
+
+Round 19 (2026-11-09, from the full set's two runs in real Chrome: 217 and then 219 of 222 lines)
+59. Pre-draw: "Split now, in 6b-2a (Recommended)". Answer 42 of 14c-5 put the split in the game's build and 6b-1 didn't do it: no step of the pre-draw longer than the slice's own budget (`PREDRAW_SLICE_MS`, 4 ms), the street's output checked byte for byte against today's.
+60. Lettering: "Look into it first (Recommended)". Why real Chrome draws the phone's Q6 word 2 pixels differently at mid-climb (11,736 against 11,738, as the mock did in 14c-5), then a fix or what was found.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -143,7 +174,13 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 
 `/afterglow/how-to-play` answers 404, with no redirect (answer 39).
 
-**The checks.** `check.mjs` becomes Playwright tests in `e2e/` (DECISIONS.md, Tests). A short set (tagged) runs in CI on every PR; the full set and the mutants run by hand through scripts in `scripts/` and the task runner.
+**The checks (6b-2, answers 44 to 53).** `check.mjs` at `fcc11e4` becomes Playwright tests in `e2e/` (DECISIONS.md, Test runner), in two PRs (answer 52):
+- **The test page** (answers 44, 49), `/check/afterglow`, outside the shell: the real `Afterglow` scene fed by a scripted runner, the mock's own run (`RUN` in `check.mjs`: seven answers, common to rare, none using a taken letter), its dud, its off-list word and its time-out, 20 s a question (DECISIONS.md, Game 1). No database. Under `next dev` it serves; in every other build it calls `notFound()`, since Next sets `NODE_ENV` to `development` for `next dev` and to `production` for every other command (Next.js, environment variables guide).
+- **The hooks** (answer 45): `startScene` takes one optional `probe`, which only the test page passes. Through it the scene reports what the carried lines read (its phase, question, placement, frame times) and takes the clock's speed and a freeze, as the mock's `__core` did. A player's page passes none, and an e2e checks `/afterglow` has none.
+- **The lines** (answer 46): each of `check.mjs`'s named lines is a named check, a soft assertion so one failure doesn't hide the rest, carried as written. The ones about what the game dropped are rewritten to the game's version where it has one (play again becomes See results), or dropped with the reason in Source diff (the skip link, New show).
+- **The short set** (answers 47, 50): one scripted run at the phone size, 390×844 at device pixel ratio 3 (the mock's), with that flow's lines, among them those answer 47 lists, runs in CI's `e2e` job with the rest of `npm run test:e2e`. Its time is measured and recorded against "a few minutes" (answer 15).
+- **The full set:** both sizes, the fps run, the flights, the ends and the minute of glitter, by hand through `npm run check:afterglow`, in real Chrome (14c-5 answer 41), as its own Playwright project that `npm run test:e2e` leaves out. Its frames and strips go to `test-results/` (answer 53).
+- **The mutants (6b-2b, answers 48, 51):** the 83 from `mutants.mjs` at `fcc11e4`, each rewritten for the game's compiled code, run by hand through `npm run check:afterglow-mutants`, four at a time. The check intercepts the dev server's response for the scene's code and serves a broken copy (Playwright, network: modify responses), so no file on disk changes; a break that no longer matches stops the script. 6b-2b's details are settled before it starts.
 
 ## Acceptance criteria
 - [x] `/afterglow` serves the game, its browser tab titled Afterglow; `/play` answers 404; the record says `{ id: "offbeat", name: "Afterglow", path: "/afterglow" }`, and the ID is unchanged.
@@ -155,8 +192,12 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 - [ ] With Reduce motion on, no frame shakes and the climb and walk are fades (e2e with `reducedMotion: "reduce"`).
 - [x] An admin's test run plays in Afterglow.
 - [x] The share text says Afterglow, with 🟩 and ⬜.
-- [ ] The short check runs in CI on the PR and passes; the full check passes by hand, its fps lines in real Chrome at 59 or more (14c-5 answer 41), and `pre-draw never stalls a frame` passes.
-- [ ] The mutants carried from 14c-5 are each caught by the full check.
+- [x] 6b-2a: `/check/afterglow` plays the scripted run under `npm run dev`, and a production build (`next build`, `next start`) answers it 404.
+- [x] 6b-2a: a player's `/afterglow` mid-run has no probe.
+- [x] 6b-2a: every named line of `check.mjs` at `fcc11e4` is a named check in `e2e/`, or is in Source diff as rewritten or dropped, with its reason.
+- [ ] 6b-2a: the short check runs in CI's `e2e` job on the PR and passes, its time recorded.
+- [x] 6b-2a: the full check passes by hand in real Chrome, its fps lines at 59 or more (14c-5 answer 41) and `pre-draw never stalls a frame` among them, and leaves its frames and strips in `test-results/`.
+- [ ] 6b-2b: the mutants carried from 14c-5 are each caught by the full check, with no file on disk changed; any not carried are in Source diff with their reason.
 - [x] `docs/DESIGN.md` describes `/afterglow` as built.
 
 14c-6d, How to play:
@@ -184,6 +225,9 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 | "A few minutes" | The short check's CI time | Answer 15 |
 | The off-list shake's length and size | Answer 9 | Answer 28: the mock's shake for a refused taken letter (`refuse()` in `game.js` at `fcc11e4`: steps of 2, −2, 1 and 0 art pixels, 40 ms each), so every refused input shakes the same way (CLAUDE.md, "One way to do each thing") |
 | The calm version's fade length | Answer 8 | The walk's descent time from 14c-5 (answer 19) |
+| Every constant in `check.mjs` at `fcc11e4` (`EDGE_RUN` 40, `ARC`, `DOWN`, `FAST` 3, `LINGER_S` 62, `HITCH_LIMIT` 16.7 ms, `AGES`, `V5`, the scripted `RUN`) | The check (6b-2a) | Carried unchanged with the origin each has there (14c-5) |
+| 1920×1080 at device pixel ratio 1, 390×844 at 3 | The check's two sizes; the short set uses the second (answer 47) | `SIZES` in `check.mjs` at `fcc11e4` |
+| 4 mutants at once | 6b-2b | `mutants.mjs` at `fcc11e4` ("eight made the PC unusable"), answer 48 |
 | 4 chunks | How to play | Answer 38 |
 | The panel's width and type scale | How to play | The question box's: `AFTERGLOW.PROMPT_W` at the scene's type scale (14c-5), so the panel matches the box |
 | 24 px | How to play's buttons, at least, each way | WCAG 2.2 2.5.8, as the game's × |
@@ -196,7 +240,9 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 1. **14c-6a, the name.** The record and the route folder renamed to Afterglow at `/afterglow` (with How to play), which the share, the boards' game switch and every heading follow; the game page's browser tab says Afterglow (answer 12). Small and reviewable alone.
 2. **14c-6b, the game,** in two PRs (answer 20):
    - **6b-1, the game plays.** The run state gains each answered question's tier, from one `tierOf` that replaces the three `levels[id] ?? "rare"` copies (scoring, matching, answers). It was planned for 6a, but nothing would read it there (CLAUDE.md, "Build for today"). The source moved and typed, full screen, the way out, Light it's wait, off-list, Next after the walk, reload, coming back to the cards, test runs and the pre-draw split, with browser tests for the rules, and DESIGN.md for the new screen (CLAUDE.md, Docs): every acceptance criterion but the two on the check and the mutants.
-   - **6b-2, the check.** `check.mjs` in `e2e/`, its short set in CI, the full set and the mutants by hand through `scripts/`: the criteria on the short and full check and the mutants. Until it merges the look is checked by the human's eye, not by machine.
+   - **6b-2, the check,** in two PRs (answer 52). Until 6b-2a merges the look is checked by the human's eye, not by machine.
+     - **6b-2a:** the test page, the probe, `check.mjs`'s lines in `e2e/`, the short set in CI and the full set by `npm run check:afterglow`; the 6b-2a criteria.
+     - **6b-2b:** the mutants by `npm run check:afterglow-mutants`, and any check fixes they force; the 6b-2b criterion.
 3. **14c-6d, How to play** (answers 30 to 40), before 6b-2 (answer 37): the panel, its two buttons, the four chunks, the old page removed.
 4. **14c-6c, the calm version** for Reduce motion.
 
@@ -207,6 +253,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - In RIFF-mocks, the human retires `themes/festival/` once the move is merged (an agent's delete there was refused before; not routed round).
 - 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx` and its `.how` CSS in `offbeat.module.css`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
 - 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
+- 6b-2a removed: the mock's lines on the skip link and New show (Source diff); the game's buttons' inherited app shadow, lift and press; ROADMAP's "Nothing checks that off-list text shakes the box", closed by the added line (answer 56). Nothing in `e2e/afterglow.e2e.ts`: it plays the game against the server (the rules, reloads, Next's timing), and its one overlap with the look check, each rarity's colour, is in the full set only, so CI would lose it. `check.mjs` and `mutants.mjs` stay in RIFF-mocks until the human retires `themes/festival/`.
 
 ---
 *Fill in the sections below at the end.*
@@ -245,6 +292,39 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 | — | The panel's text is centred | The question's text in the game is centred (`.q`), and the dialog otherwise took whatever the page round its button did (Today's banner centres, the game screen doesn't) |
 | APG: previous and next don't move focus | ‹ stays in its place, `aria-disabled` on the first chunk; › is one button that becomes Close, so focus stays on it | The pattern says nothing about the ends; *Claude's reading* (Design), approved with it (answer 41) |
 
+14c-6b-2a, against `check.mjs` at `fcc11e4` (RIFF-mocks `themes/festival/`) and this ticket's Design:
+
+| Source says | We built | Why different |
+|---|---|---|
+| The check reads `themes/dist/afterglow.test.html`, a page that judges its own made-up day | `/check/afterglow` (`src/app/check/afterglow/`): the real scene, its replies scripted from the mock's sample day and judge (`day.ts`), served by `next dev` only | Answers 44, 49 |
+| `window.__core` and the mock's page-wide variables (`scene`, `camNow`, `fuse`, `drawWalk`, `g` and the rest) | The scene's optional probe (`Probe`, `Core` in `src/afterglow/scene.ts`): the test page sets `window.__core`; the check reads `__core.scene`, `__core.fuseBox` and so on, and swaps `__core.g`, `drawSky`, `drawTower`, `drawWalk` and `draw` as the mock swapped its globals | Answer 45 |
+| The scene's counters (phase log, frame and pre-draw times, `camNow`, `skyNow`, `towerNow`, the fuse's and rumble's state) | Kept on every page, as the mock kept them; only the clock's speed and stop wait on the probe | The check reads the code players run, not a copy (CLAUDE.md, "Never cheat a check") |
+| One script, `pass`/`FAIL` lines, an exit code; `CHROME_CHANNEL=chrome` for real Chrome | Playwright tests (`e2e/afterglow-look.e2e.ts`, helpers in `afterglow-look.ts`), each line a soft check under its name and printed as before; the project `afterglow-full` in the installed Chrome | DECISIONS.md, Test runner; answers 47, 50; Playwright, browsers |
+| The whole check at both sizes | `npm run test:e2e` runs the phone size's scripted run alone (42 lines, among them the colour and font lines over the frames it looks at); `npm run check:afterglow` runs everything | Answers 15, 47 |
+| No limit on the whole check; each wait the library's 30 s unless it sets its own | The look tests have no test timeout (`test.setTimeout(0)`); the check's pages set the library's 30 s as their default (`LIBRARY_TIMEOUT`), since Playwright Test's action and navigation timeouts default to none | The mock had no limit on the whole; its waits keep theirs (playwright-core's types: "defaults to 30 seconds"). Found in 6b-2a's review |
+| "flow ran to the end": a thrown error caught and printed as a FAIL line | A thrown error fails its test with that error, and the test's name says which section | Playwright Test reports a throw itself; with each wait timed (above), a stuck section throws |
+| The skip link: to Q2's lantern (layout), to Q7 (common and rare bursts), to Q2 (taken letters), to Q5 (idle) | Layout answers Q1 and walks on to Q2's lantern; the others open the page at the question (`?q=N`, the earlier ones answered with the scripted run) | Answer 46: the game has no skip link |
+| New show: the fps run's raster part, the time-out then the dud then the taken letters on one page | A new page for each; "no console errors in the ends" is still one line, over the three pages | Answer 46: one run a day |
+| "the skip link plays each lantern once", "skipping all seven reaches the results", "after a full run, a result keeps its answer line", "a new size after New show plays on" | Dropped | Answer 46: they test the skip link and New show, which the game doesn't have |
+| "time-out: ends on the street with play again" | "time-out: ends on the street with See results" | Answer 21 |
+| "the last result's button leads to the results": Q7's button says See results | Q7's says Walk on, and the ending's See results leaves for the cards | Answers 21, 29 |
+| The recap's `+total` | `+points` | Answers 7, 24: points from the server; the bonus estimate only sizes the burst |
+| The lantern between the arrival and the box: `arrive>letter>ask` | `arrive>letter>open` | DECISIONS.md, Game 1: Timer (the box opens empty, Next is sent, then "ask") |
+| The dud's phases `ask > charge > dud > over` | `ask > wait > charge > dud > over` | Answer 16 |
+| The flow reads the word's tier as soon as it is typed | Once the reply has landed | Answer 16: the word waits in plain ink until then |
+| Two colour lines need the phases the whole check plays, play again's among them | No play again; the CI set needs only the phases its run plays | Answers 46, 47 |
+| "one font": Handjet 400 by name | The family `next/font` gave Handjet, read from `--afterglow-font`, at 400 | `src/afterglow/font.ts`: next/font names the family |
+| "memory bounded" counts play again's scene | No such scene | Answer 46 |
+| Unlisted text is rare (the mock's `UNLISTED_SHARE`) | Listed: "sydney harbour bridge" at Q1 (.01) and "sonic" at Q7 (.3, as the mock's check set it); anything else is off-list | The game refuses text that names no answer (answer 9) |
+| Every console warning fails its line, but the mock's one canvas note | Also passed over: Next's dev build's unused stylesheet preload, on every page; Next's dev-tools badge is hidden before the check looks | Answers 57, 58 |
+| — | One line more: "off-list text shakes the box, in whole art pixels, as a taken letter does" | Answer 56 |
+| `offGridBlocks` | Not carried | Defined in the mock and never called |
+| `game-check.json`, `game-colours.json`, `themes/dist/game-shots/` | The lines in Playwright's report and output; `<size>-colours.json` and the frames and strips in each test's `test-results/…/shots/` | Answer 53 |
+| — | The game's and How to play's buttons drop the app's hard shadow, lift and press (`afterglow.module.css`) | The colour line caught the ×'s shadow in the app's ink, `#1a1a18`, which isn't the game's; the mock's buttons are flat (14c-5) |
+| — | Light it places the word at the box as the wait starts (`scene.ts`, `startWait`) | 6b-1 started the charge from where the wait left the word, which a reply landing before the wait's first frame left at the last word's place: the dud line caught Q1's word flying in from the top left. The mock had no wait (answer 16) |
+| The mock's `#word` has `will-change: transform` | `.word` has none (`afterglow.module.css`) | On its own layer, real Chrome drew two of the moving word's anti-aliased edge pixels one unit off at some offsets (`181,241,60` for `182,242,60`), which "lettering never changes shape or size" counts as a change: 14c-5's open failure, answer 60. Painted with the UI's layer it was the same at every offset swept, Q6's climb from 0.40 to 0.64 |
+| The street's steps (`street.js`): rows of the sky and the street above the frame 48 at a time, the floor 24, the street's items 4, a cloud, a building, the palace, a front and each lighting pass whole | A row, a tier, a piece, a floor or an item a step (`street.ts`) | Answer 59: no step over the slice's 4 ms budget (`PREDRAW_SLICE_MS`); the slowest measured in real Chrome here was 12.0 ms before, 3.9 ms after. Output the same byte for byte in 42 sizes, stages and cameras |
+
 ## Evidence
 **14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
 - `npm run lint`: clean. `npm test`: 634 passed.
@@ -271,6 +351,19 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - Screenshots at 390×844: Today's banner with How to play under Play, and the panel's first chunk; in the session's scratchpad, not the repo.
 - PR #170's first CI e2e run (run 42539845158 at 29f4c4b): `1 failed`, `3 did not run`, `163 passed (33.4m)`. The failure, `settings.e2e.ts:55`, checked the page's first `<dialog>` was modal; since 6d that's How to play's, closed, on Today's banner. It now checks the settings sheet's own (the 3 that didn't run are that file's next tests, which stop at a failure). Missed before the PR because only the four edited e2e files were run, not the whole suite.
 - The whole suite locally after the fix (port 3000 checked free, this worktree's server): `5 failed`, `162 passed (32.1m)`, `settings.e2e.ts` passing. Four of the five failed again alone (`live-board.e2e.ts:45`, `reactions-menu.e2e.ts:172`, `test-run.e2e.ts:130`, `today.e2e.ts:105`), none touching How to play; on `main` (15adce6, without 6d) `live-board` and `today` failed too, with other errors, and the other two passed. All four passed in CI's fresh stack on 6d's code (above), so they're taken as this PC's local stack (restarted by Docker, shared with game 2's session), cause *unverified*.
+- After the merge, with port 3000 freed by the human (2026-11-09), the four again on this worktree's own server: `2 failed`, `16 passed (6.6m)`. `live-board.e2e.ts` and `test-run.e2e.ts:130` passed, so the shared server explains those two. The other two, `reactions-menu.e2e.ts:172` and `today.e2e.ts:105`, failed no check: each ran out of its 30 s (`Test timeout of 30000ms exceeded.`), its trace showing every step passing, Light it to See results taking 4.5 to 5.3 s, and the reduced-motion test playing twice. Both play Afterglow in full without `test.slow()`, as `test-run.e2e.ts` did before PR #169's fix; CI is faster on the same `npm run dev`. In ROADMAP, For M14.
+
+**14c-6b-2a, the check** (2026-11-09, Windows PC, this worktree's own `next dev` on port 3000, local stack; real Chrome is the installed one):
+- The test page: `?q=1` played Q1 to Q2 in headless Chromium, `ask > wait > charge > climb > burst > result`, "Peony", "The host said towel.", Walk on, then `descent > arrive > letter > open > ask` with "Damp fuses: P"; `?q=7` opened on Q7 with 6 results and 650 points; no console errors.
+- A production build: `npx next build` (exit 0), `npx next start -p 3001`: `/check/afterglow 404` (with `noindex`), `/about 200`; the server stopped after.
+- The CI set, `npx playwright test e2e/afterglow-look.e2e.ts --project=chromium`: first run 40 of 42 lines, the 2 failures Next's dev badge and dev stylesheet warning (answers 57, 58); then 42 of 42, `1 passed (2.5m)` to `(2.9m)` in three runs, against "a few minutes" (answer 15).
+- The full set, `npm run check:afterglow` (real Chrome): run 1, 217 of 222 (the dud's word charging from the top left, fixed in `startWait`; the off-list line's own reading, fixed; the phone lettering, answer 60); run 2, 219 of 222 (`pre-draw never stalls a frame` 25.9 and 19.7 ms on a busy PC, answer 59; the lettering again, 11736 against 11738). After the split and the word's layer: **run 3, 222 of 222, `6 passed (14.6m)`**: `60 fps, whole run` 60.0 fps at both sizes (worst interval 19.4 ms wide, 22.2 ms phone); `pre-draw never stalls a frame` worst slice 7.3 ms wide, 5.5 ms phone, slowest step 4.0 ms (rounded, at the budget) and 2.8 ms; `lettering never changes shape or size` Q6 11738 px at every point; the two raster lines printed, not judged, in real Chrome (answer 41): 12.72 and 15.26 ms average. Frames and strips are in `test-results/afterglow-look.e2e.ts-*/shots/`.
+- The street's split, against the committed `street.ts` in Chromium, every canvas, number, string and flag of `sceneSteps` in 42 sizes, stages and cameras: `configs=42 canvases=882 pixelBytes=1127700648 leaves=11430 mismatches=0 steps old=12418 new=667558`; with one dither number changed on purpose the same harness reported `mismatches=35`. Its slowest step per yield in real Chrome here, before and after: 12.0 ms (a cloud) to 3.9 ms.
+- The lettering: Q6's climb swept from 0.40 to 0.64 in real Chrome; with the word on its own layer, 4 of 13 offsets lost 2 edge pixels (`181,241,60` and `182,241,60` for `182,242,60`); without it, 11738 px at all 13.
+- A player's run has no probe: `e2e/afterglow.e2e.ts`'s whole day checks `"__core" in window` is false mid-question; with `how-to-play.e2e.ts`, `10 passed (2.4m)`.
+- `npm run lint` and `npx tsc --noEmit`: clean. `npm test`: 640 passed.
+- The whole e2e suite, `npm run test:e2e` (port 3000 this worktree's, checked): `2 failed`, `166 passed (25.3m)`. Both in `offbeat.e2e.ts` (:83 "polar bear" not found in yesterday's answers, :152 `"banana" isn't in our list`), failing again alone. Cause: this stack's yesterday, 2026-11-08, holds a fixture day left by an earlier run whose answer base was since removed, so the file takes it as its own and its answers aren't there (11-07 has another); neither test touches what 6b-2a changed. CI's fresh stack is the check (below).
+- PR #172's first CI e2e run (run 42691547407 at 83844ab): `1 failed`, `1 flaky`, `166 passed (35.5m)`. The failure, the phone look check, twice: `no console errors in the run` with "NetworkError: A network error occurred." from the scene's fault, and `every pixel plum to amber` with greens at Q6, the fault's alert on screen. Cause: next/font/local adds a "Handjet Fallback" face from `local("Arial")` by default (Font, `adjustFontFallback`); CI's Linux has no Arial, so that face fails and the scene's `document.fonts.load` of the family rejects. Shown in headless Chromium here: a family list with a face whose `local()` font is missing rejects with exactly that message, `rejected NetworkError: A network error occurred.`, and the same load without that face resolves. Fixed with `adjustFontFallback: false` (`src/afterglow/font.ts`); the game's CSS keeps its own fallback, "Arial Narrow". A device without Arial, as Android may be, would have shown players the same alert since 6b-1 (*unverified* on a phone). The flaky one was `play2.e2e.ts:51` (ROADMAP, For M14). After the fix, the served stylesheet names `handjet` alone; `afterglow-look.e2e.ts`, `afterglow.e2e.ts` and `how-to-play.e2e.ts`: `11 passed (5.3m)`.
 
 ## Review
 14c-6b-1, by the `reviewer` agent in a fresh context (2026-11-08), on `git diff origin/main...HEAD` at 3de8c14:
@@ -295,3 +388,10 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
   7. The panel's spacings had no recorded origin. Each is the game's own (the box's padding and gap, the HUD's gap, the game's buttons and ×), now cited in the CSS and the Numbers table.
 - Evidence after the fixes: lint and types clean, `npm test` 640 passed, `npx playwright test e2e/how-to-play.e2e.ts e2e/offbeat.e2e.ts e2e/headings-invites.e2e.ts e2e/shell.e2e.ts --reporter=line`: `27 passed (2.6m)`.
 - Deferred to ROADMAP "Next revision" (For M14): the panel's `--u` at its default, the weak Tab check, Plan step 3's "30 to 40", `shell.e2e.ts`'s one-path loop, and 6d built while #169 was open.
+
+**14c-6b-2a** (2026-11-09), by the `reviewer` agent in a fresh context, on `git diff 774e7d3..HEAD` with the design commits. It confirmed every converted street function is called through `yield*`, the probe changes nothing unless the test page passes it, the CI project runs only the phone test and the full project all 6, and every carried line's condition against `check.mjs`'s but for the Source diff's rewrites; it reran the CI set (42 of 42, `1 passed (1.6m)`), types and lint. Three blocking findings, all fixed:
+  1. The check's waits had no limit: Playwright Test's action and navigation timeouts default to none, where the mock's ran under the library's 30 s, so a stuck section could hang CI's `e2e` job for hours. The check's pages now default to the library's 30 s (`LIBRARY_TIMEOUT`, `e2e/afterglow-look.ts`), and the Source diff row that said each wait kept the mock's is corrected.
+  2. `check.mjs`'s "flow ran to the end" was neither carried nor listed. In the Source diff: a thrown error now fails its test, which names the section.
+  3. HANDOFF still said 6b-2a was in progress. Rewritten.
+- Evidence after the fixes: the CI set, 42 of 42, `1 passed (1.6m)`; the full set in real Chrome, 222 of 222, `6 passed (14.5m)`: 60.0 fps at both sizes, the worst pre-draw slice 6.8 ms wide and 6.5 ms phone, the slowest step 4.1 ms wide (a tenth over answer 59's budget; in ROADMAP) and 2.6 ms phone.
+- Deferred to ROADMAP "Next revision" (For M14): DESIGN.md's 4 ms step claim unchecked, the off-list line's 5 s wait without an origin, the split's total pre-draw time not compared. Done in this PR: the 14c-5 pre-draw item closed, and two DESIGN.md citations (one past the CSS's end, one stopping before `refuse()`).

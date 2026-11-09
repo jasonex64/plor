@@ -156,6 +156,15 @@
   white-space: nowrap;
 }
 
+/* The game's buttons are the mock's, flat on the art: not the app's (src/app/globals.css, Buttons), whose hard shadow, in
+   the app's ink, isn't in the game's colours, and whose lift and press the mock never had. Found by the look check's
+   "every pixel plum to amber" (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6b-2a). .go's ring is its own
+   box-shadow, untouched. */
+:is(.afterglow, .howto) button {
+  --shadow-button: none;
+  transform: none;
+}
+
 .afterglow :is(button, input):focus-visible {
   outline: var(--u) solid var(--ink);
   outline-offset: var(--u);
@@ -276,7 +285,10 @@
   top: 0;
   color: var(--word);
   white-space: nowrap;
-  will-change: transform;
+  /* No layer of its own (the mock's had will-change: transform): composited on one, the moving word's anti-aliased edges
+     came out a shade off at some offsets in real Chrome, which "lettering never changes shape or size" caught
+     (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 60). Painted with the rest of the layer, it is the same
+     at every offset. */
   pointer-events: none;
   text-shadow:
     var(--o) 0 0 var(--line),
