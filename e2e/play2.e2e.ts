@@ -73,18 +73,17 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   });
   await expect(reason).toHaveText("Not in the dictionary.");
   await expect(box).toHaveValue("");
-  // Within the lockout the box stays usable, and a try is refused unjudged. Typed and sent in one call in the page, as
-  // the double Enter above is: a software-drawn village's frames held Playwright's typing past the 0.5 s lockout on CI
-  // (docs/milestones/M16-16g-2-midnight-brew-in-play2.md, answer 21).
-  await box.evaluate(async (input: HTMLInputElement) => {
-    if (input.disabled) throw new Error("the box isn't usable within the lockout");
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, "aqkb");
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    // React applies the typed text before the submit reads it.
-    await Promise.resolve();
-    await Promise.resolve();
-    input.form!.requestSubmit();
-  });
+  // Within the lockout the box stays usable, and a try is refused unjudged. This one try's "locked" answer is stubbed with
+  // the real run: on CI the software-drawn village held the page past the 0.5 s lockout, and the server's lockout itself is
+  // checked in src/app/api/substrings/route.db.test.ts (docs/milestones/M16-16g-2-midnight-brew-in-play2.md, answer 22).
+  await page.route("**/api/substrings/try", async (route) => {
+    const headers = { "x-protocol": route.request().headers()["x-protocol"] };
+    const { run } = await (await page.request.get("/api/substrings", { headers })).json();
+    await route.fulfill({ json: { ok: true, outcome: "locked", run } });
+  }, { times: 1 });
+  await box.fill("aqkb");
+  await expect(box).toBeEnabled();
+  await box.press("Enter");
   await expect(reason).toHaveText("Too quick. Try again in a moment.");
   await expect(box).toHaveValue("");
   await page.waitForTimeout(600);
