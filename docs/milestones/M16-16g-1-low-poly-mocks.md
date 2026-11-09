@@ -1,6 +1,6 @@
 # M16 — 16g-1, two low-poly 3D mocks for game 2's look
 
-**Status:** in review (approved 2026-11-07, Pacific: "Approve, build mocks"; revision 2, 2026-11-08: four moving worlds; revision 3, 2026-11-08: the human picked Midnight Brew and asked for big-word impact, more detail and more idle life, built, reviewed and published; waits on the human to try it; then 16g-2 builds it into `/play2`).
+**Status:** in review (approved 2026-11-07, Pacific: "Approve, build mocks"; revision 2, 2026-11-08: four moving worlds; revision 3: the human picked Midnight Brew, with big-word impact, more detail and idle life; revision 4, 2026-11-08: the spell casts by itself after each word, a short automatic finale, and light that builds each round; built, reviewed and published; waits on the human to try it; then 16g-2 builds it into `/play2`).
 
 ## Goal
 Two playable, animated, low-poly 3D mocks of game 2's look, built from polyfork.dev's models, each a private claude.ai page, so the human can pick game 2's look before anything goes into `/play2`.
@@ -98,6 +98,18 @@ Round 6
 
 **As built (Claude's mapping of answers 21 and 22, for the human to judge):** a normal word arcs in as before; good: the letters, a third bigger, rise into a ring over the pot, glow and slam straight down trailing sparks; great: the slam, then the cauldron erupts, a shockwave ring sweeps the base (lamps flare, pumpkins hop, leaves fly; the crows don't react, as answer 22 left out the characters reacting) and the camera slams in; huge: all of it bigger, a second shockwave, a flash in the sky and a harder slam. The detail: a tavern, a thatched cottage, a two-storey house, a well, a stream with a bridge, barrels, crates, signposts, walls, fences, a haystack, stumps, rocks, 70 grass tufts, mushrooms, steles and candles on the graves, an alchemy bench with potions, a brazier; a rocky cliff with roots round the base; window glows, fireflies, candle flicker. The idle life: a stray cat that wanders and sits, four crows hopping between perches, an owl on the mausoleum turning its head, two rats darting between barrels, a wolf on the edge howling at the moon, chimney smoke, swaying oaks, a hearse rolling round the rim with its headlights on, three faint wisps drifting. The animal files are trimmed to the clips they play, at half the keyframes (`trim_glb.py` in the scratchpad), and the credit line says so (CC BY asks to say if files were changed).
 
+## Revision 4 (human, 2026-11-08)
+The human's message, quoted whole: "looks fine but instead of puressing the button to cast the spell and go to the next question, the spell should be cast automatically and then the button takes u to next quesiton. also some more ambient lighting would be nice as the game progresses"
+
+25. The spell casts by itself after each word; the button only moves to the next question (the message above).
+
+Round 7
+26. The last round: "if there's a finale, it should be very short no need to have a button to get there it should be automatica".
+27. A time-up: "Yes, it still casts (Recommended)".
+28. The light: "Warm village glow,Brew-coloured wash,Brighter moonlight". Not picked: a sky glow.
+
+**As built:** after a word or a time-up the result card shows at once, its button reading "Casting the spell…" and disabled while the next part of the village changes; then it reads "Next question" and only starts the next round. After round 7 the finale (a column of light and a burst, about 1.4 s) plays straight away and the end card follows. The light builds in six equal steps, a sixth after each of rounds 1 to 6, so round 1 starts dark and round 7 at full (set instantly on a jump): windows light up one by one and glow bigger, candles brighten, the lanterns get stronger, a wash of the brew's colour from above the cauldron grows over the whole village, and the moonlight and ambient light brighten.
+
 ## Acceptance criteria
 - [x] Two private claude.ai pages, Midnight Brew and Bug's-Eye Garden, each linked in this ticket.
 - [x] Each plays a sample run of 7 rounds with a 20 s clock: type a word, send it, see the word come alive, the points, and the tracker move (answers 3, 10).
@@ -126,6 +138,7 @@ Round 6
 | The tracker's full mark, a total of 2,000; the garden store's 24 seeds | The brew's level and the store's fill | Proposed by Claude for the mocks only (`FULL`, `STORE` in each page's `scene.js`); the game has no such mark yet |
 | Sample sets RE, AN, ION, BLE, OCK, IGH, OUN and bonus letter P | The mocks' sample run | Proposed by Claude for the mocks only (`SAMPLE` in `harness.js`), shaped by `SUBSTRING_ROUNDS`; any letters holding the set are accepted, as the mock has no dictionary |
 | Revision 2's layouts and timings: the colony's 10-unit chamber step and 2.8 s descent; the village's 3.6 s change per round; the tower's 3.4 m floors, 2.6 s ride and tracker mark of 1,500; the railway's 140 m between stations and 6.5 s run; each world's camera poses (fov 28–30) and Office Tower's fixed late-afternoon sky (`SKY_FIXED` 3.6) | The four mock pages only | Proposed by Claude and the two building subagents for the human to judge on the pages; not carried into the app without the human's word |
+| Revision 4's light levels and timings: the brew wash (a point light 9 m above the pot, range 40, decay 1.1, up to intensity 42), moonlight 0.8 to 1.4 plus 0.4 at the moon's round, ambient 1.4 to 2.1, lanterns 2.4 to 4.0, the window and candle ramps, the build-up's ease rate 0.9, the cast's 2.8 s hold and the 1.4 s finale | The brew page only | Proposed by Claude for the human to judge on the page (answer 28 gave the kinds of light, not their levels); not carried into the app without the human's word |
 
 ## Plan
 1. The human approves this ticket and OKs polyfork.dev's licensing page as a source.
@@ -259,6 +272,26 @@ Midnight Brew: https://claude.ai/artifact/CRVWtWk9NBgnWymHzkbhiP (version 5). 65
 
 The screenshots were read: the slam ring of green letters over the pot (tier 1); the eruption, the shockwave ring and the camera slam (tier 3); the stray cat, the crows, the hearse with its headlights, the stream and bridge, the new buildings, on desktop and phone. Still *unverified*: claude.ai's own frame and a real phone.
 
+### Revision 4 (2026-11-08)
+Midnight Brew: https://claude.ai/artifact/CRVWtWk9NBgnWymHzkbhiP (version 6); the models are unchanged from version 5. The check script's `shift` scenario now asserts the button waits during the cast and the next round starts after it, and `finale` and `after` expect the finale with no button before it. From the scratchpad, `WORLDS=brew PORT=8775 sh check.sh`, then the play scenario at tiers 0, 1 and 3, gave:
+
+```
+== brew 1920 1080 1 idle { "scenario": "idle", "stats": "60 fps · 2.4 ms draw", "errors": [] }
+== brew 390 844 3 idle { "scenario": "idle", "stats": "60 fps · 2.9 ms draw", "errors": [] }
+== brew 1280 800 1 play prepare { "scenario": "play", "stats": "60 fps · 3.4 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 390 844 3 play prepare { "scenario": "play", "stats": "58 fps · 2.5 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 jumps { "scenario": "jumps", "stats": "60 fps · 3.1 ms draw", "errors": [] }
+== brew 1280 800 1 shift { "scenario": "shift", "stats": "60 fps · 2.6 ms", "buttonWaitsDuringCast": true, "nextRoundStarted": "Round 3 of 7", "errors": [] }
+== brew 1280 800 1 miss { "scenario": "miss", "stats": "60 fps · 2.4 ms", "errors": [] }
+== brew 1280 800 1 finale pounder { "scenario": "finale", "stats": "60 fps · 3.9 ms draw", "errors": [] }
+== brew 1280 800 1 after pounder { "scenario": "after", "stats": "60 fps · 2.4 ms draw", "afterAgain": { "startShown": true, "finaleHidden": true, "total": "0" }, "errors": [] }
+== brew 1280 800 1 play tree { "scenario": "play", "stats": "60 fps · 2.6 ms", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 play refers { "scenario": "play", "stats": "60 fps · 2.6 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+== brew 1280 800 1 play rearranges { "scenario": "play", "stats": "60 fps · 3.0 ms draw", "pipsDisabledDuringSend": true, "errors": [] }
+```
+
+The screenshots were read: the result card with "Casting the spell…" disabled while the pumpkins swell (round 2's word); round 6 lighter and washed with the brew's green; the finale's column right after the last word, then the end card. Still *unverified*: claude.ai's own frame and a real phone.
+
 ## Review
 The `reviewer` agent, in a fresh context, 2026-11-07, on the ticket, the docs diff and the pages' source.
 - Blocking findings and how each was fixed:
@@ -284,3 +317,7 @@ Revision 3: the `reviewer` agent, in a fresh context, 2026-11-08, on the brew, t
   2. The ticket's Status, Evidence and Review and the handoff weren't written yet. Written in this commit.
 - Taken out for the human's answer: the crows took off at the shockwave, a character reacting, which answer 22 left out. They now only hop on their own timer.
 - Deferred to ROADMAP "Next revision" (For M16): the second shockwave drawn without its own ring; the hearse's path through props near its circle; two crows able to share a perch; per-frame allocations in `update()`; the particle pool overflowing at huge; the trimmer's unhandled cases (morph weights, STEP samplers, sparse accessors); the tier thresholds and part size missing from Numbers.
+
+Revision 4: the `reviewer` agent, in a fresh context, 2026-11-08, on the harness's new flow, the brew's light and the ticket.
+- Blocking findings and how each was fixed: all three were in the docs. The ticket said the light built "a seventh of the way each round" while the code steps a sixth (fixed); revision 4's light levels and timings had no Numbers row (added); the Status, Evidence, Review and handoff weren't written yet (written in this commit).
+- Deferred to ROADMAP "Next revision" (For M16): no phase guard in `nextRound` or on a double press of Start; the finale's column staying lit under the end card (for the human to confirm); the moon's round giving the moonlight a bigger step; the windows' soft ramp rather than one by one; the check script not asserting the pips during the cast, a time-up's cast, or the absence of the result card before the finale; the retired worlds' `world.json` lacking the "casting" word.
