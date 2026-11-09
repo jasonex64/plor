@@ -33,7 +33,8 @@ const note = (size: string, name: string, detail: string) => console.log(`note $
 const shots = () => { const d = test.info().outputPath("shots"); fs.mkdirSync(d, { recursive: true }); return d; };
 const phases = (p: Page) => p.evaluate(() => __core.log.map((e) => e.phase));
 
-// The mock waited on each step, never on the whole check; a whole section has no limit of its own.
+// The mock waited on each step, never on the whole check: a whole section has no limit of its own, each wait the mock's
+// (LIBRARY_TIMEOUT unless it set its own, e2e/afterglow-look.ts).
 test.beforeEach(() => test.setTimeout(0));
 
 // ---------- Layout, at every size the ticket names ----------

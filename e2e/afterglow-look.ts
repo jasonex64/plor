@@ -92,10 +92,16 @@ const noBadge = () => addEventListener("DOMContentLoaded", () => { const st = do
 // on every page (/about too; answer 58, and in ROADMAP for the app). Any other warning or error fails its line.
 const NOT_OURS = [/getImageData are faster with the willReadFrequently/, /^The resource \S+\.css was preloaded using link preload but not used within a few seconds/];
 
+// Every wait the mock's check made ran under the Playwright library's default, 30 s ("defaults to 30 seconds",
+// playwright-core's types); Playwright Test's own action and navigation timeouts default to none, so the check's pages set it.
+// A wait that runs out throws, which fails the test with its error, as the mock's "flow ran to the end" did.
+export const LIBRARY_TIMEOUT = 30_000;
+
 export type Opened = { c: Awaited<ReturnType<Browser["newContext"]>>; p: Page; errs: string[] };
 // The test page at a question (?q, answer 46: where the mock skipped ahead or played again), its fonts in.
 export async function open(b: Browser, opts: BrowserContextOptions, withHook = true, q = 1): Promise<Opened> {
   const c = await b.newContext(opts);
+  c.setDefaultTimeout(LIBRARY_TIMEOUT);
   await c.addInitScript(reader);
   await c.addInitScript(noBadge);
   if (withHook) await c.addInitScript(hook);
@@ -253,7 +259,9 @@ export const inFamily = (h: number | null) => h !== null && (h >= 300 || h <= 50
 
 // A blank page that decodes screenshots, for the checks that look at what reached the screen.
 export async function analyser(b: Browser) {
-  const an = await (await b.newContext()).newPage();
+  const anc = await b.newContext();
+  anc.setDefaultTimeout(LIBRARY_TIMEOUT);
+  const an = await anc.newPage();
   await an.evaluate(() => {
     window.__decode = (b64) => new Promise((f) => { const i = new Image(); i.onload = () => { const c = document.createElement("canvas"); c.width = i.width; c.height = i.height; const x = c.getContext("2d", { willReadFrequently: true })!; x.drawImage(i, 0, 0); f({ w: i.width, h: i.height, d: x.getImageData(0, 0, i.width, i.height).data }); }; i.src = "data:image/png;base64," + b64; });
     window.__hueOf = (r, g, b) => { const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return null; return (mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) * 60; };
