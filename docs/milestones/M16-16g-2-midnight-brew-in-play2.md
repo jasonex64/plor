@@ -1,6 +1,6 @@
 # M16 — 16g-2, Midnight Brew becomes game 2's run
 
-**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a built and reviewed, committed locally, its PR waiting on 16g-1's; 16g-2b and 16g-2c next).
+**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a built and reviewed, in review as PR #173 after 16g-1's PR #171 merged; 16g-2b and 16g-2c next).
 
 ## Goal
 Play game 2's real run at `/play2` in Midnight Brew, the low-poly witch's village approved in 16g-1 (version 6), full screen, with the end of the run kept as today's cards.

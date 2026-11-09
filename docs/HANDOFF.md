@@ -2,12 +2,12 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-11-08 (Pacific, evening), on `m16-game-2`, by the Windows PC session that ran 16g-1 and built 16g-2a.
+**Updated:** 2026-11-09, on `m16-game-2`, by the Windows PC session that ran 16g-1 and built 16g-2a.
 - **16g-2a, the village plays the run** (`docs/milestones/M16-16g-2-midnight-brew-in-play2.md`): built, reviewed (five blocking items, all fixed or answered; the rest in ROADMAP, Next revision), and committed locally. `/play2` plays the real run in Midnight Brew, full screen with the way out; three.js 0.180.0 is in (DECISIONS.md, 3D scenes); the models are in `public/brew/`.
 - **Learned the hard way, in the ticket:** CI has no GPU, so Chromium draws WebGL in software (SwiftShader) at about 200 ms a draw. The stage then draws less often and holds its shadows (answers 13, 15, 18). The test browser's `--enable-unsafe-swiftshader` is approved (answer 17). Joining the still props halved the draw calls but didn't speed software drawing up (answers 14, 16). A long-task reading taken right after load is polluted by load's own tasks reported late, so measure in time windows.
 - **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, and never edit `src/` while an e2e run is going (the dev server recompiles mid-run and the results stop meaning anything). A run that times out restarts its worker with a new `RUN`, so its afterAll leaves its players and today's fixture day behind; delete them by hand.
-- **Not pushed, no PR:** 16g-1's commits and 16g-2a's commit are local on `m16-game-2`. One PR per sub-ticket: 16g-1's docs PR first, then 16g-2a's; pushing waits on the human. **Left running:** nothing.
-- **Next:** the human's word on pushing and the two PRs; then 16g-2b, the calm version under Reduce motion (answer 5), with its e2e; then 16g-2c, trying mesh compression (note that `next start` already gzips the models to about 2.3 MB of 10.8; whether Vercel does too is *unverified*).
+- **PRs:** 16g-1's docs merged as PR #171 (green CI, the human's "Merge when green"). 16g-2a is PR #173, with Auto-fix watching it; merging waits on the human. After `main`'s 14c-6d and 6b-2a merges, local `brew.e2e.ts` runs failed at a different step each time while `RIFF-m14`'s dev server (port 3001) shared the PC, so CI's run decides; they had passed 8 of 8 twice before those merges. **Left running:** nothing.
+- **Next:** PR #173 green and merged at the human's word (if its `e2e` fails, read the logs before changing anything); then 16g-2b, the calm version under Reduce motion (answer 5), with its e2e; then 16g-2c, trying mesh compression (note that `next start` already gzips the models to about 2.3 MB of 10.8; whether Vercel does too is *unverified*).
 
 **From `main` (M14's session), merged into `m16-game-2` on 2026-11-09, after PR #172:**
 
