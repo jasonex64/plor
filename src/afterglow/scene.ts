@@ -134,6 +134,8 @@ function layer(w: number, h: number, read?: boolean): [HTMLCanvasElement, Canvas
 const easeOut = (k: number, p = 2) => 1 - Math.pow(1 - clamp01(k), p);
 const climbEase = (k: number) => 1 - Math.pow(1 - Math.pow(clamp01(k), CLIMB_IN), CLIMB_OUT);
 const FRAME_KEYS = ["street", "palace", "far", "near", "strings"] as const;
+// The type scale for the window as it is, from the mock (`layout()` at fcc11e4): the scene's, and How to play's (14c-6d).
+export const typeScale = () => Math.min(3, innerHeight / 375, innerWidth / 195);
 const ABOVE_KEYS = ["palace", "far", "near", "strings"] as const;
 
 // Starts the scene in root, the page's Afterglow layer, where start says, and returns its stop. fontFamily: the family
@@ -188,7 +190,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     g.setTransform(S, 0, 0, S, 0, 0);
     g.imageSmoothingEnabled = false;
     U = S / DPR;
-    K = Math.min(3, innerHeight / 375, innerWidth / 195);
+    K = typeScale();
     root.style.setProperty("--u", U + "px"); root.style.setProperty("--k", String(K)); root.style.setProperty("--gap", EDGE * U + "px");
     buildLightMask();
     buildLanternArt();

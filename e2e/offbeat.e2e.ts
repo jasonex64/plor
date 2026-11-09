@@ -1,13 +1,14 @@
-// Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md): the banner, the stakes, Start and How to play;
+// Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md): the banner, the stakes, Start and How to play (its
+// panel is how-to-play.e2e.ts's);
 // the player's stats before and after a run; yesterday's answers; the feed beside the game from 1200px; and no
 // sideways scroll at 320px.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/config/tunables";
+import { POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/config/tunables";
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { PAST_MIDNIGHT } from "../src/app/bonus";
 import { RUN, signInAndPick } from "./players";
-import { answerBox, caught, caughtToCards, safe, seeResults, skyResult, walkOn } from "./afterglow";
+import { caught, caughtToCards, safe, seeResults, skyResult, walkOn } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -39,9 +40,6 @@ test.afterAll(async () => {
 const PHONE = { width: 360, height: 800 };
 // The game's numbers as tunables.ts holds them (docs/milestones/M14-14a-2c-review-fixes.md, criterion 1).
 const [LOWEST, HIGHEST] = [POINTS_PER_QUESTION[0], POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]];
-const STEALS = new Intl.ListFormat("en", { type: "conjunction" }).format(
-  LETTER_SCHEDULE.flatMap((tier, i) => (tier === null ? [] : [String(i + 1)])),
-);
 // The game screen's requests for its stats and the run's answers, in the order they happen. In development React's
 // Strict Mode runs each effect twice, so a mount's loads come in pairs; what counts is when they start.
 const timeline = (page: Page) => {
@@ -75,25 +73,10 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   );
   await expect(game.getByRole("button", { name: "Start", exact: true })).toBeVisible();
 
-  await game.getByRole("link", { name: "How to play" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/afterglow/how-to-play");
-  const how = page.getByRole("region", { name: "How to play" });
-  await expect(how).toContainText("The host has already picked a few answers to every question.");
-  await expect(how).toContainText(`${QUESTIONS_PER_DAY} questions, one run.`);
-  await expect(how).toContainText(`On questions ${STEALS} a letter is taken`);
-  await expect(how).toContainText(`${LOWEST} points for the first, ${HIGHEST} for the last`);
-  await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
-  // Start playing starts the run, on the game screen.
-  await how.getByRole("button", { name: "Start playing" }).click();
+  // How to play opens its panel over the screen (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d).
+  await game.getByRole("button", { name: "How to play" }).click();
+  await expect(page.getByRole("dialog", { name: "How to play" })).toBeVisible();
   await expect(page).toHaveURL("http://localhost:3000/afterglow");
-  await expect(answerBox(page)).toBeVisible();
-  // Once the run has started, How to play offers no start (14a-2c, criterion 2). Its text shows before the run's
-  // state does, and the clock bar asks for the run too, so the check waits until every request has answered.
-  await page.goto("/afterglow/how-to-play");
-  await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();
-  await page.waitForLoadState("networkidle");
-  await expect(page.getByRole("region", { name: "How to play" })).toContainText("The host has already picked");
-  await expect(page.getByRole("button", { name: "Start playing" })).toHaveCount(0);
 });
 
 // Criteria 4 and 5: a player who never played, then plays and is caught on question 1.
@@ -199,9 +182,9 @@ test("a run resumed after its midnight says its answers don't count for the boar
 
 // 14c-1's, 14c-2's and 14c-6's renames moved the game to a new address with no redirect (14b-4, "The new name";
 // docs/milestones/M14-14c-2-neutral-words.md, answer 13; docs/milestones/M14-14c-6-afterglow-in-play.md, answer 13),
-// so the old ones are gone.
-test("the old addresses /offbeat, /updraft and /play answer 404", async ({ page }) => {
-  for (const path of ["/offbeat", "/updraft", "/play"]) {
+// so the old ones are gone; so is How to play's page, now a panel (14c-6 answer 39).
+test("the old addresses /offbeat, /updraft, /play and /afterglow/how-to-play answer 404", async ({ page }) => {
+  for (const path of ["/offbeat", "/updraft", "/play", "/afterglow/how-to-play"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

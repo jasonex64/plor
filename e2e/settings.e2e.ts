@@ -39,7 +39,9 @@ test.beforeAll(async ({ browser }) => {
 });
 
 const sheetOf = (page: Page) => page.getByRole("dialog", { name: "Settings" });
-const isModal = (page: Page) => page.evaluate(() => document.querySelector("dialog")!.matches(":modal"));
+// The settings sheet's own dialog: Today's banner holds How to play's too, closed, before the shell's in the page
+// (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d).
+const isModal = (page: Page) => sheetOf(page).evaluate((d) => d.matches(":modal"));
 
 // Criterion 1 on a phone: the top bar's gear, the sheet along the bottom, and the three ways to close it.
 test("on a phone the gear opens the settings sheet, which closes with Close, Escape or the dimmed page", async () => {

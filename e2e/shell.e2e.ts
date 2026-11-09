@@ -359,8 +359,9 @@ test("the sidebar is 280px, the right column holds the feed from 1200px, and no 
 });
 
 // No control drawn as a text link beyond the four tabs either (14b-2c-4, item 48): the settings sheet, the clock bar,
-// How to play, /streak and a group's page. A link drawn as text stays only inside the About and privacy pages' prose.
-test("the settings sheet, the clock bar, How to play, /streak and a group's page have no text-link controls", async ({ browser }) => {
+// /streak and a group's page (How to play is a panel of buttons now, 14c-6d). A link drawn as text stays only inside the
+// About and privacy pages' prose.
+test("the settings sheet, the clock bar, /streak and a group's page have no text-link controls", async ({ browser }) => {
   const { page, nav } = await player(browser, "su2", { width: 1440, height: 900 });
   const underlined = () =>
     page.evaluate(() =>
@@ -373,7 +374,7 @@ test("the settings sheet, the clock bar, How to play, /streak and a group's page
   expect(await underlined(), "the settings sheet").toEqual([]);
   await page.keyboard.press("Escape");
 
-  for (const path of ["/afterglow/how-to-play", "/streak"]) {
+  for (const path of ["/streak"]) {
     await page.goto(path);
     await expect(nav).toBeVisible();
     await page.waitForLoadState("networkidle");
