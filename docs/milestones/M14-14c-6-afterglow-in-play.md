@@ -118,6 +118,10 @@ Round 17
 55. Sources: "Yes, add them (Recommended)". The five Playwright pages and Next.js's environment variables guide, in SOURCES.md.
 56. Off-list: "Yes, one line (Recommended)". 6b-2a adds one line beyond the mock's, checking off-list text shakes the box as a refused taken letter does (answer 28); it closes ROADMAP's item.
 
+Round 18 (2026-11-09, from the CI set's first run: 40 of its 42 lines passed, the other two failing on the dev server's own badge and warning)
+57. Dev badge: "Hide it in the check (Recommended)". Next's dev-tools badge, which only `next dev` draws, is hidden on the check's pages before it looks; the colour line had caught its white and greys.
+58. CSS warning: "Pass over that one (Recommended)". The check ignores, by its text, the warning Next's dev build gives on every page (/about and /privacy too) for a preloaded stylesheet it doesn't use; any other warning or error still fails. The warning goes in ROADMAP for the app.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -245,7 +249,7 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 - In RIFF-mocks, the human retires `themes/festival/` once the move is merged (an agent's delete there was refused before; not routed round).
 - 14c-6d: the How to play page and its route (`src/app/(shell)/afterglow/how-to-play/`, `HowToPlay` in `src/app/offbeat.tsx` and its `.how` CSS in `offbeat.module.css`, its Start playing), the clock bar's slide back up from it (`src/app/shell.tsx`), and the tests and DESIGN.md lines about the page.
 - 14c-6b-1 removed: `Question`, `Reveal`, the in-run `Countdown` and `QuestionSkeleton` in `src/app/game.tsx` and the question card's CSS in `game.module.css` (`offbeat.module.css` had none left); scoring's and matching's own `levels[id] ?? "rare"` and `answers.ts`'s own tier union, for `tierOf`; from the mock, its questions, play again, the Preview bar and the counters only its check read.
-- 6b-2a, planned: any check in `e2e/afterglow.e2e.ts` that a carried line repeats, listed when built; ROADMAP's "Nothing checks that off-list text shakes the box", closed by one line that checks it the way the carried taken-letter line checks that shake (answer 28: one shake). `check.mjs` and `mutants.mjs` stay in RIFF-mocks until the human retires `themes/festival/`.
+- 6b-2a removed: the mock's lines on the skip link and New show (Source diff); the game's buttons' inherited app shadow, lift and press; ROADMAP's "Nothing checks that off-list text shakes the box", closed by the added line (answer 56). Nothing in `e2e/afterglow.e2e.ts`: it plays the game against the server (the rules, reloads, Next's timing), and its one overlap with the look check, each rarity's colour, is in the full set only, so CI would lose it. `check.mjs` and `mutants.mjs` stay in RIFF-mocks until the human retires `themes/festival/`.
 
 ---
 *Fill in the sections below at the end.*
@@ -283,6 +287,35 @@ Five PRs from `m14-look-and-feel`, each after bringing it up to date with `main`
 | "the page behind is inert" | The page behind can't be reached; Tab past the panel's last button goes to the browser's own controls, as a modal `<dialog>` lets it, then back into the panel | MDN `<dialog>`: the rest of the document is inert, the browser's own controls aren't part of it |
 | — | The panel's text is centred | The question's text in the game is centred (`.q`), and the dialog otherwise took whatever the page round its button did (Today's banner centres, the game screen doesn't) |
 | APG: previous and next don't move focus | ‹ stays in its place, `aria-disabled` on the first chunk; › is one button that becomes Close, so focus stays on it | The pattern says nothing about the ends; *Claude's reading* (Design), approved with it (answer 41) |
+
+14c-6b-2a, against `check.mjs` at `fcc11e4` (RIFF-mocks `themes/festival/`) and this ticket's Design:
+
+| Source says | We built | Why different |
+|---|---|---|
+| The check reads `themes/dist/afterglow.test.html`, a page that judges its own made-up day | `/check/afterglow` (`src/app/check/afterglow/`): the real scene, its replies scripted from the mock's sample day and judge (`day.ts`), served by `next dev` only | Answers 44, 49 |
+| `window.__core` and the mock's page-wide variables (`scene`, `camNow`, `fuse`, `drawWalk`, `g` and the rest) | The scene's optional probe (`Probe`, `Core` in `src/afterglow/scene.ts`): the test page sets `window.__core`; the check reads `__core.scene`, `__core.fuseBox` and so on, and swaps `__core.g`, `drawSky`, `drawTower`, `drawWalk` and `draw` as the mock swapped its globals | Answer 45 |
+| The scene's counters (phase log, frame and pre-draw times, `camNow`, `skyNow`, `towerNow`, the fuse's and rumble's state) | Kept on every page, as the mock kept them; only the clock's speed and stop wait on the probe | The check reads the code players run, not a copy (CLAUDE.md, "Never cheat a check") |
+| One script, `pass`/`FAIL` lines, an exit code; `CHROME_CHANNEL=chrome` for real Chrome | Playwright tests (`e2e/afterglow-look.e2e.ts`, helpers in `afterglow-look.ts`), each line a soft check under its name and printed as before; the project `afterglow-full` in the installed Chrome | DECISIONS.md, Test runner; answers 47, 50; Playwright, browsers |
+| The whole check at both sizes | `npm run test:e2e` runs the phone size's scripted run alone (42 lines, among them the colour and font lines over the frames it looks at); `npm run check:afterglow` runs everything | Answers 15, 47 |
+| No limit on the whole check, each wait its own | The look tests have no test timeout (`test.setTimeout(0)`); each wait keeps the mock's | The mock had none; no new number |
+| The skip link: to Q2's lantern (layout), to Q7 (common and rare bursts), to Q2 (taken letters), to Q5 (idle) | Layout answers Q1 and walks on to Q2's lantern; the others open the page at the question (`?q=N`, the earlier ones answered with the scripted run) | Answer 46: the game has no skip link |
+| New show: the fps run's raster part, the time-out then the dud then the taken letters on one page | A new page for each; "no console errors in the ends" is still one line, over the three pages | Answer 46: one run a day |
+| "the skip link plays each lantern once", "skipping all seven reaches the results", "after a full run, a result keeps its answer line", "a new size after New show plays on" | Dropped | Answer 46: they test the skip link and New show, which the game doesn't have |
+| "time-out: ends on the street with play again" | "time-out: ends on the street with See results" | Answer 21 |
+| "the last result's button leads to the results": Q7's button says See results | Q7's says Walk on, and the ending's See results leaves for the cards | Answers 21, 29 |
+| The recap's `+total` | `+points` | Answers 7, 24: points from the server; the bonus estimate only sizes the burst |
+| The lantern between the arrival and the box: `arrive>letter>ask` | `arrive>letter>open` | DECISIONS.md, Game 1: Timer (the box opens empty, Next is sent, then "ask") |
+| The dud's phases `ask > charge > dud > over` | `ask > wait > charge > dud > over` | Answer 16 |
+| The flow reads the word's tier as soon as it is typed | Once the reply has landed | Answer 16: the word waits in plain ink until then |
+| Two colour lines need the phases the whole check plays, play again's among them | No play again; the CI set needs only the phases its run plays | Answers 46, 47 |
+| "one font": Handjet 400 by name | The family `next/font` gave Handjet, read from `--afterglow-font`, at 400 | `src/afterglow/font.ts`: next/font names the family |
+| "memory bounded" counts play again's scene | No such scene | Answer 46 |
+| Unlisted text is rare (the mock's `UNLISTED_SHARE`) | Listed: "sydney harbour bridge" at Q1 (.01) and "sonic" at Q7 (.3, as the mock's check set it); anything else is off-list | The game refuses text that names no answer (answer 9) |
+| Every console warning fails its line, but the mock's one canvas note | Also passed over: Next's dev build's unused stylesheet preload, on every page; Next's dev-tools badge is hidden before the check looks | Answers 57, 58 |
+| — | One line more: "off-list text shakes the box, in whole art pixels, as a taken letter does" | Answer 56 |
+| `offGridBlocks` | Not carried | Defined in the mock and never called |
+| `game-check.json`, `game-colours.json`, `themes/dist/game-shots/` | The lines in Playwright's report and output; `<size>-colours.json` and the frames and strips in each test's `test-results/…/shots/` | Answer 53 |
+| — | The game's and How to play's buttons drop the app's hard shadow, lift and press (`afterglow.module.css`) | The colour line caught the ×'s shadow in the app's ink, `#1a1a18`, which isn't the game's; the mock's buttons are flat (14c-5) |
 
 ## Evidence
 **14c-6a, the name and address** (2026-11-07, Windows PC, this worktree's own `next dev` on port 3000, local stack):
