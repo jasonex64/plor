@@ -5,6 +5,7 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 
@@ -91,8 +92,7 @@ test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ 
 test("the insights axis fits its chart on a day a question catches everyone", async ({ browser }) => {
   const page = await admin(browser, "ix", { width: 390, height: 844 });
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport);

@@ -11,7 +11,7 @@ import {
   RARITY_MIN_PLAYERS,
   RARITY_ZERO_SHARE,
 } from "../config/tunables.ts";
-import type { ApprovedPuzzle, ApprovedQuestion } from "@/content/puzzle";
+import { tierOf, type ApprovedPuzzle, type ApprovedQuestion } from "@/content/puzzle";
 
 // inDay: given before the run's day ended at midnight; later answers earn no bonus (D8).
 export type ScoredEvent = { index: number; entryId: string; matched: boolean; inDay: boolean };
@@ -32,7 +32,7 @@ export function firstGuess(question: ApprovedQuestion, entryId: string): number 
     uncommon: levels.filter((l) => l === "uncommon").length,
     rare: question.members - levels.length,
   };
-  const tier = question.levels[entryId] ?? "rare";
+  const tier = tierOf(question.levels, entryId);
   const total = (Object.keys(size) as (keyof typeof size)[]).reduce((sum, t) => sum + (size[t] > 0 ? FIRST_GUESS_SHARES[t] : 0), 0);
   return FIRST_GUESS_SHARES[tier] / total / size[tier];
 }

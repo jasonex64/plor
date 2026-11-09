@@ -5,6 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
+import { answerBox, caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -111,7 +112,7 @@ async function flip(page: Page, name: string, on: boolean) {
 test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
   await page.goto("/");
   const banner = page.getByRole("region", { name: GAME.name });
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/afterglow");
   await expect(banner).not.toContainText("20 seconds each");
 
   await flip(page, "Skip the game screen", true);
@@ -121,15 +122,14 @@ test("Skip the game screen makes Play start question 1, and says the time limit 
   await expect(banner.getByText("20 seconds each", { exact: true })).toBeVisible();
   await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
   await banner.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/play$/);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(page).toHaveURL(/\/afterglow$/);
+  await expect(answerBox(page)).toBeVisible();
 });
 
 // Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Caught on question 1, which
 // the test before left in play, today is a played day with 0 survived.
 test("Numbers on the calendar shows each played day's questions survived", async () => {
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
   await page.goto("/me");
   const cell = page.getByRole("region", { name: "Calendar" }).locator(`[data-date='${today}']`);

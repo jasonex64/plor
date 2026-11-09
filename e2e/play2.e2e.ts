@@ -217,7 +217,7 @@ test("game 1 stays as it was", async ({ browser }) => {
   await page.goto("/");
   await signInAndPick(page, "pg");
   await expect(page.getByRole("heading", { name: "Plor, Today" })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Game number 1" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Afterglow" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Game number 2" })).toHaveCount(0);
 });
 
@@ -229,7 +229,7 @@ test("the friends leaderboard switches to game 2", async ({ browser }) => {
   await page.goto("/friends");
   const board = page.getByRole("region", { name: "Friends leaderboard" });
   const games = board.getByRole("radiogroup", { name: "Game" });
-  await expect(games.getByRole("radio", { name: "Game number 1" })).toBeChecked();
+  await expect(games.getByRole("radio", { name: "Afterglow" })).toBeChecked();
   await expect(board.getByText("Each day adds the % of players you beat.")).toHaveCount(0);
   await games.getByText("Game number 2").click();
   await expect(games.getByRole("radio", { name: "Game number 2" })).toBeChecked();

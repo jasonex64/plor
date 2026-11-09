@@ -4,6 +4,7 @@ import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { asked } from "./afterglow";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -69,11 +70,14 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   await expect(streak.locator("[aria-current]")).toContainText("Seed0 daysYour rank");
 
   // Start on the game screen begins today's run, which counts at once: the pill moves to Daisy without a reload
-  // (criterion 2).
+  // (criterion 2). The run is full screen, with no top bar (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 3),
+  // so the pill is read back on Today.
   await page.goto("/");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("http://localhost:3000/afterglow");
   await page.getByRole("button", { name: "Start", exact: true }).click();
+  await asked(page, "Name an animal");
+  await page.goBack();
   await expect(top.getByRole("link", { name: "1 day streak, Daisy" })).toBeVisible();
   // Then /streak itself counts the run: this click opens the page afresh, so it checks /streak's own reading of the
   // streak, not the pill's change without a reload, which the line above checks (14b-2c-4, item 50).

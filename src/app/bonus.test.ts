@@ -10,6 +10,7 @@ const answer = (index: number, matched: boolean, inDay: boolean): AnsweredQuesti
   prompt: "Name an animal",
   answer: { id: "a", name: "a" },
   matched,
+  tier: "rare",
   hostAnswers: [],
   points: 0,
   bonus: 0,

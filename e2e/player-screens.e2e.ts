@@ -6,6 +6,7 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick, sharedLink } from "./players";
+import { answerBox, box, caughtToCards, lightIt } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -36,8 +37,7 @@ async function player(browser: Browser, name: string, viewport: { width: number;
 // Starts today's run and is caught on question 1 by the host's answer.
 async function caught(page: Page) {
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 
@@ -48,22 +48,28 @@ const bodyPadding = (page: Page) =>
   });
 
 // Items 12 and 43: Next.js keeps the page left hidden, and its shell, clock bar and column no longer hold the room.
+// Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 5),
+// so the way out of it is the browser's Back.
 test("the room for the clock bar and the right column goes with the page that shows them", async ({ browser }) => {
   const page = await player(browser, "xa", PHONE);
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Main" });
+  await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
   const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock.getByRole("timer")).toBeVisible();
   expect((await bodyPadding(page)).bottom).toBe("112px");
   await clock.getByRole("link", { name: "Back" }).click();
-  await expect(page.getByLabel("Your answer")).toBeVisible();
-  // Back on the game screen: the tab bar's room, not the hidden Friends page's clock bar.
-  expect(await bodyPadding(page)).toEqual({ top: "56px", right: "0px", bottom: "64px", left: "0px" });
+  await expect(answerBox(page)).toBeVisible();
+  // Back on the game screen: no room at all, as the game is full screen (answers 3 and 10), and none of the hidden
+  // Friends page's clock bar.
+  expect(await bodyPadding(page)).toEqual({ top: "0px", right: "0px", bottom: "0px", left: "0px" });
 
   // From 1200px the column's room, then About from the settings sheet: a page without the shell, and no room left.
   await page.setViewportSize(WIDE);
+  // Out of the full-screen game the way it came in, by Back.
+  await page.goBack();
   await nav.getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("complementary", { name: "Friends feed" })).toBeVisible();
   expect((await bodyPadding(page)).right).toBe("360px");
@@ -90,7 +96,9 @@ test("a comment draft in the right column stays when the window crosses 1200px",
 test("a question's time running out on another page opens the friends feed there", async ({ browser }) => {
   const page = await player(browser, "xc", WIDE, true);
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
+  await expect(answerBox(page)).toBeVisible();
+  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  await page.goBack();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   const feed = page.getByRole("complementary", { name: "Friends feed" });
   await expect(feed.getByText("Finish today's game to join in.")).toBeVisible();
@@ -113,8 +121,10 @@ test("a question's time running out on Today shows where everyone ended on its b
   test.slow();
   const page = await player(browser, "xj", WIDE);
   await play(page);
-  await expect(page.getByLabel("Your answer")).toBeVisible();
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
+  await expect(answerBox(page)).toBeVisible();
+  // Mid-question the game is full screen with no tabs (answers 3 and 5): the browser's Back is the way to Today.
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
   const board = page.getByRole("region", { name: "Friends today" });
   await expect(board).toBeVisible();
   await expect(board.getByRole("region", { name: "Where everyone ended" })).toHaveCount(0);
@@ -127,15 +137,13 @@ test("a question's time running out on Today shows where everyone ended on its b
 test("text that names no entry stays selected in the box, and a catch on question 1 has no bonus line", async ({ browser }) => {
   const page = await player(browser, "xd", PHONE);
   await play(page);
-  const input = page.getByLabel("Your answer");
-  await input.fill("zzqqzz");
-  await page.getByRole("button", { name: "Answer" }).click();
-  await expect(page.getByText('"zzqqzz" isn\'t in our list. Try another answer.')).toBeVisible();
+  const input = answerBox(page);
+  await lightIt(page, "zzqqzz");
+  await expect(box(page).getByText('"zzqqzz" isn\'t in our list. Try another answer.')).toBeVisible();
   await expect(input).toHaveValue("zzqqzz");
   expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([0, 6]);
 
-  await input.fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   const result = page.locator("#result");
   await expect(result).toContainText("You survived 0 of 7 questions and scored 0 points.");
   await expect(result).not.toContainText("bonus");
@@ -151,7 +159,7 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await caught(page);
   await page.goto("/");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/play#result$/);
+  await expect(page).toHaveURL(/\/afterglow#result$/);
   await expect(page.locator("#result")).toBeVisible();
   const at = () =>
     page.evaluate(() => ({

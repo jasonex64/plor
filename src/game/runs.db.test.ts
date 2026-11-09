@@ -13,6 +13,7 @@ import { GAME_ID } from "@/platform/game";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { answerBonus, firstGuess } from "./scoring";
 import { getPool } from "@/lib/db";
+import { fixtureTier } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, nameOf, removeFixtures, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
@@ -84,6 +85,9 @@ describe("a run, step by step", () => {
           answered: [],
           question: null,
           msLeft: null,
+          // A question's whole 20 seconds, from private.question_deadline (DECISIONS.md, Game 1: Timer), sent before
+          // any question opens, for Afterglow's fuse (docs/milestones/M14-14c-6-afterglow-in-play.md).
+          msQuestion: 20_000,
           next: null,
           points: 0,
           bonus: 0,
@@ -133,6 +137,9 @@ describe("a run, step by step", () => {
         prompt: q.prompt,
         answer: { id: entryId, name: nameOf(entryId) },
         matched: false,
+        // Its tier, from the fixture's own lists (14c-6, answer 6): the host bank is common, the uncommon list
+        // uncommon, every other member rare.
+        tier: fixtureTier(0, entryId),
         hostAnswers: q.host_answers.map((id) => ({ id, name: nameOf(id) })),
         points: POINTS_PER_QUESTION[0],
         // The provisional rarity bonus (M09; M13 13c): the first guess alone, with no past days pooled, as
@@ -152,7 +159,7 @@ describe("a run, step by step", () => {
       points: POINTS_PER_QUESTION[0],
       bonus: answerBonus(0, firstGuess(q, entryId)),
     });
-    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
+    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null, stolen: publicQuestion(puzzle, 1).stolen });
   });
 
   it("refuses an answer before Next, then Next opens question 2 with its own 20 seconds, once", async () => {

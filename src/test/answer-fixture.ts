@@ -140,6 +140,15 @@ export const FIXTURE: FixtureQuestion[] = [
 const sourceId = (key: string, slug: string) => `${key}-${slug}`;
 export const fixtureId = (index: number, slug: string) => thingId("wikidata", sourceId(FIXTURE[index].key, slug));
 
+// A fixture answer's tier from the fixture's own lists, the way fixtureDay sets the levels: common for the host bank,
+// uncommon for the uncommon list, rare for every other member.
+export function fixtureTier(index: number, id: string): "common" | "uncommon" | "rare" {
+  const q = FIXTURE[index];
+  const slug = Object.keys(q.members).find((s) => fixtureId(index, s) === id);
+  if (slug === undefined) throw new Error(`${id} isn't a member of fixture question ${index}`);
+  return q.bank.includes(slug) ? "common" : q.uncommon.includes(slug) ? "uncommon" : "rare";
+}
+
 // Every thing's main name, by ID.
 export const FIXTURE_NAMES = new Map<string, string>(
   FIXTURE.flatMap((q, i) => Object.entries(q.members).map(([slug, m]) => [fixtureId(i, slug), m.names[0]] as [string, string])),

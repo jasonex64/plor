@@ -8,6 +8,9 @@ import { HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS, QUESTIONS_PER
 
 // The drafting session's first guess at how many players give an answer (M13 D5). Members it doesn't name are rare.
 export type Level = "common" | "uncommon";
+// An answer's tier: its level, and rare for every member the levels don't name.
+export type Tier = Level | "rare";
+export const tierOf = (levels: Record<string, Level>, id: string): Tier => levels[id] ?? "rare";
 
 // Thing IDs are the answer database's permanent IDs (M13 D3).
 export type Question = {

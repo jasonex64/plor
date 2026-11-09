@@ -6,6 +6,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { caughtToCards } from "./afterglow";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -47,8 +48,7 @@ const icon = (tab: Locator) =>
 async function caught(page: Page) {
   await page.goto("/");
   await play(page);
-  await page.getByLabel("Your answer").fill(puzzle.hostAnswer);
-  await page.getByRole("button", { name: "Answer" }).click();
+  await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 }
 
@@ -95,7 +95,7 @@ test("a hovered button lifts 2px, and stays put under reduced motion", async ({ 
     const page = await (await browser.newContext({ viewport: WIDE, reducedMotion })).newPage();
     await page.goto("/");
     await signInAndPick(page, reducedMotion === "reduce" ? "vc" : "vb");
-    await page.goto("/play");
+    await page.goto("/afterglow");
     const start = page.getByRole("button", { name: "Start", exact: true });
     await start.hover();
     const lift = () => start.evaluate((b) => [getComputedStyle(b).transform, getComputedStyle(b).boxShadow.replace(/^rgba?\([^)]*\) /, "")]);
