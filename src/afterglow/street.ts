@@ -189,11 +189,14 @@ function addLight(F32: Float32Array, x: number, y: number, r: number, level: num
   }
 }
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + .5) / 16 - .5);
-function applyLight(buf: Uint8Array, L: Float32Array, amp = .2, max = 7) {
-  for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
-    const c = buf[i]; if (!c || L[i] < .3) continue;
-    const lv = flo(L[i] + BAYER[(y & 3) * 4 + (x & 3)] * amp);
-    if (lv > 0) buf[i] = WARM[Math.min(lv, max)][c];
+function* applyLight(buf: Uint8Array, L: Float32Array, amp = .2, max = 7): Steps<void> {
+  for (let y = 0, i = 0; y < H; y++) {
+    for (let x = 0; x < W; x++, i++) {
+      const c = buf[i]; if (!c || L[i] < .3) continue;
+      const lv = flo(L[i] + BAYER[(y & 3) * 4 + (x & 3)] * amp);
+      if (lv > 0) buf[i] = WARM[Math.min(lv, max)][c];
+    }
+    yield;
   }
 }
 
@@ -380,7 +383,7 @@ const WALLS = () => [
 ];
 const ROOFS = () => [INK.roof, INK.red, INK.ink];
 
-function drawBuilding(b: Building) {
+function* drawBuilding(b: Building): Steps<void> {
   const s = b.side, X = X0 + b.out * (X0 > 8 ? 1.6 : 1), zm = b.z0 - camZ, R = rng(b.seed);
   if (zm + (b.z1 - b.z0) < NEAR || zm > 215) return;
   const near = (b.z0 + b.z1) / 2 - camZ, lod = near > 110 ? 2 : near > 58 ? 1 : 0;
@@ -458,8 +461,9 @@ function drawBuilding(b: Building) {
     const up = b.tiers[k + 1];
     if (up && up.balcony && lod < 2) drawBalcony(b, up, s, X + up.inset, b.z0 + up.zin, b.z1 - up.zin * .4, lod, R, after);
     if (k === 0 && lod < 2 && R() < .8) drawSign(b, s, X, b.z0 + .3, R, after);
+    yield;
   }
-  for (const f of after) f();
+  for (const f of after) { f(); yield; }
 }
 function drawRoof(b: Building, t: Tier, s: number, xi: number, z0: number, z1: number, w: number, yE: number, ramp: number[], trim: number[], lod: number, after: (() => void)[]) {
   const ov = t.ov, rh = t.rh, zn = z0 - ov, zf = z1 + ov, L = t.lift, sc = scaleAt(zn), len = zf - zn;
@@ -702,7 +706,7 @@ function bridge(z: number, Y: number) {                                       //
 }
 
 // ---------- The palace: a stack of frontal halls with everything in close ramps (reference 5) ----------
-function palace() {
+function* palace(): Steps<void> {
   const zp = PZ - camZ, sc = scaleAt(PZ); T = LY.palace; setPen(Math.min(zp * .4, 62));
   const by = pj(0, 0, PZ)[1], c = (x: number, y: number): Pt => [cx + x * sc, by - y * sc], fine = sc >= 3.4, lod = sc >= 7 ? 2 : fine ? 1 : 0, det = lod;
   const gold = INK.gold, red = INK.red, fire = INK.fire, tr = [gold[3], gold[5], gold[2]], tp = Math.max(2, .5 * sc);
@@ -759,17 +763,23 @@ function palace() {
       const st = Math.max(3, rnd(1.7 * sc)); const wy = rnd(a[1]) + rnd(1.2 * sc), wh = rnd(3.6 * sc), pit = Math.max(2, rnd(.42 * sc)); for (let q = x + 1; q < x + wd - st; q += st) { const lit = isOn(ON.hall(h2(q, k))); rect(q + 1, wy, st - 2, wh, lit ? fire[3] : red[0]); if (lit) rect(q + 1, wy + rnd(wh * .5), st - 2, wh - rnd(wh * .5), fire[4]); for (let u = q + 1 + pit; u < q + st - 1; u += pit) rect(u, wy, 1, wh, lit ? fire[1] : red[1]); for (let u = wy + pit; u < wy + wh; u += pit) rect(q + 1, u, st - 2, 1, lit ? fire[1] : red[1]); rect(q, rnd(a[1]), 1, rnd(b[1] - a[1]), red[3]); }
       const e0 = c(x0 - hwS - 1.8, 6.4), e1 = c(x0 + hwS + 1.8, 6.4), t = c(x0, 10.2);
       frontRoof(e0[0], e1[0], t[1], e0[1], (e1[0] - e0[0]) / 2 - 3.8 * sc, .6 * sc, tp, INK.roof, tr);
+      yield;
     }
   }
   hall(4.4, 23.2, 2.5, 25.7, 3.6, 7, .95, 1.5, true, 3, true);
+  yield;
   hall(7.8, 17.5, 3.1, 20.6, 2.9, 10.6, .85, 5.2, false, 5, true);
+  yield;
   hall(11.4, 11.1, 3.7, 14.8, 3, 14.8, .9, 8.6, false, 7, true);
+  yield;
   hall(15.2, 3.7, 4.4, 8.1, 3.3, 19, 1, 11.6, false, 9, true);
+  yield;
   // Centre gable on the second roof and the great one over the door.
   { const g = c(0, 15.6), w = 4.6 * sc, h = 2.4 * sc; frontRoof(g[0] - w * 1.25, g[0] + w * 1.25, g[1] - h * 1.1, g[1] + 2, 1, .3 * sc, tp, INK.roof, tr); gableFace(g[0], g[1], w * .88, h * .8, [red[2], red[1], red[3]], gold[3]); }
   { const g = c(0, 9), w = 6 * sc, h = 3 * sc; frontRoof(g[0] - w * 1.25, g[0] + w * 1.25, g[1] - h * 1.1, g[1] + 2, 1, .4 * sc, tp, INK.roof, tr); gableFace(g[0], g[1], w * .88, h * .8, [red[2], red[1], red[3]], gold[3]); }
   // Finial
   { const a = c(0, 32), b = c(0, 29.3); rect(rnd(a[0]), rnd(a[1]), Math.max(1, rnd(.3 * sc)), rnd(b[1] - a[1]), gold[3]); if (sc > 3) { disc(rnd(a[0]), rnd(c(0, 30.1)[1]), Math.max(1, rnd(.42 * sc)), gold[4]); disc(rnd(a[0]), rnd(c(0, 31)[1]), Math.max(1, rnd(.3 * sc)), gold[5]); } }
+  yield;
   // Terrace and its stairs.
   const ta = c(-22, 3.7), tb = c(22, 0), tx = rnd(ta[0]), tw = rnd(tb[0] - ta[0]), ty = rnd(ta[1]), th = rnd(tb[1] - ta[1]);
   rect(tx, ty, tw, th, INK.wood[2]);
@@ -782,9 +792,10 @@ function palace() {
     const q = c(s * x_, 3.7); rect(rnd(q[0]), rnd(q[1]) - rnd(1.5 * sc), Math.max(1, rnd(.26 * sc)), rnd(1.5 * sc), INK.wood[1]);
     hang(q[0], q[1] - rnd(2.2 * sc), .42 * sc, .46 * sc, 2, isOn(Qn(6)), .9);
   }
+  yield;
   // The palace throws light on the sky and the plaza in front of it.
   const glow = lerpArr([0, .1, .4, .5, .7, 2.2, 3.4], STG), m = c(0, 12);
-  addLight(LS, m[0], m[1], 30 * sc, glow * .8); addLight(LS, m[0], m[1], 60 * sc, glow * .55);
+  addLight(LS, m[0], m[1], 30 * sc, glow * .8); yield; addLight(LS, m[0], m[1], 60 * sc, glow * .55); yield;
   const g = pj(0, 0, PZ - 4); addLight(LF, g[0], g[1], 26 * sc, glow * .9, .22);
   for (const [x_, a, b] of [[-14, .8, 1.7], [-8, 1.05, 1.3], [-2, .9, 2], [3.5, 1.1, 1.2], [9, .85, 1.8], [14.5, 1, 1.4]]) addLR(cx + x_ * sc, g[1], sc, 26 * a + 4, glow * a, b);
   addLight(LW, c(0, 2)[0], c(0, 2)[1], 22 * sc, glow * .9);
@@ -805,7 +816,7 @@ function* drawClouds(): Steps<void> {
   const n = SKYT.length, ramp = [.2, .35, .55, .75, .95].map((p) => SKYT[Math.min(n - 1, flo(p * n))]), R = rng(77);
   const spots = [[-.52, .1, 1.5], [.92, .15, 1.7], [-.2, .03, 1], [-.18, .32, 1.2], [.34, .36, .9], [-.72, .48, 1.5], [.82, .5, 1.6], [-.96, .2, 1.8], [1.08, .24, 1.6], [-.4, .62, .9], [.5, .7, .8]];
   const unit = Math.min(W, 460) / 2;
-  for (const sp of spots) { cloud(cx + sp[0] * unit * (W > 400 ? 1.75 : 1) + STG * 26, SKY_V * sp[1] + 22, sp[2] * 34, ramp, R); yield; }
+  for (const sp of spots) { yield* cloud(cx + sp[0] * unit * (W > 400 ? 1.75 : 1) + STG * 26, SKY_V * sp[1] + 22, sp[2] * 34, ramp, R); yield; }
 }
 function* drawSky(): Steps<void> {
   T = LY.sky; PEN = IDENT; SKY_V = vy;
@@ -815,7 +826,7 @@ function* drawSky(): Steps<void> {
     const p = i / (bands - 1) * (stops.length - 1), a = flo(p), f = p - a, q = stops[Math.min(stops.length - 1, a + 1)];
     BANDS.push(nearest(...mixRGB(stops[a], q, f)));
   }
-  for (let y = 0; y < H; y++) { skyRow(y, y); if (y % 48 === 47) yield; }
+  for (let y = 0; y < H; y++) { skyRow(y, y); yield; }
   SB = T.slice();
   yield* drawClouds();
   CM = new Uint8Array(W * H); for (let i = 0; i < CM.length; i++) CM[i] = T[i] !== SB[i] ? 1 : 0;
@@ -823,12 +834,13 @@ function* drawSky(): Steps<void> {
   const Rs = rng(55), n2 = rnd(lerpArr([.14, .12, .06, .04, 0, 0, 0], STG) * W);
   for (let i = 0; i < n2; i++) { const x = rnd(Rs() * W), y = rnd(Rs() * Rs() * vy * .75); if (lum(T[y * W + x]) < mirrorLum * .8) rect(x, y, 2, 1, INK.haze[0]); }
 }
-function cloud(x: number, y: number, size: number, ramp: number[], R: () => number) {
+function* cloud(x: number, y: number, size: number, ramp: number[], R: () => number): Steps<void> {
   const n = 6 + flo(R() * 5), lobes: [number, number, number][] = [], base = y + size * .5, wide = size * 2.1;
   for (let i = 0; i < n; i++) { const t = i / (n - 1) * 2 - 1, r = size * (.32 + .5 * (1 - t * t)) * (.7 + R() * .5); lobes.push([x + t * wide * .78 + (R() - .5) * size * .3, base - r * (.4 + R() * .35), r]); }
   for (let i = 0; i < 6; i++) { const k = lobes[flo(R() * n)]; lobes.push([k[0] + (R() - .5) * k[2] * 1.6, k[1] - k[2] * (.2 + R() * .5), k[2] * (.35 + R() * .25)]); }
   const x0 = rnd(x - wide * 1.6), x1 = rnd(x + wide * 1.6), y0 = rnd(y - size * 1.9), y1 = rnd(base + size * .45), seed = x * .01;
-  for (let py = Math.max(-YOFF, y0); py <= Math.min(H - 1 - YOFF, y1); py++) for (let px = Math.max(0, x0); px <= Math.min(W - 1, x1); px++) {
+  for (let py = Math.max(-YOFF, y0); py <= Math.min(H - 1 - YOFF, y1); py++) {
+   for (let px = Math.max(0, x0); px <= Math.min(W - 1, x1); px++) {
     const warp = .34, wx = px + (vnoise(px * .05 + seed, py * .07) - .5) * size * warp, wy = py + (vnoise(px * .06, py * .05 + seed) - .5) * size * warp;
     let f = -1;
     for (const b of lobes) { const dx = (wx - b[0]) / 1.35, dy = wy - b[1], v = 1 - Math.sqrt(dx * dx + dy * dy) / b[2]; if (v > f) f = v; }
@@ -845,6 +857,8 @@ function cloud(x: number, y: number, size: number, ramp: number[], R: () => numb
       l = 4.3 - up * 4.2 + (vnoise(wx * .04, wy * .09) - .5) * 1.5 - rim * 1.2;
     }
     T[(py + YOFF) * W + px] = ramp[clamp(flo(l), 0, 4)];
+   }
+   yield;
   }
 }
 function skyLanterns() {
@@ -898,9 +912,9 @@ function* drawFloor(C: Uint8Array): Steps<void> {
       }
       T[y * W + x] = c;
     }
-    if (y % 24 === 23) yield;
+    yield;
   }
-  applyLight(LY.street, LF, .3, 5);
+  yield* applyLight(LY.street, LF, .3, 5);
 }
 
 // ---------- Crowd ----------
@@ -930,16 +944,17 @@ export function* sceneSteps(w: number, h: number, stage: number, camStage = stag
 
   yield* drawSky();
   yield;
-  palace();
+  yield* palace();
   yield;
   skyLanterns();
   yield* drawStanding(true);
   addLight(LF, cx, vy + (H - vy) * .3, W * 1.1, lerpArr([0, 0, 1.2, 2, 2.3, 2.6, 2.8], STG), .7);
-  lightLayers();
+  yield;
+  yield* lightLayers();
   yield;
   // A composite the wet stone can mirror.
   const C = new Uint8Array(W * H);
-  for (const k of ["sky", "palace", "far", "near", "strings"] as const) { const b = LY[k]; for (let i = 0; i < C.length; i++) if (b[i]) C[i] = b[i]; }
+  for (const k of ["sky", "palace", "far", "near", "strings"] as const) { const b = LY[k]; for (let i = 0; i < C.length; i++) if (b[i]) C[i] = b[i]; yield; }
   yield;
   yield* drawFloor(C);
   sparkleField();
@@ -948,7 +963,7 @@ export function* sceneSteps(w: number, h: number, stage: number, camStage = stag
   const lights = LIGHTS.filter((l) => { if (l.x < 0 || l.y < 0 || l.x >= W || l.y >= H) return false; const c = C[l.y * W + l.x]; return FIRE.has(c) || lum(c) > .7; });
   LIGHTS = null;
   // The clouds come apart from the sky behind them, so they can drift; together they are exactly the sky as drawn.
-  const skyLit = SB.slice(); applyLight(skyLit, LS, .5, 6);
+  const skyLit = SB.slice(); yield* applyLight(skyLit, LS, .5, 6);
   const frameSky = LY.sky, cloudsIn = new Uint8Array(W * H);
   for (let i = 0; i < frameSky.length; i++) { if (CM[i]) cloudsIn[i] = frameSky[i]; else skyLit[i] = frameSky[i]; }
   yield;
@@ -967,7 +982,7 @@ export function* sceneSteps(w: number, h: number, stage: number, camStage = stag
 function* drawStanding(frame: boolean): Steps<void> {
   // Buildings, far to near on each side.
   const list = [...SPECS[0], ...SPECS[1]].sort((a, b) => b.z0 - a.z0);
-  for (const b of list) { drawBuilding(b); yield; }
+  for (const b of list) { yield* drawBuilding(b); yield; }
   // Plaza halls that frame the palace on arrival.
   plazaHalls();
   yield;
@@ -983,15 +998,15 @@ function* drawStanding(frame: boolean): Steps<void> {
   }
   items.sort((a, b) => b[0] - a[0]);
   crowdDone = false;
-  let n = 0;
-  for (const it of items) { if (frame && !crowdDone && it[0] - camZ < 30) { crowd(); crowdDone = true; } it[1](); if (++n % 4 === 0) yield; }
+  for (const it of items) { if (frame && !crowdDone && it[0] - camZ < 30) { crowd(); crowdDone = true; } it[1](); yield; }
   if (frame && !crowdDone) crowd();
 }
 // Light lands on what the layers now hold.
-function lightLayers() {
+function* lightLayers(): Steps<void> {
   if (gateGlow) { addLight(LW, gateGlow[0], gateGlow[1], gateGlow[2], W > 400 ? 1.5 : 2.4, .75); gateGlow = null; }
-  applyLight(LY.far, LW, .18, 4); applyLight(LY.near, LW, .18, 4); { const L = new Float32Array(W * H); for (let i = 0; i < L.length; i++) L[i] = Math.min(2.4, LS[i] * .4) + LW[i] * .3; applyLight(LY.palace, L, .15, 3); }
-  applyLight(LY.sky, LS, .5, 6);
+  yield;
+  yield* applyLight(LY.far, LW, .18, 4); yield* applyLight(LY.near, LW, .18, 4); { const L = new Float32Array(W * H); for (let i = 0; i < L.length; i++) L[i] = Math.min(2.4, LS[i] * .4) + LW[i] * .3; yield; yield* applyLight(LY.palace, L, .15, 3); }
+  yield* applyLight(LY.sky, LS, .5, 6);
 }
 
 // ---------- The climb: the same street carried on above the frame, then a tower of repeating fronts ----------
@@ -1025,7 +1040,7 @@ function* drawAbove(cloudsIn: Uint8Array): Steps<Above> {
     const y = row - ext; skyRow(y, row);
     const up = 1 - row / ext, i = flo(up * HIGH_STEPS) - 1;
     if (i >= 0) for (let x = 0; x < W; x++) { const f = up * HIGH_STEPS - i - 1; T[row * W + x] = steps[Math.min(HIGH_STEPS - 1, f > .85 && (x + row & 1) ? i + 1 : i)]; }
-    if (row % 48 === 47) yield;
+    yield;
   }
   const Rs = rng(58);
   for (let i = 0, n = rnd(W * HIGH_STARS); i < n; i++) { const x = flo(Rs() * W), y = flo(Rs() * Rs() * ext * .7); rect(x, y, Rs() < .3 ? 2 : 1, 1, INK.haze[0]); }
@@ -1034,13 +1049,13 @@ function* drawAbove(cloudsIn: Uint8Array): Steps<Above> {
   const cloudM = new Uint8Array(W * H), withClouds = T.slice(); for (let i = 0; i < cloudM.length; i++) cloudM[i] = T[i] !== high[i] ? 1 : 0;
   T.set(high);
   yield;
-  palace();
+  yield* palace();
   yield;
   yield* drawStanding(false);
-  lightLayers();
+  yield* lightLayers();
   yield;
   // The sky took its glow; the clouds take the same one.
-  applyLight(withClouds, LS, .5, 6);
+  yield* applyLight(withClouds, LS, .5, 6);
   const skyGlow = LY.sky, cloudUp = new Uint8Array(W * H);
   for (let i = 0; i < cloudM.length; i++) if (cloudM[i]) cloudUp[i] = withClouds[i];
   const out: Above = { aboveLayers: {} as Record<AboveLayerKey, HTMLCanvasElement>, high: toCanvas(skyGlow) };
@@ -1067,12 +1082,12 @@ function* drawDeck(): Steps<HTMLCanvasElement> {
   const tops = new Int16Array(W), rows = [[.2, 1], [.5, .85], [.8, .7]];
   for (let x = 0; x < W; x++) { tops[x] = rnd(H * .3 + Math.sin(x * .021) * 16 + Math.sin(x * .053 + 1) * 8); for (let y = tops[x]; y < H; y++) T[y * W + x] = ramp[y > H * .75 ? 0 : 1]; }
   yield;
-  for (const [at, big] of rows) for (let i = 0; i < DECK_CLOUDS; i++) { cloud(W * (i + .5) / DECK_CLOUDS + (R() - .5) * 30, H * at + R() * H * .12, (40 + R() * 26 + W * .02) * big, ramp, R); yield; }
+  for (const [at, big] of rows) for (let i = 0; i < DECK_CLOUDS; i++) { yield* cloud(W * (i + .5) / DECK_CLOUDS + (R() - .5) * 30, H * at + R() * H * .12, (40 + R() * 26 + W * .02) * big, ramp, R); yield; }
   return toCanvas(T);
 }
 
 // One repeating building front, seen straight on, in the same pieces as the street. side -1 is the left edge, 1 the right.
-function facade(w: number, fh: number, seed: number, side: number, pen: Uint8Array) {
+function* facade(w: number, fh: number, seed: number, side: number, pen: Uint8Array): Steps<HTMLCanvasElement> {
   const h = fh * REPEAT, R = rng(seed), sc = fh / 3.6, ov = rnd(.8 * sc), wallW = w - ov, tile = Math.max(2, rnd(.42 * sc));
   W = w; H = h; T = new Uint8Array(w * h); LW = new Float32Array(w * h); LS = new Float32Array(w * h); LF = new Float32Array(w * h);
   PEN = pen;
@@ -1111,8 +1126,9 @@ function facade(w: number, fh: number, seed: number, side: number, pen: Uint8Arr
       if (x < 0 || R() < .3) continue;
       rect(rnd(x), y0 + rh - 2, 1, dy - rh + 3, INK.ink[1]); hang(x, y0 + dy, rr, rr * 1.2, (i + f) % 3 === 2 ? 1 : 0, lit, .75);
     }
+    yield;
   }
-  applyLight(T, LW, .18, 4);
+  yield* applyLight(T, LW, .18, 4);
   if (side > 0) for (let y = 0; y < h; y++) T.subarray(y * w, (y + 1) * w).reverse();
   return toCanvas(T);
 }
@@ -1130,8 +1146,8 @@ function* drawTower(): Steps<Tower> {
   const t: Tower = { floor, backFloor, front, back, capH, frontPeriod: floor * REPEAT, backPeriod: backFloor * REPEAT, sides: [] };
   for (const [i, s] of [[0, -1], [1, 1]]) {
     const side = {} as TowerSide;
-    side.back = facade(back, backFloor, 501 + i, s, PENS[2]); yield;
-    side.front = facade(front, floor, 301 + i, s, IDENT); yield;
+    side.back = yield* facade(back, backFloor, 501 + i, s, PENS[2]); yield;
+    side.front = yield* facade(front, floor, 301 + i, s, IDENT); yield;
     side.crownBack = roofPiece(back, capH, 21 + i, s, true);
     side.crownFront = roofPiece(front, capH, 31 + i, s, true);
     yield;

@@ -47,6 +47,8 @@ test("a whole day: each rarity's colour and the host's answer, off-list text, a 
   const page = await player(browser, "whole");
   await play(page);
   await asked(page, "Name an animal");
+  // A player's run has no probe: only the look check's test page passes one (14c-6b-2, answer 45).
+  expect(await page.evaluate(() => "__core" in window)).toBe(false);
 
   await safe(page, "aardvark");
   await expect(page.getByRole("heading", { name: "Kamuro" })).toBeVisible();
