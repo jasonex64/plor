@@ -4,17 +4,13 @@
 // whole window, the shell's bars, sidebar and clock bar hidden while it shows (answers 3, 10; body[data-game],
 // src/app/body-flag.ts). The markup is the mock's page (RIFF-mocks `themes/festival/page.html` at fcc11e4), its ids
 // as data-part names, since the page already has a #result; the scene (./scene.ts) owns everything inside it.
-import localFont from "next/font/local";
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import { GAME } from "@/platform/game";
 import { useBodyFlag } from "@/app/body-flag";
 import { startScene, type Io, type Start } from "./scene";
 import styles from "./afterglow.module.css";
+import { handjet } from "./font";
 
-// Afterglow's one font (docs/milestones/M14-14c-4-five-themes-rebuilt.md: Handjet at weight 400, "Handjet heavier"),
-// the mock's Latin file with its OFL licence beside it (src/app/fonts/OFL-Handjet.txt; licence read in 14c-4), a
-// variable font. Blocked, as the mock had it, so no text shows in the fallback before the scene measures it.
-const handjet = localFont({ src: "../app/fonts/Handjet.woff2", weight: "100 900", display: "block", variable: "--afterglow-font" });
 
 // The mock's markup, drawn once: the scene writes into it, and React never renders it again. out: what the × says to
 // screen readers, where it goes.

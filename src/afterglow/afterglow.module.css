@@ -3,8 +3,10 @@
    as data-part names. The panels are whole art pixels; the font's pixels may be finer. --u (one art pixel in CSS px),
    --k (the type scale), --gap (the edge, AFTERGLOW.EDGE art pixels, in CSS px) and --out-w are set by the scene
    (scene.ts, layout and fit). The colours
-   are the art's own, the same in every theme (DECISIONS.md, Styling). */
-.afterglow {
+   are the art's own, the same in every theme (DECISIONS.md, Styling). How to play's panel (.howto, 14c-6d) shares the
+   palette, the type and the font. */
+.afterglow,
+.howto {
   color-scheme: dark;
   --u: 1px;
   --k: 2;
@@ -22,12 +24,6 @@
   --on-hi: #2a0f22;
   --danger: #ff6a4d;
   --line: var(--panel);
-  /* The whole window, over the page (14c-6 answers 3 and 10); the shell's bars are hidden behind it (globals.css,
-     body[data-game]). */
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  background: var(--bg);
   color: var(--ink);
   font-family: var(--afterglow-font), "Arial Narrow", sans-serif;
   font-weight: 400;
@@ -35,6 +31,15 @@
   line-height: 1.15;
   font-synthesis: none;
   font-feature-settings: "tnum";
+}
+
+/* The whole window, over the page (14c-6 answers 3 and 10); the shell's bars are hidden behind it (globals.css,
+   body[data-game]). */
+.afterglow {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
 }
 
 .afterglow :is(h1, h2, b, button, input) {
@@ -354,4 +359,113 @@
   padding: var(--u) calc(var(--u) * 4);
   cursor: pointer;
   text-shadow: none;
+}
+
+/* How to play (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d): a modal dialog on Afterglow's plain dark
+   (answer 35), one panel like the HUD's, at the question box's width at the scene's type scale (AFTERGLOW.PROMPT_W × --k,
+   set when it opens), no wider than the window less the page's 16px gutter each side (DESIGN.md, Spacing), in Handjet
+   (answer 32). */
+.howto {
+  box-sizing: border-box;
+  width: min(calc(var(--prompt-w) * var(--k)), calc(100% - 32px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: calc(var(--k) * 5px) calc(var(--k) * 9px);
+  background: var(--panel);
+  border: var(--u) solid var(--edge);
+  border-radius: 0;
+  /* Centred as the game's question is (.q), whatever the page it opens from centres or not. */
+  text-align: center;
+}
+
+.howto::backdrop {
+  background: var(--bg);
+}
+
+.howto :is(h2, button, p) {
+  font: inherit;
+  margin: 0;
+}
+
+.howtoTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--u) * 6);
+}
+
+.howtoTitle {
+  color: var(--hi);
+  font-size: var(--t-l);
+}
+
+/* Every chunk in one cell, the others hidden, so the panel is as tall as its longest and ‹ › don't move between them. */
+.howtoChunks {
+  display: grid;
+  /* The question box's own top and bottom padding (.window). */
+  margin: calc(var(--k) * 5px) 0;
+}
+
+.howtoChunks > * {
+  grid-area: 1 / 1;
+}
+
+.howtoChunks > [hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.howtoNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--u) * 6);
+}
+
+.howtoDots {
+  display: flex;
+  /* The question box's own gap between its rows (.window). */
+  gap: calc(var(--u) * 3);
+  color: var(--ink-dim);
+}
+
+.howtoDots [data-at] {
+  color: var(--hi);
+}
+
+/* ‹, › and Close as the game's own buttons, the × as its way out; each at least 24px each way (WCAG 2.2 2.5.8). */
+.howtoNav button,
+.howtoClose {
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.howtoNav button {
+  color: var(--on-hi);
+  background: var(--hi);
+  border: 0;
+  padding: var(--u) calc(var(--u) * 4);
+}
+
+/* ‹ on the first chunk: unavailable, in the panel's own colours, and still in its place. */
+.howtoNav button[aria-disabled="true"] {
+  color: var(--ink-dim);
+  background: var(--field);
+  cursor: default;
+}
+
+.howtoClose {
+  color: var(--ink);
+  background: var(--panel);
+  border: var(--u) solid var(--edge);
+  padding: 0 calc(var(--u) * 4);
+  line-height: 1;
+}
+
+.howto :is(button):focus-visible {
+  outline: var(--u) solid var(--ink);
+  outline-offset: var(--u);
 }
