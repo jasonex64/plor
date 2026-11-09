@@ -1,6 +1,6 @@
 # M16 — 16g-1, two low-poly 3D mocks for game 2's look
 
-**Status:** in review (approved 2026-11-07, Pacific: "Approve, build mocks"; revision 2, 2026-11-08: four moving worlds; revision 3: the human picked Midnight Brew, with big-word impact, more detail and idle life; revision 4, 2026-11-08: the spell casts by itself after each word, a short automatic finale, and light that builds each round; built, reviewed and published; waits on the human to try it; then 16g-2 builds it into `/play2`).
+**Status:** done (approved 2026-11-07, Pacific: "Approve, build mocks"; four revisions; the human picked Midnight Brew and shaped it to version 6, answers 20–29, then "Yes, start 16g-2"). Its build into `/play2` is 16g-2 (`docs/milestones/M16-16g-2-midnight-brew-in-play2.md`).
 
 ## Goal
 Two playable, animated, low-poly 3D mocks of game 2's look, built from polyfork.dev's models, each a private claude.ai page, so the human can pick game 2's look before anything goes into `/play2`.
