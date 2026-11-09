@@ -37,12 +37,13 @@ export const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export type Updater = (t: number, dt: number) => void;
 
-// A slow GPU, such as CI's software renderer (16g-2 answer 13). Proposed by Claude and approved by the human (answer 18;
+// A slow GPU, such as CI's software renderer (16g-2 answer 13). Proposed by Claude and approved by the human (answers 18, 20;
 // ticket, Numbers): the stage keeps real time through frames up to MAX_DT long (the mock's 0.05 s slowed every moment on a slow
 // GPU); the first SLOW_SAMPLE drawn frames decide, and a GPU whose median frame is over SLOW_MS (under 10 a second) leaves
 // SLOW_DRAW_MS between the end of one draw and the next, and draws its shadows once more and then holds them (answer 15:
 // redrawing the shadow map was two-thirds of a software draw).
-const MAX_DT = 0.25;
+// 1 s, not the 0.25 s first approved: CI's software draws ran longer, and the moments fell behind real time (answer 20).
+const MAX_DT = 1;
 const SLOW_SAMPLE = 10;
 const SLOW_MS = 100;
 const SLOW_DRAW_MS = 500;
