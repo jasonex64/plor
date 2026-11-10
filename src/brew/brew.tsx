@@ -15,6 +15,7 @@ import { useCountdown } from "@/app/countdown";
 import kit from "@/app/kit.module.css";
 import { errorText } from "@/app/messages";
 import { BACK } from "@/app/slide";
+import { reduceMotion } from "@/app/shown";
 import { ALPHABET, Results, WHY, scored } from "@/app/substrings";
 import cards from "@/app/substrings.module.css";
 import type { Village } from "./village";
@@ -110,7 +111,7 @@ function Brew({ run, setRun, load, onEnded }: { run: SubstringRun; setRun: (run:
     let started: Village | null = null;
     const font = getComputedStyle(document.body).fontFamily;
     import("./village")
-      .then(({ startVillage }) => startVillage(host.current!, font, fault, gone.signal))
+      .then(({ startVillage }) => startVillage(host.current!, font, fault, gone.signal, reduceMotion().matches))
       .then((v) => {
         started = v;
         village.current = v;
@@ -127,6 +128,15 @@ function Brew({ run, setRun, load, onEnded }: { run: SubstringRun; setRun: (run:
     };
   }, [fault]);
   useEffect(() => { village.current?.score(run.score?.total ?? 0); }, [run.score?.total, ready]);
+  // Reduce motion switched during a run: the village follows from its next moment (16g-2b, answer 26).
+  useEffect(() => {
+    if (!ready) return;
+    const query = reduceMotion();
+    const follow = () => village.current?.setCalm(query.matches);
+    follow();
+    query.addEventListener("change", follow);
+    return () => query.removeEventListener("change", follow);
+  }, [ready]);
 
   // A round ended, by a word or the clock: its moment plays, then the next change casts while Next waits; after round 7
   // the finale plays by itself and the cards follow (16g-1 answers 25 to 27). The village may not have loaded yet on a

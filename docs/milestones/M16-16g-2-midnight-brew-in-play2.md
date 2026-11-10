@@ -1,6 +1,6 @@
 # M16 — 16g-2, Midnight Brew becomes game 2's run
 
-**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a built and reviewed, in review as PR #173 after 16g-1's PR #171 merged; 16g-2b and 16g-2c next).
+**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a done, PR #173 merged on green CI 2026-11-09; 16g-2b, the calm version, designed from answers 23-32, built and reviewed, in review with CI's e2e as its browser evidence (answer 33); 16g-2c next).
 
 ## Goal
 Play game 2's real run at `/play2` in Midnight Brew, the low-poly witch's village approved in 16g-1 (version 6), full screen, with the end of the run kept as today's cards.
@@ -60,6 +60,19 @@ On PR #173's CI
 21. `play2.e2e.ts`'s lockout test needs its third try at the server within 0.5 s of the one before, and Playwright's fill, enabled check and Enter each waited for slow frames: "Submit in one step (Recommended)". The test types and submits in one call in the page, as it already did for its double Enter, and keeps all three checks (the box usable, "Too quick", the box cleared).
 22. That still failed on CI (the first attempt's try was accepted, so it landed past 0.5 s), as the village held the page between the first answer and the third try by an unmeasured amount. Asked: "Stub that one answer (Recommended)". For that one try the test answers "locked" with the real run through a route stub and checks what the page does ("Too quick", the box usable and cleared); the server's lockout stays checked in `src/app/api/substrings/route.db.test.ts:146`. Answer 21's one-call submit is removed.
 
+For 16g-2b, the calm version (human, 2026-11-09), three rounds after 16g-2a merged ("its green, merge and continue work"):
+23. A big word without slams, shockwaves or shake: "One quiet moment". Every word gets the same calm moment; its tier shows only in the card's points.
+24. How much slower the ambient life (fireflies, bats, crows, fog, the stray cat): "Stopped". This goes beyond answer 5's "slower idle life"; it's the human's call.
+25. The cast: "Fade in place (Recommended)", whose option read: "No streak and no glance. The next part brightens and grows in where it stands, over the same time, with a soft sparkle there. The whole village is in view, so the change is still seen."
+26. The setting switched during a run: "At once (Recommended)". The village listens for the change (MDN `Window.matchMedia()`, its `change` event) and follows from the next moment; a moment already playing finishes as it began.
+27. What the quiet moment looks like: "Letters sink in slowly (Recommended)". A word's letter blocks appear just above the pot and sink straight in, then the brew glows once; a time-up's letters sink in grey with no glow.
+28. Things that move without travelling (candle and window flicker, fire, chimney smoke, the brew's steam and bubbles): "Hold them steady (Recommended)". Lights glow steadily at their level, and nothing rises.
+29. The characters: "Stand still, appear in place (Recommended)". The witch, cats and animals hold a pose; a round's arrivals (bats, ghosts, skeletons, the spider, the parade's lanterns) grow in where they'll stand: the bats hanging, the parade's lanterns standing lit around the ring.
+30. The finale: "The column fades up (Recommended)". The light column fades up from the pot and stays lit (16g-1 answer 29); no burst and no pull.
+31. The calm moments' lengths: "Same lengths as normal (Recommended)". A letter sinks over a small word's 0.62 s flight, 0.11 s apart, then the 1.5 s hold; a time-up sinks over its 0.8 s and holds 0.9 s; the change fades in over the cast's 2.8 s; the column fades up over the finale's 1.4 s.
+32. The 16g-2b design above: "Approve, start 16g-2b (Recommended)".
+33. 16g-2b's browser tests couldn't be judged on this PC (Evidence): "Let CI decide (Recommended)". CI's `e2e` on the PR is the browser evidence, as for 16g-2a; the local reload loop goes to ROADMAP, Next revision.
+
 ## Merging the scenery (answer 14)
 The hypothesis, written before the change: SwiftShader's cost per frame is mostly per draw call (state, uniforms and a shader run set up for each call, twice for a shadow caster), not per triangle, since a smaller canvas didn't help. Joining every prop that never moves (the island, rocks, roots, paths, buildings, fences, graves, tufts, mushrooms and the rest), grouped by material, should take the draw calls from 558 to under 200 and a software draw from about 600 ms to under 250 ms. A draw that stays above 400 ms would disprove it: the cost would then be in triangles or lights.
 
@@ -96,6 +109,7 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 - **Loading in stages** (answer 11): the village, the cauldron and the witch first; the run can start once they're in; the animals and the hearse arrive after and fade in.
 - **A refused try** (answer 7): a grey fizzle from the cauldron; the reason stays under the box, as today.
 - **Reduce motion** (answer 5): read with `matchMedia('(prefers-reduced-motion: reduce)')`; the calm version keeps every state change and drops camera moves, shake and slams.
+- **The calm version (16g-2b; answers 5, 23 to 31):** with Reduce motion on (read through `src/app/shown.ts`'s one Reduce motion check, DECISIONS.md, One way), the camera never moves (no punch, shake or pull) and the village holds still between moments: no ambient life, steady lights, no smoke, steam or sparks, every character in a held pose. A word's letters sink into the pot and the brew glows once, the same for every tier; a time-up's sink in grey. A round's change brightens and grows in where it stands, the moon and the spider included, with no streak. The finale's column fades up and stays. Every moment keeps its normal length. The setting is followed at once when it changes during a run.
 - **Not carried from the mock:** the round-number jumps, the fps readout, the sample sets, the "no dictionary" note and the mock's own scoring (the server scores).
 
 ## Acceptance criteria
@@ -105,6 +119,8 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 - [x] No clip files ship; the witch moves by code; round 7 brings the parade (answers 6, 9).
 - [x] The run can start before the animals have loaded, and they appear when they arrive (answer 11).
 - [ ] Under Reduce motion the camera never moves and nothing shakes (answer 5). *(16g-2b.)*
+- [ ] Under Reduce motion the village is still between moments: two pictures of it a few draws apart are the same (answers 24, 28, 29). *(16g-2b.)*
+- [ ] Under Reduce motion a whole run plays (words, a time-up, the casts, the finale and the cards) in the same moment lengths (answers 23, 25, 27, 30, 31), and switching the setting during a run takes effect at the next moment (answer 26). *(16g-2b.)*
 - [ ] On the Lighthouse profile, the time until the run can start and until everything has loaded are measured and recorded, before and after compression; the human decides on compression with those numbers (answers 10, 11). *(16g-2a: before compression measured, Evidence; after, 16g-2c.)*
 - [x] `e2e/brew.e2e.ts` plays a run start to finish with no console errors; game 2's existing e2e and unit tests pass; the camera is still whenever the box has focus (16g-1 answer 9).
 
@@ -121,6 +137,8 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 | 150 ms, 1.6 Mbps down, 750 Kbps up, 4× CPU, 412×823 at 1.75 | The measurements | Lighthouse throttling docs and constants (SOURCES.md, answer 12) |
 | Village and witch first, animals after | Loading in stages | Answer 11 |
 | A frame keeps real time up to 1 s (the mock's cap was 0.05 s; first 0.25 s, raised at answer 20 after CI); the first 10 drawn frames after the village shows decide; a median frame over 100 ms (under 10 a second) means a slow GPU, a median so that one stall can't decide it (the review), which draws at most every 500 ms | A slow GPU (answer 13; `src/brew/scene.ts`, `MAX_DT`, `SLOW_SAMPLE`, `SLOW_MS`, `SLOW_DRAW_MS`) | Proposed by Claude, **approved by the human** (answer 18). On a slow GPU the shadows are also held once drawn (answer 15; no number). Tuned by measurement: 20 frames and 250 ms left `play2.e2e.ts`'s lockout check failing in software rendering, 10 frames and 500 ms passed it (Evidence) |
+| Two pictures 2 s apart; 5 s after switching back; 1 s after the animals arrive; a 150 s test | `e2e/brew.e2e.ts`'s Reduce motion test | 2 s passes SLOW_DRAW_MS and a slow draw, so a draw lands between the pictures; the smoke's 3.5 s life, up to 4.2 s with scene.ts's jitter, covered by 5 s; the animals' 0.8 s fade-in covered by 1 s; the first test's 120 s plus about 30 s of pictures and waits |
+| The calm moments' lengths: a letter's 0.62 s, 0.11 s apart, and the 1.5 s hold; a time-up's 0.8 s and 0.9 s; the cast's 2.8 s; the finale's 1.4 s | The calm version (16g-2b) | The normal moments' lengths, kept by answer 31 |
 | The mock's layout, camera poses, timings (the cast's 2.8 s hold, the 1.4 s finale), light levels, particle counts and the tracker's 2,000 mark | The scene | 16g-1 version 6, proposed by Claude and judged by the human on the page; carried into the app with this ticket's approval (answer 12) |
 
 ## Plan
@@ -149,6 +167,16 @@ One PR each, from `m16-game-2`, after `main` (Afterglow) is merged into it:
 | The mock redrew the moon's shadows every frame | A slow GPU draws them once more and then holds them; a GPU keeps them live | Answer 15 |
 | The mock's Start was there from the first frame | Start waits until the village has set its pace (the ten frames that decide a slow GPU) | Answer 19's runs: in software drawing those frames hold the page for about 6 s, and a round started then showed too late for the tests and a player |
 | The mock drew from its first frame | Nothing is drawn until the village shows | Its canvas is off the page until then, and on a slow GPU those draws held up the load (Start came at 55 s, then 17 s, then 5–6 s once they stopped) |
+| Answer 5: "gentler eruptions, slower idle life" | No eruptions at all, and idle life stopped | Answers 23 ("One quiet moment") and 24 ("Stopped"), asked after it |
+| Answer 7: a refused try's small fizzle | Under Reduce motion a refused try shows nothing in the village, only its reason under the box | Answer 28: nothing rises; a refusal changes no state, so answer 5's "keeps every state change" holds |
+| The normal word: the bonus letter's gold block and its gold sparkle | The gold block stays (it marks which letter is the bonus); no sparkle | Answer 23 keeps the tier out of the village; answer 28, nothing rises |
+| Answer 27: the letters "appear just above the pot and sink straight in" | Each letter shows over the pot at the height a normal word's letters show (y 3.2, a time-up's 3) and drops straight down, one after another | No new number: the height is the normal moment's own |
+| Answer 25's option: "over the same time, with a soft sparkle there" | The change fades in over the cast's 2.8 s, eased to a stop, with no sparkle; the normal cast's 0.9 s streak is gone, so the calm cast is that much shorter | Answer 31 named 2.8 s; answer 28, nothing rises; eased to a stop so the village is truly still after it (the review) |
+| Answer 31's lengths for a word | Every word holds 1.5 s, a small word's hold, where a great or huge word normally holds 2.1 s; the normal grow-in before the flight isn't kept | Answer 23: one quiet moment for every word |
+| Answer 29: "the bats hanging", things "grow in" | The bats hold wherever they were in their flight, the ghosts fade in, the spider grows in on a thread already full length; a crow or rat moving when calm begins holds mid-move | Holding a pose is answer 29's; the rest is noted in ROADMAP, Next revision |
+| Answer 30: the column "fades up from the pot" | It stands at full height and its light fades up over 1.4 s | Rising would be the motion answer 30 dropped |
+| The normal pumpkins grow with a slight overshoot | Under Reduce motion they grow without it | Answer 29: grow in, no bounce |
+| — | The brew's level takes its new height at once after a word, rather than rising | Answer 29 (things take their place) and stillness between moments |
 | — | Playwright launches Chromium with `--enable-unsafe-swiftshader` | CI's runners have no GPU; without software WebGL the village can't draw there (*unverified* on CI until it runs); the human approved the flag (answer 17) |
 
 ## Evidence
@@ -161,6 +189,9 @@ All on the Windows PC, 2026-11-08, against the local stack; this PC's headless C
 - A software draw once the village is in: a median 190–210 ms, the page busy about 2 s in every 5 (the timeline under answer 15).
 - A full `npx playwright test` earlier in 16g-2a: `158 passed`, 7 failed, but `src/` was edited while it ran, so the dev server recompiled under it; every failed file was run again on the final code above and passed. A last full run wasn't taken: it would have crossed Plor's midnight (it takes about 40 min), which the fixtures' day depends on. CI runs it on the PR.
 - `npm run test:db` on this PC: `Tests  84 failed | 259 passed (343)`, run 12 minutes before Plor's midnight and with the known leftover day 2026-11-01 still in the local database (`expected [ { puzzle_date: '2026-11-01' }, …(1) ] to deeply equal []`; HANDOFF). 16g-2a changes no server or database code; CI's fresh stack is the check.
+- **16g-2b**, on the Windows PC, 2026-11-09, against the local stack:
+  - `npx tsc --noEmit -p .` and `npx eslint .`: no output (clean). `npm test`: `Test Files  56 passed (56)`, `Tests  640 passed (640)`.
+  - `npx playwright test brew play2 --project chromium`, twice: `4 failed`, `5 passed (10.2m)`, then `5 failed`, `4 passed (9.5m)`, at a different step each time and in tests 16g-2b doesn't touch (play2's "a whole day", the way out), the second time with no other test process running for 5 minutes before. Two guesses were disproved: `RIFF-m14`'s mutant run starting during the first (the second ran with none); and a slow first compile of `/api/substrings/start` (its trace showed it pending 39,136 ms and 55,910 ms, yet against a fresh `next dev` the route answered in 77 ms, then 24 ms, and a probe every 2 s during a test never took over 0.3 s). A single test then showed the page itself reloading: `29 × navigated to "http://localhost:3000/"` while it waited to sign in, each reload after a `✓ Compiled in 3ms` from the dev server, with no file outside `test-results/` changed. The cause is *unverified*; the 16g-2a handoff had seen local runs fail at random steps since `main`'s 14c-6d and 6b-2a merges, before 16g-2b. Per answer 33, CI's `e2e` on the PR is the browser evidence.
 
 ## Review
 The `reviewer` agent, 2026-11-08, in a fresh context, on the uncommitted 16g-2a diff.
@@ -171,4 +202,10 @@ The `reviewer` agent, 2026-11-08, in a fresh context, on the uncommitted 16g-2a 
   - **`--enable-unsafe-swiftshader` had no human OK:** asked; approved (answer 17) and logged in DECISIONS.md.
   - **ROADMAP and HANDOFF were stale:** both updated in this change.
 - A follow-up review of the fixes and the pace wait, 2026-11-08: no blocking findings; its notes (wording on the sample's size, stale comments on `dead`, a fault during `show()` logged twice) are in ROADMAP, Next revision.
+- 16g-2b, the `reviewer` agent, 2026-11-09, on the uncommitted calm version. Blocking findings and how each was fixed:
+  - **Calm came too late at load:** `build` ran its frame loop with calm off while it compiled, so smoke and steam rose into the first shown frames. Fixed: `build` takes the setting before its loop starts.
+  - **The smoke wait cited the wrong life:** 3.5 s, where scene.ts's jitter makes it up to 4.2 s. Fixed: the wait is 5 s and its comment cites the jitter.
+  - **A switch changed a moment already playing** (answer 26): the calm placements read the setting every frame. Fixed: the village takes a switch only between moments (`moment()` in village.ts).
+  - **Stillness was checked only before Start, and no switch during a run:** fixed. The test also checks at round 7 with six changes in, and switches to normal motion for a time-up's moment and back while it plays. The calm cast eases to a stop at 2.8 s, so the village is truly still after it.
+  - **The 150 s test timeout had no origin; the Source diff rows and DESIGN.md were missing; the status lines were stale:** all written.
 - Deferred to ROADMAP "Next revision": an animal failing to load stops the whole village; two paths can end one round; a village left while loading still builds, and stopping doesn't free its WebGL context; `joinStill`'s key covers only what today's models vary in; a doubled GET, `tierOf` untested, an unexplained 15 s wait; no check that a real GPU stays out of the slow mode.

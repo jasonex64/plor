@@ -76,15 +76,18 @@ export function createStage(host: HTMLElement, onFault: (err: unknown) => void, 
   const rig: { pos: THREE.Vector3; target: THREE.Vector3; wide: Pose | null; moves: Move[] } = { pos: new THREE.Vector3(0, 2, 6), target: new THREE.Vector3(), wide: null, moves: [] };
   const stage = {
     renderer, scene, camera, updaters, t: 0, aspect: 1,
+    // Reduce motion's calm version (16g-2b, answers 5, 23 to 31): the camera takes no new move and models' own animations
+    // hold; a move already running finishes as it began (answer 26).
+    calm: false,
     // A jump returns to the pose, cutting any move still running, so a round never starts with the camera moving.
     setPose(pos: THREE.Vector3, target: THREE.Vector3, wide: Pose | null) {
       rig.pos.copy(pos); rig.target.copy(target);
       rig.wide = wide && { pos: wide.pos.clone(), target: wide.target.clone() };
       rig.moves = [];
     },
-    punch(focus: THREE.Vector3, amount = 0.22, dur = 1.4) { rig.moves.push({ kind: "punch", focus: focus.clone(), amount, dur, start: stage.t }); },
-    shake(amount = 0.04, dur = 0.45) { rig.moves.push({ kind: "shake", amount, dur, start: stage.t, seed: Math.random() * 100 }); },
-    pull(amount = 0.3, dur = 3.2, rise = 0.5) { rig.moves.push({ kind: "pull", amount, dur, rise, start: stage.t }); },
+    punch(focus: THREE.Vector3, amount = 0.22, dur = 1.4) { if (!stage.calm) rig.moves.push({ kind: "punch", focus: focus.clone(), amount, dur, start: stage.t }); },
+    shake(amount = 0.04, dur = 0.45) { if (!stage.calm) rig.moves.push({ kind: "shake", amount, dur, start: stage.t, seed: Math.random() * 100 }); },
+    pull(amount = 0.3, dur = 3.2, rise = 0.5) { if (!stage.calm) rig.moves.push({ kind: "pull", amount, dur, rise, start: stage.t }); },
     // Resolves once no move is running, in the stage's own time: the box takes focus only then (16g-1 answer 9).
     settled() {
       return stage.until(() => {
@@ -262,7 +265,7 @@ export function spawn(stage: Stage, gltf: GLTF, { pos = [0, 0, 0] as [number, nu
     ent.mixer = mixer;
     for (const clip of gltf.animations) ent.actions[clip.name] = mixer.clipAction(clip);
     if (tick && ent.actions.tick) ent.actions.tick.play();
-    stage.updaters.add((t, dt) => mixer.update(dt));
+    stage.updaters.add((t, dt) => mixer.update(stage.calm ? 0 : dt));
   }
   return ent;
 }
