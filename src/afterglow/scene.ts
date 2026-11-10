@@ -153,9 +153,11 @@ export type Core = {
   readonly view: { hud: Box; prompt: Box; sky: { x0: number; x1: number; y0: number; y1: number } };
   log: LogEntry[]; place(): { S: number; DPR: number; AW: number; AH: number; U: number; K: number };
   rate(x: number): void; freezeAt(f: Stop): void; thaw(): void; readonly frozen: boolean;
+  // The pre-draw paused, so the check can make a street late on purpose (answer 74's waits, ticket 14c-6b-2b).
+  holdDrawing(on: boolean): void;
   readonly letter: LetterNow | null; readonly fuse: { head: number; size: number; flies: number } | null; readonly burst: Burst | null;
-  readonly shake: { x: number; y: number }; readonly rumble: { x: number; y: number; amp: number };
-  predraw: { slices: number; ms: number; maxSlice: number; finishedEarly: number; maxStep: number; where: string };
+  readonly shake: { x: number; y: number }; readonly rumble: { x: number; y: number; amp: number; hz: number };
+  predraw: { slices: number; ms: number; maxSlice: number; waited: number; maxStep: number; where: string };
   perf(): { avg: number; max: number; n: number; ivAvg: number; ivMax: number; phases: Record<string, Timing> };
   memory(): { bytes: number; scene: boolean; next: boolean; before: boolean; held: boolean };
   readonly rateNow: number; readonly scene: Street | null; readonly before: Street | null; readonly held: HTMLCanvasElement | null;
@@ -263,8 +265,9 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // stage's camera with this stage's lights, what you see walking there: it keeps its separate layers for the zoom, and the other two flatten theirs.
   let scene: Street | null = null, next: Street | null = null, before: Street | null = null, held: HTMLCanvasElement | null = null;
   type Want = { stage: number; cam: number; keepLayers: boolean; take: (s: Street) => void };
-  let job: (Want & { it: Generator<undefined, Street, undefined>; n: number }) | null = null;
-  const waiting: Want[] = [];
+  type Job = Want & { it: Generator<undefined, Street, undefined>; n: number };
+  let job: Job | null = null;
+  const waiting: (Want | Job)[] = [];
   function settle(sc: Street, keepLayers: boolean) {
     if (!keepLayers) {
       const [c, x] = layer(AW, AH);
@@ -276,16 +279,24 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     return sc;
   }
   function want(stage: number, cam: number, keepLayers: boolean, take: (s: Street) => void) { waiting.push({ stage, cam, keepLayers, take }); }
+  // The walk's street, ahead of the rest (answer 75, ticket 14c-6b-2b): a street half drawn waits behind it, kept where it was.
+  function wantFirst(stage: number, cam: number, keepLayers: boolean, take: (s: Street) => void) {
+    if (job) waiting.unshift(job);
+    job = null; waiting.unshift({ stage, cam, keepLayers, take });
+  }
   // What the pre-draw cost, for the check's "pre-draw never stalls a frame" (14c-5 answer 42), as the mock counted it.
   // The slowest single step, and which: a step can't be cut, so it is what a slice can't keep under its budget.
-  const predraw = { slices: 0, ms: 0, maxSlice: 0, finishedEarly: 0, maxStep: 0, where: "" };
+  // And how often a street wasn't drawn when it was wanted, so Walk on or the landing waited for it.
+  const predraw = { slices: 0, ms: 0, maxSlice: 0, waited: 0, maxStep: 0, where: "" };
+  let drawHeld = false;
   function pump(budget: number) {
+    if (drawHeld) return;
     const t0 = performance.now();
     for (;;) {
       if (!job) {
         const w = waiting.shift();
         if (!w) break;
-        job = { ...w, it: sceneSteps(AW, AH, w.stage, w.cam), n: 0 };
+        job = "it" in w ? w : { ...w, it: sceneSteps(AW, AH, w.stage, w.cam), n: 0 };
       }
       const s0 = performance.now(), s = job.it.next(), step = performance.now() - s0;
       job.n++; if (step > predraw.maxStep) { predraw.maxStep = step; predraw.where = `stage ${job.stage}, step ${job.n}`; }
@@ -295,8 +306,10 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     const ms = performance.now() - t0;
     if (ms > .01) { predraw.slices++; predraw.ms += ms; if (ms > predraw.maxSlice) predraw.maxSlice = ms; }
   }
-  // Needed now and not ready: finish it here, which stalls, and count it so the check sees it.
-  function finishPredraw() { if (job || waiting.length) { predraw.finishedEarly++; pump(Infinity); } }
+  // Needed and not drawn yet: what wants it waits, the screen moving, rather than drawing the rest in one frame, which froze
+  // a busy PC's run for ~300 ms (answers 73, 74, ticket 14c-6b-2b). Counted once a wait, for the check.
+  let holding = false;
+  const ready = (s: Street | null) => { if (s) { holding = false; return true; } if (!holding) { holding = true; predraw.waited++; } return false; };
   const planNext = () => { if (!next) { const st = stageOf(Math.min(run.q + 1, QUESTIONS)); want(st, st, false, (s) => { next = s; }); } };
   const sceneNow = () => scene!;
 
@@ -520,7 +533,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   let clockT = 0, rate = 1, frozen = false, stopAt: Stop = null;
   let phase: Phase = "ask", phaseAt = 0, phaseDur = 0;
   let shown = runScore(), shownFrom = shown, qStart = 0, atQ = run.q, walkKind: Walk = "tiny", walkStart = 0;
-  let answer: Word | null = null, burst: Burst | null = null, ending: Ending | null = null, climbD = 0, shake = { x: 0, y: 0 }, rumbleNow = { x: 0, y: 0, amp: 0 }, boxPill: Pill | null = null, flight: Flight | null = null, smokeAt: number | null = null, dissolve: Dissolve | null = null;
+  let answer: Word | null = null, burst: Burst | null = null, ending: Ending | null = null, climbD = 0, shake = { x: 0, y: 0 }, rumbleNow = { x: 0, y: 0, amp: 0, hz: 0 }, boxPill: Pill | null = null, flight: Flight | null = null, smokeAt: number | null = null, dissolve: Dissolve | null = null;
   // At zero the server is asked whether time is up; until it says, the fuse stays out and the box takes nothing.
   let expiring = false;
   // Every phase as it starts, with what the check reads of it (the mock's phase log).
@@ -531,6 +544,8 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     $("out").hidden = !WAY_OUT.has(p);
   }
   const phaseT = () => clockT - phaseAt;
+  // The check's stop as a time on the game clock: its phase's start plus the later of its part and its seconds.
+  const stopClock = () => !stopAt || phase !== stopAt.phase ? Infinity : phaseAt + Math.max(stopAt.k === undefined ? 0 : stopAt.k * (phaseDur || 1), stopAt.t ?? 0);
   const left = () => Math.max(0, Q_SECONDS - (clockT - qStart));
 
   // A question starts with its lantern if the run has just taken a letter. Read from the run, so it holds for any schedule.
@@ -744,7 +759,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     burst!.at = clockT; boxPill = null;
     shownFrom = shown;
     const q = run.q, cam = stageOf(Math.min(q + 1, QUESTIONS));
-    want(stageOf(q), cam, true, (s) => { before = s; });
+    wantFirst(stageOf(q), cam, true, (s) => { before = s; });
     go("burst", RESULT_AT);
   }
   // The sky result: the firework's name, the answer, its points and flavour, and what the host said (answer 7); the
@@ -799,7 +814,6 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     if (phase !== "result" || rBtn.hidden) return;
     $("result").hidden = true;
     advance();
-    finishPredraw();
     walkKind = (MAJOR as readonly number[]).includes(run.q) ? "major" : "tiny";
     const t = before!.tower, dist = before!.ext + DESCENT_FLOORS * t.floor + t.capH + AH;
     // The walk starts as the street's own top comes off the bottom of the tower, so the two never part.
@@ -961,7 +975,8 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       case "result": {
         const k = clamp01((clockT - burst!.at - RESULT_AT) / COUNT_S), v = Math.round(lerp(shownFrom, runScore(), k));
         if (v !== shown) { shown = v; $("hudScore").textContent = fmt(v); }
-        if (clockT - burst!.at >= BUTTON_AT && rBtn.hidden) { rBtn.hidden = false; placeResult(); rBtn.focus({ preventScroll: true }); }
+        // Walk on once the walk's street is drawn (answer 74); Q7's leads to the results, which need none.
+        if (clockT - burst!.at >= BUTTON_AT && rBtn.hidden && (run.q >= QUESTIONS || ready(before))) { rBtn.hidden = false; placeResult(); rBtn.focus({ preventScroll: true }); }
         break;
       }
       case "leaving": {
@@ -972,7 +987,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       }
       case "descent":
         if (t < 1.2) placeWordUp(t);
-        if (t >= phaseDur) { WORD.el.hidden = true; startArrive(); }
+        if (t >= phaseDur && ready(next)) { WORD.el.hidden = true; startArrive(); }
         break;
       case "arrive":
         if (t >= phaseDur) finishWalk();
@@ -991,7 +1006,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   // The whole entity shakes, harder and quicker as the charge fills. Whole art pixels, by translation only. The step count is the rate's own integral, so it tightens without jumping.
   function rumbleAt(t: number, T: number, kind: keyof typeof RUMBLE) {
     const m = RUMBLE[kind], k = clamp01(t / T), [h0, h1] = m.hz, n = Math.floor(h0 * t + (h1 - h0) * t * t / (2 * T)), amp = Math.max(1, Math.round(m.amp * k * k + k * .6));
-    return { x: (n & 1 ? 1 : -1) * Math.ceil(hash(n, 5) * amp), y: (n >> 1 & 1 ? 1 : -1) * Math.round(hash(n, 6) * amp), amp };   // side to side on every step, so a step always shows
+    return { x: (n & 1 ? 1 : -1) * Math.ceil(hash(n, 5) * amp), y: (n >> 1 & 1 ? 1 : -1) * Math.round(hash(n, 6) * amp), amp, hz: h0 + (h1 - h0) * k };   // side to side on every step, so a step always shows; hz, its steps a second now, for the check (answer 77)
   }
   // The rocket's path in CSS px at a part of the climb: an S-curve that dies away into a hang, rising with an ease that both starts and ends slow.
   function flightAt(k: number) {
@@ -1286,7 +1301,10 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
       const iv = ms - lastMs;
       perf.iv += iv; perf.ivN++; if (iv > perf.ivMax) perf.ivMax = iv;
       f.iv += iv; if (iv > f.ivMax) f.ivMax = iv;
-      if (!frozen) clockT += iv / 1000 * rate;
+      // Never past the check's stop: a frame that would carry the clock beyond it ends there, so the stopped frame is the
+      // asked point exactly, however long the frame (answer 70, ticket 14c-6b-2b; the mock stopped on the first frame
+      // past it, and a slow one moved the walk's reading). A player's run has no stop.
+      if (!frozen) clockT = Math.min(clockT + iv / 1000 * rate, stopClock());
     }
     lastMs = ms;
     if (relayout) rebuild();
@@ -1294,12 +1312,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
     // The check's stop, tried after the tick, and before it only when the tick would end the phase: one long frame can
     // carry a short phase past its stop (the mock's, at fcc11e4). Before the tick in general, the text the tick writes,
     // such as the seconds, would lag the frame drawn.
-    const stopHere = () => {
-      if (frozen || !stopAt || phase !== stopAt.phase) return;
-      if (stopAt.k !== undefined && phaseT() / (phaseDur || 1) < stopAt.k) return;
-      if (stopAt.t !== undefined && phaseT() < stopAt.t) return;
-      frozen = true; stopAt = null;
-    };
+    const stopHere = () => { if (!frozen && clockT >= stopClock()) { frozen = true; stopAt = null; } };
     if (phaseDur && phaseT() >= phaseDur) stopHere();
     if (!frozen) tick();
     stopHere();
@@ -1325,7 +1338,9 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
         drawSky(x, scene, skyTop(), 0);
         held = c; scene = null;
         placeWord(innerWidth / 2, BURST_Y * innerHeight); placeResult();
-        planNext(); want(stageOf(atQ), stageOf(Math.min(atQ + 1, QUESTIONS)), true, (v) => { before = v; });
+        wantFirst(stageOf(atQ), stageOf(Math.min(atQ + 1, QUESTIONS)), true, (v) => { before = v; }); planNext();
+        // Its street is drawn again, so Walk on waits for it again (answer 74).
+        if (phase === "result" && run.q < QUESTIONS) rBtn.hidden = true;
         break;
       }
       case "descent": case "arrive": finishWalk(); break;
@@ -1346,7 +1361,7 @@ export function startScene(root: HTMLElement, fontFamily: string, start: Start, 
   if (probe) probe.attach({
     get phase() { return phase; }, get t() { return clockT; }, get k() { return phaseT() / (phaseDur || 1); }, get q() { return run.q; }, get view() { return view; },
     log: phaseLog, place: () => ({ S, DPR, AW, AH, U, K }),
-    rate(x: number) { rate = x; }, freezeAt(f: Stop) { stopAt = f; }, thaw() { frozen = false; }, get frozen() { return frozen; },
+    rate(x: number) { rate = x; }, freezeAt(f: Stop) { stopAt = f; }, thaw() { frozen = false; }, get frozen() { return frozen; }, holdDrawing(on: boolean) { drawHeld = on; },
     get letter() { return letterNow; }, get fuse() { return fuseState; }, get burst() { return burst; }, get shake() { return shake; }, get rumble() { return rumbleNow; }, predraw,
     perf() { const p = { avg: perf.sum / (perf.n || 1), max: perf.max, n: perf.n, ivAvg: perf.iv / (perf.ivN || 1), ivMax: perf.ivMax, phases: perf.phases }; perf = { ...blank(), ivN: 0, phases: {} }; return p; },
     memory() {
