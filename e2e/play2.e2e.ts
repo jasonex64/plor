@@ -10,6 +10,8 @@ const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqmjb", "aqyzb", "aqyzc", "aqyzd"];
 let today = "";
+// Each test closes the context it opened: Playwright's browser lives as long as the worker, and a village left open keeps
+// drawing in software (CI has no GPU) for every test after it (M16 16g-2b, PR #174's e2e).
 
 const runOut = async () => {
   await DB.query("update private.run set started_at = started_at - interval '21 seconds' where game_id = 'substrings'");
@@ -33,6 +35,7 @@ test("a signed-out visit shows sign-in", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/play2");
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  await page.context().close();
 });
 
 test("a day with no puzzle says so", async ({ browser }) => {
@@ -42,6 +45,7 @@ test("a day with no puzzle says so", async ({ browser }) => {
   await page.goto("/play2");
   await expect(page.getByRole("heading", { name: "Game number 2" })).toBeVisible();
   await expect(page.getByText("There's no puzzle today.")).toBeVisible();
+  await page.context().close();
 });
 
 // Each test that plays adds the day itself, as a retry runs in a new worker, whose cleanup took it away.
@@ -49,6 +53,8 @@ const addDay = () =>
   DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2) on conflict do nothing", [today, { format: 1, game_id: "substrings", date: today, rounds: ROUNDS, bonus_letter: "j" }]);
 
 test("a whole day: a word, each reason, a lockout, a timeout, Next and the results", async ({ browser }) => {
+  // The screen loads its village too now (M16 16g-2), and each round's end plays its moment.
+  test.setTimeout(120_000);
   await addDay();
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
@@ -71,7 +77,14 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   });
   await expect(reason).toHaveText("Not in the dictionary.");
   await expect(box).toHaveValue("");
-  // Within the lockout the box stays usable, and a try is refused unjudged.
+  // Within the lockout the box stays usable, and a try is refused unjudged. This one try's "locked" answer is stubbed with
+  // the real run: on CI the software-drawn village held the page past the 0.5 s lockout, and the server's lockout itself is
+  // checked in src/app/api/substrings/route.db.test.ts (docs/milestones/M16-16g-2-midnight-brew-in-play2.md, answer 22).
+  await page.route("**/api/substrings/try", async (route) => {
+    const headers = { "x-protocol": route.request().headers()["x-protocol"] };
+    const { run } = await (await page.request.get("/api/substrings", { headers })).json();
+    await route.fulfill({ json: { ok: true, outcome: "locked", run } });
+  }, { times: 1 });
   await box.fill("aqkb");
   await expect(box).toBeEnabled();
   await box.press("Enter");
@@ -107,17 +120,17 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await box.fill("aqkqmb");
   await box.press("Enter");
 
-  // Between rounds there's no clock and no letters yet, and Next has the focus, so Enter goes on. The word's points
-  // show, and the tracker has its letters (M16 16e, answer 20).
-  await expect(page.getByText("You played aqkqmb: 40 points.")).toBeVisible();
+  // Between rounds there's no clock and no letters yet, and Next has the focus once the village's change has cast
+  // (16g-2; 16g-1 answer 25), so Enter goes on. The word's points show, and the tracker has its letters (M16 16e, answer 20).
+  await expect(page.getByText("You played aqkqmb: 40 points.")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("Letters used: 5 of 26")).toBeVisible();
   // The row of letters marks just those: a marked letter is the only one with a class.
   const marked = page.getByRole("region", { name: "Game number 2" }).locator('p[aria-hidden="true"] span[class]');
   await expect(marked).toHaveText(["a", "b", "k", "m", "q"]);
   await expect(page.getByRole("timer")).toBeHidden();
   await expect(page.getByText("qm", { exact: true })).toBeHidden();
-  const next = page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next", exact: true });
-  await expect(next).toBeFocused();
+  const next = page.getByRole("region", { name: "Game number 2" }).getByRole("button", { name: "Next question", exact: true });
+  await expect(next).toBeFocused({ timeout: 15_000 });
   await page.keyboard.press("Enter");
   await expect(page.getByText("qm", { exact: true })).toBeVisible();
 
@@ -129,7 +142,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   // A word holding the bonus letter earns its points too, once.
   await box.fill("aqmjb");
   await box.press("Enter");
-  await expect(page.getByText("You played aqmjb: 30 points, and 120 for the bonus letter.")).toBeVisible();
+  await expect(page.getByText("You played aqmjb: 30 points, and 120 for the bonus letter.")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("Letters used: 6 of 26")).toBeVisible();
   await expect(marked).toHaveText(["a", "b", "j", "k", "m", "q"]);
   await next.click();
@@ -139,7 +152,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await runOut();
   await box.fill("aqmb");
   await box.press("Enter");
-  await expect(page.getByText("Time's up.")).toBeVisible();
+  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 15_000 });
   await next.click();
   await expect(page.getByText("qrs", { exact: true })).toBeVisible();
 
@@ -147,7 +160,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await DB.query("update private.question_open set opened_at = opened_at - interval '14 seconds' where game_id = 'substrings' and question_idx = 3");
   await page.reload();
   await expect(page.getByText("qrs", { exact: true })).toBeVisible();
-  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 8000 });
+  await expect(page.getByText("Time's up.")).toBeVisible({ timeout: 15_000 });
   await next.click();
   await expect(page.getByText("qtv", { exact: true })).toBeVisible();
 
@@ -185,9 +198,12 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(page.getByRole("definition")).toHaveText(["70", "120", "65", "255"]);
   await expect(page.getByText("Bonus letter j, in 1 word")).toBeVisible();
   await expect(page.getByText("Different letters, 6 of 26")).toBeVisible();
+  await page.context().close();
 });
 
 test("a tab left between rounds finds the day it's in, and a real failure says so", async ({ browser }) => {
+  // The screen loads its village too now (M16 16g-2), and each round's end plays its moment.
+  test.setTimeout(120_000);
   await addDay();
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
@@ -198,8 +214,8 @@ test("a tab left between rounds finds the day it's in, and a real failure says s
   await box.fill("aqkb");
   await box.press("Enter");
   const game = page.getByRole("region", { name: "Game number 2" });
-  const next = game.getByRole("button", { name: "Next", exact: true });
-  await expect(next).toBeVisible();
+  const next = game.getByRole("button", { name: "Next question", exact: true });
+  await expect(next).toBeVisible({ timeout: 15_000 });
   // The server failing isn't the screen being behind: it's said, and the player can try again.
   await page.route("**/api/substrings/next", (route) => route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ ok: false, error: "internal" }) }));
   await next.click();
@@ -208,8 +224,9 @@ test("a tab left between rounds finds the day it's in, and a real failure says s
   await page.unroute("**/api/substrings/next");
   // As a new day leaves it: the run this screen shows isn't today's any more.
   await DB.query("delete from private.run where game_id = 'substrings' and user_id = (select id from auth.users where email = $1)", [`${RUN}-pm@example.test`]);
-  await game.getByRole("button", { name: "Next", exact: true }).click();
+  await game.getByRole("button", { name: "Next question", exact: true }).click();
   await expect(game.getByRole("button", { name: "Start" })).toBeVisible();
+  await page.context().close();
 });
 
 test("game 1 stays as it was", async ({ browser }) => {
@@ -219,6 +236,7 @@ test("game 1 stays as it was", async ({ browser }) => {
   await expect(page.getByRole("heading", { name: "Plor, Today" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Afterglow" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Game number 2" })).toHaveCount(0);
+  await page.context().close();
 });
 
 // The Friends page's leaderboard switches between the games (M16 16e-2, answers 23 and 24), and game 2's adds up places.
@@ -237,4 +255,5 @@ test("the friends leaderboard switches to game 2", async ({ browser }) => {
   // A new player's week: their own row, a plain 0, as places aren't points.
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).toContainText("(you)");
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).not.toContainText("points");
+  await page.context().close();
 });

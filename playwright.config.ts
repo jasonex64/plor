@@ -20,8 +20,10 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   use: { baseURL: `http://localhost:${mutant ? MUTANT_PORT : 3000}`, trace: "retain-on-failure" },
   projects: [
-    // Every test but the full look check, the e2e CI runs (`npm run test:e2e`).
-    { name: "chromium", use: { ...devices["Desktop Chrome"] }, grepInvert: /@full/ },
+    // Every test but the full look check, the e2e CI runs (`npm run test:e2e`). Game 2's village draws with WebGL (M16 16g-2) and
+    // CI's runners have no GPU, so this test browser's software WebGL is switched on (DECISIONS.md, log, 2026-11-08; 16g-2
+    // answer 17); Afterglow draws in 2D, so its checks are unaffected.
+    { name: "chromium", use: { ...devices["Desktop Chrome"], launchOptions: { args: ["--enable-unsafe-swiftshader"] } }, grepInvert: /@full/ },
     // Afterglow's full look check, by hand (`npm run check:afterglow`): both sizes and every section, in the installed
     // Chrome, where its fps lines are judged (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6b-2, answers 15 and 47;
     // 14c-5 answer 41). Its mutants run it too (`npm run check:afterglow-mutants`, 14c-6b-2b).
