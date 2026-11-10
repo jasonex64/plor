@@ -45,7 +45,10 @@ export function ease(t: number): number {
 // The whole number shown at time t (0 to 1) of a count from one value to another.
 export const countAt = (from: number, to: number, t: number) => Math.round(from + (to - from) * ease(t));
 
-const lessMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// The Reduce motion setting, the one place it's read from script (MDN Window.matchMedia(); SOURCES.md). Game 2's village
+// listens to it for changes (M16 16g-2b, answer 26).
+export const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)");
+const lessMotion = () => reduceMotion().matches;
 
 // The number to show now: the value, or, when this browser last showed another, a count up to it over COUNT_MS. The
 // value is kept once the count ends, so a count cut short (the page left, React's development double-run) runs again.

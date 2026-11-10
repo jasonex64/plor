@@ -55,6 +55,8 @@ export type Village = {
   miss(typed: string): Promise<void>;
   // A try the server refused: a puff of grey smoke, and nothing moves the camera (answer 7).
   refused(): void;
+  // Reduce motion's calm version on or off (16g-2b): read by each moment as it starts (answer 26).
+  setCalm(on: boolean): void;
   // The next part of the village changes; level is the rounds now done.
   cast(level: number): Promise<void>;
   // How the village stands with this many rounds done, at once, cutting any move: on load and on a resumed run.
@@ -83,10 +85,11 @@ function placeHome(stage: Stage) {
 
 // font: the page's font family, for the letters on the blocks (DECISIONS.md, Styling: one font). onFault: an error while
 // the village runs, to be shown. signal: the screen has gone, so a village still loading never shows its canvas.
-export async function startVillage(host: HTMLElement, font: string, onFault: (err: unknown) => void, signal: AbortSignal): Promise<Village> {
+// calm: Reduce motion is on as the village shows (16g-2b), so its first frames are already still.
+export async function startVillage(host: HTMLElement, font: string, onFault: (err: unknown) => void, signal: AbortSignal, calm: boolean): Promise<Village> {
   const stage = createStage(host, onFault, { fov: 30, near: 0.3, far: 500 });
   try {
-    const village = await build(stage, font);
+    const village = await build(stage, font, calm);
     if (signal.aborted) { village.stop(); throw signal.reason; }
     // Ready once the village has set its pace (a slow GPU's first frames hold the page).
     await stage.show();
@@ -98,7 +101,7 @@ export async function startVillage(host: HTMLElement, font: string, onFault: (er
   }
 }
 
-async function build(stage: Stage, font: string): Promise<Village> {
+async function build(stage: Stage, font: string, startCalm: boolean): Promise<Village> {
   const { scene } = stage;
   const parts = createParticles(stage);
   const R = rng(1031);
@@ -321,6 +324,22 @@ async function build(stage: Stage, font: string): Promise<Village> {
   let witchMove: WitchMove = { kind: "idle", t0: 0 };
   const cat2 = { a: 0.6, mode: "walk" as "walk" | "sit", until: 4 };
   let extras: Extras | null = null;
+  // Reduce motion's calm version (16g-2b): the ambient clock `at` stops, so idle life, flicker, the witch's sway and the
+  // animals hold where they are (answers 24, 28, 29); a round's change and its fade-ins keep the stage's own time.
+  // `wanted` is the setting; `calm` is what the village does, taken between moments (answer 26).
+  let calm = startCalm, wanted = startCalm, busy = 0, at = 0;
+  stage.calm = startCalm;
+  const apply = () => { calm = wanted; stage.calm = calm; };
+  // A moment reads the setting as it starts and finishes as it began; a switch meanwhile waits for it to end.
+  async function moment(play: () => Promise<void>) {
+    apply();
+    busy++;
+    try { await play(); } finally { if (--busy === 0) apply(); }
+  }
+  // Lights at their level, without flicker, in the calm version (answer 28).
+  const wob = (x: number) => (calm ? 0 : x);
+  // Where a round's change puts things: in the calm version they take their place at once and grow in there (answer 29).
+  const P = (k: Tween) => (calm ? k.to : k.v);
 
   // ---- the second stage: animals and the hearse (answer 11) ----
   // They're built in a group of their own and their shaders compiled in the background before they join the scene, as
@@ -333,7 +352,7 @@ async function build(stage: Stage, font: string): Promise<Village> {
     const crows: Crow[] = [0, 1, 2, 3].map((i) => {
       const e = putX(E.crow, { pos: perches[i].toArray() as [number, number, number], scale: 2.4, tick: false });
       e.play("Idle", { fade: 0 });
-      return { e, at: i, next: stage.t + 3 + R() * 6, fly: null };
+      return { e, at: i, next: at + 3 + R() * 6, fly: null };
     });
     const owl = putX(E.owl, { pos: [-7.6, 3.95, -11.4], rotY: 0.3, scale: 2.6, tick: false });
     owl.play("Idle", { fade: 0 });
@@ -342,7 +361,7 @@ async function build(stage: Stage, font: string): Promise<Village> {
       e.play("Idle", { fade: 0 });
       const spots = i ? [new THREE.Vector3(2.4, 0, -9.3), new THREE.Vector3(-4.3, 0, -9.4)] : [new THREE.Vector3(11.4, 0, 6.2), new THREE.Vector3(12.8, 0, 9)];
       e.obj.position.copy(spots[0]);
-      return { e, spots, at: 0, t0: stage.t, wait: 2 + R() * 3, from: null };
+      return { e, spots, at: 0, t0: at, wait: 2 + R() * 3, from: null };
     });
     const wolf = putX(E.wolf, { pos: [-15.4, 0.3, -6.8], rotY: Math.PI + 0.4, scale: 1.7, tick: false });
     wolf.play("Idle", { fade: 0 });
@@ -355,6 +374,8 @@ async function build(stage: Stage, font: string): Promise<Village> {
 
   const cA = new THREE.Color(), cB = new THREE.Color(), cC = new THREE.Color(), cD = new THREE.Color();
   const update: Updater = (t, dt) => {
+    const adt = calm ? 0 : dt;
+    at += adt;
     const lv = (K.lanterns.v + K.patch.v + K.moon.v + K.graves.v + K.house.v + K.parade.v) / 6;
     // the sky is recoloured only when it changes
     if (Math.abs(lv - lastLv) > 0.001 || flash > 0.01 || skyDirty) {
@@ -369,9 +390,10 @@ async function build(stage: Stage, font: string): Promise<Village> {
       domeGeo.attributes.color.needsUpdate = true;
     }
     flash *= Math.exp(-dt * 5);
-    starMat.opacity = 0.65 + Math.sin(t * 1.7) * 0.2;
-    moon.position.set(-40, lerp(-4, 34, K.moon.v), -110);
-    moonLight.position.set(-14, lerp(6, 26, K.moon.v), -12);
+    starMat.opacity = 0.65 + wob(Math.sin(at * 1.7) * 0.2);
+    moon.position.set(-40, lerp(-4, 34, P(K.moon)), -110);
+    moon.scale.setScalar(calm ? Math.max(K.moon.v, 0.001) : 1);
+    moonLight.position.set(-14, lerp(6, 26, P(K.moon)), -12);
     // the light that builds every round, 0 at round 1 and 1 at round 7 (16g-1 answer 28)
     const L = glowK.v;
     moonLight.intensity = lerp(0.8, 1.4, L) + K.moon.v * 0.4;
@@ -395,7 +417,7 @@ async function build(stage: Stage, font: string): Promise<Village> {
       if (passing(l.d)) l.boost = 1;
       l.boost *= Math.exp(-dt * 2.5);
       const on = smooth(K.lanterns.v * 1.6 - l.d / 16);
-      const fl = 1 + Math.sin(t * 9 + l.d) * 0.08;
+      const fl = 1 + wob(Math.sin(at * 9 + l.d) * 0.08);
       if (l.l) l.l.intensity = on * (2.4 + L * 1.6) * fl * (1 + l.boost * 2.5);
       l.s.material.opacity = on * fl * (0.9 + l.boost);
       l.s.scale.setScalar((l.big ? 1.2 : 1.3) * (1 + l.boost * 1.5));
@@ -405,64 +427,69 @@ async function build(stage: Stage, font: string): Promise<Village> {
       const gk = smooth(K.patch.v * 1.5 - i * 0.08);
       if (gk > 0.5 && passing(p.d)) p.hop = 1;
       p.hop *= Math.exp(-dt * 4);
-      p.e.obj.scale.setScalar(Math.max(easeOutBack(gk) * p.size, 0.001));
+      p.e.obj.scale.setScalar(Math.max((calm ? smooth(gk) : easeOutBack(gk)) * p.size, 0.001));
       p.e.obj.position.y = Math.abs(Math.sin(p.hop * Math.PI)) * 0.8 * p.hop;
-      p.s.material.opacity = gk * (0.8 + Math.sin(t * 8 + i) * 0.15);
+      p.s.material.opacity = gk * (0.8 + wob(Math.sin(at * 8 + i) * 0.15));
     });
     patchLight.intensity = K.patch.v * 4;
     // fog, bats
     fogMat.opacity = K.moon.v * 0.045;
-    for (const f of puffs) { const a = f.a0 + t * f.sp; f.m.position.set(Math.cos(a) * f.r, 0.25, Math.sin(a) * f.r); }
+    for (const f of puffs) { const a = f.a0 + at * f.sp; f.m.position.set(Math.cos(a) * f.r, 0.25, Math.sin(a) * f.r); }
     for (const b of bats) {
       b.b.visible = K.moon.v > 0.05;
-      const a = b.ph + t * b.sp;
-      b.b.position.set(8 + Math.cos(a) * b.r, b.h * K.moon.v + Math.sin(t * 2 + b.ph) * 0.5, -8 + Math.sin(a) * b.r);
-      b.b.rotation.set(0, -a, Math.sin(t * 14 + b.ph) * 0.6);
+      const a = b.ph + at * b.sp;
+      b.b.position.set(8 + Math.cos(a) * b.r, b.h * P(K.moon) + Math.sin(at * 2 + b.ph) * 0.5, -8 + Math.sin(a) * b.r);
+      b.b.rotation.set(0, -a, Math.sin(at * 14 + b.ph) * 0.6);
       b.b.scale.setScalar(K.moon.v);
     }
     // graves open
-    skeletons.forEach((e, i) => { e.obj.position.y = lerp(-1, 0, smooth(K.graves.v * 1.4 - i * 0.12)); });
+    skeletons.forEach((e, i) => {
+      const g = smooth(K.graves.v * 1.4 - i * 0.12);
+      e.obj.position.y = calm ? 0 : lerp(-1, 0, g);
+      e.obj.scale.setScalar(1.2 * (calm ? Math.max(g, 0.001) : 1));
+    });
     for (const w of wisps) {
-      w.m.position.set(w.p.x + Math.sin(t * 0.8 + w.ph) * 0.4, 0.6 + K.graves.v * (1.4 + Math.sin(t * 1.5 + w.ph) * 0.3), w.p.z);
-      w.m.rotation.z = Math.sin(t + w.ph) * 0.2;
+      w.m.position.set(w.p.x + Math.sin(at * 0.8 + w.ph) * 0.4, 0.6 + P(K.graves) * (1.4 + Math.sin(at * 1.5 + w.ph) * 0.3), w.p.z);
+      w.m.rotation.z = Math.sin(at + w.ph) * 0.2;
     }
     wispMat.opacity = K.graves.v * 0.75;
-    for (const d of drifters) { const a = d.ph + t * 0.07; d.m.position.set(Math.cos(a) * d.r, 1.4 + Math.sin(t * 0.9 + d.ph) * 0.5, Math.sin(a * 1.3) * d.r * 0.8); }
+    for (const d of drifters) { const a = d.ph + at * 0.07; d.m.position.set(Math.cos(a) * d.r, 1.4 + Math.sin(at * 0.9 + d.ph) * 0.5, Math.sin(a * 1.3) * d.r * 0.8); }
     // the house wakes
-    houseLights.forEach((l, i) => { l.intensity = K.house.v * (5 + Math.sin(t * 6 + i * 2) * 1.2); });
+    houseLights.forEach((l, i) => { l.intensity = K.house.v * (5 + wob(Math.sin(at * 6 + i * 2) * 1.2)); });
     for (const r of stringRuns) { r.obj.visible = K.house.v > 0.02; if (r.actions.tick) r.actions.tick.paused = K.house.v < 0.5; r.obj.scale.setScalar(Math.max(K.house.v, 0.001)); }
-    const sy = lerp(9, 3 + Math.sin(t * 0.9) * 0.4, smooth(K.house.v));
+    const sy = lerp(9, 3 + Math.sin(at * 0.9) * 0.4, smooth(P(K.house)));
     spider.obj.position.y = sy;
+    spider.obj.scale.setScalar(1.4 * (calm ? Math.max(smooth(K.house.v), 0.001) : 1));
     thread.position.set(12.6, (sy + 9.6) / 2, -3.2);
     thread.scale.y = Math.max(9.6 - sy, 0.01);
     // the parade hops round the ring path
     const pk = K.parade.v;
     for (const p of parade) {
-      const a = t * 0.12 - p.i * 0.2, r = 11.8;
-      const hop = Math.abs(Math.sin(t * 5 + p.i * 0.9)) * 0.5;
-      p.e.obj.position.set(Math.cos(a) * r, lerp(-1.5, hop, smooth(pk)), Math.sin(a) * r);
+      const a = at * 0.12 - p.i * 0.2, r = 11.8;
+      const hop = calm ? 0 : Math.abs(Math.sin(at * 5 + p.i * 0.9)) * 0.5;
+      p.e.obj.position.set(Math.cos(a) * r, lerp(-1.5, hop, smooth(P(K.parade))), Math.sin(a) * r);
       p.e.obj.rotation.y = -a;
       p.e.obj.scale.setScalar(Math.max(pk * 1.1, 0.001));
       p.s.position.set(p.e.obj.position.x, p.e.obj.position.y + 0.35, p.e.obj.position.z);
-      p.s.material.opacity = pk * (0.75 + Math.sin(t * 8 + p.i) * 0.15);
+      p.s.material.opacity = pk * (0.75 + wob(Math.sin(at * 8 + p.i) * 0.15));
     }
     // small lights: candles, windows, fireflies, the brazier, chimney smoke, swaying oaks, the stream's shimmer
-    for (const c of candles) { c.s.material.opacity = 0.45 + L * 0.5 + Math.sin(t * 11 + c.ph) * 0.12 + Math.sin(t * 23 + c.ph) * 0.08; c.s.scale.setScalar(0.7 + L * 0.6); }
-    windows.forEach((w, i) => { const on = smooth(L * 1.6 - i * 0.1); w.s.material.opacity = (0.25 + on * 0.75) * (0.85 + Math.sin(t * 1.3 + w.ph) * 0.12); w.s.scale.setScalar(1.2 + on * 1.2); });
+    for (const c of candles) { c.s.material.opacity = 0.45 + L * 0.5 + wob(Math.sin(at * 11 + c.ph) * 0.12 + Math.sin(at * 23 + c.ph) * 0.08); c.s.scale.setScalar(0.7 + L * 0.6); }
+    windows.forEach((w, i) => { const on = smooth(L * 1.6 - i * 0.1); w.s.material.opacity = (0.25 + on * 0.75) * (0.85 + wob(Math.sin(at * 1.3 + w.ph) * 0.12)); w.s.scale.setScalar(1.2 + on * 1.2); });
     for (const f of flies) {
-      f.s.position.set(f.x + Math.sin(t * f.sp + f.ph) * 1.2, 0.6 + Math.sin(t * f.sp * 1.7 + f.ph) * 0.4, f.z + Math.cos(t * f.sp * 0.8 + f.ph) * 1.2);
-      f.s.material.opacity = Math.max(0, Math.sin(t * 2.2 + f.ph * 3)) * 0.9;
+      f.s.position.set(f.x + Math.sin(at * f.sp + f.ph) * 1.2, 0.6 + Math.sin(at * f.sp * 1.7 + f.ph) * 0.4, f.z + Math.cos(at * f.sp * 0.8 + f.ph) * 1.2);
+      f.s.material.opacity = Math.max(0, Math.sin(at * 2.2 + f.ph * 3)) * 0.9;
     }
-    brazierLight.intensity = 3 + Math.sin(t * 13) * 0.5 + Math.sin(t * 29) * 0.3;
-    fireAcc += dt * 10;
+    brazierLight.intensity = 3 + wob(Math.sin(at * 13) * 0.5 + Math.sin(at * 29) * 0.3);
+    fireAcc += adt * 10;
     while (fireAcc > 1) { fireAcc -= 1; parts.emit({ at: new THREE.Vector3(1.6, 1.15, -9.6), count: 1, speed: 0.8, spread: 0.4, up: 1, colors: ["#ffb347", "#ff7a2c", "#ffe08a"], size: 0.06, life: 0.6, gravity: -1.5, drag: 1 }); }
-    smokeAcc += dt * 3;
+    smokeAcc += adt * 3;
     while (smokeAcc > 1) { smokeAcc -= 1; const c = chimneys[(R() * chimneys.length) | 0]; parts.emit({ at: c, count: 1, speed: 0.4, spread: 0.3, up: 1, dir: new THREE.Vector3(0.25, 0, 0), color: "#8f8aa0", size: 0.18, life: 3.5, gravity: -0.25, drag: 0.8, grow: 3 }); }
-    oaks.forEach((o, i) => { o.obj.rotation.z = Math.sin(t * 0.7 + i * 2) * 0.025; o.obj.rotation.x = Math.sin(t * 0.5 + i) * 0.015; });
-    waterMat.emissiveIntensity = 0.45 + Math.sin(t * 1.4) * 0.08;
+    oaks.forEach((o, i) => { o.obj.rotation.z = Math.sin(at * 0.7 + i * 2) * 0.025; o.obj.rotation.x = Math.sin(at * 0.5 + i) * 0.015; });
+    waterMat.emissiveIntensity = 0.45 + wob(Math.sin(at * 1.4) * 0.08);
     // the witch, by code: a gentle sway at rest, a lean to toss, a hop to cheer, a crouch to flinch
     const wk = t - witchMove.t0, wo = witch.obj;
-    let pitch = Math.sin(t * 1.1) * 0.02, lift = Math.abs(Math.sin(t * 1.6)) * 0.015, squash = 1;
+    let pitch = Math.sin(at * 1.1) * 0.02, lift = Math.abs(Math.sin(at * 1.6)) * 0.015, squash = 1;
     if (witchMove.kind === "toss") pitch += Math.sin(clamp(wk / 0.9, 0, 1) * Math.PI) * 0.35;
     else if (witchMove.kind === "cheer") lift += Math.abs(Math.sin(clamp(wk / 1.2, 0, 1) * Math.PI * 2)) * 0.35;
     else if (witchMove.kind === "flinch") { const f = Math.sin(clamp(wk / 1.1, 0, 1) * Math.PI); pitch -= f * 0.25; squash = 1 - f * 0.18; }
@@ -470,12 +497,12 @@ async function build(stage: Stage, font: string): Promise<Village> {
     wo.position.y = 0.7 + lift;
     wo.scale.set(1, squash, 1);
     // the stray cat wanders and sits
-    if (t > cat2.until) { cat2.mode = cat2.mode === "walk" ? "sit" : "walk"; cat2.until = t + (cat2.mode === "walk" ? 5 + R() * 4 : 3 + R() * 3); strayCat.play(cat2.mode === "walk" ? "Walk" : "Idle", { fade: 0.3 }); }
-    if (cat2.mode === "walk") cat2.a += dt * 0.16;
+    if (at > cat2.until) { cat2.mode = cat2.mode === "walk" ? "sit" : "walk"; cat2.until = at + (cat2.mode === "walk" ? 5 + R() * 4 : 3 + R() * 3); strayCat.play(cat2.mode === "walk" ? "Walk" : "Idle", { fade: 0.3 }); }
+    if (cat2.mode === "walk") cat2.a += adt * 0.16;
     const cr = 4.4 + Math.sin(cat2.a * 1.7) * 0.6;
     strayCat.obj.position.set(Math.cos(cat2.a) * cr, 0.02, Math.sin(cat2.a) * cr);
     strayCat.obj.rotation.y = -cat2.a;
-    if (extras) animals(extras, t);
+    if (extras) animals(extras, t, at);
 
     // eruptions for big words
     for (const gz of geysers) {
@@ -486,48 +513,50 @@ async function build(stage: Stage, font: string): Promise<Village> {
     // the brew
     brew.position.y = rimY - 0.06 + fill.v * 0.05;
     brewMat.emissiveIntensity = 0.5 + fill.v * 0.6 + wave * 0.7;
-    potLight.intensity = 6 + fill.v * 5 + wave * 14 + Math.sin(t * 13) * 0.6;
+    potLight.intensity = 6 + fill.v * 5 + wave * 14 + wob(Math.sin(at * 13) * 0.6);
     wave *= Math.exp(-dt * 3);
     const bp = brewGeo.attributes.position;
-    for (let i = 0; i < bp.count; i++) bp.setY(i, Math.sin(t * 4 + brewBase[i * 3] * 19) * 0.012 + Math.sin(t * 5.3 + brewBase[i * 3 + 2] * 23) * 0.012);
+    for (let i = 0; i < bp.count; i++) bp.setY(i, Math.sin(at * 4 + brewBase[i * 3] * 19) * 0.012 + Math.sin(at * 5.3 + brewBase[i * 3 + 2] * 23) * 0.012);
     bp.needsUpdate = true;
-    steamAcc += dt * 3;
+    steamAcc += adt * 3;
     while (steamAcc > 1) { steamAcc -= 1; parts.emit({ at: new THREE.Vector3((R() - 0.5) * 0.4, rimY + 0.1, (R() - 0.5) * 0.4), count: 1, speed: 0.4, spread: 0.3, up: 1, colors: ["#cfc3ea", brewMat.emissive.getStyle()], size: 0.07, life: 2.2, gravity: -0.15, drag: 1.2, grow: 2.5 }); }
     if (column) {
+      // Calm, it stands at full height and fades up over the finale's 1.4 s, with no bursts (answers 30, 31).
       const c = column, k2 = smooth((t - c.start) / 1.2);
-      c.mesh.scale.set(1, Math.max(k2, 0.001), 1); c.mesh.rotation.y = t * 0.6;
-      c.mesh.material.opacity = 0.55 + Math.sin(t * 6) * 0.08;
-      if (Math.floor(t * 3) !== c.last) { c.last = Math.floor(t * 3); parts.emit({ at: new THREE.Vector3((R() - 0.5) * 20, 7 + R() * 6, (R() - 0.5) * 16), count: 26, speed: 4, spread: 1, up: 0.3, colors: ["#ffe08a", "#c86cf0", "#8df060", "#ff9a3c"], size: 0.12, life: 1.3, gravity: 2.5, drag: 0.6 }); }
+      c.mesh.scale.set(1, calm ? 1 : Math.max(k2, 0.001), 1); c.mesh.rotation.y = at * 0.6;
+      c.mesh.material.opacity = calm ? 0.55 * smooth((t - c.start) / 1.4) : 0.55 + Math.sin(at * 6) * 0.08;
+      if (!calm && Math.floor(t * 3) !== c.last) { c.last = Math.floor(t * 3); parts.emit({ at: new THREE.Vector3((R() - 0.5) * 20, 7 + R() * 6, (R() - 0.5) * 16), count: 26, speed: 4, spread: 1, up: 0.3, colors: ["#ffe08a", "#c86cf0", "#8df060", "#ff9a3c"], size: 0.12, life: 1.3, gravity: 2.5, drag: 0.6 }); }
     }
   };
 
   // crows hop between perches; the owl turns its head; rats dart between barrels; the wolf howls; the hearse rolls round
-  function animals(x: Extras, t: number) {
+  // t: the stage's time, for their fade-in; at: the ambient clock, which stops in the calm version.
+  function animals(x: Extras, t: number, at: number) {
     const appear = smooth((t - x.born) / 0.8);
     for (const cw of x.crows) {
       const o = cw.e.obj;
       o.scale.setScalar(2.4 * Math.max(appear, 0.001));
-      if (!cw.fly && t > cw.next) {
+      if (!cw.fly && at > cw.next) {
         let to = cw.at;
         while (to === cw.at || x.crows.some((c) => c !== cw && c.at === to)) to = (R() * x.perches.length) | 0;
-        cw.fly = { from: o.position.clone(), to, t0: t, dur: 2.2, high: 3 };
+        cw.fly = { from: o.position.clone(), to, t0: at, dur: 2.2, high: 3 };
         cw.at = -1;
         cw.e.play("Fly", { fade: 0.15 });
       }
       if (cw.fly) {
-        const f = cw.fly, kf = Math.min((t - f.t0) / f.dur, 1), dest = x.perches[f.to];
+        const f = cw.fly, kf = Math.min((at - f.t0) / f.dur, 1), dest = x.perches[f.to];
         o.position.lerpVectors(f.from, dest, smooth(kf));
         o.position.y += Math.sin(kf * Math.PI) * f.high;
         o.rotation.y = Math.atan2(dest.x - f.from.x, dest.z - f.from.z);
-        if (kf >= 1) { cw.at = f.to; cw.fly = null; cw.next = t + 5 + R() * 7; cw.e.play("Idle", { fade: 0.2 }); }
+        if (kf >= 1) { cw.at = f.to; cw.fly = null; cw.next = at + 5 + R() * 7; cw.e.play("Idle", { fade: 0.2 }); }
       }
     }
     x.owl.obj.scale.setScalar(2.6 * Math.max(appear, 0.001));
-    x.owl.obj.rotation.y = 0.3 + Math.round(Math.sin(t * 0.4) * 2) * 0.5;
+    x.owl.obj.rotation.y = 0.3 + Math.round(Math.sin(at * 0.4) * 2) * 0.5;
     for (const r of x.rats) {
       r.e.obj.scale.setScalar(2 * Math.max(appear, 0.001));
-      const kr = (t - r.t0) / 0.9;
-      if (t - r.t0 > 0.9 + r.wait) { r.from = r.spots[r.at]; r.at = 1 - r.at; r.t0 = t; r.wait = 2 + R() * 4; r.e.play("Run", { fade: 0.1 }); }
+      const kr = (at - r.t0) / 0.9;
+      if (at - r.t0 > 0.9 + r.wait) { r.from = r.spots[r.at]; r.at = 1 - r.at; r.t0 = at; r.wait = 2 + R() * 4; r.e.play("Run", { fade: 0.1 }); }
       if (!r.from) continue;
       const to = r.spots[r.at], kk = clamp(kr, 0, 1);
       r.e.obj.position.lerpVectors(r.from, to, kk);
@@ -535,9 +564,9 @@ async function build(stage: Stage, font: string): Promise<Village> {
       else if (r.e.current !== r.e.actions.Idle) r.e.play("Idle", { fade: 0.2 });
     }
     x.wolf.obj.scale.setScalar(1.7 * Math.max(appear, 0.001));
-    const hp = (t % 11) / 11, howl = hp > 0.7 ? Math.sin(((hp - 0.7) / 0.3) * Math.PI) : 0;
+    const hp = (at % 11) / 11, howl = hp > 0.7 ? Math.sin(((hp - 0.7) / 0.3) * Math.PI) : 0;
     x.wolf.obj.rotation.x = -howl * 0.55;
-    const ha = -t * 0.05;
+    const ha = -at * 0.05;
     x.hearse.obj.scale.setScalar(0.6 * Math.max(appear, 0.001));
     x.hearse.obj.position.set(Math.sin(ha) * 15.3, 0.37 * 0.6, Math.cos(ha) * 15.3);
     x.hearse.obj.rotation.y = ha - Math.PI / 2;
@@ -611,11 +640,44 @@ async function build(stage: Stage, font: string): Promise<Village> {
     });
   }
 
-  return {
+  // Reduce motion's quiet moment (answers 23, 27, 31): each letter shows over the pot, at the height a word's letters
+  // show, and sinks straight down into it, one after another; no arc, spin, splash or shake. fly and gap are the normal
+  // moment's own lengths; looks gives each letter its block.
+  async function sinkIn(letters: string, looks: (ch: string) => BlockLook, w: number, y: number, fly: number, gap: number) {
+    const t0 = stage.t, pot = new THREE.Vector3(0, rimY, 0);
+    const blocks = [...letters].map((ch, i) => {
+      const m = letterBlock(ch, w * 0.9, looks(ch), font);
+      const from = new THREE.Vector3(0, y, 0);
+      m.position.copy(from); m.visible = false; scene.add(m);
+      return { m, from, start: t0 + i * gap, gone: false };
+    });
+    await until((t) => {
+      let left = 0;
+      for (const b of blocks) {
+        if (b.gone) continue;
+        left++;
+        const kf = clamp((t - b.start) / fly, 0, 1);
+        b.m.visible = t >= b.start;
+        if (kf >= 1) { b.gone = true; disposeBlock(b.m); continue; }
+        b.m.position.lerpVectors(b.from, pot, kf);
+        b.m.scale.setScalar(1 - kf * 0.4);
+      }
+      return !left;
+    });
+  }
+
+  const raw: Village = {
     // The word moment in four tiers (16g-1 answers 21, 22). 0: the letters arc in. 1, good: they rise, glow and slam down
     // like meteors. 2, great: the slam, then the cauldron erupts, a shockwave sweeps the village and the camera slams in.
     // 3, huge: all of it bigger, a second shockwave, a flash in the sky and a harder slam.
     async word(letters, bonus, bonusLetter) {
+      // Calm: one quiet moment for every word, its tier only in the card's points (answer 23); the brew glows once.
+      if (calm) {
+        await sinkIn(letters, (ch) => (ch === bonusLetter ? GOLD : TIER_LOOK[0]), Math.min(0.42, 3.4 / letters.length), 3.2, 0.62, 0.11);
+        wave = 1.2;
+        await wait(1500);
+        return;
+      }
       const n = letters.length, tier = tierOf(n, bonus), look = TIER_LOOK[tier];
       witchMove = { kind: "toss", t0: stage.t };
       const w = Math.min(0.42, 3.4 / n);
@@ -651,6 +713,12 @@ async function build(stage: Stage, font: string): Promise<Village> {
     },
     async miss(typed) {
       const letters = typed.slice(0, 10) || "???";
+      // Calm: the grey letters sink in together over the fall's 0.8 s, with no glow (answers 27, 31).
+      if (calm) {
+        await sinkIn(letters, () => GREY, Math.min(0.4, 3 / letters.length), 3, 0.8, 0);
+        await wait(900);
+        return;
+      }
       cat.play("Arch", { loop: false, fade: 0.15 });
       witchMove = { kind: "flinch", t0: stage.t };
       const n = letters.length, w = Math.min(0.4, 3 / n);
@@ -671,11 +739,24 @@ async function build(stage: Stage, font: string): Promise<Village> {
       cat.play("Idle", { fade: 0.4 });
     },
     refused() {
+      // Calm: nothing rises (answer 28); the reason under the box says it.
+      if (calm) return;
       parts.emit({ at: new THREE.Vector3(0, rimY + 0.1, 0), count: 14, speed: 0.7, spread: 1, up: 1, colors: ["#6d6680", "#9a93a8", "#4b4458"], size: 0.08, life: 1.4, gravity: -0.5, drag: 1.4, grow: 2 });
     },
     // One equal step of change a round (16g-1 answers 14, 15): the brew's magic streaks to the next part of the village,
     // the camera glances there and back, and that part changes.
     async cast(level) {
+      // Calm: no streak and no glance; the change brightens and grows in where it stands over the cast's 2.8 s (answer 25).
+      // The fade is eased to an end at 2.8 s, not the normal tweens' tail, so the village is still once it has cast.
+      if (calm) {
+        const name = STEPS[level - 1], g0 = glowK.v, t0 = stage.t;
+        await until((t) => {
+          const k = smooth((t - t0) / 2.8);
+          K[name].jump(k); glowK.jump(lerp(g0, level / 6, k));
+          return t - t0 >= 2.8;
+        });
+        return;
+      }
       const to = AREAS[STEPS[level - 1]];
       stage.punch(to, 0.32, 3.6);
       const from = new THREE.Vector3(0, rimY + 0.3, 0), t0 = stage.t, p = new THREE.Vector3();
@@ -695,13 +776,20 @@ async function build(stage: Stage, font: string): Promise<Village> {
       placeHome(stage);
       setSteps(level, true);
     },
-    score(total) { fill.set(Math.min(total / FULL, 1)); },
+    // Calm, the brew's level takes its place at once rather than rising (answer 29).
+    score(total) { if (calm) fill.jump(Math.min(total / FULL, 1)); else fill.set(Math.min(total / FULL, 1)); },
+    setCalm(on) { wanted = on; if (busy === 0) apply(); },
     // The short finale after round 7 (16g-1 answer 26): a column of light and a burst; it stays lit (answer 29).
     async finale() {
       const geo = new THREE.CylinderGeometry(0.5, 0.9, 40, 7, 1, true); geo.translate(0, 20, 0);
       const mat = new THREE.MeshBasicMaterial({ color: brewMat.emissive.clone(), transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false });
       const mesh = new THREE.Mesh(geo, mat); mesh.position.y = rimY; scene.add(mesh);
       column = { mesh, start: stage.t, last: -1 };
+      // Calm: the column alone fades up and stays; no burst and no pull (answer 30).
+      if (calm) {
+        await wait(1400);
+        return;
+      }
       stage.pull(0.15, 1.6, 2.5);
       parts.emit({ at: new THREE.Vector3(0, rimY, 0), count: 120, speed: 6, spread: 0.5, up: 1, colors: ["#c86cf0", "#e7b6ff", "#8df060", "#ffe08a"], size: 0.08, life: 2, gravity: 4, drag: 0.3 });
       witchMove = { kind: "cheer", t0: stage.t };
@@ -710,5 +798,12 @@ async function build(stage: Stage, font: string): Promise<Village> {
     settled: () => stage.settled(),
     extras: extrasLoaded,
     stop: () => stage.stop(),
+  };
+  return {
+    ...raw,
+    word: (letters, bonus, bonusLetter) => moment(() => raw.word(letters, bonus, bonusLetter)),
+    miss: (typed) => moment(() => raw.miss(typed)),
+    cast: (level) => moment(() => raw.cast(level)),
+    finale: () => moment(() => raw.finale()),
   };
 }
