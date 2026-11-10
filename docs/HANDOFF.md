@@ -3,12 +3,12 @@
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
 **Updated:** 2026-11-09, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2a and 16g-2b.
-- **16g-2a and 16g-2b are done:** PRs #173 and #174, merged on green CI. `/play2` plays the real run in Midnight Brew, with a calm version under Reduce motion (`docs/milestones/M16-16g-2-midnight-brew-in-play2.md`).
+- **16g, game 2's look, is done:** 16g-2a and 16g-2b (PRs #173 and #174, merged on green CI) put Midnight Brew into `/play2` with a calm version under Reduce motion. 16g-2c, compression, closed without building it: Vercel already sends all 48 models Brotli-compressed, 1.78 MB of 10.8 (`curl` against plor.app, as the PR preview needs Vercel's sign-in), and the human said "Stop here" (answer 38). This closing note is on `m16-game-2` in its own PR.
 - **`main`'s e2e is green again** (PR #174: `171 passed`, none flaky). It had failed since PR #173 because no test in `brew.e2e.ts` or `play2.e2e.ts` closed its browser context, so every village kept drawing in software for the rest of CI's one-worker run. A test that opens a 3D page must close its context.
 - **Local e2e on this PC is unreliable for `/play2`:** the page under test reloads itself after each `✓ Compiled` from `next dev`, failing even a first test; cause *unverified* (ROADMAP, Next revision). Read CI's result, not a local failure, until that's found.
 - **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, never run two e2e processes at once, and never edit `src/` while one runs. Delete only your own leftover test rows (`<RUN>-b%@example.test`, the substrings day whose first round is `qk`).
 - **Left running:** nothing.
-- **Next:** 16g-2c, trying mesh compression on the models, with guided questions first (`next start` already gzips them to about 2.3 MB of 10.8; whether Vercel does too is *unverified*). Its build-time tool needs a source in SOURCES.md before any code.
+- **Next:** this closing PR merged at the human's word; then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
 
 **From `main` (M14's session), merged into `m16-game-2` on 2026-11-09, after PR #172:**
 

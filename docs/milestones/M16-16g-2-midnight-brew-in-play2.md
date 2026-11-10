@@ -1,6 +1,6 @@
 # M16 — 16g-2, Midnight Brew becomes game 2's run
 
-**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a done, PR #173 merged on green CI 2026-11-09; 16g-2b, the calm version, done, PR #174 merged on green CI 2026-11-09 at the human's "merge and next steps"; 16g-2c next).
+**Status:** done (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a done, PR #173 merged on green CI 2026-11-09; 16g-2b, the calm version, done, PR #174 merged on green CI 2026-11-09 at the human's "merge and next steps"; 16g-2c closed without compression, as Vercel already sends the models Brotli-compressed, 1.78 MB of 10.8 (answers 34, 38)).
 
 ## Goal
 Play game 2's real run at `/play2` in Midnight Brew, the low-poly witch's village approved in 16g-1 (version 6), full screen, with the end of the run kept as today's cards.
@@ -20,7 +20,7 @@ Play game 2's real run at `/play2` in Midnight Brew, the low-poly witch's villag
   - three.js, https://threejs.org/docs/ (WebGLRenderer, GLTFLoader, SkeletonUtils, AnimationMixer, InstancedMesh) and its MIT licence, version 0.180.0, the version the mock and polyfork's README use. The one new dependency (answer 3).
   - Lighthouse's throttling docs, https://github.com/GoogleChrome/lighthouse/blob/main/docs/throttling.md ("The mobile network throttling preset", "Calibrating the CPU slowdown") and `core/config/constants.js` (`MOTOGPOWER_EMULATION_METRICS`), at commit `ea58ed1`, read 2026-11-08: the phone profile for the measurements (answer 9).
   - MDN `Window.matchMedia()`, https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia: reading Reduce motion from script, the gap 14c-6 found for its calm version.
-- **Later, for 16g-2c:** a mesh compression tool and its docs (glTF-Transform or meshoptimizer's gltfpack), asked for when 16g-2c starts.
+- **Later, for 16g-2c (not needed, answer 38):** a mesh compression tool and its docs (glTF-Transform or meshoptimizer's gltfpack), asked for when 16g-2c starts.
 
 ## Answers (human, 2026-11-08)
 Round 8
@@ -73,6 +73,13 @@ For 16g-2b, the calm version (human, 2026-11-09), three rounds after 16g-2a merg
 32. The 16g-2b design above: "Approve, start 16g-2b (Recommended)".
 33. 16g-2b's browser tests couldn't be judged on this PC (Evidence): "Let CI decide (Recommended)". CI's `e2e` on the PR is the browser evidence, as for 16g-2a; the local reload loop goes to ROADMAP, Next revision.
 
+For 16g-2c, compression (human, 2026-11-09, "merge and next steps"), round 1:
+34. What 16g-2c does first: "Check Vercel first (Recommended)". Measure what the Vercel preview sends for the models (a read, nothing published); if Vercel already compresses them, compression may barely matter.
+35. The tool, if we compress: "glTF-Transform (Recommended)", a JavaScript library run as a script in `scripts/` through the task runner, with meshopt compression.
+36. When: "Once, commit the result (Recommended)". The compressed models are committed to `public/brew/`; builds don't run the tool.
+37. Worth keeping if: "Start comes sooner, looks same". Start ready earlier on the phone profile by any measured amount, and the village the same side by side.
+38. After the Vercel check (Evidence: every model sent Brotli-compressed, 1,781,969 bytes of 10,806,808): "Stop here". 1.78 MB is small enough; 16g-2c closes with the Vercel numbers as its evidence, no compression is built, and 16g-2 is finished. Answers 35-37 go unused.
+
 ## Merging the scenery (answer 14)
 The hypothesis, written before the change: SwiftShader's cost per frame is mostly per draw call (state, uniforms and a shader run set up for each call, twice for a shadow caster), not per triangle, since a smaller canvas didn't help. Joining every prop that never moves (the island, rocks, roots, paths, buildings, fences, graves, tufts, mushrooms and the rest), grouped by material, should take the draw calls from 558 to under 200 and a software draw from about 600 ms to under 250 ms. A draw that stays above 400 ms would disprove it: the cost would then be in triangles or lights.
 
@@ -121,7 +128,7 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 - [x] Under Reduce motion the camera never moves and nothing shakes (answer 5). *(16g-2b.)*
 - [x] Under Reduce motion the village is still between moments: two pictures of it a few draws apart are the same (answers 24, 28, 29). *(16g-2b.)*
 - [x] Under Reduce motion a whole run plays (words, a time-up, the casts, the finale and the cards) in the same moment lengths (answers 23, 25, 27, 30, 31), and switching the setting during a run takes effect at the next moment (answer 26). *(16g-2b.)*
-- [ ] On the Lighthouse profile, the time until the run can start and until everything has loaded are measured and recorded, before and after compression; the human decides on compression with those numbers (answers 10, 11). *(16g-2a: before compression measured, Evidence; after, 16g-2c.)*
+- [x] On the Lighthouse profile, the time until the run can start and until everything has loaded are measured and recorded, before and after compression; the human decides on compression with those numbers (answers 10, 11). *(16g-2a: before compression measured, Evidence. 16g-2c: the human decided with Vercel's own numbers instead, answers 34 and 38; no compression was built, so there is no "after".)*
 - [x] `e2e/brew.e2e.ts` plays a run start to finish with no console errors; game 2's existing e2e and unit tests pass; the camera is still whenever the box has focus (16g-1 answer 9).
 
 ## Out of scope
@@ -145,7 +152,7 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 One PR each, from `m16-game-2`, after `main` (Afterglow) is merged into it:
 1. **16g-2a, the village plays the run:** three.js 0.180.0 added through `npm run lockfile -- update` (DECISIONS.md, Dependency lockfile) with a DECISIONS entry; the models into `public/brew/`; `src/brew/` ported from the mock and wired to the real run; full screen with the way out; staged loading; no clips, the parade; the fizzle; `e2e/brew.e2e.ts`; the measurement on the Lighthouse profile, first numbers in Evidence.
 2. **16g-2b, the calm version** under Reduce motion, with its e2e.
-3. **16g-2c, compression:** try mesh compression on the models with a build-time tool (its source asked for then), measure again, and keep it only at the human's word.
+3. **16g-2c, compression** (closed at answer 38, not built: Vercel already Brotli-compresses the models): try mesh compression on the models with a build-time tool (its source asked for then), measure again, and keep it only at the human's word.
 
 ## Removes
 - `src/app/substrings.tsx`'s plain round and between-rounds views and their styles in `substrings.module.css` (the results views stay, answer 1).
@@ -158,6 +165,7 @@ One PR each, from `m16-game-2`, after `main` (Afterglow) is merged into it:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answers 10 and 11: measure before and after compression, then decide | Measured before, and what Vercel sends; no compression built, so no "after" | Answer 38: Vercel's Brotli already sends 1.78 MB of 10.8, and the human stopped there |
 | The mock's clock bar runs over a round's 20 seconds | The bar runs from the time left when the round showed, so a resumed round's bar starts full | The run doesn't carry a round's whole length, and the 20 seconds have one home, the database (DECISIONS.md, Config and tunables); adding it to the run is a server change outside this ticket |
 | The mock's panel buttons ("Toss it in", "Stir again" and so on) | "Toss it in", then "Casting the spell…" and "Next question" (16g-1 version 6's words); Start keeps game 2's "Start" | The real run's Start and Next are the server's calls (16d); the words follow version 6 |
 | The mock's harness ran every animation on a frame time capped at 0.05 s | Frames keep real time up to 1 s, and a slow GPU draws less often | Answer 13: on CI's software renderer the 0.05 s cap stretched a spell to over 20 s |
@@ -194,6 +202,7 @@ All on the Windows PC, 2026-11-08, against the local stack; this PC's headless C
   - `npx playwright test brew play2 --project chromium`, twice: `4 failed`, `5 passed (10.2m)`, then `5 failed`, `4 passed (9.5m)`, at a different step each time and in tests 16g-2b doesn't touch (play2's "a whole day", the way out), the second time with no other test process running for 5 minutes before. Two guesses were disproved: `RIFF-m14`'s mutant run starting during the first (the second ran with none); and a slow first compile of `/api/substrings/start` (its trace showed it pending 39,136 ms and 55,910 ms, yet against a fresh `next dev` the route answered in 77 ms, then 24 ms, and a probe every 2 s during a test never took over 0.3 s). A single test then showed the page itself reloading: `29 × navigated to "http://localhost:3000/"` while it waited to sign in, each reload after a `✓ Compiled in 3ms` from the dev server, with no file outside `test-results/` changed. The cause is *unverified*; the 16g-2a handoff had seen local runs fail at random steps since `main`'s 14c-6d and 6b-2a merges, before 16g-2b. Per answer 33, CI's `e2e` on the PR is the browser evidence.
   - CI on PR #174, first run (head 16b73db): `3 failed`, `1 flaky`, `167 passed (44.9m)`: both run tests in brew.e2e.ts, play2's "a whole day" (each with its retry), and player-screens' Result link (passed on retry). `main`'s own e2e at PR #173's merge (4c942e6, no 16g-2b code) had failed the same way (`1 failed`, `2 flaky`), and every failure in those runs and in PR #173's green one was in `brew.e2e.ts` or a file after it. The cause: no test in `brew.e2e.ts` or `play2.e2e.ts` closed the browser context it opened, and Playwright's browser lives as long as the worker, so with one worker every village stayed open, drawing in software, for the rest of the run. Fixed in 3491d50: each test closes its context.
   - CI on PR #174 after the fix (head 3491d50): `171 passed (35.5m)`, none flaky, with every other check green; merged as e3f1c93. The criteria above are ticked on this run. The local failures on this PC (a page reloading itself after each `✓ Compiled`, failing even the first test) are a separate matter, still *unverified*; ROADMAP, Next revision.
+- **16g-2c, the Vercel check** (answer 34), 2026-11-10. Hypothesis: Vercel sends `.glb` uncompressed, its compression covering text types (*unverified* then); disproved. The PR preview sits behind Vercel's sign-in (`302` to `vercel.com/sso-api`), so production, built from `main`, was read instead: `curl -H "Accept-Encoding: gzip, br" https://plor.app/brew/<model>` for all 48 models gave `Content-Encoding: br` on every one, `Content-Type: model/gltf-binary`, and `raw 10806808 bytes, sent 1781969 bytes` in all (the witch 939,536 as 103,982; the wolf 905,580 as 208,091). Vercel sends less than `next start`'s gzip did for the phone-profile measurement (2.32 MB).
 
 ## Review
 The `reviewer` agent, 2026-11-08, in a fresh context, on the uncommitted 16g-2a diff.
