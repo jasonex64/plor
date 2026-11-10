@@ -13,7 +13,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { DAY } from "../src/app/check/afterglow/day";
 import { AFTERGLOW } from "../src/config/tunables";
 import {
-  A, AGES, ARC, CLIMB_FLOORS, DESCENT_FLOORS, DOWN, EDGE_RUN, FAST, FPS_FLOOR, HITCH_LIMIT, LINGER_S, R, RUN, SIZES, TAKEN_AT, TOWER_IN, V5,
+  A, AGES, ARC, CLIMB_FLOORS, DESCENT_FLOORS, DOWN, EDGE_RUN, FAST, FPS_FLOOR, HITCH_LIMIT, LINGER_S, R, RUN, SIZES, SWEEP, SWEEP_Q, TAKEN_AT, TOWER_IN, V5,
   WALK_PARALLAX, WORD_ENTER, allFonts, analyser, answerIt, artColours, asking, bandHash, burstLit, buttonUp, contrast, emberCount, fireCount, fitZoom,
   fmtM, freeze, grabFloor, hueOfN, inFamily, lanternArea, landed, open, pillFacts, rgbHexOf, rgbOf, shapeOk, stageMean, startTrace, thaw,
   thawTo, towerJoin, until, walkEdge, wordFacts, type LayerFrame, type Mark, type Trace,
@@ -27,6 +27,13 @@ const realChrome = () => test.info().project.use.channel === "chrome";
 const say = (size: string, name: string, ok: unknown, detail = "") => {
   console.log(`${ok ? "pass" : "FAIL"} ${size} ${name} ${detail}`);
   expect.soft(!!ok, `${size} ${name}: ${detail}`).toBe(true);
+};
+// The answer typed, or a FAIL line saying the box didn't take it and where the game was (answer 80): a broken game
+// fails by name rather than ending the run, and the caller decides whether to go on.
+const typeIn = async (p: Page, size: string, word: string) => {
+  if (await answerIt(p, word)) return true;
+  say(size, "every answer goes into the box", false, `"${word}" not taken, on ${await p.evaluate(() => `${__core.phase} Q${__core.q}`)}`);
+  return false;
 };
 // A number this browser cannot judge (answer 41): printed, never counted as a pass.
 const note = (size: string, name: string, detail: string) => console.log(`note ${size} ${name} ${detail}`);
@@ -61,7 +68,7 @@ test("Afterglow's layout at every size the ticket names", { tag: "@full" }, asyn
     await p.screenshot({ path: path.join(dir, `layout-${w}x${h}.png`) });
     // The mock skipped to Q2's lantern; here Q1 is answered and walked on from, fast (answer 46).
     await p.evaluate((f) => __core.rate(f), FAST);
-    await answerIt(p, RUN[0]);
+    await typeIn(p, size, RUN[0]);
     await buttonUp(p, 30000);
     await p.click(R);
     const lit = await freeze(p, { phase: "letter", t: 1 }, 30000);
@@ -93,7 +100,7 @@ for (const [size, opts] of SIZES) {
     await p.evaluate(() => { __core.perf(); window.__mem = { max: 0, most: 0 }; setInterval(() => { const m = __core.memory(); window.__mem.max = Math.max(window.__mem.max, m.bytes); window.__mem.most = Math.max(window.__mem.most, +m.scene + +m.next + +m.before); }, 50); });
     for (let i = 0; i < RUN.length; i++) {
       await asking(p, i + 1, 40000);
-      await answerIt(p, RUN[i]);
+      await typeIn(p, size, RUN[i]);
       await buttonUp(p, 40000);
       await p.click(R);
     }
@@ -101,14 +108,14 @@ for (const [size, opts] of SIZES) {
     const f = await p.evaluate(() => __core.perf()), pre = await p.evaluate(() => __core.predraw), mem = await p.evaluate(() => window.__mem);
     (realChrome() ? (n: string, d: string) => say(size, n, f.avg < 16.7 && 1000 / f.ivAvg >= FPS_FLOOR, d) : (n: string, d: string) => note(size, n, d))("60 fps, whole run", `script ${f.avg.toFixed(2)} ms avg, ${f.max.toFixed(1)} ms worst; frame interval ${f.ivAvg.toFixed(2)} ms avg (${(1000 / f.ivAvg).toFixed(1)} fps), ${f.ivMax.toFixed(1)} ms worst; ${f.n} frames`);
     for (const [k, v] of Object.entries(f.phases)) console.log(`     ${size} ${k.padEnd(8)} script ${(v.sum / v.n).toFixed(2)} ms avg ${v.max.toFixed(1)} worst, interval ${(v.iv / v.n).toFixed(2)} avg ${v.ivMax.toFixed(1)} worst, ${v.n} frames`);
-    say(size, "pre-draw never stalls a frame", pre.maxSlice < HITCH_LIMIT && pre.finishedEarly === 0, `${pre.slices} slices, ${pre.ms.toFixed(0)} ms in all, worst ${pre.maxSlice.toFixed(1)} ms; finished early ${pre.finishedEarly} times; slowest step ${pre.maxStep.toFixed(1)} ms, ${pre.where}`);
+    say(size, "pre-draw never stalls a frame", pre.maxSlice < HITCH_LIMIT, `${pre.slices} slices, ${pre.ms.toFixed(0)} ms in all, worst ${pre.maxSlice.toFixed(1)} ms; waited for a street ${pre.waited} times (answer 76: printed, not judged); slowest step ${pre.maxStep.toFixed(1)} ms, ${pre.where}`);
     say(size, "memory bounded: two scenes at most", mem.most <= 2, `at most ${mem.most} scenes, ${(mem.max / 1048576).toFixed(1)} MB in canvases at the peak`);
     await c.close();
     // The same moments again, this time paying for raster inside the frame. The mock played again; here a new page.
     const again = await open(browser, opts, false), q = again.p;
     await q.evaluate(() => { const d = __core.draw; __core.draw = function () { d(); __core.g.getImageData(0, 0, 1, 1); }; __core.perf(); });
     await asking(q, 1, 15000);
-    await answerIt(q, "kite");
+    await typeIn(q, size, "kite");
     await buttonUp(q, 30000);
     await q.waitForTimeout(3000);
     await q.click(R);
@@ -120,6 +127,40 @@ for (const [size, opts] of SIZES) {
     await again.c.close();
   });
 }
+
+// ---------- A street drawn late (answers 73, 74, ticket 14c-6b-2b): Walk on, then the landing, wait for it, the screen moving ----------
+test("Afterglow waits for a street drawn late", async ({ browser }) => {
+  const size = "phone", { c, p, errs } = await open(browser, SIZES[1][1], false), waitMs = AFTERGLOW.BUTTON_AT * 1000;
+  await asking(p, 1);
+  await typeIn(p, size, RUN[0]);
+  await buttonUp(p, 30000);
+  // Held from Q1's walk, once Q1's streets are drawn: Q2's walk and Q3's street are then asked for and never drawn.
+  await until(p, () => __core.memory().before && __core.memory().next, 30000);
+  await p.evaluate(() => __core.holdDrawing(true));
+  await p.click(R);
+  await asking(p, 2, 30000);
+  const w0 = await p.evaluate(() => __core.predraw.waited), story = () => p.evaluate(() => __core.log.slice(-5).map((e) => `${e.phase} Q${e.q}`).join(" > "));
+  await typeIn(p, size, RUN[1]);
+  const buttonWaited = await until(p, (n) => __core.predraw.waited > n, 30000, w0);
+  await p.evaluate(() => __core.perf());
+  await p.waitForTimeout(waitMs);   // as long again as the button's own wait
+  const atButton = await p.evaluate(() => ({ phase: __core.phase, hidden: __part("rBtn").hidden, frames: __core.perf().n }));
+  say(size, "a late walk's street: Walk on waits for it, the screen moving", buttonWaited && atButton.phase === "result" && atButton.hidden && atButton.frames > 0, `${JSON.stringify(atButton)}; ${await story()}`);
+  // Only the walk's street drawn, then held again: it goes first (answer 75), so Q3's street is still to draw at the landing.
+  await p.evaluate(() => { __core.holdDrawing(false); const f = () => { if (__core.memory().before) __core.holdDrawing(true); else requestAnimationFrame(f); }; requestAnimationFrame(f); });
+  const shown = await buttonUp(p, 30000), nextLate = await p.evaluate(() => !__core.memory().next);
+  const w1 = await p.evaluate(() => __core.predraw.waited);
+  await p.click(R);
+  const landingWaited = await until(p, (n) => __core.predraw.waited > n, 30000, w1);
+  await p.evaluate(() => __core.perf());
+  await p.waitForTimeout(waitMs);
+  const atLanding = await p.evaluate(() => ({ phase: __core.phase, frames: __core.perf().n }));
+  await p.evaluate(() => __core.holdDrawing(false));
+  const landed2 = await until(p, () => __core.phase !== "descent", 30000), pre = await p.evaluate(() => __core.predraw);
+  say(size, "a late next street: the walk holds its landing for it, the screen moving, then lands", shown && nextLate && landingWaited && atLanding.phase === "descent" && atLanding.frames > 0 && landed2, `Walk on ${shown}, next undrawn ${nextLate}; ${JSON.stringify(atLanding)}; landed ${landed2}; ${await story()}`);
+  say(size, "no slice drew a late street in one go", pre.maxSlice < HITCH_LIMIT && !errs.length, `worst slice ${pre.maxSlice.toFixed(1)} ms; waited ${pre.waited}${errs.length ? `; ${errs[0]}` : ""}`);
+  await c.close();
+});
 
 // ---------- Each size: the scripted run, and in the full set every other section ----------
 for (const [size, opts] of SIZES) {
@@ -176,14 +217,14 @@ for (const [size, opts] of SIZES) {
       // Every stop from here to the result is set before the clock runs again (see thawTo).
       await p.evaluate(() => __core.freezeAt({ phase: "charge", k: .8 }));
       await thaw(p);
-      await answerIt(p, RUN[i]);
+      if (!(await typeIn(p, size, RUN[i]))) { await stop(`answering Q${i + 1}`); break; }
       await p.evaluate((f) => __core.rate(f), FAST);
       const full2 = ARC.includes(i);
       if (!(await landed(p, 25000))) { await stop(`Q${i + 1} charge`); break; }
       // Read once the reply has landed: the word waits in plain ink until then (answer 16).
       const tierNow = await p.evaluate(() => __core.answer && __core.answer.tier).then((t) => (t ? [t] : []));
       { const s = await lookAt(p, `q${i + 1}-charge`, `Q${i + 1} charge`, tierNow); await noteWord("charge", i); arc.push(s.f); if (i === 0) boxPills = await p.evaluate(pillFacts, await p.evaluate(() => { const b = __core.boxAt(), pill = __core.boxPill!; return [b.x, b.y, pill.w, pill.h, pill.h >> 1]; })); }
-      for (const k of full2 ? [.08, .16, .24, .32, .4, .5, .6, .7, .8, .9] : [.5]) {
+      for (const k of full2 ? [.08, .16, .24, .32, .4, .5, .6, .7, .8, .9] : i === SWEEP_Q ? SWEEP : [.5]) {
         if (!(await thawTo(p, { phase: "climb", k }))) { await stop(`Q${i + 1} climb ${k}`); break; }
         const s = await lookAt(p, `q${i + 1}-climb${Math.round(k * 100)}`, `Q${i + 1} climb`, tierNow);
         await noteWord(`climb ${k}`, i); arc.push(s.f);
@@ -217,7 +258,7 @@ for (const [size, opts] of SIZES) {
         if (k === .22) emberN.push(await p.evaluate(emberCount));
         if (seam && k > 0 && k <= .4) edges.push({ where: `Q${i + 1} descent ${k}`, ...(await p.evaluate(walkEdge, WALK_PARALLAX)) });
       }
-      // Real speed from here to the answer: at speed a long frame, such as a pre-draw finished early, eats the question's timer.
+      // Real speed from here to the answer: at speed a long frame eats the question's timer.
       if (i < 6) await p.evaluate(() => __core.rate(1));
       if (i < 6 && (await (held ? thawTo : freeze)(p, { phase: "arrive", k: .5 }))) { arc.push((await lookAt(p, `q${i + 1}-arrive`, `Q${i + 1} arrive`)).f); await thaw(p); }
       if (i < 6) {
@@ -272,8 +313,9 @@ for (const [size, opts] of SIZES) {
     const rtrace = await p.evaluate(() => window.__trace);
     // Rewritten (answers 21, 29): Q7's result says Walk on, as every question's does, and the ending's See results leaves
     // for the cards; the mock's Q7 said See results, and its ending played again.
-    const endBtn = await p.textContent(R);
-    await p.click(R);
+    // Pressed once it shows: a run that never reaches the ending fails this line rather than ending (answer 64).
+    const endUp = await buttonUp(p), endBtn = endUp ? await p.textContent(R) : "never shown";
+    if (endUp) await p.click(R);
     say(size, "the last result's button leads to the results", lastBtn === "Walk on" && endBtn === "See results" && await p.evaluate(() => document.body.dataset.left === "results"), `Q7 ${lastBtn}, the ending ${endBtn}`);
     // The lantern: from the run's own taken letters, exactly once each, and never otherwise.
     const letters = lg.filter((e) => e.phase === "letter"), wantQ = Object.keys(TAKEN_AT).map(Number), wantL = Object.entries(TAKEN_AT).map(([q, l]): [number, string] => [+q, l.toUpperCase()]);
@@ -359,7 +401,7 @@ for (const [size, opts] of SIZES) {
         const inks: Record<string, string> = {}, texts: Record<string, { word: string; tier: string; pts: string; ans: string; flav: string; hud: string; lines: string[] }> = {}, cords: Record<string, string[]> = {}, order = [["rare", "kite"], ["common", "lemon"], ["uncommon", "chess"]];
         for (let i = 0; i < order.length; i++) {
           await asking(p, i + 1, 30000);
-          await answerIt(p, order[i][1]);
+          await typeIn(p, size, order[i][1]);
           await until(p, () => __core.phase === "charge", 5000);
           inks[order[i][0]] = await p.evaluate(() => getComputedStyle(__part("word")).color);
           cords[order[i][0]] = await p.evaluate(() => { const c = __core.boxPill!.cord, d = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data, seen = new Set<string>(); for (let k = 0; k < d.length; k += 4) if (d[k + 3]) seen.add("#" + (d[k] << 16 | d[k + 1] << 8 | d[k + 2]).toString(16).padStart(6, "0")); return [...seen]; });
@@ -374,14 +416,16 @@ for (const [size, opts] of SIZES) {
           const e = lg.find((x) => x.phase === "charge" && x.q === q)!, s = seg(q, "charge"), part = (a: number, c: number) => s.filter((f) => (f.t - e.at) / e.dur >= a && (f.t - e.at) / e.dur < c);
           const spread = (l: Trace[]) => { const m = (v: number[]) => v.reduce((a, x) => a + x, 0) / (v.length || 1), off = (k: "x" | "y") => { const v = l.map((f) => f[k] / U), c = m(v); return m(v.map((x) => Math.abs(x - c))); }; return Math.hypot(off("x"), off("y")); };
           const rate = (l: Trace[]) => { let n = 0; for (let j = 1; j < l.length; j++) if (l[j].x !== l[j - 1].x || l[j].y !== l[j - 1].y) n++; return l.length > 1 ? n / (l.at(-1)!.t - l[0].t) : 0; };
-          return { early: spread(part(.34, .52)), late: spread(part(.68, .86)), hzEarly: rate(part(.34, .52)), hzLate: rate(part(.68, .86)) };
+          // The game's own steps a second (answer 77): over common's late part, ~0.13 s, a count of moves drawn is mostly rounding.
+          const steps = (l: Trace[]) => l.reduce((a, f) => a + f.hz, 0) / (l.length || 1);
+          return { early: spread(part(.34, .52)), late: spread(part(.68, .86)), hzEarly: rate(part(.34, .52)), hzLate: rate(part(.68, .86)), stepsLate: steps(part(.68, .86)) };
         };
         const rm = { common: rumble(2), uncommon: rumble(3), rare: rumble(1) }, rl = Object.entries(rm), charge2 = lg.find((x) => x.phase === "charge" && x.q === 2)!, late = seg(2, "charge").filter((f) => f.t - charge2.at >= WORD_ENTER).slice(-20),
           // Against the word's rest place, not the frame before: placeWord rounds to screen pixels, so a half-art-pixel offset on both sides still leaves whole steps between frames.
           offArt = late.filter((f) => { const d = (f.x - Math.round((iw / 2 - f.ow / 2) * dpr) / dpr) / U; return Math.abs(d - Math.round(d)) > .02; }).length;
         say(size, "the rumble stays in whole art pixels", late.length > 5 && offArt === 0, `${offArt} of ${late.length} frames off the art grid`);
         say(size, "the whole word rumbles, growing and tightening through the charge", rl.every(([, r]) => r.late >= 1 && r.late > r.early * 1.25 && r.hzLate > r.hzEarly * 1.2), rl.map(([k, r]) => `${k} ${r.early.toFixed(1)} > ${r.late.toFixed(1)} art px, ${r.hzEarly.toFixed(0)} > ${r.hzLate.toFixed(0)} moves/s`).join("; "));
-        say(size, "the rumble differs by rarity", rm.rare.late > rm.common.late && rm.rare.hzLate > rm.common.hzLate, `late: common ${rm.common.late.toFixed(1)}, uncommon ${rm.uncommon.late.toFixed(1)}, rare ${rm.rare.late.toFixed(1)} art px`);
+        say(size, "the rumble differs by rarity", rm.rare.late > rm.common.late && rm.rare.stepsLate > rm.common.stepsLate, `late: common ${rm.common.late.toFixed(1)}, uncommon ${rm.uncommon.late.toFixed(1)}, rare ${rm.rare.late.toFixed(1)} art px; steps/s ${rl.map(([k, r]) => `${k} ${r.stepsLate.toFixed(1)}`).join(", ")}`);
         const flightOf = (q: number) => {
           const s = seg(q, "climb"), e = lg.find((x) => x.phase === "climb" && x.q === q); if (!e || s.length < 8) return null;
           const y0 = s[0].y, pts = s.map((f) => ({ k: (f.t - e.at) / e.dur, h: f.cam + (y0 - f.y) / U, dev: (f.x + f.w / 2 - iw / 2) / U, l: f.x, r: f.x + f.w })), v: { k: number; v: number }[] = [];
@@ -425,12 +469,16 @@ for (const [size, opts] of SIZES) {
         await p.evaluate(() => __core.rate(4));
         const fits: Record<number, { fit: number; dur: number }> = {}; let walkEnded = "";
         for (let q = 1; q <= 6; q++) {
-          if (!(await asking(p, q, 30000))) break;
-          await answerIt(p, RUN[q - 1]);
+          if (!(await asking(p, q, 30000))) { walkEnded = `Q${q} not asked in 30 s, on ${await p.evaluate(() => `${__core.phase} Q${__core.q}, log ${__core.log.length} long, last ${__core.log.slice(-3).map((e) => `${e.phase} Q${e.q}`).join(" > ")}`)}`; break; }
+          if (!(await typeIn(p, size, RUN[q - 1]))) { walkEnded = `Q${q}'s answer not taken`; break; }
           await p.evaluate(() => __core.rate(4));
           await buttonUp(p, 30000);
+          // The stop goes in before the click, as thawTo's does: at 4× a small step's descent is about 0.7 s, and set after
+          // the click, a slow page lost it, and the game ran on into the next question until its time ran out (the
+          // mutants' baseline, ticket 14c-6b-2b, Evidence; check.mjs set it after).
+          await p.evaluate(() => __core.freezeAt({ phase: "descent", k: .5 }));
           await p.click(R);
-          if (!(await freeze(p, { phase: "descent", k: .5 }))) { walkEnded = `Q${q} ended on ${await p.evaluate(() => __core.log.slice(-4).map((e) => e.phase).join(" > "))}`; break; }
+          if (!(await landed(p, 25000))) { walkEnded = `Q${q} ended on ${await p.evaluate(() => __core.log.slice(-4).map((e) => `${e.phase} Q${e.q}`).join(" > "))}`; break; }
           await p.evaluate(`window.__a = (${grabFloor})()`);
           const e = await p.evaluate(() => __core.log.at(-1)!);
           await p.evaluate(() => __core.rate(1));
@@ -451,7 +499,7 @@ for (const [size, opts] of SIZES) {
           for (const [q, word] of [[1, first], [7, last]] as const) {
             const { c, p } = await open(browser, opts, false, q);
             await p.evaluate(() => __core.rate(3));
-            await answerIt(p, word);
+            await typeIn(p, size, word);
             if (await freeze(p, { phase: "result", t: AGES[tier] - .7 })) {
               seen[`${tier} Q${q}`] = await p.evaluate(burstLit);
               files.push((await lookAt(p, `burst-${tier}-q${q}`, `Q${q} result`, [tier])).f);
@@ -519,7 +567,7 @@ for (const [size, opts] of SIZES) {
       {
         const { c, p, errs } = await open(browser, opts);
         await p.evaluate(startTrace);
-        await answerIt(p, "towel");
+        await typeIn(p, size, "towel");
         await until(p, () => __core.phase === "charge", 5000);
         const dudInk = await p.evaluate(() => [getComputedStyle(__part("word")).color, __core.WORD_INK.caught]);
         await p.evaluate(() => { window.__camMax = 0; const f = () => { window.__camMax = Math.max(window.__camMax, __core.camNow); requestAnimationFrame(f); }; f(); });
@@ -609,7 +657,7 @@ for (const [size, opts] of SIZES) {
         await p.evaluate(() => __core.rate(4));
         await p.setViewportSize(other);
         await p.waitForTimeout(400);
-        await answerIt(p, "kite");
+        await typeIn(p, size, "kite");
         await until(p, () => __core.phase === "climb", 20000);
         await p.setViewportSize(opts.viewport);
         await buttonUp(p, 20000);
@@ -634,11 +682,11 @@ for (const [size, opts] of SIZES) {
       {
         const { c, p } = await open(browser, opts);
         await p.evaluate(() => __core.rate(4));
-        await answerIt(p, RUN[0]);
+        await typeIn(p, size, RUN[0]);
         await buttonUp(p, 20000);
         await p.click(R);
         await asking(p, 2, 30000);
-        await answerIt(p, DAY[1].host[0]);
+        await typeIn(p, size, DAY[1].host[0]);
         const up = await buttonUp(p, 20000);
         await p.waitForTimeout(150);
         const rows = await p.evaluate(() => { const panel = getComputedStyle(__part("screen").parentElement!).getPropertyValue("--panel").trim(); return [...__part("rRecap").querySelectorAll("li")].map((li, i) => { const s = getComputedStyle(li), r = __core.run.results[i], key = r.caught ? "caught" : r.tier; return { ink: s.color, line: s.textShadow, wantInk: __core.WORD_INK[key], wantLine: r.caught ? null : __core.RAMP[r.tier][0], panel }; }); });
@@ -651,7 +699,7 @@ for (const [size, opts] of SIZES) {
       {
         const { c, p } = await open(browser, opts, false);
         await p.evaluate(() => __core.rate(4));
-        await answerIt(p, "sydney harbour bridge");
+        await typeIn(p, size, "sydney harbour bridge");
         await buttonUp(p, 20000);
         await p.waitForTimeout(100);
         await p.screenshot({ path: path.join(dir, `${size}-result-longest.png`) });
@@ -670,7 +718,7 @@ for (const [size, opts] of SIZES) {
       {
         const { c, p, errs } = await open(browser, opts, false);
         const word = size === "wide" ? "kite" : "sunscreen";
-        await answerIt(p, word);
+        await typeIn(p, size, word);
         const up = await buttonUp(p, 30000);
         await p.waitForTimeout(3000);   // past the bloom: from here only glitter is left
         const frames: Mark[] = [], files: string[] = [], t0 = Date.now(); let n = 0;

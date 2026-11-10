@@ -7,9 +7,10 @@ import path from "node:path";
 import type { Browser, BrowserContextOptions, Page } from "@playwright/test";
 import type { Core, Phase, Stop } from "../src/afterglow/scene";
 import { AFTERGLOW } from "../src/config/tunables";
+import { breakCode } from "./afterglow-mutants";
 export { RUN, TAKEN_AT } from "../src/app/check/afterglow/day";
 
-export type Trace = { ph: Phase; q: number; t: number; x: number; y: number; w: number; ow: number; h: number; fs: string; a: number; b: number; c: number; d: number; cam: number; k: number };
+export type Trace = { ph: Phase; q: number; t: number; x: number; y: number; w: number; ow: number; h: number; fs: string; hz: number; a: number; b: number; c: number; d: number; cam: number; k: number };
 export type LayerFrame = { ph: Phase; q: number; t: number; k: number; cam: number; sky: number; deck: number; back: number; css: string };
 export type Floor = { cam: number; d: Uint8ClampedArray };
 declare global {
@@ -40,6 +41,9 @@ export const A = '[data-part="answer"]', R = '[data-part="rBtn"]';
 // check.mjs's constants, carried with their origins there.
 export const EDGE_RUN = 40;            // proposed, ticket 14c-5: art rows of buildings stopping short of the edge in one run; measured 9 to 32 with the edge strips, 99 to 152 without
 export const ARC = [0, 4, 6];        // the questions whose whole arc is photographed: common, rare, the last
+// Q6's climb, read at each offset answer 60's sweep looked at: on its own layer the word lost 2 edge pixels at 4 of these 13,
+// which one stop at 0.5 can miss now that stops are exact (answer 70; ticket 14c-6b-2b, Evidence).
+export const SWEEP_Q = 5, SWEEP = [.4, .42, .44, .46, .48, .5, .52, .54, .56, .58, .6, .62, .64];
 export const DOWN = [.05, .1, .14, .18, .22, .27, .33, .4, .5, .62, .75, .9];   // frames through a whole descent, at the two major steps
 export const FAST = 3;               // the game clock's speed where only the order and the frames matter
 export const LINGER_S = 62;          // ticket 14c-5: frames compared over at least a minute
@@ -89,8 +93,11 @@ const reader = () => {
 // aren't the game's (14c-6b-2, answer 57). The mock's page had none.
 const noBadge = () => addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = "nextjs-portal { display: none !important; }"; document.head.append(st); });
 // Browser notes that aren't the game's: the mock's, and Next's dev build preloading a stylesheet a page doesn't use, as it does
-// on every page (/about too; answer 58, and in ROADMAP for the app). Any other warning or error fails its line.
-const NOT_OURS = [/getImageData are faster with the willReadFrequently/, /^The resource \S+\.css was preloaded using link preload but not used within a few seconds/];
+// on every page (/about too; answer 58, and in ROADMAP for the app). And `next dev`'s note, once per server, that a page
+// asked for with `cache-control: no-cache` renders "with server caches disabled" (next/dist/server/app-render/app-render.js,
+// isBypassingCachesInDev): a context with routes, as a mutant's, asks so, and taking the header off in the route didn't
+// stop it (ticket 14c-6b-2b, Evidence). Any other warning or error fails its line.
+const NOT_OURS = [/getImageData are faster with the willReadFrequently/, /^The resource \S+\.css was preloaded using link preload but not used within a few seconds/, /Route \/check\/afterglow is rendering with server caches disabled/];
 
 // Every wait the mock's check made ran under the Playwright library's default, 30 s ("defaults to 30 seconds",
 // playwright-core's types); Playwright Test's own action and navigation timeouts default to none, so the check's pages set it.
@@ -98,23 +105,26 @@ const NOT_OURS = [/getImageData are faster with the willReadFrequently/, /^The r
 export const LIBRARY_TIMEOUT = 30_000;
 
 export type Opened = { c: Awaited<ReturnType<Browser["newContext"]>>; p: Page; errs: string[] };
-// The test page at a question (?q, answer 46: where the mock skipped ahead or played again), its fonts in.
+// The test page at a question (?q, answer 46: where the mock skipped ahead or played again), its fonts in; under a
+// mutant (AFTERGLOW_MUTANT, set by scripts/afterglow-mutants.ts), its broken copy.
 export async function open(b: Browser, opts: BrowserContextOptions, withHook = true, q = 1): Promise<Opened> {
   const c = await b.newContext(opts);
   c.setDefaultTimeout(LIBRARY_TIMEOUT);
+  const broken = process.env.AFTERGLOW_MUTANT && await breakCode(c, process.env.AFTERGLOW_MUTANT);
   await c.addInitScript(reader);
   await c.addInitScript(noBadge);
   if (withHook) await c.addInitScript(hook);
   const p = await c.newPage(), errs: string[] = [];
   p.on("pageerror", (e) => errs.push(e.message)); p.on("console", (m) => { if ((m.type() === "error" || m.type() === "warning") && !NOT_OURS.some((re) => re.test(m.text()))) errs.push(m.text()); });
   await p.goto(q === 1 ? "/check/afterglow" : `/check/afterglow?q=${q}`, { waitUntil: "networkidle" });
+  if (broken) broken();
   await p.evaluate(() => document.fonts.ready);
   await p.waitForFunction(() => !!window.__core);
   await p.waitForTimeout(400);
   return { c, p, errs };
 }
 // A wait that can fail is a named line's business, so it answers instead of throwing.
-export const until = (p: Page, fn: () => unknown, ms = 30000) => p.waitForFunction(fn, undefined, { timeout: ms }).then(() => true, () => false);
+export const until = (p: Page, fn: (n: number) => unknown, ms = 30000, n = 0) => p.waitForFunction(fn, n, { timeout: ms }).then(() => true, () => false);
 export const buttonUp = (p: Page, ms?: number) => until(p, () => { const b = __part("rBtn"); return !b.hidden && !__part("result").hidden; }, ms);
 export const asking = (p: Page, q: number, ms = 30000) => p.waitForFunction((q) => __core.phase === "ask" && __core.q === q, q, { timeout: ms }).then(() => true, () => false);
 export const landed = async (p: Page, ms?: number) => {
@@ -134,10 +144,13 @@ export const thawTo = async (p: Page, f: Stop, ms = 25000) => {
   return landed(p, ms);
 };
 export const thaw = (p: Page) => p.evaluate(() => __core.thaw());
+// Whether the answer went in: false where the box never took it, as when a broken game stopped (answer 64), so the
+// caller's lines fail rather than the run ending.
 export const answerIt = async (p: Page, word: string) => {
   const was = await p.evaluate(() => { const r = __core.rateNow; __core.rate(1); return r; });
-  await p.fill(A, word, { timeout: 5000 }); await p.press(A, "Enter", { timeout: 5000 });
+  const typed = await p.fill(A, word, { timeout: 5000 }).then(() => p.press(A, "Enter", { timeout: 5000 })).then(() => true, () => false);
   await p.evaluate((r) => __core.rate(r), was);
+  return typed;
 };
 export const wordFacts = () => {
   const e = __part("word"), s = getComputedStyle(e), r = e.getBoundingClientRect(), m = new DOMMatrixReadOnly(s.transform), rg = document.createRange();
@@ -148,7 +161,7 @@ export const wordFacts = () => {
 export const startTrace = () => {
   const e = __part("word"); window.__trace = []; window.__layers = [];
   const f = () => {
-    if (!e.hidden) { const r = e.getBoundingClientRect(), s = getComputedStyle(e), m = new DOMMatrixReadOnly(s.transform); __trace.push({ ph: __core.phase, q: __core.q, t: __core.t, x: r.left, y: r.top, w: r.width, ow: e.offsetWidth, h: r.height, fs: s.fontSize, a: m.a, b: m.b, c: m.c, d: m.d, cam: __core.camNow, k: __core.k }); }
+    if (!e.hidden) { const r = e.getBoundingClientRect(), s = getComputedStyle(e), m = new DOMMatrixReadOnly(s.transform); __trace.push({ ph: __core.phase, q: __core.q, t: __core.t, x: r.left, y: r.top, w: r.width, ow: e.offsetWidth, h: r.height, fs: s.fontSize, hz: __core.rumble.hz, a: m.a, b: m.b, c: m.c, d: m.d, cam: __core.camNow, k: __core.k }); }
     if (__core.phase === "climb" || __core.phase === "descent") __layers.push({ ph: __core.phase, q: __core.q, t: __core.t, k: __core.k, cam: __core.camNow, sky: __core.skyNow.off, deck: __core.skyNow.deck, back: __core.towerNow.back, css: __core.screen.style.transform });
     requestAnimationFrame(f);
   };
@@ -173,6 +186,8 @@ export const fireCount = () => {
 };
 // What a burst has lit on the canvas: this frame against the held sky, leaving out the sky lanterns.
 export const burstLit = () => {
+  // No held sky or no burst (a run that didn't end at Q7's burst, say): nothing lit, so the lines reading it fail by name.
+  if (!__core.held || !__core.burst) return { tier: "none", R: 0, n: 0, wrong: 0, centre: 0, up: 0, down: 0, far: 0, sag: 0, boxW: 0, boxH: 0 };
   const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
   const { AW, AH } = __core.place(), d = __artImage(0, 0, AW, AH).data, cv = document.createElement("canvas"); cv.width = AW; cv.height = AH;
   const x = cv.getContext("2d", { willReadFrequently: true })!; x.drawImage(__core.held!, 0, 0);

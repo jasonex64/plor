@@ -19,7 +19,8 @@
     "draft": "node --env-file-if-exists=.env.local scripts/draft.ts",
     "substrings": "node scripts/substrings.ts",
     "test:e2e": "playwright test --project=chromium",
-    "check:afterglow": "playwright test --project=afterglow-full"
+    "check:afterglow": "playwright test --project=afterglow-full",
+    "check:afterglow-mutants": "node scripts/afterglow-mutants.ts"
   },
   "dependencies": {
     "@supabase/realtime-js": "2.118.0",
