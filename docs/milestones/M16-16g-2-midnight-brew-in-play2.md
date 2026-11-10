@@ -1,6 +1,6 @@
 # M16 — 16g-2, Midnight Brew becomes game 2's run
 
-**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a done, PR #173 merged on green CI 2026-11-09; 16g-2b, the calm version, designed from answers 23-32, built and reviewed, in review as PR #174 with CI's e2e as its browser evidence (answer 33); 16g-2c next).
+**Status:** in progress (drafted 2026-11-08, Pacific, from three rounds of guided questions; approved: "Approve, start 16g-2a"; 16g-2a done, PR #173 merged on green CI 2026-11-09; 16g-2b, the calm version, done, PR #174 merged on green CI 2026-11-09 at the human's "merge and next steps"; 16g-2c next).
 
 ## Goal
 Play game 2's real run at `/play2` in Midnight Brew, the low-poly witch's village approved in 16g-1 (version 6), full screen, with the end of the run kept as today's cards.
@@ -118,9 +118,9 @@ In the app the models are served as plain GLB files, not the page's base64 bundl
 - [x] Each round's word comes alive in its tier, the next change casts by itself with the button waiting, and Next starts the next round's clock; after round 7 the finale plays by itself, then the cards (16g-1 answers 21, 22, 25, 26).
 - [x] No clip files ship; the witch moves by code; round 7 brings the parade (answers 6, 9).
 - [x] The run can start before the animals have loaded, and they appear when they arrive (answer 11).
-- [ ] Under Reduce motion the camera never moves and nothing shakes (answer 5). *(16g-2b.)*
-- [ ] Under Reduce motion the village is still between moments: two pictures of it a few draws apart are the same (answers 24, 28, 29). *(16g-2b.)*
-- [ ] Under Reduce motion a whole run plays (words, a time-up, the casts, the finale and the cards) in the same moment lengths (answers 23, 25, 27, 30, 31), and switching the setting during a run takes effect at the next moment (answer 26). *(16g-2b.)*
+- [x] Under Reduce motion the camera never moves and nothing shakes (answer 5). *(16g-2b.)*
+- [x] Under Reduce motion the village is still between moments: two pictures of it a few draws apart are the same (answers 24, 28, 29). *(16g-2b.)*
+- [x] Under Reduce motion a whole run plays (words, a time-up, the casts, the finale and the cards) in the same moment lengths (answers 23, 25, 27, 30, 31), and switching the setting during a run takes effect at the next moment (answer 26). *(16g-2b.)*
 - [ ] On the Lighthouse profile, the time until the run can start and until everything has loaded are measured and recorded, before and after compression; the human decides on compression with those numbers (answers 10, 11). *(16g-2a: before compression measured, Evidence; after, 16g-2c.)*
 - [x] `e2e/brew.e2e.ts` plays a run start to finish with no console errors; game 2's existing e2e and unit tests pass; the camera is still whenever the box has focus (16g-1 answer 9).
 
@@ -192,6 +192,8 @@ All on the Windows PC, 2026-11-08, against the local stack; this PC's headless C
 - **16g-2b**, on the Windows PC, 2026-11-09, against the local stack:
   - `npx tsc --noEmit -p .` and `npx eslint .`: no output (clean). `npm test`: `Test Files  56 passed (56)`, `Tests  640 passed (640)`.
   - `npx playwright test brew play2 --project chromium`, twice: `4 failed`, `5 passed (10.2m)`, then `5 failed`, `4 passed (9.5m)`, at a different step each time and in tests 16g-2b doesn't touch (play2's "a whole day", the way out), the second time with no other test process running for 5 minutes before. Two guesses were disproved: `RIFF-m14`'s mutant run starting during the first (the second ran with none); and a slow first compile of `/api/substrings/start` (its trace showed it pending 39,136 ms and 55,910 ms, yet against a fresh `next dev` the route answered in 77 ms, then 24 ms, and a probe every 2 s during a test never took over 0.3 s). A single test then showed the page itself reloading: `29 × navigated to "http://localhost:3000/"` while it waited to sign in, each reload after a `✓ Compiled in 3ms` from the dev server, with no file outside `test-results/` changed. The cause is *unverified*; the 16g-2a handoff had seen local runs fail at random steps since `main`'s 14c-6d and 6b-2a merges, before 16g-2b. Per answer 33, CI's `e2e` on the PR is the browser evidence.
+  - CI on PR #174, first run (head 16b73db): `3 failed`, `1 flaky`, `167 passed (44.9m)`: both run tests in brew.e2e.ts, play2's "a whole day" (each with its retry), and player-screens' Result link (passed on retry). `main`'s own e2e at PR #173's merge (4c942e6, no 16g-2b code) had failed the same way (`1 failed`, `2 flaky`), and every failure in those runs and in PR #173's green one was in `brew.e2e.ts` or a file after it. The cause: no test in `brew.e2e.ts` or `play2.e2e.ts` closed the browser context it opened, and Playwright's browser lives as long as the worker, so with one worker every village stayed open, drawing in software, for the rest of the run. Fixed in 3491d50: each test closes its context.
+  - CI on PR #174 after the fix (head 3491d50): `171 passed (35.5m)`, none flaky, with every other check green; merged as e3f1c93. The criteria above are ticked on this run. The local failures on this PC (a page reloading itself after each `✓ Compiled`, failing even the first test) are a separate matter, still *unverified*; ROADMAP, Next revision.
 
 ## Review
 The `reviewer` agent, 2026-11-08, in a fresh context, on the uncommitted 16g-2a diff.
