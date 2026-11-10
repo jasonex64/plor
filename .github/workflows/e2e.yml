@@ -39,7 +39,18 @@ jobs:
           echo "::add-mask::$key"
           printf 'DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_PUBLISHABLE_KEY=%s\n' "$key" > .env.local
       - run: npx playwright install --with-deps chromium
+      # Temporary, M16 16g-3 (answer 5): the machine's CPU every 5 s while the tests run, to test whether the village's
+      # software drawing starves the runner. Removed before 16g-3 merges.
+      - name: Sample the CPU during the tests
+        run: nohup top -b -d 5 -w 200 > "$RUNNER_TEMP/cpu.txt" 2>&1 &
       - run: npm run test:e2e
+      - name: Show the CPU use during the tests
+        if: always()
+        run: |
+          awk '/^top -/ { t = $3; n = 0 }
+               /^%Cpu/ { match($0, /[0-9.]+ id/); idle = substr($0, RSTART, RLENGTH - 3) }
+               /^ *PID / { n = 1; procs = ""; next }
+               n >= 1 && n <= 3 { procs = procs " " $12 "=" $9; n++; if (n == 4) print t, "idle " idle "%", procs }' "$RUNNER_TEMP/cpu.txt"
       # What a failed test's page showed, as text. A trace holds the stack's publishable key, so none leaves the runner on
       # this public repo; this snapshot holds the page, not requests.
       - name: Show the page each failed test ended on

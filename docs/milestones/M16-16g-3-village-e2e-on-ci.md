@@ -15,6 +15,7 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 2. What CI keeps, after Claude corrected answer 1's option (a trace holds the CI stack's publishable key, and the repo is public; ROADMAP, "Waits on the human", 14c-2 answer 15): "Video only (Recommended)". Playwright records a video of each failed test and CI uploads it: what the page did, with no network data, so no key. If the videos don't show why, traces come back as a question.
 3. The ticket: "Approve, start 16g-3 (Recommended)", PR #175 closed and its commits carried in this PR.
 4. Green runs in a row that count as fixed: "3 in a row (Recommended)". Three full CI runs with no village failure and no retry needed.
+5. After the videos (Evidence): "Measure CPU first (Recommended)". One more CI run logs the machine's CPU use every few seconds during the tests, to confirm or kill hypothesis 4 before the game or the tests change.
 
 ## Source
 - Playwright Test's `video` option (SOURCES.md, Playwright; `node_modules/playwright/types/test.d.ts`, `video`, 1.64.1): `'retain-on-failure'` records every run and keeps a video only for a run that failed, a failed run's kept even when its retry passes; the size defaults to the viewport scaled to fit 800x800. Checked here (Plan, step 1's experiment): it records only contexts Playwright Test makes (the `page` and `context` fixtures), not one a test opens with `browser.newContext()`.
@@ -40,6 +41,7 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 | Video size: the viewport scaled to fit 800x800 (800x450 for Desktop Chrome's 1280x720) | The recorded videos | Playwright's default (Source) |
 | How long CI keeps the artifact | Reading a failed run's videos | The repository's default retention (`upload-artifact`'s `retention-days` left out) |
 | 3 green CI runs in a row, no village failure and no retry | The last criterion | Human, 2026-11-10, answer 4 |
+| `top` every 5 s during the e2e run | Measuring the runner's CPU (temporary) | Claude, within answer 5's "every few seconds"; 5 s matches the shortest wait that failed (`toHaveURL`'s 5 s) |
 
 ## Plan
 One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e` is red, so it is closed and its commits ride in this PR (CLAUDE.md: merge or close the open PR before the next sub-ticket).
@@ -50,6 +52,7 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 
 ## Removes
 - The explicit `page.context().close()` lines and their comment from PR #174 (the fixture closes its context).
+- The CPU sampler's two steps in `e2e.yml` (answer 5), once the measurement is read.
 - `e2e.yml`'s comment that CI keeps only a text snapshot because a trace holds the key (it keeps videos too now); ROADMAP's "Waits on the human" item on uploading traces (answered: videos, not traces).
 
 ---
@@ -60,6 +63,12 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 |---|---|---|
 
 ## Evidence
+- **The videos** (PR #176, run 42789895831 at cc2fa35: `4 failed`, `167 passed (45.0m)`, the same four tests, each with its retry). The artifact `failed-test-videos` held 8 `.webm` files and nothing else. Frames were drawn from them in Playwright's own Chromium (no ffmpeg here) into contact sheets. What they show:
+  - *The way out:* the click on × starts the navigation home, and Next's dev indicator reads "Rendering (cache disabled)" from 5.1 s to the video's end at 9.5 s: the home page's render outlasts `toHaveURL`'s 5 s while the village loads and draws.
+  - *A run in the village (retry):* the village loads in about 16 s; Start, enabled then, takes effect only at about 30 s; round 1's tries (a refused word, its reason) run so slowly that the round's 20 s clock ends at about 53 s ("Time's up."), and the test waits out its 120 s pressing Enter in a box that is gone.
+  - *play2's whole day:* the village loads in about 21 s; round 1's clock runs out the same way at about 53 s while the test is still on its tries; the 3D view is blank in three frames (26.4, 31.7, 47.6 s) and back after.
+  - *Reduce motion:* about 130 s go on the stillness pictures before Start; two frames catch Playwright's capture under way, the page drawn small on grey; the test's 150 s end before round 1.
+  - Hypothesis 4, from these: the page itself is far slower on CI's runner than here, likely because the village's software drawing shares the runner's CPU with the dev server and the browser. Each test then runs out a real limit: the round's 20 s, `toHaveURL`'s 5 s, or its own budget. Not yet shown: the runner's CPU load. Disproved by: a run where the CPU sits mostly idle while these steps lag.
 
 ## Review
 - Blocking findings and how each was fixed:
