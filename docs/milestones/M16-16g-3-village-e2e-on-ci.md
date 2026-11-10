@@ -16,11 +16,13 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 3. The ticket: "Approve, start 16g-3 (Recommended)", PR #175 closed and its commits carried in this PR.
 4. Green runs in a row that count as fixed: "3 in a row (Recommended)". Three full CI runs with no village failure and no retry needed.
 5. After the videos (Evidence): "Measure CPU first (Recommended)". One more CI run logs the machine's CPU use every few seconds during the tests, to confirm or kill hypothesis 4 before the game or the tests change.
+6. After the CPU (Evidence: one Chromium process at about 370% of 4 cores while a village is open): "Draw smaller on slow GPUs (Recommended)". Once the village finds a slow GPU it draws fewer pixels, stretched to fill; softer there only. Measured on CI again before keeping it.
+7. How much smaller: "Half each way". A quarter of the pixels.
 
 ## Source
 - Playwright Test's `video` option (SOURCES.md, Playwright; `node_modules/playwright/types/test.d.ts`, `video`, 1.64.1): `'retain-on-failure'` records every run and keeps a video only for a run that failed, a failed run's kept even when its retry passes; the size defaults to the viewport scaled to fit 800x800. Checked here (Plan, step 1's experiment): it records only contexts Playwright Test makes (the `page` and `context` fixtures), not one a test opens with `browser.newContext()`.
 - GitHub's `actions/upload-artifact` (to be added to SOURCES.md): https://github.com/actions/upload-artifact, `action.yml`, v7.0.2 (2026-10-07), commit `cf430e030ddbb5b0abf93d22962f4752f3646cd9`. `path` names the files; `retention-days` left out keeps the repository's default.
-- The fix itself: its source is named once the videos show the cause (Plan, step 3).
+- The fix (answers 6, 7): three.js's `WebGLRenderer.setPixelRatio` (SOURCES.md, three.js; `node_modules/three/src/renderers/WebGLRenderer.js`, 0.180.0): it sets the ratio and calls `setSize(width, height, false)`, so the drawing buffer is `width × ratio` by `height × ratio` and the canvas's own CSS size is left alone.
 
 ## Design
 - **The village tests use Playwright's own page.** `brew.e2e.ts`'s three tests and `play2.e2e.ts`'s village tests take the `page` fixture instead of opening their own context, so their videos are recorded; the Reduce motion test sets `reducedMotion` through `test.use`. Playwright closes the fixture's context, so the explicit closes from PR #174 go.
@@ -41,6 +43,7 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 | Video size: the viewport scaled to fit 800x800 (800x450 for Desktop Chrome's 1280x720) | The recorded videos | Playwright's default (Source) |
 | How long CI keeps the artifact | Reading a failed run's videos | The repository's default retention (`upload-artifact`'s `retention-days` left out) |
 | 3 green CI runs in a row, no village failure and no retry | The last criterion | Human, 2026-11-10, answer 4 |
+| A slow GPU draws at 0.5 of the size each way (`SLOW_SCALE`) | The village on a slow GPU (`src/brew/scene.ts`) | Human, 2026-11-10, answer 7 |
 | `top` every 5 s during the e2e run | Measuring the runner's CPU (temporary) | Claude, within answer 5's "every few seconds"; 5 s matches the shortest wait that failed (`toHaveURL`'s 5 s) |
 
 ## Plan
@@ -69,6 +72,8 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
   - *play2's whole day:* the village loads in about 21 s; round 1's clock runs out the same way at about 53 s while the test is still on its tries; the 3D view is blank in three frames (26.4, 31.7, 47.6 s) and back after.
   - *Reduce motion:* about 130 s go on the stillness pictures before Start; two frames catch Playwright's capture under way, the page drawn small on grey; the test's 150 s end before round 1.
   - Hypothesis 4, from these: the page itself is far slower on CI's runner than here, likely because the village's software drawing shares the runner's CPU with the dev server and the browser. Each test then runs out a real limit: the round's 20 s, `toHaveURL`'s 5 s, or its own budget. Not yet shown: the runner's CPU load. Disproved by: a run where the CPU sits mostly idle while these steps lag.
+- **The CPU** (answer 5; run 42798560916 at ad26418, `4 failed`, `1 flaky`, `166 passed (44.9m)`, the same four village tests): `top` every 5 s, 537 samples, lined up with the 12 village starts the browser logs (`THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported`, 10:35:01 to 11:00:40). From the first village at 10:35 to about 10:44 (the brew tests) the CPU is about 2% idle (`10:38:45 idle 2.1%  chrome-headless=371.9 ffmpeg-linux=7.2`); from 10:44 to 10:56, files with no village, 17-95% idle; from 10:56 to 11:01 (play2's village tests) about 2% idle again (`11:00:24 idle 2.1%  chrome-headless=369.3`); then idle again. Across 10:36-10:43, `chrome-headless` sums 29,020 %CPU in 103 samples, the next process 583; the video encoder about 6-8%. **Hypothesis 4 holds:** while a village is open, one Chromium process takes about 370% of the runner's 4 cores, which starves the dev server and the browser's own work.
+- **Hypothesis 5** (the fix, answers 6 and 7): a slow GPU drawing at half the size each way leaves CI's CPU clearly idle part of the time while a village is open, where it sat at about 2%, and the four village tests pass. Disproved by: the CPU still near 2% idle with the village open, which would put the cost somewhere other than the pixels drawn (shader compiling, script, the vertices).
 
 ## Review
 - Blocking findings and how each was fixed:
