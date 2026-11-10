@@ -10,6 +10,8 @@ const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 const WORDS = ["aqkb", "aqkqmb", "aqmb", "aqmjb", "aqyzb", "aqyzc", "aqyzd"];
 let today = "";
+// Each test closes the context it opened: Playwright's browser lives as long as the worker, and a village left open keeps
+// drawing in software (CI has no GPU) for every test after it (M16 16g-2b, PR #174's e2e).
 
 const runOut = async () => {
   await DB.query("update private.run set started_at = started_at - interval '21 seconds' where game_id = 'substrings'");
@@ -33,6 +35,7 @@ test("a signed-out visit shows sign-in", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/play2");
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  await page.context().close();
 });
 
 test("a day with no puzzle says so", async ({ browser }) => {
@@ -42,6 +45,7 @@ test("a day with no puzzle says so", async ({ browser }) => {
   await page.goto("/play2");
   await expect(page.getByRole("heading", { name: "Game number 2" })).toBeVisible();
   await expect(page.getByText("There's no puzzle today.")).toBeVisible();
+  await page.context().close();
 });
 
 // Each test that plays adds the day itself, as a retry runs in a new worker, whose cleanup took it away.
@@ -194,6 +198,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next and the resul
   await expect(page.getByRole("definition")).toHaveText(["70", "120", "65", "255"]);
   await expect(page.getByText("Bonus letter j, in 1 word")).toBeVisible();
   await expect(page.getByText("Different letters, 6 of 26")).toBeVisible();
+  await page.context().close();
 });
 
 test("a tab left between rounds finds the day it's in, and a real failure says so", async ({ browser }) => {
@@ -221,6 +226,7 @@ test("a tab left between rounds finds the day it's in, and a real failure says s
   await DB.query("delete from private.run where game_id = 'substrings' and user_id = (select id from auth.users where email = $1)", [`${RUN}-pm@example.test`]);
   await game.getByRole("button", { name: "Next question", exact: true }).click();
   await expect(game.getByRole("button", { name: "Start" })).toBeVisible();
+  await page.context().close();
 });
 
 test("game 1 stays as it was", async ({ browser }) => {
@@ -230,6 +236,7 @@ test("game 1 stays as it was", async ({ browser }) => {
   await expect(page.getByRole("heading", { name: "Plor, Today" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Afterglow" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Game number 2" })).toHaveCount(0);
+  await page.context().close();
 });
 
 // The Friends page's leaderboard switches between the games (M16 16e-2, answers 23 and 24), and game 2's adds up places.
@@ -248,4 +255,5 @@ test("the friends leaderboard switches to game 2", async ({ browser }) => {
   // A new player's week: their own row, a plain 0, as places aren't points.
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).toContainText("(you)");
   await expect(board.getByRole("region", { name: "This week" }).getByRole("listitem").first()).not.toContainText("points");
+  await page.context().close();
 });

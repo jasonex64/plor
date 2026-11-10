@@ -11,6 +11,8 @@ const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 const WORDS = ["aqkqmb", "aqmjb", "aqyzbcdefg"];
 let today = "";
+// Each test closes the context it opened: Playwright's browser lives as long as the worker, and a village left open keeps
+// drawing in software (CI has no GPU) for every test after it (M16 16g-2b, PR #174's e2e).
 
 test.beforeAll(async () => {
   today = (await DB.query<{ d: string }>("select private.today()::text as d")).rows[0].d;
@@ -105,6 +107,7 @@ test("a run in the village: full screen, the moments, the camera still at the bo
   await expect(page.getByRole("list", { name: "Your rounds" })).toBeVisible({ timeout: 20_000 });
   await expect(page.locator("body[data-game]")).toHaveCount(0);
   expect(errors).toEqual([]);
+  await page.context().close();
 });
 
 test("the way out leads back to Today", async ({ browser }) => {
@@ -116,6 +119,7 @@ test("the way out leads back to Today", async ({ browser }) => {
   await page.getByRole("button", { name: "Back to Today" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator("body[data-game]")).toHaveCount(0);
+  await page.context().close();
 });
 
 // Reduce motion's calm version (16g-2b, answers 5, 23 to 31): the camera never moves; between moments the village holds
@@ -213,4 +217,5 @@ test("Reduce motion: the camera never moves, the village holds still, a switch i
   await expect(page.getByRole("list", { name: "Your rounds" })).toBeVisible({ timeout: 20_000 });
   expect(await moved()).toBe(false);
   expect(errors).toEqual([]);
+  await page.context().close();
 });
