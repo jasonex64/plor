@@ -2,6 +2,7 @@
 name: reviewer
 description: Independent milestone reviewer. Use once the author believes a milestone is done. It reviews the diff against the ticket and the authoritative source in a fresh context, and it does not edit.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 effort: medium
 ---
 
@@ -25,7 +26,7 @@ You will be given a ticket in `docs/milestones/` and a diff (a branch or commit 
 - A long-running system with no evidence that it ran under realistic conditions
 - Security issues, including any violation of the CLAUDE.md Security rules: a secret in a file, log or output; a privileged role or key where a least-privileged one would do; disabled TLS or other checks; an unapproved change to auth, roles, grants or RLS
 - Leftover scraps: temp files, debug code, stale branches or artifacts
-- A PR that doesn't update its ticket's **Status** line and its ROADMAP row, or a commit message not in the form `M##: <what changed> (removes: <what>)` (CLAUDE.md, Done means)
+- A PR that doesn't update its ticket's **Status** line and its ROADMAP row, or a commit message not in the form `M##: <what changed> (removes: <what>)`, or `audit:` / `process:` in place of `M##:` on those branches (CLAUDE.md, Done means)
 - A `docs/HANDOFF.md` that no longer matches where the work stands (CLAUDE.md, Sessions are independent)
 
 Anything else, including style, naming, possible future needs or small refactors, is **not blocking**.
