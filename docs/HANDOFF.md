@@ -2,13 +2,13 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-11-09, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2a and 16g-2b.
-- **16g, game 2's look, is done:** 16g-2a and 16g-2b (PRs #173 and #174, merged on green CI) put Midnight Brew into `/play2` with a calm version under Reduce motion. 16g-2c, compression, closed without building it: Vercel already sends all 48 models Brotli-compressed, 1.78 MB of 10.8 (`curl` against plor.app, as the PR preview needs Vercel's sign-in), and the human said "Stop here" (answer 38). This closing note is on `m16-game-2` in its own PR.
-- **`main`'s e2e is red, from the village's tests:** `brew.e2e.ts`'s three tests and `play2.e2e.ts`'s "a whole day" have failed on CI in 5 of the last 6 runs since PR #173, at a different step each time. Closing each test's context (PR #174) didn't fix it; PR #174's one green run was luck. The cause is *unverified* and CI keeps no traces. This blocks every PR's required `e2e` check, `RIFF-m14`'s too. **16g-3** (`docs/milestones/M16-16g-3-village-e2e-on-ci.md`, approved) films failed tests on CI (videos only, no traces: the key, answer 2) to find and fix the cause; done means 3 green runs in a row.
+**Updated:** 2026-11-10, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2 and 16g-3.
+- **16g-3, the village's e2e on CI, is in progress (PR #176, `docs/milestones/M16-16g-3-village-e2e-on-ci.md`):** CI now films failed tests (videos only, no traces; DECISIONS.md, 2026-11-10). The videos and a CPU log showed the cause: the village's software drawing takes about 370% of the runner's 4 cores, starving the dev server and the browser. The fix, the human's: a slow GPU draws at half size each way (`SLOW_SCALE`, `src/brew/scene.ts`). Its run was green, but "the way out leads back to Today" still needed its retry. The CPU sampler is gone. The reviewer's three blocking doc findings are fixed; the rest are in ROADMAP, Next revision.
+- **Waits on:** 3 CI runs in a row with no village failure and no retry (answer 4; the human: "Wait for three runs"), then merge on green. If "the way out" (or any village test) needs a retry again, the count restarts and the test goes to the human: changing its 5 s wait or the game is their call.
 - **Local e2e on this PC is unreliable for `/play2`:** the page under test reloads itself after each `✓ Compiled` from `next dev`, failing even a first test; cause *unverified* (ROADMAP, Next revision). Read CI's result, not a local failure, until that's found.
 - **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, never run two e2e processes at once, and never edit `src/` while one runs. Delete only your own leftover test rows (`<RUN>-b%@example.test`, the substrings day whose first round is `qk`).
-- **Left running:** nothing.
-- **Next:** 16g-3: its PR's own CI uploads the failed tests' videos (artifact `failed-test-videos`); watch them, write a hypothesis, fix. PR #175 was closed and its docs ride in 16g-3's PR; then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
+- **Left running:** nothing local; CI runs on PR #176.
+- **Next:** finish 16g-3 (the runs, ticket Status and Evidence, ROADMAP row, merge); then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
 
 **From `main` (M14's session), merged into `m16-game-2` on 2026-11-09, after PR #172:**
 

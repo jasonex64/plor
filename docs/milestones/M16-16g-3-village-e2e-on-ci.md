@@ -77,5 +77,8 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 - **Hypothesis 5's run** (run 42805958719 at cee540a, sampler still on: `1 flaky`, `170 passed (35.7m)`, against 44.9-45.0 min before). Counting the samples where one `chrome-headless` process is above 150% (a village open): 49 samples (11:26:43-11:41:45) against 164 in run 42798560916; that process averages 231% against 337%; the CPU averages 13.7% idle against 2.9%, is under 5% idle in 7 of 49 samples against 151 of 164, and 20% or more idle in 11 against 1. **Hypothesis 5 holds on the CPU:** the village still takes most of the runner, but no longer all of it, and for about a third as long. The tests: two of `brew.e2e.ts`'s three and `play2.e2e.ts`'s whole day passed first time, but the third, "the way out leads back to Today", failed its first try the old way (`toHaveURL(/\/$/)`, 5000 ms, still on `/play2`) and passed its retry, so this run doesn't count toward answer 4's three. No video: the job passed, and the upload runs on failure only.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed (the `reviewer` agent, 2026-11-10, on cc2fa35..c408fa6; code and workflow found correct, the sampler fully gone):
+  - DESIGN.md's citations `scene.ts:273-303`, `:79-81` and `:268` had gone stale with `SLOW_SCALE`'s lines: now `:279-309`, `:83-85`, `:274`.
+  - HANDOFF.md still described step 1: rewritten for where 16g-3 stands.
+  - DECISIONS.md's new row read as a rule for every e2e test while 35 other files open their own contexts: narrowed to the village's tests, saying the others stay unfilmed as before.
+- Deferred to ROADMAP "Next revision": videos of a test that passes its retry aren't uploaded; `show()` doesn't restore the pixel ratio (shown once per stage today); the sampler's row left in Numbers.
