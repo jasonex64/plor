@@ -44,7 +44,7 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 | How long CI keeps the artifact | Reading a failed run's videos | The repository's default retention (`upload-artifact`'s `retention-days` left out) |
 | 3 green CI runs in a row, no village failure and no retry | The last criterion | Human, 2026-11-10, answer 4 |
 | A slow GPU draws at 0.5 of the size each way (`SLOW_SCALE`) | The village on a slow GPU (`src/brew/scene.ts`) | Human, 2026-11-10, answer 7 |
-| `top` every 5 s during the e2e run | Measuring the runner's CPU (temporary) | Claude, within answer 5's "every few seconds"; 5 s matches the shortest wait that failed (`toHaveURL`'s 5 s) |
+| `top` every 5 s during the e2e run | Measuring the runner's CPU (temporary, removed after hypothesis 5's run) | Claude, within answer 5's "every few seconds"; 5 s matches the shortest wait that failed (`toHaveURL`'s 5 s) |
 
 ## Plan
 One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e` is red, so it is closed and its commits ride in this PR (CLAUDE.md: merge or close the open PR before the next sub-ticket).
@@ -55,7 +55,7 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 
 ## Removes
 - The explicit `page.context().close()` lines and their comment from PR #174 (the fixture closes its context).
-- The CPU sampler's two steps in `e2e.yml` (answer 5), once the measurement is read.
+- The CPU sampler's two steps in `e2e.yml` (answer 5), once the measurement is read: removed after hypothesis 5's run.
 - `e2e.yml`'s comment that CI keeps only a text snapshot because a trace holds the key (it keeps videos too now); ROADMAP's "Waits on the human" item on uploading traces (answered: videos, not traces).
 
 ---
@@ -74,6 +74,7 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
   - Hypothesis 4, from these: the page itself is far slower on CI's runner than here, likely because the village's software drawing shares the runner's CPU with the dev server and the browser. Each test then runs out a real limit: the round's 20 s, `toHaveURL`'s 5 s, or its own budget. Not yet shown: the runner's CPU load. Disproved by: a run where the CPU sits mostly idle while these steps lag.
 - **The CPU** (answer 5; run 42798560916 at ad26418, `4 failed`, `1 flaky`, `166 passed (44.9m)`, the same four village tests): `top` every 5 s, 537 samples, lined up with the 12 village starts the browser logs (`THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported`, 10:35:01 to 11:00:40). From the first village at 10:35 to about 10:44 (the brew tests) the CPU is about 2% idle (`10:38:45 idle 2.1%  chrome-headless=371.9 ffmpeg-linux=7.2`); from 10:44 to 10:56, files with no village, 17-95% idle; from 10:56 to 11:01 (play2's village tests) about 2% idle again (`11:00:24 idle 2.1%  chrome-headless=369.3`); then idle again. Across 10:36-10:43, `chrome-headless` sums 29,020 %CPU in 103 samples, the next process 583; the video encoder about 6-8%. **Hypothesis 4 holds:** while a village is open, one Chromium process takes about 370% of the runner's 4 cores, which starves the dev server and the browser's own work.
 - **Hypothesis 5** (the fix, answers 6 and 7): a slow GPU drawing at half the size each way leaves CI's CPU clearly idle part of the time while a village is open, where it sat at about 2%, and the four village tests pass. Disproved by: the CPU still near 2% idle with the village open, which would put the cost somewhere other than the pixels drawn (shader compiling, script, the vertices).
+- **Hypothesis 5's run** (run 42805958719 at cee540a, sampler still on: `1 flaky`, `170 passed (35.7m)`, against 44.9-45.0 min before). Counting the samples where one `chrome-headless` process is above 150% (a village open): 49 samples (11:26:43-11:41:45) against 164 in run 42798560916; that process averages 231% against 337%; the CPU averages 13.7% idle against 2.9%, is under 5% idle in 7 of 49 samples against 151 of 164, and 20% or more idle in 11 against 1. **Hypothesis 5 holds on the CPU:** the village still takes most of the runner, but no longer all of it, and for about a third as long. The tests: two of `brew.e2e.ts`'s three and `play2.e2e.ts`'s whole day passed first time, but the third, "the way out leads back to Today", failed its first try the old way (`toHaveURL(/\/$/)`, 5000 ms, still on `/play2`) and passed its retry, so this run doesn't count toward answer 4's three. No video: the job passed, and the upload runs on failure only.
 
 ## Review
 - Blocking findings and how each was fixed:
