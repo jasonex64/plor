@@ -3,12 +3,12 @@
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
 **Updated:** 2026-11-10, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2 and 16g-3.
-- **16g-3, the village's e2e on CI, is in progress (PR #176, `docs/milestones/M16-16g-3-village-e2e-on-ci.md`):** CI now films failed tests (videos only, no traces; DECISIONS.md, 2026-11-10). The videos and a CPU log showed the cause: the village's software drawing takes about 370% of the runner's 4 cores, starving the dev server and the browser. The fix, the human's: a slow GPU draws at half size each way (`SLOW_SCALE`, `src/brew/scene.ts`). Its run was green, but "the way out leads back to Today" still needed its retry. The CPU sampler is gone. The reviewer's three blocking doc findings are fixed; the rest are in ROADMAP, Next revision.
-- **Waits on:** 3 CI runs in a row with no village failure and no retry (answer 4; the human: "Wait for three runs"), then merge on green. If "the way out" (or any village test) needs a retry again, the count restarts and the test goes to the human: changing its 5 s wait or the game is their call.
+- **16g-3, the village's e2e on CI, is merged short of its last criterion (PR #176, `docs/milestones/M16-16g-3-village-e2e-on-ci.md`):** CI films failed tests (videos only, no traces; DECISIONS.md, 2026-11-10). The cause: the village's software drawing takes most of the runner's 4 cores, so `next dev` renders the next page in over 5 s and rounds' 20 s clocks run out. Half size on slow GPUs (`SLOW_SCALE`, `src/brew/scene.ts`) cut it, but 0 of 3 runs since were clean; the human: "Merge #176 now, decide later" (answer 8).
+- **Waits on the human:** the next fix for the village's e2e (ROADMAP, Next revision): e2e on a production build as its own sub-ticket (recommended; Afterglow's look check uses a page only `next dev` serves) or changing the four tests. Until then `main`'s e2e may need re-runs.
 - **Local e2e on this PC is unreliable for `/play2`:** the page under test reloads itself after each `✓ Compiled` from `next dev`, failing even a first test; cause *unverified* (ROADMAP, Next revision). Read CI's result, not a local failure, until that's found.
 - **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, never run two e2e processes at once, and never edit `src/` while one runs. Delete only your own leftover test rows (`<RUN>-b%@example.test`, the substrings day whose first round is `qk`).
-- **Left running:** nothing local; CI runs on PR #176.
-- **Next:** finish 16g-3 (the runs, ticket Status and Evidence, ROADMAP row, merge); then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
+- **Left running:** nothing.
+- **Next:** the human's call on the village's e2e; then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
 
 **From `main` (M14's session), merged into `m16-game-2` on 2026-11-09, after PR #172:**
 

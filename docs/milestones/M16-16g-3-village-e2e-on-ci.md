@@ -1,6 +1,6 @@
 # M16 16g-3 — The village's e2e passes on CI
 
-**Status:** in progress (drafted 2026-11-10 from two answers; approved: "Approve, start 16g-3 (Recommended)").
+**Status:** done short of its last criterion, merged in PR #176 on the human's "Merge #176 now, decide later" (answer 8): the cause is found and half size cuts it, but the village's tests still need retries on CI (Evidence). Drafted 2026-11-10 from two answers; approved: "Approve, start 16g-3 (Recommended)".
 
 ## Goal
 Find out why game 2's village tests fail on CI most runs, from videos of the failed runs, and fix the cause, so `main`'s required `e2e` check is green again.
@@ -18,6 +18,7 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 5. After the videos (Evidence): "Measure CPU first (Recommended)". One more CI run logs the machine's CPU use every few seconds during the tests, to confirm or kill hypothesis 4 before the game or the tests change.
 6. After the CPU (Evidence: one Chromium process at about 370% of 4 cores while a village is open): "Draw smaller on slow GPUs (Recommended)". Once the village finds a slow GPU it draws fewer pixels, stretched to fill; softer there only. Measured on CI again before keeping it.
 7. How much smaller: "Half each way". A quarter of the pixels.
+8. After two CI runs with half size (Evidence: "the way out" needed its retry, then failed both tries; two more village tests needed retries), offered e2e on a production build as its own sub-ticket, changing the four tests, or merging now: "Merge #176 now, decide later". Half size stays; the three-runs criterion is left unmet; the next fix is the human's call.
 
 ## Source
 - Playwright Test's `video` option (SOURCES.md, Playwright; `node_modules/playwright/types/test.d.ts`, `video`, 1.64.1): `'retain-on-failure'` records every run and keeps a video only for a run that failed, a failed run's kept even when its retry passes; the size defaults to the viewport scaled to fit 800x800. Checked here (Plan, step 1's experiment): it records only contexts Playwright Test makes (the `page` and `context` fixtures), not one a test opens with `browser.newContext()`.
@@ -30,9 +31,9 @@ After PR #175 (16g-2's closing docs, no code) failed `e2e` the same way:
 - **The upload:** a step in `.github/workflows/e2e.yml` after the tests, on failure only, uploading `test-results/**/*.webm` as one artifact. Nothing else from `test-results/` is uploaded (no trace, no network data). A DECISIONS.md entry records answer 2 as a secret-handling decision.
 
 ## Acceptance criteria
-- [ ] A failed test on CI leaves its video as an artifact of the run, and the artifact holds `.webm` files only (the run's artifact list and its contents).
-- [ ] The cause of the village's CI failures is found from the videos, stated with the evidence, and fixed.
-- [ ] The village's tests then pass on CI in 3 runs in a row with no retry (answer 4).
+- [x] A failed test on CI leaves its video as an artifact of the run, and the artifact holds `.webm` files only (the run's artifact list and its contents).
+- [ ] The cause of the village's CI failures is found from the videos, stated with the evidence, and fixed. *Found (hypothesis 4, the CPU) and cut (hypothesis 5), not fixed: the tests still need retries (answer 8).*
+- [ ] The village's tests then pass on CI in 3 runs in a row with no retry (answer 4). *Not met: 0 of 3 runs since half size; left unmet by answer 8.*
 
 ## Out of scope
 - Full or scrubbed traces (answer 2); the local reload problem on the Windows PC (ROADMAP, Next revision), unless the videos show it's the same cause; other files' occasional CI failures already in ROADMAP.
@@ -64,6 +65,8 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Playwright: `retain-on-failure` keeps a failed test's video | The upload step runs only when the e2e job fails, so a video of a test that passes its retry stays on the runner | The design (step 1) uploads on failure; recorded in ROADMAP, Next revision |
+| three.js: `setPixelRatio` is for the device's pixel ratio | `scene.ts` multiplies the ratio by `SLOW_SCALE` once a slow GPU is found, to draw fewer pixels | Answers 6 and 7; the drawing buffer shrinks and the canvas keeps its CSS size, as the source describes |
 
 ## Evidence
 - **The videos** (PR #176, run 42789895831 at cc2fa35: `4 failed`, `167 passed (45.0m)`, the same four tests, each with its retry). The artifact `failed-test-videos` held 8 `.webm` files and nothing else. Frames were drawn from them in Playwright's own Chromium (no ffmpeg here) into contact sheets. What they show:
@@ -75,6 +78,7 @@ One PR from `m16-game-2`. PR #175 (16g-2's closing docs) can't merge while `e2e`
 - **The CPU** (answer 5; run 42798560916 at ad26418, `4 failed`, `1 flaky`, `166 passed (44.9m)`, the same four village tests): `top` every 5 s, 537 samples, lined up with the 12 village starts the browser logs (`THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported`, 10:35:01 to 11:00:40). From the first village at 10:35 to about 10:44 (the brew tests) the CPU is about 2% idle (`10:38:45 idle 2.1%  chrome-headless=371.9 ffmpeg-linux=7.2`); from 10:44 to 10:56, files with no village, 17-95% idle; from 10:56 to 11:01 (play2's village tests) about 2% idle again (`11:00:24 idle 2.1%  chrome-headless=369.3`); then idle again. Across 10:36-10:43, `chrome-headless` sums 29,020 %CPU in 103 samples, the next process 583; the video encoder about 6-8%. **Hypothesis 4 holds:** while a village is open, one Chromium process takes about 370% of the runner's 4 cores, which starves the dev server and the browser's own work.
 - **Hypothesis 5** (the fix, answers 6 and 7): a slow GPU drawing at half the size each way leaves CI's CPU clearly idle part of the time while a village is open, where it sat at about 2%, and the four village tests pass. Disproved by: the CPU still near 2% idle with the village open, which would put the cost somewhere other than the pixels drawn (shader compiling, script, the vertices).
 - **Hypothesis 5's run** (run 42805958719 at cee540a, sampler still on: `1 flaky`, `170 passed (35.7m)`, against 44.9-45.0 min before). Counting the samples where one `chrome-headless` process is above 150% (a village open): 49 samples (11:26:43-11:41:45) against 164 in run 42798560916; that process averages 231% against 337%; the CPU averages 13.7% idle against 2.9%, is under 5% idle in 7 of 49 samples against 151 of 164, and 20% or more idle in 11 against 1. **Hypothesis 5 holds on the CPU:** the village still takes most of the runner, but no longer all of it, and for about a third as long. The tests: two of `brew.e2e.ts`'s three and `play2.e2e.ts`'s whole day passed first time, but the third, "the way out leads back to Today", failed its first try the old way (`toHaveURL(/\/$/)`, 5000 ms, still on `/play2`) and passed its retry, so this run doesn't count toward answer 4's three. No video: the job passed, and the upload runs on failure only.
+- **After the sampler** (half size, no sampler): run 42884972011 at c408fa6, `1 flaky` ("the way out"), `170 passed (30.4m)`; run 42885406286 at 6c5fb66 (docs only), `1 failed` ("the way out", both tries), `2 flaky` ("a run in the village", "a whole day"), `168 passed (39.0m)`. The way out's two videos (`failed-test-videos`, 4 `.webm` files) show the same thing as before: × is clicked at about 3 s while "Loading the village…" shows, Next's dev indicator reads "Rendering (cache disabled)" from 3.3 s to the end at about 10 s, and the village appears at 6.6 s with the page still on `/play2`. So `next dev`'s render of the home page outlasts `toHaveURL`'s 5 s while the village loads and starts drawing (before it has found a slow GPU, it draws at full size). 0 of 3 runs clean; offered to the human (answer 8).
 
 ## Review
 - Blocking findings and how each was fixed (the `reviewer` agent, 2026-11-10, on cc2fa35..c408fa6; code and workflow found correct, the sampler fully gone):
