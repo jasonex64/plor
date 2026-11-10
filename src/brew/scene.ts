@@ -43,10 +43,14 @@ export type Updater = (t: number, dt: number) => void;
 // SLOW_DRAW_MS between the end of one draw and the next, and draws its shadows once more and then holds them (answer 15:
 // redrawing the shadow map was two-thirds of a software draw).
 // 1 s, not the 0.25 s first approved: CI's software draws ran longer, and the moments fell behind real time (answer 20).
+// A slow GPU also draws at SLOW_SCALE of the size each way, stretched to fill: drawing in software took nearly all of CI's
+// four cores while the village was open (docs/milestones/M16-16g-3-village-e2e-on-ci.md, Evidence), and its cost grows
+// with the pixels drawn. The human's "Half each way" (16g-3 answer 7).
 const MAX_DT = 1;
 const SLOW_SAMPLE = 10;
 const SLOW_MS = 100;
 const SLOW_DRAW_MS = 500;
+const SLOW_SCALE = 0.5;
 type Pose = { pos: THREE.Vector3; target: THREE.Vector3 };
 type Move =
   | { kind: "punch"; focus: THREE.Vector3; amount: number; dur: number; start: number }
@@ -191,6 +195,8 @@ export function createStage(host: HTMLElement, onFault: (err: unknown) => void, 
           slow = true;
           renderer.shadowMap.autoUpdate = false;
           renderer.shadowMap.needsUpdate = true;
+          // Only the drawing buffer shrinks; the canvas keeps its size on the page (three.js WebGLRenderer.setPixelRatio).
+          renderer.setPixelRatio(renderer.getPixelRatio() * SLOW_SCALE);
         }
         paced();
       }

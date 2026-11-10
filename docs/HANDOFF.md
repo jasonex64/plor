@@ -2,13 +2,13 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
-**Updated:** 2026-11-09, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2a and 16g-2b.
-- **16g-2a, the village plays the run:** done, PR #173 merged on green CI. `/play2` plays the real run in Midnight Brew (`docs/milestones/M16-16g-2-midnight-brew-in-play2.md`).
-- **16g-2b, the calm version under Reduce motion** (answers 23-33): built, reviewed (seven blocking findings, all fixed; the rest in ROADMAP, Next revision), in review as PR #174 from `m16-game-2`. Under Reduce motion the camera takes no move, idle life and flicker stop, every word gets one quiet moment, a change fades in where it stands, and a switch during a run takes effect from the next moment (`moment()` in `village.ts`). `e2e/brew.e2e.ts`'s third test checks it with two canvas pictures 2 s apart.
-- **Its browser tests are CI's to judge** (answer 33): on this PC every local `brew play2` run failed at a different step, even with nothing else running, because the page under test reloads itself after each `✓ Compiled` from `next dev` (ticket, Evidence; ROADMAP, Next revision). The cause is *unverified*. Until it's found, a local e2e failure here is not evidence about the code; read CI's.
-- **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, never run two e2e processes at once, and never edit `src/` while one runs. A run that times out leaves its players and today's fixture day behind; delete only your own (`<RUN>-b%@example.test`, the substrings day whose first round is `qk`).
-- **Waits on the human:** merging PR #174 once CI is green ("Merge when green"). **Left running:** nothing.
-- **Next:** the 16g-2b PR merged; then 16g-2c, trying mesh compression on the models (`next start` already gzips them to about 2.3 MB of 10.8; whether Vercel does too is *unverified*). Ask for the build-time tool's source first.
+**Updated:** 2026-11-10, on `m16-game-2`, by the Windows PC session that ran 16g-1, 16g-2 and 16g-3.
+- **16g-3, the village's e2e on CI, is merged short of its last criterion (PR #176, `docs/milestones/M16-16g-3-village-e2e-on-ci.md`):** CI films failed tests (videos only, no traces; DECISIONS.md, 2026-11-10). The cause: the village's software drawing takes most of the runner's 4 cores, so `next dev` renders the next page in over 5 s and rounds' 20 s clocks run out. Half size on slow GPUs (`SLOW_SCALE`, `src/brew/scene.ts`) cut it, but 0 of 3 runs since were clean; the human: "Merge #176 now, decide later" (answer 8).
+- **Waits on the human:** the next fix for the village's e2e (ROADMAP, Next revision): e2e on a production build as its own sub-ticket (recommended; Afterglow's look check uses a page only `next dev` serves) or changing the four tests. Until then `main`'s e2e may need re-runs.
+- **Local e2e on this PC is unreliable for `/play2`:** the page under test reloads itself after each `✓ Compiled` from `next dev`, failing even a first test; cause *unverified* (ROADMAP, Next revision). Read CI's result, not a local failure, until that's found.
+- **Port 3000 and the database are shared** with `RIFF-m14`'s session: check `Get-NetTCPConnection -LocalPort 3000` before an e2e run, never run two e2e processes at once, and never edit `src/` while one runs. Delete only your own leftover test rows (`<RUN>-b%@example.test`, the substrings day whose first round is `qk`).
+- **Left running:** nothing.
+- **Next:** the human's call on the village's e2e; then M16's last piece, 16f, the shared pieces (the M16 ticket's Plan, step 5), which waits on M14's `/play` build. Ask the human before starting it, with guided questions.
 
 **From `main` (M14's session), merged into `m16-game-2` on 2026-11-09, after PR #172:**
 
