@@ -2,6 +2,8 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
+**Updated last:** 2026-11-10, by the planning session in `C:/Users/jason/RIFF`, which owns the plan now (human: "This session"). **14c-6c and M16 16f are paused**; ignore "Next: build 6c" below. The next step is **14c-7** (`docs/milestones/M14-14c-7-simpler-games.md`): one private page showing each game as built, calm and plain, for the human to choose ("if pics dont look good then go plain"). The plan to the beta is in ROADMAP, Focus, "The plan to the beta". Waits on the human: the must-fix list's approval, and guided questions for guest play. Nothing is left running. In `RIFF-m14`, `.next` was rebuilt: delete `.next/dev` before `npm run dev`.
+
 **Updated:** 2026-11-10, on `m14-look-and-feel`, by the session that built 14c-6a, 6b-1, 6d, 6b-2a and 6b-2b, part of it overnight while the human slept (answer 78: the recommended option at each decision, each recorded).
 - **14c-6, Afterglow becomes the game** (`docs/milestones/M14-14c-6-afterglow-in-play.md`): 6a (PR #168), 6b-1 (#169), 6d (#170), 6b-2a (#172) and **6b-2b, the mutants (#177, merged on green CI at the human's "ok merge it now", 2026-11-10)** are done.
 - **What 6b-2b is:** `npm run check:afterglow-mutants [pattern]` (`scripts/afterglow-mutants.ts`, list in `e2e/afterglow-mutants.ts`, 93 mutants) runs its own `next dev` on port 3001, matches every break first, runs the unbroken game through the whole check (the baseline, about 15 min), then four mutants at a time, then the fps one alone. All of it takes about 5 hours; by name, a mutant takes the baseline plus 12 to 20 min. Run it with the PC otherwise idle, as it judges frame times.
