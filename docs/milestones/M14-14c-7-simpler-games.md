@@ -65,6 +65,7 @@ Nothing: it adds one ticket and one private page, and changes no code.
 |---|---|---|
 
 ## Evidence
+- The page, private: https://claude.ai/artifact/C4V2rx34vuSqiATZuGBrZi (version 1, 2026-11-10), built by an Opus subagent and looked at by the planning session at 1280px. Six pictures: game 1 as built (a screenshot, reshot from `/check/afterglow?q=4` with the dev badge hidden), game 1 calm (a drawing: the same frame with the four changes of 14c-6's answers 8 and 83 to 91 marked), game 1 plain (a drawing from `8309555`'s `game.tsx`), game 2 as built and calm (screenshots), game 2 plain (a drawing from the round in `7c94697^`'s `substrings.tsx`). The builder's report: no sideways scroll at 390px; `git status --short` in `RIFF-m14` empty and nothing listening on 3000 or 3001 after. Unverified: game 1's plain drawing at 390px (the builder's capture was clipped).
 - Left by the review session (its handover message, 2026-11-10; unverified by this session): screenshots at 390×844 of game 1 as built (to reshoot, the Next dev badge covers the name), game 2 as built and game 2 calm, in that session's scratchpad; the three drawings not started; no page written or published.
 
 ## Review
