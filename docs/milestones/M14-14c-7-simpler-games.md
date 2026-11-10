@@ -1,6 +1,6 @@
 # M14 14c-7 — Simpler games, side by side
 
-**Status:** in progress (approved 2026-11-10: "Approve pictures"). Pauses 14c-6c and M16 16f until the human picks a direction.
+**Status:** done, 2026-11-10 (approved: "Approve pictures"; the human chose "go plain for both", answer 12). No review: it changed no code. 14c-6c isn't built; M16 16f waits for the plain games.
 
 ## Goal
 Show the human each game as built, calm and plain, side by side at phone size, so they can choose how far to simplify both games.
@@ -26,6 +26,7 @@ Round 3 (the planning session in `C:/Users/jason/RIFF`, which took this ticket o
 9. Which session owns the plan from here? "This session" (the planning session). The review session confirmed it had stopped, with nothing running and this draft its only uncommitted change.
 10. This draft ticket: "Take it over (Recommended)".
 11. Pictures first, Reduce motion then freeze, or plain with no pictures? "if pics dont look good then go plain". So the pictures come first, and plain is the fallback for both games. This replaces the same session's earlier "Freeze after Reduce motion (Recommended)", given before it knew of answers 1 to 8.
+12. The choice, after the page (Evidence): "go plain for both". Both games drop their worlds for the app's own look.
 
 ## Source
 - `docs/DESIGN.md`: the app's own look (colour slots, Baloo 2, cards, buttons), for the plain versions.
