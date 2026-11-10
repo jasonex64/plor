@@ -40,8 +40,17 @@ jobs:
           printf 'DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_PUBLISHABLE_KEY=%s\n' "$key" > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      # What a failed test's page showed, as text: CI-only failures can't otherwise be read, as a trace holds the stack's
-      # publishable key and stays off a public repo (ROADMAP, "Waits on the human"). This snapshot holds the page, not requests.
+      # What a failed test's page showed, as text. A trace holds the stack's publishable key, so none leaves the runner on
+      # this public repo; this snapshot holds the page, not requests.
       - name: Show the page each failed test ended on
         if: failure()
         run: find test-results -name error-context.md -exec cat {} +
+      # What a failed test's page did, as video: Playwright keeps one per failed test on CI (playwright.config.ts). Only the
+      # .webm files are uploaded, no trace or network data (the human, docs/milestones/M16-16g-3-village-e2e-on-ci.md,
+      # answer 2; DECISIONS.md). The repository's default retention applies.
+      - name: Keep the failed tests' videos
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: failed-test-videos
+          path: test-results/**/*.webm
