@@ -1,6 +1,6 @@
 # M14 14c-9 — Game 2, plain
 
-**Status:** planned (awaiting the human's approval; starts after 14c-8 merges)
+**Status:** approved, not started (human, 2026-11-10: "approve"); starts after 14c-8 merges
 
 ## Goal
 Game 2 plays in the app's own look, at game 1's level of finish, and the village is removed.
@@ -12,7 +12,7 @@ Game 2 plays in the app's own look, at game 1's level of finish, and the village
 ## The human's answers (2026-11-10, guided questions, the planning session)
 Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
 6. What the plain game keeps: "also add an how-to-play, just like the first one(and any other discrepancies u think we should add. both games should have similar level of polish),Running score all game,Timer bar,Full-screen play with a close button".
-7. **Claude's reading of "any other discrepancies", to confirm at approval.** So both games match:
+7. Claude's reading of "any other discrepancies", approved with the ticket ("approve"). So both games match:
    - (a) game 2 gets a How to play pop-up, in 14c-8's component, with its own steps;
    - (b) both games show the countdown the same way: the seconds number with the draining bar (so 14c-8's game 1 gains the bar here);
    - (c) both use 14c-8's play frame and ×;

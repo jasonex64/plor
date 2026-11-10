@@ -1,6 +1,6 @@
 # M14 14c-8 — Game 1, plain
 
-**Status:** planned (awaiting the human's approval)
+**Status:** approved, not started (human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
 
 ## Goal
 Game 1 plays in the app's own look, with the four additions the human kept from the festival, and the festival is removed.
@@ -12,7 +12,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 ## The human's answers (2026-11-10, guided questions, the planning session)
 1. The games' look, after 14c-7's six pictures: "go plain for both".
 2. The festival's and village's code, art and the mutant check: "Remove them (Recommended)". They stay in git history.
-3. The games' names: "use placeholder names that are simple". Claude's proposal, to confirm at approval: **"Game 1" at `/play`** and "Game 2" at `/play2`.
+3. The games' names: "use placeholder names that are simple". **"Game 1" at `/play`** and "Game 2" at `/play2`, Claude's proposal, approved with the ticket ("approve").
 4. What the plain games keep: "Show me the differences first". From the list (a Sonnet subagent's reading of `8309555` against today, not run), the human kept all four offered for game 1: "Full-screen play with a close button", "How to play as a pop-up", "Answer recap before results", "Rarity label on safe answers".
 5. Game 2 (14c-9): "also add an how-to-play, just like the first one(and any other discrepancies u think we should add. both games should have similar level of polish)". So what both games share is built once here, for 14c-9 to use.
 
@@ -44,7 +44,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
 | 7 questions, 20 seconds, the points and the taken letters | play | unchanged (DECISIONS.md, Game 1) |
-| The three rarity words | the label on a safe answer | **blank: the human picks at approval.** The code has three tiers, shown today as Peony, Chrysanthemum and Kamuro (`src/afterglow/scene.ts`). Claude's proposal: "Common", "Uncommon", "Rare" |
+| The three rarity words | the label on a safe answer | "Common", "Uncommon", "Rare": Claude's proposal for the code's three tiers (shown before as Peony, Chrysanthemum and Kamuro, `src/afterglow/scene.ts`), approved with the ticket (human, 2026-11-10: "approve") |
 | 390×844, 1440×900 | the sizes checked | the 2026-10-29 Impeccable audit's sizes (HANDOFF.md) |
 
 ## Plan
