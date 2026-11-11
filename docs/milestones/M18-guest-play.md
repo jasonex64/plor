@@ -130,7 +130,7 @@ Each can be checked by a command or an e2e.
 Answers 17 to 20 settled four of the draft's five. The one left, approved as proposed with the ticket (human, 2026-11-11: "Approve M18"):
 1. **A guest closes the tab before the result shows.** Decided: it is gone (answer 9: "sees their result once"). Keeping it a short while would need a number from the human and a longer link to the token.
 
-**Needs the human's OK before 18a is done** (security changes made by review round 1's fixes, after "Approve M18"; the human, asked 2026-11-11: "Explain more first"):
+**Approved by the human, 2026-11-11: "Yes, all three"** (security changes made by review round 1's fixes, after "Approve M18"; asked, the human first said "Explain more first", and approved after each was explained in plain words):
 1. `plor_app` may only read `guest_tally`. A trigger on `guest_run_event` adds to it, and only while the day is open. The approved draft let the app insert and update the count.
 2. `plor_app` gets no delete grant on any guest table. Two `security definer` functions delete: `private.end_guest_run` (one run) and `private.purge_guest_days` (closed days' runs). The approved draft gave the app delete on the guest run tables.
 3. `guest_tally`'s key gains `matched`, whether the answer was a catch, so Insights can count guests' catches (answer 22). It says nothing about a person.
