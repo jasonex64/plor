@@ -10,11 +10,11 @@ import { HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import styles from "./play-frame.module.css";
 
-// out: what the × says to screen readers and where it goes ("Back to Today", "Back to Puzzles"); onLeave: what it does.
+// steps: the game's How to play steps. out: what the × says to screen readers and where it goes ("Back to Today", "Back to Puzzles"); onLeave: what it does.
 // Focus: the shell's bars leave the page with the frame, so a control that had focus may be gone; if nothing inside the
 // frame has it once it shows, the × takes it, so focus is never lost (WCAG 2.2 2.4.3, 2.4.11). A control inside that
 // focuses itself, such as the answer box, has already done so by then.
-export function PlayFrame({ out, onLeave, children }: { out: string; onLeave: () => void; children: ReactNode }) {
+export function PlayFrame({ steps, out, onLeave, children }: { steps: readonly string[]; out: string; onLeave: () => void; children: ReactNode }) {
   useBodyFlag("game", true);
   const root = useRef<HTMLDivElement>(null);
   const leave = useRef<HTMLButtonElement>(null);
@@ -25,7 +25,7 @@ export function PlayFrame({ out, onLeave, children }: { out: string; onLeave: ()
     <div ref={root} className={styles.frame}>
       <div className={styles.inner}>
         <div className={styles.top}>
-          <HowToPlay className={kit.small} />
+          <HowToPlay steps={steps} className={kit.small} />
           <button ref={leave} type="button" className={kit.close} aria-label={out} onClick={onLeave}>
             ×
           </button>

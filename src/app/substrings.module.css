@@ -1,4 +1,4 @@
-/* Game 2's cards (M16 16d-2, 16g-2): the results at the end of a run and the card for a day with no puzzle. */
+/* Game 2's plain screen (M16 16d-2): only what makes it readable. */
 .title {
   margin: 0 0 12px;
 }
@@ -12,6 +12,64 @@
   color: var(--muted);
 }
 
+/* The top bar, kept for the running score (docs/milestones/M14-14c-9-plain-game-2.md, answer 6): the round at the left,
+   the score at the right. The values are the deleted village's (src/brew/brew.module.css at b4ac330: .top, lines
+   106-111, 12px between the round and the score; .score, lines 121-138, its label at 0.6875rem bold with 0.08em
+   spacing in --muted, its number at 1.75rem and weight 800). */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topScore {
+  margin: 0;
+  text-align: right;
+  line-height: 1;
+}
+
+.topScore small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topScore b {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.letters {
+  margin: 12px 0 4px;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.form label {
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reason {
+  min-height: 1.5em;
+  margin: 8px 0 0;
+}
+
 .results {
   display: flex;
   flex-direction: column;
@@ -19,6 +77,26 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* M16 16e: the letters a run has used, and its score at the end. */
+.tracker {
+  margin-top: 8px;
+}
+
+.alphabet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.used {
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: underline;
 }
 
 .score {
