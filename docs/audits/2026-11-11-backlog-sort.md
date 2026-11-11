@@ -1,6 +1,6 @@
 # Backlog sort for the closed beta, 2026-11-11
 
-**For the human's approval. Nothing has moved: no ROADMAP item was ticked, dropped or re-filed.** It is the full itemised list the plan to the beta waits for (ROADMAP, Focus: "I sort, you approve"; "Sort, fix only launch-blockers").
+**Approved by the human, 2026-11-11: "Approve the sort".** Its Drop rows were then taken out of ROADMAP's Next revision (408 lines, 49 of them open items, the rest already ticked or their sub-lines), but for lines 805 to 836, the village's, which 14c-9's PR sorts itself. Later and For the human rows stay in ROADMAP. It is the full itemised list the plan to the beta waits for (ROADMAP, Focus: "I sort, you approve"; "Sort, fix only launch-blockers").
 
 ## How it was sorted
 Seven Sonnet agents, one per part of ROADMAP's "Next revision" and one for the 2026-10-26 audit's 81 findings, read every item in full and opened the cited code on `main` at `3076d81` where they could; a row says *unverified* where they didn't. The main session re-read the must-fix and close-call rows. No test was run.
