@@ -1,6 +1,6 @@
 # M16 16g-3 — The village's e2e passes on CI
 
-**Status:** done short of its last criterion, merged in PR #176 on the human's "Merge #176 now, decide later" (answer 8): the cause is found and half size cuts it, but the village's tests still need retries on CI (Evidence). Drafted 2026-11-10 from two answers; approved: "Approve, start 16g-3 (Recommended)".
+**Status:** done short of its last criterion, merged in PR #176 on the human's "Merge #176 now, decide later" (answer 8): the cause is found and half size cuts it, but the village's tests still need retries on CI (Evidence); that open question is moot, as 14c-9 removes the village and its e2e. Drafted 2026-11-10 from two answers; approved: "Approve, start 16g-3 (Recommended)".
 
 ## Goal
 Find out why game 2's village tests fail on CI most runs, from videos of the failed runs, and fix the cause, so `main`'s required `e2e` check is green again.

@@ -1,8 +1,8 @@
 "use client";
 
 // Game 2's plain screen (docs/milestones/M14-14c-9-plain-game-2.md, Plan 1): the round as 16d-2 built it
-// (docs/milestones/M16-16d-playing-it.md), back in place of Midnight Brew's village and inside 14c-8's play frame. Each round: its letters, the clock and a box that stays usable through the lockout, as the server
-// enforces it and a player can still type (M16 16b, answer 6). Between rounds the next letters stay hidden until Next
+// (docs/milestones/M16-16d-playing-it.md), inside 14c-8's play frame. Each round: its letters, the clock and a box that stays usable through the lockout, as the
+// server enforces it and a player can still type (M16 16b, answer 6). Between rounds the next letters stay hidden until Next
 // starts the clock (16d, answer 5). The end shows each round's word, and examples for one missed. There are no points
 // until 16e.
 import { useRouter } from "next/navigation";
@@ -165,7 +165,7 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
 }
 
 // The round and the running score, above every state of a run in play (docs/milestones/M14-14c-9-plain-game-2.md,
-// answers 6 and 7; the village's top bar, src/brew/brew.tsx at 14c-9's start). The score is the server's total so far.
+// answers 6 and 7). The score is the server's total so far.
 function Top({ round, total, score }: { round: number; total: number; score: number }) {
   return (
     <div className={styles.top}>

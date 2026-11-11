@@ -1,7 +1,7 @@
 "use client";
 
 // The seconds left on a question or a round, as a number with a bar that drains, in both games (docs/milestones/
-// M14-14c-9-plain-game-2.md, answer 7b; the bar is Midnight Brew's, src/brew/brew.tsx at 14c-9's start). The number is
+// M14-14c-9-plain-game-2.md, answer 7b). The number is
 // the main sign of time and what screen readers get, in the timer's own text, which some skip in an aria-label
 // (docs/milestones/M14-14b-21-screen-readers.md); the bar is only for the eye (WCAG 2.2 1.4.1). At zero it asks the
 // server again, which decides whether time is up; the count itself is only a display.

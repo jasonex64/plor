@@ -78,6 +78,45 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
 
 ## Evidence
 
+### Criterion 7's grep (`git grep -il "brew\|village\|three" -- src e2e package.json`, after step 3)
+Village leftovers removed from `src/`: comments naming the village, `brew.module.css`, `src/brew/brew.tsx` or Moonbrew in `src/app/countdown-bar.module.css`, `countdown-bar.tsx`, `substrings.module.css` and `substrings.tsx`; `reduceMotion` in `src/app/shown.ts` (exported for the village's change listener, now folded into `lessMotion`). `package.json` had only the two dependencies. Left for step 4: `e2e/brew.e2e.ts` and `e2e/play2.e2e.ts` (the village's tests and "Game number 2"), and `e2e/approve-and-play.e2e.ts`, `audit.e2e.ts`, `live-board.e2e.ts`, `overall-board.e2e.ts`, `screen-readers.e2e.ts`, `settings.e2e.ts` (to be read then; their matches look like the number "three").
+Unrelated words in `src/` (the number three, not the village):
+- `src/app/layout.tsx`: "three CI runs"
+- `src/app/offbeat.module.css`: "Three stats side by side"
+- `src/app/race-layout.ts`: "three-letter names"
+- `src/app/reactions.tsx`: "Three dots"
+- `src/app/settings.module.css`: "three to a row"
+- `src/app/shell.tsx`: "The three turn point-down"
+- `src/config/tunables.ts`: "all three" (the group-name checks)
+- `src/lib/db.ts`: "all three" (the database's three runtimes)
+- `src/game/ldnoobw-en.ts`: "threesome", "throating" lists' "three" substring
+- tests: `src/app/api/admin/audit/route.db.test.ts` "Three typists", `board/route.db.test.ts` "three players", `comments/group.db.test.ts` "three players", `friends/route.db.test.ts` "three players", `groups/route.db.test.ts` "three of them", `const three`, "one of three joins", `leaderboard/overall.db.test.ts` "Three closed days", `leaderboard/substrings.db.test.ts` "the three others", `offbeat/route.db.test.ts` "three players", `profile/username/route.db.test.ts` "three players", `src/app/race-layout.test.ts` "Three players", `src/game/misses.db.test.ts` "three players"
+
+### ROADMAP Next revision, sorted (Removes)
+Judged item by item on its text, not run. Removed (13), each concerning only Midnight Brew's drawing, models, credits or its e2e:
+- "16g-1's ticket: Midnight Brew's rim values (0.7, 0.26), the 12 hauling ants…" (`brew/scene.js`)
+- "16g-1's credit line, "Models by Polyfork, CC BY 4.0"…" (the models and their credit are gone)
+- "16g-1, *unverified*: whether polyfork's JSON re-bakes of the Quaternius clips stay CC0…" (no clips ship)
+- "16g-1 revision 2's Midnight Brew: the pumpkin-costume kid's own GLB clip…" (was fixed)
+- "16g-1 revision 2's Midnight Brew: round 4's step (moon, moonlight, fog and bats)…"
+- "16g-1 revision 3's Midnight Brew: at huge the second shockwave…"
+- "16g-1 revision 4's Midnight Brew: the finale's light column…"
+- "16g-2a: an animal or the hearse failing to load stops the whole village…"
+- "16g-2a: a village left while loading… `forceContextLoss()`…"
+- "16g-2a's `joinStill` keys only on what today's polyfork materials vary in…"
+- "16g-2a: `brew.tsx`'s `load` and `first` are two copies of one GET; `tierOf`…; `play2.e2e.ts`'s 15 s wait…" (the village's, with the software drawing)
+- "The village's e2e fails on CI most runs…" (the village's tests are removed; 16g-3's open question is moot)
+- "16g-2b's calm look: the brew's "glows once"…" (the village's Reduce motion branch)
+
+Reworded (3), because they also concern the app:
+- "The local e2e suite is flaky on the Windows PC…": "game 2's village steps" dropped from the list of failing steps.
+- "Local e2e runs on the Windows PC: the page under test reloads itself…": the sentence on CI's villages left open now says that cause went with the village; whether it explains these stays *unverified*.
+- "16g-3's review, not blocking…": only (1), the videos uploading only when the e2e job fails, kept (it concerns the e2e job); (2) `show()` in `src/brew/scene.ts` and (3) the CPU sampler's Numbers row removed.
+
+Kept though they name the village's mocks or models, as not about the village's drawing and unsure: "16g-1's ticket, Source diff row 2…" (the ticket's wording about polyfork and three.js), "16g-1 revision 2, phone cost…" and "small mock items…" (they list the other mocks, Office Tower and the garden), and the 16g-1 mock-page items.
+
+Also: M16's ROADMAP row says 16g-3's retries are moot now; M16-16g-3's Status and HANDOFF's "Waits on the human" and "Next" lines no longer ask for the human's call on the village's e2e.
+
 ## Review
 - Blocking findings and how each was fixed:
 - Deferred to ROADMAP "Next revision":
