@@ -75,6 +75,14 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| `7c94697^`: the round plays on the page with the shell's bars | Inside 14c-8's play frame, the bars hidden, × "Back to Today" | Answer 6, "Full-screen play with a close button"; answer 7c |
+| `7c94697^`: the round's sentence is a `role="status"` paragraph that Next names by `aria-describedby` | A visible sentence and 14c-8's `StatusMessage`; Next keeps its focus | Answer 7d, one status message as game 1's; read once, not twice |
+| `7c94697^`: after round 7 the cards show at once | Round 7's sentence, then See results, then the cards, whose heading takes focus | Answer 9 |
+| `7c94697^`: a seconds number only; `8309555`'s game 1: the seconds beside the prompt | One countdown for both games, the number on a row under the prompt with the bar beside it (`countdown-bar.tsx`) | Answers 7b and 10 |
+| The village (`src/brew/brew.module.css` at `b4ac330`, `.clock`): the seconds inside the bar, the track in its own purple `--track` | The number beside the bar in `--text`; the track `--soft`, the fill `--accent` | The village's colours have no app slot, and the tokens over the accent fill lack contrast; answer 11 |
+| `7c94697^`: no score during the round | The village's top bar: "Round N of 7" and Score, its values from `brew.module.css` at `b4ac330` (`.top`, `.score`) | Answer 6, "Running score all game" |
+| 14c-6d / 14c-8: How to play has game 1's four steps only | `HowToPlay` takes its game's steps; game 2's four (answer 8), on its card and in the frame | Answers 7a and 8 |
+| `7c94697^`: the lockout was stubbed in the village's e2e | The real lockout runs in `play2.e2e.ts`, as at `7c94697^` | The stub's reason, the village slowing CI, is gone |
 
 ## Evidence
 
@@ -132,5 +140,9 @@ A bug in step 2b's own CSS, found while writing 4b's DESIGN.md: the top row's sc
 - `npm run check:client-bundle`: `CLIENT BUNDLE OK: 151 files, 5 patterns, 3 env values (DATABASE_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)`.
 
 ## Review
+The `reviewer` agent, on `git diff b4ac330 HEAD`.
 - Blocking findings and how each was fixed:
+  - The CSS comments credited the bar's and the top row's values to answers 6, 7, 10 and 11, which give no numbers; they now cite the village's `src/brew/brew.module.css` at `b4ac330` (`.clock` 196-202, `.score` 121-138, `.top` 106-111).
+  - DESIGN.md cited the prompt at `game.module.css:91-94` (now `:93-96`) and read as if the 12px were between the score's label and number (it is `.top`'s gap); both fixed.
+  - The Source diff, the criteria and the handoff were unfilled; filled with the PR.
 - Deferred to ROADMAP "Next revision":
