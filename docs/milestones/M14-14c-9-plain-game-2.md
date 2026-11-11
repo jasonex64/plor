@@ -25,6 +25,7 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
    2. You get 20 seconds a round. Not a word, missing the letters, or used already? Try again. The clock keeps going.
    3. Out of time? That round scores nothing, but your run goes on to the next.
    4. Longer words score more, and each word with the day's bonus letter earns 120 more. At the end, every different letter you've used adds to your bonus.
+9. After round 7 the server's run is finished, so `7c94697^` went straight to the result cards and round 7's "You played X: N points" never showed: "Show it, then See results (Recommended)". Round 7's sentence shows as every round's does, with See results in place of Next, as game 1 pauses before its results.
 
 ## Source
 - `docs/DESIGN.md`: the app's look.
