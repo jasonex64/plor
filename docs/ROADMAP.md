@@ -886,3 +886,5 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] A `secure` cookie over `http://localhost` is verified only in Chromium (what the e2e uses); check Safari and Firefox before the beta. Found in M18 18a (review, 2026-11-11)
 - [ ] Answers 13 and 14 together let anyone play as a guest first, see the day's answers, then play for points, and free replays let a guest push rarity counts. Accepted for the beta; revisit before public launch. Found in M18 18a (review, 2026-11-11)
 - [ ] The signed-in `/api/run/answer` 40-character check (the 2026-11-11 audit's W1) has no ticket yet. Found in M18 18a (review, 2026-11-11)
+- [ ] `private.end_guest_run` takes a token's hash, and `plor_app` can read every hash, so the app role can end any guest run; decide in 18b whether it refuses a run that isn't over. Found in M18 18a (review round 2, 2026-11-11).
+- [ ] Insights read every `run_event` whatever its time (`src/insights/queries.ts:39`), while the guest tally drops answers given after midnight, so the mix of players and guests on Insights is slightly uneven; the page's note should say so. Found in M18 18a (review round 2, 2026-11-11).
