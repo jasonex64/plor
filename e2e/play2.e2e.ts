@@ -83,7 +83,8 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP]] as c
     const bars = [tabs(page), page.getByRole("banner")];
     const start = game(page).getByRole("button", { name: "Start", exact: true });
     await expect(start).toBeEnabled();
-    await expect(page.getByText(/village/i)).toHaveCount(0);
+    // Nothing is still loading by then: Start is the page's own, with no second wait behind it.
+    await expect(page.getByText(/loading/i)).toHaveCount(0);
     await expect(tabs(page)).toBeVisible();
     await expect(wayOut(page)).toHaveCount(0);
 
@@ -94,6 +95,11 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP]] as c
     await expect(wayOut(page)).toBeVisible();
     await expect(page.getByText("Round 1 of 7")).toBeVisible();
     await expect(score(page)).toHaveText("0");
+    // The label stands over the number, not beside it (substrings.module.css, .topScore).
+    const label = (await game(page).getByText("Score", { exact: true }).boundingBox())!;
+    const number = (await score(page).boundingBox())!;
+    // The number is inline, its box taller than its line, so its middle is compared, not its top.
+    expect(number.y + number.height / 2).toBeGreaterThanOrEqual(label.y + label.height - 0.5);
 
     await box.fill("aqkqmb");
     await box.press("Enter");

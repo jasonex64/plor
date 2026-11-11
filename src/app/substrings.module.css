@@ -21,13 +21,13 @@
   gap: 12px;
 }
 
-.score {
+.topScore {
   margin: 0;
   text-align: right;
   line-height: 1;
 }
 
-.score small {
+.topScore small {
   display: block;
   color: var(--muted);
   font-size: 0.6875rem;
@@ -36,7 +36,7 @@
   text-transform: uppercase;
 }
 
-.score b {
+.topScore b {
   font-size: 1.75rem;
   font-weight: 800;
 }

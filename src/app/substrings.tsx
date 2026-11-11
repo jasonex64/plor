@@ -3,8 +3,8 @@
 // Game 2's plain screen (docs/milestones/M14-14c-9-plain-game-2.md, Plan 1): the round as 16d-2 built it
 // (docs/milestones/M16-16d-playing-it.md), inside 14c-8's play frame. Each round: its letters, the clock and a box that stays usable through the lockout, as the
 // server enforces it and a player can still type (M16 16b, answer 6). Between rounds the next letters stay hidden until Next
-// starts the clock (16d, answer 5). The end shows each round's word, and examples for one missed. There are no points
-// until 16e.
+// starts the clock (16d, answer 5). The top row's running score, each word's points and the end's score come from the server
+// (16e); the end shows each round's word, and examples for one missed.
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-state";
@@ -172,7 +172,7 @@ function Top({ round, total, score }: { round: number; total: number; score: num
       <p className={styles.progress}>
         Round {round} of {total}
       </p>
-      <p className={styles.score}>
+      <p className={styles.topScore}>
         <small>Score</small>
         <b>{score}</b>
       </p>
