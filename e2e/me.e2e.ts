@@ -5,7 +5,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, play, signInAndPick } from "./players";
-import { caughtToCards } from "./afterglow";
+import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -79,7 +79,7 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
   await expect(total(page, GAME.name, "best score")).toHaveText("–");
   await expect(page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: `${GAME.name}'s game screen` })).toHaveAttribute(
     "href",
-    "/afterglow",
+    "/play",
   );
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 

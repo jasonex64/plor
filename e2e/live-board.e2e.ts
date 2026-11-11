@@ -9,7 +9,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
-import { answerBox, caughtToCards, safe } from "./afterglow";
+import { answerBox, caughtToCards, next, safe } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -242,18 +242,18 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   expect(received).not.toContain(kept);
 });
 
-// After a safe answer, the sky result shows the points it earned, and the score corner the points so far (M09 9a;
-// docs/milestones/M14-14c-6-afterglow-in-play.md, answers 7 and 24). The rarity bonus's estimate is no longer shown
-// there (answer 7: "the bonus estimate and the running total stay off it"). The numbers themselves are the route
-// test's (src/game/runs.db.test.ts); this checks the page shows them.
-test("the sky result shows a safe answer's points, and the score corner the points so far", async ({ browser }) => {
+// After a safe answer, the reveal shows the points it earned and the points so far, and the next question's card keeps
+// the points so far (M09 9a; docs/milestones/M14-14c-8-plain-game-1.md). The numbers themselves are the route test's
+// (src/game/runs.db.test.ts); this checks the page shows them.
+test("the reveal shows a safe answer's points, and the next question the points so far", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "s");
   await play(page);
   await safe(page, safeAnswer);
-  await expect(page.getByText("+25", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Score")).toHaveText("Q1/725");
+  await expect(page.getByText(/^\+25 points, rarity bonus \+\d+ \(estimate\) · 25 points so far$/)).toBeVisible();
+  await next(page, "Name a fruit");
+  await expect(page.getByText("25 points so far", { exact: true })).toBeVisible();
 });
 
 // Browser offline emulation left the Realtime socket open (tried twice, 2026-10-22), so the server end is restarted
@@ -347,7 +347,7 @@ test("the reset leaves a question in play alone", async ({ browser }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "q");
-  await openBoard(page, "/afterglow");
+  await openBoard(page, "/play");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await answerBox(page).fill("half typ");
   // Past the reset. While the run is in progress the game screen shows only the game (M14 14b-6c, answer 23), so

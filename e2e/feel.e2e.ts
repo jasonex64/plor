@@ -8,7 +8,7 @@ import { Pool } from "pg";
 import { UNDO_SECONDS } from "../src/config/tunables";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sent, signInAndPick } from "./players";
-import { box, caughtToCards } from "./afterglow";
+import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { slideOf, watchSlides } from "./slides";
 
@@ -204,17 +204,14 @@ test("comments and reactions show at once, with Undo before they're sent", async
 });
 
 // While the run is in progress the game screen holds only the question: the seconds left with the prompt, and no
-// banner, stats, Yesterday or comments, which come back when the run ends (criterion 4; answers 20–23). Since 14c-6
-// the question is Afterglow's box, whose seconds sit in its top row in the game's own look
-// (docs/milestones/M14-14c-6-afterglow-in-play.md, Removes: the in-run countdown), so 14b-8's sizes and place beside
-// the prompt are gone.
+// banner, stats, Yesterday or comments, which come back when the run ends (criterion 4; answers 20–23).
 test("a question shows its seconds with the prompt, and nothing else until the run ends", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "fc");
   await play(page);
-  await expect(box(page).getByText("Name an animal", { exact: true })).toBeVisible();
-  // The number, the " s" shown after it, and the words screen readers hear.
-  await expect(box(page).getByRole("timer")).toHaveText(/^\d+ s seconds left$/);
+  await expect(page.getByRole("heading", { name: "Name an animal", exact: true })).toBeVisible();
+  // The number and the words screen readers hear.
+  await expect(page.getByRole("timer")).toHaveText(/^\d+ seconds left$/);
   const hidden = [
     page.getByRole("heading", { level: 2, name: GAME.name, exact: true }),
     page.getByRole("region", { name: `Your ${GAME.name}` }),
@@ -238,7 +235,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   const nav = page.getByRole("navigation", { name: "Main" });
   expect(await nav.evaluate((el) => getComputedStyle(el).viewTransitionName)).toBe("plor-nav");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/afterglow$/);
+  await expect(page).toHaveURL(/\/play$/);
   expect(await slideOf(slides, 1)).toEqual({ types: ["nav-forward"], slide: 200 });
   expect((await slides())[0].animations.filter((a) => a.pseudo.includes("plor-"))).toEqual([]);
 
@@ -258,7 +255,7 @@ test("detail pages slide in and back, tabs don't, and reduced motion stills them
   await page.emulateMedia({ reducedMotion: "reduce" });
   const count = (await slides()).length + 1;
   await page.getByRole("link", { name: `${GAME.name}'s game screen` }).click();
-  await expect(page).toHaveURL(/\/afterglow$/);
+  await expect(page).toHaveURL(/\/play$/);
   await expect.poll(async () => (await slides()).length).toBeGreaterThanOrEqual(count);
   await expect.poll(async () => (await slides())[count - 1].types).toEqual(["nav-forward"]);
   const still = (await slides())[count - 1].animations.filter((a) => a.name === "slide");

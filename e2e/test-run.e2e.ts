@@ -1,6 +1,7 @@
 // A test run (docs/milestones/M14-14b-11-test-runs.md, criterion 5): an admin opens Play test on a draft with a host
 // answer changed on the page, plays to a catch, taps Restart and plays again from the start, leaves by the × and by See
-// results, each back to the admin puzzles page (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 26); a player who
+// results, each back to the admin puzzles page (14c-6 answer 26, kept by
+// docs/milestones/M14-14c-8-plain-game-1.md); a player who
 // isn't an admin sees no game. The draft is the fixture draft (src/test/answer-fixture.ts) under a
 // day far ahead, written to content/offbeat for this test and removed after.
 import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
@@ -10,7 +11,7 @@ import { Pool } from "pg";
 import { fixtureDraft, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/day-text";
 import { RUN, signInAndPick } from "./players";
-import { caught, lightIt, safe, seeResults } from "./afterglow";
+import { answer, caught, safe, seeResults } from "./game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const DRAFTS = join(process.cwd(), "content", "offbeat");
@@ -70,8 +71,8 @@ test("an admin plays a draft as a test run, with a host answer changed on the pa
 
   await expect(admin.getByText("Test run of the draft: nothing is saved")).toBeVisible();
   await admin.getByRole("button", { name: "Start", exact: true }).click();
-  // Caught on question 1 by the dog the page chose: the dud's ending list, with the test run's label and Restart still
-  // over the scene (answer 12; docs/milestones/M14-14c-6-afterglow-in-play.md, answer 11).
+  // Caught on question 1 by the dog the page chose: the recap, with the test run's label and Restart still above it
+  // (answer 12).
   await caught(admin, "dog");
   await expect(admin.getByText("Test run of the draft: nothing is saved")).toBeVisible();
 
@@ -82,7 +83,7 @@ test("an admin plays a draft as a test run, with a host answer changed on the pa
   // The × goes back to the admin puzzles page, as See results does (14c-6 answer 26).
   await admin.getByRole("button", { name: "Back to Puzzles" }).click();
   await expect(admin).toHaveURL(/\/admin\/puzzles$/);
-  // Played again, fresh from Q1 with the page's choice kept, dog is the host's: the dud's See results goes back there too.
+  // Played again, fresh from Q1 with the page's choice kept, dog is the host's: the recap's See results goes back there too.
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
   await day.getByRole("link", { name: "Play test" }).click();
   await admin.getByRole("button", { name: "Start", exact: true }).click();
@@ -116,11 +117,11 @@ test("a refused answer in a test run keeps the countdown going", async ({ browse
   await admin.goto(`/admin/test/${ahead}?hosts=${encodeURIComponent(JSON.stringify(hosts))}`);
   await admin.getByRole("button", { name: "Start", exact: true }).click();
   const timer = admin.getByRole("timer").filter({ hasText: /seconds left/ });
-  // The seconds, the " s" shown after them (hidden from screen readers), and the words screen readers hear.
-  await expect(timer).toHaveText("20 s seconds left");
+  // The seconds, and the words screen readers hear.
+  await expect(timer).toHaveText("20 seconds left");
   await admin.clock.fastForward("00:05");
-  await expect(timer).toHaveText("15 s seconds left");
-  await lightIt(admin, "zzqx not a thing");
+  await expect(timer).toHaveText("15 seconds left");
+  await answer(admin, "zzqx not a thing");
   await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
   expect(parseInt((await timer.textContent())!)).toBeLessThanOrEqual(15);
 });
@@ -138,7 +139,7 @@ test("a test run's refused answer waits on the Audit page, and accepting it ther
   // apple is a fruit, so "Name an animal" refuses it.
   await admin.goto(testRun);
   await admin.getByRole("button", { name: "Start", exact: true }).click();
-  await lightIt(admin, "apple");
+  await answer(admin, "apple");
   await expect(admin.getByText("isn't in our list. Try another answer.")).toBeVisible();
 
   await admin.goto("/admin/audit");

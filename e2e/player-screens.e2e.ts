@@ -6,7 +6,7 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick, sharedLink } from "./players";
-import { answerBox, box, caughtToCards, lightIt } from "./afterglow";
+import { answer, answerBox, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -48,7 +48,7 @@ const bodyPadding = (page: Page) =>
   });
 
 // Items 12 and 43: Next.js keeps the page left hidden, and its shell, clock bar and column no longer hold the room.
-// Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 5),
+// Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-8-plain-game-1.md),
 // so the way out of it is the browser's Back.
 test("the room for the clock bar and the right column goes with the page that shows them", async ({ browser }) => {
   const page = await player(browser, "xa", PHONE);
@@ -97,7 +97,7 @@ test("a question's time running out on another page opens the friends feed there
   const page = await player(browser, "xc", WIDE, true);
   await play(page);
   await expect(answerBox(page)).toBeVisible();
-  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  // Mid-question the game is full screen with no tabs: Back to Today, whose tabs lead on.
   await page.goBack();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   const feed = page.getByRole("complementary", { name: "Friends feed" });
@@ -122,7 +122,7 @@ test("a question's time running out on Today shows where everyone ended on its b
   const page = await player(browser, "xj", WIDE);
   await play(page);
   await expect(answerBox(page)).toBeVisible();
-  // Mid-question the game is full screen with no tabs (answers 3 and 5): the browser's Back is the way to Today.
+  // Mid-question the game is full screen with no tabs: the browser's Back is the way to Today.
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
   const board = page.getByRole("region", { name: "Friends today" });
@@ -138,8 +138,8 @@ test("text that names no entry stays selected in the box, and a catch on questio
   const page = await player(browser, "xd", PHONE);
   await play(page);
   const input = answerBox(page);
-  await lightIt(page, "zzqqzz");
-  await expect(box(page).getByText('"zzqqzz" isn\'t in our list. Try another answer.')).toBeVisible();
+  await answer(page, "zzqqzz");
+  await expect(page.getByText('"zzqqzz" isn\'t in our list. Try another answer.')).toBeVisible();
   await expect(input).toHaveValue("zzqqzz");
   expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([0, 6]);
 
@@ -159,7 +159,7 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await caught(page);
   await page.goto("/");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Result" }).click();
-  await expect(page).toHaveURL(/\/afterglow#result$/);
+  await expect(page).toHaveURL(/\/play#result$/);
   await expect(page.locator("#result")).toBeVisible();
   const at = () =>
     page.evaluate(() => ({

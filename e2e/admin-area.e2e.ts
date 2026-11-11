@@ -5,7 +5,7 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
-import { caughtToCards } from "./afterglow";
+import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 
