@@ -218,7 +218,7 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
 // (human, 2026-10-29, answer 2). The browser holds the run, the texts that named answers and whether the next question
 // is open, and sends all of it each time to POST /api/admin/test, which answers with play's state, so this is the same
-// screen (answer 3), in the play frame too (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 11). hostAnswers: a
+// screen (answer 3), in the play frame too (14c-6, answer 11). hostAnswers: a
 // draft's, as its page shows them (answer 9); null for an approved day. label: the test run's label and Restart
 // (answer 12), which the frame keeps above the question, so they stay in view the whole run. Its 20 seconds count down
 // here alone: nothing is stored for the database to judge.

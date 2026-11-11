@@ -1,6 +1,6 @@
 "use client";
 
-// How to play (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d; plain in docs/milestones/M14-14c-8-plain-game-1.md): a
+// How to play (14c-6d; plain in docs/milestones/M14-14c-8-plain-game-1.md): a
 // button that opens a panel over the page it's on, on Today's banner and over the game, for both games. The panel is a
 // modal <dialog> (MDN <dialog>, SOURCES.md), so the page behind is inert, Escape closes it and focus goes back to the
 // button. Four steps, one at a time, after the WAI-ARIA APG Carousel pattern (14c-6d, answer 42): each a slide named "N

@@ -18,7 +18,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 
 ### During the build (2026-11-10, the 14c-8 build session)
 6. `src/game/runs.ts` and `runs.db.test.ts` name Afterglow in comments, against "prints nothing" and "no test of `src/game/` changed": "Reword the notes only (Recommended)". Only those comments change.
-7. `RunState.msQuestion` and `next.stolen` were for Afterglow's fuse and box only, and have no caller once it goes: "Remove them now (Recommended)". `runs.db.test.ts` loses its `msQuestion: 20_000` expectation, as the field is gone; no rule or score changes.
+7. `RunState.msQuestion` and `next.stolen` were for Afterglow's fuse and box only, and have no caller once it goes: "Remove them now (Recommended)". `runs.db.test.ts` loses its `msQuestion: 20_000` expectation and the `stolen` part of one `next` expectation, and `share.test.ts` its `msQuestion` fixture line, as the fields are gone; no rule or score changes.
 
 ## Source
 - `docs/DESIGN.md`: the app's look (colour slots, Baloo 2, cards, buttons, the 44px controls); nothing in the plain game takes a value from outside it.

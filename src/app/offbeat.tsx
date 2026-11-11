@@ -62,7 +62,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
 
   return (
     <div className={styles.screen}>
-      {/* In a run the game is full screen, with its own way out (docs/milestones/M14-14c-6-afterglow-in-play.md). */}
+      {/* In a run the game is full screen, with its own way out (the play frame, src/app/play-frame.tsx). */}
       <p className={styles.back} hidden={playing}>
         <ButtonLink href="/" transitionTypes={BACK}>
           <span aria-hidden="true">‹ </span>Today
@@ -84,8 +84,8 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
 
 // A test run's screen (docs/milestones/M14-14b-11-test-runs.md): the game screen as players see it (human, 2026-10-29,
 // answer 3: "i need the real screen and animations so i can critique it"), under a "Test run" label and Restart, which
-// stay in view the whole run (answer 12): in a run they ride over Afterglow's scene, whose × goes back to the admin
-// puzzles page (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 11 and 26). Back goes to the admin puzzles
+// stay in view the whole run (answer 12): in a run they ride above the question in the play frame, whose × goes back to the admin
+// puzzles page (14c-6, answers 11 and 26). Back goes to the admin puzzles
 // page, where Play test is. After the run the cards come back as on the game screen; the comments don't (answer 6).
 export function TestScreen({ date, hostAnswers }: { date: string; hostAnswers: string[][] | null }) {
   const [playing, setPlaying] = useState(false);
