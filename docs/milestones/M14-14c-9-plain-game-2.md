@@ -1,6 +1,6 @@
 # M14 14c-9 — Game 2, plain
 
-**Status:** in progress (approved by the human, 2026-11-10: "approve"; started 2026-11-11, after 14c-8 merged in PR #179)
+**Status:** in review, PR open (approved by the human, 2026-11-10: "approve"; started 2026-11-11, after 14c-8 merged in PR #179)
 
 ## Goal
 Game 2 plays in the app's own look, at game 1's level of finish, and the village is removed.
@@ -38,15 +38,15 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
 - 14c-8: the play frame, the How to play pop-up. SOURCES.md: HTML `<dialog>`, APG Carousel, WCAG 2.2 (4.1.3 for the status message; 1.4.1, the bar never the only sign of time, the number stays).
 
 ## Acceptance criteria
-- [ ] `/play2` shows game 2 in the app's look, named "Game 2": round N of 7, the running score, the letters and bonus letter, the seconds number with its bar, the letters-used panel, the word box, Try.
-- [ ] After a word or a time-up the result sentence shows at once and Next is focused at once; no step waits on an animation.
-- [ ] Start is enabled as soon as the page is; nothing reads "Loading the village".
-- [ ] The play frame and × behave as game 1's; How to play opens as game 1's does, with game 2's steps.
-- [ ] Game 1 shows the same number-and-bar countdown.
-- [ ] No rule or scoring change: `npm test`, `npm run test:db`, `npx supabase test db` pass with no test of game 2's rules changed.
-- [ ] `git grep -il "brew\|village\|three" -- src e2e package.json` prints nothing (but for words unrelated to the village, listed in the Evidence); `public/brew/` is gone; `three` is out of `package.json`; `npm run build` and `npm run check:client-bundle` pass.
+- [x] `/play2` shows game 2 in the app's look, named "Game 2": round N of 7, the running score, the letters and bonus letter, the seconds number with its bar, the letters-used panel, the word box, Try.
+- [x] After a word or a time-up the result sentence shows at once and Next is focused at once; no step waits on an animation.
+- [x] Start is enabled as soon as the page is; nothing reads "Loading the village".
+- [x] The play frame and × behave as game 1's; How to play opens as game 1's does, with game 2's steps.
+- [x] Game 1 shows the same number-and-bar countdown.
+- [x] No rule or scoring change: `npm test`, `npm run test:db`, `npx supabase test db` pass with no test of game 2's rules changed.
+- [x] `git grep -il "brew\|village\|three" -- src e2e package.json` prints nothing (but for words unrelated to the village, listed in the Evidence); `public/brew/` is gone; `three` is out of `package.json`; `npm run build` and `npm run check:client-bundle` pass.
 - [ ] `npm run test:e2e` passes twice in a row locally and on CI's first run, with game 2's e2e rewritten for the plain round.
-- [ ] `docs/DESIGN.md` describes the plain round.
+- [x] `docs/DESIGN.md` describes the plain round.
 
 ## Out of scope
 - The shared Today, streak, feed, Me and Share (16f). Any rule change. Any art.
@@ -125,6 +125,13 @@ Reworded (3), because they also concern the app:
 Kept though they name the village's mocks or models, as not about the village's drawing and unsure: "16g-1's ticket, Source diff row 2…" (the ticket's wording about polyfork and three.js), "16g-1 revision 2, phone cost…" and "small mock items…" (they list the other mocks, Office Tower and the garden), and the 16g-1 mock-page items.
 
 Also: M16's ROADMAP row says 16g-3's retries are moot now; M16-16g-3's Status and HANDOFF's "Waits on the human" and "Next" lines no longer ask for the human's call on the village's e2e.
+
+### Checks (2026-11-11, this PC, the local stack, at `f8e14b1`)
+- First full checks (`a6e884a` to `3a54bed`): 62 db tests, `load_sync.test.sql` and 44 e2e failed, on a leftover fixture day (answer 12). Hypothesis: with it deleted, the db suites pass and e2e falls to the PC's usual flakiness or none; disproved by a db test still failing or a game 2 test failing. Held:
+- `npm test`: 56 files, 640 passed. `npm run test:db`: 50 files, 343 passed. `npx supabase test db`: 36 files, 616 tests, PASS. No test of game 2's rules changed (`git diff b4ac330 HEAD --stat -- src/game supabase` prints nothing).
+- `npm run build`: passes. `npm run check:client-bundle`: "CLIENT BUNDLE OK: 151 files, 5 patterns, 3 env values". `ls public/brew`: no such directory; `three` is not in `package.json`.
+- `npx playwright test --project=chromium`: run 1, 171 passed, 1 failed (`themes.e2e.ts:28`, a 30 s timeout with its trace's teardown failing, "file data stream has unexpected number of bytes"; not this change's files); run 2, 172 passed; run 3 (15:11 to 15:27 UTC), 172 passed, exit 0. Runs 2 and 3 are criterion 8's two in a row locally; CI's first run is pending on the PR.
+- Criteria 1 to 5: `play2.e2e.ts`, `how-to-play.e2e.ts`, `controls-and-state.e2e.ts` and `play.e2e.ts` passed in both runs (Step 4a, below, lists what each checks).
 
 ### Step 4a: game 2's e2e (commit e35dd14)
 `e2e/brew.e2e.ts` deleted (the village's three tests: full screen with the village, the way out, Reduce motion). Carried into `e2e/play2.e2e.ts`: the play frame at 390x844 and 1440x900 (the shell's bars hidden from Start, the × showing, the way out leading to Today, the run waiting at its sentence when the page is opened again), Start enabled as soon as the page is with nothing still loading (criterion 3), the box focused at Start, Next focused at once after a word or a time-up with no wait (criterion 2). New there: the running score (0 at Start, the server's total after a word, 255 at round 7's sentence), round 7's sentence with See results, the frame staying up and the cards' "Your score" heading taking focus, a page opened on a finished run going straight to the cards. `e2e/how-to-play.e2e.ts` gained game 2's How to play (from its card and from the frame, its four steps checked against the source's numbers, Previous/Next/Close/×/Escape). Criterion 5: `e2e/game.ts`'s `expectCountdown` (a timer role with "NN seconds left", an aria-hidden bar with a scaleX fill) runs for game 2 in `play2.e2e.ts` and for game 1 in `controls-and-state.e2e.ts`, whose "seconds sit beside the prompt" check became: the row sits under the prompt, and the prompt, the number and the bar don't move from two digits to one, the fill shrinking. Removed from `play2.e2e.ts`: the village's 15 s waits and 120 s timeouts, the stubbed "locked" answer (a village workaround; the real lockout runs again as at `7c94697^`), "Game number 2".
