@@ -1,6 +1,6 @@
 # M14 14c-8 — Game 1, plain
 
-**Status:** in progress (approved by the human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
+**Status:** in review, PR open (approved by the human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
 
 ## Goal
 Game 1 plays in the app's own look, with the four additions the human kept from the festival, and the festival is removed.
@@ -20,6 +20,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 6. `src/game/runs.ts` and `runs.db.test.ts` name Afterglow in comments, against "prints nothing" and "no test of `src/game/` changed": "Reword the notes only (Recommended)". Only those comments change.
 7. `RunState.msQuestion` and `next.stolen` were for Afterglow's fuse and box only, and have no caller once it goes: "Remove them now (Recommended)". `runs.db.test.ts` loses its `msQuestion: 20_000` expectation and the `stolen` part of one `next` expectation, and `share.test.ts` its `msQuestion` fixture line, as the fields are gone; no rule or score changes.
 8. This PC's local stack held leftover game 1 days (2026-11-01, 11-02 with one run of the phone test's account, 11-07, 11-08), on which `overall.db.test.ts` and `load_sync.test.sql` failed here (checked: they insert those dates; this change touches neither): "Delete all four (Recommended)". Deleted in the local stack only, in one transaction (1 run, 4 days).
+9. The e2e suite failed 1 to 13 of 172 tests per full run on this PC, different ones each time, none in `play.e2e.ts` or `how-to-play.e2e.ts`, so criterion 9's "twice in a row locally" couldn't be met (2026-11-11, the 14c-8 finishing session): "Prove it, then PR (Recommended)". The suite was run the same way on `31c1c23`, before this change, and failed more (Evidence); the flakiness is in Next revision, and the PR is opened. The human's rule stands: no merge unless every check is green on CI's first run.
 
 ## Source
 - `docs/DESIGN.md`: the app's look (colour slots, Baloo 2, cards, buttons, the 44px controls); nothing in the plain game takes a value from outside it.
@@ -29,16 +30,16 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 - `docs/milestones/M14-14c-2-neutral-words.md`: the neutral words ("Safe!", "Caught on question 3", "Time's up on question 4", "the host said").
 
 ## Acceptance criteria
-- [ ] `/play` shows game 1 in the app's look: the question card of `8309555`, "Question N of 7", the running points, the countdown number, the "Letters taken" tiles, Answer. `/afterglow` answers 404.
-- [ ] While a run is in play the shell's bars and sidebar are hidden and an × ("Back to Today") is shown; before and after a run they are back. Checked at 390×844 and 1440×900.
-- [ ] How to play opens as a pop-up over the game and from Today, with the same four steps, Previous, Next, Close and Escape; its words name no festival.
-- [ ] A safe answer shows "Safe!", the host's answer, the points, the bonus estimate, the running total, the next taken letter and the answer's rarity as a plain word (Numbers); Next is focused at once, with no wait.
-- [ ] When a run ends (caught, time up or finished), a recap lists each answer with its points and the total, then "See results" opens the result cards of `8309555`.
-- [ ] A screen reader hears each result and the recap's total (one status message each), and the "Past midnight" note shows during play as today.
-- [ ] No rule or scoring change: `npm test`, `npm run test:db` and `npx supabase test db` pass with no test of `src/game/` changed, but for answer 7's lines.
-- [ ] `git grep -il afterglow -- src e2e scripts package.json playwright.config.ts` prints nothing; `npm run build` passes; the client bundle check (`npm run check:client-bundle`) passes.
+- [x] `/play` shows game 1 in the app's look: the question card of `8309555`, "Question N of 7", the running points, the countdown number, the "Letters taken" tiles, Answer. `/afterglow` answers 404.
+- [x] While a run is in play the shell's bars and sidebar are hidden and an × ("Back to Today") is shown; before and after a run they are back. Checked at 390×844 and 1440×900.
+- [x] How to play opens as a pop-up over the game and from Today, with the same four steps, Previous, Next, Close and Escape; its words name no festival.
+- [x] A safe answer shows "Safe!", the host's answer, the points, the bonus estimate, the running total, the next taken letter and the answer's rarity as a plain word (Numbers); Next is focused at once, with no wait.
+- [x] When a run ends (caught, time up or finished), a recap lists each answer with its points and the total, then "See results" opens the result cards of `8309555`.
+- [x] A screen reader hears each result and the recap's total (one status message each), and the "Past midnight" note shows during play as today.
+- [x] No rule or scoring change: `npm test`, `npm run test:db` and `npx supabase test db` pass with no test of `src/game/` changed, but for answer 7's lines.
+- [x] `git grep -il afterglow -- src e2e scripts package.json playwright.config.ts` prints nothing; `npm run build` passes; the client bundle check (`npm run check:client-bundle`) passes.
 - [ ] `npm run test:e2e` passes twice in a row locally and on CI's first run, with the game's e2e rewritten for the plain screen.
-- [ ] `docs/DESIGN.md` describes the plain game screen, each value cited.
+- [x] `docs/DESIGN.md` describes the plain game screen, each value cited.
 
 ## Out of scope
 - Game 2 (14c-9). The shared Today, streak and feed (16f).
@@ -80,8 +81,20 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 | 14c-6d (answers 38, 43): How to play's four steps | The same words; the build first reworded steps 1 and 4, the review caught it, and they are restored | Criterion 3, "the same four steps" |
 | Criterion 7: no test of `src/game/` changed | Comments in `runs.ts` and `runs.db.test.ts` reworded; `msQuestion` and `next.stolen` and their three expectations removed | Answers 6 and 7 |
 | `src/app/settings.module.css .close` | Moved unchanged to `kit.module.css button.close`, used by the settings sheet's ×, the play frame's and How to play's | One definition for the three ×s (CLAUDE.md, One way to do each thing) |
+| Criterion 9: e2e passes twice in a row locally | Four full runs failed 13, 1, 3 and 7 of 172, none in the game's or How to play's files; the code before this change failed 12 and 17 | Answer 9: older flakiness, not this change's (Evidence); CI's first run is still required |
 
 ## Evidence
+
+### Checks (2026-11-11, this PC, the local stack)
+- `git grep -il afterglow -- src e2e scripts package.json playwright.config.ts`: prints nothing (exit 1).
+- `npm test`: 56 files, 640 tests passed. `npm run test:db`: 50 files, 343 passed. `npx supabase test db`: 36 files, 616 tests, "Result: PASS".
+- `npm run build`: compiled, 81 of 81 static pages. `npm run check:client-bundle`: "CLIENT BUNDLE OK: 152 files, 5 patterns, 3 env values".
+- `curl -w '%{http_code}'` on `next dev` at `7004b37`: `/afterglow` 404, `/check/afterglow` 404, `/play/how-to-play` 404, `/play` 200 (criterion 1's 404, which no e2e can name under criterion 8's grep).
+- Criteria 1 to 6: `play.e2e.ts` (the frame at 390×844 and 1440×900, a whole run with each rarity word, the recap, the status messages, time up, a failed Next, focus) and `how-to-play.e2e.ts` (the four steps against the source, no festival words) passed in all four full runs below.
+- `npx playwright test --project=chromium`, four full runs on this branch (`0345003`, then `7004b37`, docs only): 13, 1, 3 and 7 of 172 failed, a different set each time (`alive`, `answer-search`, `brew`, `controls-and-state`, `live-board`, `me`, `play2`, `player-screens`, `reactions-menu`, `screen-readers`, `shell`, `text-size`), most at "Play didn't reach `/play` in 5 s" or a game 2 village step.
+  - Hypothesis 1, a cold `next dev` on a busy PC (run 1 started on an empty `.next/dev` while the review ran): runs 3 and 4 on a warm server and an idle PC should pass. Disproved: 3 and 7 failed.
+  - Hypothesis 2, the flakiness is older than this change: the same suite at `31c1c23`, run the same way, should fail as much. Confirmed: 12 and 17 of 172 failed (five tests in both runs). Answer 9.
+- CI's first run: pending on the PR.
 
 ### ROADMAP Next revision, sorted (Removes)
 Judged item by item on its text, not run. Removed (23), each concerning only the festival's drawing, scene, font, mutants or look check, or its private mock pages:
@@ -116,5 +129,8 @@ Reworded (2), because they also concern the app or the plain game:
 Also: 14c-6c, Reduce motion, is out of ROADMAP's M14 row and its "The games' look" paragraph (this ticket's Removes). The M14 row notes 14c-8 as building, in review, PR pending.
 
 ## Review
+The `reviewer` agent, twice, on the diff from `31c1c23`.
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - Round 1 (the build session): How to play's steps 1 and 4 reworded; restored to 14c-6d's words (`0345003`). Focus at the recap, the results and while the run loads; now checked in `play.e2e.ts` (`0345003`).
+  - Round 2: DESIGN.md cited `play-frame.module.css` and `how-to-play.module.css` at lines past their ends (criterion 10); the seven cites now point at the rules (`7004b37`). The handoff still said "build 14c-8"; rewritten with this PR.
+- Deferred to ROADMAP "Next revision": seven items marked "Found in 14c-8's review" (the recap's double status, focus after a failed Next or a failed load, the status messages in real screen readers, `Runner`'s unread return values, How to play mid-question, the recap's caught row and the 7th answer's rarity), and the e2e flakiness (answer 9).
