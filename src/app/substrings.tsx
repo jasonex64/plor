@@ -11,6 +11,7 @@ import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-sta
 import { ApiError, api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
 import { useCountdown } from "./countdown";
+import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { ordinal } from "./ordinal";
@@ -67,6 +68,7 @@ export function SubstringsScreen() {
           <button type="button" className={kit.primary} onClick={() => send("/api/substrings/start")}>
             Start
           </button>
+          <HowToPlay steps={GAME_2_STEPS} />
         </>
       ) : run.status === "finished" ? (
         <Results run={run} />
@@ -78,7 +80,7 @@ export function SubstringsScreen() {
     </section>
   );
   return playing ? (
-    <PlayFrame out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })}>
+    <PlayFrame steps={GAME_2_STEPS} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })}>
       {card}
     </PlayFrame>
   ) : (

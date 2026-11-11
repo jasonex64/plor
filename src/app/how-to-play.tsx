@@ -7,7 +7,7 @@
 // of 4", announced politely as it changes, with Previous and Next, which don't move focus; Next becomes Close on the last
 // step. The words are neutral (docs/milestones/M14-14c-2-neutral-words.md).
 import { useId, useRef, useState } from "react";
-import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "@/config/tunables";
+import { LETTER_SCHEDULE, POINTS_PER_QUESTION, QUESTIONS_PER_DAY, SUBSTRING_BONUS_LETTER_POINTS, SUBSTRING_ROUNDS } from "@/config/tunables";
 import kit from "./kit.module.css";
 import styles from "./how-to-play.module.css";
 
@@ -19,16 +19,24 @@ const TAKEN = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(
 const [FIRST, LAST] = [POINTS_PER_QUESTION[0], POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]];
 // The same four steps as 14c-6d's (answers 38, 43), in the app's words. The 20 seconds are judged in SQL
 // (private.question_deadline), so they have no constant here.
-const STEPS = [
+export const GAME_1_STEPS = [
   `The host has picked a few answers to each question. Say one and your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
   "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going.",
   `On questions ${TAKEN} a letter is taken. Answer without it.`,
   `Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${FIRST} points for the first, ${LAST} for the last. Run out of time and your run ends.`,
 ];
+// Game 2's four steps, as the human approved them word for word (docs/milestones/M14-14c-9-plain-game-2.md, answer 8). The
+// 20 seconds are judged in SQL as well (supabase/migrations/20261107105151_game_2_rounds.sql), so they have no constant.
+export const GAME_2_STEPS = [
+  `Each round gives you a few letters. Type a word that holds them together, in that order: for "cks", "rocks" or "backspace". ${SUBSTRING_ROUNDS.length} rounds, one run a day.`,
+  "You get 20 seconds a round. Not a word, missing the letters, or used already? Try again. The clock keeps going.",
+  "Out of time? That round scores nothing, but your run goes on to the next.",
+  `Longer words score more, and each word with the day's bonus letter earns ${SUBSTRING_BONUS_LETTER_POINTS} more. At the end, every different letter you've used adds to your bonus.`,
+];
 
-// className: the opening button's look where it sits: the kit's small button on Today and in the play frame, a plain
+// steps: the game's four (GAME_1_STEPS, GAME_2_STEPS). className: the opening button's look where it sits: the kit's small button on Today and in the play frame, a plain
 // button on the game screen.
-export function HowToPlay({ className }: { className?: string }) {
+export function HowToPlay({ steps, className }: { steps: readonly string[]; className?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
   const [at, setAt] = useState(0);
@@ -37,7 +45,7 @@ export function HowToPlay({ className }: { className?: string }) {
     dialog.current!.showModal();
   }
   const close = () => dialog.current!.close();
-  const last = at === STEPS.length - 1;
+  const last = at === steps.length - 1;
   return (
     <>
       <button type="button" className={className} onClick={open}>
@@ -54,8 +62,8 @@ export function HowToPlay({ className }: { className?: string }) {
         </div>
         <div role="group" aria-roledescription="carousel" aria-label="Rules">
           <div className={styles.steps} aria-live="polite" aria-atomic="false">
-            {STEPS.map((text, i) => (
-              <p key={text} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${STEPS.length}`} hidden={i !== at}>
+            {steps.map((text, i) => (
+              <p key={text} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${steps.length}`} hidden={i !== at}>
                 {text}
               </p>
             ))}
@@ -66,7 +74,7 @@ export function HowToPlay({ className }: { className?: string }) {
               Previous
             </button>
             <span className={styles.place} aria-hidden="true">
-              {at + 1} of {STEPS.length}
+              {at + 1} of {steps.length}
             </span>
             <button type="button" className={`${kit.small} ${kit.primary}`} onClick={last ? close : () => setAt(at + 1)}>
               {last ? "Close" : "Next"}

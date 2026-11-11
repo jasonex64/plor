@@ -28,7 +28,7 @@ import styles from "./game.module.css";
 import kit from "./kit.module.css";
 import { CopyField, shareLink } from "./share";
 import { GAME } from "@/platform/game";
-import { HowToPlay } from "./how-to-play";
+import { GAME_1_STEPS, HowToPlay } from "./how-to-play";
 import { PlayFrame, StatusMessage } from "./play-frame";
 import { Recap } from "./recap";
 import { Line, Skeleton } from "./skeleton";
@@ -116,7 +116,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
             <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
               Play
             </ButtonLink>
-            <HowToPlay className={kit.small} />
+            <HowToPlay steps={GAME_1_STEPS} className={kit.small} />
           </>
         )}
         {/* Skipping the game screen skips its rules line too, so the time limit is said here before it runs (WCAG 2.2
@@ -129,7 +129,7 @@ export function TodayBanner({ skip, ...hooks }: DayHooks & { skip: boolean }) {
               Play
             </button>
             {/* Under Play, smaller, before the run, with or without Skip the game screen (14c-6 answers 30 and 40). */}
-            <HowToPlay className={kit.small} />
+            <HowToPlay steps={GAME_1_STEPS} className={kit.small} />
             {starting.error && <p role="alert">{starting.error}</p>}
           </>
         )}
@@ -372,7 +372,7 @@ function Run({
     return error ? (
       <p role="alert">{error}</p>
     ) : expectPlay ? (
-      <PlayFrame out={out} onLeave={onLeave}>
+      <PlayFrame steps={GAME_1_STEPS} out={out} onLeave={onLeave}>
         <QuestionSkeleton />
       </PlayFrame>
     ) : (
@@ -383,13 +383,13 @@ function Run({
     return error ? (
       <p role="alert">{error}</p>
     ) : (
-      <PlayFrame out={out} onLeave={onLeave}>
+      <PlayFrame steps={GAME_1_STEPS} out={out} onLeave={onLeave}>
         <QuestionSkeleton />
       </PlayFrame>
     );
   if (inGame)
     return (
-      <PlayFrame out={out} onLeave={leave}>
+      <PlayFrame steps={GAME_1_STEPS} out={out} onLeave={leave}>
         {label}
         {pastMidnight(run) && <p>{PAST_MIDNIGHT}</p>}
         {error && <p role="alert">{error}</p>}
@@ -439,7 +439,7 @@ function Run({
           <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
             Start
           </button>
-          <HowToPlay />
+          <HowToPlay steps={GAME_1_STEPS} />
         </>
       )}
       {over && <Result run={run} saved={saved} focus={seen && done} />}
