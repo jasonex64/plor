@@ -1,4 +1,4 @@
-/* Game 2's cards (M16 16d-2, 16g-2): the results at the end of a run and the card for a day with no puzzle. */
+/* Game 2's plain screen (M16 16d-2): only what makes it readable. Its look is Moonbrew's (16g). */
 .title {
   margin: 0 0 12px;
 }
@@ -12,6 +12,39 @@
   color: var(--muted);
 }
 
+.letters {
+  margin: 12px 0 4px;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.clock {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.form label {
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reason {
+  min-height: 1.5em;
+  margin: 8px 0 0;
+}
+
 .results {
   display: flex;
   flex-direction: column;
@@ -19,6 +52,26 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* M16 16e: the letters a run has used, and its score at the end. */
+.tracker {
+  margin-top: 8px;
+}
+
+.alphabet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.used {
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: underline;
 }
 
 .score {

@@ -1,6 +1,6 @@
 # M14 14c-9 — Game 2, plain
 
-**Status:** approved, not started (human, 2026-11-10: "approve"); starts after 14c-8 merges
+**Status:** in progress (approved by the human, 2026-11-10: "approve"; started 2026-11-11, after 14c-8 merged in PR #179)
 
 ## Goal
 Game 2 plays in the app's own look, at game 1's level of finish, and the village is removed.
@@ -18,6 +18,13 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
    - (c) both use 14c-8's play frame and ×;
    - (d) game 2's result sentence is a status message for screen readers, as game 1's is;
    - (e) no recap is added to game 2: its result cards already list "Your rounds".
+
+### During the build (2026-11-11, the 14c-9 build session)
+8. How to play's four steps, drafted from the rules (`M16-game-2-substrings.md`: S6, S7, S8, S10, S15; `tunables.ts`: `SUBSTRING_ROUNDS`, `SUBSTRING_BONUS_LETTER_POINTS`; `substrings.tsx`, `WHY`): "Use it as written (Recommended)". The steps:
+   1. Each round gives you a few letters. Type a word that holds them together, in that order: for "cks", "rocks" or "backspace". 7 rounds, one run a day.
+   2. You get 20 seconds a round. Not a word, missing the letters, or used already? Try again. The clock keeps going.
+   3. Out of time? That round scores nothing, but your run goes on to the next.
+   4. Longer words score more, and each word with the day's bonus letter earns 120 more. At the end, every different letter you've used adds to your bonus.
 
 ## Source
 - `docs/DESIGN.md`: the app's look.
