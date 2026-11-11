@@ -26,10 +26,10 @@ test.afterAll(async () => {
 
 // The four steps (src/app/how-to-play.tsx), the game's numbers from tunables.ts.
 const CHUNKS = [
-  `The host has picked a few answers to each question. Say one of them and you're caught: your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
+  `The host has picked a few answers to each question. Say one and your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
   "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going.",
   "On questions 2, 4, 5 and 7 a letter is taken. Answer without it.",
-  `Not one of the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${POINTS_PER_QUESTION[0]} points for the first, ${POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} for the last. Run out of time and your run ends.`,
+  `Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${POINTS_PER_QUESTION[0]} points for the first, ${POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} for the last. Run out of time and your run ends.`,
 ];
 // The ticket's two sizes (criterion 5).
 const PHONE = { width: 375, height: 812 };
@@ -150,7 +150,6 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP], ["32
     await banner(page).getByRole("button", { name: "How to play" }).click();
     const dialog = panel(page);
     await expect(dialog).toBeVisible();
-
     for (const button of await dialog.getByRole("button").all()) {
       const box = (await button.boundingBox())!;
       expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(24);

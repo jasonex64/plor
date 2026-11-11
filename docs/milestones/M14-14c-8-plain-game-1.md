@@ -19,6 +19,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 ### During the build (2026-11-10, the 14c-8 build session)
 6. `src/game/runs.ts` and `runs.db.test.ts` name Afterglow in comments, against "prints nothing" and "no test of `src/game/` changed": "Reword the notes only (Recommended)". Only those comments change.
 7. `RunState.msQuestion` and `next.stolen` were for Afterglow's fuse and box only, and have no caller once it goes: "Remove them now (Recommended)". `runs.db.test.ts` loses its `msQuestion: 20_000` expectation and the `stolen` part of one `next` expectation, and `share.test.ts` its `msQuestion` fixture line, as the fields are gone; no rule or score changes.
+8. This PC's local stack held leftover game 1 days (2026-11-01, 11-02 with one run of the phone test's account, 11-07, 11-08), on which `overall.db.test.ts` and `load_sync.test.sql` failed here (checked: they insert those dates; this change touches neither): "Delete all four (Recommended)". Deleted in the local stack only, in one transaction (1 run, 4 days).
 
 ## Source
 - `docs/DESIGN.md`: the app's look (colour slots, Baloo 2, cards, buttons, the 44px controls); nothing in the plain game takes a value from outside it.
@@ -34,7 +35,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 - [ ] A safe answer shows "Safe!", the host's answer, the points, the bonus estimate, the running total, the next taken letter and the answer's rarity as a plain word (Numbers); Next is focused at once, with no wait.
 - [ ] When a run ends (caught, time up or finished), a recap lists each answer with its points and the total, then "See results" opens the result cards of `8309555`.
 - [ ] A screen reader hears each result and the recap's total (one status message each), and the "Past midnight" note shows during play as today.
-- [ ] No rule or scoring change: `npm test`, `npm run test:db` and `npx supabase test db` pass with no test of `src/game/` changed.
+- [ ] No rule or scoring change: `npm test`, `npm run test:db` and `npx supabase test db` pass with no test of `src/game/` changed, but for answer 7's lines.
 - [ ] `git grep -il afterglow -- src e2e scripts package.json playwright.config.ts` prints nothing; `npm run build` passes; the client bundle check (`npm run check:client-bundle`) passes.
 - [ ] `npm run test:e2e` passes twice in a row locally and on CI's first run, with the game's e2e rewritten for the plain screen.
 - [ ] `docs/DESIGN.md` describes the plain game screen, each value cited.
@@ -71,6 +72,14 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| `8309555`: How to play is its own page, `/play/how-to-play`, a ButtonLink under Start | The 14c-6d pop-up, moved to `src/app/how-to-play.tsx`, opened from Today, the game screen and the play frame's top row | Answer 4, "How to play as a pop-up"; `/play/how-to-play` answers 404 |
+| `8309555`: the shell stays during a run; the banner hides | The play frame hides the shell from Start to See results, with the × shown the whole time | Answer 4, "Full-screen play with a close button". 14c-6 showed its × only while no fuse burned; with no fuse, nothing hides it |
+| `8309555`: the run ends straight on the result cards | A recap (each answer, its points, the total), then See results | Answer 4, "Answer recap before results" |
+| `8309555`: the reveal has no rarity | "Rarity: Common / Uncommon / Rare" | Answer 4, "Rarity label on safe answers"; the Numbers table |
+| `8309555`: the "Past midnight" note and errors sit on the page | Lines above the question inside the frame, as 14c-6 kept them over its scene | The frame covers the page, so they move into it |
+| 14c-6d (answers 38, 43): How to play's four steps | The same words; the build first reworded steps 1 and 4, the review caught it, and they are restored | Criterion 3, "the same four steps" |
+| Criterion 7: no test of `src/game/` changed | Comments in `runs.ts` and `runs.db.test.ts` reworded; `msQuestion` and `next.stolen` and their three expectations removed | Answers 6 and 7 |
+| `src/app/settings.module.css .close` | Moved unchanged to `kit.module.css button.close`, used by the settings sheet's ×, the play frame's and How to play's | One definition for the three ×s (CLAUDE.md, One way to do each thing) |
 
 ## Evidence
 

@@ -102,6 +102,8 @@ test("a whole run: off-list text, a taken letter, each rarity, a reload at a rev
   // The recap: how it ended, each answer with its points, the total, then See results. Its result and its total are one
   // status message each.
   await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeVisible();
+  // The question that had focus is gone, so the recap's heading takes it (WCAG 2.2 2.4.3).
+  await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeFocused();
   await expect(page.getByRole("list", { name: "Your answers" }).getByRole("listitem")).toHaveText([
     new RegExp(`^Name an animal: you said aardvark \\(safe, \\+${points(Q1)}\\)$`, "i"),
     new RegExp(`^Name a fruit: you said kiwi \\(safe, \\+${points(Q2)}\\)$`, "i"),
@@ -114,6 +116,8 @@ test("a whole run: off-list text, a taken letter, each rarity, a reload at a rev
 
   await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeVisible();
+  // See results went with the frame, so the result's heading takes focus.
+  await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeFocused();
   await expect(page.locator("#result")).toContainText("You survived 3 of 7 questions");
   await expect(tabs(page)).toBeVisible();
 });
@@ -148,6 +152,8 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP]] as c
     await expect(wayOut(page)).toBeHidden();
     await page.getByRole("link", { name: "Continue" }).click();
     await expect(nextButton(page)).toBeVisible();
+    // The run waiting at a reveal: Next focuses itself, so the × fallback has nothing to do and focus is in the frame.
+    await expect(nextButton(page)).toBeFocused();
     await expect(tabs(page)).toBeHidden();
 
     await next(page, "Name a fruit");
@@ -175,6 +181,27 @@ for (const [size, viewport] of [["a phone", PHONE], ["a desktop", DESKTOP]] as c
     await expect(tabs(page)).toBeVisible();
   });
 }
+
+// While the run loads on the way in, the frame shows its skeleton with nothing inside to focus, so the × takes focus
+// (src/app/play-frame.tsx; WCAG 2.2 2.4.3), and the question's box takes it from there once it's drawn.
+test("the × holds focus while the run loads on Continue, and the answer box takes it after", async ({ browser }) => {
+  const page = await player(browser, "plfocus");
+  await play(page);
+  await asked(page, "Name an animal");
+  await wayOut(page).click();
+  await expect(page).toHaveURL(/\/$/);
+  let release: () => void = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/api/run", async (route) => {
+    if (new URL(page.url()).pathname === "/play") await held;
+    await route.continue();
+  });
+  await page.getByRole("link", { name: "Continue" }).click();
+  await expect(page.locator('[data-loading="Loading your question"]')).toBeVisible();
+  await expect(wayOut(page)).toBeFocused();
+  release();
+  await expect(answerBox(page)).toBeFocused();
+});
 
 // Time up ends the run: the database agrees time is up when the page asks at zero, and the recap says so. The browser's
 // clock is faked, the database's isn't, so the run is moved back past the question's 20 seconds there too

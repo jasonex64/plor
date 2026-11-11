@@ -20,10 +20,10 @@ const [FIRST, LAST] = [POINTS_PER_QUESTION[0], POINTS_PER_QUESTION[POINTS_PER_QU
 // The same four steps as 14c-6d's (answers 38, 43), in the app's words. The 20 seconds are judged in SQL
 // (private.question_deadline), so they have no constant here.
 const STEPS = [
-  `The host has picked a few answers to each question. Say one of them and you're caught: your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
+  `The host has picked a few answers to each question. Say one and your run ends. ${QUESTIONS_PER_DAY} questions, one run a day.`,
   "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going.",
   `On questions ${TAKEN} a letter is taken. Answer without it.`,
-  `Not one of the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${FIRST} points for the first, ${LAST} for the last. Run out of time and your run ends.`,
+  `Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${FIRST} points for the first, ${LAST} for the last. Run out of time and your run ends.`,
 ];
 
 // className: the opening button's look where it sits: the kit's small button on Today and in the play frame, a plain

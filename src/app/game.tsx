@@ -713,7 +713,6 @@ function Question({
   );
 }
 
-
 // The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14). Then
