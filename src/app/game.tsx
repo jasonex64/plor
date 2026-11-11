@@ -8,12 +8,15 @@
 // (docs/milestones/M14-14a-2a-today.md); with Skip the game screen on, Play starts the run itself
 // (docs/milestones/M14-14a-3b-settings.md, L39).
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import type { AnsweredQuestion, RunState } from "@/game/runs";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import type { RunState } from "@/game/runs";
+import type { PublicQuestion } from "@/game/payload";
+import type { Tier } from "@/content/puzzle";
 import { FINISHED } from "@/game/status";
 import { shareText, survivedCount } from "@/game/share";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { api, ApiError } from "@/lib/api-client";
+import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus, PAST_MIDNIGHT, pastMidnight } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
@@ -25,9 +28,9 @@ import styles from "./game.module.css";
 import kit from "./kit.module.css";
 import { CopyField, shareLink } from "./share";
 import { GAME } from "@/platform/game";
-import { Afterglow, AfterglowLoading } from "@/afterglow/afterglow";
-import { HowToPlay } from "@/afterglow/how-to-play";
-import type { Asked, Reply, Result as Shown, Start } from "@/afterglow/scene";
+import { HowToPlay } from "./how-to-play";
+import { PlayFrame, StatusMessage } from "./play-frame";
+import { Recap } from "./recap";
 import { Line, Skeleton } from "./skeleton";
 import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
 
@@ -162,8 +165,8 @@ type Runner = {
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
-// onPlaying: whether Afterglow is up, when the screen shows only the game (docs/milestones/
-// M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
+// onPlaying: whether the play frame is up, when the screen shows only the game (docs/milestones/
+// M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23; docs/milestones/M14-14c-8-plain-game-1.md), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
 export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted: () => void; onPlaying: (playing: boolean) => void }) {
   const router = useRouter();
   const { run, setRun, noPuzzle, error, setError, over } = useRun(hooks);
@@ -215,9 +218,9 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
 // (human, 2026-10-29, answer 2). The browser holds the run, the texts that named answers and whether the next question
 // is open, and sends all of it each time to POST /api/admin/test, which answers with play's state, so this is the same
-// screen (answer 3), Afterglow's too (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 11). hostAnswers: a
+// screen (answer 3), in the play frame too (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 11). hostAnswers: a
 // draft's, as its page shows them (answer 9); null for an approved day. label: the test run's label and Restart
-// (answer 12), which Afterglow keeps over the scene, so they stay in view the whole run. Its 20 seconds count down
+// (answer 12), which the frame keeps above the question, so they stay in view the whole run. Its 20 seconds count down
 // here alone: nothing is stored for the database to judge.
 type Moves = { texts: string[]; open: boolean; timedOut: boolean };
 const FRESH: Moves = { texts: [], open: false, timedOut: false };
@@ -306,10 +309,11 @@ export function TestGame({
 
 // The game screen's run, whichever runner it comes from. saved: a played run, whose result has Share and the answer
 // searches; a test run saves nothing, so it has neither (14b-11, answer 6; 14b-12, Out of scope). From Start to See
-// results the run is Afterglow, full screen (docs/milestones/M14-14c-6-afterglow-in-play.md): a run already over when
-// the screen opens shows the cards at once (answer 25), and one that ends here shows its ending list until See results.
-// onLeave: where the × goes (answers 22, 26), and out what it says to screen readers; onResults: where See results goes,
-// if not to the cards here (a test run's, answer 26). label: a line Afterglow keeps over the scene, a test run's.
+// results the run is in the play frame, the shell's bars hidden (docs/milestones/M14-14c-8-plain-game-1.md): a run
+// already over when the screen opens shows the cards at once (14c-6, answer 25), and one that ends here shows its recap
+// until See results. onLeave: where the × goes, and out what it says to screen readers (14c-6, answers 22, 26); onResults:
+// where See results goes, if not to the cards here (a test run's). label: a line the frame keeps above the question, a
+// test run's.
 function Run({
   runner,
   onPlaying,
@@ -331,16 +335,14 @@ function Run({
   const playing = run?.status === "in_progress";
   // A page Next.js kept hidden shows again with the run as it last had it, while the run loads again (useRun's load is an
   // effect, which runs each time the page shows). A run that was in play then may have ended elsewhere meanwhile, its
-  // time up away from the page, so the scene waits for the new state rather than start from the old one (answer 25).
+  // time up away from the page, so the screen waits for the new state rather than start from the old one (14c-6, answer 25).
   const [hiddenWith, setHiddenWith] = useState<RunState | null>(null);
   useEffect(() => () => setHiddenWith(run), [run]);
   const stale = playing && run === hiddenWith;
-  // Played here, and its ending list not yet left: the scene stays up after the run is over, until See results or the ×.
+  // Played here, and its recap not yet left: the frame stays up after the run is over, until See results or the ×.
   // Hiding the page forgets it, so a run that ends while the page is away opens on the cards.
   const [seen, setSeen] = useState(false);
   const [done, setDone] = useState(false);
-  // What the scene couldn't go on from that the runner didn't report: a reply with no question, a font that didn't load.
-  const [fault, setFault] = useState<string | null>(null);
   useEffect(
     () => () => {
       setSeen(false);
@@ -358,46 +360,69 @@ function Run({
   // (src/app/to-play.ts).
   const [expectPlay] = useState(expectingPlay);
   useEffect(spendToPlay, []);
+  // The × after the recap counts as leaving it, so the page comes back as the cards when it shows again.
+  const leave = () => {
+    if (!playing) setDone(true);
+    onLeave();
+  };
 
   if (noPuzzle) return <NoPuzzleBanner msToReset={noPuzzle.msToReset} />;
-  if (!run) return error ? <p role="alert">{error}</p> : expectPlay ? <AfterglowLoading /> : <BannerSkeleton />;
+  // The frame is up while the state loads on the way into a run, so the page doesn't show its cards for a moment first.
+  if (!run)
+    return error ? (
+      <p role="alert">{error}</p>
+    ) : expectPlay ? (
+      <PlayFrame out={out} onLeave={onLeave}>
+        <QuestionSkeleton />
+      </PlayFrame>
+    ) : (
+      <BannerSkeleton />
+    );
   // Its new load failing is said, not hidden behind the loading layer.
-  if (stale) return error ? <p role="alert">{error}</p> : <AfterglowLoading />;
+  if (stale)
+    return error ? (
+      <p role="alert">{error}</p>
+    ) : (
+      <PlayFrame out={out} onLeave={onLeave}>
+        <QuestionSkeleton />
+      </PlayFrame>
+    );
   if (inGame)
     return (
-      <Afterglow
-        out={out}
-        start={() => startOf(run)}
-        io={{
-          answer: (text) => runner.answer(text).then(replyOf),
-          next: async () => {
-            const response = await runner.next();
-            if (!response) return null;
-            // Next opens the next question (src/game/runs.ts); a reply without one is said, not waited on.
-            const asked = askedOf(response.run);
-            if (!asked) setFault(errorText(new Error("Next opened no question")));
-            return asked;
-          },
-          timeUp: () => runner.timeUp().then((r) => r && (r.status === "in_progress" && r.question ? askedOf(r) : "over")),
-          fault: (err) => setFault(errorText(err)),
-          seeResults: () => {
-            setDone(true);
-            onResults?.();
-          },
-          leave: () => {
-            if (!playing) setDone(true);
-            onLeave();
-          },
-        }}
-        notices={
-          <>
-            {label}
-            {pastMidnight(run) && <p>{PAST_MIDNIGHT}</p>}
-            {error && <p role="alert">{error}</p>}
-            {fault && <p role="alert">{fault}</p>}
-          </>
-        }
-      />
+      <PlayFrame out={out} onLeave={leave}>
+        {label}
+        {pastMidnight(run) && <p>{PAST_MIDNIGHT}</p>}
+        {error && <p role="alert">{error}</p>}
+        {run.status === "in_progress" && run.next && <Reveal run={run} busy={busy} onNext={runner.next} />}
+        {run.status === "in_progress" && run.question && (
+          <Question
+            key={run.question.index}
+            question={run.question}
+            total={run.total}
+            points={run.points}
+            busy={busy}
+            // Keyed by each state the server sends, so a retry restarts the count from the server's own time left.
+            clock={<Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={() => void runner.timeUp()} />}
+            onAnswer={async (text) => (await runner.answer(text))?.notInList ?? false}
+          />
+        )}
+        {over && (
+          <Recap
+            heading={endedHeading(run)}
+            answers={run.answered.map((a) => ({
+              key: a.index,
+              text: a.matched
+                ? `${a.prompt}: you said ${a.answer.name}, the host said ${a.hostAnswers.map((h) => h.name).join(", ")} (caught)`
+                : `${a.prompt}: you said ${a.answer.name} (safe, +${pointsText(a.points)})`,
+            }))}
+            total={`Total: ${earnsBonus(run) ? `${pointsText(run.points)} + about ${run.bonus} bonus` : pointsText(run.points)}`}
+            onSeeResults={() => {
+              setDone(true);
+              onResults?.();
+            }}
+          />
+        )}
+      </PlayFrame>
     );
   return (
     <div className={styles.game}>
@@ -414,39 +439,13 @@ function Run({
           <button type="button" className={`${kit.primary} ${styles.start}`} disabled={busy} onClick={runner.start}>
             Start
           </button>
-          {/* Opens over the screen (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 30 and 34). */}
           <HowToPlay />
         </>
       )}
-      {over && <Result run={run} saved={saved} />}
+      {over && <Result run={run} saved={saved} focus={seen && done} />}
       {error && <p role="alert">{error}</p>}
     </div>
   );
-}
-
-// An answered question as Afterglow's scene takes it: its tier picks the firework, and points plus the provisional
-// bonus size the burst only (src/afterglow/scene.ts, Result).
-const resultOf = (a: AnsweredQuestion): Shown => ({ answer: a.answer.name, caught: a.matched, tier: a.tier, points: a.points, total: a.points + a.bonus });
-const askedOf = (run: RunState): Asked | null => run.question && { prompt: run.question.prompt, stolen: run.question.stolen, msLeft: run.msLeft! };
-
-// Where the scene picks the run up: a question in play, or a safe answer waiting for Next, on its sky result.
-function startOf(run: RunState): Start {
-  const results = run.answered.map(resultOf);
-  const asked = askedOf(run);
-  if (asked) return { total: run.total, msQuestion: run.msQuestion, results, at: { kind: "ask", asked } };
-  const last = run.answered[run.answered.length - 1];
-  return { total: run.total, msQuestion: run.msQuestion, results, at: { kind: "result", hostSaid: last.hostAnswers.map((h) => h.name), next: run.next! } };
-}
-
-// The server's reply to an answer, as the scene takes it: text that named nothing; a late answer the database refused,
-// which ended the run with nothing added; or the answer it named, and what comes next.
-function replyOf(response: AnswerResponse | null): Reply {
-  if (!response) return { kind: "failed" };
-  const { run, notInList } = response;
-  if (notInList) return { kind: "offList" };
-  if (run.status === "timed_out") return { kind: "timeUp" };
-  const last = run.answered[run.answered.length - 1];
-  return { kind: "listed", result: resultOf(last), hostSaid: last.hostAnswers.map((h) => h.name), next: run.next, over: run.status !== "in_progress" };
 }
 
 function NoPuzzleBanner({ msToReset }: { msToReset: number }) {
@@ -500,6 +499,18 @@ function Facts({ facts }: { facts: string[] }) {
   );
 }
 
+// A question card before the run in play loads: its soft card, a line for its chips and one for its prompt.
+function QuestionSkeleton() {
+  return (
+    <Skeleton label="Loading your question">
+      <div className={`${kit.card} ${kit.soft}`}>
+        <Line />
+        <Line />
+      </div>
+    </Skeleton>
+  );
+}
+
 // Offbeat's banner: the day as a chip, the game's name, then what the day holds for the player (mockup 3).
 // The banner before today's run loads: the real banner, its title, a line where the day goes.
 function BannerSkeleton() {
@@ -522,11 +533,37 @@ function Banner({ date, children }: { date?: string; children?: ReactNode }) {
   );
 }
 
+// How a finished run ended, as the recap and the result say it (docs/milestones/M14-14c-2-neutral-words.md).
+const endedHeading = (run: RunState): string =>
+  run.status === "survived"
+    ? `You survived all ${run.total}!`
+    : run.status === "timed_out"
+      ? `Time's up on question ${run.answered.length + 1}`
+      : `Caught on question ${run.answered.length}`;
+
 // How a finished run ended, as the banner says it.
 function endedText(run: RunState): string {
   if (run.status === "survived") return `survived all ${run.total}`;
   if (run.status === "timed_out") return `time's up on question ${run.answered.length + 1}`;
   return `caught on question ${run.answered.length}`;
+}
+
+// Seconds left on the current question, as a number beside the prompt (14b-6c, answer 20), at mockup 3's size with
+// "seconds left" under it (14b-8, answer 11). The words are in the timer's own text for screen readers, which some
+// skip in an aria-label (docs/milestones/M14-14b-21-screen-readers.md). At zero it asks the server again, which decides whether time is up
+// (rule 3); the count itself is only a display.
+function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
+  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
+  return (
+    <div className={styles.clockBox}>
+      <p role="timer" className={styles.clock}>
+        {seconds}
+        <span className="sr-only"> seconds left</span>
+      </p>
+      {/* Shown under the number; the timer's own text says it to screen readers. */}
+      <span aria-hidden="true">seconds left</span>
+    </div>
+  );
 }
 
 // Nothing to do at zero: Game's own timer moves the page to the new day.
@@ -546,14 +583,151 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
 
 const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
+// The answer's rarity as a plain word (docs/milestones/M14-14c-8-plain-game-1.md, Numbers: "Common", "Uncommon", "Rare",
+// approved with the ticket; human, 2026-11-10: "approve").
+const RARITY: Record<Tier, string> = { common: "Common", uncommon: "Uncommon", rare: "Rare" };
+
+// After a safe answer (G5): your answer next to the host's, the points it earned with its estimated rarity bonus (M09:
+// from the expected popularity alone; the final bonus is worked out once the day is over), the answer's rarity, and the
+// letter taken at the next question (docs/milestones/M14-14c-2-neutral-words.md, answer 7). The next question and its 20
+// seconds start on Next, which has focus at once (WCAG 2.2 2.4.3). A screen reader hears the result once (4.1.3).
+function Reveal({ run, busy, onNext }: { run: RunState; busy: boolean; onNext: () => void }) {
+  const last = run.answered[run.answered.length - 1];
+  return (
+    <div className={kit.card}>
+      <h2>Safe!</h2>
+      <StatusMessage text={`Safe! ${pointsText(last.points)}`} />
+      <p>
+        You said {last.answer.name}; the host said {last.hostAnswers.map((h) => h.name).join(", ")}.
+      </p>
+      <p>Rarity: {RARITY[last.tier]}</p>
+      <p>
+        +{pointsText(last.points)}, rarity bonus +{last.bonus} (estimate) · {pointsText(run.points)} so far
+      </p>
+      {run.next!.steals && <p>Next question: {run.next!.steals.toUpperCase()} is taken.</p>}
+      <button type="button" className={kit.primary} autoFocus disabled={busy} onClick={onNext}>
+        Next
+      </button>
+    </div>
+  );
+}
+
+function Question({
+  question,
+  total,
+  points,
+  busy,
+  clock,
+  onAnswer,
+}: {
+  question: PublicQuestion;
+  total: number;
+  points: number;
+  busy: boolean;
+  // The seconds left, beside the prompt.
+  clock: ReactNode;
+  // Resolves true when the text named no entry (the player tries again).
+  onAnswer: (text: string) => Promise<boolean>;
+}) {
+  const [typed, setTyped] = useState("");
+  const [notInList, setNotInList] = useState<string | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const [blocked, setBlocked] = useState<string | null>(null);
+
+  // A stolen letter's key does nothing (G11, human, 2026-10-21). Filtering the value, not the key press, also
+  // covers paste and phone keyboards; each character is normalized as the server normalizes text, so an accented or
+  // folded letter counts as the plain letters it becomes ("é" as e, "ß" as ss: 13f-1).
+  function change(value: string) {
+    const kept = [...value].filter((ch) => !question.stolen.some((letter) => normalize(ch).includes(letter)));
+    setBlocked(kept.length < [...value].length ? [...value].find((ch) => !kept.includes(ch))!.toUpperCase() : null);
+    setTyped(kept.join(""));
+    setNotInList(null);
+  }
+
+  // Enter sends the text; the server decides what it names. busy blocks a second Enter while one is in flight. Text
+  // that names no entry stays in the box, selected, so a typo is fixed or typed over rather than retyped (human,
+  // 2026-10-26: "Keep the text (Recommended)"; docs/milestones/M14-14b-2c-review-items.md, answer 6).
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    const text = typed.trim();
+    if (text === "" || busy) return;
+    if (await onAnswer(text)) {
+      setNotInList(text);
+      input.current?.select();
+    }
+  }
+
+  return (
+    // Mockup 3's question card: the question's number and the points as chips, the prompt with the seconds beside it,
+    // the stolen letters as struck tiles, the answer box and Answer (M14 14b-8b; answer 11).
+    <div className={`${kit.card} ${kit.soft}`}>
+      <p className={kit.head}>
+        <span className={`${kit.chip} ${kit.dark}`}>
+          Question {question.index + 1} of {total}
+        </span>
+        <span className={kit.chip}>{pointsText(points)} so far</span>
+      </p>
+      <div className={styles.ask}>
+        <h2 className={styles.prompt}>{question.prompt}</h2>
+        {clock}
+      </div>
+      {question.stolen.length > 0 && (
+        <div>
+          <p className={styles.taken}>Letters taken</p>
+          <p className={styles.letters}>
+            {question.stolen.map((l) => (
+              <span key={l}>{l.toUpperCase()}</span>
+            ))}
+          </p>
+        </div>
+      )}
+      <form onSubmit={submit}>
+        <label>
+          Your answer
+          <input
+            ref={input}
+            value={typed}
+            autoFocus
+            autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(e) => change(e.target.value)}
+          />
+        </label>
+        <button type="submit" className={kit.primary} disabled={busy || typed.trim() === ""}>
+          Answer
+        </button>
+        {blocked && (
+          <p role="status" className={styles.note}>
+            {blocked} is taken. Try a word without it.
+          </p>
+        )}
+        {notInList && (
+          <p role="status" className={styles.note}>
+            &quot;{notInList}&quot; isn&apos;t in our list. Try another answer.
+          </p>
+        )}
+      </form>
+    </div>
+  );
+}
+
+
 // The result's details, below the banner, which carries the score and the time to the next puzzle. A link to
 // #result (the banner's Result, the clock bar's) lands before the run has loaded, when there's nothing to jump to yet,
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14). Then
 // #result leaves the address, so the page shown again or reloaded later stays where the player left it
 // (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
-function Result({ run, saved }: { run: RunState; saved: boolean }) {
+function Result({ run, saved, focus }: { run: RunState; saved: boolean; focus: boolean }) {
   const survived = survivedCount(run);
   const box = useRef<HTMLDivElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  // Coming from the recap, whose See results had focus and is gone with the frame (WCAG 2.2 2.4.3). A run already over
+  // when the screen opens leaves focus where it is.
+  useEffect(() => {
+    if (focus) heading.current!.focus();
+  }, [focus]);
   useEffect(() => {
     if (window.location.hash !== "#result") return;
     box.current?.scrollIntoView();
@@ -561,12 +735,8 @@ function Result({ run, saved }: { run: RunState; saved: boolean }) {
   }, []);
   return (
     <div id="result" ref={box} className={kit.card}>
-      <h2>
-        {run.status === "survived"
-          ? `You survived all ${run.total}!`
-          : run.status === "timed_out"
-            ? `Time's up on question ${run.answered.length + 1}`
-            : `Caught on question ${run.answered.length}`}
+      <h2 ref={heading} tabIndex={-1}>
+        {endedHeading(run)}
       </h2>
       <p>
         You survived {survived} of {run.total} questions and scored {pointsText(run.points)}

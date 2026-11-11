@@ -1,6 +1,6 @@
 # M14 14c-8 — Game 1, plain
 
-**Status:** approved, not started (human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
+**Status:** in progress (approved by the human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
 
 ## Goal
 Game 1 plays in the app's own look, with the four additions the human kept from the festival, and the festival is removed.
@@ -15,6 +15,10 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 3. The games' names: "use placeholder names that are simple". **"Game 1" at `/play`** and "Game 2" at `/play2`, Claude's proposal, approved with the ticket ("approve").
 4. What the plain games keep: "Show me the differences first". From the list (a Sonnet subagent's reading of `8309555` against today, not run), the human kept all four offered for game 1: "Full-screen play with a close button", "How to play as a pop-up", "Answer recap before results", "Rarity label on safe answers".
 5. Game 2 (14c-9): "also add an how-to-play, just like the first one(and any other discrepancies u think we should add. both games should have similar level of polish)". So what both games share is built once here, for 14c-9 to use.
+
+### During the build (2026-11-10, the 14c-8 build session)
+6. `src/game/runs.ts` and `runs.db.test.ts` name Afterglow in comments, against "prints nothing" and "no test of `src/game/` changed": "Reword the notes only (Recommended)". Only those comments change.
+7. `RunState.msQuestion` and `next.stolen` were for Afterglow's fuse and box only, and have no caller once it goes: "Remove them now (Recommended)". `runs.db.test.ts` loses its `msQuestion: 20_000` expectation, as the field is gone; no rule or score changes.
 
 ## Source
 - `docs/DESIGN.md`: the app's look (colour slots, Baloo 2, cards, buttons, the 44px controls); nothing in the plain game takes a value from outside it.
