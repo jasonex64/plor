@@ -1,6 +1,6 @@
 # M14 14c-8 — Game 1, plain
 
-**Status:** in review, PR open (approved by the human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
+**Status:** done, PR #179 merged on green CI at the human's "push on green" (2026-11-11) (approved by the human, 2026-11-10: "approve", to both tickets with the proposed names, rarity words and polish list)
 
 ## Goal
 Game 1 plays in the app's own look, with the four additions the human kept from the festival, and the festival is removed.
@@ -38,7 +38,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 - [x] A screen reader hears each result and the recap's total (one status message each), and the "Past midnight" note shows during play as today.
 - [x] No rule or scoring change: `npm test`, `npm run test:db` and `npx supabase test db` pass with no test of `src/game/` changed, but for answer 7's lines.
 - [x] `git grep -il afterglow -- src e2e scripts package.json playwright.config.ts` prints nothing; `npm run build` passes; the client bundle check (`npm run check:client-bundle`) passes.
-- [ ] `npm run test:e2e` passes twice in a row locally and on CI's first run, with the game's e2e rewritten for the plain screen.
+- [x] `npm run test:e2e` passes twice in a row locally and on CI's first run, with the game's e2e rewritten for the plain screen.
 - [x] `docs/DESIGN.md` describes the plain game screen, each value cited.
 
 ## Out of scope
@@ -94,7 +94,7 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 - `npx playwright test --project=chromium`, four full runs on this branch (`0345003`, then `7004b37`, docs only): 13, 1, 3 and 7 of 172 failed, a different set each time (`alive`, `answer-search`, `brew`, `controls-and-state`, `live-board`, `me`, `play2`, `player-screens`, `reactions-menu`, `screen-readers`, `shell`, `text-size`), most at "Play didn't reach `/play` in 5 s" or a game 2 village step.
   - Hypothesis 1, a cold `next dev` on a busy PC (run 1 started on an empty `.next/dev` while the review ran): runs 3 and 4 on a warm server and an idle PC should pass. Disproved: 3 and 7 failed.
   - Hypothesis 2, the flakiness is older than this change: the same suite at `31c1c23`, run the same way, should fail as much. Confirmed: 12 and 17 of 172 failed (five tests in both runs). Answer 9.
-- CI's first run: pending on the PR.
+- CI's first run on PR #179 (`cfa748b`): check, db, secrets, e2e and Vercel all SUCCESS, attempt 1. Locally, not met (answer 9).
 
 ### ROADMAP Next revision, sorted (Removes)
 Judged item by item on its text, not run. Removed (23), each concerning only the festival's drawing, scene, font, mutants or look check, or its private mock pages:

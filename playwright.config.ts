@@ -17,10 +17,8 @@ export default defineConfig({
   // are filmed, so tests take the `page` fixture rather than opening their own context.
   use: { baseURL: "http://localhost:3000", trace: "retain-on-failure", video: process.env.CI ? "retain-on-failure" : "off" },
   projects: [
-    // Every test, the e2e CI runs (`npm run test:e2e`). Game 2's village draws with WebGL (M16 16g-2) and
-    // CI's runners have no GPU, so this test browser's software WebGL is switched on (DECISIONS.md, log, 2026-11-08; 16g-2
-    // answer 17).
-    { name: "chromium", use: { ...devices["Desktop Chrome"], launchOptions: { args: ["--enable-unsafe-swiftshader"] } } },
+    // Every test, the e2e CI runs (`npm run test:e2e`).
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: { command: "npm run dev", url: "http://localhost:3000", reuseExistingServer: !process.env.CI },
 });

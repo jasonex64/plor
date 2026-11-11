@@ -1,13 +1,13 @@
 // 14b-19, controls, layout jumps, lost taps and stale state (docs/milestones/M14-14b-19-controls-layout-and-state.md):
 // disabled buttons flat, your own reaction filled, the dark themes' danger red, 16px fields; no cards flashing on
-// Continue, a countdown that doesn't move the prompt, a long name cut on a board row only at the default text size,
+// Continue, a countdown row, number and bar, that keeps its place, a long name cut on a board row only at the default text size,
 // Privacy's list items without a lone last word; the feed kept across Start, a tab tapped mid-slide opened, the streak
 // read again at the daily reset and Me after a time-up.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sharedLink, signInAndPick } from "./players";
-import { answerBox, caughtToCards } from "./game";
+import { answerBox, caughtToCards, countdown, expectCountdown, fillScale } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -217,9 +217,11 @@ test("from 1200px the game screen's feed column is there from the first paint, n
   expect(await page.evaluate(() => (window as unknown as { gone: number }).gone)).toBe(0);
 });
 
-// The seconds sit beside the prompt (src/app/game.tsx, Question). The timer's text is the number and the words screen
-// readers hear.
-test("the countdown going from two digits to one doesn't move the prompt", async ({ page }) => {
+// The countdown is a row under the prompt: the seconds number with the bar beside it (src/app/countdown-bar.tsx; docs/
+// milestones/M14-14c-9-plain-game-2.md, answers 7b and 10). The timer's text is the number and the words screen readers
+// hear; the bar is for the eye. The number's box holds two digits' room, so the bar keeps its place when the count goes
+// from two digits to one, and the prompt above doesn't move either.
+test("the countdown going from two digits to one doesn't move its row or the prompt", async ({ page }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "ck");
@@ -227,12 +229,20 @@ test("the countdown going from two digits to one doesn't move the prompt", async
   const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
   const prompt = page.getByRole("heading", { name: "Name an animal", exact: true });
   await expect(clock).toHaveText(/^\d\d seconds left$/);
-  const two = (await prompt.boundingBox())!;
+  await expectCountdown(page);
+  const { track } = countdown(page);
+  const before = { prompt: (await prompt.boundingBox())!, clock: (await clock.boundingBox())!, track: (await track.boundingBox())!, scale: await fillScale(page) };
+  // Under the prompt, the number and the bar side by side.
+  expect(before.clock.y).toBeGreaterThanOrEqual(before.prompt.y + before.prompt.height - 0.5);
+  expect(Math.abs(before.track.y + before.track.height / 2 - (before.clock.y + before.clock.height / 2))).toBeLessThan(before.clock.height);
+  expect(before.track.x).toBeGreaterThanOrEqual(before.clock.x + before.clock.width);
   await page.clock.fastForward("00:12");
   await expect(clock).toHaveText(/^\d seconds left$/);
-  const one = (await prompt.boundingBox())!;
-  expect(Math.abs(one.x - two.x)).toBeLessThan(0.5);
-  expect(Math.abs(one.y - two.y)).toBeLessThan(0.5);
+  const after = { prompt: (await prompt.boundingBox())!, clock: (await clock.boundingBox())!, track: (await track.boundingBox())!, scale: await fillScale(page) };
+  for (const part of ["prompt", "clock", "track"] as const)
+    for (const edge of ["x", "y", "width", "height"] as const) expect(Math.abs(after[part][edge] - before[part][edge]), `${part} ${edge}`).toBeLessThan(0.5);
+  // The bar drained as the seconds did.
+  expect(after.scale).toBeLessThan(before.scale);
 });
 
 test("a long name on a board row is cut at the default text size, and shown whole with the points under it at 200%", async ({ page }) => {
