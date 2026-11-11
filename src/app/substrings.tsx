@@ -95,7 +95,7 @@ export function SubstringsScreen() {
   );
 }
 
-export const WHY: Partial<Record<TryOutcome, (letters: string) => string>> = {
+const WHY: Partial<Record<TryOutcome, (letters: string) => string>> = {
   locked: () => "Too quick. Try again in a moment.",
   not_a_word: () => "Not in the dictionary.",
   needs_letters: (letters) => `Needs the letters ${letters}.`,
@@ -199,7 +199,7 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
 }
 
 // A word's points, with the bonus letter's when it holds it (M16 16e, answer 20).
-export const scored = (round: PlayedRound) => `${round.points} points${round.bonus > 0 ? `, and ${round.bonus} for the bonus letter` : ""}`;
+const scored = (round: PlayedRound) => `${round.points} points${round.bonus > 0 ? `, and ${round.bonus} for the bonus letter` : ""}`;
 
 // The letters the run has used, cashed in at its end (answer 6). The row of letters is for the eye; the count says it.
 function Tracker({ used }: { used: string }) {
@@ -219,7 +219,7 @@ function Tracker({ used }: { used: string }) {
   );
 }
 
-export const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
 // Where the run stands so far today (M16 16e-2, answers 3 and 19): among the day's finished players once there are
 // enough, and among the player's friends who've finished.
@@ -238,7 +238,7 @@ function Standing({ standing }: { standing: NonNullable<SubstringRun["standing"]
 
 // focus: coming from round 7's sentence, whose See results had focus and is gone with the frame (WCAG 2.2 2.4.3), as game 1's
 // results heading takes it.
-export function Results({ run, focus }: { run: SubstringRun; focus: boolean }) {
+function Results({ run, focus }: { run: SubstringRun; focus: boolean }) {
   const score = run.score!;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
