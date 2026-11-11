@@ -81,8 +81,8 @@
   margin: 0;
 }
 
-/* The question card (mockup 3's question screen; M14 14b-8b, answer 11): the prompt at 30px and the seconds beside it
-   at 64px with "seconds left" under them, 16px apart (the page's gutter). */
+/* The question card (mockup 3's question screen; M14 14b-8b, answer 11): the prompt at 30px; the seconds and their bar
+   under it are countdown-bar.module.css's. */
 .ask {
   display: flex;
   align-items: flex-end;
@@ -93,23 +93,6 @@
 .prompt {
   margin: 0;
   font-size: 1.875rem;
-}
-
-.clockBox {
-  text-align: right;
-  color: var(--muted);
-  font-size: 0.8125rem;
-}
-
-/* Two digits' room, the 20 seconds' most (private.question_deadline), so the prompt beside it keeps its lines at 10 → 9
-   (docs/milestones/M14-14b-19-controls-layout-and-state.md); digits are tabular, so 2ch is any two. */
-.clock {
-  min-width: 2ch;
-  margin: 0;
-  color: var(--text);
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1;
 }
 
 /* The stolen letters as mockup 3's struck tiles (.letters): the caught colours, a 2px ink border, small corners, the

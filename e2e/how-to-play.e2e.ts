@@ -1,26 +1,35 @@
 // How to play (docs/milestones/M14-14c-8-plain-game-1.md, after 14c-6d): a panel over the page, opened before the run
 // from the game screen and from Today's banner under Play, with Skip the game screen off and on, and over the game
-// from the play frame; four steps one at a time with Previous and Next, Close on the last; Close, × and Escape close it
+// from the play frame, for both games (game 2's from its card, docs/milestones/M14-14c-9-plain-game-2.md, answer 8,
+// checked against the source's own numbers); four steps one at a time with Previous and Next, Close on the last; Close, × and Escape close it
 // with focus back on the button and the page behind out of reach; a slide named "N of 4" for screen readers; it fits
 // at a phone's size, a desktop's and 320px; its words name no festival.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/config/tunables";
-import { GAME } from "../src/platform/game";
+import { POINTS_PER_QUESTION, QUESTIONS_PER_DAY, SUBSTRING_BONUS_LETTER_POINTS, SUBSTRING_ROUNDS } from "../src/config/tunables";
+import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { answerBox, asked } from "./game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
+let today = "";
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
+  // Game 2's card shows Start only on a day with a puzzle; this test's own, the rounds' letters as the other e2e files' (play2.e2e.ts).
+  today = (await DB.query<{ d: string }>("select private.today()::text as d")).rows[0].d;
+  await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2) on conflict do nothing", [
+    today,
+    { format: 1, game_id: "substrings", date: today, rounds: ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"], bonus_letter: "j" },
+  ]);
 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
   await removePuzzle(DB, puzzle);
+  await DB.query("delete from private.puzzle where game_id = 'substrings' and puzzle_date = $1::date", [today]);
   await DB.end();
 });
 
@@ -30,6 +39,13 @@ const CHUNKS = [
   "You get 20 seconds for each question. A typo, or not a real answer? Try again. The clock keeps going.",
   "On questions 2, 4, 5 and 7 a letter is taken. Answer without it.",
   `Not the host's? You're safe, and the rarer your answer, the bigger your bonus. Each question is worth more: ${POINTS_PER_QUESTION[0]} points for the first, ${POINTS_PER_QUESTION[POINTS_PER_QUESTION.length - 1]} for the last. Run out of time and your run ends.`,
+];
+// Game 2's four steps (src/app/how-to-play.tsx, GAME_2_STEPS), the numbers from tunables.ts.
+const CHUNKS_2 = [
+  `Each round gives you a few letters. Type a word that holds them together, in that order: for "cks", "rocks" or "backspace". ${SUBSTRING_ROUNDS.length} rounds, one run a day.`,
+  "You get 20 seconds a round. Not a word, missing the letters, or used already? Try again. The clock keeps going.",
+  "Out of time? That round scores nothing, but your run goes on to the next.",
+  `Longer words score more, and each word with the day's bonus letter earns ${SUBSTRING_BONUS_LETTER_POINTS} more. At the end, every different letter you've used adds to your bonus.`,
 ];
 // The ticket's two sizes (criterion 5).
 const PHONE = { width: 375, height: 812 };
@@ -169,4 +185,56 @@ test("How to play's steps name no festival", async ({ browser }) => {
   const text = await panel(page).evaluate((d) => d.textContent!);
   expect(text).toContain("The host has picked");
   expect(text).not.toMatch(/firework|fuse|dud|show|street|festival|light it/i);
+});
+
+// Game 2's steps (14c-9, criterion 4): from its card before Start and from the play frame once the round runs, each step
+// as the source words it, Previous and Next, and Close, × and Escape closing it with focus back on the button.
+test("game 2's How to play shows its own four steps, from its card and from the play frame", async ({ browser }) => {
+  const page = await player(browser, "howg2");
+  await page.goto(SUBSTRINGS.path);
+  const card = page.getByRole("region", { name: SUBSTRINGS.name, exact: true });
+  const open = card.getByRole("button", { name: "How to play" });
+  await open.click();
+  const dialog = panel(page);
+  await expect(dialog).toBeVisible();
+  const previous = dialog.getByRole("button", { name: "Previous" });
+  const next = dialog.getByRole("button", { name: "Next" });
+  for (const [i, text] of CHUNKS_2.entries()) {
+    const slide = dialog.getByRole("group", { name: `${i + 1} of ${CHUNKS_2.length}` });
+    await expect(slide).toBeVisible();
+    await expect(slide).toHaveText(text);
+    await expect(dialog.getByRole("group", { name: /^\d of 4$/ })).toHaveCount(1);
+    await expect(previous).toHaveAttribute("aria-disabled", String(i === 0));
+    if (i < CHUNKS_2.length - 1) await next.click();
+  }
+  await expect(next).toHaveCount(0);
+  for (let i = CHUNKS_2.length - 1; i > 0; i--) await previous.click();
+  await expect(dialog.getByRole("group", { name: "1 of 4" })).toBeVisible();
+
+  // Close on the last step, the × and Escape each close it, with focus back on the card's button.
+  for (const close of ["last", "×", "Escape"] as const) {
+    if (!(await dialog.isVisible())) await open.click();
+    if (close === "last") {
+      for (let i = 0; i < CHUNKS_2.length - 1; i++) await next.click();
+      await dialog.getByRole("button", { name: "Close", exact: true }).last().click();
+    } else if (close === "×") await dialog.getByRole("button", { name: "Close", exact: true }).first().click();
+    else await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(open).toBeFocused();
+  }
+
+  // In the frame, over the round: the card's button is gone with the card's Start, and the frame's opens the same steps.
+  await card.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page.getByLabel("Your word")).toBeFocused();
+  const inFrame = page.getByRole("button", { name: "How to play" });
+  await expect(inFrame).toHaveCount(1);
+  await inFrame.focus();
+  await page.keyboard.press("Enter");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("group", { name: "1 of 4" })).toHaveText(CHUNKS_2[0]);
+  await expect(page.getByLabel("Your word")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Main" })).toBeHidden();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(inFrame).toBeFocused();
 });

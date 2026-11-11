@@ -11,9 +11,10 @@ export const GAME = { id: "offbeat", name: "Game 1", path: "/play" } as const;
 // The ID under the name the queries use.
 export const GAME_ID = GAME.id;
 
-// Game 2's record: its permanent ID (human, 2026-11-06: "substrings (Recommended)"), and a working name and address that
-// carry no theme, as game 1's (human, 2026-11-07: "Game number 2, /play2 (Recommended)"; docs/milestones/M16-16d-playing-it.md).
-export const SUBSTRINGS = { id: "substrings", name: "Game number 2", path: "/play2" } as const;
+// Game 2's record: its permanent ID (human, 2026-11-06: "substrings (Recommended)"), and a placeholder name, "Game 2",
+// at /play2, as game 1's (human, 2026-11-10: "use placeholder names that are simple"; docs/milestones/M14-14c-8-plain-game-1.md,
+// answer 3; docs/milestones/M14-14c-9-plain-game-2.md).
+export const SUBSTRINGS = { id: "substrings", name: "Game 2", path: "/play2" } as const;
 
 export const SUBSTRINGS_ID = SUBSTRINGS.id;
 
