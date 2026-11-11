@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-state";
 import { ApiError, api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
-import { useCountdown } from "./countdown";
+import { Countdown } from "./countdown-bar";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
@@ -134,11 +134,9 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
 
   return (
     <>
-      <p className={styles.progress}>
-        Round {open.index + 1} of {run.total}
-      </p>
+      <Top round={open.index + 1} total={run.total} score={run.score!.total} />
       <p className={styles.letters}>{open.letters}</p>
-      <Clock key={open.msLeft} msLeft={open.msLeft} onTimeUp={onTimeUp} />
+      <Countdown key={open.msLeft} msLeft={open.msLeft} onTimeUp={onTimeUp} />
       <p className={styles.progress}>Bonus letter {run.bonusLetter}</p>
       <Tracker used={run.score!.used} />
       <form onSubmit={submit} className={styles.form}>
@@ -159,13 +157,19 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
   );
 }
 
-function Clock({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
-  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
+// The round and the running score, above every state of a run in play (docs/milestones/M14-14c-9-plain-game-2.md,
+// answers 6 and 7; the village's top bar, src/brew/brew.tsx at 14c-9's start). The score is the server's total so far.
+function Top({ round, total, score }: { round: number; total: number; score: number }) {
   return (
-    <p role="timer" className={styles.clock}>
-      {seconds}
-      <span className="sr-only"> seconds left</span>
-    </p>
+    <div className={styles.top}>
+      <p className={styles.progress}>
+        Round {round} of {total}
+      </p>
+      <p className={styles.score}>
+        <small>Score</small>
+        <b>{score}</b>
+      </p>
+    </div>
   );
 }
 
@@ -174,9 +178,7 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
   const sentence = last.word === null ? "Time's up." : `You played ${last.word}: ${scored(last)}.`;
   return (
     <>
-      <p className={styles.progress}>
-        Round {run.rounds.length} of {run.total}
-      </p>
+      <Top round={run.rounds.length} total={run.total} score={run.score!.total} />
       {/* The sentence is a status message for screen readers (WCAG 2.2 4.1.3), as game 1's result is. */}
       <p>{sentence}</p>
       <StatusMessage text={sentence} />

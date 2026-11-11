@@ -1,0 +1,42 @@
+/* The number's box is game 1's (game.module.css before 14c-9: .clockBox 0.8125rem in --muted, .clock 4rem, weight 800,
+   two digits' room so the bar beside it keeps its place at 10 -> 9; 14b-19). The bar is the village's (brew.module.css
+   .clock and .fill): 22px tall, fully round (11px), the fill scaled from its left edge. It has no transition, no
+   low-time change and no colour of its own there, so none is added; the fill is --accent as there, and the track,
+   which the village drew in its own purple, is --soft, the accent at low strength (DESIGN.md, Colours). The 16px
+   between the two is the page's gutter (DESIGN.md, the question). */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.box {
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.number {
+  min-width: 2ch;
+  margin: 0;
+  color: var(--text);
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: left;
+}

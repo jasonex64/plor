@@ -12,17 +12,40 @@
   color: var(--muted);
 }
 
+/* The village's top bar (brew.module.css .top, .score): the round at the left, the score at the right, its label at
+   0.6875rem bold with 0.08em spacing in --muted, its number at 1.75rem and weight 800, 12px between. */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.score {
+  margin: 0;
+  text-align: right;
+  line-height: 1;
+}
+
+.score small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.score b {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
 .letters {
   margin: 12px 0 4px;
   font-size: 48px;
   font-weight: 800;
   line-height: 1.1;
-}
-
-.clock {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
 }
 
 .form {

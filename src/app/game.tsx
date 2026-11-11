@@ -20,6 +20,7 @@ import { normalize } from "@/content/puzzle";
 import { bonusNote, earnsBonus, PAST_MIDNIGHT, pastMidnight } from "./bonus";
 import { ButtonLink } from "./button-link";
 import { useCountdown } from "./countdown";
+import { Countdown } from "./countdown-bar";
 import { BACK, FORWARD } from "./slide";
 import { givenText } from "./given";
 import { AnswerSearch } from "./answer-search";
@@ -548,24 +549,6 @@ function endedText(run: RunState): string {
   return `caught on question ${run.answered.length}`;
 }
 
-// Seconds left on the current question, as a number beside the prompt (14b-6c, answer 20), at mockup 3's size with
-// "seconds left" under it (14b-8, answer 11). The words are in the timer's own text for screen readers, which some
-// skip in an aria-label (docs/milestones/M14-14b-21-screen-readers.md). At zero it asks the server again, which decides whether time is up
-// (rule 3); the count itself is only a display.
-function Countdown({ msLeft, onTimeUp }: { msLeft: number; onTimeUp: () => void }) {
-  const seconds = Math.ceil(useCountdown(msLeft, onTimeUp) / 1000);
-  return (
-    <div className={styles.clockBox}>
-      <p role="timer" className={styles.clock}>
-        {seconds}
-        <span className="sr-only"> seconds left</span>
-      </p>
-      {/* Shown under the number; the timer's own text says it to screen readers. */}
-      <span aria-hidden="true">seconds left</span>
-    </div>
-  );
-}
-
 // Nothing to do at zero: Game's own timer moves the page to the new day.
 const NOTHING = () => {};
 
@@ -624,7 +607,7 @@ function Question({
   total: number;
   points: number;
   busy: boolean;
-  // The seconds left, beside the prompt.
+  // The seconds left, under the prompt.
   clock: ReactNode;
   // Resolves true when the text named no entry (the player tries again).
   onAnswer: (text: string) => Promise<boolean>;
@@ -658,7 +641,7 @@ function Question({
   }
 
   return (
-    // Mockup 3's question card: the question's number and the points as chips, the prompt with the seconds beside it,
+    // Mockup 3's question card: the question's number and the points as chips, the prompt with the seconds under it,
     // the stolen letters as struck tiles, the answer box and Answer (M14 14b-8b; answer 11).
     <div className={`${kit.card} ${kit.soft}`}>
       <p className={kit.head}>
@@ -669,8 +652,8 @@ function Question({
       </p>
       <div className={styles.ask}>
         <h2 className={styles.prompt}>{question.prompt}</h2>
-        {clock}
       </div>
+      {clock}
       {question.stolen.length > 0 && (
         <div>
           <p className={styles.taken}>Letters taken</p>
