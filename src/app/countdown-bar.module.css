@@ -1,9 +1,9 @@
 /* The number's box is game 1's (game.module.css before 14c-9: .clockBox 0.8125rem in --muted, .clock 4rem, weight 800,
-   two digits' room so the bar beside it keeps its place at 10 -> 9; 14b-19). The bar is 22px tall, fully round (11px),
-   the fill scaled from its left edge, with no transition and no low-time change (answers 10 and 11 of
-   docs/milestones/M14-14c-9-plain-game-2.md); the fill is --accent and the track is --soft, the accent at low
-   strength (DESIGN.md, Colours). The 16px
-   between the two is the page's gutter (DESIGN.md, the question). */
+   two digits' room so the bar beside it keeps its place at 10 -> 9; 14b-19). The bar is the deleted village's
+   (src/brew/brew.module.css at b4ac330, .clock and .fill, lines 196-202 on): 22px tall, fully round (11px), the fill
+   scaled from its left edge, with no transition and no low-time change. Its place under the prompt and its colours are
+   answers 10 and 11 (docs/milestones/M14-14c-9-plain-game-2.md): the fill --accent, the track --soft, the accent at
+   low strength (DESIGN.md, Colours). The 16px between the two is the page's gutter (DESIGN.md, the question). */
 .countdown {
   display: flex;
   align-items: center;

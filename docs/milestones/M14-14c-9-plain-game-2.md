@@ -28,6 +28,7 @@ Answers 1 to 3 and 5 of `M14-14c-8-plain-game-1.md` apply. For game 2:
 9. After round 7 the server's run is finished, so `7c94697^` went straight to the result cards and round 7's "You played X: N points" never showed: "Show it, then See results (Recommended)". Round 7's sentence shows as every round's does, with See results in place of Next, as game 1 pauses before its results.
 10. Game 1's seconds sat beside the question; the shared countdown (`src/app/countdown-bar.tsx`) puts the number on a row under it with the bar beside: "Row under the question (Recommended)".
 11. The bar's track, which the village drew in its own purple (`--track`, no app slot): "Faint accent (Recommended)", `--soft`, with the fill in `--accent`.
+12. The first full checks failed 62 db tests, `load_sync.test.sql` (`puzzle_pkey`) and 44 e2e tests. Cause: 14c-8's third full e2e run crossed Pacific midnight, and `screen-readers.e2e.ts` (players `…-ql` to `…-qx`, 08:26 to 08:29 UTC on 2026-11-11) left today's game 1 fixture day and its 9 players, its `afterAll` never having run; `todayPuzzle` (`e2e/puzzle.ts`) then reused the fixture day and never removed it. "Delete them (Recommended)": deleted in the local stack only, in one transaction (9 players, their 8 runs, 1 day).
 
 ## Source
 - `docs/DESIGN.md`: the app's look.

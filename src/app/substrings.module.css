@@ -12,8 +12,10 @@
   color: var(--muted);
 }
 
-/* The top bar (docs/milestones/M14-14c-9-plain-game-2.md, answers 6 and 7): the round at the left, the score at the right, its label at
-   0.6875rem bold with 0.08em spacing in --muted, its number at 1.75rem and weight 800, 12px between. */
+/* The top bar, kept for the running score (docs/milestones/M14-14c-9-plain-game-2.md, answer 6): the round at the left,
+   the score at the right. The values are the deleted village's (src/brew/brew.module.css at b4ac330: .top, lines
+   106-111, 12px between the round and the score; .score, lines 121-138, its label at 0.6875rem bold with 0.08em
+   spacing in --muted, its number at 1.75rem and weight 800). */
 .top {
   display: flex;
   align-items: center;
