@@ -74,6 +74,38 @@ Game 1 plays in the app's own look, with the four additions the human kept from 
 
 ## Evidence
 
+### ROADMAP Next revision, sorted (Removes)
+Judged item by item on its text, not run. Removed (23), each concerning only the festival's drawing, scene, font, mutants or look check, or its private mock pages:
+- "Found in 14c-5's second review (2026-11-07), to do in the build into `/play` (answer 42)…" (pre-draw slices; was done)
+- "`e2e/afterglow.e2e.ts`'s full-screen test checks only the tab bar or sidebar…" (the file is gone)
+- "Nothing checks that off-list text shakes the box…" (was done; the shake is gone)
+- "`afterglow.e2e.ts`'s reload mid-question checks only that the seconds are at most 20…" (the file is gone)
+- "Afterglow's HUD is a plain `div` with `aria-label="Score"`…"
+- "The box's placeholder is the mock's "Name a firework…"…"
+- "DECISIONS.md, Styling: the Handjet sentence sits before…" (the font is gone; the sentence itself is DECISIONS.md's to change, not touched here)
+- "How to play's panel keeps `--u` at its default 1px…"
+- "The 14c-6 ticket's Plan step 3 says "answers 30 to 40"…"
+- "Handjet is preloaded on every page…"
+- "DESIGN.md says no street step is longer than the slice's 4 ms…"
+- "The added off-list shake line waits 5 s for the box's steps…"
+- "The split pre-draw takes about 54 times as many steps…"
+- "Found in 14c-5's second review (2026-11-07), not blocking: `check.mjs`'s `inside`…"
+- "Found checking 14c-5's version 7 (2026-11-06)… `WORD_MARGIN`…"
+- "Found checking 14c-5's version 6 (2026-11-06)… the "Afterglow" corner name…"
+- "Found in 14c-5's first review (2026-11-05), on the private page…"
+- "Found in 14c-4's review (2026-11-05), all on the mock pages…"
+- "The test hook's exact stop moves the clock back…" (`src/afterglow/scene.ts`)
+- "`holding` in the scene's `ready()` resets only when a street is ready…"
+- "No test covers a resize on the sky result hiding Walk on again…"
+- ""The rumble differs by rarity" judges the rate on the probe's `hz`…"
+- "Comments in 6b-2b's files that misstate counts…"
+
+Reworded (2), because they also concern the app or the plain game:
+- "`reactions-menu.e2e.ts:172` … and `today.e2e.ts:105` … play Afterglow in full with no `test.slow()`": now "play a run in full"; the festival's 4.5 to 5.3 s per run kept as history, and whether the plain game still needs `test.slow()` marked *unverified*.
+- "Under `next dev` every page warns that a stylesheet of admin and shell styles… was preloaded and not used": the sentence about Afterglow's look check passing over the warning now says the check is gone.
+
+Also: 14c-6c, Reduce motion, is out of ROADMAP's M14 row and its "The games' look" paragraph (this ticket's Removes). The M14 row notes 14c-8 as building, in review, PR pending.
+
 ## Review
 - Blocking findings and how each was fixed:
 - Deferred to ROADMAP "Next revision":
