@@ -2,6 +2,13 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets.
 
+**Updated last:** 2026-11-11, on `m18-guest-play` (cut from `main`, checkout `C:/Users/jason/RIFF`), by the session that caught up on the overnight work and ran guest play's questions.
+- **M18, guest play** (`docs/milestones/M18-guest-play.md`): drafted from five rounds of the human's answers (1 to 20, quoted), **waiting for the human's approval**. No code. Its first step after approval is 18a: the security changes into DECISIONS.md, reviewed, before any migration. Three sources were added at the human's OK (SOURCES.md: Supabase anonymous sign-ins, Supabase CAPTCHA, Cloudflare Turnstile). One question is left in the ticket (a guest who closes the tab before the result).
+- **PR #181, 14c-9 (game 2 plain), and PR #180 (the audit and backlog sort):** each one's first e2e run failed before any test ran (the runner couldn't reach Ubuntu's package servers while installing the browser). Both were re-run on 2026-11-11; #181's re-run passed. **Both wait for the human's word to merge**; the human's rule is green on CI's first run, so whether a re-run after an install failure counts is theirs to say. `m14-look-and-feel`'s own handoff is the one for 14c-9.
+- **The one must-fix before the beta** (the sort in PR #180): plor.app can't be given the answer lists or game 2's dictionary. Facts were gathered (DECISIONS.md already allows a guarded hosted load as `postgres`; open: how the address reaches the script, who runs it from where, pooler or direct connection). Its guided questions haven't been asked; it belongs with the plor.app update, after M14, M16 and M17.
+- **Order from here** (ROADMAP, Focus): M18, then 16f, M17, the plor.app update, the beta's preparation.
+- **Left running:** nothing.
+
 **Updated last:** 2026-11-11, on `m14-look-and-feel`, by the session finishing 14c-8 (the human: build 14c-8, then 14c-9). Work in `C:/Users/jason/RIFF-m14`; `C:/Users/jason/RIFF` is a stale detached checkout.
 - **Decided 2026-11-10:** both games go plain ("go plain for both", 14c-7, done); the festival and the village are removed. **Ignore every "Next: build 6c" and 16f step below**: 14c-6c isn't built, and 16f waits for the plain games.
 - **14c-8, game 1 plain** (`docs/milestones/M14-14c-8-plain-game-1.md`): built, reviewed twice, checks in its Evidence; **in review, PR open**. The local e2e suite is flaky on this PC whatever the code (answer 9; Next revision), so the PR waits on CI. **Merge only at the human's word, with every check green on CI's first run** (their rule, 2026-11-11).
