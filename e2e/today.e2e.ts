@@ -3,7 +3,7 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
-import { asked, caughtToCards } from "./afterglow";
+import { asked, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -45,18 +45,18 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   expect(await block.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(47, 61, 92)");
 
   // Play is a link to Offbeat's game screen, where the run is played (docs/milestones/M14-14a-2b-game-screen.md).
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/afterglow");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
   await play(page);
-  // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff). Mid-
-  // question the game is full screen, with no tabs and no × (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3
-  // and 5), so this goes to Today by the browser's Back; the × at a reveal is afterglow.e2e.ts's.
+  // During the run, Today's banner leads back to it: a run waiting at a reveal has no clock bar (Source diff). The game
+  // is full screen, with no tabs (docs/milestones/M14-14c-8-plain-game-1.md), so this goes to Today by the browser's
+  // Back; the × is play.e2e.ts's.
   await asked(page, "Name an animal");
   const nav = page.getByRole("navigation", { name: "Main" });
   await page.goBack();
   await expect(page).toHaveURL("http://localhost:3000/");
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/afterglow");
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
@@ -68,7 +68,7 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await banner.getByRole("link", { name: "Result" }).click();
   // In view, then #result leaves the address (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
   await expect(page.locator("#result")).toBeInViewport();
-  await expect(page).toHaveURL(/\/afterglow$/);
+  await expect(page).toHaveURL(/\/play$/);
 });
 
 // Criterion 3.
@@ -125,7 +125,7 @@ test("before playing, the feed names who commented and holds none of their words
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/afterglow");
+  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/play");
   const item = feed.getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);

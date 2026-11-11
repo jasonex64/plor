@@ -2,6 +2,7 @@
 // as the real list isn't in git. Clocks that would take 20 seconds are run out in the database.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
+import { GAME } from "../src/platform/game";
 import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -223,7 +224,7 @@ test("game 1 stays as it was", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "pg");
   await expect(page.getByRole("heading", { name: "Plor, Today" })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Afterglow" })).toBeVisible();
+  await expect(page.getByRole("region", { name: GAME.name })).toBeVisible();
   await expect(page.getByRole("region", { name: "Game number 2" })).toHaveCount(0);
 });
 
@@ -234,7 +235,7 @@ test("the friends leaderboard switches to game 2", async ({ page }) => {
   await page.goto("/friends");
   const board = page.getByRole("region", { name: "Friends leaderboard" });
   const games = board.getByRole("radiogroup", { name: "Game" });
-  await expect(games.getByRole("radio", { name: "Afterglow" })).toBeChecked();
+  await expect(games.getByRole("radio", { name: GAME.name })).toBeChecked();
   await expect(board.getByText("Each day adds the % of players you beat.")).toHaveCount(0);
   await games.getByText("Game number 2").click();
   await expect(games.getByRole("radio", { name: "Game number 2" })).toBeChecked();

@@ -6,7 +6,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { REACTIONS } from "../src/config/tunables";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
-import { caughtToCards } from "./afterglow";
+import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });

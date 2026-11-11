@@ -4,7 +4,7 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
-import { answerBox } from "./afterglow";
+import { answerBox } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -191,27 +191,26 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
 });
 
 // Leaving lets the timer run (M14 L18): back on the game screen, the question is still in play. On the game screen the
-// Today tab is current, as the page it opens from (14a-2b). Since 14c-6 the tabs hide while a question is in play, the
-// game full screen with no × (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 5), so the way to
-// another tab is the browser's Back to Today.
+// Today tab is current, as the page it opens from (14a-2b). Since 14c-6 the tabs hide while a run is in play, the
+// game full screen (docs/milestones/M14-14c-8-plain-game-1.md), so the way to another tab is the browser's Back to Today.
 test("a question in play is still there after a visit to another tab", async ({ browser }) => {
   const { page, nav } = await player(browser, "se", { width: 360, height: 800 });
   await play(page);
   await expect(answerBox(page)).toBeVisible();
-  // The tabs are hidden while the question is in play; that Today is the current tab on the game screen is checked
+  // The tabs are hidden while the run is in play; that Today is the current tab on the game screen is checked
   // before Start by offbeat.e2e.ts ("Play opens the game screen").
   await expect(nav).toBeHidden();
   await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/afterglow");
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await expect(answerBox(page)).toBeVisible();
 });
 
 // Away from the game screen, the question's clock sits just above the tab bar, with Back; at zero it says time's up
 // and links to the result (M14 L18; docs/milestones/M14-14a-2a-today.md, criterion 6; 14a-2b moved the game to
-// /afterglow). The clock is faked so zero comes at once.
+// /play). The clock is faked so zero comes at once.
 test("away from the game screen, a question in play shows its clock above the tab bar, and time's up at zero", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 360, height: 800 } })).newPage();
   await page.clock.install();
@@ -223,12 +222,12 @@ test("away from the game screen, a question in play shows its clock above the ta
   const clock = page.getByRole("region", { name: "Question in play" });
   await expect(clock).toHaveCount(0);
   const nav = page.getByRole("navigation", { name: "Main" });
-  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  // Mid-question the game is full screen with no tabs: Back to Today, whose tabs lead on.
   await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
 
   await expect(clock.getByRole("timer")).toHaveText(/^Question 1 · \d+s left$/);
-  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/afterglow");
+  await expect(clock.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/play");
   const [bar, tabs] = [(await clock.boundingBox())!, (await nav.boundingBox())!];
   expect(bar.y + bar.height).toBeCloseTo(tabs.y, 0);
 
@@ -247,7 +246,7 @@ test("away from the game screen, a question in play shows its clock above the ta
   );
   await page.clock.fastForward("00:21");
   await expect(clock.getByRole("status")).toHaveText("Time's up on question 1");
-  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/afterglow#result");
+  await expect(clock.getByRole("link", { name: "Result" })).toHaveAttribute("href", "/play#result");
 });
 
 test("the colours follow the device: Paper when light, Night when dark", async ({ browser }) => {
@@ -392,7 +391,7 @@ test("the settings sheet, the clock bar, /streak and a group's page have no text
   await page.goto("/");
   await play(page);
   await expect(answerBox(page)).toBeVisible();
-  // Mid-question the game is full screen with no tabs (answers 3 and 5): Back to Today, whose tabs lead on.
+  // Mid-question the game is full screen with no tabs: Back to Today, whose tabs lead on.
   await page.goBack();
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();

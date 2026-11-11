@@ -1,6 +1,6 @@
 # M14 — 14c-6, Afterglow becomes the game
 
-**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merged on green CI at the human's "Merge when green"); 6b-2, the check, designed from answers 44 to 56 (Design, "The checks") and approved ("Approve, start 6b-2a (Recommended)"): 6b-2a, the look check, done (Evidence, Review; PR #172, merged on green CI at the human's "Merge when green"); 6b-2b, the mutants, designed from answers 61 to 66 (Design, "The checks") and approved ("Approve, start 6b-2b"): built, reviewed, in review (PR #177); the one-step cloud's mutant kept as caught only on a busy PC (answer 82); answers 79 to 81 were Claude's overnight under answer 78, and the human kept them (answer 82). `main`'s e2e fix, PR #176, is merged in. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
+**Status:** in progress: 14c-6a done (Evidence; PR #168, merged on green CI at the human's "Merge when green"); 14c-6b approved (answers 20 to 29); 6b-1, the game plays, done (Evidence, Review; PR #169, merged on green CI at the human's "Merge when green"); 14c-6d, How to play, done (Evidence, Review; PR #170, merged on green CI at the human's "Merge when green"); 6b-2, the check, designed from answers 44 to 56 (Design, "The checks") and approved ("Approve, start 6b-2a (Recommended)"): 6b-2a, the look check, done (Evidence, Review; PR #172, merged on green CI at the human's "Merge when green"); 6b-2b, the mutants, designed from answers 61 to 66 (Design, "The checks") and approved ("Approve, start 6b-2b"): done (Evidence, Review; PR #177, merged on green CI at the human's "ok merge it now", 2026-11-10, after one re-run of the e2e job, whose failure was game 2's village test); the one-step cloud's mutant kept as caught only on a busy PC (answer 82); answers 79 to 81 were Claude's overnight under answer 78, and the human kept them (answer 82). 14c-6c, Reduce motion, designed from answers 83 to 90 and approved (answer 91, "Approve, build it"): next. (Drafted 2026-11-07 from four rounds of guided questions; approved 2026-11-07: "Approve, start 6a (Recommended)".)
 
 ## Goal
 Play the real game, every day's run, as Afterglow, the firework festival approved on its private page in 14c-5, full screen, with the game named Afterglow.
@@ -172,6 +172,19 @@ Round 30 (2026-11-10, overnight: Claude's decisions under answer 78, the human a
 Round 31 (2026-11-10, the human back)
 82. The cloud's mutant: "keep the mutant and keep going", answer 81's (c). It stays in the list, caught only on a busy PC: on an idle one the script reports it MISSED, so a whole run there ends `1 of 93 not caught` and exits 1, as expected. Answers 79 and 80 stand, the human taking them as made.
 
+Round 32 (2026-11-10, 14c-6c, Reduce motion, while PR #177 waits; answer 8 already settles the outline: no shake, rumble or sway, the charge, climb and walk one short fade each, bursts, glitter and the fuse still drawn)
+83. Fade length: "0.5 s, as the results fade (Recommended)". Each fade takes `RESULTS_FADE_S`, the game's approved 0.5 s; a rare answer no longer charges or climbs longer than a common one.
+84. A change mid-run: "At the next moment (Recommended)". Each charge, climb or walk reads the setting as it starts, as game 2's village does (16g-2b answer 26); nothing jumps mid-animation.
+85. The box on an off-list answer or a taken letter: "No shake, the line says it (Recommended)". The box stays still; the text stays selected and the line tells the player.
+86. Motion nobody triggers (embers on the way down, the sky lanterns, clouds): "Hold them still (Recommended)". Drawn where they are, not moving, as game 2's idle life stops.
+
+Round 33 (2026-11-10, where those answers meet)
+87. The burst: "Animate as now (Recommended)". The burst is the reward and plays as for everyone; the rest of the screen is still around it.
+88. The server's wait: "Still word, then fade (Recommended)". The word stays in place, no rumble; once the reply comes, one 0.5 s fade shows the sky with the word in its rarity's colour, so no colour shows before the server decides.
+89. A taken letter: "Fade in place, 0.5 s (Recommended)". The lantern fades in where it ends up and the letter appears in the row without the pop.
+90. The fade: "Crossfade (Recommended)". The new frame blends over the old; the screen never goes dark.
+91. The design from 83 to 90: "Approve, build it (Recommended)". The charge and the climb share one fade, the still wait standing in for the charge (answer 8 had one each); built after PR #177 merges, as its own PR; no mutants for its lines.
+
 ## What this changes
 | Was | Now | Why |
 |---|---|---|
@@ -204,7 +217,7 @@ Unchanged: the rules, the database as judge, the share's squares (answer 14), th
 
 **The end.** After Q7, or a dud or fuse out, the ending list fades in as in 14c-5. Its button, **See results** (answer 21), leaves full screen and shows today's result cards.
 
-**Reduce motion.** No shake, rumble or sway; the charge, climb and walk become one short fade each between still frames; bursts, glitter and the fuse still draw.
+**Reduce motion** (14c-6c, answers 8, 83 to 91). Read with `matchMedia("(prefers-reduced-motion: reduce)")` (MDN `Window.matchMedia()`, SOURCES.md) as each moment starts, so a change mid-run is followed at the next one. Light it leaves the word in the box in plain ink, no step or rumble; on the reply, one crossfade of `RESULTS_FADE_S` (0.5 s) shows the sky, the word at its sky place in its colour, the burst starting. Bursts and the result play as for everyone. Walk on is one 0.5 s crossfade from the sky to the next street, landed, still waiting for that street. A taken letter's lantern fades in where it ends, 0.5 s, and the letter shows in the row without the pop. A dud or time-out takes its colour in place, then the ending list fades in as now. The box doesn't shake (the line says it); no rumble; embers, sky lanterns and clouds hold still; the fuse, glitter and Q7's results fade draw as now. Checked by a phone test in the CI set under `reducedMotion: "reduce"`: no frame shakes, the climb and walk are crossfades (each middle frame a blend of the two stills), the burst still animates, and the setting switched on mid-run is followed at the next moment.
 
 **Test runs.** The admin's test run uses the same screen, fed by its test runner; its × and See results return to the admin page it started from (answer 26).
 

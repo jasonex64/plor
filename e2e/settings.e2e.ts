@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
-import { answerBox, caughtToCards } from "./afterglow";
+import { answerBox, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -40,7 +40,7 @@ test.beforeAll(async ({ browser }) => {
 
 const sheetOf = (page: Page) => page.getByRole("dialog", { name: "Settings" });
 // The settings sheet's own dialog: Today's banner holds How to play's too, closed, before the shell's in the page
-// (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d).
+// (14c-6d, docs/milestones/M14-14c-8-plain-game-1.md).
 const isModal = (page: Page) => sheetOf(page).evaluate((d) => d.matches(":modal"));
 
 // Criterion 1 on a phone: the top bar's gear, the sheet along the bottom, and the three ways to close it.
@@ -114,7 +114,7 @@ async function flip(page: Page, name: string, on: boolean) {
 test("Skip the game screen makes Play start question 1, and says the time limit first", async () => {
   await page.goto("/");
   const banner = page.getByRole("region", { name: GAME.name });
-  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/afterglow");
+  await expect(banner.getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", "/play");
   await expect(banner).not.toContainText("20 seconds each");
 
   await flip(page, "Skip the game screen", true);
@@ -124,7 +124,7 @@ test("Skip the game screen makes Play start question 1, and says the time limit 
   await expect(banner.getByText("20 seconds each", { exact: true })).toBeVisible();
   await expect(banner.getByText("7 questions", { exact: true })).toBeVisible();
   await banner.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL(/\/afterglow$/);
+  await expect(page).toHaveURL(/\/play$/);
   await expect(answerBox(page)).toBeVisible();
 });
 

@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
-import { caughtToCards } from "./afterglow";
+import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -100,7 +100,7 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
 
   for (const viewport of [PHONE, WIDE]) {
     await page.setViewportSize(viewport);
-    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/afterglow", "/admin/puzzles", "/admin/insights"]) {
+    for (const path of ["/", "/friends", "/groups", group, "/me", "/streak", "/play", "/admin/puzzles", "/admin/insights"]) {
       await page.goto(path);
       // Measured once every section has loaded: no skeleton left, and the page's own small controls on screen.
       await expect(page.locator("[data-loading]")).toHaveCount(0);

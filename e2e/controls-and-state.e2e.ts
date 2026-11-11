@@ -7,7 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
 import { RUN, play, sharedLink, signInAndPick } from "./players";
-import { answerBox, box, caughtToCards } from "./afterglow";
+import { answerBox, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -153,11 +153,11 @@ test("the comment box and the pickers are 16px, and follow the browser's text si
   expect(await box.evaluate((el) => getComputedStyle(el).fontSize)).toBe("32px");
 });
 
-// Afterglow's dark, full screen, is what shows until the run loads, in place of the question's skeleton
-// (src/afterglow/afterglow.tsx, AfterglowLoading; docs/milestones/M14-14c-6-afterglow-in-play.md, Removes).
-const loading = (page: Page) => page.getByRole("status").filter({ hasText: `Loading ${GAME.name}` });
+// The play frame with the question's skeleton is what shows until the run loads, in place of the cards (src/app/game.tsx,
+// Run; docs/milestones/M14-14c-8-plain-game-1.md).
+const loading = (page: Page) => page.locator('[data-loading="Loading your question"]');
 
-test("Continue shows Afterglow loading, never the cards, until the run loads", async ({ page }) => {
+test("Continue shows the question's skeleton, never the cards, until the run loads", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "cc");
   await play(page);
@@ -179,7 +179,7 @@ test("Continue shows Afterglow loading, never the cards, until the run loads", a
   await expect(page.getByRole("heading", { name: `Your ${GAME.name}` })).toHaveCount(0);
 });
 
-test("the clock bar's Back also opens on Afterglow loading", async ({ page }) => {
+test("the clock bar's Back also opens on the question's skeleton", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "cq");
   await play(page);
@@ -217,19 +217,19 @@ test("from 1200px the game screen's feed column is there from the first paint, n
   expect(await page.evaluate(() => (window as unknown as { gone: number }).gone)).toBe(0);
 });
 
-// In Afterglow the seconds sit in the box's top row, apart from the prompt's own line (src/afterglow/afterglow.tsx). The
-// timer's text is the number, the " s" shown after it and the words screen readers hear.
+// The seconds sit beside the prompt (src/app/game.tsx, Question). The timer's text is the number and the words screen
+// readers hear.
 test("the countdown going from two digits to one doesn't move the prompt", async ({ page }) => {
   await page.clock.install();
   await page.goto("/");
   await signInAndPick(page, "ck");
   await play(page);
-  const clock = box(page).getByRole("timer");
-  const prompt = box(page).getByText("Name an animal", { exact: true });
-  await expect(clock).toHaveText(/^\d\d s seconds left$/);
+  const clock = page.getByRole("timer").filter({ hasText: /seconds left/ });
+  const prompt = page.getByRole("heading", { name: "Name an animal", exact: true });
+  await expect(clock).toHaveText(/^\d\d seconds left$/);
   const two = (await prompt.boundingBox())!;
   await page.clock.fastForward("00:12");
-  await expect(clock).toHaveText(/^\d s seconds left$/);
+  await expect(clock).toHaveText(/^\d seconds left$/);
   const one = (await prompt.boundingBox())!;
   expect(Math.abs(one.x - two.x)).toBeLessThan(0.5);
   expect(Math.abs(one.y - two.y)).toBeLessThan(0.5);
@@ -366,8 +366,7 @@ test("after a time-up away from the game, Me reads its numbers again", async ({ 
   await signInAndPick(page, "cm");
   await play(page);
   await expect(answerBox(page)).toBeVisible();
-  // Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and
-  // 5): Back to Today, whose tabs lead on.
+  // Mid-question the game is full screen with no tabs (docs/milestones/M14-14c-8-plain-game-1.md): Back to Today, whose tabs lead on.
   await page.goBack();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
   await expect(page.getByRole("region", { name: "Question in play" })).toBeVisible();

@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import { FIXTURE, fixtureDraft, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
-import { asked, LAST_MS, safe, seeResults, SKY_MS, skyResult, walkOn, WALK_MS } from "./afterglow";
+import { answer, asked, next, safe, seeResults } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -91,9 +91,6 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
 });
 
 test("a player survives all seven questions of a day, past the stolen letters", async ({ browser }) => {
-  // Seven sky results and six walks, at the longest each can take (e2e/afterglow.ts), past Playwright's own 30 s for a
-  // test, as afterglow.e2e.ts's seven.
-  test.setTimeout(FIXTURE.length * (SKY_MS + WALK_MS) + LAST_MS + 30_000);
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");
   await signInAndPick(page, "ap");
@@ -102,15 +99,14 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   // Q5, O at Q7).
   const answers = ["cat", "kiwi", "green", "Kenya", "lead", "boxing", "knee"];
   await asked(page, FIXTURE[0].prompt);
-  for (let i = 0; i < answers.length; i++) {
+  for (let i = 0; i < answers.length - 1; i++) {
     await safe(page, answers[i]);
-    if (i < answers.length - 1) await walkOn(page, FIXTURE[i + 1].prompt);
+    await next(page, FIXTURE[i + 1].prompt);
   }
-  // Q7's Walk on fades in the ending list, Show's over with all seven answers (docs/milestones/M14-14c-6-afterglow-in-play.md,
-  // answer 29); See results opens the cards.
-  await skyResult(page).click();
-  await expect(seeResults(page)).toBeVisible({ timeout: LAST_MS });
-  await expect(page.getByRole("heading", { name: "Show's over" })).toBeVisible();
+  // Q7's safe answer ends the run: the recap lists all seven answers, and See results opens the cards (docs/milestones/
+  // M14-14c-8-plain-game-1.md, "Answer recap before results").
+  await answer(page, answers[answers.length - 1]);
+  await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();
   await expect(page.getByRole("list", { name: "Your answers" }).getByRole("listitem")).toHaveCount(answers.length);
   await seeResults(page).click();
   await expect(page.getByRole("heading", { name: "You survived all 7!" })).toBeVisible();

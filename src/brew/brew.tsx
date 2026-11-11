@@ -193,7 +193,7 @@ function Brew({ run, setRun, load, onEnded }: { run: SubstringRun; setRun: (run:
       <div ref={host} className={styles.scene}>
         <h2 className={styles.name}>{SUBSTRINGS.name}</h2>
         {!ready && !error && <p className={styles.loading} aria-hidden="true">Loading the village…</p>}
-        {/* The way out (answer 2), as Afterglow's: back to Today. */}
+        {/* The way out (answer 2), as game 1's: back to Today. */}
         <button type="button" className={styles.out} aria-label="Back to Today" onClick={() => router.push("/", { transitionTypes: BACK })}>
           ×
         </button>

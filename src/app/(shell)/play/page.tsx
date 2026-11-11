@@ -3,7 +3,7 @@ import { GAME } from "@/platform/game";
 import { GameTab, Signed } from "../../home";
 import { Slide } from "../../slide";
 
-// The browser tab names the game (docs/milestones/M14-14c-6-afterglow-in-play.md, answer 12).
+// The browser tab names the game (14c-6, answer 12).
 export const metadata: Metadata = { title: GAME.name };
 
 // The game's screen: the run, the player's stats, yesterday's answers and the feed

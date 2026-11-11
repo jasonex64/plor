@@ -47,17 +47,6 @@
   line-height: 1.1;
 }
 
-.close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  padding: 0;
-  border-radius: 22px;
-}
-
 .fields {
   margin: 0;
 }

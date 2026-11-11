@@ -231,6 +231,20 @@ form.chips {
   box-shadow: 0 0 0 var(--ink);
 }
 
+/* A round 44px close button, moved here from the settings sheet (M14 L44), so its ×, the play frame's
+   and How to play's take one definition (docs/milestones/M14-14c-8-plain-game-1.md). Written with the kit's button kinds below
+   it, so it outranks the base button whatever order the CSS loads in. */
+button.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border-radius: 22px;
+}
+
 /* A minor action (mockup 3's .link): a thin ink outline, no shadow and no press, at the buttons' one 44px height
    (14b-10, answer 7). */
 button.link {

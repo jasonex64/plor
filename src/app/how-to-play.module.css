@@ -1,0 +1,67 @@
+/* How to play's panel (docs/milestones/M14-14c-8-plain-game-1.md): a centred modal in the app's own look, as wide as the
+   settings panel (440px, settings.module.css, .dialog) and no wider than the window less the page's 16px gutter each side
+   (globals.css, main); the card's padding, border, corners and fill (kit.module.css, .card) and the settings panel's
+   dimmed backdrop (settings.module.css, .dialog::backdrop). */
+.dialog {
+  box-sizing: border-box;
+  width: min(440px, calc(100% - 32px));
+  margin: auto;
+  padding: 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dialog::backdrop {
+  background: rgba(10, 10, 10, 0.45);
+}
+
+/* 10px between a card's parts (kit.module.css, .card gap). */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* A card's heading, 24px (kit.module.css, .card > h2). */
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Every step in one cell, the others hidden, so the panel is as tall as its longest and the buttons don't move. */
+.steps {
+  display: grid;
+  /* A card's gap again (kit.module.css, .card). */
+  margin: 10px 0;
+}
+
+.steps > * {
+  grid-area: 1 / 1;
+  margin: 0;
+}
+
+.steps > [hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* A card's gap (kit.module.css, .card). */
+  gap: 10px;
+}
+
+.nav button {
+  margin: 0;
+}
+
+/* 14px, as a note under the answer box (game.module.css, .note) and the kit's small button. */
+.place {
+  color: var(--muted);
+  font-size: 0.875rem;
+}

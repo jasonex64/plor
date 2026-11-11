@@ -85,9 +85,6 @@ describe("a run, step by step", () => {
           answered: [],
           question: null,
           msLeft: null,
-          // A question's whole 20 seconds, from private.question_deadline (DECISIONS.md, Game 1: Timer), sent before
-          // any question opens, for Afterglow's fuse (docs/milestones/M14-14c-6-afterglow-in-play.md).
-          msQuestion: 20_000,
           next: null,
           points: 0,
           bonus: 0,
@@ -159,7 +156,7 @@ describe("a run, step by step", () => {
       points: POINTS_PER_QUESTION[0],
       bonus: answerBonus(0, firstGuess(q, entryId)),
     });
-    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null, stolen: publicQuestion(puzzle, 1).stolen });
+    expect(body.run.next).toEqual({ steals: puzzle.questions[1].steals ?? null });
   });
 
   it("refuses an answer before Next, then Next opens question 2 with its own 20 seconds, once", async () => {

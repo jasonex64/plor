@@ -8,7 +8,7 @@ import { POINTS_PER_QUESTION, QUESTIONS_PER_DAY } from "../src/config/tunables";
 import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 import { PAST_MIDNIGHT } from "../src/app/bonus";
 import { RUN, signInAndPick } from "./players";
-import { caught, caughtToCards, safe, seeResults, skyResult, walkOn } from "./afterglow";
+import { caught, caughtToCards, next, nextButton, safe, seeResults } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
@@ -60,7 +60,7 @@ async function player(browser: Browser, name: string, viewport = PHONE) {
 test("Play opens the game screen: the day, the stakes, Start and How to play", async ({ browser }) => {
   const page = await player(browser, "oa");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/afterglow");
+  await expect(page).toHaveURL("http://localhost:3000/play");
   await expect(page).toHaveTitle(GAME.name);
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
@@ -73,16 +73,16 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   );
   await expect(game.getByRole("button", { name: "Start", exact: true })).toBeVisible();
 
-  // How to play opens its panel over the screen (docs/milestones/M14-14c-6-afterglow-in-play.md, 14c-6d).
+  // How to play opens its panel over the screen (docs/milestones/M14-14c-8-plain-game-1.md, after 14c-6d).
   await game.getByRole("button", { name: "How to play" }).click();
   await expect(page.getByRole("dialog", { name: "How to play" })).toBeVisible();
-  await expect(page).toHaveURL("http://localhost:3000/afterglow");
+  await expect(page).toHaveURL("http://localhost:3000/play");
 });
 
 // Criteria 4 and 5: a player who never played, then plays and is caught on question 1.
 test("Your Offbeat counts the run once it's over, and yesterday's answers show the host's", async ({ browser }) => {
   const page = await player(browser, "ob");
-  await page.goto("/afterglow");
+  await page.goto("/play");
   const stats = page.getByRole("region", { name: `Your ${GAME.name}` });
   const stat = (label: string) => stats.locator("div", { has: page.getByText(label, { exact: true }) }).locator("dd");
   await expect(stat("day streak")).toHaveText("0");
@@ -115,7 +115,7 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
   // Opened again on the finished run, the stats load with the page and not again once the run's state arrives
   // (14a-2c, criterion 3).
   const seen = timeline(page);
-  await page.goto("/afterglow");
+  await page.goto("/play");
   await expect(page.locator("#result")).toBeVisible();
   await expect(stat("day streak")).toHaveText("1");
   await page.waitForLoadState("networkidle");
@@ -128,7 +128,7 @@ test("Your Offbeat counts the run once it's over, and yesterday's answers show t
 // Criteria 6 and 7.
 test("the feed sits beside the game from 1200px and below it on phones, with no sideways scroll at 320px", async ({ browser }) => {
   const wide = await player(browser, "oc", { width: 1440, height: 900 });
-  await wide.goto("/afterglow");
+  await wide.goto("/play");
   const box = async (page: typeof wide, name: string) => (await page.getByRole("region", { name, exact: true }).boundingBox())!;
   // The game screen heads the feed as round 5 does (14a-2c, criterion 4).
   await expect(wide.getByRole("region", { name: `${GAME.name} comments` }).getByRole("heading", { name: `${GAME.name} comments` })).toBeVisible();
@@ -138,7 +138,7 @@ test("the feed sits beside the game from 1200px and below it on phones, with no 
   expect(feed.y).toBeLessThan(game.y + game.height);
 
   const narrow = await player(browser, "od", { width: 320, height: 640 });
-  await narrow.goto("/afterglow");
+  await narrow.goto("/play");
   await expect(narrow.getByRole("region", { name: "Yesterday's answers" })).toBeVisible();
   const [game2, cards, feed2] = [await box(narrow, GAME.name), await box(narrow, "Yesterday's answers"), await box(narrow, `${GAME.name} comments`)];
   expect(feed2.y).toBeGreaterThanOrEqual(cards.y + cards.height);
@@ -163,16 +163,17 @@ test("a run resumed after its midnight says its answers don't count for the boar
     [id, date, fixtureId(0, "dog")],
   );
 
-  await page.goto("/afterglow");
+  await page.goto("/play");
   const game = page.getByRole("region", { name: GAME.name, exact: true });
-  // Back on question 1's sky result, over which the line shows while the run is played.
-  await expect(skyResult(page)).toBeVisible();
-  await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
-  await walkOn(page, "Name a fruit");
-  await expect(game.getByText(PAST_MIDNIGHT)).toBeVisible();
+  // Back on question 1's reveal, over which the line shows while the run is played (in the play frame, which has no
+  // game region of its own to look in).
+  await expect(nextButton(page)).toBeVisible();
+  await expect(page.getByText(PAST_MIDNIGHT)).toBeVisible();
+  await next(page, "Name a fruit");
+  await expect(page.getByText(PAST_MIDNIGHT)).toBeVisible();
   // Safe on question 2 (fruit; the host said apple), then caught on question 3 (color; the host said red).
   await safe(page, "banana");
-  await walkOn(page, "Name a color");
+  await next(page, "Name a color");
   await caught(page, "red");
   await seeResults(page).click();
   // The full run's score, 25 + 50, though the boards count question 1's 25 alone; the line once, on the result.
@@ -180,11 +181,11 @@ test("a run resumed after its midnight says its answers don't count for the boar
   await expect(game.getByText(PAST_MIDNIGHT)).toHaveCount(1);
 });
 
-// 14c-1's, 14c-2's and 14c-6's renames moved the game to a new address with no redirect (14b-4, "The new name";
-// docs/milestones/M14-14c-2-neutral-words.md, answer 13; docs/milestones/M14-14c-6-afterglow-in-play.md, answer 13),
-// so the old ones are gone; so is How to play's page, now a panel (14c-6 answer 39).
-test("the old addresses /offbeat, /updraft, /play and /afterglow/how-to-play answer 404", async ({ page }) => {
-  for (const path of ["/offbeat", "/updraft", "/play", "/afterglow/how-to-play"]) {
+// 14c-1's, 14c-2's and 14c-8's renames moved the game to a new address with no redirect (14b-4, "The new name";
+// docs/milestones/M14-14c-2-neutral-words.md, answer 13; docs/milestones/M14-14c-8-plain-game-1.md, answer 3), so the
+// old ones are gone; so is How to play's page, now a panel (14c-6 answer 39).
+test("the old addresses /offbeat, /updraft and /play/how-to-play answer 404", async ({ page }) => {
+  for (const path of ["/offbeat", "/updraft", "/play/how-to-play"]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(404);
   }

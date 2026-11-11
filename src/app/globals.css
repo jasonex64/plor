@@ -293,9 +293,9 @@ body[data-column] {
   padding-right: var(--right-column);
 }
 
-/* Afterglow full screen (docs/milestones/M14-14c-6-afterglow-in-play.md, answers 3 and 10): the game covers the whole
-   window (src/afterglow/afterglow.module.css), so the page leaves no room for the shell, doesn't scroll behind it, and
-   its own "Plor" heading gives way to the game's (src/app/shell.module.css hides the bars). After the rules above, so
+/* A game in play (the play frame, src/app/play-frame.tsx; docs/milestones/M14-14c-8-plain-game-1.md): the game covers the
+   whole window, so the page leaves no room for the shell, doesn't scroll behind it, and its own "Plor" heading gives way
+   to the game's (src/app/shell.module.css hides the bars). After the rules above, so
    it wins over them at every width. */
 body[data-game] {
   padding: 0;

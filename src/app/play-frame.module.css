@@ -1,0 +1,28 @@
+/* The play frame (docs/milestones/M14-14c-8-plain-game-1.md): a layer over the whole window, in the page's own background,
+   scrolling by itself. */
+.frame {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* The page's column: 960px at most, padded 16px (globals.css, main); 16px between its parts (game.module.css, .game). */
+.inner {
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 12px between the buttons, as the settings sheet's top (settings.module.css, .sheet). */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
