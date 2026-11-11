@@ -64,7 +64,7 @@ export function BrewScreen() {
       <section aria-label={SUBSTRINGS.name} className={kit.card}>
         <h2 className={cards.title}>{SUBSTRINGS.name}</h2>
         {error && <p role="alert">{error}</p>}
-        {run === null ? <p>There&apos;s no puzzle today.</p> : <Results run={run} />}
+        {run === null ? <p>There&apos;s no puzzle today.</p> : <Results run={run} focus={false} />}
       </section>
     );
   }

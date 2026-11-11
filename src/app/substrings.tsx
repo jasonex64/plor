@@ -52,8 +52,15 @@ export function SubstringsScreen() {
     }
   };
 
-  // A run in play fills the frame, with the × back to Today as game 1's; before it and after it the page shows its card.
+  // A run in play, and round 7's sentence, fill the frame, with the × back to Today as game 1's; before it and after it the page shows its card.
   const playing = run?.status === "in_progress";
+  // Round 7 ends the server's run, so its word or time-up would land on the cards with its sentence never shown; the
+  // frame stays up after a run played here is over, until See results or the ×, as game 1's does (answer 9). A page
+  // opened on a finished run, or reloaded on it, never saw the run in play and goes straight to the cards.
+  const [seen, setSeen] = useState(false);
+  const [done, setDone] = useState(false);
+  if (playing && !seen) setSeen(true);
+  const inFrame = playing || (seen && run?.status === "finished" && !done);
   const card = (
     <section aria-label={SUBSTRINGS.name} className={kit.card}>
       <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
@@ -71,7 +78,7 @@ export function SubstringsScreen() {
           <HowToPlay steps={GAME_2_STEPS} />
         </>
       ) : run.status === "finished" ? (
-        <Results run={run} />
+        inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} />
       ) : run.open ? (
         <Round key={run.open.index} run={run} onChange={setRun} onTimeUp={load} />
       ) : (
@@ -79,7 +86,7 @@ export function SubstringsScreen() {
       )}
     </section>
   );
-  return playing ? (
+  return inFrame ? (
     <PlayFrame steps={GAME_2_STEPS} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })}>
       {card}
     </PlayFrame>
@@ -185,7 +192,7 @@ function Between({ run, onNext }: { run: SubstringRun; onNext: () => void }) {
       <Tracker used={run.score!.used} />
       {/* Focus moves here as the box goes, so Enter goes on (WCAG 2.2 2.4.3). */}
       <button type="button" className={kit.primary} autoFocus onClick={onNext}>
-        Next
+        {run.status === "finished" ? "See results" : "Next"}
       </button>
     </>
   );
@@ -229,12 +236,20 @@ function Standing({ standing }: { standing: NonNullable<SubstringRun["standing"]
   );
 }
 
-export function Results({ run }: { run: SubstringRun }) {
+// focus: coming from round 7's sentence, whose See results had focus and is gone with the frame (WCAG 2.2 2.4.3), as game 1's
+// results heading takes it.
+export function Results({ run, focus }: { run: SubstringRun; focus: boolean }) {
   const score = run.score!;
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (focus) heading.current!.focus();
+  }, [focus]);
   const bonusWords = run.rounds.filter((round) => round.bonus > 0).length;
   return (
     <>
-      <h3 className={styles.heading}>Your score</h3>
+      <h3 ref={heading} tabIndex={-1} className={styles.heading}>
+        Your score
+      </h3>
       <dl className={styles.score}>
         <dt>Words</dt>
         <dd>{score.words}</dd>
