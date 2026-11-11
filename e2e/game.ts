@@ -43,3 +43,22 @@ export async function caughtToCards(page: Page, text: string): Promise<void> {
   await seeResults(page).click();
   await expect(page.locator("#result")).toBeVisible();
 }
+
+// The countdown both games show (src/app/countdown-bar.tsx, docs/milestones/M14-14c-9-plain-game-2.md, answer 7b): the
+// seconds as the timer's own text, "NN seconds left", and a bar for the eye only, aria-hidden, whose fill shrinks.
+export const countdown = (page: Page) => {
+  const track = page.locator('div[aria-hidden="true"]').filter({ has: page.locator('div[style*="scaleX"]') });
+  return { timer: page.getByRole("timer"), track, fill: track.locator("div") };
+};
+export const fillScale = (page: Page) => countdown(page).fill.evaluate((el) => Number(/scaleX\(([\d.e-]+)\)/.exec((el as HTMLElement).style.transform)![1]));
+
+export async function expectCountdown(page: Page): Promise<void> {
+  const { timer, track } = countdown(page);
+  await expect(timer).toHaveText(/^\d+ seconds left$/);
+  await expect(track).toHaveCount(1);
+  // The words under the number are for the eye; the timer's text says them to screen readers.
+  await expect(page.locator('span[aria-hidden="true"]').filter({ hasText: /^seconds left$/ })).toHaveCount(1);
+  const start = await fillScale(page);
+  expect(start).toBeGreaterThan(0);
+  expect(start).toBeLessThanOrEqual(1);
+}
