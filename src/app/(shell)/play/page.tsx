@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: GAME.name };
 export default function Page() {
   return (
     <Slide>
-      <Signed signedOut={<GuestPlay />}>
+      <Signed signedOut={<GuestPlay game="offbeat" />}>
         <GameTab />
       </Signed>
     </Slide>

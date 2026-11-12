@@ -52,17 +52,23 @@ test.afterAll(async () => {
   await ADMIN.end();
 });
 
-test("a signed-out visit shows sign-in", async ({ page }) => {
-  await page.goto("/play2");
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
-});
-
 test("a day with no puzzle says so", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "pn");
   await page.goto("/play2");
   await expect(page.getByRole("heading", { name: SUBSTRINGS.name, exact: true })).toBeVisible();
   await expect(page.getByText("There's no puzzle today.")).toBeVisible();
+});
+
+// Signed out, the page is the bare guest game, not sign-in first (docs/milestones/M18-guest-play.md, 18d; e2e/guest-play.e2e.ts
+// plays it). It needs a day, as a signed-in visit does, so it
+// comes after the test of a day with none.
+test("a signed-out visit shows the bare guest game, with a way to sign in", async ({ page }) => {
+  await addDay();
+  await page.goto("/play2");
+  await expect(game(page).getByRole("button", { name: "Start", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
+  await expect(tabs(page)).toHaveCount(0);
 });
 
 // Each test that plays adds the day itself, as a retry runs in a new worker, whose cleanup took it away.

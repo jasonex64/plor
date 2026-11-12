@@ -1,6 +1,6 @@
 "use client";
 
-// Game 1 for a visitor with no account: the bare game and a way to sign in, nothing else (docs/milestones/M18-guest-play.md,
+// A game for a visitor with no account: the bare game and a way to sign in, nothing else (docs/milestones/M18-guest-play.md,
 // Design, "What a guest can reach"). Its Start runs Cloudflare's bot check first and starts the run with the token it yields
 // (Design, "The bot check"; answers 8 and 16). Cloudflare's explicit rendering ("Explicit rendering gives you programmatic
 // control over when and where the widget appears.", developers.cloudflare.com/turnstile/get-started/client-side-rendering/):
@@ -16,6 +16,7 @@ import { ApiError } from "@/lib/api-client";
 import { BACK } from "./slide";
 import { ButtonLink } from "./button-link";
 import { Game } from "./game";
+import { SubstringsScreen } from "./substrings";
 import styles from "./offbeat.module.css";
 import { GAME } from "@/platform/game";
 
@@ -31,7 +32,8 @@ const SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=exp
 
 type Pending = { resolve: (token: string) => void; reject: (error: ApiError) => void };
 
-export function GuestGame({ siteKey }: { siteKey: string }) {
+// game: which of the two games this page plays; the widget and the way back to sign-in are the same.
+export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" | "substrings" }) {
   const container = useRef<HTMLDivElement>(null);
   const widget = useRef<string | null>(null);
   const pending = useRef<Pending | null>(null);
@@ -91,9 +93,13 @@ export function GuestGame({ siteKey }: { siteKey: string }) {
           Sign in
         </ButtonLink>
       </p>
-      <section id="offbeat" aria-label={GAME.name} className={styles.game}>
-        <Game key={`game-${gameDay}`} family="guest" botCheck={botCheck} onOver={() => {}} onDayOver={nextDay} onPlaying={setPlaying} />
-      </section>
+      {game === "offbeat" ? (
+        <section id="offbeat" aria-label={GAME.name} className={styles.game}>
+          <Game key={`game-${gameDay}`} family="guest" botCheck={botCheck} onOver={() => {}} onDayOver={nextDay} onPlaying={setPlaying} />
+        </section>
+      ) : (
+        <SubstringsScreen family="guest" botCheck={botCheck} onPlaying={setPlaying} />
+      )}
       {/* Cloudflare draws its box here only when it needs the visitor (appearance: interaction-only). */}
       <div ref={container} />
     </div>

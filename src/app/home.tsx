@@ -271,7 +271,12 @@ export function PlayFirst() {
     <>
       <p>
         <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={kit.primary}>
-          Play without an account
+          Play {GAME.name} without an account
+        </ButtonLink>
+      </p>
+      <p>
+        <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={kit.primary}>
+          Play {SUBSTRINGS.name} without an account
         </ButtonLink>
       </p>
       <SignIn onSignedIn={loadMe} />
