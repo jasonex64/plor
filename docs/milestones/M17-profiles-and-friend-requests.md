@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** planned, NOT approved to build. Its design round is in progress (started 2026-11-11). Four rounds of guided questions were answered 2026-11-05 (the quote "Approve, start dictionary" approved M16's dictionary, not this ticket); its open questions wait for that round. It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); nothing built yet. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -107,12 +107,10 @@ For the human to approve, change or reject; none is decided here. CLAUDE.md, Sec
 
 ## Open
 What truly remains; nothing above is designed around an unanswered question.
-- **The privacy page draft** below waits for the human's approval (answer 26).
-- **This ticket's approval:** its Status stays "not approved to build" until the human approves it.
 - The lines marked *unverified* in Design (a request to someone who is already a friend; the new tables cascading on account deletion) stay unverified.
 
 ## Privacy page draft
-**A draft, awaiting the human's approval (answer 26). `src/app/privacy/page.tsx` is not changed.** Added under "What we keep", in the page's tone; "Last updated" would change with it:
+**Approved by the human, 2026-11-11 ("Approve M17"; answer 26). `src/app/privacy/page.tsx` is not changed until 17c.** Added under "What we keep", in the page's tone; "Last updated" would change with it:
 - **Your profile and who can find it:** any signed-in player can search for you by your exact username (not by display name or part of a username) and open your profile. A signed-in player who isn't your friend sees your totals and streak, and a card for each game. Your friends also see your calendar of days played, your rarest answers and your recent results. Nobody who is signed out can see a profile. If you change your username, the old one still opens your profile for 30 days and no one else can take it; if you delete your account in that time, the old username is freed at once.
 - **Friend requests and blocks:** we keep the friend requests you send and receive, and the players you block. Blocking someone ends any friendship with them, stops their requests reaching you, and makes your profile and username show nothing to them. You and they stop seeing each other's comments and reactions, though results on a shared group's board still show. They are not told. You can unblock someone from a list in Settings.
 - **Search counts:** to stop anyone listing usernames, we count how many searches each signed-in player makes in an hour.
