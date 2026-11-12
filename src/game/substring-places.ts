@@ -20,6 +20,11 @@ const runsSql = (where: string) => `
   where r.game_id = $1 and ${where}
   group by r.user_id, r.puzzle_date, p.content`;
 
+// The runs finished on a date ($2), for a standing.
+const finishedOn = `r.puzzle_date = $2::date
+       and exists (select from private.run_status s where s.user_id = r.user_id and s.game_id = r.game_id
+                   and s.puzzle_date = r.puzzle_date and s.status = 'survived')`;
+
 const total = (run: RunWords) => scoreRun(run.keys, run.bonus_letter).total;
 
 // Writes the missing rows for every game 2 run on a closed day, and returns how many it wrote. Every player's, as a
@@ -49,9 +54,7 @@ export async function settleSubstringRuns(db: Db): Promise<number> {
 export async function standingToday(db: Db, userId: string, date: string): Promise<Standing> {
   const { rows } = await db.query<RunWords & { circle: boolean }>(
     `select f.*, f.user_id::uuid in (${circleSql("$3")}) as circle
-     from (${runsSql(`r.puzzle_date = $2::date
-       and exists (select from private.run_status s where s.user_id = r.user_id and s.game_id = r.game_id
-                   and s.puzzle_date = r.puzzle_date and s.status = 'survived')`)}) f`,
+     from (${runsSql(finishedOn)}) f`,
     [SUBSTRINGS_ID, date, userId],
   );
   const scores = rows.map((r) => ({ ...r, total: total(r) }));
@@ -62,4 +65,11 @@ export async function standingToday(db: Db, userId: string, date: string): Promi
     percent: scores.length >= PERCENTILE_MIN_PLAYERS ? percentile(you, others.map((s) => s.total)) : null,
     friends: friends.length === 0 ? null : { rank: 1 + friends.filter((s) => s.total > you).length, of: friends.length + 1 },
   };
+}
+
+// A guest's place so far today, from the players' finished runs alone: read only, so the guest's score is never added to
+// theirs (docs/milestones/M18-guest-play.md, answer 20). The same minimum as a player's; a guest has no friends.
+export async function guestStandingToday(db: Db, date: string, score: number): Promise<Standing> {
+  const { rows } = await db.query<RunWords>(runsSql(finishedOn), [SUBSTRINGS_ID, date]);
+  return { percent: rows.length >= PERCENTILE_MIN_PLAYERS ? percentile(score, rows.map(total)) : null, friends: null };
 }

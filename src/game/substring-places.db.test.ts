@@ -5,7 +5,8 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
 import { SUBSTRINGS_ID } from "@/platform/game";
-import { settleSubstringRuns, standingToday } from "./substring-places";
+import { scoreRun } from "./substring-scoring";
+import { guestStandingToday, settleSubstringRuns, standingToday } from "./substring-places";
 
 const DAY = "2001-02-03";
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
@@ -111,6 +112,28 @@ describe("a finished run's standing so far", () => {
       await befriend(client, viewer, friend);
       await asPlorApp(client);
       expect(await standingToday(client, viewer, DAY)).toEqual({ percent: null, friends: null });
+    });
+  });
+});
+
+describe("a guest's standing so far", () => {
+  it("places a score among the players' finished runs from 10 of them, and adds nothing to anyone", async () => {
+    await inRolledBackTransaction(async (client) => {
+      await day(client, DAY);
+      // As above: one letter each, so a run's score is its word's points and 35.
+      for (const length of [3, 4, 5, 6, 7, 8, 9, 10, 11]) await run(client, DAY, ["a".repeat(length)], true);
+      await run(client, DAY, ["a".repeat(12)], false);
+      await asPlorApp(client);
+      // 9 finished: no percent yet, and a guest has no friends.
+      expect(await guestStandingToday(client, DAY, 100)).toEqual({ percent: null, friends: null });
+
+      await client.query("reset role; set local session_replication_role = replica");
+      await run(client, DAY, ["a".repeat(2)], true);
+      await asPlorApp(client);
+      // 10 finished, of 2 to 11 letters: a 7-letter score ties one and beats 5 (2 to 6 letters), 5.5 of 10.
+      const before = await client.query("select count(*)::int as n from private.run");
+      expect(await guestStandingToday(client, DAY, scoreRun(["a".repeat(7)], "j").total)).toEqual({ percent: 55, friends: null });
+      expect((await client.query("select count(*)::int as n from private.run")).rows).toEqual(before.rows);
     });
   });
 });
