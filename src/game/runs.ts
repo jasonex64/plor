@@ -5,7 +5,7 @@ import { DatabaseError } from "pg";
 import { avoids, normalize, stolenLetters, tierOf, type ApprovedPuzzle, type Tier } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
-import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION } from "@/config/tunables";
+import { ANSWER_SHARE_MIN_PLAYERS, MISS_ACCEPT_MIN_PLAYERS, MISS_ACCEPT_SHARE_PERCENT, POINTS_PER_QUESTION, TYPED_ANSWER_MAX_LENGTH } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 import { dayLookup, isNearTypo, resolveTyped, type Lookup } from "./matching";
 import { isListed } from "./misses";
@@ -56,17 +56,17 @@ export type RunState = {
 };
 
 // in_day: given before the run's day ended at midnight (M09 D8).
-type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
+export type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
 // The SQLSTATEs raised by the answer and Next triggers
 // (supabase/migrations/20261028140000_baseline.sql).
-const OUT_OF_ORDER = "OB002";
-const RUN_OVER = "OB003";
-const TIME_UP = "OB005";
-const NOT_OPEN = "OB006";
+export const OUT_OF_ORDER = "OB002";
+export const RUN_OVER = "OB003";
+export const TIME_UP = "OB005";
+export const NOT_OPEN = "OB006";
 
 // null when nothing is approved for today.
-async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
+export async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
   const { rows } = await db.query<{ date: string; content: ApprovedPuzzle | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
@@ -85,7 +85,7 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number; dayOver: boolean };
+export type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number; dayOver: boolean };
 
 // The share of the question's players who gave this entry, or null below the minimum (H5).
 function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
@@ -96,7 +96,7 @@ function shareOf(counts: DayCounts | null, index: number, entryId: string): numb
 
 // counts: the day's counts once the run is over, otherwise null; pooled: the category's past days, for the provisional
 // bonus. names: the main names of the answers and host answers.
-function buildState(
+export function buildState(
   date: string,
   puzzle: ApprovedPuzzle,
   stored: StoredEvent[],
@@ -213,6 +213,12 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
   return state;
 }
 
+// Refuses typed text over the limit before any matching: the typo check builds every one-edit spelling of what it is
+// given (audit W1, docs/audits/2026-11-11-weekly-audit.md). One check for signed-in answers, test misses and guests'.
+export function assertTypedLength(typed: string): void {
+  if (typed.length > TYPED_ANSWER_MAX_LENGTH) throw new AppError("text_invalid", 400);
+}
+
 // Answers one question of the player's latest run with typed text, which the server turns into a thing of the
 // question's category (matching.ts, resolveTyped). Text that names none is logged as a miss and costs nothing: the
 // player tries again (human, 2026-10-21). A retry naming the same thing returns the stored result; a different one for
@@ -244,6 +250,7 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   if (isCurrent && !current[0].started) throw new AppError("not_open", 409);
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
+  assertTypedLength(typed);
   const resolved = await resolveTyped(dayLookup(db, puzzle), puzzle, index, typed, stolen);
   if (!resolved) {
     try {
@@ -416,7 +423,7 @@ export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lo
 // misses (the database's check on what was typed, `missed_answer_typed_length`), typed text over 40 characters is
 // refused first (M02 ticket, Numbers; docs/milestones/M14-14b-11c-test-misses-to-audit.md, Numbers).
 async function reportTestMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, lookup: Lookup, index: number, typed: string): Promise<void> {
-  if (typed.length > 40) throw new AppError("text_invalid", 400);
+  assertTypedLength(typed);
   const text = normalize(typed);
   if (!text || (await isNearTypo(lookup, index, typed))) return;
   await db.query("select private.report_test_miss($1, $2, $3)", [userId, puzzle.questions[index], text]);

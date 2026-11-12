@@ -1,4 +1,4 @@
-import { Signed, TodayTab } from "../home";
+import { PlayFirst, Signed, TodayTab } from "../home";
 import { GAME } from "@/platform/game";
 import { Slide } from "../slide";
 
@@ -24,7 +24,7 @@ export default function Page() {
           friends did.
         </p>
       </div>
-      <Signed>
+      <Signed signedOut={<PlayFirst />}>
         <TodayTab />
       </Signed>
     </Slide>

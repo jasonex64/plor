@@ -14,12 +14,23 @@ export type SupabaseAuthEnv = {
   publishableKey: string;
 };
 
+// Cloudflare Turnstile, the guest start's bot check (M18). The site key is public and reaches the browser at runtime,
+// as the Supabase publishable key does; the secret key is server-only.
+export type TurnstileEnv = {
+  siteKey: string;
+  secretKey: string;
+  // The site names a check may be solved on; Siteverify's reply names the one it was solved on, and verifyTurnstile
+  // refuses any other (M18 18c, human, 2026-11-11). Set in Vercel, never in code.
+  allowedHostnames: string[];
+};
+
 export type ServerEnv = {
   database: DbConnection;
   // Supabase Auth, used by server code (route handlers and the proxy). The browser's Realtime-only client (M07 D5)
   // gets both values at runtime from /api/realtime/session, so neither needs the NEXT_PUBLIC_ prefix that would
   // inline it into the client bundle.
   supabase: SupabaseAuthEnv;
+  turnstile: TurnstileEnv;
   // Required for any non-local database: Supabase recommends verify-full against its own CA
   // (supabase.com/docs/guides/platform/ssl-enforcement). Null only for the local stack.
   databaseCaCert: string | null;
@@ -74,14 +85,15 @@ export function readDatabaseUrl(source: Record<string, string | undefined> = pro
 export function readServerEnv(source: Record<string, string | undefined> = process.env): ServerEnv {
   const database = readDatabaseUrl(source);
   const supabase = readSupabaseAuthEnv(source);
-  if (isLocalHost(database.host)) return { database, supabase, databaseCaCert: null };
+  const turnstile = readTurnstileEnv(source);
+  if (isLocalHost(database.host)) return { database, supabase, turnstile, databaseCaCert: null };
 
   const ca = source.DATABASE_CA_CERT;
   if (!ca) throw new Error(`DATABASE_CA_CERT is required for remote database host ${database.host}`);
   if (!ca.trim().startsWith("-----BEGIN CERTIFICATE-----")) {
     throw new Error("DATABASE_CA_CERT is not a PEM certificate: it must start with -----BEGIN CERTIFICATE----- (check for quotes or extra text in the Vercel env var or .env.local)");
   }
-  return { database, supabase, databaseCaCert: ca };
+  return { database, supabase, turnstile, databaseCaCert: ca };
 }
 
 function readSupabaseAuthEnv(source: Record<string, string | undefined>): SupabaseAuthEnv {
@@ -107,4 +119,14 @@ function readSupabaseAuthEnv(source: Record<string, string | undefined>): Supaba
     throw new Error("SUPABASE_PUBLISHABLE_KEY must be a publishable key (it starts with sb_publishable_)");
   }
   return { url: url.origin, publishableKey };
+}
+
+function readTurnstileEnv(source: Record<string, string | undefined>): TurnstileEnv {
+  const siteKey = source.TURNSTILE_SITE_KEY;
+  if (!siteKey) throw new Error("TURNSTILE_SITE_KEY is not set");
+  const secretKey = source.TURNSTILE_SECRET_KEY;
+  if (!secretKey) throw new Error("TURNSTILE_SECRET_KEY is not set");
+  const allowedHostnames = (source.TURNSTILE_ALLOWED_HOSTNAMES ?? "").split(",").map((name) => name.trim()).filter(Boolean);
+  if (allowedHostnames.length === 0) throw new Error("TURNSTILE_ALLOWED_HOSTNAMES is not set (comma-separated hostnames)");
+  return { siteKey, secretKey, allowedHostnames };
 }
