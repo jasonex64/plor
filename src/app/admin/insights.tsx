@@ -76,6 +76,8 @@ export function Insights() {
         <span className={kit.chip}>{report.finished ? "Finished" : "Today, still being played"}</span>
         <span className={admin.muted}>{players === 1 ? "1 player" : `${players} players`}</span>
       </div>
+      {/* The counts mix guests and players unevenly (docs/milestones/M18-guest-play.md, answers 22 and 35). */}
+      <p>These counts include guests, who can play a day more than once. A guest&apos;s answer after midnight isn&apos;t counted; a player&apos;s is.</p>
       <section aria-label="Caught per question" className={kit.card}>
         <h3 className={admin.cardTitle}>Caught per question</h3>
         <p className={admin.note}>

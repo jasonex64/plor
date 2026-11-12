@@ -20,8 +20,8 @@ export default function Page() {
         <h2>Today&apos;s game: {GAME.name}</h2>
         <p>
           Seven questions, such as &quot;Name an animal&quot;. For each one, give an answer the host didn&apos;t pick:
-          if you match the host, your run ends. Unusual answers are your way through. Sign in to play and see how your
-          friends did.
+          if you match the host, your run ends. Unusual answers are your way through. Play without an account, or sign
+          in to see how your friends did.
         </p>
       </div>
       <Signed signedOut={<PlayFirst />}>
