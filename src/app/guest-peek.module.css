@@ -20,8 +20,10 @@
 }
 
 /* The words' card, in the middle, with the card's own 14px (kit.module.css, .card) left around it for the stand-in to
-   show. */
+   show. Positioned, because the stand-in's filter makes it paint above anything that isn't: without this the blur
+   covered the words and took the link's clicks (e2e/guest-play.e2e.ts, expectPeek). */
 .ask {
+  position: relative;
   place-self: center;
   margin: 14px;
   align-items: center;
