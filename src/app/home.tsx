@@ -264,7 +264,7 @@ export function Signed({ children, signedOut }: { children: ReactNode; signedOut
 }
 
 // The front page for a signed-out visitor: play first, sign in second (human, 2026-11-11: "Play first, sign in second
-// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 8).
+// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 26).
 export function PlayFirst() {
   const { loadMe } = useFrame();
   return (

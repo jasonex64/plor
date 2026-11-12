@@ -168,8 +168,8 @@ type Runner = {
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 // family: which routes it plays (src/app/run-routes.ts); a guest has no streak, so no onStarted, and no Share or answer
-// searches, which need an account (Share comes to guests with 18e's result, docs/milestones/M18-guest-play.md). turnstileToken:
-// the bot check's token a guest's start sends.
+// searches, which need an account (Share comes to guests with 18e's result, docs/milestones/M18-guest-play.md). botCheck:
+// runs the bot check when a guest presses Start and gives the token the start sends.
 // onPlaying: whether the play frame is up, when the screen shows only the game (docs/milestones/
 // M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23; docs/milestones/M14-14c-8-plain-game-1.md), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
 export function Game({
