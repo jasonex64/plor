@@ -69,7 +69,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
         </ButtonLink>
       </p>
       <section id="offbeat" aria-label={GAME.name} className={styles.game}>
-        <Game key={`game-${gameDay}`} onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} onPlaying={setPlaying} />
+        <Game key={`game-${gameDay}`} family="account" onOver={reportOver} onDayOver={nextDay} onStarted={onStarted} onPlaying={setPlaying} />
       </section>
       <div className={styles.cards} hidden={playing}>
         <OffbeatInfo key={`info-${day}-${ended}`} />

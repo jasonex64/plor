@@ -34,6 +34,7 @@ import { PlayFrame, StatusMessage } from "./play-frame";
 import { Recap } from "./recap";
 import { Line, Skeleton } from "./skeleton";
 import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
+import { runRoutes, startBody, type RunFamily } from "./run-routes";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -51,7 +52,7 @@ type AnswerResponse = { run: RunState; notInList: boolean };
 type DayHooks = { onOver: (over: boolean) => void; onDayOver: (inPlay: boolean) => void };
 
 // The day's run as the server last gave it, for Today's banner and the game screen alike.
-function useRun({ onOver, onDayOver }: DayHooks) {
+function useRun({ onOver, onDayOver }: DayHooks, family: RunFamily = "account") {
   const [run, setRun] = useState<RunState | null>(null);
   const [noPuzzle, setNoPuzzle] = useState<NoPuzzle | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +64,11 @@ function useRun({ onOver, onDayOver }: DayHooks) {
 
   // Stable, so the run loads once each time the page shows, not on every render.
   const load = useCallback(() => {
-    api<RunResponse>("/api/run", { method: "GET" }).then(
+    api<RunResponse>(runRoutes(family).state, { method: "GET" }).then(
       (r) => (r.run ? setRun(r.run) : setNoPuzzle({ msToReset: r.msToReset })),
       (err) => setError(errorText(err)),
     );
-  }, []);
+  }, [family]);
   useEffect(load, [load]);
   // Each state carries the time to the reset as the server measured it, so the timer starts again from each one, with
   // whether that state is in play.
@@ -166,11 +167,21 @@ type Runner = {
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
+// family: which routes it plays (src/app/run-routes.ts); a guest has no streak, so no onStarted, and no Share or answer
+// searches, which need an account (Share comes to guests with 18e's result, docs/milestones/M18-guest-play.md). botCheck:
+// runs the bot check when a guest presses Start and gives the token the start sends.
 // onPlaying: whether the play frame is up, when the screen shows only the game (docs/milestones/
 // M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23; docs/milestones/M14-14c-8-plain-game-1.md), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
-export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted: () => void; onPlaying: (playing: boolean) => void }) {
+export function Game({
+  family,
+  botCheck,
+  onStarted,
+  onPlaying,
+  ...hooks
+}: DayHooks & { family: RunFamily; botCheck?: () => Promise<string>; onStarted?: () => void; onPlaying: (playing: boolean) => void }) {
   const router = useRouter();
-  const { run, setRun, noPuzzle, error, setError, over } = useRun(hooks);
+  const { run, setRun, noPuzzle, error, setError, over } = useRun(hooks, family);
+  const routes = runRoutes(family);
   const [busy, setBusy] = useState(false);
 
   async function send(path: string, body?: unknown): Promise<AnswerResponse | null> {
@@ -188,11 +199,27 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     }
   }
 
+  async function startRun() {
+    let body;
+    if (family === "guest") {
+      setBusy(true);
+      setError(null);
+      try {
+        body = startBody(family, await botCheck!());
+      } catch (err) {
+        setError(errorText(err));
+        setBusy(false);
+        return;
+      }
+    }
+    if (await send(routes.start, body)) onStarted?.();
+  }
+
   // At zero the server is asked again, and decides whether time is up (rule 3). The run in play can't vanish, so no run
   // at all is an error, shown as any other.
   async function timeUp(): Promise<RunState | null> {
     try {
-      const response = await api<RunResponse>("/api/run", { method: "GET" });
+      const response = await api<RunResponse>(routes.state, { method: "GET" });
       if (!response.run) throw new Error("the run in play is gone");
       setRun(response.run);
       return response.run;
@@ -208,12 +235,12 @@ export function Game({ onStarted, onPlaying, ...hooks }: DayHooks & { onStarted:
     error,
     busy,
     over,
-    start: () => void send("/api/run/start").then((r) => r && onStarted()),
-    next: () => send("/api/run/next"),
-    answer: (text) => send("/api/run/answer", { index: run!.question!.index, text }),
+    start: () => void startRun(),
+    next: () => send(routes.next),
+    answer: (text) => send(routes.answer, { index: run!.question!.index, text }),
     timeUp,
   };
-  return <Run runner={runner} onPlaying={onPlaying} saved out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })} />;
+  return <Run runner={runner} onPlaying={onPlaying} saved={family === "account"} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })} />;
 }
 
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
