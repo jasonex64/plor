@@ -17,11 +17,17 @@ import { fixtureTier } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, nameOf, removeFixtures, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
+import { resolveTyped } from "./matching";
 import { startRun, todaysState } from "./runs";
 import { publicQuestion } from "./payload";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
+// The real matcher, wrapped so a test can see whether it was called (audit W1: matching long text is the cost).
+vi.mock("./matching", async (importActual) => {
+  const actual = await importActual<typeof import("./matching")>();
+  return { ...actual, resolveTyped: vi.fn(actual.resolveTyped) };
+});
 
 const RUN = Date.now().toString(36);
 let today = "";
@@ -450,5 +456,17 @@ describe("startRun's foreign keys, and a day with no puzzle", () => {
       await expect(failure).rejects.toBeInstanceOf(DatabaseError);
       await expect(failure).rejects.toMatchObject({ code: "23503", constraint: "run_user_id_fkey" });
     });
+  });
+});
+
+// Audit W1: long text must be refused before the typo matcher builds spellings of it.
+describe("a long answer", () => {
+  it("refuses typed text over 40 characters before it is matched", async () => {
+    const player = await newPlayer("long");
+    useSession(player.session);
+    await start();
+    vi.mocked(resolveTyped).mockClear();
+    expect(await answerText(0, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
+    expect(resolveTyped).not.toHaveBeenCalled();
   });
 });

@@ -43,6 +43,7 @@ Anyone can play today's game 1 or game 2 from the front page without an account;
 20. Game 2's "better than X% of players" for a guest: "Show it". Read only; the guest's score isn't added to the players' scores.
 21. Where the guest token's size comes from (asked in 18a, when the draft's `gen_random_uuid()` was dropped): "From a security source (Recommended)". OWASP's Session Management Cheat Sheet is added to SOURCES.md and its size is used. Shown both of the page's figures for a token stored as a hash, "at least 128 bits of entropy; prefer 160 bits or more", the human chose "160 bits, the preferred (Recommended)" (round 2 of 18a's review).
 22. Should the admin Insights page include guests' answers (asked after 18a's review): "Yes, include guests (Recommended)". Insights add the nameless guest counts, so the human sees every answer given; catch rates then mix guests, who can replay, with players, and the page says so.
+23. The signed-in `/api/run/answer` length fix the ticket left out of scope (audit W1), asked 2026-11-11: "Add it to 18c (Recommended)". One shared check for guests and signed-in players, in 18c's pull request.
 
 ## Design (proposed)
 **What a guest can reach.** The front page, both game routes, a run, the result with a share button, and the peek. Not friends, groups, comments, reactions, the feed, boards, Me or settings. A guest has no name, no points ledger row, no streak.
@@ -70,7 +71,7 @@ Anyone can play today's game 1 or game 2 from the front page without an account;
 
 **The bot check.** The guest start route reads a Turnstile token from the browser, posts it with the secret to Siteverify, and creates the run only on `success: true`. A failed check, a repeated token (`timeout-or-duplicate`), a missing token, or Siteverify being unreachable (network error, non-200, bad JSON) each stop with an error and create nothing: 400 `captcha_failed`, or 503 `captcha_unavailable` for unreachable, logged and counted (`log.warn`/`log.error`, as `authFailure` does, `auth.ts:47`). No silent pass. The widget is Managed mode (answer 16) on the guest start button; its script loads from `challenges.cloudflare.com`. No Content-Security-Policy was found in `next.config.ts`, `vercel.json` or `src` (grep 2026-11-11); if one appears later it must allow that host. Only the start is checked: the run token is the proof afterward. Keys: the site key is public and the secret key is a server-only variable in `src/config/env.ts`, which refuses to boot when either is missing; local and CI use Cloudflare's published test keys (values are in the Turnstile testing page, not secrets). The widget and routes are not split: the start route is born with its check, so no guest route is ever reachable unchecked.
 
-**Answer length (audit W1).** `/api/run/answer` checks `text.trim() === ""` but no length before matching (`src/app/api/run/answer/route.ts:13-14`); the only 40-character rule is the table check `missed_answer_typed_length` (baseline line 488), reached after matching, and a hard-coded `> 40` in `reportTestMiss` (`runs.ts:419`). The guest answer route refuses text over 40 characters with 400 `text_invalid` before any matching. The signed-in route gets the same line as its own small ticket, not here; the two routes share no code path (the guest one calls its own function), so nothing here forces it. *Unverified:* JavaScript length counts UTF-16 units and Postgres `char_length` counts characters, so 18c compares them with an emoji case.
+**Answer length (audit W1).** `/api/run/answer` checks `text.trim() === ""` but no length before matching (`src/app/api/run/answer/route.ts:13-14`); the only 40-character rule is the table check `missed_answer_typed_length` (baseline line 488), reached after matching, and a hard-coded `> 40` in `reportTestMiss` (`runs.ts:419`). The guest answer route refuses text over 40 characters with 400 `text_invalid` before any matching. The signed-in route gets the same refusal in this PR, through one shared check (answer 23). *Unverified:* JavaScript length counts UTF-16 units and Postgres `char_length` counts characters, so 18c compares them with an emoji case.
 
 **Guest misses.** Text that names no entry is a free retry and not stored for a guest. Signed-in misses feed learning by distinct players (`private.record_miss`, `runs.ts:330`), which needs an identity; answer 9 keeps answers only. The human confirmed (answer 19).
 
@@ -98,6 +99,7 @@ Each can be checked by a command or an e2e.
 - [ ] Insights count guests: a db test gives guest answers (caught and not) to one question and sees `answered`, `caught`, `catchRate` and `topAnswers` change by exactly those, and `misses` unchanged; the page says its counts include guests. (18b: the counts, tested; the page's text waits for 18e, see Source diff.)
 - [x] Guests' order, clock and "over" rules match signed-in ones: the same pgTAP cases (late answer OB005, out of order OB002, after a catch OB003, before Next OB006) pass on both table sets; game 2's lockout and round rules likewise.
 - [ ] A guest answer over 40 characters is refused with 400 `text_invalid` before matching (a test with a spy on `resolveTyped` that it isn't called).
+- [ ] A signed-in answer over 40 characters is refused with 400 `text_invalid` before matching (a test with a spy on `resolveTyped` that it isn't called); the signed-in and guest routes use the one shared check.
 - [ ] A failed bot check (always-fail test secret), a repeated token, a missing token, and Siteverify unreachable each return an error and create no `guest_run` row (db count before and after). Unreachable is tested by making the call to Cloudflare fail, the only stub, at the network edge.
 - [ ] The e2e plays a whole guest run in game 1 and game 2 with the always-pass test keys, sees the result, the blurred stand-in and the share button, and finds no friends, groups, Me or settings; another e2e with the force-interaction key shows the box and starts after it is ticked.
 - [ ] A guest who signs up the same day starts clean (no streak, no totals) and can play today's game for points (e2e).
@@ -110,13 +112,12 @@ Each can be checked by a command or an e2e.
 - Any guest name, streak, totals, history, ledger row, friends, groups, comments, reactions or boards (answers 6, 9).
 - Supabase anonymous sign-ins and their rate limit (above).
 - Removing friend invite links (M17 17c).
-- The signed-in `/api/run/answer` length fix (its own small ticket from audit W1).
 - Real-data peeks (answer 15) and merging a guest's run into a new account (answer 9).
 
 ## Numbers
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
-| 40 characters | Longest typed answer, refused before matching | `missed_answer_typed_length` (baseline line 488); `runs.ts:419`; M02 ticket, Numbers. Not in `tunables.ts` today; 18c should import it from there or share one helper (*unverified* where the M02 number was set) |
+| 40 characters | Longest typed answer, refused before matching | `missed_answer_typed_length` (baseline line 488); M02 ticket, Numbers. Now one constant, `TYPED_ANSWER_MAX_LENGTH` in `tunables.ts`, with one check, `assertTypedLength` in `src/game/runs.ts`, used by `answer()`, `reportTestMiss` and (18c) the guest answer route (answer 23) |
 | 20 seconds | A guest question's clock | `private.question_deadline`; DECISIONS.md, Game 1, Timer (reused) |
 | 7 questions, 7 rounds | A run's length | `QUESTIONS_PER_DAY`; DECISIONS.md, Game 2 (reused) |
 | 300 seconds | A Turnstile token's life | Cloudflare, server-side validation (a fact; we set nothing) |

@@ -18,6 +18,11 @@ export const CATCH_TARGETS = [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2];
 // at least 30 days"; 13d: "Same category (Recommended)"). npm run draft picks by it and content:validate checks it.
 export const REPEAT_GAP_DAYS = 30;
 
+// The longest typed answer, in characters (M02 ticket, Numbers; docs/milestones/M18-guest-play.md, Numbers). The
+// database's check constraint missed_answer_typed_length holds the same 40; assertTypedLength (src/game/runs.ts)
+// refuses longer text before it is matched, for signed-in and guest answers alike (M18 answer 23, 2026-11-11).
+export const TYPED_ANSWER_MAX_LENGTH = 40;
+
 // Username length (human, 2026-10-18; docs/milestones/M02-sign-in-and-play.md, Numbers). The database's check
 // constraint profile_username_format enforces it; src/lib/profile.db.test.ts checks the two agree (M02 2f, B6).
 export const USERNAME_MIN_LENGTH = 3;
