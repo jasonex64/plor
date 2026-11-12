@@ -74,6 +74,8 @@ select is(pg_temp.grants('plor_app'), array[
   -- What a waiting near-typo could be linked to, in one click (M14 14b-2b-2b).
   'private.audit_near(uuid,bigint,text[]) execute',
   'private.audit_open_count(uuid) execute',
+  -- Blocks (M17 17a, D4): read and added; an unblock goes through private.unblock, one pair a call, so there is no delete.
+  'private.block insert', 'private.block select',
   -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
   'private.base_lookup(uuid,text) execute',
   -- A test run builds a draft as approval would and resolves its answers, admins only, writing nothing (M14 14b-11).
@@ -100,6 +102,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.end_guest_run(text,text) execute',
   'private.friend_invite insert', 'private.friend_invite select',
   'private.friend_invite.code update',
+  -- Friend requests (M17 17a): read, sent, and deleted by an accept, a decline or a cancel.
+  'private.friend_request delete', 'private.friend_request insert', 'private.friend_request select',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
