@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); nothing built yet; 17a's exact security design is proposed (2026-11-12, "17a design" below: tables, grants, policies, and seven decisions D1 to D7 that wait for the human; no code or migration before the human's OK). Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); 17a is being built; nothing merged yet. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -57,6 +57,9 @@ This ticket follows the three OWASP pages added to `docs/SOURCES.md` on 2026-11-
 28. A declined request leaves the sender's sent list, while a blocked sender's request stays pending forever, like one being ignored: "Yes, keep it (Recommended)". A blocked sender can't tell a block from no answer.
 29. Can the blocker send a request to someone they've blocked: "No, unblock first (Recommended)". No friendship either way while a block is on; so mutual requests never make friends while either has blocked the other, and a request that was already waiting from the now-blocked player is not delivered or counted.
 
+## Answer (human, 2026-11-12, 17a's security design)
+30. Asked whether PR #190's merge means D1 to D7 are accepted and 17a can be built: "Yes, build as proposed". So each of D1 to D7 is settled as its recommended option (a), and 17a's tables, grants, triggers and block rule are approved as written in "17a design" (CLAUDE.md, "Security changes need a human"; DECISIONS.md, log, 2026-11-12).
+
 *Reading, Claude's, not an answer:* the Friends tab's count (answer 14) counts requests waiting for the viewer only, not ones the viewer sent and not ones from a player the viewer has blocked.
 
 ## Design (proposed)
@@ -105,8 +108,8 @@ For the human to approve, change or reject; none is decided here. CLAUDE.md, Sec
 5. **The search counter:** a table and a guarded function like `private.take_auth_attempt`, keyed by the player instead of the IP. Proposal: reuse that table and function if it can hold a per-player key, rather than a second pair. There is no per-address key (18).
 6. **Account deletion:** `private.delete_account` must leave none of the player's requests, blocks or held names behind. A name held on behalf of a deleted player is freed at once (27).
 
-## 17a design (proposed, 2026-11-12, Claude's overnight draft; waits for the human)
-Friend requests and blocking only (Plan 1); search, profiles and the held name are 17b, invite removal 17c. This makes Security changes proposed 1, 3 (requests, blocks and their reach) and 6 (deletion, for these two tables) exact. **Nothing here is approved; no code or migration before the human approves it** (CLAUDE.md, Security). Where an answer doesn't settle a point, the design is written for the recommended option of "Decisions for the human", below, and marked **[D*n*]**. Every line about PostgreSQL's locking and trigger behaviour is *unverified*: from memory, not read this session; Plan step 1 reads the manual (SOURCES.md, PostgreSQL 17) before any SQL.
+## 17a design (proposed 2026-11-12, Claude's overnight draft; approved by the human 2026-11-12, answer 30)
+Friend requests and blocking only (Plan 1); search, profiles and the held name are 17b, invite removal 17c. This makes Security changes proposed 1, 3 (requests, blocks and their reach) and 6 (deletion, for these two tables) exact. **Approved as proposed, D1 to D7 each as its recommended option (answer 30); the words "proposed", "waits" and "none is settled" below are the draft's, kept as written.** Where an answer doesn't settle a point, the design is written for the recommended option of "Decisions for the human", below, and marked **[D*n*]**. Every line about PostgreSQL's locking and trigger behaviour is *unverified*: from memory, not read this session; Plan step 1 reads the manual (SOURCES.md, PostgreSQL 17) before any SQL.
 
 **What exists (read 2026-11-12, `supabase/migrations/20261028140000_baseline.sql` unless named).** `private.friendship`: one row per pair, `user_a < user_b`, both `references auth.users (id) on delete cascade`, RLS on (lines 559-571); `plor_app` has select, insert, delete (line 2889) with one policy each (3042-3046). Nothing fires on a friendship change: the triggers are on `run`, `run_event`, `question_open`, `group_member`, `comment`, `reaction` and `profile` (2963-2997). The live board's sends read the friendship at send time (`broadcast_board`, 2651-2653); comment nudges go to the actor's friends or, for a group comment, to every member (`broadcast_comments`, 2727-2733). In the app, who sees what is written once in `src/friends/circle.ts`: `friendsSql` (7-9), `seesAuthorSql` (12-14), `seesCommentSql` (24-27), `seesCommentReactionSql` (31-34), `circleSql` (37-41). `private.delete_account` deletes the `auth.users` row and lets its cascades remove the rest (1115-1138, the delete at 1135); `supabase/tests/account_deletion.test.sql:55-63` counts a deleted player's rows table by table. The highest error code in the migrations is OB015 (grep, 2026-11-12).
 
@@ -194,7 +197,7 @@ Friend requests and blocking only (Plan 1); search, profiles and the held name a
 ## Open
 What truly remains; nothing above is designed around an unanswered question.
 - The lines marked *unverified* in Design (a request to someone who is already a friend; the new tables cascading on account deletion) stay unverified.
-- 17a's seven "Decisions for the human" (17a design, D1 to D7) and its security changes wait for the human; 17a's design is written for the recommended options.
+- Nothing of 17a's waits: D1 to D7 and its security changes are approved (answer 30).
 
 ## Privacy page draft
 **Approved by the human, 2026-11-11 ("Approve M17"; answer 26). `src/app/privacy/page.tsx` is not changed until 17c.** Added under "What we keep", in the page's tone; "Last updated" would change with it:
