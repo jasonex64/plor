@@ -52,7 +52,8 @@ import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
 import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
-import { BACK } from "./slide";
+import { BACK, FORWARD } from "./slide";
+import kit from "./kit.module.css";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
@@ -260,6 +261,22 @@ export function Signed({ children, signedOut }: { children: ReactNode; signedOut
     );
   if (me.username === null) return <PickUsername onDone={loadMe} />;
   return children;
+}
+
+// The front page for a signed-out visitor: play first, sign in second (human, 2026-11-11: "Play first, sign in second
+// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 8).
+export function PlayFirst() {
+  const { loadMe } = useFrame();
+  return (
+    <>
+      <p>
+        <ButtonLink href={GAME.path} transitionTypes={FORWARD} className={kit.primary}>
+          Play without an account
+        </ButtonLink>
+      </p>
+      <SignIn onSignedIn={loadMe} />
+    </>
+  );
 }
 
 // A sign-in that came back with an error (src/app/auth/callback/route.ts), above the sign-in it failed.
