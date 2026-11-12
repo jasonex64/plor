@@ -51,7 +51,13 @@ Asked from a fresh grep at `98609f5`: `GAME_ID` is imported by 18 non-test files
 3. Game 2's shown name: first "something neutral but not "game 2"", then, from Claude's three neutral options, "Fragments". The `game_id` stays `substrings` (S1).
 4. The friends' live board: "One per game". In a game you see friends playing that same game.
 
-Not yet asked: the carousel's details (which card shows first, swipe, the peek), the shared streak on a day when one game has no approved day, comments, the mixed feed, groups and Share. 16f is not approved to build.
+Second round (human, 2026-11-11):
+5. Which card is in front when the app opens: "The one you haven't played (Recommended)". Whatever is left to play today comes first; once both are played, game 1 first.
+6. The carousel's feel: "Show me mock-ups first". Claude makes two or three pictures of the carousel before any of it is built; this is design work, so the session that makes them runs on Fable (CLAUDE.md, Agent setup).
+7. A day when only one game has an approved day: "Play what's there (Recommended)". Starting the one available game keeps the shared streak; a day with no approved day in either game is skipped and breaks no streak.
+8. Groups and Share for Fragments: "Both, for both games (Recommended)". Group boards cover both games and Share gets a Fragments result.
+
+Not yet asked: the carousel's mock-ups and the choice between them, each game's comments and reactions on the shared screens, and the mixed feed's details. 16f is not approved to build.
 
 ## Decisions
 | # | Decision | Answer (origin) |
