@@ -29,6 +29,17 @@ No entry in `docs/SOURCES.md` covers this feature's limits or how to stop people
 7. Order: "Profiles after Game 2".
 8. When: "Before the beta (Recommended)".
 
+## Answers (human, 2026-11-11, the design round's first three rounds)
+9. A profile's address: "The username".
+10. An old link after a rename: "Hold the old name a while". For how long: "30 days (Recommended)", the same 30 days as between username changes (M12 12b).
+11. Streak and totals with two games: "Same as your Me page (Recommended)": the all-games summary and a card for each game.
+12. How far a block reaches: "Also comments and reactions". Neither player sees the other's comments or reactions anywhere; results on a shared group's boards still show.
+13. Whether the blocked player is told: "Silent (Recommended)". Their request looks unanswered and the profile looks as if it doesn't exist.
+14. Learning of a new request: "A count on the Friends tab (Recommended)", shown when the page next loads; no live nudge.
+15. Searches allowed: "60 an hour", for one player.
+16. A cap on requests waiting for an answer: "No separate cap (Recommended)". A request needs a search first, so the search limit bounds them.
+17. Asking again after a decline: "Right away; block stops it (Recommended)".
+
 ## Design (proposed)
 - **A profile page for each player,** reusing Me's totals, calendar and rarest answers.
 - **Rarest answers and recent results never spoil a day the viewer hasn't played** (a rule, not a setting).
@@ -36,12 +47,10 @@ No entry in `docs/SOURCES.md` covers this feature's limits or how to stop people
 - **Friend invites end in the same release that search ships,** so there is always a way to add a friend.
 
 ## Open, for the design round
-- Is a profile's address the username, or a permanent ID? Usernames can change every 30 days (M12 12b), and ROADMAP For M15 already lists actions that reach the wrong player from a stale page.
-- What does a blocked player see in a group you share? Group members see each other today.
-- Does blocking stop comments and reactions, or only requests and the profile?
-- With two games, is a profile's streak and total per game or for all of Plor (M16's open decision on streaks)?
-- Are live nudges for a new request needed, or does the list do?
+- The search limit per address: answer 15 gives it per player only.
+- A source for the search limit. A search on 2026-11-11 found that OWASP's Authentication Cheat Sheet, WSTG-IDNT-04 and REST Security Cheat Sheet ask for a limit and for replies that don't tell an existing account from a missing one, and give no number; none is in SOURCES.md yet, which needs the human's OK. Answer 3 already accepts that an exact search reveals which usernames exist.
 - The privacy policy: usernames become searchable and profiles visible to strangers (`src/app/privacy/page.tsx`).
+- The Design and the acceptance criteria below are not yet rewritten for answers 9 to 17, and the ticket is not approved to build.
 
 ## Acceptance criteria
 Draft shape, for the human to change:
@@ -61,9 +70,11 @@ Draft shape, for the human to change:
 ## Numbers
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
-| Searches allowed per player and per address | Stops listing usernames | Open: a human number, with a source |
-| Requests allowed per player | Stops request spam | Open: a human number |
-| How long a declined player waits before asking again | Requests | Open: a human number |
+| 60 searches an hour per player | Stops listing usernames | Human, 2026-11-11 (answer 15); no source gives a number |
+| Searches allowed per address | Stops listing usernames | Open: a human number |
+| 30 days a freed username is held | An old profile link doesn't reach a stranger | Human, 2026-11-11 (answer 10); the same 30 as M12 12b's wait between changes |
+| No cap on pending requests | Requests | Human, 2026-11-11 (answer 16) |
+| No wait after a decline | Requests | Human, 2026-11-11 (answer 17) |
 
 ## Plan
 Draft sub-tickets, for the human to reorder after the design round:
