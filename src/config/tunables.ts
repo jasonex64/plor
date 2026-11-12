@@ -212,3 +212,8 @@ export const PERCENTILE_MIN_PLAYERS = 10;
 // The guest token's length in random bytes: 160 bits, the size OWASP's Session Management Cheat Sheet prefers for a token
 // stored as a hash (human, 2026-11-11, M18 answer 21: "160 bits, the preferred (Recommended)"; SOURCES.md).
 export const GUEST_TOKEN_BYTES = 20;
+
+// How long the bot check waits for Cloudflare's Siteverify reply before failing closed, in milliseconds (human,
+// 2026-11-11: "10 seconds"; docs/milestones/M18-guest-play.md, Open questions 2). Cloudflare's server-side validation
+// page says to set a timeout and gives no number (developers.cloudflare.com/turnstile/get-started/server-side-validation/).
+export const SITEVERIFY_TIMEOUT_MS = 10_000;

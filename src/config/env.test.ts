@@ -4,8 +4,8 @@ import { readServerEnv } from "./env.ts";
 const PEM = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----";
 const REMOTE = "postgresql://plor_app.ref:pw@aws-0-us-east-1.pooler.supabase.com:6543/postgres";
 const LOCAL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
-const TURNSTILE_ONLY = { TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret" };
-const AUTH = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x", TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret" };
+const TURNSTILE_ONLY = { TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret", TURNSTILE_ALLOWED_HOSTNAMES: "plor.app, www.plor.app" };
+const AUTH = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x", TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret", TURNSTILE_ALLOWED_HOSTNAMES: "plor.app, www.plor.app" };
 
 describe("readServerEnv", () => {
   it("fails when DATABASE_URL is missing", () => {
@@ -42,7 +42,7 @@ describe("readServerEnv", () => {
     expect(readServerEnv({ DATABASE_URL: LOCAL, ...AUTH })).toEqual({
       database: { host: "127.0.0.1", port: 54322, user: "postgres", password: "postgres", database: "postgres" },
       supabase: { url: "https://ref.supabase.co", publishableKey: "sb_publishable_x" },
-      turnstile: { siteKey: "site", secretKey: "secret" },
+      turnstile: { siteKey: "site", secretKey: "secret", allowedHostnames: ["plor.app", "www.plor.app"] },
       databaseCaCert: null,
     });
   });
@@ -83,7 +83,7 @@ describe("readServerEnv", () => {
     expect(env.supabase.url).toBe("http://127.0.0.1:54321");
   });
 
-  it.each(["TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY"])("refuses to boot without %s", (name) => {
+  it.each(["TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY", "TURNSTILE_ALLOWED_HOSTNAMES"])("refuses to boot without %s", (name) => {
     const without = Object.fromEntries(Object.entries(AUTH).filter(([key]) => key !== name));
     expect(() => readServerEnv({ DATABASE_URL: LOCAL, ...without })).toThrow(new RegExp(`${name} is not set`));
   });

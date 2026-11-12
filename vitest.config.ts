@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
-import { TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./src/test/turnstile-keys.ts";
+import { TURNSTILE_TEST_HOSTNAME, TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./src/test/turnstile-keys.ts";
 
 // Mirrors the "@/*" path alias in tsconfig.json so tests import modules the way the app does.
 export default defineConfig({
@@ -13,6 +13,6 @@ export default defineConfig({
   // from here for all of them (M18 18c), so the variables stay required in readServerEnv.
   test: {
     exclude: [...configDefaults.exclude, ".claude/worktrees/**"],
-    env: { TURNSTILE_SITE_KEY: TURNSTILE_TEST_SITE_KEY, TURNSTILE_SECRET_KEY: TURNSTILE_TEST_PASS_SECRET },
+    env: { TURNSTILE_SITE_KEY: TURNSTILE_TEST_SITE_KEY, TURNSTILE_SECRET_KEY: TURNSTILE_TEST_PASS_SECRET, TURNSTILE_ALLOWED_HOSTNAMES: TURNSTILE_TEST_HOSTNAME },
   },
 });

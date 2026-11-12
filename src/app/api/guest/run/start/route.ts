@@ -12,7 +12,8 @@ import { startGuestRun } from "@/game/guest-runs";
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const { turnstileToken } = await readJsonObject(request);
-  await verifyTurnstile(typeof turnstileToken === "string" ? turnstileToken : null, readServerEnv().turnstile.secretKey);
+  const { secretKey, allowedHostnames } = readServerEnv().turnstile;
+  await verifyTurnstile(typeof turnstileToken === "string" ? turnstileToken : null, secretKey, allowedHostnames);
   const token = (await readGuestToken()) ?? newGuestToken();
   const run = await startGuestRun(getPool(), hashKey(token));
   await setGuestCookie(token);

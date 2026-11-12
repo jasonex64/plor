@@ -8,7 +8,7 @@ import { expect, vi } from "vitest";
 import { POST as sendCode } from "@/app/api/auth/email/route";
 import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
 import { apiRequest, cookieJar } from "./request-scope";
-import { TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./turnstile-keys";
+import { TURNSTILE_TEST_HOSTNAME, TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./turnstile-keys";
 
 export { TURNSTILE_TEST_PASS_SECRET };
 
@@ -25,6 +25,7 @@ export function useLocalStack(): void {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", key);
   vi.stubEnv("TURNSTILE_SITE_KEY", TURNSTILE_TEST_SITE_KEY);
   vi.stubEnv("TURNSTILE_SECRET_KEY", TURNSTILE_TEST_PASS_SECRET);
+  vi.stubEnv("TURNSTILE_ALLOWED_HOSTNAMES", TURNSTILE_TEST_HOSTNAME);
 }
 
 type MailSummary = { ID: string; Subject: string };

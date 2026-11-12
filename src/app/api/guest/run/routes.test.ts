@@ -17,6 +17,7 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
   vi.stubEnv("TURNSTILE_SITE_KEY", "1x00000000000000000000AA");
   vi.stubEnv("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA");
+  vi.stubEnv("TURNSTILE_ALLOWED_HOSTNAMES", "example.com");
 });
 
 async function call(response: Promise<Response>) {

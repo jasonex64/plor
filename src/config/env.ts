@@ -19,6 +19,9 @@ export type SupabaseAuthEnv = {
 export type TurnstileEnv = {
   siteKey: string;
   secretKey: string;
+  // The site names a check may be solved on; Siteverify's reply names the one it was solved on, and verifyTurnstile
+  // refuses any other (M18 18c, human, 2026-11-11). Set in Vercel, never in code.
+  allowedHostnames: string[];
 };
 
 export type ServerEnv = {
@@ -123,5 +126,7 @@ function readTurnstileEnv(source: Record<string, string | undefined>): Turnstile
   if (!siteKey) throw new Error("TURNSTILE_SITE_KEY is not set");
   const secretKey = source.TURNSTILE_SECRET_KEY;
   if (!secretKey) throw new Error("TURNSTILE_SECRET_KEY is not set");
-  return { siteKey, secretKey };
+  const allowedHostnames = (source.TURNSTILE_ALLOWED_HOSTNAMES ?? "").split(",").map((name) => name.trim()).filter(Boolean);
+  if (allowedHostnames.length === 0) throw new Error("TURNSTILE_ALLOWED_HOSTNAMES is not set (comma-separated hostnames)");
+  return { siteKey, secretKey, allowedHostnames };
 }
