@@ -68,7 +68,20 @@ Third round (human, 2026-11-11, two sets of guided questions):
 
 **Claude's reading, not the human's words (open to change):** answer 11 changes where comments are today (a separate list) and meets answer 3 of the split ("Each game its own", opened by finishing that game): a comment on a game the viewer hasn't finished today would be blurred as answer 13 says. Earlier days' items are not blurred, their games being over.
 
-Not yet asked: the choice between the carousel's mock-ups; reactions in the feed; how replies to a comment show; how many items load at a time (a number: the human's or a source's); whether the date between days is shown. 16f is not approved to build.
+Fourth round (human, 2026-11-11, after three mock-ups of the carousel, A "a sliver and dots", B "a wide peek, arrows on top", C "centre stage, named arrows"; the files were shown in the session and are not in the repo):
+16. The carousel: "B, wide peek". A row above the cards reads "Today's games" with ‹ "1 of 2" ›, as How to play's arrows, and a wide strip of the next card shows.
+17. Fragments' card colour: "Its own colour". The colour is not chosen.
+18. What Fragments' card shows: "Mirror, plus the percent after play". As game 1's card, and after play it adds "better than X% of players".
+19. The leaderboard card on Today, now that the feed is endless: "Off Today on phones".
+20. Which game's board the leaderboard shows: "Its own game switch" (game 1, Fragments, overall).
+21. A friend's comment on a game the viewer hasn't played today: "The comment shows". Only results are blurred. The option's stated cost was that a comment could give away an answer. This replaces "opened by finishing that game" in answer 3 of the split, for reading.
+22. When a game's blurred items clear: "Once you finish that game (Recommended)".
+23. Where a comment is written: "Both": on the game's result screen and in a box at the top of the feed.
+24. The friends' live board on phones: "Stays as it is" (from tablet width up, one per game).
+
+**Claude's reading, not the human's words (open to change):** answer 20 applies wherever the board still shows (Friends, and Today on wider screens), since answer 19 takes it off Today on phones. Answer 23's box on Today lets the writer pick only a game they have finished, which the option stated.
+
+Not yet asked: Fragments' card colour (options to be shown); whether the cards keep one order or the unplayed one moves first; words on a blurred item; reactions in the feed; how replies to a comment show; how many items load at a time (a number: the human's or a source's); whether the date between days is shown. 16f is not approved to build.
 
 ## Decisions
 | # | Decision | Answer (origin) |
