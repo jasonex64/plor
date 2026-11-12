@@ -91,5 +91,7 @@ test("every footer links to About, which says what Plor is, who makes it, its cr
   await expect(page.getByRole("link", { name: "privacy@plor.app" })).toHaveAttribute("href", "mailto:privacy@plor.app");
   await expect(page.getByRole("link", { name: "Rosé Pine" })).toHaveAttribute("href", "https://rosepinetheme.com/");
   await expect(page.getByRole("link", { name: "monkeytype" })).toHaveAttribute("href", "https://monkeytype.com/");
+  await expect(page.getByRole("heading", { name: "Dictionary credits", exact: true })).toBeVisible();
+  await expect(page.locator("pre").filter({ hasText: "J Ross Beresford 1993-1999" })).toContainText("the text of this document must be included");
   await expect(page.getByText("Plor is built with help from AI.")).toBeVisible();
 });

@@ -120,7 +120,7 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 - [ ] Two players get the same substrings and highlighted letter on the same day (DECISIONS.md, Day boundary).
 - [ ] The score follows S15 and S16, checked by tests on hand-worked runs.
 - [ ] The human approves each day before it goes live (S11).
-- [ ] Before game 2 goes live, the About page shows UKACD's notice prominently with its text verbatim, and ESDB's notice (SOURCES.md, 16a).
+- [x] Before game 2 goes live, the About page shows UKACD's notice prominently with its text verbatim, and ESDB's notice (SOURCES.md, 16a).
 - [ ] Offbeat plays exactly as before the split: its existing unit, database and e2e tests pass unchanged.
 
 ## Out of scope
@@ -167,6 +167,8 @@ Nothing yet: this is a draft ticket with no code. The split (16b) is where somet
 |---|---|---|
 
 ## Evidence
+
+**16h, the dictionary's licence notices on About (2026-11-11).** The notices come from `data/licences/english-speller-database-Copyright.txt` (the file at the commit SOURCES.md pins) through `src/app/about/licence.ts`; About shows the top notice (file lines 1-22) and UKACD's (lines 58-69) in `<pre>` under "Dictionary credits". Included by the file's own applicability notes (lines 33-34: "a generated word list larger than 80, the copyright after '=== UKACD' applies") and `DICTIONARY_MAX_SIZE = 85` (`src/config/tunables.ts:167`); the top notice is the licence's main one (lines 26-28). Left out, a question for the human: **AU** (lines 30-31, applies to "a wordlist that uses the 'D' SPELLING code and/or the 'AU' REGION code"): `scripts/dictionary.ts:51,68` reads the D code as a main spelling, so whether it covers game 2's list is not plain; **WordNet** (lines 36-39) is for distributing the database or results that are not a speller dictionary or generated word list, and game 2's is a generated word list, so it does not apply. The check, `src/app/about/licence.test.ts`, renders About and compares its two `<pre>` blocks with the file's lines cut by number: red before the page had them (`expected [] to deeply equal [ ... ]`, 1 failed), green after (`Tests 1 passed (1)`). `npx tsc --noEmit -p .` reports only the four stale `.next` generated-type errors that are there without this change too (none in `src`); `npm run lint` clean. An assertion was added to the About test in `e2e/themes.e2e.ts`; the e2e suite was not run. The `<pre>` blocks are unstyled (no new styling) and may scroll sideways on a phone: unverified.
 
 ## Review
 - Blocking findings and how each was fixed:
