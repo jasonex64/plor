@@ -11,6 +11,7 @@ import { GAME_ID } from "@/platform/game";
 import { TURNSTILE_TEST_PASS_SECRET, useLocalStack } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures, safeEntries, typeableName } from "@/test/puzzles";
 import { apiRequest, cookieJar, cookieOptions } from "@/test/request-scope";
+import { guestTodaysState } from "@/game/guest-runs";
 import { resolveTyped } from "@/game/matching";
 import { POST as answerRoute } from "./answer/route";
 import { POST as nextRoute } from "./next/route";
@@ -168,6 +169,32 @@ describe("a guest run, step by step", () => {
     expect((await state()).body.run).toMatchObject({ status: "timed_out", question: null });
     expect(await rowsWith(hash)).toBe(0);
     expect(await answerEntry(0, safe(0))).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
+  });
+
+  it("builds a result from the whole run when another request ends it right after the status is read", async () => {
+    await start();
+    await answerEntry(0, safe(0));
+    await next();
+    const hash = tokenHash();
+    await getPool().query("update private.guest_question_open set opened_at = opened_at - interval '21 seconds' where token_hash = $1", [hash]);
+    // The real pool, except that the first read of the run's status is followed by the other request's end_guest_run.
+    const pool = getPool();
+    let ended = false;
+    const racing = {
+      query: async (...args: unknown[]) => {
+        const result = await (pool.query as (...a: unknown[]) => Promise<unknown>)(...args);
+        if (!ended && typeof args[0] === "string" && args[0].includes("private.guest_run_status")) {
+          ended = true;
+          await pool.query("select private.end_guest_run($1, $2)", [hash, GAME_ID]);
+        }
+        return result;
+      },
+    } as unknown as typeof pool;
+    const run = await guestTodaysState(racing, hash);
+    expect(ended).toBe(true);
+    expect(run).toMatchObject({ status: "timed_out", question: null });
+    expect(run!.answered).toHaveLength(1);
+    expect(await rowsWith(hash)).toBe(0);
   });
 
   it("refuses typed text over 40 characters before it is matched", async () => {

@@ -36,20 +36,24 @@ async function events(db: Db, tokenHash: string, date: string): Promise<StoredEv
 
 // The state of the token's run on a date, as runs.ts's stateOf builds it. A run that is over is read once and then ended:
 // its result is in this return, and its rows are gone (every read finds a run over, so a crash between the two loses nothing
-// but the chance to read it). A null hash is a visitor with no run: the day not started.
+// but the chance to read it). A null hash is a visitor with no run: the day not started. The status and the events are one
+// statement, so one snapshot: another request's end_guest_run can't delete the events between two reads of a finished run.
 async function stateOf(db: Db, tokenHash: string | null, date: string, puzzle: ApprovedPuzzle): Promise<RunState> {
-  const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number; day_over: boolean }>(
+  const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number; day_over: boolean; events: StoredEvent[] }>(
     `select s.status,
             case when s.deadline is null then null
                  else greatest(0, floor(extract(epoch from s.deadline - statement_timestamp()) * 1000))::int end as ms_left,
             floor(extract(epoch from private.next_reset() - statement_timestamp()) * 1000)::int as ms_to_reset,
-            $3::date < private.today() as day_over
+            $3::date < private.today() as day_over,
+            coalesce((select json_agg(json_build_object('question_idx', e.question_idx, 'entry_id', e.entry_id, 'matched', e.matched,
+                                                        'in_day', private.day_of(e.created_at) = e.puzzle_date) order by e.question_idx)
+                      from private.guest_run_event e
+                      where s.status is not null and e.token_hash = $1 and e.game_id = $2 and e.puzzle_date = $3::date), '[]'::json) as events
      from (select 1) as one
      left join private.guest_run_status s on s.token_hash = $1 and s.game_id = $2 and s.puzzle_date = $3::date`,
     [tokenHash, GAME_ID, date],
   );
-  const { status, ms_left, ms_to_reset, day_over } = rows[0];
-  const stored = status === null ? [] : await events(db, tokenHash!, date);
+  const { status, ms_left, ms_to_reset, day_over, events: stored } = rows[0];
   const over = status !== null && FINISHED.includes(status);
   const counts = over ? (await dayCounts(db, [date])).get(date)! : null;
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
