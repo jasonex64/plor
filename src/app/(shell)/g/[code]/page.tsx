@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import { JoinGroup } from "../../../groups";
-import { Signed } from "../../../home";
+import { InviteSignedOut, Signed } from "../../../home";
 import { PageSkeleton } from "../../../skeleton";
 
 // A group's invite link, /g/<code> (docs/milestones/M10-groups.md, 10b; G7; M14 14b-3): sign in if needed, pick a
-// username if needed, then join. The API checks the code; this page only passes it on. params is runtime data under
-// Cache Components, so it is read inside the page's own Suspense boundary, as on the invite page.
+// username if needed, then join; signed out, a link to play today's game as a guest sits under the sign-in
+// (docs/milestones/M18-guest-play.md, answer 10). The API checks the code; this page only passes it on. params is
+// runtime data under Cache Components, so it is read inside the page's own Suspense boundary, as on the invite page.
 export default function Page({ params }: PageProps<"/g/[code]">) {
   return (
     <>
@@ -20,7 +21,7 @@ export default function Page({ params }: PageProps<"/g/[code]">) {
 async function WithCode({ params }: { params: PageProps<"/g/[code]">["params"] }) {
   const { code } = await params;
   return (
-    <Signed>
+    <Signed signedOut={<InviteSignedOut />}>
       <JoinGroup code={code} />
     </Signed>
   );

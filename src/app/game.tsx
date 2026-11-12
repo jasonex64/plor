@@ -35,6 +35,8 @@ import { Recap } from "./recap";
 import { Line, Skeleton } from "./skeleton";
 import { expectingPlay, markToPlay, spendToPlay } from "./to-play";
 import { runRoutes, startBody, type RunFamily } from "./run-routes";
+import { GuestPeek } from "./guest-peek";
+import { resultExtras, type RunKind } from "./result-extras";
 
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
@@ -167,8 +169,8 @@ type Runner = {
 // The run on the game screen. Before it starts, the stakes sit above Start (the critique's P1; the 20 seconds are
 // stated before the timer runs, WCAG 2.2 2.2.1), with How to play. onStarted: Start began today's run, which counts in
 // the streak at once (src/game/streak.ts), so the shell's rank can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
-// family: which routes it plays (src/app/run-routes.ts); a guest has no streak, so no onStarted, and no Share or answer
-// searches, which need an account (Share comes to guests with 18e's result, docs/milestones/M18-guest-play.md). botCheck:
+// family: which routes it plays (src/app/run-routes.ts); a guest has no streak, so no onStarted, and their result has
+// Share and the peek and no answer searches (src/app/result-extras.ts). botCheck:
 // runs the bot check when a guest presses Start and gives the token the start sends.
 // onPlaying: whether the play frame is up, when the screen shows only the game (docs/milestones/
 // M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23; docs/milestones/M14-14c-8-plain-game-1.md), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
@@ -240,7 +242,7 @@ export function Game({
     answer: (text) => send(routes.answer, { index: run!.question!.index, text }),
     timeUp,
   };
-  return <Run runner={runner} onPlaying={onPlaying} saved={family === "account"} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })} />;
+  return <Run runner={runner} onPlaying={onPlaying} kind={family} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })} />;
 }
 
 // A test run (docs/milestones/M14-14b-11-test-runs.md): an admin plays a day as often as they like and nothing is saved
@@ -332,11 +334,12 @@ export function TestGame({
     onRestart();
     router.push("/admin/puzzles", { transitionTypes: BACK });
   };
-  return <Run runner={runner} onPlaying={onPlaying} saved={false} label={label} out="Back to Puzzles" onLeave={back} onResults={back} />;
+  return <Run runner={runner} onPlaying={onPlaying} kind="test" label={label} out="Back to Puzzles" onLeave={back} onResults={back} />;
 }
 
-// The game screen's run, whichever runner it comes from. saved: a played run, whose result has Share and the answer
-// searches; a test run saves nothing, so it has neither (14b-11, answer 6; 14b-12, Out of scope). From Start to See
+// The game screen's run, whichever runner it comes from. kind: whose run it is, which says what sits with its result
+// (src/app/result-extras.ts): a test run saves nothing, so it has no Share or answer searches (14b-11, answer 6; 14b-12,
+// Out of scope), and a guest's has the peek under it (docs/milestones/M18-guest-play.md, answer 2). From Start to See
 // results the run is in the play frame, the shell's bars hidden (docs/milestones/M14-14c-8-plain-game-1.md): a run
 // already over when the screen opens shows the cards at once (14c-6, answer 25), and one that ends here shows its recap
 // until See results. onLeave: where the × goes, and out what it says to screen readers (14c-6, answers 22, 26); onResults:
@@ -345,7 +348,7 @@ export function TestGame({
 function Run({
   runner,
   onPlaying,
-  saved,
+  kind,
   out,
   onLeave,
   onResults,
@@ -353,13 +356,14 @@ function Run({
 }: {
   runner: Runner;
   onPlaying: (playing: boolean) => void;
-  saved: boolean;
+  kind: RunKind;
   out: string;
   onLeave: () => void;
   onResults?: () => void;
   label?: ReactNode;
 }) {
   const { run, noPuzzle, error, busy, over } = runner;
+  const extras = resultExtras(kind);
   const playing = run?.status === "in_progress";
   // A page Next.js kept hidden shows again with the run as it last had it, while the run loads again (useRun's load is an
   // effect, which runs each time the page shows). A run that was in play then may have ended elsewhere meanwhile, its
@@ -470,7 +474,8 @@ function Run({
           <HowToPlay steps={GAME_1_STEPS} />
         </>
       )}
-      {over && <Result run={run} saved={saved} focus={seen && done} />}
+      {over && <Result run={run} share={extras.share} search={extras.search} focus={seen && done} />}
+      {over && extras.peek && <GuestPeek />}
       {error && <p role="alert">{error}</p>}
     </div>
   );
@@ -728,7 +733,7 @@ function Question({
 // so the result brings itself into view once it's drawn (docs/milestones/M14-14b-2c-review-items.md, item 14). Then
 // #result leaves the address, so the page shown again or reloaded later stays where the player left it
 // (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 2).
-function Result({ run, saved, focus }: { run: RunState; saved: boolean; focus: boolean }) {
+function Result({ run, share, search, focus }: { run: RunState; share: boolean; search: boolean; focus: boolean }) {
   const survived = survivedCount(run);
   const box = useRef<HTMLDivElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -751,7 +756,7 @@ function Result({ run, saved, focus }: { run: RunState; saved: boolean; focus: b
         You survived {survived} of {run.total} questions and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
-      {saved && <Share run={run} />}
+      {share && <Share run={run} />}
       <ol className={kit.rows}>
         {run.answered.map((a) => (
           <li key={a.index} className={kit.row}>
@@ -760,7 +765,7 @@ function Result({ run, saved, focus }: { run: RunState; saved: boolean; focus: b
                 {a.prompt}: you said {a.answer.name}, the host said {a.hostAnswers.map((h) => h.name).join(", ")}
                 {a.matched ? " (caught)" : ` (safe, +${pointsText(a.points)}, bonus +${a.bonus})`} · {givenText(a.share)}
               </span>{" "}
-              {saved && <AnswerSearch date={run.date} index={a.index} prompt={a.prompt} />}
+              {search && <AnswerSearch date={run.date} index={a.index} prompt={a.prompt} />}
             </div>
           </li>
         ))}

@@ -16,6 +16,8 @@ import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { ordinal } from "./ordinal";
 import { startBody, substringRoutes, type RunFamily } from "./run-routes";
+import { GuestPeek } from "./guest-peek";
+import { resultExtras } from "./result-extras";
 import { PlayFrame, StatusMessage } from "./play-frame";
 import { BACK } from "./slide";
 import { LoadingStatus } from "./skeleton";
@@ -116,7 +118,11 @@ export function SubstringsScreen({ family = "account", botCheck, onPlaying }: { 
       {card}
     </PlayFrame>
   ) : (
-    card
+    <>
+      {card}
+      {/* Under a guest's result (docs/milestones/M18-guest-play.md, answer 2). */}
+      {run?.status === "finished" && resultExtras(family).peek && <GuestPeek />}
+    </>
   );
 }
 

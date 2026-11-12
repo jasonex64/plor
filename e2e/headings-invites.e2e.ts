@@ -89,6 +89,8 @@ test("signed in, Today's introduction never shows, not even before the profile l
   // Signed in, on the pick-username step.
   const email = `${RUN}-hi@example.test`;
   await forwardPlayerIp(page, email);
+  // The form opens from the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
   await page.getByLabel("Code").fill(await emailedCode(email));

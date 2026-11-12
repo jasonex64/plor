@@ -103,7 +103,8 @@ test("signing out sends a held post first, waits for its answer, and signs out o
     button.click();
     button.click();
   });
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  // Signed out on Today's address: the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
   expect(order).toEqual(["post answered", "sign-out"]);
   expect(await comments("us")).toEqual(["Sent before I go."]);
 });
@@ -120,6 +121,7 @@ test("when that send fails, the player stays signed in and chooses", async ({ pa
   // Still signed in: the sheet still holds the account.
   await expect(sheet.getByRole("button", { name: "Try again" })).toBeVisible();
   await sheet.getByRole("button", { name: "Sign out without it" }).click();
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  // Signed out on Today's address: the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
   expect(await comments("uf")).toEqual([]);
 });
