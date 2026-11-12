@@ -19,6 +19,7 @@ import { Game } from "./game";
 import { SubstringsScreen } from "./substrings";
 import styles from "./offbeat.module.css";
 import { GAME } from "@/platform/game";
+import { SIGN_IN_HREF } from "./sign-in-open";
 
 type TurnstileApi = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
@@ -89,7 +90,7 @@ export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" 
     <div className={styles.screen}>
       <Script src={SCRIPT} strategy="afterInteractive" onReady={ready} onError={() => (failed.current = true)} />
       <p className={styles.back} hidden={playing}>
-        <ButtonLink href="/" transitionTypes={BACK}>
+        <ButtonLink href={SIGN_IN_HREF} transitionTypes={BACK}>
           Sign in
         </ButtonLink>
       </p>

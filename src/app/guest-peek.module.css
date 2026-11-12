@@ -1,0 +1,87 @@
+/* The peek under a guest's result (docs/milestones/M18-guest-play.md, answers 2 and 15): the words and the link in the
+   kit's card, over a drawn stand-in. Both share one grid cell, so the panel is as tall as the taller of the two. */
+.peek {
+  display: grid;
+}
+
+.standIn,
+.ask {
+  grid-area: 1 / 1;
+}
+
+/* Shapes, not data: blurred as the feed's filler is before you've played (comments.module.css, .filler: 4px), and not
+   selectable. Its parts are 10px apart, as a card's are (kit.module.css, .card). */
+.standIn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  filter: blur(4px);
+  user-select: none;
+}
+
+/* The words' card, in the middle, with the card's own 14px (kit.module.css, .card) left around it for the stand-in to
+   show. */
+.ask {
+  place-self: center;
+  margin: 14px;
+  align-items: center;
+  text-align: center;
+}
+
+/* A bar where a number or a name would be, a letter tall. */
+.standIn i {
+  flex: 1;
+  height: 1em;
+  border-radius: var(--r-small);
+  background: var(--line);
+}
+
+/* The streak pill's shape (shell.module.css, .streak): fully round, the soft tint, a 1.5px ink border, its padding and
+   gap. Its bar is as wide as the badge beside it (kit.module.css, .badge). */
+.streak {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px 2px 6px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--soft);
+}
+
+.streak i {
+  flex: none;
+  width: 1.5rem;
+}
+
+/* Me's calendar (me.module.css, .calendar and .day): seven columns 4px apart, each day edged in ink with the cells'
+   corners, in the calendar's four shades. A day is as tall as a badge (kit.module.css, .badge), not square, so two weeks
+   stay short on a wide screen. */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar span {
+  box-sizing: border-box;
+  height: 1.5rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-cell);
+}
+
+.calendar [data-shade="1"] {
+  background: var(--shade-1);
+}
+
+.calendar [data-shade="2"] {
+  background: var(--shade-2);
+}
+
+.calendar [data-shade="3"] {
+  background: var(--shade-3);
+}
+
+.calendar [data-shade="4"] {
+  background: var(--shade-4);
+}
