@@ -56,17 +56,17 @@ export type RunState = {
 };
 
 // in_day: given before the run's day ended at midnight (M09 D8).
-type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
+export type StoredEvent = { question_idx: number; entry_id: string; matched: boolean; in_day: boolean };
 
 // The SQLSTATEs raised by the answer and Next triggers
 // (supabase/migrations/20261028140000_baseline.sql).
-const OUT_OF_ORDER = "OB002";
-const RUN_OVER = "OB003";
-const TIME_UP = "OB005";
-const NOT_OPEN = "OB006";
+export const OUT_OF_ORDER = "OB002";
+export const RUN_OVER = "OB003";
+export const TIME_UP = "OB005";
+export const NOT_OPEN = "OB006";
 
 // null when nothing is approved for today.
-async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
+export async function todaysPuzzle(db: Db): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
   const { rows } = await db.query<{ date: string; content: ApprovedPuzzle | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
@@ -85,7 +85,7 @@ async function events(db: Db, userId: string, date: string): Promise<StoredEvent
   return rows;
 }
 
-type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number; dayOver: boolean };
+export type Clock = { status: RunStatus | null; msLeft: number | null; msToReset: number; dayOver: boolean };
 
 // The share of the question's players who gave this entry, or null below the minimum (H5).
 function shareOf(counts: DayCounts | null, index: number, entryId: string): number | null {
@@ -96,7 +96,7 @@ function shareOf(counts: DayCounts | null, index: number, entryId: string): numb
 
 // counts: the day's counts once the run is over, otherwise null; pooled: the category's past days, for the provisional
 // bonus. names: the main names of the answers and host answers.
-function buildState(
+export function buildState(
   date: string,
   puzzle: ApprovedPuzzle,
   stored: StoredEvent[],

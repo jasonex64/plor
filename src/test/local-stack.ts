@@ -12,6 +12,10 @@ import { apiRequest, cookieJar } from "./request-scope";
 // The local stack's documented defaults (supabase.com/docs/guides/local-development/cli/getting-started).
 export const LOCAL_DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const MAILPIT = "http://127.0.0.1:54324";
+// Cloudflare's published always-pass Turnstile test keys (developers.cloudflare.com/turnstile/troubleshooting/testing/): public
+// values, which readServerEnv needs to boot (M18 18c).
+export const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
+export const TURNSTILE_TEST_PASS_SECRET = "1x0000000000000000000000000000000AA";
 
 // Points the server env at the local stack. The publishable key comes from the running stack, never printed.
 export function useLocalStack(): void {
@@ -21,6 +25,8 @@ export function useLocalStack(): void {
   vi.stubEnv("DATABASE_URL", LOCAL_DATABASE_URL);
   vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", key);
+  vi.stubEnv("TURNSTILE_SITE_KEY", TURNSTILE_TEST_SITE_KEY);
+  vi.stubEnv("TURNSTILE_SECRET_KEY", TURNSTILE_TEST_PASS_SECRET);
 }
 
 type MailSummary = { ID: string; Subject: string };

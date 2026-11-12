@@ -208,3 +208,7 @@ export const SUBSTRING_BONUS_LETTER_POINTS = 120;
 // Players a day of a game needs before "Better than X% of players" shows (human, 2026-11-07: "10 players";
 // docs/milestones/M16-16e-points-and-boards.md, answer 16). A smaller day still counts on the boards (answer 17).
 export const PERCENTILE_MIN_PLAYERS = 10;
+
+// The guest token's length in random bytes: 160 bits, the size OWASP's Session Management Cheat Sheet prefers for a token
+// stored as a hash (human, 2026-11-11, M18 answer 21: "160 bits, the preferred (Recommended)"; SOURCES.md).
+export const GUEST_TOKEN_BYTES = 20;

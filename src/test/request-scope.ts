@@ -7,6 +7,8 @@ import { vi } from "vitest";
 import { PROTOCOL_VERSION } from "@/lib/protocol";
 
 export const cookieJar = new Map<string, string>();
+// The options each cookie was last set with, so a test can check what a route asked the browser to do with it.
+export const cookieOptions = new Map<string, object>();
 
 export const nextHeaders = {
   cookies: async () => ({
@@ -15,6 +17,7 @@ export const nextHeaders = {
     set: (name: string, value: string, options?: { maxAge?: number }) => {
       if (value === "" || options?.maxAge === 0) cookieJar.delete(name);
       else cookieJar.set(name, value);
+      cookieOptions.set(name, options ?? {});
     },
   }),
 };
