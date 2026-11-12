@@ -66,16 +66,30 @@ export async function settleRuns(db: Db, day: string | null = null): Promise<num
 // The answers the bonus pools for each of a day's questions (M13 D5: per category, all history equal): every answer
 // given before its day's midnight (M09 D8) to a question of the same category, on the category's days before this one,
 // and on this one too when withDay (the final bonus). The provisional bonus leaves this day out, so it holds all day
-// (human, 2026-10-24: "Past days only (Recommended)"; docs/milestones/M13-13c-rarity-and-the-host.md).
+// (human, 2026-10-24: "Past days only (Recommended)"; docs/milestones/M13-13c-rarity-and-the-host.md). Guests' answers
+// count too, from private.guest_tally (M18, answer 7: "Yes, guests count"); the tally already holds only answers given
+// before their day's midnight.
 export async function pooledCounts(db: Db, puzzle: ApprovedPuzzle, withDay: boolean): Promise<DayCounts> {
   const categories = puzzle.questions.map((q) => q.category);
   const { rows } = await db.query<{ category: string; entry_id: string; n: number }>(
-    `select p.content -> 'questions' -> e.question_idx ->> 'category' as category, e.entry_id, count(*)::int as n
-     from private.run_event e
-     join private.puzzle p on p.game_id = e.game_id and p.puzzle_date = e.puzzle_date
-     where e.game_id = $1 and p.content ->> 'format' = '3' and private.day_of(e.created_at) = e.puzzle_date
-       and (e.puzzle_date < $2::date or ($3 and e.puzzle_date = $2::date))
-       and p.content -> 'questions' -> e.question_idx ->> 'category' = any($4::text[])
+    `select category, entry_id, sum(n)::int as n
+     from (
+       select p.content -> 'questions' -> e.question_idx ->> 'category' as category, e.entry_id, count(*) as n
+       from private.run_event e
+       join private.puzzle p on p.game_id = e.game_id and p.puzzle_date = e.puzzle_date
+       where e.game_id = $1 and p.content ->> 'format' = '3' and private.day_of(e.created_at) = e.puzzle_date
+         and (e.puzzle_date < $2::date or ($3 and e.puzzle_date = $2::date))
+         and p.content -> 'questions' -> e.question_idx ->> 'category' = any($4::text[])
+       group by 1, 2
+       union all
+       select p.content -> 'questions' -> t.question_idx ->> 'category', t.entry_id, sum(t.n)
+       from private.guest_tally t
+       join private.puzzle p on p.game_id = t.game_id and p.puzzle_date = t.puzzle_date
+       where t.game_id = $1 and p.content ->> 'format' = '3'
+         and (t.puzzle_date < $2::date or ($3 and t.puzzle_date = $2::date))
+         and p.content -> 'questions' -> t.question_idx ->> 'category' = any($4::text[])
+       group by 1, 2
+     ) counted
      group by 1, 2`,
     [GAME_ID, puzzle.date, withDay, categories],
   );
@@ -90,13 +104,22 @@ export async function pooledCounts(db: Db, puzzle: ApprovedPuzzle, withDay: bool
 }
 
 // Every player's answers on these days before their midnight, by question and entry: the shares on the result screen
-// (docs/milestones/M11-home-screen.md, H5). Today's grow until midnight.
+// (docs/milestones/M11-home-screen.md, H5). Today's grow until midnight. Guests' answers are in them, from the tally.
 export async function dayCounts(db: Db, dates: string[]): Promise<Map<string, DayCounts>> {
   const { rows: tallies } = await db.query<{ date: string; question_idx: number; entry_id: string; n: number }>(
-    `select puzzle_date::text as date, question_idx, entry_id, count(*)::int as n
-     from private.run_event
-     where game_id = $1 and puzzle_date = any($2::date[]) and private.day_of(created_at) = puzzle_date
-     group by puzzle_date, question_idx, entry_id`,
+    `select date, question_idx, entry_id, sum(n)::int as n
+     from (
+       select puzzle_date::text as date, question_idx, entry_id, count(*) as n
+       from private.run_event
+       where game_id = $1 and puzzle_date = any($2::date[]) and private.day_of(created_at) = puzzle_date
+       group by puzzle_date, question_idx, entry_id
+       union all
+       select puzzle_date::text, question_idx, entry_id, sum(n)
+       from private.guest_tally
+       where game_id = $1 and puzzle_date = any($2::date[])
+       group by puzzle_date, question_idx, entry_id
+     ) counted
+     group by date, question_idx, entry_id`,
     [GAME_ID, dates],
   );
   const counts = new Map<string, DayCounts>(dates.map((date) => [date, new Map()]));

@@ -8,6 +8,8 @@ import { hostAnswers, named, type Named, type Names } from "../game/payload.ts";
 
 export type AnswerRow = { question_idx: number; entry_id: string; matched: boolean };
 export type MissRow = { question_idx: number; typed: string };
+// One answer of the guests' tally, n times: guests leave counts and no runs (M18, answer 22).
+export type TallyRow = { question_idx: number; entry_id: string; matched: boolean; n: number };
 
 export type QuestionInsights = {
   index: number;
@@ -26,13 +28,16 @@ export type QuestionInsights = {
 
 export type DayInsights = { date: string; finished: boolean; questions: QuestionInsights[] };
 
-// names: the main names of every answer given and every host answer (src/game/payload.ts, thingNames).
-export function buildInsights(date: string, finished: boolean, puzzle: ApprovedPuzzle, answers: AnswerRow[], misses: MissRow[], names: Names): DayInsights {
+// names: the main names of every answer given and every host answer (src/game/payload.ts, thingNames). guests: the
+// guests' tally for the day, added to the players' answers; their misses are not kept (M18, answer 19), so `misses`
+// stays the players'. Callers that have no guests leave it out.
+export function buildInsights(date: string, finished: boolean, puzzle: ApprovedPuzzle, answers: AnswerRow[], misses: MissRow[], names: Names, guests: TallyRow[] = []): DayInsights {
   const questions = puzzle.questions.map((question, index): QuestionInsights => {
-    const rows = answers.filter((a) => a.question_idx === index);
-    const caught = rows.filter((a) => a.matched).length;
+    const rows = [...answers.filter((a) => a.question_idx === index).map((a) => ({ ...a, n: 1 })), ...guests.filter((g) => g.question_idx === index)];
+    const answered = rows.reduce((sum, row) => sum + row.n, 0);
+    const caught = rows.filter((a) => a.matched).reduce((sum, row) => sum + row.n, 0);
     const counts = new Map<string, number>();
-    for (const row of rows) counts.set(row.entry_id, (counts.get(row.entry_id) ?? 0) + 1);
+    for (const row of rows) counts.set(row.entry_id, (counts.get(row.entry_id) ?? 0) + row.n);
     const topAnswers = [...counts]
       .map(([id, count]) => ({ answer: named(names, id), count }))
       .sort((a, b) => b.count - a.count || a.answer.name.localeCompare(b.answer.name))
@@ -41,10 +46,10 @@ export function buildInsights(date: string, finished: boolean, puzzle: ApprovedP
       index,
       prompt: question.prompt,
       hostAnswers: hostAnswers(question, names),
-      answered: rows.length,
+      answered,
       caught,
-      catchRate: rows.length ? caught / rows.length : null,
-      tooFew: rows.length < INSIGHTS_MIN_PLAYERS,
+      catchRate: answered ? caught / answered : null,
+      tooFew: answered < INSIGHTS_MIN_PLAYERS,
       topAnswers,
       breaksShape: false,
       misses: groupMisses(misses.filter((m) => m.question_idx === index)),
