@@ -57,7 +57,18 @@ Second round (human, 2026-11-11):
 7. A day when only one game has an approved day: "Play what's there (Recommended)". Starting the one available game keeps the shared streak; a day with no approved day in either game is skipped and breaks no streak.
 8. Groups and Share for Fragments: "Both, for both games (Recommended)". Group boards cover both games and Share gets a Fragments result.
 
-Not yet asked: the carousel's mock-ups and the choice between them, each game's comments and reactions on the shared screens, and the mixed feed's details. 16f is not approved to build.
+Third round (human, 2026-11-11, two sets of guided questions):
+9. The feed, in the human's own words (given in place of an answer on where comments show): "the feed should be sometihgn that supports scrolling endlessly like twitter."
+10. What the endless feed reaches back through: "Today first, then earlier days". Scrolling past today keeps loading older days.
+11. Where comments live: "In the feed, as items". A comment is a feed item tagged with its game, in time order with the rest.
+12. Where the feed sits: "Under the carousel on Today".
+13. A feed item for a game the viewer hasn't played today: "Name and game show, result blurred (Recommended)".
+14. Tapping a blurred item: "Opens that game to play (Recommended)".
+15. The feed's order: "Newest first, games mixed (Recommended)".
+
+**Claude's reading, not the human's words (open to change):** answer 11 changes where comments are today (a separate list) and meets answer 3 of the split ("Each game its own", opened by finishing that game): a comment on a game the viewer hasn't finished today would be blurred as answer 13 says. Earlier days' items are not blurred, their games being over.
+
+Not yet asked: the choice between the carousel's mock-ups; reactions in the feed; how replies to a comment show; how many items load at a time (a number: the human's or a source's); whether the date between days is shown. 16f is not approved to build.
 
 ## Decisions
 | # | Decision | Answer (origin) |
