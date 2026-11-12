@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(122);
+select plan(126);
 
 -- Real puzzles and runs may exist for the days used here. The whole file runs in one transaction that is rolled back.
 delete from private.guest_run where puzzle_date between private.today() - 1 and private.today() + 445;
@@ -262,13 +262,19 @@ select pg_temp.run('guest', 5, private.today());
 select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 5), 'substrings')$$, 'a finished game 2 run is ended');
 select is(pg_temp.rows_of('guest', 5, 'question_open') + pg_temp.rows_of('guest', 5, 'round_word') + pg_temp.rows_of('guest', 5, 'round_reject'), 0, 'with its words, rejections and opens');
 select is(pg_temp.rows_of('guest', 5, 'run'), 1, 'while the same token''s game 1 run stays');
+-- A survived run (guest 1) and a timed-out one (guest 4) end the same way, whatever their kind.
+select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 1), 'offbeat')$$, 'a run that survived is ended');
+select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 4), 'offbeat')$$, 'a run that timed out is ended');
+select is(pg_temp.rows_of('guest', 1, 'run') + pg_temp.rows_of('guest', 1, 'run_event') + pg_temp.rows_of('guest', 1, 'question_open')
+  + pg_temp.rows_of('guest', 4, 'run') + pg_temp.rows_of('guest', 4, 'run_event'), 0, 'neither leaves a row carrying its hash');
+select is((select count(*)::int from private.guest_tally where puzzle_date = private.today() and entry_id = 'x'), 2, 'and the tally still holds their answers (a refused answer is not counted)');
 -- A closed day's runs go at the next purge, and only they.
 select lives_ok($$select private.purge_guest_days()$$, 'a purge runs');
 select is((select count(*)::int from private.guest_run where puzzle_date < private.today()), 0, 'no guest run of a closed day is left');
 select is((select count(*)::int from private.guest_run_event where puzzle_date < private.today()), 0, 'nor its answers');
 select is(pg_temp.rows_of('guest', 20, 'run') + pg_temp.rows_of('guest', 20, 'run_event'), 0, 'no row carries its hash');
 select ok((select count(*)::int from private.guest_run where puzzle_date = private.today()) > 0, 'today''s runs stay');
-select is((select count(*)::int from private.guest_run), 8, 'and exactly today''s eight');
+select is((select count(*)::int from private.guest_run), 6, 'and exactly today''s six');
 
 select * from finish();
 rollback;

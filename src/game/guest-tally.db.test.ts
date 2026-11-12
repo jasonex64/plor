@@ -2,21 +2,23 @@
 // docs/milestones/M18-guest-play.md, 18b). Each test runs as plor_app in a transaction that is always rolled back, so
 // the guest tally's real rows are never changed, and reads the counts before and after: the hypothesis is that they
 // move by exactly the guest answers. The test's own role adds the day's puzzle (plor_app can't write it).
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { type ApprovedPuzzle } from "@/content/puzzle";
 import { dayInsights } from "@/insights/queries";
 import { hashKey } from "@/lib/auth-limits";
-import { GAME_ID } from "@/platform/game";
+import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { fixtureDay, isFixtureDay, loadFixtureBase } from "@/test/answer-fixture";
-import { safeEntry } from "@/test/puzzles";
+import { hostName, safeEntry } from "@/test/puzzles";
+import { searchAnswers } from "./answers";
 import { dayCounts, pooledCounts } from "./ledger";
+import { answer, startRun } from "./runs";
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 afterAll(() => admin.end());
 
-type Day = { client: PoolClient; today: string; puzzle: ApprovedPuzzle };
+type Day = { client: PoolClient; today: string; puzzle: ApprovedPuzzle; userId: string };
 
 // Runs fn as plor_app, with today's puzzle (the fixture day when today has none).
 async function asPlorApp(fn: (day: Day) => Promise<void>): Promise<void> {
@@ -34,8 +36,10 @@ async function asPlorApp(fn: (day: Day) => Promise<void>): Promise<void> {
       puzzle = fixtureDay(today, await loadFixtureBase(client));
       await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, today, puzzle]);
     }
+    const userId = randomUUID();
+    await client.query("insert into auth.users (id, email) values ($1, $2)", [userId, `${userId}@example.test`]);
     await client.query("set local role plor_app");
-    await fn({ client, today, puzzle });
+    await fn({ client, today, puzzle, userId });
   } finally {
     await client.query("rollback");
     client.release();
@@ -120,6 +124,80 @@ describe("guests in the rarity counts", () => {
       await startGuest(client, open, today);
       await answerGuest(client, open, today, 0, entry, false);
       expect(await tallyTotal(client)).toBe(before + 1);
+    });
+  });
+});
+
+describe("guests in the answer search", () => {
+  it("counts guests with the players who gave an answer, once enough answered", async () => {
+    await asPlorApp(async ({ client, today, puzzle, userId }) => {
+      const host = puzzle.questions[0].host_answers[0];
+      // A player catches the host on question 1: their run is over, so they may search that question's answers.
+      await startRun(client, userId);
+      expect((await answer(client, userId, 0, hostName(puzzle, 0))).run.status).toBe("died");
+      const found = async () => (await searchAnswers(client, userId, today, 0, "")).map((a) => a.players);
+      // One player answered: under the minimum, no count.
+      expect(await found()).toEqual([null]);
+      for (let i = 0; i < 4; i++) {
+        const token = newToken();
+        await startGuest(client, token, today);
+        await answerGuest(client, token, today, 0, host, true);
+      }
+      // Five answers in all, one a player's: the minimum is met by the sum, and the count is theirs together.
+      expect(await found()).toEqual([5]);
+    });
+  });
+});
+
+describe("a game 2 guest run as plor_app", () => {
+  it("plays through the guest judge and examples, and is ended with every row", async () => {
+    await asPlorApp(async ({ client }) => {
+      // The test's own role adds what plor_app can't write: a day of two rounds and two words that fit them.
+      await client.query("reset role");
+      const { rows } = await client.query<{ day: string }>("select (private.today() + 455)::text as day");
+      const day = rows[0].day;
+      await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [
+        SUBSTRINGS_ID,
+        day,
+        { format: 1, game_id: SUBSTRINGS_ID, date: day, rounds: ["ck", "ro"], bonus_letter: "f" },
+      ]);
+      await client.query(
+        "insert into private.dictionary_word (word_key, spelling, plain, everyday) values ('zqckq', 'zqckq', 'zqckq', false), ('zqrok', 'zqrok', 'zqrok', false) on conflict do nothing",
+      );
+      await client.query("set local role plor_app");
+      const token = newToken();
+      await client.query("insert into private.guest_run (token_hash, game_id, puzzle_date) values ($1, $2, $3::date)", [token, SUBSTRINGS_ID, day]);
+      const judge = async (word: string) =>
+        (await client.query<{ r: { outcome: string; word?: string } }>("select private.guest_judge_word($1, $2::date, $3, $3, $3) as r", [token, day, word])).rows[0].r;
+      expect(await judge("zqckq")).toEqual({ outcome: "accepted", word: "zqckq" });
+      await client.query("insert into private.guest_question_open (token_hash, game_id, puzzle_date, question_idx) values ($1, $2, $3::date, 1)", [token, SUBSTRINGS_ID, day]);
+      expect((await judge("zzzzz")).outcome).toBe("not_a_word");
+      expect((await judge("zqrok")).outcome).toBe("locked");
+      // plor_app can neither write the words nor read the rejections: only the judge does.
+      await client.query("savepoint direct");
+      await expect(
+        client.query("insert into private.guest_round_word (token_hash, game_id, puzzle_date, round_idx, word_key, word) values ($1, $2, $3::date, 1, 'a', 'a')", [token, SUBSTRINGS_ID, day]),
+      ).rejects.toThrow(/permission denied/);
+      await client.query("rollback to savepoint direct");
+      await client.query("savepoint reject");
+      await expect(client.query("select count(*) from private.guest_round_reject")).rejects.toThrow(/permission denied/);
+      await client.query("rollback to savepoint reject");
+      // A run still going is not ended; round 2's clock then runs out (the test's own role moves it back), which ends the run.
+      await client.query("savepoint going");
+      await expect(client.query("select private.end_guest_run($1, $2)", [token, SUBSTRINGS_ID])).rejects.toMatchObject({ code: "OB015" });
+      await client.query("rollback to savepoint going");
+      await client.query("reset role");
+      await client.query("update private.guest_question_open set opened_at = opened_at - interval '21 seconds' where token_hash = $1", [token]);
+      await client.query("set local role plor_app");
+      expect((await client.query("select private.guest_round_examples($1, $2::date)", [token, day])).rows).toBeDefined();
+      await client.query("select private.end_guest_run($1, $2)", [token, SUBSTRINGS_ID]);
+      await client.query("reset role");
+      const left = await client.query<{ n: number }>(
+        `select ((select count(*) from private.guest_run where token_hash = $1) + (select count(*) from private.guest_question_open where token_hash = $1)
+               + (select count(*) from private.guest_round_word where token_hash = $1) + (select count(*) from private.guest_round_reject where token_hash = $1))::int as n`,
+        [token],
+      );
+      expect(left.rows[0].n).toBe(0);
     });
   });
 });
