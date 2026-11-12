@@ -64,6 +64,8 @@ create function pg_temp.grants(who text) returns text[] language sql return (
   ) as held);
 select is(pg_temp.grants('plor_app'), array[
   'private.admin select',
+  -- The answer and Next rules, written once and called by the player and the guest triggers, which run as plor_app (M18 18b).
+  'private.answer_rule(integer,boolean,integer,integer,timestamp with time zone) execute',
   -- Puzzle entry (M06): an admin's approval goes through a guarded function, never the table (M13 13d dropped the
   -- questions an admin typed, and their function).
   'private.approve_puzzle(uuid,jsonb) execute',
@@ -93,18 +95,31 @@ select is(pg_temp.grants('plor_app'), array[
   'private.delete_account(uuid,text) execute',
   'private.delete_reported_comment(uuid,bigint) execute',
   -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
+  -- Guest play (M18 18b): a guest's run is read and started, never deleted by a grant; its game 2 words go through the
+  -- judge, and a run's rows go through two functions. The tally and round words are read only, round_reject not at all.
+  'private.end_guest_run(text,text) execute',
   'private.friend_invite insert', 'private.friend_invite select',
   'private.friend_invite.code update',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',
   'private.give_back_auth_attempt(text,text) execute',
   -- Groups (M10 10b, G10): members join, leave and are removed; the handover trigger, not plor_app, sets the creator.
   'private.group_member delete', 'private.group_member insert', 'private.group_member select',
+  'private.guest_judge_word(text,date,text,text,text) execute',
+  'private.guest_question_open insert', 'private.guest_question_open select',
+  'private.guest_question_started_at(text,text,date,integer) execute',
+  'private.guest_round_examples(text,date) execute',
+  'private.guest_round_word select',
+  'private.guest_run insert', 'private.guest_run select',
+  'private.guest_run_event insert', 'private.guest_run_event select',
+  'private.guest_run_status select',
+  'private.guest_tally select',
   'private.judge_word(uuid,date,text,text,text) execute',
   'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
   'private.missed_answer select',
   -- The reset countdown (M04 13c-4).
   'private.next_reset() execute',
+  'private.open_rule(integer,boolean,integer,integer) execute',
   -- A group is created, read and deleted; its creator renames it and resets its link (M10 10b, G10).
   'private.player_group delete', 'private.player_group insert', 'private.player_group select',
   'private.player_group.invite_code update', 'private.player_group.name update',
@@ -118,6 +133,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.profile.skip_game_screen update', 'private.profile.theme update', 'private.profile.user_id insert',
   'private.profile.username insert',
   'private.profile.username update',
+  'private.purge_guest_days() execute',
   'private.puzzle select',
   -- The status view and the answer trigger compute each question's deadline as plor_app (M04 13c-2), from when it
   -- was opened with Next (13c-4).
@@ -137,6 +153,7 @@ select is(pg_temp.grants('plor_app'), array[
   -- Game 2's words go through the judge alone, and a finished run's examples through round_examples; the status view
   -- reads round_word as plor_app (M16 16d).
   'private.round_examples(uuid,date) execute',
+  'private.round_open_rule(integer,integer,integer,boolean,timestamp with time zone) execute',
   'private.round_word select',
   'private.run insert', 'private.run select',
   'private.run_event insert', 'private.run_event select',
