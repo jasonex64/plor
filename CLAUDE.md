@@ -15,7 +15,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Overnight** nobody can answer: the `goodnight` skill says what to do instead.
 
 ## Before writing code
-1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), and changes to these rules (recorded in DECISIONS.md's log).
+1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), a docs-only tidy of an audit's findings, and changes to these rules (both on a `process-` branch, recorded in DECISIONS.md's log).
 2. **Say where we are.** Give the current milestone, its status and what comes next, taken from `docs/ROADMAP.md`.
 3. **Anchor to the source.** Read the cited sections in `docs/SOURCES.md` and name the sections you are following. If no source covers the work, stop and ask. Don't fill the gap from memory.
 4. **Justify it.** The ticket must answer *Who uses this?* and *What breaks without it?* If the answer is "nothing yet", don't build it.

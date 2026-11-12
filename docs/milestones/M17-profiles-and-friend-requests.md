@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** planned. Approved 2026-11-05 ("Approve, start dictionary") after four rounds of guided questions; its open questions wait for its design round. It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** planned, NOT approved to build. Its design round is in progress (started 2026-11-11). Four rounds of guided questions were answered 2026-11-05 (the quote "Approve, start dictionary" approved M16's dictionary, not this ticket); its open questions wait for that round. It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
