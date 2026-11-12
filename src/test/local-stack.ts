@@ -8,15 +8,13 @@ import { expect, vi } from "vitest";
 import { POST as sendCode } from "@/app/api/auth/email/route";
 import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
 import { apiRequest, cookieJar } from "./request-scope";
+import { TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./turnstile-keys";
+
+export { TURNSTILE_TEST_PASS_SECRET };
 
 // The local stack's documented defaults (supabase.com/docs/guides/local-development/cli/getting-started).
 export const LOCAL_DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const MAILPIT = "http://127.0.0.1:54324";
-// Cloudflare's published always-pass Turnstile test keys (developers.cloudflare.com/turnstile/troubleshooting/testing/): public
-// values, which readServerEnv needs to boot (M18 18c).
-export const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
-export const TURNSTILE_TEST_PASS_SECRET = "1x0000000000000000000000000000000AA";
-
 // Points the server env at the local stack. The publishable key comes from the running stack, never printed.
 export function useLocalStack(): void {
   const status = execSync("npx supabase status -o env", { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
