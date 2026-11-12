@@ -1,6 +1,6 @@
 # M14 14c-9 — Game 2, plain
 
-**Status:** in review, PR open (approved by the human, 2026-11-10: "approve"; started 2026-11-11, after 14c-8 merged in PR #179)
+**Status:** done (PR #181, merged 2026-11-11 at the human's "Merge #181", every check green after a re-run: the first e2e run failed installing the browser, before any test ran) (approved by the human, 2026-11-10: "approve"; started 2026-11-11, after 14c-8 merged in PR #179)
 
 ## Goal
 Game 2 plays in the app's own look, at game 1's level of finish, and the village is removed.
