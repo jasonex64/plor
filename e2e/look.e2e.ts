@@ -65,6 +65,9 @@ test("a button presses down onto its shadow, and doesn't move under reduced moti
     const page = await (await browser.newContext({ reducedMotion })).newPage();
     await page.goto("/");
     const button = page.getByRole("button", { name: "Email me a sign-in code" });
+    // Since the front page offers each game to a guest (M18 18d), this button sits at the fold of the test's window:
+    // a pointer pressed below the window's edge presses nothing.
+    await button.scrollIntoViewIfNeeded();
     const box = (await button.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();

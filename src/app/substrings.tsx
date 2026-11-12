@@ -15,6 +15,7 @@ import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { ordinal } from "./ordinal";
+import { startBody, substringRoutes, type RunFamily } from "./run-routes";
 import { PlayFrame, StatusMessage } from "./play-frame";
 import { BACK } from "./slide";
 import { LoadingStatus } from "./skeleton";
@@ -26,29 +27,52 @@ type RunResponse = { run: SubstringRun | null };
 // back, and its run isn't today's. Anything else is a failure, and is shown.
 const BEHIND = ["no_run", "no_puzzle_today", "run_over", "round_running"];
 
-export function SubstringsScreen() {
+// family: which routes it plays (src/app/run-routes.ts); a guest's Start runs botCheck first and sends its token (as game.tsx).
+// onPlaying: whether the play frame is up, when the screen shows only the game (src/app/guest-game.tsx).
+export function SubstringsScreen({ family = "account", botCheck, onPlaying }: { family?: RunFamily; botCheck?: () => Promise<string>; onPlaying?: (playing: boolean) => void }) {
+  const routes = substringRoutes(family);
   const router = useRouter();
   const [run, setRun] = useState<SubstringRun | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    api<RunResponse>("/api/substrings", { method: "GET" }).then(
+    api<RunResponse>(routes.state, { method: "GET" }).then(
       (r) => {
         setRun(r.run);
         setError(null);
       },
       (err) => setError(errorText(err)),
     );
-  }, []);
+  }, [routes.state]);
   useEffect(load, [load]);
 
-  const send = async (path: string) => {
+  const send = async (path: string, body?: unknown) => {
     try {
-      setRun((await api<RunResponse>(path, { method: "POST" })).run);
+      setRun((await api<RunResponse>(path, { method: "POST", body })).run);
       setError(null);
     } catch (err) {
       if (err instanceof ApiError && BEHIND.includes(err.code)) load();
       else setError(errorText(err));
+    }
+  };
+
+  // A guest's start is checked first, and the check's token goes with it; the button waits meanwhile, as one check runs at a time.
+  const [starting, setStarting] = useState(false);
+  const startRun = async () => {
+    setStarting(true);
+    try {
+      let body;
+      if (family === "guest") {
+        try {
+          body = startBody(family, await botCheck!());
+        } catch (err) {
+          setError(errorText(err));
+          return;
+        }
+      }
+      await send(routes.start, body);
+    } finally {
+      setStarting(false);
     }
   };
 
@@ -61,6 +85,7 @@ export function SubstringsScreen() {
   const [done, setDone] = useState(false);
   if (playing && !seen) setSeen(true);
   const inFrame = playing || (seen && run?.status === "finished" && !done);
+  useEffect(() => onPlaying?.(inFrame), [onPlaying, inFrame]);
   const card = (
     <section aria-label={SUBSTRINGS.name} className={kit.card}>
       <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
@@ -72,7 +97,7 @@ export function SubstringsScreen() {
       ) : run.status === "not_started" ? (
         <>
           <p>{run.total} rounds. Each gives you a few letters and 20 seconds to type a word that holds them.</p>
-          <button type="button" className={kit.primary} onClick={() => send("/api/substrings/start")}>
+          <button type="button" className={kit.primary} disabled={starting} onClick={() => void startRun()}>
             Start
           </button>
           <HowToPlay steps={GAME_2_STEPS} />
@@ -80,9 +105,9 @@ export function SubstringsScreen() {
       ) : run.status === "finished" ? (
         inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} />
       ) : run.open ? (
-        <Round key={run.open.index} run={run} onChange={setRun} onTimeUp={load} />
+        <Round key={run.open.index} run={run} tryPath={routes.try} onChange={setRun} onTimeUp={load} />
       ) : (
-        <Between run={run} onNext={() => send("/api/substrings/next")} />
+        <Between run={run} onNext={() => send(routes.next)} />
       )}
     </section>
   );
@@ -102,7 +127,7 @@ const WHY: Partial<Record<TryOutcome, (letters: string) => string>> = {
   already_used: () => "Already used.",
 };
 
-function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run: SubstringRun) => void; onTimeUp: () => void }) {
+function Round({ run, tryPath, onChange, onTimeUp }: { run: SubstringRun; tryPath: string; onChange: (run: SubstringRun) => void; onTimeUp: () => void }) {
   const open = run.open!;
   const [text, setText] = useState("");
   const [reason, setReason] = useState<string | null>(null);
@@ -121,7 +146,7 @@ function Round({ run, onChange, onTimeUp }: { run: SubstringRun; onChange: (run:
     trying.current = true;
     const sent = text;
     try {
-      const result = await api<RunResponse & { outcome: TryOutcome }>("/api/substrings/try", { method: "POST", body: { text: sent } });
+      const result = await api<RunResponse & { outcome: TryOutcome }>(tryPath, { method: "POST", body: { text: sent } });
       setError(null);
       const why = WHY[result.outcome];
       if (why) {

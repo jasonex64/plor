@@ -9,14 +9,14 @@ import { AppError } from "@/lib/http";
 import { SUBSTRINGS_ID } from "@/platform/game";
 import { standingToday } from "./substring-places";
 import { bonusPoints, scoreRun, wordPoints } from "./substring-scoring";
-import type { PlayedRound, SubstringRun, TryOutcome } from "./substring-state";
+import type { PlayedRound, Standing, SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
 
-const OUT_OF_ORDER = "OB002";
-const RUN_OVER = "OB003";
-const ROUND_RUNNING = "OB014";
+export const OUT_OF_ORDER = "OB002";
+export const RUN_OVER = "OB003";
+export const ROUND_RUNNING = "OB014";
 
-async function todaysDay(db: Db): Promise<{ date: string; day: SubstringDay } | null> {
+export async function todaysDay(db: Db): Promise<{ date: string; day: SubstringDay } | null> {
   const { rows } = await db.query<{ date: string; content: SubstringDay | null }>(
     `select private.today()::text as date,
             (select content from private.puzzle where game_id = $1 and puzzle_date = private.today()) as content`,
@@ -26,25 +26,23 @@ async function todaysDay(db: Db): Promise<{ date: string; day: SubstringDay } | 
   return content ? { date, day: content } : null;
 }
 
-async function stateOf(db: Db, userId: string, date: string, day: SubstringDay): Promise<SubstringRun> {
+export type PlayedWord = { round_idx: number; word_key: string; word: string };
+
+// A run as a player may see it, from what the database says of it: a pure build, shared by a signed-in player's run and a
+// guest's (src/game/guest-substring-runs.ts). null facts is a run not started.
+export function buildRun(
+  date: string,
+  day: SubstringDay,
+  facts: { status: string; answered: number; msLeft: number | null } | null,
+  words: PlayedWord[],
+  examples: { round_idx: number; words: string[] }[],
+  standing: Standing | null,
+): SubstringRun {
   const total = day.rounds.length;
-  const { rows } = await db.query<{ status: string; answered: number; ms_left: number | null }>(
-    `select status, answered,
-            case when deadline is null then null
-                 else greatest(0, floor(extract(epoch from deadline - statement_timestamp()) * 1000))::int end as ms_left
-     from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
-    [userId, SUBSTRINGS_ID, date],
-  );
-  if (rows.length === 0) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null, score: null, standing: null };
-  const { status, answered, ms_left: msLeft } = rows[0];
-  const finished = status === "survived";
-  const words = await db.query<{ round_idx: number; word_key: string; word: string }>(
-    "select round_idx, word_key, word from private.round_word where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
-    [userId, SUBSTRINGS_ID, date],
-  );
-  const wordOf = new Map(words.rows.map((r) => [r.round_idx, r]));
-  const examples = finished ? await db.query<{ round_idx: number; words: string[] }>("select round_idx, words from private.round_examples($1, $2::date)", [userId, date]) : null;
-  const examplesOf = new Map(examples?.rows.map((r) => [r.round_idx, r.words]) ?? []);
+  if (!facts) return { date, status: "not_started", total, bonusLetter: null, rounds: [], open: null, score: null, standing: null };
+  const { status, answered, msLeft } = facts;
+  const wordOf = new Map(words.map((r) => [r.round_idx, r]));
+  const examplesOf = new Map(examples.map((r) => [r.round_idx, r.words]));
   const rounds: PlayedRound[] = day.rounds.slice(0, answered).map((letters, i) => {
     const played = wordOf.get(i);
     return {
@@ -57,14 +55,33 @@ async function stateOf(db: Db, userId: string, date: string, day: SubstringDay):
   });
   return {
     date,
-    status: finished ? "finished" : "in_progress",
+    status: status === "survived" ? "finished" : "in_progress",
     total,
     bonusLetter: day.bonus_letter,
     rounds,
     open: msLeft === null ? null : { index: answered, letters: day.rounds[answered], msLeft },
-    score: scoreRun(words.rows.map((r) => r.word_key), day.bonus_letter),
-    standing: finished ? await standingToday(db, userId, date) : null,
+    score: scoreRun(words.map((r) => r.word_key), day.bonus_letter),
+    standing,
   };
+}
+
+async function stateOf(db: Db, userId: string, date: string, day: SubstringDay): Promise<SubstringRun> {
+  const { rows } = await db.query<{ status: string; answered: number; ms_left: number | null }>(
+    `select status, answered,
+            case when deadline is null then null
+                 else greatest(0, floor(extract(epoch from deadline - statement_timestamp()) * 1000))::int end as ms_left
+     from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = $3::date`,
+    [userId, SUBSTRINGS_ID, date],
+  );
+  if (rows.length === 0) return buildRun(date, day, null, [], [], null);
+  const { status, answered, ms_left: msLeft } = rows[0];
+  const finished = status === "survived";
+  const words = await db.query<PlayedWord>(
+    "select round_idx, word_key, word from private.round_word where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
+    [userId, SUBSTRINGS_ID, date],
+  );
+  const examples = finished ? await db.query<{ round_idx: number; words: string[] }>("select round_idx, words from private.round_examples($1, $2::date)", [userId, date]) : null;
+  return buildRun(date, day, { status, answered, msLeft }, words.rows, examples?.rows ?? [], finished ? await standingToday(db, userId, date) : null);
 }
 
 // null when nothing is approved for today.
