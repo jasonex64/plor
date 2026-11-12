@@ -1,6 +1,6 @@
 # M14 — 14c-3, six pixel-art directions for the game
 
-**Status:** in progress (drafted 2026-11-03, Pacific, from four rounds of guided questions and one approval; the human, away from home, asked for the directions as private claude.ai pages).
+**Status:** done as a first look, eleven private claude.ai pages, no PR (drafted 2026-11-03, Pacific, from four rounds of guided questions and one approval; the human, away from home, asked for the directions as private claude.ai pages).
 
 ## Goal
 Six animated, pixel-art directions for the game's identity, each a private claude.ai page, so the human can pick one (or parts of several) to build into the game screen.

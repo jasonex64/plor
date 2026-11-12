@@ -1,6 +1,6 @@
 # M13 13e-4 — Subsets of any category
 
-**Status:** in progress (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c done (PR #92). Pop culture moves to 13e-6 and uses this (renumbered 2026-10-26, when the base's shape took 13e-5: `M13-13e-5-the-base-shape.md`).
+**Status:** done (2026-10-26): the design approved ("Approve 13e-4's design and go through O1–O5") with O1–O5 answered (below); 13e-4a done (PR #87); 13e-4b and 13e-4c done (PR #92). Pop culture moves to 13e-6 and uses this (renumbered 2026-10-26, when the base's shape took 13e-5: `M13-13e-5-the-base-shape.md`).
 
 ## Goal
 Any broad category can give narrower questions: by a fact about its members ("Name an African country", "Name an endangered animal", later "Name a Nintendo racing game") or by its members' first letter ("Name a country that starts with D").
