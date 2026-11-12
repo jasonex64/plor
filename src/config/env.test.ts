@@ -4,7 +4,8 @@ import { readServerEnv } from "./env.ts";
 const PEM = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----";
 const REMOTE = "postgresql://plor_app.ref:pw@aws-0-us-east-1.pooler.supabase.com:6543/postgres";
 const LOCAL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
-const AUTH = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x" };
+const TURNSTILE_ONLY = { TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret" };
+const AUTH = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x", TURNSTILE_SITE_KEY: "site", TURNSTILE_SECRET_KEY: "secret" };
 
 describe("readServerEnv", () => {
   it("fails when DATABASE_URL is missing", () => {
@@ -41,6 +42,7 @@ describe("readServerEnv", () => {
     expect(readServerEnv({ DATABASE_URL: LOCAL, ...AUTH })).toEqual({
       database: { host: "127.0.0.1", port: 54322, user: "postgres", password: "postgres", database: "postgres" },
       supabase: { url: "https://ref.supabase.co", publishableKey: "sb_publishable_x" },
+      turnstile: { siteKey: "site", secretKey: "secret" },
       databaseCaCert: null,
     });
   });
@@ -65,7 +67,7 @@ describe("readServerEnv", () => {
   });
 
   it("fails when SUPABASE_URL is missing", () => {
-    expect(() => readServerEnv({ DATABASE_URL: LOCAL, SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x" })).toThrow(/SUPABASE_URL is not set/);
+    expect(() => readServerEnv({ DATABASE_URL: LOCAL, SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x", ...TURNSTILE_ONLY })).toThrow(/SUPABASE_URL is not set/);
   });
 
   it("rejects a SUPABASE_URL with a path, e.g. the REST endpoint", () => {
@@ -81,8 +83,13 @@ describe("readServerEnv", () => {
     expect(env.supabase.url).toBe("http://127.0.0.1:54321");
   });
 
+  it.each(["TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY"])("refuses to boot without %s", (name) => {
+    const without = Object.fromEntries(Object.entries(AUTH).filter(([key]) => key !== name));
+    expect(() => readServerEnv({ DATABASE_URL: LOCAL, ...without })).toThrow(new RegExp(`${name} is not set`));
+  });
+
   it("fails when SUPABASE_PUBLISHABLE_KEY is missing", () => {
-    expect(() => readServerEnv({ DATABASE_URL: LOCAL, SUPABASE_URL: AUTH.SUPABASE_URL })).toThrow(/SUPABASE_PUBLISHABLE_KEY is not set/);
+    expect(() => readServerEnv({ DATABASE_URL: LOCAL, SUPABASE_URL: AUTH.SUPABASE_URL, ...TURNSTILE_ONLY })).toThrow(/SUPABASE_PUBLISHABLE_KEY is not set/);
   });
 
   // A secret key bypasses RLS; the app must never hold one (CLAUDE.md: Least privilege).

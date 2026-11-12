@@ -31,7 +31,8 @@ jobs:
       - name: Start the local Supabase stack
         run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
       # The dev server reads .env.local. The publishable key comes from the running stack and is masked, never
-      # printed; the other two values are the local stack's documented defaults.
+      # printed; the other values are the local stack's documented defaults and Cloudflare's published always-pass Turnstile test keys
+      # (developers.cloudflare.com/turnstile/troubleshooting/testing/), not secrets.
       - name: Point the app at the local stack
         run: |
           key=$(npx supabase status -o env 2>/dev/null | sed -n 's/^PUBLISHABLE_KEY="\{0,1\}\([^"]*\)"\{0,1\}$/\1/p')
