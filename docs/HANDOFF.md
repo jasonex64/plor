@@ -17,7 +17,8 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
    - Streak and totals: "Same as your Me page (Recommended)".
    - Blocking: "Also comments and reactions" (results on shared group boards still show); the blocked player isn't told: "Silent (Recommended)".
    - A new request: "A count on the Friends tab (Recommended)".
-   - Still open: the numbers (searches allowed, requests allowed, the wait after a decline, the name hold) and the privacy text. A question round on the four numbers was put to the human and dismissed unanswered (2026-11-11); ask again when they're ready. What a search found (2026-11-11, nothing added to SOURCES.md, which needs the human's OK): OWASP's Authentication Cheat Sheet, WSTG-IDNT-04 and REST Security Cheat Sheet ask for a limit and generic replies and give no number; GitHub's "Changing your GitHub username" releases an old name at once; other platforms' pages couldn't be opened (*unverified*). So all four are human numbers.
+   - The numbers (human, 2026-11-11): a freed username is held "30 days (Recommended)", the same 30 as between username changes; searches, "60 an hour" for one player; pending requests, "No separate cap (Recommended)"; after a decline, "Right away; block stops it (Recommended)".
+   - Still open: the search limit per address (the ticket's Numbers asks for per player and per address; only per player was asked), the OWASP pages as sources (SOURCES.md needs the human's OK), the privacy text, and then the ticket's approval. What a search found (2026-11-11, nothing added to SOURCES.md, which needs the human's OK): OWASP's Authentication Cheat Sheet, WSTG-IDNT-04 and REST Security Cheat Sheet ask for a limit and generic replies and give no number; GitHub's "Changing your GitHub username" releases an old name at once; other platforms' pages couldn't be opened (*unverified*). So all four are human numbers.
 
 ## Waits on the human
 - PR #184's merge word; 14c-6's wording.
