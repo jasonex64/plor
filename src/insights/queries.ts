@@ -5,7 +5,7 @@ import { GAME_ID } from "@/platform/game";
 import type { Db } from "@/lib/db";
 import { thingNames } from "@/game/payload";
 import { AppError } from "@/lib/http";
-import { buildInsights, type AnswerRow, type DayInsights, type MissRow } from "./report";
+import { buildInsights, type AnswerRow, type DayInsights, type MissRow, type TallyRow } from "./report";
 
 export async function isAdmin(db: Db, userId: string): Promise<boolean> {
   const { rows } = await db.query("select 1 from private.admin where user_id = $1", [userId]);
@@ -39,10 +39,15 @@ export async function dayInsights(db: Db, date: string | null): Promise<DayInsig
     "select question_idx, entry_id, matched from private.run_event where game_id = $1 and puzzle_date = $2::date",
     [GAME_ID, day.date],
   );
+  // Guests' answers, counted with no one attached (M18, answer 22); no run, token or time is read, and none exists to read.
+  const guests = await db.query<TallyRow>(
+    "select question_idx, entry_id, matched, n from private.guest_tally where game_id = $1 and puzzle_date = $2::date",
+    [GAME_ID, day.date],
+  );
   const misses = await db.query<MissRow>(
     "select question_idx, typed from private.missed_answer where game_id = $1 and puzzle_date = $2::date",
     [GAME_ID, day.date],
   );
-  const names = await thingNames(db, [...answers.rows.map((a) => a.entry_id), ...day.content.questions.flatMap((q) => q.host_answers)]);
-  return buildInsights(day.date, day.finished, day.content, answers.rows, misses.rows, names);
+  const names = await thingNames(db, [...answers.rows.map((a) => a.entry_id), ...guests.rows.map((g) => g.entry_id), ...day.content.questions.flatMap((q) => q.host_answers)]);
+  return buildInsights(day.date, day.finished, day.content, answers.rows, misses.rows, names, guests.rows);
 }

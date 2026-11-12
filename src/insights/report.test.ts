@@ -112,3 +112,31 @@ describe("buildInsights", () => {
     expect(empty.finished).toBe(false);
   });
 });
+
+// M18, answer 22: the guests' tally adds to the players' counts and carries no misses.
+describe("buildInsights with guests", () => {
+  const guests = [
+    { question_idx: 0, entry_id: "dog", matched: true, n: 3 },
+    { question_idx: 0, entry_id: "yak", matched: false, n: 4 },
+    { question_idx: 1, entry_id: "yak", matched: false, n: 2 },
+  ];
+  const players = answers(0, 10, 2, "dog", ["cat", "axolotl"]);
+  const without = buildInsights("d", true, puzzle, players, [], NAMES).questions[0];
+  const with_ = buildInsights("d", true, puzzle, players, [], NAMES, guests).questions[0];
+
+  it("adds each tally row's count to answered, to caught where it caught, and to the answer's count", () => {
+    expect(with_.answered - without.answered).toBe(7);
+    expect(with_.caught - without.caught).toBe(3);
+    expect(with_.catchRate).toBe(5 / 17);
+    const count = (q: typeof with_, id: string) => q.topAnswers.find((t) => t.answer.id === id)?.count ?? 0;
+    expect(count(with_, "dog") - count(without, "dog")).toBe(3);
+    expect(count(with_, "yak") - count(without, "yak")).toBe(4);
+  });
+
+  it("lets guests lift a question past the too-few line, and leaves misses as they were", () => {
+    const few = buildInsights("d", true, puzzle, answers(1, 2, 0, "cat", ["yak"]), [{ question_idx: 1, typed: "okapi" }], NAMES, guests);
+    expect(few.questions[1]).toMatchObject({ answered: 4, tooFew: true });
+    const enough = buildInsights("d", true, puzzle, answers(1, 3, 0, "cat", ["yak"]), [{ question_idx: 1, typed: "okapi" }], NAMES, guests);
+    expect(enough.questions[1]).toMatchObject({ answered: 5, tooFew: false, misses: [{ text: "okapi", count: 1 }] });
+  });
+});
