@@ -370,6 +370,12 @@ p {
   margin: 40px 0 10px;
 }
 
+/* A licence notice keeps its own line breaks, and a line too long for a phone wraps, so the page never scrolls
+   sideways (M16 16h). */
+.reading pre {
+  white-space: pre-wrap;
+}
+
 a {
   color: var(--accent);
 }

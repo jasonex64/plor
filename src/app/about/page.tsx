@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "../button-link";
+import { dictionaryNotices } from "./licence";
 
 export const metadata: Metadata = { title: "About Plor" };
 
@@ -8,8 +9,10 @@ export const metadata: Metadata = { title: "About Plor" };
 // human chose its parts (2026-10-25: "What Plor is", "Who makes it, contact", "by jason") and the AI line, at the
 // bare minimum ("Plor is built with help from AI."). Moonlit's colours are monkeytype's "rose pine moon"
 // (frontend/src/ts/constants/themes.ts, read 2026-10-25), from the Rosé Pine palette. The answer data's credits stay
-// on the privacy page.
+// on the privacy page. The dictionary's licence notices come from data/licences (docs/milestones/
+// M16-game-2-substrings.md, 16h).
 export default function About() {
+  const notices = dictionaryNotices();
   return (
     <main className="reading">
       <h1>About Plor</h1>
@@ -32,6 +35,14 @@ export default function About() {
       <p>
         The open data sets behind Plor&apos;s answers are credited on the <Link href="/privacy">privacy policy</Link>.
       </p>
+
+      <h2>Dictionary credits</h2>
+      <p>
+        Game 2&apos;s dictionary is built from the ENABLE word list, the Moby word lists and the English Speller
+        Database. The notices the English Speller Database&apos;s licence requires follow.
+      </p>
+      <pre>{notices.top}</pre>
+      <pre>{notices.ukacd}</pre>
 
       <h2>AI</h2>
       <p>Plor is built with help from AI.</p>
