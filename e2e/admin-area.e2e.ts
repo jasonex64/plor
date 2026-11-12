@@ -54,6 +54,10 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
   const chart = page.getByRole("region", { name: "Caught per question" });
   await expect(chart.getByRole("img")).toHaveAttribute("aria-label", /^Share of players caught per question, against the Gentle target: Q1 /);
   await expect(page.getByRole("button", { name: "Next day" })).toBeDisabled();
+  // The counts mix guests and players unevenly, and the page says so (docs/milestones/M18-guest-play.md, answers 22 and 35).
+  await expect(
+    page.getByText("These counts include guests, who can play a day more than once. A guest's answer after midnight isn't counted; a player's is.", { exact: true }),
+  ).toBeVisible();
 });
 
 test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ browser }) => {

@@ -29,19 +29,45 @@ export async function forwardPlayerIp(page: Page, email: string): Promise<void> 
   );
 }
 
-// Signs in on the page it's on (home or an invite link) and picks a username.
+// Signs in on the page it's on (home, a guest game, an invite link or a tab) and picks a username. The front page and
+// the guest games show a small "Sign in" link that opens the form at /?sign-in; other pages show the form itself
+// (docs/milestones/M18-guest-play.md, answers 32 and 33). Signed in through the link, it goes Back to the page it was
+// on, so the tests' history has that page where it always had it (a Back from a game lands on "/", not "/?sign-in").
 export async function signInAndPick(page: Page, name: string): Promise<void> {
   const email = `${RUN}-${name}@example.test`;
   await forwardPlayerIp(page, email);
-  await page.getByLabel("Email").fill(email);
+  const field = page.getByLabel("Email");
+  const link = page.getByRole("link", { name: "Sign in", exact: true });
+  await expect(field.or(link)).toBeVisible();
+  const throughLink = !(await field.isVisible());
+  const from = page.url();
+  if (throughLink) {
+    // A press that lands while the page is still starting up can go nowhere (seen on shell.e2e.ts, 2026-11-12): pressed
+    // again until the address is the form's.
+    await expect(async () => {
+      if (!/\/\?sign-in$/.test(page.url())) await link.click();
+      await expect(page).toHaveURL(/\/\?sign-in$/);
+    }).toPass();
+  }
+  await field.fill(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
   await page.getByLabel("Code").fill(await emailedCode(email));
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.getByLabel("Username").fill(`${name}${RUN}`);
-  await page.getByRole("button", { name: "Save" }).click();
+  // The visible step: signed in from a guest game, the game's page is still in the document, hidden, with a step of its
+  // own (seen in guest-play.e2e.ts, 2026-11-12: two Username fields).
+  await page.getByLabel("Username").filter({ visible: true }).fill(`${name}${RUN}`);
+  await page.getByRole("button", { name: "Save" }).filter({ visible: true }).click();
   // Saved once the step is gone: a test that navigates straight after would otherwise leave before the save lands
   // and find the step again (seen in M14 14a-1's e2e run).
-  await expect(page.getByRole("heading", { name: "Pick a username" })).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Pick a username" }).filter({ visible: true })).toHaveCount(0);
+  // Back in the page's own history, not a new load: a load would show Today again before it can take a click.
+  if (throughLink) {
+    await page.goBack();
+    await expect(page).toHaveURL(from);
+    // Until Back's transition is over the tab bar isn't hit-tested, so a test's next tap could miss (as shell.e2e.ts
+    // waits, docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 5).
+    await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
+  }
 }
 
 // From Today, Play opens Offbeat's game screen and Start there begins question 1

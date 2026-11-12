@@ -76,7 +76,8 @@ test("a player picks a theme, which paints before the profile loads, and Follow 
   expect(await copy(page)).toBe("moonlit");
   await expect(sheet.getByRole("link", { name: "About Plor" })).toHaveAttribute("href", "/about");
   await sheet.getByRole("button", { name: "Sign out" }).click();
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  // Signed out on Today's address: the front page's small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
   expect([await attribute(page), await copy(page), await background(page)]).toEqual([null, null, "rgb(250, 250, 248)"]);
 });
 

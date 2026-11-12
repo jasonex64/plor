@@ -252,6 +252,20 @@ describe("the bot check", () => {
     expect(cookieJar.size).toBe(0);
   });
 
+  // Cloudflare's test secrets cannot produce a real timeout-or-duplicate (the always-pass secret passes every token), so
+  // this stubs only the network edge with the reply Siteverify gives for a token already redeemed.
+  it("answers 400 captcha_failed and creates no run when Siteverify says the token was already used", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: false, "error-codes": ["timeout-or-duplicate"] }), { status: 200 })));
+    try {
+      const before = await guestRuns();
+      expect(await start({ turnstileToken: DUMMY_TOKEN })).toEqual({ status: 400, body: { ok: false, error: "captcha_failed" } });
+      expect(await guestRuns()).toBe(before);
+      expect(cookieJar.size).toBe(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("answers 503 captcha_unavailable and creates no run when Siteverify can't be reached", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("fetch failed")));
     try {

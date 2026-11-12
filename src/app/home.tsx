@@ -44,6 +44,7 @@ import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
 import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
+import { SIGN_IN_HREF, signInOpen } from "./sign-in-open";
 import { LoadingStatus, PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
 import { useBodyFlag } from "./body-flag";
@@ -245,8 +246,8 @@ function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shel
 
 // Around each page's own section: sign-in, then picking a username, then the section. The profile is read on the
 // client, so the served HTML holds the skeleton here.
-// signedOut: what a signed-out visitor sees in place of the sign-in: the guest game on its route, or the front page's
-// PlayFirst (docs/milestones/M18-guest-play.md, Design, "What a guest can reach").
+// signedOut: what a signed-out visitor sees in place of the sign-in: the guest game on its route, the front page's
+// PlayFirst, or a group invite's InviteSignedOut (docs/milestones/M18-guest-play.md, Design, "What a guest can reach").
 export function Signed({ children, signedOut }: { children: ReactNode; signedOut?: ReactNode }) {
   const { me, loadError, loadMe } = useFrame();
   if (loadError) return <p role="alert">{loadError}</p>;
@@ -264,9 +265,11 @@ export function Signed({ children, signedOut }: { children: ReactNode; signedOut
 }
 
 // The front page for a signed-out visitor: play first, sign in second (human, 2026-11-11: "Play first, sign in second
-// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 26).
+// (Recommended)"; docs/milestones/M18-guest-play.md, Answers, 26). The sign-in is a small link, and the form shows at the
+// address the link goes to (answers 32 and 33).
 export function PlayFirst() {
   const { loadMe } = useFrame();
+  const open = signInOpen(useSearchParams());
   return (
     <>
       <p>
@@ -279,7 +282,30 @@ export function PlayFirst() {
           Play {SUBSTRINGS.name} without an account
         </ButtonLink>
       </p>
+      {open ? (
+        <SignIn onSignedIn={loadMe} />
+      ) : (
+        <p>
+          <ButtonLink href={SIGN_IN_HREF} className={kit.small}>
+            Sign in
+          </ButtonLink>
+        </p>
+      )}
+    </>
+  );
+}
+
+// A group's invite link for a signed-out visitor: sign-up first, then a way to play today's game as a guest, on the
+// front page (docs/milestones/M18-guest-play.md, answer 10; Design, "The peek and pages"). The same SignIn, so a Google
+// sign-in still comes back to the invite (PENDING_INVITE).
+export function InviteSignedOut() {
+  const { loadMe } = useFrame();
+  return (
+    <>
       <SignIn onSignedIn={loadMe} />
+      <p>
+        <ButtonLink href="/">Play today&apos;s game as a guest</ButtonLink>
+      </p>
     </>
   );
 }
@@ -463,7 +489,8 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
   }
   return (
     <section>
-      <h2>Sign in to play</h2>
+      {/* Not "Sign in to play": play needs no account (docs/milestones/M18-guest-play.md, answer 26). */}
+      <h2>Sign in</h2>
       <button type="button" onClick={google} disabled={busy}>
         Continue with Google
       </button>

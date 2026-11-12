@@ -50,6 +50,12 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
 
   const joiner = await (await browser.newContext()).newPage();
   await joiner.goto(link);
+  // Signed out, the invite asks for sign-in first, with a way to play today's game as a guest under it, on the front page
+  // (docs/milestones/M18-guest-play.md, answer 10).
+  await expect(joiner.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
+  const asGuest = joiner.getByRole("link", { name: "Play today's game as a guest", exact: true });
+  await expect(asGuest).toHaveAttribute("href", "/");
+  expect((await joiner.getByLabel("Email").boundingBox())!.y).toBeLessThan((await asGuest.boundingBox())!.y);
   await signInAndPick(joiner, "gb");
   await joiner.getByRole("button", { name: "Join group" }).click();
   await expect(joiner).toHaveURL(groupUrl);

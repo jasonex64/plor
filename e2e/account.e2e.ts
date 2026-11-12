@@ -82,9 +82,11 @@ test("a player deletes their account from the settings sheet", async ({ browser 
   await expect(button).toBeEnabled();
   await button.click();
 
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  // Signed out, the front page offers its small Sign in link (docs/milestones/M18-guest-play.md, answer 32).
+  const signIn = page.getByRole("link", { name: "Sign in", exact: true });
+  await expect(signIn).toBeVisible();
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  await expect(signIn).toBeVisible();
   const { rows } = await DB.query("select from auth.users where email = $1", [`${RUN}-dx@example.test`]);
   expect(rows).toHaveLength(0);
 });
