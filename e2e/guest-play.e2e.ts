@@ -90,7 +90,8 @@ test("a visitor plays game 2 as a guest from the front page, through the guest r
   await expect(page.getByText("xk", { exact: true })).toBeVisible();
   await box.fill("axkb");
   await box.press("Enter");
-  await expect(game2(page).getByText("You played axkb: 25 points.")).toBeVisible();
+  // The sentence as the eye sees it; the same words are also the status message (as e2e/play2.e2e.ts's `sentence`).
+  await expect(game2(page).locator("p:not([role='status'])", { hasText: "You played axkb: 25 points." })).toBeVisible();
   await game2(page).getByRole("button", { name: "Next", exact: true }).click();
 
   // Rounds 2 to 7 run out in the database, and the next try finds it.
