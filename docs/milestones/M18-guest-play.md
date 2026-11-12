@@ -1,6 +1,6 @@
 # M18 — Guest play
 
-**Status:** approved by the human, 2026-11-11 ("Approve M18"); 18a, the decision (no code), reviewed (round 1: five blocking findings fixed, see Review) and in review as a PR; **18b, the data, built locally and in review** (2026-11-11, not pushed; Evidence, 18b). Drafted the same day from five rounds of the human's answers; answers 1 to 22. Built before M16's 16f and M17 (ROADMAP, Focus, "The plan to the beta"), for the closed beta. No code, and no migration, before the security change below is reviewed and recorded in DECISIONS.md.
+**Status:** approved by the human, 2026-11-11 ("Approve M18"); 18a, the decision (no code), done (PR #182, merged 2026-11-11 on green CI at the human's "merge"); **18b, the data, built, reviewed and in review as a PR** (2026-11-11; Evidence, 18b). Drafted the same day from five rounds of the human's answers; answers 1 to 22. Built before M16's 16f and M17 (ROADMAP, Focus, "The plan to the beta"), for the closed beta. No code, and no migration, before the security change below is reviewed and recorded in DECISIONS.md.
 
 ## Goal
 Anyone can play today's game 1 or game 2 from the front page without an account; they see their result once, and nothing about them is kept except their answers, with no one attached.
@@ -180,6 +180,11 @@ Round 1 (`reviewer` agent, 2026-11-11). Blocking findings and how each was fixed
 5. **HANDOFF.** Updated: approved, answers 1 to 22, 18a written and reviewed, PR to be opened by the lead.
 - Round 2 (2026-11-11, a second `reviewer` run on round 1's fixes): two blocking findings. (1) Round 1's three tightenings were written as approved though they came after "Approve M18": now listed under "Needs the human's OK" and marked as waiting in DECISIONS.md. (2) The token's size quoted OWASP's 128 bits and left out "prefer 160 bits or more": the human chose 160 bits (answer 21). Its smaller findings: the stale token sentences and an unread OWASP phrase are fixed, DECISIONS.md no longer overstates what the delete functions prevent, and two went to Next revision.
 - Deferred to ROADMAP "Next revision" (For M18, each "Found in M18 18a (review, 2026-11-11)"): a purged run must give a 4xx from the answer route (18c's tests); whether Siteverify is sent `remoteip`, and the privacy text saying so; the privacy text must not over-claim (backups, dead rows and Vercel's request logs hold address and time); a `secure` cookie over `http://localhost` verified only in Chromium; answers 13 and 14 together let a guest see the day's answers and then play for points, and free replays let a guest push rarity counts (accepted for the beta, revisit before public launch); the signed-in `/api/run/answer` 40-character check (audit W1) has no ticket yet.
+
+### 18b review (2026-11-11, the `reviewer` agent, on the four 18b commits)
+- Blocking, one, docs only: this Status line, ROADMAP's M18 row and the handoff still said 18a was in review though PR #182 had merged. Fixed in all three.
+- Nothing blocking in the security, the players' behaviour or the tests: the grants match Security change 3, `plor_app_role.test.sql` was only extended, the players' rules compare line for line with the baseline's, and the reviewer's own runs gave `npx supabase test db` Files=37, Tests=742, PASS and `npm run test:db` 51 files, 349 tests passed.
+- Deferred to ROADMAP "Next revision" (For M18, each "Found in M18 18b (review, 2026-11-11)"): a db test's `toBeDefined()` that proves nothing; `report.ts`'s default for the guests' rows; a pgTAP that counts tally rows where its label says counts; a misplaced comment; the tally rows' hidden `xmin`.
 
 ### 18b (2026-11-11)
 **Before the migration (baseline, nothing changed yet):** `npm test` 56 files, 640 tests passed; `npx supabase test db` Files=36, Tests=616, PASS; `npm run test:db` 50 files, 343 tests passed.
