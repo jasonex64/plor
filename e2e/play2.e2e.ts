@@ -52,9 +52,14 @@ test.afterAll(async () => {
   await ADMIN.end();
 });
 
-test("a signed-out visit shows sign-in", async ({ page }) => {
+// Signed out, the page is the bare guest game, not sign-in first (docs/milestones/M18-guest-play.md, 18d; e2e/guest-play.e2e.ts
+// plays it). It needs a day, as a signed-in visit does.
+test("a signed-out visit shows the bare guest game, with a way to sign in", async ({ page }) => {
+  await addDay();
   await page.goto("/play2");
-  await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
+  await expect(game(page).getByRole("button", { name: "Start", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
+  await expect(tabs(page)).toHaveCount(0);
 });
 
 test("a day with no puzzle says so", async ({ page }) => {
