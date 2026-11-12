@@ -244,7 +244,9 @@ function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shel
 
 // Around each page's own section: sign-in, then picking a username, then the section. The profile is read on the
 // client, so the served HTML holds the skeleton here.
-export function Signed({ children }: { children: ReactNode }) {
+// signedOut: what a signed-out visitor sees in place of the sign-in: the guest game on its route, or the front page's
+// PlayFirst (docs/milestones/M18-guest-play.md, Design, "What a guest can reach").
+export function Signed({ children, signedOut }: { children: ReactNode; signedOut?: ReactNode }) {
   const { me, loadError, loadMe } = useFrame();
   if (loadError) return <p role="alert">{loadError}</p>;
   // Only until the profile first loads (a page opened from its address); afterwards the frame keeps it.
@@ -253,7 +255,7 @@ export function Signed({ children }: { children: ReactNode }) {
     return (
       <>
         <RedirectError />
-        <SignIn onSignedIn={loadMe} />
+        {signedOut ?? <SignIn onSignedIn={loadMe} />}
       </>
     );
   if (me.username === null) return <PickUsername onDone={loadMe} />;

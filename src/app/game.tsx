@@ -174,11 +174,11 @@ type Runner = {
 // M14-14b-6-feel-and-polish.md, 14b-6c; answers 22 and 23; docs/milestones/M14-14c-8-plain-game-1.md), said once the day is known (docs/milestones/M14-14b-19-controls-layout-and-state.md, answer 3).
 export function Game({
   family,
-  turnstileToken = null,
+  botCheck,
   onStarted,
   onPlaying,
   ...hooks
-}: DayHooks & { family: RunFamily; turnstileToken?: string | null; onStarted?: () => void; onPlaying: (playing: boolean) => void }) {
+}: DayHooks & { family: RunFamily; botCheck?: () => Promise<string>; onStarted?: () => void; onPlaying: (playing: boolean) => void }) {
   const router = useRouter();
   const { run, setRun, noPuzzle, error, setError, over } = useRun(hooks, family);
   const routes = runRoutes(family);
@@ -197,6 +197,22 @@ export function Game({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function startRun() {
+    let body;
+    if (family === "guest") {
+      setBusy(true);
+      setError(null);
+      try {
+        body = startBody(family, await botCheck!());
+      } catch (err) {
+        setError(errorText(err));
+        setBusy(false);
+        return;
+      }
+    }
+    if (await send(routes.start, body)) onStarted?.();
   }
 
   // At zero the server is asked again, and decides whether time is up (rule 3). The run in play can't vanish, so no run
@@ -219,7 +235,7 @@ export function Game({
     error,
     busy,
     over,
-    start: () => void send(routes.start, startBody(family, turnstileToken)).then((r) => r && onStarted?.()),
+    start: () => void startRun(),
     next: () => send(routes.next),
     answer: (text) => send(routes.answer, { index: run!.question!.index, text }),
     timeUp,

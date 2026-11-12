@@ -70,6 +70,9 @@ const MESSAGES: Record<string, string> = {
   text_invalid: "That's too long to send. Try a shorter answer.",
   admins_only: "This page is for admins only.",
   not_available: "There's no report for that day yet.",
+  // The guest start's bot check (docs/milestones/M18-guest-play.md, Design, "The bot check"). Wording approved by the human, 2026-11-11.
+  captcha_failed: "The check didn't pass. Try again.",
+  captcha_unavailable: "The check isn't working on our side right now. Try again in a few minutes.",
   // Puzzle entry (docs/milestones/M06-puzzle-entry.md).
   day_past: "That day is over.",
   puzzle_started: "That day has started, so its puzzle can't change.",
