@@ -45,10 +45,48 @@ Asked from a fresh grep at `98609f5`: `GAME_ID` is imported by 18 non-test files
 
 **Claude's reading:** Me keeps L45's "Totals across games, A card per game" (M14), which answer 1 doesn't change. How a day with no approved day in one game counts for the shared streak is for 16f.
 
+## Answers for 16f (human, 2026-11-11, first round of guided questions)
+1. Today with two games: "one card featured at a time, with arrows to navigate to the other one. ideally with even more games over time u can kinda peek at the next game's card if that makes sense, kind of like a carousel? but i also want to implement it in a way that is tasteful in a design sense."
+2. Me's days played: "Started counts (Recommended)". Starting either game is a played day on Me, as on the streak and the boards (settles ROADMAP, Next revision, "Me's days played still counts finished runs alone").
+3. Game 2's shown name: first "something neutral but not "game 2"", then, from Claude's three neutral options, "Fragments". The `game_id` stays `substrings` (S1).
+4. The friends' live board: "One per game". In a game you see friends playing that same game.
+
+Second round (human, 2026-11-11):
+5. Which card is in front when the app opens: "The one you haven't played (Recommended)". Whatever is left to play today comes first; once both are played, game 1 first.
+6. The carousel's feel: "Show me mock-ups first". Claude makes two or three pictures of the carousel before any of it is built; this is design work, so the session that makes them runs on Fable (CLAUDE.md, Agent setup).
+7. A day when only one game has an approved day: "Play what's there (Recommended)". Starting the one available game keeps the shared streak; a day with no approved day in either game is skipped and breaks no streak.
+8. Groups and Share for Fragments: "Both, for both games (Recommended)". Group boards cover both games and Share gets a Fragments result.
+
+Third round (human, 2026-11-11, two sets of guided questions):
+9. The feed, in the human's own words (given in place of an answer on where comments show): "the feed should be sometihgn that supports scrolling endlessly like twitter."
+10. What the endless feed reaches back through: "Today first, then earlier days". Scrolling past today keeps loading older days.
+11. Where comments live: "In the feed, as items". A comment is a feed item tagged with its game, in time order with the rest.
+12. Where the feed sits: "Under the carousel on Today".
+13. A feed item for a game the viewer hasn't played today: "Name and game show, result blurred (Recommended)".
+14. Tapping a blurred item: "Opens that game to play (Recommended)".
+15. The feed's order: "Newest first, games mixed (Recommended)".
+
+**Claude's reading, not the human's words (open to change):** answer 11 changes where comments are today (a separate list) and meets answer 3 of the split ("Each game its own", opened by finishing that game): a comment on a game the viewer hasn't finished today would be blurred as answer 13 says. Earlier days' items are not blurred, their games being over.
+
+Fourth round (human, 2026-11-11, after three mock-ups of the carousel, A "a sliver and dots", B "a wide peek, arrows on top", C "centre stage, named arrows"; the files were shown in the session and are not in the repo):
+16. The carousel: "B, wide peek". A row above the cards reads "Today's games" with ‹ "1 of 2" ›, as How to play's arrows, and a wide strip of the next card shows.
+17. Fragments' card colour: "Its own colour". The colour is not chosen.
+18. What Fragments' card shows: "Mirror, plus the percent after play". As game 1's card, and after play it adds "better than X% of players".
+19. The leaderboard card on Today, now that the feed is endless: "Off Today on phones".
+20. Which game's board the leaderboard shows: "Its own game switch" (game 1, Fragments, overall).
+21. A friend's comment on a game the viewer hasn't played today: "The comment shows". Only results are blurred. The option's stated cost was that a comment could give away an answer. This replaces "opened by finishing that game" in answer 3 of the split, for reading.
+22. When a game's blurred items clear: "Once you finish that game (Recommended)".
+23. Where a comment is written: "Both": on the game's result screen and in a box at the top of the feed.
+24. The friends' live board on phones: "Stays as it is" (from tablet width up, one per game).
+
+**Claude's reading, not the human's words (open to change):** answer 20 applies wherever the board still shows (Friends, and Today on wider screens), since answer 19 takes it off Today on phones. Answer 23's box on Today lets the writer pick only a game they have finished, which the option stated.
+
+Not yet asked: Fragments' card colour (options to be shown); whether the cards keep one order or the unplayed one moves first; words on a blurred item; reactions in the feed; how replies to a comment show; how many items load at a time (a number: the human's or a source's); whether the date between days is shown. 16f is not approved to build.
+
 ## Decisions
 | # | Decision | Answer (origin) |
 |---|---|---|
-| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is open.** The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
+| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is Fragments** (human, 2026-11-11, 16f answer 3). The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
 | S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **Picked** (human, 2026-11-05): "ENABLE + Moby + SCOWL (Recommended)": see "The dictionary" below |
 | S3 | "Never impossible or too hard" | Difficulty narrows through the run (human, 2026-10-22): "the first couple rounds only have 2 characters in the substring", a "middle round" uses substrings in more than 500 words, the "last round maybe ~100-200", "never anything too difficult". The rounds in between are S18 |
 | S4 | Substring length | 2 letters in the first rounds (human, 2026-10-22, with S3). The length for the later rounds is S18 |
