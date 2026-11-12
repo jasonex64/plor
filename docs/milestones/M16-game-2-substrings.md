@@ -45,10 +45,18 @@ Asked from a fresh grep at `98609f5`: `GAME_ID` is imported by 18 non-test files
 
 **Claude's reading:** Me keeps L45's "Totals across games, A card per game" (M14), which answer 1 doesn't change. How a day with no approved day in one game counts for the shared streak is for 16f.
 
+## Answers for 16f (human, 2026-11-11, first round of guided questions)
+1. Today with two games: "one card featured at a time, with arrows to navigate to the other one. ideally with even more games over time u can kinda peek at the next game's card if that makes sense, kind of like a carousel? but i also want to implement it in a way that is tasteful in a design sense."
+2. Me's days played: "Started counts (Recommended)". Starting either game is a played day on Me, as on the streak and the boards (settles ROADMAP, Next revision, "Me's days played still counts finished runs alone").
+3. Game 2's shown name: first "something neutral but not "game 2"", then, from Claude's three neutral options, "Fragments". The `game_id` stays `substrings` (S1).
+4. The friends' live board: "One per game". In a game you see friends playing that same game.
+
+Not yet asked: the carousel's details (which card shows first, swipe, the peek), the shared streak on a day when one game has no approved day, comments, the mixed feed, groups and Share. 16f is not approved to build.
+
 ## Decisions
 | # | Decision | Answer (origin) |
 |---|---|---|
-| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is open.** The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
+| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is Fragments** (human, 2026-11-11, 16f answer 3). The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
 | S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **Picked** (human, 2026-11-05): "ENABLE + Moby + SCOWL (Recommended)": see "The dictionary" below |
 | S3 | "Never impossible or too hard" | Difficulty narrows through the run (human, 2026-10-22): "the first couple rounds only have 2 characters in the substring", a "middle round" uses substrings in more than 500 words, the "last round maybe ~100-200", "never anything too difficult". The rounds in between are S18 |
 | S4 | Substring length | 2 letters in the first rounds (human, 2026-10-22, with S3). The length for the later rounds is S18 |
