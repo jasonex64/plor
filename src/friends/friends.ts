@@ -69,6 +69,9 @@ export async function addFriend(db: Db, userId: string, code: string): Promise<F
     if (err instanceof DatabaseError && err.code === "23505" && err.constraint === "friendship_pkey") {
       throw new AppError("already_friends", 409);
     }
+    // A block between the two, either way (private.friendship_unblocked): the same answer as a link that has gone, so
+    // a blocked player learns nothing (M17 17a, answer 13).
+    if (err instanceof DatabaseError && err.code === "OB016") throw new AppError("invite_invalid", 404);
     throw err;
   }
   return { username, name };
