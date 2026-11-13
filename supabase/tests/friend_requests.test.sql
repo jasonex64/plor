@@ -27,7 +27,7 @@ select ok(not has_table_privilege('plor_app', 'private.block', 'delete, update, 
 select is((select relrowsecurity from pg_class where oid = 'private.friend_request'::regclass), true, 'requests have RLS on');
 select is((select relrowsecurity from pg_class where oid = 'private.block'::regclass), true, 'blocks have RLS on');
 select is(
-  (select array_agg(format('%s %s %s', policyname, cmd, array_to_string(roles, ',')) order by 1)
+  (select array_agg(format('%s %s %s', policyname, cmd, array_to_string(roles, ',')) order by policyname)
    from pg_policies where schemaname = 'private' and tablename in ('friend_request', 'block')),
   array['block_plor_app_insert INSERT plor_app', 'block_plor_app_select SELECT plor_app',
     'friend_request_plor_app_delete DELETE plor_app', 'friend_request_plor_app_insert INSERT plor_app',
@@ -46,15 +46,15 @@ select ok(not has_function_privilege('anon', 'private.unblock(uuid,uuid)', 'exec
 
 -- The two trigger functions run with the caller's rights, as profile_username_change does, so they need no grant.
 select is(
-  (select array_agg(format('%s %s %s', proname, prosecdef, proconfig) order by 1) from pg_proc
+  (select array_agg(format('%s %s %s', proname, prosecdef, proconfig) order by proname) from pg_proc
    where oid in ('private.block_ends_friendship()'::regprocedure, 'private.friendship_unblocked()'::regprocedure)),
-  array['block_ends_friendship false {"search_path=\"\""}', 'friendship_unblocked false {"search_path=\"\""}'],
+  array['block_ends_friendship f {"search_path=\"\""}', 'friendship_unblocked f {"search_path=\"\""}'],
   'the two trigger functions are security invoker with an empty search_path');
 select ok(not has_function_privilege('plor_app', 'private.block_ends_friendship()', 'execute')
   and not has_function_privilege('plor_app', 'private.friendship_unblocked()', 'execute'),
   'plor_app holds no execute on them');
 select is(
-  (select array_agg(format('%s on %s', tgname, tgrelid::regclass) order by 1) from pg_trigger
+  (select array_agg(format('%s on %s', tgname, tgrelid::regclass) order by tgname) from pg_trigger
    where not tgisinternal and tgrelid in ('private.friend_request'::regclass, 'private.block'::regclass, 'private.friendship'::regclass)),
   array['block_ends_friendship on private.block', 'friendship_unblocked on private.friendship'],
   'a block and a friendship each have one trigger, and a request has none, so nothing is sent when one arrives (answer 14)');
@@ -108,7 +108,7 @@ select is((select count(*)::int from private.block), 3, 'and deletes none');
 select is((select count(*)::int from private.friend_request where sender = pg_temp.u(2) and receiver = pg_temp.u(1)), 1,
   'nor any request');
 select is(private.unblock(pg_temp.u(1), pg_temp.u(2)), true, 'unblocking a blocked player says a block was there');
-select is((select array_agg(format('%s %s', blocker, blocked) order by 1) from private.block),
+select is((select array_agg(format('%s %s', blocker, blocked) order by blocker) from private.block),
   array[format('%s %s', pg_temp.u(1), pg_temp.u(3)), format('%s %s', pg_temp.u(4), pg_temp.u(1))], 'it deletes that one block');
 select is((select count(*)::int from private.friend_request where sender = pg_temp.u(2) and receiver = pg_temp.u(1)), 0,
   'and the blocked player''s hidden request to the blocker');

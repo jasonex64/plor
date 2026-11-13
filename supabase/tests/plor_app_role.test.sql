@@ -74,10 +74,10 @@ select is(pg_temp.grants('plor_app'), array[
   -- What a waiting near-typo could be linked to, in one click (M14 14b-2b-2b).
   'private.audit_near(uuid,bigint,text[]) execute',
   'private.audit_open_count(uuid) execute',
-  -- Blocks (M17 17a, D4): read and added; an unblock goes through private.unblock, one pair a call, so there is no delete.
-  'private.block insert', 'private.block select',
   -- The answer database (M13 13a, D1 a): no table grant; an admin's lookup goes through one guarded function.
   'private.base_lookup(uuid,text) execute',
+  -- Blocks (M17 17a, D4): read and added; an unblock goes through private.unblock, one pair a call, so there is no delete.
+  'private.block insert', 'private.block select',
   -- A test run builds a draft as approval would and resolves its answers, admins only, writing nothing (M14 14b-11).
   'private.build_puzzle(uuid,jsonb) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
@@ -166,7 +166,9 @@ select is(pg_temp.grants('plor_app'), array[
   'private.search_answers(uuid,text,date,integer,text,integer,integer) execute',
   'private.take_auth_attempt(text,text,integer,interval) execute',
   'private.thing_names(uuid[]) execute',
-  'private.today() execute'], 'plor_app holds exactly the grants the routes need');
+  'private.today() execute',
+  -- Lifting one block, the named pair's (M17 17a, D4).
+  'private.unblock(uuid,uuid) execute'], 'plor_app holds exactly the grants the routes need');
 
 select * from finish();
 rollback;
