@@ -88,7 +88,15 @@ const PENDING_INVITE = "plor.pendingInvite";
 const INVITE_PATH = /^\/[ig]\/(.+)$/;
 
 // What the frame shares with the page inside it: the profile, null until it loads (or when loading it failed, loadError).
-type FrameState = { me: Me | null; loadError: string | null; loadMe: () => void; timeUps: number; reloadStreak: () => void };
+// requestsChanged: a friend request was answered on the page, so the Friends tab's count is read again (M17 17a, D6).
+type FrameState = {
+  me: Me | null;
+  loadError: string | null;
+  loadMe: () => void;
+  timeUps: number;
+  reloadStreak: () => void;
+  requestsChanged: () => void;
+};
 const FrameContext = createContext<FrameState | null>(null);
 
 function useFrame(): FrameState {
@@ -98,10 +106,10 @@ function useFrame(): FrameState {
 }
 
 // For the sections inside Signed, which renders them only for a player with a username.
-function usePlayer(): { player: Player; timeUps: number; reloadStreak: () => void } {
-  const { me, timeUps, reloadStreak } = useFrame();
+function usePlayer(): { player: Player; timeUps: number; reloadStreak: () => void; requestsChanged: () => void } {
+  const { me, timeUps, reloadStreak, requestsChanged } = useFrame();
   if (!me?.signedIn || me.username === null) throw new Error("a player section rendered outside Signed");
-  return { player: me, timeUps, reloadStreak };
+  return { player: me, timeUps, reloadStreak, requestsChanged };
 }
 
 // The frame reads no address-bar hooks itself, so the page inside it is in the served HTML (Google's brand check, M02
@@ -135,6 +143,9 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
   // read it again then (docs/milestones/M14-14b-2c-review-items.md, items 6 and 46).
   const [timeUps, setTimeUps] = useState(0);
   const timeUp = useCallback(() => setTimeUps((n) => n + 1), []);
+  // Counts the friend requests answered on the page: FrameParts reads the Friends tab's count again at each.
+  const [requestsVersion, setRequestsVersion] = useState(0);
+  const requestsChanged = useCallback(() => setRequestsVersion((n) => n + 1), []);
   const reloadStreak = useCallback(() => {
     setStreakError(null);
     api<Me>("/api/profile", { method: "GET" }).then(read, (err) => setStreakError(errorText(err)));
@@ -161,7 +172,7 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
 
   const player = me?.signedIn && me.username !== null ? me : null;
   return (
-    <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak }}>
+    <FrameContext value={{ me, loadError, loadMe, timeUps, reloadStreak, requestsChanged }}>
       {/* The page's one "Loading", for every skeleton in it (src/app/skeleton.tsx). */}
       <LoadingStatus>
         {/* Around the feed's column too, which holds comments (14b-6b). */}
@@ -174,9 +185,11 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
               timeUp={timeUp}
               timeUps={timeUps}
               streakError={streakError}
-              shell={
+              requestsVersion={requestsVersion}
+              shell={(requests) =>
                 player && (
                   <Shell
+                    requests={requests}
                     lost={lost}
                     admin={player.admin}
                     profile={player}
@@ -200,15 +213,17 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
 }
 
 // The frame's parts that read the address: the shell (its current tab), the clock bar away from the game screen, the
-// friends feed's column, and the invite remembered across a Google sign-in.
-function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shell }: {
+// friends feed's column, the invite remembered across a Google sign-in, and the Friends tab's count of friend requests,
+// read on each page (docs/milestones/M17-profiles-and-friend-requests.md, 17a; answer 14, D6).
+function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, requestsVersion, shell }: {
   lost: boolean;
   signedIn: boolean;
   player: Player | null;
   timeUp: () => void;
   timeUps: number;
   streakError: string | null;
-  shell: ReactNode;
+  requestsVersion: number;
+  shell: (requests: number) => ReactNode;
 }) {
   const path = usePathname();
   const router = useRouter();
@@ -232,10 +247,26 @@ function FrameParts({ lost, signedIn, player, timeUp, timeUps, streakError, shel
     if (pending && code && INVITE_CODE.test(code)) router.replace(pending);
   }, [onInvite, signedIn, router]);
 
+  const [requests, setRequests] = useState(0);
+  const [requestsError, setRequestsError] = useState<string | null>(null);
+  const playing = player !== null;
+  // Again on each page (path) and after a request is answered on one (requestsVersion); no live nudge (answer 14).
+  useEffect(() => {
+    if (!playing) return;
+    api<{ count: number }>("/api/friends/requests/count", { method: "GET" }).then(
+      (r) => {
+        setRequests(r.count);
+        setRequestsError(null);
+      },
+      (err) => setRequestsError(errorText(err)),
+    );
+  }, [playing, path, requestsVersion]);
+
   if (!player) return null;
   return (
     <>
-      {shell}
+      {shell(requests)}
+      {requestsError && <p role="alert">{requestsError}</p>}
       {/* Away from the game screen, a question left in play keeps its clock in view (M14 L18). */}
       {path !== GAME.path && <ClockBar onTimeUp={timeUp} />}
       {streakError && <p role="alert">{streakError}</p>}
@@ -323,8 +354,8 @@ export function TodayTab() {
 }
 
 export function FriendsTab() {
-  const { player, timeUps } = usePlayer();
-  return <Friends username={player.username} timeUps={timeUps} />;
+  const { player, timeUps, requestsChanged } = usePlayer();
+  return <Friends username={player.username} timeUps={timeUps} onRequestsChanged={requestsChanged} />;
 }
 
 export function MeTab() {
@@ -639,7 +670,7 @@ function FriendsFeed({ username, name, timeUps }: { username: string; name: stri
 // the invite link (human, 2026-10-25: "friends list should be in the friends tab"; "Below the boards (Recommended)";
 // docs/milestones/M14-14a-3b-settings.md), whose link is the board's here, so it shows once. With no game on the page,
 // the time to the reset comes from the run's state, and the boards start again at midnight Pacific (M11 H6).
-function Friends({ username, timeUps }: { username: string; timeUps: number }) {
+function Friends({ username, timeUps, onRequestsChanged }: { username: string; timeUps: number; onRequestsChanged: () => void }) {
   const [day, setDay] = useState(0);
   // Held in an object, so each answer starts the timer again even when it repeats the last (0 right at midnight), and
   // the next reset still fires (14b-2c-1, item 5).
@@ -665,7 +696,7 @@ function Friends({ username, timeUps }: { username: string; timeUps: number }) {
       {error && <p role="alert">{error}</p>}
       <Board key={timeUps} username={username} invite={false} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
-      <FriendsList />
+      <FriendsList onRequestsChanged={onRequestsChanged} />
     </Fragment>
   );
 }

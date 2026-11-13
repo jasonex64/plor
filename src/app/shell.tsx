@@ -210,12 +210,14 @@ const GEAR = icon(
 // review). The frame (Frame, src/app/home.tsx), which renders it, runs only on the client (it reads the address bar
 // behind Suspense). On phones the top bar's wordmark stands for the page's own "Plor" heading, which is then read but
 // not shown twice.
-export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onSignedOut }: {
+export function Shell({ lost, admin, profile, streak, requests, onChanged, onSettings, onSignedOut }: {
   // On the 404 page no tab is current (docs/milestones/M14-14b-16-not-found.md).
   lost: boolean;
   admin: boolean;
   profile: Profile;
   streak: number;
+  // Friend requests waiting for the player's answer, shown on the Friends tab (M17 17a; answer 14).
+  requests: number;
   onChanged: () => void;
   onSettings: (settings: Settings) => void;
   onSignedOut: () => void;
@@ -226,7 +228,12 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
   const nav = useRef<HTMLElement>(null);
   useSlideTaps(nav);
   const dialog = useRef<HTMLDialogElement>(null);
-  const open = () => dialog.current?.showModal();
+  // Counts the times the sheet opened: its blocked list is read then, not on every page (M17 17a).
+  const [opens, setOpens] = useState(0);
+  const open = () => {
+    setOpens((n) => n + 1);
+    dialog.current?.showModal();
+  };
   return createPortal(
     <>
       {/* Anchored while a detail page slides (globals.css; M14 14b-6e), as are the tab bar and the clock bar: named
@@ -258,6 +265,15 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
                 <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
                   <TabIcon art={tab.art} />
                   {tab.label}
+                  {tab.href === "/friends" && requests > 0 && (
+                    <>
+                      <span aria-hidden="true"> ({requests})</span>
+                      {/* No comma before it: Chromium read the name as "Friends , 1 friend request" (seen 2026-11-12). */}
+                      <span className="sr-only">
+                        {requests} friend {requests === 1 ? "request" : "requests"}
+                      </span>
+                    </>
+                  )}
                 </Link>
               </li>
             );
@@ -273,7 +289,7 @@ export function Shell({ lost, admin, profile, streak, onChanged, onSettings, onS
           Settings
         </button>
       </nav>
-      <SettingsSheet dialog={dialog} profile={profile} onChanged={onChanged} onSettings={onSettings} onSignedOut={onSignedOut} />
+      <SettingsSheet dialog={dialog} opens={opens} profile={profile} onChanged={onChanged} onSettings={onSettings} onSignedOut={onSignedOut} />
     </>,
     document.body,
   );

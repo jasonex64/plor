@@ -40,6 +40,10 @@ const MESSAGES: Record<string, string> = {
   invite_own: "That's your own invite link. Send it to a friend.",
   already_friends: "You're already friends.",
   not_friends: "You aren't friends with that player.",
+  // Friend requests and blocks (docs/milestones/M17-profiles-and-friend-requests.md, 17a): the ones its screens can meet.
+  request_not_found: "That friend request is already gone.",
+  player_not_found: "There's no player with that username.",
+  not_blocked: "That player isn't blocked.",
   // Groups (docs/milestones/M10-groups.md, 10b). The name rule and the caps are the database's (G11).
   group_name_invalid: `Group names are 1 to ${GROUP_NAME_MAX_LENGTH} characters: letters, digits, single spaces and ' . _ -`,
   group_not_found: "That group doesn't exist, or you aren't in it.",
