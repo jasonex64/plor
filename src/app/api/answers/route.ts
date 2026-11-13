@@ -1,4 +1,5 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
+import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle } from "@/lib/http";
 import { isCalendarDate } from "@/content/puzzle";
@@ -15,6 +16,7 @@ export const GET = handle(async (request) => {
   const index = params.get("index");
   const q = params.get("q") ?? "";
   if (!isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
-  if (index === null || !/^\d+$/.test(index)) throw new AppError("bad_request", 400, "index");
+  // The upper bound keeps a long run of digits from reaching the database's integer as a 500 (M19 19a).
+  if (index === null || !/^\d+$/.test(index) || Number(index) >= QUESTIONS_PER_DAY) throw new AppError("bad_request", 400, "index");
   return Response.json({ ok: true, answers: await searchAnswers(getPool(), userId, date, Number(index), q) });
 });

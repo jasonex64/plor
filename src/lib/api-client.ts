@@ -21,6 +21,9 @@ export async function api<T>(path: string, init: { method: "GET" | "POST"; body?
     headers: { "x-protocol": String(PROTOCOL_VERSION), "content-type": "application/json" },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
   });
+  // A failed reply that isn't JSON is the platform's error page, not a route's: the same error a route's own 500
+  // gives (M19 19a; src/lib/http.ts, "internal").
+  if (!response.ok && !response.headers.get("content-type")?.includes("application/json")) throw new ApiError("internal", response.status);
   const json = await response.json();
   if (response.ok) return json as T;
   if (response.status === 409 && json.error === "client_outdated") {

@@ -55,6 +55,9 @@ describe("searching a question's answers", () => {
     await startRun("mid");
     expect(await search("0", "bear")).toEqual({ status: 403, body: { ok: false, error: "answers_closed" } });
     expect((await search("one", "bear")).status).toBe(400);
+    // Past the day's questions, and past the database's integer (M19 19a; the 2026-11-11 audit's W9).
+    expect((await search("99999999999", "bear")).status).toBe(400);
+    expect((await search("7", "bear")).status).toBe(400);
   });
 
   it("finds a finished player's answers by any name, and refuses a question they didn't reach", async () => {
