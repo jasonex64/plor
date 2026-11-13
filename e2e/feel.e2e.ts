@@ -38,14 +38,12 @@ async function hold(page: Page, path: string): Promise<() => void> {
 }
 
 // The introduction is in the served HTML, before any script runs (Google's brand check, M02 2c): the frame around the
-// page mustn't hold it back. The invite pages' lines too.
+// page mustn't hold it back. A group's invite page's line too.
 test("the pages' static text is served without JavaScript", async ({ browser }) => {
   const page = await (await browser.newContext({ javaScriptEnabled: false })).newPage();
   await page.goto("/");
   await expect(page.getByText("Plor is a small site with a daily word game.")).toBeVisible();
   await expect(page.getByRole("heading", { name: /Today's game:/ })).toBeVisible();
-  await page.goto("/i/AAAAAAAAAA");
-  await expect(page.getByText("A friend invited you to Plor")).toBeVisible();
   await page.goto("/g/AAAAAAAAAA");
   await expect(page.getByText("You were invited to a group on Plor")).toBeVisible();
 });

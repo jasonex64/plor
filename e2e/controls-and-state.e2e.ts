@@ -6,7 +6,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, play, sharedLink, signInAndPick } from "./players";
+import { RUN, play, signInAndPick, befriend } from "./players";
 import { answerBox, caughtToCards, countdown, expectCountdown, fillScale } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -93,11 +93,10 @@ test("your own reaction in the ⋯ menu is filled with the accent", async ({ bro
   const friend = await (await browser.newContext({ viewport: PHONE })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "ca");
-  const invite = await sharedLink(friend, friend.getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "cb");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "cb", friend, "ca");
   await caught(friend);
   await caught(page);
   // The friend's comment, with this player's 😂, written straight to the database: the reaction rules aren't what this

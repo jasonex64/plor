@@ -4,7 +4,7 @@
 // board, the streak pill and Me's "All games" card (since 14b-15) take the soft tint; a stat's number shrinks to fit a phone (answer 23).
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -76,11 +76,10 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   const friend = await (await browser.newContext({ viewport: PHONE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "kb");
-  const invite = await sharedLink(friend, friend.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: PHONE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "ka");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "ka", friend, "kb");
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-ka@example.test`]);
   await page.goto("/groups");
   await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Calm Club");

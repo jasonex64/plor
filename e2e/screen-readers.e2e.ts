@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, play, sent, sharedLink, signInAndPick } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -151,11 +151,10 @@ test("after Report focus moves to the next comment's ⋯", async ({ browser }) =
   const friend = await (await browser.newContext()).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "qp");
-  const invite = await sharedLink(friend, friend.getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext()).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "qq");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "qq", friend, "qp");
   await caught(friend);
   await post(friend, "Report me.");
   await sent(friend, "/api/comments");

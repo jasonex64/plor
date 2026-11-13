@@ -1,5 +1,5 @@
 // The live board with two real browsers (docs/milestones/M07-friends-and-live-board.md, 7c): two players sign in
-// with emailed codes, become friends through an invite link, and one sees the other start without reloading, and
+// with emailed codes, become friends by a friend request, and one sees the other start without reloading, and
 // nothing more until their own run is over (M12 12d).
 // Reactions (M08 8b), reports (8c) and comments and reactions arriving live (8d) are checked once both have played.
 // The board is on the Friends tab and the game and the feed on Today (docs/milestones/M14-14a-1-shell.md), so the
@@ -8,7 +8,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { answerBox, caughtToCards, next, safe } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -64,15 +64,9 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
 
   await watcher.goto("/friends");
   await signInAndPick(watcher, "w");
-  // The invite link is on the Friends tab, with the friends list (M14 14a-3b).
-  const invite = watcher.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  const link = await sharedLink(watcher, invite.getByRole("button", { name: "Invite a friend" }));
-
-  await player.goto(new URL(link!).pathname);
+  await player.goto("/friends");
   await signInAndPick(player, "p");
-  await expect(player.getByRole("heading", { name: `Add ${watcherName} as a friend?` })).toBeVisible();
-  await player.getByRole("button", { name: "Add friend" }).click();
-  await expect(player.getByRole("heading", { name: `You and ${watcherName} are now friends.` })).toBeVisible();
+  await befriend(player, "p", watcher, "w");
 
   await openBoard(watcher);
   // The plain list of friends, not the lists inside "where everyone ended".

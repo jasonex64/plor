@@ -2,7 +2,7 @@
 // the feed before playing (names, no words), and Today's columns from phone to desktop.
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { asked, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
@@ -104,15 +104,10 @@ test("one leaderboard card switches between yesterday and this week, for friends
 // Criterion 4: a friend's comment, before the viewer has played.
 test("before playing, the feed names who commented and holds none of their words", async ({ browser }) => {
   const viewer = await player(browser, "tc");
-  await viewer.goto("/friends");
-  const invite = viewer.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  const link = await sharedLink(viewer, invite.getByRole("button", { name: "Invite a friend" }));
-
   const friend = await (await browser.newContext({ viewport: PHONE })).newPage();
-  await friend.goto(path(link));
+  await friend.goto("/friends");
   await signInAndPick(friend, "td");
-  await friend.getByRole("button", { name: "Add friend" }).click();
-  await expect(friend.getByRole("heading", { name: `You and tc${RUN} are now friends.` })).toBeVisible();
+  await befriend(friend, "td", viewer, "tc");
   await friend.goto("/");
   await play(friend);
   await caughtToCards(friend, puzzle.hostAnswer);
