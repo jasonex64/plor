@@ -59,8 +59,10 @@ select lives_ok($$update private.profile set username = 'b_new' where user_id = 
   'the first change is allowed at once, so a wrong pick at sign-up can be fixed');
 select isnt((select username_changed_at from private.profile where user_id = '00000000-0000-0000-0000-00000000000b'), null,
   'a change records when it happened');
-select lives_ok($$insert into private.profile (user_id, username) values ('00000000-0000-0000-0000-00000000000c', 'abcdefghij0123456789')$$,
-  'the old username is free for anyone at once');
+-- M17 17b replaced M12 A2's "free for anyone at once": the old name is held 30 days (held_username.test.sql has the rest).
+select throws_ok($$insert into private.profile (user_id, username) values ('00000000-0000-0000-0000-00000000000c', 'abcdefghij0123456789')$$,
+  'OB017', null, 'the old username is held, not free for anyone at once');
+insert into private.profile (user_id, username) values ('00000000-0000-0000-0000-00000000000c', 'c_player');
 select throws_ok($$update private.profile set username = 'b_again' where user_id = '00000000-0000-0000-0000-00000000000b'$$,
   'OB011', null, 'a second change within 30 days of the last is refused');
 -- statement_timestamp(), as the trigger uses: now() is when the transaction began, which over a remote connection
