@@ -12,7 +12,7 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 - **plor.app stays as it is** (live on `main`, hosted database not updated): "Leave it as is".
 - **The order stands:** "Keep the full order".
 - **No new features before the beta** (break alerts and a feedback button were offered): "jk i dont want the new features everything else is fine".
-- Stale, to tidy: ROADMAP's M18 row and the M18 ticket call #191 open; ROADMAP's M16 row says game 2's name is open (it is "Fragments", 16f answer 3); 14c-6 still reads "in progress"; the "very long answer" must-fix looks fixed at `src/game/runs.ts:253` and `:426` (*read by a subagent, not run*) but is unchecked in ROADMAP.
+- The docs tidy the planning session listed is done (PR #192, merged): #191 marked merged, game 2 named in the M16 Status, 14c-6 marked dropped, the long-answer must-fix ticked.
 
 ## The tracks
 1. **M18, guest play** (this branch). 18a (#182), 18b (#183), 18c (#186) and 18d (#189) are merged. **18e is built and its PR, #191, is open:** the front page's sign-in is a small link to `/?sign-in`, where the form shows; a guest's result has Share (game 1) and the blurred peek with "Make an account" (both games); the group invite page offers a guest link; Insights says its counts include guests. The `reviewer` found nothing blocking in two passes. **Whether it was merged: read the PR.** The night's rule was merge only with every CI check green; a merge publishes those changes to plor.app (no migration in it). **Two criteria are still open, both the human's:** the privacy page's words (a draft is in the ticket, "Privacy page draft"; the page is unchanged) and the force-interaction-key e2e (answer 37: it needs a port, a second server and a CI change). A third stays unticked for a decision: the repeated bot-check token is proven with a stubbed reply only. The overnight decisions are answers 33 to 37 in the ticket. **Not verified:** the peek's look in a browser (before a CSS fix the blur sat over the words; the e2e now proves the link takes a click, nobody has looked at it); the full local `npm run test:db`; the full e2e with the final sign-in helper (CI's run is the evidence).
@@ -24,7 +24,7 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 - **17a:** read PR #193; when to merge it (with the hosted database's update, not before); the words on its screens (the ticket, "Words on the 17a screens"); a look at the screens in a browser.
 - **plor.app is live on the newest `main`: every merge to `main` is published.** **Before any merge to `main`, say what it does to plor.app.** The hosted database still waits on the human's `db push` (DECISIONS.md, Database migrations), so a guest pressing Start on plor.app is *unverified*, as is the bot check with the real keys. To go back: `vercel rollback` to `dpl_EeS3jdJHMYi4yrN8Q1qBozEg9ViK` (the version before 18c).
 - 16f's remaining questions (above); then the plor.app load's one must-fix (`docs/audits/2026-11-11-backlog-sort.md`).
-- 14c-6's Status reading "superseded" (not confirmed); whether the dictionary licence's AU section applies; the Privacy page naming the dictionary (audit W2).
+- Whether the dictionary licence's AU section applies; the Privacy page naming the dictionary (audit W2).
 - The public repo shows the answer lists and the upcoming day, and this file's history names private email addresses (ROADMAP, Next revision, For the human).
 - `C:/Users/jason/RIFF-m15` (`m15-launch-readiness`) is far behind `main` with uncommitted edits and a half-built 15d: undecided, untouched.
 - GitHub reports one moderate vulnerability in a dependency (Dependabot alert 2): not looked at.
@@ -44,4 +44,4 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 
 **Open pull requests:** #193 (17a, from `m17-profiles-and-friend-requests`). The M16 branch is behind `main`: merge `main` in before working on it.
 
-**Next:** the human's word on #193. Then 17b's guiding questions and build on this branch (after #193 is merged or closed: one open PR per sub-ticket), then 17c. Beside it: 16f's remaining questions and its ticket for approval; the docs tidy above; M18's two open criteria (the human's).
+**Next:** the human's word on #193. Then 17b's guiding questions and build on this branch (after #193 is merged or closed: one open PR per sub-ticket), then 17c. Beside it: 16f's remaining questions and its ticket for approval; M18's two open criteria (the human's).
