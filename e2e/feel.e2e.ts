@@ -106,9 +106,11 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
 });
 
 // Every number on the page has same-width digits, and headings and paragraphs wrap evenly, from globals.css's base
-// rules (criterion 5): read on Today's real elements, a section's h3 included, so a module overriding them shows here.
+// rules (criterion 5): read on a page's real elements, a section's h3 included, so a module overriding them shows here.
+// The Friends tab, since Today has no h3 for a new player once "Plor is better with friends" went from it (M17 17c,
+// answer 34); the Friends tab's board still says it.
 test("numbers are tabular, headings balanced and paragraphs pretty", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/friends");
   await signInAndPick(page, "fn");
   await expect(page.locator("h3").first()).toBeVisible();
   const styles = await page.evaluate(() => {
