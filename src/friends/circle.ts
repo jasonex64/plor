@@ -13,6 +13,11 @@ export function seesAuthorSql(viewer: string, author: string): string {
   return `(${author} = ${viewer}::uuid or ${friendsSql(viewer, author)})`;
 }
 
+// True when either player has blocked the other (docs/milestones/M17-profiles-and-friend-requests.md, 17a; answer 12).
+export function blockedSql(viewer: string, other: string): string {
+  return `exists (select from private.block k where k.blocker = ${viewer}::uuid and k.blocked = ${other} or k.blocker = ${other} and k.blocked = ${viewer}::uuid)`;
+}
+
 // True when the player is a current member of the group.
 export function memberSql(player: string, group: string): string {
   return `exists (select from private.group_member gm where gm.group_id = ${group} and gm.user_id = ${player}::uuid)`;
@@ -20,17 +25,20 @@ export function memberSql(player: string, group: string): string {
 
 // True when the viewer may see this comment (a private.comment alias): in the friends thread, their own or a friend's
 // (M08 D5); in a group's thread, any, while the viewer is a member (M10 G4). Whether the day's thread is open to them
-// yet is the caller's check.
+// yet is the caller's check. Never one by a player on either side of a block with the viewer (M17 17a, answer 12).
 export function seesCommentSql(viewer: string, comment: string): string {
-  return `(${comment}.group_id is null and ${seesAuthorSql(viewer, `${comment}.user_id`)}
-          or ${comment}.group_id is not null and ${memberSql(viewer, `${comment}.group_id`)})`;
+  return `((${comment}.group_id is null and ${seesAuthorSql(viewer, `${comment}.user_id`)}
+          or ${comment}.group_id is not null and ${memberSql(viewer, `${comment}.group_id`)})
+          and not ${blockedSql(viewer, `${comment}.user_id`)})`;
 }
 
 // True when a reaction on this comment counts for the viewer, who can see the comment: in the friends thread, their
-// own or a friend's (M08 8b); in a group's thread, a current member's, so every member sees the same counts (G4).
+// own or a friend's (M08 8b); in a group's thread, a current member's, so every member sees the same counts (G4),
+// except that a reaction by a player on either side of a block with the viewer never counts (M17 17a, answer 12).
 export function seesCommentReactionSql(viewer: string, comment: string, reactor: string): string {
-  return `(${comment}.group_id is null and ${seesAuthorSql(viewer, reactor)}
-          or ${comment}.group_id is not null and ${memberSql(reactor, `${comment}.group_id`)})`;
+  return `((${comment}.group_id is null and ${seesAuthorSql(viewer, reactor)}
+          or ${comment}.group_id is not null and ${memberSql(reactor, `${comment}.group_id`)})
+          and not ${blockedSql(viewer, reactor)})`;
 }
 
 // The viewer and each of their friends, one user_id per row (M07; M09 D4).
