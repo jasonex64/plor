@@ -14,8 +14,8 @@ test.afterAll(async () => {
   await DB.end();
 });
 
-const A = `qa${RUN}`;
-const B = `qb${RUN}`;
+const A = `fra${RUN}`;
+const B = `frb${RUN}`;
 
 async function send(page: Page, username: string) {
   const response = await page.request.post("/api/friends/requests", { data: { username }, headers: { "x-protocol": String(PROTOCOL_VERSION) } });
@@ -33,9 +33,9 @@ test("a request shows on the Friends tab and its page, is accepted, and a block 
   test.slow();
   const other = await (await browser.newContext()).newPage();
   await page.goto("/friends");
-  await signInAndPick(page, "qa");
+  await signInAndPick(page, "fra");
   await other.goto("/friends");
-  await signInAndPick(other, "qb");
+  await signInAndPick(other, "frb");
   await expect(requests(other)).toHaveCount(0);
   await expect(tab(other)).toHaveAccessibleName("Friends");
 
@@ -84,19 +84,19 @@ test("Decline and block takes the request off the blocker's page, and the sender
   test.slow();
   const other = await (await browser.newContext()).newPage();
   await page.goto("/friends");
-  await signInAndPick(page, "qc");
+  await signInAndPick(page, "frc");
   await other.goto("/friends");
-  await signInAndPick(other, "qd");
-  await send(other, `qc${RUN}`);
+  await signInAndPick(other, "frd");
+  await send(other, `frc${RUN}`);
   await page.reload();
   await expect(tab(page)).toHaveAccessibleName("Friends 1 friend request");
   page.once("dialog", (dialog) => void dialog.accept());
   await requests(page).getByRole("button", { name: "Decline and block" }).click();
   await expect(requests(page)).toHaveCount(0);
   await expect(tab(page)).toHaveAccessibleName("Friends");
-  await expect((await blockedList(page)).getByRole("listitem")).toContainText([`qd${RUN}`]);
+  await expect((await blockedList(page)).getByRole("listitem")).toContainText([`frd${RUN}`]);
   // The blocked sender's page reads as if nothing happened.
   await other.reload();
-  await expect(requests(other).getByRole("list", { name: "Requests you sent" }).getByRole("listitem")).toContainText([`qc${RUN}`]);
+  await expect(requests(other).getByRole("list", { name: "Requests you sent" }).getByRole("listitem")).toContainText([`frc${RUN}`]);
   await other.context().close();
 });
