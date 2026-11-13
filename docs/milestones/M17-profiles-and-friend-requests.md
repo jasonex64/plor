@@ -62,6 +62,7 @@ This ticket follows the three OWASP pages added to `docs/SOURCES.md` on 2026-11-
 
 ## Answer (human, 2026-11-12, 17b's design)
 31. Asked "Accept all seven recommended options (E1 to E7) and build 17b?", after PR #194 listed them: "Yes, build as proposed". So each of E1 to E7 is settled as its recommended option (a), and 17b's held-name table, its definer trigger and the limiter's new `lookup` kind are approved as written in "17b design" (CLAUDE.md, "Security changes need a human"; DECISIONS.md, log, 2026-11-12).
+32. The same, one by one, in the planning session's multiple-choice questions (2026-11-12/13, relayed by that session). E1, search and profile, one thing or two: "One (Recommended)"; E2, what counts toward the 60 an hour: "Lookups + requests (Recommended)"; E3, what "Recent results" is: "Existing 7-day chart (Recommended)"; E4, game 2 on a profile: "Game 1 only for now (Recommended)"; E5, how the old name is held: "Read-only for the app (Recommended)"; E6, where things go: "/u/name + Friends page (Recommended)"; E7, what a stranger sees beside the numbers: "Names only (Recommended)"; and, asked "the search limit would reuse the existing sign-in limiter with one new kind ("lookup"), adding no new table or permission. Approve?": "Approve (Recommended)".
 
 *Reading, Claude's, not an answer:* the Friends tab's count (answer 14) counts requests waiting for the viewer only, not ones the viewer sent and not ones from a player the viewer has blocked.
 
