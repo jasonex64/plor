@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design ("17b design", below; seven decisions, E1 to E7, two of them security) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 31; one by one, answer 32). **17b, search, profiles, the held name and the lookup limit, is built (2026-11-13) and in review: its PR, #195, is open and not merged** (Evidence, 17b; merging it before the hosted database has its migration would break sending a friend request on plor.app). 17c is not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design ("17b design", below; seven decisions, E1 to E7, two of them security) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 31; one by one, answer 32). **17b, search, profiles, the held name and the lookup limit, is done: PR #195 merged 2026-11-13 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "IT IS DONE"; *not checked by Claude*). **17c, friend invite links out and the privacy page, is asked for (human, 2026-11-13, relayed: "Yes, start 17c") and proposed, not built: "17c design", below, has five decisions (G1 to G5) and the privacy page's exact words, all waiting on the human.** Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -277,6 +277,73 @@ Search, the profile page, the 30-day hold and the lookup limit (Plan 2). This ma
 7. **[E7] What a stranger sees beside the numbers.** (a) *Recommended:* the display name and username; "Playing since" for friends only (answer 4 says totals and streak). (b) "Playing since" for strangers too, as the Me header shows it.
 
 **Numbers:** 60 an hour (answer 15) and 30 days (answer 10), both the human's; 7 days for [E3] (a) (human, 2026-10-24, M14 L35), reused. The tests' 10 rounds and day 29 / day 30 are sizes and edges, not limits. Nothing else is needed; if a decision above goes another way and needs a number, it is asked.
+
+## 17c design (proposed 2026-11-13 by Claude; **not approved, nothing of 17c is built**)
+Friend invite links out, and the privacy page. Answer 6 ("Remove friend invites"; group invite links stay), the Removes section and the last unticked criterion settle *that* the links go. They don't settle what stands where the Invite buttons were, and the privacy words approved on 2026-11-11 (answer 26) no longer match what 17b built. So this is written for the recommended option of each decision below, marked **[G*n*]**, and waits for the human. Every `file:line` was read on 2026-11-13 at `2fecf81`.
+
+**What goes (the fresh search the Removes section asks for)**
+- Pages and routes: `/i/[code]` (`src/app/(shell)/i/[code]/page.tsx`), `POST /api/friends/invite`, `POST /api/friends/add`, `GET /api/friends/preview`, and `inviteCode` from `GET /api/friends`.
+- Server: in `src/friends/friends.ts`, `readInviteCode`, `getInviteCode`, `issueInviteCode`, `findInviter`, `addFriend` and its OB016 mapping. `newInviteCode` stays: groups (`src/groups/groups.ts:38`, `:135`) and the guest token's comment use it. `src/friends/invite-code.ts` stays for group links (`src/app/home.tsx:248`).
+- Screens: `src/app/invite-link.tsx` whole (`InviteCodeProvider`, `InviteLink`); `InviteTab` and `AcceptInvite` in `src/app/home.tsx`; the `friend-invite` body flag (`src/app/body-flag.ts`) and its two CSS rules (`src/app/globals.css:226-236`); the Invite button under Today's board, in the phone Today card and on the Friends tab (`src/app/board.tsx:164`, `:193`; `src/app/friends-list.tsx:173`). `INVITE_PATH` and `PENDING_INVITE` (`src/app/home.tsx:88-89`) stay for `/g/` links, narrowed to them.
+- Database, one new migration: `drop table private.friend_invite`, which takes its three policies and `plor_app`'s grants on it with it (`supabase/migrations/20261028140000_baseline.sql:535-557`, `:2884-2886`, `:3036-3040`). The baseline is not edited (DECISIONS.md, Database migrations). `private.friendship`, the block triggers and OB016 stay: accept still inserts friendships.
+- Tests: the invite cases of `src/app/api/friends/route.db.test.ts`, `route.test.ts`, `block/route.db.test.ts:234`, `src/friends/friends.test.ts`, `src/lib/account.plor-app.db.test.ts:127`, `supabase/tests/account_deletion.test.sql:35`, the three grants in `plor_app_role.test.sql`; and in e2e, the tests of the invite link itself (`settings-and-invites`, `headings-invites`, `player-screens:174`, `account:97`, `feel:48`, `shell:112`, `look:123`, `me:155`). **These are deleted because the feature they test is deleted, not to get a green run**; each test that only *used* a link to make two players friends (`alive`, `calm`, `controls-and-state`, `live-board`, `reactions-menu`, `screen-readers`, `today`, `headings-invites:207`) keeps every assertion and makes its friends with a friend request on the screens instead, through one helper in `e2e/players.ts`.
+- ROADMAP: the two friend-request items in Later, and the Next revision items that are about the friend invite link only (lines 195, 197, 222, 227 and 384 at `2fecf81`), marked removed with the feature.
+
+**What happens to what players have**
+- **Every existing `/i/…` link stops working for everyone the moment 17c is merged**: it answers the site's "not found" page (the criterion: "`GET /i/<any code>` answers 404"). A link sent to someone who hasn't opened it yet is lost; they add each other by username instead. **[G2]**
+- **Friendships made through links stay.** Nothing in `private.friendship` is touched.
+- **Every stored invite code is deleted for good** when the migration drops the table. A code is a random 10 characters with no other use; nothing else reads it.
+- **Group invite links (`/g/…`) are not touched**: their routes, their page and their tests stay as they are.
+
+**Merge first, then `db push` (the reverse of 17a and 17b).** The new code never reads the table, so merging before the hosted database is changed breaks nothing: the table just sits unused. Pushing the migration *before* the merge would break plor.app: the live Friends page and every Invite button read the table (`GET /api/friends`, `src/friends/friends.ts:30`) and would answer "Something went wrong". After the merge, the push can wait as long as the human likes.
+
+**Screens [G1]** (words are Claude's)
+- Friends tab: the "Invite friends" card and Reset link go. "Find a player" is already at the top (17b). The empty list reads "No friends yet. Find a player by their username, above." **[G3]**
+- Remove's question reads "Remove *name* as a friend? To be friends again, one of you sends a friend request." **[G3]**
+- Today, for a player with no friends: the "Plor is better with friends" words stay, under the board from 768px and as the phone card, and where the Invite button was there is a link, "Find a player", to the Friends tab. With friends, nothing shows there, as today on phones.
+
+**Security.** Dropping the table removes grants and policies and adds none. It is still a change to grants, so it is proposed here and recorded in DECISIONS.md's log when approved (CLAUDE.md, "Security changes need a human"). No new table, grant, policy, function or route.
+
+**No numbers.** 17c adds no limit, timeout or size.
+
+### Privacy page: the words, for approval [G4]
+The draft approved on 2026-11-11 ("Privacy page draft", below) was written before 17b's design. Three of its statements are no longer true of what was built, and two lines it only described ("your invite link leaves…", "Keeping and deleting would add…") were never worded. The page's own rule is that every statement matches what the code does (`src/app/privacy/page.tsx:6-8`). Below is the whole of what 17c would put on the page; **bold** marks every word that differs from the approved draft. The page is not changed until the human approves these words.
+
+- Replaces "Your friends" (today: "who you are friends with, and your invite link. Your friends, and anyone signed in who opens your invite link, can see your username and your display name if you set one."):
+  > **Your friends:** who you are friends with. **Your friends can see your username and your display name if you set one.**
+- New, after it:
+  > **Your profile and who can find it:** any signed-in player can **look you up** by your exact username (not by display name or part of a username) and open your profile. A signed-in player who isn't your friend sees **your username, your display name if you set one, your points, days played and streaks, and your best and average results in the daily game.** Your friends also see **when you started playing,** your calendar of days played **this month**, your rarest answers and **a chart of your last 7 days**. Nobody who is signed out can see a profile. If you change your username, the old one still opens your profile for 30 days and no one else can take it; if you delete your account in that time, the old username is freed at once.
+
+  Why it differs: the draft said "a card for each game" (E4: game 1 only for now), "your recent results" (E3: the 7-day chart) and didn't say "Playing since" shows to friends (E7). Read from `src/friends/players.ts:48-51` and `src/game/me.ts:16-23`.
+- New, unchanged from the approved draft:
+  > **Friend requests and blocks:** we keep the friend requests you send and receive, and the players you block. Blocking someone ends any friendship with them, stops their requests reaching you, and makes your profile and username show nothing to them. You and they stop seeing each other's comments and reactions, though results on a shared group's board still show. They are not told. You can unblock someone from a list in Settings.
+- New, in place of the draft's "Search counts":
+  > **Lookup counts:** to stop anyone listing usernames, we count how many **times each signed-in player looks up a username that isn't their own or a friend's, and how many friend requests they send,** in an hour. **We count by a scrambled form of your account's ID. An entry stops counting after an hour, and is deleted the next time anyone's lookup is counted after that.**
+
+  Why it differs: E2 made the count "lookups + requests", and the count is kept as sign-in attempts are (`src/lib/auth-limits.ts:37`; `private.take_auth_attempt`, baseline `:1054`).
+- "Keeping and deleting", one phrase: "…comments, reactions, reports and friends, straight away" becomes
+  > …comments, reactions, reports, **friends, friend requests, blocks and any old username held for you**, straight away
+
+  (pgTAP, `account_deletion.test.sql`: no row of the player remains in requests, blocks or held names.)
+- "Last updated" becomes the day the page is changed.
+
+**M18's guest-play words edit the same page and are still not approved** (`docs/milestones/M18-guest-play.md`, "Privacy page draft", answer 34). Guest play and the bot check are already live on plor.app, and the page says nothing of them. **[G5]**
+
+### Decisions for the human
+None is settled. Each recommended option is what the design above is written for.
+1. **[G1] Where the Invite buttons were.** (a) *Recommended:* as "Screens" above: the Friends tab's invite card goes, and Today's "Plor is better with friends" keeps its words with a "Find a player" link in place of the button. (b) Take all three away and point nowhere: less on Today, but a new player with no friends is never told how to add one. (c) (a), plus a "Share Plor" button that shares the plain plor.app address, so a friend with no account can be told of the site: a new small feature, which answer 6 gave up knowingly.
+2. **[G2] An old `/i/…` link.** (a) *Recommended:* the site's ordinary "not found" page, as the criterion says. (b) A page saying friend invite links have ended and to find the friend by username: kinder to someone holding an old link, but it keeps a page and its words for a feature that's gone, and changes the approved criterion.
+3. **[G3] The two new sentences** on the Friends tab ("No friends yet. Find a player by their username, above." and "To be friends again, one of you sends a friend request."). (a) *Recommended:* as written. (b) Your own words.
+4. **[G4] The privacy words above.** (a) *Recommended:* approve as written. (b) Change them: say what. (c) Leave the privacy page out of 17c, so 17c only removes the links: then the live page keeps saying "your invite link" after the links are gone, and says nothing of profiles, requests or blocks, which are live now.
+5. **[G5] M18's guest-play privacy words, on the same page.** (a) *Recommended:* read M18's draft now and, if you approve it, 17c puts both sets of words on the page in one edit with one "Last updated": the page is already behind the live site on guest play. (b) Not now: 17c changes only M17's lines, and M18's criterion stays open. Either way Claude writes none of M18's words onto the page without your approval of them.
+
+### Plan (once approved)
+1. e2e helper that makes two players friends by a request on the screens; switch the specs that only used a link → verify: each switched spec passes locally, one file at a time, port 3000 free first.
+2. Screens: the Invite buttons out, the "Find a player" link and the two sentences in → verify: `npx tsc --noEmit -p .` and `npm run lint` clean; `e2e/shell.e2e.ts`, `look`, `account`, `me` pass with their invite assertions replaced by the new words.
+3. Routes and server code out, `/i/` page out → verify: a route test that `GET /i/<code>` answers 404 fails before, passes after; `npm run test:db -- -t "friend requests|blocking|players|groups"` passes.
+4. Migration `drop table private.friend_invite` → verify: `npx supabase test db` passes with the three grants gone from `plor_app_role.test.sql`; `git grep friend_invite` finds only the baseline and the dropping migration (the criterion says "only the migration that drops it"; the baseline can't be edited, a deviation for Source diff).
+5. Privacy page, with exactly the approved words → verify: `e2e/settings.e2e.ts` and the page's own tests pass; the page's text is compared to the ticket's by eye and by the reviewer.
+6. `npm test`, the full `npm run test:db`, then the `reviewer` on `sonnet`; DESIGN.md, ROADMAP, the ticket and HANDOFF.
 
 ## Open
 What truly remains; nothing above is designed around an unanswered question.
