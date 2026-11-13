@@ -117,6 +117,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.guest_run_event insert', 'private.guest_run_event select',
   'private.guest_run_status select',
   'private.guest_tally select',
+  -- Held usernames (M17 17b, E5): read only, to follow an old name to its player; the hold trigger writes and frees them.
+  'private.held_username select',
   'private.judge_word(uuid,date,text,text,text) execute',
   'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).

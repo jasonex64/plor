@@ -105,5 +105,7 @@ function profileError(err: unknown): unknown {
   if (err.code === "23505" && err.constraint === "profile_username_key") return new AppError("username_taken", 409);
   if (err.code === "23505" && err.constraint === "profile_pkey") return new AppError("profile_exists", 409);
   if (err.code === "OB011") return new AppError("username_change_too_soon", 409);
+  // A name someone gave up less than 30 days ago is held (M17 17b, answers 10 and 22): to the player it is taken.
+  if (err.code === "OB017") return new AppError("username_taken", 409);
   return err;
 }

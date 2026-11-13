@@ -18,6 +18,7 @@ import { errorText } from "./messages";
 import { SideColumn } from "./side-column";
 import { BACK } from "./slide";
 import kit from "./kit.module.css";
+import { SurvivedChart } from "./survived-chart";
 import { CountUp } from "./count-up";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
@@ -160,17 +161,12 @@ function OffbeatInfo() {
   );
 }
 
-// "Sat", "24 Oct" and "Fri 23 Oct", from a calendar date read in UTC so it can't shift by a day.
+// "24 Oct" and "Fri 23 Oct", from a calendar date read in UTC so it can't shift by a day.
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
-const weekday = (date: string) => dateText(date, { weekday: "short" });
 
 // The stats as round 5 shows them: "1,050 best score", "5.2/7 avg. survived", and the questions survived each day.
 function YourOffbeat({ stats }: { stats: Stats }) {
-  const today = stats.days[stats.days.length - 1].date;
-  const said = stats.days.map(
-    (d) => `${weekday(d.date)} ${d.survived ?? (d.date === today ? "not played yet" : "not played")}`,
-  );
   return (
     <section aria-label={`Your ${GAME.name}`} className={kit.card}>
       <h2 className={styles.heading}>Your {GAME.name}</h2>
@@ -190,19 +186,7 @@ function YourOffbeat({ stats }: { stats: Stats }) {
           <dd>{stats.average === null ? "–" : `${stats.average.toFixed(1)}/${QUESTIONS_PER_DAY}`}</dd>
         </div>
       </dl>
-      <figure className={styles.chart}>
-        <figcaption>Questions survived, last 7 days</figcaption>
-        {/* The bars are one image to a screen reader, whose label says each day's value (WCAG 2.2 1.1.1). */}
-        <div role="img" aria-label={said.join(", ")} className={styles.bars}>
-          {stats.days.map((d) => (
-            <div key={d.date} aria-hidden="true">
-              <span className={styles.value}>{d.survived ?? "–"}</span>
-              <i style={{ height: `${((d.survived ?? 0) / QUESTIONS_PER_DAY) * 100}%` }} />
-              <span>{weekday(d.date)}</span>
-            </div>
-          ))}
-        </div>
-      </figure>
+      <SurvivedChart days={stats.days} />
     </section>
   );
 }

@@ -25,7 +25,7 @@ test.afterAll(async () => {
 // Friends' boards, and Me's stats alone, the account being in the settings sheet (docs/milestones/M14-14a-3b-settings.md).
 const TABS = [
   { name: "Today", path: "/", sections: [GAME.name, "Leaderboard", "Feed"] },
-  { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Your friends"] },
+  { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Find a player", "Your friends"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
   { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, "Your rarest answers"] },
 ];

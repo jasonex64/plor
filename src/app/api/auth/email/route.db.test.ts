@@ -77,7 +77,7 @@ describe("POST /api/auth/email limits", () => {
     try {
       expect((await send(address, "192.0.2.12")).status).toBe(429);
       const line = JSON.parse(warn.mock.calls.at(-1)![0] as string);
-      expect(line).toMatchObject({ level: "warn", msg: "sign-in attempt refused", kind: "send_email", key: hashKey(emailKey(address)).slice(0, 8) });
+      expect(line).toMatchObject({ level: "warn", msg: "attempt refused", kind: "send_email", key: hashKey(emailKey(address)).slice(0, 8) });
       expect(JSON.stringify(line)).not.toContain(address);
       expect(JSON.stringify(line)).not.toContain("192.0.2.12");
     } finally {

@@ -43,7 +43,7 @@ export async function takeAttempt(db: Db, kind: AuthLimitKind, value: string): P
     windowSeconds,
   ]);
   if (rows[0].taken) return;
-  log.warn("sign-in attempt refused", { kind, key: key.slice(0, 8) });
+  log.warn("attempt refused", { kind, key: key.slice(0, 8) });
   throw new AppError("too_many_attempts", 429);
 }
 

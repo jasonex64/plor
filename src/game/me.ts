@@ -6,7 +6,7 @@ import { GAME_ID } from "@/platform/game";
 import { ANSWER_SHARE_MIN_PLAYERS, RAREST_ANSWERS_SHOWN } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { allTimePoints, dayCounts } from "./ledger";
-import { FINISHED_RUNS, readStats } from "./offbeat";
+import { FINISHED_RUNS, readStats, type Stats } from "./offbeat";
 import { named, thingNames, type Named } from "./payload";
 import { FINISHED } from "./status";
 
@@ -23,6 +23,12 @@ export type Me = {
 };
 
 export async function getMe(db: Db, userId: string): Promise<Me> {
+  return (await getPlayerStats(db, userId)).me;
+}
+
+// A player's stats as another player's profile shows them (docs/milestones/M17-profiles-and-friend-requests.md, 17b):
+// what Me shows, so the two can't drift apart, and recent, the game screen's chart of the last days (E3).
+export async function getPlayerStats(db: Db, userId: string): Promise<{ me: Me; recent: Stats["days"] }> {
   // The day is read once, first, and every read is of it, the settling included, so a request at midnight can't mix
   // two (readStats; item 19). allTimePoints settles the player's runs closed by that day, once, so the points and the
   // best score are complete.
@@ -64,7 +70,7 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
     [userId, GAME_ID, FINISHED, day],
   );
   const row = rows[0];
-  return {
+  const me = {
     username: row.username,
     since: row.since,
     totals: { points, daysPlayed: row.days_played, streak: stats.streak, longestStreak: row.longest },
@@ -72,6 +78,7 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
     offbeat: { best: stats.best, average: stats.average, fullRuns: row.full_runs },
     rarest: await rarestAnswers(db, userId, day),
   };
+  return { me, recent: stats.days };
 }
 
 // The player's answers that survived (a caught one is the host's, not theirs: human, 2026-10-25, "Leave caught out

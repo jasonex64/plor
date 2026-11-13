@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(16);
 
 create function pg_temp.k(n int) returns text language sql immutable return lpad(to_hex(n), 64, '0');
 create function pg_temp.take(n int) returns boolean language sql
@@ -26,11 +26,13 @@ select ok(has_function_privilege('plor_app', 'private.take_auth_attempt(text,tex
 select ok(not has_table_privilege('plor_app', 'private.auth_attempt', 'select, insert, update, delete'),
   'plor_app can''t touch the table itself');
 
--- Only hashed keys, and only the four kinds the routes use.
+-- Only hashed keys, and only the kinds the routes use: the four of sign-in, and a player's lookups of other players
+-- (M17 17b, E2).
 select throws_ok($$insert into private.auth_attempt (kind, key) values ('send_ip', '203.0.113.7')$$, '23514', null,
   'a raw IP address is refused as a key');
 select throws_ok($$insert into private.auth_attempt (kind, key) values ('other', $$ || quote_literal(pg_temp.k(1)) || $$)$$,
   '23514', null, 'an unknown kind is refused');
+select is(private.take_auth_attempt('lookup', pg_temp.k(9), 60, interval '1 hour'), true, 'a lookup is a kind it counts');
 
 -- Exactly the limit, then a refusal that isn't recorded.
 select is(array[pg_temp.take(1), pg_temp.take(1), pg_temp.take(1)], array[true, true, true], 'the first 3 of a limit of 3 are allowed');

@@ -6,13 +6,16 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(23);
 
 -- Player 1 deletes their account; 2 to 4 stay.
 create function pg_temp.u(n int) returns uuid language sql immutable
   return ('00000000-0000-0000-0000-' || lpad(to_hex(n), 12, '0'))::uuid;
 insert into auth.users (id, email) select pg_temp.u(n), n || '@deletion.example.test' from generate_series(1, 4) as s(n);
-insert into private.profile (user_id, username) select pg_temp.u(n), 'del' || n from generate_series(1, 4) as s(n);
+insert into private.profile (user_id, username) select pg_temp.u(n), 'del' || n from generate_series(2, 4) as s(n);
+-- Player 1 was 'delold' until a rename, so that name is held for them (M17 17b, answer 27).
+insert into private.profile (user_id, username) values (pg_temp.u(1), 'delold');
+update private.profile set username = 'del1' where user_id = pg_temp.u(1);
 insert into private.admin (user_id) values (pg_temp.u(1));
 
 -- A day both 1 and 2 played, with comments, reactions and reports both ways.
@@ -67,6 +70,7 @@ create function pg_temp.rows_of(who uuid[]) returns int language sql return (
   + (select count(*) from private.friendship where user_a = any(who) or user_b = any(who))
   + (select count(*) from private.friend_request where sender = any(who) or receiver = any(who))
   + (select count(*) from private.block where blocker = any(who) or blocked = any(who))
+  + (select count(*) from private.held_username where user_id = any(who))
   + (select count(*) from private.friend_invite where user_id = any(who)) + (select count(*) from private.group_member where user_id = any(who)))::int;
 
 -- The function itself (A7): its owner's rights, a fixed search_path, and plor_app's execute.
@@ -82,11 +86,11 @@ select ok(not has_function_privilege('anon', 'private.delete_account(uuid,text)'
 
 -- A wrong username deletes nothing.
 -- 1 user, profile, admin row, run and comment; 2 reactions and 1 report by them; 2 friendships, 2 requests, 2 blocks,
--- 1 invite, 3 memberships.
-select is(pg_temp.rows_of(array[pg_temp.u(1)]), 18, 'player 1 has rows in every table before');
+-- 1 held name, 1 invite, 3 memberships.
+select is(pg_temp.rows_of(array[pg_temp.u(1)]), 19, 'player 1 has rows in every table before');
 select is(private.delete_account(pg_temp.u(1), 'del2'), false, 'another player''s username is refused');
 select is(private.delete_account(pg_temp.u(1), 'DEL1'), false, 'the username must match exactly');
-select is(pg_temp.rows_of(array[pg_temp.u(1)]), 18, 'and nothing is deleted');
+select is(pg_temp.rows_of(array[pg_temp.u(1)]), 19, 'and nothing is deleted');
 
 -- The right username deletes everything (A5).
 select is(private.delete_account(pg_temp.u(1), 'del1'), true, 'the player''s own username deletes the account');
@@ -116,6 +120,10 @@ select is((select count(*)::int from private.comment where id = -2), 1, 'another
 select has_index('private', 'comment', 'comment_run', array['user_id', 'game_id', 'puzzle_date'], 'comments are indexed by run');
 select has_index('private', 'reaction', 'reaction_run_owner', array['user_id', 'game_id', 'puzzle_date'],
   'reactions are indexed by the reacting player''s run');
+
+-- The name held for player 1 went with the account, so it is free at once (M17 17b, answer 27).
+select lives_ok($$update private.profile set username = 'delold' where user_id = pg_temp.u(4)$$,
+  'a deleted player''s held name can be taken right away');
 
 select * from finish();
 rollback;
