@@ -49,7 +49,7 @@ describe("invite links and friends", () => {
 
   it("has no code and no friends at first", async () => {
     useSession(A.session);
-    expect(await call(friends, "/api/friends", "GET")).toEqual({ status: 200, body: { ok: true, inviteCode: null, friends: [] } });
+    expect(await call(friends, "/api/friends", "GET")).toEqual({ status: 200, body: { ok: true, inviteCode: null, friends: [], requests: [], sent: [] } });
   });
 
   it("makes a code once, then returns the same one", async () => {

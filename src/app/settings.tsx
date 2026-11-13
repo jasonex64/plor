@@ -4,7 +4,8 @@
 // bottom on phones and a side panel from 768px, as round 7 draws them. It holds the account (M12 12a, 12b, 12c: the
 // username, once every 30 days; the display name friends see, M07 7a; Sign out; Delete account) and the two settings,
 // Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account; and the theme
-// (docs/milestones/M14-14b-1-themes.md; L21, L47), with links to the privacy and About pages.
+// (docs/milestones/M14-14b-1-themes.md; L21, L47), with links to the privacy and About pages; and the players the
+// player has blocked, each with Unblock (docs/milestones/M17-profiles-and-friend-requests.md, 17a; answer 21).
 //
 // A modal <dialog> opened with showModal() (MDN <dialog>, SOURCES.md): the page behind is inert, focus starts on the
 // first focusable element, Close, and Escape closes it. A tap on the dimmed page (the dialog's ::backdrop, outside its
@@ -13,6 +14,7 @@
 // item 26).
 import { ButtonLink } from "./button-link";
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import type { Friend } from "@/friends/friends";
 import type { Profile, Settings, Theme } from "@/lib/profile";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
@@ -29,12 +31,15 @@ function onBackdrop(dialog: HTMLDialogElement, event: { clientX: number; clientY
 
 export function SettingsSheet({
   dialog,
+  opens,
   profile,
   onChanged,
   onSettings,
   onSignedOut,
 }: {
   dialog: RefObject<HTMLDialogElement | null>;
+  // How many times the sheet has opened (src/app/shell.tsx): the blocked list is read at each.
+  opens: number;
   profile: Profile;
   // The username or display name changed: the profile is read again.
   onChanged: () => void;
@@ -104,6 +109,7 @@ export function SettingsSheet({
             </ButtonLink>
           </div>
         </div>
+        {opens > 0 && <Blocked key={opens} />}
         <div className={styles.end}>
           <SignOut onSignedOut={signedOut} />
           <DeleteAccount key={closings} username={profile.username} onDeleted={signedOut} />
@@ -372,6 +378,55 @@ function useRefusal(): [string | null, (message: string | null) => void] {
     };
   }, []);
   return [error, (message) => (shown.current || message === null ? setError(message) : undo.fail(message))];
+}
+
+// The players the player has blocked, read each time the sheet opens, each with Unblock (M17 17a; answer 21).
+// Unblocking brings back no friendship and no request.
+function Blocked() {
+  const [blocked, setBlocked] = useState<Friend[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function load() {
+    api<{ blocked: Friend[] }>("/api/friends/blocked", { method: "GET" }).then(
+      (r) => setBlocked(r.blocked),
+      (err) => setError(errorText(err)),
+    );
+  }
+  useEffect(load, []);
+
+  async function unblock(player: Friend) {
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/friends/unblock", { method: "POST", body: { username: player.username } });
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      load();
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section aria-label="Blocked players" className={kit.card}>
+      <strong>Blocked players</strong>
+      {blocked && blocked.length === 0 && <p>You haven&apos;t blocked anyone.</p>}
+      {blocked && blocked.length > 0 && (
+        <ul className={kit.rows}>
+          {blocked.map((p) => (
+            <li key={p.username} className={kit.row}>
+              <span className={kit.grow}>{p.name}</span>
+              <button type="button" className={kit.link} disabled={busy} onClick={() => void unblock(p)}>
+                Unblock
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && <p role="alert">{error}</p>}
+    </section>
+  );
 }
 
 // Signs out of this device (M12 A3).
