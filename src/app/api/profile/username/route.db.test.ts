@@ -56,9 +56,11 @@ describe("changing a username", () => {
     expect(next).toBeLessThanOrEqual(Date.now() + USERNAME_CHANGE_DAYS * DAY_MS + 60_000);
   });
 
-  it("frees the old username for anyone at once", async () => {
+  // M17 17b replaced "free for anyone at once" (M12 A2): the old name is held for 30 days (answer 10); the hold's days
+  // are in src/app/api/players/[username]/route.db.test.ts.
+  it("holds the old username from another player", async () => {
     useSession(B.session);
-    expect(await change(A.username)).toEqual({ status: 200, body: { ok: true, username: A.username } });
+    expect(await change(A.username)).toEqual({ status: 409, body: { ok: false, error: "username_taken" } });
   });
 
   it("refuses a second change within 30 days", async () => {

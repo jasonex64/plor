@@ -146,6 +146,9 @@ export const AUTH_LIMITS = {
   check_ip: { limit: 30, windowSeconds: 5 * 60 },
   // N4: wrong codes per address before a new code is needed; a check is counted before Auth says whether it's right.
   check_email: { limit: 5, windowSeconds: 60 * 60 },
+  // Lookups of other players by username, and friend requests sent, per player (human, 2026-11-11: "60 an hour";
+  // docs/milestones/M17-profiles-and-friend-requests.md, answer 15, D1 and E2).
+  lookup: { limit: 60, windowSeconds: 60 * 60 },
 } as const;
 
 
