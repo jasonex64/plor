@@ -173,6 +173,8 @@ function current(path: string, href: string, sidebar: boolean): "page" | "true" 
   // Admin (round 10).
   if (href === "/me" && !sidebar && (path === "/admin" || path.startsWith("/admin/"))) return "true";
   if (href !== "/" && path.startsWith(`${href}/`)) return "true";
+  // A player's profile is opened from the Friends tab (docs/milestones/M17-profiles-and-friend-requests.md, 17b, E6).
+  if (href === "/friends" && path.startsWith("/u/")) return "true";
 }
 
 // The page's name in its "Plor" heading (docs/milestones/M14-14b-18-headings-today-invites-words.md, answers 5 and 17

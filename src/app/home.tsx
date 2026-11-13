@@ -36,6 +36,7 @@ import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
 import { GroupPage } from "./groups";
+import { PlayerPage } from "./player";
 import { InviteCodeProvider, InviteLink } from "./invite-link";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
@@ -430,6 +431,18 @@ export function GroupTab({ id }: { id: string }) {
     <>
       <BackTo href="/groups">Groups</BackTo>
       <GroupPage id={id} username={player.username} name={nameOf(player)} timeUps={timeUps} />
+    </>
+  );
+}
+
+// A player's profile, opened from Find a player or a friend's row (docs/milestones/M17-profiles-and-friend-requests.md,
+// 17b, E6). The page starts again for each name.
+export function PlayerTab({ username }: { username: string }) {
+  const { player, requestsChanged } = usePlayer();
+  return (
+    <>
+      <BackTo href="/friends">Friends</BackTo>
+      <PlayerPage key={username} username={username} numbers={player.settings.calendarNumbers} onRequestsChanged={requestsChanged} />
     </>
   );
 }

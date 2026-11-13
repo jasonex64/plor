@@ -7,6 +7,7 @@ import { ButtonLink } from "./button-link";
 import { useEffect, useState, type ReactNode } from "react";
 import { QUESTIONS_PER_DAY } from "@/config/tunables";
 import type { Me } from "@/game/me";
+import type { Stats } from "@/game/offbeat";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { givenText } from "./given";
@@ -17,6 +18,7 @@ import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME } from "@/platform/game";
 import { FORWARD } from "./slide";
+import { SurvivedChart } from "./survived-chart";
 
 // Calendar dates, read in UTC so they can't shift by a day: "2 Oct 2026", "12 Oct", "October 2026".
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
@@ -46,27 +48,52 @@ export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: numbe
         </div>
       </Skeleton>
     );
+  return <StatsCards own name={me.username} since={me.since} totals={me.totals} offbeat={me.offbeat} month={me.month} rarest={me.rarest} numbers={numbers} />;
+}
+
+// A player's stats as cards: the Me tab's (own), and another player's profile, which shows what Me shows
+// (docs/milestones/M17-profiles-and-friend-requests.md, 17b, E4). A stranger's profile has no since, month or rarest
+// (answer 4, E7); a friend's also has recent, the last days' chart (E3). username: shown when the name is a display
+// name. children: the profile's actions, under the header. Only your own numbers count up and link to the game.
+export function StatsCards({
+  own = false,
+  name,
+  username,
+  since,
+  totals,
+  offbeat,
+  month,
+  rarest,
+  recent,
+  numbers,
+  children,
+}: Pick<Me, "totals" | "offbeat"> &
+  Partial<Pick<Me, "since" | "month" | "rarest">> & { own?: boolean; name: string; username?: string; recent?: Stats["days"]; numbers: boolean; children?: ReactNode }) {
+  const count = (key: string, value: number) => (own ? <CountUp name={key} value={value} /> : value.toLocaleString("en-US"));
+  const me = { totals, offbeat };
   return (
     <div className={styles.me}>
       {/* Mockup 3's Me (M14 14b-8c): the player as a card, the big avatar, the name, when they began as a chip. */}
       <div className={`${kit.card} ${styles.header}`}>
-        <Avatar name={me.username} large />
+        <Avatar name={name} large />
         <div className={styles.who}>
-          <h2 className={styles.name}>{me.username}</h2>
-          <span className={kit.chip}>Playing since {dateText(me.since, { day: "numeric", month: "short", year: "numeric" })}</span>
+          <h2 className={styles.name}>{name}</h2>
+          {username && username !== name && <span className={kit.chip}>{username}</span>}
+          {since && <span className={kit.chip}>Playing since {dateText(since, { day: "numeric", month: "short", year: "numeric" })}</span>}
         </div>
       </div>
+      {children}
       {/* Your headline numbers: the screen's one tinted card (14b-15, answers 3 and 7). */}
       <section aria-label="All games" className={`${kit.card} ${kit.soft}`}>
         <h2>All games</h2>
         <dl className={styles.totals}>
-          <Total value={<CountUp name="me.points" value={me.totals.points} />} label="points all time" />
+          <Total value={count("me.points", me.totals.points)} label="points all time" />
           <Total value={String(me.totals.daysPlayed)} label="days played" />
-          <Total value={<CountUp name="me.streak" value={me.totals.streak} />} label="day streak now" />
-          <Total value={<CountUp name="me.longest" value={me.totals.longestStreak} />} label="longest streak" />
+          <Total value={count("me.streak", me.totals.streak)} label="day streak now" />
+          <Total value={count("me.longest", me.totals.longestStreak)} label="longest streak" />
         </dl>
       </section>
-      <Calendar month={me.month} numbers={numbers} />
+      {month && <Calendar month={month} numbers={numbers} />}
       {/* The game's card, its numbers as chips (mockup 3's "Your <game>" card); plain since 14b-15 (answer 7). */}
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
@@ -79,34 +106,43 @@ export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: numbe
           <Chip value={me.offbeat.average === null ? "–" : `${me.offbeat.average.toFixed(1)}/${QUESTIONS_PER_DAY}`} label="avg. survived" />
           <Chip value={String(me.offbeat.fullRuns)} label="full runs" />
         </dl>
-        <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
-          {GAME.name}&apos;s game screen
-        </ButtonLink>
-      </section>
-      <section aria-label="Your rarest answers" className={kit.card}>
-        <h2>Your rarest answers</h2>
-        {me.rarest.length === 0 ? (
-          <p className={styles.muted}>None yet. Answers show here once their day is over and enough players have answered.</p>
-        ) : (
-          <ol className={kit.rows}>
-            {me.rarest.map((r, i) => (
-              <li key={`${r.date} ${r.prompt}`} className={kit.row}>
-                {/* The place as mockup 3's badge, drawn by CSS: the list's order says it (kit.module.css). */}
-                <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
-                <span className={`${kit.grow} ${styles.rare}`}>
-                  {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
-                      docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
-                  <strong>{r.answer.name}</strong>{" "}
-                  <span className={styles.muted}>
-                    {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ol>
+        {recent && <SurvivedChart days={recent} />}
+        {own && (
+          <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
+            {GAME.name}&apos;s game screen
+          </ButtonLink>
         )}
       </section>
+      {rarest && <Rarest title={own ? "Your rarest answers" : "Rarest answers"} rarest={rarest} />}
     </div>
+  );
+}
+
+function Rarest({ title, rarest }: { title: string; rarest: Me["rarest"] }) {
+  return (
+    <section aria-label={title} className={kit.card}>
+      <h2>{title}</h2>
+      {rarest.length === 0 ? (
+        <p className={styles.muted}>None yet. Answers show here once their day is over and enough players have answered.</p>
+      ) : (
+        <ol className={kit.rows}>
+          {rarest.map((r, i) => (
+            <li key={`${r.date} ${r.prompt}`} className={kit.row}>
+              {/* The place as mockup 3's badge, drawn by CSS: the list's order says it (kit.module.css). */}
+              <span className={i === 0 ? `${kit.badge} ${kit.hot}` : kit.badge} data-place={i + 1} aria-hidden="true" />
+              <span className={`${kit.grow} ${styles.rare}`}>
+                {/* The space keeps the name and its line apart for screen readers ("cat Name an animal", not "catName";
+                    docs/milestones/M14-14b-2c-review-items.md, item 20); each is its own line on screen. */}
+                <strong>{r.answer.name}</strong>{" "}
+                <span className={styles.muted}>
+                  {r.prompt} · {givenText(r.share)} · {dateText(r.date, { day: "numeric", month: "short" })}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   );
 }
 

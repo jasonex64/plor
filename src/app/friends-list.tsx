@@ -5,11 +5,14 @@
 // (L37) and Remove (M07 D4), which asks first, since a new invite link is the only way back
 // (docs/milestones/M12-12f-review-fixes.md, F3); then the player's own invite link, with Reset ("Yes, with the list
 // (Recommended)"). Above them, while there are any, the friend requests waiting for the player's answer and the ones
-// they sent, and on each friend a Block (docs/milestones/M17-profiles-and-friend-requests.md, 17a, D7).
-import { useEffect, useState } from "react";
+// they sent, and on each friend a Block (docs/milestones/M17-profiles-and-friend-requests.md, 17a, D7). At the top, Find
+// a player: a username opens that player's profile, which is the search (17b, E1 and E6); each friend's row opens theirs.
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Friend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
+import { ButtonLink } from "./button-link";
 import { InviteLink } from "./invite-link";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
@@ -19,7 +22,7 @@ type Lists = { friends: Friend[]; requests: Friend[]; sent: Friend[] };
 
 // What a block does, said before it happens, as it ends a friendship and is undone only from Settings (answers 12, 13,
 // 20 and 21).
-const blockQuestion = (name: string) =>
+export const blockQuestion = (name: string) =>
   `Block ${name}? You won't be friends, and you won't see each other's comments or reactions. They won't be told. You can unblock them in Settings.`;
 
 // onRequestsChanged: a change was made here, so the Friends tab's count and the live board are read again
@@ -28,6 +31,16 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
   const [lists, setLists] = useState<Lists | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [find, setFind] = useState("");
+  const router = useRouter();
+
+  // Usernames have no capitals or spaces, so what's typed is read without them; the profile's page says when nobody
+  // has the name.
+  function open(event: FormEvent) {
+    event.preventDefault();
+    const name = find.trim().toLowerCase();
+    if (name) router.push(`/u/${encodeURIComponent(name)}`);
+  }
 
   function load() {
     api<Lists>("/api/friends", { method: "GET" }).then(
@@ -62,6 +75,18 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
   );
   return (
     <>
+      <section aria-label="Find a player" className={kit.card}>
+        <h2>Find a player</h2>
+        <form onSubmit={open} className={kit.chips}>
+          <label className={kit.grow}>
+            Their exact username
+            <input value={find} onChange={(e) => setFind(e.target.value)} autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+          </label>
+          <button type="submit" className={kit.small}>
+            Find
+          </button>
+        </form>
+      </section>
       {lists && lists.requests.length + lists.sent.length > 0 && (
         <section aria-label="Friend requests" className={kit.card}>
           <div className={kit.head}>
@@ -125,6 +150,9 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
               <li key={f.username} className={kit.row}>
                 <Avatar name={f.name} />
                 <span className={kit.grow}>{f.name}</span>
+                <ButtonLink href={`/u/${f.username}`} aria-label={`${f.name}'s profile`}>
+                  Profile
+                </ButtonLink>
                 {action(
                   "Remove",
                   "/api/friends/remove",
