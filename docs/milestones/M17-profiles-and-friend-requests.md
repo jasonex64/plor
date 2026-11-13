@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); 17a is being built; nothing merged yet. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is built (2026-11-12) and in review: its PR is open and not merged** (Evidence, 17a; merging it before the hosted database has its migration would break plor.app's signed-in pages, as the PR says). 17b and 17c are not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -183,6 +183,19 @@ Friend requests and blocking only (Plan 1); search, profiles and the held name a
 6. The screens of [D7] → verify: `npm test`, and an e2e that sends, accepts and blocks between two browsers (`npm run test:e2e -- friend`), failing before.
 7. Whole → verify: `npm test`, `npm run test:db`, `npx supabase test db`, `npx next typegen` then `npx tsc --noEmit -p .`, `npm run lint`, `npm test -- src/app/api/guest-cookie`.
 
+**The manual, read (Plan step 1, 2026-11-12).** Each fact the design leans on, with where PostgreSQL 17 states it; the pages were fetched and quoted by a subagent, and what the manual leaves unsaid was run instead (Evidence). No fact contradicted the design.
+- Locking the two profiles needs an update privilege: PostgreSQL 17, SELECT, Description: "The use of FOR NO KEY UPDATE, FOR UPDATE, FOR SHARE or FOR KEY SHARE requires UPDATE privilege as well (for at least one column of each table so selected)." `plor_app` holds column update grants on `private.profile`.
+- Under row-level security the locked rows pass the table's SELECT and UPDATE policies: PostgreSQL 17, CREATE POLICY, "Policies Applied by Command Type", the row "SELECT FOR UPDATE/SHARE". The page doesn't name FOR NO KEY UPDATE; `src/friends/requests.plor-app.db.test.ts` takes the lock as `plor_app` and passes.
+- Two pair locks wait for each other: PostgreSQL 17, 13.3.2 Row-Level Locks: under FOR UPDATE, another transaction's "SELECT FOR NO KEY UPDATE" of the row "will be blocked until the current transaction ends", and FOR NO KEY UPDATE "will not block SELECT FOR KEY SHARE commands".
+- The waiter then sees what the first committed: PostgreSQL 17, 13.3.2 Row-Level Locks: it "will then lock and return the updated row", and PostgreSQL 17, 13.2.1 Read Committed Isolation Level: "Read Committed mode starts each command with a new snapshot that includes all transactions committed up to that instant".
+- A trigger's error undoes the statement that fired it: PostgreSQL 17, 37.1 Overview of Trigger Behavior: "if either the statement or the trigger causes an error, the effects of both will be rolled back." So OB016 leaves no friendship.
+- The two trigger functions run as the caller: PostgreSQL 17, CREATE FUNCTION: "SECURITY INVOKER indicates that the function is to be executed with the privileges of the user that calls it. That is the default."
+- `private.unblock`'s empty `search_path`: PostgreSQL 17, CREATE FUNCTION, Writing SECURITY DEFINER Functions Safely: "search_path should be set to exclude any schemas writable by untrusted users."
+- Deleting a user deletes their requests and blocks: PostgreSQL 17, 5.5.5 Foreign Keys: "CASCADE specifies that when a referenced row is deleted, row(s) referencing it should be automatically deleted as well."
+- A foreign key's own checks ignore the policies: PostgreSQL 17, 5.9 Row Security Policies: "Referential integrity checks, such as unique or primary key constraints and foreign key references, always bypass row security". It doesn't name cascades; `account_deletion.test.sql` and `friend_requests.test.sql` show them deleting the rows.
+- A repeat send or block changes nothing: PostgreSQL 17, INSERT, ON CONFLICT Clause: "For ON CONFLICT DO NOTHING, it is optional to specify a conflict_target; when omitted, conflicts with all usable constraints (and unique indexes) are handled."
+- **Not in the manual, and not relied on:** which lock a foreign-key check takes on `auth.users` (so the deadlock with account deletion, under Races, stays *unverified*), and whether an AFTER INSERT row trigger fires for a row ON CONFLICT DO NOTHING skipped (blocking twice is harmless either way: the trigger's deletes find nothing the second time).
+
 **Decisions for the human** (17a's design above follows each recommendation, marked [D*n*]; none is settled until the human answers):
 1. **[D1] A send names a username, so the send route tells whether a username exists, and nothing makes a search come first** (answer 16 assumes it). A client could list usernames through sends without touching the 60-an-hour search limit (15). (a) *Recommended:* a send counts against the same per-player counter as a search (the 60 of answer 15, now "60 lookups an hour"), built with 17b's counter; 17a ships with 17b in one release anyway (Plan 3). No new number, but answer 15's number gains a use. (b) Leave sends uncounted: simplest, and the limit stops nobody who skips the search box. (c) A send must follow a search of that name within some time: needs a new number and a record of searches; rejected. The same question will meet 17b's profile route, which also answers by username.
 2. **[D2] What unblocking does to the blocked player's hidden request** (21 "restores nothing ... no request" against 28 "stays pending forever"). (a) *Recommended:* `private.unblock` deletes it, so it never reappears in the blocker's list; the sender sees it leave their sent list, as after a decline, and can send again (21's criterion: "a new request from B reaches A"). (b) Keep it: after the unblock it shows in the blocker's list again; simplest, but it restores a request the blocker hid, and a new send by B is then a repeat.
@@ -214,22 +227,22 @@ Each is a check that can fail. "Route test" is a `route.db.test.ts` run the way 
 - [ ] **Search limit (15).** Route test: as one player, searches 1 to 60 inside an hour succeed (found or not) and the 61st answers 429 `too_many_attempts`; a second player's first search still succeeds; the refusal is logged with its kind and no username or email in the line.
 - [ ] **Stranger's view (1, 4, 11).** Route test: the profile response for a non-friend holds the all-games summary and a card for each game and no calendar, rarest answers or recent results, checked on the JSON, not the screen; a signed-out request answers 401.
 - [ ] **Friend's view and spoilers (1, 2, 25).** Route test: with two games played, a friend's response holds the all-games summary and, for each game, a card with its calendar, rarest answers and recent results, as the Me page does; for a day the viewer has not played, no rarest answer or recent result of that day appears in it.
-- [ ] **Requests (5).** Route test: send creates a pending request; the receiver's list shows it; accept makes both friends; decline removes it and no friendship exists; a request to oneself is refused.
-- [ ] **Sent list and cancel (23).** Route test: after A sends to B, A's sent list holds the request; A cancels it and both A's sent list and B's list are empty; after B declines instead, A's sent list no longer holds it and shows no "declined" state.
-- [ ] **Mutual requests (23, 29).** Route test: A sends to B, then B sends to A: A and B are friends, no pending request remains in either list, and neither send is refused. With A having blocked B (or B having blocked A) the same two sends make no friendship, whichever order they come in.
-- [ ] **Blocker can't send (29).** Route test: after A blocks B, A's send to B is refused and no request exists; A unblocks B, and the same send now succeeds and B's list shows it. A request B sent to A before the block is not in A's list or A's Friends count after the block, and stays pending in B's sent list.
-- [ ] **Re-request after decline (17).** Route test: decline, then send again straight away, succeeds; repeated three times in a row, still succeeds. After a block, the same send does not put a request in the blocker's list.
-- [ ] **No cap on pending (16).** Route test: one player sends a request to each of 25 different players (25 is the test's size, not a limit); every send succeeds, and the only refusal reachable is the search limit.
-- [ ] **Count on the Friends tab (14).** Route test: with 3 requests waiting the Friends page data shows 3, after one is declined 2; a request from a player the viewer has blocked is not counted; no Realtime message is sent when a request arrives (the viewer's board topic is compared before and after).
-- [ ] **Block's reach (5, 12).** Route test and pgTAP: after A blocks B, B's request does not reach A; B opening A's profile gets the same status and body as a username nobody has; A's comments and reactions are absent from B's comment, reaction and feed responses, and B's from A's; on a shared group's leaderboard both players' results are still present.
-- [ ] **Block ends the friendship (20).** Route test: A and B are friends and appear in each other's feed and on a shared live board; A blocks B; each is absent from the other's friends, feed and live board data, read before and after.
-- [ ] **Unblock (21).** Route test: A's blocked list holds B; A unblocks B; the list is empty, B's profile opens for B as a stranger's (not a friend's), B's search finds A, and a new request from B reaches A.
-- [ ] **Block is silent (13, 28).** Route test: B's response to sending a request, and B's list of their own requests, are the same as when A simply hasn't answered; no B-facing response names the block. B's request stays in B's sent list as pending, still there after the test clock is advanced past the 30-day hold, so nothing expires it (23, 28).
+- [x] **Requests (5).** Route test: send creates a pending request; the receiver's list shows it; accept makes both friends; decline removes it and no friendship exists; a request to oneself is refused.
+- [x] **Sent list and cancel (23).** Route test: after A sends to B, A's sent list holds the request; A cancels it and both A's sent list and B's list are empty; after B declines instead, A's sent list no longer holds it and shows no "declined" state.
+- [x] **Mutual requests (23, 29).** Route test: A sends to B, then B sends to A: A and B are friends, no pending request remains in either list, and neither send is refused. With A having blocked B (or B having blocked A) the same two sends make no friendship, whichever order they come in.
+- [x] **Blocker can't send (29).** Route test: after A blocks B, A's send to B is refused and no request exists; A unblocks B, and the same send now succeeds and B's list shows it. A request B sent to A before the block is not in A's list or A's Friends count after the block, and stays pending in B's sent list.
+- [x] **Re-request after decline (17).** Route test: decline, then send again straight away, succeeds; repeated three times in a row, still succeeds. After a block, the same send does not put a request in the blocker's list.
+- [ ] *(17a's part done, Evidence: 25 sends succeed; "the only refusal reachable is the search limit" is 17b's.)* **No cap on pending (16).** Route test: one player sends a request to each of 25 different players (25 is the test's size, not a limit); every send succeeds, and the only refusal reachable is the search limit.
+- [x] **Count on the Friends tab (14).** Route test: with 3 requests waiting the Friends page data shows 3, after one is declined 2; a request from a player the viewer has blocked is not counted; no Realtime message is sent when a request arrives (the viewer's board topic is compared before and after).
+- [ ] *(17a's part done, Evidence: requests, comments, reactions, the feed and the group board; the profile part is 17b's.)* **Block's reach (5, 12).** Route test and pgTAP: after A blocks B, B's request does not reach A; B opening A's profile gets the same status and body as a username nobody has; A's comments and reactions are absent from B's comment, reaction and feed responses, and B's from A's; on a shared group's leaderboard both players' results are still present.
+- [x] **Block ends the friendship (20).** Route test: A and B are friends and appear in each other's feed and on a shared live board; A blocks B; each is absent from the other's friends, feed and live board data, read before and after.
+- [ ] *(17a's part done, Evidence: the blocked list, Unblock, a new request reaching the unblocker; the profile and search parts are 17b's.)* **Unblock (21).** Route test: A's blocked list holds B; A unblocks B; the list is empty, B's profile opens for B as a stranger's (not a friend's), B's search finds A, and a new request from B reaches A.
+- [x] **Block is silent (13, 28).** Route test: B's response to sending a request, and B's list of their own requests, are the same as when A simply hasn't answered; no B-facing response names the block. B's request stays in B's sent list as pending, still there after the test clock is advanced past the 30-day hold, so nothing expires it (23, 28).
 - [ ] **Rename hold (10).** Route test with the clock set: after A renames from `old` to `new`, the address for `old` opens A's profile under the viewing rules; another player renaming or signing up as `old` is refused at day 29 and succeeds at day 30; A renaming back to `old` inside the 30 days is refused (22); a search for `old` finds nobody.
 - [ ] **Old link and blocks (10, 13).** Route test: B, blocked by A, opens A's old address and gets the same response as a username nobody has.
-- [ ] **Security (proposals above, once approved).** pgTAP: `plor_app` has on each new table only the grants the approved proposal lists; a direct read of another player's requests or blocks returns no rows.
+- [ ] *(17a's part done, Evidence: the two tables' grants, policies, triggers and `private.unblock`, and no Data API role holding anything on them; held names and the search counter are 17b's.)* **Security (proposals above, once approved).** pgTAP: `plor_app` has on each new table only the grants the approved proposal lists; a direct read of another player's requests or blocks returns no rows.
 - [ ] **Invite links removed (6).** `GET /i/<any code>` answers 404; a search of the repo for `friend_invite` finds only the migration that drops it; group invite links pass their existing route tests.
-- [ ] **Account deletion (27).** pgTAP: A renames from `old` to `new` and then `private.delete_account` runs for A inside the 30 days; no row of A remains in requests, blocks or held names; right after, another player renames or signs up as `old` and it succeeds, with no wait.
+- [ ] *(17a's part done, Evidence: requests and blocks go with the account; held names are 17b's.)* **Account deletion (27).** pgTAP: A renames from `old` to `new` and then `private.delete_account` runs for A inside the 30 days; no row of A remains in requests, blocks or held names; right after, another player renames or signs up as `old` and it succeeds, with no wait.
 
 ## Out of scope
 - Search by display name or partial name (answer 3).
@@ -258,11 +271,108 @@ Friend invite links (answer 6), to be confirmed by a fresh search in 17c: `/i/[c
 *Fill in the sections below at the end.*
 
 ## Source diff
+### 17a (the source is "17a design", above, approved by answer 30)
 | Source says | We built | Why different |
 |---|---|---|
+| The pair lock is its own statement, `select from private.profile where user_id in ($me, $them) order by user_id for no key update` | One statement finds the other player by username and locks both rows: `where user_id = $1 or username = $2 order by user_id for no key update` (`src/friends/requests.ts`, `withPair`) | The same two rows, the same order and lock, one read fewer; the username has to be looked up anyway |
+| "Every send, accept and block transaction" takes the lock; decline and cancel are single deletes | Every change takes it: decline, cancel and unblock too | One helper for the six changes; the extra lock costs a decline nothing and keeps one way to write a change |
+| Accept: "then insert the friendship (OB016 backstop)" | The insert is `on conflict do nothing`, in accept and in a mutual send | An invite link can make the pair friends while a request waits (until 17c); the accept then only clears the request, where a plain insert would be a 500 |
+| Accept, decline, cancel: 404 `request_not_found`; unblock: 404 `not_blocked`; nothing said for a username nobody has, or one's own, on those four | Both get the route's same 404 | The design lists no other code for those routes, and a different one would tell a request that isn't there from a player who isn't |
+| 409 `no_profile` "as `add` does", said once for the route module | Every change answers it for a player with no username | Read as covering all six; none can do anything without a profile |
+| The lists are `Friend[]`; no order given | The friends list's order: by shown name, then username | The one order a list of players already has (`listFriends`) |
+| D1 (a): a send counts against the search counter, "built with 17b's counter" | Sends are not counted in 17a | The counter is 17b's. Until 17b, the send route tells whether a username exists with no limit, so 17a must not reach players without 17b (Plan 3: one release) |
+| Plan step 4: the route tests "fail before (routes missing), pass after" | The requests tests were written after `requests.ts`; only blocking's two reach tests were seen failing first, before `blockedSql` was used (Evidence) | Claude wrote the module before its test file; the tests were not weakened to fit |
+| Tests: two route test files and pgTAP | Also `src/friends/requests.plor-app.db.test.ts`, with the two races run 10 times each (the test's size, not a limit) | Locally the routes connect as postgres, so the lock, the grants and the invoker triggers as `plor_app` need their own file, as groups and runs have |
+| Count on the Friends tab: "with 3 requests waiting" | Two sent through the route, the third written to the table by the test | Three signed-in senders would need a fifth emailed sign-in; the count reads the same rows |
+| D7: the screens are named (the lists, Accept, Decline, Decline and block, Cancel, Block, the count, the blocked list with Unblock); no words or looks given | The words are Claude's, listed under "Words on the 17a screens"; the count is the tab's own text, "Friends (2)", not a badge; Remove now reads the lists again after a refusal too | No answer gives a badge's look or the wording, so nothing new was drawn and the words wait for the human's eye; Remove shares the list's one change function |
+| Error codes for send (`request_own`, `already_friends`, `unblock_first`) | They have no message in `src/app/messages.ts` yet | No 17a screen can meet them: sending has no screen until 17b (CLAUDE.md, "Build for today") |
+| Protocol "stays at 6" | It stays at 7 | It was 7 already (M16 16e-2); fields were added, none changed |
+
+### Words on the 17a screens (Claude's, for the human to change)
+- Friends page: the card "Friend requests"; its chip's hidden words "waiting for your answer"; buttons "Accept", "Decline", "Decline and block"; the heading "Sent, waiting for an answer"; "Cancel"; on a friend, "Block".
+- The question before a block: "Block <name>? You won't be friends, and you won't see each other's comments or reactions. They won't be told. You can unblock them in Settings."
+- The Friends tab: "Friends (2)", read "Friends 2 friend requests".
+- Settings: the card "Blocked players", "Unblock", "You haven't blocked anyone."
+- Messages: "That friend request is already gone." (`request_not_found`), "There's no player with that username." (`player_not_found`), "That player isn't blocked." (`not_blocked`).
 
 ## Evidence
+### 17a (2026-11-12, local stack only; nothing touched the hosted database or plor.app)
+Each line is a command run in `C:/Users/jason/RIFF-m17` and what it printed.
+
+**Plan step 1, the manual.** `grep -c "PostgreSQL 17, " docs/milestones/M17-profiles-and-friend-requests.md` → `12` (the facts under "The manual, read"; none contradicted the design).
+
+**Plan step 2, the SQL tests first.** Before the migration, `npx supabase test db`:
+```
+/Users/jason/RIFF-m17/supabase/tests/account_deletion.test.sql (Wstat: 768 (exited 3) Tests: 0 Failed: 0)
+  Parse errors: Bad plan.  You planned 22 tests but ran 0.
+/Users/jason/RIFF-m17/supabase/tests/friend_requests.test.sql (Wstat: 768 (exited 3) Tests: 0 Failed: 0)
+  Parse errors: Bad plan.  You planned 43 tests but ran 0.
+/Users/jason/RIFF-m17/supabase/tests/plor_app_role.test.sql   (Wstat: 0 Tests: 15 Failed: 1)
+Files=38, Tests=720, 17 wallclock secs
+Result: FAIL
+```
+Exactly the three files the hypothesis named, and no other.
+
+**Plan step 3, the migration.** `npx supabase migration up` → `Applying migration 20261112235831_friend_requests_and_blocks.sql...` `"message":"Migrations applied"`. Then `npx supabase test db` (run again after the last code change):
+```
+/Users/jason/RIFF-m17/supabase/tests/account_deletion.test.sql .. ok
+/Users/jason/RIFF-m17/supabase/tests/friend_requests.test.sql ... ok
+/Users/jason/RIFF-m17/supabase/tests/plor_app_role.test.sql ..... ok
+/Users/jason/RIFF-m17/supabase/tests/private_schema.test.sql .... ok
+Files=38, Tests=785, 17 wallclock secs
+Result: PASS
+```
+785 is the 720 that ran before plus the two files that couldn't run then (22 and 43). This is the **Security** criterion's 17a part (`friend_requests.test.sql`: each grant by command, no delete on `block`, `private.unblock` definer with an empty `search_path` and `plor_app`'s execute alone, the two triggers invoker, no trigger on `friend_request`, RLS with `plor_app` policies only, OB016, a block deleting the friendship; `plor_app_role.test.sql`'s exact list; `private_schema.test.sql`: no Data API role holds anything on a private table) and **Account deletion**'s (`account_deletion.test.sql`: `rows_of` with both tables, 18 rows before and 0 after).
+
+**Plan steps 4 and 5, the routes and the block check.** With the routes built and `blockedSql` not yet used by the two comment rules, `npm run test:db -- -t "blocking"`:
+```
+ ❯ src/app/api/friends/block/route.db.test.ts (13 tests | 2 failed)
+     × drops a blocked player's comments and reactions from the preview of a viewer whose run isn't over (12)
+     × hides the pair's comments and reactions from each other, in the thread, the feed and the reaction reads (12)
+```
+With the two lines in `src/friends/circle.ts` (`seesCommentSql`, `seesCommentReactionSql`), the same command passes. The requests tests were written after the module (Source diff).
+
+`npm run test:db -- -t "friend requests|blocking|plor_app, which can't|at the same moment|racing an accept"` (after the last change):
+```
+ Test Files  4 passed | 53 skipped (57)
+      Tests  38 passed | 376 skipped (414)
+```
+Which test proves which criterion (the test's name, in the file named):
+- **Requests (5):** "sends a pending request the receiver sees…", "refuses a request to oneself…", "makes both players friends on accept…", "removes a declined request from both lists…" (`src/app/api/friends/requests/route.db.test.ts`).
+- **Sent list and cancel (23):** "lets the sender cancel a request…", "removes a declined request … no declined state" (same file).
+- **Mutual requests (23, 29):** "makes two players who request each other friends…", and the four "makes no friendship from mutual requests while …" cases, each block direction and each order (same file); "two players sending to each other at the same moment always end as friends…", 10 rounds as `plor_app` (`src/friends/requests.plor-app.db.test.ts`).
+- **Blocker can't send (29):** "refuses the blocker's own request until they unblock", "after the unblock, the same send succeeds…", "decline and block: the waiting request leaves the blocker's list and count, and stays pending for its sender" (`src/app/api/friends/block/route.db.test.ts`).
+- **Re-request after decline (17):** "lets a declined sender ask again straight away, three times in a row: time 1, 2, 3" (requests file).
+- **No cap on pending (16), 17a's part:** "puts no cap on pending requests: 25 sends to 25 players all succeed" (requests file).
+- **Count on the Friends tab (14):** "counts the requests waiting for the viewer, not blocked senders' nor their own, and sends nothing live": 3, then 2 after a decline, then 1 after a block, with `realtime.messages` for the viewer's `board:` topic the same before and after (requests file).
+- **Block's reach (5, 12), 17a's part:** "drops a blocked player's comments and reactions from the preview of a viewer whose run isn't over", "hides the pair's comments and reactions from each other, in the thread, the feed and the reaction reads" (both ways, with a reaction and a report on a hidden comment refused), "keeps both players on the shared group's leaderboard" as each of three members sees it (block file).
+- **Block ends the friendship (20):** "before any block: friends see each other everywhere…", then "ends the friendship: the blocker / the blocked player has no friend, on the list, the board or the friends leaderboard, at once" (block file); "a block racing an accept never leaves a friendship beside the block", 10 rounds as `plor_app` (plor-app file).
+- **Unblock (21), 17a's part:** "unblocks from the blocked list, restoring no friendship and no request (21, D2)", "after the unblock, the same send succeeds and reaches the other player, both ways" (block file).
+- **Block is silent (13, 28):** "is silent: the blocked player's send, sent list and cancel read as if the blocker hadn't answered", comparing the JSON of a send and a cancel to the blocker with those to a player who simply hasn't answered, and the request still pending with its `created_at` set back 31 days; "makes no friends through an invite link while a block is on: the link reads as one that has gone" (block file).
+- **As `plor_app`:** "sends, accepts, blocks and unblocks as plor_app, which can't delete a block itself": the pair lock under the role's own grants and policies, the trigger ending the friendship with the role's delete, OB016 on a direct friendship insert, and `delete from private.block` refused with 42501 (plor-app file).
+
+**Plan step 6, the screens.** `npm run test:e2e -- friend-requests` (port 3000 free before and after; `.next/dev` deleted first):
+```
+  ok 1 [chromium] › e2e\friend-requests.e2e.ts:32:1 › a request shows on the Friends tab and its page, is accepted, and a block ends the friendship until Unblock (13.2s)
+  ok 2 [chromium] › e2e\friend-requests.e2e.ts:83:1 › Decline and block takes the request off the blocker's page, and the sender still sees it waiting (6.5s)
+  2 passed (25.2s)
+```
+After the review's fix the same command, run again: `2 passed (45.4s)`, the first test now also checking that the blocked friend leaves the live board with no reload.
+Its first run failed both tests on the tab's spoken name ("Friends , 1 friend request"), which is why the count's hidden words have no comma. It was not seen failing before the screens existed. **Not run locally:** the rest of the e2e suite (HANDOFF: unreliable on this PC); CI's run on the PR is the evidence. **Nobody has looked at the screens.**
+
+**Plan step 7, the whole.**
+- `npm run test:db` → `Test Files  57 passed (57)`, `Tests  414 passed (414)`, `Duration  209.48s`. So `-t "invite links and friends"` and `-t "comment|reaction|feed|board|leaderboard"` are unchanged but for the one line of `src/app/api/friends/route.db.test.ts` that now expects `requests: []` and `sent: []`.
+- `npm test` → `Test Files  64 passed (64)`, `Tests  751 passed (751)` (with `src/app/api/guest-cookie.test.ts`, which calls each of the eight new routes with a guest cookie and gets 401, and `e2e/players.test.ts`).
+- `npx next typegen` then `npx tsc --noEmit -p .` → no output. `npm run lint` → no problems.
+- `npm run routes | grep friends` lists the eight new routes: `POST /api/friends/block`, `GET /api/friends/blocked`, `POST /api/friends/requests`, `…/requests/accept`, `…/requests/cancel`, `GET …/requests/count`, `POST …/requests/decline`, `POST /api/friends/unblock`.
+
+**Removes:** nothing. 17a adds; the friend invite links go in 17c.
 
 ## Review
+### 17a (the `reviewer` agent, Sonnet, a fresh context, 2026-11-12; it read the diff and ran `npm test`, `tsc`, lint and `npm run routes`, and was told not to touch the shared database, so the database and e2e runs are the author's)
 - Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+  - **A blocked or removed friend stayed on the blocker's open live board** until the page next loaded, where D5 (a) says "the blocker's page reloads its board after the block"; the e2e didn't look at the board. Fixed: the Friends tab's board starts again after any change in the friends list (`src/app/home.tsx`, `changes`). The e2e now checks the board: with the fix taken out it failed (`Expected substring: not "frb…"`, `Received string: "Friends today frb…: hasn't played yet"`), and with it `2 passed`.
+- Not blocking, and found sound: the migration against the design line by line; no response of a new or changed route differing for a blocked player; no path through the new routes leaving a friendship beside a block or deleting a hidden request; `withPair`'s lock order, rollback and release; every SQL-building helper taking only SQL text or a parameter; each 17a acceptance line having a test that doesn't mock what it tests; the commit messages.
+- **A correction to the design's words, from the review:** OB016 is not a full backstop for the invite-link `addFriend`, which takes no pair lock: an invite-link friendship and a block written at the same instant can each miss the other's uncommitted row, and both would stand. The window is an instant wide and the invite links go in 17c, so nothing is built for it (ROADMAP, Next revision: a race milliseconds wide is closed, not parked).
+- Deferred to ROADMAP "Next revision" (For M17): the leaderboard and feed column on an open page after a block; the count's reply order and its error line on every page; the friends list's two state slips; "Blocked players" not being a heading; the transaction wrapper written twice.
+- Unverified by the reviewer: the database, pgTAP and e2e runs (the author's, in Evidence); the manual's quotes (fetched by a Haiku subagent, not re-read); DESIGN.md's line numbers but one.
