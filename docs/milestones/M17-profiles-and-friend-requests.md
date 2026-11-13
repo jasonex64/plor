@@ -519,6 +519,8 @@ Which test proves which criterion (`src/app/api/players/[username]/route.db.test
 ```
 Its first two runs failed on the test's own locator for the "no player" line (two elements have the alert role), not on the screens. It was not seen failing before the screens existed. The run before it, `npm run test:e2e -- profile friend-requests`, passed 17a's two tests with the new Friends page. **Not run locally:** the rest of the e2e suite (HANDOFF: unreliable on this PC); CI's run on the PR is the evidence. **Nobody has looked at the screens.**
 
+**CI's first run on PR #195** (run 43371637325: 177 passed, 3 failed): `e2e/shell.e2e.ts:55`, `:184` and `:326`, each comparing a tab's sections with a fixed list. Hypothesis, written before any change: the one extra entry is the Friends tab's new "Find a player" card (E6), and no other tab changed. `npm run test:e2e -- shell.e2e.ts:55` showed it: `+   "Find a player",` between "Friends leaderboard" and "Your friends", and nothing else. The app is as designed, so the list in `e2e/shell.e2e.ts` gained that one section; no assertion was removed. Then `npm run test:e2e -- shell` → `10 passed (1.3m)`, the 320px no-sideways-scroll and no-text-link tests among them, now with the new card and the Profile button on the page.
+
 **Plan step 8, the whole.**
 - `npm run test:db` → `Test Files  59 passed (59)`, `Tests  430 passed (430)`, `Duration  219.73s`.
 - `npm test` → `Test Files  64 passed (64)`, `Tests  752 passed (752)` (with `src/app/api/guest-cookie.test.ts`, which now calls `GET /api/players/[username]` with a guest cookie and gets 401, and `e2e/players.test.ts`).
