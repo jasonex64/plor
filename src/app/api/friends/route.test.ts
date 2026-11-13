@@ -2,9 +2,6 @@
 // call. The signed-in paths are in route.db.test.ts.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
-import { POST as add } from "./add/route";
-import { POST as invite } from "./invite/route";
-import { GET as preview } from "./preview/route";
 import { POST as remove } from "./remove/route";
 import { GET as friends } from "./route";
 
@@ -19,14 +16,9 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-const CODE = "abcdefgh-_";
-
 describe("/api/friends routes (M07 7b)", () => {
   it.each([
     ["GET /api/friends", () => friends(apiRequest("/api/friends", { method: "GET" }))],
-    ["POST /api/friends/invite", () => invite(apiRequest("/api/friends/invite", { method: "POST", body: {} }))],
-    ["GET /api/friends/preview", () => preview(apiRequest(`/api/friends/preview?code=${CODE}`, { method: "GET" }))],
-    ["POST /api/friends/add", () => add(apiRequest("/api/friends/add", { method: "POST", body: { code: CODE } }))],
     ["POST /api/friends/remove", () => remove(apiRequest("/api/friends/remove", { method: "POST", body: { username: "abc" } }))],
   ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
     const response = await call();

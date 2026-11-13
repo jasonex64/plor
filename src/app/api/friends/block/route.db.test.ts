@@ -19,9 +19,7 @@ import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
-import { POST as add } from "../add/route";
 import { GET as blockedRoute } from "../blocked/route";
-import { POST as invite } from "../invite/route";
 import { POST as accept } from "../requests/accept/route";
 import { POST as cancel } from "../requests/cancel/route";
 import { GET as count } from "../requests/count/route";
@@ -229,18 +227,6 @@ describe("blocking", () => {
     // Cancelling and sending again read the same for both.
     expect(JSON.stringify(await to(cancel, "requests/cancel", A.username))).toBe(JSON.stringify(await to(cancel, "requests/cancel", E.username)));
     expect(await to(send, "requests", A.username)).toEqual(sent);
-  });
-
-  it("makes no friends through an invite link while a block is on: the link reads as one that has gone (29, 13)", async () => {
-    const gone = { status: 404, body: { ok: false, error: "invite_invalid" } };
-    useSession(A.session);
-    const codeA = (await call(invite, "/api/friends/invite", "POST", {})).body.inviteCode;
-    useSession(B.session);
-    const codeB = (await call(invite, "/api/friends/invite", "POST", {})).body.inviteCode;
-    expect(await call(add, "/api/friends/add", "POST", { code: codeA })).toEqual(gone);
-    useSession(A.session);
-    expect(await call(add, "/api/friends/add", "POST", { code: codeB })).toEqual(gone);
-    expect((await lists()).friends).toEqual([]);
   });
 
   it("refuses the blocker's own request until they unblock (29)", async () => {

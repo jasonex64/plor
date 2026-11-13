@@ -2,9 +2,8 @@
 
 // The player's friends on the Friends tab (human, 2026-10-25: "friends list should be in the friends tab";
 // docs/milestones/M14-14a-3b-settings.md), moved from the Me tab's account section (M12 12a): each with an avatar slot
-// (L37) and Remove (M07 D4), which asks first, since a new invite link is the only way back
-// (docs/milestones/M12-12f-review-fixes.md, F3); then the player's own invite link, with Reset ("Yes, with the list
-// (Recommended)"). Above them, while there are any, the friend requests waiting for the player's answer and the ones
+// (L37) and Remove (M07 D4), which asks first, since a new friend request is the only way back
+// (docs/milestones/M12-12f-review-fixes.md, F3; M17 17c, G3). Above them, while there are any, the friend requests waiting for the player's answer and the ones
 // they sent, and on each friend a Block (docs/milestones/M17-profiles-and-friend-requests.md, 17a, D7). At the top, Find
 // a player: a username opens that player's profile, which is the search (17b, E1 and E6); each friend's row opens theirs.
 import { useRouter } from "next/navigation";
@@ -13,7 +12,6 @@ import type { Friend } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { ButtonLink } from "./button-link";
-import { InviteLink } from "./invite-link";
 import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { Line, Skeleton } from "./skeleton";
@@ -143,7 +141,7 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
             </span>
           )}
         </div>
-        {friends && friends.length === 0 && <p>No friends yet. Send someone your invite link.</p>}
+        {friends && friends.length === 0 && <p>No friends yet. Find a player by their username, above.</p>}
         {friends && friends.length > 0 && (
           <ul className={kit.rows}>
             {friends.map((f) => (
@@ -157,7 +155,7 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
                   "Remove",
                   "/api/friends/remove",
                   f,
-                  `Remove ${f.name} as a friend? To be friends again, one of you opens the other's invite link.`,
+                  `Remove ${f.name} as a friend? To be friends again, one of you sends a friend request.`,
                 )}
                 {action("Block", "/api/friends/block", f, blockQuestion(f.name))}
               </li>
@@ -170,7 +168,6 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
           </Skeleton>
         )}
         {error && <p role="alert">{error}</p>}
-        <InviteLink canReset />
       </section>
     </>
   );

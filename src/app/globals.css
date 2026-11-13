@@ -223,18 +223,6 @@ html[data-signed-in] [data-signed-out] {
   display: none;
 }
 
-/* An invite page's "A friend invited you…" isn't for the link's owner (docs/milestones/
-   M14-14b-18-headings-today-invites-words.md, answer 10): signed in, it shows only once the page knows the link is a
-   friend's (docs/milestones/M14-14b-22-settings-and-invites.md, answer 4; src/app/home.tsx, AcceptInvite); signed out, it's there from the
-   served HTML. */
-html[data-signed-in] [data-invite-line] {
-  display: none;
-}
-
-html[data-signed-in] body[data-friend-invite] [data-invite-line] {
-  display: block;
-}
-
 /* The page's name in its "Plor" heading, with the shell, at the card heading's size and muted so "Plor" stays loudest
    (docs/milestones/M14-14b-18-headings-today-invites-words.md, answers 5 and 17; src/app/shell.tsx, PageName). Below
    768px the heading is read but not shown (below). */

@@ -30,9 +30,8 @@ insert into private.reaction (user_id, game_id, puzzle_date, run_user_id, emoji)
   (pg_temp.u(1), 'offbeat', '2000-01-01', pg_temp.u(2), '😮'), (pg_temp.u(2), 'offbeat', '2000-01-01', pg_temp.u(1), '😢');
 insert into private.comment_report (comment_id, reporter_id) values (-1, pg_temp.u(2)), (-2, pg_temp.u(1));
 
--- Friends both ways (user_a < user_b), and invite codes.
+-- Friends both ways (user_a < user_b).
 insert into private.friendship (user_a, user_b) values (pg_temp.u(1), pg_temp.u(2)), (pg_temp.u(1), pg_temp.u(3)), (pg_temp.u(2), pg_temp.u(3));
-insert into private.friend_invite (user_id, code) values (pg_temp.u(1), lpad('1', 10, 'f')), (pg_temp.u(2), lpad('2', 10, 'f'));
 
 -- Requests and blocks (M17 17a): 1 has sent a request and received one, blocks 4 and is blocked by 4, who is no
 -- one's friend, so no friendship ends. 2 has a request to 3, which stays.
@@ -71,7 +70,7 @@ create function pg_temp.rows_of(who uuid[]) returns int language sql return (
   + (select count(*) from private.friend_request where sender = any(who) or receiver = any(who))
   + (select count(*) from private.block where blocker = any(who) or blocked = any(who))
   + (select count(*) from private.held_username where user_id = any(who))
-  + (select count(*) from private.friend_invite where user_id = any(who)) + (select count(*) from private.group_member where user_id = any(who)))::int;
+  + (select count(*) from private.group_member where user_id = any(who)))::int;
 
 -- The function itself (A7): its owner's rights, a fixed search_path, and plor_app's execute.
 select is((select prosecdef from pg_proc where oid = 'private.delete_account(uuid,text)'::regprocedure), true,
@@ -86,11 +85,11 @@ select ok(not has_function_privilege('anon', 'private.delete_account(uuid,text)'
 
 -- A wrong username deletes nothing.
 -- 1 user, profile, admin row, run and comment; 2 reactions and 1 report by them; 2 friendships, 2 requests, 2 blocks,
--- 1 held name, 1 invite, 3 memberships.
-select is(pg_temp.rows_of(array[pg_temp.u(1)]), 19, 'player 1 has rows in every table before');
+-- 1 held name, 3 memberships.
+select is(pg_temp.rows_of(array[pg_temp.u(1)]), 18, 'player 1 has rows in every table before');
 select is(private.delete_account(pg_temp.u(1), 'del2'), false, 'another player''s username is refused');
 select is(private.delete_account(pg_temp.u(1), 'DEL1'), false, 'the username must match exactly');
-select is(pg_temp.rows_of(array[pg_temp.u(1)]), 19, 'and nothing is deleted');
+select is(pg_temp.rows_of(array[pg_temp.u(1)]), 18, 'and nothing is deleted');
 
 -- The right username deletes everything (A5).
 select is(private.delete_account(pg_temp.u(1), 'del1'), true, 'the player''s own username deletes the account');
@@ -111,9 +110,9 @@ select is((select creator_id from private.player_group where id = (select id fro
   'a group someone else made keeps its creator');
 select lives_ok('set constraints all immediate', 'every group''s creator is still a member');
 
--- Everyone else keeps their rows: 3 users and profiles, 2's run, comment and invite, the 2-3 friendship, 2's request
+-- Everyone else keeps their rows: 3 users and profiles, 2's run and comment, the 2-3 friendship, 2's request
 -- to 3 and 3 memberships. 2's reaction and report on 1's comment and run went with them.
-select is(pg_temp.rows_of(array[pg_temp.u(2), pg_temp.u(3), pg_temp.u(4)]), 14, 'other players keep their own rows');
+select is(pg_temp.rows_of(array[pg_temp.u(2), pg_temp.u(3), pg_temp.u(4)]), 13, 'other players keep their own rows');
 select is((select count(*)::int from private.comment where id = -2), 1, 'another player''s comment stays');
 
 -- The cascade's lookups by run key (ROADMAP "Next revision", For M12).

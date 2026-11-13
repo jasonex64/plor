@@ -62,8 +62,7 @@ async function withPair<T>(
 // A request named by a username nobody has, or by the player's own, is the same 404 as one that isn't there.
 const requestNotFound = () => ({ own: new AppError("request_not_found", 404), unknown: new AppError("request_not_found", 404) });
 
-// Both ways at once: one row per pair, the smaller user ID first (M07 7b). Already friends changes nothing: an invite
-// link can make a pair friends while a request between them waits (until 17c removes the links).
+// Both ways at once: one row per pair, the smaller user ID first (M07 7b). Already friends changes nothing.
 const BEFRIEND = `insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))
                   on conflict do nothing`;
 

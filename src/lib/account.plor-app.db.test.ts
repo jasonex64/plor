@@ -6,7 +6,6 @@ import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { postComment } from "@/comments/comments";
 import { GAME_ID } from "@/platform/game";
-import { issueInviteCode } from "@/friends/friends";
 import { startRun } from "@/game/runs";
 import { createGroup, leaveGroup } from "@/groups/groups";
 import { deleteAccount } from "./account";
@@ -124,7 +123,6 @@ describe("writes for a deleted player", () => {
   const writes: [string, (client: PoolClient, userId: string) => Promise<unknown>, object][] = [
     ["create a profile", (client, userId) => createProfile(client, userId, `dg2${RUN}`), { code: "23503", constraint: "profile_user_id_fkey" }],
     ["start a run", (client, userId) => startRun(client, userId), { code: "23503", constraint: "run_user_id_fkey" }],
-    ["make an invite link", (client, userId) => issueInviteCode(client, userId, false), { code: "23503", constraint: "friend_invite_user_id_fkey" }],
     ["create a group", (client, userId) => createGroup(client, userId, "Ghost Club"), { code: "23503", constraint: "group_member_user_id_fkey" }],
     [
       "post a comment",

@@ -22,8 +22,8 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
+import { ButtonLink } from "./button-link";
 import kit from "./kit.module.css";
-import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
@@ -38,9 +38,9 @@ function reacted(board: BoardData | null, change: { friend: string; emoji: Emoji
   };
 }
 
-// invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
-// holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
-export function Board({ username, invite }: { username: string; invite: boolean }) {
+// find: for a player with no friends, a link to the Friends tab's Find a player under the board, where the invite
+// link was (docs/milestones/M17-profiles-and-friend-requests.md, 17c, G1); off on the Friends tab, which holds it.
+export function Board({ username, find }: { username: string; find: boolean }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   // A reaction on a friend's run shows at once while it's held for Undo and sent
   // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b).
@@ -134,6 +134,7 @@ export function Board({ username, invite }: { username: string; invite: boolean 
         <>
           <h3>{BETTER_WITH_FRIENDS.title}</h3>
           <p>{BETTER_WITH_FRIENDS.text}</p>
+          {find && <FindAPlayer />}
         </>
       )}
       {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions used on a line under
@@ -160,8 +161,6 @@ export function Board({ username, invite }: { username: string; invite: boolean 
         </Skeleton>
       )}
       {error && <p role="alert">{error}</p>}
-      {/* Adding a friend starts here too (docs/milestones/M12-12f-review-fixes.md, F1). */}
-      {invite && <InviteLink canReset={false} />}
     </section>
   );
 }
@@ -173,9 +172,18 @@ export const BETTER_WITH_FRIENDS = {
   text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
 };
 
-// Phone Today's invite card when the player has no friends (mockup 3's soft tile; answer 13). From 768px the board says
-// it instead.
-export function FriendsInviteCard() {
+// Adding a friend starts on the Friends tab, at Find a player (17c, G1).
+function FindAPlayer() {
+  return (
+    <p>
+      <ButtonLink href="/friends">Find a player</ButtonLink>
+    </p>
+  );
+}
+
+// Phone Today's card when the player has no friends (mockup 3's soft tile; answer 13). From 768px the board says it
+// instead.
+export function NoFriendsCard() {
   const [friends, setFriends] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -190,7 +198,7 @@ export function FriendsInviteCard() {
     <section aria-label={BETTER_WITH_FRIENDS.title} className={`${kit.card} ${kit.soft}`}>
       <h2>{BETTER_WITH_FRIENDS.title}</h2>
       <p>{BETTER_WITH_FRIENDS.text}</p>
-      <InviteLink canReset={false} />
+      <FindAPlayer />
     </section>
   );
 }
