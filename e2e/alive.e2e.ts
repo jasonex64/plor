@@ -5,7 +5,7 @@
 // comment that arrives pop in.
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -152,11 +152,10 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   const friend = await (await browser.newContext({ viewport: WIDE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "vf");
-  const invite = await sharedLink(friend, friend.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: WIDE })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "vg");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "vg", friend, "vf");
   await caught(friend);
   await caught(page);
   const popping = (el: Locator) => el.evaluate((e) => getComputedStyle(e).animationName !== "none");

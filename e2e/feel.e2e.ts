@@ -38,14 +38,12 @@ async function hold(page: Page, path: string): Promise<() => void> {
 }
 
 // The introduction is in the served HTML, before any script runs (Google's brand check, M02 2c): the frame around the
-// page mustn't hold it back. The invite pages' lines too.
+// page mustn't hold it back. A group's invite page's line too.
 test("the pages' static text is served without JavaScript", async ({ browser }) => {
   const page = await (await browser.newContext({ javaScriptEnabled: false })).newPage();
   await page.goto("/");
   await expect(page.getByText("Plor is a small site with a daily word game.")).toBeVisible();
   await expect(page.getByRole("heading", { name: /Today's game:/ })).toBeVisible();
-  await page.goto("/i/AAAAAAAAAA");
-  await expect(page.getByText("A friend invited you to Plor")).toBeVisible();
   await page.goto("/g/AAAAAAAAAA");
   await expect(page.getByText("You were invited to a group on Plor")).toBeVisible();
 });
@@ -108,9 +106,11 @@ test("a section waiting for its data shows its skeleton, not Loading text", asyn
 });
 
 // Every number on the page has same-width digits, and headings and paragraphs wrap evenly, from globals.css's base
-// rules (criterion 5): read on Today's real elements, a section's h3 included, so a module overriding them shows here.
+// rules (criterion 5): read on a page's real elements, a section's h3 included, so a module overriding them shows here.
+// The Friends tab, since Today has no h3 for a new player once "Plor is better with friends" went from it (M17 17c,
+// answer 34); the Friends tab's board still says it.
 test("numbers are tabular, headings balanced and paragraphs pretty", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/friends");
   await signInAndPick(page, "fn");
   await expect(page.locator("h3").first()).toBeVisible();
   const styles = await page.evaluate(() => {

@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
 import styles from "./share.module.css";
 
-// Sharing a link, for the result's Share (M05, S4), the invite link's (docs/milestones/M12-12f-review-fixes.md, F1) and a
-// group's: the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard (MDN,
+// Sharing a link, for the result's Share (M05, S4) and a group's invite link: the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard (MDN,
 // Clipboard.writeText). A cancelled sheet rejects with AbortError, which isn't a failure (MDN). A clipboard the page
 // may not write to rejects with NotAllowedError (MDN), and the caller shows the text to copy by hand (CopyField; docs/
 // milestones/M14-14b-18-headings-today-invites-words.md, answer 9). Anything else is thrown for the caller to show.

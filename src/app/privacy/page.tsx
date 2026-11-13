@@ -10,7 +10,7 @@ export default function Privacy() {
   return (
     <main className="reading">
       <h1>Plor privacy policy</h1>
-      <p>Last updated: 2026-10-25</p>
+      <p>Last updated: 2026-11-13</p>
       <p>
         Plor (plor.app) is a small daily word game. This page says what we keep about you, why, and how to have it
         deleted. Questions: <a href="mailto:privacy@plor.app">privacy@plor.app</a>.
@@ -30,9 +30,47 @@ export default function Privacy() {
           characters). Once enough players type the same answer, it can become an answer everyone can give, shown
           without who typed it.
         </li>
+        {/* The next two, the guest cookie under "Sign-in cookies" and Cloudflare below: docs/milestones/M18-guest-play.md,
+            "Privacy page draft" (approved 2026-11-13). */}
         <li>
-          <strong>Your friends:</strong> who you are friends with, and your invite link. Your friends, and anyone
-          signed in who opens your invite link, can see your username and your display name if you set one.
+          <strong>Playing without an account:</strong> you can play a day&apos;s game as a guest. While you play, a
+          cookie holds a random code so the game knows which run is yours; it is not an account and has no name. When
+          your run ends we delete the run and keep only your answers, added to the day&apos;s counts of how many people
+          gave each answer, with nothing that says who gave them. A run you leave unfinished is deleted after that day
+          ends. Text you type that isn&apos;t on our list isn&apos;t kept. A guest has no streak, points or history;
+          making an account starts fresh.
+        </li>
+        <li>
+          <strong>The bot check:</strong> when a guest presses Start, Cloudflare Turnstile checks that a person, not a
+          program, is there. For that, your browser loads a script from Cloudflare, which sees your IP address and
+          details of your browser. Plor gets back only whether the check passed.
+        </li>
+        <li>
+          <strong>Your friends:</strong> who you are friends with. Your friends can see your username and your display
+          name if you set one.
+        </li>
+        {/* The next three: docs/milestones/M17-profiles-and-friend-requests.md, "17c design", Privacy page (answer 33). */}
+        <li>
+          <strong>Your profile and who can find it:</strong> any signed-in player can look you up by your exact
+          username (not by display name or part of a username) and open your profile. A signed-in player who isn&apos;t
+          your friend sees your username, your display name if you set one, your points, days played and streaks, and
+          your best and average results in the daily game. Your friends also see when you started playing, your
+          calendar of days played this month, your rarest answers and a chart of your last 7 days. Nobody who is signed
+          out can see a profile. If you change your username, the old one still opens your profile for 30 days and no
+          one else can take it; if you delete your account in that time, the old username is freed at once.
+        </li>
+        <li>
+          <strong>Friend requests and blocks:</strong> we keep the friend requests you send and receive, and the players
+          you block. Blocking someone ends any friendship with them, stops their requests reaching you, and makes your
+          profile and username show nothing to them. You and they stop seeing each other&apos;s comments and reactions,
+          though results on a shared group&apos;s board still show. They are not told. You can unblock someone from a
+          list in Settings.
+        </li>
+        <li>
+          <strong>Lookup counts:</strong> to stop anyone listing usernames, we count how many times each signed-in
+          player looks up a username that isn&apos;t their own or a friend&apos;s, and how many friend requests they
+          send, in an hour. We count by a scrambled form of your account&apos;s ID. An entry stops counting after an
+          hour, and is deleted the next time anyone&apos;s lookup is counted after that.
         </li>
         <li>
           <strong>Your groups:</strong> which groups you are in, and the comments and reactions you post in them.
@@ -45,8 +83,8 @@ export default function Privacy() {
           its text, and which admin deleted it, until you delete your account.
         </li>
         <li>
-          <strong>Sign-in cookies:</strong> they keep you signed in. Plor has no ads, no analytics and no tracking
-          cookies.
+          <strong>Sign-in cookies:</strong> they keep you signed in. Also the guest cookie above, which lasts until you
+          close the browser. Plor has no ads, no analytics and no tracking cookies.
         </li>
         <li>
           <strong>Your theme, in this browser:</strong> a copy of the theme you picked, kept in this browser&apos;s
@@ -80,13 +118,14 @@ export default function Privacy() {
         <li>Resend: sends the sign-in emails, so it sees your email address.</li>
         <li>An email forwarding service: passes mail sent to privacy@plor.app on to us.</li>
         <li>Google: only if you choose to sign in with Google.</li>
+        <li>Cloudflare: the bot check when a guest starts a game.</li>
       </ul>
 
       <h2>Keeping and deleting</h2>
       <p>
         We keep your account and games until you delete them. You can delete your account yourself in Settings (the
         gear): it removes your account together with all your games, unlisted answers, points, comments, reactions,
-        reports and friends, straight away. A group you made stays with its other members, and an answer that enough
+        reports, friends, friend requests, blocks and any old username held for you, straight away. A group you made stays with its other members, and an answer that enough
         players typed stays in the game, without your name. For anything else, email{" "}
         <a href="mailto:privacy@plor.app">privacy@plor.app</a> from the address you sign in with. Our providers&apos;
         logs are not part of your account and expire on their own schedules.

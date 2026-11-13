@@ -1,10 +1,10 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { checkProtocol, handle } from "@/lib/http";
-import { getInviteCode, listFriends } from "@/friends/friends";
+import { listFriends } from "@/friends/friends";
 import { listReceived, listSent } from "@/friends/requests";
 
-// The signed-in player's friends and invite code, if they have made one (docs/milestones/M07-friends-and-live-board.md, 7b),
+// The signed-in player's friends (docs/milestones/M07-friends-and-live-board.md, 7b),
 // and the friend requests waiting for their answer and the ones they sent (M17 17a).
 export const GET = handle(async (request) => {
   checkProtocol(request);
@@ -12,7 +12,6 @@ export const GET = handle(async (request) => {
   const db = getPool();
   return Response.json({
     ok: true,
-    inviteCode: await getInviteCode(db, userId),
     friends: await listFriends(db, userId),
     requests: await listReceived(db, userId),
     sent: await listSent(db, userId),

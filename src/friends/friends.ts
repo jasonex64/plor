@@ -1,7 +1,7 @@
-// Invite links and friends (docs/milestones/M07-friends-and-live-board.md, 7b). The database keeps the rules: one
-// code per player, one row per pair with the smaller user ID first, no friendship with yourself.
+// Friends (docs/milestones/M07-friends-and-live-board.md, 7b). The database keeps the rules: one row per pair with
+// the smaller user ID first, no friendship with yourself. A friendship is made by an accepted friend request
+// (src/friends/requests.ts); friend invite links ended in M17 17c, and the invite codes made and read here are groups'.
 import { randomBytes } from "node:crypto";
-import { DatabaseError } from "pg";
 import { INVITE_CODE_LENGTH } from "@/config/tunables";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -24,57 +24,6 @@ export function newInviteCode(): string {
 export function readInviteCode(input: unknown): string {
   if (typeof input !== "string" || !INVITE_CODE.test(input)) throw new AppError("invite_invalid", 404);
   return input;
-}
-
-export async function getInviteCode(db: Db, userId: string): Promise<string | null> {
-  const { rows } = await db.query<{ code: string }>("select code from private.friend_invite where user_id = $1", [userId]);
-  return rows[0]?.code ?? null;
-}
-
-// Returns the player's code, making one the first time. Reset replaces it, so the old link stops working.
-export async function issueInviteCode(db: Db, userId: string, reset: boolean): Promise<string> {
-  const code = newInviteCode();
-  const { rows } = await db.query<{ code: string }>(
-    reset
-      ? `insert into private.friend_invite (user_id, code) values ($1, $2)
-         on conflict (user_id) do update set code = excluded.code returning code`
-      : `insert into private.friend_invite (user_id, code) values ($1, $2)
-         on conflict (user_id) do update set code = private.friend_invite.code returning code`,
-    [userId, code],
-  );
-  return rows[0].code;
-}
-
-// Who a code belongs to, as a friend would see them.
-export async function findInviter(db: Db, code: string): Promise<Friend & { userId: string }> {
-  const { rows } = await db.query<Friend & { userId: string }>(
-    `select i.user_id as "userId", p.username, coalesce(p.display_name, p.username::text) as name
-     from private.friend_invite i join private.profile p using (user_id) where i.code = $1`,
-    [code],
-  );
-  if (!rows[0]) throw new AppError("invite_invalid", 404);
-  return rows[0];
-}
-
-// Makes the signed-in player and the code's owner friends, both ways at once (one row per pair).
-export async function addFriend(db: Db, userId: string, code: string): Promise<Friend> {
-  const { userId: inviterId, username, name } = await findInviter(db, code);
-  if (inviterId === userId) throw new AppError("invite_own", 409);
-  try {
-    await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [
-      userId,
-      inviterId,
-    ]);
-  } catch (err) {
-    if (err instanceof DatabaseError && err.code === "23505" && err.constraint === "friendship_pkey") {
-      throw new AppError("already_friends", 409);
-    }
-    // A block between the two, either way (private.friendship_unblocked): the same answer as a link that has gone, so
-    // a blocked player learns nothing (M17 17a, answer 13).
-    if (err instanceof DatabaseError && err.code === "OB016") throw new AppError("invite_invalid", 404);
-    throw err;
-  }
-  return { username, name };
 }
 
 // Ends a friendship both ways (D4).

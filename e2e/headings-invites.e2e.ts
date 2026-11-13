@@ -1,12 +1,11 @@
 // 14b-18, headings, signed-in Today, invites and words (docs/milestones/M14-14b-18-headings-today-invites-words.md):
 // from 768px the page's name sits under "Plor" in its one heading; a signed-in player never sees Today's introduction;
-// the streak pill is a 44px target; a refused clipboard shows the link to copy; your
-// own invite link doesn't say a friend invited you; the 404 has no feed beside it; dates, bullets, reactions and back
+// the streak pill is a 44px target; a refused clipboard shows the link to copy; the 404 has no feed beside it; dates, bullets, reactions and back
 // arrows read one way.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME } from "../src/platform/game";
-import { RUN, emailedCode, forwardPlayerIp, play, sharedLink, signInAndPick } from "./players";
+import { RUN, emailedCode, forwardPlayerIp, play, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -141,7 +140,7 @@ test("the streak pill is a 44px target in the top bar and the sidebar, and looks
   }
 });
 
-test("a refused clipboard shows the link to copy, for an invite, a group and the result", async ({ page }) => {
+test("a refused clipboard shows the link to copy, for a group and the result", async ({ page }) => {
   test.slow();
   await refuseClipboard(page);
   await page.goto("/friends");
@@ -154,8 +153,6 @@ test("a refused clipboard shows the link to copy, for an invite, a group and the
     expect(await field.evaluate((el: HTMLInputElement | HTMLTextAreaElement) => [el.readOnly, el.selectionStart, el.selectionEnd === el.value.length])).toEqual([true, 0, true]);
     await expect(page.getByText("Something went wrong")).toHaveCount(0);
   };
-  await check("Invite a friend", /^http:\/\/localhost:3000\/i\/[A-Za-z0-9_-]+$/);
-
   await page.goto("/groups");
   await page.getByLabel("New group's name").fill("Copy Club");
   await page.getByRole("button", { name: "Create group" }).click();
@@ -167,24 +164,6 @@ test("a refused clipboard shows the link to copy, for an invite, a group and the
   await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
   await check("Share", /http:\/\/localhost:3000\/$/);
-});
-
-test("your own invite link says it's yours; a friend's still says a friend invited you", async ({ browser }) => {
-  const owner = await (await browser.newContext()).newPage();
-  await owner.goto("/friends");
-  await signInAndPick(owner, "ho");
-  const link = new URL(await sharedLink(owner, owner.getByRole("button", { name: "Invite a friend" }))).pathname;
-  await owner.goto(link);
-  await expect(owner.getByRole("heading", { name: "This is your invite link" })).toBeVisible();
-  await expect(owner.getByText("Send it to a friend.")).toBeVisible();
-  await expect(owner.getByText("A friend invited you")).toBeHidden();
-
-  const friend = await (await browser.newContext()).newPage();
-  await friend.goto(link);
-  await expect(friend.getByText("A friend invited you")).toBeVisible();
-  await signInAndPick(friend, "hf");
-  await expect(friend.getByRole("button", { name: "Add friend" })).toBeVisible();
-  await expect(friend.getByText("A friend invited you")).toBeVisible();
 });
 
 test("from 1200px the 404 has no friends feed beside it", async ({ page }) => {
@@ -204,11 +183,10 @@ test("the feed's past day reads like every other date, comments have no bullets,
   const friend = await (await browser.newContext({ viewport: PHONE })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "hw");
-  const invite = await sharedLink(friend, friend.getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "hx");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "hx", friend, "hw");
   for (const p of [friend, page]) {
     await p.goto("/");
     await play(p);

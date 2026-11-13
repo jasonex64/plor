@@ -119,8 +119,9 @@ test("a card and a chip take the kit's border and corners, flat", async ({ brows
 
 // Signed in, Today starts with the game: the introduction is gone (answer 12); the banner's chips are its white on the
 // game's colour, not the kit's plain chip (a production CSS order once let the kit's win: 14b-8b review); and with no
-// friends a phone ends with the invite card, which from 768px the board says instead (answer 13).
-test("signed-in Today: no introduction, the banner's own chips, and the invite card on phones", async ({ browser }) => {
+// friends Today says nothing of it, on a phone or from 768px: "Plor is better with friends" went from Today with the
+// invite link (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
+test("signed-in Today: no introduction, the banner's own chips, and no words about friends", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await page.goto("/");
   await signInAndPick(page, "lt");
@@ -132,11 +133,15 @@ test("signed-in Today: no introduction, the banner's own chips, and the invite c
   const color = await ink(page);
   expect(await chip.evaluate((el) => getComputedStyle(el).borderTopColor)).not.toBe(color);
 
-  const card = page.getByRole("region", { name: "Plor is better with friends" });
-  await expect(card.getByRole("button", { name: "Invite a friend" })).toBeVisible();
+  // The feed has loaded, so a card that came after it would be there by now.
+  await expect(page.getByRole("region", { name: "Feed" })).toBeVisible();
+  await expect(page.getByText("Plor is better with friends")).toHaveCount(0);
   await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(card).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Friends today" }).getByText("Plor is better with friends")).toBeVisible();
+  const board = page.getByRole("region", { name: "Friends today" });
+  await expect(board.getByRole("heading", { name: "Friends today" })).toBeVisible();
+  await expect(board.locator('[data-loading]')).toHaveCount(0);
+  await expect(page.getByText("Plor is better with friends")).toHaveCount(0);
+  await expect(page.getByRole("main").getByRole("link", { name: "Find a player" })).toHaveCount(0);
 });
 
 // 14b-8c: Me's header card lays its avatar beside the name, the avatar is ringed in ink, the totals are stats on their card (14b-15) and

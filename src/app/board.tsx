@@ -23,7 +23,6 @@ import {
 } from "./board-channel";
 import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
-import { InviteLink } from "./invite-link";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
@@ -38,9 +37,9 @@ function reacted(board: BoardData | null, change: { friend: string; emoji: Emoji
   };
 }
 
-// invite: the invite link, without Reset, under the board (M12 12f, F1); off on the Friends tab, whose friends list
-// holds the link with Reset (docs/milestones/M14-14a-3b-settings.md).
-export function Board({ username, invite }: { username: string; invite: boolean }) {
+// betterWithFriends: the words for a player with no friends, on the Friends tab, above Find a player; off on Today,
+// where nothing stands in the invite link's place (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
+export function Board({ username, betterWithFriends }: { username: string; betterWithFriends: boolean }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   // A reaction on a friend's run shows at once while it's held for Undo and sent
   // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b).
@@ -130,7 +129,7 @@ export function Board({ username, invite }: { username: string; invite: boolean 
         </p>
       )}
       {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}
-      {shownBoard && shownBoard.friends.length === 0 && (
+      {betterWithFriends && shownBoard && shownBoard.friends.length === 0 && (
         <>
           <h3>{BETTER_WITH_FRIENDS.title}</h3>
           <p>{BETTER_WITH_FRIENDS.text}</p>
@@ -160,40 +159,15 @@ export function Board({ username, invite }: { username: string; invite: boolean 
         </Skeleton>
       )}
       {error && <p role="alert">{error}</p>}
-      {/* Adding a friend starts here too (docs/milestones/M12-12f-review-fixes.md, F1). */}
-      {invite && <InviteLink canReset={false} />}
     </section>
   );
 }
 
-// L31's wording (round 3's, provisional per L32), for a player with no friends yet: under the board, and on phones as
-// Today's own card (docs/milestones/M14-14b-8-the-new-look.md, answer 13).
-export const BETTER_WITH_FRIENDS = {
+// L31's wording (round 3's, provisional per L32), for a player with no friends yet, under the Friends tab's board.
+const BETTER_WITH_FRIENDS = {
   title: "Plor is better with friends",
   text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
 };
-
-// Phone Today's invite card when the player has no friends (mockup 3's soft tile; answer 13). From 768px the board says
-// it instead.
-export function FriendsInviteCard() {
-  const [friends, setFriends] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    api<{ friends: unknown[] }>("/api/friends", { method: "GET" }).then(
-      (r) => setFriends(r.friends.length),
-      (err) => setError(errorText(err)),
-    );
-  }, []);
-  if (error) return <p role="alert">{error}</p>;
-  if (friends !== 0) return null;
-  return (
-    <section aria-label={BETTER_WITH_FRIENDS.title} className={`${kit.card} ${kit.soft}`}>
-      <h2>{BETTER_WITH_FRIENDS.title}</h2>
-      <p>{BETTER_WITH_FRIENDS.text}</p>
-      <InviteLink canReset={false} />
-    </section>
-  );
-}
 
 // A friend's state as a chip: safe for a run that survived every question, caught for one that ended earlier, plain
 // otherwise.

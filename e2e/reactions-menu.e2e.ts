@@ -5,7 +5,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { REACTIONS } from "../src/config/tunables";
-import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
+import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -53,11 +53,10 @@ test("reactions sit behind each comment's and run's ⋯, and its popover closes 
   const friend = await (await browser.newContext({ viewport: PHONE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "ra");
-  const invite = await sharedLink(friend, friend.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: PHONE })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "rb");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "rb", friend, "ra");
   await caught(friend);
   await caught(page);
   await comment(friend, "Theirs, first.");
@@ -173,11 +172,10 @@ test("under reduced motion the popover doesn't pop in", async ({ browser }) => {
   const friend = await (await browser.newContext({ viewport: PHONE, permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await friend.goto("/friends");
   await signInAndPick(friend, "rc");
-  const invite = await sharedLink(friend, friend.getByRole("region", { name: "Invite friends" }).getByRole("button", { name: "Invite a friend" }));
   const page = await (await browser.newContext({ viewport: PHONE, reducedMotion: "reduce" })).newPage();
-  await page.goto(new URL(invite).pathname);
+  await page.goto("/friends");
   await signInAndPick(page, "rd");
-  await page.getByRole("button", { name: "Add friend" }).click();
+  await befriend(page, "rd", friend, "rc");
   await caught(friend);
   await caught(page);
   await page.goto("/friends");

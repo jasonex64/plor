@@ -1,26 +1,15 @@
--- private.friend_invite and private.friendship keep their rules in the database
+-- private.friendship keeps its rules in the database, and the friend invite table is gone (M17 17c)
 -- (docs/milestones/M07-friends-and-live-board.md, 7b). Run with `npm run test:sql`.
 begin;
 -- Same preamble as plor_app_role.test.sql: remote runs log in as cli_login_postgres.
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(12);
+select plan(7);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000f1', 'f1@example.test'),
   ('00000000-0000-0000-0000-0000000000f2', 'f2@example.test');
-
-select lives_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'abcdefgh-_')$$,
-  'a 10-character base64url code is accepted (M14 14b-3)');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh-')$$,
-  '23514', null, 'a 9-character code is rejected');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh+/')$$,
-  '23514', null, 'a code with characters outside base64url is rejected');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f2', 'abcdefgh-_')$$,
-  '23505', null, 'two players cannot share a code');
-select throws_ok($$insert into private.friend_invite (user_id, code) values ('00000000-0000-0000-0000-0000000000f1', 'ABCDEFGH-_')$$,
-  '23505', null, 'a player has one code (reset replaces it)');
 
 select lives_ok($$insert into private.friendship (user_a, user_b) values ('00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-0000000000f2')$$,
   'a pair stored smaller ID first is accepted');
@@ -37,9 +26,9 @@ select throws_ok($$insert into private.friendship (user_a, user_b) values ('0000
 delete from auth.users where id = '00000000-0000-0000-0000-0000000000f2';
 select is((select count(*)::int from private.friendship where '00000000-0000-0000-0000-0000000000f2' in (user_a, user_b)), 0,
   'deleting a user deletes their friendships');
-delete from auth.users where id = '00000000-0000-0000-0000-0000000000f1';
-select is((select count(*)::int from private.friend_invite where user_id = '00000000-0000-0000-0000-0000000000f1'), 0,
-  'deleting a user deletes their invite code');
+
+-- Friend invite links ended (M17 17c, answer 6): the table and every stored code are gone.
+select hasnt_table('private', 'friend_invite', 'the friend invite table is dropped');
 
 select * from finish();
 rollback;

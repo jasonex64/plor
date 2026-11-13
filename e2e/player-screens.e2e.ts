@@ -1,11 +1,11 @@
 // 14b-2c-1, the player screens' review items (docs/milestones/M14-14b-2c-review-items.md): the room the shell, the
 // clock bar and the right column leave goes with the page that shows them; the right column keeps a draft across
 // 1200px; a question's time running out away from the game opens the feed; text that names no entry stays in the box;
-// the bonus line, the result's jump, your own invite link, reactions at 320px, the leaderboard card on a new choice,
+// the bonus line, the result's jump, reactions at 320px, the leaderboard card on a new choice,
 // and Try again when the live channel can't be opened.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, play, signInAndPick, sharedLink } from "./players";
+import { RUN, play, signInAndPick, befriend } from "./players";
 import { answer, answerBox, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
@@ -169,23 +169,15 @@ test("the banner's Result opens the game screen at the result", async ({ browser
   await expect.poll(at).toEqual({ top: 56, scrolled: true });
 });
 
-// Answer 8, and item 10: your own link says so; then, friends who have both played see each other's reactions (behind
-// a ⋯ since 14b-13), and a 320px phone still doesn't scroll sideways with its popover open.
-test("your own invite link says it's yours, and a board with reactions fits 320px", async ({ browser }) => {
+// Item 10: friends who have both played see each other's reactions (behind a ⋯ since 14b-13), and a 320px phone still
+// doesn't scroll sideways with its popover open. (Answer 8, your own invite link, went with the links: M17 17c.)
+test("a board with reactions fits 320px", async ({ browser }) => {
   test.slow();
   const host = await player(browser, "xf", PHONE);
-  await host.goto("/friends");
-  const invite = host.getByRole("region", { name: "Your friends" }).getByRole("region", { name: "Invite friends" });
-  const link = new URL(await sharedLink(host, invite.getByRole("button", { name: "Invite a friend" }))).pathname;
-  await host.goto(link);
-  await expect(host.getByRole("heading", { name: "This is your invite link" })).toBeVisible();
-  await expect(host.getByRole("button", { name: "Add friend" })).toHaveCount(0);
-
   const guest = await (await browser.newContext({ viewport: PHONE })).newPage();
-  await guest.goto(link);
+  await guest.goto("/friends");
   await signInAndPick(guest, "xg");
-  await guest.getByRole("button", { name: "Add friend" }).click();
-  await expect(guest.getByRole("heading", { name: /are now friends\.$/ })).toBeVisible();
+  await befriend(guest, "xg", host, "xf");
   await guest.goto("/");
   await caught(guest);
   await host.goto("/");

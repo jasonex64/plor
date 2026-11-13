@@ -29,7 +29,7 @@ export async function forwardPlayerIp(page: Page, email: string): Promise<void> 
   );
 }
 
-// Signs in on the page it's on (home, a guest game, an invite link or a tab) and picks a username. The front page and
+// Signs in on the page it's on (home, a guest game, a group's invite link or a tab) and picks a username. The front page and
 // the guest games show a small "Sign in" link that opens the form at /?sign-in; other pages show the form itself
 // (docs/milestones/M18-guest-play.md, answers 32 and 33). Signed in through the link, it goes Back to the page it was
 // on, so the tests' history has that page where it always had it (a Back from a game lands on "/", not "/?sign-in").
@@ -78,7 +78,20 @@ export async function play(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Start", exact: true }).click();
 }
 
-// The link a share button gives (M14 14b-3: invite links are shared, never shown). These browsers have no share sheet,
+// Makes two signed-in players friends on the screens: one sends a friend request from the other's profile, who
+// accepts it from the sender's (docs/milestones/M17-profiles-and-friend-requests.md, 17a and 17b; friend invite links
+// ended in 17c). Players are named by the name they signed in with (signInAndPick). Each is left on the other's profile.
+export async function befriend(sender: Page, senderName: string, receiver: Page, receiverName: string): Promise<void> {
+  const you = (page: Page) => page.getByRole("region", { name: "You and this player" });
+  await sender.goto(`/u/${receiverName}${RUN}`);
+  await you(sender).getByRole("button", { name: "Add friend" }).click();
+  await expect(you(sender)).toContainText("Friend request sent.");
+  await receiver.goto(`/u/${senderName}${RUN}`);
+  await you(receiver).getByRole("button", { name: "Accept" }).click();
+  await expect(you(receiver)).toContainText("You're friends.");
+}
+
+// The link a share button gives (M14 14b-3: a group's invite link is shared, never shown). These browsers have no share sheet,
 // so it's copied (src/app/share.tsx) as its text, a line break and the URL; this presses the button and returns the URL.
 export async function sharedLink(page: Page, button: Locator): Promise<string> {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);

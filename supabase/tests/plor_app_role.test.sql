@@ -96,12 +96,10 @@ select is(pg_temp.grants('plor_app'), array[
   -- Deleting your own account (M12 12c, A7): one guarded function, never Auth's table.
   'private.delete_account(uuid,text) execute',
   'private.delete_reported_comment(uuid,bigint) execute',
-  -- Invite links and friends (M07 7b): a code is created and replaced on reset; friendships are added and removed.
+  -- Friends (M07 7b): friendships are added and removed. (Friend invite codes ended in M17 17c.)
   -- Guest play (M18 18b): a guest's run is read and started, never deleted by a grant; its game 2 words go through the
   -- judge, and a run's rows go through two functions. The tally and round words are read only, round_reject not at all.
   'private.end_guest_run(text,text) execute',
-  'private.friend_invite insert', 'private.friend_invite select',
-  'private.friend_invite.code update',
   -- Friend requests (M17 17a): read, sent, and deleted by an accept, a decline or a cancel.
   'private.friend_request delete', 'private.friend_request insert', 'private.friend_request select',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',

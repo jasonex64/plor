@@ -78,7 +78,7 @@ describe("friend requests", () => {
     useSession(A.session);
     expect(await call(friends, "/api/friends", "GET")).toEqual({
       status: 200,
-      body: { ok: true, inviteCode: null, friends: [], requests: [], sent: [] },
+      body: { ok: true, friends: [], requests: [], sent: [] },
     });
     expect(await call(count, "/api/friends/requests/count", "GET")).toEqual({ status: 200, body: { ok: true, count: 0 } });
   });
@@ -132,7 +132,7 @@ describe("friend requests", () => {
     expect(await to(decline, "requests/decline", A.username)).toEqual(notFound);
     useSession(A.session);
     const mine = await call(friends, "/api/friends", "GET");
-    expect(mine.body).toEqual({ ok: true, inviteCode: null, friends: [], requests: [], sent: [] });
+    expect(mine.body).toEqual({ ok: true, friends: [], requests: [], sent: [] });
     expect(JSON.stringify(mine.body)).not.toMatch(/declin/i);
   });
 

@@ -179,7 +179,7 @@ function current(path: string, href: string, sidebar: boolean): "page" | "true" 
 
 // The page's name in its "Plor" heading (docs/milestones/M14-14b-18-headings-today-invites-words.md, answers 5 and 17
 // to 19): the tab it's under, as the tab bar marks it from 768px, so the game screen is Today's;
-// /streak is Me's and the admin pages Admin's; an invite and the 404 have none. Shown with the shell from 768px and read
+// /streak is Me's and the admin pages Admin's; a group's invite and the 404 have none. Shown with the shell from 768px and read
 // on phones, where the heading is hidden for the top bar's wordmark (globals.css, .page-name).
 export function pageName(path: string, lost: boolean): string | null {
   if (lost) return null;

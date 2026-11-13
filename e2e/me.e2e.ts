@@ -151,8 +151,8 @@ test("names carry an avatar slot, and the Friends tab says Plor is better with f
   const board = page.getByRole("region", { name: "Friends today" });
   await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
   await expect(board).toContainText("compare scores every week, in whichever games you both play.");
-  // The invite link sits below, with the friends list (docs/milestones/M14-14a-3b-settings.md, criterion 7).
-  await expect(page.getByRole("region", { name: "Your friends" }).getByRole("button", { name: "Invite a friend" })).toBeVisible();
+  // The friends list sits below (docs/milestones/M14-14a-3b-settings.md, criterion 7), pointing to Find a player (M17 17c, G3).
+  await expect(page.getByRole("region", { name: "Your friends" })).toContainText("No friends yet. Find a player by their username, above.");
 
   // The leaderboards: the player's own row.
   const week = page.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "This week" }).getByRole("listitem");

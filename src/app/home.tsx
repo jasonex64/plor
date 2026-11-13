@@ -6,7 +6,7 @@
 // in Signed: sign-in, then picking a username, then the section: Today (Offbeat's banner and the feed), Friends, Groups
 // or Me; Offbeat's game screen (docs/milestones/M14-14a-2b-game-screen.md); the streak's ranks (/streak,
 // docs/milestones/M14-14b-2a-streak-ranks.md); the admin area (/admin/…, docs/milestones/M14-14b-2b-2-admin-build.md);
-// or, on an invite link (/i/<code>), the friend request; on a group's link (/g/<code>), joining it; on a group's page
+// or, on a group's invite link (/g/<code>), joining it; on a group's page
 // (/groups/<id>), the group. Every step goes through the API; errors are shown to the player and never retried
 // silently (DECISIONS.md: Error handling).
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -23,13 +23,12 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import type { Friend } from "@/friends/friends";
 import { INVITE_CODE } from "@/friends/invite-code";
 import { api } from "@/lib/api-client";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Profile } from "@/lib/profile";
 import { AdminArea, type AdminPage } from "./admin/admin-area";
-import { Board, FriendsInviteCard } from "./board";
+import { Board } from "./board";
 import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
@@ -37,7 +36,6 @@ import { FriendsList } from "./friends-list";
 import { TodayBanner } from "./game";
 import { GroupPage } from "./groups";
 import { PlayerPage } from "./player";
-import { InviteCodeProvider, InviteLink } from "./invite-link";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
 import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
@@ -48,7 +46,6 @@ import { SideColumn } from "./side-column";
 import { SIGN_IN_HREF, signInOpen } from "./sign-in-open";
 import { LoadingStatus, PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
-import { useBodyFlag } from "./body-flag";
 import { markSignedIn } from "./signed-in";
 import { applyTheme } from "./theme";
 import { ClockBar, MeAdminLink, Shell } from "./shell";
@@ -74,19 +71,19 @@ function nameOf(player: Player): string {
   return player.displayName ?? player.username;
 }
 
-// The pages without the friends feed's column: Today, the game screen and the admin area have their own, and an invite
-// or a group's link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
+// The pages without the friends feed's column: Today, the game screen and the admin area have their own, and a
+// group's invite link is one decision, with nothing beside it (human, 2026-10-26: "Hide it there (Recommended)";
 // docs/milestones/M14-14b-2c-review-items.md, answer 12); and the 404, which stands alone (docs/milestones/
 // M14-14b-18-headings-today-invites-words.md, answer 11).
 function feedBeside(path: string, lost: boolean): boolean {
   return !lost && path !== "/" && path !== GAME.path && path !== SUBSTRINGS.path && !path.startsWith("/admin") && !INVITE_PATH.test(path);
 }
 
-// Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so an invite link opened
-// while signed out, a friend's or a group's, is remembered for that round trip in this tab's sessionStorage, as its
+// Google sign-in leaves the page and comes back to "/" (src/app/auth/callback/route.ts), so a group's invite link opened
+// while signed out is remembered for that round trip in this tab's sessionStorage, as its
 // path (M07 7b; M10 10b).
 const PENDING_INVITE = "plor.pendingInvite";
-const INVITE_PATH = /^\/[ig]\/(.+)$/;
+const INVITE_PATH = /^\/g\/(.+)$/;
 
 // What the frame shares with the page inside it: the profile, null until it loads (or when loading it failed, loadError).
 // requestsChanged: a friend request was answered on the page, so the Friends tab's count is read again (M17 17a, D6).
@@ -205,8 +202,7 @@ export function Frame({ children, lost = false }: { children: ReactNode; lost?: 
               }
             />
           </Suspense>
-          {/* The pages' one invite code, the signed-in player's (src/app/invite-link.tsx). */}
-          <InviteCodeProvider owner={player?.username ?? null}>{children}</InviteCodeProvider>
+          {children}
         </UndoProvider>
       </LoadingStatus>
     </FrameContext>
@@ -447,11 +443,6 @@ export function PlayerTab({ username }: { username: string }) {
   );
 }
 
-export function InviteTab({ code }: { code: string }) {
-  const { player } = usePlayer();
-  return <AcceptInvite code={code} username={player.username} />;
-}
-
 function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
   // An invite page's own path, remembered across a Google sign-in (PENDING_INVITE).
   const path = usePathname();
@@ -622,15 +613,13 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
       </section>
       <SideColumn label="Your circle" inPlace className={styles.side}>
         {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
-        {wide && <Board key={`board-${day}-${timeUps}`} username={username} invite />}
+        {wide && <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />}
         <LeaderboardCard key={`card-${day}`} />
       </SideColumn>
       <div className={styles.feed}>
         <LiveStatus channel={channel} />
         <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
       </div>
-      {/* Phones end with the invite card when the player has no friends, as mockup 3 draws Today (answer 13). */}
-      {!wide && <FriendsInviteCard />}
     </div>
   );
 }
@@ -679,9 +668,9 @@ function FriendsFeed({ username, name, timeUps }: { username: string; name: stri
   );
 }
 
-// Friends (M14 14a-1): the live board and the friends leaderboard, moved from the home page, then the friends list with
-// the invite link (human, 2026-10-25: "friends list should be in the friends tab"; "Below the boards (Recommended)";
-// docs/milestones/M14-14a-3b-settings.md), whose link is the board's here, so it shows once. With no game on the page,
+// Friends (M14 14a-1): the live board and the friends leaderboard, moved from the home page, then the friends list
+// (human, 2026-10-25: "friends list should be in the friends tab"; "Below the boards (Recommended)";
+// docs/milestones/M14-14a-3b-settings.md). With no game on the page,
 // the time to the reset comes from the run's state, and the boards start again at midnight Pacific (M11 H6).
 function Friends({ username, timeUps, onRequestsChanged }: { username: string; timeUps: number; onRequestsChanged: () => void }) {
   const [day, setDay] = useState(0);
@@ -710,7 +699,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   return (
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
-      <Board key={`${timeUps}-${changes}`} username={username} invite={false} />
+      <Board key={`${timeUps}-${changes}`} username={username} betterWithFriends />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
       <FriendsList
         onRequestsChanged={() => {
@@ -719,67 +708,5 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
         }}
       />
     </Fragment>
-  );
-}
-
-// What an invite link opens, once signed in with a username (M07 7b). The player's own link says so, with the link to
-// share, rather than offering to add themselves (human, 2026-10-26: "Say it's yours (Recommended)";
-// docs/milestones/M14-14b-2c-review-items.md, answer 8).
-function AcceptInvite({ code, username }: { code: string; username: string }) {
-  const [inviter, setInviter] = useState<Friend | null>(null);
-  const [added, setAdded] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    api<{ inviter: Friend }>(`/api/friends/preview?code=${encodeURIComponent(code)}`, { method: "GET" }).then(
-      (r) => setInviter(r.inviter),
-      (err) => setError(errorText(err)),
-    );
-  }, [code]);
-  const own = inviter?.username === username;
-  useBodyFlag("friend-invite", inviter !== null && !own);
-
-  async function addFriend() {
-    setBusy(true);
-    setError(null);
-    try {
-      await api("/api/friends/add", { method: "POST", body: { code } });
-      setAdded(true);
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (own) {
-    return (
-      <section aria-label="Invite">
-        <h2>This is your invite link</h2>
-        <p>Send it to a friend.</p>
-        <InviteLink canReset={false} />
-        <p>
-          <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
-        </p>
-      </section>
-    );
-  }
-  return (
-    <section aria-label="Invite">
-      {inviter && !added && (
-        <>
-          <h2>Add {inviter.name} as a friend?</h2>
-          <button type="button" disabled={busy} onClick={() => void addFriend()}>
-            Add friend
-          </button>
-        </>
-      )}
-      {inviter && added && <h2>You and {inviter.name} are now friends.</h2>}
-      {error && <p role="alert">{error}</p>}
-      <p>
-        <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
-      </p>
-    </section>
   );
 }

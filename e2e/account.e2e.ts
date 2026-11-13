@@ -1,10 +1,10 @@
 // The account (docs/milestones/M12-account.md, 12a; A1), in the settings sheet since M14 14a-3b
 // (docs/milestones/M14-14a-3b-settings.md): reached from the gear, it holds the username, display name, Sign out and
-// Delete account; Me shows the points. Opened signed out, a tab asks for sign-in first. The friends list and the invite
-// link with Reset are on the Friends tab; Today's board has the invite link too, without Reset (M12 12f, F1).
+// Delete account; Me shows the points. Opened signed out, a tab asks for sign-in first. The friends list is on the
+// Friends tab.
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
-import { RUN, signInAndPick, forwardPlayerIp, sharedLink } from "./players";
+import { RUN, signInAndPick, forwardPlayerIp, befriend } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -91,49 +91,40 @@ test("a player deletes their account from the settings sheet", async ({ browser 
   expect(rows).toHaveLength(0);
 });
 
-// A friend added from the invite link on the Friends tab, which holds the friends list with the link and its Reset
-// (M14 14a-3b, criterion 7), and removing them asks first (F3). Today's board, from 768px, has the link without Reset
-// (12f, F1).
-test("a player invites a friend from the Friends tab, and removing them asks first", async ({ browser }) => {
+// The Friends tab's friends list, where removing a friend asks first (F3). With no friends, the list points to Find a
+// player, nothing stands where the invite link was, and an old invite link's address is not found
+// (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
+test("nothing offers an invite link, an old one is not found, and removing a friend asks first", async ({ browser }) => {
   const inviter = await (await browser.newContext()).newPage();
   await inviter.goto("/friends");
   await signInAndPick(inviter, "iv");
   const board = inviter.getByRole("region", { name: "Friends today" });
   // With no friends, the board says L31's friendlier line (docs/milestones/M14-14a-3a-me.md, criterion 7).
   await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
-  // The link shows once on this tab: in the friends list, not on the board.
-  await expect(board.getByRole("region", { name: "Invite friends" })).toHaveCount(0);
+  await expect(inviter.getByRole("region", { name: "Find a player" })).toBeVisible();
   const friends = inviter.getByRole("region", { name: "Your friends" });
-  await expect(friends.getByText("No friends yet. Send someone your invite link.")).toBeVisible();
-  const invite = friends.getByRole("region", { name: "Invite friends" });
-  // One button shares the link, which is never shown (M14 14b-3, criterion 1); the link is made as soon as the button
-  // shows, so Reset sits beside it from the start (answer 8; docs/milestones/M14-14b-22-settings-and-invites.md,
-  // answer 1).
-  await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();
-  const link = await sharedLink(inviter, invite.getByRole("button", { name: "Invite a friend" }));
-  expect(link).toMatch(/^http:\/\/localhost:3000\/i\/[A-Za-z0-9_-]{10}$/);
-  await expect(invite.getByRole("button", { name: "Reset link" })).toBeVisible();
-  expect(await inviter.locator("body").innerText()).not.toContain("/i/");
-  // Today's board, from 768px, shares the same link and has no Reset that would break a link already sent (F1).
+  await expect(friends.getByText("No friends yet. Find a player by their username, above.")).toBeVisible();
+  // Nothing on the tab offers an invite link any more.
+  await expect(inviter.getByRole("button", { name: /Invite|Reset link/ })).toHaveCount(0);
+  // Today's board, from 768px, has nothing where the Invite button was.
   const wide = await (await inviter.context().browser()!.newContext({ viewport: { width: 1440, height: 900 }, storageState: await inviter.context().storageState() })).newPage();
   await wide.goto("/");
-  const todayInvite = wide.getByRole("region", { name: "Friends today" }).getByRole("region", { name: "Invite friends" });
-  expect(await sharedLink(wide, todayInvite.getByRole("button", { name: "Invite a friend" }))).toBe(link);
-  await expect(wide.getByRole("button", { name: "Reset link" })).toHaveCount(0);
-  // A code of the old 22-character size is refused like any unknown one, and the old /invite/ address is gone
-  // (M14 14b-3, criteria 4 and 5).
-  await wide.goto("/i/abcdefghijklmnopqrst-_");
-  await expect(wide.getByText("That invite link doesn't work. Ask your friend for their current link.")).toBeVisible();
-  expect((await wide.goto(`/invite/${new URL(link).pathname.slice(3)}`))!.status()).toBe(404);
+  await expect(wide.getByRole("region", { name: "Friends today" }).getByRole("heading", { name: "Friends today" })).toBeVisible();
+  await expect(wide.getByRole("region", { name: "Leaderboard" })).toBeVisible();
+  await expect(wide.getByRole("main").getByRole("button", { name: /Invite|Reset link/ })).toHaveCount(0);
+  await expect(wide.getByRole("main").getByRole("link", { name: "Find a player" })).toHaveCount(0);
+  // A friend invite link's address answers 404, whatever its code (the criterion "Invite links removed"), as the older
+  // /invite/ address does (M14 14b-3, criterion 5).
+  expect((await wide.goto("/i/abcdefgh-_"))!.status()).toBe(404);
+  expect((await wide.goto("/invite/abcdefgh-_"))!.status()).toBe(404);
   await wide.context().close();
 
   const friend = await (await browser.newContext()).newPage();
-  await friend.goto(new URL(link).pathname);
+  await friend.goto("/friends");
   await signInAndPick(friend, "if");
-  await friend.getByRole("button", { name: "Add friend" }).click();
-  await expect(friend.getByRole("heading", { name: `You and iv${RUN} are now friends.` })).toBeVisible();
+  await befriend(friend, "if", inviter, "iv");
 
-  await inviter.reload();
+  await inviter.goto("/friends");
   const row = friends.getByRole("listitem").filter({ hasText: `if${RUN}` });
   await expect(row).toBeVisible();
   // The moved list carries the avatar slots (L37).
@@ -145,10 +136,10 @@ test("a player invites a friend from the Friends tab, and removing them asks fir
     void dialog.dismiss();
   });
   await row.getByRole("button", { name: "Remove" }).click();
-  expect(asked).toContain(`Remove if${RUN} as a friend?`);
+  expect(asked).toBe(`Remove if${RUN} as a friend? To be friends again, one of you sends a friend request.`);
   await inviter.reload();
   await expect(row).toBeVisible();
   inviter.once("dialog", (d) => void d.accept());
   await row.getByRole("button", { name: "Remove" }).click();
-  await expect(friends.getByText("No friends yet. Send someone your invite link.")).toBeVisible();
+  await expect(friends.getByText("No friends yet. Find a player by their username, above.")).toBeVisible();
 });
