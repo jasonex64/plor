@@ -676,6 +676,9 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   // the next reset still fires (14b-2c-1, item 5).
   const [reset, setReset] = useState<{ ms: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Counts the changes made in the friends list (a request answered, a friend removed or blocked): the board starts
+  // again at each, so a blocked player leaves it at once (docs/milestones/M17-profiles-and-friend-requests.md, 17a, D5).
+  const [changes, setChanges] = useState(0);
   useEffect(() => {
     api<{ run: { msToReset: number } } | { run: null; msToReset: number }>("/api/run", { method: "GET" }).then(
       (r) => setReset({ ms: r.run ? r.run.msToReset : r.msToReset }),
@@ -694,9 +697,14 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   return (
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
-      <Board key={timeUps} username={username} invite={false} />
+      <Board key={`${timeUps}-${changes}`} username={username} invite={false} />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
-      <FriendsList onRequestsChanged={onRequestsChanged} />
+      <FriendsList
+        onRequestsChanged={() => {
+          setChanges((n) => n + 1);
+          onRequestsChanged();
+        }}
+      />
     </Fragment>
   );
 }

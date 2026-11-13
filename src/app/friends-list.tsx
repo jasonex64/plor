@@ -22,7 +22,8 @@ type Lists = { friends: Friend[]; requests: Friend[]; sent: Friend[] };
 const blockQuestion = (name: string) =>
   `Block ${name}? You won't be friends, and you won't see each other's comments or reactions. They won't be told. You can unblock them in Settings.`;
 
-// onRequestsChanged: a request was answered here, so the Friends tab's count is read again (src/app/home.tsx).
+// onRequestsChanged: a change was made here, so the Friends tab's count and the live board are read again
+// (src/app/home.tsx).
 export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => void }) {
   const [lists, setLists] = useState<Lists | null>(null);
   const [busy, setBusy] = useState(false);

@@ -60,13 +60,17 @@ test("a request shows on the Friends tab and its page, is accepted, and a block 
   await expect(friends(page).getByRole("listitem")).toContainText([B]);
   await expect(requests(page)).toHaveCount(0);
 
-  // A blocks B from the friends list, after the question: the friendship ends for both.
+  // A blocks B from the friends list, after the question: the friendship ends for both, and B leaves A's live board at
+  // once, with no reload (D5).
+  const board = page.getByRole("region", { name: "Friends today" });
+  await expect(board).toContainText(B);
   page.once("dialog", (dialog) => {
     expect(dialog.message()).toContain(`Block ${B}?`);
     void dialog.accept();
   });
   await friends(page).getByRole("button", { name: "Block" }).click();
   await expect(friends(page).getByText("No friends yet.")).toBeVisible();
+  await expect(board).not.toContainText(B);
   await other.reload();
   await expect(friends(other).getByText("No friends yet.")).toBeVisible();
 
