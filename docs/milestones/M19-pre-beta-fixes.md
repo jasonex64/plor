@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** planned (drafted 2026-11-13; **not approved to build**: it waits for the human's word on this ticket).
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a is in review (its PR); 19b to 19f are not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -34,9 +34,9 @@ Close the player-facing bugs already recorded in ROADMAP's "Next revision" and t
 One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they share files). Every merge publishes to plor.app; none but 19d can need a hosted `db push`.
 
 **19a — three one-file fixes.**
-- [ ] `src/lib/api-client.ts:24` looks at the status before reading the reply as JSON (audit W8) → verify: a unit test giving it an HTML 502 gets the app's error, not a `SyntaxError`.
-- [ ] `/api/answers?index=` refuses an index outside the day's questions with a 400 (audit W9; `src/app/api/answers/route.ts:18-19`) → verify: a route test with an index past the integer range gets 400.
-- [ ] `POST /api/account/delete` answers ok when the deletion committed and `signOut` then failed; the failure is logged and counted (answer 6; `src/app/api/account/delete/route.ts:16-17`) → verify: a test with a failing `signOut` gets ok and one counted log line.
+- [x] `src/lib/api-client.ts:24` looks at the status before reading the reply as JSON (audit W8) → verify: a unit test giving it an HTML 502 gets the app's error, not a `SyntaxError`.
+- [x] `/api/answers?index=` refuses an index outside the day's questions with a 400 (audit W9; `src/app/api/answers/route.ts:18-19`) → verify: a route test with an index past the integer range gets 400.
+- [x] `POST /api/account/delete` answers ok when the deletion committed and `signOut` then failed; the failure is logged and counted (answer 6; `src/app/api/account/delete/route.ts:16-17`) → verify: a test with a failing `signOut` gets ok and one counted log line.
 
 **19b — clear replies for rare clashes** (ROADMAP: "Concurrent or malformed requests that get a 500 instead of a 4xx").
 - [ ] Each of these answers a 4xx, with a test that fails first: Next from a second tab (`openNext`, OB002; both games); two tabs replacing one reaction (the unique index); a report racing its comment's deletion (23503); a group join racing the group's deletion (23503); a comment holding a NUL character (22021).
@@ -64,7 +64,7 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 ## Numbers
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
-| The highest answer index | 19a's 400 | The day's own question count, read from the puzzle; no constant |
+| The highest answer index | 19a's 400 | `QUESTIONS_PER_DAY` (`src/config/tunables.ts:4`), the constant the puzzle check already enforces for every day (`src/content/puzzle.ts:180`); no new number, and no read of the puzzle |
 | How long a guest's finished result is kept | 19d | **Blank: stop and ask** (19d's proposal) |
 | The 4xx status of each 19b case | 19b | The status each file's error map already gives its nearest case; a case with none is asked |
 
@@ -80,9 +80,15 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 19a, as drafted: the index bound is "read from the puzzle; no constant" | The route compares with `QUESTIONS_PER_DAY` | Every approved day has exactly that many questions, and the route serves game 1 only; a read would add a query for the same number |
+| CLAUDE.md, Fail loudly: recovery is "logged and counted" | The failed sign-out is one `log.error` line, "account deleted, sign-out failed" | The project counts by log lines (DECISIONS.md, the Turnstile entry); there is no other counter |
 
 ## Evidence
+**19a** (2026-11-13, commit `9dbde61`).
+- Each test failed first: the api client, "expected SyntaxError: Unexpected token '<' … to be an instance of ApiError"; the delete route, "expected { status: 500, …(1) } to deeply equal { status: 200, body: { ok: true } }"; the answers route, "expected 500 to be 400" for index 99999999999 (index 7 alone answered 403 before, 400 now).
+- After: `npx vitest run src/lib/api-client.test.ts src/app/api/account/delete/route.test.ts`: "Tests  3 passed (3)". `npm run test:db -- -t "refuses a player whose run is still going"`: "Tests  1 passed". `npm run test:db -- src/app/api/account/delete -t "POST /api/account/delete"`: "Tests  4 passed". `npm test`: "Test Files  66 passed (66)", "Tests  749 passed (749)". `npx tsc --noEmit -p .`: exit 0.
+- **Not run:** the full `npm run test:db` and the e2e (CI's run is the evidence); nobody has seen the three messages in a browser.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: 19a: none (the `reviewer`, 2026-11-13, one pass).
+- Deferred to ROADMAP "Next revision": 19a: two missing boundary tests (For M19).
