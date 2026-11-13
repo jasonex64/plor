@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design ("17b design", below; seven decisions, E1 to E7, two of them security) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 31) and is being built.** 17c is not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design ("17b design", below; seven decisions, E1 to E7, two of them security) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 31; one by one, answer 32). **17b, search, profiles, the held name and the lookup limit, is built (2026-11-13) and in review, not merged** (Evidence, 17b; merging it before the hosted database has its migration would break sending a friend request on plor.app). 17c is not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -260,6 +260,13 @@ Search, the profile page, the 30-day hold and the lookup limit (Plan 2). This ma
 7. The screens → verify: `npm test`, and an e2e that finds a player, sends a request from the profile, is accepted and sees the friend's view (`npm run test:e2e -- profile`), failing before.
 8. Whole → verify: `npm test`, `npm run test:db`, `npx supabase test db`, `npx next typegen` then `npx tsc --noEmit -p .`, `npm run lint`, `npm run routes`.
 
+**The manual, read (Plan step 1, 2026-11-13).** Fetched and quoted by a Haiku subagent, whose tool extracts quotes with a small model, so the wording is *not re-read by Claude*; no fact contradicted the design.
+- A name's lock lasts to the end of the transaction, and a second taker waits: PostgreSQL 17, 13.3.5 Advisory Locks: transaction-level requests "are automatically released at the end of the transaction, and there is no explicit unlock operation"; PostgreSQL 17, 9.28.10 Advisory Lock Functions, `pg_advisory_xact_lock`: "Obtains an exclusive transaction-level advisory lock, waiting if necessary."
+- The hold's trigger fires after the 30-day rule's: PostgreSQL 17, 37.1 Overview of Trigger Behavior: "If more than one trigger is defined for the same event on the same relation, the triggers will be fired in alphabetical order by trigger name."
+- A sign-up that waited for a rename then sees its hold: PostgreSQL 17, 36.7 Function Volatility Categories: "VOLATILE functions obtain a fresh snapshot at the start of each query they execute."
+- The trigger writes the table the app's role can't: PostgreSQL 17, CREATE FUNCTION: "SECURITY DEFINER specifies that the function is to be executed with the privileges of the user that owns it."
+- **Not in the manual, and not relied on:** whether a BEFORE INSERT trigger fires before the unique index is checked; the name's lock makes the order not matter.
+
 **Decisions for the human** (the design above follows each recommendation; none is settled until answered):
 1. **[E1] Search and the profile: one door or two.** (a) *Recommended:* one route; searching a name is opening its profile. Fewer places that tell whether a name exists, one count per lookup, and less to build. An old held name then finds the renamed player through the search box too, where the ticket's reading had search find nobody. (b) Two routes: a search that matches current names only, and a profile address that also follows held names; a search and the profile it leads to each count against the 60.
 2. **[E2] What counts against the 60 an hour.** (a) *Recommended:* each profile lookup of a name that isn't your own or a friend's, and each request sent (D1). Looking at friends' profiles is free. (b) Every lookup, friends' included: simpler, and a player who opens friends' profiles 60 times in an hour is stopped. (c) Searches only: a profile address typed by hand is then an unlimited way to list names; rejected.
@@ -287,27 +294,27 @@ Also: "your invite link" leaves the "Your friends" line when friend invite links
 
 ## Acceptance criteria
 Each is a check that can fail. "Route test" is a `route.db.test.ts` run the way DECISIONS.md says; "pgTAP" is `supabase test db`. File names are set when built.
-- [ ] **Search.** Route test: an exact username returns that player; a prefix, a display name, an empty string and a missing name each return nobody; with no session the route answers 401.
-- [ ] **Blocked search finds nobody (24).** Route test: after A blocks B, B's search for A's exact username returns the same status and body as a search for a username nobody has; A's search for B still finds B.
-- [ ] **Search limit (15).** Route test: as one player, searches 1 to 60 inside an hour succeed (found or not) and the 61st answers 429 `too_many_attempts`; a second player's first search still succeeds; the refusal is logged with its kind and no username or email in the line.
-- [ ] **Stranger's view (1, 4, 11).** Route test: the profile response for a non-friend holds the all-games summary and a card for each game and no calendar, rarest answers or recent results, checked on the JSON, not the screen; a signed-out request answers 401.
-- [ ] **Friend's view and spoilers (1, 2, 25).** Route test: with two games played, a friend's response holds the all-games summary and, for each game, a card with its calendar, rarest answers and recent results, as the Me page does; for a day the viewer has not played, no rarest answer or recent result of that day appears in it.
+- [x] **Search.** Route test: an exact username returns that player; a prefix, a display name, an empty string and a missing name each return nobody; with no session the route answers 401.
+- [x] **Blocked search finds nobody (24).** Route test: after A blocks B, B's search for A's exact username returns the same status and body as a search for a username nobody has; A's search for B still finds B.
+- [x] **Search limit (15).** Route test: as one player, searches 1 to 60 inside an hour succeed (found or not) and the 61st answers 429 `too_many_attempts`; a second player's first search still succeeds; the refusal is logged with its kind and no username or email in the line.
+- [x] **Stranger's view (1, 4, 11).** Route test: the profile response for a non-friend holds the all-games summary and a card for each game and no calendar, rarest answers or recent results, checked on the JSON, not the screen; a signed-out request answers 401.
+- [x] **Friend's view and spoilers (1, 2, 25).** Route test: with two games played, a friend's response holds the all-games summary and, for each game, a card with its calendar, rarest answers and recent results, as the Me page does; for a day the viewer has not played, no rarest answer or recent result of that day appears in it.
 - [x] **Requests (5).** Route test: send creates a pending request; the receiver's list shows it; accept makes both friends; decline removes it and no friendship exists; a request to oneself is refused.
 - [x] **Sent list and cancel (23).** Route test: after A sends to B, A's sent list holds the request; A cancels it and both A's sent list and B's list are empty; after B declines instead, A's sent list no longer holds it and shows no "declined" state.
 - [x] **Mutual requests (23, 29).** Route test: A sends to B, then B sends to A: A and B are friends, no pending request remains in either list, and neither send is refused. With A having blocked B (or B having blocked A) the same two sends make no friendship, whichever order they come in.
 - [x] **Blocker can't send (29).** Route test: after A blocks B, A's send to B is refused and no request exists; A unblocks B, and the same send now succeeds and B's list shows it. A request B sent to A before the block is not in A's list or A's Friends count after the block, and stays pending in B's sent list.
 - [x] **Re-request after decline (17).** Route test: decline, then send again straight away, succeeds; repeated three times in a row, still succeeds. After a block, the same send does not put a request in the blocker's list.
-- [ ] *(17a's part done, Evidence: 25 sends succeed; "the only refusal reachable is the search limit" is 17b's.)* **No cap on pending (16).** Route test: one player sends a request to each of 25 different players (25 is the test's size, not a limit); every send succeeds, and the only refusal reachable is the search limit.
+- [x] **No cap on pending (16).** Route test: one player sends a request to each of 25 different players (25 is the test's size, not a limit); every send succeeds, and the only refusal reachable is the search limit.
 - [x] **Count on the Friends tab (14).** Route test: with 3 requests waiting the Friends page data shows 3, after one is declined 2; a request from a player the viewer has blocked is not counted; no Realtime message is sent when a request arrives (the viewer's board topic is compared before and after).
-- [ ] *(17a's part done, Evidence: requests, comments, reactions, the feed and the group board; the profile part is 17b's.)* **Block's reach (5, 12).** Route test and pgTAP: after A blocks B, B's request does not reach A; B opening A's profile gets the same status and body as a username nobody has; A's comments and reactions are absent from B's comment, reaction and feed responses, and B's from A's; on a shared group's leaderboard both players' results are still present.
+- [x] **Block's reach (5, 12).** Route test and pgTAP: after A blocks B, B's request does not reach A; B opening A's profile gets the same status and body as a username nobody has; A's comments and reactions are absent from B's comment, reaction and feed responses, and B's from A's; on a shared group's leaderboard both players' results are still present.
 - [x] **Block ends the friendship (20).** Route test: A and B are friends and appear in each other's feed and on a shared live board; A blocks B; each is absent from the other's friends, feed and live board data, read before and after.
-- [ ] *(17a's part done, Evidence: the blocked list, Unblock, a new request reaching the unblocker; the profile and search parts are 17b's.)* **Unblock (21).** Route test: A's blocked list holds B; A unblocks B; the list is empty, B's profile opens for B as a stranger's (not a friend's), B's search finds A, and a new request from B reaches A.
+- [x] **Unblock (21).** Route test: A's blocked list holds B; A unblocks B; the list is empty, B's profile opens for B as a stranger's (not a friend's), B's search finds A, and a new request from B reaches A.
 - [x] **Block is silent (13, 28).** Route test: B's response to sending a request, and B's list of their own requests, are the same as when A simply hasn't answered; no B-facing response names the block. B's request stays in B's sent list as pending, still there after the test clock is advanced past the 30-day hold, so nothing expires it (23, 28).
-- [ ] **Rename hold (10).** Route test with the clock set: after A renames from `old` to `new`, the address for `old` opens A's profile under the viewing rules; another player renaming or signing up as `old` is refused at day 29 and succeeds at day 30; A renaming back to `old` inside the 30 days is refused (22); a search for `old` finds nobody.
-- [ ] **Old link and blocks (10, 13).** Route test: B, blocked by A, opens A's old address and gets the same response as a username nobody has.
-- [ ] *(17a's part done, Evidence: the two tables' grants, policies, triggers and `private.unblock`, and no Data API role holding anything on them; held names and the search counter are 17b's.)* **Security (proposals above, once approved).** pgTAP: `plor_app` has on each new table only the grants the approved proposal lists; a direct read of another player's requests or blocks returns no rows.
+- [x] **Rename hold (10).** Route test with the clock set: after A renames from `old` to `new`, the address for `old` opens A's profile under the viewing rules; another player renaming or signing up as `old` is refused at day 29 and succeeds at day 30; A renaming back to `old` inside the 30 days is refused (22); a search for `old` finds nobody.
+- [x] **Old link and blocks (10, 13).** Route test: B, blocked by A, opens A's old address and gets the same response as a username nobody has.
+- [x] **Security (proposals above, once approved).** pgTAP: `plor_app` has on each new table only the grants the approved proposal lists; a direct read of another player's requests or blocks returns no rows.
 - [ ] **Invite links removed (6).** `GET /i/<any code>` answers 404; a search of the repo for `friend_invite` finds only the migration that drops it; group invite links pass their existing route tests.
-- [ ] *(17a's part done, Evidence: requests and blocks go with the account; held names are 17b's.)* **Account deletion (27).** pgTAP: A renames from `old` to `new` and then `private.delete_account` runs for A inside the 30 days; no row of A remains in requests, blocks or held names; right after, another player renames or signs up as `old` and it succeeds, with no wait.
+- [x] **Account deletion (27).** pgTAP: A renames from `old` to `new` and then `private.delete_account` runs for A inside the 30 days; no row of A remains in requests, blocks or held names; right after, another player renames or signs up as `old` and it succeeds, with no wait.
 
 ## Out of scope
 - Search by display name or partial name (answer 3).
@@ -352,6 +359,30 @@ Friend invite links (answer 6), to be confirmed by a fresh search in 17c: `/i/[c
 | D7: the screens are named (the lists, Accept, Decline, Decline and block, Cancel, Block, the count, the blocked list with Unblock); no words or looks given | The words are Claude's, listed under "Words on the 17a screens"; the count is the tab's own text, "Friends (2)", not a badge; Remove now reads the lists again after a refusal too | No answer gives a badge's look or the wording, so nothing new was drawn and the words wait for the human's eye; Remove shares the list's one change function |
 | Error codes for send (`request_own`, `already_friends`, `unblock_first`) | They have no message in `src/app/messages.ts` yet | No 17a screen can meet them: sending has no screen until 17b (CLAUDE.md, "Build for today") |
 | Protocol "stays at 6" | It stays at 7 | It was 7 already (M16 16e-2); fields were added, none changed |
+
+### 17b (the source is "17b design", above, approved by answers 31 and 32)
+| Source says | We built | Why different |
+|---|---|---|
+| The ticket's reading "an old name held after a rename finds nobody", and the Rename hold criterion's "a search for `old` finds nobody" | The old name opens the renamed player's profile, from the search box too | E1 (a), chosen by the human with that side effect stated: search and the address are one route |
+| "Friend's view and spoilers": "with two games played ... for each game, a card" | Game 1's card only | E4 (a): the profile shows what Me shows, and Me has no game 2 card until 16f |
+| The same criterion: "for a day the viewer has not played, no rarest answer or recent result of that day appears" | No test of its own. Rarest answers come from closed days only, by the Me page's read (`src/game/me.ts`, tested in `src/app/api/me/route.db.test.ts`), and "recent" holds counts, not answers; the route test compares a friend's profile with that friend's own Me | Plan step 2: a run is only ever started for today (`src/game/runs.ts:197`, the insert pins `private.today()`), so a closed day can't be played and its answers spoil nothing |
+| The friend's view is `since`, `month`, `rarest`, `recent`; "the viewer's own name gets the friend's view" | As written; the test players have no runs, so the views are compared field by field with `/api/me`, all zeros and empty lists | Building days of play is the Me test's job; the same function reads both |
+| `private.hold_username()` "(2) deletes held rows whose `held_until` has passed" | As written; two renames at the same instant could each delete the same expired rows | Found by the review; an instant wide and harmless (the rows are gone either way), in ROADMAP's Next revision |
+| Step 3: `npx supabase test db` "fails on exactly those four" files, and step 4: "every other file's count unchanged" | Before the migration exactly those four failed. After it `profile.test.sql` failed 4 of 35: its test 27 asserted M12 A2's "the old username is free for anyone at once" | The approved design replaces that rule (answer 10), so the test now expects OB017 and signs its player up under another name; `src/app/api/profile/username/route.db.test.ts` had the same assertion and changed the same way. The hypothesis "nothing else changes" was wrong once |
+| Plan step 5 names the route test's filter `-t "players\|lookup"` | `-t "^players "` | "players" alone also matches single tests in other files and runs them without their set-up |
+| Step 6: the race is "never both held and taken" | Also asserts the sign-up is always refused and the rename always succeeds | Both orders end that way: before the rename the name is the renamer's, after it it is held. The race was not seen failing with the lock taken out |
+| "`takeAttempt`'s log text ... becomes \"attempt refused\"" | Done; `src/app/api/auth/email/route.db.test.ts` expects the new text | The test pinned the old words |
+| Route handlers are `handle(fn)` | The players route wraps `handle` in a function that also takes Next's `params` | `handle` passes one argument; changing it would touch every route |
+| Screens: "drawn by the Me page's own components (`src/app/me.tsx`, split so both use them)" | `StatsCards` in `me.tsx` draws both; the 7-day chart moved to `src/app/survived-chart.tsx` | The chart lived in the game screen's file, which a profile shouldn't load |
+| "Friends' names on the Friends list link to their profile" | A "Profile" button link on each friend's row | No control on the site is a text link (M14 14b-2b-1) |
+| Screens: no words given | Claude's, listed below | For the human's eye, as 17a's |
+| The lookup limit's refusal is 429 `too_many_attempts` | The profile page says it in its own words; `src/app/messages.ts` still reads "Too many sign-in attempts..." for that code | The shared text is the sign-in form's; in ROADMAP's Next revision |
+
+### Words on the 17b screens (Claude's, for the human to change)
+- Friends page: the card "Find a player"; the field "Their exact username"; the button "Find"; on a friend's row, "Profile" (read "<name>'s profile").
+- The profile: "‹ Friends"; the card "You and this player"; "Add friend"; "Friend request sent." and "Cancel request"; "<name> sent you a friend request." with "Accept", "Decline", "Decline and block"; "You're friends." with "Remove" and "Block"; "You've blocked this player." and "Unblock"; "This is you." and "Your Me page"; the heading "Rarest answers".
+- The questions: "Remove <name> as a friend?"; the block's is 17a's.
+- Messages: "There's no player with that username." (17a's, now also for a profile nobody has); "You've looked up a lot of players. Wait a while and try again."
 
 ### Words on the 17a screens (Claude's, for the human to change)
 - Friends page: the card "Friend requests"; its chip's hidden words "waiting for your answer"; buttons "Accept", "Decline", "Decline and block"; the heading "Sent, waiting for an answer"; "Cancel"; on a friend, "Block".
@@ -433,7 +464,77 @@ Its first run failed both tests on the tab's spoken name ("Friends , 1 friend re
 
 **Removes:** nothing. 17a adds; the friend invite links go in 17c.
 
+### 17b (2026-11-13, local stack only; nothing touched the hosted database or plor.app)
+Each line is a command run in `C:/Users/jason/RIFF-m17` and what it printed.
+
+**Plan step 1, the manual.** The five facts under "The manual, read (Plan step 1, 2026-11-13)"; none contradicted the design.
+
+**Plan step 2, a closed day can't be played.** `grep -n "private.today()" src/game/runs.ts` → line 197, `insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, private.today())`: the route takes no date. The hypothesis held.
+
+**Plan step 3, the SQL tests first.** Before the migration, `npx supabase test db`:
+```
+/Users/jason/RIFF-m17/supabase/tests/account_deletion.test.sql (Wstat: 768 (exited 3) Tests: 0 Failed: 0)
+  Parse errors: Bad plan.  You planned 23 tests but ran 0.
+/Users/jason/RIFF-m17/supabase/tests/auth_attempt.test.sql    (Wstat: 768 (exited 3) Tests: 6 Failed: 0)
+  Parse errors: Bad plan.  You planned 16 tests but ran 6.
+/Users/jason/RIFF-m17/supabase/tests/held_username.test.sql   (Wstat: 768 (exited 3) Tests: 0 Failed: 0)
+  Parse errors: Bad plan.  You planned 21 tests but ran 0.
+/Users/jason/RIFF-m17/supabase/tests/plor_app_role.test.sql   (Wstat: 0 Tests: 15 Failed: 1)
+Files=39, Tests=754, 18 wallclock secs
+Result: FAIL
+```
+Exactly the four files named.
+
+**Plan step 4, the migration.** `npx supabase migration up` → `"applied":[...20261113045051_held_username_and_lookup_limit.sql"],"message":"Migrations applied"`. Then `npx supabase test db`:
+```
+/Users/jason/RIFF-m17/supabase/tests/profile.test.sql         (Wstat: 0 Tests: 35 Failed: 4)
+  Failed tests:  27, 31-32, 35
+# Failed test 27: "the old username is free for anyone at once"
+#     died: OB017: username is held
+Files=39, Tests=808
+Result: FAIL
+```
+The replaced rule's own test (Source diff); 31, 32 and 35 failed only because 27's player was never made. With that test changed: `Files=39, Tests=808`, `Result: PASS`. 808 is 17a's 785 plus the new file's 21, one more in `auth_attempt.test.sql` and one more in `account_deletion.test.sql`. This is **Security**'s 17b part (`held_username.test.sql`: `plor_app` reads held names and holds no other privilege, RLS with one select policy, `hold_username` definer with an empty `search_path` and no role's execute; `plor_app_role.test.sql`'s exact list; `auth_attempt.test.sql`: `lookup` is a kind it counts and `plor_app` still can't touch the table), **Rename hold**'s database part (held for the renamer until 30 days on; another player, a new one in any case, and the renamer refused with OB017; refused with a day left, taken once the hold has ended; a second change still OB011) and **Account deletion** (27) (`account_deletion.test.sql`: 19 rows before, the held name among them, 0 after, and another player takes the name right away).
+
+**Plan step 5, the route and the limit.** With the route built and OB017 not yet mapped, `npm run test:db -- -t "players"` failed the two hold tests with `"status": 500` where 409 `username_taken` was expected; with the mapping in `src/lib/profile.ts` they pass. `npm run test:db -- -t "^changing a username"` then failed "frees the old username for anyone at once" (the replaced rule; Source diff) and passes as "holds the old username from another player".
+
+Which test proves which criterion (`src/app/api/players/[username]/route.db.test.ts` unless named):
+- **Search:** "finds a player by their exact username only, and nobody when signed out or without a username (3)": the exact name is found; a name one letter short, the display name, the name in capitals, a space and a name nobody has are each 404 `player_not_found`; signed out 401; no username 409.
+- **Blocked search finds nobody (24):** "finds nobody for a player the other has blocked, the same answer as a name nobody has (13, 24)": the two responses are compared whole, and the blocker still finds the blocked player.
+- **Search limit (15) and No cap on pending (16):** "allows 60 lookups and requests in an hour and refuses the next, each player on their own count (15, 16, D1)": one found lookup, one request and 58 lookups of nobody pass; then a found name, a name nobody has and a request are each 429 `too_many_attempts`; the log line has `kind: "lookup"` and 8 characters of the hash, and no username, email or user ID; the player's own profile still opens and another player's lookup works. "counts a lookup against the viewer, found or not, but not their own name or a friend's (15, E2)". "counts again once an attempt is an hour old".
+- **Stranger's view (1, 4, 11):** "shows a stranger the name, the totals and the game's card, and nothing else": the whole JSON equals `{username, name, relation, totals, offbeat}`.
+- **Friend's view (1, 2, 25):** "shows a friend, and the player themself, what the Me page shows, with the last days' chart": equal to the player's own `/api/me` fields, with 7 recent days ending today. Spoilers: Source diff.
+- **Block's reach, the profile part:** the blocked-search test above (the profile is the search).
+- **Unblock (21), the profile and search parts:** "after an unblock, opens again as a stranger's profile (21)".
+- **Rename hold (10):** "keeps a renamed player's old name opening their profile, under the same viewing rules (10)" (a friend's view for a friend, a stranger's for a stranger); "holds the old name from everyone for 30 days: a rename, a sign-up, and the player who gave it up (10, 22)"; "refuses the name on day 29 and frees it on day 30", after which the name opens its new owner's profile.
+- **Old link and blocks (10, 13):** "gives a blocked player the same nothing at the old name (10, 13)".
+- **As `plor_app`** (`src/lib/profile.plor-app.db.test.ts`): "holds a renamed player's name as plor_app, which can read held names and not write them" (an insert, a delete and an update of `private.held_username` each refused with 42501; `getPlayer` follows the old name with the role's own grants, its lookup counted through `take_auth_attempt`).
+
+**Plan step 6, the race.** "a sign-up racing a rename never gets the name being given up, 10 rounds", as `plor_app`: in every round the rename succeeded, the sign-up was refused `username_taken`, the name was held for the renamer and no profile had it. `npm run test:db -- -t "held names and not write|racing a rename"` → `Tests  2 passed`.
+
+**Plan step 7, the screens.** `npm run test:e2e -- profile` (port 3000 free before; `.next/dev` deleted first):
+```
+  ok 1 [chromium] › e2e\profile.e2e.ts:27:1 › a player is found by username, sent a request from their profile, and shows more once a friend (17.2s)
+  1 passed (23.6s)
+```
+Its first two runs failed on the test's own locator for the "no player" line (two elements have the alert role), not on the screens. It was not seen failing before the screens existed. The run before it, `npm run test:e2e -- profile friend-requests`, passed 17a's two tests with the new Friends page. **Not run locally:** the rest of the e2e suite (HANDOFF: unreliable on this PC); CI's run on the PR is the evidence. **Nobody has looked at the screens.**
+
+**Plan step 8, the whole.**
+- `npm run test:db` → `Test Files  59 passed (59)`, `Tests  430 passed (430)`, `Duration  219.73s`.
+- `npm test` → `Test Files  64 passed (64)`, `Tests  752 passed (752)` (with `src/app/api/guest-cookie.test.ts`, which now calls `GET /api/players/[username]` with a guest cookie and gets 401, and `e2e/players.test.ts`).
+- `npx next typegen` then `npx tsc --noEmit -p .` → no output. `npm run lint` → no problems.
+- `npm run routes | grep players` → `GET /api/players/[username] src\app\api\players\[username]\route.ts`.
+
+**Removes:** M12 A2's "the old username is free for anyone at once", with its two tests' assertions; the log text "sign-in attempt refused". Nothing else: 17b adds.
+
 ## Review
+### 17b (the `reviewer` agent, Sonnet, a fresh context, 2026-11-13; it read the diff and ran `npm test`, `tsc`, lint and `npm run routes`, and was told not to touch the shared database, so the database and e2e runs are the author's)
+- Blocking findings and how each was fixed:
+  - **`docs/DESIGN.md` had none of the new screens** (CLAUDE.md: a PR that changes what it describes updates it). Fixed: Find a player, the profile page and its action row are described there, and the line numbers this change shifted are corrected.
+- Not blocking, and found sound: a name nobody has and a player who blocked the viewer taking one path (the same query, the same count, the same 404 before any stats are read); a stranger's view built from five fields only; a 429 being the same for a found name, a missing one and a request; the limit holding for sends and not bypassed by case or held names; the trigger's lock order, its citext comparison under an empty `search_path`, and its order after the 30-day rule's; the two replaced tests changed to a stricter assertion, not weakened; the Me page's markup and count-up names unchanged, by reading; every number from the ticket; no orphans.
+- Deferred to ROADMAP "Next revision" (For M17): the shared `too_many_attempts` text speaking of sign-in; two renames at one instant deleting the same expired held rows; the race test covering a sign-up but not two renames for one freed name.
+- Unverified by the reviewer: the database, pgTAP and e2e runs (the author's, in Evidence); the Me page being unchanged, read not rendered (its e2e runs on CI).
+
 ### 17a (the `reviewer` agent, Sonnet, a fresh context, 2026-11-12; it read the diff and ran `npm test`, `tsc`, lint and `npm run routes`, and was told not to touch the shared database, so the database and e2e runs are the author's)
 - Blocking findings and how each was fixed:
   - **A blocked or removed friend stayed on the blocker's open live board** until the page next loaded, where D5 (a) says "the blocker's page reloads its board after the block"; the e2e didn't look at the board. Fixed: the Friends tab's board starts again after any change in the friends list (`src/app/home.tsx`, `changes`). The e2e now checks the board: with the fix taken out it failed (`Expected substring: not "frb…"`, `Received string: "Friends today frb…: hasn't played yet"`), and with it `2 passed`.
