@@ -1,6 +1,6 @@
 # M17 — Player profiles and friend requests
 
-**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design is proposed ("17b design", below) and waits for the human: seven decisions, E1 to E7, two of them security; nothing of 17b is built** (human, 2026-11-12: "do 17b"). 17c is not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
+**Status:** approved to build, with its privacy text and its proposed security changes (human, 2026-11-11: "Approve M17", asked "Approve the M17 ticket and its privacy text to build?"); 17a's exact security design ("17a design" below: tables, grants, policies, and seven decisions D1 to D7) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 30); **17a, friend requests and blocking, is done: PR #193 merged 2026-11-12 on green checks, after the human's hosted `db push`** (their words, relayed by the planning session: "it is pushed"; *not checked by Claude*). **17b's exact design ("17b design", below; seven decisions, E1 to E7, two of them security) is approved as proposed (human, 2026-11-12: "Yes, build as proposed", answer 31) and is being built.** 17c is not started. Its design round ran 2026-11-05 and 2026-11-11 (answers 1 to 29). It ships before the closed beta and after M16's game 2 ("Profiles after Game 2", "Before the beta (Recommended)").
 
 ## Goal
 A signed-in player can find another player by their exact username, open their profile, and send a friend request that the other player accepts, declines or blocks.
@@ -59,6 +59,9 @@ This ticket follows the three OWASP pages added to `docs/SOURCES.md` on 2026-11-
 
 ## Answer (human, 2026-11-12, 17a's security design)
 30. Asked whether PR #190's merge means D1 to D7 are accepted and 17a can be built: "Yes, build as proposed". So each of D1 to D7 is settled as its recommended option (a), and 17a's tables, grants, triggers and block rule are approved as written in "17a design" (CLAUDE.md, "Security changes need a human"; DECISIONS.md, log, 2026-11-12).
+
+## Answer (human, 2026-11-12, 17b's design)
+31. Asked "Accept all seven recommended options (E1 to E7) and build 17b?", after PR #194 listed them: "Yes, build as proposed". So each of E1 to E7 is settled as its recommended option (a), and 17b's held-name table, its definer trigger and the limiter's new `lookup` kind are approved as written in "17b design" (CLAUDE.md, "Security changes need a human"; DECISIONS.md, log, 2026-11-12).
 
 *Reading, Claude's, not an answer:* the Friends tab's count (answer 14) counts requests waiting for the viewer only, not ones the viewer sent and not ones from a player the viewer has blocked.
 
@@ -207,8 +210,8 @@ Friend requests and blocking only (Plan 1); search, profiles and the held name a
 
 **Numbers:** none needed beyond the ticket's; [D1] (a) reuses answer 15's 60 for sends, which is the human's to allow.
 
-## 17b design (proposed 2026-11-12 by Claude; **not approved, nothing of it is built**)
-Search, the profile page, the 30-day hold and the lookup limit (Plan 2). This makes Security changes proposed 2, 4, 5 and 6 (held names) exact, as "17a design" did for 1 and 3. The ticket's approval (2026-11-11) covers those four in outline; their exact tables, grants and trigger are below for the human to approve, change or reject (CLAUDE.md, "Security changes need a human"). Where no answer settles a point, the design is written for the recommended option of "Decisions for the human", below, marked **[E*n*]**. Every line about PostgreSQL's locks and snapshots is *unverified*, from memory; Plan step 1 reads the manual first.
+## 17b design (proposed 2026-11-12 by Claude; approved by the human 2026-11-12, answer 31)
+Search, the profile page, the 30-day hold and the lookup limit (Plan 2). This makes Security changes proposed 2, 4, 5 and 6 (held names) exact, as "17a design" did for 1 and 3. The ticket's approval (2026-11-11) covers those four in outline; their exact tables, grants and trigger are below for the human to approve, change or reject (CLAUDE.md, "Security changes need a human"). **Approved as proposed, E1 to E7 each as its recommended option (answer 31); the words "proposed", "recommended" and "none is settled" below are the draft's, kept as written.** Where no answer settles a point, the design is written for the recommended option of "Decisions for the human", below, marked **[E*n*]**. Every line about PostgreSQL's locks and snapshots is *unverified*, from memory; Plan step 1 reads the manual first.
 
 **What exists (read 2026-11-12).**
 - **The Me page has one game and no "recent results".** `getMe` (`src/game/me.ts:17-24`) returns the username, `since`, totals (points, days played, streak, longest streak), this month's calendar, game 1's card (best, average, full runs) and the 3 rarest answers from closed days. Game 2's card on Me is 16f's, not built. Nothing on any page is called "recent results"; the nearest is the game screen's chart of questions survived over today and the 6 days before (`readStats`, `src/game/offbeat.ts:54-65`; `STATS_CHART_DAYS = 7`, human, 2026-10-24, "Last 7 days chart").
@@ -269,7 +272,7 @@ Search, the profile page, the 30-day hold and the lookup limit (Plan 2). This ma
 
 ## Open
 What truly remains; nothing above is designed around an unanswered question.
-- **17b waits on E1 to E7** ("17b design", Decisions for the human) and on the approval of its exact security design (the held-name table and its definer trigger; the limiter's new kind).
+- Nothing of 17b's waits: E1 to E7 and its security changes are approved (answer 31).
 - The lines marked *unverified* in Design (a request to someone who is already a friend; the new tables cascading on account deletion) stay unverified.
 - Nothing of 17a's waits: D1 to D7 and its security changes are approved (answer 30).
 
