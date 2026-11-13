@@ -17,7 +17,7 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 - **17a:** PR #190's D1 to D7, then the word to build.
 - **plor.app is live on the newest `main`: every merge to `main` is published.** **Before any merge to `main`, say what it does to plor.app.** The hosted database still waits on the human's `db push` (DECISIONS.md, Database migrations), so a guest pressing Start on plor.app is *unverified*, as is the bot check with the real keys. To go back: `vercel rollback` to `dpl_EeS3jdJHMYi4yrN8Q1qBozEg9ViK` (the version before 18c).
 - 16f's remaining questions (above); then the plor.app load's one must-fix (`docs/audits/2026-11-11-backlog-sort.md`).
-- 14c-6's Status reading "superseded" (not confirmed); whether the dictionary licence's AU section applies; the Privacy page naming the dictionary (audit W2).
+- Whether the dictionary licence's AU section applies; the Privacy page naming the dictionary (audit W2).
 - The public repo shows the answer lists and the upcoming day, and this file's history names private email addresses (ROADMAP, Next revision, For the human).
 - `C:/Users/jason/RIFF-m15` (`m15-launch-readiness`) is far behind `main` with uncommitted edits and a half-built 15d: undecided, untouched.
 - GitHub reports one moderate vulnerability in a dependency (Dependabot alert 2): not looked at.
