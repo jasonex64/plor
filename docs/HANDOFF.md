@@ -21,7 +21,7 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 
 ## Waits on the human
 - **18e:** the force-interaction e2e's port and server; the repeated-token stub; look at the peek in a browser; answers 33 to 37 are open to change.
-- **17c:** read its PR; merge it, then run the hosted `db push` (that order). Confirm two readings (the ticket's answer 34): G1 as "Remove all" over the earlier "build as proposed", and "Plor is better with friends" staying on the Friends tab's own board. From 768px Today's "Friends today" card is now a bare heading for a player with no friends (ROADMAP, For M17).
+- **17c:** read its PR; merge it, then run the hosted `db push` (that order). The two readings under answer 34 are confirmed (answer 35: "Yes, as built"). From 768px Today's "Friends today" card is now a bare heading for a player with no friends (ROADMAP, For M17).
 - **17b (merged):** the words on its screens (the ticket, "Words on the 17b screens"); a look at the screens in a browser.
 - **17a (merged):** the words on its screens (the ticket, "Words on the 17a screens"); a look at the screens in a browser, on plor.app too now that it is live there.
 - **plor.app is live on the newest `main`: every merge to `main` is published.** **Before any merge to `main`, say what it does to plor.app.** The hosted database still waits on the human's `db push` (DECISIONS.md, Database migrations), so a guest pressing Start on plor.app is *unverified*, as is the bot check with the real keys. To go back: `vercel rollback` to `dpl_EeS3jdJHMYi4yrN8Q1qBozEg9ViK` (the version before 18c).
