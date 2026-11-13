@@ -28,7 +28,7 @@ import { api } from "@/lib/api-client";
 import { FINISHED, type RunStatus } from "@/game/status";
 import type { Profile } from "@/lib/profile";
 import { AdminArea, type AdminPage } from "./admin/admin-area";
-import { Board, NoFriendsCard } from "./board";
+import { Board } from "./board";
 import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
@@ -613,15 +613,13 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
       </section>
       <SideColumn label="Your circle" inPlace className={styles.side}>
         {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
-        {wide && <Board key={`board-${day}-${timeUps}`} username={username} find />}
+        {wide && <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />}
         <LeaderboardCard key={`card-${day}`} />
       </SideColumn>
       <div className={styles.feed}>
         <LiveStatus channel={channel} />
         <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
       </div>
-      {/* Phones end with a card when the player has no friends, as mockup 3 draws Today (answer 13). */}
-      {!wide && <NoFriendsCard />}
     </div>
   );
 }
@@ -701,7 +699,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
   return (
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
-      <Board key={`${timeUps}-${changes}`} username={username} find={false} />
+      <Board key={`${timeUps}-${changes}`} username={username} betterWithFriends />
       <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
       <FriendsList
         onRequestsChanged={() => {

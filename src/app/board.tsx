@@ -22,7 +22,6 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
-import { ButtonLink } from "./button-link";
 import kit from "./kit.module.css";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
@@ -38,9 +37,9 @@ function reacted(board: BoardData | null, change: { friend: string; emoji: Emoji
   };
 }
 
-// find: for a player with no friends, a link to the Friends tab's Find a player under the board, where the invite
-// link was (docs/milestones/M17-profiles-and-friend-requests.md, 17c, G1); off on the Friends tab, which holds it.
-export function Board({ username, find }: { username: string; find: boolean }) {
+// betterWithFriends: the words for a player with no friends, on the Friends tab, above Find a player; off on Today,
+// where nothing stands in the invite link's place (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
+export function Board({ username, betterWithFriends }: { username: string; betterWithFriends: boolean }) {
   const [board, setBoard] = useState<BoardData | null>(null);
   // A reaction on a friend's run shows at once while it's held for Undo and sent
   // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b).
@@ -130,11 +129,10 @@ export function Board({ username, find }: { username: string; find: boolean }) {
         </p>
       )}
       {/* L31: friendlier, and for any game (round 3's wording, provisional per L32). */}
-      {shownBoard && shownBoard.friends.length === 0 && (
+      {betterWithFriends && shownBoard && shownBoard.friends.length === 0 && (
         <>
           <h3>{BETTER_WITH_FRIENDS.title}</h3>
           <p>{BETTER_WITH_FRIENDS.text}</p>
-          {find && <FindAPlayer />}
         </>
       )}
       {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions used on a line under
@@ -165,43 +163,11 @@ export function Board({ username, find }: { username: string; find: boolean }) {
   );
 }
 
-// L31's wording (round 3's, provisional per L32), for a player with no friends yet: under the board, and on phones as
-// Today's own card (docs/milestones/M14-14b-8-the-new-look.md, answer 13).
-export const BETTER_WITH_FRIENDS = {
+// L31's wording (round 3's, provisional per L32), for a player with no friends yet, under the Friends tab's board.
+const BETTER_WITH_FRIENDS = {
   title: "Plor is better with friends",
   text: "See how your friends did each day, talk about the puzzles, and compare scores every week, in whichever games you both play.",
 };
-
-// Adding a friend starts on the Friends tab, at Find a player (17c, G1).
-function FindAPlayer() {
-  return (
-    <p>
-      <ButtonLink href="/friends">Find a player</ButtonLink>
-    </p>
-  );
-}
-
-// Phone Today's card when the player has no friends (mockup 3's soft tile; answer 13). From 768px the board says it
-// instead.
-export function NoFriendsCard() {
-  const [friends, setFriends] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    api<{ friends: unknown[] }>("/api/friends", { method: "GET" }).then(
-      (r) => setFriends(r.friends.length),
-      (err) => setError(errorText(err)),
-    );
-  }, []);
-  if (error) return <p role="alert">{error}</p>;
-  if (friends !== 0) return null;
-  return (
-    <section aria-label={BETTER_WITH_FRIENDS.title} className={`${kit.card} ${kit.soft}`}>
-      <h2>{BETTER_WITH_FRIENDS.title}</h2>
-      <p>{BETTER_WITH_FRIENDS.text}</p>
-      <FindAPlayer />
-    </section>
-  );
-}
 
 // A friend's state as a chip: safe for a run that survived every question, caught for one that ended earlier, plain
 // otherwise.

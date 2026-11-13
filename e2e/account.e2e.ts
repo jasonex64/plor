@@ -91,28 +91,28 @@ test("a player deletes their account from the settings sheet", async ({ browser 
   expect(rows).toHaveLength(0);
 });
 
-// The Friends tab's friends list, where removing a friend asks first (F3). With no friends, the list and Today's board
-// point to Find a player, where the invite link was, and an old invite link's address is not found
-// (docs/milestones/M17-profiles-and-friend-requests.md, 17c, G1 to G3).
-test("a player with no friends is pointed to Find a player, and removing a friend asks first", async ({ browser }) => {
+// The Friends tab's friends list, where removing a friend asks first (F3). With no friends, the list points to Find a
+// player, nothing stands where the invite link was, and an old invite link's address is not found
+// (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
+test("nothing offers an invite link, an old one is not found, and removing a friend asks first", async ({ browser }) => {
   const inviter = await (await browser.newContext()).newPage();
   await inviter.goto("/friends");
   await signInAndPick(inviter, "iv");
   const board = inviter.getByRole("region", { name: "Friends today" });
   // With no friends, the board says L31's friendlier line (docs/milestones/M14-14a-3a-me.md, criterion 7).
   await expect(board.getByRole("heading", { name: "Plor is better with friends" })).toBeVisible();
-  // Find a player is on this tab already, so the board has no link to it here.
-  await expect(board.getByRole("link", { name: "Find a player" })).toHaveCount(0);
   await expect(inviter.getByRole("region", { name: "Find a player" })).toBeVisible();
   const friends = inviter.getByRole("region", { name: "Your friends" });
   await expect(friends.getByText("No friends yet. Find a player by their username, above.")).toBeVisible();
   // Nothing on the tab offers an invite link any more.
   await expect(inviter.getByRole("button", { name: /Invite|Reset link/ })).toHaveCount(0);
-  // Today's board, from 768px, links to the Friends tab where the Invite button was.
+  // Today's board, from 768px, has nothing where the Invite button was.
   const wide = await (await inviter.context().browser()!.newContext({ viewport: { width: 1440, height: 900 }, storageState: await inviter.context().storageState() })).newPage();
   await wide.goto("/");
-  await wide.getByRole("region", { name: "Friends today" }).getByRole("link", { name: "Find a player" }).click();
-  await expect(wide).toHaveURL(/\/friends$/);
+  await expect(wide.getByRole("region", { name: "Friends today" }).getByRole("heading", { name: "Friends today" })).toBeVisible();
+  await expect(wide.getByRole("region", { name: "Leaderboard" })).toBeVisible();
+  await expect(wide.getByRole("main").getByRole("button", { name: /Invite|Reset link/ })).toHaveCount(0);
+  await expect(wide.getByRole("main").getByRole("link", { name: "Find a player" })).toHaveCount(0);
   // A friend invite link's address answers 404, whatever its code (the criterion "Invite links removed"), as the older
   // /invite/ address does (M14 14b-3, criterion 5).
   expect((await wide.goto("/i/abcdefgh-_"))!.status()).toBe(404);
