@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import kit from "./kit.module.css";
 import styles from "./share.module.css";
 
 // Sharing a link, for the result's Share (M05, S4) and a group's invite link: the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard (MDN,
@@ -45,5 +46,36 @@ export function CopyField({ value }: { value: string }) {
         {lines === 1 ? <input ref={field} readOnly value={value} /> : <textarea ref={field} readOnly rows={lines} value={value} />}
       </label>
     </p>
+  );
+}
+
+// Share (M05, S4) on a finished run's result, either game's: the text is the game's share text, and the link is today's
+// game at the site's root (S3), from the page's own origin so it's right on any deployment.
+export function ShareResult({ text }: { text: string }) {
+  const [note, setNote] = useState<string | null>(null);
+  const [copy, setCopy] = useState<string | null>(null);
+
+  async function share() {
+    setCopy(null);
+    const url = `${window.location.origin}/`;
+    try {
+      const shared = await shareLink(text, url);
+      if (shared === "copied") setNote("Copied");
+      if (shared === "refused") setCopy(`${text}\n${url}`);
+    } catch (err) {
+      setNote(`Couldn't share: ${String(err)}`);
+    }
+  }
+
+  return (
+    <>
+      <p>
+        <button type="button" className={kit.primary} onClick={share}>
+          Share
+        </button>{" "}
+        {note && <span role="status">{note}</span>}
+      </p>
+      {copy && <CopyField value={copy} />}
+    </>
   );
 }

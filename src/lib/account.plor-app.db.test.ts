@@ -126,7 +126,7 @@ describe("writes for a deleted player", () => {
     ["create a group", (client, userId) => createGroup(client, userId, "Ghost Club"), { code: "23503", constraint: "group_member_user_id_fkey" }],
     [
       "post a comment",
-      async (client, userId) => postComment(client, userId, (await client.query("select private.today()::text as d")).rows[0].d, "hello", null),
+      async (client, userId) => postComment(client, userId, GAME_ID, (await client.query("select private.today()::text as d")).rows[0].d, "hello", null),
       { code: "not_finished", status: 409 },
     ],
   ];

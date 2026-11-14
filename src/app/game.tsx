@@ -27,7 +27,7 @@ import { AnswerSearch } from "./answer-search";
 import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
-import { CopyField, shareLink } from "./share";
+import { ShareResult } from "./share";
 import { GAME, SUBSTRINGS } from "@/platform/game";
 import { GAME_1_STEPS, HowToPlay } from "./how-to-play";
 import { PlayFrame, StatusMessage } from "./play-frame";
@@ -757,7 +757,7 @@ function Result({ run, share, search, focus }: { run: RunState; share: boolean; 
         You survived {survived} of {run.total} questions and scored {pointsText(run.points)}
         {earnsBonus(run) ? `, plus a rarity bonus of about ${run.bonus}.` : "."} {bonusNote(run)}
       </p>
-      {share && <Share run={run} />}
+      {share && <ShareResult text={shareText(run)} />}
       <ol className={kit.rows}>
         {run.answered.map((a) => (
           <li key={a.index} className={kit.row}>
@@ -772,37 +772,5 @@ function Result({ run, share, search, focus }: { run: RunState; share: boolean; 
         ))}
       </ol>
     </div>
-  );
-}
-
-// Share (M05, S4), by the share sheet or the clipboard (src/app/share.tsx). The link is today's game at the site's root
-// (S3), from the page's own origin so it's right on any deployment.
-function Share({ run }: { run: RunState }) {
-  const [note, setNote] = useState<string | null>(null);
-  const [copy, setCopy] = useState<string | null>(null);
-
-  async function share() {
-    setCopy(null);
-    const text = shareText(run);
-    const url = `${window.location.origin}/`;
-    try {
-      const shared = await shareLink(text, url);
-      if (shared === "copied") setNote("Copied");
-      if (shared === "refused") setCopy(`${text}\n${url}`);
-    } catch (err) {
-      setNote(`Couldn't share: ${String(err)}`);
-    }
-  }
-
-  return (
-    <>
-      <p>
-        <button type="button" className={kit.primary} onClick={share}>
-          Share
-        </button>{" "}
-        {note && <span role="status">{note}</span>}
-      </p>
-      {copy && <CopyField value={copy} />}
-    </>
   );
 }

@@ -40,6 +40,7 @@ import { MeStats } from "./me";
 import { useMinWidth } from "./min-width";
 import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
+import { FragmentsScreen } from "./fragments";
 import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
 import { TodayCards } from "./today-cards";
@@ -53,7 +54,7 @@ import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
 import { BACK, FORWARD } from "./slide";
 import kit from "./kit.module.css";
-import { GAME, SUBSTRINGS } from "@/platform/game";
+import { GAME, GAME_ID, SUBSTRINGS } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
 // sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
@@ -366,6 +367,12 @@ export function MeTab() {
   );
 }
 
+// Fragments' screen, as the game tab is Offbeat's.
+export function FragmentsTab() {
+  const { player } = usePlayer();
+  return <FragmentsScreen username={player.username} name={nameOf(player)} />;
+}
+
 export function GameTab() {
   const { player, reloadStreak } = usePlayer();
   return <OffbeatScreen username={player.username} name={nameOf(player)} onStarted={reloadStreak} />;
@@ -618,7 +625,7 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
       </SideColumn>
       <div className={styles.feed}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} game={GAME_ID} />
       </div>
     </div>
   );
@@ -663,7 +670,7 @@ function FriendsFeed({ username, name, timeUps }: { username: string; name: stri
     <SideColumn label="Friends feed">
       <LiveStatus channel={channel} />
       {error && <p role="alert">{error}</p>}
-      {run && <Comments key={`feed-${day}`} username={username} name={name} runOver={run.over} nudge={nudge} />}
+      {run && <Comments key={`feed-${day}`} username={username} name={name} runOver={run.over} nudge={nudge} game={GAME_ID} />}
     </SideColumn>
   );
 }

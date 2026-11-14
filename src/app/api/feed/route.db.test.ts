@@ -11,6 +11,7 @@ import { POST as startRoute } from "@/app/api/run/start/route";
 import { type ApprovedPuzzle } from "@/content/puzzle";
 import { createGroup, getGroup, joinGroup } from "@/groups/groups";
 import { getPool } from "@/lib/db";
+import { GAME_ID } from "@/platform/game";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
@@ -39,7 +40,7 @@ async function call(route: (r: Request) => Promise<Response>, path: string, meth
   return { status: response.status, body: await response.json() };
 }
 const feed = () => call(feedRoute, "/api/feed", "GET");
-const post = (body: string, group?: string) => call(postComment, "/api/comments", "POST", { date: today, body, group });
+const post = (body: string, group?: string) => call(postComment, "/api/comments", "POST", { game: GAME_ID, date: today, body, group });
 type FeedComment = {
   id: string;
   username: string;
@@ -100,7 +101,7 @@ describe("today's feed", () => {
     expect((await post("other words from o", other)).status).toBe(201);
     expect((await post("friends words from o")).status).toBe(201);
     expect(
-      (await call(react, "/api/reactions", "POST", { date: today, target: { type: "comment", id: gComment }, emoji: "😂" })).status,
+      (await call(react, "/api/reactions", "POST", { game: GAME_ID, date: today, target: { type: "comment", id: gComment }, emoji: "😂" })).status,
     ).toBe(200);
   });
 

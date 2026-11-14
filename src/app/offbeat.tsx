@@ -22,7 +22,7 @@ import { SurvivedChart } from "./survived-chart";
 import { CountUp } from "./count-up";
 import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
-import { GAME } from "@/platform/game";
+import { GAME, GAME_ID } from "@/platform/game";
 
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function OffbeatScreen({ username, name, onStarted }: { username: string; name: string; onStarted: () => void }) {
@@ -77,7 +77,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
       </div>
       <SideColumn label="Feed" inPlace className={styles.feed} hidden={playing}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} title={`${GAME.name} comments`} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} game={GAME_ID} title={`${GAME.name} comments`} />
       </SideColumn>
     </div>
   );

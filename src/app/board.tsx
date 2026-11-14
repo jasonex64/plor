@@ -26,6 +26,7 @@ import kit from "./kit.module.css";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
+import { GAME_ID } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
 import { useHeldChanges, useUndo } from "./undo";
 
@@ -111,7 +112,7 @@ export function Board({ username, betterWithFriends }: { username: string; bette
       key: `run ${friend.username}`,
       text: reactionText(friend.reactions!, emoji),
       failed: "Your reaction wasn't saved",
-      send: (keepalive) => api("/api/reactions", { method: "POST", body: { date: day, target: { type: "run", userId: friend.userId }, emoji }, keepalive }),
+      send: (keepalive) => api("/api/reactions", { method: "POST", body: { game: GAME_ID, date: day, target: { type: "run", userId: friend.userId }, emoji }, keepalive }),
     });
     showReaction({ friend: friend.username, emoji }, held.then((sent) => (sent ? load() : undefined)));
   }

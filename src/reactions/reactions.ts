@@ -3,10 +3,10 @@
 // and sees only their own reactions and their friends', or on a group's comment its members' (M10 10d, G4).
 import { DatabaseError, type Pool } from "pg";
 import { REACTIONS } from "@/config/tunables";
-import { GAME_ID } from "@/platform/game";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
 import { readUserId } from "@/friends/friends";
+import type { BoardGame } from "@/friends/leaderboard";
 import { FINISHED } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -17,7 +17,7 @@ export type Emoji = (typeof REACTIONS)[number];
 // What the viewer sees on one target: how many of each emoji, in the set's order and only those used, and their own.
 export type Reactions = { counts: { emoji: Emoji; count: number }[]; mine: Emoji | null };
 
-// A comment by its ID, or a friend's run that day by the friend's ID (a username can change hands after the page was
+// A comment by its ID, or a friend's run of the game that day by the friend's ID (a username can change hands after the page was
 // drawn: M19 19e).
 export type Target = { type: "comment"; id: string } | { type: "run"; userId: string };
 
@@ -42,7 +42,7 @@ export function readTarget(input: unknown): Target {
 // Sets the player's reaction on a target, replacing any other they had there, or removes it (emoji null). The page
 // names the day it shows, as when posting a comment. One transaction, because plor_app can't update a reaction: a
 // replace deletes the old one and inserts the new one.
-export async function setReaction(pool: Pool, userId: string, date: string, target: Target, emoji: Emoji | null): Promise<void> {
+export async function setReaction(pool: Pool, userId: string, game: BoardGame, date: string, target: Target, emoji: Emoji | null): Promise<void> {
   const client = await pool.connect();
   let broken = false;
   try {
@@ -79,7 +79,7 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
        select day.today::text as today, $3::date < day.today as past, coalesce(day.status = any($6::text[]), false) as finished,
               t.comment_id::text as comment_id, t.run_user_id, t.played
        from day left join target t on true`,
-      [userId, GAME_ID, date, target.type === "comment" ? target.id : null, target.type === "run" ? target.userId : null, FINISHED],
+      [userId, game, date, target.type === "comment" ? target.id : null, target.type === "run" ? target.userId : null, FINISHED],
     );
     const row = rows[0];
     if (row.past) throw new AppError("day_past", 409);
@@ -94,7 +94,7 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
       const { rowCount } = await client.query(
         `insert into private.reaction (user_id, game_id, puzzle_date, comment_id, run_user_id, emoji)
          select $1, $2, $3::date, $4::bigint, $5::uuid, $6 where private.today() = $3::date`,
-        [userId, GAME_ID, date, row.comment_id, row.run_user_id, emoji],
+        [userId, game, date, row.comment_id, row.run_user_id, emoji],
       );
       if (rowCount === 0) throw new AppError("day_past", 409);
     }
@@ -134,14 +134,14 @@ export async function commentReactions(db: Db, viewerId: string, commentIds: str
   return summarize(rows);
 }
 
-// Reactions on each of these players' runs on a day, by user ID: only the viewer's own and their friends' count.
-export async function runReactions(db: Db, viewerId: string, date: string, userIds: string[]): Promise<Map<string, Reactions>> {
+// Reactions on each of these players' runs of a game on a day, by user ID: only the viewer's own and their friends' count.
+export async function runReactions(db: Db, viewerId: string, game: BoardGame, date: string, userIds: string[]): Promise<Map<string, Reactions>> {
   const { rows } = await db.query<CountRow>(
     `select r.run_user_id::text as target, r.emoji, count(*)::int as count, bool_or(r.user_id = $1) as mine
      from private.reaction r
      where r.run_user_id = any($4::uuid[]) and r.game_id = $2 and r.puzzle_date = $3::date and ${seesAuthorSql("$1", "r.user_id")}
      group by r.run_user_id, r.emoji`,
-    [viewerId, GAME_ID, date, userIds],
+    [viewerId, game, date, userIds],
   );
   return summarize(rows);
 }

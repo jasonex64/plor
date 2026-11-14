@@ -3,5 +3,5 @@
 // 4: the leaderboard is this week and last week instead of one all-time list (M10 10a). 5: the board shows a friend
 // as started, not their question or finished, until the viewer has finished (M12 12d). 6: GET /api/run answers run
 // null on a day with no puzzle, instead of 404 (M12 12f, F2). 7: the weekly boards name their game, `game`, and are
-// refused without it (M16 16e-2).
-export const PROTOCOL_VERSION = 7;
+// refused without it (M16 16e-2). 8: comments and reactions name their game, `game`, and are refused without it (M16 16f-3).
+export const PROTOCOL_VERSION = 8;

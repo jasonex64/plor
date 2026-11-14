@@ -49,12 +49,12 @@ async function call(route: (r: Request) => Promise<Response>, path: string, meth
   return { status: response.status, body: await response.json() };
 }
 type Comment = { id: string; username: string; body: string; reactions: { counts: { emoji: string; count: number }[] } };
-const thread = (query = "") => call(threadRoute, `/api/comments${query}`, "GET");
+const thread = (query = "") => call(threadRoute, `/api/comments?game=${GAME_ID}${query.replace("?", "&")}`, "GET");
 const comments = async (query = ""): Promise<Comment[]> => (await thread(query)).body.thread.comments;
 const bodies = async (query = "") => (await comments(query)).map((c) => c.body);
-const post = (body: string, group?: unknown, date = today) => call(postRoute, "/api/comments", "POST", { date, body, group });
+const post = (body: string, group?: unknown, date = today) => call(postRoute, "/api/comments", "POST", { game: GAME_ID, date, body, group });
 const react = (id: string, emoji: string) =>
-  call(reactRoute, "/api/reactions", "POST", { date: today, target: { type: "comment", id }, emoji });
+  call(reactRoute, "/api/reactions", "POST", { game: GAME_ID, date: today, target: { type: "comment", id }, emoji });
 const notFound = { status: 404, body: { ok: false, error: "group_not_found" } };
 
 // Question 1 steals no letter (schedule A), so the host answer's name can be typed as is.
@@ -256,7 +256,7 @@ describe("a member leaving while a reaction on their comment is replaced", () =>
         return client;
       },
     } as unknown as Pool;
-    const replaced = await setReaction(holding, A.userId, today, { type: "comment", id: bComment }, "❤️").then(
+    const replaced = await setReaction(holding, A.userId, GAME_ID, today, { type: "comment", id: bComment }, "❤️").then(
       () => undefined,
       (err: unknown) => err,
     );

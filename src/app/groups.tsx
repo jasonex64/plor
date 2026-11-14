@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
+import { GAME_ID } from "@/platform/game";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { LiveStatus } from "./live-status";
 import { Avatar } from "./avatar";
@@ -281,7 +282,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
         />
       )}
       {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}
-      {group && <Comments key={`${day}-${timeUps}`} username={username} name={name} runOver={false} nudge={threadNudge} group={id} />}
+      {group && <Comments key={`${day}-${timeUps}`} username={username} name={name} runOver={false} nudge={threadNudge} game={GAME_ID} group={id} />}
     </>
   );
 }

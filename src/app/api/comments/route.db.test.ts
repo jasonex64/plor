@@ -35,8 +35,8 @@ async function call(response: Promise<Response>) {
   const r = await response;
   return { status: r.status, body: await r.json() };
 }
-const thread = (date?: string) => call(threadRoute(apiRequest(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" })));
-const post = (body: unknown, date = today) => call(postRoute(apiRequest("/api/comments", { method: "POST", body: { date, body } })));
+const thread = (date?: string) => call(threadRoute(apiRequest(date ? `/api/comments?game=${GAME_ID}&date=${date}` : `/api/comments?game=${GAME_ID}`, { method: "GET" })));
+const post = (body: unknown, date = today) => call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date, body } })));
 const remove = (id: unknown) => call(deleteRoute(apiRequest("/api/comments/delete", { method: "POST", body: { id } })));
 const bodies = (r: { body: { thread: { comments: { body: string }[] } } }) => r.body.thread.comments.map((c) => c.body);
 

@@ -29,10 +29,15 @@ export type BoardGame = typeof GAME_ID | typeof SUBSTRINGS_ID;
 // What a board can show: one game's, or both games' places, the overall board.
 export type BoardChoice = BoardGame | typeof OVERALL.id;
 
+// A request names its game, as each game has its own board, thread and reactions (comments and reactions: M16 16f-3).
+export function readGame(input: unknown): BoardGame {
+  if (input === GAME_ID || input === SUBSTRINGS_ID) return input;
+  throw new AppError("unknown_game", 400);
+}
+
 // A board names its game, as each game's board counts differently, or asks for the overall one.
 export function readBoardGame(input: unknown): BoardChoice {
-  if (input === GAME_ID || input === SUBSTRINGS_ID || input === OVERALL.id) return input;
-  throw new AppError("unknown_game", 400);
+  return input === OVERALL.id ? input : readGame(input);
 }
 
 // name is the display name if set, else the username (M07 7a); you marks the viewer.
