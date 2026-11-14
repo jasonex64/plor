@@ -53,6 +53,10 @@ export const GROUPS_PER_PLAYER = 10;
 // constraint comment_body_format enforces it; the comments route test posts both lengths through it.
 export const COMMENT_MAX_LENGTH = 280;
 
+// How many items one page of the feed holds (human, 2026-11-13, docs/milestones/M16-16f-the-shared-pieces.md, 16f
+// answer 30: "20").
+export const FEED_PAGE_SIZE = 20;
+
 // The reaction set, in the order the page shows it (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md,
 // D3). The database's check constraint reaction_emoji holds the same five; the reactions route test sends each one
 // through it.

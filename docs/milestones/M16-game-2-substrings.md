@@ -114,6 +114,10 @@ Tenth round (human, 2026-11-14, before 16f-2's build, after three pictures of th
 Eleventh round (human, 2026-11-14, after screenshots of 16f-2 as built: at a 768px window the sidebar left each card about 230px and "Fragments" broke across two lines):
 43. Side by side on tablets: "Side by side only with room (Recommended)". The carousel stays until each card has at least a phone card's width. As built: side by side once the cards' own row is 768px wide.
 
+Twelfth round (human, 2026-11-14, before 16f-4's build):
+44. Whose finished runs are feed items: "Friends only (Recommended)". Group members who aren't friends appear only through their comments in that group.
+45. The viewer's own finished runs in their own feed: "Yes, show mine too (Recommended)".
+
 16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1, 40 to 43 to 16f-2): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions
