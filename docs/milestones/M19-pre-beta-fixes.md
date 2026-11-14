@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a is in review (its PR); 19b to 19f are not started.
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a is merged (PR #199); 19b is in review (its PR); 19c to 19f are not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -21,6 +21,10 @@ Close the player-facing bugs already recorded in ROADMAP's "Next revision" and t
 | 7 | `plor_app` can delete any comment with no record | "After the beta" (stays in Next revision; a security change) |
 | 8 | The live board showing a timed-out friend as still playing | "Confirm first, then ask" |
 | 9 | "Ship on your word" (M15 15d, approved 2026-10-26, half built in `RIFF-m15`) | "Drop it": `main` keeps publishing to plor.app on every merge |
+| 10 | 19d: how long a guest's finished run is kept, now that it can't be erased at its first read | "Until the day resets (Recommended)": kept until midnight Pacific, when guest runs are already cleared (`private.purge_guest_days`); one play a day per device; the Privacy page's guest words change, drafted for the human's approval |
+| 11 | 19b: two tabs replacing one reaction | "Clear 'try again' message (Recommended)": 409 `reaction_changed`, "That changed in another tab. Try again." |
+| 12 | 19b: a member leaving while a reaction on their comment is replaced (the deadlock, reproduced) | "Clear 'try again' message (Recommended)": 409 `busy`, "Plor was busy. Try again."; no retry |
+| 13 | 19b: the NUL character in the other text inputs (group names, display names, usernames, typed answers) | "Yes, in this step (Recommended)" |
 
 ## Source
 - **Next.js** (SOURCES.md): route handlers, for the routes' replies.
@@ -39,8 +43,9 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 - [x] `POST /api/account/delete` answers ok when the deletion committed and `signOut` then failed; the failure is logged and counted (answer 6; `src/app/api/account/delete/route.ts:16-17`) → verify: a test with a failing `signOut` gets ok and one counted log line.
 
 **19b — clear replies for rare clashes** (ROADMAP: "Concurrent or malformed requests that get a 500 instead of a 4xx").
-- [ ] Each of these answers a 4xx, with a test that fails first: Next from a second tab (`openNext`, OB002; both games); two tabs replacing one reaction (the unique index); a report racing its comment's deletion (23503); a group join racing the group's deletion (23503); a comment holding a NUL character (22021).
-- [ ] The sixth case (a member leaving while a reaction is replaced, 40P01) is *unverified*: reproduce it first; if it can't be reproduced, record that and leave it.
+- [x] Each of these answers a 4xx, with a test that fails first: Next from a second tab (`openNext`, OB002; both games); two tabs replacing one reaction (the unique index); a report racing its comment's deletion (23503); a group join racing the group's deletion (23503); a comment holding a NUL character (22021). Game 2's Next already mapped OB002 (`substring-runs.ts`), so only game 1 changed.
+- [x] The sixth case (a member leaving while a reaction is replaced, 40P01) was reproduced and now answers 409 `busy` (answer 12). The leave was the request stopped in every run; the reaction side's mapping is *unverified*.
+- [x] A NUL character is refused where text reaches the database, with each field's existing code (answer 13): comments, group names, display names, usernames (profile, friend requests, removals, reaction targets, the account-delete confirmation) and typed answers.
 
 **19c — boards start at a player's join day** (answer 4).
 - [ ] A friends board for a day before a player joined doesn't list that player (`src/friends/leaderboard.ts:100-110`, where group boards already filter) → verify: a db test with a player made today reads yesterday's board without them.
@@ -65,8 +70,8 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 | Value | Used for | Origin (source section / person + date) |
 |---|---|---|
 | The highest answer index | 19a's 400 | `QUESTIONS_PER_DAY` (`src/config/tunables.ts:4`), the constant the puzzle check already enforces for every day (`src/content/puzzle.ts:180`); no new number, and no read of the puzzle |
-| How long a guest's finished result is kept | 19d | **Blank: stop and ask** (19d's proposal) |
-| The 4xx status of each 19b case | 19b | The status each file's error map already gives its nearest case; a case with none is asked |
+| How long a guest's finished result is kept | 19d | Until the day's reset, the existing `private.next_reset` (answer 10); no new number |
+| The 4xx status of each 19b case | 19b | The status each file's error map already gives its nearest case; the two with none were asked (answers 11 and 12), both 409 like the file's other clashes |
 
 ## Plan
 19a → 19b → 19c → 19d's proposal (asked while 19c builds) → 19d → 19e → 19f. Within a sub-ticket, fixes in separate files go to parallel builders (`sonnet`); the `reviewer` (`sonnet`) reads each PR. Beside M19: 16f's remaining questions (a design task, different files).
@@ -88,7 +93,12 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 - Each test failed first: the api client, "expected SyntaxError: Unexpected token '<' … to be an instance of ApiError"; the delete route, "expected { status: 500, …(1) } to deeply equal { status: 200, body: { ok: true } }"; the answers route, "expected 500 to be 400" for index 99999999999 (index 7 alone answered 403 before, 400 now).
 - After: `npx vitest run src/lib/api-client.test.ts src/app/api/account/delete/route.test.ts`: "Tests  3 passed (3)". `npm run test:db -- -t "refuses a player whose run is still going"`: "Tests  1 passed". `npm run test:db -- src/app/api/account/delete -t "POST /api/account/delete"`: "Tests  4 passed". `npm test`: "Test Files  66 passed (66)", "Tests  749 passed (749)". `npx tsc --noEmit -p .`: exit 0.
 - **Not run:** the full `npm run test:db` and the e2e (CI's run is the evidence); nobody has seen the three messages in a browser.
+**19b** (2026-11-13, commit `2d9525b` and the one after it).
+- Each test failed first with a 500 (the builder's runs): OB002 from `openNext`; 23505 on `reaction_one_per_comment`; 23503 on `comment_report_comment_id_fkey` and on `group_member_group_id_fkey`; 40P01 "deadlock detected"; 22021 "invalid byte sequence … 0x00" for each NUL case; the account-delete confirmation, "expected { status: 500, …(1) } to deeply equal { status: 400, …(1) }". The races hold a second connection's transaction and wait on `pg_stat_activity`; no sleeps.
+- After: the whole `npm run test:db`: "Test Files  59 passed (59)", "Tests  432 passed (432)" (before the account-delete case, which then passed alone: "Tests  4 passed"). `npm test`: 749 passed. `npx tsc --noEmit -p .`: exit 0.
+- **Not run:** the e2e (CI). **Not verified:** the two messages in a browser; the reaction side as the deadlock's victim.
+
 
 ## Review
-- Blocking findings and how each was fixed: 19a: none (the `reviewer`, 2026-11-13, one pass).
-- Deferred to ROADMAP "Next revision": 19a: two missing boundary tests (For M19).
+- Blocking findings and how each was fixed: 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
+- Deferred to ROADMAP "Next revision": 19a: two missing boundary tests (For M19). 19b: three items (For M19).

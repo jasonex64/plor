@@ -72,7 +72,7 @@ describe("players", () => {
   it("finds a player by their exact username only, and nobody when signed out or without a username (3)", async () => {
     useSession(A.session);
     expect(await lookup(B.username)).toMatchObject({ status: 200, body: { ok: true, player: { username: B.username, name: `Bee ${RUN}` } } });
-    for (const name of [B.username.slice(0, -1), `Bee ${RUN}`, B.username.toUpperCase(), " ", NOBODY]) expect(await lookup(name)).toEqual(notFound);
+    for (const name of [B.username.slice(0, -1), `Bee ${RUN}`, B.username.toUpperCase(), " ", NOBODY, "a\u0000b"]) expect(await lookup(name)).toEqual(notFound);
     useSession(new Map());
     expect(await lookup(B.username)).toEqual({ status: 401, body: { ok: false, error: "not_signed_in" } });
     useSession(D.session);

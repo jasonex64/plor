@@ -108,7 +108,7 @@ describe("sign-in and profile", () => {
   });
 
   it("rejects a display name outside the rules, with 400 display_name_invalid", async () => {
-    for (const name of ["", "Zoe 😀", "a".repeat(25), "Zoe  Ann", 7]) {
+    for (const name of ["", "Zoe 😀", "a".repeat(25), "Zoe  Ann", 7, "Zoe\u0000Ann"]) {
       expect(await rename(name)).toEqual({ status: 400, body: { ok: false, error: "display_name_invalid" } });
     }
   });
@@ -125,6 +125,7 @@ describe("sign-in and profile", () => {
   it("rejects a username outside the rules, with 400 username_invalid", async () => {
     expect(await pick(`B${RUN}`)).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
     expect(await pick("ab")).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
+    expect(await pick("ab\u0000cd")).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
   });
 
   it("refuses a wrong code without using up the right one", async () => {

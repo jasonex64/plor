@@ -19,9 +19,10 @@ export type Comment = { id: string; username: string; name: string; body: string
 // is over.
 export type Thread = { date: string; canPost: boolean; comments: Comment[] | null };
 
-// The text as sent by the browser, trimmed, the form the database requires. Anything that isn't text gets 400.
+// The text as sent by the browser, trimmed, the form the database requires. Anything that isn't text gets 400, and so
+// does text with a NUL character, which Postgres text can't hold (it fails with 22021; 19b).
 export function readCommentBody(input: unknown): string {
-  if (typeof input !== "string") throw new AppError("comment_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("comment_invalid", 400);
   return input.trim();
 }
 
@@ -122,22 +123,31 @@ export async function deleteComment(db: Db, userId: string, id: string): Promise
 // again changes nothing. Reporting works on past days too: D6 makes them read-only for talking, and a report isn't
 // talking.
 export async function reportComment(db: Db, userId: string, id: string): Promise<void> {
-  const { rows } = await db.query<{ own: boolean; visible: boolean }>(
-    `with target as (
-       select c.id, c.user_id = $1 as own,
-              case when c.puzzle_date = private.today() then coalesce(s.status = any($3::text[]), false)
-                   else s.status is null or s.status = any($3::text[]) end as visible
-       from private.comment c
-       left join private.run_status s on s.user_id = $1 and s.game_id = c.game_id and s.puzzle_date = c.puzzle_date
-       where c.id = $2 and ${seesCommentSql("$1", "c")}
-     ), added as (
-       insert into private.comment_report (comment_id, reporter_id)
-       select id, $1 from target where not own and visible
-       on conflict do nothing
-     )
-     select own, visible from target`,
-    [userId, id, FINISHED],
-  );
+  let rows: { own: boolean; visible: boolean }[];
+  try {
+    ({ rows } = await db.query<{ own: boolean; visible: boolean }>(
+      `with target as (
+         select c.id, c.user_id = $1 as own,
+                case when c.puzzle_date = private.today() then coalesce(s.status = any($3::text[]), false)
+                     else s.status is null or s.status = any($3::text[]) end as visible
+         from private.comment c
+         left join private.run_status s on s.user_id = $1 and s.game_id = c.game_id and s.puzzle_date = c.puzzle_date
+         where c.id = $2 and ${seesCommentSql("$1", "c")}
+       ), added as (
+         insert into private.comment_report (comment_id, reporter_id)
+         select id, $1 from target where not own and visible
+         on conflict do nothing
+       )
+       select own, visible from target`,
+      [userId, id, FINISHED],
+    ));
+  } catch (err) {
+    // The comment was deleted between the read and the insert (19b): the same reply as a comment that was already gone.
+    if (err instanceof DatabaseError && err.code === "23503" && err.constraint === "comment_report_comment_id_fkey") {
+      throw new AppError("comment_not_found", 404);
+    }
+    throw err;
+  }
   // A comment the player can't see is the same 404 as a missing one, like deleting.
   if (!rows[0]?.visible) throw new AppError("comment_not_found", 404);
   if (rows[0].own) throw new AppError("report_own", 409);

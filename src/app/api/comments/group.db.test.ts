@@ -1,6 +1,7 @@
 // Group threads end to end against the local stack (run with `npm run test:db`; docs/milestones/M10-groups.md, 10d):
 // real players sign in, play today's puzzle, and post, read, react and report through the route handlers. A creates
 // Club, which B joins, and Other, which no one else is in; C is A's friend and in neither; A and B aren't friends.
+import type { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createGroup } from "@/app/api/groups/create/route";
 import { GET as groupDetail } from "@/app/api/groups/detail/route";
@@ -12,8 +13,11 @@ import { POST as answerRoute } from "@/app/api/run/answer/route";
 import { POST as startRoute } from "@/app/api/run/start/route";
 import { listReports } from "@/admin/reports";
 import { type ApprovedPuzzle } from "@/content/puzzle";
+import { leaveGroup } from "@/groups/groups";
+import { setReaction } from "@/reactions/reactions";
 import { GAME_ID } from "@/platform/game";
 import { getPool } from "@/lib/db";
+import { AppError } from "@/lib/http";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
@@ -211,5 +215,54 @@ describe("a group's thread", () => {
     expect(left[0].reactions.counts).toEqual([]);
     useSession(B.session);
     expect(await thread(`?group=${club}`)).toEqual(notFound);
+  });
+});
+
+// 19b, the ticket's sixth case (reproduced): a member leaves while another member
+// replaces their reaction on that member's comment. The replace deletes the old reaction, then inserts the new one,
+// which checks the comment; the leave deletes the membership, which deletes the comment, which deletes the reactions on
+// it. Each waits for the row the other holds. The test holds the replace between its delete and its insert until the
+// leave is blocked on the reaction.
+describe("a member leaving while a reaction on their comment is replaced", () => {
+  it("stops one of the two with 409 busy, never a 500", async () => {
+    useSession(A.session);
+    const race = (await call(createGroup, "/api/groups/create", "POST", { name: "Race" })).body.group.id;
+    const code = (await call(groupDetail, `/api/groups/detail?id=${race}`, "GET")).body.group.inviteCode;
+    useSession(B.session);
+    expect((await call(joinGroup, "/api/groups/join", "POST", { code })).status).toBe(200);
+    const bComment = (await post("race from b", race)).body.comment.id;
+    useSession(A.session);
+    expect((await react(bComment, "👍")).status).toBe(200);
+
+    const pool = getPool();
+    let leaving: Promise<unknown> | undefined;
+    const holding = {
+      connect: async () => {
+        const client = await pool.connect();
+        const query = client.query.bind(client) as unknown as (...args: unknown[]) => Promise<unknown>;
+        (client as unknown as { query: typeof query }).query = async (...args) => {
+          const result = await query(...args);
+          if (leaving === undefined && String(args[0]).includes("delete from private.reaction")) {
+            leaving = leaveGroup(pool, B.userId, race).then(
+              () => undefined,
+              (err: unknown) => err,
+            );
+            await expect
+              .poll(async () => (await pool.query<{ n: number }>("select count(*)::int as n from pg_stat_activity where wait_event_type = 'Lock' and query like '%group_member%'")).rows[0].n)
+              .toBe(1);
+          }
+          return result;
+        };
+        return client;
+      },
+    } as unknown as Pool;
+    const replaced = await setReaction(holding, A.userId, today, { type: "comment", id: bComment }, "❤️").then(
+      () => undefined,
+      (err: unknown) => err,
+    );
+    const left = await leaving;
+    // Postgres picks the victim: the stopped request answers 409 busy, the other goes through.
+    const outcomes = [replaced, left].map((e) => (e === undefined ? "ok" : e instanceof AppError ? `${e.status} ${e.code}` : "unexpected"));
+    expect(outcomes.sort()).toEqual(["409 busy", "ok"]);
   });
 });

@@ -74,6 +74,7 @@ describe("changing a username", () => {
     expect(await change(`ua2${RUN}`)).toEqual({ status: 409, body: { ok: false, error: "username_taken" } });
     expect(await change("Not Valid")).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
     expect(await change(7)).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
+    expect(await change("ab\u0000cd")).toEqual({ status: 400, body: { ok: false, error: "username_invalid" } });
     expect(await account()).toMatchObject({ username: C.username, usernameChangeableAt: null });
   });
 });

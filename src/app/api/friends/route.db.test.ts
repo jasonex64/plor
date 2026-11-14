@@ -61,6 +61,7 @@ describe("friends list", () => {
 
   it("removes a friendship both ways, and only an existing one", async () => {
     useSession(A.session);
+    expect(await call(remove, "/api/friends/remove", "POST", { username: "a\u0000b" })).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
     expect(await call(remove, "/api/friends/remove", "POST", { username: B.username })).toEqual({ status: 200, body: { ok: true } });
     expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([]);
     useSession(B.session);

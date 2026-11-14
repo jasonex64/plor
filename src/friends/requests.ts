@@ -11,7 +11,7 @@ import type { Friend } from "./friends";
 
 // The username a route's body names. Anything that isn't text gets 400.
 export function readUsername(input: unknown): string {
-  if (typeof input !== "string") throw new AppError("bad_request", 400, "username");
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("bad_request", 400, "username");
   return input;
 }
 

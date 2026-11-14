@@ -1,7 +1,7 @@
 // Reactions on comments and on friends' runs (docs/milestones/M08-comments-and-reactions.md, 8b; D2, D3): one per
 // player per target, from a fixed set. Like comments, a player reacts only on today, once their own run is over (D6),
 // and sees only their own reactions and their friends', or on a group's comment its members' (M10 10d, G4).
-import type { Pool } from "pg";
+import { DatabaseError, type Pool } from "pg";
 import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/platform/game";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
@@ -32,7 +32,7 @@ export function readTarget(input: unknown): Target {
   if (typeof input === "object" && input !== null) {
     const t = input as Record<string, unknown>;
     if (t.type === "comment") return { type: "comment", id: readCommentId(t.id) };
-    if (t.type === "run" && typeof t.username === "string") return { type: "run", username: t.username };
+    if (t.type === "run" && typeof t.username === "string" && !t.username.includes("\0")) return { type: "run", username: t.username };
   }
   throw new AppError("bad_request", 400, "target");
 }
@@ -106,6 +106,12 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
       broken = true;
       log.error("rollback failed", { error: String(rollbackErr) });
     }
+    // Another tab stored this player's reaction first (the unique index), or a member's leaving took the comment's rows
+    // while this replaced one (a deadlock the database broke): a message to try again, not a 500 (19b).
+    if (err instanceof DatabaseError && err.code === "23505" && (err.constraint === "reaction_one_per_comment" || err.constraint === "reaction_one_per_run")) {
+      throw new AppError("reaction_changed", 409);
+    }
+    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", 409);
     throw err;
   } finally {
     client.release(broken);

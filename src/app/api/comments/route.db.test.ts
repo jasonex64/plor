@@ -13,6 +13,7 @@ import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures, safeEntry } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { POST as deleteRoute } from "./delete/route";
+import { POST as reportRoute } from "./report/route";
 import { GET as threadRoute, POST as postRoute } from "./route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -141,6 +142,12 @@ describe("comments on the day's game", () => {
     expect((await remove(longest.body.comment.id)).status).toBe(200);
   });
 
+  // 19b: Postgres text can't hold a NUL (22021); refused at the input boundary like any other invalid body.
+  it("refuses a comment holding a NUL character with the same 400", async () => {
+    useSession(players.a.session);
+    expect(await post("before\u0000after")).toEqual({ status: 400, body: { ok: false, error: "comment_invalid" } });
+  });
+
   it("deletes your own comment for everyone, and refuses anyone else's", async () => {
     useSession(players.a.session);
     const mine = await post("delete me");
@@ -158,6 +165,29 @@ describe("comments on the day's game", () => {
     useSession(players.b.session);
     expect(bodies(await thread())).not.toContain("delete me");
     expect(bodies(await thread())).toContain("hello from b");
+  });
+
+  // 19b: the report's insert checks the comment with a foreign key, so a delete that commits after the report read the
+  // comment fails it (23503). It is the same 404 as a comment that was already gone.
+  it("answers the missing-comment 404 to a report racing its comment's deletion", async () => {
+    useSession(players.b.session);
+    const theirs = await post("reported while it is deleted");
+    expect(theirs.status).toBe(201);
+    useSession(players.a.session);
+    const pool = getPool();
+    const deleter = await pool.connect();
+    try {
+      await deleter.query("begin");
+      await deleter.query("delete from private.comment where id = $1", [theirs.body.comment.id]);
+      const report = call(reportRoute(apiRequest("/api/comments/report", { method: "POST", body: { id: theirs.body.comment.id } })));
+      await expect
+        .poll(async () => (await pool.query<{ n: number }>("select count(*)::int as n from pg_stat_activity where wait_event_type = 'Lock' and query like '%comment_report%'")).rows[0].n)
+        .toBe(1);
+      await deleter.query("commit");
+      expect(await report).toEqual({ status: 404, body: { ok: false, error: "comment_not_found" } });
+    } finally {
+      deleter.release();
+    }
   });
 
   it("lets A browse yesterday's thread read-only, though A didn't play it (D6)", async () => {

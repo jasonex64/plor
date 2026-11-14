@@ -149,6 +149,38 @@ describe("reactions on comments and on friends' runs", () => {
     expect((await react(onComment(commentOf.b), null)).status).toBe(200);
   });
 
+  // 19b: a NUL character can't reach the database in a text column (22021).
+  it("refuses a friend's username holding a NUL character with 400 bad_request", async () => {
+    useSession(players.a.session);
+    expect(await react(onRun("a\u0000b"), "👍")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+  });
+
+  // 19b: the same player's other tab stores a reaction between this tab's delete and its insert. The insert waits on the
+  // unique index, then fails on it once the other commits: a message to try again, not a 500.
+  it("answers 409 reaction_changed when another tab stored the player's reaction first", async () => {
+    useSession(players.a.session);
+    const pool = getPool();
+    const other = await pool.connect();
+    try {
+      await other.query("begin");
+      await other.query("insert into private.reaction (user_id, game_id, puzzle_date, comment_id, emoji) values ($1, $2, $3::date, $4, '👍')", [
+        players.a.userId,
+        GAME_ID,
+        today,
+        commentOf.b,
+      ]);
+      const second = react(onComment(commentOf.b), "❤️");
+      await expect
+        .poll(async () => (await pool.query<{ n: number }>("select count(*)::int as n from pg_stat_activity where wait_event_type = 'Lock' and query like '%private.reaction%'")).rows[0].n)
+        .toBe(1);
+      await other.query("commit");
+      expect(await second).toEqual({ status: 409, body: { ok: false, error: "reaction_changed" } });
+    } finally {
+      other.release();
+      await pool.query("delete from private.reaction where user_id = $1 and comment_id = $2", [players.a.userId, commentOf.b]);
+    }
+  });
+
   it(`accepts each of the ${REACTIONS.length} reactions (D3), so the tunable and the database agree, and nothing else`, async () => {
     useSession(players.a.session);
     for (const emoji of REACTIONS) {

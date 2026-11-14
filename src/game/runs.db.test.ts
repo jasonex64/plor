@@ -12,13 +12,13 @@ import { type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
 import { POINTS_PER_QUESTION } from "@/config/tunables";
 import { answerBonus, firstGuess } from "./scoring";
-import { getPool } from "@/lib/db";
+import { getPool, type Db } from "@/lib/db";
 import { fixtureTier } from "@/test/answer-fixture";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, nameOf, removeFixtures, safeEntries, safeEntry, typeableName } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { resolveTyped } from "./matching";
-import { startRun, todaysState } from "./runs";
+import { openNext, startRun, todaysState } from "./runs";
 import { publicQuestion } from "./payload";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -122,6 +122,11 @@ describe("a run, step by step", () => {
 
   it("refuses empty text with 400", async () => {
     expect(await answerText(0, "   ")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+  });
+
+  // 19b: a NUL character can't reach the database in a text column (22021).
+  it("refuses typed text holding a NUL character with 400 text_invalid", async () => {
+    expect(await answerText(0, "a\u0000b")).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
   });
 
   it("refuses to skip ahead", async () => {
@@ -416,6 +421,32 @@ describe("the 20-second timer", () => {
     const { status, body } = await answerText(0, "a thing nobody listed");
     expect(status).toBe(200);
     expect(body).toMatchObject({ notInList: false, run: { status: "timed_out" } });
+  });
+});
+
+// 19b: Next from a stale tab. The trigger counts the answers at the insert, so an answer that lands between Next's read
+// and its insert (the same player's other tab) makes the index it read out of order (OB002), not a 500.
+describe("Next racing an answer from another tab", () => {
+  it("answers 409 out_of_order, never a 500", async () => {
+    const player = await newPlayer("nr");
+    useSession(player.session);
+    await start();
+    expect((await answer(0, safeEntry(puzzle, 0))).status).toBe(200);
+    let raced = false;
+    const pool = getPool();
+    const racing = {
+      query: async (...args: unknown[]) => {
+        const result = await (pool.query as (...a: unknown[]) => Promise<unknown>)(...args);
+        if (!raced && String(args[0]).includes("private.run_status")) {
+          raced = true;
+          // The other tab opens question 2 and answers it between this tab's read and its insert.
+          expect((await next()).status).toBe(200);
+          expect((await answer(1, safeEntry(puzzle, 1))).status).toBe(200);
+        }
+        return result;
+      },
+    } as unknown as Db;
+    await expect(openNext(racing, player.userId)).rejects.toMatchObject({ code: "out_of_order", status: 409 });
   });
 });
 

@@ -72,7 +72,7 @@ export async function createProfile(db: Db, userId: string, username: string): P
 // requires (M07 D1), so a name typed with combining accents is still accepted. Anything else gets 400.
 export function readDisplayName(input: unknown): string | null {
   if (input === null) return null;
-  if (typeof input !== "string") throw new AppError("display_name_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("display_name_invalid", 400);
   return input.normalize("NFC").trim();
 }
 
