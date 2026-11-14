@@ -81,7 +81,32 @@ Fourth round (human, 2026-11-11, after three mock-ups of the carousel, A "a sliv
 
 **Claude's reading, not the human's words (open to change):** answer 20 applies wherever the board still shows (Friends, and Today on wider screens), since answer 19 takes it off Today on phones. Answer 23's box on Today lets the writer pick only a game they have finished, which the option stated.
 
-Not yet asked: Fragments' card colour (options to be shown); whether the cards keep one order or the unplayed one moves first; words on a blurred item; reactions in the feed; how replies to a comment show; how many items load at a time (a number: the human's or a source's); whether the date between days is shown. 16f is not approved to build.
+Fifth round (human, 2026-11-13, two sets of guided questions):
+25. Whether the carousel's cards swap places: "Fixed order (Recommended)". Game 1 is always card 1 and Fragments card 2; the app opens on whichever is unplayed (answer 5), so "1 of 2" may open on 2.
+26. What a blurred item says: "\"Play to see\" (Recommended)". Name and game, then a short prompt such as "Play Fragments to see". The exact words are not chosen.
+27. Where you can react in the feed: "On every item (Recommended)". Results and comments both take reactions in the feed.
+28. How a reply to a comment shows: "Tucked under it (Recommended)". Indented under its comment, behind a count such as "2 replies"; a new reply does not move to the top of the feed.
+29. A date between days: "Yes, a date line (Recommended)". A small line where each earlier day begins.
+30. How many feed items load at a time: "20" (the human's number, picked from 20, 30, 50 or a whole day at a time).
+
+Sixth round (human, 2026-11-13, after four pictures of the wide-peek carousel with Fragments' card beside Offbeat's navy on Paper and Night: A plum `#5a2f5e`, B deep teal `#17525a`, C rust `#8a3f1c`, D moss `#4a5524`; shown in the session, not in the repo):
+31. Fragments' card colour: "A. Plum". `#5a2f5e` with white text (10.48:1, computed in the session; `src/app/colors.test.ts` is to check it when built), the same in every theme, as Offbeat's `--offbeat`.
+
+Seventh round (human, 2026-11-13, while the ticket was drafted from the code):
+32. Replies, once Claude said its question for answer 28 was wrong (plor has no replies today, so they would be a new feature with a database change): "Leave replies out (Recommended)". Answer 28 is kept for after the beta.
+33. What a friend's row shows on Fragments' live board: "Round, then score (Recommended)". "On round 3 of 7" while they play; their score once they and the viewer have finished.
+34. Fragments' share: "Score and round marks (Recommended)". "Fragments · date", the score, and one mark per round, found or missed, with no words or letters.
+
+Eighth round (human, 2026-11-13, before 16f-1's build, on Me):
+35. "points all time" on Me's "All games" card: "Add both games (Recommended)". Offbeat's points plus Fragments' scores, one total. The option's stated cost: it mixes two scales.
+36. What a day's shade on Me's calendar means: "Played or not (Recommended)". Shaded if either game was started, as the streak; the shading by Offbeat's questions survived goes.
+37. Fragments' card on Me: "Best, average, days (Recommended)". Best score, average score and days played, with a link to the game; no chart.
+
+Ninth round (human, 2026-11-13, after 16f-1's first review):
+38. A profile's "All games" numbers now counting both games, though E4 (DECISIONS.md, 2026-11-12) said game 2 on a profile is "Game 1 only for now": "Yes, totals count both (Recommended)". No Fragments card on a profile yet.
+39. The "Numbers on the calendar" setting, now that the shade means played or not: "Remove the setting".
+
+16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions
 | # | Decision | Answer (origin) |

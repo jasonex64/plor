@@ -18,9 +18,9 @@ import { Line, Skeleton } from "./skeleton";
 const text = (err: unknown) =>
   err instanceof ApiError && err.code === "too_many_attempts" ? "You've looked up a lot of players. Wait a while and try again." : errorText(err);
 
-// numbers: the viewer's Numbers on the calendar setting. onRequestsChanged: a request was sent or answered here, so
+// onRequestsChanged: a request was sent or answered here, so
 // the Friends tab's count is read again (src/app/home.tsx).
-export function PlayerPage({ username, numbers, onRequestsChanged }: { username: string; numbers: boolean; onRequestsChanged: () => void }) {
+export function PlayerPage({ username, onRequestsChanged }: { username: string; onRequestsChanged: () => void }) {
   const [player, setPlayer] = useState<PlayerProfile | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +119,6 @@ export function PlayerPage({ username, numbers, onRequestsChanged }: { username:
       month={player.month}
       rarest={player.rarest}
       recent={player.recent}
-      numbers={numbers}
     >
       <section aria-label="You and this player" className={kit.card}>
         <div className={kit.chips}>{actions[player.relation]}</div>

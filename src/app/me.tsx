@@ -16,7 +16,7 @@ import kit from "./kit.module.css";
 import { CountUp } from "./count-up";
 import styles from "./me.module.css";
 import { Line, Skeleton } from "./skeleton";
-import { GAME } from "@/platform/game";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 import { FORWARD } from "./slide";
 import { SurvivedChart } from "./survived-chart";
 
@@ -24,10 +24,9 @@ import { SurvivedChart } from "./survived-chart";
 const dateText = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 
-// numbers: the player's Numbers on the calendar setting (L46).
 // timeUps: the frame's count of questions timed out away from the game screen; each one ends a run, so the numbers are
 // read again (docs/milestones/M14-14b-19-controls-layout-and-state.md).
-export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: number }) {
+export function MeStats({ timeUps }: { timeUps: number }) {
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -48,13 +47,15 @@ export function MeStats({ numbers, timeUps }: { numbers: boolean; timeUps: numbe
         </div>
       </Skeleton>
     );
-  return <StatsCards own name={me.username} since={me.since} totals={me.totals} offbeat={me.offbeat} month={me.month} rarest={me.rarest} numbers={numbers} />;
+  return <StatsCards own name={me.username} since={me.since} totals={me.totals} offbeat={me.offbeat} fragments={me.fragments} month={me.month} rarest={me.rarest} />;
 }
 
 // A player's stats as cards: the Me tab's (own), and another player's profile, which shows what Me shows
 // (docs/milestones/M17-profiles-and-friend-requests.md, 17b, E4). A stranger's profile has no since, month or rarest
 // (answer 4, E7); a friend's also has recent, the last days' chart (E3). username: shown when the name is a display
 // name. children: the profile's actions, under the header. Only your own numbers count up and link to the game.
+// fragments: Fragments' card, which only Me has: game 2 isn't on another player's profile yet (DECISIONS.md, Log
+// 2026-11-12, E4).
 export function StatsCards({
   own = false,
   name,
@@ -62,13 +63,13 @@ export function StatsCards({
   since,
   totals,
   offbeat,
+  fragments,
   month,
   rarest,
   recent,
-  numbers,
   children,
 }: Pick<Me, "totals" | "offbeat"> &
-  Partial<Pick<Me, "since" | "month" | "rarest">> & { own?: boolean; name: string; username?: string; recent?: Stats["days"]; numbers: boolean; children?: ReactNode }) {
+  Partial<Pick<Me, "since" | "month" | "rarest" | "fragments">> & { own?: boolean; name: string; username?: string; recent?: Stats["days"]; children?: ReactNode }) {
   const count = (key: string, value: number) => (own ? <CountUp name={key} value={value} /> : value.toLocaleString("en-US"));
   const me = { totals, offbeat };
   return (
@@ -93,7 +94,7 @@ export function StatsCards({
           <Total value={count("me.longest", me.totals.longestStreak)} label="longest streak" />
         </dl>
       </section>
-      {month && <Calendar month={month} numbers={numbers} />}
+      {month && <Calendar month={month} />}
       {/* The game's card, its numbers as chips (mockup 3's "Your <game>" card); plain since 14b-15 (answer 7). */}
       <section aria-label={GAME.name} className={kit.card}>
         <div className={styles.game}>
@@ -113,6 +114,21 @@ export function StatsCards({
           </ButtonLink>
         )}
       </section>
+      {fragments && (
+        <section aria-label={SUBSTRINGS.name} className={kit.card}>
+          <div className={styles.game}>
+            <h2>{SUBSTRINGS.name}</h2>
+          </div>
+          <dl className={styles.stats}>
+            <Chip value={fragments.best === null ? "–" : fragments.best.toLocaleString("en-US")} label="best score" />
+            <Chip value={fragments.average === null ? "–" : fragments.average.toFixed(1)} label="avg. score" />
+            <Chip value={String(fragments.daysPlayed)} label="days played" />
+          </dl>
+          <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD}>
+            {SUBSTRINGS.name}&apos;s game screen
+          </ButtonLink>
+        </section>
+      )}
       {rarest && <Rarest title={own ? "Your rarest answers" : "Rarest answers"} rarest={rarest} />}
     </div>
   );
@@ -167,22 +183,19 @@ function Chip({ value, label }: { value: string; label: string }) {
   );
 }
 
-// Round 7's shading: four steps of questions survived, 0-1, 2-3, 4-5 and 6-7 (M14 L46).
-function shade(survived: number): number {
-  return Math.min(3, Math.floor(survived / 2));
-}
-
-// This month, Sunday first: a played day (a finished run) shaded by questions survived, with its number when the
-// setting is on (L46), an earlier day without one outlined, today outlined thick, and the days after it dashed. Every
-// shade reaches 3:1 on the card (WCAG 2.2 1.4.11; globals.css), and one text alternative names each played day and
-// how far it went, so the shade isn't the only way to tell (1.1.1, 1.4.1; human, 2026-10-25: "Meet 3:1").
-function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) {
+// This month, Sunday first: a played day (a run started in either game) shaded, an earlier day without one outlined,
+// today outlined thick, and the days after it dashed (human, 2026-11-13: "Played or not"; it was four shades of
+// questions survived, M14 L46; the number setting was removed, human, 2026-11-13: "Remove the setting"). The shade reaches 3:1 on
+// the card (WCAG 2.2 1.4.11; globals.css), and one text
+// alternative names each played day and, when it has one, how far it went, so the shade isn't the only way to tell (1.1.1, 1.4.1; human, 2026-10-25: "Meet
+// 3:1").
+function Calendar({ month }: { month: Me["month"] }) {
   const first = month.days[0].date;
   const sofar = month.days.filter((d) => d.date <= month.today);
-  const days = sofar.filter((d) => d.survived !== null);
+  const days = sofar.filter((d) => d.played);
   const played = days.length;
   const name = dateText(first, { month: "long" });
-  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}, ${d.survived} of ${QUESTIONS_PER_DAY} survived`);
+  const named = days.map((d) => `${dateText(d.date, { day: "numeric", month: "long" })}${d.survived === null ? "" : `, ${d.survived} of ${QUESTIONS_PER_DAY} survived`}`);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   return (
     <section aria-label="Calendar" className={kit.card}>
@@ -211,20 +224,11 @@ function Calendar({ month, numbers }: { month: Me["month"]; numbers: boolean }) 
             data-date={d.date}
             className={[
               styles.day,
-              d.survived !== null ? styles[`shade${shade(d.survived) + 1}`] : d.date > month.today ? styles.later : styles.missed,
+              d.played ? styles.played : d.date > month.today ? styles.later : styles.missed,
               d.date === month.today ? styles.today : "",
             ].join(" ")}
-          >
-            {numbers && d.survived}
-          </span>
+          />
         ))}
-      </div>
-      <div className={styles.legend} aria-hidden="true">
-        <span>Fewer</span>
-        {[1, 2, 3, 4].map((k) => (
-          <i key={k} className={styles[`shade${k}`]} />
-        ))}
-        <span>More survived</span>
       </div>
     </section>
   );

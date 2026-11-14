@@ -4,8 +4,8 @@
 // T-12, T-11, T-10, T-9, T-8, T-5, T-3, T-2, T-1 and T (T-4, T-6 and T-7 have none). By hand:
 //   P: T-8 survived all 7 (ledger 1000); T-5 caught on question 3 (2 survived, 125); T-3 time ran out on question 5
 //      (4, 400); T-2 caught on question 1 (0, settled to 0 by the route); T-1 caught on question 2 (1, 25); T one safe
-//      answer, waiting at the reveal (in progress). Points 1000 + 125 + 400 + 0 + 25 = 1550; 5 days played (finished
-//      runs); 1 full run; best 1000; average (7 + 2 + 4 + 0 + 1) / 5 = 2.8. Streak and longest streak: T-9 wasn't
+//      answer, waiting at the reveal (in progress). Points 1000 + 125 + 400 + 0 + 25 = 1550; 6 days played (a run started
+//      on T-8, T-5, T-3, T-2, T-1 and T: 16f-1, "Started counts"); 1 full run; best 1000; average (7 + 2 + 4 + 0 + 1) / 5 = 2.8. Streak and longest streak: T-9 wasn't
 //      played, then T-8 to T all were, 6 puzzle days.
 //   L: started T-12, T-11, T-10 and T-1 and answered nothing (each timed out): longest streak 3, streak 1 (T-9
 //      unplayed; T not played yet, so it counts back from T-1).
@@ -169,14 +169,16 @@ describe("the Me tab's stats", () => {
     expect(r.body.me).toMatchObject({
       username: P.username,
       since: day[0],
-      totals: { points: 1550, daysPlayed: 5, streak: 6, longestStreak: 6 },
+      totals: { points: 1550, daysPlayed: 6, streak: 6, longestStreak: 6 },
       offbeat: { best: 1000, average: 2.8, fullRuns: 1 },
     });
   });
 
-  it("gives this month's days with the questions survived on finished runs, today's unfinished one as none (criterion 2)", async () => {
+  it("gives this month's days with whether a run was started that day, today's unfinished one too (criterion 2; 16f-1)", async () => {
     useSession(P.session);
     const { me } = (await call()).body;
+    const played = new Set([day[8], day[5], day[3], day[2], day[1], day[0]]);
+    // The questions survived stay for the numbers setting, on finished runs only: today's unfinished one has none.
     const survived = new Map([
       [day[8], 7],
       [day[5], 2],
@@ -189,7 +191,7 @@ describe("the Me tab's stats", () => {
       "select generate_series(date_trunc('month', private.today()), date_trunc('month', private.today()) + interval '1 month - 1 day', interval '1 day')::date::text as d",
     );
     expect(me.month.today).toBe(day[0]);
-    expect(me.month.days).toEqual(rows.map((r) => ({ date: r.d, survived: survived.get(r.d) ?? null })));
+    expect(me.month.days).toEqual(rows.map((r) => ({ date: r.d, played: played.has(r.d), survived: survived.get(r.d) ?? null })));
     expect(me.month.days.every((d: { date: string }) => d.date.startsWith(month))).toBe(true);
   });
 

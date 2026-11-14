@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
 
 // The custom properties declared in the first block after `marker`, a slot named as another (`var(--text)`) read as
-// that slot's colour in the same block (the numbers on the calendar's shades, M14 14b-2c-2, item 28).
+// that slot's colour in the same block.
 function slots(marker: string): Record<string, string> {
   const start = css.indexOf("{", css.indexOf(marker));
   const block = css.slice(start, css.indexOf("}", start));
@@ -73,7 +73,7 @@ describe("Offbeat's colour", () => {
 
 describe.each(Object.entries(themes))("%s", (_, t) => {
   it("declares every slot", () => {
-    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "danger", "edge", "line", "muted", "on-accent", "on-shade-1", "on-shade-2", "on-shade-3", "on-shade-4", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "surface", "text"]);
+    expect(Object.keys(t).sort()).toEqual(["accent", "bg", "caught", "caught-bg", "danger", "edge", "line", "muted", "on-accent", "safe", "safe-bg", "shade-1", "shade-2", "shade-3", "shade-4", "soft", "surface", "text"]);
   });
 
   it.each([
@@ -105,12 +105,10 @@ describe.each(Object.entries(themes))("%s", (_, t) => {
     expect(ratio(rgb(t.text), over(t.soft, t.bg))).toBeGreaterThanOrEqual(4.5);
   });
 
-  // Me's calendar sits on a card: each played day's shade is a graphic the calendar needs (1.4.11), and its number,
-  // shown with Numbers on the calendar, is text (1.4.3).
-  it.each([1, 2, 3, 4])("shade %i is at least 3:1 on the surface, and its number at least 4.5:1 on it", (k) => {
+  // Me's calendar sits on a card: each played day's shade is a graphic the calendar needs (1.4.11).
+  it.each([1, 2, 3, 4])("shade %i is at least 3:1 on the surface", (k) => {
     const shade = over(t[`shade-${k}`], t.surface);
     expect(ratio(shade, rgb(t.surface))).toBeGreaterThanOrEqual(3);
-    expect(ratio(rgb(t[`on-shade-${k}`]), shade)).toBeGreaterThanOrEqual(4.5);
   });
 
   // The admin pages (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 7): Delete's confirm button, text on the

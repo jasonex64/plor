@@ -20,7 +20,7 @@ export default function Privacy() {
       <ul>
         <li>
           <strong>Your account:</strong> your email address, the username you pick, your display name if you set one, and your settings (Skip the game
-          screen, Numbers on the calendar, your theme). If you sign in with Google,
+          screen, your theme). If you sign in with Google,
           Google also shares your name, and your profile picture if you have one; they are stored with your
           account. Plor doesn&apos;t show or use them.
         </li>

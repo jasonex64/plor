@@ -24,15 +24,11 @@
   --caught-bg: #fbe4e6;
   /* Me's calendar: a played day shaded in four steps of questions survived (M14 L46), the accent at rising strength from
      the lightest that reaches 3:1 on the card, in even steps (human, 2026-10-25: "Use these (Recommended)";
-     docs/milestones/M14-14a-3b-settings.md), and the colour of the day's number on each, 4.5:1 or more. */
+     docs/milestones/M14-14a-3b-settings.md). */
   --shade-1: #2457d6a5;
   --shade-2: #2457d6c3;
   --shade-3: #2457d6e1;
   --shade-4: #2457d6;
-  --on-shade-1: var(--text);
-  --on-shade-2: var(--text);
-  --on-shade-3: var(--on-accent);
-  --on-shade-4: var(--on-accent);
   /* Delete account (round 7's palettes). */
   --danger: #b4232f;
   /* The game's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour"), a navy with white text. */
@@ -62,10 +58,6 @@
     --shade-2: #7ea6ffb1;
     --shade-3: #7ea6ffd8;
     --shade-4: #7ea6ff;
-    --on-shade-1: var(--text);
-    --on-shade-2: var(--on-accent);
-    --on-shade-3: var(--on-accent);
-    --on-shade-4: var(--on-accent);
     --danger: #ff5c5c;
   }
 }
@@ -89,17 +81,13 @@
   --shade-2: #7ea6ffb1;
   --shade-3: #7ea6ffd8;
   --shade-4: #7ea6ff;
-  --on-shade-1: var(--text);
-  --on-shade-2: var(--on-accent);
-  --on-shade-3: var(--on-accent);
-  --on-shade-4: var(--on-accent);
   --danger: #ff5c5c;
 }
 
 /* Sky, Moonlit and Ink: the Themes board's colours (L21; Moonlit's are monkeytype's "rose pine moon", from Rosé Pine,
    credited on /about), with the rest filled by round 8's rule: the outline, the text faded toward the card until 3:1;
-   Moonlit's divider as visible as Night's; the shades as Paper's and Night's; each shade's number the first of text,
-   on-accent, white and black reaching 4.5:1; Safe, Caught and Delete as Paper (Sky) or Night (Moonlit, Ink). */
+   Moonlit's divider as visible as Night's; the shades as Paper's and Night's;
+   Safe, Caught and Delete as Paper (Sky) or Night (Moonlit, Ink). */
 [data-theme="sky"] {
   color-scheme: light;
   --bg: #eef3fa;
@@ -119,10 +107,6 @@
   --shade-2: #1f5fbfc4;
   --shade-3: #1f5fbfe2;
   --shade-4: #1f5fbf;
-  --on-shade-1: var(--text);
-  --on-shade-2: #000000;
-  --on-shade-3: var(--on-accent);
-  --on-shade-4: var(--on-accent);
   --danger: #b4232f;
 }
 
@@ -145,10 +129,6 @@
   --shade-2: #9ccfd8a1;
   --shade-3: #9ccfd8d0;
   --shade-4: #9ccfd8;
-  --on-shade-1: #ffffff;
-  --on-shade-2: #000000;
-  --on-shade-3: var(--on-accent);
-  --on-shade-4: var(--on-accent);
   --danger: #ff5c5c;
 }
 
@@ -171,10 +151,6 @@
   --shade-2: #ffd84d98;
   --shade-3: #ffd84dcc;
   --shade-4: #ffd84d;
-  --on-shade-1: var(--text);
-  --on-shade-2: var(--on-accent);
-  --on-shade-3: var(--on-accent);
-  --on-shade-4: var(--on-accent);
   --danger: #ff5c5c;
 }
 

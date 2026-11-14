@@ -55,7 +55,7 @@ test("a switch toggled on, off, on stays on while the answers land", async ({ pa
     await route.continue();
   });
   await openSheet(page);
-  const toggle = sheetOf(page).getByRole("switch", { name: /Numbers on the calendar/ });
+  const toggle = sheetOf(page).getByRole("switch", { name: /Skip the game screen/ });
   const start = await toggle.isChecked();
   await toggle.click();
   await toggle.click();

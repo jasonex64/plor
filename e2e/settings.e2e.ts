@@ -1,21 +1,19 @@
 // The settings sheet (docs/milestones/M14-14a-3b-settings.md): the gear opens a modal <dialog> (MDN <dialog>,
 // SOURCES.md), a sheet at the bottom on phones and a 440px panel from 768px, which closes with Close, Escape or a click
-// on the dimmed page; and its two switches, Skip the game screen (L39) and Numbers on the calendar (L46), saved on the
+// on the dimmed page; and its switch, Skip the game screen (L39), saved on the
 // account. The account's own controls in it are in account.e2e.ts.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
-import { answerBox, caughtToCards } from "./game";
+import { answerBox } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
-let today = "";
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
-  today = (await DB.query<{ today: string }>("select private.today()::text as today")).rows[0].today;
 });
 
 test.afterAll(async () => {
@@ -126,26 +124,4 @@ test("Skip the game screen makes Play start question 1, and says the time limit 
   await banner.getByRole("button", { name: "Play", exact: true }).click();
   await expect(page).toHaveURL(/\/play$/);
   await expect(answerBox(page)).toBeVisible();
-});
-
-// Criterion 5: each played day's number, in its shade's number colour, only with the switch on. Caught on question 1, which
-// the test before left in play, today is a played day with 0 survived.
-test("Numbers on the calendar shows each played day's questions survived", async () => {
-  await caughtToCards(page, puzzle.hostAnswer);
-  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
-  await page.goto("/me");
-  const cell = page.getByRole("region", { name: "Calendar" }).locator(`[data-date='${today}']`);
-  await expect(page.getByRole("region", { name: "Calendar" }).getByText(/^1 of \d+ days$/)).toBeVisible();
-  await expect(cell).toHaveText("");
-
-  await flip(page, "Numbers on the calendar", true);
-  await expect(cell).toHaveText("0");
-  // Paper's first shade takes the text colour for its number, 4.5:1 on it (colors.test.ts).
-  expect(await cell.evaluate((el) => getComputedStyle(el).color)).toBe("rgb(26, 26, 24)");
-  // Saved on the account: a reload keeps it.
-  await page.reload();
-  await expect(cell).toHaveText("0");
-
-  await flip(page, "Numbers on the calendar", false);
-  await expect(cell).toHaveText("");
 });

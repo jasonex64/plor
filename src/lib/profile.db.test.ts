@@ -9,7 +9,7 @@ import { DISPLAY_NAME_MAX_LENGTH, USERNAME_CHANGE_DAYS, USERNAME_MAX_LENGTH, USE
 import { changeUsername, createProfile, getProfile, setDisplayName, setSettings } from "./profile";
 
 // Both settings off and the theme following the device on a new profile (M14 14a-3b, 14b-1).
-const OFF = { skipGameScreen: false, calendarNumbers: false, theme: "device" };
+const OFF = { skipGameScreen: false, theme: "device" };
 
 const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
 
@@ -51,7 +51,7 @@ describe("private.profile as plor_app", () => {
     });
   });
 
-  // Since M14 14a-3b (a security change) plor_app may update the two settings' columns (DECISIONS.md Log, 2026-10-25),
+  // Since M14 14a-3b (a security change) plor_app may update the settings column (DECISIONS.md Log, 2026-10-25),
   // which the existing update policy covers.
   it("sets the settings and the theme, one at a time, and refuses them before the profile exists", async () => {
     await asPlorApp(async (client, userId) => {
@@ -60,10 +60,9 @@ describe("private.profile as plor_app", () => {
     await asPlorApp(async (client, userId) => {
       await createProfile(client, userId, "plor_app_probe");
       expect(await setSettings(client, userId, { skipGameScreen: true })).toEqual({ ...OFF, skipGameScreen: true });
-      expect(await setSettings(client, userId, { calendarNumbers: true })).toEqual({ ...OFF, skipGameScreen: true, calendarNumbers: true });
       // And the theme (14b-1): its own column grant.
-      expect(await setSettings(client, userId, { theme: "moonlit" })).toEqual({ skipGameScreen: true, calendarNumbers: true, theme: "moonlit" });
-      expect((await getProfile(client, userId))?.settings).toEqual({ skipGameScreen: true, calendarNumbers: true, theme: "moonlit" });
+      expect(await setSettings(client, userId, { theme: "moonlit" })).toEqual({ skipGameScreen: true, theme: "moonlit" });
+      expect((await getProfile(client, userId))?.settings).toEqual({ skipGameScreen: true, theme: "moonlit" });
     });
   });
 

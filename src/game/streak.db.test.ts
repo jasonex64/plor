@@ -5,7 +5,7 @@
 // which days the local database has.
 import { afterAll, describe, expect, it } from "vitest";
 import { Pool, type PoolClient } from "pg";
-import { GAME_ID } from "@/platform/game";
+import { GAME_ID, SUBSTRINGS_ID } from "@/platform/game";
 import { fixtureDay } from "@/test/answer-fixture";
 
 // The streak reads only which days have a puzzle, so the fixture day needs no answer database here.
@@ -59,6 +59,53 @@ describe("the streak of days played", () => {
       // Today, but not yesterday: the streak starts again.
       expect(await getStreak(client, await player([0, 2]))).toBe(1);
       expect(await getStreak(client, await player([]))).toBe(0);
+    } finally {
+      await client.query("rollback");
+      client.release();
+    }
+  });
+
+  // One streak for both games (docs/milestones/M16-16f-the-shared-pieces.md, 16f-1; human, 2026-11-13: "One shared
+  // streak", "Started counts", "Play what's there"). Every puzzle on the days around today is cleared inside the
+  // transaction first, so each case names exactly which game had an approved day when.
+  it("counts a run of either game, needs only the game that had a day, and skips a day with none in either (16f-1)", async () => {
+    const client: PoolClient = await admin.connect();
+    try {
+      await client.query("begin");
+      await client.query("set local session_replication_role = replica");
+      const { rows } = await client.query<{ day: string }>(
+        "select (private.today() - n)::text as day from generate_series(0, 4) as n order by n",
+      );
+      const day = (n: number) => rows[n].day;
+      const fragmentsDay = (date: string) => ({ format: 1, game_id: SUBSTRINGS_ID, date, rounds: ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"], bonus_letter: "j" });
+      async function puzzles(offbeat: number[], fragments: number[]) {
+        await client.query("delete from private.puzzle where puzzle_date = any($1::date[])", [rows.map((r) => r.day)]);
+        for (const n of offbeat) {
+          await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, day(n), fixture(day(n))]);
+        }
+        for (const n of fragments) {
+          await client.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [SUBSTRINGS_ID, day(n), fragmentsDay(day(n))]);
+        }
+      }
+      async function player(runs: [string, number][]): Promise<string> {
+        const { rows: user } = await client.query<{ id: string }>(
+          "insert into auth.users (id, email) values (gen_random_uuid(), gen_random_uuid() || '@example.test') returning id",
+        );
+        for (const [game, n] of runs) {
+          await client.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [user[0].id, game, day(n)]);
+        }
+        return user[0].id;
+      }
+
+      // Fragments alone yesterday, Offbeat today: 2. Yesterday had no Offbeat day at all.
+      await puzzles([0], [1]);
+      expect(await getStreak(client, await player([[SUBSTRINGS_ID, 1], [GAME_ID, 0]]))).toBe(2);
+      // Three days ago both had a day, two days ago neither did: it neither counts nor breaks, so the three played days are 3.
+      await puzzles([0, 3], [1, 3]);
+      expect(await getStreak(client, await player([[GAME_ID, 0], [SUBSTRINGS_ID, 1], [GAME_ID, 3]]))).toBe(3);
+      // Yesterday only Fragments had a day and the player, who played Offbeat on both sides, didn't play it: broken.
+      await puzzles([0, 2], [1]);
+      expect(await getStreak(client, await player([[GAME_ID, 0], [GAME_ID, 2]]))).toBe(1);
     } finally {
       await client.query("rollback");
       client.release();

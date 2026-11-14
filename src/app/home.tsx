@@ -360,7 +360,7 @@ export function MeTab() {
   return (
     <>
       {/* Only the stats (L45); the account is in the settings sheet (14a-3b). */}
-      <MeStats numbers={player.settings.calendarNumbers} timeUps={timeUps} />
+      <MeStats timeUps={timeUps} />
       {player.admin && <MeAdminLink />}
     </>
   );
@@ -434,11 +434,11 @@ export function GroupTab({ id }: { id: string }) {
 // A player's profile, opened from Find a player or a friend's row (docs/milestones/M17-profiles-and-friend-requests.md,
 // 17b, E6). The page starts again for each name.
 export function PlayerTab({ username }: { username: string }) {
-  const { player, requestsChanged } = usePlayer();
+  const { requestsChanged } = usePlayer();
   return (
     <>
       <BackTo href="/friends">Friends</BackTo>
-      <PlayerPage key={username} username={username} numbers={player.settings.calendarNumbers} onRequestsChanged={requestsChanged} />
+      <PlayerPage key={username} username={username} onRequestsChanged={requestsChanged} />
     </>
   );
 }

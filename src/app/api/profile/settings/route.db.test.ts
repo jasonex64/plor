@@ -37,30 +37,28 @@ describe("the player's settings", () => {
     for (const p of [A, B]) {
       p.session = (await signIn(p.email)).session;
       expect((await createProfile(apiRequest("/api/profile", { method: "POST", body: { username: p.username } }))).status).toBe(201);
-      expect(await settings()).toEqual({ skipGameScreen: false, calendarNumbers: false, theme: "device" });
+      expect(await settings()).toEqual({ skipGameScreen: false, theme: "device" });
     }
   });
 
-  it("sets one setting, then the other, keeping the first", async () => {
+  it("sets one setting, then another, keeping the first", async () => {
     useSession(A.session);
     expect(await set({ skipGameScreen: true })).toEqual({
       status: 200,
-      body: { ok: true, settings: { skipGameScreen: true, calendarNumbers: false, theme: "device" } },
+      body: { ok: true, settings: { skipGameScreen: true, theme: "device" } },
     });
-    expect(await set({ calendarNumbers: true })).toEqual({
-      status: 200,
-      body: { ok: true, settings: { skipGameScreen: true, calendarNumbers: true, theme: "device" } },
-    });
-    expect(await settings()).toEqual({ skipGameScreen: true, calendarNumbers: true, theme: "device" });
-    expect(await set({ skipGameScreen: false, calendarNumbers: false, theme: "device" })).toMatchObject({ status: 200 });
-    expect(await settings()).toEqual({ skipGameScreen: false, calendarNumbers: false, theme: "device" });
+    // Numbers on the calendar was removed (human, 2026-11-13: "Remove the setting"): an unknown field is refused.
+    expect(await set({ calendarNumbers: true })).toEqual({ status: 400, body: { ok: false, error: "settings_invalid" } });
+    expect(await settings()).toEqual({ skipGameScreen: true, theme: "device" });
+    expect(await set({ skipGameScreen: false, theme: "device" })).toMatchObject({ status: 200 });
+    expect(await settings()).toEqual({ skipGameScreen: false, theme: "device" });
   });
 
   // The theme is one of the six presets (docs/milestones/M14-14b-1-themes.md, criterion 3).
   it("sets each theme, and back to following the device", async () => {
     useSession(A.session);
     for (const theme of ["paper", "night", "sky", "moonlit", "ink", "device"]) {
-      expect(await set({ theme })).toEqual({ status: 200, body: { ok: true, settings: { skipGameScreen: false, calendarNumbers: false, theme } } });
+      expect(await set({ theme })).toEqual({ status: 200, body: { ok: true, settings: { skipGameScreen: false, theme } } });
     }
   });
 
@@ -68,15 +66,15 @@ describe("the player's settings", () => {
     useSession(A.session);
     await set({ skipGameScreen: true });
     useSession(B.session);
-    expect(await settings()).toEqual({ skipGameScreen: false, calendarNumbers: false, theme: "device" });
+    expect(await settings()).toEqual({ skipGameScreen: false, theme: "device" });
   });
 
-  it.each([{}, { skipGameScreen: "yes" }, { calendarNumbers: null }, { theme: "dark" }, { theme: 7 }, { skipGameScreen: true, other: true }])(
+  it.each([{}, { skipGameScreen: "yes" }, { calendarNumbers: true }, { theme: "dark" }, { theme: 7 }, { skipGameScreen: true, other: true }])(
     "refuses %j with 400 settings_invalid",
     async (body) => {
       useSession(B.session);
       expect(await set(body)).toEqual({ status: 400, body: { ok: false, error: "settings_invalid" } });
-      expect(await settings()).toEqual({ skipGameScreen: false, calendarNumbers: false, theme: "device" });
+      expect(await settings()).toEqual({ skipGameScreen: false, theme: "device" });
     },
   );
 });

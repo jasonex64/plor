@@ -3,7 +3,7 @@ import { getPool } from "@/lib/db";
 import { checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { readSettings, setSettings } from "@/lib/profile";
 
-// Sets the signed-in player's settings, Skip the game screen and Numbers on the calendar
+// Sets the signed-in player's settings, Skip the game screen
 // (docs/milestones/M14-14a-3b-settings.md), and their theme (docs/milestones/M14-14b-1-themes.md). The user comes
 // from the verified session, never from the body, and of the profile plor_app may update only these columns, with the
 // names (DECISIONS.md Log, 2026-10-25).
