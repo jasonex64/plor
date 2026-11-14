@@ -6,7 +6,7 @@ import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { answerBox } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { GAME } from "../src/platform/game";
+import { GAME, SUBSTRINGS } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
@@ -27,7 +27,7 @@ const TABS = [
   { name: "Today", path: "/", sections: [GAME.name, "Leaderboard", "Feed"] },
   { name: "Friends", path: "/friends", sections: ["Friends today", "Friends leaderboard", "Find a player", "Your friends"] },
   { name: "Groups", path: "/groups", sections: ["Groups"] },
-  { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, "Your rarest answers"] },
+  { name: "Me", path: "/me", sections: ["All games", "Calendar", GAME.name, SUBSTRINGS.name, "Your rarest answers"] },
 ];
 
 // A signed-in player in a fresh browser of the given size, with every request recorded.
