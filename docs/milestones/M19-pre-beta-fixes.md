@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c (PR #201) is merged too; 19d (PR #202) is merged (the human's hosted `db push` follows it); 19e (PR #203) is merged; 19f's test is written, in its pull request, not merged: the board does lag, and which fix, if any, is the human's to choose (asked 2026-11-13).
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c (PR #201) is merged too; 19d (PR #202) is merged (the human's hosted `db push` follows it); 19e (PR #203) is merged; 19f's test is written, in its pull request: the board does lag, and the human chose to leave it for the beta (answer 19). With 19f's merge every step is done.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -30,6 +30,7 @@ Close the player-facing bugs already recorded in ROADMAP's "Next revision" and t
 | 16 | 19d: the Privacy page's guest words, drafted: "Your answers are added to the day's counts of how many people gave each answer, with nothing that says who gave them. Your run is kept until that day ends, so you can see your result again, and is then deleted, finished or not." (in place of "When your run ends we delete the run and keep only your answers, added to the day's counts … A run you leave unfinished is deleted after that day ends.") | "Approve as drafted". Told first: the clearing runs at the next guest's Start after midnight Pacific, not on a timer, and the guest cookie ends with the browser, so "one play a day" is per browser session |
 | 17 | 19d: `private.end_guest_run` is left unused by the fix; remove it? | "Remove it now": a migration that drops it, and the human's hosted `db push` **after** 19d's merge, not before (the live code calls it until then) |
 | 18 | 19c, after CI showed it: on a player's first day, Today's Leaderboard card opens on an empty Yesterday. Keep it, or always show your own row? | "keep it, merge, and next steps" |
+| 19 | 19f, after its test showed the open board is late: leave it, have the friend's browser report it, refresh the board on return, or a server timer? | "Leave it for the beta (Recommended)" |
 
 ## Source
 - **Next.js** (SOURCES.md): route handlers, for the routes' replies.
