@@ -89,7 +89,10 @@ Fifth round (human, 2026-11-13, two sets of guided questions):
 29. A date between days: "Yes, a date line (Recommended)". A small line where each earlier day begins.
 30. How many feed items load at a time: "20" (the human's number, picked from 20, 30, 50 or a whole day at a time).
 
-Not yet asked: Fragments' card colour (options to be shown as pictures; a design task, on Fable). 16f is not approved to build: its ticket is to be drafted from answers 1 to 30 for approval.
+Sixth round (human, 2026-11-13, after four pictures of the wide-peek carousel with Fragments' card beside Offbeat's navy on Paper and Night: A plum `#5a2f5e`, B deep teal `#17525a`, C rust `#8a3f1c`, D moss `#4a5524`; shown in the session, not in the repo):
+31. Fragments' card colour: "A. Plum". `#5a2f5e` with white text (10.48:1, computed in the session; `src/app/colors.test.ts` is to check it when built), the same in every theme, as Offbeat's `--offbeat`.
+
+Nothing is left to ask. 16f is not approved to build: its ticket is to be drafted from answers 1 to 31 for approval.
 
 ## Decisions
 | # | Decision | Answer (origin) |
