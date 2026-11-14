@@ -13,7 +13,8 @@ export const POST = handle(async (request) => {
   const supabase = await createAuthClient();
   const userId = await requireUserId(supabase);
   const typed = (await readJsonObject(request)).username;
-  if (typeof typed !== "string" || !(await deleteAccount(getPool(), userId, typed))) throw new AppError("username_mismatch", 400);
+  // A NUL character can't reach Postgres text (22021), and no username holds one (M19 19b).
+  if (typeof typed !== "string" || typed.includes("\0") || !(await deleteAccount(getPool(), userId, typed))) throw new AppError("username_mismatch", 400);
   const { error } = await supabase.auth.signOut({ scope: "local" });
   // The account is gone either way, so the reply says so (M19 19a, answer 6: "Say it's deleted").
   if (error) log.error("account deleted, sign-out failed", { error: String(error) });
