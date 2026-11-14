@@ -2,8 +2,8 @@
 
 // The settings sheet (docs/milestones/M14-14a-3b-settings.md; M14 L44), opened from the shell's gear: a sheet at the
 // bottom on phones and a side panel from 768px, as round 7 draws them. It holds the account (M12 12a, 12b, 12c: the
-// username, once every 30 days; the display name friends see, M07 7a; Sign out; Delete account) and the two settings,
-// Skip the game screen (L39) and Numbers on the calendar (L46), saved on the account; and the theme
+// username, once every 30 days; the display name friends see, M07 7a; Sign out; Delete account) and the settings,
+// Skip the game screen (L39), saved on the account; and the theme
 // (docs/milestones/M14-14b-1-themes.md; L21, L47), with links to the privacy and About pages; and the players the
 // player has blocked, each with Unblock (docs/milestones/M17-profiles-and-friend-requests.md, 17a; answer 21).
 //
@@ -269,9 +269,8 @@ function DisplayName({ name, onChanged }: { name: string | null; onChanged: () =
   );
 }
 
-const SWITCHES: { key: "skipGameScreen" | "calendarNumbers"; label: string; line: string }[] = [
+const SWITCHES: { key: "skipGameScreen"; label: string; line: string }[] = [
   { key: "skipGameScreen", label: "Skip the game screen", line: "Play goes straight to question 1." },
-  { key: "calendarNumbers", label: "Numbers on the calendar", line: "Show how many questions you survived each day." },
 ];
 
 // The six themes (L21), each tile drawn in its own theme's background and accent through its data-theme; Follow
@@ -285,7 +284,7 @@ const TILES: { theme: Theme; label: string; drawn: Exclude<Theme, "device"> }[] 
   { theme: "ink", label: "Ink", drawn: "ink" },
 ];
 
-// Round 7's two switches, in its wording (provisional, L32), and its theme picker: radio buttons, so the chosen one is
+// Round 7's switch, in its wording (provisional, L32), and its theme picker: radio buttons, so the chosen one is
 // announced as checked, and drawn with a thick outline alone (L47). Each is saved as it's changed, and shown at once
 // while it saves: the controls stay enabled, so a keyboard player's focus isn't lost, and a picked theme restyles the
 // page straight away (docs/milestones/M14-14b-2c-review-items.md, item 33). Saves go one after another, so the last

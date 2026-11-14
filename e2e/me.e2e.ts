@@ -1,5 +1,5 @@
-// The Me tab's stats (docs/milestones/M14-14a-3a-me.md): the header, totals, this month's calendar, Offbeat's card and
-// the rarest answers, before and after a run; the avatar slots by names; and the Friends tab's empty state. Yesterday's
+// The Me tab's stats (docs/milestones/M14-14a-3a-me.md): the header, totals, this month's calendar, Offbeat's and
+// Fragments' cards (M16 16f-1) and the rarest answers, before and after a run; the avatar slots by names; and the Friends tab's empty state. Yesterday's
 // answers are written with the answer triggers off, as the database tests do, so they need the local superuser.
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
@@ -7,7 +7,7 @@ import { FIXTURE, fixtureDay, fixtureId, isFixtureDay, loadFixtureBase } from ".
 import { RUN, play, signInAndPick } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { GAME } from "../src/platform/game";
+import { GAME, SUBSTRINGS } from "../src/platform/game";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -81,9 +81,17 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
     "href",
     "/play",
   );
+  // Fragments' card beside it: best, average and days played, and its game screen.
+  await expect(total(page, SUBSTRINGS.name, "best score")).toHaveText("–");
+  await expect(total(page, SUBSTRINGS.name, "avg. score")).toHaveText("–");
+  await expect(total(page, SUBSTRINGS.name, "days played")).toHaveText("0");
+  await expect(page.getByRole("region", { name: SUBSTRINGS.name, exact: true }).getByRole("link", { name: `${SUBSTRINGS.name}'s game screen` })).toHaveAttribute(
+    "href",
+    SUBSTRINGS.path,
+  );
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
-  // Caught on question 1: a finished run with 0 survived, shaded at the first step.
+  // Caught on question 1: a finished run with 0 survived, a played day.
   await page.goto("/");
   await play(page);
   await caughtToCards(page, puzzle.hostAnswer);
@@ -99,8 +107,8 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
     "aria-label",
     `Days played in ${dateText(today, { month: "long" })}: 1 of the ${sofar} days so far: ${dateText(today, { day: "numeric", month: "long" })}, 0 of 7 survived`,
   );
-  // Paper's first shade, the accent at alpha 0xa5, the lightest reaching 3:1 on the card (14a-3b).
-  expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(36, 87, 214, 0.647)");
+  // A played day takes Paper's strongest shade, the accent itself (16f-1, "Played or not").
+  expect(await todayCell.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(36, 87, 214)");
   // No numbers until the player turns them on (L46).
   await expect(todayCell).toHaveText("");
 });

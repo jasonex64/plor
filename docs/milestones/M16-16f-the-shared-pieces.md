@@ -1,6 +1,6 @@
 # M16 16f — the shared pieces
 
-**Status:** planned. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Not approved to build.**
+**Status:** in progress. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Approved by the human (2026-11-13: "Approve 16f").** 16f-1 is built, in its pull request, not merged (a hosted `db push` follows its merge, never before).
 
 ## Goal
 Make the screens around the games work for two games: Today shows both, one streak counts either, and the feed, comments, reactions, boards, Me and Share know Fragments as well as Offbeat.
@@ -26,10 +26,14 @@ Make the screens around the games work for two games: Today shows both, one stre
 ## Acceptance criteria and plan
 One pull request per step, from `m16-game-2`, in this order. Each fix starts with a failing test. Steps 16f-4 and 16f-6 carry a database migration: **the hosted `db push` is the human's, after that step's merge.** Every merge publishes to plor.app.
 
-**16f-1 — one shared streak; Me knows both games** (the split's answer 2; answers 2, 7).
-- [ ] Starting either game today keeps the streak; a day with an approved day in only one game needs only that game; a day with none in either is skipped and breaks nothing (`src/game/streak.ts`, `src/game/me.ts:49-57`) → verify: db tests: Fragments alone yesterday and Offbeat today is a streak of 2; a day with no approved day in either game between two played days does not break it.
-- [ ] Me's days played counts started runs in either game (answer 2; `src/game/me.ts:60`) → verify: a db test with one started, unfinished Fragments run counts 1.
-- [ ] Me shows a Fragments card beside Offbeat's, and "All games" adds both (M14 L45; `src/app/me.tsx:87-112`) → verify: a db test of `/api/me` with runs in both games, and an e2e that finds both cards.
+**16f-1 — one shared streak; Me knows both games** (the split's answer 2; answers 2, 7, 35 to 39). Migration: drops `private.profile.calendar_numbers`; the human's `db push` after the merge.
+- [x] Starting either game today keeps the streak; a day with an approved day in only one game needs only that game; a day with none in either is skipped and breaks nothing (`src/game/streak.ts`, `src/game/me.ts:49-57`) → verify: db tests: Fragments alone yesterday and Offbeat today is a streak of 2; a day with no approved day in either game between two played days does not break it.
+- [x] Me's days played counts started runs in either game (answer 2; `src/game/me.ts:60`) → verify: a db test with one started, unfinished Fragments run counts 1.
+- [x] Me shows a Fragments card beside Offbeat's with best score, average score and days played and a link to the game, no chart (answer 37; M14 L45; `src/app/me.tsx:87-112`) → verify: a db test of `/api/me` with runs in both games, and an e2e that finds both cards.
+- [x] "points all time" adds Offbeat's points and Fragments' scores (answer 35) → verify: a db test on a hand-worked pair of days.
+- [x] Me's calendar shades a day if either game was started, and no longer by questions survived (answer 36) → verify: a db test marks a Fragments-only day as played.
+- [x] The "Numbers on the calendar" setting is gone: its switch, its saved value and its column (answer 39) → verify: a db test that the settings route refuses `calendarNumbers` as any unknown field and the profile's settings no longer carry it; pgTAP's grant list.
+- [x] A profile's "All games" numbers count both games; a profile has no Fragments card (answer 38).
 
 **16f-2 — Fragments' colour and Today's carousel** (answers 1, 5, 6, 16, 18, 25, 31).
 - [ ] `--fragments: #5a2f5e` with white text, the same in every theme (answer 31) → verify: `src/app/colors.test.ts` checks white on it at 4.5:1 or more, and the focus ring at 3:1.
@@ -82,7 +86,7 @@ One pull request per step, from `m16-game-2`, in this order. Each fix starts wit
 | How near the end the next load starts | Feed | **Blank: ask at 16f-5** |
 
 ## Removes
-Per step, listed in each pull request. Expected: the single-game `GAME_ID` in the streak, Me, comments, reactions, the feed and the board's reads; `broadcast_board`'s skip of game 2; the "waits for 16f" notes in `src/app/leaderboard.tsx`; the whole-day feed reply, replaced by pages.
+Per step, listed in each pull request. **16f-1:** the game-1-only days in the streak and Me (two copies, now one `playedDays`); days played as finished runs; the calendar's four-step shading, its legend and `.shade1` to `.shade3`; the "Numbers on the calendar" setting: its switch and words, `calendarNumbers` in the profile's settings, the `numbers` props, the `--on-shade-*` slots and their colour check, its e2e test, the Privacy page's mention, and the column `private.profile.calendar_numbers` with its grants. Expected: the single-game `GAME_ID` in the streak, Me, comments, reactions, the feed and the board's reads; `broadcast_board`'s skip of game 2; the "waits for 16f" notes in `src/app/leaderboard.tsx`; the whole-day feed reply, replaced by pages.
 
 ---
 *Fill in the sections below at the end.*
@@ -92,7 +96,14 @@ Per step, listed in each pull request. Expected: the single-game `GAME_ID` in th
 |---|---|---|
 
 ## Evidence
+**16f-1** (2026-11-13).
+- Failed first: `npm run test:db -- -t "the streak of days played"`: "AssertionError: expected 1 to be 2" (Fragments alone yesterday, Offbeat today). `-t "the Me tab with both games"` (new, `src/app/api/me/fragments.db.test.ts`): totals came back `{points:125, daysPlayed:0, streak:1, longestStreak:1}` against `{315, 4, 4, 4}`. `-t "the player's settings"`: 10 failed, the first on the profile still carrying `calendarNumbers` (the other nine on that first test's sign-in).
+- After: the whole `npm run test:db`: 60 files, 448 tests passed. `npx supabase test db`: PASS, 791 tests. `npm test`: 752 passed. `npx tsc --noEmit -p .` and `npm run lint`: clean.
+- The migration `20261114071510_drop_calendar_numbers.sql` (`alter table private.profile drop column calendar_numbers;`) is applied to the local database. `plor_app`'s column grants on `private.profile` after it: the same list less `calendar_numbers`' SELECT and UPDATE.
+- Changed expectations: `daysPlayed` 5 → 6 in `src/app/api/me/route.db.test.ts` (today's started, unfinished run counts now); `month.days` gains `played`; the e2e's played-day colour is the strongest shade. Deleted with the setting: the `--on-shade-*` colour check and the e2e "Numbers on the calendar shows each played day's questions survived"; two e2e that used its switch use "Skip the game screen".
+- Words added: on Fragments' card, the game's shown name (today "Game 2", `src/platform/game.ts:17`), "best score", "avg. score", "days played", and the link "Game 2's game screen". The card has no colour block until 16f-2 adds `--fragments`. Fragments' best and average come from its ledger, so a day's score shows once the day is closed, as Offbeat's best does.
+- **Not run:** the e2e (CI). **Not verified:** Me and a profile in a browser. **No test:** a stranger's or a friend's totals counting Fragments.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: 16f-1 (the `reviewer`, 2026-11-13, two passes, by reading: the streak and Me, then the setting's removal): none. The first pass asked for the human's word on a profile's totals counting Fragments: answer 38.
+- Deferred to ROADMAP "Next revision": 16f-1: six items (For M16).

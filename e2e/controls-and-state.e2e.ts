@@ -364,7 +364,7 @@ test("a setting saved before the reset doesn't put the reset's read off", async 
   const first = reads[0];
   await page.waitForTimeout(1500);
   await page.getByRole("button", { name: "Settings" }).filter({ visible: true }).click();
-  await page.getByRole("dialog", { name: "Settings" }).getByRole("switch", { name: /Numbers on the calendar/ }).click();
+  await page.getByRole("dialog", { name: "Settings" }).getByRole("switch", { name: /Skip the game screen/ }).click();
   await expect.poll(() => reads.filter((at) => at - first >= 2800).length, { timeout: 6000 }).toBeGreaterThanOrEqual(1);
   expect(reads.find((at) => at - first >= 2800)! - first).toBeLessThan(4000);
 });

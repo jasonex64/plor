@@ -5,18 +5,18 @@ import type { Db } from "@/lib/db";
 import { USERNAME_CHANGE_DAYS } from "@/config/tunables";
 import { AppError } from "@/lib/http";
 
-// The player's settings (docs/milestones/M14-14a-3b-settings.md): Skip the game screen (L39) and Numbers on the
-// calendar (L46), both off until turned on; and the theme (docs/milestones/M14-14b-1-themes.md; L21), following the
+// The player's settings (docs/milestones/M14-14a-3b-settings.md): Skip the game screen (L39), off until turned on;
+// and the theme (docs/milestones/M14-14b-1-themes.md; L21), following the
 // device until one is picked. The database's check (profile_theme) holds the same list.
 export const THEMES = ["device", "paper", "night", "sky", "moonlit", "ink"] as const;
 export type Theme = (typeof THEMES)[number];
-export type Settings = { skipGameScreen: boolean; calendarNumbers: boolean; theme: Theme };
+export type Settings = { skipGameScreen: boolean; theme: Theme };
 
 // usernameChangeableAt: when the username may next change, or null if it may now (M12 A2: once every 30 days, the
 // first change at once).
 export type Profile = { username: string; displayName: string | null; usernameChangeableAt: string | null; settings: Settings };
 
-const SETTINGS = `json_build_object('skipGameScreen', skip_game_screen, 'calendarNumbers', calendar_numbers, 'theme', theme)`;
+const SETTINGS = `json_build_object('skipGameScreen', skip_game_screen, 'theme', theme)`;
 
 export async function getProfile(db: Db, userId: string): Promise<Profile | null> {
   // The trigger (supabase/migrations/20261028140000_baseline.sql) refuses a change before this time.
@@ -33,12 +33,11 @@ export async function getProfile(db: Db, userId: string): Promise<Profile | null
   return { ...rest, usernameChangeableAt: changeable?.toISOString() ?? null };
 }
 
-// The settings as sent by the browser: one or more, the switches as booleans and the theme one of THEMES, and nothing
+// The settings as sent by the browser: one or more, the switch a boolean and the theme one of THEMES, and nothing
 // else, or 400.
 export function readSettings(input: Record<string, unknown>): Partial<Settings> {
   const valid: Record<keyof Settings, (v: unknown) => boolean> = {
     skipGameScreen: (v) => typeof v === "boolean",
-    calendarNumbers: (v) => typeof v === "boolean",
     theme: (v) => (THEMES as readonly unknown[]).includes(v),
   };
   const keys = Object.keys(input);
@@ -51,10 +50,10 @@ export function readSettings(input: Record<string, unknown>): Partial<Settings> 
 // Sets the signed-in player's settings, leaving any not given as they were, and returns both.
 export async function setSettings(db: Db, userId: string, settings: Partial<Settings>): Promise<Settings> {
   const { rows } = await db.query<{ settings: Settings }>(
-    `update private.profile set skip_game_screen = coalesce($2, skip_game_screen), calendar_numbers = coalesce($3, calendar_numbers),
-            theme = coalesce($4, theme)
+    `update private.profile set skip_game_screen = coalesce($2, skip_game_screen),
+            theme = coalesce($3, theme)
      where user_id = $1 returning ${SETTINGS} as settings`,
-    [userId, settings.skipGameScreen ?? null, settings.calendarNumbers ?? null, settings.theme ?? null],
+    [userId, settings.skipGameScreen ?? null, settings.theme ?? null],
   );
   if (!rows[0]) throw new AppError("no_profile", 409);
   return rows[0].settings;

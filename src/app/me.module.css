@@ -122,18 +122,13 @@
   text-align: center;
 }
 
-/* A day's number, with Numbers on the calendar on, 13px bold in its shade's number colour (round 7; L46). A played day
+/* A day of the calendar (round 7; L46). A played day
    is edged in ink, as drawn. */
 .day {
   box-sizing: border-box;
   aspect-ratio: 1 / 1;
   border: 1.5px solid var(--ink);
   border-radius: var(--r-cell);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8125rem;
-  font-weight: 700;
 }
 
 .missed {
@@ -150,41 +145,9 @@
   outline-offset: 1px;
 }
 
-.shade1 {
-  background: var(--shade-1);
-  color: var(--on-shade-1);
-}
-
-.shade2 {
-  background: var(--shade-2);
-  color: var(--on-shade-2);
-}
-
-.shade3 {
-  background: var(--shade-3);
-  color: var(--on-shade-3);
-}
-
-.shade4 {
+/* A played day, in the strongest of the calendar's four shades (--shade-4); the others stay for the guest peek's drawing. */
+.played {
   background: var(--shade-4);
-  color: var(--on-shade-4);
-}
-
-.legend {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-
-.legend i {
-  display: inline-block;
-  box-sizing: border-box;
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid var(--ink);
-  border-radius: var(--r-cell);
 }
 
 /* A rare answer's name over its prompt, beside its place badge. */

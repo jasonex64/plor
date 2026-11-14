@@ -97,7 +97,16 @@ Seventh round (human, 2026-11-13, while the ticket was drafted from the code):
 33. What a friend's row shows on Fragments' live board: "Round, then score (Recommended)". "On round 3 of 7" while they play; their score once they and the viewer have finished.
 34. Fragments' share: "Score and round marks (Recommended)". "Fragments · date", the score, and one mark per round, found or missed, with no words or letters.
 
-16f's ticket is drafted from answers 1 to 34: `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
+Eighth round (human, 2026-11-13, before 16f-1's build, on Me):
+35. "points all time" on Me's "All games" card: "Add both games (Recommended)". Offbeat's points plus Fragments' scores, one total. The option's stated cost: it mixes two scales.
+36. What a day's shade on Me's calendar means: "Played or not (Recommended)". Shaded if either game was started, as the streak; the shading by Offbeat's questions survived goes.
+37. Fragments' card on Me: "Best, average, days (Recommended)". Best score, average score and days played, with a link to the game; no chart.
+
+Ninth round (human, 2026-11-13, after 16f-1's first review):
+38. A profile's "All games" numbers now counting both games, though E4 (DECISIONS.md, 2026-11-12) said game 2 on a profile is "Game 1 only for now": "Yes, totals count both (Recommended)". No Fragments card on a profile yet.
+39. The "Numbers on the calendar" setting, now that the shade means played or not: "Remove the setting".
+
+16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions
 | # | Decision | Answer (origin) |
