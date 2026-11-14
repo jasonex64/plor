@@ -48,6 +48,13 @@ export async function settleSubstringRuns(db: Db): Promise<number> {
   return rowCount!;
 }
 
+// The totals of these runs (their players and days, in step), by "userId:date", for the feed's result items: the score is
+// the scoring function's, from the run's words, as the ledger writes it.
+export async function runTotals(db: Db, userIds: string[], dates: string[]): Promise<Map<string, number>> {
+  const { rows } = await db.query<RunWords>(runsSql("(r.user_id, r.puzzle_date) in (select * from unnest($2::uuid[], $3::date[]))"), [SUBSTRINGS_ID, userIds, dates]);
+  return new Map(rows.map((r) => [`${r.user_id}:${r.date}`, total(r)]));
+}
+
 // A finished run's place so far today (answers 3, 16, 19): among the runs finished so far, as one still going would
 // count low, shown from PERCENTILE_MIN_PLAYERS of them; and among the player and their friends who've finished, shown
 // once a friend has.

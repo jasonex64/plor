@@ -92,7 +92,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   };
 }
 
-function ended(f: Row, event: { question_idx: number; entry_id: string } | undefined, names: Names): Ended {
+export function ended(f: Pick<Row, "username" | "status" | "answered">, event: { question_idx: number; entry_id: string } | undefined, names: Names): Ended {
   if (f.status === "survived") return { result: "survived" };
   if (f.status === "timed_out") return { result: "timed_out", question: f.answered! + 1 };
   // A died run always has its matched event (run_status: died = bool_or(matched)).
