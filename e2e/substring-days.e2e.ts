@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { dayText } from "../src/app/day-text";
+import { SUBSTRINGS } from "../src/platform/game";
 import { RUN, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -39,7 +40,7 @@ test("an admin sees a drafted game 2 day and approves it", async ({ browser }) =
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-gt@example.test`]);
   await admin.goto("/admin/puzzles");
 
-  const games = admin.getByRole("region", { name: "Game 2 days" });
+  const games = admin.getByRole("region", { name: `${SUBSTRINGS.name} days` });
   const day = games.getByRole("group", { name: dayText(ahead) });
   await expect(day.getByText("Draft, waiting for approval.")).toBeVisible();
   for (const set of ROUNDS) await expect(day.getByText(set, { exact: true })).toBeVisible();

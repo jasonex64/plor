@@ -34,6 +34,10 @@
   /* The game's own colour, the same in every theme (M14 14a-2a: "Offbeat's own colour"), a navy with white text. */
   --offbeat: #2f3d5c;
   --on-offbeat: #ffffff;
+  /* Fragments' own colour likewise, a plum with white text (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2; human,
+     2026-11-14: "A. Plum"). */
+  --fragments: #5a2f5e;
+  --on-fragments: #ffffff;
 }
 
 /* Following the device: Night when it's dark and no theme is chosen. The same values as [data-theme="night"], which

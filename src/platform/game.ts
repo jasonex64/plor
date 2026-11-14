@@ -3,18 +3,17 @@
 // (DECISIONS.md: Game 1), the name players see, and its address. The ID never changes ("Keep it (Recommended)"); the
 // name and the address change freely, and the route folder, `src/app/(shell)/play/`, is renamed by hand with the
 // address ("Rename by hand at N1"). Each game's address is its name, so a link says which game it opens once there are
-// several (14c-6, answers 12 and 13); the plain games carry placeholder names, "Game 1" at /play (human, 2026-11-10:
-// "use placeholder names that are simple"; docs/milestones/M14-14c-8-plain-game-1.md, answer 3). No imports, so the
-// scripts can load it as the app does.
-export const GAME = { id: "offbeat", name: "Game 1", path: "/play" } as const;
+// several (14c-6, answers 12 and 13); game 1 is "Offbeat" at /play (human, 2026-11-14: "Offbeat and Fragments"; it
+// carried the placeholder "Game 1" before, 2026-11-10; docs/milestones/M16-16f-the-shared-pieces.md, 16f-2). No imports,
+// so the scripts can load it as the app does.
+export const GAME = { id: "offbeat", name: "Offbeat", path: "/play" } as const;
 
 // The ID under the name the queries use.
 export const GAME_ID = GAME.id;
 
-// Game 2's record: its permanent ID (human, 2026-11-06: "substrings (Recommended)"), and a placeholder name, "Game 2",
-// at /play2, as game 1's (human, 2026-11-10: "use placeholder names that are simple"; docs/milestones/M14-14c-8-plain-game-1.md,
-// answer 3; docs/milestones/M14-14c-9-plain-game-2.md).
-export const SUBSTRINGS = { id: "substrings", name: "Game 2", path: "/play2" } as const;
+// Game 2's record: its permanent ID (human, 2026-11-06: "substrings (Recommended)"), and its name, "Fragments",
+// at /play2 (human, 2026-11-14: "Offbeat and Fragments"; it carried the placeholder "Game 2" before).
+export const SUBSTRINGS = { id: "substrings", name: "Fragments", path: "/play2" } as const;
 
 export const SUBSTRINGS_ID = SUBSTRINGS.id;
 

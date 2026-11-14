@@ -2,6 +2,7 @@
 // username. Every player's email starts with RUN, so each file's afterAll can delete its players.
 import { createHash } from "node:crypto";
 import { expect, type Locator, type Page } from "@playwright/test";
+import { GAME } from "../src/platform/game";
 
 const MAILPIT = "http://127.0.0.1:54324";
 export const RUN = Date.now().toString(36);
@@ -73,7 +74,8 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
 // From Today, Play opens Offbeat's game screen and Start there begins question 1
 // (docs/milestones/M14-14a-2b-game-screen.md, criterion 2).
 export async function play(page: Page): Promise<void> {
-  await page.getByRole("link", { name: "Play", exact: true }).click();
+  // Offbeat's own Play: Today has a card a game since M16 16f-2, and Fragments' can be drawn first.
+  await page.getByRole("region", { name: GAME.name, exact: true }).getByRole("link", { name: "Play", exact: true }).click();
   await expect(page).toHaveURL(/\/play$/);
   await page.getByRole("button", { name: "Start", exact: true }).click();
 }

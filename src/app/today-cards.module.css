@@ -1,0 +1,72 @@
+/* Today's game cards (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2): on phones a row "Today's games" with the
+   arrows, then the cards in a scrolling strip, the front one 82% of the row (human, 2026-11-14: "B. Medium, front card
+   82%") so the next shows beside it; once this row is 768px wide (.wide, set by today-cards.tsx) the two sit side by side. */
+.cards {
+  display: flex;
+  flex-direction: column;
+  /* A card's gap (kit.module.css, .card). */
+  gap: 10px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.label {
+  margin: 0;
+  font-weight: 700;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav button {
+  margin: 0;
+}
+
+/* 14px, as How to play's place (how-to-play.module.css, .place). */
+.place {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Position: relative, so a card's offsetLeft counts from the strip (today-cards.tsx). The arrows and the keyboard scroll it,
+   smoothly unless the player asks for less motion. */
+.strip {
+  position: relative;
+  display: flex;
+  /* Between the cards, the gap between Today's sections (today.module.css, .today). */
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip {
+    scroll-behavior: auto;
+  }
+}
+
+.slide {
+  flex: 0 0 82%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.wide .strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: visible;
+}
+
+.wide .slide {
+  flex: none;
+}

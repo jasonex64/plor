@@ -28,7 +28,7 @@ import { errorText } from "./messages";
 import styles from "./game.module.css";
 import kit from "./kit.module.css";
 import { CopyField, shareLink } from "./share";
-import { GAME } from "@/platform/game";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 import { GAME_1_STEPS, HowToPlay } from "./how-to-play";
 import { PlayFrame, StatusMessage } from "./play-frame";
 import { Recap } from "./recap";
@@ -520,7 +520,7 @@ function longDate(date: string): string {
 }
 
 // What the day holds, as the banner's chips (mockup 3, M14 14b-8b).
-function Facts({ facts }: { facts: string[] }) {
+export function Facts({ facts }: { facts: string[] }) {
   return (
     <p className={`${kit.chips} ${styles.facts}`}>
       {facts.map((f) => (
@@ -546,7 +546,7 @@ function QuestionSkeleton() {
 
 // Offbeat's banner: the day as a chip, the game's name, then what the day holds for the player (mockup 3).
 // The banner before today's run loads: the real banner, its title, a line where the day goes.
-function BannerSkeleton() {
+export function BannerSkeleton() {
   return (
     <Skeleton label="Loading today's puzzle">
       <Banner>
@@ -556,11 +556,12 @@ function BannerSkeleton() {
   );
 }
 
-function Banner({ date, children }: { date?: string; children?: ReactNode }) {
+// game: Fragments' card is this banner in its own colour (src/app/today-fragments.tsx; M16 16f-2).
+export function Banner({ date, game = GAME, children }: { date?: string; game?: typeof GAME | typeof SUBSTRINGS; children?: ReactNode }) {
   return (
-    <div className={styles.banner}>
+    <div className={game === SUBSTRINGS ? `${styles.banner} ${styles.fragments}` : styles.banner}>
       {date && <p className={`${kit.chip} ${styles.chip}`}>{longDate(date)}</p>}
-      <h2 className={styles.title}>{GAME.name}</h2>
+      <h2 className={styles.title}>{game.name}</h2>
       {children}
     </div>
   );
@@ -596,7 +597,7 @@ function ResetCountdown({ label, msToReset }: { label: string; msToReset: number
   );
 }
 
-const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
+export const pointsText = (n: number) => (n === 1 ? "1 point" : `${n} points`);
 
 // The answer's rarity as a plain word (docs/milestones/M14-14c-8-plain-game-1.md, Numbers: "Common", "Uncommon", "Rare",
 // approved with the ticket; human, 2026-11-10: "approve").

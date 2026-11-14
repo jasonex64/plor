@@ -117,6 +117,7 @@ export function StatsCards({
       {fragments && (
         <section aria-label={SUBSTRINGS.name} className={kit.card}>
           <div className={styles.game}>
+            <span className={`${styles.block} ${styles.plum}`} aria-hidden="true" />
             <h2>{SUBSTRINGS.name}</h2>
           </div>
           <dl className={styles.stats}>

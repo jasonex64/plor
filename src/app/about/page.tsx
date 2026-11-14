@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "../button-link";
+import { SUBSTRINGS } from "@/platform/game";
 import { dictionaryNotices } from "./licence";
 
 export const metadata: Metadata = { title: "About Plor" };
@@ -38,7 +39,7 @@ export default function About() {
 
       <h2>Dictionary credits</h2>
       <p>
-        Game 2&apos;s dictionary is built from the ENABLE word list, the Moby word lists and the English Speller
+        {SUBSTRINGS.name}&apos;s dictionary is built from the ENABLE word list, the Moby word lists and the English Speller
         Database. The notices the English Speller Database&apos;s licence requires follow.
       </p>
       <pre>{notices.top}</pre>

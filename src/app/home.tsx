@@ -33,7 +33,6 @@ import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
 import { Comments } from "./comments";
 import { FriendsList } from "./friends-list";
-import { TodayBanner } from "./game";
 import { GroupPage } from "./groups";
 import { PlayerPage } from "./player";
 import { Leaderboard, LeaderboardCard } from "./leaderboard";
@@ -43,6 +42,7 @@ import { errorText, messageForRedirect } from "./messages";
 import { LiveStatus } from "./live-status";
 import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
+import { TodayCards } from "./today-cards";
 import { SIGN_IN_HREF, signInOpen } from "./sign-in-open";
 import { LoadingStatus, PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
@@ -584,8 +584,8 @@ function PickUsername({ onDone }: { onDone: () => void }) {
   );
 }
 
-// Today (docs/milestones/M14-14a-2a-today.md): Offbeat's banner, which links to its game screen (14a-2b), the one
-// leaderboard card and the feed;
+// Today (docs/milestones/M14-14a-2a-today.md): the games' cards, which link to their game screens (14a-2b; M16 16f-2),
+// the one leaderboard card and the feed;
 // from 768px the live board too (L42), and from 1200px the board and the card in the right column (SideColumn). The page listens to
 // the board's channel for the feed's nudges (M08 8d, M11 11b); from 768px the board brings its own.
 function Today({ username, name, skip, timeUps }: { username: string; name: string; skip: boolean; timeUps: number }) {
@@ -608,9 +608,9 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
 
   return (
     <div className={styles.today}>
-      <section id="offbeat" aria-label={GAME.name} className={styles.game}>
-        <TodayBanner key={`game-${day}-${timeUps}`} skip={skip} onOver={setRunOver} onDayOver={nextDay} />
-      </section>
+      <div className={styles.game}>
+        <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} />
+      </div>
       <SideColumn label="Your circle" inPlace className={styles.side}>
         {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
         {wide && <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />}

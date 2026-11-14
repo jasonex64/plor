@@ -9,7 +9,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { answer, asked, caught, next, safe, seeResults } from "./game";
 import { play, RUN, signInAndPick } from "./players";
-import { SUBSTRINGS } from "../src/platform/game";
+import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -64,7 +64,7 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
   // Play first, sign in second: a small link, not the form (answer 32).
   await expect(page.getByRole("link", { name: "Sign in", exact: true })).toHaveAttribute("href", "/?sign-in");
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toHaveCount(0);
-  await page.getByRole("link", { name: "Play Game 1 without an account", exact: true }).click();
+  await page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true }).click();
   await expect(page).toHaveURL(/\/play$/);
 
   // Nothing of an account is on the screen: no shell navigation, and a way to sign in instead.
@@ -110,7 +110,7 @@ test("a visitor plays game 2 as a guest from the front page, through the guest r
   });
 
   await page.goto("/");
-  await page.getByRole("link", { name: "Play Game 2 without an account", exact: true }).click();
+  await page.getByRole("link", { name: `Play ${SUBSTRINGS.name} without an account`, exact: true }).click();
   await expect(page).toHaveURL(/\/play2$/);
   await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
@@ -183,7 +183,7 @@ test("a guest who makes an account the same day starts clean and plays today's g
     if (request.method() === "POST") posts.push(new URL(request.url()).pathname);
   });
   await page.goto("/");
-  await page.getByRole("link", { name: "Play Game 1 without an account", exact: true }).click();
+  await page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true }).click();
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await asked(page, "Name an animal");
   await safe(page, "aardvark");
@@ -225,7 +225,7 @@ test("the front page shows the sign-in form only at /?sign-in", async ({ page })
   await expect(page.getByLabel("Email")).toBeVisible();
   await expect(page.getByRole("button", { name: "Email me a sign-in code" })).toBeVisible();
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Play Game 1 without an account", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: `Play ${GAME.name} without an account`, exact: true })).toBeVisible();
   await expect(page.getByLabel("Email")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toHaveCount(0);
 });

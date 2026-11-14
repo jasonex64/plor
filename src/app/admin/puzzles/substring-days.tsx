@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { setsDiffer, type SubstringDayView, type SubstringSets } from "@/admin/substring-sets";
 import { ApiError, api } from "@/lib/api-client";
+import { SUBSTRINGS } from "@/platform/game";
 import { dayText } from "../../day-text";
 import { errorText } from "../../messages";
 import kit from "../../kit.module.css";
@@ -15,8 +16,8 @@ import styles from "./puzzles.module.css";
 export function SubstringDays({ days, onApproved }: { days: SubstringDayView[]; onApproved: () => void }) {
   if (days.length === 0) return null;
   return (
-    <section aria-label="Game 2 days" className={styles.gameDays}>
-      <h2 className={admin.cardTitle}>Game 2</h2>
+    <section aria-label={`${SUBSTRINGS.name} days`} className={styles.gameDays}>
+      <h2 className={admin.cardTitle}>{SUBSTRINGS.name}</h2>
       {days.map((day) => (
         <Day key={day.date} day={day} onApproved={onApproved} />
       ))}

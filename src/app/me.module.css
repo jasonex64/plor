@@ -108,6 +108,11 @@
   background: var(--offbeat);
 }
 
+/* Fragments' block, in its own colour (M16 16f-2). */
+.plum {
+  background: var(--fragments);
+}
+
 /* The calendar: seven columns, 4px apart, square days with the cells' 2px corners. */
 .calendar {
   display: grid;
