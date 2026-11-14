@@ -148,4 +148,35 @@ describe("the live board over HTTP", () => {
       ended: null,
     });
   });
+
+  // M19 19f: is the live board late? The deadline is a clock reading inside private.run_status, so nothing is written
+  // or sent when a question's time runs out (ROADMAP, M07 7c). The board broadcasts from triggers on insert into
+  // private.run and private.run_event only, so a friend's row on an open board changes at the next read.
+  // The update below is this test's clock (the same way as src/game/runs.db.test.ts's ageRun), not the app's write:
+  // it has no trigger, so a new run_event row or a new Realtime message could only come from the app, and none does.
+  it("a friend whose time ran out changes on the board only at the next read: nothing is written or sent when time runs out", async () => {
+    const db = getPool();
+    const sent = async () =>
+      (await db.query<{ n: number }>("select count(*)::int as n from realtime.messages where payload ->> 'username' = $1", [players.c.username])).rows[0].n;
+    const eventRows = async () =>
+      (await db.query<{ n: number }>("select count(*)::int as n from private.run_event where user_id = $1", [players.c.userId])).rows[0].n;
+    const friendC = async () => (await board()).friends.find((f: { username: string }) => f.username === players.c.username);
+
+    useSession(players.b.session);
+    expect(await friendC()).toMatchObject({ state: "playing", question: 1, ended: null });
+    const before = { sent: await sent(), events: await eventRows() };
+    // Starting c's run sent at least one message, so the count is a real measure.
+    expect(before.sent).toBeGreaterThan(0);
+
+    // Question 1 starts at the run's started_at; 21 seconds is past its 20-second timer (src/game/runs.db.test.ts).
+    await db.query("update private.run set started_at = started_at - interval '21 seconds' where user_id = $1 and puzzle_date = $2::date", [
+      players.c.userId,
+      puzzle.date,
+    ]);
+
+    expect({ sent: await sent(), events: await eventRows() }).toEqual(before);
+    expect(await friendC()).toMatchObject({ state: "finished", question: null, ended: { result: "timed_out", question: 1 } });
+    // Reading the board writes nothing either.
+    expect({ sent: await sent(), events: await eventRows() }).toEqual(before);
+  });
 });
