@@ -89,6 +89,9 @@ test("Me shows the header, totals, calendar and Offbeat's card, and counts a run
     "href",
     SUBSTRINGS.path,
   );
+  // Fragments' own colour, #5A2F5E, in its block, whatever the theme (16f-2).
+  const plum = page.getByRole("region", { name: SUBSTRINGS.name, exact: true }).locator("span[aria-hidden='true']").first();
+  expect(await plum.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(90, 47, 94)");
   await expect(page.getByRole("region", { name: "Your rarest answers" })).toContainText("None yet.");
 
   // Caught on question 1: a finished run with 0 survived, a played day.

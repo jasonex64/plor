@@ -1,6 +1,6 @@
 # M16 16f — the shared pieces
 
-**Status:** in progress. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Approved by the human (2026-11-13: "Approve 16f").** 16f-1 is built, in its pull request, not merged (a hosted `db push` follows its merge, never before).
+**Status:** in progress. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Approved by the human (2026-11-13: "Approve 16f").** 16f-1 is merged (PR #205, 2026-11-14; the hosted `db push` is the human's). 16f-2 is built, in its pull request, not merged (no database change).
 
 ## Goal
 Make the screens around the games work for two games: Today shows both, one streak counts either, and the feed, comments, reactions, boards, Me and Share know Fragments as well as Offbeat.
@@ -35,12 +35,13 @@ One pull request per step, from `m16-game-2`, in this order. Each fix starts wit
 - [x] The "Numbers on the calendar" setting is gone: its switch, its saved value and its column (answer 39) → verify: a db test that the settings route refuses `calendarNumbers` as any unknown field and the profile's settings no longer carry it; pgTAP's grant list.
 - [x] A profile's "All games" numbers count both games; a profile has no Fragments card (answer 38).
 
-**16f-2 — Fragments' colour and Today's carousel** (answers 1, 5, 6, 16, 18, 25, 31).
-- [ ] `--fragments: #5a2f5e` with white text, the same in every theme (answer 31) → verify: `src/app/colors.test.ts` checks white on it at 4.5:1 or more, and the focus ring at 3:1.
-- [ ] Today shows one game card in front with a wide strip of the next, under a row "Today's games ‹ 1 of 2 ›" (answer 16, mock-up B); Offbeat is always card 1 and Fragments card 2 (answer 25); the unplayed game is in front on opening, Offbeat when both are played (answer 5) → verify: e2e: with Offbeat played and Fragments not, Today opens on "2 of 2"; the arrows and the keyboard move between cards (APG Carousel).
-- [ ] Fragments' card mirrors Offbeat's (the day, the name, Play, Continue or the result) and adds "better than X% of players" after play once it is known (answer 18) → verify: e2e before and after a Fragments run.
-- [ ] A day with an approved day in only one game shows that one card and no arrows (answer 7) → verify: e2e.
-- **Stop and ask before the code:** how wide the peeking strip is (a number; mock-up B is in no repo), shown as pictures at phone and tablet widths.
+**16f-2 — Fragments' colour and Today's carousel** (answers 1, 5, 6, 16, 18, 25, 31, 40 to 42).
+- [x] The games are shown as "Offbeat" and "Fragments" everywhere a name shows (answer 41; `src/platform/game.ts`); ids and addresses unchanged → verify: unit and e2e tests read the names from `src/platform/game.ts`; a grep finds no shown "Game 1" or "Game 2" left in `src`.
+- [x] `--fragments: #5a2f5e` with white text, the same in every theme (answer 31) → verify: `src/app/colors.test.ts` checks white on it at 4.5:1 or more, and the focus ring at 3:1.
+- [x] On phones Today shows one game card in front, 82% of the row (answer 40), with a strip of the next, under a row "Today's games ‹ 1 of 2 ›" (answer 16, mock-up B); Offbeat is always card 1 and Fragments card 2 (answer 25); the unplayed game is in front on opening, Offbeat when both are played (answer 5) → verify: e2e: with Offbeat played and Fragments not, Today opens on "2 of 2"; the arrows and the keyboard move between cards (APG Carousel).
+- [x] Fragments' card mirrors Offbeat's (the day, the name, Play, Continue or the result) and adds "better than X% of players" after play once it is known (answer 18) → verify: e2e before and after a Fragments run.
+- [x] A day with an approved day in only one game shows that one card and no arrows (answer 7) → verify: e2e.
+- [x] Once the cards' own row is 768px wide the two sit side by side with no arrows; a tablet, where the sidebar leaves less, keeps the carousel (answers 42 and 43) → verify: e2e: at a 768px window the carousel and an unbroken name; at 1100px both cards visible and no arrows.
 
 **16f-3 — Fragments gets comments, reactions and Share** (the split's answer 3; answers 8, 21, 23, 34).
 - [ ] Comments and reactions take the game: a Fragments day has its own thread, friends' and each group's, opened by finishing Fragments; reactions on a Fragments run and comment work as Offbeat's (`src/comments/comments.ts`, `src/reactions/reactions.ts`, their routes) → verify: db tests: a Fragments comment is not in Offbeat's thread; a player who has not finished Fragments cannot post to it.
@@ -82,11 +83,12 @@ One pull request per step, from `m16-game-2`, in this order. Each fix starts wit
 | 7 | Rounds in "on round k of 7" | The game's rounds as built (M16 16b), read from the day, not typed in |
 | Players before a percent shows | Fragments' card after play | As the result screen's today (`src/config/tunables.ts`, S17); no new value |
 | 280 | A comment's longest length | As built (`private.comment`, M08); unchanged |
-| The peek's width | Carousel | **Blank: ask at 16f-2, with pictures** |
+| 82% | The front card's share of the row on phones | Human, 2026-11-14, answer 40: "B. Medium, front card 82%" |
+| 768px | The cards' row width from which they sit side by side | The app's tablet width as built (`src/app/min-width`, M14), measured on the row, not the window; answers 42 and 43 ("Side by side only with room") |
 | How near the end the next load starts | Feed | **Blank: ask at 16f-5** |
 
 ## Removes
-Per step, listed in each pull request. **16f-1:** the game-1-only days in the streak and Me (two copies, now one `playedDays`); days played as finished runs; the calendar's four-step shading, its legend and `.shade1` to `.shade3`; the "Numbers on the calendar" setting: its switch and words, `calendarNumbers` in the profile's settings, the `numbers` props, the `--on-shade-*` slots and their colour check, its e2e test, the Privacy page's mention, and the column `private.profile.calendar_numbers` with its grants. Expected: the single-game `GAME_ID` in the streak, Me, comments, reactions, the feed and the board's reads; `broadcast_board`'s skip of game 2; the "waits for 16f" notes in `src/app/leaderboard.tsx`; the whole-day feed reply, replaced by pages.
+Per step, listed in each pull request. **16f-2:** the shown names "Game 1" and "Game 2", and the strings that hard-coded them on the About page, the admin puzzles pages and in three e2e files; Today's lone banner (`TodayBanner` now sits in `TodayCards`). **16f-1:** the game-1-only days in the streak and Me (two copies, now one `playedDays`); days played as finished runs; the calendar's four-step shading, its legend and `.shade1` to `.shade3`; the "Numbers on the calendar" setting: its switch and words, `calendarNumbers` in the profile's settings, the `numbers` props, the `--on-shade-*` slots and their colour check, its e2e test, the Privacy page's mention, and the column `private.profile.calendar_numbers` with its grants. Expected: the single-game `GAME_ID` in the streak, Me, comments, reactions, the feed and the board's reads; `broadcast_board`'s skip of game 2; the "waits for 16f" notes in `src/app/leaderboard.tsx`; the whole-day feed reply, replaced by pages.
 
 ---
 *Fill in the sections below at the end.*
@@ -96,6 +98,14 @@ Per step, listed in each pull request. **16f-1:** the game-1-only days in the st
 |---|---|---|
 
 ## Evidence
+**16f-2** (2026-11-14).
+- Failed first: `npm test -- src/app/colors.test.ts src/app/today-games.test.ts`: four failures in `colors.test.ts` (no `--fragments` yet) and `today-games.test.ts` could not import its rule.
+- After: `npm test`: 67 files, 761 passed. The whole `npm run test:db`: 60 files, 448 passed. `npx tsc --noEmit -p .` and `npm run lint`: clean. No migration; no new or changed reply (Today reads the player's own `/api/run` and `/api/substrings`).
+- In a browser, locally: `npm run test:e2e -- e2e/today-games.e2e.ts`: "4 passed" twice in a row (the phone carousel at 82%, opening on the game left to play, the arrows and keyboard; side by side at 768px with no arrows; one card on a one-game day; Fragments' card before, during and after a run). `e2e/today.e2e.ts e2e/shell.e2e.ts e2e/me.e2e.ts`: 16 passed, 1 failed: `today.e2e.ts:105` timed out at 30s mid-`befriend` and passed alone (26.3s); cause not found, treated as flaky.
+- Found by running the e2e, and fixed in the test: its tests left a Fragments run behind, so the next could not remove its day (now an `afterEach` closes the pages and deletes this file's players' runs); `noArrows` counted every "N of M" on the page. The server logged "Cannot read properties of undefined (reading 'total')" once: by reading, `standingToday` (`src/game/substring-places.ts`) when the viewer's run row is deleted between two reads, which only the test did; not reproduced, no source changed.
+- Looked at in screenshots (phone 390px, tablet 768px, 1100px), sent to the human. The first tablet shot showed "Fragments" broken across two lines side by side: answer 43, test first ("expect(locator).toBeVisible() failed … getByText('1 of 2')" at 768px), then `npm run test:e2e -- e2e/today-games.e2e.ts`: "4 passed" three times.
+- Words added (the builder's, for the human to confirm): on Fragments' card, "7 rounds" (the count read from the day), "20 seconds each" (as `/play2`'s own sentence), "Your run is still going", "N points", "better than X% of players"; the row "Today's games", the arrows "Previous game" and "Next game", "1 of 2".
+- **Not verified:** the cards after a run, by eye; the Privacy page and admin words for a name that now reads wrong in its sentence; whether any test of the share text expects the old name (the suites pass).
 **16f-1** (2026-11-13).
 - Failed first: `npm run test:db -- -t "the streak of days played"`: "AssertionError: expected 1 to be 2" (Fragments alone yesterday, Offbeat today). `-t "the Me tab with both games"` (new, `src/app/api/me/fragments.db.test.ts`): totals came back `{points:125, daysPlayed:0, streak:1, longestStreak:1}` against `{315, 4, 4, 4}`. `-t "the player's settings"`: 10 failed, the first on the profile still carrying `calendarNumbers` (the other nine on that first test's sign-in).
 - After: the whole `npm run test:db`: 60 files, 448 tests passed. `npx supabase test db`: PASS, 791 tests. `npm test`: 752 passed. `npx tsc --noEmit -p .` and `npm run lint`: clean.
@@ -105,5 +115,5 @@ Per step, listed in each pull request. **16f-1:** the game-1-only days in the st
 - **Not run:** the e2e (CI). **Not verified:** Me and a profile in a browser. **No test:** a stranger's or a friend's totals counting Fragments.
 
 ## Review
-- Blocking findings and how each was fixed: 16f-1 (the `reviewer`, 2026-11-13, two passes, by reading: the streak and Me, then the setting's removal): none. The first pass asked for the human's word on a profile's totals counting Fragments: answer 38.
-- Deferred to ROADMAP "Next revision": 16f-1: six items (For M16).
+- Blocking findings and how each was fixed: 16f-2 (the `reviewer`, 2026-11-14, one pass, by reading): the strip's `gap: 16px` had no stated origin; it is the gap between Today's sections (`today.module.css`), now said in a comment; not re-reviewed. 16f-1 (the `reviewer`, 2026-11-13, two passes, by reading: the streak and Me, then the setting's removal): none. The first pass asked for the human's word on a profile's totals counting Fragments: answer 38.
+- Deferred to ROADMAP "Next revision": 16f-2: seven items (For M16). 16f-1: six items (For M16).

@@ -13,6 +13,7 @@ import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
 import type { SubstringDayView } from "@/admin/substring-sets";
 import { normalize } from "@/content/puzzle";
 import { ApiError, api } from "@/lib/api-client";
+import { GAME } from "@/platform/game";
 import { ButtonLink } from "../../button-link";
 import { errorText } from "../../messages";
 import { FORWARD } from "../../slide";
@@ -72,7 +73,7 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
   if (data.days.length === 0)
     return (
       <>
-        <p>No game 1 days yet: a Claude session drafts them from the question bank.</p>
+        <p>No {GAME.name} days yet: a Claude session drafts them from the question bank.</p>
         {gameTwo}
       </>
     );

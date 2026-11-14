@@ -43,7 +43,7 @@ function ratio(a: Rgb, b: Rgb): number {
 // The games' own colours sit in :root with Paper's and stay the same in every theme (M14 14a-2a). Each theme is a
 // [data-theme] block, Paper's shared with :root, and Night's repeated for the device's dark mode
 // (docs/milestones/M14-14b-1-themes.md, criterion 1).
-const GAME_SLOTS = ["offbeat", "on-offbeat"];
+const GAME_SLOTS = ["offbeat", "on-offbeat", "fragments", "on-fragments"];
 const root = slots(":root,");
 const themes = {
   Paper: Object.fromEntries(Object.entries(root).filter(([name]) => !GAME_SLOTS.includes(name))),
@@ -68,6 +68,23 @@ describe("Offbeat's colour", () => {
   // The banner's text and Play's label (docs/milestones/M14-14a-2a-today.md, criterion 7).
   it("white on it is at least 4.5:1", () => {
     expect(ratio(rgb(root["on-offbeat"]), rgb(root.offbeat))).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+// Fragments' card and its block on Me (docs/milestones/M16-16f-the-shared-pieces.md, 16f-2; answer 31, "A. Plum"). White
+// text and white focus rings sit on it, as on Offbeat's banner (src/app/today-fragments.module.css).
+describe("Fragments' colour", () => {
+  it("is plum, with white text", () => {
+    expect(root.fragments).toBe("#5a2f5e");
+    expect(root["on-fragments"]).toBe("#ffffff");
+  });
+
+  it("white on it is at least 4.5:1", () => {
+    expect(ratio(rgb(root["on-fragments"]), rgb(root.fragments))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("the white focus ring on it is at least 3:1", () => {
+    expect(ratio(rgb(root["on-fragments"]), rgb(root.fragments))).toBeGreaterThanOrEqual(3);
   });
 });
 

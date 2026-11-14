@@ -2,19 +2,27 @@
    phones and 240px from 768px (the approved mockups), drawn as mockup 3's banner (M14 14b-8b): the
    ink border and corners 2px rounder than a card's, flat as a card is (M14 14b-10, answer 3). */
 .banner {
+  /* The game's colour and its text: Offbeat's, or Fragments' with .fragments (M16 16f-2). */
+  --game: var(--offbeat);
+  --on-game: var(--on-offbeat);
   box-sizing: border-box;
   min-height: 230px;
   padding: 24px 16px 20px;
   border: 2px solid var(--ink);
   border-radius: calc(var(--r-card) + 2px);
-  background: var(--offbeat);
-  color: var(--on-offbeat);
+  background: var(--game);
+  color: var(--on-game);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   text-align: center;
+}
+
+.banner.fragments {
+  --game: var(--fragments);
+  --on-game: var(--on-fragments);
 }
 
 .title {
@@ -28,9 +36,9 @@
    loads in. */
 .banner .chip {
   margin: 0;
-  border-color: color-mix(in srgb, var(--on-offbeat) 50%, transparent);
-  background: color-mix(in srgb, var(--on-offbeat) 12%, transparent);
-  color: var(--on-offbeat);
+  border-color: color-mix(in srgb, var(--on-game) 50%, transparent);
+  background: color-mix(in srgb, var(--on-game) 12%, transparent);
+  color: var(--on-game);
 }
 
 .banner .facts {
@@ -46,9 +54,9 @@
 }
 
 /* On the game's colour the accent ring would fade (Paper's is 1.75:1 on it), so focus there is white: 10.8:1, the
-   pairing src/app/colors.test.ts checks (WCAG 2.2 1.4.11). */
+   pairing src/app/colors.test.ts checks, as it does for Fragments' (WCAG 2.2 1.4.11). */
 .banner :focus-visible {
-  outline-color: var(--on-offbeat);
+  outline-color: var(--on-game);
 }
 
 @media (min-width: 768px) {

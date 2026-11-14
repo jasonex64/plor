@@ -106,12 +106,20 @@ Ninth round (human, 2026-11-13, after 16f-1's first review):
 38. A profile's "All games" numbers now counting both games, though E4 (DECISIONS.md, 2026-11-12) said game 2 on a profile is "Game 1 only for now": "Yes, totals count both (Recommended)". No Fragments card on a profile yet.
 39. The "Numbers on the calendar" setting, now that the shade means played or not: "Remove the setting".
 
-16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
+Tenth round (human, 2026-11-14, before 16f-2's build, after three pictures of the peek on a phone: A front card 90%, B 82%, C 72%):
+40. How much of the next card peeks in on a phone: "B. Medium, front card 82% (Recommended)".
+41. The games' shown names, "Game 1" and "Game 2" in the app since M14 14c-2: "Offbeat and Fragments". The option's stated cost: it undoes the earlier choice to keep game 1 unnamed until its design is settled. The `game_id`s and the addresses `/play` and `/play2` stay.
+42. Today on tablets and computers: "Both cards side by side (Recommended)". From tablet width up, the two cards sit next to each other with no arrows.
+
+Eleventh round (human, 2026-11-14, after screenshots of 16f-2 as built: at a 768px window the sidebar left each card about 230px and "Fragments" broke across two lines):
+43. Side by side on tablets: "Side by side only with room (Recommended)". The carousel stays until each card has at least a phone card's width. As built: side by side once the cards' own row is 768px wide.
+
+16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1, 40 to 43 to 16f-2): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions
 | # | Decision | Answer (origin) |
 |---|---|---|
-| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is Fragments** (human, 2026-11-11, 16f answer 3). The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
+| S1 | The game's name and its `game_id`. The `game_id` is permanent: it's stored with every run, event, ledger row and content path (DECISIONS.md, Game 1) | **ID chosen:** `substrings` (human, 2026-11-06, 16b: "substrings (Recommended)"). **The shown name is Fragments** (human, 2026-11-11, 16f answer 3; in the app since 16f-2, with game 1 shown as "Offbeat", answer 41). The human asked Claude for ideas that fit the cauldron (2026-10-22). Claude's shortlist: **Toil** (the witches' "double, double toil and trouble", *Macbeth*, public domain), **Simmer** (the brew heats up each round), **Brewhaha** (a pun on "brouhaha"; a spelling game named "BrouHaHa" exists). A web search on 2026-10-22 found no word game named Toil, Simmer or Brewhaha; that is not a trademark check (*unverified*) |
 | S2 | The dictionary | "very, very broad", like JKLM's; offensive words and proper nouns removed; look at JKLM's word bank and Merriam-Webster (human, 2026-10-22). **Picked** (human, 2026-11-05): "ENABLE + Moby + SCOWL (Recommended)": see "The dictionary" below |
 | S3 | "Never impossible or too hard" | Difficulty narrows through the run (human, 2026-10-22): "the first couple rounds only have 2 characters in the substring", a "middle round" uses substrings in more than 500 words, the "last round maybe ~100-200", "never anything too difficult". The rounds in between are S18 |
 | S4 | Substring length | 2 letters in the first rounds (human, 2026-10-22, with S3). The length for the later rounds is S18 |
