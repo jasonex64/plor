@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-state";
 import { ApiError, api } from "@/lib/api-client";
+import { substringShareText } from "@/game/share";
 import { SUBSTRINGS } from "@/platform/game";
 import { Countdown } from "./countdown-bar";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
@@ -19,6 +20,7 @@ import { startBody, substringRoutes, type RunFamily } from "./run-routes";
 import { GuestPeek } from "./guest-peek";
 import { resultExtras } from "./result-extras";
 import { PlayFrame, StatusMessage } from "./play-frame";
+import { ShareResult } from "./share";
 import { BACK } from "./slide";
 import { LoadingStatus } from "./skeleton";
 import styles from "./substrings.module.css";
@@ -30,8 +32,19 @@ type RunResponse = { run: SubstringRun | null };
 const BEHIND = ["no_run", "no_puzzle_today", "run_over", "round_running"];
 
 // family: which routes it plays (src/app/run-routes.ts); a guest's Start runs botCheck first and sends its token (as game.tsx).
-// onPlaying: whether the play frame is up, when the screen shows only the game (src/app/guest-game.tsx).
-export function SubstringsScreen({ family = "account", botCheck, onPlaying }: { family?: RunFamily; botCheck?: () => Promise<string>; onPlaying?: (playing: boolean) => void }) {
+// onPlaying: whether the play frame is up, when the screen shows only the game (src/app/guest-game.tsx). onOver: whether the
+// run is over, which opens the day's comments (src/app/fragments.tsx).
+export function SubstringsScreen({
+  family = "account",
+  botCheck,
+  onPlaying,
+  onOver,
+}: {
+  family?: RunFamily;
+  botCheck?: () => Promise<string>;
+  onPlaying?: (playing: boolean) => void;
+  onOver?: (over: boolean) => void;
+}) {
   const routes = substringRoutes(family);
   const router = useRouter();
   const [run, setRun] = useState<SubstringRun | null | undefined>(undefined);
@@ -88,6 +101,8 @@ export function SubstringsScreen({ family = "account", botCheck, onPlaying }: { 
   if (playing && !seen) setSeen(true);
   const inFrame = playing || (seen && run?.status === "finished" && !done);
   useEffect(() => onPlaying?.(inFrame), [onPlaying, inFrame]);
+  const over = run?.status === "finished";
+  useEffect(() => onOver?.(over), [onOver, over]);
   const card = (
     <section aria-label={SUBSTRINGS.name} className={kit.card}>
       <h2 className={styles.title}>{SUBSTRINGS.name}</h2>
@@ -105,7 +120,7 @@ export function SubstringsScreen({ family = "account", botCheck, onPlaying }: { 
           <HowToPlay steps={GAME_2_STEPS} />
         </>
       ) : run.status === "finished" ? (
-        inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} />
+        inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} share={family === "account"} />
       ) : run.open ? (
         <Round key={run.open.index} run={run} tryPath={routes.try} onChange={setRun} onTimeUp={load} />
       ) : (
@@ -267,9 +282,11 @@ function Standing({ standing }: { standing: NonNullable<SubstringRun["standing"]
   );
 }
 
+// share: a signed-in player's result has Share; a guest's has none, as before 16f-3 (e2e/guest-play.e2e.ts), until the human
+// says a guest's should.
 // focus: coming from round 7's sentence, whose See results had focus and is gone with the frame (WCAG 2.2 2.4.3), as game 1's
 // results heading takes it.
-function Results({ run, focus }: { run: SubstringRun; focus: boolean }) {
+function Results({ run, focus, share }: { run: SubstringRun; focus: boolean; share: boolean }) {
   const score = run.score!;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -292,6 +309,7 @@ function Results({ run, focus }: { run: SubstringRun; focus: boolean }) {
         <dd className={styles.total}>{score.total}</dd>
       </dl>
       {run.standing && <Standing standing={run.standing} />}
+      {share && <ShareResult text={substringShareText(run)} />}
       <h3 className={styles.heading}>Your rounds</h3>
       <ol aria-label="Your rounds" className={styles.results}>
         {run.rounds.map((round) => (

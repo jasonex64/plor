@@ -46,7 +46,7 @@ const list = () => call(listRoute(apiRequest("/api/admin/reports", { method: "GE
 const remove = (id: unknown) => call(deleteRoute(apiRequest("/api/admin/reports/delete", { method: "POST", body: { id } })));
 const keep = (id: unknown) => call(keepRoute(apiRequest("/api/admin/reports/keep", { method: "POST", body: { id } })));
 const bodies = async (date?: string) =>
-  (await call(threadRoute(apiRequest(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" })))).body.thread.comments.map(
+  (await call(threadRoute(apiRequest(date ? `/api/comments?game=${GAME_ID}&date=${date}` : `/api/comments?game=${GAME_ID}`, { method: "GET" })))).body.thread.comments.map(
     (c: { body: string }) => c.body,
   );
 const ok = { status: 200, body: { ok: true } };
@@ -63,7 +63,7 @@ async function getCaught() {
 async function finishAndPost(key: (typeof keys)[number]) {
   await start();
   await getCaught();
-  const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { date: today, body: `hello from ${key}` } })));
+  const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: `hello from ${key}` } })));
   expect(r.status).toBe(201);
   commentOf[key] = r.body.comment.id;
 }
@@ -136,7 +136,7 @@ describe("reporting comments, and the admins' list", () => {
   it("refuses reporting your own comment, one you can't see, or a missing one", async () => {
     useSession(players.a.session);
     await getCaught();
-    const posted = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { date: today, body: "hello from a" } })));
+    const posted = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: "hello from a" } })));
     commentOf.a = posted.body.comment.id;
     expect(await report(commentOf.a)).toEqual({ status: 409, body: { ok: false, error: "report_own" } });
     expect(await report(commentOf.c)).toEqual(notFound);
@@ -184,7 +184,7 @@ describe("reporting comments, and the admins' list", () => {
 
   it("lets an admin delete a reported comment for everyone, with its reports and reactions, but not an unreported one", async () => {
     useSession(players.d.session);
-    expect((await call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { date: today, target: { type: "comment", id: commentOf.b }, emoji: "👍" } })))).status).toBe(200);
+    expect((await call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { game: GAME_ID, date: today, target: { type: "comment", id: commentOf.b }, emoji: "👍" } })))).status).toBe(200);
     useSession(players.x.session);
     expect(await remove(commentOf.c)).toEqual(notFound);
     expect(await remove("999999999999")).toEqual(notFound);

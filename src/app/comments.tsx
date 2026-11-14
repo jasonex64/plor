@@ -12,6 +12,7 @@ import { ButtonLink } from "./button-link";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
 import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
+import type { BoardGame } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { previewText } from "@/comments/preview";
@@ -25,7 +26,7 @@ import { dayText, shiftDay } from "./day-text";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
-import { GAME } from "@/platform/game";
+import { GAME, GAME_ID } from "@/platform/game";
 import { COMMENT_MAX_LENGTH } from "@/config/tunables";
 import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
@@ -57,13 +58,16 @@ function changed(thread: Thread | Feed | null, change: Change): Thread | Feed | 
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
-// friends feed. title names today's feed (its heading and region): "Feed" on Today, the game screen's own on
-// Offbeat's (round 5: "Offbeat comments"; docs/milestones/M14-14a-2c-review-fixes.md).
+// friends feed. game: the game whose thread this is, which each game has of its own (M16 16f-3); Offbeat's friends thread
+// on today is the feed until the feed holds both games (16f-4), and Fragments' is its plain thread. title names today's
+// feed (its heading and region): "Feed" on Today, the game screen's own on Offbeat's (round 5: "Offbeat comments";
+// docs/milestones/M14-14a-2c-review-fixes.md).
 export function Comments({
   username,
   name,
   runOver,
   nudge,
+  game,
   group,
   title = "Feed",
 }: {
@@ -72,6 +76,7 @@ export function Comments({
   name: string;
   runOver: boolean;
   nudge: number;
+  game: BoardGame;
   group?: string;
   title?: string;
 }) {
@@ -96,14 +101,14 @@ export function Comments({
       setError(null);
     };
     const failed = (err: unknown) => setError(errorText(err));
-    if (!group && date === null) {
+    if (!group && date === null && game === GAME_ID) {
       return latest(api<{ feed: Feed }>("/api/feed", { method: "GET" }), (r) => shown(r.feed), failed);
     }
-    const query = new URLSearchParams();
+    const query = new URLSearchParams({ game });
     if (date) query.set("date", date);
     if (group) query.set("group", group);
     return latest(api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }), (r) => shown(r.thread), failed);
-  }, [date, group, latest]);
+  }, [date, game, group, latest]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
   useEffect(() => void load(), [load, runOver, nudge]);
@@ -139,7 +144,7 @@ export function Comments({
       {
         text: "Comment posted",
         failed: "Your comment wasn't posted",
-        send: (keepalive) => api("/api/comments", { method: "POST", body: { date: day, body, group }, keepalive }),
+        send: (keepalive) => api("/api/comments", { method: "POST", body: { game, date: day, body, group }, keepalive }),
       },
       // The text goes back in the box, unless the player has started another.
       () => setDraft((d) => (d === "" ? body : d)),
@@ -211,7 +216,7 @@ export function Comments({
                   text: reactionText(c.reactions, emoji),
                   failed: "Your reaction wasn't saved",
                   send: (keepalive) =>
-                    api("/api/reactions", { method: "POST", body: { date: day, target: { type: "comment", id: c.id }, emoji }, keepalive }),
+                    api("/api/reactions", { method: "POST", body: { game, date: day, target: { type: "comment", id: c.id }, emoji }, keepalive }),
                 },
               );
             const remove = () =>

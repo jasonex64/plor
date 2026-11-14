@@ -1,12 +1,12 @@
-// Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): seen by the author and their
+// Comments on a day of a game (docs/milestones/M08-comments-and-reactions.md, 8a; each game has its own thread, M16 16f-3): seen by the author and their
 // friends; a day's thread only once the viewer's own run that day is over, since comments talk about answers; past
 // days read-only, and shown even if the viewer never played them (D6). The length rule is the database's check (D1).
 // A comment the viewer reported is hidden from them (8c, D5). Each group has its own thread per day, which its members
 // share, with the same rules (docs/milestones/M10-groups.md, 10d; G4).
 import { DatabaseError } from "pg";
-import { GAME_ID } from "@/platform/game";
 import { memberSql, seesCommentSql } from "@/friends/circle";
 import { FINISHED, type RunStatus } from "@/game/status";
+import type { BoardGame } from "@/friends/leaderboard";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { NO_REACTIONS, commentReactions, type Reactions } from "@/reactions/reactions";
@@ -37,15 +37,15 @@ export type CommentRow = { id: string; username: string; name: string; body: str
 // True when the thread is the friends thread (the parameter is null) or a group the player ($1) is in.
 const inThreadSql = (group: string) => `(${group}::uuid is null or ${memberSql("$1", `${group}::uuid`)})`;
 
-// A day's thread, oldest first: the friends thread, or a group's (its ID, which the route checks). date is a
+// A day's thread of a game, oldest first: the friends thread, or a group's (its ID, which the route checks). date is a
 // calendar date (the route checks it); none means today. A group the viewer isn't in is the group page's 404.
-export async function getThread(db: Db, viewerId: string, date: string | null, group: string | null): Promise<Thread> {
+export async function getThread(db: Db, viewerId: string, game: BoardGame, date: string | null, group: string | null): Promise<Thread> {
   const { rows: day } = await db.query<{ date: string; today: boolean; future: boolean; status: RunStatus | null; member: boolean }>(
     `select d::text as date, d = private.today() as today, d > private.today() as future,
             (select status from private.run_status where user_id = $1 and game_id = $2 and puzzle_date = d) as status,
             ${inThreadSql("$4")} as member
      from (select coalesce($3::date, private.today()) as d) as day`,
-    [viewerId, GAME_ID, date, group],
+    [viewerId, game, date, group],
   );
   const { today, future, status, member } = day[0];
   if (!member) throw new AppError("group_not_found", 404);
@@ -64,17 +64,17 @@ export async function getThread(db: Db, viewerId: string, date: string | null, g
        and ${seesCommentSql("$1", "c")}
        and not exists (select from private.comment_report r where r.comment_id = c.id and r.reporter_id = $1)
      order by c.created_at, c.id`,
-    [viewerId, GAME_ID, day[0].date, group],
+    [viewerId, game, day[0].date, group],
   );
   const reactions = await commentReactions(db, viewerId, rows.map((r) => r.id));
   return { date: day[0].date, canPost: today, comments: rows.map((r) => toComment(r, reactions.get(r.id) ?? NO_REACTIONS)) };
 }
 
-// Posts to today's thread: the friends thread, or a group's (its ID, which the route checks). The page names the day
+// Posts to today's thread of a game: the friends thread, or a group's (its ID, which the route checks). The page names the day
 // it shows, so a page left open past midnight can't post to the new day by mistake. The day, the finished run and the
 // membership are checked in the insert itself, so midnight can't slip between a check and the write; a member removed
 // in between fails the database's membership check (G4).
-export async function postComment(db: Db, userId: string, date: string, body: string, group: string | null): Promise<Comment> {
+export async function postComment(db: Db, userId: string, game: BoardGame, date: string, body: string, group: string | null): Promise<Comment> {
   let rows: (CommentRow & { today: string; past: boolean; member: boolean })[];
   try {
     ({ rows } = await db.query<CommentRow & { today: string; past: boolean; member: boolean }>(
@@ -92,7 +92,7 @@ export async function postComment(db: Db, userId: string, date: string, body: st
        from day
        left join added a on true
        left join private.profile p on p.user_id = a.user_id`,
-      [userId, GAME_ID, date, body, FINISHED, group],
+      [userId, game, date, body, FINISHED, group],
     ));
   } catch (err) {
     if (err instanceof DatabaseError && err.code === "23514" && err.constraint === "comment_body_format") {

@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { countdown, expectCountdown, fillScale } from "./game";
-import { RUN, signInAndPick } from "./players";
+import { RUN, sent, signInAndPick } from "./players";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 // A friend's finished run is written with the round rules off, which needs the local superuser.
@@ -21,6 +21,8 @@ let today = "";
 const game = (page: Page) => page.getByRole("region", { name: SUBSTRINGS.name, exact: true });
 const next = (page: Page) => game(page).getByRole("button", { name: "Next", exact: true });
 const seeResults = (page: Page) => game(page).getByRole("button", { name: "See results", exact: true });
+// Fragments' own comments (src/app/fragments.tsx).
+const thread = (page: Page) => page.getByRole("region", { name: `${SUBSTRINGS.name} comments`, exact: true });
 const tabs = (page: Page) => page.getByRole("navigation", { name: "Main" });
 const wayOut = (page: Page) => page.getByRole("button", { name: "Back to Today" });
 // What a screen reader is told: the page's status messages that have text.
@@ -298,6 +300,18 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next, round 7's se
   await expect(page.getByText("Bonus letter j, in 1 word")).toBeVisible();
   await expect(page.getByText("Different letters, 6 of 26")).toBeVisible();
 
+  // Share, in the share text of a hand-worked run (src/game/share.ts): the name and day, a mark a round (words in rounds 1
+  // and 2, the other five missed) and the score, then the link.
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("button", { name: "Share", exact: true }).click();
+  await expect(said(page)).toHaveText(["Copied"]);
+  const day = new Date(`${today}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  // Windows' clipboard hands the line breaks back as CRLF; the text itself is src/game/share.test.ts's.
+  const copied = (await page.evaluate(() => navigator.clipboard.readText())).replaceAll("\r\n", "\n");
+  expect(copied).toBe(`${SUBSTRINGS.name} · ${day}\n🟩🟩⬜⬜⬜⬜⬜ 255\nhttp://localhost:3000/`);
+  // The comment box is under the result, for the day's Fragments thread (16f-3).
+  await expect(thread(page).getByLabel("Comment to your friends")).toBeVisible();
+
   // A page opened on a finished run never saw it in play: the cards, with no frame and no See results.
   await page.reload();
   await expect(page.getByRole("heading", { name: "Your score" })).toBeVisible();
@@ -325,6 +339,50 @@ test("a tab left between rounds finds the day it's in, and a real failure says s
   await DB.query("delete from private.run where game_id = 'substrings' and user_id = (select id from auth.users where email = $1)", [`${RUN}-pm@example.test`]);
   await next(page).click();
   await expect(game(page).getByRole("button", { name: "Start" })).toBeVisible();
+});
+
+// A finished run's result has the comment box, and a comment posted there is in Fragments' thread, which stays shut to a friend
+// who hasn't finished Fragments (16f-3). The run is written finished directly, as its play is the whole-day test's.
+test("a comment posted from Fragments' result is in its thread, shut to a friend who hasn't finished", async ({ browser }) => {
+  test.slow();
+  await addDay();
+  const page = await (await browser.newContext()).newPage();
+  const friend = await (await browser.newContext()).newPage();
+  try {
+    await page.goto("/");
+    await signInAndPick(page, "pq");
+    await friend.goto("/");
+    await signInAndPick(friend, "pr");
+    const client = await ADMIN.connect();
+    try {
+      await client.query("begin");
+      await client.query("set local session_replication_role = replica");
+      const [writer, reader] = (await client.query<{ id: string }>("select id from auth.users where email = any($1) order by email", [[`${RUN}-pq@example.test`, `${RUN}-pr@example.test`]])).rows.map((r) => r.id);
+      await client.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [writer, reader]);
+      await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'substrings', $2::date, now() - interval '1 hour')", [writer, today]);
+      await client.query("insert into private.question_open (user_id, game_id, puzzle_date, question_idx, opened_at) values ($1, 'substrings', $2::date, 6, now() - interval '1 hour')", [writer, today]);
+      await client.query("commit");
+    } finally {
+      client.release();
+    }
+
+    const body = `fragments words ${RUN}`;
+    await page.goto("/play2");
+    await expect(page.getByRole("heading", { name: "Your score" })).toBeVisible();
+    await thread(page).getByLabel("Comment to your friends").fill(body);
+    await thread(page).getByRole("button", { name: "Post" }).click();
+    await expect(thread(page).getByText(body)).toBeVisible();
+    await sent(page, "/api/comments");
+
+    // The friend has a run in neither game: the thread is shut, with none of its words in the page.
+    await friend.goto("/play2");
+    await expect(thread(friend).getByText("Finish today's puzzle to see your friends' comments.")).toBeVisible();
+    await expect(thread(friend).getByLabel("Comment to your friends")).toHaveCount(0);
+    expect(await friend.content()).not.toContain(body);
+  } finally {
+    await page.context().close();
+    await friend.context().close();
+  }
 });
 
 // This file's day is game 2's alone, so Today shows its card and no other (M16 16f-2, answer 7: "Play what's there").

@@ -2,6 +2,7 @@ import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
 import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
 import { isCalendarDate } from "@/content/puzzle";
+import { readGame } from "@/friends/leaderboard";
 import { readEmoji, readTarget, setReaction } from "@/reactions/reactions";
 
 // Sets, replaces or removes (emoji null) the signed-in player's reaction on a comment or a friend's run
@@ -10,8 +11,9 @@ import { readEmoji, readTarget, setReaction } from "@/reactions/reactions";
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
-  const { date, target, emoji } = await readJsonObject(request);
+  const { game, date, target, emoji } = await readJsonObject(request);
+  const gameId = readGame(game);
   if (!isCalendarDate(date)) throw new AppError("bad_request", 400, "date");
-  await setReaction(getPool(), userId, date, readTarget(target), readEmoji(emoji));
+  await setReaction(getPool(), userId, gameId, date, readTarget(target), readEmoji(emoji));
   return Response.json({ ok: true });
 });

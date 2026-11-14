@@ -44,11 +44,11 @@ async function call(response: Promise<Response>) {
 }
 type Target = { type: "comment"; id: string } | { type: "run"; userId: string };
 const react = (target: unknown, emoji: unknown, date = today) =>
-  call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { date, target, emoji } })));
+  call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { game: GAME_ID, date, target, emoji } })));
 const onComment = (id: string): Target => ({ type: "comment", id });
 const onRun = (userId: string): Target => ({ type: "run", userId });
 const thread = async (date?: string) =>
-  (await call(threadRoute(apiRequest(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" })))).body.thread;
+  (await call(threadRoute(apiRequest(date ? `/api/comments?game=${GAME_ID}&date=${date}` : `/api/comments?game=${GAME_ID}`, { method: "GET" })))).body.thread;
 const reactionsOnComment = async (id: string, date?: string) =>
   (await thread(date)).comments.find((c: { id: string }) => c.id === id).reactions;
 const board = async () => (await call(boardRoute(apiRequest("/api/board", { method: "GET" })))).body.board;
@@ -66,7 +66,7 @@ async function getCaught() {
 async function finishAndPost(key: (typeof keys)[number]) {
   await start();
   await getCaught();
-  const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { date: today, body: `hello from ${key}` } })));
+  const r = await call(postRoute(apiRequest("/api/comments", { method: "POST", body: { game: GAME_ID, date: today, body: `hello from ${key}` } })));
   expect(r.status).toBe(201);
   commentOf[key] = r.body.comment.id;
 }

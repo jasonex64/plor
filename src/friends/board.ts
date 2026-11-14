@@ -68,7 +68,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
   }
   const names = await thingNames(db, [...caught.values()].map((e) => e.entry_id));
   // Reactions wait for the viewer's run to end too: a reaction on how a friend's run ended says something about it.
-  const reactions = finished ? await runReactions(db, viewerId, date, rows.map((r) => r.user_id)) : new Map<string, Reactions>();
+  const reactions = finished ? await runReactions(db, viewerId, GAME_ID, date, rows.map((r) => r.user_id)) : new Map<string, Reactions>();
 
   return {
     date,
