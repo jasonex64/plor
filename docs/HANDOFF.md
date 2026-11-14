@@ -42,6 +42,6 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 
 **Left running:** nothing.
 
-**Open pull requests:** none (2026-11-13, after #200's merge).
+**Open pull requests:** #201, M19 19c, from `m19-pre-beta-fixes` (2026-11-13): waits for green checks and the human's word to merge.
 
 **Next:** the human's word to merge 19c's PR (say first what it does to plor.app: friends boards stop listing players for days before they joined; no database change), then M19 19d on `m19-pre-beta-fixes`. Beside it: 16f's remaining questions, asked in rounds (CLAUDE.md, "Ask before designing"), then its ticket for approval; the human's hand test of M17 on plor.app; M18's open criteria; the database plan (the human chose "Check first, then decide").
