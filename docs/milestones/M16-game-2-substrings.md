@@ -92,7 +92,12 @@ Fifth round (human, 2026-11-13, two sets of guided questions):
 Sixth round (human, 2026-11-13, after four pictures of the wide-peek carousel with Fragments' card beside Offbeat's navy on Paper and Night: A plum `#5a2f5e`, B deep teal `#17525a`, C rust `#8a3f1c`, D moss `#4a5524`; shown in the session, not in the repo):
 31. Fragments' card colour: "A. Plum". `#5a2f5e` with white text (10.48:1, computed in the session; `src/app/colors.test.ts` is to check it when built), the same in every theme, as Offbeat's `--offbeat`.
 
-Nothing is left to ask. 16f is not approved to build: its ticket is to be drafted from answers 1 to 31 for approval.
+Seventh round (human, 2026-11-13, while the ticket was drafted from the code):
+32. Replies, once Claude said its question for answer 28 was wrong (plor has no replies today, so they would be a new feature with a database change): "Leave replies out (Recommended)". Answer 28 is kept for after the beta.
+33. What a friend's row shows on Fragments' live board: "Round, then score (Recommended)". "On round 3 of 7" while they play; their score once they and the viewer have finished.
+34. Fragments' share: "Score and round marks (Recommended)". "Fragments · date", the score, and one mark per round, found or missed, with no words or letters.
+
+16f's ticket is drafted from answers 1 to 34: `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions
 | # | Decision | Answer (origin) |
