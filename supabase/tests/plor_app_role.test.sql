@@ -98,8 +98,7 @@ select is(pg_temp.grants('plor_app'), array[
   'private.delete_reported_comment(uuid,bigint) execute',
   -- Friends (M07 7b): friendships are added and removed. (Friend invite codes ended in M17 17c.)
   -- Guest play (M18 18b): a guest's run is read and started, never deleted by a grant; its game 2 words go through the
-  -- judge, and a run's rows go through two functions. The tally and round words are read only, round_reject not at all.
-  'private.end_guest_run(text,text) execute',
+  -- judge, and a closed day's runs go through one function (the purge). The tally and round words are read only, round_reject not at all.
   -- Friend requests (M17 17a): read, sent, and deleted by an accept, a decline or a cancel.
   'private.friend_request delete', 'private.friend_request insert', 'private.friend_request select',
   'private.friendship delete', 'private.friendship insert', 'private.friendship select',

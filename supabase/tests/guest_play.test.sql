@@ -6,7 +6,7 @@ begin;
 set local role postgres;
 set local search_path to extensions, public;
 create extension if not exists pgtap with schema extensions;
-select plan(126);
+select plan(115);
 
 -- Real puzzles and runs may exist for the days used here. The whole file runs in one transaction that is rolled back.
 delete from private.guest_run where puzzle_date between private.today() - 1 and private.today() + 445;
@@ -143,8 +143,7 @@ select ok(not has_table_privilege('plor_app', 'private.guest_round_reject', 'sel
 select ok(has_table_privilege('plor_app', 'private.guest_run_status', 'select'), 'plor_app reads the guest status view');
 select ok(has_function_privilege('plor_app', 'private.guest_judge_word(text,date,text,text,text)', 'execute')
   and has_function_privilege('plor_app', 'private.guest_round_examples(text,date)', 'execute')
-  and has_function_privilege('plor_app', 'private.end_guest_run(text,text)', 'execute')
-  and has_function_privilege('plor_app', 'private.purge_guest_days()', 'execute'), 'plor_app runs the guest judge, the examples and the two delete functions');
+  and has_function_privilege('plor_app', 'private.purge_guest_days()', 'execute'), 'plor_app runs the guest judge, the examples and the purge');
 select ok(not has_function_privilege('plor_app', 'private.count_guest_answer()', 'execute')
   and not has_function_privilege('plor_app', 'private.judge_core(text,text,text,text,text,text,timestamptz,timestamptz,boolean)', 'execute')
   and not has_function_privilege('plor_app', 'private.round_examples_core(date,int[])', 'execute'), 'but not the tally trigger or the judge''s and examples'' cores');
@@ -248,33 +247,17 @@ select is(pg_temp.tally(private.today() - 1), 0, 'an answer after the day''s mid
 select is(pg_temp.rows_of('guest', 20, 'run_event'), 1, 'though its answer row is written and the run goes on');
 
 -- ====================================================================================================================
--- Ending a run, and a closed day's purge: no row carries the token's hash, the tally stays
+-- A closed day's purge: no row carries the token's hash, the tally stays (a finished run is kept until then, M19 19d)
 -- ====================================================================================================================
-select throws_ok($$select private.end_guest_run(pg_temp.key('guest', 13), 'offbeat')$$, 'OB015', null, 'a run still going cannot be ended');
-select is(pg_temp.rows_of('guest', 13, 'run'), 1, 'and keeps its rows');
-select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 11), 'offbeat')$$, 'a run that died is ended');
-select is(pg_temp.rows_of('guest', 11, 'run') + pg_temp.rows_of('guest', 11, 'run_event') + pg_temp.rows_of('guest', 11, 'question_open')
-  + pg_temp.rows_of('guest', 11, 'round_word') + pg_temp.rows_of('guest', 11, 'round_reject'), 0, 'no guest row carries its hash');
-select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 99), 'offbeat')$$, 'a run that is not there is already ended');
-select is(pg_temp.tally(private.today()), 5, 'the tally keeps every answer after the runs end');
--- Game 2's end takes the round words and rejections with it, and only that game's run: the token also has a game 1 run.
-select pg_temp.run('guest', 5, private.today());
-select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 5), 'substrings')$$, 'a finished game 2 run is ended');
-select is(pg_temp.rows_of('guest', 5, 'question_open') + pg_temp.rows_of('guest', 5, 'round_word') + pg_temp.rows_of('guest', 5, 'round_reject'), 0, 'with its words, rejections and opens');
-select is(pg_temp.rows_of('guest', 5, 'run'), 1, 'while the same token''s game 1 run stays');
--- A survived run (guest 1) and a timed-out one (guest 4) end the same way, whatever their kind.
-select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 1), 'offbeat')$$, 'a run that survived is ended');
-select lives_ok($$select private.end_guest_run(pg_temp.key('guest', 4), 'offbeat')$$, 'a run that timed out is ended');
-select is(pg_temp.rows_of('guest', 1, 'run') + pg_temp.rows_of('guest', 1, 'run_event') + pg_temp.rows_of('guest', 1, 'question_open')
-  + pg_temp.rows_of('guest', 4, 'run') + pg_temp.rows_of('guest', 4, 'run_event'), 0, 'neither leaves a row carrying its hash');
-select is((select count(*)::int from private.guest_tally where puzzle_date = private.today() and entry_id = 'x'), 2, 'and the tally still holds their answers (a refused answer is not counted)');
+select is(pg_temp.tally(private.today()), 5, 'the tally holds every answer given');
+select is((select count(*)::int from private.guest_tally where puzzle_date = private.today() and entry_id = 'x'), 2, 'a refused answer is not counted');
 -- A closed day's runs go at the next purge, and only they.
 select lives_ok($$select private.purge_guest_days()$$, 'a purge runs');
 select is((select count(*)::int from private.guest_run where puzzle_date < private.today()), 0, 'no guest run of a closed day is left');
 select is((select count(*)::int from private.guest_run_event where puzzle_date < private.today()), 0, 'nor its answers');
 select is(pg_temp.rows_of('guest', 20, 'run') + pg_temp.rows_of('guest', 20, 'run_event'), 0, 'no row carries its hash');
 select ok((select count(*)::int from private.guest_run where puzzle_date = private.today()) > 0, 'today''s runs stay');
-select is((select count(*)::int from private.guest_run), 6, 'and exactly today''s six');
+select is((select count(*)::int from private.guest_run), 9, 'and exactly today''s nine (finished runs are kept until their day closes)');
 
 select * from finish();
 rollback;

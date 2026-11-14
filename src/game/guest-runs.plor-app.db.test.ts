@@ -46,7 +46,7 @@ async function runsOf(client: PoolClient, hash: string): Promise<number> {
 }
 
 describe("a guest run as plor_app", () => {
-  it("plays all seven questions, is ended with the last answer, and a retry then finds no run", async () => {
+  it("plays all seven questions, is over with the last answer, which a retry then returns again", async () => {
     await asPlorApp(async ({ client, puzzle }) => {
       const hash = newHash();
       expect((await guestTodaysState(client, hash))!.status).toBe("not_started");
@@ -61,19 +61,20 @@ describe("a guest run as plor_app", () => {
       const done = await answerGuest(client, hash, last, name(last));
       expect(done.run).toMatchObject({ status: "survived", question: null });
       expect(done.run.answered).toHaveLength(puzzle.questions.length);
-      expect(await runsOf(client, hash)).toBe(0);
-      await expect(answerGuest(client, hash, last, name(last))).rejects.toMatchObject({ code: "run_over", status: 409 });
+      expect(await runsOf(client, hash)).toBe(1);
+      expect((await answerGuest(client, hash, last, name(last))).run).toMatchObject({ status: "survived" });
+      expect((await startGuestRun(client, hash)).status).toBe("survived");
       await expect(openNextGuest(client, hash)).rejects.toMatchObject({ code: "run_over", status: 409 });
     });
   });
 
-  it("ends a caught run with the answer that caught it", async () => {
+  it("keeps a caught run, over with the answer that caught it", async () => {
     await asPlorApp(async ({ client, puzzle }) => {
       const hash = newHash();
       await startGuestRun(client, hash);
       const caught = await answerGuest(client, hash, 0, hostName(puzzle, 0));
       expect(caught.run.status).toBe("died");
-      expect(await runsOf(client, hash)).toBe(0);
+      expect(await runsOf(client, hash)).toBe(1);
     });
   });
 
