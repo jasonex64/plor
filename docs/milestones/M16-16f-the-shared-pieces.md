@@ -1,6 +1,6 @@
 # M16 16f — the shared pieces
 
-**Status:** in progress. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Approved by the human (2026-11-13: "Approve 16f").** 16f-1 is merged (PR #205, 2026-11-14; the hosted `db push` is the human's). 16f-2 is merged (PR #206, 2026-11-14). 16f-3 is merged (PR #207, 2026-11-14). The human on 2026-11-14: "database is pushed" (19d's and 16f-1's migrations; not checked by any agent). 16f-4 is merged (PR #208, 2026-11-14). 16f-5, the feed on Today, is built and in its pull request, not merged (answers 46 to 54; no database change).
+**Status:** in progress. Drafted 2026-11-13 from the human's answers 1 to 34 (`docs/milestones/M16-game-2-substrings.md`, "Answers for 16f"). **Approved by the human (2026-11-13: "Approve 16f").** 16f-1 is merged (PR #205, 2026-11-14; the hosted `db push` is the human's). 16f-2 is merged (PR #206, 2026-11-14). 16f-3 is merged (PR #207, 2026-11-14). The human on 2026-11-14: "database is pushed" (19d's and 16f-1's migrations; not checked by any agent). 16f-4 is merged (PR #208, 2026-11-14). 16f-5, the feed on Today, is merged (PR #209, 2026-11-14, on nine green checks, by the human's "Merge when green"; answers 46 to 54; no database change).
 
 ## Goal
 Make the screens around the games work for two games: Today shows both, one streak counts either, and the feed, comments, reactions, boards, Me and Share know Fragments as well as Offbeat.
