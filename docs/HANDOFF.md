@@ -2,13 +2,13 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets. Older notes are in git (`git log -p docs/HANDOFF.md`); this file was cut down on 2026-11-11 (audit W10).
 
-**Updated last:** 2026-11-13, on `m17-profiles-and-friend-requests` (checkout `C:/Users/jason/RIFF-m17`), by the session that built M17 and closed its paperwork. **This file is the newest handoff.** The one on `m18-guest-play` (2026-11-12, with a later note in the `C:/Users/jason/RIFF` checkout) is superseded: read this one.
+**Updated last:** 2026-11-13, on `m19-pre-beta-fixes` (checkout `C:/Users/jason/RIFF`), by the session that drafted M19 and built 19a and 19b. **This file is the newest handoff**; the note below, "Since M17 closed", is this session's.
 
 ## The goal, settled (don't re-ask)
 Closed beta with a plain look, guest play, both games, and profiles with friend requests before the beta. Clean-up is blockers plus cheap tidying. Still true from 2026-11-12: "Keep the full order"; no new features before the beta ("jk i dont want the new features everything else is fine").
 
 ## Since M17 closed (2026-11-13, a planning session on `m19-pre-beta-fixes`, checkout `C:/Users/jason/RIFF`; no code)
-- **M19, pre-beta fixes, is approved ("Approve M19"):** `docs/milestones/M19-pre-beta-fixes.md` holds the human's thirteen answers, quoted. **19a is merged** (PR #199, green checks, published to plor.app, no migration). **19b is built** on `m19-pre-beta-fixes` (clear 4xx replies for rare clashes, two new messages, NUL refused in stored text); the `reviewer` found nothing blocking. **Whether 19b is pushed, has a PR or is merged: read `gh pr list`**; a merge publishes it (no migration). Next: 19c (boards start at a player's join day), then 19d: answer 10 settles its design (a guest's finished run is kept until the day's reset, one play a day per device), and it still owes the human a draft of the Privacy page's guest words and a statement of whether it needs a migration and a hosted `db push`, before it is built. Nobody has looked at 19a's or 19b's messages in a browser.
+- **M19, pre-beta fixes, is approved ("Approve M19"):** `docs/milestones/M19-pre-beta-fixes.md` holds the human's thirteen answers, quoted. **19a (PR #199) and 19b (PR #200) are merged** on green checks and published to plor.app; neither has a migration. This handoff's own commit is on `m19-pre-beta-fixes`, pushed, in no PR: it rides with 19c's. **Next: 19c** (a friends board for a day before a player joined doesn't list them; `src/friends/leaderboard.ts:100-110`; whether `private.profile` holds a join date is *unverified*). **Then 19d:** answer 10 settles its design (a guest's finished run is kept until the day's reset, one play a day per device); before it is built it owes the human a draft of the Privacy page's guest words and a statement of whether it needs a migration and a hosted `db push`. Then 19e (actions by player ID) and 19f (a test of the live board's lag, then ask). **Not verified:** nobody has looked at 19a's or 19b's messages in a browser or on plor.app; the reaction side as the deadlock's victim (19b).
 - **"Ship on your word" (M15 15d) is dropped** ("Drop it"): `main` keeps publishing on every merge. `RIFF-m15`'s uncommitted edits are that half-built 15d (a `ship` script, `vercel.json`'s deploy switch, rule and DECISIONS edits); they are untouched, and deleting them needs the human's word.
 - **The public repo stays public with the answers in it** ("Leave it").
 - **The database plan:** Supabase's pricing page (read 2026-11-13) says Free pauses "after 1 week of inactivity", has 500 MB and no backups; Pro is "from $25/month", never pauses, daily backups kept 7 days. How full the hosted database is: *unverified* (the human's dashboard). The human chose "Check first, then decide"; the decision is still open.
@@ -42,6 +42,6 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 
 **Left running:** nothing.
 
-**Open pull requests:** the docs-only PR that carries this handoff and marks M17 done (from `m17-profiles-and-friend-requests`; `gh pr list` has its number). It changes nothing visible on plor.app.
+**Open pull requests:** none (2026-11-13, after #200's merge).
 
-**Next:** 16f's remaining questions, asked in rounds (CLAUDE.md, "Ask before designing"), then its ticket for approval. Beside it: the human's hand test of M17 on plor.app, and M18's two open criteria.
+**Next:** M19 19c on `m19-pre-beta-fixes`, then 19d's proposal to the human. Beside it: 16f's remaining questions, asked in rounds (CLAUDE.md, "Ask before designing"), then its ticket for approval; the human's hand test of M17 on plor.app; M18's open criteria; the database plan (the human chose "Check first, then decide").

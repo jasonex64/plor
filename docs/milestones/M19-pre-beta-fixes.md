@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a is merged (PR #199); 19b is in review (its PR); 19c to 19f are not started.
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c to 19f are not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
