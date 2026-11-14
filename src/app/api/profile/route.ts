@@ -29,7 +29,7 @@ export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const { username } = await readJsonObject(request);
-  if (typeof username !== "string") throw new AppError("username_invalid", 400);
+  if (typeof username !== "string" || username.includes("\0")) throw new AppError("username_invalid", 400);
   await createProfile(getPool(), userId, username);
   return Response.json({ ok: true, username }, { status: 201 });
 });

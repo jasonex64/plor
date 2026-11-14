@@ -23,7 +23,7 @@ export function readGroupId(input: unknown): string {
 
 // Trimmed and in NFC, the form the database requires, as display names (M07 D1); the database checks the rest (G11).
 export function readGroupName(input: unknown): string {
-  if (typeof input !== "string") throw new AppError("group_name_invalid", 400);
+  if (typeof input !== "string" || input.includes("\0")) throw new AppError("group_name_invalid", 400);
   return input.normalize("NFC").trim();
 }
 
@@ -98,10 +98,18 @@ const LOCK_GROUP = "with locked as materialized (select id from private.player_g
 
 // Any member may leave; a creator who leaves hands the group on, and the last member deletes it (G6, in the database).
 export async function leaveGroup(db: Db, userId: string, groupId: string): Promise<void> {
-  const { rowCount } = await db.query(
-    `${LOCK_GROUP} delete from private.group_member m using locked where m.group_id = locked.id and m.user_id = $1`,
-    [userId, groupId],
-  );
+  let rowCount: number | null;
+  try {
+    ({ rowCount } = await db.query(
+      `${LOCK_GROUP} delete from private.group_member m using locked where m.group_id = locked.id and m.user_id = $1`,
+      [userId, groupId],
+    ));
+  } catch (err) {
+    // The leave deletes the member's comments and the reactions on them, so it can meet a reaction being replaced, and
+    // the database stops one of the two (40P01; 19b).
+    if (err instanceof DatabaseError && err.code === "40P01") throw new AppError("busy", 409);
+    throw err;
+  }
   if (rowCount === 0) throw new AppError("group_not_found", 404);
 }
 
@@ -160,6 +168,8 @@ function groupError(err: unknown): unknown {
   if (!(err instanceof DatabaseError)) return err;
   if (err.code === "23514" && err.constraint === "player_group_name_format") return new AppError("group_name_invalid", 400);
   if (err.code === "23505" && err.constraint === "group_member_pkey") return new AppError("already_member", 409);
+  // The group was deleted between the join's read and its insert (19b): the group page's 404.
+  if (err.code === "23503" && err.constraint === "group_member_group_id_fkey") return new AppError("group_not_found", 404);
   if (err.code === "OB009") return new AppError("group_full", 409);
   if (err.code === "OB010") return new AppError("too_many_groups", 409);
   return err;

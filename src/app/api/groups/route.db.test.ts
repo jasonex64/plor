@@ -77,6 +77,7 @@ describe("groups", () => {
     expect(await call(create, "/api/groups/create", "POST", { name: `${longest}a` })).toEqual(invalid);
     expect(await call(create, "/api/groups/create", "POST", { name: "" })).toEqual(invalid);
     expect(await call(create, "/api/groups/create", "POST", { name: 7 })).toEqual(invalid);
+    expect(await call(create, "/api/groups/create", "POST", { name: "a\u0000b" })).toEqual(invalid);
     expect(await call(groups, "/api/groups", "GET")).toEqual({
       status: 200,
       body: { ok: true, groups: [{ id: longName, name: longest }, { id: club, name: "Book Club" }] },
@@ -138,6 +139,7 @@ describe("groups", () => {
     useSession(A.session);
     expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "Readers" })).toEqual({ status: 200, body: { ok: true, name: "Readers" } });
     expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "Two  spaces" })).toEqual(error(400, "group_name_invalid"));
+    expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "a\u0000b" })).toEqual(error(400, "group_name_invalid"));
     const reset = await call(invite, "/api/groups/invite", "POST", { id: club });
     expect(reset.body.inviteCode).toMatch(/^[A-Za-z0-9_-]{10}$/);
     expect(reset.body.inviteCode).not.toBe(code);
@@ -150,6 +152,7 @@ describe("groups", () => {
 
   it("lets the creator remove a member, who loses the group (G6)", async () => {
     useSession(A.session);
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: "a\u0000b" })).toEqual(error(400, "bad_request"));
     expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: D.username })).toEqual({ status: 200, body: { ok: true } });
     expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: D.username })).toEqual(error(404, "member_not_found"));
     // The creator goes by leaving, not by removing themselves.
@@ -241,6 +244,30 @@ describe("groups under concurrent requests", () => {
       await Promise.all([leaveGroup(getPool(), a, three.id), leaveGroup(getPool(), b, three.id)]);
       const { rows } = await getPool().query("select creator_id from private.player_group where id = $1", [three.id]);
       expect(rows).toEqual([{ creator_id: c }]);
+    }
+  });
+
+  // 19b: a join that read the group before its deletion committed fails the membership's foreign key (23503). The group
+  // is gone, which is the group page's 404.
+  it("answers group_not_found to a join racing the group's deletion", async () => {
+    const [a, b] = await players(2);
+    const { id, code } = await groupOf([a]);
+    const pool = getPool();
+    const deleter = await pool.connect();
+    try {
+      await deleter.query("begin");
+      await deleter.query("delete from private.player_group where id = $1", [id]);
+      const joining = joinGroup(pool, b, code).then(
+        () => undefined,
+        (err: unknown) => err,
+      );
+      await expect
+        .poll(async () => (await pool.query<{ n: number }>("select count(*)::int as n from pg_stat_activity where wait_event_type = 'Lock' and query like '%group_member%'")).rows[0].n)
+        .toBe(1);
+      await deleter.query("commit");
+      expect(await joining).toMatchObject({ code: "group_not_found", status: 404 });
+    } finally {
+      deleter.release();
     }
   });
 

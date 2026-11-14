@@ -216,7 +216,8 @@ export async function startRun(db: Db, userId: string): Promise<RunState> {
 // Refuses typed text over the limit before any matching: the typo check builds every one-edit spelling of what it is
 // given (audit W1, docs/audits/2026-11-11-weekly-audit.md). One check for signed-in answers, test misses and guests'.
 export function assertTypedLength(typed: string): void {
-  if (typed.length > TYPED_ANSWER_MAX_LENGTH) throw new AppError("text_invalid", 400);
+  // A NUL character can't be stored in Postgres text (it fails with 22021 when the miss is logged), so it is refused too (19b).
+  if (typed.length > TYPED_ANSWER_MAX_LENGTH || typed.includes("\0")) throw new AppError("text_invalid", 400);
 }
 
 // Answers one question of the player's latest run with typed text, which the server turns into a thing of the
@@ -310,6 +311,9 @@ export async function openNext(db: Db, userId: string): Promise<RunState> {
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
     if (err.code === RUN_OVER) throw new AppError("run_over", 409);
+    // An answer from another tab landed between our read and our insert, so the index we read is behind (19b); the
+    // same reply as an answer to a question that isn't next.
+    if (err.code === OUT_OF_ORDER) throw new AppError("out_of_order", 409);
     // question_idx must be over 0: Start opens question 1, so Next before the first answer has nothing to open.
     if (err.code === "23514" && err.constraint === "question_open_question_idx_check") throw new AppError("no_reveal", 409);
     throw err;

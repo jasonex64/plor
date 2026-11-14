@@ -100,6 +100,7 @@ describe("friend requests", () => {
     expect(await sendTo(A.username.toUpperCase())).toEqual({ status: 409, body: { ok: false, error: "request_own" } });
     expect(await sendTo(`nobody${RUN}`)).toEqual({ status: 404, body: { ok: false, error: "player_not_found" } });
     expect(await sendTo(7)).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await sendTo("a\u0000b")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
     useSession(D.session);
     expect(await sendTo(A.username)).toEqual({ status: 409, body: { ok: false, error: "no_profile" } });
     useSession(A.session);

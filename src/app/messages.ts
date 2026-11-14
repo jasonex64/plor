@@ -86,6 +86,8 @@ const MESSAGES: Record<string, string> = {
   // A question's answer search (docs/milestones/M14-14b-12-answer-lists.md).
   answers_closed: "This question's answers open once your run of the day is over.",
   // The audit of what was learned from misses (docs/milestones/M13-13b-learning-from-misses.md).
+  reaction_changed: "That changed in another tab. Try again.",
+  busy: "Plor was busy. Try again.",
   audit_invalid: "That decision no longer fits this answer. Reload the page.",
 };
 

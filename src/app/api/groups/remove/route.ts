@@ -9,7 +9,7 @@ export const POST = handle(async (request) => {
   const userId = await requireUserId(await createAuthClient());
   const body = await readJsonObject(request);
   const groupId = readGroupId(body.id);
-  if (typeof body.username !== "string") throw new AppError("bad_request", 400, "username");
+  if (typeof body.username !== "string" || body.username.includes("\0")) throw new AppError("bad_request", 400, "username");
   await removeMember(getPool(), userId, groupId, body.username);
   return Response.json({ ok: true });
 });
