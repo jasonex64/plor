@@ -79,6 +79,7 @@ describe("the live board over HTTP", () => {
 
   it("shows a friend playing, then caught, only as started while the viewer hasn't finished", async () => {
     const started = {
+      userId: players.a.userId,
       username: players.a.username,
       name: players.a.username,
       state: "started",

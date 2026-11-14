@@ -111,7 +111,7 @@ export function Board({ username, betterWithFriends }: { username: string; bette
       key: `run ${friend.username}`,
       text: reactionText(friend.reactions!, emoji),
       failed: "Your reaction wasn't saved",
-      send: (keepalive) => api("/api/reactions", { method: "POST", body: { date: day, target: { type: "run", username: friend.username }, emoji }, keepalive }),
+      send: (keepalive) => api("/api/reactions", { method: "POST", body: { date: day, target: { type: "run", userId: friend.userId }, emoji }, keepalive }),
     });
     showReaction({ friend: friend.username, emoji }, held.then((sent) => (sent ? load() : undefined)));
   }

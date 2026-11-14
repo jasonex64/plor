@@ -29,8 +29,8 @@ it("creates, joins, renames, resets, removes, hands over and deletes as plor_app
     await renameGroup(client, a, group.id, "Renamed");
     const code = await resetGroupInvite(client, a, group.id);
     await joinGroup(client, c, code);
-    const cName = (await getGroup(client, c, group.id)).members.find((m) => !m.creator && m.username.startsWith("p2"))!.username;
-    await removeMember(client, a, group.id, cName);
+    const cId = (await getGroup(client, c, group.id)).members.find((m) => !m.creator && m.username.startsWith("p2"))!.userId;
+    await removeMember(client, a, group.id, cId);
     await leaveGroup(client, a, group.id);
     const handed = await getGroup(client, b, group.id);
     expect(handed).toMatchObject({ name: "Renamed", inviteCode: code, creator: true });

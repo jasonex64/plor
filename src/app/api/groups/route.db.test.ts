@@ -3,10 +3,11 @@
 // (docs/milestones/M10-groups.md, 10b).
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { GROUP_MAX_MEMBERS, GROUP_NAME_MAX_LENGTH, GROUPS_PER_PLAYER } from "@/config/tunables";
-import { createGroup, joinGroup, leaveGroup } from "@/groups/groups";
+import { createGroup, joinGroup, leaveGroup, removeMember } from "@/groups/groups";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
+import { handNameOver } from "@/test/usernames";
 import { POST as setDisplayName } from "../profile/display-name/route";
 import { POST as createProfile } from "../profile/route";
 import { POST as create } from "./create/route";
@@ -24,7 +25,7 @@ vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextH
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
-const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, session: new Map<string, string>() });
+const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
 const A = player("ga");
 const B = player("gb");
 const D = player("gd");
@@ -37,7 +38,7 @@ async function call(route: (r: Request) => Promise<Response>, path: string, meth
 }
 
 const error = (status: number, code: string) => ({ status, body: { ok: false, error: code } });
-const member = (p: { username: string }, creator: boolean, name = p.username) => ({ username: p.username, name, creator });
+const member = (p: { userId: string; username: string }, creator: boolean, name = p.username) => ({ userId: p.userId, username: p.username, name, creator });
 
 beforeAll(useLocalStack);
 
@@ -58,6 +59,7 @@ describe("groups", () => {
     for (const p of [A, B, D]) {
       p.session = (await signIn(p.email)).session;
       expect((await call(createProfile, "/api/profile", "POST", { username: p.username })).status).toBe(201);
+      p.userId = (await getPool().query<{ id: string }>("select id from auth.users where email = $1", [p.email])).rows[0].id;
     }
     C.session = (await signIn(C.email)).session;
   });
@@ -127,7 +129,7 @@ describe("groups", () => {
     const forbidden = error(403, "not_creator");
     expect(await call(rename, "/api/groups/rename", "POST", { id: club, name: "Mine" })).toEqual(forbidden);
     expect(await call(invite, "/api/groups/invite", "POST", { id: club })).toEqual(forbidden);
-    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: A.username })).toEqual(forbidden);
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, userId: A.userId })).toEqual(forbidden);
     expect(await call(del, "/api/groups/delete", "POST", { id: club })).toEqual(forbidden);
     useSession(D.session);
     const notFound = error(404, "group_not_found");
@@ -152,11 +154,11 @@ describe("groups", () => {
 
   it("lets the creator remove a member, who loses the group (G6)", async () => {
     useSession(A.session);
-    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: "a\u0000b" })).toEqual(error(400, "bad_request"));
-    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: D.username })).toEqual({ status: 200, body: { ok: true } });
-    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: D.username })).toEqual(error(404, "member_not_found"));
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, userId: "a\u0000b" })).toEqual(error(400, "bad_request"));
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, userId: D.userId })).toEqual({ status: 200, body: { ok: true } });
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, userId: D.userId })).toEqual(error(404, "member_not_found"));
     // The creator goes by leaving, not by removing themselves.
-    expect(await call(remove, "/api/groups/remove", "POST", { id: club, username: A.username })).toEqual(error(404, "member_not_found"));
+    expect(await call(remove, "/api/groups/remove", "POST", { id: club, userId: A.userId })).toEqual(error(404, "member_not_found"));
     useSession(D.session);
     expect(await call(detail, `/api/groups/detail?id=${club}`, "GET")).toEqual(error(404, "group_not_found"));
   });
@@ -277,5 +279,29 @@ describe("groups under concurrent requests", () => {
     const results = await Promise.allSettled(ids.slice(GROUP_MAX_MEMBERS - 1).map((id) => joinGroup(getPool(), id, code)));
     expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
     expect(results.filter((r) => r.status === "rejected").map((r) => (r as PromiseRejectedResult).reason.code)).toEqual(["group_full", "group_full"]);
+  });
+});
+
+// 19e: the page names the member to remove by their ID, so a username that has since passed to someone else removes
+// nobody else. Players without sign-ins, as above; the usernames are what the fixture changes hands.
+describe("removing a member whose username has changed hands", () => {
+  it("removes the member the page showed, not the player who holds their old username now", async () => {
+    const tag = `${RUN}-s`;
+    const { rows } = await getPool().query<{ id: string }>(
+      "insert into auth.users (id, email) select gen_random_uuid(), $1 || n || '@example.test' from generate_series(1, 3) n returning id",
+      [tag],
+    );
+    const [creator, gone, taker] = rows.map((r, i) => ({ userId: r.id, username: `sx${i}${RUN}` }));
+    for (const p of [creator, gone, taker]) await getPool().query("insert into private.profile (user_id, username) values ($1, $2)", [p.userId, p.username]);
+    const { id, code } = await (async () => {
+      const group = await createGroup(getPool(), creator.userId, "Stale");
+      const { rows: found } = await getPool().query("select invite_code from private.player_group where id = $1", [group.id]);
+      return { id: group.id, code: found[0].invite_code };
+    })();
+    for (const p of [gone, taker]) await joinGroup(getPool(), p.userId, code);
+    await handNameOver(getPool(), gone, taker, `${gone.username}z`);
+    await removeMember(getPool(), creator.userId, id, gone.userId);
+    const left = await getPool().query("select user_id from private.group_member where group_id = $1 order by user_id", [id]);
+    expect(left.rows.map((r) => r.user_id).toSorted()).toEqual([creator.userId, taker.userId].toSorted());
   });
 });

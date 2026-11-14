@@ -19,7 +19,7 @@ beforeEach(() => {
 describe("/api/friends routes (M07 7b)", () => {
   it.each([
     ["GET /api/friends", () => friends(apiRequest("/api/friends", { method: "GET" }))],
-    ["POST /api/friends/remove", () => remove(apiRequest("/api/friends/remove", { method: "POST", body: { username: "abc" } }))],
+    ["POST /api/friends/remove", () => remove(apiRequest("/api/friends/remove", { method: "POST", body: { userId: "abc" } }))],
   ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
     const response = await call();
     expect(response.status).toBe(401);

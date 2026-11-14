@@ -4,6 +4,7 @@ import type { BoardFriend, Ended } from "./board";
 import { placeRows } from "./ended";
 
 const friend = (name: string, ended: Ended | null): BoardFriend => ({
+  userId: `id-${name}`,
   username: name.toLowerCase(),
   name,
   state: ended ? "finished" : "playing",

@@ -1,15 +1,15 @@
 import { createAuthClient, requireUserId } from "@/lib/auth";
 import { getPool } from "@/lib/db";
-import { AppError, checkProtocol, handle, readJsonObject } from "@/lib/http";
+import { checkProtocol, handle, readJsonObject } from "@/lib/http";
+import { readUserId } from "@/friends/friends";
 import { readGroupId, removeMember } from "@/groups/groups";
 
-// The creator removes a member by username (M10 10b; G1, G6).
+// The creator removes a member by ID (M10 10b; G1, G6; M19 19e: a username can change hands after the page was drawn).
 export const POST = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
   const body = await readJsonObject(request);
   const groupId = readGroupId(body.id);
-  if (typeof body.username !== "string" || body.username.includes("\0")) throw new AppError("bad_request", 400, "username");
-  await removeMember(getPool(), userId, groupId, body.username);
+  await removeMember(getPool(), userId, groupId, readUserId(body.userId));
   return Response.json({ ok: true });
 });

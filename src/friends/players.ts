@@ -17,7 +17,8 @@ import type { Friend } from "./friends";
 // viewer has blocked them. A player who has blocked the viewer has no profile at all for them (answers 13 and 24).
 export type Relation = "self" | "friend" | "sent" | "received" | "blocked" | "none";
 
-export type PlayerProfile = Friend & { relation: Relation } & Pick<Me, "totals" | "offbeat"> & Partial<Pick<Me, "since" | "month" | "rarest"> & { recent: Stats["days"] }>;
+// userId goes only with the full profile: a stranger sees names only (DECISIONS, 2026-11-12, E7).
+export type PlayerProfile = Friend & { relation: Relation } & Pick<Me, "totals" | "offbeat"> & Partial<Pick<Me, "since" | "month" | "rarest"> & { userId: string; recent: Stats["days"] }>;
 
 // The username rules (profile_username_format, supabase/migrations/20261028140000_baseline.sql): a name outside them
 // is nobody's, so the database isn't asked about it.
@@ -48,5 +49,5 @@ export async function getPlayer(db: Db, viewerId: string, name: string): Promise
   const { me, recent } = await getPlayerStats(db, them.user_id);
   const short = { username: them.username, name: them.name, relation, totals: me.totals, offbeat: me.offbeat };
   if (relation !== "self" && relation !== "friend") return short;
-  return { ...short, since: me.since, month: me.month, rarest: me.rarest, recent };
+  return { ...short, userId: them.user_id, since: me.since, month: me.month, rarest: me.rarest, recent };
 }

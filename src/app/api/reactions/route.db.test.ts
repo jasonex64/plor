@@ -2,6 +2,7 @@
 // play today's puzzle, and react through the route, then read reactions from the comments thread and the live board
 // (docs/milestones/M08-comments-and-reactions.md, 8b). A is the viewer; B is A's friend; C is no one's friend; D is
 // B's friend but not A's; E is A's friend who hasn't played.
+import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST as createProfile } from "@/app/api/profile/route";
 import { POST as answerRoute } from "@/app/api/run/answer/route";
@@ -13,6 +14,7 @@ import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
+import { handNameOver } from "@/test/usernames";
 import { GET as boardRoute } from "../board/route";
 import { POST as deleteRoute } from "../comments/delete/route";
 import { GET as threadRoute, POST as postRoute } from "../comments/route";
@@ -40,11 +42,11 @@ async function call(response: Promise<Response>) {
   const r = await response;
   return { status: r.status, body: await r.json() };
 }
-type Target = { type: "comment"; id: string } | { type: "run"; username: string };
+type Target = { type: "comment"; id: string } | { type: "run"; userId: string };
 const react = (target: unknown, emoji: unknown, date = today) =>
   call(reactRoute(apiRequest("/api/reactions", { method: "POST", body: { date, target, emoji } })));
 const onComment = (id: string): Target => ({ type: "comment", id });
-const onRun = (username: string): Target => ({ type: "run", username });
+const onRun = (userId: string): Target => ({ type: "run", userId });
 const thread = async (date?: string) =>
   (await call(threadRoute(apiRequest(date ? `/api/comments?date=${date}` : "/api/comments", { method: "GET" })))).body.thread;
 const reactionsOnComment = async (id: string, date?: string) =>
@@ -120,15 +122,15 @@ describe("reactions on comments and on friends' runs", () => {
     await finishAndPost("c");
     useSession(players.d.session);
     await finishAndPost("d");
-    expect(await react(onRun(players.b.username), "😂")).toEqual({ status: 200, body: { ok: true } });
+    expect(await react(onRun(players.b.userId), "😂")).toEqual({ status: 200, body: { ok: true } });
   });
 
   it("refuses A's reactions, and shows A no reactions on runs, until A's run is over", async () => {
     useSession(players.a.session);
     const notFinished = { status: 409, body: { ok: false, error: "not_finished" } };
-    expect(await react(onRun(players.b.username), "👍")).toEqual(notFinished);
+    expect(await react(onRun(players.b.userId), "👍")).toEqual(notFinished);
     await start();
-    expect(await react(onRun(players.b.username), "👍")).toEqual(notFinished);
+    expect(await react(onRun(players.b.userId), "👍")).toEqual(notFinished);
     expect(await react(onComment(commentOf.b), "👍")).toEqual(notFinished);
     const b = await board();
     expect(b.reactionsOnMine).toBeNull();
@@ -149,8 +151,8 @@ describe("reactions on comments and on friends' runs", () => {
     expect((await react(onComment(commentOf.b), null)).status).toBe(200);
   });
 
-  // 19b: a NUL character can't reach the database in a text column (22021).
-  it("refuses a friend's username holding a NUL character with 400 bad_request", async () => {
+  // 19b: a NUL character can't reach the database; 19e: nor can anything that is not an ID (22P02).
+  it("refuses a run target whose ID is not an ID, a NUL character included, with 400 bad_request", async () => {
     useSession(players.a.session);
     expect(await react(onRun("a\u0000b"), "👍")).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
   });
@@ -184,17 +186,17 @@ describe("reactions on comments and on friends' runs", () => {
   it(`accepts each of the ${REACTIONS.length} reactions (D3), so the tunable and the database agree, and nothing else`, async () => {
     useSession(players.a.session);
     for (const emoji of REACTIONS) {
-      expect(await react(onRun(players.b.username), emoji)).toEqual({ status: 200, body: { ok: true } });
+      expect(await react(onRun(players.b.userId), emoji)).toEqual({ status: 200, body: { ok: true } });
     }
     const bad = { status: 400, body: { ok: false, error: "bad_request" } };
-    expect(await react(onRun(players.b.username), "👎")).toEqual(bad);
-    expect(await react(onRun(players.b.username), "❤")).toEqual(bad);
-    expect(await react(onRun(players.b.username), undefined)).toEqual(bad);
-    expect(await react(onRun(players.b.username), 1)).toEqual(bad);
+    expect(await react(onRun(players.b.userId), "👎")).toEqual(bad);
+    expect(await react(onRun(players.b.userId), "❤")).toEqual(bad);
+    expect(await react(onRun(players.b.userId), undefined)).toEqual(bad);
+    expect(await react(onRun(players.b.userId), 1)).toEqual(bad);
     expect(await react({ type: "comment", id: "x" }, "👍")).toEqual(bad);
     expect(await react({ type: "run" }, "👍")).toEqual(bad);
     expect(await react("run", "👍")).toEqual(bad);
-    expect(await react(onRun(players.b.username), "👍", "yesterday")).toEqual(bad);
+    expect(await react(onRun(players.b.userId), "👍", "yesterday")).toEqual(bad);
   });
 
   it("shows reactions on a run to the runner and their friends, but not a friend of a friend's", async () => {
@@ -236,10 +238,10 @@ describe("reactions on comments and on friends' runs", () => {
     expect(await react(onComment(commentOf.c), "👍")).toEqual({ status: 404, body: { ok: false, error: "comment_not_found" } });
     expect(await react(onComment("999999999999"), "👍")).toEqual({ status: 404, body: { ok: false, error: "comment_not_found" } });
     const notFriends = { status: 404, body: { ok: false, error: "not_friends" } };
-    expect(await react(onRun(players.c.username), "👍")).toEqual(notFriends);
-    expect(await react(onRun(players.a.username), "👍")).toEqual(notFriends);
-    expect(await react(onRun(`nobody${RUN}`), "👍")).toEqual(notFriends);
-    expect(await react(onRun(e.username), "👍")).toEqual({ status: 404, body: { ok: false, error: "run_not_found" } });
+    expect(await react(onRun(players.c.userId), "👍")).toEqual(notFriends);
+    expect(await react(onRun(players.a.userId), "👍")).toEqual(notFriends);
+    expect(await react(onRun(randomUUID()), "👍")).toEqual(notFriends);
+    expect(await react(onRun(e.userId), "👍")).toEqual({ status: 404, body: { ok: false, error: "run_not_found" } });
     expect((await board()).friends.find((f: { username: string }) => f.username === e.username).reactions).toBeNull();
   });
 
@@ -270,6 +272,18 @@ describe("reactions on comments and on friends' runs", () => {
     expect(await react(onComment(rows[0].id), null, yesterday)).toEqual({ status: 409, body: { ok: false, error: "day_past" } });
     expect(await react(onComment(rows[0].id), "👍", yesterday)).toEqual({ status: 409, body: { ok: false, error: "day_past" } });
     const { rows: tomorrow } = await pool.query<{ d: string }>("select (private.today() + 1)::text as d");
-    expect(await react(onRun(players.a.username), "👍", tomorrow[0].d)).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await react(onRun(players.a.userId), "👍", tomorrow[0].d)).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+  });
+
+  // 19e: the page names a friend's run by their ID, so a username that has since passed to someone else reacts on nobody
+  // else's run. C has a run today and is made A's friend here, after the tests that needed C a stranger.
+  it("reacts on the run the page showed, not on that of the player who holds its owner's old username now", async () => {
+    const pool = getPool();
+    await befriend(players.a, players.c);
+    await handNameOver(pool, players.b, players.c, `${players.b.username}z`);
+    useSession(players.a.session);
+    expect(await react({ type: "run", userId: players.b.userId }, "👍")).toEqual({ status: 200, body: { ok: true } });
+    const { rows } = await pool.query<{ run_user_id: string }>("select run_user_id from private.reaction where user_id = $1 and run_user_id is not null", [players.a.userId]);
+    expect(rows.map((r) => r.run_user_id)).toEqual([players.b.userId]);
   });
 });

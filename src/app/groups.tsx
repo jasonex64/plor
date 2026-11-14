@@ -20,7 +20,7 @@ import { Line, Skeleton } from "./skeleton";
 import { FORWARD } from "./slide";
 
 type GroupSummary = { id: string; name: string };
-type Member = { username: string; name: string; creator: boolean };
+type Member = { userId: string; username: string; name: string; creator: boolean };
 type Group = GroupSummary & { inviteCode: string; creator: boolean; members: Member[] };
 
 // Runs one action at a time with its error shown, as the Friends section does.
@@ -169,7 +169,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   const removeMember = (member: Member) => {
     if (!window.confirm(`Remove ${member.name} from ${group?.name}? Their comments in it are deleted.`)) return;
     act(async () => {
-      await api("/api/groups/remove", { method: "POST", body: { id, username: member.username } });
+      await api("/api/groups/remove", { method: "POST", body: { id, userId: member.userId } });
       load();
     });
   };

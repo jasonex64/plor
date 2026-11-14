@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c (PR #201) is merged too; 19d is built, in its pull request, not merged (the human's hosted `db push` follows its merge, never before); 19e and 19f are not started.
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c (PR #201) is merged too; 19d (PR #202) is merged (the human's hosted `db push` follows it); 19e is built, in its pull request, not merged; 19f is not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -63,7 +63,7 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 - Answer 3 changes M18's answer 9 ("sees their result once", "discard everything else about them after the run"): M18's ticket says keeping a result "would need a number from the human". The proposal must say what is kept, for how long (the human's number, or an end that needs none, such as the guest's next Start or the day's reset), whether it needs a migration and a hosted `db push`, and whether the Privacy page's guest words still hold.
 
 **19e — actions name a player by ID, not username** (answer 5; ROADMAP: "can reach the wrong one from a stale page").
-- [ ] Removing a friend, removing a group member and reacting to a friend's run send the player's ID (`src/friends/friends.ts:30-34`, `src/groups/groups.ts:142-147`, `src/reactions/reactions.ts`, their routes and buttons) → verify: a db test renames A, gives A's old name to B, and the stale action reaches A or nobody, never B.
+- [x] Removing a friend, removing a group member and reacting to a friend's run send the player's ID (`src/friends/friends.ts:30-34`, `src/groups/groups.ts:142-147`, `src/reactions/reactions.ts`, their routes and buttons) → verify: a db test renames A, gives A's old name to B, and the stale action reaches A or nobody, never B.
 
 **19f — is the live board late?** (answer 8).
 - [ ] An e2e or db test shows whether a friend whose question time ran out stays "on question k" on an open board (`src/friends/board.ts:60-95`). Hypothesis: yes, until the next fetch, because nothing is written when time runs out (ROADMAP, M07 7c); disproved if the board changes with no fetch. Then ask the human, with the fixes' costs. No fix in this ticket.
@@ -84,7 +84,7 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 19a → 19b → 19c → 19d's proposal (asked while 19c builds) → 19d → 19e → 19f. Within a sub-ticket, fixes in separate files go to parallel builders (`sonnet`); the `reviewer` (`sonnet`) reads each PR. Beside M19: 16f's remaining questions (a design task, different files).
 
 ## Removes
-To be listed per PR. Expected: the username parameters of the three actions in 19e.
+To be listed per PR. 19e: the username parameters of the three actions (`removeFriend`, `removeMember`, a run reaction's target) and `GROUP_ID` in `src/groups/groups.ts` (one shared `UUID` now).
 
 ---
 *Fill in the sections below at the end.*
@@ -118,7 +118,14 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 - What a guest gets after the end, as a player does: game 1, a retried last answer 200 with the stored result, Next 409 `run_over`; game 2, a try 200 `time_up` with the finished run, Next 409.
 - Tests of the old rule were rewritten to the new one, and those of `end_guest_run` removed with it (the OB015 cases, the "another request ends it mid-read" race, pgTAP's eleven cases; its count of today's runs went six → nine as finished runs stay).
 - **Not run:** the e2e (CI). **No test:** a finished game 2 run of a closed day being purged (game 1's case and pgTAP cover the same statement); the purge racing a read at midnight. **Not verified:** a returning guest's finished result in a browser; the hosted database (nothing is pushed).
+**19e** (2026-11-13).
+- Three db tests failed first (`npm run test:db -- -t "<describe name>"`): reacting and removing a friend by ID, "expected { status: 400, … } to deeply equal { status: 200, body: { ok: true } }"; removing a group member by ID, "Error: member_not_found". They fail because the old routes took no ID (the request's shape changed), so "failed first" is by interface. In each, B gives up their username, C in the same circle takes it, the action names B's ID: it reaches B, and C is untouched.
+- The review's fix, test first: a stranger's profile carried the player's ID ("AssertionError: expected { …(6) } to deeply equal { username: '…', …(4) }", `+ "userId"`); now only a friend's or the player's own full profile does.
+- After: the whole `npm run test:db`: "Test Files  59 passed (59)", "Tests  444 passed (444)". `npm test`: "Tests  752 passed (752)". `npx tsc --noEmit -p .`: exit 0. No migration.
+- Who now receives a player's ID (recorded in DECISIONS.md's Log, 2026-11-13): the viewer's friends list and board (their friends'), a group's members (each other's), a friend's or own profile. Not a stranger's, a requester's or a blocked player's profile, nor the request lists.
+- A new test helper, `src/test/usernames.ts` (`handNameOver`), moves the rename wait and the 30-day hold aside with SQL, as the players route test does.
+- **Not run:** the e2e (CI). **Not verified:** the three buttons in a browser. **Still by username** (out of scope): accept, decline, cancel, block; the open board's live updates and reaction keys.
 
 ## Review
-- Blocking findings and how each was fixed: 19d (the `reviewer`, 2026-11-13, one pass, by reading): none in the code; the ticket, handoff and commit message it asked for are in this PR. 19c (the `reviewer`, 2026-11-13, one pass, by reading): one. The Graph of Last week would throw for a viewer who joined this week, as `summary` and `Standings` took the viewer to be listed; fixed in this PR (the graph is described without the viewer's points, and an empty week shows the list, not the race). The fix itself was not reviewed again. 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
-- Deferred to ROADMAP "Next revision": 19d: two items (For M19). 19c: two items (For M19). 19a: two missing boundary tests (For M19). 19b: three items (For M19).
+- Blocking findings and how each was fixed: 19e (the `reviewer`, 2026-11-13, one pass, by reading): `GET /api/players/[username]` gave any signed-in player the ID of any player they looked up, against DECISIONS 2026-11-12 (E7, a stranger sees names only); fixed, test first, by sending the ID only with the full profile; the fix was not re-reviewed. 19d (the `reviewer`, 2026-11-13, one pass, by reading): none in the code; the ticket, handoff and commit message it asked for are in this PR. 19c (the `reviewer`, 2026-11-13, one pass, by reading): one. The Graph of Last week would throw for a viewer who joined this week, as `summary` and `Standings` took the viewer to be listed; fixed in this PR (the graph is described without the viewer's points, and an empty week shows the list, not the race). The fix itself was not reviewed again. 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
+- Deferred to ROADMAP "Next revision": 19e: two items (For M19). 19d: two items (For M19). 19c: two items (For M19). 19a: two missing boundary tests (For M19). 19b: three items (For M19).

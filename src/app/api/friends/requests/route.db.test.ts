@@ -119,7 +119,7 @@ describe("friend requests", () => {
     useSession(A.session);
     expect(await lists()).toEqual({ friends: [B.username], requests: [], sent: [] });
     expect(await sendTo(B.username)).toEqual({ status: 409, body: { ok: false, error: "already_friends" } });
-    expect((await call(remove, "/api/friends/remove", "POST", { username: B.username })).status).toBe(200);
+    expect((await call(remove, "/api/friends/remove", "POST", { userId: B.userId })).status).toBe(200);
   });
 
   it("removes a declined request from both lists, with no friendship and no declined state (5, 23)", async () => {
@@ -170,7 +170,7 @@ describe("friend requests", () => {
     expect(await lists()).toEqual({ friends: [A.username], requests: [], sent: [] });
     useSession(A.session);
     expect(await lists()).toEqual({ friends: [B.username], requests: [], sent: [] });
-    expect((await call(remove, "/api/friends/remove", "POST", { username: B.username })).status).toBe(200);
+    expect((await call(remove, "/api/friends/remove", "POST", { userId: B.userId })).status).toBe(200);
   });
 
   it.each([

@@ -209,7 +209,7 @@ describe("a group's thread", () => {
 
   it("takes a removed member's comments and reactions out of the thread (G6)", async () => {
     useSession(A.session);
-    expect((await call(removeMember, "/api/groups/remove", "POST", { id: club, username: B.username })).status).toBe(200);
+    expect((await call(removeMember, "/api/groups/remove", "POST", { id: club, userId: B.userId })).status).toBe(200);
     const left = await comments(`?group=${club}`);
     expect(left.map((c) => c.body)).toEqual(["club from a"]);
     expect(left[0].reactions.counts).toEqual([]);

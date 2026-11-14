@@ -23,14 +23,14 @@ afterEach(() => vi.restoreAllMocks());
 describe("setReaction when a statement fails", () => {
   it("throws that error and returns the client to the pool after a rollback", async () => {
     const { pool, release } = poolWith(false);
-    await expect(setReaction(pool, "u", "2026-10-22", { type: "run", username: "x" }, "👍")).rejects.toThrow("query failed");
+    await expect(setReaction(pool, "u", "2026-10-22", { type: "run", userId: "00000000-0000-4000-8000-000000000000" }, "👍")).rejects.toThrow("query failed");
     expect(release).toHaveBeenCalledExactlyOnceWith(false);
   });
 
   it("still throws that error when the rollback fails too, logs the rollback's, and destroys the client", async () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     const { pool, release } = poolWith(true);
-    await expect(setReaction(pool, "u", "2026-10-22", { type: "run", username: "x" }, "👍")).rejects.toThrow("query failed");
+    await expect(setReaction(pool, "u", "2026-10-22", { type: "run", userId: "00000000-0000-4000-8000-000000000000" }, "👍")).rejects.toThrow("query failed");
     expect(release).toHaveBeenCalledExactlyOnceWith(true);
     expect(logged).toHaveBeenCalledOnce();
     expect(JSON.parse(logged.mock.calls[0][0] as string)).toMatchObject({ level: "error", msg: "rollback failed" });
