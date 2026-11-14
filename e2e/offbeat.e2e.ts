@@ -132,7 +132,8 @@ test("the feed sits beside the game from 1200px and below it on phones, with no 
   const box = async (page: typeof wide, name: string) => (await page.getByRole("region", { name, exact: true }).boundingBox())!;
   // The game screen heads the feed as round 5 does (14a-2c, criterion 4).
   await expect(wide.getByRole("region", { name: `${GAME.name} comments` }).getByRole("heading", { name: `${GAME.name} comments` })).toBeVisible();
-  await expect(wide.getByRole("region", { name: `${GAME.name} comments` }).getByText("No comments yet.")).toBeVisible();
+  // Before the run is over it is Offbeat's friends thread, closed, as Fragments' is on its screen (M16 16f-5, answer 53).
+  await expect(wide.getByRole("region", { name: `${GAME.name} comments` }).getByText("Finish today's puzzle to see your friends' comments.")).toBeVisible();
   const [game, feed] = [await box(wide, GAME.name), await box(wide, `${GAME.name} comments`)];
   expect(feed.x).toBeGreaterThanOrEqual(game.x + game.width);
   expect(feed.y).toBeLessThan(game.y + game.height);
