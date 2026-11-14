@@ -2,22 +2,20 @@
 // format, the invite code's shape, the creator always a member, the caps and the creator handover
 // (supabase/migrations/20261028140000_baseline.sql). The routes pass only the verified player's ID.
 import { DatabaseError } from "pg";
-import { newInviteCode, type Friend } from "@/friends/friends";
+import { newInviteCode, UUID, type FriendWithId } from "@/friends/friends";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 
 export type GroupSummary = { id: string; name: string };
-// A member as the others see them (G3): the username identifies them (the creator removes by it), and the name shown
-// is the display name if set (M07 7a).
-export type Member = Friend & { creator: boolean };
+// A member as the others see them (G3): the ID identifies them (the creator removes by it), and the name shown is the
+// display name if set (M07 7a).
+export type Member = FriendWithId & { creator: boolean };
 // creator says whether the viewer is the creator, which decides the controls the page shows (G1).
 export type Group = GroupSummary & { inviteCode: string; creator: boolean; members: Member[] };
 
-const GROUP_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-
 // A group ID from a link or a request body. Anything that can't be one is the same 404 as a group the player isn't in.
 export function readGroupId(input: unknown): string {
-  if (typeof input !== "string" || !GROUP_ID.test(input)) throw new AppError("group_not_found", 404);
+  if (typeof input !== "string" || !UUID.test(input)) throw new AppError("group_not_found", 404);
   return input;
 }
 
@@ -56,7 +54,7 @@ export async function listGroups(db: Db, userId: string): Promise<GroupSummary[]
 export async function getGroup(db: Db, userId: string, groupId: string): Promise<Group> {
   const { rows } = await db.query<Group>(
     `select g.id, g.name, g.invite_code as "inviteCode", g.creator_id = $1 as creator,
-            (select json_agg(json_build_object('username', p.username, 'name', coalesce(p.display_name, p.username::text),
+            (select json_agg(json_build_object('userId', p.user_id, 'username', p.username, 'name', coalesce(p.display_name, p.username::text),
                                                'creator', m.user_id = g.creator_id)
                              order by lower(coalesce(p.display_name, p.username::text)), p.username)
              from private.group_member m join private.profile p using (user_id) where m.group_id = g.id) as members
@@ -147,12 +145,12 @@ export async function resetGroupInvite(db: Db, userId: string, groupId: string):
 }
 
 // The creator removes another member; leaving is how the creator goes.
-export async function removeMember(db: Db, userId: string, groupId: string, username: string): Promise<void> {
+export async function removeMember(db: Db, userId: string, groupId: string, memberId: string): Promise<void> {
   await checkCreator(db, userId, groupId);
   const { rowCount } = await db.query(
-    `${LOCK_GROUP} delete from private.group_member m using locked, private.profile p, private.player_group g
-     where g.id = locked.id and g.creator_id = $1 and m.group_id = g.id and p.username = $3 and m.user_id = p.user_id and m.user_id <> $1`,
-    [userId, groupId, username],
+    `${LOCK_GROUP} delete from private.group_member m using locked, private.player_group g
+     where g.id = locked.id and g.creator_id = $1 and m.group_id = g.id and m.user_id = $3::uuid and m.user_id <> $1`,
+    [userId, groupId, memberId],
   );
   if (rowCount === 0) throw new AppError("member_not_found", 404);
 }

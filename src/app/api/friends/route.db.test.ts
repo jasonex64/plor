@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { getPool } from "@/lib/db";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
+import { handNameOver } from "@/test/usernames";
 import { POST as setDisplayName } from "../profile/display-name/route";
 import { POST as createProfile } from "../profile/route";
 import { POST as remove } from "./remove/route";
@@ -17,8 +18,10 @@ vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextH
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
-const A = { email: `${RUN}-fa@example.test`, username: `fa${RUN}`, session: new Map<string, string>() };
-const B = { email: `${RUN}-fb@example.test`, username: `fb${RUN}`, session: new Map<string, string>() };
+const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
+const A = player("fa");
+const B = player("fb");
+const C = player("fc");
 
 async function call(route: (r: Request) => Promise<Response>, path: string, method: "GET" | "POST", body?: unknown) {
   const response = await route(apiRequest(path, { method, body }));
@@ -39,6 +42,7 @@ describe("friends list", () => {
     for (const player of [A, B]) {
       player.session = (await signIn(player.email)).session;
       expect((await call(createProfile, "/api/profile", "POST", { username: player.username })).status).toBe(201);
+      player.userId = (await getPool().query<{ id: string }>("select id from auth.users where email = $1", [player.email])).rows[0].id;
     }
   });
 
@@ -53,22 +57,38 @@ describe("friends list", () => {
     expect((await call(send, "/api/friends/requests", "POST", { username: B.username })).status).toBe(200);
     useSession(B.session);
     expect((await call(accept, "/api/friends/requests/accept", "POST", { username: A.username })).status).toBe(200);
-    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ username: A.username, name: "Ana" }]);
+    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: A.userId, username: A.username, name: "Ana" }]);
     useSession(A.session);
     // B has no display name, so A sees B's username.
-    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ username: B.username, name: B.username }]);
+    expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([{ userId: B.userId, username: B.username, name: B.username }]);
   });
 
   it("removes a friendship both ways, and only an existing one", async () => {
     useSession(A.session);
-    expect(await call(remove, "/api/friends/remove", "POST", { username: "a\u0000b" })).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
-    expect(await call(remove, "/api/friends/remove", "POST", { username: B.username })).toEqual({ status: 200, body: { ok: true } });
+    expect(await call(remove, "/api/friends/remove", "POST", { userId: "a\u0000b" })).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+    expect(await call(remove, "/api/friends/remove", "POST", { userId: B.userId })).toEqual({ status: 200, body: { ok: true } });
     expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([]);
     useSession(B.session);
     expect((await call(friends, "/api/friends", "GET")).body.friends).toEqual([]);
-    expect(await call(remove, "/api/friends/remove", "POST", { username: A.username })).toEqual({
+    expect(await call(remove, "/api/friends/remove", "POST", { userId: A.userId })).toEqual({
       status: 404,
       body: { ok: false, error: "not_friends" },
     });
+  });
+
+  // 19e: the page names a friend by their ID, so a username that has since passed to someone else reaches nobody.
+  it("removes the friend the page showed, not the player who holds their old username now", async () => {
+    C.session = (await signIn(C.email)).session;
+    useSession(C.session);
+    expect((await call(createProfile, "/api/profile", "POST", { username: C.username })).status).toBe(201);
+    C.userId = (await getPool().query<{ id: string }>("select id from auth.users where email = $1", [C.email])).rows[0].id;
+    for (const friend of [B, C]) {
+      await getPool().query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [A.userId, friend.userId]);
+    }
+    await handNameOver(getPool(), B, C, `${B.username}z`);
+    useSession(A.session);
+    expect(await call(remove, "/api/friends/remove", "POST", { userId: B.userId })).toEqual({ status: 200, body: { ok: true } });
+    const left = await getPool().query<{ user_a: string; user_b: string }>("select user_a, user_b from private.friendship where $1::uuid in (user_a, user_b)", [A.userId]);
+    expect(left.rows.map((r) => (r.user_a === A.userId ? r.user_b : r.user_a))).toEqual([C.userId]);
   });
 });

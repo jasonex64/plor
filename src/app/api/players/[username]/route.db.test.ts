@@ -105,7 +105,7 @@ describe("players", () => {
     const mine = (await lookup(B.username)).body.player;
     useSession(A.session);
     const theirs = (await lookup(B.username)).body.player;
-    const full = { username: B.username, name: `Bee ${RUN}`, totals: own.totals, offbeat: own.offbeat, since: own.since, month: own.month, rarest: own.rarest };
+    const full = { userId: B.userId, username: B.username, name: `Bee ${RUN}`, totals: own.totals, offbeat: own.offbeat, since: own.since, month: own.month, rarest: own.rarest };
     expect(theirs).toEqual({ ...full, relation: "friend", recent: theirs.recent });
     expect(mine).toEqual({ ...full, relation: "self", recent: theirs.recent });
     expect(theirs.recent).toHaveLength(STATS_CHART_DAYS);

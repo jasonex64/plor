@@ -16,6 +16,8 @@ import { circleSql } from "./circle";
 export type Ended = { result: "caught"; question: number; answer: string } | { result: "survived" } | { result: "timed_out"; question: number };
 
 export type BoardFriend = {
+  // What a reaction on their run names (M19 19e).
+  userId: string;
   username: string;
   // The display name if set, else the username (M07 7a).
   name: string;
@@ -77,6 +79,7 @@ export async function getBoard(db: Db, viewerId: string): Promise<Board> {
       .map((f): BoardFriend => {
         const state = f.status === null ? "not_started" : !finished ? "started" : FINISHED.includes(f.status) ? "finished" : "playing";
         return {
+          userId: f.user_id,
           username: f.username,
           name: f.name,
           state,

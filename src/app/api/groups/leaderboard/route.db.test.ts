@@ -159,7 +159,7 @@ describe("a group's leaderboard", () => {
 
   it("drops a member once the creator removes them (G6)", async () => {
     useSession(A.session);
-    expect((await call(remove, "/api/groups/remove", "POST", { id: club, username: B.username })).status).toBe(200);
+    expect((await call(remove, "/api/groups/remove", "POST", { id: club, userId: B.userId })).status).toBe(200);
     expect(totals((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).body).thisWeek).toEqual([[A.username, 0]]);
     useSession(B.session);
     expect((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=offbeat`, "GET")).status).toBe(404);

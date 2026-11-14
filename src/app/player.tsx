@@ -37,12 +37,13 @@ export function PlayerPage({ username, numbers, onRequestsChanged }: { username:
   useEffect(load, [username]);
 
   // One change between the viewer and this player, then the profile again: what the viewer may see can change with it.
+  // Removing a friend names the ID, not the username, which can change hands while the page is open (M19 19e).
   async function change(path: string, question?: string) {
     if (!player || (question && !window.confirm(question))) return;
     setBusy(true);
     setError(null);
     try {
-      await api(path, { method: "POST", body: { username: player.username } });
+      await api(path, { method: "POST", body: path === "/api/friends/remove" ? { userId: player.userId } : { username: player.username } });
       load();
     } catch (err) {
       setError(text(err));

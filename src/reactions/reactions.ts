@@ -6,6 +6,7 @@ import { REACTIONS } from "@/config/tunables";
 import { GAME_ID } from "@/platform/game";
 import { friendsSql, seesAuthorSql, seesCommentReactionSql, seesCommentSql } from "@/friends/circle";
 import { readCommentId } from "@/comments/comments";
+import { readUserId } from "@/friends/friends";
 import { FINISHED } from "@/game/status";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -16,8 +17,9 @@ export type Emoji = (typeof REACTIONS)[number];
 // What the viewer sees on one target: how many of each emoji, in the set's order and only those used, and their own.
 export type Reactions = { counts: { emoji: Emoji; count: number }[]; mine: Emoji | null };
 
-// A comment by its ID, or a friend's run that day by their username.
-export type Target = { type: "comment"; id: string } | { type: "run"; username: string };
+// A comment by its ID, or a friend's run that day by the friend's ID (a username can change hands after the page was
+// drawn: M19 19e).
+export type Target = { type: "comment"; id: string } | { type: "run"; userId: string };
 
 export const NO_REACTIONS: Reactions = { counts: [], mine: null };
 
@@ -32,7 +34,7 @@ export function readTarget(input: unknown): Target {
   if (typeof input === "object" && input !== null) {
     const t = input as Record<string, unknown>;
     if (t.type === "comment") return { type: "comment", id: readCommentId(t.id) };
-    if (t.type === "run" && typeof t.username === "string" && !t.username.includes("\0")) return { type: "run", username: t.username };
+    if (t.type === "run") return { type: "run", userId: readUserId(t.userId) };
   }
   throw new AppError("bad_request", 400, "target");
 }
@@ -67,7 +69,7 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
          select null, p.user_id,
                 exists (select from private.run r where r.user_id = p.user_id and r.game_id = $2 and r.puzzle_date = $3::date)
          from private.profile p
-         where p.username = $5 and ${friendsSql("$1", "p.user_id")}
+         where p.user_id = $5::uuid and ${friendsSql("$1", "p.user_id")}
        ), removed as (
          delete from private.reaction r using day, target t
          where day.today = $3::date and day.status = any($6::text[]) and t.played
@@ -77,7 +79,7 @@ export async function setReaction(pool: Pool, userId: string, date: string, targ
        select day.today::text as today, $3::date < day.today as past, coalesce(day.status = any($6::text[]), false) as finished,
               t.comment_id::text as comment_id, t.run_user_id, t.played
        from day left join target t on true`,
-      [userId, GAME_ID, date, target.type === "comment" ? target.id : null, target.type === "run" ? target.username : null, FINISHED],
+      [userId, GAME_ID, date, target.type === "comment" ? target.id : null, target.type === "run" ? target.userId : null, FINISHED],
     );
     const row = rows[0];
     if (row.past) throw new AppError("day_past", 409);

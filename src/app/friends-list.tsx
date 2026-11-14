@@ -8,7 +8,7 @@
 // a player: a username opens that player's profile, which is the search (17b, E1 and E6); each friend's row opens theirs.
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
-import type { Friend } from "@/friends/friends";
+import type { Friend, FriendWithId } from "@/friends/friends";
 import { api } from "@/lib/api-client";
 import { Avatar } from "./avatar";
 import { ButtonLink } from "./button-link";
@@ -16,7 +16,10 @@ import kit from "./kit.module.css";
 import { errorText } from "./messages";
 import { Line, Skeleton } from "./skeleton";
 
-type Lists = { friends: Friend[]; requests: Friend[]; sent: Friend[] };
+type Who = { username: string } | { userId: string };
+const byName = (p: Friend): Who => ({ username: p.username });
+
+type Lists = { friends: FriendWithId[]; requests: Friend[]; sent: Friend[] };
 
 // What a block does, said before it happens, as it ends a friendship and is undone only from Settings (answers 12, 13,
 // 20 and 21).
@@ -48,14 +51,15 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
   }
   useEffect(load, []);
 
-  // One change to a player, by username, then the lists again. A refusal is shown, and the lists are still read again:
-  // it usually means they changed elsewhere (a request its sender cancelled).
-  async function change(path: string, player: Friend, question?: string) {
+  // One change to a player, named by `who`, then the lists again. A refusal is shown, and the lists are still read
+  // again: it usually means they changed elsewhere (a request its sender cancelled). Removing a friend names the ID, not
+  // the username, which can change hands while the page is open (M19 19e).
+  async function change(path: string, who: Who, question?: string) {
     if (question && !window.confirm(question)) return;
     setBusy(true);
     setError(null);
     try {
-      await api(path, { method: "POST", body: { username: player.username } });
+      await api(path, { method: "POST", body: who });
     } catch (err) {
       setError(errorText(err));
     } finally {
@@ -66,8 +70,8 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
   }
 
   const friends = lists?.friends;
-  const action = (label: string, path: string, player: Friend, question?: string) => (
-    <button type="button" className={kit.link} disabled={busy} onClick={() => void change(path, player, question)}>
+  const action = (label: string, path: string, who: Who, question?: string) => (
+    <button type="button" className={kit.link} disabled={busy} onClick={() => void change(path, who, question)}>
       {label}
     </button>
   );
@@ -104,10 +108,10 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
                   <div className={kit.grow}>
                     {p.name}
                     <div className={kit.below}>
-                      {action("Accept", "/api/friends/requests/accept", p)}
-                      {action("Decline", "/api/friends/requests/decline", p)}
+                      {action("Accept", "/api/friends/requests/accept", byName(p))}
+                      {action("Decline", "/api/friends/requests/decline", byName(p))}
                       {/* The block alone: a decline would tell the sender, whose request must look unanswered (answer 28). */}
-                      {action("Decline and block", "/api/friends/block", p, blockQuestion(p.name))}
+                      {action("Decline and block", "/api/friends/block", byName(p), blockQuestion(p.name))}
                     </div>
                   </div>
                 </li>
@@ -122,7 +126,7 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
                   <li key={p.username} className={kit.row}>
                     <Avatar name={p.name} />
                     <span className={kit.grow}>{p.name}</span>
-                    {action("Cancel", "/api/friends/requests/cancel", p)}
+                    {action("Cancel", "/api/friends/requests/cancel", byName(p))}
                   </li>
                 ))}
               </ul>
@@ -154,10 +158,10 @@ export function FriendsList({ onRequestsChanged }: { onRequestsChanged: () => vo
                 {action(
                   "Remove",
                   "/api/friends/remove",
-                  f,
+                  { userId: f.userId },
                   `Remove ${f.name} as a friend? To be friends again, one of you sends a friend request.`,
                 )}
-                {action("Block", "/api/friends/block", f, blockQuestion(f.name))}
+                {action("Block", "/api/friends/block", byName(f), blockQuestion(f.name))}
               </li>
             ))}
           </ul>
