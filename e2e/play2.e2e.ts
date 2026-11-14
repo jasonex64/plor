@@ -327,12 +327,13 @@ test("a tab left between rounds finds the day it's in, and a real failure says s
   await expect(game(page).getByRole("button", { name: "Start" })).toBeVisible();
 });
 
-test("game 1 stays as it was", async ({ page }) => {
+// This file's day is game 2's alone, so Today shows its card and no other (M16 16f-2, answer 7: "Play what's there").
+test("Today shows Fragments' card alone on a day only game 2 has", async ({ page }) => {
   await page.goto("/");
   await signInAndPick(page, "pg");
   await expect(page.getByRole("heading", { name: "Plor, Today" })).toBeVisible();
-  await expect(page.getByRole("region", { name: GAME.name })).toBeVisible();
-  await expect(page.getByRole("region", { name: SUBSTRINGS.name, exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: SUBSTRINGS.name, exact: true }).getByRole("link", { name: "Play", exact: true })).toHaveAttribute("href", SUBSTRINGS.path);
+  await expect(page.getByRole("region", { name: GAME.name, exact: true })).toHaveCount(0);
 });
 
 // The Friends page's leaderboard switches between the games (M16 16e-2, answers 23 and 24), and game 2's adds up places.
