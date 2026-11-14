@@ -72,6 +72,10 @@ describe("a group's leaderboard", () => {
       const { rows } = await getPool().query<{ id: string }>("select id from auth.users where email = $1", [p.email]);
       p.userId = rows[0].id;
     }
+    // Signed up before last week: a friends board lists only players whose account was made by the week's end (M19 19c).
+    await getPool().query("update private.profile set created_at = now() - interval '14 days' where user_id = any($1::uuid[])", [
+      [A, B, C, D].map((p) => p.userId),
+    ]);
     useSession(A.session);
     club = (await call(create, "/api/groups/create", "POST", { name: "Book Club" })).body.group.id;
     const code = (await call(detail, `/api/groups/detail?id=${club}`, "GET")).body.group.inviteCode;

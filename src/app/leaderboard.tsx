@@ -209,7 +209,9 @@ export function LeaderboardCard() {
 function Standings(props: { label: string; week: Week; graph: boolean; picked: string | null; onPick: (key: string | null) => void; places: boolean }) {
   const { label, week, graph, picked, onPick, places } = props;
   const [table, setTable] = useState(false);
-  const drawn = graph && week.days > 0;
+  // Last week's friends board is empty for a viewer who joined this week with no older friends (M19 19c): no race.
+  const empty = week.entries.length === 0;
+  const drawn = graph && week.days > 0 && !empty;
   return (
     <section aria-label={label} className={styles.week}>
       <div className={kit.head}>
@@ -223,8 +225,8 @@ function Standings(props: { label: string; week: Week; graph: boolean; picked: s
           )}
         </div>
       </div>
-      {!graph && <Entries entries={week.entries} places={places} />}
-      {graph && !drawn && <p className={raceStyles.empty}>The first points arrive Tuesday, once Monday is over.</p>}
+      {(!graph || empty) && <Entries entries={week.entries} places={places} />}
+      {graph && week.days === 0 && <p className={raceStyles.empty}>The first points arrive Tuesday, once Monday is over.</p>}
       {drawn && <Race label={label} week={week} picked={picked} onPick={onPick} />}
       {drawn && week.hidden.length > 0 && <p className={styles.note}>{hiddenText(week.hidden)}</p>}
       {drawn && table && <RaceTable label={label} week={week} picked={picked} />}

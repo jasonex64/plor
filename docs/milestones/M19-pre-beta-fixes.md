@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c to 19f are not started.
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c is built, in its pull request, not merged; 19d's design is settled (answers 16 and 17), not built; 19e and 19f are not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -25,6 +25,10 @@ Close the player-facing bugs already recorded in ROADMAP's "Next revision" and t
 | 11 | 19b: two tabs replacing one reaction | "Clear 'try again' message (Recommended)": 409 `reaction_changed`, "That changed in another tab. Try again." |
 | 12 | 19b: a member leaving while a reaction on their comment is replaced (the deadlock, reproduced) | "Clear 'try again' message (Recommended)": 409 `busy`, "Plor was busy. Try again."; no retry |
 | 13 | 19b: the NUL character in the other text inputs (group names, display names, usernames, typed answers) | "Yes, in this step (Recommended)" |
+| 14 | 19c: on your own first day, does Yesterday's friends board hide you too? | "Hide me too (Recommended)": one rule for everyone; a new player's list can be empty |
+| 15 | 19c: Last week's friends board and a friend who joined this week | "Hide there too (Recommended)" |
+| 16 | 19d: the Privacy page's guest words, drafted: "Your answers are added to the day's counts of how many people gave each answer, with nothing that says who gave them. Your run is kept until that day ends, so you can see your result again, and is then deleted, finished or not." (in place of "When your run ends we delete the run and keep only your answers, added to the day's counts … A run you leave unfinished is deleted after that day ends.") | "Approve as drafted". Told first: the clearing runs at the next guest's Start after midnight Pacific, not on a timer, and the guest cookie ends with the browser, so "one play a day" is per browser session |
+| 17 | 19d: `private.end_guest_run` is left unused by the fix; remove it? | "Remove it now": a migration that drops it, and the human's hosted `db push` **after** 19d's merge, not before (the live code calls it until then) |
 
 ## Source
 - **Next.js** (SOURCES.md): route handlers, for the routes' replies.
@@ -48,11 +52,13 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 - [x] A NUL character is refused where text reaches the database, with each field's existing code (answer 13): comments, group names, display names, usernames (profile, friend requests, removals, reaction targets, the account-delete confirmation) and typed answers.
 
 **19c — boards start at a player's join day** (answer 4).
-- [ ] A friends board for a day before a player joined doesn't list that player (`src/friends/leaderboard.ts:100-110`, where group boards already filter) → verify: a db test with a player made today reads yesterday's board without them.
+- [x] A friends board for a day before a player joined doesn't list that player (`src/friends/leaderboard.ts:100-110`, where group boards already filter) → verify: a db test with a player made today reads yesterday's board without them.
+- Joined is the account's day, `private.day_of(profile.created_at)`; no migration. The viewer too (answer 14), and Last week's friends board in every game (answer 15). Group boards keep M12 12d's D3: a later member stays listed with what they scored since.
 
 **19d — a guest's result isn't lost** (answers 2 and 3). **Design first: stop and ask before building.**
 - [ ] A guest's Start on a run that is over returns that run's result, not a new run (`src/game/guest-runs.ts:77-96`).
 - [ ] A time-up read that lands after the answer that ended the run still shows the result, in both games (`guest-runs.ts:37-64`, `guest-substring-runs.ts`).
+- **The design, settled (answers 10, 16, 17):** a finished guest run is no longer deleted at its first read; `private.purge_guest_days` clears it with the day's other guest runs. The Privacy page takes answer 16's words. One migration drops `private.end_guest_run`; the human's hosted `db push` follows the merge.
 - Answer 3 changes M18's answer 9 ("sees their result once", "discard everything else about them after the run"): M18's ticket says keeping a result "would need a number from the human". The proposal must say what is kept, for how long (the human's number, or an end that needs none, such as the guest's next Start or the day's reset), whether it needs a migration and a hosted `db push`, and whether the Privacy page's guest words still hold.
 
 **19e — actions name a player by ID, not username** (answer 5; ROADMAP: "can reach the wrong one from a stale page").
@@ -97,8 +103,13 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 - Each test failed first with a 500 (the builder's runs): OB002 from `openNext`; 23505 on `reaction_one_per_comment`; 23503 on `comment_report_comment_id_fkey` and on `group_member_group_id_fkey`; 40P01 "deadlock detected"; 22021 "invalid byte sequence … 0x00" for each NUL case; the account-delete confirmation, "expected { status: 500, …(1) } to deeply equal { status: 400, …(1) }". The races hold a second connection's transaction and wait on `pg_stat_activity`; no sleeps.
 - After: the whole `npm run test:db`: "Test Files  59 passed (59)", "Tests  432 passed (432)" (before the account-delete case, which then passed alone: "Tests  4 passed"). `npm test`: 749 passed. `npx tsc --noEmit -p .`: exit 0.
 - **Not run:** the e2e (CI). **Not verified:** the two messages in a browser; the reaction side as the deadlock's victim.
-
+**19c** (2026-11-13).
+- Each test failed first (the builder's runs): yesterday's board, "expected [ 'yfmwfq746i', 'ynmwfq7s6t', …(2) ] to deeply equal [ 'yfmwfq7s6t', 'yvmwfq7s6t' ]" (N, made today, still listed); Last week's, "expected [ 'lfmwfq8e86', 'lcmwfq8e86' ] to deeply equal [ 'lcmwfq8e86' ]".
+- After: the whole `npm run test:db`: "Test Files  59 passed (59)", "Tests  434 passed (434)". `npx tsc --noEmit -p .`: exit 0.
+- The review's finding, the graph: `summary` moved from `race.tsx` to `race-layout.ts` to be tested; its two tests failed first with "TypeError: summary is not a function" (the old one, unexported, read `.points` of a viewer who isn't listed). After: `npx vitest run src/app/race-layout.test.ts`: "Tests  20 passed (20)"; `npm test`: "Tests  752 passed (752)".
+- The older board tests and three e2e specs make their players today, so their sign-up day is set 14 days back (a fixture value: before last week's Monday); no expected value changed.
+- **Not run:** the e2e (CI), the three edited specs among them. **No test of its own:** game 2's and the Overall board's Last week (the same `onBoard` filter as game 1's). **No test:** `Standings` showing an empty Last week in Graph as the bare list, not the race (`src/app/leaderboard.tsx`; the project has no component tests). **Not verified:** the boards in a browser, and what an empty Yesterday or Last week list looks like for a new player with no older friends.
 
 ## Review
-- Blocking findings and how each was fixed: 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
-- Deferred to ROADMAP "Next revision": 19a: two missing boundary tests (For M19). 19b: three items (For M19).
+- Blocking findings and how each was fixed: 19c (the `reviewer`, 2026-11-13, one pass, by reading): one. The Graph of Last week would throw for a viewer who joined this week, as `summary` and `Standings` took the viewer to be listed; fixed in this PR (the graph is described without the viewer's points, and an empty week shows the list, not the race). The fix itself was not reviewed again. 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
+- Deferred to ROADMAP "Next revision": 19c: two items (For M19). 19a: two missing boundary tests (For M19). 19b: three items (For M19).

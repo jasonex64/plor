@@ -6,7 +6,7 @@
 // description, open to everyone (WAI Complex Images, "Long descriptions"; answer 17).
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { Week } from "@/friends/leaderboard";
-import { layout, running, type RacePlayer } from "./race-layout";
+import { layout, running, summary, type RacePlayer } from "./race-layout";
 import { useMinWidth } from "./min-width";
 import styles from "./race.module.css";
 
@@ -14,13 +14,6 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const players = (week: Week): RacePlayer[] =>
   week.entries.map((e) => ({ key: e.username, name: e.you ? "You" : e.name, you: e.you, daily: e.daily }));
-
-// The graph's short description: who leads, and where you stand (WAI Complex Images, "Overview").
-function summary(label: string, week: Week): string {
-  const [leader] = week.entries;
-  const you = week.entries.find((e) => e.you)!;
-  return `${label}, day by day: ${leader.you ? `you lead with ${you.points}` : `${leader.name} leads with ${leader.points}; you have ${you.points}`}.`;
-}
 
 // The graph's text size: 0.75rem (race.module.css), 12px at the browser's default and more when the player sets a bigger
 // text size (14b-17). Read, like the measuring, only once the graph has a width, so only in the browser.
@@ -64,7 +57,7 @@ export function Race({ label, week, picked, onPick }: { label: string; week: Wee
   return (
     <div ref={box} className={styles.race} style={{ height }}>
       {view && (
-        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={summary(label, week)} onClick={tap}>
+        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={summary(label, week.entries)} onClick={tap}>
           {view.grid.map((g) => (
             <g key={g.text}>
               <line className={styles.grid} x1={g.from} x2={g.to} y1={g.y} y2={g.y} />

@@ -94,7 +94,11 @@ describe("the overall board", () => {
     const db = getPool();
     for (const p of [A, B, C, S, G]) {
       await signIn(p.email);
-      await db.query("insert into private.profile (user_id, username) select id, $2 from auth.users where email = $1", [p.email, p.username]);
+      // Signed up before last week: a friends board lists only players whose account was made by the week's end (M19 19c).
+      await db.query(
+        "insert into private.profile (user_id, username, created_at) select id, $2, now() - interval '14 days' from auth.users where email = $1",
+        [p.email, p.username],
+      );
       p.userId = (await db.query<{ id: string }>("select id from auth.users where email = $1", [p.email])).rows[0].id;
     }
     for (const friend of [B, C]) {

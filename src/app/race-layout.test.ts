@@ -1,7 +1,7 @@
 // The leaderboard graph's drawing (docs/milestones/M14-14b-14-leaderboard-graph.md): its grid steps, cut names, tied
 // labels, the labels' spacing and ticks, the right margin and picking the nearest line.
 import { describe, expect, it } from "vitest";
-import { gridStep, layout, shortName, type RacePlayer } from "./race-layout";
+import { gridStep, layout, shortName, summary, type RacePlayer } from "./race-layout";
 
 // Each character 6px wide, whatever the weight.
 const measure = (text: string) => [...text].length * 6;
@@ -117,5 +117,24 @@ describe("layout", () => {
       ["Ben", "found"],
       ["me", "you"],
     ]);
+  });
+});
+
+// A friends board for a week before the viewer joined doesn't list them (docs/milestones/M19-pre-beta-fixes.md, 19c).
+describe("a week the viewer isn't in", () => {
+  it("draws the others, naming the leader only", () => {
+    const view = layout({ ...base, players: [player("ana", [3, 0, 0, 0, 0, 0, 0]), player("bo", [1, 0, 0, 0, 0, 0, 0])] });
+    expect(view.labels.map((l) => l.text)).toEqual(["ana 3"]);
+  });
+
+  it("describes the graph without the viewer's points", () => {
+    expect(summary("Last week", [{ name: "Ana", you: false, points: 3 }])).toBe("Last week, day by day: Ana leads with 3.");
+  });
+
+  it("still says where the viewer stands in a week they are in", () => {
+    const ana = { name: "Ana", you: false, points: 3 };
+    const you = { name: "me", you: true, points: 2 };
+    expect(summary("This week", [ana, you])).toBe("This week, day by day: Ana leads with 3; you have 2.");
+    expect(summary("This week", [{ ...you, points: 5 }, ana])).toBe("This week, day by day: you lead with 5.");
   });
 });
