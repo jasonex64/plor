@@ -1,21 +1,18 @@
 "use client";
 
-// Comments on the day's game (docs/milestones/M08-comments-and-reactions.md, 8a): the player's own and their friends',
+// Comments on a game's day (docs/milestones/M08-comments-and-reactions.md, 8a): the player's own and their friends',
 // oldest first. Today's thread opens once the player's run is over; earlier days can be browsed one day at a time,
 // read-only (D6), except one whose run the player is still finishing. Comments carry reactions (8b), which can be
 // changed only where posting can. Other players' comments can be reported on any day shown, which hides them from the
-// reporter (8c, D5). A group's page shows the group's thread instead, with the same rules (M10 10d, G4). On Today, and
-// in other pages' right column, today is the feed: the friends thread's and the player's groups' comments in one list,
-// each labelled, with only who commented and how many reactions until the run is over
-// (docs/milestones/M11-home-screen.md, 11b; H2, H3); earlier days are the friends thread.
-import { ButtonLink } from "./button-link";
+// reporter (8c, D5). A group's page shows the group's threads instead, with the same rules (M10 10d, G4): both games'
+// in one list, each comment tagged with its game, and the box picks the game among those the writer has finished
+// (docs/milestones/M16-16f-the-shared-pieces.md, 16f-5; answer 50). Today's feed, with every game's comments and
+// results in one list, is src/app/feed.tsx, which shows a comment as CommentContent does here.
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { Comment, Thread } from "@/comments/comments";
-import type { Feed, FeedComment, FeedPreview } from "@/comments/feed";
 import type { BoardGame } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
-import { previewText } from "@/comments/preview";
 import { choose } from "@/reactions/choose";
 import type { Emoji } from "@/reactions/reactions";
 import type { Held } from "@/lib/hold";
@@ -26,22 +23,28 @@ import { dayText, shiftDay } from "./day-text";
 import { errorText } from "./messages";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { useHeldChanges, useUndo } from "./undo";
-import { GAME, GAME_ID } from "@/platform/game";
 import { COMMENT_MAX_LENGTH } from "@/config/tunables";
+import { gameName } from "./feed-logic";
 import { Line, Skeleton } from "./skeleton";
-import { FORWARD } from "./slide";
+
+// A comment with the game whose thread it is in, which a reaction on it names.
+type Tagged = Comment & { game: BoardGame };
+
+// The day's comments of every game shown, oldest first. canPost: the games the player may post to (the day is today and
+// their run in that game is over); closed: the games whose thread is still hidden from them (comments is null when all are).
+type Shown = { date: string; comments: Tagged[] | null; canPost: BoardGame[]; closed: BoardGame[] };
 
 // A change shown before the server has it (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b): it lasts while the
 // action is held for Undo and sent, then the thread loaded again shows it for real.
 // date: the day of the thread it was made on, which it changes only (the player may move to an earlier day meanwhile).
-type Change = { date: string } & ({ type: "post"; comment: Comment } | { type: "delete"; id: string } | { type: "react"; id: string; emoji: Emoji | null });
+type Change = { date: string } & ({ type: "post"; comment: Tagged } | { type: "delete"; id: string } | { type: "react"; id: string; emoji: Emoji | null });
 
 // A posted comment's ID until it's sent, numbered so two held at once differ; shown without its buttons.
-const PENDING = "pending";
+export const PENDING = "pending";
 
-function changed(thread: Thread | Feed | null, change: Change): Thread | Feed | null {
+function changed(thread: Shown | null, change: Change): Shown | null {
   if (!thread?.comments || thread.date !== change.date) return thread;
-  const comments: Comment[] = thread.comments;
+  const comments = thread.comments;
   // A posted comment the loaded thread already has (another load landed before the post's own reload) isn't shown
   // twice (14b-8b: a race the e2e caught; ROADMAP's "a sent comment can flicker or show twice").
   if (change.type === "post" && comments.some((c) => c.username === change.comment.username && c.body === change.comment.body)) return thread;
@@ -51,42 +54,43 @@ function changed(thread: Thread | Feed | null, change: Change): Thread | Feed | 
       : change.type === "delete"
         ? comments.filter((c) => c.id !== change.id)
         : comments.map((c) => (c.id === change.id ? { ...c, reactions: choose(c.reactions, change.emoji) } : c));
-  // A feed's comments keep their thread labels: only the list changes.
-  return { ...thread, comments: next } as Thread | Feed;
+  return { ...thread, comments: next };
 }
 
 // runOver: the player's run today is over, so today's thread can open (src/app/game.tsx reports it). nudge: a count
 // that goes up when comments or reactions changed in this thread, from the player's own Realtime topic (8d;
 // src/app/board-channel.ts), so the day shown is fetched again. group: the group whose thread this is; none is the
-// friends feed. game: the game whose thread this is, which each game has of its own (M16 16f-3); Offbeat's friends thread
-// on today is the feed until the feed holds both games (16f-4), and Fragments' is its plain thread. title names today's
-// feed (its heading and region): "Feed" on Today, the game screen's own on Offbeat's (round 5: "Offbeat comments";
+// friends thread. games: the games whose threads are shown, each with a thread of its own (M16 16f-3): one on a game's
+// screen, both on a group's page. A constant, so the threads aren't loaded again at every render. title names the
+// friends thread (its heading and region): the game screen's own (round 5: "Offbeat comments";
 // docs/milestones/M14-14a-2c-review-fixes.md).
 export function Comments({
   username,
   name,
   runOver,
   nudge,
-  game,
+  games,
   group,
-  title = "Feed",
+  title = "Comments",
 }: {
   username: string;
   // The player's name as their comments show it, for one posted before the server has it.
   name: string;
   runOver: boolean;
   nudge: number;
-  game: BoardGame;
+  games: readonly BoardGame[];
   group?: string;
   title?: string;
 }) {
   // null shows today, whose date comes from the server (the day boundary is the server's: DECISIONS.md, Day boundary).
   const [date, setDate] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
-  const [thread, setThread] = useState<Thread | Feed | null>(null);
+  const [thread, setThread] = useState<Shown | null>(null);
   const [shownThread, showChange] = useHeldChanges(thread, changed);
   const arrived = useArrived(shownThread?.comments ?? null, shownThread?.date);
   const [draft, setDraft] = useState("");
+  // The game the box posts to, among those the player may post to (answer 50): the first until they pick another.
+  const [picked, setPicked] = useState<BoardGame | null>(null);
   // Why Post did nothing, until the box changes (docs/milestones/M14-14b-20-comments-and-undo.md, answer 6).
   const [refused, setRefused] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -95,20 +99,38 @@ export function Comments({
   const [latest] = useState(latestOnly);
 
   const load = useCallback(() => {
-    const shown = (t: Thread | Feed) => {
+    const shown = (t: Shown) => {
       setThread(t);
       if (date === null) setToday(t.date);
       setError(null);
     };
     const failed = (err: unknown) => setError(errorText(err));
-    if (!group && date === null && game === GAME_ID) {
-      return latest(api<{ feed: Feed }>("/api/feed", { method: "GET" }), (r) => shown(r.feed), failed);
-    }
-    const query = new URLSearchParams({ game });
-    if (date) query.set("date", date);
-    if (group) query.set("group", group);
-    return latest(api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" }), (r) => shown(r.thread), failed);
-  }, [date, game, group, latest]);
+    const read = async (): Promise<Shown> => {
+      const threads = await Promise.all(
+        games.map(async (game) => {
+          const query = new URLSearchParams({ game });
+          if (date) query.set("date", date);
+          if (group) query.set("group", group);
+          return { game, thread: (await api<{ thread: Thread }>(`/api/comments?${query}`, { method: "GET" })).thread };
+        }),
+      );
+      // One request a game: a day boundary between them would put two days in one list.
+      if (new Set(threads.map((t) => t.thread.date)).size > 1) throw new Error("The day changed while the comments loaded");
+      const open = threads.filter((t) => t.thread.comments !== null);
+      return {
+        date: threads[0].thread.date,
+        comments:
+          open.length === 0
+            ? null
+            : open
+                .flatMap((t) => t.thread.comments!.map((c) => ({ ...c, game: t.game })))
+                .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)),
+        canPost: threads.filter((t) => t.thread.canPost).map((t) => t.game),
+        closed: threads.filter((t) => t.thread.comments === null).map((t) => t.game),
+      };
+    };
+    return latest(read(), shown, failed);
+  }, [date, games, group, latest]);
   // runOver and nudge are dependencies so the thread loads again when the run ends, and when a comment or reaction
   // changed. A nudge names its day, but any nudge reloads the day shown: one request, and nudges are rare.
   useEffect(() => void load(), [load, runOver, nudge]);
@@ -126,9 +148,13 @@ export function Comments({
     showChange(change, undo.hold(action).then((sent) => (sent ? loadShown.current() : onNotSent?.())));
   }
 
+  const several = games.length > 1;
+  // The game the box posts to now: the one picked if the player may still post to it, else the first they may.
+  const postTo = thread && (picked && thread.canPost.includes(picked) ? picked : thread.canPost[0]);
+
   function post(event: FormEvent) {
     event.preventDefault();
-    if (!thread) return;
+    if (!thread || !postTo) return;
     const body = draft.trim();
     // Stopped here, as the database would refuse it once sent (comment_body_format), so nothing shows and then fails.
     const length = characters(body);
@@ -137,8 +163,9 @@ export function Comments({
       return;
     }
     const day = thread.date;
+    const game = postTo;
     setDraft("");
-    const comment = { id: `${PENDING}-${posted.current++}`, username, name, body, createdAt: new Date().toISOString(), reactions: { counts: [], mine: null } };
+    const comment = { id: `${PENDING}-${posted.current++}`, game, username, name, body, createdAt: new Date().toISOString(), reactions: { counts: [], mine: null } };
     act(
       { date: day, type: "post", comment },
       {
@@ -177,7 +204,6 @@ export function Comments({
 
   const shown = shownThread?.date ?? null;
   const isToday = shown !== null && shown === today;
-  const preview = shownThread && "preview" in shownThread ? shownThread.preview : null;
   return (
     <section aria-label={group ? "Comments" : title} className={kit.card}>
       <h2 ref={heading} tabIndex={-1}>
@@ -196,12 +222,16 @@ export function Comments({
           )}
         </p>
       )}
-      {preview && <Preview preview={preview} />}
-      {shownThread && shownThread.comments === null && !preview && (
+      {shownThread && shownThread.comments === null && !several && (
         <p>
           Finish {isToday ? "today's" : "that day's"} puzzle to see {group ? "the group's" : "your friends'"} comments.
         </p>
       )}
+      {shownThread && several && shownThread.closed.map((game) => (
+        <p key={game}>
+          Finish {isToday ? "today's" : "that day's"} {gameName(game)} to see the group&apos;s {gameName(game)} comments.
+        </p>
+      ))}
       {shownThread?.comments && shownThread.comments.length === 0 && <p>No comments{isToday ? " yet" : " that day"}.</p>}
       {shownThread?.comments && shownThread.comments.length > 0 && (
         <ul ref={list} className={kit.rows}>
@@ -216,7 +246,7 @@ export function Comments({
                   text: reactionText(c.reactions, emoji),
                   failed: "Your reaction wasn't saved",
                   send: (keepalive) =>
-                    api("/api/reactions", { method: "POST", body: { game, date: day, target: { type: "comment", id: c.id }, emoji }, keepalive }),
+                    api("/api/reactions", { method: "POST", body: { game: c.game, date: day, target: { type: "comment", id: c.id }, emoji }, keepalive }),
                 },
               );
             const remove = () =>
@@ -229,31 +259,47 @@ export function Comments({
                 },
               );
             return (
-              <CommentItem
+              <li
                 key={c.id}
-                comment={c}
-                label={"group" in c ? <ThreadLabel comment={c as FeedComment} /> : undefined}
-                mine={c.username === username}
-                pending={c.id.startsWith(PENDING)}
-                arrived={arrived.has(c.id)}
-                onDelete={() => {
-                  leave();
-                  remove();
-                }}
-                onReport={() => {
-                  leave();
-                  report(c.id);
-                }}
-                onReact={shownThread.canPost ? react : undefined}
-              />
+                data-comment={c.id}
+                className={arrived.has(c.id) ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}
+              >
+                <CommentContent
+                  comment={c}
+                  label={several ? gameName(c.game) : undefined}
+                  mine={c.username === username}
+                  pending={c.id.startsWith(PENDING)}
+                  onDelete={() => {
+                    leave();
+                    remove();
+                  }}
+                  onReport={() => {
+                    leave();
+                    report(c.id);
+                  }}
+                  onReact={shownThread.canPost.includes(c.game) ? react : undefined}
+                />
+              </li>
             );
           })}
         </ul>
       )}
-      {shownThread?.canPost && (
+      {shownThread && postTo && (
         <form onSubmit={post} className={styles.compose}>
+          {shownThread.canPost.length > 1 && (
+            <label>
+              Game
+              <select value={postTo} onChange={(e) => setPicked(e.target.value as BoardGame)}>
+                {shownThread.canPost.map((game) => (
+                  <option key={game} value={game}>
+                    {gameName(game)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label>
-            {/* The feed's box posts to the friends thread only (M11 H2 (a)), so it says so (M12 12f, F5). */}
+            {/* The friends thread's box says so (M11 H2 (a); M12 12f, F5). */}
             {group ? "Comment" : "Comment to your friends"}
             <textarea
               value={draft}
@@ -282,11 +328,11 @@ export function Comments({
 
 // Characters as the database counts them (char_length): by code point, so an emoji is one (14b-6b dropped maxLength
 // for counting it as two). Trimmed, as the comment is sent.
-const characters = (text: string) => Array.from(text.trim()).length;
+export const characters = (text: string) => Array.from(text.trim()).length;
 
 // The count under the box, from 20 left (docs/milestones/M14-14b-20-comments-and-undo.md, answer 9); past the limit, how many too many, in
 // the danger colour. A status, so screen readers hear it without leaving the box (WCAG 2.2, 4.1.3).
-function Count({ text }: { text: string }) {
+export function Count({ text }: { text: string }) {
   const left = COMMENT_MAX_LENGTH - characters(text);
   return (
     <p role="status" className={left < 0 ? `${styles.count} ${styles.over}` : styles.count}>
@@ -295,53 +341,11 @@ function Count({ text }: { text: string }) {
   );
 }
 
-// Before the player has played (docs/milestones/M14-14a-2a-today.md, L40): the names, blurred filler that holds none
-// of their words (the server sends none, H3), and a link to the game screen; src/comments/preview.ts says what.
-const FILLER = ["xxxx xx xxxx xxx xx", "xxxxxxx xxxx xx", "xxx xxxxx xxxx xxx"];
-
-function Preview({ preview }: { preview: FeedPreview }) {
-  const text = previewText(preview);
-  if (text.read === null) {
-    return (
-      <>
-        <p>No comments yet.</p>
-        <p>Finish today&apos;s game to join in.</p>
-      </>
-    );
-  }
-  return (
-    <>
-      <p>
-        <ButtonLink href={GAME.path} transitionTypes={FORWARD}>
-          {text.read}
-        </ButtonLink>
-      </p>
-      <ul className={kit.rows}>
-        {/* By position: two friends can share a display name. */}
-        {text.named.map((name, i) => (
-          <li key={i} className={kit.row}>
-            <Avatar name={name} /> <strong>{name}</strong> <span className={styles.filler} aria-hidden="true">{FILLER[i]}</span>
-            <span className="sr-only">comment hidden until you play</span>
-          </li>
-        ))}
-      </ul>
-      {text.more && <p>{text.more}</p>}
-      <p>{preview.reactions === 1 ? "1 reaction" : `${preview.reactions} reactions`}</p>
-    </>
-  );
-}
-
-// Which thread a feed comment is in: the friends thread, or a group's, by name; the group is on the Groups tab (no text
-// links: docs/milestones/M14-14b-2b-1-shell.md, criterion 4).
-function ThreadLabel({ comment }: { comment: FeedComment }) {
-  return <>{comment.group ? comment.group.name : "Friends"}</>;
-}
-
 // The comments that have appeared since a day's thread was first shown: one that arrived, or the player's own as it's
 // posted (14b-10b, answer 12). A posted comment shows at once under a pending id and comes back from the server under its
 // own: beside the pending copy for a moment, or a load after it has gone (ROADMAP For M14, the flicker). That return is the
 // same comment, so it doesn't pop again: each pending copy shown is remembered until a comment like it comes back.
-function useArrived(comments: Comment[] | null, day: string | undefined): Set<string> {
+export function useArrived(comments: Pick<Comment, "id" | "username" | "body">[] | null, day: string | undefined): Set<string> {
   // Kept from render to render, and updated while rendering when the comments change (React's "Storing information from
   // previous renders"): the ids seen, the pending copies not yet back, and the ones that pop. Compared by their ids, as the
   // list itself is a new array on every render.
@@ -351,7 +355,7 @@ function useArrived(comments: Comment[] | null, day: string | undefined): Set<st
   const ids = comments?.map((c) => c.id).join(" ") ?? null;
   if (ids === null || (ids === seen.ids && day === seen.day)) return seen.arrived;
   if (!comments) return seen.arrived;
-  const key = (c: Comment) => `${c.username}
+  const key = (c: Pick<Comment, "username" | "body">) => `${c.username}
 ${c.body}`;
   const first = seen.ids === null || seen.day !== day;
   const known = new Set(first ? [] : seen.known);
@@ -371,12 +375,17 @@ ${c.body}`;
   return arrived;
 }
 
-function CommentItem({
+// What a comment's row holds (the thread's rows and the feed's items): the avatar, then the name with its label and time as
+// a chip, the words, and the reactions used under them (mockup 3's comment row; M14 14b-8b); its ⋯ at the top right holds
+// the reactions and Delete or Report (14b-13, answer 1). The row itself, its classes and element, is the caller's.
+// ids: the elements a screen reader's name and description for the row are made from, when the caller has one (the feed's
+// items, src/app/feed.tsx).
+export function CommentContent({
   comment,
   label,
   mine,
   pending,
-  arrived,
+  ids,
   onDelete,
   onReport,
   onReact,
@@ -386,26 +395,28 @@ function CommentItem({
   mine: boolean;
   // Posted but held for Undo: nothing to react to, delete or report yet.
   pending: boolean;
-  // Shown since the thread first loaded: it pops in (14b-10b, answer 12).
-  arrived: boolean;
+  ids?: { name: string; time: string; body: string };
   onDelete: () => void;
   onReport: () => void;
   onReact?: (emoji: Emoji | null) => void;
 }) {
-  // Mockup 3's comment row: the avatar, then the name with its thread and time as a chip, the words, and the reactions
-  // used under them (M14 14b-8b); its ⋯ at the top right holds the reactions and Delete or Report (14b-13, answer 1).
   return (
-    <li data-comment={comment.id} className={arrived ? `${kit.row} ${styles.comment} ${kit.pop}` : `${kit.row} ${styles.comment}`}>
+    <>
       <Avatar name={comment.name} />
       <div className={kit.grow}>
         <div className={kit.head}>
-          <strong>{comment.name}</strong>
+          <strong id={ids?.name}>{comment.name}</strong>
           <span className={kit.chip}>
-            {label && <>{label} · </>}
-            <time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
+            {/* One flex item, so the chip's words wrap as text rather than as separate boxes. */}
+            <span>
+              {label && <>{label} · </>}
+              <time id={ids?.time} dateTime={comment.createdAt} className={styles.nowrap}>
+                {new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+              </time>
+            </span>
           </span>
         </div>
-        <p>{comment.body}</p>
+        <p id={ids?.body}>{comment.body}</p>
         <Reactions reactions={comment.reactions} below />
       </div>
       {!pending && (
@@ -416,6 +427,6 @@ function CommentItem({
           actions={[mine ? { name: "Delete", run: onDelete } : { name: "Report", run: onReport }]}
         />
       )}
-    </li>
+    </>
   );
 }

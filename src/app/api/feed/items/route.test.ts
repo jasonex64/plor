@@ -15,9 +15,9 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-describe("GET /api/feed (M11 11b)", () => {
+describe("GET /api/feed/items (M16 16f-4; was GET /api/feed, M11 11b)", () => {
   it("refuses a signed-out player with 401 not_signed_in", async () => {
-    const response = await feed(apiRequest("/api/feed", { method: "GET" }));
+    const response = await feed(apiRequest("/api/feed/items", { method: "GET" }));
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ ok: false, error: "not_signed_in" });
   });

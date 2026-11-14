@@ -193,7 +193,8 @@ test("a board with reactions fits 320px", async ({ browser }) => {
 
 // Item 13: the new choice's rows load under its label, with nothing of the old choice's meanwhile.
 test("the leaderboard card shows nothing of the old choice while the new one loads", async ({ browser }) => {
-  const page = await player(browser, "xh", PHONE);
+  // A tablet's width: phones have no leaderboard card on Today (M16 16f-5, answer 19).
+  const page = await player(browser, "xh", { width: 768, height: 1024 });
   const card = page.getByRole("region", { name: "Leaderboard" });
   await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
   let release!: () => void;

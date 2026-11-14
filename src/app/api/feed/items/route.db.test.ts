@@ -376,6 +376,19 @@ describe("the feed's pages", () => {
     expect(items.find((i) => i.body === "words about fragments")).toMatchObject({ kind: "comment", game: SUBSTRINGS_ID, date: today });
   });
 
+  it("says with each page which games the viewer has finished today, for the comment box (answer 23)", async () => {
+    // W has finished Offbeat only (so far); P's run today is still going, so none.
+    useSession(W.session);
+    expect((await page()).body.feed).toMatchObject({ today, finishedToday: [GAME_ID] });
+    useSession(P.session);
+    expect((await page()).body.feed).toMatchObject({ today, finishedToday: [] });
+    // Every page says it, as the first does.
+    useSession(V.session);
+    const first = (await page()).body.feed;
+    expect(first.finishedToday).toEqual([GAME_ID, SUBSTRINGS_ID]);
+    expect((await page(first.next)).body.feed).toMatchObject({ today, finishedToday: [GAME_ID, SUBSTRINGS_ID] });
+  });
+
   it("shows the whole result once W has finished that game", async () => {
     await seed(async (q) => {
       await fragments(q, W, today, await minute(today, 51));
@@ -385,6 +398,7 @@ describe("the feed's pages", () => {
     expect(shown).toMatchObject({ blurred: false, score: scoreRun([WORD], "j").total });
     expect(shown.reactions).toEqual((await runReactions(getPool(), W.userId, SUBSTRINGS_ID, today, [F.userId])).get(F.userId));
     expect(shown.reactions!.counts).toEqual([{ emoji: "😢", count: 1 }]);
+    expect((await page()).body.feed.finishedToday).toEqual([GAME_ID, SUBSTRINGS_ID]);
   });
 
   it("orders a run that ran out of time by its deadline, a finished one by its last answer or round, and gives their endings", async () => {

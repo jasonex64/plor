@@ -178,7 +178,8 @@ test("from 1200px the 404 has no friends feed beside it", async ({ page }) => {
   await expect(page.getByLabel("Friends feed")).toHaveCount(0);
 });
 
-test("the feed's past day reads like every other date, comments have no bullets, reactions are apart, and back arrows are ‹", async ({ browser }) => {
+// The feed's earlier days are date lines in one endless list now (M16 16f-5, answer 49; e2e/feed.e2e.ts), not a day to browse.
+test("the feed's comments have no bullets, reactions are apart, and back arrows are ‹", async ({ browser }) => {
   test.slow();
   const friend = await (await browser.newContext({ viewport: PHONE })).newPage();
   await friend.goto("/friends");
@@ -212,14 +213,11 @@ test("the feed's past day reads like every other date, comments have no bullets,
 
   await page.goto("/");
   const feed = page.getByRole("region", { name: "Feed" });
-  const comment = feed.getByRole("listitem").filter({ hasText: "Two reactions." });
+  const comment = feed.getByRole("article").filter({ hasText: "Two reactions." });
   await expect(comment).toBeVisible();
-  expect(await comment.evaluate((li) => getComputedStyle(li).listStyleType)).toBe("none");
+  expect(await comment.evaluate((el) => getComputedStyle(el).display)).not.toBe("list-item");
   // The viewer's own is ❤️, read "❤️ 1, yours"; the comma between the two is read, not shown (Source diff).
   expect(await comment.evaluate((li) => li.textContent)).toContain("😂 1, ❤️ 1, yours");
-
-  await feed.getByRole("button", { name: "Earlier day" }).click();
-  await expect(page.getByRole("heading", { level: 2, name: /^Friends' comments on (Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d{1,2} [A-Z][a-z]{2}$/ })).toBeVisible();
 
   for (const path of [GAME.path, "/streak"]) {
     await page.goto(path);

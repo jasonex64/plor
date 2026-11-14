@@ -43,6 +43,9 @@ async function player(browser: Browser, name: string, viewport: { width: number;
 // The visible page's top-level sections (those not inside another section, wherever the layout puts them): Next.js
 // keeps a page already visited in the document, hidden, so the tab navigated from is still there (cacheComponents,
 // next.config.ts).
+// The sections a tab holds at a width: Today's leaderboard card is off phones (M16 16f-5, the human's answer 19).
+const sectionsAt = (tab: (typeof TABS)[number], width: number) => (tab.name === "Today" && width < 768 ? tab.sections.filter((s) => s !== "Leaderboard") : tab.sections);
+
 const sections = (page: Page) =>
   page
     .locator("main section")
@@ -59,7 +62,7 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
     await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
     await expect(nav.locator("[aria-current]")).toHaveCount(1);
     await expect(nav.getByRole("link", { name: tab.name })).toHaveAttribute("aria-current", "page");
-    await expect.poll(() => sections(page)).toEqual(tab.sections);
+    await expect.poll(() => sections(page)).toEqual(sectionsAt(tab, 360));
   }
   // The account page moved to the Me tab (criterion 4).
   expect((await page.goto("/account"))!.status()).toBe(404);
@@ -181,7 +184,7 @@ test("no tab scrolls sideways at 320px", async ({ browser }) => {
   const { page } = await player(browser, "sd", { width: 320, height: 640 });
   for (const tab of TABS) {
     await page.goto(tab.path);
-    await expect.poll(() => sections(page)).toEqual(tab.sections);
+    await expect.poll(() => sections(page)).toEqual(sectionsAt(tab, 320));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
 });

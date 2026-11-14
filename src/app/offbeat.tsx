@@ -24,6 +24,9 @@ import styles from "./offbeat.module.css";
 import { Line, Skeleton } from "./skeleton";
 import { GAME, GAME_ID } from "@/platform/game";
 
+// Comments' games: this game's friends thread alone, as the feed is Today's (M16 16f-5, answer 53).
+const OFFBEAT_ONLY = [GAME_ID] as const;
+
 // onStarted: Start began today's run, so the shell's streak can follow (docs/milestones/M14-14b-2a-streak-ranks.md).
 export function OffbeatScreen({ username, name, onStarted }: { username: string; name: string; onStarted: () => void }) {
   const [runOver, setRunOver] = useState(false);
@@ -77,7 +80,7 @@ export function OffbeatScreen({ username, name, onStarted }: { username: string;
       </div>
       <SideColumn label="Feed" inPlace className={styles.feed} hidden={playing}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} game={GAME_ID} title={`${GAME.name} comments`} />
+        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} games={OFFBEAT_ONLY} title={`${GAME.name} comments`} />
       </SideColumn>
     </div>
   );

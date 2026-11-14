@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { GET as boardRoute } from "@/app/api/board/route";
 import { POST as reportRoute } from "@/app/api/comments/report/route";
 import { GET as threadRoute, POST as postRoute } from "@/app/api/comments/route";
-import { GET as feedRoute } from "@/app/api/feed/route";
+import { GET as feedRoute } from "@/app/api/feed/items/route";
 import { GET as groupBoard } from "@/app/api/groups/leaderboard/route";
 import { GET as friendsBoard } from "@/app/api/leaderboard/route";
 import { POST as createProfile } from "@/app/api/profile/route";
@@ -60,7 +60,8 @@ const blockedList = async () => names((await call(blockedRoute, "/api/friends/bl
 type Comment = { id: string; username: string; body: string; reactions: { counts: { emoji: string; count: number }[] } };
 const thread = async (query = ""): Promise<Comment[]> => (await call(threadRoute, `/api/comments?game=${GAME_ID}${query.replace("?", "&")}`, "GET")).body.thread.comments;
 const seen = async (query = "") => (await thread(query)).map((c) => [c.body, c.reactions.counts]);
-const feed = async () => (await call(feedRoute, "/api/feed", "GET")).body.feed;
+// The feed's comments, newest first, as the first page of /api/feed/items holds them (its results are not read here).
+const feed = async (): Promise<Comment[]> => (await call(feedRoute, "/api/feed/items", "GET")).body.feed.items.filter((i: { kind: string }) => i.kind === "comment");
 const post = (body: string, group?: string) => call(postRoute, "/api/comments", "POST", { game: GAME_ID, date: today, body, group });
 const react = (id: string, emoji: string) => call(reactRoute, "/api/reactions", "POST", { game: GAME_ID, date: today, target: { type: "comment", id }, emoji });
 const boardFriends = async () => names((await call(boardRoute, "/api/board", "GET")).body.board.friends);
@@ -122,7 +123,7 @@ describe("blocking", () => {
     expect((await react(ids.aClub, "😂")).status).toBe(200);
   });
 
-  it("before any block: friends see each other everywhere, and a group member's preview counts everyone", async () => {
+  it("before any block: friends see each other everywhere, and a group member reads the group's comments", async () => {
     useSession(A.session);
     expect((await lists()).friends).toEqual([B.username]);
     expect(await boardFriends()).toEqual([B.username]);
@@ -135,18 +136,23 @@ describe("blocking", () => {
       ["friends from b", []],
       ["friends from a", []],
     ]);
-    expect((await feed()).comments.map((c: Comment) => c.body)).toEqual(["friends from b", "club from b", "friends from a", "club from a"]);
+    expect((await feed()).map((c) => c.body)).toEqual(["club from a", "friends from a", "club from b", "friends from b"]);
     useSession(B.session);
     expect(await boardFriends()).toEqual([A.username]);
+    // C, a group member who has not finished and is nobody's friend, reads Club's comments whole, with the members'
+    // reactions on them (answer 21: comments come whole), and the friends threads' not at all.
     useSession(C.session);
-    expect((await feed()).preview).toEqual({ friends: [], others: 2, count: 2, reactions: 2 });
+    expect((await feed()).map((c) => [c.body, c.reactions.counts])).toEqual([
+      ["club from a", [{ emoji: "😂", count: 1 }]],
+      ["club from b", [{ emoji: "👍", count: 1 }]],
+    ]);
   });
 
-  it("drops a blocked player's comments and reactions from the preview of a viewer whose run isn't over (12)", async () => {
+  it("drops a blocked player's comments and reactions from the feed of a viewer whose run isn't over (12)", async () => {
     useSession(C.session);
     expect(await to(block, "block", B.username)).toEqual(ok);
     // B's club comment goes, with A's reaction on it; A's stays, without B's reaction on it.
-    expect(await feed()).toMatchObject({ comments: null, preview: { friends: [], others: 1, count: 1, reactions: 0 } });
+    expect((await feed()).map((c) => [c.body, c.reactions.counts])).toEqual([["club from a", []]]);
   });
 
   it("refuses a block of oneself and of a username nobody has; blocking twice is one block", async () => {
@@ -177,18 +183,18 @@ describe("blocking", () => {
     useSession(A.session);
     expect(await seen(`?group=${club}`)).toEqual([["club from a", []]]);
     expect(await seen()).toEqual([["friends from a", []]]);
-    expect((await feed()).comments.map((c: Comment) => [c.body, c.reactions.counts])).toEqual([
-      ["friends from a", []],
+    expect((await feed()).map((c) => [c.body, c.reactions.counts])).toEqual([
       ["club from a", []],
+      ["friends from a", []],
     ]);
     expect(await react(ids.bClub, "😂")).toEqual(commentNotFound);
     expect(await call(reportRoute, "/api/comments/report", "POST", { id: ids.bClub })).toEqual(commentNotFound);
     useSession(B.session);
     expect(await seen(`?group=${club}`)).toEqual([["club from b", []]]);
     expect(await seen()).toEqual([["friends from b", []]]);
-    expect((await feed()).comments.map((c: Comment) => [c.body, c.reactions.counts])).toEqual([
-      ["friends from b", []],
+    expect((await feed()).map((c) => [c.body, c.reactions.counts])).toEqual([
       ["club from b", []],
+      ["friends from b", []],
     ]);
     expect(await react(ids.aClub, "👍")).toEqual(commentNotFound);
     expect(await call(reportRoute, "/api/comments/report", "POST", { id: ids.aClub })).toEqual(commentNotFound);

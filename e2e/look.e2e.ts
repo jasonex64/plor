@@ -104,7 +104,8 @@ test("the tab bar and the sidebar's current item take the ink rules", async ({ b
 });
 
 test("a card and a chip take the kit's border and corners, flat", async ({ browser }) => {
-  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  // From 768px: phones have no leaderboard card on Today (M16 16f-5, answer 19).
+  const page = await (await browser.newContext({ viewport: { width: 768, height: 1024 } })).newPage();
   await page.goto("/");
   await signInAndPick(page, "lc");
   const color = await ink(page);

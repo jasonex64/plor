@@ -76,8 +76,11 @@ test("after Undo focus goes back where the player was, or to the page's heading 
   await post(page, "Undo me.");
   const undo = page.getByRole("button", { name: "Undo" });
   await undo.focus();
-  // At the top, with Post below the screen, so focusing it would scroll.
+  // At the top, with Post below the screen, so focusing it would scroll: the window is made shorter than Post's place, which
+  // the feed's box (M16 16f-5: at the top of the feed) puts higher than the longer window reached.
   await page.evaluate(() => window.scrollTo(0, 0));
+  const place = (await page.getByRole("button", { name: "Post" }).boundingBox())!;
+  await page.setViewportSize({ width: 390, height: Math.floor(place.y / 2) });
   await expect(page.getByRole("button", { name: "Post" })).not.toBeInViewport();
   await page.keyboard.press("Enter");
   expect(await focused(page)).toBe("button Post");
@@ -135,16 +138,18 @@ test("after Delete focus moves to the next comment's ⋯, then the one before, t
   await page.reload();
   const feed = page.getByRole("region", { name: "Feed" });
   const remove = async (body: string) => {
-    const row = feed.getByRole("listitem").filter({ hasText: body });
+    const row = feed.getByRole("article").filter({ hasText: body });
     await row.getByRole("button", { name: /^Actions for / }).click();
     await row.getByRole("button", { name: "Delete" }).click();
     await expect(row).toHaveCount(0);
   };
   await remove("One.");
   expect(await focused(page)).toMatch(/^button Actions for .*'s comment$/);
-  expect(await page.evaluate(() => document.activeElement!.closest("li")!.textContent)).toContain("Two.");
+  // The feed lists newest first, and the player's own result is an item below the comments: "next" is the next comment down
+  // the list, or the one above if it was the last.
+  expect(await page.evaluate(() => document.activeElement!.closest("article")!.textContent)).toContain("Two.");
   await remove("Three.");
-  expect(await page.evaluate(() => document.activeElement!.closest("li")!.textContent)).toContain("Two.");
+  expect(await page.evaluate(() => document.activeElement!.closest("article")!.textContent)).toContain("Two.");
   await remove("Two.");
   expect(await focused(page)).toBe("h2 Feed");
 });
@@ -166,11 +171,11 @@ test("after Report focus moves to the next comment's ⋯", async ({ browser }) =
   await sent(page, "/api/comments");
   await page.reload();
   const feed = page.getByRole("region", { name: "Feed" });
-  const theirs = feed.getByRole("listitem").filter({ hasText: "Report me." });
+  const theirs = feed.getByRole("article").filter({ hasText: "Report me." });
   await theirs.getByRole("button", { name: /^Actions for / }).click();
   await theirs.getByRole("button", { name: "Report" }).click();
   await expect(theirs).toHaveCount(0);
-  await expect.poll(() => page.evaluate(() => document.activeElement?.closest("li")?.textContent ?? null)).toContain("Mine, after.");
+  await expect.poll(() => page.evaluate(() => document.activeElement?.closest("article")?.textContent ?? null)).toContain("Mine, after.");
   expect(await focused(page)).toMatch(/^button Actions for .*'s comment$/);
 });
 
@@ -186,7 +191,7 @@ test("a comment's reactions are a group named Reactions", async ({ page }) => {
     [`${RUN}-qr@example.test`, GAME.id],
   );
   await page.reload();
-  const row = page.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: "React to me." });
+  const row = page.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: "React to me." });
   await expect(row.getByRole("group", { name: "Reactions" })).toContainText("😂 1");
 });
 

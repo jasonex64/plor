@@ -25,6 +25,7 @@ import { Avatar } from "./avatar";
 import kit from "./kit.module.css";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
+import { endedText } from "./ended-text";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
 import { GAME_ID } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
@@ -179,9 +180,7 @@ function toneOf(f: BoardFriend): string {
 }
 
 function describe(f: BoardFriend): string {
-  if (f.ended?.result === "caught") return `caught on question ${f.ended.question} by "${f.ended.answer}"`;
-  if (f.ended?.result === "survived") return "survived every question";
-  if (f.ended?.result === "timed_out") return `ran out of time on question ${f.ended.question}`;
+  if (f.ended) return endedText(f.ended);
   if (f.state === "playing") return `on question ${f.question}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "hasn't played yet";

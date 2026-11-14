@@ -4,8 +4,8 @@ import { checkProtocol, handle } from "@/lib/http";
 import { getFeedPage, readFeedCursor } from "@/comments/feed-page";
 
 // A page of the endless feed: comments and finished runs of both games, newest first (docs/milestones/M16-16f-the-shared-pieces.md,
-// 16f-4). `?cursor=` is the previous page's `next`, kept as it came; none gives the first page. Beside /api/feed,
-// which 16f-5 replaces with this when Today switches over.
+// 16f-4). `?cursor=` is the previous page's `next`, kept as it came; none gives the first page. Today's feed and the
+// right column's read it (src/app/feed.tsx, 16f-5), which replaced the whole-day /api/feed.
 export const GET = handle(async (request) => {
   checkProtocol(request);
   const userId = await requireUserId(await createAuthClient());
