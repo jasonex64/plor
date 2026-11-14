@@ -69,6 +69,9 @@ test("after Undo focus goes back where the player was, or to the page's heading 
   const scrolled = () => page.evaluate(() => window.scrollY);
   await page.goto("/");
   await signInAndPick(page, "qu");
+  // Signed up before yesterday, so the leaderboard card holds the player's row and the page is as tall as the scroll
+  // below was written for: yesterday's friends board lists only players whose account was made by then (M19 19c).
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[`qu${RUN}`]]);
   await caught(page);
   await post(page, "Undo me.");
   const undo = page.getByRole("button", { name: "Undo" });

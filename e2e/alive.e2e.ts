@@ -156,6 +156,9 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await page.goto("/friends");
   await signInAndPick(page, "vg");
   await befriend(page, "vg", friend, "vf");
+  // Signed up before yesterday: Today's card opens on yesterday's friends board, which lists only players whose account
+  // was made by then (M19 19c).
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[`vf${RUN}`, `vg${RUN}`]]);
   await caught(friend);
   await caught(page);
   const popping = (el: Locator) => el.evaluate((e) => getComputedStyle(e).animationName !== "none");

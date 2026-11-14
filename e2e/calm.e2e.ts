@@ -80,6 +80,9 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   await page.goto("/friends");
   await signInAndPick(page, "ka");
   await befriend(page, "ka", friend, "kb");
+  // Signed up before yesterday: Today's card opens on yesterday's friends board, which lists only players whose account
+  // was made by then (M19 19c).
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[`ka${RUN}`, `kb${RUN}`]]);
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-ka@example.test`]);
   await page.goto("/groups");
   await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Calm Club");

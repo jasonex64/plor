@@ -67,6 +67,8 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await player.goto("/friends");
   await signInAndPick(player, "p");
   await befriend(player, "p", watcher, "w");
+  // Signed up before yesterday: yesterday's friends board lists only players whose account was made by then (M19 19c).
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where username = any($1::text[])", [[playerName, watcherName]]);
 
   await openBoard(watcher);
   // The plain list of friends, not the lists inside "where everyone ended".

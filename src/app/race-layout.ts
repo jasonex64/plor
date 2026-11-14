@@ -59,6 +59,16 @@ export function running(daily: number[]): number[] {
 export type Role = "you" | "found" | "other";
 type Point = { x: number; y: number };
 
+// The graph's short description: who leads, and where you stand (WAI Complex Images, "Overview"). A friends board for a
+// week before the viewer joined doesn't list them (docs/milestones/M19-pre-beta-fixes.md, 19c). entries: at least one,
+// ranked.
+export function summary(label: string, entries: { name: string; you: boolean; points: number }[]): string {
+  const [leader] = entries;
+  const you = entries.find((e) => e.you);
+  const lead = leader.you ? `you lead with ${leader.points}` : `${leader.name} leads with ${leader.points}`;
+  return `${label}, day by day: ${lead}${you && !leader.you ? `; you have ${you.points}` : ""}.`;
+}
+
 export function layout({ players, days, hidden, picked, width, height, long, text, measure }: RaceInput) {
   // The room kept for text, and the labels' spacing, grow with it (14b-17, answer 6); the mockup's values are at 12px.
   const k = text / 12;

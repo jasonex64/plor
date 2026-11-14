@@ -77,6 +77,8 @@ test("the overall board shows Sum and Average on the Friends page and a group's"
   await page.goto("/");
   await signInAndPick(page, "wx");
   const [x, y] = [await idOf("wx"), await idOf("wy")];
+  // Signed up before last week: a friends board lists only players whose account was made by the week's end (M19 19c).
+  await DB.query("update private.profile set created_at = now() - interval '14 days' where user_id = any($1::uuid[])", [[x, y]]);
   await DB.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [x, y]);
   const [thursday, friday] = days;
   await scored(x, "offbeat", thursday, 100);

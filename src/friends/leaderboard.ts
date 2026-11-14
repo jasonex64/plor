@@ -7,7 +7,8 @@
 // that day is still going, since a run can be finished after midnight (DECISIONS.md, Game 1: Timer): otherwise a
 // friend's total would tell the viewer how far the friend got on questions the viewer hasn't answered (M09 D5; 9b
 // review, like M08 8a's past-day thread). A group's boards count each member only from the puzzle day they joined,
-// that day included (M12 12d, docs/milestones/M12-12d-decided-fixes.md); a friend's whole week counts. Each week
+// that day included (M12 12d, docs/milestones/M12-12d-decided-fixes.md); a friend's whole week counts, but a friends board for a week or a day that ended before a player's account was made
+// doesn't list them, the viewer included (M19 19c). Each week
 // also gives every player's points on each of its days that are over, for the graph view
 // (docs/milestones/M14-14b-14-leaderboard-graph.md). Each board is one game's (M16 16e-2,
 // docs/milestones/M16-16e-points-and-boards.md): game 1's adds up points, and game 2's each day's place, the % of that
@@ -70,7 +71,8 @@ function daysFrom(from: string, day: string): number {
 }
 
 // A player's ledger points by puzzle day ("2026-10-22" → points).
-type Row = { user_id: string; username: string; name: string; days: Record<string, number> };
+// joined is the puzzle day the account was made.
+type Row = { user_id: string; username: string; name: string; joined: string; days: Record<string, number> };
 
 // A player's points from (included) to (excluded). Game 2's are places with one decimal, so the sum keeps one.
 function total(row: Row, from: string, to: string): number {
@@ -106,7 +108,7 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
   await settleRuns(db);
   const yesterday = daysBefore(circle.today, 1);
   const skip = await playing(db, viewerId, yesterday, circle.today);
-  const rows = await ledger(db, GAME_ID, circle.ids, groupId, yesterday, circle.today, skip);
+  const rows = onBoard(await ledger(db, GAME_ID, circle.ids, groupId, yesterday, circle.today, skip), groupId, circle.today);
   return { date: yesterday, entries: ranked(rows.map((r) => entry(r, viewerId, total(r, yesterday, circle.today))), byTotal) };
 }
 
@@ -133,7 +135,7 @@ async function weeklyBoard(
     const overallWeek = (from: string, to: string): OverallWeek => ({
       from,
       entries: ranked(
-        both[0].map((r) => {
+        onBoard(both[0], groupId, to).map((r) => {
           const days = [r, both[1].find((s) => s.user_id === r.user_id)!].flatMap((row) => inWeek(row, from, to));
           return { ...entry(r, viewerId, placeTotal(days)), average: placeAverage(days) };
         }),
@@ -148,7 +150,7 @@ async function weeklyBoard(
     days,
     hidden: skip.filter((day) => day >= from && day < to && day < today).map((day) => daysFrom(from, day)),
     entries: ranked(
-      rows.map((r) => ({
+      onBoard(rows, groupId, to).map((r) => ({
         ...entry(r, viewerId, total(r, from, to)),
         daily: Array.from({ length: days }, (_, i) => r.days[daysBefore(from, -i)] ?? 0),
       })),
@@ -170,6 +172,10 @@ async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[]
   await settleSubstringRuns(db);
   return { rows: await places(db, game, await ledger(db, game, ids, groupId, from, to, []), from, to), skip: [] };
 }
+
+// A friends board for a period lists only the players whose account was made before it ended, the viewer too; a group's
+// keeps a member who joined later, on 0 (M19 19c; M12 12d, D3). to is the period's end, excluded.
+const onBoard = (rows: Row[], groupId: string | null, to: string) => (groupId === null ? rows.filter((r) => r.joined < to) : rows);
 
 // A row's numbers on the days from (included) to (excluded).
 const inWeek = (row: Row, from: string, to: string) => Object.entries(row.days).flatMap(([day, n]) => (day >= from && day < to ? [n] : []));
@@ -216,6 +222,7 @@ async function playing(db: Db, viewerId: string, from: string, to: string): Prom
 async function ledger(db: Db, game: BoardGame, ids: string[], groupId: string | null, from: string, to: string, skip: string[]): Promise<Row[]> {
   const { rows } = await db.query<Row>(
     `select p.user_id::text, p.username::text as username, coalesce(p.display_name, p.username::text) as name,
+            private.day_of(p.created_at)::text as joined,
             coalesce(jsonb_object_agg(l.puzzle_date::text, l.points) filter (where l.puzzle_date is not null), '{}'::jsonb) as days
      from private.profile p
      left join private.points_ledger l
@@ -224,7 +231,7 @@ async function ledger(db: Db, game: BoardGame, ids: string[], groupId: string | 
           and ($6::uuid is null or l.puzzle_date >= (select private.day_of(m.joined_at) from private.group_member m
                                                      where m.group_id = $6::uuid and m.user_id = p.user_id))
      where p.user_id = any($1::uuid[])
-     group by p.user_id, p.username, p.display_name`,
+     group by p.user_id, p.username, p.display_name, p.created_at`,
     [ids, game, from, to, skip, groupId],
   );
   return rows;

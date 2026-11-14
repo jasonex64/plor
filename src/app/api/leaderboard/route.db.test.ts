@@ -118,6 +118,10 @@ describe("the friends leaderboard", () => {
       const { rows } = await getPool().query<{ id: string }>("select id from auth.users where email = $1", [`${RUN}-${key}@example.test`]);
       p.userId = rows[0].id;
     }
+    // Accounts from before last week: a friends board lists a player only from the week they signed up (M19 19c).
+    await getPool().query("update private.profile set created_at = now() - interval '14 days' where user_id = any($1::uuid[])", [
+      keys.map((k) => players[k].userId),
+    ]);
     for (const [x, y] of [
       [players.a, players.b],
       [players.a, players.e],
@@ -291,5 +295,17 @@ describe("the friends leaderboard", () => {
     const f = (week: "thisWeek" | "lastWeek") => r[week].entries.find((x: Entry) => x.username === players.f.username).daily;
     expect(f("lastWeek")).toEqual([10, 0, 0, 0, 0, 0, 100]);
     expect(f("thisWeek")).toEqual(Array.from({ length: over("thisWeek") }, (_, i) => (i === 0 ? 1000 : 0)));
+  });
+
+  // M19 19c: F signs up today, after last week ended: last week's board leaves F out, this week's lists F.
+  it("leaves a player who signed up this week off last week's board, and keeps them on this week's", async () => {
+    await getPool().query("update private.profile set created_at = now() where user_id = $1", [players.f.userId]);
+    useSession(players.c.session);
+    const r = (await leaderboard()).body;
+    expect(r.lastWeek.entries.map((x: Entry) => x.username)).toEqual([players.c.username]);
+    expect(r.thisWeek.entries.map((x: Entry) => x.username).sort()).toEqual([players.c.username, players.f.username].sort());
+    // F's own board has no last week to show F on either.
+    useSession(players.f.session);
+    expect((await leaderboard()).body.lastWeek.entries.map((x: Entry) => x.username)).toEqual([players.c.username]);
   });
 });

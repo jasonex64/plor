@@ -86,6 +86,8 @@ async function withFriends(page: Page, tag: string): Promise<string> {
   await signInAndPick(page, tag);
   const viewer = (await DB.query<{ id: string }>("select id from auth.users where email = $1", [`${RUN}-${tag}@example.test`])).rows[0].id;
   await written(async (client) => {
+    // Signed up before last week: a friends board lists only players whose account was made by the week's end (M19 19c).
+    await client.query("update private.profile set created_at = now() - interval '14 days' where user_id = $1", [viewer]);
     await points(client, viewer, LAST.you, lastMonday);
     await points(client, viewer, THIS.you.slice(0, thisOver), weekStart(today));
     for (const name of ["Ana", "Bea", "Ben", "Cleo"]) {
@@ -93,7 +95,11 @@ async function withFriends(page: Page, tag: string): Promise<string> {
         `${RUN}-${tag}${name.toLowerCase()}@example.test`,
       ]);
       const id = rows[0].id;
-      await client.query("insert into private.profile (user_id, username, display_name) values ($1, $2, $3)", [id, `${tag}${name.toLowerCase()}${RUN}`, name]);
+      await client.query("insert into private.profile (user_id, username, display_name, created_at) values ($1, $2, $3, now() - interval '14 days')", [
+        id,
+        `${tag}${name.toLowerCase()}${RUN}`,
+        name,
+      ]);
       await client.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [id, viewer]);
       await points(client, id, LAST[name], lastMonday);
       await points(client, id, THIS[name].slice(0, thisOver), weekStart(today));

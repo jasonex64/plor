@@ -26,6 +26,7 @@ const V = player("yv");
 const F = player("yf");
 const G = player("yg");
 const D = player("yd");
+const N = player("yn");
 let yesterday = "";
 let club = "";
 
@@ -66,6 +67,10 @@ describe("yesterday's standings", () => {
       const { rows } = await getPool().query<{ id: string }>("select id from auth.users where email = $1", [p.email]);
       p.userId = rows[0].id;
     }
+    // Accounts from before yesterday: a friends board lists a player only from the day they signed up (M19 19c).
+    await getPool().query("update private.profile set created_at = now() - interval '14 days' where user_id = any($1::uuid[])", [
+      [V.userId, F.userId, G.userId, D.userId],
+    ]);
     await getPool().query(
       "insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))",
       [V.userId, F.userId],
@@ -124,6 +129,26 @@ describe("yesterday's standings", () => {
       [F.username, 300, false],
       [V.username, 0, true],
     ]);
+  });
+
+  // M19 19c: yesterday is before N's account existed, so N is on no friends board for it, N's own included; a group
+  // keeps listing a member who joined later, with 0 (M12 12d, D3).
+  it("leaves a player who signed up today off yesterday's friends boards, their own too, but not off a group's", async () => {
+    N.session = (await signIn(N.email)).session;
+    expect((await createProfile(apiRequest("/api/profile", { method: "POST", body: { username: N.username } }))).status).toBe(201);
+    N.userId = (await getPool().query<{ id: string }>("select id from auth.users where email = $1", [N.email])).rows[0].id;
+    await getPool().query(
+      "insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))",
+      [F.userId, N.userId],
+    );
+    // F's own run yesterday is still going, which leaves yesterday's points out for F (M09 D5): the names are the point.
+    useSession(F.session);
+    expect((await points("/api/leaderboard/yesterday")).map(([username]: [string]) => username)).toEqual([F.username, V.username]);
+    useSession(N.session);
+    expect(await points("/api/leaderboard/yesterday")).toEqual([[F.username, 300, false]]);
+    await joinGroup(getPool(), N.userId, (await getGroup(getPool(), V.userId, club)).inviteCode);
+    useSession(V.session);
+    expect(await points(`/api/leaderboard/yesterday?group=${club}`)).toContainEqual([N.username, 0, false]);
   });
 
   // M16 16e-3a (answers 35, 36): D, V's friend from now, survived question 1 at yesterday's noon and question 2 only
