@@ -11,7 +11,7 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 - **M19, pre-beta fixes, is approved ("Approve M19"):** `docs/milestones/M19-pre-beta-fixes.md` holds the human's nineteen answers, quoted. **M19 is done:** 19a to 19f (#199 to #204) are merged and published; the branch is deleted. **19d's hosted `db push` is the human's, asked for on 2026-11-13; whether it was run is unknown** (it drops `private.end_guest_run`, which nothing calls now). The open board is late (19f's test); the human chose "Leave it for the beta" (answer 19). **Not verified:** nobody has looked at 19a's to 19e's screens in a browser or on plor.app; the reaction side as the deadlock's victim (19b); an empty Yesterday or Last week list for a new player (19c, kept: answer 18).
 - **"Ship on your word" (M15 15d) is dropped** ("Drop it"): `main` keeps publishing on every merge. `RIFF-m15`'s uncommitted edits are that half-built 15d (a `ship` script, `vercel.json`'s deploy switch, rule and DECISIONS edits); they are untouched, and deleting them needs the human's word.
 - **The public repo stays public with the answers in it** ("Leave it").
-- **The database plan:** Supabase's pricing page (read 2026-11-13) says Free pauses "after 1 week of inactivity", has 500 MB and no backups; Pro is "from $25/month", never pauses, daily backups kept 7 days. How full the hosted database is: *unverified* (the human's dashboard). The human chose "Check first, then decide"; the decision is still open.
+- **The database plan:** Supabase's pricing page (read 2026-11-13) says Free pauses "after 1 week of inactivity", has 500 MB and no backups; Pro is "from $25/month", never pauses, daily backups kept 7 days. How full the hosted database is: *unverified* (the human's dashboard). The human chose "Check first, then decide", then on 2026-11-14: "stay on free until the beta, then switch to pro". **Before beta players are invited, remind the human to switch the plan to Pro** (their dashboard; no agent can).
 - `m18-guest-play` in this checkout holds one unpushed commit (`1d1cedf`, an older handoff, superseded by this file).
 
 ## The tracks
@@ -47,4 +47,4 @@ Closed beta with a plain look, guest play, both games, and profiles with friend 
 
 **Open pull requests:** none. `m16-game-2` is level with `main` plus one docs commit (this handoff, the ticket's Status and the ROADMAP row after #209's merge), which rides with 16f-6's PR.
 
-**Next:** 16f-6 on `m16-game-2`, the boards (ask first: see track 3). Nobody has looked at 16f-5's feed on plor.app by hand yet. Beside it: a look at M19's error messages in a browser; M18's open criteria; the database plan.
+**Next:** 16f-6 on `m16-game-2`, the boards (ask first: see track 3). Nobody has looked at 16f-5's feed on plor.app by hand yet. Beside it: a look at M19's error messages in a browser; M18's open criteria.
