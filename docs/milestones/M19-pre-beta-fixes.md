@@ -1,6 +1,6 @@
 # M19 — Pre-beta fixes
 
-**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c is built, in its pull request, not merged; 19d's design is settled (answers 16 and 17), not built; 19e and 19f are not started.
+**Status:** in progress. Approved by the human (2026-11-13: "Approve M19"). 19a (PR #199) and 19b (PR #200) are merged; 19c (PR #201) is merged too; 19d is built, in its pull request, not merged (the human's hosted `db push` follows its merge, never before); 19e and 19f are not started.
 
 ## Goal
 Close the player-facing bugs already recorded in ROADMAP's "Next revision" and the 2026-11-11 audit before the closed beta, each as a small step with a failing test first.
@@ -29,6 +29,7 @@ Close the player-facing bugs already recorded in ROADMAP's "Next revision" and t
 | 15 | 19c: Last week's friends board and a friend who joined this week | "Hide there too (Recommended)" |
 | 16 | 19d: the Privacy page's guest words, drafted: "Your answers are added to the day's counts of how many people gave each answer, with nothing that says who gave them. Your run is kept until that day ends, so you can see your result again, and is then deleted, finished or not." (in place of "When your run ends we delete the run and keep only your answers, added to the day's counts … A run you leave unfinished is deleted after that day ends.") | "Approve as drafted". Told first: the clearing runs at the next guest's Start after midnight Pacific, not on a timer, and the guest cookie ends with the browser, so "one play a day" is per browser session |
 | 17 | 19d: `private.end_guest_run` is left unused by the fix; remove it? | "Remove it now": a migration that drops it, and the human's hosted `db push` **after** 19d's merge, not before (the live code calls it until then) |
+| 18 | 19c, after CI showed it: on a player's first day, Today's Leaderboard card opens on an empty Yesterday. Keep it, or always show your own row? | "keep it, merge, and next steps" |
 
 ## Source
 - **Next.js** (SOURCES.md): route handlers, for the routes' replies.
@@ -55,9 +56,9 @@ One PR each, from `m19-pre-beta-fixes`, in this order (19b before 19e: they shar
 - [x] A friends board for a day before a player joined doesn't list that player (`src/friends/leaderboard.ts:100-110`, where group boards already filter) → verify: a db test with a player made today reads yesterday's board without them.
 - Joined is the account's day, `private.day_of(profile.created_at)`; no migration. The viewer too (answer 14), and Last week's friends board in every game (answer 15). Group boards keep M12 12d's D3: a later member stays listed with what they scored since.
 
-**19d — a guest's result isn't lost** (answers 2 and 3). **Design first: stop and ask before building.**
-- [ ] A guest's Start on a run that is over returns that run's result, not a new run (`src/game/guest-runs.ts:77-96`).
-- [ ] A time-up read that lands after the answer that ended the run still shows the result, in both games (`guest-runs.ts:37-64`, `guest-substring-runs.ts`).
+**19d — a guest's result isn't lost** (answers 2 and 3; the design, answers 10, 16, 17).
+- [x] A guest's Start on a run that is over returns that run's result, not a new run (`src/game/guest-runs.ts:77-96`).
+- [x] A time-up read that lands after the answer that ended the run still shows the result, in both games (`guest-runs.ts:37-64`, `guest-substring-runs.ts`).
 - **The design, settled (answers 10, 16, 17):** a finished guest run is no longer deleted at its first read; `private.purge_guest_days` clears it with the day's other guest runs. The Privacy page takes answer 16's words. One migration drops `private.end_guest_run`; the human's hosted `db push` follows the merge.
 - Answer 3 changes M18's answer 9 ("sees their result once", "discard everything else about them after the run"): M18's ticket says keeping a result "would need a number from the human". The proposal must say what is kept, for how long (the human's number, or an end that needs none, such as the guest's next Start or the day's reset), whether it needs a migration and a hosted `db push`, and whether the Privacy page's guest words still hold.
 
@@ -92,6 +93,7 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 | Source says | We built | Why different |
 |---|---|---|
 | 19a, as drafted: the index bound is "read from the puzzle; no constant" | The route compares with `QUESTIONS_PER_DAY` | Every approved day has exactly that many questions, and the route serves game 1 only; a read would add a query for the same number |
+| M18, answer 9 and DECISIONS' Guest play: a guest "sees their result once"; a run's rows go when it ends; a retried final answer gets 409 `run_over` | A finished guest run stays until `private.purge_guest_days` clears its day; a retried final answer gets the stored result, as a player's does; `private.end_guest_run` is dropped | Answers 2, 3, 10, 16, 17: a result read once could be lost unseen. DECISIONS.md's row and Log (2026-11-13) record it |
 | CLAUDE.md, Fail loudly: recovery is "logged and counted" | The failed sign-out is one `log.error` line, "account deleted, sign-out failed" | The project counts by log lines (DECISIONS.md, the Turnstile entry); there is no other counter |
 
 ## Evidence
@@ -110,7 +112,13 @@ To be listed per PR. Expected: the username parameters of the three actions in 1
 - The older board tests and three e2e specs make their players today, so their sign-up day is set 14 days back (a fixture value: before last week's Monday); no expected value changed.
 - CI's first e2e run (head `13f1abb`) failed three specs the builder hadn't touched: `alive.e2e.ts:150` and `calm.e2e.ts:71` ("element(s) not found": a row on Today's card, which opens on Yesterday) and `screen-readers.e2e.ts:65` ("Expected: 95, Received: 53": the page is shorter without the player's row). Their players' sign-up day is now set back as well; `npm run test:e2e -- e2e/alive.e2e.ts:150 e2e/calm.e2e.ts:71 e2e/screen-readers.e2e.ts:65`: "3 passed (1.3m)" on this PC. **What it showed: on a player's first day, Today's Leaderboard card opens on an empty Yesterday** (answer 14's "list can be empty", now the first thing a new player sees there; ROADMAP, For M19).
 - **Not run locally:** the rest of the e2e (CI), the three specs the builder edited among them. **No test of its own:** game 2's and the Overall board's Last week (the same `onBoard` filter as game 1's). **No test:** `Standings` showing an empty Last week in Graph as the bare list, not the race (`src/app/leaderboard.tsx`; the project has no component tests). **Not verified:** the boards in a browser, and what an empty Yesterday or Last week list looks like for a new player with no older friends.
+**19d** (2026-11-13).
+- Six tests failed first (`npm run test:db -- -t "a finished guest"`: "Tests  6 failed | 2 passed"): game 1's Start and second read, "expected { date: '2026-11-13', …(10) } to match object { status: 'died', question: null }"; its retry and late Next, "expected 'not_started' to be 'died'"; game 2's Start, "expected { date: '2026-11-13', …(7) } to match object { status: 'finished', open: null }"; its second read, "expected [] to deeply equal [ { letters: 'xk', …(4) }, …(6) ]"; its try after the end, "expected 'not_started' to be 'finished'". The two that passed before are guards: re-reads add nothing to the tally, and the purge still clears a closed day's finished run.
+- After: the whole `npm run test:db`: "Test Files  59 passed (59)", "Tests  441 passed (441)". `npx supabase test db`: "Files=39, Tests=791 … Result: PASS" (`guest_play`'s plan 126 → 115: `end_guest_run`'s cases out). `npm test`: "Tests  752 passed (752)". `npx tsc --noEmit -p .`: exit 0. The migration `20261114023236_drop_end_guest_run.sql` is applied to the local database (`npx supabase migration up`).
+- What a guest gets after the end, as a player does: game 1, a retried last answer 200 with the stored result, Next 409 `run_over`; game 2, a try 200 `time_up` with the finished run, Next 409.
+- Tests of the old rule were rewritten to the new one, and those of `end_guest_run` removed with it (the OB015 cases, the "another request ends it mid-read" race, pgTAP's eleven cases; its count of today's runs went six → nine as finished runs stay).
+- **Not run:** the e2e (CI). **No test:** a finished game 2 run of a closed day being purged (game 1's case and pgTAP cover the same statement); the purge racing a read at midnight. **Not verified:** a returning guest's finished result in a browser; the hosted database (nothing is pushed).
 
 ## Review
-- Blocking findings and how each was fixed: 19c (the `reviewer`, 2026-11-13, one pass, by reading): one. The Graph of Last week would throw for a viewer who joined this week, as `summary` and `Standings` took the viewer to be listed; fixed in this PR (the graph is described without the viewer's points, and an empty week shows the list, not the race). The fix itself was not reviewed again. 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
-- Deferred to ROADMAP "Next revision": 19c: two items (For M19). 19a: two missing boundary tests (For M19). 19b: three items (For M19).
+- Blocking findings and how each was fixed: 19d (the `reviewer`, 2026-11-13, one pass, by reading): none in the code; the ticket, handoff and commit message it asked for are in this PR. 19c (the `reviewer`, 2026-11-13, one pass, by reading): one. The Graph of Last week would throw for a viewer who joined this week, as `summary` and `Standings` took the viewer to be listed; fixed in this PR (the graph is described without the viewer's points, and an empty week shows the list, not the race). The fix itself was not reviewed again. 19a: none (the `reviewer`, 2026-11-13, one pass). 19b: none (the `reviewer`, 2026-11-13, one pass, by reading); the account-delete NUL case it found was fixed in this PR under answer 13.
+- Deferred to ROADMAP "Next revision": 19d: two items (For M19). 19c: two items (For M19). 19a: two missing boundary tests (For M19). 19b: three items (For M19).

@@ -1,7 +1,10 @@
 // A guest's game 1 run (docs/milestones/M18-guest-play.md, Design). The same rules as a signed-in run (runs.ts: the
 // database's triggers decide order and clock, the matching and stolen letters are the same functions), held on the guest
-// tables by the hash of the guest's token. A run's rows go when it ends (end_guest_run), so what a retry finds after the
-// end is no run: 409 run_over. Text that names no entry is a free retry and is stored nowhere (answer 19).
+// tables by the hash of the guest's token. A run's rows are kept after it ends, until the day's purge
+// (private.purge_guest_days, run at any guest's Start once the day has closed; M19 answers 2, 3 and 10), so its result can
+// be read again and a Start on it shows it. What a retry finds after the end is as a player's: the stored result for a
+// repeat of the last answer, else a 4xx from the database's rules. Text that names no entry is a free retry and is stored
+// nowhere (answer 19).
 import { DatabaseError } from "pg";
 import { avoids, stolenLetters, type ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID } from "@/platform/game";
@@ -14,7 +17,7 @@ import { assertTypedLength, buildState, NOT_OPEN, OUT_OF_ORDER, RUN_OVER, TIME_U
 import { FINISHED, type RunStatus } from "./status";
 
 // The guest's run, which is always today's: one left over midnight is not resumed, it waits for the purge (Design, "Same
-// rules as a signed-in run"). null when there is none: never started, or ended and deleted.
+// rules as a signed-in run"). null when there is none: never started, or left by a day that has closed.
 async function todaysRun(db: Db, tokenHash: string): Promise<{ date: string; puzzle: ApprovedPuzzle } | null> {
   const { rows } = await db.query<{ date: string; content: ApprovedPuzzle }>(
     `select r.puzzle_date::text as date, p.content
@@ -34,10 +37,9 @@ async function events(db: Db, tokenHash: string, date: string): Promise<StoredEv
   return rows;
 }
 
-// The state of the token's run on a date, as runs.ts's stateOf builds it. A run that is over is read once and then ended:
-// its result is in this return, and its rows are gone (every read finds a run over, so a crash between the two loses nothing
-// but the chance to read it). A null hash is a visitor with no run: the day not started. The status and the events are one
-// statement, so one snapshot: another request's end_guest_run can't delete the events between two reads of a finished run.
+// The state of the token's run on a date, as runs.ts's stateOf builds it. A run that is over is not ended by a read: its
+// rows stay until the day's purge, so every read gives the result. A null hash is a visitor with no run: the day not started.
+// The status and the events are one statement, so one snapshot: the purge can't delete the events between two reads.
 async function stateOf(db: Db, tokenHash: string | null, date: string, puzzle: ApprovedPuzzle): Promise<RunState> {
   const { rows } = await db.query<{ status: RunStatus | null; ms_left: number | null; ms_to_reset: number; day_over: boolean; events: StoredEvent[] }>(
     `select s.status,
@@ -58,9 +60,7 @@ async function stateOf(db: Db, tokenHash: string | null, date: string, puzzle: A
   const counts = over ? (await dayCounts(db, [date])).get(date)! : null;
   const names = await thingNames(db, stored.flatMap((e) => [e.entry_id, ...puzzle.questions[e.question_idx].host_answers]));
   const pooled = await pooledCounts(db, puzzle, false);
-  const run = buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset, dayOver: day_over }, counts, pooled, names);
-  if (over) await db.query("select private.end_guest_run($1, $2)", [tokenHash, GAME_ID]);
-  return run;
+  return buildState(date, puzzle, stored, { status, msLeft: ms_left, msToReset: ms_to_reset, dayOver: day_over }, counts, pooled, names);
 }
 
 // The guest's run, or today's puzzle not started; null when nothing is approved for today (as todaysState).
@@ -71,13 +71,13 @@ export async function guestTodaysState(db: Db, tokenHash: string | null): Promis
   return today && stateOf(db, null, today.date, today.puzzle);
 }
 
-// Starts a run, or returns the one that is open. Every start first deletes the guest runs of days that have closed: nothing
-// is scheduled, and a run left at a reveal never ends by itself (Design, "When a guest run ends"). A run of this token that
-// is over is ended by reading it, so a replay is a new run.
+// Starts a run, or returns today's run of this token, open or over: one play a day per browser session (M19 answer 2). Every
+// start first deletes the guest runs of days that have closed: nothing is scheduled, and a run left at a reveal never ends
+// by itself (Design, "When a guest run ends").
 export async function startGuestRun(db: Db, tokenHash: string): Promise<RunState> {
   await db.query("select private.purge_guest_days()");
   const open = await guestTodaysState(db, tokenHash);
-  if (open?.status === "in_progress") return open;
+  if (open && open.status !== "not_started") return open;
   try {
     await db.query(
       `insert into private.guest_run (token_hash, game_id, puzzle_date) values ($1, $2, private.today())
@@ -96,8 +96,8 @@ export async function startGuestRun(db: Db, tokenHash: string): Promise<RunState
   return state;
 }
 
-// Answers one question of the guest's run, as runs.ts's answer does for a player. No run is 409 run_over: it ended, or
-// its day closed, and a retried final answer lands here.
+// Answers one question of the guest's run, as runs.ts's answer does for a player. No run today is 409 run_over: its day
+// closed. A retry after the end meets the database's rules, as a player's does.
 export async function answerGuest(db: Db, tokenHash: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean }> {
   const found = await todaysRun(db, tokenHash);
   if (!found) throw new AppError("run_over", 409);
@@ -109,7 +109,7 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
      from private.guest_run_status where token_hash = $1 and game_id = $2 and puzzle_date = $3::date`,
     [tokenHash, GAME_ID, date],
   );
-  // The run can end between the two reads (a retry racing the final answer).
+  // The purge can take the run between the two reads, at the day's close.
   if (current.length === 0) throw new AppError("run_over", 409);
   const isCurrent = current[0].status === "in_progress" && current[0].answered === index;
   // As a signed-in answer: no answer before Next, and a stolen letter only counts on the question in play, so a client
@@ -141,7 +141,7 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
     if (!(err instanceof DatabaseError)) throw err;
     if (err.code === TIME_UP) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: false };
     if (err.code === NOT_OPEN) throw new AppError("not_open", 409);
-    // The run ended between our read and our insert (a retry racing the final answer): its rows, and the foreign key, are gone.
+    // The purge took the run between our read and our insert, at the day's close: its rows, and the foreign key, are gone.
     if (err.code === "23503") throw new AppError("run_over", 409);
     if (err.code === OUT_OF_ORDER || err.code === RUN_OVER) {
       if (await settledAnswer(db, tokenHash, date, index, entryId)) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: false };

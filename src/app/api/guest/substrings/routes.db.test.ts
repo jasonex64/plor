@@ -140,7 +140,7 @@ describe("a guest game 2 run, step by step", () => {
     expect(await next()).toMatchObject({ status: 200 });
   });
 
-  it("refuses Next during round 1, and plays all seven rounds, returns the result once, keeps no row and adds nothing to the players", async () => {
+  it("refuses Next during round 1, and plays all seven rounds, shows the result every time, keeps the run for the day and adds nothing to the players", async () => {
     const players = await playerRows();
     await start();
     const hash = tokenHash();
@@ -163,17 +163,17 @@ describe("a guest game 2 run, step by step", () => {
     expect(run.rounds[6].examples).toEqual(expect.arrayContaining(["axtb", "axtc"]));
     // The percent is among the players' finished runs, read only; under the day's minimum it is null, and a guest has no friends.
     expect(run.standing).toEqual({ percent: null, friends: null });
-    // Game 2's rows are gone and game 1's, under the same token, stay.
-    expect(await rowsWith(hash)).toBe(1);
+    // Game 2's rows stay until the day's purge, beside game 1's under the same token (M19 answers 3 and 10).
+    expect(await rowsWith(hash)).toBeGreaterThan(1);
     expect(await playerRows()).toEqual(players);
 
-    // A retry finds no run: 409 run_over, never a 500.
-    expect(await tryText("axtb")).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
+    // A try after the end is the judge's outcome, as a player's is; Next on a run that is over is 409 run_over.
+    expect(await tryText("axtb")).toMatchObject({ status: 200, body: { outcome: "time_up", run: { status: "finished" } } });
     expect(await next()).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
-    expect((await state()).body.run!.status).toBe("not_started");
+    expect((await state()).body.run).toMatchObject({ status: "finished", score: run.score });
 
-    // Replay is free: a new bot check and a new run, under the same cookie.
-    expect((await start()).body.run).toMatchObject({ status: "in_progress", rounds: [], open: { index: 0 } });
+    // One play a day: a new bot check and a Start show the same result, under the same cookie.
+    expect((await start()).body.run).toMatchObject({ status: "finished", score: run.score });
   });
 
   it("answers no_run to a try or Next from a visitor with no cookie, and 400 to a try that isn't text", async () => {
@@ -181,6 +181,47 @@ describe("a guest game 2 run, step by step", () => {
     expect(await next()).toEqual({ status: 404, body: { ok: false, error: "no_run" } });
     await start();
     expect(await tryText(7)).toEqual({ status: 400, body: { ok: false, error: "bad_request" } });
+  });
+});
+
+// M19 19d, answers 2, 3 and 10: a finished run is kept until its day's purge, so its result can be read again.
+describe("a finished guest game 2 run", () => {
+  async function playToTheEnd() {
+    await start();
+    for (const word of ["axkb", "axmb", "axnb", "axpb", "axrb", "axsb"]) {
+      expect((await tryText(word)).body.outcome).toBe("accepted");
+      expect((await next()).status).toBe(200);
+    }
+    await timeOut();
+  }
+
+  it("is shown again by Start, in place of a new run (answer 2)", async () => {
+    await playToTheEnd();
+    const hash = tokenHash();
+    const rows = await rowsWith(hash);
+    const again = await start();
+    expect(again.status).toBe(200);
+    expect(again.body.run).toMatchObject({ status: "finished", open: null });
+    expect(again.body.run!.rounds[0]).toMatchObject({ letters: "xk", word: "axkb", points: 25 });
+    expect(await rowsWith(hash)).toBe(rows);
+    expect(rows).toBeGreaterThan(0);
+  });
+
+  it("is shown every time it is read, including the read that finds the clock run out (answer 3)", async () => {
+    await playToTheEnd();
+    const first = (await state()).body.run!;
+    expect(first).toMatchObject({ status: "finished", open: null });
+    const second = (await state()).body.run!;
+    expect(second.rounds).toEqual(first.rounds);
+    expect(second.score).toEqual(first.score);
+    expect((await state()).body.run!.status).toBe("finished");
+  });
+
+  it("answers a try or Next after the end with a 4xx or the stored result, never a 500", async () => {
+    await playToTheEnd();
+    expect((await tryText("axmb")).status).toBeLessThan(500);
+    expect((await next()).status).toBeLessThan(500);
+    expect((await state()).body.run!.status).toBe("finished");
   });
 });
 

@@ -150,7 +150,7 @@ describe("guests in the answer search", () => {
 });
 
 describe("a game 2 guest run as plor_app", () => {
-  it("plays through the guest judge and examples, and is ended with every row", async () => {
+  it("plays through the guest judge and examples, and is over when round 2's clock runs out", async () => {
     await asPlorApp(async ({ client }) => {
       // The test's own role adds what plor_app can't write: a day of two rounds and two words that fit them.
       await client.query("reset role");
@@ -182,46 +182,28 @@ describe("a game 2 guest run as plor_app", () => {
       await client.query("savepoint reject");
       await expect(client.query("select count(*) from private.guest_round_reject")).rejects.toThrow(/permission denied/);
       await client.query("rollback to savepoint reject");
-      // A run still going is not ended; round 2's clock then runs out (the test's own role moves it back), which ends the run.
-      await client.query("savepoint going");
-      await expect(client.query("select private.end_guest_run($1, $2)", [token, SUBSTRINGS_ID])).rejects.toMatchObject({ code: "OB015" });
-      await client.query("rollback to savepoint going");
+      // Round 2's clock then runs out (the test's own role moves it back), which ends the run.
       await client.query("reset role");
       await client.query("update private.guest_question_open set opened_at = opened_at - interval '21 seconds' where token_hash = $1", [token]);
       await client.query("set local role plor_app");
       expect((await client.query("select private.guest_round_examples($1, $2::date)", [token, day])).rows).toBeDefined();
-      await client.query("select private.end_guest_run($1, $2)", [token, SUBSTRINGS_ID]);
-      await client.query("reset role");
-      const left = await client.query<{ n: number }>(
-        `select ((select count(*) from private.guest_run where token_hash = $1) + (select count(*) from private.guest_question_open where token_hash = $1)
-               + (select count(*) from private.guest_round_word where token_hash = $1) + (select count(*) from private.guest_round_reject where token_hash = $1))::int as n`,
-        [token],
-      );
-      expect(left.rows[0].n).toBe(0);
     });
   });
 });
 
-describe("ending a guest run", () => {
-  it("leaves no row with the hash after end_guest_run or purge_guest_days, and leaves the tally", async () => {
+describe("clearing guest runs", () => {
+  it("leaves no row with the hash after purge_guest_days, keeps a finished run of today, and leaves the tally", async () => {
     await asPlorApp(async ({ client, today, puzzle }) => {
       const entry = safeEntry(puzzle, 0);
       const caught = newToken();
       await startGuest(client, caught, today);
       await answerGuest(client, caught, today, 0, puzzle.questions[0].host_answers[0], true);
       expect(await rowsWith(client, caught)).toBe(2);
-      const before = await tallyTotal(client);
-      await client.query("select private.end_guest_run($1, $2)", [caught, GAME_ID]);
-      expect(await rowsWith(client, caught)).toBe(0);
-      expect(await tallyTotal(client)).toBe(before);
 
-      // A run still going is not ended by it.
+      // A run still going.
       const going = newToken();
       await startGuest(client, going, today);
       await answerGuest(client, going, today, 0, entry, false);
-      await client.query("savepoint going");
-      await expect(client.query("select private.end_guest_run($1, $2)", [going, GAME_ID])).rejects.toMatchObject({ code: "OB015" });
-      await client.query("rollback to savepoint going");
       expect(await rowsWith(client, going)).toBe(2);
 
       // A closed day's run goes at the purge, with its answers; today's stays.
@@ -240,6 +222,7 @@ describe("ending a guest run", () => {
       await client.query("select private.purge_guest_days()");
       expect(await rowsWith(client, old)).toBe(0);
       expect(await rowsWith(client, going)).toBe(2);
+      expect(await rowsWith(client, caught)).toBe(2);
       expect(await tallyTotal(client)).toBe(tally);
     });
   });

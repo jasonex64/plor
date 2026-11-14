@@ -11,7 +11,6 @@ import { GAME_ID } from "@/platform/game";
 import { TURNSTILE_TEST_PASS_SECRET, useLocalStack } from "@/test/local-stack";
 import { ensurePuzzle, hostName, removeFixtures, safeEntries, typeableName } from "@/test/puzzles";
 import { apiRequest, cookieJar, cookieOptions } from "@/test/request-scope";
-import { guestTodaysState } from "@/game/guest-runs";
 import { resolveTyped } from "@/game/matching";
 import { POST as answerRoute } from "./answer/route";
 import { POST as nextRoute } from "./next/route";
@@ -96,7 +95,7 @@ afterAll(async () => {
 });
 
 describe("a guest run, step by step", () => {
-  it("starts with the cookie set as designed, plays to a catch, returns the result once and keeps no row", async () => {
+  it("starts with the cookie set as designed, plays to a catch, shows the result again and keeps the run until its day closes", async () => {
     const started = await start();
     expect(started.status).toBe(200);
     expect(started.body.run).toMatchObject({ status: "in_progress", answered: [], question: { index: 0 } });
@@ -112,20 +111,21 @@ describe("a guest run, step by step", () => {
     expect((await next()).body.run.question.index).toBe(1);
     expect((await state()).body.run).toMatchObject({ status: "in_progress", question: { index: 1 } });
 
-    // The host's own answer catches the guest: the response is the whole result, and the run's rows are gone.
+    // The host's own answer catches the guest: the response is the whole result, and the run's rows stay (M19 answers 3 and 10).
     const last = await answerText(1, hostName(puzzle, 1));
     expect(last.status).toBe(200);
     expect(last.body.run).toMatchObject({ status: "died", question: null });
     expect(last.body.run.answered).toHaveLength(2);
-    expect(await rowsWith(hash)).toBe(0);
+    expect(await rowsWith(hash)).toBe(4);
 
-    // A retry of the final answer finds no run: 409 run_over, never a 500.
-    expect(await answerText(1, hostName(puzzle, 1))).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
+    // A retry of the final answer is the stored result, as a player's is; Next on a run that is over is 409 run_over.
+    expect(await answerText(1, hostName(puzzle, 1))).toMatchObject({ status: 200, body: { run: { status: "died" } } });
     expect(await next()).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
-    expect((await state()).body.run.status).toBe("not_started");
+    expect((await state()).body.run).toMatchObject({ status: "died", question: null });
 
-    // Replay is free: a new bot check and a new run, under the same cookie.
-    expect((await start()).body.run).toMatchObject({ status: "in_progress", answered: [] });
+    // One play a day: a new bot check and a Start show the same result, under the same cookie.
+    expect((await start()).body.run).toMatchObject({ status: "died", question: null });
+    expect(await rowsWith(hash)).toBe(4);
   });
 
   it("returns the open run when started again", async () => {
@@ -162,39 +162,13 @@ describe("a guest run, step by step", () => {
     expect(await answerText(3, "zzz zzz")).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
   });
 
-  it("ends a run whose clock ran out when it is next read, and keeps no row", async () => {
+  it("ends a run whose clock ran out when it is next read, and keeps its rows for the day", async () => {
     await start();
     const hash = tokenHash();
     await getPool().query("update private.guest_run set started_at = started_at - interval '21 seconds' where token_hash = $1", [hash]);
     expect((await state()).body.run).toMatchObject({ status: "timed_out", question: null });
-    expect(await rowsWith(hash)).toBe(0);
-    expect(await answerEntry(0, safe(0))).toEqual({ status: 409, body: { ok: false, error: "run_over" } });
-  });
-
-  it("builds a result from the whole run when another request ends it right after the status is read", async () => {
-    await start();
-    await answerEntry(0, safe(0));
-    await next();
-    const hash = tokenHash();
-    await getPool().query("update private.guest_question_open set opened_at = opened_at - interval '21 seconds' where token_hash = $1", [hash]);
-    // The real pool, except that the first read of the run's status is followed by the other request's end_guest_run.
-    const pool = getPool();
-    let ended = false;
-    const racing = {
-      query: async (...args: unknown[]) => {
-        const result = await (pool.query as (...a: unknown[]) => Promise<unknown>)(...args);
-        if (!ended && typeof args[0] === "string" && args[0].includes("private.guest_run_status")) {
-          ended = true;
-          await pool.query("select private.end_guest_run($1, $2)", [hash, GAME_ID]);
-        }
-        return result;
-      },
-    } as unknown as typeof pool;
-    const run = await guestTodaysState(racing, hash);
-    expect(ended).toBe(true);
-    expect(run).toMatchObject({ status: "timed_out", question: null });
-    expect(run!.answered).toHaveLength(1);
-    expect(await rowsWith(hash)).toBe(0);
+    expect(await rowsWith(hash)).toBe(1);
+    expect(await answerEntry(0, safe(0))).toMatchObject({ status: 200, body: { run: { status: "timed_out" } } });
   });
 
   it("refuses typed text over 40 characters before it is matched", async () => {
@@ -202,6 +176,80 @@ describe("a guest run, step by step", () => {
     vi.mocked(resolveTyped).mockClear();
     expect(await answerText(0, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
     expect(resolveTyped).not.toHaveBeenCalled();
+  });
+});
+
+// M19 19d, answers 2, 3 and 10: a finished run is kept until its day's purge, so its result can be read again.
+describe("a finished guest run", () => {
+  async function playToCatch() {
+    await start();
+    await answerEntry(0, safe(0));
+    await next();
+    await answerText(1, hostName(puzzle, 1));
+  }
+
+  it("is shown again by Start, in place of a new run (answer 2)", async () => {
+    await playToCatch();
+    const hash = tokenHash();
+    const rows = await rowsWith(hash);
+    const again = await start();
+    expect(again.status).toBe(200);
+    expect(again.body.run).toMatchObject({ status: "died", question: null });
+    expect(again.body.run.answered).toHaveLength(2);
+    expect(await rowsWith(hash)).toBe(rows);
+    expect(rows).toBeGreaterThan(0);
+  });
+
+  it("is shown every time it is read, whether it ended by an answer or by the clock (answer 3)", async () => {
+    await playToCatch();
+    const first = (await state()).body.run;
+    expect(first).toMatchObject({ status: "died", question: null });
+    expect((await state()).body.run.answered).toEqual(first.answered);
+    expect((await state()).body.run.status).toBe("died");
+
+    cookieJar.clear();
+    await start();
+    await getPool().query("update private.guest_run set started_at = started_at - interval '21 seconds' where token_hash = $1", [tokenHash()]);
+    expect((await state()).body.run).toMatchObject({ status: "timed_out", question: null });
+    expect((await state()).body.run).toMatchObject({ status: "timed_out", question: null });
+  });
+
+  it("adds nothing to the tally when it is read or started again", async () => {
+    await start();
+    const entry = safe(0);
+    const before = await tallied(today, 0, entry);
+    await answerEntry(0, entry);
+    await next();
+    await answerText(1, hostName(puzzle, 1));
+    const counted = await tallied(today, 0, entry);
+    expect(counted).toBe(before + 1);
+    await state();
+    await state();
+    await start();
+    expect(await tallied(today, 0, entry)).toBe(counted);
+  });
+
+  it("answers a retried final answer and a late Next with a 4xx or the stored result, never a 500", async () => {
+    await playToCatch();
+    const retry = await answerText(1, hostName(puzzle, 1));
+    expect(retry.status).toBeLessThan(500);
+    expect((await next()).status).toBeLessThan(500);
+    expect((await state()).body.run.status).toBe("died");
+  });
+
+  it("is cleared with its day's other guest runs by the next Start after the day closes", async () => {
+    const old = randomBytes(20).toString("base64url");
+    const oldHash = hashKey(old);
+    const db = getPool();
+    await db.query("insert into private.guest_run (token_hash, game_id, puzzle_date) values ($1, $2, $3::date)", [oldHash, GAME_ID, yesterday]);
+    await db.query(
+      "insert into private.guest_run_event (token_hash, game_id, puzzle_date, question_idx, entry_id, matched) values ($1, $2, $3::date, 0, $4, true)",
+      [oldHash, GAME_ID, yesterday, safe(0)],
+    );
+    expect((await db.query("select status from private.guest_run_status where token_hash = $1", [oldHash])).rows[0].status).toBe("died");
+    cookieJar.clear();
+    expect((await start()).status).toBe(200);
+    expect(await rowsWith(oldHash)).toBe(0);
   });
 });
 

@@ -82,7 +82,7 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
   await caught(page, "italy");
   await expect(page.getByRole("heading", { name: "Caught on question 4", exact: true })).toBeVisible();
 
-  // The result, once, with Share and the peek under it (answer 2).
+  // The result, with Share and the peek under it (answer 2); it stays until the day ends (M19 answers 3 and 10).
   await seeResults(page).click();
   await expect(page.locator("#result")).toContainText("You survived 3 of 7 questions");
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
@@ -172,7 +172,7 @@ test("a signed-in player still plays through /api/run, and their result has Shar
 const total = (page: Page, region: string, label: string) =>
   page.getByRole("region", { name: region, exact: true }).locator("div", { has: page.getByText(label, { exact: true }) }).locator("dd");
 
-// Answers 9 and 14: nothing of a guest run is kept, so the new account starts clean, and it may still play today's game for
+// Answers 9 and 14: nothing of a guest run carries into the account (the run itself waits for the day's purge), so the new account starts clean, and it may still play today's game for
 // points, which then count as any player's run does.
 test("a guest who makes an account the same day starts clean and plays today's game for points", async ({ browser }) => {
   // Two runs and a sign-in: 25.6 s of the default 30 s on a warm local dev server (2026-11-12).

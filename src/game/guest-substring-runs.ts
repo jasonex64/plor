@@ -1,8 +1,9 @@
 // A guest's game 2 run (docs/milestones/M18-guest-play.md, Design). The same rules as a signed-in run (substring-runs.ts: the
 // database judges every try and decides every clock), held on the guest tables by the hash of the guest's token and judged by
-// private.guest_judge_word and private.guest_round_examples. A run's rows go when it ends (end_guest_run), so what a retry
-// finds after the end is no run: 409 run_over. Game 2 keeps no rarity count (Design, "Game 2 has no rarity count"), so
-// nothing of a guest's words outlives the run.
+// private.guest_judge_word and private.guest_round_examples. A run's rows are kept after it ends, until the day's purge
+// (private.purge_guest_days, run at any guest's Start once the day has closed; M19 answers 2, 3 and 10), so its result can be
+// read again and a Start on it shows it. A try after the end gets what a player's gets (the judge's own outcome). Game 2
+// keeps no rarity count (Design, "Game 2 has no rarity count"), so nothing of a guest's words outlives the purge.
 import { DatabaseError } from "pg";
 import type { SubstringDay } from "@/content/substrings";
 import type { Db } from "@/lib/db";
@@ -13,10 +14,10 @@ import { buildRun, ROUND_RUNNING, OUT_OF_ORDER, RUN_OVER, todaysDay, type Played
 import type { SubstringRun, TryOutcome } from "./substring-state";
 import { cleanedTry, plainText, tryKey } from "./substring-try";
 
-// The state of the token's run on a date, as substring-runs.ts's stateOf builds it. A run that is over is read once and then
-// ended: its result is in this return and its rows are gone. The status, the words and the examples are one statement, so one
-// snapshot: another request's end_guest_run can't delete the words between two reads of a finished run (as guest-runs.ts's
-// stateOf). A null hash is a visitor with no run.
+// The state of the token's run on a date, as substring-runs.ts's stateOf builds it. A run that is over is not ended by a
+// read: its rows stay until the day's purge, so every read gives the result. The status, the words and the examples are one
+// statement, so one snapshot: the purge can't delete the words between two reads (as guest-runs.ts's stateOf). A null hash is
+// a visitor with no run.
 async function stateOf(db: Db, tokenHash: string | null, date: string, day: SubstringDay): Promise<SubstringRun> {
   const { rows } = await db.query<{ status: string | null; answered: number | null; ms_left: number | null; words: PlayedWord[]; examples: { round_idx: number; words: string[] }[] }>(
     `select s.status, s.answered,
@@ -36,7 +37,6 @@ async function stateOf(db: Db, tokenHash: string | null, date: string, day: Subs
   const run = buildRun(date, day, { status, answered: answered!, msLeft }, words, examples, null);
   if (run.status === "finished") {
     run.standing = await guestStandingToday(db, date, run.score!.total);
-    await db.query("select private.end_guest_run($1, $2)", [tokenHash, SUBSTRINGS_ID]);
   }
   return run;
 }
@@ -47,14 +47,14 @@ export async function guestSubstringState(db: Db, tokenHash: string | null): Pro
   return today && stateOf(db, tokenHash, today.date, today.day);
 }
 
-// Starts a run, or returns the one that is open. Every start first deletes the guest runs of days that have closed, as
-// startGuestRun does for game 1. A run of this token that is over is ended by reading it, so a replay is a new run.
+// Starts a run, or returns today's run of this token, open or over (M19 answer 2). Every start first deletes the guest runs
+// of days that have closed, as startGuestRun does for game 1.
 export async function startGuestSubstringRun(db: Db, tokenHash: string): Promise<SubstringRun> {
   await db.query("select private.purge_guest_days()");
   const today = await todaysDay(db);
   if (!today) throw new AppError("no_puzzle_today", 404);
   const open = await stateOf(db, tokenHash, today.date, today.day);
-  if (open.status === "in_progress") return open;
+  if (open.status !== "not_started") return open;
   await db.query(
     `insert into private.guest_run (token_hash, game_id, puzzle_date) values ($1, $2, $3::date)
      on conflict do nothing`,
@@ -63,7 +63,7 @@ export async function startGuestSubstringRun(db: Db, tokenHash: string): Promise
   return stateOf(db, tokenHash, today.date, today.day);
 }
 
-// One try at the open round. No run is 409 run_over: it ended, or its day closed, and a retried final try lands here.
+// One try at the open round. No run today is 409 run_over: its day closed.
 export async function tryGuestWord(db: Db, tokenHash: string, typed: string): Promise<{ outcome: TryOutcome; word?: string; run: SubstringRun }> {
   const today = await todaysDay(db);
   if (!today) throw new AppError("no_puzzle_today", 404);
@@ -94,7 +94,7 @@ export async function nextGuestRound(db: Db, tokenHash: string): Promise<Substri
     );
   } catch (err) {
     if (!(err instanceof DatabaseError)) throw err;
-    // The run ended between our read and our insert: its rows, and the foreign key, are gone.
+    // The purge took the run between our read and our insert, at the day's close: its rows, and the foreign key, are gone.
     if (err.code === RUN_OVER || err.code === "23503") throw new AppError("run_over", 409);
     if (err.code === ROUND_RUNNING || err.code === OUT_OF_ORDER) throw new AppError("round_running", 409);
     // question_idx must be over 0: round 1 opens with Start, so Next during it has nothing to open.

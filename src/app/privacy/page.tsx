@@ -31,13 +31,14 @@ export default function Privacy() {
           without who typed it.
         </li>
         {/* The next two, the guest cookie under "Sign-in cookies" and Cloudflare below: docs/milestones/M18-guest-play.md,
-            "Privacy page draft" (approved 2026-11-13). */}
+            "Privacy page draft" (approved 2026-11-13); the guest item's run-keeping words: docs/milestones/M19-pre-beta-fixes.md,
+            answer 16 (approved 2026-11-13). */}
         <li>
           <strong>Playing without an account:</strong> you can play a day&apos;s game as a guest. While you play, a
-          cookie holds a random code so the game knows which run is yours; it is not an account and has no name. When
-          your run ends we delete the run and keep only your answers, added to the day&apos;s counts of how many people
-          gave each answer, with nothing that says who gave them. A run you leave unfinished is deleted after that day
-          ends. Text you type that isn&apos;t on our list isn&apos;t kept. A guest has no streak, points or history;
+          cookie holds a random code so the game knows which run is yours; it is not an account and has no name.
+          Your answers are added to the day&apos;s counts of how many people gave each answer, with nothing that says
+          who gave them. Your run is kept until that day ends, so you can see your result again, and is then deleted,
+          finished or not. Text you type that isn&apos;t on our list isn&apos;t kept. A guest has no streak, points or history;
           making an account starts fresh.
         </li>
         <li>
