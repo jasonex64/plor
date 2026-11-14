@@ -1,0 +1,22 @@
+/* The feed (docs/milestones/M16-16f-the-shared-pieces.md, 16f-5): its items are articles, each holding a row of the kit
+   (kit.module.css), so the article itself draws nothing but the keyboard's focus. */
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Wide as the column, whatever the words, so a long name or word wraps inside it (as .today's grid, today.module.css). */
+.item {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* An earlier day's line, at the top of that day's first article: the muted small bold of the composer's label
+   (comments.module.css .compose). */
+.date {
+  margin: 8px 0 6px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}

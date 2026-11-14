@@ -44,9 +44,7 @@
   color: var(--danger);
 }
 
-/* Filler, not words: blurred so it reads as hidden text, and aria-hidden so it isn't read out. */
-.filler {
-  color: var(--muted);
-  filter: blur(4px);
-  user-select: none;
+/* A time or a name that stays whole when its chip wraps, so "1:06 PM" isn't split across lines in a narrow column. */
+.nowrap {
+  white-space: nowrap;
 }

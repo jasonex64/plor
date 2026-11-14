@@ -66,7 +66,7 @@ const short = (page: Page) =>
 
 // Controls each page must show before it's measured: the small kinds that were under 44px before 14b-10a.
 // A comment's Report and Delete are behind its ⋯ since 14b-13; the ⋯ itself is measured.
-const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /, "Earlier day"], "/friends": ["Remove"], "/groups": ["Create group"] };
+const SHOWN: Record<string, (string | RegExp)[]> = { "/": ["Post", /^Actions for /], "/friends": ["Remove"], "/groups": ["Create group"] };
 
 test("only what can be pressed has a shadow, and every control is 44px tall", async ({ browser }) => {
   // Two players who are friends, share a group, and have both played and commented, so the friends list's Remove, the
@@ -126,7 +126,8 @@ test("only what can be pressed has a shadow, and every control is 44px tall", as
   expect(Math.abs(a.y + a.height - (b.y + b.height))).toBeLessThan(0.5);
 
   // Your own row takes the soft tint: on the leaderboard ("(you)") and in "Where everyone ended" on Friends.
-  await page.setViewportSize(PHONE);
+  // On a tablet's width: phones have no leaderboard card on Today (M16 16f-5, answer 19).
+  await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto("/");
   const soft = await slot(page, "--soft");
   const yours = page.getByRole("region", { name: "Leaderboard" }).getByRole("listitem").filter({ hasText: "(you)" });
@@ -191,10 +192,12 @@ test("the streak pill is round and tinted, and the sizes are the new ones", asyn
   expect(await stats.first().evaluate((el) => getComputedStyle(el).fontSize)).toBe("40px");
   await page.setViewportSize(PHONE);
 
-  // Today: a card's heading.
+  // Today: a card's heading, on a tablet's width, as phones have no leaderboard card (M16 16f-5, answer 19).
+  await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto("/");
   const board = page.getByRole("region", { name: "Leaderboard" });
   expect(await board.getByRole("heading", { name: "Leaderboard" }).evaluate((el) => getComputedStyle(el).fontSize)).toBe("24px");
+  await page.setViewportSize(PHONE);
 
   // Me: the four headline numbers on their card, which is tinted, not each cell (14b-15, answer 3); on a 360px phone
   // "999,999" points fits a cell, and on a desktop the numbers are 40px.

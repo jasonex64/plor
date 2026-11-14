@@ -1,10 +1,10 @@
 // The endless feed's data (docs/milestones/M16-16f-the-shared-pieces.md, 16f-4; the human's answers 9 to 15, 21, 22, 30,
 // 44 and 45): comments and finished runs of both games in one list, newest first, a page at a time from today back
-// through earlier days. Comments are what getFeed lists (the friends thread's and each of the viewer's groups', the
-// reports filter, seesCommentSql); results are the viewer's own finished runs and their friends'. Today's results of a
+// through earlier days. Comments are the friends thread's and each of the viewer's groups' (the reports filter,
+// seesCommentSql), as the old whole-day feed listed them; results are the viewer's own finished runs and their friends'. Today's results of a
 // game the viewer hasn't finished come with the name, the game and the time and nothing of the run, not even a reaction
 // (the board withholds both too, src/friends/board.ts); comments come whole (answer 21); earlier days never blur.
-// Not called by a screen yet: 16f-5 switches Today to this and removes getFeed with its route, /api/feed.
+// Today's feed screen reads it (src/app/feed.tsx).
 import { FEED_PAGE_SIZE } from "@/config/tunables";
 import { blockedSql, circleSql, seesCommentSql } from "@/friends/circle";
 import { ended, type Ended } from "@/friends/board";
@@ -39,8 +39,11 @@ export type FeedResultItem =
 
 export type FeedItem = FeedCommentItem | FeedResultItem;
 
-// next is the cursor for the page after this one, or null when there is none. The client holds it as it is.
-export type FeedPage = { items: FeedItem[]; next: string | null };
+// next is the cursor for the page after this one, or null when there is none. The client holds it as it is. today and
+// finishedToday are the server's day and the games the viewer has finished on it, so the screen knows where the date
+// lines start, which items it may react to, and which games the comment box offers (answers 23 and 49), without
+// guessing from its own clock or from what it has loaded.
+export type FeedPage = { items: FeedItem[]; next: string | null; today: string; finishedToday: BoardGame[] };
 
 // Where a page starts: after the item with this time, kind and tie, in the feed's order. kind and tie are what keep two
 // items with one time apart: a comment is 0 and its tie its ID, a result is 1 and its tie its game, player and day.
@@ -145,6 +148,11 @@ const PAGE_SQL = `
 export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | null): Promise<FeedPage> {
   const { rows: read } = await db.query<Row>(PAGE_SQL, [viewerId, FINISHED, cursor?.at ?? null, cursor?.kind ?? null, cursor?.tie ?? null, FEED_PAGE_SIZE + 1]);
   const rows = read.slice(0, FEED_PAGE_SIZE);
+  const { rows: day } = await db.query<{ today: string; finished: BoardGame[] }>(
+    `select private.today()::text as today,
+            array(select game_id from private.run_status where user_id = $1 and puzzle_date = private.today() and status = any($2::text[]) order by game_id) as finished`,
+    [viewerId, FINISHED],
+  );
   const last = rows.at(-1);
   const next = read.length > FEED_PAGE_SIZE ? encodeCursor({ at: last!.at, kind: last!.kind, tie: last!.tie }) : null;
 
@@ -204,5 +212,5 @@ export async function getFeedPage(db: Db, viewerId: string, cursor: Cursor | nul
     if (r.game === SUBSTRINGS_ID) return { ...result, game: SUBSTRINGS_ID, blurred: false, score: scores.get(`${r.user_id}:${r.date}`)!, reactions: reactionsOf(r) };
     return { ...result, game: GAME_ID, blurred: false, ended: ended(r, caught.get(`${r.user_id}:${r.date}`), names), reactions: reactionsOf(r) };
   });
-  return { items, next };
+  return { items, next, today: day[0].today, finishedToday: day[0].finished };
 }

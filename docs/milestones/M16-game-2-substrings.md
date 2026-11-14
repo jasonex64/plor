@@ -118,6 +118,17 @@ Twelfth round (human, 2026-11-14, before 16f-4's build):
 44. Whose finished runs are feed items: "Friends only (Recommended)". Group members who aren't friends appear only through their comments in that group.
 45. The viewer's own finished runs in their own feed: "Yes, show mine too (Recommended)".
 
+Thirteenth round (human, 2026-11-14, before 16f-5's build):
+46. How an endless list works for a keyboard and a screen reader: "Auto-load, W3C Feed (Recommended)". More items load by themselves on scrolling; the WAI-ARIA APG Feed pattern is added to `docs/SOURCES.md`.
+47. How near the end the next 20 load: "When the last item appears". Loading starts when the final loaded item scrolls onto the screen.
+48. The words on a blurred item: "Play to see". The name and game stand in the line above the button.
+49. The date line between days: "Yesterday, then the date". "Yesterday" for the day before today, then the app's date style ("Thu 12 Nov") for older days; today has no line.
+50. Where a group's Fragments comments show: "One list, tagged by game (Recommended)". The group's page shows both games' comments for the day in one list, each tagged with its game; the box lets the writer pick the game.
+51. Whether a blurred item hides that the friend finished: "Keep name, game, time (Recommended)".
+52. The right column's "Friends feed" on other pages from 1200px, once the old feed is removed: "The same new feed (Recommended)".
+53. Offbeat's own result screen, which used the old feed: "Offbeat's friends thread (Recommended)". Friends' Offbeat comments only, as Fragments' result screen; group comments no longer show there.
+54. Reactions on earlier days' items (the rule D6, today only, against answer 27, "On every item"): "Today only; older show counts (Recommended)".
+
 16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1, 40 to 43 to 16f-2): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions

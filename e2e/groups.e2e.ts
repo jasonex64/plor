@@ -129,19 +129,19 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
 
   const ws = await openLive("/");
   const feed = creator.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("listitem").filter({ hasText: body })).toContainText("Book Club");
+  await expect(feed.getByRole("article").filter({ hasText: body })).toContainText("Book Club");
   // The page loads the feed a few times as it starts (mount, join, the run's state), so one of those could land after
   // the post. Only a request made after the group's nudge arrives shows the nudge reloads the feed.
   let nudged = false;
   ws.on("framereceived", (f) => {
     if (String(f.payload).includes("comments_changed")) nudged = true;
   });
-  const refetch = creator.waitForRequest((r) => nudged && r.url().includes("/api/feed"));
+  const refetch = creator.waitForRequest((r) => nudged && r.url().includes("/api/feed/items"));
   const second = `home too ${RUN}`;
   await thread.getByLabel("Comment", { exact: true }).fill(second);
   await thread.getByRole("button", { name: "Post" }).click();
   await refetch;
-  await expect(feed.getByRole("listitem").filter({ hasText: second })).toContainText("Book Club");
+  await expect(feed.getByRole("article").filter({ hasText: second })).toContainText("Book Club");
 });
 
 // A group's page left open past midnight moves to the new day too (M11 H6): its board and thread start again, and the

@@ -115,7 +115,7 @@ test("your own reaction in the ⋯ menu is filled with the accent", async ({ bro
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto("/");
-    const comment = page.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: "Pressed." });
+    const comment = page.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: "Pressed." });
     await comment.getByRole("button", { name: /^Actions for / }).click();
     const mine = comment.getByRole("button", { name: "😂" });
     await expect(mine).toHaveAttribute("aria-pressed", "true");

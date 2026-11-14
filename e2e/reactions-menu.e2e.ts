@@ -64,8 +64,8 @@ test("reactions sit behind each comment's and run's ⋯, and its popover closes 
 
   await page.goto("/");
   const feed = page.getByRole("region", { name: "Feed" });
-  const theirs = feed.getByRole("listitem").filter({ hasText: "Theirs, first." });
-  const mine = feed.getByRole("listitem").filter({ hasText: "Mine, second." });
+  const theirs = feed.getByRole("article").filter({ hasText: "Theirs, first." });
+  const mine = feed.getByRole("article").filter({ hasText: "Mine, second." });
   await expect(mine).toBeVisible();
 
   // At rest: no emoji button anywhere, and a comment nobody reacted to has nothing under its words.
@@ -127,18 +127,19 @@ test("reactions sit behind each comment's and run's ⋯, and its popover closes 
   await page.getByRole("heading", { name: "Feed" }).click();
   await expect(emojis).toHaveCount(0);
 
-  // Your own comment's ⋯ holds Delete, not Report; opening another ⋯ closes the first. (The one above: an open popover
-  // lies over the row below it.)
+  // Your own comment's ⋯ holds Delete, not Report; opening another ⋯ closes the first. (An open popover lies over the row
+  // below it, and the feed lists newest first, so yours is the row above: the lower ⋯ is opened first.)
   const mineMore = mine.getByRole("button", { name: `Actions for rb${RUN}'s comment` });
   const del = mine.getByRole("button", { name: "Delete", exact: true });
+  await more.click();
+  await expect(emojis).toHaveCount(5);
   await mineMore.click();
   await expect(del).toBeVisible();
   await expect(mine.getByRole("button", { name: "Report", exact: true })).toHaveCount(0);
-  await more.click();
-  await expect(del).toHaveCount(0);
-  await expect(mineMore).toHaveAttribute("aria-expanded", "false");
-  await expect(emojis).toHaveCount(5);
+  await expect(emojis).toHaveCount(0);
+  await expect(more).toHaveAttribute("aria-expanded", "false");
   await page.keyboard.press("Escape");
+  await expect(del).toHaveCount(0);
 
   // A pick reacts, closes the popover back on the ⋯, says so with Undo, and the summary shows it, tinted as yours, in
   // 13px, popping in.

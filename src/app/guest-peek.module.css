@@ -9,7 +9,7 @@
   grid-area: 1 / 1;
 }
 
-/* Shapes, not data: blurred as the feed's filler is before you've played (comments.module.css, .filler: 4px), and not
+/* Shapes, not data: blurred 4px, as the old feed's filler was before you'd played (removed in M16 16f-5), and not
    selectable. Its parts are 10px apart, as a card's are (kit.module.css, .card). */
 .standIn {
   display: flex;

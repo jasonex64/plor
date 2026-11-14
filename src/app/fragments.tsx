@@ -10,6 +10,8 @@ import { Comments } from "./comments";
 import { SideColumn } from "./side-column";
 import { SubstringsScreen } from "./substrings";
 
+const FRAGMENTS_ONLY = [SUBSTRINGS_ID] as const;
+
 export function FragmentsScreen({ username, name }: { username: string; name: string }) {
   const [runOver, setRunOver] = useState(false);
   // While the run is in play the screen holds only the game, as Offbeat's does; the thread stays mounted, hidden, so a
@@ -20,7 +22,7 @@ export function FragmentsScreen({ username, name }: { username: string; name: st
     <>
       <SubstringsScreen onOver={reportOver} onPlaying={setPlaying} />
       <SideColumn label={`${SUBSTRINGS.name} comments`} inPlace hidden={playing}>
-        <Comments username={username} name={name} runOver={runOver} nudge={0} game={SUBSTRINGS_ID} title={`${SUBSTRINGS.name} comments`} />
+        <Comments username={username} name={name} runOver={runOver} nudge={0} games={FRAGMENTS_ONLY} title={`${SUBSTRINGS.name} comments`} />
       </SideColumn>
     </>
   );

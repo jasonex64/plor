@@ -31,7 +31,7 @@ import { AdminArea, type AdminPage } from "./admin/admin-area";
 import { Board } from "./board";
 import { ButtonLink } from "./button-link";
 import { PAYLOAD_VERSION, changesThread, useBoardChannel } from "./board-channel";
-import { Comments } from "./comments";
+import { Feed } from "./feed";
 import { FriendsList } from "./friends-list";
 import { GroupPage } from "./groups";
 import { PlayerPage } from "./player";
@@ -54,7 +54,7 @@ import styles from "./today.module.css";
 import { UndoProvider } from "./undo";
 import { BACK, FORWARD } from "./slide";
 import kit from "./kit.module.css";
-import { GAME, GAME_ID, SUBSTRINGS } from "@/platform/game";
+import { GAME, SUBSTRINGS } from "@/platform/game";
 
 // GET /api/profile: signed out; signed in without a username yet; or signed in with the profile, which the settings
 // sheet shows and Today and Me follow (docs/milestones/M14-14a-3b-settings.md), with the streak, which the shell shows as
@@ -618,14 +618,18 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
       <div className={styles.game}>
         <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} />
       </div>
-      <SideColumn label="Your circle" inPlace className={styles.side}>
-        {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
-        {wide && <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />}
-        <LeaderboardCard key={`card-${day}`} />
-      </SideColumn>
+      {/* The circle is from 768px only: the feed is endless, so on phones the leaderboard card is off Today (M16 16f-5, the
+          human's answer 19). */}
+      {wide && (
+        <SideColumn label="Your circle" inPlace className={styles.side}>
+          {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
+          <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />
+          <LeaderboardCard key={`card-${day}`} />
+        </SideColumn>
+      )}
       <div className={styles.feed}>
         <LiveStatus channel={channel} />
-        <Comments key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} game={GAME_ID} />
+        <Feed key={`feed-${day}`} username={username} name={name} runOver={runOver} nudge={commentsNudge} />
       </div>
     </div>
   );
@@ -633,8 +637,8 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
 
 // The friends feed in the right column of every player page but Today and the game screen, which have their own
 // (docs/milestones/M14-14b-2b-1-shell.md, criterion 2; human, 2026-10-26: "The friends feed everywhere (Recommended)").
-// As on Today: locked until today's run is over (M08 8a), nudged by the board's channel (M08 8d), and started again at
-// midnight Pacific (M11 H6), from the run's state.
+// As on Today: read again from the top when today's run is over, nudged by the board's channel (M08 8d), and started again
+// at midnight Pacific (M11 H6), from the run's state.
 function FriendsFeed({ username, name, timeUps }: { username: string; name: string; timeUps: number }) {
   const [day, setDay] = useState(0);
   const [run, setRun] = useState<{ over: boolean; msToReset: number } | null>(null);
@@ -670,7 +674,7 @@ function FriendsFeed({ username, name, timeUps }: { username: string; name: stri
     <SideColumn label="Friends feed">
       <LiveStatus channel={channel} />
       {error && <p role="alert">{error}</p>}
-      {run && <Comments key={`feed-${day}`} username={username} name={name} runOver={run.over} nudge={nudge} game={GAME_ID} />}
+      {run && <Feed key={`feed-${day}`} username={username} name={name} runOver={run.over} nudge={nudge} />}
     </SideColumn>
   );
 }

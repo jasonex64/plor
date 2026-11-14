@@ -73,7 +73,8 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
 
 // Criterion 3.
 test("one leaderboard card switches between yesterday and this week, for friends or a group", async ({ browser }) => {
-  const page = await player(browser, "tb");
+  // From 768px: phones have no leaderboard card on Today (M16 16f-5, answer 19).
+  const page = await player(browser, "tb", { width: 1024, height: 900 });
   await page.goto("/groups");
   await page.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Owls");
   await page.getByRole("button", { name: "Create group" }).click();
@@ -101,8 +102,9 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await groupYesterday;
 });
 
-// Criterion 4: a friend's comment, before the viewer has played.
-test("before playing, the feed names who commented and holds none of their words", async ({ browser }) => {
+// Criterion 4, as the human's answer 21 changed it (2026-11-13, "The comment shows"): a friend's comment comes whole to a
+// viewer who hasn't played; only a friend's result is blurred (e2e/feed.e2e.ts).
+test("before playing, a friend's comment is in the feed whole, with its game; their result is blurred", async ({ browser }) => {
   const viewer = await player(browser, "tc");
   const friend = await (await browser.newContext({ viewport: PHONE })).newPage();
   await friend.goto("/friends");
@@ -120,17 +122,16 @@ test("before playing, the feed names who commented and holds none of their words
 
   await viewer.goto("/");
   const feed = viewer.getByRole("region", { name: "Feed" });
-  await expect(feed.getByRole("link", { name: "Finish today's game to read 1 comment" })).toHaveAttribute("href", "/play");
-  const item = feed.getByRole("listitem");
+  const item = feed.getByRole("article").filter({ hasText: body });
   await expect(item).toHaveCount(1);
   await expect(item.locator("strong")).toHaveText(`td${RUN}`);
-  // Beside the name, filler hidden from screen readers, which hear "comment hidden until you play" instead.
-  await expect(item.locator("[aria-hidden='true']:not([data-initial])")).toHaveText(/^[x ]+$/);
-  await expect(item).toContainText("comment hidden until you play");
-  // Not in the page at all: the server sends no comment text before the viewer has played (H3).
-  expect(await viewer.content()).not.toContain(body);
-  // The locked feed's names carry the avatar slot (docs/milestones/M14-14a-3a-me.md, criterion 6), and so does the
-  // friend's row on the live board.
+  await expect(item).toContainText(`${GAME.name} · Friends`);
+  // The friend's result of the game the viewer hasn't played is the blurred item: a prompt in place of how it ended.
+  const result = feed.getByRole("article").filter({ has: viewer.getByRole("link", { name: "Play to see", exact: true }) });
+  await expect(result).toHaveCount(1);
+  await expect(result).not.toContainText(body);
+  // The feed's names carry the avatar slot (docs/milestones/M14-14a-3a-me.md, criterion 6), and so does the friend's row
+  // on the live board.
   await expect(item.locator("[data-initial='T']")).toHaveCount(1);
   await viewer.goto("/friends");
   const row = viewer.getByRole("region", { name: "Friends today" }).getByRole("listitem").filter({ hasText: `td${RUN}:` });
@@ -153,8 +154,9 @@ test("Today's columns: the circle on the right from 1200px, stacked below it, an
   expect(side2.y).toBeGreaterThanOrEqual(game2.y + game2.height);
 
   const narrow = await player(browser, "tg", { width: 320, height: 640 });
-  await expect(narrow.getByRole("region", { name: "Leaderboard" })).toBeVisible();
-  // Phones have no live board on Today; it's on the Friends tab.
+  await expect(narrow.getByRole("region", { name: "Feed" })).toBeVisible();
+  // Phones have no leaderboard card on Today (M16 16f-5, answer 19) and no live board; it's on the Friends tab.
+  await expect(narrow.getByRole("region", { name: "Leaderboard" })).toHaveCount(0);
   await expect(narrow.getByRole("region", { name: "Friends today" })).toHaveCount(0);
   expect(await narrow.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

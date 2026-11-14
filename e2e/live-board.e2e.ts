@@ -183,10 +183,10 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   const body = `report me ${RUN}`;
   await player.getByLabel("Comment to your friends").fill(body);
   await player.getByRole("button", { name: "Post" }).click();
-  const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
+  const playerComment = player.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: body });
   await expect(playerComment).toBeVisible();
   await sent(player, "/api/comments");
-  const watcherComment = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: body });
+  const watcherComment = watcher.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: body });
   await expect(watcherComment).toBeVisible();
   await watcherComment.getByRole("button", { name: /^Actions for / }).click();
   await watcherComment.getByRole("button", { name: "😂" }).click();
@@ -196,12 +196,13 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await player.getByLabel("Comment to your friends").fill(kept);
   await player.getByRole("button", { name: "Post" }).click();
   await sent(player, "/api/comments");
-  const watcherKept = watcher.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept });
+  const watcherKept = watcher.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: kept });
   for (const c of [watcherComment, watcherKept]) {
     await c.getByRole("button", { name: /^Actions for / }).click();
     await c.getByRole("button", { name: "Report" }).click();
   }
-  await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
+  await expect(watcherComment).toHaveCount(0);
+  await expect(watcherKept).toHaveCount(0);
   await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-w@example.test`]);
   await watcher.goto("/admin/reports");
   const reported = watcher.getByRole("region", { name: "Reported comments" }).getByRole("listitem").filter({ hasText: body });
@@ -226,9 +227,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(record.getByRole("cell").nth(2)).toHaveText(watcherName);
   await expect(record.getByRole("cell").nth(3)).toHaveText(playerName);
   await expect(playerComment).toHaveCount(0);
-  await expect(player.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: kept })).toBeVisible();
+  await expect(player.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: kept })).toBeVisible();
   await watcher.goto("/");
-  await expect(watcher.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
+  // The kept comment is hidden for the watcher who reported it, and the deleted one is gone: no comment in their feed (their
+  // friend's and their own results are items, so the feed isn't empty).
+  await expect(watcher.getByRole("region", { name: "Feed" }).getByRole("feed")).toBeVisible();
+  await expect(watcher.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: /report me|keep me/ })).toHaveCount(0);
 
   // Every change came over Realtime as a nudge, and no frame either page received holds a comment's text.
   const received = [...framesOf.values()].flat().join("\n");
@@ -284,7 +288,7 @@ test("a reconnect on Today shows the pause in the feed and fetches it again", as
   const paused = page.getByRole("region", { name: "Feed" }).locator("xpath=..").getByText("Live updates paused, reconnecting…");
   await expect(paused).toBeVisible();
   // Waited for only once the channel is down, so the feed's loads as the page starts can't count (the 14b-2c-4 review).
-  const refetch = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/feed");
+  const refetch = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/feed/items");
   await refetch;
   await expect(paused).toBeHidden();
 });
@@ -310,7 +314,7 @@ test("the reset reloads every section of Today", async ({ browser }) => {
   await signInAndPick(page, "m");
   await openBoard(page, "/");
   await expect(page.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
-  const reloads = ["/api/run", "/api/feed", "/api/leaderboard/yesterday"].map((path) =>
+  const reloads = ["/api/run", "/api/feed/items", "/api/leaderboard/yesterday"].map((path) =>
     page.waitForRequest((r) => new URL(r.url()).pathname === path),
   );
   await page.clock.fastForward("25:00:00");

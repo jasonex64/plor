@@ -175,7 +175,7 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   // The player's own comment pops as it's posted, and not again when the server's copy (with Delete) replaces it.
   await page.goto("/");
   const feed = page.getByRole("region", { name: "Feed" });
-  const mine = feed.getByRole("listitem").filter({ hasText: "First, mine." });
+  const mine = feed.getByRole("article").filter({ hasText: "First, mine." });
   await page.getByLabel("Comment to your friends").fill("First, mine.");
   await page.getByRole("button", { name: "Post" }).click();
   await expect(mine).toBeVisible();
@@ -189,14 +189,14 @@ test("a friend's row takes the tint under the pointer, and a reaction you add an
   await friend.getByLabel("Comment to your friends").fill("Then, theirs.");
   await friend.getByRole("button", { name: "Post" }).click();
   await sent(friend, "/api/comments");
-  const theirs = feed.getByRole("listitem").filter({ hasText: "Then, theirs." });
+  const theirs = feed.getByRole("article").filter({ hasText: "Then, theirs." });
   await expect(theirs).toBeVisible();
   expect(await popping(theirs)).toBe(true);
   expect(await popping(mine)).toBe(false);
 
   // A reaction added pops its emoji in, in the comment's summary (14b-13: picked from its ⋯); one already shown when the
   // page loaded doesn't. The friend's 👍 is there first.
-  const friendTheirs = friend.getByRole("region", { name: "Feed" }).getByRole("listitem").filter({ hasText: "Then, theirs." });
+  const friendTheirs = friend.getByRole("region", { name: "Feed" }).getByRole("article").filter({ hasText: "Then, theirs." });
   await friendTheirs.getByRole("button", { name: /^Actions for / }).click();
   await friendTheirs.getByRole("button", { name: "👍" }).click();
   await sent(friend, "/api/reactions");
