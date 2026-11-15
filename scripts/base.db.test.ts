@@ -7,7 +7,7 @@
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { loadFixtureBase, removeFixtureBase } from "../src/test/answer-fixture.ts";
-import { checkWithin, hostedCheck, hostedLoad, inReadOnly } from "./base.ts";
+import { checkWithin, hostedCheck, hostedLoad, inReadOnly, liftStatementTimeout } from "./base.ts";
 
 const url = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const first = new pg.Client({ connectionString: url });
@@ -73,6 +73,23 @@ describe("hosted check and load", () => {
     return rows[0];
   };
   const logged = () => vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+  // The first hosted load stopped at Supabase's two-minute statement limit (57014) on its first set (15e, Evidence).
+  it("lifts the statement time limit for its own session, and no other", async () => {
+    const other = new pg.Client({ connectionString: url });
+    await other.connect();
+    const shown = async (client: pg.Client) => (await client.query<{ statement_timeout: string }>("show statement_timeout")).rows[0].statement_timeout;
+    const before = await shown(other);
+    await second.query("set statement_timeout = '1s'");
+    try {
+      await liftStatementTimeout(second);
+      expect(await shown(second)).toBe("0");
+      expect(await shown(other)).toBe(before);
+    } finally {
+      await second.query("reset statement_timeout");
+      await other.end();
+    }
+  });
 
   it("reads the state in a read-only transaction, so the database itself refuses a write there", async () => {
     await expect(inReadOnly(second, (c) => c.query("delete from private.dictionary_word"))).rejects.toThrow("cannot execute DELETE in a read-only transaction");
