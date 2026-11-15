@@ -1,6 +1,6 @@
 # M15 15e — Loading plor.app's answer lists and dictionary
 
-**Status:** planned. Drafted 2026-11-14 from the human's answers below; **waits for the human's approval** (a security change: CLAUDE.md, Security). Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
+**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1 is being built. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
 
 ## Goal
 The human can load the answer base and game 2's dictionary into plor.app's database from this PC, after seeing what the load would do, so both games can be played there.
