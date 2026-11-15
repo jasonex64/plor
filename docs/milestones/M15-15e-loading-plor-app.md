@@ -114,5 +114,5 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 
 
 ## Review
-- Blocking findings and how each was fixed: 15e-1 (the `reviewer`, 2026-11-14, one pass, by reading, with the unit tests and pg's source): one. A base load that fails part-way was reported as done on the next run ("SKIPPED the base: it is already there"), against the ticket's own rule; `hostedLoad` now refuses any database with a base and says a part-loaded one is incomplete (`hostedRefusal`, five tests), and the DECISIONS row says the same.
+- Blocking findings and how each was fixed: 15e-1 (the `reviewer`, 2026-11-14, one pass, by reading, with the unit tests and pg's source): one. A base load that fails part-way was reported as done on the next run ("SKIPPED the base: it is already there"), against the ticket's own rule; `hostedLoad` now refuses any database with a base and says a part-loaded one is incomplete (`hostedRefusal`, five tests), and the DECISIONS row says the same. The statement-limit fix (the `reviewer`, 2026-11-15, by reading): none; the hosted database's other limits were then read through the connector (`idle_in_transaction_session_timeout`, `idle_session_timeout`, `lock_timeout` and `transaction_timeout` are all 0), the pooler's own limits *unverified*.
 - Deferred to ROADMAP "Next revision": 15e-1: four items (For M15).
