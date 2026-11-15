@@ -38,6 +38,9 @@ async function sessionFor(name: string): Promise<Map<string, string>> {
   return sessions.get(name)!;
 }
 
+// useSession is a test helper, not a React hook; the alias keeps react-hooks/rules-of-hooks from reading it as one in a loop.
+const switchTo = useSession;
+const actAs = async (name: string) => switchTo(await sessionFor(name));
 const unlock = () => getPool().query("update private.round_reject set rejected_at = rejected_at - interval '1 second'");
 const timeOut = async () => {
   await getPool().query("update private.run set started_at = started_at - interval '21 seconds' where game_id = $1", [SUBSTRINGS_ID]);
@@ -258,5 +261,50 @@ describe("a day of game 2", () => {
     expect(b.standing).toEqual({ percent: null, friends: { rank: 2, of: 2 } });
     useSession(await sessionFor("a"));
     expect((await state()).run!.standing).toEqual({ percent: null, friends: { rank: 1, of: 2 } });
+  });
+});
+
+// Criterion 2 (S19: everything but letters is dropped) and the word list staying on the server (criterion 2, and the
+// pgTAP check supabase/tests/game_2_rounds.test.sql that the app's role can't read private.dictionary_word).
+describe("what a try is judged by, and what the client is told", () => {
+  it("judges a try by its letters alone: a digit or an apostrophe inside a word doesn't stop it", async () => {
+    useSession(await sessionFor("d"));
+    await startRun();
+    expect((await sent("aq3kb")).outcome).toBe("accepted");
+  });
+
+  it("sends no word of the list before the run ends but the player's own tries", async () => {
+    const own = ["aqkb", "aqmb"];
+    const replies: string[] = [JSON.stringify(await state())];
+    replies.push(await (await nextRound()).text());
+    replies.push(JSON.stringify(await state()));
+    replies.push(JSON.stringify(await sent("zzzqqqzz")));
+    await unlock();
+    // An apostrophe inside the word, and the round's letters in it: accepted as aqmb.
+    const apostrophe = await sent("aq'mb");
+    expect(apostrophe.outcome).toBe("accepted");
+    replies.push(JSON.stringify(apostrophe), JSON.stringify(await state()));
+    const text = replies.join("\n");
+    expect(text).toContain(`"aqkb"`);
+    for (const word of WORDS.filter((w) => !own.includes(w))) expect(text, word).not.toContain(`"${word}"`);
+  });
+
+  it("shows two players the same letters for every round, and the same bonus letter", async () => {
+    const seen = new Map<string, { letters: string[]; bonus: string | null }>();
+    for (const name of ["e", "f"]) {
+      await actAs(name);
+      const run = ((await (await startRun()).json()) as Body).run!;
+      seen.set(name, { letters: [run.open!.letters], bonus: run.bonusLetter });
+    }
+    for (let i = 1; i < 7; i++) {
+      await timeOut();
+      for (const name of ["e", "f"]) {
+        await actAs(name);
+        seen.get(name)!.letters.push(((await (await nextRound()).json()) as Body).run!.open!.letters);
+      }
+    }
+    expect(seen.get("e")!.letters).toEqual(ROUNDS);
+    expect(seen.get("f")).toEqual(seen.get("e"));
+    expect(seen.get("e")!.bonus).toBe("j");
   });
 });

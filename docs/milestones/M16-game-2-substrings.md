@@ -1,6 +1,6 @@
 # M16 — Game 2: the substring game
 
-**Status:** in progress (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, merged on green CI 2026-11-06, 256,433 words; the split's questions answered and the order approved, "Approve, ask S18"; S18, S20 and S21 settled; 16a-3, possessives out and 160 words back, 254,477 words, done in PR #159; 16c, a day of game 2, done in PRs #160 and #161; 16d, playing it, done in PRs #162 and #163; 16e, points and boards, approved, the score done in PR #164, places and game 2's boards done in PR #165, the overall board approved, game 1's midnight rule done in PR #166, the overall board done in PR #167, so 16e is done; 16g, the look: Midnight Brew chosen in 16g-1 (PR #171) and built into `/play2` in 16g-2 (PRs #173 and #174), `docs/milestones/M16-16g-2-midnight-brew-in-play2.md`; 16g-3, its e2e on CI, done short of its last criterion in PR #176: the tests still need retries, the next fix the human's call), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Approved in its parts; 16f has no ticket yet. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name is Fragments (16f answer 3), and S15 and S17 are settled in 16e, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
+**Status:** built; its closing pull request, from `m16-game-2`, is open and not merged (2026-11-14: the seven criteria below are ticked with their tests, five of them new in that pull request; 16f, `docs/milestones/M16-16f-the-shared-pieces.md`, is done in PRs #205 to #210). Its history: (16a done in PR #155; 16b, `docs/milestones/M16-16b-run-model-and-format.md`, done in PR #157, 2026-11-06; 16a-2, proper spellings, done in PR #158, merged on green CI 2026-11-06, 256,433 words; the split's questions answered and the order approved, "Approve, ask S18"; S18, S20 and S21 settled; 16a-3, possessives out and 160 words back, 254,477 words, done in PR #159; 16c, a day of game 2, done in PRs #160 and #161; 16d, playing it, done in PRs #162 and #163; 16e, points and boards, approved, the score done in PR #164, places and game 2's boards done in PR #165, the overall board approved, game 1's midnight rule done in PR #166, the overall board done in PR #167, so 16e is done; 16g, the look: Midnight Brew chosen in 16g-1 (PR #171) and built into `/play2` in 16g-2 (PRs #173 and #174), `docs/milestones/M16-16g-2-midnight-brew-in-play2.md`; 16g-3, its e2e on CI, done short of its last criterion in PR #176: the tests still need retries, the next fix the human's call), before the closed beta (human, 2026-11-05: "Both in the beta (Recommended)"). Approved in its parts. The human answered S1–S14 on 2026-10-22 and S2's pick on 2026-11-05; S1's ID, S5's fixed 7 and S16 were settled in 16b (2026-11-06) and S19 on 2026-11-05; S1's shown name is Fragments (16f answer 3), and S15 and S17 are settled in 16e, with the audit's seven below. Its non-visual parts can run alongside M14's game design; its shared screens wait for the `/play` build (Answers, below).
 
 **Audit proposals (2026-10-26, not approved):** `docs/audits/2026-10-26-codebase-audit.md`, "M16": the boundary inventory below is stale (7 `GAME_ID` importers listed, 15–16 today, none of `src/app`), plus seven open decisions for the human before 16b.
 
@@ -204,15 +204,15 @@ What a split would touch, read from the code on 2026-10-22 (`main` at `fd134f7`,
 **Still to be built, and so best built with more than one game in mind** (Claude's reading; for the human, with each ticket): M09 points (an overall leaderboard adds up games), M10 groups (their leaderboards), M11 home screen ("the day's games"). None of them should add a game-2 option before game 2 exists ("Build for today", CLAUDE.md). The cheap part is not hard-coding a single game in new code where a `game_id` is already at hand.
 
 ## Acceptance criteria
-Filled in once the open decisions are answered. Draft shape, for the human to change:
-- [ ] The daily substring picker refuses any substring outside its round's S18 word-count band, checked by a test with a substring just outside the band.
-- [ ] A typed word is accepted only if it is in the dictionary, contains the round's substring once everything but letters is dropped (S19) and hasn't been used earlier in the run (S10), judged by the server; the client never receives the word list.
-- [ ] A miss or a timeout scores nothing for that round and the run goes on to the next (S7).
-- [ ] Two players get the same substrings and highlighted letter on the same day (DECISIONS.md, Day boundary).
-- [ ] The score follows S15 and S16, checked by tests on hand-worked runs.
-- [ ] The human approves each day before it goes live (S11).
+Drafted before the open decisions were answered and kept as drafted; ticked at the close (2026-11-14), each with the test that shows it (Evidence, "The close").
+- [x] The daily substring picker refuses any substring outside its round's S18 word-count band, checked by a test with a substring just outside the band. **Done:** `scripts/substrings.test.ts:63`, each of the seven rounds at its band's edges, the numbers read from `SUBSTRING_ROUNDS`. Round 1's band has no upper number (5,000+), so only its lower edge is checked.
+- [x] A typed word is accepted only if it is in the dictionary, contains the round's substring once everything but letters is dropped (S19) and hasn't been used earlier in the run (S10), judged by the server; the client never receives the word list. **Done:** `supabase/tests/game_2_rounds.test.sql` (not a word, needs the letters, accepted, already answered, already used; line 138: the app's role can't read the word list); `src/app/api/substrings/route.db.test.ts:270` (a digit or an apostrophe inside a word is dropped by the server's judge) and `:276` (no word of the list is in any reply before the run ends but the player's own tries). Example words are sent once the run is over, by design (16d).
+- [x] A miss or a timeout scores nothing for that round and the run goes on to the next (S7). **Done:** `supabase/tests/game_2_rounds.test.sql` (time up, no word kept, the run goes on, and ends after round 7's); `src/game/substring-scoring.test.ts` (the run with two misses); `e2e/play2.e2e.ts`, "a whole day".
+- [x] Two players get the same substrings and highlighted letter on the same day (DECISIONS.md, Day boundary). **Done:** `src/app/api/substrings/route.db.test.ts:292`, two players through all seven rounds.
+- [x] The score follows S15 and S16, checked by tests on hand-worked runs. **Done:** `src/game/substring-scoring.test.ts`, "the approved tables" and "the approved worked runs" (16e's Numbers); the bonus letter is one a day (S16) in the day's format (`src/content/substrings.test.ts`).
+- [x] The human approves each day before it goes live (S11). **Done:** `src/app/api/admin/puzzles/substrings/route.db.test.ts:126` (a drafted day reaches no player until it is approved) and its "who may approve"; `supabase/tests/substring_days.test.sql`; `e2e/substring-days.e2e.ts`.
 - [x] Before game 2 goes live, the About page shows UKACD's notice prominently with its text verbatim, and ESDB's notice (SOURCES.md, 16a).
-- [ ] Offbeat plays exactly as before the split: its existing unit, database and e2e tests pass unchanged.
+- [x] Offbeat plays exactly as before the split: its existing unit, database and e2e tests pass unchanged. **Done:** at the close the whole unit, database and pgTAP suites pass, with `e2e/offbeat.e2e.ts`, `play.e2e.ts` and `approve-and-play.e2e.ts`. Not "unchanged" to the letter: each step that changed one of Offbeat's tests says which and why in its own ticket (protocol 7 to 9 added `game` to its requests; 16f-5 and 16f-6's Evidence).
 
 ## Out of scope
 - Games 3 to 6 (ROADMAP, Later). The word chain needs a different list of two-word phrases.
@@ -229,8 +229,8 @@ Filled in once the open decisions are answered. Draft shape, for the human to ch
 | Days before a substring returns | Picking substrings | 30 (human, 2026-11-06, S18: "30 days (Recommended)") |
 | Everyday words a substring must have | Difficulty | 5 (human, 2026-11-06, S21: "At least 5 (Recommended)") |
 | A common word's SCOWL size | Difficulty | 35 or less (human, 2026-11-06, S21: "Everyday, 40,000 words" as the option, "Yes, use that") |
-| Points per letter, letter-variety bonus, highlighted-letter bonus | Scoring | S15, open |
-| Minimum players before a percentile is shown | Comparing games | S17, open |
+| Points per letter, letter-variety bonus, highlighted-letter bonus | Scoring | S15, settled in 16e: `docs/milestones/M16-16e-points-and-boards.md`, Numbers |
+| Minimum players before a percentile is shown | Comparing games | 10 (human, 16e answer 16; `M16-16e-points-and-boards.md`, Numbers) |
 
 ## Plan
 Draft sub-tickets, for the human to reorder once the open decisions are answered.
@@ -248,7 +248,7 @@ After M14's `/play` build merges (shared screens):
 6. **16g, the game's look,** as M14 14c did for game 1: a low-poly 3D look, not Moonbrew (16g-1 answer 1). **16g-1,** two playable mocks, Midnight Brew and Bug's-Eye Garden, built and published, waits on the human's pick (`docs/milestones/M16-16g-1-low-poly-mocks.md`); then **16g-2** builds the pick into `/play2`. Both done (PRs #171, #173, #174); the human picked Midnight Brew. **16g-3** works on the village's e2e on CI (`docs/milestones/M16-16g-3-village-e2e-on-ci.md`): merged with half size, still needing retries (answer 8).
 
 ## Removes
-Nothing yet: this is a draft ticket with no code. The split (16b) is where something gets removed, such as the single `GAME_ID` constant as the only game.
+Listed per step, in each sub-ticket and pull request. The closing pull request removes nothing: it adds tests and fills in this ticket.
 
 ---
 *Fill in the sections below at the end.*
@@ -256,11 +256,22 @@ Nothing yet: this is a draft ticket with no code. The split (16b) is where somet
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Each sub-ticket's source | As built | Each sub-ticket has its own Source diff (16a to 16g-3); this table holds only what belongs to the whole |
+| S18: every round has a word-count band | Round 1's band is 5,000 and up, with no upper number | The human's bands (Numbers: "5,000+") |
+| Criterion: Offbeat's existing tests pass unchanged | Its tests pass; some had `game` added to their requests, and a few expectations followed approved changes | Protocols 7 to 9 (DECISIONS, 2026-11-07 to 2026-11-14); each change is named in its step's Evidence |
+| Criterion 2: "the client never receives the word list" | Up to three example words for each round are sent once the run is over | 16d, by the human's answers there; nothing of the list is sent while a run can still score |
+| 16g-3: the village's e2e pass on CI without retries | Still needing retries when merged (PR #176) | The human: "Merge #176 now, decide later"; moot since 14c-9 removed the village and its e2e (16g-3's Status) |
 
 ## Evidence
+
+**The close (2026-11-14).** A search of the tests against the seven criteria found four only partly shown; five tests were added, with no change to the app or to any existing assertion, and each passed on its first full run (they show what was already built, so none failed first): `scripts/substrings.test.ts:63` (the bands of all seven rounds; before, round 7's alone); `src/app/api/substrings/route.db.test.ts:270` (punctuation through the server's judge), `:276` (no word of the list before the run ends) and `:292` (two players, the same letters and bonus letter); `src/app/api/admin/puzzles/substrings/route.db.test.ts:126` (a drafted day reaches no player until approved).
+- After, each command alone: `npm test`: 67 files, 777 passed. The whole `npm run test:db`: 63 files, 485 passed. `npx supabase test db`: 40 files, 805 tests, PASS (run before a last lint-only edit to two test files; no SQL changed after it). `npx tsc --noEmit` and `npm run lint`: clean.
+- e2e, one file at a time on the local stack: `play2` 9 passed, `substring-days` 1, `offbeat` 5, `play` 6, `approve-and-play` 2.
+- In the two db test files `useSession`, a test helper, is called through a local alias inside a loop, because the lint rule for React hooks reads its name as a hook; a comment says so at each.
+- **Not verified:** the hosted database (the human's pushes: "database is pushed", "should be up to date"); a whole Fragments day played by hand on plor.app; the items under ROADMAP, Next revision, For M16.
 
 **16h, the dictionary's licence notices on About (2026-11-11).** The notices come from `data/licences/english-speller-database-Copyright.txt` (the file at the commit SOURCES.md pins) through `src/app/about/licence.ts`; About shows the top notice (file lines 1-22) and UKACD's (lines 58-69) in `<pre>` under "Dictionary credits". Included by the file's own applicability notes (lines 33-34: "a generated word list larger than 80, the copyright after '=== UKACD' applies") and `DICTIONARY_MAX_SIZE = 85` (`src/config/tunables.ts:167`); the top notice is the licence's main one (lines 26-28). Left out, a question for the human: **AU** (lines 30-31, applies to "a wordlist that uses the 'D' SPELLING code and/or the 'AU' REGION code"): `scripts/dictionary.ts:51,68` reads the D code as a main spelling, so whether it covers game 2's list is not plain; **WordNet** (lines 36-39) is for distributing the database or results that are not a speller dictionary or generated word list, and game 2's is a generated word list, so it does not apply. The check, `src/app/about/licence.test.ts`, renders About and compares its two `<pre>` blocks with the file's lines cut by number: red before the page had them (`expected [] to deeply equal [ ... ]`, 1 failed), green after (`Tests 1 passed (1)`). `npx tsc --noEmit -p .` reports only the four stale `.next` generated-type errors that are there without this change too (none in `src`); `npm run lint` clean. An assertion was added to the About test in `e2e/themes.e2e.ts`; the e2e suite was not run. The `<pre>` blocks are unstyled (no new styling) and may scroll sideways on a phone: unverified.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: each step's review is in its own ticket. The close: the `reviewer`, 2026-11-14, one pass, by reading each cited test against its criterion, with `tsc` and the picker's unit tests; it ran no database or browser test: none.
+- Deferred to ROADMAP "Next revision": each step's items are under For M16. The close: three items (For M16).

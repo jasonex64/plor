@@ -11,6 +11,8 @@ import { getPool } from "@/lib/db";
 import { SUBSTRINGS_ID } from "@/platform/game";
 import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
+import { GET as playerState } from "../../../substrings/route";
+import { POST as startRun } from "../../../substrings/start/route";
 import { GET } from "../route";
 import { POST as approve } from "./route";
 
@@ -116,6 +118,34 @@ describe("approving a game 2 day", () => {
     } finally {
       await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, today]);
       rmSync(written.pop()!);
+      rmSync(written.pop()!);
+    }
+  });
+
+  // Criterion 6: a day only drafted isn't served; approving it is what serves it.
+  it("serves a drafted day to no player until it's approved", async () => {
+    const db = getPool();
+    const today = (await db.query<{ d: string }>("select private.today()::text as d")).rows[0].d;
+    const player = await sessionFor("player");
+    await db.query("insert into private.profile (user_id, username) select id, $2 from auth.users where email = $1 on conflict do nothing", [`${RUN}-player@example.test`, `player${RUN}`]);
+    // useSession is a test helper, not a React hook; the alias keeps react-hooks/rules-of-hooks from reading it as one here.
+    const switchTo = useSession;
+    const asPlayer = async () => {
+      switchTo(player);
+      const state = await playerState(apiRequest("/api/substrings", { method: "GET" }));
+      const started = await startRun(apiRequest("/api/substrings/start", { method: "POST" }));
+      return { run: (await state.json()).run, started: { status: started.status, error: (await started.json()).error } };
+    };
+    draft(dayOn(today));
+    try {
+      expect(await asPlayer()).toEqual({ run: null, started: { status: 404, error: "no_puzzle_today" } });
+      useSession(await sessionFor("admin"));
+      expect((await (await approveDay({ date: today })).json()).ok).toBe(true);
+      const served = await asPlayer();
+      expect(served.run).toMatchObject({ date: today, status: "not_started", total: 7 });
+    } finally {
+      await db.query("delete from private.run where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, today]);
+      await db.query("delete from private.puzzle where game_id = $1 and puzzle_date = $2::date", [SUBSTRINGS_ID, today]);
       rmSync(written.pop()!);
     }
   });
