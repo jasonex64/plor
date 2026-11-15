@@ -1,6 +1,6 @@
 # M15 15e — Loading plor.app's answer lists and dictionary
 
-**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1's code is merged (PR #213, merge commit `9c8606e`, 2026-11-14, on nine green checks, by the human's "Merge when green"); **its last two criteria are the human's run on plor.app, not done.** 15e-2 is not drafted. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
+**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1's code is merged (PR #213, merge commit `9c8606e`, 2026-11-14, on nine green checks, by the human's "Merge when green"); **its last two criteria are the human's run on plor.app: the first run loaded the dictionary and stopped at Supabase's statement time limit before any of the base (2026-11-15); the fix, on answer 10, is in the next pull request from the branch.** 15e-2 is not drafted. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
 
 ## Goal
 The human can load the answer base and game 2's dictionary into plor.app's database from this PC, after seeing what the load would do, so both games can be played there.
@@ -26,6 +26,8 @@ The human can load the answer base and game 2's dictionary into plor.app's datab
 7. A load while someone is mid-game: "Warn me, I decide (Recommended)".
 8. The raw downloads' durable copy: "Leave on this PC for the beta (Recommended)".
 9. The old uncommitted work in the M15 checkout (a `ship` command, `git.deploymentEnabled` off, edits in 7 files): "Discard them". Done 2026-11-14; the untracked ticket `M15-15d-ship-on-your-word.md` was not named in the question and is still there, for the human.
+10. The first hosted load stopped at Supabase's two-minute limit on one statement (2026-11-15). How the loader gets past it: "Lift the limit for the loader only (Recommended)" (the other options: a longer limit of the human's choosing; sending the lists in smaller pieces).
+11. The Supabase connector (2026-11-14): "Full access"; list loads: "No, keep loads by hand" (DECISIONS, 2026-11-14; CLAUDE.md, Security).
 
 ## Assumptions (say if any is wrong)
 - plor.app's database holds no answer base and no dictionary today (*unverified*: no agent can read it; the dry run shows it).
@@ -68,8 +70,9 @@ The human can load the answer base and game 2's dictionary into plor.app's datab
 | 500 MB | The free plan's database | SOURCES.md, Supabase pricing (accessed 2026-10-24) |
 | About 380 MB | The lists' size, for the question only | 337 MB (M13 13e-11, Evidence) + 42 MB (`private.dictionary_word`, measured locally 2026-11-14); the real number is what `hosted check` and the load report |
 | 5000 | Dictionary rows per insert | Already in `scripts/base.ts` (`loadDictionary`); unchanged |
+| 0 (no limit) | `statement_timeout` for the hosted load's own session | Human, 2026-11-15, answer 10; the limit it lifts, 120000 ms, was read from the hosted database (`pg_settings`) on 2026-11-15 |
 
-No new number. No timeout, retry or size threshold is added; if the build needs one, it stops and asks.
+One new number, answer 10's. No retry or size threshold is added; if the build needs one, it stops and asks.
 
 ## Plan
 1. The target check and the hidden prompt, with their unit tests → verify: `npm test -- scripts/` fails first, then passes.
@@ -90,6 +93,7 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The ticket: "No timeout, retry or size threshold is added" | The hosted load lifts `statement_timeout` for its own session | The first hosted load stopped at Supabase's two-minute limit; the human chose it (answer 10) |
 | The ticket: "If the check finds a base already there, `hosted load` refuses" | As written, after a first build that did otherwise: it loaded each part only where empty and skipped a base already there, on the main session's own instruction to the builder | The reviewer's blocking finding: a base left part-loaded by a failed run would have been skipped and looked finished. Fixed before the first commit |
 | The ticket: the base, then the dictionary ("`load all`'s steps and the dictionary's") | The dictionary first, then the base | The dictionary is replaced in one transaction, so a failed run can be run again while no base is there; a failure during the base leaves a base, which the next run refuses loudly |
 | The ticket: `hosted load` "refuses a database that already has a base" | The refusal comes after the host name is typed | So a wrong name is always the first thing refused, and both refusals can be tested on the local stack; nothing is written either way |
@@ -105,6 +109,8 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 - CI's `db` check failed once on the pull request: three of the four hosted db tests leaned on this PC's loaded base, and CI's database is empty ("expected … to match /BASE: there, \d+ things/"; "data/snapshots/dictionary/2026-11-07.json is missing"). The tests now load and remove the fixture base themselves; tests only. Then nine green checks.
 - **Not verified, and only the human's run can:** a load into an empty database (the local stack is shared and was not wiped; it runs the `loadAll` and `loadDictionary` the local commands use); the certificate check against the real Supabase; the hidden prompt and the second, visible prompt in a real PowerShell window; how long the load takes over the network; the size on plor.app.
 - **The first look at the hosted database (2026-11-14, by Claude through the Supabase connector, read-only; the human connected it and approved the rule, DECISIONS, 2026-11-14):** one project, `plor-staging`, in us-east-1. Size 18 MB; 0 things, 0 categories, 0 dictionary words; 0 runs in progress; 7 players; 0 puzzles. So the load meets an empty base, and about 380 MB more would bring it to about 400 MB of the free plan's 500 MB. **Migrations: 13 of the repo's 14 are applied; `20261114230701_fragments_live_board` (16f-6's) is not**, so the human's "should be up to date" did not hold for it, and Fragments' board on plor.app does not move live until it is pushed.
+- **The human's first runs (2026-11-15, their PowerShell, `C:/Users/jason/RIFF`; from their screenshots and Claude's reads through the connector).** The hidden prompt worked in a real terminal. A transaction-mode string was refused: "hosted load failed: refusing port 6543, the transaction-mode pooler…", nothing written. With the session-mode string the check printed, the host name was typed (`aws-0-us-east-1.pooler.supabase.com`, the second prompt worked), and `LOADED dictionary: 259968 spellings`. Then: **"hosted load failed: canceling statement due to statement timeout (57014)"** during the base. After it: 259,968 dictionary words, 0 things, 0 categories, no load open, 98 MB (44 MB before the base began; the rest is the cancelled set's space, which Postgres reuses). The session's `statement_timeout` was 120000 ms. So nothing was part-loaded, and the loader would run again.
+- **The fix (answer 10):** `liftStatementTimeout` sets `statement_timeout = 0` on the load's own connection, after the host name is typed and before the first write. Failed first: "TypeError: liftStatementTimeout is not a function"; then the hosted db describe 5 of 5 (it shows the session's limit is 0 and another connection's is unchanged), `scripts/hosted.test.ts` 20 passed, lint clean.
 
 
 ## Review

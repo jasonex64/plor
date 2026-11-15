@@ -1215,6 +1215,13 @@ export async function hostedCheck(client: pg.Client, host: string): Promise<Host
   return state;
 }
 
+// Supabase stops any statement after two minutes, and a set's import over the network takes longer: the first hosted
+// load stopped there (57014; 15e, Evidence). Lifted for the load's own session only, on the human's answer (15e, answer
+// 10: "Lift the limit for the loader only (Recommended)"); a stuck load is stopped with Ctrl-C.
+export async function liftStatementTimeout(client: pg.Client): Promise<void> {
+  await client.query("set statement_timeout = 0");
+}
+
 // Why a load is refused, or null when it may go ahead (M15 15e-1: "refuses a database that already has a base"). Any thing
 // or category counts as a base, so a load that stopped part-way (each set commits on its own) is refused, never read as done.
 export function hostedRefusal(host: string, state: Pick<HostedState, "things" | "categories">): string | null {
@@ -1235,6 +1242,7 @@ export async function hostedLoad(client: pg.Client, host: string, ask: (question
   const typed = await ask(`To load into this database, type its host name (${host}), or just press Enter to stop: `);
   if (typed !== host) throw new Error(`what you typed isn't ${host}; nothing was written`);
   if (refusal) throw new Error(refusal);
+  await liftStatementTimeout(client);
   await loadDictionary(client, words);
   console.log(`LOADED dictionary: ${words.length} spellings`);
   await loadAll(client);
