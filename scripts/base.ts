@@ -8,16 +8,27 @@
 // - review: what the human reviews for an import or a batch of categories (human, 2026-10-24: "Summary + flags
 //   (Recommended)", "Batches with flags (Recommended)"): each category's count, 20 random members, and flags.
 // The local stack only (human, 2026-10-24: "Local only (Recommended)"): load and review refuse any other database.
-// Game 2's dictionary is fetched the same way, `npm run base -- fetch dictionary` (M16 16a), and nothing loads it yet.
+// Game 2's dictionary is fetched the same way, `npm run base -- fetch dictionary` (M16 16a), and `load dictionary` loads it (16d).
+// The hosted database (plor.app) is reached only by two commands, run by hand in a real terminal such as PowerShell
+// (M15 15e-1; DECISIONS.md, Log, 2026-11-14), never by `load`:
+// - `npm run base -- hosted check`: asks for the database's session-mode connection string at a hidden prompt (kept in
+//   memory only: never in a file, the environment or the output), then reads inside a read-only transaction and prints the
+//   host, the size, whether a base and a dictionary are there, the runs in progress, and what a load would bring. Writes nothing.
+// - `npm run base -- hosted load`: the same check, then asks you to type the host name it showed (anything else stops with
+//   nothing written), then loads the dictionary and then the base (as `load all`), and prints the new size. A database
+//   with any base already there (a thing or a category) is refused: updating a live base is 15e-2, and a load that stopped
+//   part-way leaves one, so ask before doing anything else.
+// Both verify the database's certificate against supabase/certs/prod-ca-2021.crt; there is no way to turn that off.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createInterface } from "node:readline/promises";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import pluralize from "pluralize";
-import { isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
+import { type DbConnection, isLocalHost, readDatabaseUrl } from "../src/config/env.ts";
 import { BASE_BATCH_IDS, BASE_PLACES_MIN_POPULATION, BASE_REVIEW_SAMPLE, BASE_VIDEO_GAME_MIN_SITELINKS, CATEGORY_MIN_MEMBERS } from "../src/config/tunables.ts";
 import { parseBank, type Bank } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, filterOf, isSubset, parseCategories, type BaseCategory, type CategoryDef } from "../src/content/categories.ts";
@@ -1077,6 +1088,188 @@ export async function localClient(): Promise<pg.Client> {
   return client;
 }
 
+// --- the hosted database (M15 15e-1; DECISIONS.md, Log, 2026-11-14) ---
+
+// The transaction-mode pooler's port (DECISIONS.md, Database access from route handlers). The load's lock lives on its
+// session (ROADMAP, "The load's gaps for hosted loads"), which that mode doesn't keep.
+const TRANSACTION_POOLER_PORT = 6543;
+// The CA the app verifies Supabase's certificate with (DECISIONS.md, Database TLS).
+const HOSTED_CA_FILE = join("supabase", "certs", "prod-ca-2021.crt");
+
+// The typed connection string, parsed as the app parses DATABASE_URL (any query parameter refused). Its messages never
+// echo the string.
+export function hostedTarget(raw: string): DbConnection {
+  const database = readDatabaseUrl({ DATABASE_URL: raw });
+  if (isLocalHost(database.host)) {
+    throw new Error(`refusing ${database.host}: hosted check and hosted load are for a hosted database; the local stack takes load all and load dictionary`);
+  }
+  if (database.port === TRANSACTION_POOLER_PORT) {
+    throw new Error(`refusing port ${TRANSACTION_POOLER_PORT}, the transaction-mode pooler: the load needs the session-mode connection string (its lock lives on the session)`);
+  }
+  return database;
+}
+
+// pg's fields and the CA, nothing else: no URL and no option, so the certificate is always verified (pg's default once
+// `ca` is given, as in src/lib/db.ts poolConfig).
+export function hostedConfig(database: DbConnection): pg.ClientConfig {
+  return { ...database, ssl: { ca: readFileSync(HOSTED_CA_FILE, "utf8") } };
+}
+
+// A line typed with nothing echoed: Node's own stdin in raw mode. Only a real terminal: there is no fallback to visible
+// input or to an environment variable, so the string can't land in a file, a pipe or a log.
+export function readHidden(
+  question: string,
+  input: NodeJS.ReadableStream & { isTTY?: boolean; setRawMode?: (on: boolean) => unknown } = process.stdin,
+  output: { write: (text: string) => unknown } = process.stdout,
+): Promise<string> {
+  if (!input.isTTY || !input.setRawMode) {
+    return Promise.reject(new Error("this command asks for the connection string at a hidden prompt, which needs a real terminal: run it in PowerShell (or another terminal), not through a pipe, a redirect or a tool"));
+  }
+  const setRawMode = input.setRawMode.bind(input);
+  return new Promise((resolve, reject) => {
+    let typed: string[] = [];
+    const finish = (settle: () => void) => {
+      input.removeListener("data", onData);
+      setRawMode(false);
+      (input as { pause?: () => unknown }).pause?.();
+      output.write("\n");
+      settle();
+    };
+    function onData(chunk: Buffer | string): void {
+      for (const ch of String(chunk)) {
+        if (ch === "\r" || ch === "\n") return finish(() => resolve(typed.join("").trim()));
+        if (ch === "\u0003") return finish(() => reject(new Error("cancelled")));
+        if (ch === "\u007f" || ch === "\b") typed = typed.slice(0, -1);
+        else typed.push(ch);
+      }
+    }
+    output.write(question);
+    setRawMode(true);
+    input.setEncoding("utf8");
+    input.on("data", onData);
+    input.resume();
+  });
+}
+
+// What a failed hosted run may print: the error with the whole string and the password (as typed and decoded) replaced,
+// because pg and URL errors can echo their input. The only place errors are rewritten, at the boundary.
+export function hostedFailure(err: unknown, raw: string): string {
+  const typedPassword = /^[a-z]+:\/\/[^:/@]*:(.*)@/i.exec(raw)?.[1];
+  const secrets = [raw];
+  if (typedPassword) {
+    secrets.push(typedPassword);
+    // A password that isn't valid percent-encoding is already in the list as typed.
+    try { secrets.push(decodeURIComponent(typedPassword)); } catch { /* as typed, above */ }
+  }
+  let text = failureText(err);
+  for (const secret of secrets.filter(Boolean)) text = text.replaceAll(secret, "[hidden]");
+  return text;
+}
+
+function failureText(err: unknown): string {
+  if (err instanceof AggregateError) return [err.message, ...err.errors.map(failureText)].filter(Boolean).join("; ") || err.name;
+  if (err instanceof Error) {
+    const code = (err as { code?: string }).code;
+    return code && !err.message.includes(code) ? `${err.message} (${code})` : err.message;
+  }
+  return String(err);
+}
+
+// The database refuses a write inside it, whatever the work does.
+export async function inReadOnly<T>(client: pg.Client, work: (client: pg.Client) => Promise<T>): Promise<T> {
+  await client.query("begin read only");
+  try {
+    return await work(client);
+  } finally {
+    await client.query("rollback");
+  }
+}
+
+export type HostedState = { database: string; size: string; things: number; categories: number; words: number; running: number };
+
+// A base is "there" when it has things or categories (a half-done load leaves one of them). Runs in progress are what
+// private.run_status says now: every run whose status is in_progress (not finished, its clock not run out), not only today's.
+export async function readHostedState(client: pg.Client): Promise<HostedState> {
+  return inReadOnly(client, async (c) => {
+    const { rows } = await c.query<HostedState>(`select current_database() as database, pg_size_pretty(pg_database_size(current_database())) as size,
+      (select count(*) from private.thing)::int as things, (select count(*) from private.category)::int as categories,
+      (select count(*) from private.dictionary_word)::int as words,
+      (select count(*) from private.run_status where status = 'in_progress')::int as running`);
+    return rows[0];
+  });
+}
+
+const readManifest = (set: string) => JSON.parse(readFileSync(manifestPath(set), "utf8")) as Manifest;
+
+// The dry run: what is there, and what a load would bring (each set's items from its committed manifest). Writes nothing.
+export async function hostedCheck(client: pg.Client, host: string): Promise<HostedState> {
+  const state = await readHostedState(client);
+  console.log(`HOST ${host}, database ${state.database}`);
+  console.log(`SIZE ${state.size} now`);
+  console.log(`BASE: ${state.things || state.categories ? `there, ${state.things} things and ${state.categories} categories` : "none yet (0 things, 0 categories)"}`);
+  console.log(`DICTIONARY: ${state.words ? `there, ${state.words} words` : "none yet (0 words)"}`);
+  console.log(`RUNS IN PROGRESS: ${state.running}${state.running ? " (players are mid-game now)" : ""}`);
+  console.log("A LOAD WOULD BRING:");
+  for (const set of Object.keys(SETS)) console.log(`  ${set}: ${readManifest(set).items} items`);
+  console.log(`  ${DICTIONARY_SET}: ${readManifest(DICTIONARY_SET).items} words`);
+  return state;
+}
+
+// Why a load is refused, or null when it may go ahead (M15 15e-1: "refuses a database that already has a base"). Any thing
+// or category counts as a base, so a load that stopped part-way (each set commits on its own) is refused, never read as done.
+export function hostedRefusal(host: string, state: Pick<HostedState, "things" | "categories">): string | null {
+  if (state.things === 0 && state.categories === 0) return null;
+  return `${host} already has a base (${state.things} things, ${state.categories} categories): 15e-1 loads an empty database only. If a load stopped part-way, the base is incomplete: stop and ask before doing anything else; nothing was written`;
+}
+
+// The load into a database with no base (15e-1): the check, the snapshots read and verified, the host's name typed, and
+// only then the writes: the dictionary first (replaced in one transaction, so a re-run after a failure is safe while no base
+// is there), then the base. A failure after the dictionary leaves a part-loaded base, which the next run refuses.
+// The refusal comes after the name, so a wrong name is always the first thing refused.
+export async function hostedLoad(client: pg.Client, host: string, ask: (question: string) => Promise<string>): Promise<void> {
+  const state = await hostedCheck(client, host);
+  const refusal = hostedRefusal(host, state);
+  // Everything the load reads is read and checked before anything is written.
+  const words = refusal ? [] : readSnapshot<DictionaryEntry>(DICTIONARY_SET).items;
+  if (!refusal) for (const set of Object.keys(SETS)) readSnapshot(set);
+  const typed = await ask(`To load into this database, type its host name (${host}), or just press Enter to stop: `);
+  if (typed !== host) throw new Error(`what you typed isn't ${host}; nothing was written`);
+  if (refusal) throw new Error(refusal);
+  await loadDictionary(client, words);
+  console.log(`LOADED dictionary: ${words.length} spellings`);
+  await loadAll(client);
+  const { rows } = await client.query<{ size: string }>("select pg_size_pretty(pg_database_size(current_database())) as size");
+  console.log(`DATABASE ${rows[0].size} now`);
+}
+
+async function hostedMain(what: "check" | "load"): Promise<void> {
+  let raw = "";
+  try {
+    raw = await readHidden("Database connection string (session mode; nothing you type shows): ");
+    const target = hostedTarget(raw);
+    const client = new pg.Client(hostedConfig(target));
+    await client.connect();
+    try {
+      if (what === "check") await hostedCheck(client, target.host);
+      else {
+        await hostedLoad(client, target.host, async (question) => {
+          const lines = createInterface({ input: process.stdin, output: process.stdout });
+          try {
+            return (await lines.question(question)).trim();
+          } finally {
+            lines.close();
+          }
+        });
+      }
+    } finally {
+      await client.end();
+    }
+  } catch (err) {
+    console.error(`hosted ${what} failed: ${hostedFailure(err, raw)}`);
+    process.exitCode = 1;
+  }
+}
+
 // Game 2's word list, replaced in one transaction, so a day never sees half of it, and a failed load leaves the old list
 // (M16 16d; ROADMAP, For M16). The days use whatever is loaded (16b, answer 11).
 export async function loadDictionary(client: pg.Client, items: DictionaryEntry[]): Promise<void> {
@@ -1836,23 +2029,29 @@ async function reviewOne(client: pg.Client, key: string, doubles: Doubles): Prom
   console.log(`  flag, a P460 pair or fork a bank answer names: ${pairs.length}${pairs.length ? ` (${pairs.map(([kind, p]) => `${kind} ${p.join(" / ")}`).join("; ")})` : ""}`);
 }
 
+// `load all`'s steps on one connection: the local stack's, or (hostedLoad) the hosted database's.
+async function loadAll(client: pg.Client): Promise<void> {
+  await beginLoad(client);
+  for (const [set, def] of Object.entries(SETS)) await loadSet(client, set, def);
+  const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
+  if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
+  const unusedRows = unusedListedRows(readHandFiles().listed, readHandFiles().names.rename, listedRowsUsed);
+  if (unusedRows.renames.length) throw new Error(`${NAMES_FILE}: ${unusedRows.renames.join(", ")} did nothing in any set (the list emptied the item)`);
+  if (unusedRows.guards.length) console.log(`${LISTED_FILE}: ${unusedRows.guards.length} drop_listed_names rows hold no listed name today (guards against a re-fetch): ${unusedRows.guards.map((k) => k.slice("drop_listed_names ".length)).join(", ")}`);
+  await loadLinks(client);
+  await defineCategories(client);
+  await finishLoad(client);
+  await analyzeBase(client);
+}
+
 async function main(): Promise<void> {
   const [command, name, ...more] = process.argv.slice(2);
   if (command === "review" && name) return review([name, ...more]);
+  if (command === "hosted" && (name === "check" || name === "load")) return hostedMain(name);
   if (command === "load" && name === "all") {
     const client = await localClient();
     try {
-      await beginLoad(client);
-      for (const [set, def] of Object.entries(SETS)) await loadSet(client, set, def);
-      const unused = unusedHandNames(readHandFiles().names, handNamesUsed);
-      if (unused.length) throw new Error(`${NAMES_FILE}: ${unused.join(", ")} did nothing in any set (the item already had the name, or lacked the one removed)`);
-      const unusedRows = unusedListedRows(readHandFiles().listed, readHandFiles().names.rename, listedRowsUsed);
-      if (unusedRows.renames.length) throw new Error(`${NAMES_FILE}: ${unusedRows.renames.join(", ")} did nothing in any set (the list emptied the item)`);
-      if (unusedRows.guards.length) console.log(`${LISTED_FILE}: ${unusedRows.guards.length} drop_listed_names rows hold no listed name today (guards against a re-fetch): ${unusedRows.guards.map((k) => k.slice("drop_listed_names ".length)).join(", ")}`);
-      await loadLinks(client);
-      await defineCategories(client);
-      await finishLoad(client);
-      return await analyzeBase(client);
+      return await loadAll(client);
     } finally {
       await client.end();
     }
@@ -1872,7 +2071,7 @@ async function main(): Promise<void> {
   }
   const def = name ? SETS[name] : undefined;
   if ((command !== "fetch" && command !== "load") || !def) {
-    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${DICTIONARY_SET}\n       npm run base -- review <category key>…`);
+    console.error(`usage: npm run base -- fetch|load <${Object.keys(SETS).join("|")}>\n       npm run base -- fetch ${MARKS_SET}|${DICTIONARY_SET}\n       npm run base -- load all|${DICTIONARY_SET}\n       npm run base -- hosted check|load\n       npm run base -- review <category key>…`);
     process.exit(2);
   }
   if (command === "fetch") return fetchSet(name, def);

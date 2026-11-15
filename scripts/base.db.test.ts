@@ -5,9 +5,9 @@
 // test:db`); supabase/tests/load_sync.test.sql covers the rest in one session. Each load_begin runs in a transaction
 // rolled back, so the base keeps what it had; the lock, a session's, outlives the rollback.
 import pg from "pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { loadFixtureBase } from "../src/test/answer-fixture.ts";
-import { checkWithin } from "./base.ts";
+import { checkWithin, hostedCheck, hostedLoad, inReadOnly } from "./base.ts";
 
 const url = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const first = new pg.Client({ connectionString: url });
@@ -57,5 +57,73 @@ describe("checkWithin", () => {
     } finally {
       await second.query("rollback");
     }
+  });
+});
+
+// The hosted loader's database steps (M15 15e-1), run against the local stack through a local client: the functions take
+// a pg client, as `load all` does, so nothing here is mocked. The local stack holds a base and a dictionary and must keep
+// them, so "an empty database loads" is not tested here (the human's hosted run covers it, with the same functions).
+describe("hosted check and load", () => {
+  const counts = async (client: pg.Client) => {
+    const { rows } = await client.query<Record<string, string>>(`select
+      (select count(*) from private.thing)::text as thing, (select count(*) from private.thing_alias)::text as alias,
+      (select count(*) from private.thing_source)::text as source, (select count(*) from private.fact)::text as fact,
+      (select count(*) from private.number_fact)::text as number_fact, (select count(*) from private.category)::text as category,
+      (select count(*) from private.dictionary_word)::text as word`);
+    return rows[0];
+  };
+  const logged = () => vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+  it("reads the state in a read-only transaction, so the database itself refuses a write there", async () => {
+    await expect(inReadOnly(second, (c) => c.query("delete from private.dictionary_word"))).rejects.toThrow("cannot execute DELETE in a read-only transaction");
+    const { rows } = await second.query("select 1");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("the check writes nothing and reports the local stack's size, base, dictionary and runs in progress", async () => {
+    const sent: string[] = [];
+    const spy = new Proxy(second, {
+      get: (target, key) => key === "query"
+        ? (...args: [string]) => { sent.push(args[0]); return (target.query as (...a: unknown[]) => unknown)(...args); }
+        : (target as never)[key],
+    });
+    const before = await counts(second);
+    const log = logged();
+    let printed = "";
+    try {
+      await hostedCheck(spy, "127.0.0.1");
+      printed = log.mock.calls.map((c) => c[0]).join("\n");
+    } finally {
+      log.mockRestore();
+    }
+    expect(await counts(second)).toEqual(before);
+    expect(sent[0]).toBe("begin read only");
+    expect(sent.at(-1)).toBe("rollback");
+    expect(printed).toContain("HOST 127.0.0.1, database postgres");
+    expect(printed).toMatch(/BASE: there, \d+ things/);
+    expect(printed).toMatch(/DICTIONARY: there, \d+ words/);
+    expect(printed).toMatch(/RUNS IN PROGRESS: \d+/);
+  });
+
+  it("a typed name that isn't the host's writes nothing and says so", async () => {
+    const before = await counts(second);
+    const log = logged();
+    try {
+      await expect(hostedLoad(second, "127.0.0.1", async () => "localhost")).rejects.toThrow(/what you typed isn't 127\.0\.0\.1.*nothing was written/);
+    } finally {
+      log.mockRestore();
+    }
+    expect(await counts(second)).toEqual(before);
+  });
+
+  it("with a base already there, refuses even the right name, says 15e-1 loads an empty database only, and writes nothing", async () => {
+    const before = await counts(second);
+    const log = logged();
+    try {
+      await expect(hostedLoad(second, "127.0.0.1", async () => "127.0.0.1")).rejects.toThrow(/already has a base \(\d+ things, \d+ categories\).*15e-1 loads an empty database only.*nothing was written/);
+    } finally {
+      log.mockRestore();
+    }
+    expect(await counts(second)).toEqual(before);
   });
 });

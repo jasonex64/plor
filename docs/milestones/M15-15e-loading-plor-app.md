@@ -1,6 +1,6 @@
 # M15 15e — Loading plor.app's answer lists and dictionary
 
-**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1 is being built. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
+**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1's code is built and reviewed, in the pull request from `m15-launch-readiness`; **its last two criteria are the human's run on plor.app, not done.** 15e-2 is not drafted. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
 
 ## Goal
 The human can load the answer base and game 2's dictionary into plor.app's database from this PC, after seeing what the load would do, so both games can be played there.
@@ -45,12 +45,12 @@ The human can load the answer base and game 2's dictionary into plor.app's datab
 
 ## Acceptance criteria and plan
 **15e-1 — the guarded loader and the first load.** One pull request from `m15-launch-readiness`. Tests first.
-- [ ] `load all` and `load dictionary` still refuse a hosted host, and `hosted` refuses a local one → verify: unit tests of the target check, failing first.
-- [ ] The connection string never leaves memory → verify: a unit test that the prompt echoes nothing and that no error or output of a failed run (bad string, refused host, failed TLS) contains the password or the whole string; gitleaks in CI.
-- [ ] A hosted connection without a verified certificate is impossible → verify: a unit test of the connection's config (the CA set, no way to turn checking off).
-- [ ] `hosted check` writes nothing → verify: a db test on the local stack (the check's code with the host rule stubbed at the boundary, not the SQL), comparing the base's tables before and after.
-- [ ] `hosted load` stops with nothing written unless the typed name matches, and refuses a database that already has a base → verify: db tests on the local stack, the same way.
-- [ ] The README of the commands (the header of `scripts/base.ts`) says how to run a hosted load, and loses its stale "nothing loads it yet" line → verify: by reading.
+- [x] `load all` and `load dictionary` still refuse a hosted host, and `hosted` refuses a local one → verify: unit tests of the target check, failing first. **Done:** `scripts/base.test.ts`, "localClient > refuses a database that isn't this machine" (there before; the guard is untouched); `scripts/hosted.test.ts`, `hostedTarget` (127.0.0.1, localhost, [::1] and port 6543 refused).
+- [x] The connection string never leaves memory → verify: a unit test that the prompt echoes nothing and that no error or output of a failed run (bad string, refused host, failed TLS) contains the password or the whole string; gitleaks in CI. **Done:** `scripts/hosted.test.ts`, `readHidden` (echoes nothing; a non-terminal refused, no fallback) and `hostedFailure` (no message holds the string, the typed password or the decoded one, a real failed connection to `db.example.test` included). The reviewer read every path that prints.
+- [x] A hosted connection without a verified certificate is impossible → verify: a unit test of the connection's config (the CA set, no way to turn checking off). **Done:** `scripts/hosted.test.ts`, `hostedConfig` (the fields and `ssl: { ca }`, one argument). The reviewer read pg 8.23.1: with `ca` alone the certificate and the host name are both checked, and no `PGSSL*` variable is read.
+- [x] `hosted check` writes nothing → verify: a db test on the local stack (the check's code with the host rule stubbed at the boundary, not the SQL), comparing the base's tables before and after. **Done:** `scripts/base.db.test.ts`, "hosted check and load": the six base tables' and the dictionary's counts are the same after, its first statement is `begin read only`, and a DELETE inside is refused by the database ("cannot execute DELETE in a read-only transaction").
+- [x] `hosted load` stops with nothing written unless the typed name matches, and refuses a database that already has a base → verify: db tests on the local stack, the same way. **Done:** the same describe (a wrong name writes nothing; with a base there the right name is refused and nothing is written) and `hostedRefusal`'s five cases in `scripts/hosted.test.ts`.
+- [x] The README of the commands (the header of `scripts/base.ts`) says how to run a hosted load, and loses its stale "nothing loads it yet" line → verify: by reading. **Done:** `scripts/base.ts`, the header.
 - [ ] **The human's run:** `hosted check` on plor.app, the size reported; the human decides free or Pro from the number (answer 3); then `hosted load`; then `hosted check` again shows the base and dictionary with the manifests' counts → evidence: the human's pasted output (it holds no secret by the criterion above).
 - [ ] On plor.app afterwards: an Offbeat day can be approved and a Fragments try is judged against the dictionary → evidence: the human's word, or `scripts/status` plus a played day.
 
@@ -90,9 +90,21 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| The ticket: "If the check finds a base already there, `hosted load` refuses" | As written, after a first build that did otherwise: it loaded each part only where empty and skipped a base already there, on the main session's own instruction to the builder | The reviewer's blocking finding: a base left part-loaded by a failed run would have been skipped and looked finished. Fixed before the first commit |
+| The ticket: the base, then the dictionary ("`load all`'s steps and the dictionary's") | The dictionary first, then the base | The dictionary is replaced in one transaction, so a failed run can be run again while no base is there; a failure during the base leaves a base, which the next run refuses loudly |
+| The ticket: `hosted load` "refuses a database that already has a base" | The refusal comes after the host name is typed | So a wrong name is always the first thing refused, and both refusals can be tested on the local stack; nothing is written either way |
+| DECISIONS, 2026-10-26: the hosted load "connects as `postgres`" | The role is whatever the pasted string names; nothing checks it | The human pastes the string; no rule for it was asked for (ROADMAP, Next revision) |
+| Answer 7: "Warn me, I decide" on games in progress | The count is every run `private.run_status` calls in progress, not today's alone | A run can be finished the next day (DECISIONS, Timer), and a run never finished reads in progress for good (ROADMAP, For M16), so the number can overstate |
 
 ## Evidence
+**15e-1's code (2026-11-14).** No hosted database was touched: the builder and the reviewer had no credentials and made no connection but to the local stack and to `db.example.test` (a name that doesn't resolve).
+- Failed first: `scripts/hosted.test.ts`, 12 of 16 ("TypeError: hostedTarget is not a function"; the four that passed need no new code); the db describe "hosted check and load", 4 of 4 (its imports were missing); after the review, `hostedRefusal`'s five cases ("TypeError: hostedRefusal is not a function").
+- After: `npm test`: 68 files, 797 passed. `npm run test:db -- -t "hosted check and load"`: 4 passed; the whole `npm run test:db`, run before the review's fix: 63 files, 489 passed (CI runs it again). `npm run lint`: clean. `npx tsc --noEmit`: nothing in `scripts/`; this checkout lacks Next's generated types, so it reports `PageProps`, `LayoutProps` and `RouteContext` in `src/app`, untouched by this step (CI's check is the evidence).
+- `npm run base -- hosted check < /dev/null` exits 1 with "this command asks for the connection string at a hidden prompt, which needs a real terminal…"; `hosted load` the same.
+- No e2e: no screen changed.
+- **Not verified, and only the human's run can:** a load into an empty database (the local stack is shared and was not wiped; it runs the `loadAll` and `loadDictionary` the local commands use); the certificate check against the real Supabase; the hidden prompt and the second, visible prompt in a real PowerShell window; how long the load takes over the network; the size on plor.app.
+
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: 15e-1 (the `reviewer`, 2026-11-14, one pass, by reading, with the unit tests and pg's source): one. A base load that fails part-way was reported as done on the next run ("SKIPPED the base: it is already there"), against the ticket's own rule; `hostedLoad` now refuses any database with a base and says a part-loaded one is incomplete (`hostedRefusal`, five tests), and the DECISIONS row says the same.
+- Deferred to ROADMAP "Next revision": 15e-1: four items (For M15).
