@@ -1,6 +1,6 @@
 # M15 15e — Loading plor.app's answer lists and dictionary
 
-**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1's code is built and reviewed, in the pull request from `m15-launch-readiness`; **its last two criteria are the human's run on plor.app, not done.** 15e-2 is not drafted. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
+**Status:** in progress. Drafted 2026-11-14 from the human's answers below; **approved by the human (2026-11-14: "Approve 15e")**, the design included (a security change: CLAUDE.md, Security). 15e-1's code is merged (PR #213, merge commit `9c8606e`, 2026-11-14, on nine green checks, by the human's "Merge when green"); **its last two criteria are the human's run on plor.app, not done.** 15e-2 is not drafted. Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
 
 ## Goal
 The human can load the answer base and game 2's dictionary into plor.app's database from this PC, after seeing what the load would do, so both games can be played there.
@@ -102,6 +102,7 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 - After: `npm test`: 68 files, 797 passed. `npm run test:db -- -t "hosted check and load"`: 4 passed; the whole `npm run test:db`, run before the review's fix: 63 files, 489 passed (CI runs it again). `npm run lint`: clean. `npx tsc --noEmit`: nothing in `scripts/`; this checkout lacks Next's generated types, so it reports `PageProps`, `LayoutProps` and `RouteContext` in `src/app`, untouched by this step (CI's check is the evidence).
 - `npm run base -- hosted check < /dev/null` exits 1 with "this command asks for the connection string at a hidden prompt, which needs a real terminal…"; `hosted load` the same.
 - No e2e: no screen changed.
+- CI's `db` check failed once on the pull request: three of the four hosted db tests leaned on this PC's loaded base, and CI's database is empty ("expected … to match /BASE: there, \d+ things/"; "data/snapshots/dictionary/2026-11-07.json is missing"). The tests now load and remove the fixture base themselves; tests only. Then nine green checks.
 - **Not verified, and only the human's run can:** a load into an empty database (the local stack is shared and was not wiped; it runs the `loadAll` and `loadDictionary` the local commands use); the certificate check against the real Supabase; the hidden prompt and the second, visible prompt in a real PowerShell window; how long the load takes over the network; the size on plor.app.
 
 
