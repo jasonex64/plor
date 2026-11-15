@@ -1,6 +1,7 @@
 // The drafting script's pure parts (scripts/draft.ts): the letter picker, which tries schedule A's slots in a
 // date-seeded order and skips what doesn't fit (the database checks it runs per choice are the caller's: here fits is
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
+import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
 import { blockRange, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
@@ -175,5 +176,15 @@ describe("isDayFailure", () => {
     expect(isDayFailure(new Error("no letters fit schedule A for 2027-01-03"))).toBe(true);
     expect(isDayFailure(Object.assign(new Error("read ECONNRESET"), { code: "ECONNRESET" }))).toBe(false);
     expect(isDayFailure(new Error("Connection terminated unexpectedly"))).toBe(false);
+  });
+});
+
+// `npm run draft` runs under plain Node, which resolves no "@/" alias: one in a module the script imports stopped every
+// draft from M14 14c-6b-1 until the beta's first batch (2026-11-15). Vitest resolves the alias, so only a real run shows it.
+describe("the script under plain Node", () => {
+  it("loads its imports and prints its usage", () => {
+    const run = spawnSync(process.execPath, ["scripts/draft.ts"], { encoding: "utf8" });
+    expect(run.stderr).not.toContain("ERR_MODULE_NOT_FOUND");
+    expect(run.stderr).toContain("usage: npm run draft");
   });
 });

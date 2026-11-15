@@ -11,7 +11,7 @@ import {
   RARITY_MIN_PLAYERS,
   RARITY_ZERO_SHARE,
 } from "../config/tunables.ts";
-import { tierOf, type ApprovedPuzzle, type ApprovedQuestion } from "@/content/puzzle";
+import { tierOf, type ApprovedPuzzle, type ApprovedQuestion } from "../content/puzzle.ts";
 
 // inDay: given before the run's day ended at midnight; later answers earn no bonus (D8).
 export type ScoredEvent = { index: number; entryId: string; matched: boolean; inDay: boolean };
