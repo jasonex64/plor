@@ -6,7 +6,7 @@
 // rolled back, so the base keeps what it had; the lock, a session's, outlives the rollback.
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { loadFixtureBase } from "../src/test/answer-fixture.ts";
+import { loadFixtureBase, removeFixtureBase } from "../src/test/answer-fixture.ts";
 import { checkWithin, hostedCheck, hostedLoad, inReadOnly } from "./base.ts";
 
 const url = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
@@ -100,30 +100,39 @@ describe("hosted check and load", () => {
     expect(sent[0]).toBe("begin read only");
     expect(sent.at(-1)).toBe("rollback");
     expect(printed).toContain("HOST 127.0.0.1, database postgres");
-    expect(printed).toMatch(/BASE: there, \d+ things/);
-    expect(printed).toMatch(/DICTIONARY: there, \d+ words/);
-    expect(printed).toMatch(/RUNS IN PROGRESS: \d+/);
+    // Whatever the database holds: the printed lines agree with counts the test reads itself.
+    const { thing: things, category, word } = before;
+    expect(printed).toContain(Number(things) || Number(category) ? `BASE: there, ${things} things and ${category} categories` : "BASE: none yet (0 things, 0 categories)");
+    expect(printed).toContain(Number(word) ? `DICTIONARY: there, ${word} words` : "DICTIONARY: none yet (0 words)");
+    const { rows } = await second.query<{ n: number }>("select count(*)::int as n from private.run_status where status = 'in_progress'");
+    expect(printed).toContain(`RUNS IN PROGRESS: ${rows[0].n}`);
   });
 
+  // A base present for the two tests below: the fixture, committed (the check opens its own transaction) and removed
+  // after, so they pass on an empty database (CI) and on a loaded one, leaving each as found.
   it("a typed name that isn't the host's writes nothing and says so", async () => {
-    const before = await counts(second);
     const log = logged();
     try {
+      await loadFixtureBase(second);
+      const before = await counts(second);
       await expect(hostedLoad(second, "127.0.0.1", async () => "localhost")).rejects.toThrow(/what you typed isn't 127\.0\.0\.1.*nothing was written/);
+      expect(await counts(second)).toEqual(before);
     } finally {
       log.mockRestore();
+      await removeFixtureBase(second);
     }
-    expect(await counts(second)).toEqual(before);
   });
 
   it("with a base already there, refuses even the right name, says 15e-1 loads an empty database only, and writes nothing", async () => {
-    const before = await counts(second);
     const log = logged();
     try {
+      await loadFixtureBase(second);
+      const before = await counts(second);
       await expect(hostedLoad(second, "127.0.0.1", async () => "127.0.0.1")).rejects.toThrow(/already has a base \(\d+ things, \d+ categories\).*15e-1 loads an empty database only.*nothing was written/);
+      expect(await counts(second)).toEqual(before);
     } finally {
       log.mockRestore();
+      await removeFixtureBase(second);
     }
-    expect(await counts(second)).toEqual(before);
   });
 });
