@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "game_id": "substrings",
+  "date": "2026-11-30",
+  "rounds": [
+    "ia",
+    "ub",
+    "lie",
+    "clo",
+    "umm",
+    "utc",
+    "alg"
+  ],
+  "bonus_letter": "q"
+}

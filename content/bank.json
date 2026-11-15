@@ -4468,29 +4468,6 @@
       "added_by": "claude"
     },
     {
-      "id": "name-a-gun",
-      "prompt": "Name a kind of gun",
-      "category": "gun",
-      "host_bank": [
-        "rifle",
-        "pistol",
-        "shotgun",
-        "revolver",
-        "machine gun",
-        "musket"
-      ],
-      "uncommon": [
-        "blunderbuss",
-        "derringer",
-        "carbine",
-        "flintlock",
-        "Gatling gun",
-        "Tommy gun"
-      ],
-      "themes": [],
-      "added_by": "claude"
-    },
-    {
       "id": "name-a-social-science",
       "prompt": "Name a social science",
       "category": "social_science",

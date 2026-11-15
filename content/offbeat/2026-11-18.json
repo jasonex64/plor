@@ -1,0 +1,216 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-11-18",
+  "questions": [
+    {
+      "prompt": "Name a bone",
+      "category": "bone",
+      "host_bank": [
+        "b8ea55f9-70bb-528c-af6f-be45b5354393",
+        "0123c203-8821-5cc5-aa7f-b7816555b293",
+        "290b78fc-6f60-52d4-bba9-7dedf00abd39",
+        "e847142e-ce2a-5cc8-9177-71b34469efef",
+        "49644b39-733a-5877-b48d-cbe7f3ece829",
+        "2f258ff6-77d9-5dae-9cb6-40bc20e8c886"
+      ],
+      "host_answers": [
+        "49644b39-733a-5877-b48d-cbe7f3ece829"
+      ],
+      "levels": {
+        "63a66258-c632-59ee-aa18-8e8dbb40cdea": "uncommon",
+        "289fb172-6bd3-5b99-9833-4c6bdfaccec4": "uncommon",
+        "1cf9a783-1b46-555a-a384-703fa1159979": "uncommon",
+        "fa804d94-eace-50a0-ade8-399629fa147f": "uncommon",
+        "07341548-c533-557b-9d46-b7c94ed83d0b": "uncommon",
+        "904d0639-5b58-58a0-9faa-3de9536037b8": "uncommon",
+        "b8ea55f9-70bb-528c-af6f-be45b5354393": "common",
+        "0123c203-8821-5cc5-aa7f-b7816555b293": "common",
+        "290b78fc-6f60-52d4-bba9-7dedf00abd39": "common",
+        "e847142e-ce2a-5cc8-9177-71b34469efef": "common",
+        "49644b39-733a-5877-b48d-cbe7f3ece829": "common",
+        "2f258ff6-77d9-5dae-9cb6-40bc20e8c886": "common"
+      }
+    },
+    {
+      "prompt": "Name a bird",
+      "category": "bird",
+      "host_bank": [
+        "99e3102b-d9bf-59b5-8d51-62b977ffdf7c",
+        "d1ca667e-6a7f-5060-8a21-53b6903c4c9f",
+        "ed32a34f-abad-5bb6-897b-a9155d23b707",
+        "1fed325b-0002-54a9-8d71-dc276a079f39",
+        "e71d817d-e7b5-5414-b1dd-c7311a67318f",
+        "4fc1c21e-b77d-5688-96fb-b92b62499d90"
+      ],
+      "host_answers": [
+        "ed32a34f-abad-5bb6-897b-a9155d23b707"
+      ],
+      "levels": {
+        "b3420887-2086-5d74-ab4e-c26eca929220": "uncommon",
+        "4dbd6ec9-0942-5b0d-b271-eab3b0ab4c2b": "uncommon",
+        "2dfa05cc-8d6f-5979-bc8e-8e3ddce145a3": "uncommon",
+        "2ac8884f-1c30-5e46-89c4-1288725609d9": "uncommon",
+        "35ec79d4-b0c6-58a2-9d33-35f6f1834c35": "uncommon",
+        "99e3102b-d9bf-59b5-8d51-62b977ffdf7c": "common",
+        "d1ca667e-6a7f-5060-8a21-53b6903c4c9f": "common",
+        "ed32a34f-abad-5bb6-897b-a9155d23b707": "common",
+        "1fed325b-0002-54a9-8d71-dc276a079f39": "common",
+        "e71d817d-e7b5-5414-b1dd-c7311a67318f": "common",
+        "4fc1c21e-b77d-5688-96fb-b92b62499d90": "common"
+      },
+      "steals": "u"
+    },
+    {
+      "prompt": "Name a fish",
+      "category": "fish",
+      "host_bank": [
+        "312729a6-cbf1-5d91-afab-5a10de3b7a1d",
+        "9dfb39cf-5967-50ab-b813-ef346904adcf",
+        "dd86f527-ac23-5475-85ef-101a5a73fad4",
+        "e31e8a04-40a6-5e94-9ee8-4017e6fa6d1f",
+        "081a7b11-28d2-57d5-aa87-ce4bc6c472d2",
+        "63e38ba9-66b4-56c6-8d81-6b719198e7b4"
+      ],
+      "host_answers": [
+        "e31e8a04-40a6-5e94-9ee8-4017e6fa6d1f"
+      ],
+      "levels": {
+        "1645ff3d-b171-552b-95e3-39a8f524f59f": "uncommon",
+        "85804525-0d65-542c-b6ca-1c773cc03129": "uncommon",
+        "04aadcc8-cc82-5897-95e3-49988b4bd35f": "uncommon",
+        "370e220b-2ea5-5dfb-b379-f6d48c44dfd1": "uncommon",
+        "682b0c2e-9e6b-5563-9f05-b0389d545862": "uncommon",
+        "312729a6-cbf1-5d91-afab-5a10de3b7a1d": "common",
+        "9dfb39cf-5967-50ab-b813-ef346904adcf": "common",
+        "dd86f527-ac23-5475-85ef-101a5a73fad4": "common",
+        "e31e8a04-40a6-5e94-9ee8-4017e6fa6d1f": "common",
+        "081a7b11-28d2-57d5-aa87-ce4bc6c472d2": "common",
+        "63e38ba9-66b4-56c6-8d81-6b719198e7b4": "common"
+      }
+    },
+    {
+      "prompt": "Name a coin",
+      "category": "coin",
+      "host_bank": [
+        "92b9da2b-333c-5fc6-b1fb-d231d11bf071",
+        "8bd73b44-9865-542b-9277-40026bdffa12",
+        "2b683adf-ce44-5952-92e8-89531f3a2779",
+        "132c6a5d-6902-54d4-94bb-e5df31991612",
+        "48a95e01-30b0-50fe-b76c-4a48aeab25bb",
+        "021abac0-efe3-5152-9f74-decda7fc2d51"
+      ],
+      "host_answers": [
+        "92b9da2b-333c-5fc6-b1fb-d231d11bf071"
+      ],
+      "levels": {
+        "af88e482-1b19-581f-b40b-934934f123c9": "uncommon",
+        "14fb8d56-39ab-5e23-849e-f6a0abe563b5": "uncommon",
+        "ddc40d2b-3f2b-58ba-acb6-fb9a232dcd71": "uncommon",
+        "ad3a089c-79f4-52ec-97f1-92e009b98925": "uncommon",
+        "6238c9d6-e673-5ecf-98a9-a2b7b4bc2679": "uncommon",
+        "617c0f98-7240-58a0-8efa-095622081fda": "uncommon",
+        "92b9da2b-333c-5fc6-b1fb-d231d11bf071": "common",
+        "8bd73b44-9865-542b-9277-40026bdffa12": "common",
+        "2b683adf-ce44-5952-92e8-89531f3a2779": "common",
+        "132c6a5d-6902-54d4-94bb-e5df31991612": "common",
+        "48a95e01-30b0-50fe-b76c-4a48aeab25bb": "common",
+        "021abac0-efe3-5152-9f74-decda7fc2d51": "common"
+      },
+      "steals": "g"
+    },
+    {
+      "prompt": "Name a coat or jacket",
+      "category": "coat",
+      "host_bank": [
+        "fe7e0c11-8f82-580b-9583-a7618e718214",
+        "27b3662d-006c-5958-8242-f22f8903922c",
+        "9b6b26f1-b4d2-5fd6-a542-a45b4ee5f13e",
+        "674f0de8-b2a8-5f96-8985-993ade556680",
+        "8fc4f4b9-8b96-5323-806d-65048756aa6a",
+        "d2da670a-73ea-57c6-b80a-b3ce65f649c7"
+      ],
+      "host_answers": [
+        "fe7e0c11-8f82-580b-9583-a7618e718214",
+        "d2da670a-73ea-57c6-b80a-b3ce65f649c7"
+      ],
+      "levels": {
+        "23196f68-28f3-58be-8a9e-2e5f66e5c499": "uncommon",
+        "7fd8295a-386a-5bb4-97dc-89a85c5b89f9": "uncommon",
+        "5f0e2655-9204-56ef-bbe2-411487b82652": "uncommon",
+        "ab147c5d-c74b-585c-8143-9017799a5e1e": "uncommon",
+        "3615a800-22ed-5365-9fa0-e503b0228a3d": "uncommon",
+        "fdb810de-4686-55f9-8aa2-83286e59663f": "uncommon",
+        "fe7e0c11-8f82-580b-9583-a7618e718214": "common",
+        "27b3662d-006c-5958-8242-f22f8903922c": "common",
+        "9b6b26f1-b4d2-5fd6-a542-a45b4ee5f13e": "common",
+        "674f0de8-b2a8-5f96-8985-993ade556680": "common",
+        "8fc4f4b9-8b96-5323-806d-65048756aa6a": "common",
+        "d2da670a-73ea-57c6-b80a-b3ce65f649c7": "common"
+      },
+      "steals": "l"
+    },
+    {
+      "prompt": "Name a kind of book",
+      "category": "book",
+      "host_bank": [
+        "4a53bb64-1ce4-5ab0-b3a6-66257ecbd41d",
+        "1504806f-8442-59b1-8d51-31c84bd7996d",
+        "49760724-9d1a-524f-91be-e87cd772b4f3",
+        "6c0c4247-4e3f-53b2-9c06-d21697ed50c6",
+        "17043c38-37e7-5907-89d7-69b1a1534bd3",
+        "6dfec0f5-0b9a-5331-a13a-0176072c6b2e"
+      ],
+      "host_answers": [
+        "4a53bb64-1ce4-5ab0-b3a6-66257ecbd41d",
+        "49760724-9d1a-524f-91be-e87cd772b4f3"
+      ],
+      "levels": {
+        "5fb356dd-f5f9-5193-a689-42e2c7331114": "uncommon",
+        "eb677611-f156-572b-bf13-1723d977f493": "uncommon",
+        "a792267d-de8c-53b4-b8d6-dde1527f7cae": "uncommon",
+        "f79d169c-ce80-5e1c-846f-43cab1c28c42": "uncommon",
+        "3443f33f-1112-53a5-ae82-71d7db411da8": "uncommon",
+        "ce674784-dda1-5b9b-8602-1310ecdd3a30": "uncommon",
+        "4a53bb64-1ce4-5ab0-b3a6-66257ecbd41d": "common",
+        "1504806f-8442-59b1-8d51-31c84bd7996d": "common",
+        "49760724-9d1a-524f-91be-e87cd772b4f3": "common",
+        "6c0c4247-4e3f-53b2-9c06-d21697ed50c6": "common",
+        "17043c38-37e7-5907-89d7-69b1a1534bd3": "common",
+        "6dfec0f5-0b9a-5331-a13a-0176072c6b2e": "common"
+      }
+    },
+    {
+      "prompt": "Name a kind of door",
+      "category": "door",
+      "host_bank": [
+        "e6bd9bbc-a310-5f1d-a4bc-9e2032a1d17c",
+        "9bcd319c-06ae-5743-9171-2e7b0ad947f8",
+        "26ff6ebc-764a-5284-89a3-d6f412411640",
+        "3e15b8a4-4853-5604-bbce-53bd8c0ef732",
+        "1ca3f34d-13f8-5752-9158-48efb0f7670f",
+        "4be06eb2-a925-5efe-99ef-b8628a1f5e4d"
+      ],
+      "host_answers": [
+        "e6bd9bbc-a310-5f1d-a4bc-9e2032a1d17c",
+        "1ca3f34d-13f8-5752-9158-48efb0f7670f",
+        "3e15b8a4-4853-5604-bbce-53bd8c0ef732"
+      ],
+      "levels": {
+        "9c240ce1-89cf-58c9-a866-8e2ee302f1e7": "uncommon",
+        "a8c614a7-49bd-53df-835d-40185c2f8953": "uncommon",
+        "b61071cc-44d2-5595-889d-bd271a8d5916": "uncommon",
+        "416317ae-2dfb-5071-b54a-ee5421dd5c73": "uncommon",
+        "1014856c-7e44-5226-b7c8-cff66d982a5f": "uncommon",
+        "50639cf5-40d5-5512-a43a-9890754d0387": "uncommon",
+        "e6bd9bbc-a310-5f1d-a4bc-9e2032a1d17c": "common",
+        "9bcd319c-06ae-5743-9171-2e7b0ad947f8": "common",
+        "26ff6ebc-764a-5284-89a3-d6f412411640": "common",
+        "3e15b8a4-4853-5604-bbce-53bd8c0ef732": "common",
+        "1ca3f34d-13f8-5752-9158-48efb0f7670f": "common",
+        "4be06eb2-a925-5efe-99ef-b8628a1f5e4d": "common"
+      },
+      "steals": "i"
+    }
+  ]
+}
