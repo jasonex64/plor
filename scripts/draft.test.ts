@@ -4,7 +4,7 @@
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
+import { blockRange, draftArgs, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -168,6 +168,31 @@ describe("the soft guide", () => {
       "  q7: expected catch 10% (target 20%)",
       "  expected finish 48% (the targets': 45%)",
     ]);
+  });
+});
+
+describe("draftArgs", () => {
+  it("reads a date alone as it did before --not", () => {
+    expect(draftArgs(["2026-11-20"])).toEqual({ date: "2026-11-20", ids: undefined, not: [] });
+    expect(draftArgs(["2026-11-20", "--questions", "a,b"])).toEqual({ date: "2026-11-20", ids: ["a", "b"], not: [] });
+    expect(draftArgs(["simulate"])).toEqual({ date: "simulate", ids: undefined, not: [] });
+  });
+
+  it("reads --not as a list of IDs", () => {
+    expect(draftArgs(["2026-11-20", "--not", "a,b"])).toEqual({ date: "2026-11-20", ids: undefined, not: ["a", "b"] });
+  });
+
+  it("refuses --not naming a question that --questions names, saying which", () => {
+    expect(() => draftArgs(["2026-11-20", "--questions", "a,b", "--not", "b,c"])).toThrow('--not and --questions both name "b"');
+  });
+
+  it("returns null for usage it doesn't take", () => {
+    expect(draftArgs([])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--not"])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--questions"])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--bogus", "x"])).toBeNull();
+    expect(draftArgs(["not-a-date"])).toBeNull();
+    expect(draftArgs(["simulate", "--not", "a"])).toBeNull();
   });
 });
 

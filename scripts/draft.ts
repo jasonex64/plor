@@ -1,7 +1,8 @@
 // Drafting a day from the question bank and the answer database (DECISIONS.md, Puzzle drafting; M13 13a–13d):
-// `npm run draft -- <date> [--questions <id>,…]`, `npm run draft -- simulate` and `npm run draft -- check-bank` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
+// `npm run draft -- <date> [--questions <id>,…] [--not <id>,…]`, `npm run draft -- simulate` and `npm run draft -- check-bank` (below). It picks the day's 7 questions from content/bank.json (src/content/bank.ts:
 // the 30-day gap per category, the date's theme first, never used or least recently used first), or takes the 7 named
-// ones in that order; orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
+// ones in that order (`--not` leaves the named questions out of the pick, the human's veto of a drafted question that
+// stays in the bank); orders picked ones easiest first, moving a question that blocks the letters earlier (13e-3); turns each name into the category's thing (or takes
 // "#<thing id>" for one a name can't single out); picks the letters the Wind steals (schedule A) and, for each choice,
 // draws each question's host answers at random among its bank answers the host can still say past the letters stolen
 // so far (13c; letters first, 13e-2), so 3 familiar answers stay typeable and safe; checks the day; writes
@@ -13,10 +14,11 @@
 // at or before it leaves no familiar answer typeable, and the letters skip it ("Yes, the draft skips it").
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import { CATCH_TARGETS, FAMILIAR_SAFE_MIN, HOST_ANSWERS_PER_QUESTION, LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { easiestFirst, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
+import { easiestFirst, leftOutQuestions, namedQuestions, parseBank, pickQuestions, seed, type Bank, type BankQuestion } from "../src/content/bank.ts";
 import { CATEGORIES_FILE, familyOf, parseCategories } from "../src/content/categories.ts";
 import { avoids, checkHostNames, checkPuzzle, checkPuzzleFile, isCalendarDate, normalize, parsePuzzle, stolenLetters, type Level, type Puzzle } from "../src/content/puzzle.ts";
 import { GAME_ID } from "../src/platform/game.ts";
@@ -373,7 +375,7 @@ export const swapLines = (swapped: { prompt: string }[]): string[] => swapped.ma
 
 // days: every drafted day, for the gap. family: a category's family (src/content/categories.ts). ids: the 7 bank
 // questions to use, in order, instead of the pick; a hand-picked day is never swapped ("Never (Recommended)").
-export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[]): Promise<{ day: Puzzle; guide: string[]; swapped: BankQuestion[] }> {
+export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: string, family: (key: string) => string, ids?: string[], not: string[] = []): Promise<{ day: Puzzle; guide: string[]; swapped: BankQuestion[] }> {
   // Each bank question resolved and measured once per draft: a swap round changes one question of the 7, and
   // resolving and measuring the other 6 again gave the same answers each round (13e-10b review; 13f-4a).
   const measured = new Map<string, Promise<{ q: Question; catch: number }>>();
@@ -426,11 +428,12 @@ export async function draft(db: pg.Client, bank: Bank, days: Puzzle[], date: str
   };
   let built: Awaited<ReturnType<typeof assemble>>;
   let swapped: BankQuestion[] = [];
+  const vetoed = leftOutQuestions(bank, not);
   if (ids) {
     built = await assemble(namedQuestions(bank, days, date, ids, family));
   } else {
     ({ built, swapped } = await withSwaps<BankQuestion, typeof built>(
-      (leftOut) => pickQuestions(bank, days, date, family, leftOut),
+      (leftOut) => pickQuestions(bank, days, date, family, new Set([...vetoed, ...leftOut])),
       async (chosen) => {
         const a = await assemble(chosen);
         return a.steals ? { built: a } : { blockers: blocked(a).map((r) => r.bank) };
@@ -508,15 +511,36 @@ async function checkBank(db: pg.Client, bank: Bank): Promise<void> {
   if (problems.length) process.exitCode = 1;
 }
 
+// The command line, or null for usage it doesn't take. The date is user input: a malformed one would make every gap NaN
+// and let any category through (13d review). --not and --questions naming one question is a contradiction, refused.
+export function draftArgs(args: string[]): { date: string; ids: string[] | undefined; not: string[] } | null {
+  let parsed;
+  try {
+    parsed = parseArgs({ args, allowPositionals: true, options: { questions: { type: "string" }, not: { type: "string" } } });
+  } catch {
+    return null;
+  }
+  const { values, positionals } = parsed;
+  const [date] = positionals;
+  const command = date === "simulate" || date === "check-bank";
+  const hasFlag = values.questions !== undefined || values.not !== undefined;
+  if (positionals.length !== 1 || (command ? hasFlag : !isCalendarDate(date)) || values.questions === "" || values.not === "") return null;
+  const ids = values.questions?.split(",");
+  const not = values.not?.split(",") ?? [];
+  const both = not.find((id) => ids?.includes(id));
+  if (both) throw new Error(`--not and --questions both name "${both}"`);
+  return { date, ids, not };
+}
+
 async function main(): Promise<void> {
-  const [date, flag, list] = process.argv.slice(2);
-  const simulating = date === "simulate" && flag === undefined;
-  const checking = date === "check-bank" && flag === undefined;
-  // The date is user input: a malformed one would make every gap NaN and let any category through (13d review).
-  if (!simulating && !checking && (!isCalendarDate(date) || (flag !== undefined && (flag !== "--questions" || !list)))) {
-    console.error("usage: npm run draft -- <date> [--questions <id>,…]\n       npm run draft -- simulate\n       npm run draft -- check-bank");
+  const args = draftArgs(process.argv.slice(2));
+  if (!args) {
+    console.error("usage: npm run draft -- <date> [--questions <id>,…] [--not <id>,…]\n       npm run draft -- simulate\n       npm run draft -- check-bank");
     process.exit(2);
   }
+  const { date, ids, not } = args;
+  const simulating = date === "simulate";
+  const checking = date === "check-bank";
   const { bank, errors } = parseBank("bank.json", readFileSync(join("content", "bank.json"), "utf8"));
   if (!bank) throw new Error(errors.join("\n"));
   const dir = join("content", GAME_ID);
@@ -533,7 +557,7 @@ async function main(): Promise<void> {
   try {
     if (simulating) return await simulate(db, bank, days, familyOf(categories));
     if (checking) return await checkBank(db, bank);
-    const { day, guide } = await draft(db, bank, days, date, familyOf(categories), list?.split(","));
+    const { day, guide } = await draft(db, bank, days, date, familyOf(categories), ids, not);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, `${day.date}.json`), `${JSON.stringify(day, null, 2)}\n`);
     console.log(`DRAFTED ${dir}/${day.date}.json: letters ${day.questions.map((q, i) => (q.steals ? `Q${i + 1} ${q.steals.toUpperCase()}` : null)).filter(Boolean).join(", ")}`);

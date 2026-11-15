@@ -143,6 +143,13 @@ export function pickQuestions(bank: Bank, days: Puzzle[], date: string, family: 
   return picked;
 }
 
+// The questions the human vetoed for one draft (`--not <id>,…`; human, 2026-11-15, the first batch's review): their IDs as
+// the set pickQuestions skips, refused when one isn't in the bank, so a typo can't veto nothing.
+export function leftOutQuestions(bank: Bank, ids: string[]): Set<string> {
+  for (const id of ids) if (!bank.questions.some((q) => q.id === id)) throw new Error(`--not: no bank question "${id}"`);
+  return new Set(ids);
+}
+
 // The 7 named bank questions for a date, in that order (human, 2026-10-24: "Pick its 7 yourself (Recommended)"),
 // refused when an ID is unknown or a category breaks the gap or shares a family with another that day.
 export function namedQuestions(bank: Bank, days: Puzzle[], date: string, ids: string[], family: (key: string) => string): BankQuestion[] {

@@ -1,7 +1,7 @@
 // The question bank's rules (docs/milestones/M13-13d-the-question-bank.md): the shape, the 30-day gap per category, the
 // pick for a date, the hand-picked 7, and easiest first. Pure: a bank and drafted days built here.
 import { describe, expect, it } from "vitest";
-import { easiestFirst, gapProblems, namedQuestions, parseBank, pickQuestions, type Bank, type BankQuestion } from "./bank";
+import { easiestFirst, gapProblems, leftOutQuestions, namedQuestions, parseBank, pickQuestions, type Bank, type BankQuestion } from "./bank";
 import type { Puzzle } from "./puzzle";
 
 const question = (id: string, category = id.replaceAll("-", "_"), themes: string[] = []): BankQuestion => ({
@@ -115,6 +115,37 @@ describe("pickQuestions", () => {
     expect(() => pickQuestions(bank(ten.slice(0, 5)), [], "2026-12-01", own)).toThrow(
       "2026-12-01: only 5 bank questions ask a category not used within 30 days; 2 more needed",
     );
+  });
+});
+
+describe("leaving named questions out (--not)", () => {
+  const themed = Array.from({ length: 8 }, (_, i) => question(`t-${i}`, `t_${i}`, ["winter"]));
+  const all = bank([...ten, ...themed], { "2026-12-25": "winter" });
+  const first = pickQuestions(all, [], "2026-12-25", own).map((q) => q.id);
+
+  it("never picks a vetoed question, and the day still has 7", () => {
+    const vetoed = leftOutQuestions(all, [first[0], first[3]]);
+    const picked = pickQuestions(all, [], "2026-12-25", own, vetoed).map((q) => q.id);
+    expect(picked).toHaveLength(7);
+    expect(picked).not.toContain(first[0]);
+    expect(picked).not.toContain(first[3]);
+  });
+
+  it("leaves the pick unchanged when nothing is vetoed", () => {
+    expect(pickQuestions(all, [], "2026-12-25", own, leftOutQuestions(all, [])).map((q) => q.id)).toEqual(first);
+  });
+
+  it("refuses an ID that is not in the bank, naming it", () => {
+    expect(() => leftOutQuestions(all, [first[0], "q-typo"])).toThrow('--not: no bank question "q-typo"');
+  });
+
+  it("keeps a vetoed question out when the draft swaps others out too (the draft passes both sets to the one pick)", () => {
+    const vetoed = leftOutQuestions(all, [first[0]]);
+    const swappedOut = new Set([first[1]]);
+    const picked = pickQuestions(all, [], "2026-12-25", own, new Set([...vetoed, ...swappedOut])).map((q) => q.id);
+    expect(picked).toHaveLength(7);
+    expect(picked).not.toContain(first[0]);
+    expect(picked).not.toContain(first[1]);
   });
 });
 
