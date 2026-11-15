@@ -73,8 +73,10 @@
   outline-offset: 3px;
 }
 
-/* "+N more" is the kit's minor button, dotted so it doesn't read as an answer. */
+/* "+N more" is the kit's minor button, dotted so it doesn't read as an answer. A button, so at the buttons' one height,
+   not the chips' (e2e/calm.e2e.ts; it was 30px, unseen until a drafted day had more bank answers than are shown). */
 .chips .more {
+  min-height: 44px;
   border-style: dotted;
   color: var(--muted);
 }
