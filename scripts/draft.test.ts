@@ -1,9 +1,10 @@
 // The drafting script's pure parts (scripts/draft.ts): the letter picker, which tries schedule A's slots in a
 // date-seeded order and skips what doesn't fit (the database checks it runs per choice are the caller's: here fits is
 // a stand-in); the host answers drawn from the bank, among those the letters leave sayable; and the soft guide.
+import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { LETTER_SCHEDULE, LETTER_TIERS } from "../src/config/tunables.ts";
-import { blockRange, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
+import { blockRange, draftArgs, fitOrder, isDayFailure, moveTo, pickHosts, pickLetters, softGuide, swapLines, withHosts, withSwaps } from "./draft.ts";
 
 const fitsAll = async () => true;
 
@@ -170,10 +171,45 @@ describe("the soft guide", () => {
   });
 });
 
+describe("draftArgs", () => {
+  it("reads a date alone as it did before --not", () => {
+    expect(draftArgs(["2026-11-20"])).toEqual({ date: "2026-11-20", ids: undefined, not: [] });
+    expect(draftArgs(["2026-11-20", "--questions", "a,b"])).toEqual({ date: "2026-11-20", ids: ["a", "b"], not: [] });
+    expect(draftArgs(["simulate"])).toEqual({ date: "simulate", ids: undefined, not: [] });
+  });
+
+  it("reads --not as a list of IDs", () => {
+    expect(draftArgs(["2026-11-20", "--not", "a,b"])).toEqual({ date: "2026-11-20", ids: undefined, not: ["a", "b"] });
+  });
+
+  it("refuses --not naming a question that --questions names, saying which", () => {
+    expect(() => draftArgs(["2026-11-20", "--questions", "a,b", "--not", "b,c"])).toThrow('--not and --questions both name "b"');
+  });
+
+  it("returns null for usage it doesn't take", () => {
+    expect(draftArgs([])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--not"])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--questions"])).toBeNull();
+    expect(draftArgs(["2026-11-20", "--bogus", "x"])).toBeNull();
+    expect(draftArgs(["not-a-date"])).toBeNull();
+    expect(draftArgs(["simulate", "--not", "a"])).toBeNull();
+  });
+});
+
 describe("isDayFailure", () => {
   it("counts the draft's own refusals as failed days, and stops on the database's errors or a lost connection (13f-4c)", () => {
     expect(isDayFailure(new Error("no letters fit schedule A for 2027-01-03"))).toBe(true);
     expect(isDayFailure(Object.assign(new Error("read ECONNRESET"), { code: "ECONNRESET" }))).toBe(false);
     expect(isDayFailure(new Error("Connection terminated unexpectedly"))).toBe(false);
+  });
+});
+
+// `npm run draft` runs under plain Node, which resolves no "@/" alias: one in a module the script imports stopped every
+// draft from M14 14c-6b-1 until the beta's first batch (2026-11-15). Vitest resolves the alias, so only a real run shows it.
+describe("the script under plain Node", () => {
+  it("loads its imports and prints its usage", () => {
+    const run = spawnSync(process.execPath, ["scripts/draft.ts"], { encoding: "utf8" });
+    expect(run.stderr).not.toContain("ERR_MODULE_NOT_FOUND");
+    expect(run.stderr).toContain("usage: npm run draft");
   });
 });
