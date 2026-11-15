@@ -64,7 +64,7 @@ const seen = async (query = "") => (await thread(query)).map((c) => [c.body, c.r
 const feed = async (): Promise<Comment[]> => (await call(feedRoute, "/api/feed/items", "GET")).body.feed.items.filter((i: { kind: string }) => i.kind === "comment");
 const post = (body: string, group?: string) => call(postRoute, "/api/comments", "POST", { game: GAME_ID, date: today, body, group });
 const react = (id: string, emoji: string) => call(reactRoute, "/api/reactions", "POST", { game: GAME_ID, date: today, target: { type: "comment", id }, emoji });
-const boardFriends = async () => names((await call(boardRoute, "/api/board", "GET")).body.board.friends);
+const boardFriends = async () => names((await call(boardRoute, "/api/board?game=offbeat", "GET")).body.board.friends);
 const weekOf = async (route: (r: Request) => Promise<Response>, path: string) => names((await call(route, path, "GET")).body.thisWeek.entries).toSorted();
 const ok = { status: 200, body: { ok: true } };
 const sent = { status: 200, body: { ok: true, state: "sent" } };

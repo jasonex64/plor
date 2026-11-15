@@ -7,7 +7,11 @@
 // that card alone (src/app/today-games.ts). The row follows the WAI-ARIA APG Carousel pattern as How to play's steps do
 // (src/app/how-to-play.tsx): a carousel group, each card a slide named "N of 2", the arrows' state in aria-disabled.
 // The cards scroll (CSS scroll-snap), so a swipe moves them too; the place and the arrows read the scroll position.
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+// onView tells the page which games have a card, which is in front or opened in front, and whether the cards sit side
+// by side or in the carousel, for Today's live board, which follows the front card in the carousel and has its own
+// switch beside it (16f-6, answers 4 and 57).
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import type { BoardGame } from "@/friends/leaderboard";
 import type { SubstringRun } from "@/game/substring-state";
 import { FINISHED, type RunStatus } from "@/game/status";
 import { api } from "@/lib/api-client";
@@ -22,6 +26,9 @@ import styles from "./today-cards.module.css";
 
 type OffbeatState = { run: { status: RunStatus; msToReset: number } } | { run: null; msToReset: number };
 type Days = { offbeat: OffbeatState; fragments: SubstringRun | null };
+// games: the cards in order; front: the one opened in front; wide and at: whether they sit side by side, and the card the
+// carousel is on.
+export type CardsView = { games: BoardGame[]; front: number; wide: boolean; at: number };
 
 export function TodayCards({
   skip,
@@ -29,12 +36,14 @@ export function TodayCards({
   timeUps,
   onOver,
   onDayOver,
+  onView,
 }: {
   skip: boolean;
   day: number;
   timeUps: number;
   onOver: (over: boolean) => void;
   onDayOver: () => void;
+  onView: (view: CardsView) => void;
 }) {
   const [days, setDays] = useState<Days | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +59,18 @@ export function TodayCards({
     );
   }, [day, timeUps]);
 
-  const { cards, front } = days
-    ? todayCards(days.offbeat.run && { over: FINISHED.includes(days.offbeat.run.status) }, days.fragments && { over: days.fragments.status === "finished" })
-    : { cards: [], front: 0 };
+  const { cards, front } = useMemo(
+    () =>
+      days
+        ? todayCards(days.offbeat.run && { over: FINISHED.includes(days.offbeat.run.status) }, days.fragments && { over: days.fragments.status === "finished" })
+        : { cards: [], front: 0 },
+    [days],
+  );
+  // Where the carousel is, once it has said (it mounts after the days load); one card has no carousel.
+  const [place, setPlace] = useState<{ wide: boolean; at: number } | null>(null);
+  useEffect(() => {
+    if (days && (cards.length === 1 || place)) onView({ games: cards, front, wide: place?.wide ?? false, at: place?.at ?? 0 });
+  }, [days, cards, front, place, onView]);
   // Offbeat's banner sets the timer for the reset when it's there; Fragments' state has no time to it.
   const msToReset = days && cards[0] !== GAME.id ? (days.offbeat.run ? days.offbeat.run.msToReset : days.offbeat.msToReset) : null;
   useEffect(() => {
@@ -74,10 +92,10 @@ export function TodayCards({
   );
   if (error) return <p role="alert">{error}</p>;
   if (!days) return <BannerSkeleton />;
-  return shown.length === 1 ? shown[0] : <Carousel front={front}>{shown}</Carousel>;
+  return shown.length === 1 ? shown[0] : <Carousel front={front} onPlace={setPlace}>{shown}</Carousel>;
 }
 
-function Carousel({ front, children }: { front: number; children: ReactNode[] }) {
+function Carousel({ front, onPlace, children }: { front: number; onPlace: (place: { wide: boolean; at: number }) => void; children: ReactNode[] }) {
   // Wide: the row itself, not the window, is at least the app's tablet width (src/app/min-width.ts's 768px).
   const [wide, setWide] = useState(false);
   const row = useRef<HTMLDivElement>(null);
@@ -90,6 +108,7 @@ function Carousel({ front, children }: { front: number; children: ReactNode[] })
   const label = useId();
   const strip = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(front);
+  useEffect(() => onPlace({ wide, at }), [wide, at, onPlace]);
 
   // Where a card's left edge scrolls to: the last can't reach the strip's start, so it ends at the strip's end.
   const target = useCallback((i: number) => {

@@ -7,7 +7,7 @@
 // a List / Graph switch shows each week as a race instead, with Find a player over both. Since M16 16e-2 a Game switch
 // picks game 1's board or game 2's, and since 16e-3b the overall one, list only, by Sum or Average
 // (docs/milestones/M16-16e-points-and-boards.md, answers 23, 29 and 33).
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallWeek, Week } from "@/friends/leaderboard";
 import { ranked } from "@/friends/rank";
 import { api } from "@/lib/api-client";
@@ -27,6 +27,22 @@ import { Line, Skeleton } from "./skeleton";
 // (16e-3b, answer 29).
 const GAMES = [GAME, SUBSTRINGS, OVERALL] as const;
 
+// The Game switch, for a leaderboard, Today's card and the live board (M16 16e-2, answer 23; 16f-6, answers 20, 56 and 57):
+// one choice a game, each by its name.
+export function GameSwitch<T extends string>({ choices, value, onChange }: { choices: readonly { id: T; name: string }[]; value: T; onChange: (id: T) => void }) {
+  const name = useId();
+  return (
+    <div role="radiogroup" aria-label="Game" className={styles.switch} style={{ "--choices": choices.length } as CSSProperties}>
+      {choices.map((g) => (
+        <label key={g.id} className={value === g.id ? `${styles.choice} ${styles.on}` : styles.choice}>
+          <input type="radio" name={name} checked={value === g.id} onChange={() => onChange(g.id)} />
+          {g.name}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 // title names the board (its heading and region); path is the API route that returns it, which the game is added to.
 export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
@@ -38,7 +54,6 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
   const [average, setAverage] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const name = useId();
-  const gameName = useId();
   const countName = useId();
   // Switching games faster than the answers come back shows only the newest game's (M11 H6).
   const [latest] = useState(latestOnly);
@@ -54,22 +69,14 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
   return (
     <section aria-label={title} className={kit.card}>
       <h2>{title}</h2>
-      <div role="radiogroup" aria-label="Game" className={styles.switch}>
-        {GAMES.map((g) => (
-          <label key={g.id} className={game === g.id ? `${styles.choice} ${styles.on}` : styles.choice}>
-            <input
-              type="radio"
-              name={gameName}
-              checked={game === g.id}
-              onChange={() => {
-                setBoard(null);
-                setGame(g.id);
-              }}
-            />
-            {g.name}
-          </label>
-        ))}
-      </div>
+      <GameSwitch
+        choices={GAMES}
+        value={game}
+        onChange={(id) => {
+          setBoard(null);
+          setGame(id);
+        }}
+      />
       {/* The overall board is a list (answer 33): Sum or Average in the place of List or Graph. */}
       {overall ? (
         <div role="radiogroup" aria-label="Count" className={styles.switch}>
@@ -120,15 +127,17 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
 }
 
 // Today's one leaderboard card (docs/milestones/M14-14a-2a-today.md; L41): Yesterday or This week, for friends or one
-// of the player's groups, from the routes the boards already use. Yesterday is closed, so its points are final (M09
+// of the player's groups, from the routes the boards already use, and for Offbeat, Fragments or Overall (M16 16f-6,
+// answer 20), Offbeat on every load as the other leaderboards. Yesterday is closed, so its points are final (M09
 // D9); this week's count days once they're over. Each choice loads once.
 export function LeaderboardCard() {
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
   // null: the friends board.
   const [group, setGroup] = useState<string | null>(null);
   const [period, setPeriod] = useState<"yesterday" | "week">("yesterday");
+  const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
   const [day, setDay] = useState<Day | null>(null);
-  const [week, setWeek] = useState<Week | null>(null);
+  const [week, setWeek] = useState<Week | OverallWeek | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Kept apart from the board's error, which each new choice clears, so a failed list of groups stays on show.
   const [groupsError, setGroupsError] = useState<string | null>(null);
@@ -136,9 +145,10 @@ export function LeaderboardCard() {
   const [latest] = useState(latestOnly);
   // A new choice clears the last one's rows and error, so they aren't shown under the new label while it loads, or
   // for good if it fails (docs/milestones/M14-14b-2c-review-items.md, item 13).
-  function choose(next: { period?: "yesterday" | "week"; group?: string | null }) {
+  function choose(next: { period?: "yesterday" | "week"; group?: string | null; game?: (typeof GAMES)[number]["id"] }) {
     if (next.period !== undefined) setPeriod(next.period);
     if (next.group !== undefined) setGroup(next.group);
+    if (next.game !== undefined) setGame(next.game);
     setDay(null);
     setWeek(null);
     setError(null);
@@ -153,14 +163,13 @@ export function LeaderboardCard() {
   useEffect(() => {
     const failed = (err: unknown) => setError(errorText(err));
     if (period === "yesterday") {
-      const path = group === null ? "/api/leaderboard/yesterday" : `/api/leaderboard/yesterday?group=${encodeURIComponent(group)}`;
+      const path = `/api/leaderboard/yesterday?game=${game}${group === null ? "" : `&group=${encodeURIComponent(group)}`}`;
       latest(api<{ day: Day }>(path, { method: "GET" }), (r) => (setDay(r.day), setWeek(null), setError(null)), failed);
     } else {
-      // Today's card is game 1's until both games come to Today (M16 16f).
-      const path = group === null ? `/api/leaderboard?game=${GAME.id}` : `/api/groups/leaderboard?id=${encodeURIComponent(group)}&game=${GAME.id}`;
-      latest(api<Board>(path, { method: "GET" }), (r) => (setWeek(r.thisWeek), setDay(null), setError(null)), failed);
+      const path = group === null ? `/api/leaderboard?game=${game}` : `/api/groups/leaderboard?id=${encodeURIComponent(group)}&game=${game}`;
+      latest(api<Board | OverallBoard>(path, { method: "GET" }), (r) => (setWeek(r.thisWeek), setDay(null), setError(null)), failed);
     }
-  }, [group, period, latest]);
+  }, [group, period, game, latest]);
 
   const label = period === "yesterday" ? "Yesterday" : "This week";
   return (
@@ -178,6 +187,7 @@ export function LeaderboardCard() {
           </label>
         ))}
       </div>
+      <GameSwitch choices={GAMES} value={game} onChange={(id) => choose({ game: id })} />
       <label className={styles.board}>
         {/* Named for screen readers; mockup 3 shows the picker alone. */}
         <span className="sr-only">Board</span>
@@ -191,8 +201,8 @@ export function LeaderboardCard() {
         </select>
       </label>
       <section aria-label={label}>
-        {day && <Entries entries={day.entries} />}
-        {week && <Entries entries={week.entries} />}
+        {day && <Entries entries={day.entries} places={game !== GAME.id} />}
+        {week && <Entries entries={week.entries} places={game !== GAME.id} />}
         {!day && !week && !error && (
           <Skeleton label="Loading scores">
             <Line />

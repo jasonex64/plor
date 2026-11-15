@@ -6,10 +6,14 @@
 // HTTP board once the player's own run is over, so nothing reaches the page early. So do reactions on runs
 // (M08 8b), which the player can add to friends' runs from then on. The same channel carries nudges that comments or
 // reactions changed (8d), with no content: the page refetches over HTTP, which decides what the player may see. The
-// feed, on Today, listens to the channel itself (src/app/home.tsx).
+// feed, on Today, listens to the channel itself (src/app/home.tsx). Each game has its own board (M16 16f-6): Offbeat's
+// as above, and Fragments', where a friend shows "on round k of n" and, once they and the player have both finished,
+// their score, and never their words. The board is a game's alone when its page names one, and otherwise has the game switch
+// (answers 56 and 57).
 import { useCallback, useEffect, useState } from "react";
 import type { Board as BoardData, BoardFriend, Ended } from "@/friends/board";
 import { placeRows, type Place } from "@/friends/ended";
+import type { BoardGame } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { choose } from "@/reactions/choose";
@@ -26,8 +30,10 @@ import kit from "./kit.module.css";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
 import { endedText } from "./ended-text";
+import { pointsText } from "./game";
+import { GameSwitch } from "./leaderboard";
 import { ReactMenu, Reactions, reactionText } from "./reactions";
-import { GAME_ID } from "@/platform/game";
+import { GAME, GAME_ID, SUBSTRINGS } from "@/platform/game";
 import { Line, Skeleton } from "./skeleton";
 import { useHeldChanges, useUndo } from "./undo";
 
@@ -39,13 +45,32 @@ function reacted(board: BoardData | null, change: { friend: string; emoji: Emoji
   };
 }
 
+const NAMES = { [GAME.id]: GAME.name, [SUBSTRINGS.id]: SUBSTRINGS.name } as const;
+
 // betterWithFriends: the words for a player with no friends, on the Friends tab, above Find a player; off on Today,
 // where nothing stands in the invite link's place (docs/milestones/M17-profiles-and-friend-requests.md, 17c, answer 34).
-export function Board({ username, betterWithFriends }: { username: string; betterWithFriends: boolean }) {
-  const [board, setBoard] = useState<BoardData | null>(null);
+// game: the game this board is for, with no switch (Today follows its front card, or has one game); otherwise the
+// player picks, from the games with a day today, and the board opens on initial, Offbeat if none.
+export function Board({
+  username,
+  betterWithFriends,
+  game,
+  initial = GAME_ID,
+}: {
+  username: string;
+  betterWithFriends: boolean;
+  game?: BoardGame;
+  initial?: BoardGame;
+}) {
+  const [chosen, setChosen] = useState<BoardGame>(initial);
+  const shown = game ?? chosen;
+  const [loaded, setBoard] = useState<BoardData | null>(null);
+  // Another game's board is no answer for this one: it shows as loading until its own comes.
+  const board = loaded?.game === shown ? loaded : null;
   // A reaction on a friend's run shows at once while it's held for Undo and sent
   // (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6b).
   const [shownBoard, showReaction] = useHeldChanges(board, reacted);
+  const gameChoices = loaded?.games ?? [];
   const [error, setError] = useState<string | null>(null);
   const undo = useUndo();
   // Refetches overlap (nudges, a reconnect, a reaction): only the newest answer is shown (M11 H6).
@@ -54,14 +79,16 @@ export function Board({ username, betterWithFriends }: { username: string; bette
   const load = useCallback(
     (reason?: "reconnect") =>
       latest(
-        api<{ board: BoardData }>(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" }),
+        api<{ board: BoardData }>(`/api/board?${reason ? `reason=${reason}&` : ""}game=${shown}`, { method: "GET" }),
         (r) => {
           setBoard(r.board);
+          // A day with only one game: opened on the other, the board moves to the one there is.
+          setChosen((c) => (r.board.games.includes(c) || r.board.games.length !== 1 ? c : r.board.games[0]));
           setError(null);
         },
         (err) => setError(errorText(err)),
       ),
-    [latest],
+    [latest, shown],
   );
   useEffect(() => void load(), [load]);
 
@@ -87,7 +114,8 @@ export function Board({ username, betterWithFriends }: { username: string; bette
       load();
       return;
     }
-    if (!board || message.puzzleDate !== board.date) return;
+    // Another game's run says nothing about this board.
+    if (!board || message.puzzleDate !== board.date || message.gameId !== board.game) return;
     // The player's own run ended: how friends' runs ended may now be shown.
     if (message.username === username) {
       if (message.state === "finished" && !board.finished) load();
@@ -113,7 +141,7 @@ export function Board({ username, betterWithFriends }: { username: string; bette
       key: `run ${friend.username}`,
       text: reactionText(friend.reactions!, emoji),
       failed: "Your reaction wasn't saved",
-      send: (keepalive) => api("/api/reactions", { method: "POST", body: { game: GAME_ID, date: day, target: { type: "run", userId: friend.userId }, emoji }, keepalive }),
+      send: (keepalive) => api("/api/reactions", { method: "POST", body: { game: board!.game, date: day, target: { type: "run", userId: friend.userId }, emoji }, keepalive }),
     });
     showReaction({ friend: friend.username, emoji }, held.then((sent) => (sent ? load() : undefined)));
   }
@@ -122,6 +150,10 @@ export function Board({ username, betterWithFriends }: { username: string; bette
     <section aria-label="Friends today" className={kit.card}>
       <h2>Friends today</h2>
       <LiveStatus channel={channel} />
+      {/* The games with a day today, when the page doesn't name one and there are two (answers 56 and 57). */}
+      {game === undefined && gameChoices.length > 1 && (
+        <GameSwitch choices={gameChoices.map((id) => ({ id, name: NAMES[id] }))} value={shown} onChange={setChosen} />
+      )}
       {shownBoard?.mine && <WhereEveryoneEnded username={username} mine={shownBoard.mine} friends={shownBoard.friends} />}
       {shownBoard?.reactionsOnMine && shownBoard.reactionsOnMine.counts.length > 0 && (
         // Read once, as the group's name: "Reactions on your run, 😂 1" (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 6).
@@ -147,7 +179,7 @@ export function Board({ username, betterWithFriends }: { username: string; bette
               <Avatar name={f.name} />
               <div className={kit.grow}>
                 <b>{f.name}</b>
-                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f)}</span>
+                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f, shownBoard.rounds)}</span>
                 {f.reactions && <Reactions reactions={f.reactions} below />}
               </div>
               {f.reactions && <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
@@ -179,9 +211,11 @@ function toneOf(f: BoardFriend): string {
   return kit.chip;
 }
 
-function describe(f: BoardFriend): string {
+// rounds: Fragments' rounds today, which a friend's round is counted against; null on Offbeat's board, which has questions.
+function describe(f: BoardFriend, rounds: number | null): string {
   if (f.ended) return endedText(f.ended);
-  if (f.state === "playing") return `on question ${f.question}`;
+  if (f.score !== null) return pointsText(f.score);
+  if (f.state === "playing") return rounds === null ? `on question ${f.question}` : `on round ${f.question} of ${rounds}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
   return "hasn't played yet";
 }

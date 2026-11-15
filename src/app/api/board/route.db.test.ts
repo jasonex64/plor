@@ -32,7 +32,7 @@ async function call(response: Promise<Response>) {
   return { status: r.status, body: await r.json() };
 }
 const board = async (reason?: string) =>
-  (await call(boardRoute(apiRequest(reason ? `/api/board?reason=${reason}` : "/api/board", { method: "GET" })))).body.board;
+  (await call(boardRoute(apiRequest(reason ? `/api/board?game=offbeat&reason=${reason}` : "/api/board?game=offbeat", { method: "GET" })))).body.board;
 // Plays as whoever is signed in now, and gets caught on question 1.
 async function playAndGetCaught() {
   expect((await call(startRoute(apiRequest("/api/run/start", { method: "POST" })))).status).toBe(200);
@@ -85,6 +85,8 @@ describe("the live board over HTTP", () => {
       state: "started",
       question: null,
       ended: null,
+      // Fragments' score: always null on Offbeat's board.
+      score: null,
       // Reactions on runs wait for the viewer's run too (M08 8b).
       reactions: null,
     };

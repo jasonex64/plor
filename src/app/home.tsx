@@ -43,7 +43,7 @@ import { LiveStatus } from "./live-status";
 import { FragmentsScreen } from "./fragments";
 import { OffbeatScreen, TestScreen } from "./offbeat";
 import { SideColumn } from "./side-column";
-import { TodayCards } from "./today-cards";
+import { TodayCards, type CardsView } from "./today-cards";
 import { SIGN_IN_HREF, signInOpen } from "./sign-in-open";
 import { LoadingStatus, PageSkeleton } from "./skeleton";
 import { StreakRanks } from "./streak";
@@ -612,18 +612,22 @@ function Today({ username, name, skip, timeUps }: { username: string; name: stri
   const nextDay = useCallback(() => setDay((d) => d + 1), []);
 
   const wide = useMinWidth(768);
+  // The board's game: the only card's, or the front card's while the cards are a carousel; with the cards side by side the
+  // board has its own switch, opened on the game left to play (16f-6, answers 4 and 57).
+  const [view, setView] = useState<CardsView | null>(null);
+  const boardGame = view && (view.games.length === 1 ? view.games[0] : view.wide ? undefined : view.games[view.at]);
 
   return (
     <div className={styles.today}>
       <div className={styles.game}>
-        <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} />
+        <TodayCards skip={skip} day={day} timeUps={timeUps} onOver={setRunOver} onDayOver={nextDay} onView={setView} />
       </div>
       {/* The circle is from 768px only: the feed is endless, so on phones the leaderboard card is off Today (M16 16f-5, the
           human's answer 19). */}
       {wide && (
         <SideColumn label="Your circle" inPlace className={styles.side}>
           {/* Again on a time-up too: how friends' runs ended shows once the player's is over (src/friends/board.ts). */}
-          <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} />
+          {view && <Board key={`board-${day}-${timeUps}`} username={username} betterWithFriends={false} game={boardGame ?? undefined} initial={view.games[view.front]} />}
           <LeaderboardCard key={`card-${day}`} />
         </SideColumn>
       )}

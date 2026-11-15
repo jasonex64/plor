@@ -54,7 +54,7 @@ select is(pg_temp.status(), 'in_progress', 'a new run is in progress');
 select is(pg_temp.answered(), 0, 'with no round done');
 select ok((select deadline is not null from private.run_status where game_id = 'substrings'), 'and round 1''s clock running');
 
-select is((select count(*)::int from realtime.messages where topic = 'board:00000000-0000-0000-0000-00000000e621'), 0, 'a game 2 run tells no board yet');
+select is((select count(*)::int from realtime.messages where topic = 'board:00000000-0000-0000-0000-00000000e621'), 1, 'a game 2 run tells the player''s own board, as a game 1 run does (16f-6)');
 
 -- Round 1, "ck".
 select is(pg_temp.outcome(''), 'empty', 'an empty try is not judged');

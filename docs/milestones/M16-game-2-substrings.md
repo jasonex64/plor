@@ -129,6 +129,11 @@ Thirteenth round (human, 2026-11-14, before 16f-5's build):
 53. Offbeat's own result screen, which used the old feed: "Offbeat's friends thread (Recommended)". Friends' Offbeat comments only, as Fragments' result screen; group comments no longer show there.
 54. Reactions on earlier days' items (the rule D6, today only, against answer 27, "On every item"): "Today only; older show counts (Recommended)".
 
+Fourteenth round (human, 2026-11-14, before 16f-6's build):
+55. The live board for Fragments, a security change, proposed as: a Fragments run sends friends' boards exactly what an Offbeat run does (the friend's name, the game, the day, started, playing or finished, and the round number; never words or score), with the same rule that a friend who hasn't finished Fragments learns only "started"; one migration, with one new trigger so a word given updates the board: "Approve as proposed (Recommended)". A run that ends by the clock still shows late, as Offbeat's (M19, answer 19).
+56. The Friends tab's live board: "A switch: Offbeat / Fragments (Recommended)". One board, opening on Offbeat.
+57. Today's live board from 768px when both cards sit side by side: "The same switch (Recommended)". Side by side, the board has the Offbeat / Fragments switch and opens on the game not yet played (Offbeat when both are played); in the carousel it follows the front card.
+
 16f's ticket is drafted from answers 1 to 34 (35 to 39 added to its step 16f-1, 40 to 43 to 16f-2): `docs/milestones/M16-16f-the-shared-pieces.md`. **Not approved to build.**
 
 ## Decisions

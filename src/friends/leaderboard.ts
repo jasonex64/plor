@@ -102,19 +102,23 @@ export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: str
   return board;
 }
 
-// Yesterday's points, a closed day's, so final (M09 D9), for the game card (docs/milestones/M11-home-screen.md, H7):
+// Yesterday's standings, a closed day's, so final (M09 D9), for the game card (docs/milestones/M11-home-screen.md, H7):
 // the viewer and their friends, or the members of one of the viewer's groups (a non-member gets the group page's 404).
-export async function getYesterdayBoard(db: Db, viewerId: string, groupId: string | null): Promise<Day> {
+// The card names its game as the weekly boards do (M16 16f-6, answer 20): Offbeat's points, Fragments' places, or both
+// games' places added up.
+export async function getYesterdayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<Day> {
   const circle =
     groupId === null
       ? await circleOf(db, circleSql("$1"), [viewerId])
       : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
   if (!circle) throw new AppError("group_not_found", 404);
-  await settleRuns(db);
   const yesterday = daysBefore(circle.today, 1);
-  const skip = await playing(db, viewerId, yesterday, circle.today);
-  const rows = onBoard(await ledger(db, GAME_ID, circle.ids, groupId, yesterday, circle.today, skip), groupId, circle.today);
-  return { date: yesterday, entries: ranked(rows.map((r) => entry(r, viewerId, total(r, yesterday, circle.today))), byTotal) };
+  if (game === OVERALL.id) {
+    const both = await bothGames(db, viewerId, circle.ids, groupId, yesterday, circle.today);
+    return { date: yesterday, entries: ranked(overallDays(both, groupId, yesterday, circle.today).map(({ row, days }) => entry(row, viewerId, placeTotal(days))), byTotal) };
+  }
+  const { rows } = await gameRows(db, game, viewerId, circle.ids, groupId, yesterday, circle.today);
+  return { date: yesterday, entries: ranked(onBoard(rows, groupId, circle.today).map((r) => entry(r, viewerId, total(r, yesterday, circle.today))), byTotal) };
 }
 
 // groupId: the group whose members players lists, or null for the friends board.
@@ -134,16 +138,11 @@ async function weeklyBoard(
   const nextWeek = daysBefore(thisWeek, -7);
   const rowsOf = (g: BoardGame) => gameRows(db, g, viewerId, circle.ids, groupId, lastWeek, nextWeek);
   if (game === OVERALL.id) {
-    // Game 1's places leave out the days the viewer is still playing, game 2's count (answer 32).
-    const first = await rowsOf(GAME_ID);
-    const both = [await places(db, GAME_ID, first.rows, lastWeek, nextWeek), (await rowsOf(SUBSTRINGS_ID)).rows];
+    const both = await bothGames(db, viewerId, circle.ids, groupId, lastWeek, nextWeek);
     const overallWeek = (from: string, to: string): OverallWeek => ({
       from,
       entries: ranked(
-        onBoard(both[0], groupId, to).map((r) => {
-          const days = [r, both[1].find((s) => s.user_id === r.user_id)!].flatMap((row) => inWeek(row, from, to));
-          return { ...entry(r, viewerId, placeTotal(days)), average: placeAverage(days) };
-        }),
+        overallDays(both, groupId, from, to).map(({ row, days }) => ({ ...entry(row, viewerId, placeTotal(days)), average: placeAverage(days) })),
         byTotal,
       ),
     });
@@ -177,6 +176,17 @@ async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[]
   await settleSubstringRuns(db);
   return { rows: await places(db, game, await ledger(db, game, ids, groupId, from, to, []), from, to), skip: [] };
 }
+
+// Both games' rows for an overall board, from (included) to (excluded): game 1's turned into places, as game 2's are. Game
+// 1's places leave out the days the viewer is still playing, game 2's count (answer 32).
+async function bothGames(db: Db, viewerId: string, ids: string[], groupId: string | null, from: string, to: string): Promise<[Row[], Row[]]> {
+  const first = await gameRows(db, GAME_ID, viewerId, ids, groupId, from, to);
+  return [await places(db, GAME_ID, first.rows, from, to), (await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to)).rows];
+}
+
+// Each player on an overall board with the places of both games they hold on the days from (included) to (excluded).
+const overallDays = (both: [Row[], Row[]], groupId: string | null, from: string, to: string) =>
+  onBoard(both[0], groupId, to).map((row) => ({ row, days: [row, both[1].find((s) => s.user_id === row.user_id)!].flatMap((r) => inWeek(r, from, to)) }));
 
 // A friends board for a period lists only the players whose account was made before it ended, the viewer too; a group's
 // keeps a member who joined later, on 0 (M19 19c; M12 12d, D3). to is the period's end, excluded.
