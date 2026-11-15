@@ -1,0 +1,98 @@
+# M15 15e — Loading plor.app's answer lists and dictionary
+
+**Status:** planned. Drafted 2026-11-14 from the human's answers below; **waits for the human's approval** (a security change: CLAUDE.md, Security). Numbered 15e because an unbuilt, uncommitted 15d ticket ("Ship on your word", 2026-10-26) sits in the M15 checkout.
+
+## Goal
+The human can load the answer base and game 2's dictionary into plor.app's database from this PC, after seeing what the load would do, so both games can be played there.
+
+## Who uses it / what breaks without it
+- **Used by:** the human, who runs the load; every beta player, who needs the lists.
+- **Breaks without it:** the loader refuses any database but this PC's (`scripts/base.ts:1072-1074`: "refusing <host>: 13a loads the local stack only"). On plor.app every Offbeat answer is refused and a day can't be approved (`private.approve_puzzle` builds its lists from the base), and Fragments calls every word "not a word" (`private.dictionary_word` is empty). The backlog sort's one must-fix before friends play (`docs/audits/2026-11-11-backlog-sort.md`, "Must fix before friends play").
+
+## Source
+- DECISIONS.md, Log, 2026-10-26, "the scripts connect like the app": loading the hosted base from the scripts is allowed and connects as `postgres`, an exception to the App database role row, made when M15 builds it (human: "Hosted too, guarded", "postgres, recorded").
+- DECISIONS.md, Database TLS (2026-10-17): verify-full against Supabase's CA. The CA file is in the repo, `supabase/certs/prod-ca-2021.crt`.
+- SOURCES.md, Rules: "Supabase Postgres connections" (pooler modes and ports; a session lock needs a session-mode connection, ROADMAP, For M15, "The load's gaps"), "node-postgres" (the `ssl` object), "Supabase database roles".
+- SOURCES.md's Supabase pricing row: the free plan's 500 MB.
+- CLAUDE.md, Security: secrets never leave their home; verify, don't disable.
+
+## Answers (human, 2026-11-14, two rounds of guided questions)
+1. Who runs the script: "Me, from this PC (Recommended)".
+2. How the password reaches it: "Typed at a hidden prompt (Recommended)".
+3. The space (the lists are about 380 MB of the free plan's 500 MB: 337 MB, M13 13e-11's Evidence, plus the dictionary's 42 MB, measured locally 2026-11-14): "Measure first, then decide (Recommended)". The same day: "if we CAN stay on free for now lets do that if possible".
+4. How often the lists change during the beta: "About weekly, in batches (Recommended)".
+5. The order: "First load now, updates second (Recommended)".
+6. The safeguard: "Dry run, then type the name (Recommended)".
+7. A load while someone is mid-game: "Warn me, I decide (Recommended)".
+8. The raw downloads' durable copy: "Leave on this PC for the beta (Recommended)".
+9. The old uncommitted work in the M15 checkout (a `ship` command, `git.deploymentEnabled` off, edits in 7 files): "Discard them". Done 2026-11-14; the untracked ticket `M15-15d-ship-on-your-word.md` was not named in the question and is still there, for the human.
+
+## Assumptions (say if any is wrong)
+- plor.app's database holds no answer base and no dictionary today (*unverified*: no agent can read it; the dry run shows it).
+- The human can copy the database's session-mode connection string from Supabase's dashboard or their password manager.
+- `load all` and `load dictionary` do on plor.app what they do locally once they can connect: the same SQL functions, already pushed with the migrations (the human: "database is pushed", "should be up to date"; *unverified*).
+- 43 seconds locally (M13 13e-4) says nothing sure about the time over the network; the first hosted load measures it.
+
+## The design, for approval
+**What changes in security terms:** today no script can write to plor.app. After this, one can, only when all of these hold: the human starts it by hand with a new word on the command; the human pastes the connection string at a hidden prompt; the connection verifies Supabase's certificate; the human has read the dry run and typed the database's host name. The string is held in memory for that run only: never written to a file, the environment, the command line, a log or the output. Nothing is added to `.env.local`, Vercel, GitHub or any Claude session. No grant, role, policy or migration changes.
+
+- `npm run base -- load all` and `load dictionary` stay local-only, as now. A new target word, `hosted`, is the only way to plor.app: `npm run base -- hosted check` and `npm run base -- hosted load`.
+- Both ask for the connection string with input hidden. It is parsed by the app's own `readDatabaseUrl` (any query parameter refused). A local host is refused here, as a hosted one is refused by the local commands. TLS is verify-full with `supabase/certs/prod-ca-2021.crt`; a failed check stops the run.
+- `hosted check` writes nothing. It prints: the host and database name; the database's size now; whether a base and a dictionary are there, with their counts; how many runs are in progress right now (answer 7); and what the load would bring (each set's items from its manifest, the dictionary's words). After a first load it is also the weekly look at the size (answer 3).
+- `hosted load` runs the check, then asks the human to type the host name it showed. Anything else stops with nothing written. Then `load all`'s steps and the dictionary's, as locally, on one session-mode connection (the load's lock lives on the session); it ends by printing the new size.
+- **15e-1 loads an empty database only.** If the check finds a base already there, `hosted load` refuses and says updates are 15e-2. So none of the known live-load gaps can be met in 15e-1.
+- **15e-2, before the first weekly update** (its own questions first): loading over a base people are playing on. ROADMAP, For M15: merging loaded things on a live base; the four load gaps; a name given back after its midnight.
+
+## Acceptance criteria and plan
+**15e-1 — the guarded loader and the first load.** One pull request from `m15-launch-readiness`. Tests first.
+- [ ] `load all` and `load dictionary` still refuse a hosted host, and `hosted` refuses a local one → verify: unit tests of the target check, failing first.
+- [ ] The connection string never leaves memory → verify: a unit test that the prompt echoes nothing and that no error or output of a failed run (bad string, refused host, failed TLS) contains the password or the whole string; gitleaks in CI.
+- [ ] A hosted connection without a verified certificate is impossible → verify: a unit test of the connection's config (the CA set, no way to turn checking off).
+- [ ] `hosted check` writes nothing → verify: a db test on the local stack (the check's code with the host rule stubbed at the boundary, not the SQL), comparing the base's tables before and after.
+- [ ] `hosted load` stops with nothing written unless the typed name matches, and refuses a database that already has a base → verify: db tests on the local stack, the same way.
+- [ ] The README of the commands (the header of `scripts/base.ts`) says how to run a hosted load, and loses its stale "nothing loads it yet" line → verify: by reading.
+- [ ] **The human's run:** `hosted check` on plor.app, the size reported; the human decides free or Pro from the number (answer 3); then `hosted load`; then `hosted check` again shows the base and dictionary with the manifests' counts → evidence: the human's pasted output (it holds no secret by the criterion above).
+- [ ] On plor.app afterwards: an Offbeat day can be approved and a Fragments try is judged against the dictionary → evidence: the human's word, or `scripts/status` plus a played day.
+
+**15e-2 — updating a live base.** Drafted after 15e-1, from its own round of questions.
+
+## Out of scope
+- Drafting and approving the beta's days (M15, next).
+- Backups, alerts, the size warning's level (a human number), the load test.
+- A durable copy of the raw downloads (answer 8).
+- An automatic or Claude-run load (answer 1).
+
+## Numbers
+| Value | Used for | Origin (source section / person + date) |
+|---|---|---|
+| 500 MB | The free plan's database | SOURCES.md, Supabase pricing (accessed 2026-10-24) |
+| About 380 MB | The lists' size, for the question only | 337 MB (M13 13e-11, Evidence) + 42 MB (`private.dictionary_word`, measured locally 2026-11-14); the real number is what `hosted check` and the load report |
+| 5000 | Dictionary rows per insert | Already in `scripts/base.ts` (`loadDictionary`); unchanged |
+
+No new number. No timeout, retry or size threshold is added; if the build needs one, it stops and asks.
+
+## Plan
+1. The target check and the hidden prompt, with their unit tests → verify: `npm test -- scripts/` fails first, then passes.
+2. The verified connection → verify: its unit test.
+3. `hosted check` → verify: its db test on the local stack.
+4. `hosted load` with the typed name and the empty-only rule → verify: its db tests.
+5. DECISIONS.md: the App database role row's exception written out as built; the header of `scripts/base.ts`.
+6. The `reviewer`; then the human's run.
+
+**Expected at the human's run, and what would prove it wrong:** the check shows no base and no dictionary, and a size well under 500 MB; after the load the size is near 380 MB more. Wrong if: a base is already there (the load refuses; ask the human what loaded it), or the size after the load leaves no room on free (the human's call, answer 3), or a load function is missing (a migration was not pushed).
+
+## Removes
+The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-only guard is not removed: it stays for the local commands.
+
+---
+*Fill in the sections below at the end.*
+
+## Source diff
+| Source says | We built | Why different |
+|---|---|---|
+
+## Evidence
+
+## Review
+- Blocking findings and how each was fixed:
+- Deferred to ROADMAP "Next revision":
