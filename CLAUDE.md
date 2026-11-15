@@ -42,6 +42,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Least privilege.** App code connects as a dedicated role with only the grants it needs, never as `postgres` or with the `service_role` key, unless DECISIONS.md says otherwise.
 - **Verify, don't disable.** Remote connections use verified TLS. Never turn off a security check to make something work; stop and ask instead.
 - **Security changes need a human.** Changes to auth, roles, grants, RLS, network exposure or secret handling are proposed first and recorded in DECISIONS.md.
+- **The Supabase connector: read freely, change only on the human's word.** A session may read the hosted database through the Supabase connector, which the human signs in to with their own Supabase account (human, 2026-11-14: "Full access"). Every change through it (a write, a setting, pausing or creating a project, anything that costs money) needs the human's go-ahead in that conversation for that one action, after the session has said in plain words what it will do. Migrations still reach the hosted database by `npx supabase db push`, and list loads by the human's own `npm run base -- hosted load` ("No, keep loads by hand"), until DECISIONS.md says otherwise. The connector holds no password and none is ever asked for.
 
 ## Stop and ask when
 - the source is missing, ambiguous or contradicts another source
