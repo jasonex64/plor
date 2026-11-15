@@ -1,0 +1,206 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-11-21",
+  "questions": [
+    {
+      "prompt": "Name a musical instrument",
+      "category": "musical_instrument",
+      "host_bank": [
+        "538f72ae-6f12-502e-a3a8-ca54146b8ca7",
+        "f326ecb7-f8fc-5bc6-aec4-9b6b7d051edb",
+        "33e648a2-ed08-534b-a87b-6285fae68888",
+        "43a326b4-02b7-589d-ad9f-bf42121f8663",
+        "ddbafd07-c654-567d-8acd-2639754c60f6",
+        "b913903d-c185-5042-b5d6-4c8dff4e8952"
+      ],
+      "host_answers": [
+        "ddbafd07-c654-567d-8acd-2639754c60f6"
+      ],
+      "levels": {
+        "f909216a-51b2-5e29-aab3-55f6a15fe052": "uncommon",
+        "16da1958-9603-5c68-a5a9-a463ee306130": "uncommon",
+        "0b57b0f3-7005-5fad-894a-1fdbb43c8d03": "uncommon",
+        "8cf5ba3e-6463-5066-93eb-2bddab13a251": "uncommon",
+        "934c59f2-56da-584f-b618-acc31992f969": "uncommon",
+        "538f72ae-6f12-502e-a3a8-ca54146b8ca7": "common",
+        "f326ecb7-f8fc-5bc6-aec4-9b6b7d051edb": "common",
+        "33e648a2-ed08-534b-a87b-6285fae68888": "common",
+        "43a326b4-02b7-589d-ad9f-bf42121f8663": "common",
+        "ddbafd07-c654-567d-8acd-2639754c60f6": "common",
+        "b913903d-c185-5042-b5d6-4c8dff4e8952": "common"
+      }
+    },
+    {
+      "prompt": "Name a piece of clothing that starts with J",
+      "category": "clothing_j",
+      "host_bank": [
+        "d87ea5bc-2414-5f79-9512-1fcb546f9d0d",
+        "30e917f7-7f80-593a-b3db-0c09aab3f441",
+        "f79fbf38-36af-56b3-9264-a6230e0f0db2",
+        "13778283-003f-5056-a27b-a7568499ad8f",
+        "9118fd53-7714-563f-9a24-5a93efc40198",
+        "1958711c-f2fe-58b3-8d35-d0897b4be501"
+      ],
+      "host_answers": [
+        "d87ea5bc-2414-5f79-9512-1fcb546f9d0d"
+      ],
+      "levels": {
+        "8afeea3b-ecaf-583f-892b-0b6ffc4c2cd9": "uncommon",
+        "ad7be2b0-a991-5d25-b1da-5c77de8d7fbb": "uncommon",
+        "0a2ec6fd-72b8-568b-84ba-85471fb664af": "uncommon",
+        "d87ea5bc-2414-5f79-9512-1fcb546f9d0d": "common",
+        "30e917f7-7f80-593a-b3db-0c09aab3f441": "common",
+        "f79fbf38-36af-56b3-9264-a6230e0f0db2": "common",
+        "13778283-003f-5056-a27b-a7568499ad8f": "common",
+        "9118fd53-7714-563f-9a24-5a93efc40198": "common",
+        "1958711c-f2fe-58b3-8d35-d0897b4be501": "common"
+      },
+      "steals": "p"
+    },
+    {
+      "prompt": "Name a kind of pasta",
+      "category": "pasta",
+      "host_bank": [
+        "429f9746-ad90-5e88-ae2a-d432cc552140",
+        "f548c9ca-6362-5e6d-ba39-9a17b604fb16",
+        "904a0b5c-f04a-5c00-83f1-833b5e933676",
+        "ba16fac8-34f3-5e3f-94f3-87337e1116b5",
+        "c83f895f-6e71-58fc-b4d8-c5fd4c18ccfe"
+      ],
+      "host_answers": [
+        "c83f895f-6e71-58fc-b4d8-c5fd4c18ccfe"
+      ],
+      "levels": {
+        "30bbf75e-0d54-574e-8a25-e9cfc9687840": "uncommon",
+        "c41a3ca8-926c-5a92-8eaf-48661984780f": "uncommon",
+        "02225dce-dcb5-5b6e-a166-49cc058e07fa": "uncommon",
+        "71a4f32e-64f0-52c7-b15b-3410e3073820": "uncommon",
+        "d5bc0653-4594-530c-9d57-6029ae55fd76": "uncommon",
+        "429f9746-ad90-5e88-ae2a-d432cc552140": "common",
+        "f548c9ca-6362-5e6d-ba39-9a17b604fb16": "common",
+        "904a0b5c-f04a-5c00-83f1-833b5e933676": "common",
+        "ba16fac8-34f3-5e3f-94f3-87337e1116b5": "common",
+        "c83f895f-6e71-58fc-b4d8-c5fd4c18ccfe": "common"
+      }
+    },
+    {
+      "prompt": "Name a sausage",
+      "category": "sausage",
+      "host_bank": [
+        "99358ebe-1e6a-5ddb-a03c-fc142de94756",
+        "0f1cef47-f26b-5efe-8877-db99dbffea81",
+        "5e1ba658-f33a-5f0f-b1ed-f81c8c8cef4d",
+        "d28ba83c-8c9b-5504-9aab-d5c1332536c5",
+        "b75074cc-d999-51e8-aafa-4f4c6d9abd78",
+        "5394785a-8d50-5c57-9996-6c0afe5156ab"
+      ],
+      "host_answers": [
+        "99358ebe-1e6a-5ddb-a03c-fc142de94756"
+      ],
+      "levels": {
+        "806ea5cf-3b36-5ed1-9abb-277986fc58e3": "uncommon",
+        "582aa9f7-a439-5ba5-b22b-5358ae6f00b8": "uncommon",
+        "0f74e0f9-5bb5-55ce-9c76-eb0bdfcb8dc0": "uncommon",
+        "85a823ed-6cb3-5082-afce-5a40734aef29": "uncommon",
+        "8f7b0af2-1bfb-5ced-9583-ca9eaea7d0e2": "uncommon",
+        "abbf201a-3136-5ba8-86c9-4e3676efb479": "uncommon",
+        "99358ebe-1e6a-5ddb-a03c-fc142de94756": "common",
+        "0f1cef47-f26b-5efe-8877-db99dbffea81": "common",
+        "5e1ba658-f33a-5f0f-b1ed-f81c8c8cef4d": "common",
+        "d28ba83c-8c9b-5504-9aab-d5c1332536c5": "common",
+        "b75074cc-d999-51e8-aafa-4f4c6d9abd78": "common",
+        "5394785a-8d50-5c57-9996-6c0afe5156ab": "common"
+      },
+      "steals": "u"
+    },
+    {
+      "prompt": "Name a kind of bread",
+      "category": "bread",
+      "host_bank": [
+        "c3e0f1e7-c646-5a2f-97c0-a6be0a897498",
+        "985348a8-7c84-52cb-af54-4c99e6c6aaff",
+        "ad783f07-1b17-57e4-8649-1e62e44b4e42",
+        "20b82b4c-e100-57db-bfd0-6ce8978cc9cd",
+        "36b7a133-676f-58f8-9752-7c320167543e"
+      ],
+      "host_answers": [
+        "c3e0f1e7-c646-5a2f-97c0-a6be0a897498",
+        "20b82b4c-e100-57db-bfd0-6ce8978cc9cd"
+      ],
+      "levels": {
+        "6b94e276-3749-5d05-a131-21b4b2232120": "uncommon",
+        "510736c6-5e02-5637-9d29-aeca2572421e": "uncommon",
+        "1e18235a-0b6f-55bd-a1f2-e9b0070772df": "uncommon",
+        "a598f888-660d-5e8f-afac-71c45b9cda3e": "uncommon",
+        "9f425b48-c270-594a-9f30-3e48b92966a5": "uncommon",
+        "c3e0f1e7-c646-5a2f-97c0-a6be0a897498": "common",
+        "985348a8-7c84-52cb-af54-4c99e6c6aaff": "common",
+        "ad783f07-1b17-57e4-8649-1e62e44b4e42": "common",
+        "20b82b4c-e100-57db-bfd0-6ce8978cc9cd": "common",
+        "36b7a133-676f-58f8-9752-7c320167543e": "common"
+      },
+      "steals": "n"
+    },
+    {
+      "prompt": "Name a kind of greeting card",
+      "category": "greeting_card",
+      "host_bank": [
+        "3338924a-3d17-5909-bdfb-6337474fc30e",
+        "4a4a648d-ec19-5791-91d5-c8424c01cd74",
+        "bca05af0-22cc-5d9c-8a78-46667dfc078a",
+        "907aed82-5e48-5671-9f0e-59933ccfd1a0",
+        "0d22039f-3748-5539-bb68-f3219265174d",
+        "62aa0b5c-01e6-59e5-9eef-804e5a6ffc57"
+      ],
+      "host_answers": [
+        "3338924a-3d17-5909-bdfb-6337474fc30e",
+        "4a4a648d-ec19-5791-91d5-c8424c01cd74"
+      ],
+      "levels": {
+        "9a4c13e0-a6ef-5de1-8c99-150e1ddce81d": "uncommon",
+        "71f79d50-c377-5504-ba01-c6b9715c498c": "uncommon",
+        "dd55f4f1-2255-54ee-818a-02b36d70b6e0": "uncommon",
+        "d5c1e3bc-fa65-5d3a-aa07-c7ecd4f47ace": "uncommon",
+        "3338924a-3d17-5909-bdfb-6337474fc30e": "common",
+        "4a4a648d-ec19-5791-91d5-c8424c01cd74": "common",
+        "bca05af0-22cc-5d9c-8a78-46667dfc078a": "common",
+        "907aed82-5e48-5671-9f0e-59933ccfd1a0": "common",
+        "0d22039f-3748-5539-bb68-f3219265174d": "common",
+        "62aa0b5c-01e6-59e5-9eef-804e5a6ffc57": "common"
+      }
+    },
+    {
+      "prompt": "Name a simple machine",
+      "category": "simple_machine",
+      "host_bank": [
+        "b62afe63-457b-5c2e-9bed-5ec33e0ccd5d",
+        "8ea2ca2f-da04-56fc-88cb-587e06093669",
+        "65297a43-52ab-55c8-8076-a4a87fa4d8d3",
+        "d7faf97b-7948-5225-bc93-81a5fd7e4a1f",
+        "50ea97b6-dd20-5c0c-8700-2f599ab5ee7b",
+        "3834d2e9-6fc3-5e30-bb08-1193f95734bc"
+      ],
+      "host_answers": [
+        "b62afe63-457b-5c2e-9bed-5ec33e0ccd5d",
+        "d7faf97b-7948-5225-bc93-81a5fd7e4a1f",
+        "65297a43-52ab-55c8-8076-a4a87fa4d8d3"
+      ],
+      "levels": {
+        "420627ce-c0e2-5d62-9a47-f4ee4a262e8e": "uncommon",
+        "4be0442e-0fc4-5d50-a09b-8bcb53853412": "uncommon",
+        "67798396-cfc3-521a-ab1a-937c93d10ddc": "uncommon",
+        "c233dbd3-8f96-58ab-85bb-f59f6614634f": "uncommon",
+        "61e9a1a6-0c6a-503a-9eb5-e3bef93f6a9d": "uncommon",
+        "ac563bda-e300-5d60-aa41-09a31751ab16": "uncommon",
+        "b62afe63-457b-5c2e-9bed-5ec33e0ccd5d": "common",
+        "8ea2ca2f-da04-56fc-88cb-587e06093669": "common",
+        "65297a43-52ab-55c8-8076-a4a87fa4d8d3": "common",
+        "d7faf97b-7948-5225-bc93-81a5fd7e4a1f": "common",
+        "50ea97b6-dd20-5c0c-8700-2f599ab5ee7b": "common",
+        "3834d2e9-6fc3-5e30-bb08-1193f95734bc": "common"
+      },
+      "steals": "o"
+    }
+  ]
+}

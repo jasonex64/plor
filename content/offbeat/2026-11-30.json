@@ -1,0 +1,233 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-11-30",
+  "questions": [
+    {
+      "prompt": "Name a card game",
+      "category": "card_game",
+      "host_bank": [
+        "18513d9b-d74b-5391-b09e-9d92f5a3eadc",
+        "f2d9ec14-3ea6-55ff-b668-97089a893d78",
+        "3d9f7f82-8039-509f-8bbe-0c753b9372a3",
+        "ce147bab-5b6f-5de3-b777-1846c0c6f5bf",
+        "285283e0-4c4f-5a60-80c2-3345b4ee1ca2",
+        "dce3ffd5-bc21-5d86-bafa-a739fcbb290e"
+      ],
+      "host_answers": [
+        "285283e0-4c4f-5a60-80c2-3345b4ee1ca2"
+      ],
+      "levels": {
+        "952598b7-1240-5f6a-af76-91d83d07d1d7": "uncommon",
+        "a252ff21-7c31-5755-a3dd-13aca50e85a2": "uncommon",
+        "4279b1ee-85eb-509d-b4c2-f888dfbea483": "uncommon",
+        "d7405577-4979-574c-b7b2-49a014aae1f9": "uncommon",
+        "cd0bf5e9-aea5-5862-9aef-3de1103566da": "uncommon",
+        "e12d2746-f5df-5dab-93df-4ed4159be189": "uncommon",
+        "18513d9b-d74b-5391-b09e-9d92f5a3eadc": "common",
+        "f2d9ec14-3ea6-55ff-b668-97089a893d78": "common",
+        "3d9f7f82-8039-509f-8bbe-0c753b9372a3": "common",
+        "ce147bab-5b6f-5de3-b777-1846c0c6f5bf": "common",
+        "285283e0-4c4f-5a60-80c2-3345b4ee1ca2": "common",
+        "dce3ffd5-bc21-5d86-bafa-a739fcbb290e": "common"
+      }
+    },
+    {
+      "prompt": "Name an animal that went extinct in modern times",
+      "category": "extinct_animal",
+      "host_bank": [
+        "52d9e6f6-4e33-531b-b96f-b09b823800da",
+        "9c8a499b-bf94-5289-a176-71fa5802ebb2",
+        "7f754a51-112e-598c-9313-86d584edb343",
+        "a2eddaa6-e05e-52af-8c70-c64f75ca8f13",
+        "dc6264c0-08dc-5c67-b88a-e6f6efc2d8bc",
+        "25f37bfd-09f3-5546-aa79-f8ad5c337fe9"
+      ],
+      "host_answers": [
+        "52d9e6f6-4e33-531b-b96f-b09b823800da"
+      ],
+      "levels": {
+        "5b55a50f-6e0a-52e4-9db1-ff9f5d3bd06d": "uncommon",
+        "03fa0d84-62ec-52c3-a1b6-17252bfa081f": "uncommon",
+        "cfce639a-44e3-5fcb-84b6-7b603be62bd1": "uncommon",
+        "a0c911c1-1174-53fa-9258-67dc3df4cd52": "uncommon",
+        "963f81e1-edcd-5209-b4d5-b4711f71712f": "uncommon",
+        "65a42108-48ff-5c9d-b560-61e728d24e70": "uncommon",
+        "52d9e6f6-4e33-531b-b96f-b09b823800da": "common",
+        "9c8a499b-bf94-5289-a176-71fa5802ebb2": "common",
+        "7f754a51-112e-598c-9313-86d584edb343": "common",
+        "a2eddaa6-e05e-52af-8c70-c64f75ca8f13": "common",
+        "dc6264c0-08dc-5c67-b88a-e6f6efc2d8bc": "common",
+        "25f37bfd-09f3-5546-aa79-f8ad5c337fe9": "common"
+      },
+      "steals": "u"
+    },
+    {
+      "prompt": "Name a household appliance",
+      "category": "home_appliance",
+      "host_bank": [
+        "16916eab-1240-564e-97a4-64a35a28c3ab",
+        "6a338aa0-8bd4-5f7a-a953-5e9761bb238e",
+        "b71e3b54-720f-5a08-9cb5-99f699275ac5",
+        "611a6d7b-972d-54a7-92e1-38d9bd77780c",
+        "74758fbf-98c5-5416-9c24-3b6f6abe1f81",
+        "55761809-769e-5f33-aeb2-b64723ce3fd2"
+      ],
+      "host_answers": [
+        "74758fbf-98c5-5416-9c24-3b6f6abe1f81"
+      ],
+      "levels": {
+        "dad5dd1f-e5bf-573c-bd1c-dc54b7493d42": "uncommon",
+        "21e7a4c8-23bc-5f2f-a368-5101d5031742": "uncommon",
+        "f71bad8d-0e8c-54c0-b328-f376a9d55348": "uncommon",
+        "887f5fc7-d314-5455-bbb4-5114ead90295": "uncommon",
+        "cede75b8-3c3f-5647-adf2-c31285dc9212": "uncommon",
+        "16916eab-1240-564e-97a4-64a35a28c3ab": "common",
+        "6a338aa0-8bd4-5f7a-a953-5e9761bb238e": "common",
+        "b71e3b54-720f-5a08-9cb5-99f699275ac5": "common",
+        "611a6d7b-972d-54a7-92e1-38d9bd77780c": "common",
+        "74758fbf-98c5-5416-9c24-3b6f6abe1f81": "common",
+        "55761809-769e-5f33-aeb2-b64723ce3fd2": "common"
+      }
+    },
+    {
+      "prompt": "Name a form of government",
+      "category": "political_system",
+      "host_bank": [
+        "4f2e02df-501f-5f1c-97f2-d36cecce3e66",
+        "cae77f6f-bd5a-53a3-afe8-2d586d9c50d2",
+        "33dd1381-b44f-5ad9-9d59-7915124464ae",
+        "0839fd92-8c60-5da3-a57a-24aaaae364bf",
+        "9fc96030-2017-5d01-8741-f765047d7120",
+        "6512c09a-7fe4-557b-a0d3-b8b80789e16c"
+      ],
+      "host_answers": [
+        "4f2e02df-501f-5f1c-97f2-d36cecce3e66"
+      ],
+      "levels": {
+        "b239942a-4a7d-5a2c-a667-359f2464bea3": "uncommon",
+        "da71e632-8d46-5688-b155-ec08d843d2ae": "uncommon",
+        "ef3ab99b-08e3-5646-9ec4-b5d0795c4c63": "uncommon",
+        "83465691-e387-5755-aa3b-f62a936004c5": "uncommon",
+        "a4412730-15a9-5da6-afa3-a53a6a49668b": "uncommon",
+        "dbdd57ed-0851-544e-bb44-26bd16d2bf3e": "uncommon",
+        "4f2e02df-501f-5f1c-97f2-d36cecce3e66": "common",
+        "cae77f6f-bd5a-53a3-afe8-2d586d9c50d2": "common",
+        "33dd1381-b44f-5ad9-9d59-7915124464ae": "common",
+        "0839fd92-8c60-5da3-a57a-24aaaae364bf": "common",
+        "9fc96030-2017-5d01-8741-f765047d7120": "common",
+        "6512c09a-7fe4-557b-a0d3-b8b80789e16c": "common"
+      },
+      "steals": "b"
+    },
+    {
+      "prompt": "Name a kind of aircraft",
+      "category": "aircraft",
+      "host_bank": [
+        "b51069a5-b503-5a17-9ebb-05349e94efda",
+        "a351f8fa-2fd6-5ea9-a2e6-6ec5ba009b4d",
+        "78251a0d-e1e7-5fc5-97f5-45ae24422e53",
+        "62414894-d13c-5f8b-a83b-35008c5283db",
+        "45be9c94-f364-5d52-83d2-3752b9d6fe49",
+        "93bd215a-c6d7-517e-aa80-e277b930f0b5"
+      ],
+      "host_answers": [
+        "78251a0d-e1e7-5fc5-97f5-45ae24422e53",
+        "a351f8fa-2fd6-5ea9-a2e6-6ec5ba009b4d"
+      ],
+      "levels": {
+        "ac00a0f7-f076-5a18-8321-1a72163130a0": "uncommon",
+        "df503902-6d02-5d9f-ba69-afb5beb1540a": "uncommon",
+        "cbae9499-2984-5fd1-8f7a-3ea547880d93": "uncommon",
+        "bf03099e-9560-5597-8263-135b29237c31": "uncommon",
+        "94e4e32a-e55e-572a-b334-f3279104d423": "uncommon",
+        "0e5b56d1-726e-559f-8eab-1e9ea6295c17": "uncommon",
+        "a89fc129-9753-5dd8-9577-8455413f1a02": "uncommon",
+        "5ed693f7-7b97-5317-bf2c-9f77c2b2449c": "uncommon",
+        "d10b9775-1e1e-593d-8fc3-e15d54a9bb93": "uncommon",
+        "4278ad93-9ae9-5d4d-ad7d-6a4dfd1b9465": "uncommon",
+        "58bce046-3dfc-516f-938b-e162d89e462f": "uncommon",
+        "66a48038-c23a-5102-ae19-50cc9fd94c66": "uncommon",
+        "6fcf9b20-adc2-5e29-8e4d-2c72bb7e5932": "uncommon",
+        "6e41fe02-959a-57f2-a9c4-04f8122a41f8": "uncommon",
+        "b51069a5-b503-5a17-9ebb-05349e94efda": "common",
+        "a351f8fa-2fd6-5ea9-a2e6-6ec5ba009b4d": "common",
+        "78251a0d-e1e7-5fc5-97f5-45ae24422e53": "common",
+        "62414894-d13c-5f8b-a83b-35008c5283db": "common",
+        "45be9c94-f364-5d52-83d2-3752b9d6fe49": "common",
+        "93bd215a-c6d7-517e-aa80-e277b930f0b5": "common"
+      },
+      "steals": "n"
+    },
+    {
+      "prompt": "Name a waterfowl",
+      "category": "waterfowl",
+      "host_bank": [
+        "26ceded0-5d41-52a1-9fba-268a2a950361",
+        "7f6f8d6a-6d5f-50e1-a8f8-45b296cc61b0",
+        "4df8d829-3d72-51a7-aefa-5fa6f90dfaa7",
+        "5d0fec9b-997d-5b73-82b3-e2b8f6461636",
+        "38915240-6153-559d-ac3c-679568a090f0",
+        "0bb1eddd-8cfc-5e93-8930-192dfa6994e9"
+      ],
+      "host_answers": [
+        "7f6f8d6a-6d5f-50e1-a8f8-45b296cc61b0",
+        "4df8d829-3d72-51a7-aefa-5fa6f90dfaa7"
+      ],
+      "levels": {
+        "973130d7-7bdd-5d7b-bfab-909e5128bcfa": "uncommon",
+        "a2ba4dd3-3539-53b5-a778-75b1904c07ae": "uncommon",
+        "f73bf8dd-c946-5ac2-9bd1-083a8fe1b384": "uncommon",
+        "8d374f26-8b17-57c9-841a-e96d17c71550": "uncommon",
+        "f748632b-e616-5c18-8c8c-a45735c08ff4": "uncommon",
+        "d38ab407-7098-5904-9199-f391482dd564": "uncommon",
+        "26ceded0-5d41-52a1-9fba-268a2a950361": "common",
+        "7f6f8d6a-6d5f-50e1-a8f8-45b296cc61b0": "common",
+        "4df8d829-3d72-51a7-aefa-5fa6f90dfaa7": "common",
+        "5d0fec9b-997d-5b73-82b3-e2b8f6461636": "common",
+        "38915240-6153-559d-ac3c-679568a090f0": "common",
+        "0bb1eddd-8cfc-5e93-8930-192dfa6994e9": "common"
+      }
+    },
+    {
+      "prompt": "Name a branch of natural science",
+      "category": "natural_science",
+      "host_bank": [
+        "7e4dcebf-9d5b-540c-9c0a-98e05352d35a",
+        "b343b387-96e1-56a5-a102-e3d03e47927e",
+        "444c8113-84a1-50a4-9bcf-e6a5f33dcdac",
+        "7f0e389a-6aee-5bea-8b62-9763703d90c9",
+        "90375055-8888-5b26-84dd-8522850fc61c",
+        "a94410f5-3ff6-58f5-b0b3-0f6345b455d2"
+      ],
+      "host_answers": [
+        "444c8113-84a1-50a4-9bcf-e6a5f33dcdac",
+        "b343b387-96e1-56a5-a102-e3d03e47927e",
+        "90375055-8888-5b26-84dd-8522850fc61c"
+      ],
+      "levels": {
+        "3aa7089b-9d8e-5a07-9806-05d78bfc2f97": "uncommon",
+        "30b3109e-cb52-5cc0-be6f-22a0baf4c6de": "uncommon",
+        "d29bdbed-bf76-53de-9d6c-e4305dcc9137": "uncommon",
+        "85b3d21d-7e9c-556c-9bc9-17ae518bd360": "uncommon",
+        "76594b23-11f0-581c-82b8-8cbdcad0733a": "uncommon",
+        "70e5c72a-1edb-58d7-89bb-1eb348e0abca": "uncommon",
+        "c4728a33-8657-5d88-a8b2-3e3d94117fe8": "uncommon",
+        "2d1400d7-242b-5cc1-ad3f-76a93067f0fe": "uncommon",
+        "7b76f757-9680-5887-8f95-f3fa2ad876b9": "uncommon",
+        "a8b595af-7668-5a9d-a60e-ebb15747738b": "uncommon",
+        "743d6bd7-2d24-5a45-b6f2-f9a1d457adc0": "uncommon",
+        "790c07bb-d91d-5d39-98ee-c74975280875": "uncommon",
+        "0162d17f-ffab-56d6-8a14-a10002ab14cf": "uncommon",
+        "51ca22b2-dc0d-5e07-980b-8cab55728355": "uncommon",
+        "7e4dcebf-9d5b-540c-9c0a-98e05352d35a": "common",
+        "b343b387-96e1-56a5-a102-e3d03e47927e": "common",
+        "444c8113-84a1-50a4-9bcf-e6a5f33dcdac": "common",
+        "7f0e389a-6aee-5bea-8b62-9763703d90c9": "common",
+        "90375055-8888-5b26-84dd-8522850fc61c": "common",
+        "a94410f5-3ff6-58f5-b0b3-0f6345b455d2": "common"
+      },
+      "steals": "a"
+    }
+  ]
+}

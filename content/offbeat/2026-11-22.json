@@ -1,0 +1,207 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-11-22",
+  "questions": [
+    {
+      "prompt": "Name a tool that starts with W",
+      "category": "tool_w",
+      "host_bank": [
+        "1e58ef17-dcb5-55be-b183-b28e4b39a7e3",
+        "1b7b789d-ec80-530e-889d-158de887d77a",
+        "cd849e10-d51e-59d6-b38b-0bb564a7dfc4",
+        "33aeaa52-15a3-5b69-ba7d-4a76e9f3856d",
+        "62e49d9c-b101-5bbc-adca-c8d570fb8b92",
+        "d0bcb1b4-b3ab-5ad4-863a-efa5af4be91d"
+      ],
+      "host_answers": [
+        "62e49d9c-b101-5bbc-adca-c8d570fb8b92"
+      ],
+      "levels": {
+        "d568a2c9-b579-5639-9fd7-ad5c4ec98bc2": "uncommon",
+        "6f34c914-26a1-5f50-b248-df4f2163612f": "uncommon",
+        "1e58ef17-dcb5-55be-b183-b28e4b39a7e3": "common",
+        "1b7b789d-ec80-530e-889d-158de887d77a": "common",
+        "cd849e10-d51e-59d6-b38b-0bb564a7dfc4": "common",
+        "33aeaa52-15a3-5b69-ba7d-4a76e9f3856d": "common",
+        "62e49d9c-b101-5bbc-adca-c8d570fb8b92": "common",
+        "d0bcb1b4-b3ab-5ad4-863a-efa5af4be91d": "common"
+      }
+    },
+    {
+      "prompt": "Name a festival",
+      "category": "festival",
+      "host_bank": [
+        "42b1e56d-2a1f-51f1-9c53-aedcf57d5c8c",
+        "6c9abb0f-6b52-57fc-9e75-359a2c4d76d5",
+        "8b77712a-47da-5602-885f-ee7c4ac679ca",
+        "65430d25-3ea2-5f3f-a5c7-33119d169e68",
+        "ea80621e-adb4-5fe1-b6fc-ed58f74ce948",
+        "2f587178-39ec-55c1-a0a0-52053464613c"
+      ],
+      "host_answers": [
+        "2f587178-39ec-55c1-a0a0-52053464613c"
+      ],
+      "levels": {
+        "31679f65-b419-5db0-920f-12b2139fb643": "uncommon",
+        "64ea4909-a7bb-5a74-be6c-afb82d44cb88": "uncommon",
+        "4dac3043-d4d5-5d4f-95c1-f38779981c83": "uncommon",
+        "69bd395d-a6c6-5f28-be94-3d2d5736a498": "uncommon",
+        "42b1e56d-2a1f-51f1-9c53-aedcf57d5c8c": "common",
+        "6c9abb0f-6b52-57fc-9e75-359a2c4d76d5": "common",
+        "8b77712a-47da-5602-885f-ee7c4ac679ca": "common",
+        "65430d25-3ea2-5f3f-a5c7-33119d169e68": "common",
+        "ea80621e-adb4-5fe1-b6fc-ed58f74ce948": "common",
+        "2f587178-39ec-55c1-a0a0-52053464613c": "common"
+      },
+      "steals": "b"
+    },
+    {
+      "prompt": "Name a kind of school",
+      "category": "school",
+      "host_bank": [
+        "96f5bbfb-5774-5afd-a584-c5f407a5981b",
+        "1e41fb94-69b3-5e11-a4e5-b524b6969c22",
+        "1e08bbd3-e2ba-5b8a-a459-66429885c74f",
+        "98e5b28c-fa42-541c-88c2-8f6b11c3ad30",
+        "dab8142c-3a90-5cd0-bea5-68c9e044df46",
+        "0844f73e-849d-5bde-921f-7b93adc94991"
+      ],
+      "host_answers": [
+        "1e41fb94-69b3-5e11-a4e5-b524b6969c22"
+      ],
+      "levels": {
+        "2b7278a3-8fe9-52e4-89c9-0a48345c6d97": "uncommon",
+        "5d7077a6-3164-59c7-b3a3-c1dde9318cb5": "uncommon",
+        "e1e4b11a-ab7e-5764-9770-fa3294b217cc": "uncommon",
+        "16b842ab-43bc-5840-8234-71cbbee354e6": "uncommon",
+        "483bbedf-ec97-50d1-b99a-c9100f35a142": "uncommon",
+        "2cc82576-3a41-54ec-aa29-3bdc8b95e1ee": "uncommon",
+        "96f5bbfb-5774-5afd-a584-c5f407a5981b": "common",
+        "1e41fb94-69b3-5e11-a4e5-b524b6969c22": "common",
+        "1e08bbd3-e2ba-5b8a-a459-66429885c74f": "common",
+        "98e5b28c-fa42-541c-88c2-8f6b11c3ad30": "common",
+        "dab8142c-3a90-5cd0-bea5-68c9e044df46": "common",
+        "0844f73e-849d-5bde-921f-7b93adc94991": "common"
+      }
+    },
+    {
+      "prompt": "Name a kind of squash",
+      "category": "squash",
+      "host_bank": [
+        "4449fb22-9286-51bb-846c-d84270a05d72",
+        "e8bc1111-75c2-5514-9808-2115588641b4",
+        "41abfc90-03f8-516c-8cdc-f5e75879698f",
+        "757e4db3-3835-5798-8401-0dfa1e1c5503",
+        "d84f258b-59cd-5882-a079-e95db6890ae2",
+        "bc8fd9e3-b136-5848-b8ef-04e454bde470"
+      ],
+      "host_answers": [
+        "4449fb22-9286-51bb-846c-d84270a05d72"
+      ],
+      "levels": {
+        "14542c3b-9498-52ad-ad8a-1b5b2008ffdb": "uncommon",
+        "0b3d6819-5396-5b74-8626-dd5bcc270d71": "uncommon",
+        "b167d7d9-aebd-5373-87e4-9162b19e2deb": "uncommon",
+        "5cf67f66-f1c7-52a5-a015-7b8e8c249a0e": "uncommon",
+        "b6e13874-44ae-5904-9cd8-ade198965d88": "uncommon",
+        "f2df88ee-7c20-5c64-a858-6e9f28f25996": "uncommon",
+        "4449fb22-9286-51bb-846c-d84270a05d72": "common",
+        "e8bc1111-75c2-5514-9808-2115588641b4": "common",
+        "41abfc90-03f8-516c-8cdc-f5e75879698f": "common",
+        "757e4db3-3835-5798-8401-0dfa1e1c5503": "common",
+        "d84f258b-59cd-5882-a079-e95db6890ae2": "common",
+        "bc8fd9e3-b136-5848-b8ef-04e454bde470": "common"
+      },
+      "steals": "g"
+    },
+    {
+      "prompt": "Name a rodent",
+      "category": "rodent",
+      "host_bank": [
+        "360acd1e-8008-5930-82f1-70f1be26b244",
+        "47eb97b1-61cb-5f5a-832e-4ff09558e90c",
+        "86501e8f-c133-51c7-906d-d72dbdc383fc",
+        "85285de2-6855-5b85-8007-2e1030aa7e0f",
+        "9eef8b88-3e58-58ec-9f00-45f3fe3e3ccb",
+        "4ff9ff29-518e-51a6-ba0b-348d80884dfe"
+      ],
+      "host_answers": [
+        "360acd1e-8008-5930-82f1-70f1be26b244",
+        "85285de2-6855-5b85-8007-2e1030aa7e0f"
+      ],
+      "levels": {
+        "8f83fc9d-69e3-537d-83b6-00afb14f11d5": "uncommon",
+        "4312c71e-b83c-5d45-a13e-4d46abb96e07": "uncommon",
+        "2356d20a-5e95-541b-8214-bc2b695a6212": "uncommon",
+        "fa5df142-589b-5ad0-a058-8ded8501be3f": "uncommon",
+        "dc83e7b5-3b68-54cc-9664-ef8fd6e8de6f": "uncommon",
+        "360acd1e-8008-5930-82f1-70f1be26b244": "common",
+        "47eb97b1-61cb-5f5a-832e-4ff09558e90c": "common",
+        "86501e8f-c133-51c7-906d-d72dbdc383fc": "common",
+        "85285de2-6855-5b85-8007-2e1030aa7e0f": "common",
+        "9eef8b88-3e58-58ec-9f00-45f3fe3e3ccb": "common",
+        "4ff9ff29-518e-51a6-ba0b-348d80884dfe": "common"
+      },
+      "steals": "n"
+    },
+    {
+      "prompt": "Name an insect that starts with W",
+      "category": "insect_w",
+      "host_bank": [
+        "da97047f-abe2-57d0-b504-ccf62a520530",
+        "3e851bcc-5cf1-5be1-944a-964a2014b79d",
+        "46f93971-7bf4-5ebe-a967-3b75b1cc4371",
+        "86d179da-f44c-5582-8586-af66919df5c9",
+        "7432cf75-8f64-5267-877a-081fb24259ec"
+      ],
+      "host_answers": [
+        "da97047f-abe2-57d0-b504-ccf62a520530",
+        "7432cf75-8f64-5267-877a-081fb24259ec"
+      ],
+      "levels": {
+        "90812e59-471d-579b-99ee-65e4c088da5b": "uncommon",
+        "e21f273c-1470-5970-9f97-52becc3dd745": "uncommon",
+        "3c64203e-1e68-5c45-a295-473690db68b5": "uncommon",
+        "5cb0f850-ad95-593c-9e08-39527f56a9b8": "uncommon",
+        "da97047f-abe2-57d0-b504-ccf62a520530": "common",
+        "3e851bcc-5cf1-5be1-944a-964a2014b79d": "common",
+        "46f93971-7bf4-5ebe-a967-3b75b1cc4371": "common",
+        "86d179da-f44c-5582-8586-af66919df5c9": "common",
+        "7432cf75-8f64-5267-877a-081fb24259ec": "common"
+      }
+    },
+    {
+      "prompt": "Name a kind of parrot",
+      "category": "parrot",
+      "host_bank": [
+        "316ffe98-c834-59a0-bdd6-a851eccd1a95",
+        "69694ebd-a33d-5a69-99eb-14f40096f044",
+        "9d1053f5-b999-5f07-9dca-562b2bf94ac0",
+        "dbb99394-db52-5790-9d82-fae2e205dfa5",
+        "ad5229eb-d138-56c4-813c-a480d9af9c48",
+        "dec16fb2-c33a-5ba5-835b-fce80b6523ec"
+      ],
+      "host_answers": [
+        "9d1053f5-b999-5f07-9dca-562b2bf94ac0",
+        "316ffe98-c834-59a0-bdd6-a851eccd1a95",
+        "69694ebd-a33d-5a69-99eb-14f40096f044"
+      ],
+      "levels": {
+        "73ef538d-9a77-5978-a6c1-6c1dd2c101af": "uncommon",
+        "96b483b8-8e44-51d3-be35-a9667163d720": "uncommon",
+        "975f4942-cf55-520e-83ce-45bde0ef80bf": "uncommon",
+        "e0162ff3-4973-5e20-9d97-33c080bb4cfc": "uncommon",
+        "1aefcd13-c203-5652-a6a2-48423ec074b0": "uncommon",
+        "60a700af-6428-52af-b9af-8e4713728e79": "uncommon",
+        "316ffe98-c834-59a0-bdd6-a851eccd1a95": "common",
+        "69694ebd-a33d-5a69-99eb-14f40096f044": "common",
+        "9d1053f5-b999-5f07-9dca-562b2bf94ac0": "common",
+        "dbb99394-db52-5790-9d82-fae2e205dfa5": "common",
+        "ad5229eb-d138-56c4-813c-a480d9af9c48": "common",
+        "dec16fb2-c33a-5ba5-835b-fce80b6523ec": "common"
+      },
+      "steals": "i"
+    }
+  ]
+}

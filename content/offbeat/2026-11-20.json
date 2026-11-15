@@ -1,0 +1,215 @@
+{
+  "format": 3,
+  "game_id": "offbeat",
+  "date": "2026-11-20",
+  "questions": [
+    {
+      "prompt": "Name a board or card game",
+      "category": "tabletop_game",
+      "host_bank": [
+        "29f131d5-04d5-5f67-afb6-17fa2d1f2337",
+        "8dbcd088-1940-5d9a-8b77-0dd7efb4062a",
+        "720712c1-6a0c-5771-b4c7-14e06e735c12",
+        "18513d9b-d74b-5391-b09e-9d92f5a3eadc",
+        "eaeae6f8-6a5d-5aaf-87b6-768706d45062",
+        "5d4f8672-782d-5bd2-8480-c854012968c5"
+      ],
+      "host_answers": [
+        "eaeae6f8-6a5d-5aaf-87b6-768706d45062"
+      ],
+      "levels": {
+        "0cc6e5af-9ff5-5c25-b34e-aae44e8dcb96": "uncommon",
+        "c62d3469-410f-5750-9f7d-9862f33c7bc9": "uncommon",
+        "6aaa783c-8a42-5652-848d-6a1813436fab": "uncommon",
+        "b0056bbb-770d-56fa-b576-3d5abcbc5a4e": "uncommon",
+        "c7022d7d-d9f2-53bb-aa1c-4a62c254b2a6": "uncommon",
+        "bb821202-11cc-5354-aced-3191a16193cb": "uncommon",
+        "29f131d5-04d5-5f67-afb6-17fa2d1f2337": "common",
+        "8dbcd088-1940-5d9a-8b77-0dd7efb4062a": "common",
+        "720712c1-6a0c-5771-b4c7-14e06e735c12": "common",
+        "18513d9b-d74b-5391-b09e-9d92f5a3eadc": "common",
+        "eaeae6f8-6a5d-5aaf-87b6-768706d45062": "common",
+        "5d4f8672-782d-5bd2-8480-c854012968c5": "common"
+      }
+    },
+    {
+      "prompt": "Name an acid",
+      "category": "acid",
+      "host_bank": [
+        "e6313393-276f-5b1b-96eb-2be388912f1e",
+        "435040f3-e5b0-50b4-a93c-fc60c1776ec0",
+        "6bf98349-6f17-5053-9fa1-7d5a6f1176a7",
+        "ba95eed5-42cd-5838-a084-41f4cc4bf816",
+        "b4b1c54e-6c4c-5d0b-bef4-6afca11c76df",
+        "4119f2f2-3762-5916-b5d2-9a39f1e22f1d"
+      ],
+      "host_answers": [
+        "b4b1c54e-6c4c-5d0b-bef4-6afca11c76df"
+      ],
+      "levels": {
+        "14012b46-e164-541c-a46c-a13c5ee26ad3": "uncommon",
+        "52da7458-1d2a-52cd-83c1-a7fdb7e81d27": "uncommon",
+        "5e824499-1f8b-5f50-8eaf-3cbd7984efd4": "uncommon",
+        "c4cc3805-06a3-52c5-9ddf-feb9ab29efb3": "uncommon",
+        "48d4e746-cbdd-5904-bd19-a78f1059c806": "uncommon",
+        "ceb834b8-ad36-5b13-94ae-329427f4195a": "uncommon",
+        "e6313393-276f-5b1b-96eb-2be388912f1e": "common",
+        "435040f3-e5b0-50b4-a93c-fc60c1776ec0": "common",
+        "6bf98349-6f17-5053-9fa1-7d5a6f1176a7": "common",
+        "ba95eed5-42cd-5838-a084-41f4cc4bf816": "common",
+        "b4b1c54e-6c4c-5d0b-bef4-6afca11c76df": "common",
+        "4119f2f2-3762-5916-b5d2-9a39f1e22f1d": "common"
+      },
+      "steals": "g"
+    },
+    {
+      "prompt": "Name a wind instrument",
+      "category": "wind_instrument",
+      "host_bank": [
+        "ddbafd07-c654-567d-8acd-2639754c60f6",
+        "b913903d-c185-5042-b5d6-4c8dff4e8952",
+        "0b57b0f3-7005-5fad-894a-1fdbb43c8d03",
+        "4977394c-46a4-592c-9ebe-30eef106a322",
+        "fc1d5bb7-53a6-593c-a32d-12707048f9ca",
+        "934c59f2-56da-584f-b618-acc31992f969"
+      ],
+      "host_answers": [
+        "fc1d5bb7-53a6-593c-a32d-12707048f9ca"
+      ],
+      "levels": {
+        "6172b9be-f6a6-5760-91ae-99e3f976f65f": "uncommon",
+        "6fd569f9-7e70-52b9-9b38-c6220798a9bc": "uncommon",
+        "1b6dc11f-f98d-5393-a1e5-f0d873c83086": "uncommon",
+        "12a0fd67-6ef8-58fd-9288-7535f96f54ea": "uncommon",
+        "a14f1f06-ad9b-515a-84c0-3c0a85eda55a": "uncommon",
+        "2d2c9ee5-8a7b-5844-b38e-4b81ca9d2e12": "uncommon",
+        "ddbafd07-c654-567d-8acd-2639754c60f6": "common",
+        "b913903d-c185-5042-b5d6-4c8dff4e8952": "common",
+        "0b57b0f3-7005-5fad-894a-1fdbb43c8d03": "common",
+        "4977394c-46a4-592c-9ebe-30eef106a322": "common",
+        "fc1d5bb7-53a6-593c-a32d-12707048f9ca": "common",
+        "934c59f2-56da-584f-b618-acc31992f969": "common"
+      }
+    },
+    {
+      "prompt": "Name a dessert",
+      "category": "dessert",
+      "host_bank": [
+        "02e205f7-1dec-51a0-873f-5c36dd98c800",
+        "f7fb31c8-d5b8-5e12-afde-220328ef8124",
+        "99328cc3-1301-52c1-a308-b6d919eca01b",
+        "78a431e4-0d49-5121-9e2e-b4dcb03073ee",
+        "d635b871-a49e-52e1-bb8e-21657d112651"
+      ],
+      "host_answers": [
+        "02e205f7-1dec-51a0-873f-5c36dd98c800"
+      ],
+      "levels": {
+        "224891ce-a295-50de-9c93-a941bb2133bc": "uncommon",
+        "fcf43831-7754-5c6a-a1f6-4a6bbab44ab7": "uncommon",
+        "ce074a36-dd53-59bc-98f3-99b52d54be45": "uncommon",
+        "230add36-133d-50b9-ae61-7c07cc084e30": "uncommon",
+        "eab7c7f2-d592-5a84-b733-2af236e48d48": "uncommon",
+        "02e205f7-1dec-51a0-873f-5c36dd98c800": "common",
+        "f7fb31c8-d5b8-5e12-afde-220328ef8124": "common",
+        "99328cc3-1301-52c1-a308-b6d919eca01b": "common",
+        "78a431e4-0d49-5121-9e2e-b4dcb03073ee": "common",
+        "d635b871-a49e-52e1-bb8e-21657d112651": "common"
+      },
+      "steals": "u"
+    },
+    {
+      "prompt": "Name a kind of weather",
+      "category": "weather",
+      "host_bank": [
+        "c15a6f38-5cc3-5513-a2b0-439216dac060",
+        "f938d946-37e2-5147-a3cc-f582af2358f0",
+        "3520745d-738a-50ec-ab09-b1543fcaeef8",
+        "bb044a87-b3ee-5e78-9346-84dbb6e6f954",
+        "ccd54716-8ac7-5ba6-b1c9-1f83abfd4609",
+        "c89c355b-9a92-5a2f-a3f8-59e213f9f0aa"
+      ],
+      "host_answers": [
+        "c15a6f38-5cc3-5513-a2b0-439216dac060",
+        "f938d946-37e2-5147-a3cc-f582af2358f0"
+      ],
+      "levels": {
+        "b15750eb-e50f-5b99-ace2-c70556ff3e6c": "uncommon",
+        "c1d56358-017e-5b65-a354-9b587c5abede": "uncommon",
+        "fdd43347-8f8a-5102-81fd-cbcef5a214fd": "uncommon",
+        "0ddfa6ff-3e97-5209-9ae7-9cbb5f4baaca": "uncommon",
+        "a00bf0be-b1fb-5539-b594-ea0c9955896e": "uncommon",
+        "bca32e0b-9bab-5a80-b849-57af8eac4acf": "uncommon",
+        "c15a6f38-5cc3-5513-a2b0-439216dac060": "common",
+        "f938d946-37e2-5147-a3cc-f582af2358f0": "common",
+        "3520745d-738a-50ec-ab09-b1543fcaeef8": "common",
+        "bb044a87-b3ee-5e78-9346-84dbb6e6f954": "common",
+        "ccd54716-8ac7-5ba6-b1c9-1f83abfd4609": "common",
+        "c89c355b-9a92-5a2f-a3f8-59e213f9f0aa": "common"
+      },
+      "steals": "l"
+    },
+    {
+      "prompt": "Name a kind of artist",
+      "category": "artist",
+      "host_bank": [
+        "f0cebb5b-84bf-5485-9f67-2969b531fa7f",
+        "fffa58ce-f88b-51a6-8f2f-aa672e6cb088",
+        "2e5c8229-307d-5912-bda8-945f137e320f",
+        "69656ad7-0182-52c0-9bd0-4084d27b31c3",
+        "c986896b-5c22-5833-beb4-d0b64fa6aed8",
+        "51463297-b779-5afe-90f8-d0b6bbb20b24"
+      ],
+      "host_answers": [
+        "51463297-b779-5afe-90f8-d0b6bbb20b24",
+        "f0cebb5b-84bf-5485-9f67-2969b531fa7f"
+      ],
+      "levels": {
+        "00f4b50d-0861-548c-9a6e-076c7163f66d": "uncommon",
+        "1a76c462-cc23-5e51-b8ac-6a134def0446": "uncommon",
+        "4706a704-ef28-5387-adb4-6f0d1ea5ddce": "uncommon",
+        "b0eb5cfb-8c61-53d3-8529-e4486a36e0dc": "uncommon",
+        "04be0ddc-bf1a-5570-8ef3-a8b72bfa2b03": "uncommon",
+        "663a25e6-dcd6-5903-813a-87727ad329e0": "uncommon",
+        "f0cebb5b-84bf-5485-9f67-2969b531fa7f": "common",
+        "fffa58ce-f88b-51a6-8f2f-aa672e6cb088": "common",
+        "2e5c8229-307d-5912-bda8-945f137e320f": "common",
+        "69656ad7-0182-52c0-9bd0-4084d27b31c3": "common",
+        "c986896b-5c22-5833-beb4-d0b64fa6aed8": "common",
+        "51463297-b779-5afe-90f8-d0b6bbb20b24": "common"
+      }
+    },
+    {
+      "prompt": "Name a crustacean",
+      "category": "crustacean",
+      "host_bank": [
+        "91480a59-3e85-5fa7-a30d-a6583e0de4b4",
+        "fc65adea-fae4-534b-8705-bca48d6c898e",
+        "29af6f0c-8326-5074-82a3-afd6acff4b30",
+        "730f989c-ba8c-5dc7-8d6f-8f4bcb5ce5d0",
+        "a127140b-6a72-5221-9226-adac224e19d9",
+        "e877edea-a5d3-5964-8a33-f6ed77d072b2"
+      ],
+      "host_answers": [
+        "29af6f0c-8326-5074-82a3-afd6acff4b30",
+        "91480a59-3e85-5fa7-a30d-a6583e0de4b4",
+        "e877edea-a5d3-5964-8a33-f6ed77d072b2"
+      ],
+      "levels": {
+        "0e0b5987-836e-558d-8a55-5b263979f77b": "uncommon",
+        "4aa1ccab-22a2-5259-957c-0ba5cc21de48": "uncommon",
+        "f87d97d1-8141-51c2-8b87-3e7c0d4fd80d": "uncommon",
+        "b1be138d-52d7-523e-a10d-eb9818bd05b7": "uncommon",
+        "d0de6726-d6ca-534c-997f-8aff1adf3cc2": "uncommon",
+        "7019a694-ef54-5c2a-b83e-6404ea14089d": "uncommon",
+        "91480a59-3e85-5fa7-a30d-a6583e0de4b4": "common",
+        "fc65adea-fae4-534b-8705-bca48d6c898e": "common",
+        "29af6f0c-8326-5074-82a3-afd6acff4b30": "common",
+        "730f989c-ba8c-5dc7-8d6f-8f4bcb5ce5d0": "common",
+        "a127140b-6a72-5221-9226-adac224e19d9": "common",
+        "e877edea-a5d3-5964-8a33-f6ed77d072b2": "common"
+      },
+      "steals": "o"
+    }
+  ]
+}
