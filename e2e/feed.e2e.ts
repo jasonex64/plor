@@ -83,12 +83,13 @@ async function friendOf(name: string, viewerName: string): Promise<string> {
 }
 
 // A comment of the friends thread, `ago` minutes before now, on a puzzle day (a number of days before today).
-const comment = (userId: string, body: string, minutesAgo: number, daysBack = 0, game = "offbeat") =>
+// Its day is its time's day, as the app writes it: a day later than its time's hides it from a later page, whose cursor
+// is a time (CI failed so in the minutes after the day's reset, 2026-11-15).
+const comment = (userId: string, body: string, minutesAgo: number, game = "offbeat") =>
   seed(async (q) => {
-    await q("insert into private.comment (user_id, game_id, puzzle_date, body, created_at) values ($1, $2, private.today() - $3::int, $4, now() - make_interval(mins => $5::int))", [
+    await q("insert into private.comment (user_id, game_id, puzzle_date, body, created_at) values ($1, $2, private.day_of(now() - make_interval(mins => $4::int)), $3, now() - make_interval(mins => $4::int))", [
       userId,
       game,
-      daysBack,
       body,
       minutesAgo,
     ]);
@@ -210,8 +211,8 @@ test("a date line begins each earlier day, inside its first article and outside 
   const page = await viewer(browser, "fg");
   const friend = await friendOf("fh", "fg");
   await comment(friend, `today ${RUN}`, 5);
-  await comment(friend, `yesterday ${RUN}`, 60 * 24, 1);
-  await comment(friend, `older ${RUN}`, 60 * 24 * 3, 3);
+  await comment(friend, `yesterday ${RUN}`, 60 * 24);
+  await comment(friend, `older ${RUN}`, 60 * 24 * 3);
   // A reaction already on yesterday's comment, to be shown without a menu to add one.
   await seed(async (q) => {
     await q(
