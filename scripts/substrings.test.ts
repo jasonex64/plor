@@ -60,6 +60,23 @@ describe("eligibleSets", () => {
     expect(eligibleSets(6, counted)).toEqual(["abc", "abf"]);
   });
 
+  it.each([0, 1, 2, 3, 4, 5, 6])("round %i: keeps a set at its band's lower number and just inside its upper, leaves out one just outside each", (i) => {
+    const { letters, atLeast, below } = SUBSTRING_ROUNDS[i];
+    const names = letters === 2 ? ["qa", "qb", "qc", "qd"] : ["abc", "abd", "abe", "abf"];
+    const counted: SetStats = new Map([
+      [names[0], { words: atLeast, everyday: 9 }],
+      [names[1], { words: atLeast - 1, everyday: 9 }],
+      ...(below === Infinity
+        ? []
+        : ([
+            [names[2], { words: below, everyday: 9 }],
+            [names[3], { words: below - 1, everyday: 9 }],
+          ] as [string, { words: number; everyday: number }][])),
+    ]);
+    // Round 1's band has no upper number (below is Infinity), so there is no "just outside" above it.
+    expect(eligibleSets(i, counted)).toEqual(below === Infinity ? [names[0]] : [names[0], names[3]]);
+  });
+
   it("holds the floor of everyday words", () => {
     const counted: SetStats = new Map([
       ["abc", { words: round.atLeast, everyday: SUBSTRING_EVERYDAY_FLOOR }],
