@@ -92,10 +92,10 @@ describe("yesterday's standings", () => {
 
   it("shows the viewer and their friends by default, yesterday's points only (H7)", async () => {
     useSession(V.session);
-    const r = await call("/api/leaderboard/yesterday");
+    const r = await call("/api/leaderboard/yesterday?game=offbeat");
     expect(r.status).toBe(200);
     expect(r.body.day.date).toBe(yesterday);
-    expect(await points("/api/leaderboard/yesterday")).toEqual([
+    expect(await points("/api/leaderboard/yesterday?game=offbeat")).toEqual([
       [F.username, 300, false],
       [V.username, 0, true],
     ]);
@@ -103,7 +103,7 @@ describe("yesterday's standings", () => {
 
   it("shows a group's members when asked, friends or not (H7, M10 G3)", async () => {
     useSession(V.session);
-    expect(await points(`/api/leaderboard/yesterday?group=${club}`)).toEqual([
+    expect(await points(`/api/leaderboard/yesterday?game=offbeat&group=${club}`)).toEqual([
       [G.username, 500, false],
       [V.username, 0, true],
     ]);
@@ -112,20 +112,20 @@ describe("yesterday's standings", () => {
   it("refuses a group the viewer isn't in, and an ID that isn't a group, with the group page's 404", async () => {
     const notFound = { status: 404, body: { ok: false, error: "group_not_found" } };
     useSession(D.session);
-    expect(await call(`/api/leaderboard/yesterday?group=${club}`)).toEqual(notFound);
-    expect(await call("/api/leaderboard/yesterday?group=not-a-group")).toEqual(notFound);
+    expect(await call(`/api/leaderboard/yesterday?game=offbeat&group=${club}`)).toEqual(notFound);
+    expect(await call("/api/leaderboard/yesterday?game=offbeat&group=not-a-group")).toEqual(notFound);
   });
 
   it("counts none of yesterday's points in the group for a member who joined today (M12 12d, D3)", async () => {
     await joinGroup(getPool(), F.userId, (await getGroup(getPool(), V.userId, club)).inviteCode);
     useSession(V.session);
-    expect(await points(`/api/leaderboard/yesterday?group=${club}`)).toEqual([
+    expect(await points(`/api/leaderboard/yesterday?game=offbeat&group=${club}`)).toEqual([
       [G.username, 500, false],
       [F.username, 0, false],
       [V.username, 0, true],
     ]);
     // V's friends standings still have F's.
-    expect(await points("/api/leaderboard/yesterday")).toEqual([
+    expect(await points("/api/leaderboard/yesterday?game=offbeat")).toEqual([
       [F.username, 300, false],
       [V.username, 0, true],
     ]);
@@ -143,12 +143,12 @@ describe("yesterday's standings", () => {
     );
     // F's own run yesterday is still going, which leaves yesterday's points out for F (M09 D5): the names are the point.
     useSession(F.session);
-    expect((await points("/api/leaderboard/yesterday")).map(([username]: [string]) => username)).toEqual([F.username, V.username]);
+    expect((await points("/api/leaderboard/yesterday?game=offbeat")).map(([username]: [string]) => username)).toEqual([F.username, V.username]);
     useSession(N.session);
-    expect(await points("/api/leaderboard/yesterday")).toEqual([[F.username, 300, false]]);
+    expect(await points("/api/leaderboard/yesterday?game=offbeat")).toEqual([[F.username, 300, false]]);
     await joinGroup(getPool(), N.userId, (await getGroup(getPool(), V.userId, club)).inviteCode);
     useSession(V.session);
-    expect(await points(`/api/leaderboard/yesterday?group=${club}`)).toContainEqual([N.username, 0, false]);
+    expect(await points(`/api/leaderboard/yesterday?game=offbeat&group=${club}`)).toContainEqual([N.username, 0, false]);
   });
 
   // M16 16e-3a (answers 35, 36): D, V's friend from now, survived question 1 at yesterday's noon and question 2 only
@@ -183,7 +183,7 @@ describe("yesterday's standings", () => {
     await open(2);
     await answer(2, puzzle.questions[2].host_answers[0], true, false);
     useSession(V.session);
-    const standings = await points("/api/leaderboard/yesterday");
+    const standings = await points("/api/leaderboard/yesterday?game=offbeat");
     const { rows } = await db.query<{ bonus: number }>(
       "select bonus from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date",
       [D.userId, GAME_ID, yesterday],
@@ -203,7 +203,7 @@ describe("yesterday's standings", () => {
       yesterday,
     ]);
     useSession(V.session);
-    expect(await points("/api/leaderboard/yesterday")).toEqual([
+    expect(await points("/api/leaderboard/yesterday?game=offbeat")).toEqual([
       [D.username, 0, false],
       [F.username, 0, false],
       [V.username, 0, true],

@@ -8,7 +8,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { execSync } from "node:child_process";
-import { RUN, play, sent, signInAndPick, befriend } from "./players";
+import { RUN, play, sent, signInAndPick, befriend, openBoard } from "./players";
 import { answerBox, caughtToCards, next, safe } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 
@@ -27,20 +27,6 @@ test.afterAll(async () => {
   await removePuzzle(DB, puzzle);
   await DB.end();
 });
-
-// Opens a page, the Friends tab unless another is named, and waits until its board channel has joined (Realtime
-// replies ok to the join). Today joins the channel too, for the feed.
-async function openBoard(page: Page, path = "/friends"): Promise<void> {
-  // Leave the page first, so a channel the old page was still opening can't be the one waited on: it closes with the
-  // page, and its join never comes (seen in M14 14a-1, once signing in waits for the username to save).
-  await page.goto("about:blank");
-  // The dev server's hot-reload socket opens too; only Realtime's counts.
-  const joined = page.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1")).then((ws) =>
-    ws.waitForEvent("framereceived", { predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:") }),
-  );
-  await page.goto(path);
-  await joined;
-}
 
 test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // Two players moving between Today and the Friends tab, each move waiting for the channel to join: near Playwright's

@@ -51,7 +51,7 @@ const thread = async (date?: string) =>
   (await call(threadRoute(apiRequest(date ? `/api/comments?game=${GAME_ID}&date=${date}` : `/api/comments?game=${GAME_ID}`, { method: "GET" })))).body.thread;
 const reactionsOnComment = async (id: string, date?: string) =>
   (await thread(date)).comments.find((c: { id: string }) => c.id === id).reactions;
-const board = async () => (await call(boardRoute(apiRequest("/api/board", { method: "GET" })))).body.board;
+const board = async () => (await call(boardRoute(apiRequest("/api/board?game=offbeat", { method: "GET" })))).body.board;
 const reactionsOnRun = async (username: string) => (await board()).friends.find((f: { username: string }) => f.username === username).reactions;
 const none = { counts: [], mine: null };
 

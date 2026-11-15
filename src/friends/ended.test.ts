@@ -10,6 +10,7 @@ const friend = (name: string, ended: Ended | null): BoardFriend => ({
   state: ended ? "finished" : "playing",
   question: ended ? null : 2,
   ended,
+  score: null,
   reactions: null,
 });
 const person = (name: string) => ({ username: name.toLowerCase(), name });

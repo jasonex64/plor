@@ -83,10 +83,12 @@ test("one leaderboard card switches between yesterday and this week, for friends
   await page.goto("/");
   const card = page.getByRole("region", { name: "Leaderboard" });
   await expect(card.getByRole("radio", { name: "Yesterday" })).toBeChecked();
-  // Dated, as "Fri 23 Oct" (L25), in a chip beside its heading since 14b-8b, and naming no game: the card is shared by
-  // every game (14b-4, answer 1).
+  // Dated, as "Fri 23 Oct" (L25), in a chip beside its heading since 14b-8b, and naming no game in its heading or chip: the
+  // card is shared by every game (14b-4, answer 1), which it names only in its Game switch, on Offbeat on every load (M16
+  // 16f-6, answer 20).
   await expect(card.getByText(/^[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}$/)).toBeVisible();
-  await expect(card).not.toContainText(GAME.name);
+  await expect(card.getByRole("heading")).not.toContainText(GAME.name);
+  await expect(card.getByRole("radiogroup", { name: "Game" }).getByRole("radio", { name: GAME.name })).toBeChecked();
   await expect(card.getByLabel("Board").locator("option")).toHaveText(["Friends", "Owls"]);
 
   const friendsWeek = page.waitForRequest((r) => path(r.url()) === "/api/leaderboard");

@@ -6,6 +6,7 @@
 // part that listens.
 import { RealtimeClient } from "@supabase/realtime-js";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { BoardGame } from "@/friends/leaderboard";
 import { api } from "@/lib/api-client";
 import { errorText } from "./messages";
 
@@ -18,9 +19,12 @@ export const PAYLOAD_VERSION = 1;
 export const STATUS_VERSION = 2;
 
 // started: a friend's run began, sent to a player who hasn't finished that day instead of playing or finished (12d).
+// gameId: the game the run is in, as each game has its own board (M16 16f-6); question is Offbeat's question or Fragments'
+// round.
 export type StatusMessage = {
   v: number;
   username: string;
+  gameId: BoardGame;
   puzzleDate: string;
   state: "started" | "playing" | "finished";
   question: number | null;

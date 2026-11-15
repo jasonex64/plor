@@ -93,6 +93,20 @@ export async function befriend(sender: Page, senderName: string, receiver: Page,
   await expect(you(receiver)).toContainText("You're friends.");
 }
 
+// Opens a page, the Friends tab unless another is named, and waits until its board channel has joined (Realtime
+// replies ok to the join). Today joins the channel too, for the feed.
+export async function openBoard(page: Page, path = "/friends"): Promise<void> {
+  // Leave the page first, so a channel the old page was still opening can't be the one waited on: it closes with the
+  // page, and its join never comes (seen in M14 14a-1, once signing in waits for the username to save).
+  await page.goto("about:blank");
+  // The dev server's hot-reload socket opens too; only Realtime's counts.
+  const joined = page.waitForEvent("websocket", (ws) => ws.url().includes("/realtime/v1")).then((ws) =>
+    ws.waitForEvent("framereceived", { predicate: (f) => String(f.payload).includes("phx_reply") && String(f.payload).includes('"status":"ok"') && String(f.payload).includes("board:") }),
+  );
+  await page.goto(path);
+  await joined;
+}
+
 // The link a share button gives (M14 14b-3: a group's invite link is shared, never shown). These browsers have no share sheet,
 // so it's copied (src/app/share.tsx) as its text, a line break and the URL; this presses the button and returns the URL.
 export async function sharedLink(page: Page, button: Locator): Promise<string> {

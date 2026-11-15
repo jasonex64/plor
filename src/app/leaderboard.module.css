@@ -7,7 +7,8 @@
    item 17). */
 .switch {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* One row of equal choices: two, or the three games a board switches between (--choices, from GameSwitch). */
+  grid-template-columns: repeat(var(--choices, 2), minmax(0, 1fr));
   border: 2px solid var(--ink);
   border-radius: var(--r-small);
 }
