@@ -104,6 +104,7 @@ The stale header line in `scripts/base.ts` ("nothing loads it yet"). The local-o
 - No e2e: no screen changed.
 - CI's `db` check failed once on the pull request: three of the four hosted db tests leaned on this PC's loaded base, and CI's database is empty ("expected … to match /BASE: there, \d+ things/"; "data/snapshots/dictionary/2026-11-07.json is missing"). The tests now load and remove the fixture base themselves; tests only. Then nine green checks.
 - **Not verified, and only the human's run can:** a load into an empty database (the local stack is shared and was not wiped; it runs the `loadAll` and `loadDictionary` the local commands use); the certificate check against the real Supabase; the hidden prompt and the second, visible prompt in a real PowerShell window; how long the load takes over the network; the size on plor.app.
+- **The first look at the hosted database (2026-11-14, by Claude through the Supabase connector, read-only; the human connected it and approved the rule, DECISIONS, 2026-11-14):** one project, `plor-staging`, in us-east-1. Size 18 MB; 0 things, 0 categories, 0 dictionary words; 0 runs in progress; 7 players; 0 puzzles. So the load meets an empty base, and about 380 MB more would bring it to about 400 MB of the free plan's 500 MB. **Migrations: 13 of the repo's 14 are applied; `20261114230701_fragments_live_board` (16f-6's) is not**, so the human's "should be up to date" did not hold for it, and Fragments' board on plor.app does not move live until it is pushed.
 
 
 ## Review
