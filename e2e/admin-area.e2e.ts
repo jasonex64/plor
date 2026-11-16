@@ -6,7 +6,7 @@ import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
 import { caughtToCards } from "./game";
-import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { removePuzzle, todayPuzzle, tomorrowWarning, type TodayPuzzle } from "./puzzle";
 import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
@@ -44,8 +44,9 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
 
   const needs = page.getByRole("complementary", { name: "What needs you" });
   await expect(needs.getByRole("listitem")).toHaveCount(4);
-  // Tomorrow has nothing drafted or approved here, so its warning stands in for the days-ahead row, first (14b-6f).
-  await expect(needs.getByRole("link")).toHaveText([/Tomorrow has no puzzle/, /to approve/, /to review/, /reported comment/]);
+  // Tomorrow isn't approved here, so its warning stands in for the days-ahead row, first (14b-6f).
+  const warning = await tomorrowWarning(DB);
+  await expect(needs.getByRole("link")).toHaveText([new RegExp(warning.what), /to approve/, /to review/, /reported comment/]);
   expect(await needs.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
 
   // Insights: today's day, the chart against the Gentle target, said in full for screen readers.
@@ -127,21 +128,24 @@ test("the insights axis fits its chart on a day a question catches everyone", as
   }
 });
 
-// With nothing for tomorrow, the rail's first row warns in the danger colour and says what to do, the phone's Waiting
-// strip shows it first, and Puzzles has an empty slot that says how days get drafted; with tomorrow approved, none of
-// them shows (criterion 7; answers 27 to 29).
-test("the admin is warned when tomorrow has no puzzle", async ({ browser }) => {
-  const { rows } = await DB.query<{ tomorrow: string; taken: boolean }>(
-    "select (private.today() + 1)::text as tomorrow, exists (select 1 from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today() + 1) as taken",
+// Until tomorrow is approved, the rail's first row warns in the danger colour and says what to do, and the phone's
+// Waiting strip shows it first; with nothing drafted, Puzzles also has an empty slot that says how days get drafted;
+// with tomorrow approved, none of them shows (criterion 7; answers 27 to 29). Whether tomorrow is drafted depends on the
+// repo's content on the day the test runs (tomorrowWarning).
+test("the admin is warned until tomorrow is approved", async ({ browser }) => {
+  const warning = await tomorrowWarning(DB);
+  const tomorrow = warning.date;
+  const { rows } = await DB.query<{ taken: boolean }>(
+    "select exists (select 1 from private.puzzle where game_id = 'offbeat' and puzzle_date = $1::date) as taken",
+    [tomorrow],
   );
-  const { tomorrow } = rows[0];
   expect(rows[0].taken, "the test needs tomorrow free").toBe(false);
 
   const page = await admin(browser, "tw", { width: 1440, height: 900 });
   await page.goto("/admin/puzzles");
   const first = page.getByRole("complementary", { name: "What needs you" }).getByRole("link").first();
-  await expect(first).toContainText("Tomorrow has no puzzle");
-  await expect(first).toContainText("Draft it before midnight Pacific");
+  await expect(first).toContainText(warning.what);
+  await expect(first).toContainText(warning.todo);
   const look = await first.evaluate((el) => {
     const probe = document.createElement("span");
     probe.style.color = "var(--danger)";
@@ -154,14 +158,19 @@ test("the admin is warned when tomorrow has no puzzle", async ({ browser }) => {
   const days = page.getByRole("navigation", { name: "Days" });
   // The day the page opens on is the one shown pressed, the empty slot beside it not (14b-6f review).
   await expect(days.getByRole("button", { pressed: true })).toHaveCount(1);
-  await expect(days.getByRole("button", { name: /Not drafted/ })).toHaveAttribute("aria-pressed", "false");
-  await days.getByRole("button", { name: /Not drafted/ }).click();
-  await expect(days.getByRole("button", { pressed: true })).toHaveText(/Not drafted/);
-  await expect(page.getByText(/^Nothing drafted for .+\. A Claude session drafts days from the question bank\.$/)).toBeVisible();
+  if (warning.drafted) {
+    // A drafted tomorrow is a day in the row, not an empty slot.
+    await expect(days.getByRole("button", { name: /Not drafted/ })).toHaveCount(0);
+  } else {
+    await expect(days.getByRole("button", { name: /Not drafted/ })).toHaveAttribute("aria-pressed", "false");
+    await days.getByRole("button", { name: /Not drafted/ }).click();
+    await expect(days.getByRole("button", { pressed: true })).toHaveText(/Not drafted/);
+    await expect(page.getByText(/^Nothing drafted for .+\. A Claude session drafts days from the question bank\.$/)).toBeVisible();
+  }
 
   const phone = await admin(browser, "tp", { width: 360, height: 800 });
   await phone.goto("/admin/puzzles");
-  await expect(phone.getByRole("navigation", { name: "Admin" }).getByRole("link").first()).toHaveText("Tomorrow has no puzzle");
+  await expect(phone.getByRole("navigation", { name: "Admin" }).getByRole("link").first()).toHaveText(warning.what);
 
   await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [tomorrow, fixtureDay(tomorrow, await loadFixtureBase(DB))]);
   try {
