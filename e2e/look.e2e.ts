@@ -200,7 +200,8 @@ test("Me's header, totals and days, and /streak's own rank, in the kit", async (
 });
 
 // 14b-8d: the admin area's current sub-tab is drawn as the sidebar's current item, a page's section is the kit's card,
-// and the rail's warning row is edged in its own danger colour, not the ink (tomorrow has no puzzle in this file).
+// and the rail's warning row is edged in its own danger colour, not the ink (tomorrow isn't approved in this file:
+// drafted in the repo or missing, so either warning).
 test("the admin area's current sub-tab, a card and the rail's warning, in the kit", async ({ browser }) => {
   const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
   await page.goto("/");
@@ -213,7 +214,7 @@ test("the admin area's current sub-tab, a card and the rail's warning, in the ki
   const card = page.getByRole("region", { name: "Caught per question" });
   await expect(card).toBeVisible();
   expect(await look(card)).toEqual({ border: `2px ${color}`, corners: "5px", shadow: "none" });
-  const warning = page.getByRole("complementary", { name: "What needs you" }).getByRole("link", { name: /Tomorrow has no puzzle/ });
+  const warning = page.getByRole("complementary", { name: "What needs you" }).getByRole("link", { name: /Tomorrow (has no puzzle|isn't approved)/ });
   const [edge, text] = await warning.evaluate((el) => [getComputedStyle(el).borderTopColor, getComputedStyle(el).color]);
   expect(edge).toBe(text);
   expect(edge).not.toBe(color);

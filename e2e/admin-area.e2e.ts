@@ -2,6 +2,8 @@
 // Puzzles inside the shell with Admin as the current section; the sub-tabs in two groups; what needs the admin in the
 // right column from 1200px; the insights chart; on phones one menu in the sub-tabs' order. The warning when tomorrow
 // has no puzzle (docs/milestones/M14-14b-6-feel-and-polish.md, 14b-6f, criterion 7). The chart's axis (14b-9).
+import { existsSync, renameSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test, type Browser } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, signInAndPick } from "./players";
@@ -11,9 +13,16 @@ import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
 
 const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
 let puzzle: TodayPuzzle;
+// Tomorrow's drafted day, set aside by the test that needs tomorrow missing, and where it goes back.
+let aside: { draft: string; held: string } | null = null;
 
 test.beforeAll(async () => {
   puzzle = await todayPuzzle(DB);
+});
+
+test.afterEach(() => {
+  if (aside) renameSync(aside.held, aside.draft);
+  aside = null;
 });
 
 test.afterAll(async () => {
@@ -44,8 +53,10 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
 
   const needs = page.getByRole("complementary", { name: "What needs you" });
   await expect(needs.getByRole("listitem")).toHaveCount(4);
-  // Tomorrow has nothing drafted or approved here, so its warning stands in for the days-ahead row, first (14b-6f).
-  await expect(needs.getByRole("link")).toHaveText([/Tomorrow has no puzzle/, /to approve/, /to review/, /reported comment/]);
+  // Tomorrow isn't approved here, so its warning stands in for the days-ahead row, first (14b-6f). Which of the two
+  // warnings depends on whether the repo holds a drafted day for tomorrow; the test of the
+  // warning below checks the missing one's words.
+  await expect(needs.getByRole("link")).toHaveText([/Tomorrow (has no puzzle|isn't approved)/, /to approve/, /to review/, /reported comment/]);
   expect(await needs.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
 
   // Insights: today's day, the chart against the Gentle target, said in full for screen readers.
@@ -136,6 +147,13 @@ test("the admin is warned when tomorrow has no puzzle", async ({ browser }) => {
   );
   const { tomorrow } = rows[0];
   expect(rows[0].taken, "the test needs tomorrow free").toBe(false);
+  // The repo holds drafted days ahead (the beta's), and a drafted tomorrow makes the warning "Tomorrow isn't approved".
+  // This test is about a tomorrow with nothing, so it sets that file aside; afterEach puts it back.
+  const draft = join(process.cwd(), "content", "offbeat", `${tomorrow}.json`);
+  if (existsSync(draft)) {
+    aside = { draft, held: `${draft}.aside` };
+    renameSync(aside.draft, aside.held);
+  }
 
   const page = await admin(browser, "tw", { width: 1440, height: 900 });
   await page.goto("/admin/puzzles");
