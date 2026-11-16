@@ -98,7 +98,7 @@ export async function startGuestRun(db: Db, tokenHash: string): Promise<RunState
 
 // Answers one question of the guest's run, as runs.ts's answer does for a player. No run today is 409 run_over: its day
 // closed. A retry after the end meets the database's rules, as a player's does.
-export async function answerGuest(db: Db, tokenHash: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean }> {
+export async function answerGuest(db: Db, tokenHash: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean; needs?: string }> {
   const found = await todaysRun(db, tokenHash);
   if (!found) throw new AppError("run_over", 409);
   const { date, puzzle } = found;
@@ -118,7 +118,9 @@ export async function answerGuest(db: Db, tokenHash: string, index: number, type
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
   assertTypedLength(typed);
-  const resolved = await resolveTyped(dayLookup(db, puzzle), puzzle, index, typed, stolen);
+  const resolved = await resolveTyped(dayLookup(db, puzzle), (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
+  // Letters are stolen only on the question in play, so this is one: a free retry that says the letter (M15 15h).
+  if (resolved && "needs" in resolved) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: true, needs: resolved.needs };
   if (!resolved) {
     // A free retry on the question in play; a run whose time ran out shows its ending; anything else isn't a question to retry.
     if (isCurrent) return { run: await stateOf(db, tokenHash, date, puzzle), notInList: true };

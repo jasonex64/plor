@@ -96,9 +96,9 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
 test("an admin reads a question's answer pool on the admin page", async ({ browser }) => {
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/");
-  await signInAndPick(admin, "ap");
+  await signInAndPick(admin, "apo");
   await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
-  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-ap@example.test`]);
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-apo@example.test`]);
   await admin.goto("/admin/puzzles");
   const name = dayText(ahead);
   await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
@@ -135,6 +135,13 @@ test("a player survives all seven questions of a day, past the stolen letters", 
   const answers = ["cat", "kiwi", "green", "Kenya", "lead", "boxing", "knee"];
   await asked(page, FIXTURE[0].prompt);
   for (let i = 0; i < answers.length - 1; i++) {
+    // At question 4, "gaul" is France, whose shown name holds the C taken at question 2: it can't be given under
+    // another name, and the line says which letter (docs/milestones/M15-15h-taken-letters-follow-the-name.md).
+    if (i === 3) {
+      await answer(page, "gaul");
+      await expect(page.getByRole("status").filter({ hasText: "That answer needs C, which is taken. Try another answer." })).toBeVisible();
+      await asked(page, FIXTURE[3].prompt);
+    }
     await safe(page, answers[i]);
     await next(page, FIXTURE[i + 1].prompt);
   }
