@@ -8,8 +8,9 @@ import { RUN, play, signInAndPick } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { fixtureDay, loadFixtureBase } from "../src/test/answer-fixture";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
@@ -33,7 +34,7 @@ async function admin(browser: Browser, name: string, viewport: { width: number; 
 test("the admin area sits in the shell, with grouped sub-tabs and what needs the admin beside it", async ({ browser }) => {
   const page = await admin(browser, "ar", { width: 1440, height: 900 });
   await page.goto("/admin");
-  await expect(page).toHaveURL("http://localhost:3000/admin/puzzles");
+  await expect(page).toHaveURL("/admin/puzzles");
   await expect(page.getByRole("heading", { level: 2, name: "Puzzles" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Admin" })).toHaveAttribute("aria-current", "true");
 
@@ -50,7 +51,7 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
 
   // Insights: today's day, the chart against the Gentle target, said in full for screen readers.
   await tabs.getByRole("link", { name: "Insights" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/admin/insights");
+  await expect(page).toHaveURL("/admin/insights");
   const chart = page.getByRole("region", { name: "Caught per question" });
   await expect(chart.getByRole("img")).toHaveAttribute("aria-label", /^Share of players caught per question, against the Gentle target: Q1 /);
   await expect(page.getByRole("button", { name: "Next day" })).toBeDisabled();
@@ -84,7 +85,7 @@ test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ 
   await expect(menu.getByRole("list", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
   await expect(menu.getByRole("list", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database"]);
   await menu.getByRole("link", { name: "Database" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/admin/base");
+  await expect(page).toHaveURL("/admin/base");
   await expect(page.getByRole("heading", { level: 2, name: "Database" })).toBeVisible();
   // No sideways scroll on a phone.
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

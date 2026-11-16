@@ -5,10 +5,11 @@ import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { afterAll, expect, it } from "vitest";
 import { hashKey } from "./auth-limits";
+import { localStack } from "../../scripts/slot.ts";
 
 const ATTEMPTS = 20;
 const LIMIT = 3;
-const db = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: ATTEMPTS });
+const db = new Pool({ connectionString: localStack().databaseUrl, max: ATTEMPTS });
 const key = hashKey(randomUUID());
 
 afterAll(async () => {

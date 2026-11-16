@@ -18,13 +18,14 @@ import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as meRoute } from "./route";
+import { localStack } from "../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
 const F = { email: `${RUN}-mf@example.test`, username: `mf${RUN}`, userId: "", session: new Map<string, string>() };
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 const day: Record<number, string> = {};
 const fragmentsDays: string[] = [];
 

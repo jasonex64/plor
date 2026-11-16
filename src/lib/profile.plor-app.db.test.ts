@@ -9,8 +9,9 @@ import { getPlayer } from "@/friends/players";
 import { hashKey } from "./auth-limits";
 import { AppError } from "./http";
 import { changeUsername, createProfile } from "./profile";
+import { localStack } from "../../scripts/slot.ts";
 
-const URL = "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres";
+const URL = localStack().adminDatabaseUrl;
 const admin = new Pool({ connectionString: URL, max: 1 });
 const app = new Pool({ connectionString: URL, options: "-c role=plor_app" });
 const made: string[] = [];

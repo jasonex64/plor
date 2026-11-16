@@ -5,8 +5,9 @@ import { randomUUID } from "node:crypto";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { lookupThings } from "./base";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 
 afterAll(async () => {
   await admin.end();

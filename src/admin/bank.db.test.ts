@@ -9,8 +9,9 @@ import type { Bank } from "@/content/bank";
 import { GAME_ID } from "@/platform/game";
 import { fixtureDay, fixtureDraft, fixtureId, loadFixtureBase } from "@/test/answer-fixture";
 import { bankView } from "./bank";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 const PLAYED = "2001-03-03";

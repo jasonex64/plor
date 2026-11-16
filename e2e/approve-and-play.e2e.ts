@@ -12,8 +12,9 @@ import { dayText } from "../src/app/day-text";
 import { RUN, play, signInAndPick } from "./players";
 import { answer, asked, next, safe, seeResults } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const DRAFTS = join(process.cwd(), "content", "offbeat");
 let ahead = "";
 let draftFile = "";

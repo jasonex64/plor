@@ -11,8 +11,9 @@ import { RUN, signInAndPick } from "./players";
 import { caught, caughtToCards, next, nextButton, safe, seeResults } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 // Yesterday's fixture day, when this file added it.
 let yesterdayAdded: string | null = null;
@@ -60,7 +61,7 @@ async function player(browser: Browser, name: string, viewport = PHONE) {
 test("Play opens the game screen: the day, the stakes, Start and How to play", async ({ browser }) => {
   const page = await player(browser, "oa");
   await page.getByRole("region", { name: GAME.name }).getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("/play");
   await expect(page).toHaveTitle(GAME.name);
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(nav.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "true");
@@ -76,7 +77,7 @@ test("Play opens the game screen: the day, the stakes, Start and How to play", a
   // How to play opens its panel over the screen (docs/milestones/M14-14c-8-plain-game-1.md, after 14c-6d).
   await game.getByRole("button", { name: "How to play" }).click();
   await expect(page.getByRole("dialog", { name: "How to play" })).toBeVisible();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("/play");
 });
 
 // Criteria 4 and 5: a player who never played, then plays and is caught on question 1.

@@ -12,10 +12,11 @@ import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { asked, caughtToCards } from "./game";
 import { RUN, sent, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // Rows for players who never played are written with the rules off, which needs the local superuser.
-const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 let puzzle: TodayPuzzle;
 let today = "";

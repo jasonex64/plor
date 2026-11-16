@@ -8,8 +8,9 @@ import { DatabaseError, Pool } from "pg";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { AppError } from "@/lib/http";
 import { acceptRequest, blockPlayer, listReceived, listSent, sendRequest, unblockPlayer } from "./requests";
+import { localStack } from "../../scripts/slot.ts";
 
-const URL = "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres";
+const URL = localStack().adminDatabaseUrl;
 const admin = new Pool({ connectionString: URL, max: 1 });
 const app = new Pool({ connectionString: URL, options: "-c role=plor_app" });
 const [a, b] = [randomUUID(), randomUUID()].toSorted();

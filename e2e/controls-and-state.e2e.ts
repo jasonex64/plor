@@ -9,8 +9,9 @@ import { GAME } from "../src/platform/game";
 import { RUN, play, signInAndPick, befriend } from "./players";
 import { answerBox, caughtToCards, countdown, expectCountdown, fillScale } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
 let puzzle: TodayPuzzle;
 

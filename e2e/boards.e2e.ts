@@ -12,11 +12,12 @@ import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { asked, caughtToCards } from "./game";
 import { RUN, openBoard, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // A player who never signs in, and a finished run of Fragments with no word, are written with the round rules off, which needs
 // the local superuser.
-const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
 // The app's tablet width (src/app/min-width.ts): Today shows the board from here, its cards still a carousel.
 const TABLET = { width: 768, height: 1024 };

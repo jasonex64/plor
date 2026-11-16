@@ -9,19 +9,21 @@ import { POST as sendCode } from "@/app/api/auth/email/route";
 import { POST as verifyCode } from "@/app/api/auth/email/verify/route";
 import { apiRequest, cookieJar } from "./request-scope";
 import { TURNSTILE_TEST_HOSTNAME, TURNSTILE_TEST_PASS_SECRET, TURNSTILE_TEST_SITE_KEY } from "./turnstile-keys";
+import { localStack } from "../../scripts/slot.ts";
 
 export { TURNSTILE_TEST_PASS_SECRET };
 
-// The local stack's documented defaults (supabase.com/docs/guides/local-development/cli/getting-started).
-export const LOCAL_DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
-const MAILPIT = "http://127.0.0.1:54324";
+// This slot's local stack (scripts/slot.ts), with the stack's documented default users
+// (supabase.com/docs/guides/local-development/cli/getting-started).
+export const LOCAL_DATABASE_URL = localStack().databaseUrl;
+const MAILPIT = localStack().mailpitUrl;
 // Points the server env at the local stack. The publishable key comes from the running stack, never printed.
 export function useLocalStack(): void {
   const status = execSync("npx supabase status -o env", { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
   const key = /^PUBLISHABLE_KEY="?([^"\n]+)/m.exec(status)?.[1];
   if (!key) throw new Error("local Supabase stack is not running (npx supabase start)");
   vi.stubEnv("DATABASE_URL", LOCAL_DATABASE_URL);
-  vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+  vi.stubEnv("SUPABASE_URL", localStack().apiUrl);
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", key);
   vi.stubEnv("TURNSTILE_SITE_KEY", TURNSTILE_TEST_SITE_KEY);
   vi.stubEnv("TURNSTILE_SECRET_KEY", TURNSTILE_TEST_PASS_SECRET);

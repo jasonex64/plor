@@ -6,6 +6,7 @@ import pg from "pg";
 import { loadDictionary } from "../../scripts/base.ts";
 import { LOCAL_DATABASE_URL } from "@/test/local-stack";
 import { SUBSTRINGS_ID } from "@/platform/game";
+import { localStack } from "../../scripts/slot.ts";
 
 const RUN = Date.now().toString(36);
 const db = new pg.Pool({ connectionString: LOCAL_DATABASE_URL, max: 8 });
@@ -53,7 +54,7 @@ describe("a run as plor_app", () => {
     await db.query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [other, SUBSTRINGS_ID, day]);
     await db.query("insert into private.dictionary_word (word_key, spelling, plain) values ('qckq', 'qckq', 'qckq') on conflict do nothing");
     // Locally the routes connect as postgres, which can't take this role (src/game/runs.plor-app.db.test.ts).
-    const app = new pg.Client({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres" });
+    const app = new pg.Client({ connectionString: localStack().adminDatabaseUrl });
     await app.connect();
     try {
       await app.query("set role plor_app");

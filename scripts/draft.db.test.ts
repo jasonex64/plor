@@ -9,8 +9,9 @@ import { FAMILIAR_SAFE_MIN } from "../src/config/tunables.ts";
 import type { Level, Puzzle } from "../src/content/puzzle.ts";
 import { fixtureDraft, fixtureId, loadFixtureBase, removeFixtureBase, removeTestBase } from "../src/test/answer-fixture.ts";
 import { bankFlags, bankProblems, expectedCatches, familiarLeft, oneHostCatch, resolveNames } from "./draft.ts";
+import { localStack } from "./slot.ts";
 
-const db = new pg.Client({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres" });
+const db = new pg.Client({ connectionString: localStack().databaseUrl });
 const animal = (slug: string) => fixtureId(0, slug);
 const levels = (...slugs: string[]): Record<string, Level> => Object.fromEntries(slugs.map((s) => [animal(s), "uncommon" as const]));
 const question = (host: string[], uncommon: string[]) => ({ id: "q", prompt: "Name an animal", category: "fixture_animal", host_bank: host, uncommon, themes: [], added_by: "claude" as const });

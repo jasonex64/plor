@@ -8,9 +8,10 @@ import { RUN, play, signInAndPick } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
-const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 let today = "";
 let yesterday = "";

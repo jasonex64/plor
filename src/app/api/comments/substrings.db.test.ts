@@ -24,6 +24,7 @@ import { apiRequest } from "@/test/request-scope";
 import { POST as deleteRoute } from "./delete/route";
 import { POST as reportRoute } from "./report/route";
 import { GET as threadRoute, POST as postRoute } from "./route";
+import { localStack } from "../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -31,7 +32,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 const RUN = Date.now().toString(36);
 const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
 const [A, B, C, D, X, Y] = ["fa", "fb", "fc", "fd", "fx", "fy"].map(player);
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let today = "";
 let yesterday = "";
 let puzzle: ApprovedPuzzle;

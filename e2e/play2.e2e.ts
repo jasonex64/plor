@@ -7,10 +7,11 @@ import { Pool } from "pg";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { countdown, expectCountdown, fillScale } from "./game";
 import { RUN, sent, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // A friend's finished run is written with the round rules off, which needs the local superuser.
-const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 // The ticket's two sizes (docs/milestones/M14-14c-8-plain-game-1.md, Numbers).
 const PHONE = { width: 390, height: 844 };
 const DESKTOP = { width: 1440, height: 900 };
@@ -308,7 +309,7 @@ test("a whole day: a word, each reason, a lockout, a timeout, Next, round 7's se
   const day = new Date(`${today}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   // Windows' clipboard hands the line breaks back as CRLF; the text itself is src/game/share.test.ts's.
   const copied = (await page.evaluate(() => navigator.clipboard.readText())).replaceAll("\r\n", "\n");
-  expect(copied).toBe(`${SUBSTRINGS.name} · ${day}\n🟩🟩⬜⬜⬜⬜⬜ 255\nhttp://localhost:3000/`);
+  expect(copied).toBe(`${SUBSTRINGS.name} · ${day}\n🟩🟩⬜⬜⬜⬜⬜ 255\n${localStack().appUrl}/`);
   // The comment box is under the result, for the day's Fragments thread (16f-3).
   await expect(thread(page).getByLabel("Comment to your friends")).toBeVisible();
 

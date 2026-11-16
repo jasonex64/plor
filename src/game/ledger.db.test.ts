@@ -11,6 +11,7 @@ import { Pool, type PoolClient } from "pg";
 import { GAME_ID } from "@/platform/game";
 import { fixtureDay, fixtureId } from "@/test/answer-fixture";
 import { pooledCounts, settleRuns } from "./ledger";
+import { localStack } from "../../scripts/slot.ts";
 
 // A closed day, in Pacific time (PST in February).
 const DAY = "2001-02-03";
@@ -22,7 +23,7 @@ const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
 // A fixture thing by question and slug.
 const t = (q: number, slug: string) => fixtureId(q, slug);
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {

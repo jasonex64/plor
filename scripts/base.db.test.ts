@@ -8,8 +8,9 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { loadFixtureBase, removeFixtureBase } from "../src/test/answer-fixture.ts";
 import { checkWithin, hostedCheck, hostedLoad, inReadOnly, liftStatementTimeout } from "./base.ts";
+import { localStack } from "./slot.ts";
 
-const url = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+const url = localStack().databaseUrl;
 const first = new pg.Client({ connectionString: url });
 const second = new pg.Client({ connectionString: url });
 let firstOpen = true;

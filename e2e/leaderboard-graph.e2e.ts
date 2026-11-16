@@ -6,8 +6,9 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool, type PoolClient } from "pg";
 import { fixtureDay, fixtureId, loadFixtureBase } from "../src/test/answer-fixture";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
 const ACCENT = "rgb(36, 87, 214)";
 const EDGE = "rgb(138, 138, 132)";

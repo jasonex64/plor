@@ -6,10 +6,11 @@ import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { dayText } from "../src/app/day-text";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
 // Every question the page lists: the repo's bank, which grows with each batch (13e).
 const QUESTIONS = (JSON.parse(readFileSync("content/bank.json", "utf8")) as { questions: unknown[] }).questions.length;
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);

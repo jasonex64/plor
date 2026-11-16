@@ -2,6 +2,10 @@
 // stack with Realtime (`npx supabase start`) and .env.local pointing at it; Playwright starts the dev server itself.
 // Run with `npm run test:e2e`. Timeouts are Playwright's defaults.
 import { defineConfig, devices } from "@playwright/test";
+import { localStack } from "./scripts/slot.ts";
+
+// This slot's own dev server (docs/milestones/PROCESS-parallel-sessions.md): npm run dev serves it on the slot's port.
+const appUrl = localStack().appUrl;
 
 export default defineConfig({
   testDir: "e2e",
@@ -15,10 +19,12 @@ export default defineConfig({
   // On CI a failed test keeps a video of its page, which CI uploads: what the page did, with no network data, so not the
   // stack's key a trace holds (docs/milestones/M16-16g-3-village-e2e-on-ci.md, answer 2). Only pages Playwright makes
   // are filmed, so tests take the `page` fixture rather than opening their own context.
-  use: { baseURL: "http://localhost:3000", trace: "retain-on-failure", video: process.env.CI ? "retain-on-failure" : "off" },
+  use: { baseURL: appUrl, trace: "retain-on-failure", video: process.env.CI ? "retain-on-failure" : "off" },
   projects: [
     // Every test, the e2e CI runs (`npm run test:e2e`).
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
   ],
-  webServer: { command: "npm run dev", url: "http://localhost:3000", reuseExistingServer: !process.env.CI },
+  // A server already on the port is reused only if it is this slot's own: e2e/own-server.ts checks, after this step.
+  webServer: { command: "npm run dev", url: appUrl, reuseExistingServer: !process.env.CI },
+  globalSetup: "./e2e/own-server.ts",
 });

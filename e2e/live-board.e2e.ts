@@ -11,8 +11,9 @@ import { execSync } from "node:child_process";
 import { RUN, play, sent, signInAndPick, befriend, openBoard } from "./players";
 import { answerBox, caughtToCards, next, safe } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 let hostAnswer = "";
 let safeAnswer = "";
