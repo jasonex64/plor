@@ -1,6 +1,6 @@
 # Process — Parallel sessions: three slots, a quick-fix lane and an inbox
 
-**Status:** in review (2026-11-16), in pull request #227 from `process-parallel-sessions`, not merged. Nine questions answered (below, quoted); every criterion has evidence but the first "inbox:", which is the human's.
+**Status:** in review (2026-11-16), in pull request #227 from `process-parallel-sessions`, not merged. Nine questions answered (below, quoted); every criterion has evidence.
 
 ## Goal
 Up to three Claude sessions work on unrelated things at once, each in its own folder, port and local database, with no waiting on port 3000 and no session's migrations breaking another's.
@@ -48,13 +48,13 @@ Asked after the build (2026-11-16, in chat):
 - [x] Local sign-in works in every slot (Supabase `site_url` / `additional_redirect_urls` allow each slot's port); checked by signing in on each.
 - [x] Each slot's `.env.local` points at its own stack. No key is printed in chat, logs or commits while it is written (CLAUDE.md, Secrets never leave their home).
 - [x] CLAUDE.md has the quick-fix lane and the slot rule; DECISIONS.md's Log records both; HANDOFF's line on shared port 3000 and the shared stack is replaced.
-- [ ] ~~`docs/INBOX.md` exists with the format below; a session told "inbox: …" appends one line and builds nothing.~~ Amended by answer 9: a session told "inbox: …" opens one issue labelled `inbox` and builds nothing. (The rule and the labels exist; the first "inbox:" is the human's to give.)
+- [x] ~~`docs/INBOX.md` exists with the format below; a session told "inbox: …" appends one line and builds nothing.~~ Amended by answer 9: a session told "inbox: …" opens one issue labelled `inbox` and builds nothing. (Evidence: the first inbox.)
 - [x] `RIFF-m14` and `RIFF-m16` are removed as worktrees, `RIFF-m17`'s leftover folder is gone, `RIFF-m15` is handled per open question 5. Their branches stay in git (`git branch -a` lists them).
 
 ## The rules this adds to CLAUDE.md
 - **Slots.** Work happens in one of three slot folders. A session takes a free slot (`npm run slots`), checks out its branch there and resets that slot's database. It never makes another folder or worktree. When its PR merges, the slot is free.
 - **Two lanes.** *Quick fix:* a change that needs no migration and no design input from the human. It gets its own `fix-<short-name>` branch off `main`, one PR, and a line in the PR saying what it fixes and who sees it (Who uses it / What breaks). No milestone, no ticket. *Milestone:* everything else, as now. If a quick fix turns out to need a migration or the human's input, stop and move it to a milestone. Add the quick-fix lane to CLAUDE.md's list of exceptions in "Find the ticket".
-- **The inbox** (amended by answer 9). "inbox: <thing>" from the human opens one GitHub issue, labelled `inbox` and one of `gameplay`, `ui`, `other`, titled with the human's words, and builds nothing. "Go through the inbox" sorts each open `inbox` issue into a quick fix or a milestone, asking the human what's unclear, and closes it once it has a branch or a ticket.
+- **The inbox** (amended by answer 9). "inbox: <thing>" from the human opens one GitHub issue per separate thing, labelled `inbox` and one of `gameplay`, `ui`, `other`, titled short in the human's words, with their exact words and the date in the body, and builds nothing. "Go through the inbox" sorts each open `inbox` issue into a quick fix or a milestone, asking the human what's unclear, and closes it once it has a branch or a ticket.
 
 ## Out of scope
 - The hosted Supabase project and Vercel: unchanged.
@@ -115,6 +115,7 @@ Asked after the build (2026-11-16, in chat):
 - **RAM (answer 4):** one slot, stack plus `next dev` after five pages: stack `plor` 2,254 MiB (`docker stats`), `next dev`'s three processes 892 MiB, about 3.1 GB; the PC had 35.8 GB of 63.8 GB free. Reported to the human; slot 3 waits for their word.
 - **Database tests in both slots at once:** `npm run test:db` in slot 1 and slot 2 together: 498 passed, 2 failed in each, the same 2 (`src/app/api/leaderboard/substrings.db.test.ts`, "adds up par scores…" and "keeps game 1's board to game 1"), plus one file that failed to start: `admin/puzzles/substrings/route.db.test.ts` mocks `process.cwd`, so `scripts/slot.ts` now finds its checkout from its own location (fixed; the file passes). The 2 board tests fail the same way on `main`'s code (`abcf04a`, run in slot 2 against slot 1's stack: "2 failed | 3 passed"): they fail on any Monday, Pacific, when their "yesterday" is last week (CI on this PR failed them at 03:11 Monday; `main`'s green runs were Sunday evening). Not this change (ROADMAP, Next revision).
 - **CI's first e2e run:** `e2e/own-server.ts` failed with "nothing listens on slot 1's port 3000" before any test. CI never reuses a server, so the check now skips on CI. `npx supabase test db` (pgTAP): `Files=42, Tests=833 … Result: PASS` in slot 1 and in slot 2.
+- **The first inbox (answer 9), 2026-11-16:** the human gave four group items in one message; four issues opened, #230 (`ui`, a group's share link opens the computer's own share menu), #231 (`other`, invite a friend to a group; accept or decline), #232 (`other`, search for a group), #233 (`ui`, show how old a group is), each body the human's exact words. `gh issue list --label inbox` lists the four with their labels; no branch, commit or file change came of it (`git status` clean here and in `plor-2`). Titles were shortened from long words, so the rule now says so and puts the exact words in the body.
 - **Unit tests:** `npm test`: 71 files, 820 tests passed. `npx tsc --noEmit -p .` and `npx eslint scripts e2e playwright.config.ts src/test src/config`: clean.
 
 ## Review
