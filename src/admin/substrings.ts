@@ -27,6 +27,18 @@ export function readSubstringDrafts(): Map<string, SubstringDay> {
   return drafts;
 }
 
+// One drafted day by its date, for a test run (docs/milestones/M15-15f-fragments-test-run.md, 15f-2): null when there is
+// no file, and the file's problems when the format refuses it, as approval would, where readSubstringDrafts throws.
+export function readSubstringDraft(date: string): { day: SubstringDay } | { problems: string[] } | null {
+  const path = join(process.cwd(), "content", "substrings", `${date}.json`);
+  if (!existsSync(path)) return null;
+  const file = `${SUBSTRINGS_ID}/${date}.json`;
+  const text = readFileSync(path, "utf8");
+  const errors = checkSubstringsFile(file, text);
+  const { day } = parseSubstringDay(file, text);
+  return errors.length || !day ? { problems: errors } : { day };
+}
+
 const sets = (day: SubstringDay): SubstringSets => ({ rounds: day.rounds, bonusLetter: day.bonus_letter });
 
 // Every day from today on that has a draft or an approved day, oldest first.

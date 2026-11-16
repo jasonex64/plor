@@ -116,6 +116,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.guest_tally select',
   -- Held usernames (M17 17b, E5): read only, to follow an old name to its player; the hold trigger writes and frees them.
   'private.held_username select',
+  -- A Fragments test run's one word-list function, admins only, writing nothing (M15 15f-2).
+  'private.judge_test_word(uuid,text,text,text,text[]) execute',
   'private.judge_word(uuid,date,text,text,text) execute',
   'private.keep_reported_comment(uuid,bigint) execute',
   -- Misses are read for the insights; one is logged only through private.record_miss (M13 13b).
