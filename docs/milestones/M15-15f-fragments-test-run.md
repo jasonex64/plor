@@ -1,6 +1,6 @@
 # M15 15f — Fragments' test run, and one date for both games on the Puzzles page
 
-**Status:** in progress. Drafted 2026-11-15 from the human's request and answers below; the design's security part is approved in answer 2 ("Approve as proposed (Recommended)"). 15f-1 is merged (PR #219, merge commit `d93b223`, 2026-11-15, nine green checks, the human's "Merge when green"). 15f-2 is built and reviewed, in the pull request from `m15-launch-readiness`, not merged; **it carries one migration, `20261116030004_judge_test_word.sql`: the hosted `db push` is the human's, after the merge.**
+**Status:** in progress. Drafted 2026-11-15 from the human's request and answers below; the design's security part is approved in answer 2 ("Approve as proposed (Recommended)"). 15f-1 is merged (PR #219, merge commit `d93b223`, 2026-11-15, nine green checks, the human's "Merge when green"). 15f-2 is merged (PR #220, 2026-11-15, as one squashed commit `f3d955e` from the human's GitHub account a moment before this session's own merge step, which found it already merged; nine green checks; the human's "Merge when green"); **it carries one migration, `20261116030004_judge_test_word.sql`: the hosted `db push` is the human's, after the merge.**
 
 ## Goal
 On `/admin/puzzles` a chosen date shows that date's day for both games, and an admin can play a test run of a Fragments day as they can an Offbeat one, with nothing saved.
