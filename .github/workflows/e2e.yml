@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  # Two real browsers against the local stack and the dev server (M07 D7: Playwright): the live board end to end.
+  # Two real browsers against the local stack and the built app (M07 D7: Playwright; M21 21a): the live board end to end.
   e2e:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
           sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54329
       - name: Start the local Supabase stack
         run: npx supabase start -x storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,postgrest > /dev/null
-      # The dev server reads .env.local. The publishable key comes from the running stack and is masked, never
+      # The build and the app read .env.local. The publishable key comes from the running stack and is masked, never
       # printed; the other values are the local stack's documented defaults and Cloudflare's published always-pass Turnstile test keys
       # (developers.cloudflare.com/turnstile/troubleshooting/testing/), not secrets.
       - name: Point the app at the local stack
