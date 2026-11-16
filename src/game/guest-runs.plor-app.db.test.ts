@@ -10,8 +10,9 @@ import { GAME_ID } from "@/platform/game";
 import { fixtureDay, isFixtureDay, loadFixtureBase } from "@/test/answer-fixture";
 import { hostName, safeEntries, typeableName } from "@/test/puzzles";
 import { answerGuest, guestTodaysState, openNextGuest, startGuestRun } from "./guest-runs";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 type Day = { client: PoolClient; today: string; puzzle: ApprovedPuzzle };

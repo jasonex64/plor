@@ -3,8 +3,9 @@
 import { createHash } from "node:crypto";
 import { expect, type Locator, type Page } from "@playwright/test";
 import { GAME } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const MAILPIT = "http://127.0.0.1:54324";
+const MAILPIT = localStack().mailpitUrl;
 export const RUN = Date.now().toString(36);
 
 export async function emailedCode(email: string): Promise<string> {

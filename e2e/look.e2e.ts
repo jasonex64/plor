@@ -9,8 +9,9 @@ import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { GAME } from "../src/platform/game";
 import { removePuzzle, todayPuzzle, tomorrowWarning, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // Today's banner shows the day's facts only when there is a day: the fixture day, removed again after.
 let puzzle: TodayPuzzle;
 

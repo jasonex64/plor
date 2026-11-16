@@ -13,6 +13,7 @@ import { ensurePuzzle, hostName, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as sessionRoute } from "../realtime/session/route";
 import { GET as boardRoute } from "./route";
+import { localStack } from "../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -130,7 +131,7 @@ describe("the live board over HTTP", () => {
     useSession(players.a.session);
     const { status, body } = await call(sessionRoute(apiRequest("/api/realtime/session", { method: "GET" })));
     expect(status).toBe(200);
-    expect(body).toMatchObject({ ok: true, url: "http://127.0.0.1:54321", userId: players.a.userId });
+    expect(body).toMatchObject({ ok: true, url: localStack().apiUrl, userId: players.a.userId });
     expect(body.publishableKey).toMatch(/^sb_publishable_/);
     expect(typeof body.accessToken).toBe("string");
     expect(body.expiresAt).toBeGreaterThan(Date.now() / 1000);

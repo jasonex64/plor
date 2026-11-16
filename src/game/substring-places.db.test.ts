@@ -7,11 +7,12 @@ import { Pool, type PoolClient } from "pg";
 import { SUBSTRINGS_ID } from "@/platform/game";
 import { scoreRun } from "./substring-scoring";
 import { guestStandingToday, settleSubstringRuns, standingToday } from "./substring-places";
+import { localStack } from "../../scripts/slot.ts";
 
 const DAY = "2001-02-03";
 const ROUNDS = ["qk", "qm", "qnp", "qrs", "qtv", "qwx", "qyz"];
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {

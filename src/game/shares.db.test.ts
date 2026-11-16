@@ -13,8 +13,9 @@ import { safeEntry } from "@/test/puzzles";
 const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
 import { dayCounts } from "./ledger";
 import { todaysState } from "./runs";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 async function inRolledBackTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {

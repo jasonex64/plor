@@ -9,8 +9,9 @@ import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
@@ -40,7 +41,7 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
   // Shared from a button, never shown (M14 14b-3, answer 9), on /g/ with a 10-character code.
   const link = await sharedLink(creator, creator.getByRole("button", { name: "Share group link" }));
-  expect(link).toMatch(/^http:\/\/localhost:3000\/g\/[A-Za-z0-9_-]{10}$/);
+  expect(link).toMatch(new RegExp(`^${localStack().appUrl}/g/[A-Za-z0-9_-]{10}$`));
   expect(await creator.locator("body").innerText()).not.toContain("/g/");
   // A group's page doesn't scroll sideways on a 320px phone (14b-3, criterion 7). Polled: measured the moment after a
   // resize, the page is still the old width while it lays out again (seen at 360 for a moment, then 320).

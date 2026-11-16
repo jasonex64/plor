@@ -8,8 +8,9 @@ import { GAME } from "../src/platform/game";
 import { RUN, emailedCode, forwardPlayerIp, play, signInAndPick, befriend } from "./players";
 import { caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
 const WIDE = { width: 1440, height: 900 };
 let puzzle: TodayPuzzle;
@@ -157,13 +158,13 @@ test("a refused clipboard shows the link to copy, for a group and the result", a
   await page.getByLabel("New group's name").fill("Copy Club");
   await page.getByRole("button", { name: "Create group" }).click();
   await expect(page).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
-  await check("Share group link", /^http:\/\/localhost:3000\/g\/[A-Za-z0-9_-]{10}$/);
+  await check("Share group link", new RegExp(`^${localStack().appUrl}/g/[A-Za-z0-9_-]{10}$`));
 
   await page.goto("/");
   await play(page);
   await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toBeVisible();
-  await check("Share", /http:\/\/localhost:3000\/$/);
+  await check("Share", new RegExp(`${localStack().appUrl}/$`));
 });
 
 test("from 1200px the 404 has no friends feed beside it", async ({ page }) => {

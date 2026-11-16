@@ -11,8 +11,9 @@ import { createGroup, leaveGroup } from "@/groups/groups";
 import { deleteAccount } from "./account";
 import { createProfile } from "./profile";
 import { fixtureDay, loadFixtureBase } from "@/test/answer-fixture";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 3 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 3 });
 const RUN = Date.now().toString(36);
 const committed: string[] = [];
 

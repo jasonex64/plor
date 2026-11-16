@@ -11,8 +11,9 @@ import { answer, asked, caught, next, safe, seeResults } from "./game";
 import { play, RUN, signInAndPick } from "./players";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const ROUNDS = ["xk", "xm", "xn", "xp", "xr", "xs", "xt"];
 const WORDS = ["axkb", "axmb"];
 let puzzle: TodayPuzzle;
@@ -88,7 +89,7 @@ test("a visitor plays game 1 as a guest from the front page, through the guest r
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("button", { name: "Share", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "Copied" })).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/\nhttp:\/\/localhost:3000\/$/);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`\n${localStack().appUrl}/$`));
   await expectPeek(peek(page));
 
   expect(posts).toEqual(expect.arrayContaining(["/api/guest/run/start", "/api/guest/run/answer", "/api/guest/run/next"]));

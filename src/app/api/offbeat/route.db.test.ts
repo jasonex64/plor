@@ -21,6 +21,7 @@ import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, fixture, nameOf, removeFixtures, safeEntry } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as offbeatRoute } from "./route";
+import { localStack } from "../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -29,7 +30,7 @@ const RUN = Date.now().toString(36);
 const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
 const [P, Q, N] = [player("op"), player("oq"), player("on")];
 // The local superuser, which may switch the triggers off; the routes connect as postgres locally (ROADMAP).
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 // T-k, from private.today().
 const day: Record<number, string> = {};
 // Today's puzzle carries a marker no other day has, so the route's answer can be searched for it.

@@ -5,8 +5,9 @@ import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { asked } from "./game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
@@ -50,7 +51,7 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
 
   // /streak: how it counts, the six ranks, the player's marked (criterion 3).
   await pill.click();
-  await expect(page).toHaveURL("http://localhost:3000/streak");
+  await expect(page).toHaveURL("/streak");
   const streak = page.getByRole("region", { name: "Streak" });
   await expect(streak.getByRole("heading", { name: "Your streak: 0 days" })).toBeVisible();
   await expect(streak).toContainText("A day with no puzzle neither counts nor breaks it.");
@@ -74,7 +75,7 @@ test("a phone's top bar shows the streak's rank beside the gear, and it grows wh
   // so the pill is read back on Today.
   await page.goto("/");
   await page.getByRole("link", { name: "Play", exact: true }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("/play");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await asked(page, "Name an animal");
   await page.goBack();

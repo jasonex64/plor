@@ -11,8 +11,9 @@ import { fixtureDay } from "@/test/answer-fixture";
 // The streak reads only which days have a puzzle, so the fixture day needs no answer database here.
 const fixture = (date: string) => fixtureDay(date, `${date}T00:00:00Z`);
 import { getStreak } from "./streak";
+import { localStack } from "../../scripts/slot.ts";
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 afterAll(() => admin.end());
 
 describe("the streak of days played", () => {

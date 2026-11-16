@@ -8,8 +8,9 @@ import { Pool } from "pg";
 import { dayText } from "../src/app/day-text";
 import { SUBSTRINGS } from "../src/platform/game";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const DRAFTS = join(process.cwd(), "content", "substrings");
 const ROUNDS = ["ou", "lu", "att", "yin", "odo", "hec", "vet"];
 const AFTER_ROUNDS = ["pr", "st", "ing", "ame", "ode", "ush", "ald"];

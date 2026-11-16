@@ -8,13 +8,14 @@ import { getPool } from "@/lib/db";
 import { useLocalStack } from "@/test/local-stack";
 import { apiRequest } from "@/test/request-scope";
 import { POST as sendRoute } from "./route";
+import { localStack } from "../../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
 const RUN = Date.now().toString(36);
 const email = (tag: string) => `${RUN}-${tag}@example.test`;
-const MAILPIT = "http://127.0.0.1:54324";
+const MAILPIT = localStack().mailpitUrl;
 // Documentation addresses (RFC 5737), never a real player's. Their counts are removed after the run.
 const IP_A = "198.51.100.1";
 const IP_B = "198.51.100.2";

@@ -6,8 +6,9 @@ import { RUN, play, sent, signInAndPick, befriend } from "./players";
 import { asked, caughtToCards } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
@@ -53,15 +54,15 @@ test("Offbeat's banner has Play before the run, and the score, how it ended and 
   await asked(page, "Name an animal");
   const nav = page.getByRole("navigation", { name: "Main" });
   await page.goBack();
-  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page).toHaveURL("/");
   await expect(banner.getByText("Your run is still going")).toBeVisible();
   await banner.getByRole("link", { name: "Continue" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("/play");
   await caughtToCards(page, puzzle.hostAnswer);
   await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
 
   await nav.getByRole("link", { name: "Today" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page).toHaveURL("/");
   await expect(banner.getByText("0 points", { exact: true })).toBeVisible();
   await expect(banner.getByText("caught on question 1", { exact: true })).toBeVisible();
   await expect(banner.getByRole("timer")).toContainText("Next puzzle in");

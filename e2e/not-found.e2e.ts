@@ -4,8 +4,9 @@
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
@@ -39,7 +40,7 @@ test("signed out, an unknown address answers 404 with Plor's page, in its theme 
     await expect(home).toHaveAttribute("href", "/");
     expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await home.click();
-    await expect(page).toHaveURL("http://localhost:3000/");
+    await expect(page).toHaveURL("/");
     await page.context().close();
   }
 });

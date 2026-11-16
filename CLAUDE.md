@@ -15,7 +15,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Overnight** nobody can answer: the `goodnight` skill says what to do instead.
 
 ## Before writing code
-1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), a docs-only tidy of an audit's findings, and changes to these rules (both on a `process-` branch, recorded in DECISIONS.md's log).
+1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: a quick fix ("Slots, lanes and the inbox", below), drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), a docs-only tidy of an audit's findings, and changes to these rules (both on a `process-` branch, recorded in DECISIONS.md's log).
 2. **Say where we are.** Give the current milestone, its status and what comes next, taken from `docs/ROADMAP.md`.
 3. **Anchor to the source.** Read the cited sections in `docs/SOURCES.md` and name the sections you are following. If no source covers the work, stop and ask. Don't fill the gap from memory.
 4. **Justify it.** The ticket must answer *Who uses this?* and *What breaks without it?* If the answer is "nothing yet", don't build it.
@@ -73,6 +73,12 @@ Branches and PRs:
 - **One PR per sub-ticket** (2a, 2b, …), opened from the milestone branch.
 - **Merge or close the open PR before starting the next sub-ticket.** Delete the branch once the milestone is merged.
 - *(Added 2026-10-20, after M02 2e was done on new `claude/…` branches and its evidence was stranded on the old `m02-sign-in-and-play` branch.)*
+
+## Slots, lanes and the inbox
+*(Human, 2026-11-15; `docs/milestones/PROCESS-parallel-sessions.md`.)*
+- **Slots.** Work happens in one of three slot folders: `RIFF`, `plor-2` and `plor-3`, each with its own dev port and local database. Run `npm run slots` to see them; `npm run slots -- take <branch>` puts your branch in a free slot and resets that slot's database to the branch's migrations. Never make another folder or worktree. When the PR merges, `npm run slots -- free <n>`. Run only one e2e run at a time on a machine, full or targeted: on the PC, two or three at once time out tests that pass alone. Dev servers and db tests may run in every slot together.
+- **Two lanes.** *Quick fix:* a change that needs no migration and no design input from the human. It gets its own `fix-<short-name>` branch off `main`, one PR, and a line in the PR saying what it fixes and who sees it (Who uses this / What breaks). No milestone, no ticket. *Milestone:* everything else, as now. If a quick fix turns out to need a migration or the human's input, stop and move it to a milestone.
+- **The inbox** is GitHub issues labelled `inbox`, on no branch, so every slot and the Mac see an item at once *(human, 2026-11-16: "GitHub issues")*. "inbox: <thing>" from the human opens one issue per separate thing, `gh issue create --label inbox --label <gameplay|ui|other> --title "<the thing, short, in the human's words>" --body "The human, <YYYY-MM-DD>: \"<their exact words>\""`, and builds nothing. "Go through the inbox" (`gh issue list --label inbox`) sorts each item into a quick fix or a milestone, asking the human what's unclear, and closes it once it has a branch or a ticket (`gh issue close <n> --comment "<branch or ticket>"`). The repo is public, so the issues are too.
 
 ## Agent setup
 *(Human, 2026-11-10.)*

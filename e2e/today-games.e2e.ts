@@ -10,10 +10,11 @@ import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { asked, caughtToCards } from "./game";
 import { RUN, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 // Runs of players who never played are written with the round rules off, which needs the local superuser.
-const ADMIN = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const ADMIN = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 const PHONE = { width: 390, height: 844 };
 // The app's tablet width (src/app/min-width.ts, used by src/app/today-cards.tsx).
 const TABLET = { width: 768, height: 1024 };

@@ -12,8 +12,9 @@ import { fixtureDraft, loadFixtureBase } from "../src/test/answer-fixture";
 import { dayText } from "../src/app/day-text";
 import { RUN, signInAndPick } from "./players";
 import { answer, caught, safe, seeResults } from "./game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const DRAFTS = join(process.cwd(), "content", "offbeat");
 let ahead = "";
 let draftFile = "";

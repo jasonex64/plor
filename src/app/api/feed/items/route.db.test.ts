@@ -18,6 +18,7 @@ import { signIn, useLocalStack, useSession } from "@/test/local-stack";
 import { ensurePuzzle, nameOf, removeFixtures } from "@/test/puzzles";
 import { apiRequest } from "@/test/request-scope";
 import { GET as itemsRoute } from "./route";
+import { localStack } from "../../../../../scripts/slot.ts";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
@@ -25,7 +26,7 @@ vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextSe
 const RUN = Date.now().toString(36);
 const player = (tag: string) => ({ email: `${RUN}-${tag}@example.test`, username: `${tag}${RUN}`, userId: "", session: new Map<string, string>() });
 const [V, F, S, K, L, G, W, P, E] = ["pv", "pf", "ps", "pk", "pl", "pg", "pw", "pp", "pe"].map(player);
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 let today = "";
 let yesterday = "";
 let puzzle: ApprovedPuzzle;

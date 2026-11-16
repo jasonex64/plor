@@ -7,11 +7,12 @@ import { Pool, type PoolClient } from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 import { DISPLAY_NAME_MAX_LENGTH, USERNAME_CHANGE_DAYS, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "@/config/tunables";
 import { changeUsername, createProfile, getProfile, setDisplayName, setSettings } from "./profile";
+import { localStack } from "../../scripts/slot.ts";
 
 // Both settings off and the theme following the device on a new profile (M14 14a-3b, 14b-1).
 const OFF = { skipGameScreen: false, theme: "device" };
 
-const admin = new Pool({ connectionString: "postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres", max: 1 });
+const admin = new Pool({ connectionString: localStack().adminDatabaseUrl, max: 1 });
 
 afterAll(async () => {
   await admin.end();

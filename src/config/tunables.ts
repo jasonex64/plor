@@ -234,3 +234,13 @@ export const GUEST_TOKEN_BYTES = 20;
 // 2026-11-11: "10 seconds"; docs/milestones/M18-guest-play.md, Open questions 2). Cloudflare's server-side validation
 // page says to set a timeout and gives no number (developers.cloudflare.com/turnstile/get-started/server-side-validation/).
 export const SITEVERIFY_TIMEOUT_MS = 10_000;
+
+// The three slots, the folders sessions work in at once, and each one's ports (docs/milestones/PROCESS-parallel-sessions.md).
+// Three, on the PC and the Mac (human, 2026-11-15: "just do three … for both right now"). The dev servers' ports (human,
+// 2026-11-16: "3000, 3002, 3003 (Recommended)"). Each stack's ports are a block of ten from stackBase, 100 apart (human,
+// 2026-11-16: "Steps of 100 (Recommended)"); slot 1's block and inspector port are supabase/config.toml's.
+export const SLOTS = [
+  { devPort: 3000, stackBase: 54320, inspectorPort: 8083 },
+  { devPort: 3002, stackBase: 54420, inspectorPort: 8183 },
+  { devPort: 3003, stackBase: 54520, inspectorPort: 8283 },
+] as const;

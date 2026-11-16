@@ -4,8 +4,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 
 test.afterAll(async () => {
   await DB.query("delete from auth.users where email like $1", [`${RUN}-%@example.test`]);
@@ -85,7 +86,7 @@ test("a player picks a theme, which paints before the profile loads, and Follow 
 test("every footer links to About, which says what Plor is, who makes it, its credits and its use of AI", async ({ page }) => {
   await page.goto("/");
   await page.locator("footer").getByRole("link", { name: "About Plor" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/about");
+  await expect(page).toHaveURL("/about");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("About Plor");
   for (const heading of ["Who makes it", "Credits", "AI"]) await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
   await expect(page.getByText("Plor is made by Jason.")).toBeVisible();

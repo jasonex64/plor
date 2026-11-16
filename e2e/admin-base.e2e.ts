@@ -4,8 +4,9 @@
 import { expect, test } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, signInAndPick } from "./players";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 const id = (n: string) => `e2e-${RUN}-${n}`;
 // A category key is letters and underscores (supabase/migrations/20261028140000_baseline.sql).
 const KEY = `endtoend_${RUN.replace(/[0-9]/g, (d) => "abcdefghij"[Number(d)])}`;

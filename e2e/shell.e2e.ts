@@ -7,8 +7,9 @@ import { RUN, play, signInAndPick } from "./players";
 import { answerBox } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
+import { localStack } from "../scripts/slot.ts";
 
-const DB = new Pool({ connectionString: "postgresql://postgres:postgres@127.0.0.1:54322/postgres", max: 1 });
+const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
 
 test.beforeAll(async () => {
@@ -59,7 +60,7 @@ test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ 
   expect([box.x, box.width, box.y + box.height]).toEqual([0, 360, 800]);
   for (const tab of TABS) {
     await nav.getByRole("link", { name: tab.name }).click();
-    await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
+    await expect(page).toHaveURL(tab.path);
     await expect(nav.locator("[aria-current]")).toHaveCount(1);
     await expect(nav.getByRole("link", { name: tab.name })).toHaveAttribute("aria-current", "page");
     await expect.poll(() => sections(page)).toEqual(sectionsAt(tab, 360));
@@ -167,7 +168,7 @@ test("from 768px the tabs are a sidebar, with Admin for admins only", async ({ b
   // /admin opens on Puzzles (docs/milestones/M14-14b-2b-2-admin-build.md, criterion 1), so the link ends there; the
   // bare /admin was only seen when the check ran before the redirect, which the persistent frame's prefetch made rare
   // (PR #113's pull-request e2e run, 2026-10-27).
-  await expect(page).toHaveURL("http://localhost:3000/admin/puzzles");
+  await expect(page).toHaveURL("/admin/puzzles");
   // Back on a desktop, the Me tab leaves it to the sidebar.
   await page.goto("/me");
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -203,7 +204,7 @@ test("a question in play is still there after a visit to another tab", async ({ 
   await nav.getByRole("link", { name: "Friends" }).click();
   await expect(page.getByRole("region", { name: "Friends today" })).toBeVisible();
   await page.getByRole("region", { name: "Question in play" }).getByRole("link", { name: "Back" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/play");
+  await expect(page).toHaveURL("/play");
   await expect(answerBox(page)).toBeVisible();
 });
 
@@ -326,7 +327,7 @@ test("the sidebar is 280px, the right column holds the feed from 1200px, and no 
   const { page, nav } = await player(browser, "sw", { width: 1440, height: 900 });
   expect((await nav.boundingBox())!.width).toBe(280);
   await nav.getByRole("link", { name: "Me" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/me");
+  await expect(page).toHaveURL("/me");
   const feed = page.getByRole("complementary", { name: "Friends feed" });
   await expect(feed.getByRole("region", { name: "Feed" })).toBeVisible();
   expect(await feed.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
@@ -338,7 +339,7 @@ test("the sidebar is 280px, the right column holds the feed from 1200px, and no 
 
   for (const tab of TABS) {
     await nav.getByRole("link", { name: tab.name }).click();
-    await expect(page).toHaveURL(`http://localhost:3000${tab.path}`);
+    await expect(page).toHaveURL(tab.path);
     // Today's circle (the Leaderboard) is in the right column here, beside the page's own sections.
     await expect.poll(() => sections(page)).toEqual(tab.sections.filter((s) => s !== "Leaderboard"));
     const underlined = await page.evaluate(() =>
