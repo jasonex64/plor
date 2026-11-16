@@ -1,6 +1,6 @@
 # M21 — Faster e2e
 
-**Status:** drafted 2026-11-16, waiting for the human's approval. Nothing is built.
+**Status:** approved 2026-11-16 ("Approve, start with the upgrade (Recommended)"); next, Dependabot's Next.js 16.4.5 pull request, then 21a. Nothing is built.
 
 ## Goal
 Make the e2e check, which every pull request waits on, take far less time, in three measured steps: run the tests on a built app, give the tests that don't test sign-in a quicker signed-in player, then split the suite across two CI machines.
@@ -14,7 +14,7 @@ Make the e2e check, which every pull request waits on, take far less time, in th
 - **Playwright sharding** (to add to SOURCES.md, the human's "Yes, add and read them", 2026-11-16): `https://playwright.dev/docs/test-sharding`, read 2026-11-16. Followed: `--shard=x/y`; without `fullyParallel`, "entire test files are assigned to shards"; uneven files can leave a shard with "significantly more tests"; the GitHub Actions example's `strategy` with `fail-fast: false` and a matrix.
 - **Playwright authentication** (to add, same answer): `https://playwright.dev/docs/auth`, read 2026-11-16. Followed: a signed-in browser context from saved state (`browser.newContext({ storageState })`, one per role or player in a test); the warning that a state file "may contain sensitive cookies" and is never committed; state written under the project's output folder, "automatically cleaned up before every test run".
 - **Next.js deploying** (SOURCES.md, Next.js; the bundled `node_modules/next/dist/docs/01-app/01-getting-started/17-deploying.md`, "Node.js server"): `npm run build` then `npm run start`, which "supports all Next.js features".
-- **Supabase auth admin API** (*not yet in SOURCES.md: needs the human's OK*): `https://supabase.com/docs/reference/javascript/admin-api` ("Any method under the `supabase.auth.admin` namespace requires a `secret` key"; "should be called on a trusted server. Never expose your `secret` key in the browser"), `auth-admin-createuser`, `auth-admin-generatelink`, `auth-verifyotp`, read 2026-11-16. Gap: these pages don't document `generateLink`'s or `verifyOtp`'s return values, so 21b must confirm them from the installed `@supabase/supabase-js` types before building on them.
+- **Supabase auth admin API** (added to SOURCES.md, the human's "Yes, add them (Recommended)", 2026-11-16): `https://supabase.com/docs/reference/javascript/admin-api` ("Any method under the `supabase.auth.admin` namespace requires a `secret` key"; "should be called on a trusted server. Never expose your `secret` key in the browser"), `auth-admin-createuser`, `auth-admin-generatelink`, `auth-verifyotp`, read 2026-11-16. Gap: these pages don't document `generateLink`'s or `verifyOtp`'s return values, so 21b must confirm them from the installed `@supabase/supabase-js` types before building on them.
 
 ## Answers (the human, 2026-11-16)
 Asked in two rounds after a measuring run (PR #237, below).
@@ -30,6 +30,11 @@ Round 2
 6. Machines: "2".
 7. Next.js: "Yes, merge the upgrade first (Recommended)": Dependabot's pull request to Next.js 16.4.5 goes before this ticket, after its checks and release notes are read and what it changes is told to the human. Today local e2e can't start: `next dev` 16.4.2 stops at a security-upgrade notice whenever Playwright starts it.
 8. Sources: "Yes, add and read them (Recommended)".
+
+Approval
+9. "Approve, start with the upgrade (Recommended)".
+10. Supabase's auth admin API pages in SOURCES.md: "Yes, add them (Recommended)".
+11. How long the test runner waits for the build and start: "3 minutes".
 
 ## What was measured (PR #237, 2026-11-16, closed unmerged)
 The whole suite twice at once on CI, once on `next dev` and once on `next build` + `next start`, with every sign-in timed as steps (`signInAndPick`, `e2e/players.ts`).
@@ -90,7 +95,7 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 | 2 machines | 21c's shards | The human, 2026-11-16 (answer 6) |
 | The five sign-in files | 21b's real-sign-in files | `grep -l "Email me a sign-in code\|emailedCode" e2e/*.e2e.ts`, 2026-11-16 |
 | The #237 times | Evidence's before | PR #237's two runs, 2026-11-16 |
-| The web server's `timeout` for the build | 21a, step 2 | **Blank: for the human.** Playwright's default is too short for the build (#237's built run took about 1.4 min to build and start); no source gives Plor's value |
+| 3 minutes | The web server's `timeout` for the build and start, 21a step 2 | The human, 2026-11-16 (answer 11); #237's built run took about 1.4 min on CI |
 
 ## Removes
 - The `npm run dev` web server in `playwright.config.ts` (21a), and ROADMAP's Next revision item "Run e2e on a production build", which 21a does.
