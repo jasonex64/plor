@@ -84,5 +84,6 @@ The typo step's alias-only check stays and gains the name check after it, so not
 - **Not verified:** the line on plor.app; a phone; how many answers the rule takes from the 28 drafted days (answer 4).
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- The `reviewer` agent (a fresh context, 2026-11-16) read the whole diff against this ticket and ran `npx tsc --noEmit -p .` (clean); it ran no db or e2e test.
+- Blocking findings and how each was fixed: none. It checked the non-null reads (`private.thing_names` returns the ID it was given, so a merged thing still has its name), that nothing changes with no letter taken, and that `needs` reaches only the question in play.
+- Deferred to ROADMAP "Next revision" (For M15), five. Two are consequences of the rule, for the human to know: **a name two things share can now dodge the host** (a name of a caught answer whose shown name holds a taken letter and of an uncaught one whose name is clean was caught before, and is now the clean one alone, safe); and **the shown name is read as it is now**, while aliases are read as of the day's approval, so renaming a thing in the base mid-day could change what a started day accepts. Three are small: DESIGN.md's new cite is `game.tsx:730-740` for lines 733-739; the DECISIONS row is dated 2026-11-16 beside answers of 2026-11-15 (the build ran past midnight UTC, not Pacific); a comment in `src/game/runs.db.test.ts` now sits above the "Gaul" block instead of the line it describes.
