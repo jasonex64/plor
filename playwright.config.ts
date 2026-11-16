@@ -25,6 +25,8 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
   ],
   // A server already on the port is reused only if it is this slot's own: e2e/own-server.ts checks, after this step.
-  webServer: { command: "npm run dev", url: appUrl, reuseExistingServer: !process.env.CI },
+  webServer: process.env.E2E_SERVER === "prod"
+    ? { command: "npm run build && npm run start", url: appUrl, reuseExistingServer: false, timeout: 900_000 }
+    : { command: "npm run dev", url: appUrl, reuseExistingServer: !process.env.CI },
   globalSetup: "./e2e/own-server.ts",
 });

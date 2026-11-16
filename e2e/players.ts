@@ -1,7 +1,7 @@
 // Signing players in on a page, shared by the e2e tests: an emailed code read from the local Mailpit inbox, then a
 // username. Every player's email starts with RUN, so each file's afterAll can delete its players.
 import { createHash } from "node:crypto";
-import { expect, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { GAME } from "../src/platform/game";
 import { localStack } from "../scripts/slot.ts";
 
@@ -36,6 +36,10 @@ export async function forwardPlayerIp(page: Page, email: string): Promise<void> 
 // (docs/milestones/M18-guest-play.md, answers 32 and 33). Signed in through the link, it goes Back to the page it was
 // on, so the tests' history has that page where it always had it (a Back from a game lands on "/", not "/?sign-in").
 export async function signInAndPick(page: Page, name: string): Promise<void> {
+  await test.step("measure: sign-in total", () => signInAndPickInner(page, name));
+}
+
+async function signInAndPickInner(page: Page, name: string): Promise<void> {
   const email = `${RUN}-${name}@example.test`;
   await forwardPlayerIp(page, email);
   const field = page.getByLabel("Email");
@@ -53,15 +57,18 @@ export async function signInAndPick(page: Page, name: string): Promise<void> {
   }
   await field.fill(email);
   await page.getByRole("button", { name: "Email me a sign-in code" }).click();
-  await page.getByLabel("Code").fill(await emailedCode(email));
+  const code = await test.step("measure: wait for emailed code", () => emailedCode(email));
+  await page.getByLabel("Code").fill(code);
   await page.getByRole("button", { name: "Sign in" }).click();
   // The visible step: signed in from a guest game, the game's page is still in the document, hidden, with a step of its
   // own (seen in guest-play.e2e.ts, 2026-11-12: two Username fields).
-  await page.getByLabel("Username").filter({ visible: true }).fill(`${name}${RUN}`);
-  await page.getByRole("button", { name: "Save" }).filter({ visible: true }).click();
-  // Saved once the step is gone: a test that navigates straight after would otherwise leave before the save lands
-  // and find the step again (seen in M14 14a-1's e2e run).
-  await expect(page.getByRole("heading", { name: "Pick a username" }).filter({ visible: true })).toHaveCount(0);
+  await test.step("measure: pick username", async () => {
+    await page.getByLabel("Username").filter({ visible: true }).fill(`${name}${RUN}`);
+    await page.getByRole("button", { name: "Save" }).filter({ visible: true }).click();
+    // Saved once the step is gone: a test that navigates straight after would otherwise leave before the save lands
+    // and find the step again (seen in M14 14a-1's e2e run).
+    await expect(page.getByRole("heading", { name: "Pick a username" }).filter({ visible: true })).toHaveCount(0);
+  });
   // Back in the page's own history, not a new load: a load would show Today again before it can take a click.
   if (throughLink) {
     await page.goBack();
