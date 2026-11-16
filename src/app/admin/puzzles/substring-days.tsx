@@ -1,6 +1,6 @@
 "use client";
 
-// Game 2's days on the puzzles page (docs/milestones/M16-16c-a-day-of-game-2.md, 16c-2): each day's seven sets of
+// Game 2's day on the puzzles page (docs/milestones/M16-16c-a-day-of-game-2.md, 16c-2): each day's seven sets of
 // letters and its bonus letter, approved one day at a time (human, 2026-11-07: "Each day on its own (Recommended)").
 // The word counts are in the batch's PR ("Counts in the PR, approve on page (Recommended)").
 import { useState } from "react";
@@ -13,14 +13,13 @@ import kit from "../../kit.module.css";
 import admin from "../admin.module.css";
 import styles from "./puzzles.module.css";
 
-export function SubstringDays({ days, onApproved }: { days: SubstringDayView[]; onApproved: () => void }) {
-  if (days.length === 0) return null;
+// The chosen date's day of game 2, or that it has none (docs/milestones/M15-15f-fragments-test-run.md, 15f-1, answer 1:
+// "One date, both games").
+export function SubstringDay({ date, day, onApproved }: { date: string; day: SubstringDayView | null; onApproved: () => void }) {
   return (
-    <section aria-label={`${SUBSTRINGS.name} days`} className={styles.gameDays}>
+    <section aria-label={`${SUBSTRINGS.name} day`} className={styles.gameDays}>
       <h2 className={admin.cardTitle}>{SUBSTRINGS.name}</h2>
-      {days.map((day) => (
-        <Day key={day.date} day={day} onApproved={onApproved} />
-      ))}
+      {day ? <Day day={day} onApproved={onApproved} /> : <p>Nothing drafted for {dayText(date)}.</p>}
     </section>
   );
 }

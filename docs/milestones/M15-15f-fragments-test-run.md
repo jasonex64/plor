@@ -1,6 +1,6 @@
 # M15 15f — Fragments' test run, and one date for both games on the Puzzles page
 
-**Status:** in progress. Drafted 2026-11-15 from the human's request and answers below; the design's security part is approved in answer 2 ("Approve as proposed (Recommended)"). 15f-1 is being built.
+**Status:** in progress. Drafted 2026-11-15 from the human's request and answers below; the design's security part is approved in answer 2 ("Approve as proposed (Recommended)"). 15f-1 is built and reviewed, in the pull request from `m15-launch-readiness`, not merged. 15f-2 starts after its merge.
 
 ## Goal
 On `/admin/puzzles` a chosen date shows that date's day for both games, and an admin can play a test run of a Fragments day as they can an Offbeat one, with nothing saved.
@@ -28,10 +28,10 @@ The request: "can u build it? make it the same type of style as the other game f
 
 ## Acceptance criteria and plan
 **15f-1 — one date, both games.** One pull request from `m15-launch-readiness`. No database change. Tests first.
-- [ ] The Days row lists every date from today on that has a day of either game, and the chosen date shows Offbeat's day (or its "Not drafted" slot, as now) and then Fragments' day for that date alone (or that it has none) → verify: e2e, failing first: with Fragments days on several dates, the chosen date shows one Fragments day, and choosing another date shows that one.
-- [ ] Approving a Fragments day works as before from its new place, the redraft message included → verify: `e2e/substring-days.e2e.ts`, changed only where it named the old list (say which lines and why).
-- [ ] Nothing else on the page changes: the tomorrow warning, Offbeat's Approve and Play test, "Test an earlier day" → verify: `e2e/admin-area.e2e.ts`, `approve-and-play.e2e.ts`, `test-run.e2e.ts` and `calm.e2e.ts` pass unchanged.
-- [ ] DESIGN.md says the page as built.
+- [x] The Days row lists every date from today on that has a day of either game, and the chosen date shows Offbeat's day (or its "Not drafted" slot, as now) and then Fragments' day for that date alone (or that it has none) → verify: e2e, failing first: with Fragments days on several dates, the chosen date shows one Fragments day, and choosing another date shows that one. **Done:** `e2e/substring-days.e2e.ts`, "the chosen date shows one game 2 day, and choosing another date shows that one"; `src/app/admin/puzzle-dates.test.ts`.
+- [x] Approving a Fragments day works as before from its new place, the redraft message included → verify: `e2e/substring-days.e2e.ts`, changed only where it named the old list (say which lines and why). **Done:** `e2e/substring-days.e2e.ts`, 2 passed; what changed in it is under Evidence.
+- [x] Nothing else on the page changes: the tomorrow warning, Offbeat's Approve and Play test, "Test an earlier day" → verify: `e2e/admin-area.e2e.ts`, `approve-and-play.e2e.ts`, `test-run.e2e.ts` and `calm.e2e.ts` pass unchanged. **Done:** admin-area 4, approve-and-play 2, test-run 4 and calm 2 passed, their files unchanged.
+- [x] DESIGN.md says the page as built. **Done:** the Puzzles page's bullet.
 
 **15f-2 — Fragments' test run.** One pull request, after 15f-1 is merged. One migration: **the hosted `db push` is the human's, after the merge.**
 - [ ] One new function, `private.judge_test_word` (the name may follow the file's neighbours): security definer, empty `search_path`, refuses anyone not in `private.admin` (OB007), reads `private.dictionary_word`, writes nothing; `plor_app` may execute it and still can't select from `private.dictionary_word`; no other grant, role or policy changes → verify: pgTAP, failing first (a non-admin refused; an admin gets a known word accepted and an unknown one refused; the table privilege unchanged; row counts of every game table equal before and after).
@@ -67,9 +67,19 @@ No new number. If the build needs one, it stops and asks.
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Answer 1: the chosen date shows both games' days | The small chip on each date in the Days row still tells Offbeat's state alone: a date only Fragments has reads "Not drafted" | The ticket: nothing else on the page changes; told to the human, whose call it is (ROADMAP, Next revision) |
+| The ticket: a date Fragments has no day for says so | New words: "Nothing drafted for <date>." under Fragments, Offbeat's own line without its second sentence | No words were given; for the human to confirm |
 
 ## Evidence
+**15f-1 (2026-11-15).**
+- Failed first, on the old page: the new e2e, "waiting for getByRole('navigation', { name: 'Days' }).getByRole('button', { name: 'Wed 19 Jan' })" (the old row listed Offbeat's dates alone). `slotDates`' three unit tests were written with the helper and not seen failing.
+- After: `npm test`: 69 files, 809 passed. `npx tsc --noEmit`: exit 0. `npm run lint`: clean. e2e, one file at a time: substring-days 2, admin-area 4, approve-and-play 2, test-run 4, calm 2 passed. **`e2e/shell.e2e.ts`: 9 passed, 1 failed** (line 149: a player's Groups link lacks `aria-current="page"`); it fails the same way with this step's two page files put back to HEAD, so it is not this step's (ROADMAP, Next revision).
+- **Existing assertions changed, all in `e2e/substring-days.e2e.ts`:** the region's name, "Fragments days" to "Fragments day" (the section holds one day); a click on the date's Days button before the day is used, in three places (each after a load, which chooses the default date again). What it proves of approving and of the redraft message is as before.
+- The page by eye, from screenshots of the local build with the beta's real drafts (390px and 1280px, Wed 18 Nov chosen; one sent to the human, none kept): Offbeat's day, then a "Fragments" heading and that date's day alone; no sideways scroll.
+- The build was cut off once when the app restarted; it left a dev server on port 3000 and two fixture drafts in `content/substrings/`, both removed before it went on.
+- **Not verified:** the page on plor.app; `look`, `headings-invites`, `me`, `screen-readers` and `player-screens` e2e were not run (they open other pages).
+
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: 15f-1 (the `reviewer`, 2026-11-15, one pass, by reading, with the admin unit tests and `tsc`; it ran no e2e): none.
+- Deferred to ROADMAP "Next revision": 15f-1: three items (For M15).
