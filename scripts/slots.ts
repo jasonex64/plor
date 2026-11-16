@@ -1,7 +1,7 @@
 // `npm run slots`: the three folders sessions work in at once (docs/milestones/PROCESS-parallel-sessions.md; CLAUDE.md,
 // Slots). `npm run slots` lists them; `-- take <branch>` puts a branch in the first free slot and resets that slot's
 // database; `-- free <n>` returns a merged slot to origin/main and stops its stack. There are three and no more.
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, execSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -13,10 +13,11 @@ function git(args: string[], cwd: string): string {
   return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
 }
 
-// Runs a command in a folder with its output shown; a failure stops the script (npx is a .cmd on Windows, so a shell).
-function run(command: string, args: string[], cwd: string): void {
-  const result = spawnSync(command, args, { cwd, stdio: "inherit", shell: true });
-  if (result.status !== 0) throw new Error(`${command} ${args.join(" ")} failed in ${cwd} (exit ${result.status})`);
+// Runs a fixed command line in a folder; a failure stops the script (npx is a .cmd on Windows, so a shell). `hideOutput`
+// drops its standard output and keeps its errors: `supabase start` prints the stack's keys there (CLAUDE.md, Secrets).
+function run(commandLine: string, cwd: string, hideOutput = false): void {
+  const result = spawnSync(commandLine, { cwd, stdio: ["inherit", hideOutput ? "ignore" : "inherit", "inherit"], shell: true });
+  if (result.status !== 0) throw new Error(`${commandLine} failed in ${cwd} (exit ${result.status})`);
 }
 
 function stateOf(slot: Slot): State {
@@ -69,7 +70,7 @@ function list(main: string): void {
 function writeEnvLocal(slot: Slot, main: string): void {
   const source = join(main, ".env.local");
   if (!existsSync(source)) throw new Error(`${source} is missing: slot 1's .env.local is the template for the other slots`);
-  const status = execFileSync("npx", ["supabase", "status", "-o", "env"], { cwd: slot.dir, encoding: "utf8", shell: true, stdio: ["ignore", "pipe", "ignore"] });
+  const status = execSync("npx supabase status -o env", { cwd: slot.dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
   const key = /^PUBLISHABLE_KEY="?([^"\n]+)/m.exec(status)?.[1];
   if (!key) throw new Error(`slot ${slot.number}'s stack reported no publishable key (is it running?)`);
   const stack = localStack(slot);
@@ -100,7 +101,7 @@ function take(main: string, branch: string): void {
   git(["fetch", "origin", "--prune"], main);
   if (!states[index].exists) {
     git(["worktree", "add", "--detach", slot.dir, "origin/main"], main);
-    run("npm", ["ci"], slot.dir);
+    run("npm ci", slot.dir);
   }
   const local = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: slot.dir }).status === 0;
   const remote = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branch}`], { cwd: slot.dir }).status === 0;
@@ -108,9 +109,9 @@ function take(main: string, branch: string): void {
   else if (remote) git(["switch", "--track", `origin/${branch}`], slot.dir);
   else git(["switch", "-c", branch, "origin/main"], slot.dir);
   if (slot.number !== 1) writeFileSync(join(slot.dir, "supabase", ".env"), supabaseEnv(slot));
-  if (stackState(slot) !== "running") run("npx", ["supabase", "start"], slot.dir);
+  if (stackState(slot) !== "running") run("npx supabase start", slot.dir, true);
   // The slot's database, and only it: supabase/.env names this slot's stack (answer 3).
-  run("npx", ["supabase", "db", "reset"], slot.dir);
+  run("npx supabase db reset", slot.dir);
   if (slot.number !== 1) writeEnvLocal(slot, main);
   console.log(`TAKEN: slot ${slot.number}, ${slot.dir}, on ${branch}; its database is reset to the branch's migrations. npm run dev serves ${localStack(slot).appUrl}.`);
 }
@@ -124,7 +125,7 @@ function free(main: string, number: number): void {
   if (state.devHolder) throw new Error(`REFUSED: slot ${number}'s port ${slot.devPort} is held by process ${state.devHolder.pid}: ${state.devHolder.command}`);
   git(["fetch", "origin", "--prune"], main);
   git(["switch", "--detach", "origin/main"], slot.dir);
-  if (stackState(slot) === "running") run("npx", ["supabase", "stop"], slot.dir);
+  if (stackState(slot) === "running") run("npx supabase stop", slot.dir);
   console.log(`FREED: slot ${number}, ${slot.dir}, detached at origin/main; its stack is stopped.`);
 }
 

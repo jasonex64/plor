@@ -15,7 +15,7 @@ For every ticket and every subject that needs the human's intent, ask guiding qu
 - **Overnight** nobody can answer: the `goodnight` skill says what to do instead.
 
 ## Before writing code
-1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), a docs-only tidy of an audit's findings, and changes to these rules (both on a `process-` branch, recorded in DECISIONS.md's log).
+1. **Find the ticket.** All work happens against a milestone in `docs/milestones/`. If there's no ticket, stop and draft one for approval. The exceptions, each on its own branch with one PR: a quick fix ("Slots, lanes and the inbox", below), drafting a day's puzzle (DECISIONS.md, "Puzzle drafting"), the weekly audit (the `audit` skill), a docs-only tidy of an audit's findings, and changes to these rules (both on a `process-` branch, recorded in DECISIONS.md's log).
 2. **Say where we are.** Give the current milestone, its status and what comes next, taken from `docs/ROADMAP.md`.
 3. **Anchor to the source.** Read the cited sections in `docs/SOURCES.md` and name the sections you are following. If no source covers the work, stop and ask. Don't fill the gap from memory.
 4. **Justify it.** The ticket must answer *Who uses this?* and *What breaks without it?* If the answer is "nothing yet", don't build it.
@@ -74,6 +74,12 @@ Branches and PRs:
 - **Merge or close the open PR before starting the next sub-ticket.** Delete the branch once the milestone is merged.
 - *(Added 2026-10-20, after M02 2e was done on new `claude/…` branches and its evidence was stranded on the old `m02-sign-in-and-play` branch.)*
 
+## Slots, lanes and the inbox
+*(Human, 2026-11-15; `docs/milestones/PROCESS-parallel-sessions.md`.)*
+- **Slots.** Work happens in one of three slot folders: `RIFF`, `plor-2` and `plor-3`, each with its own dev port and local database. Run `npm run slots` to see them; `npm run slots -- take <branch>` puts your branch in a free slot and resets that slot's database to the branch's migrations. Never make another folder or worktree. When the PR merges, `npm run slots -- free <n>`.
+- **Two lanes.** *Quick fix:* a change that needs no migration and no design input from the human. It gets its own `fix-<short-name>` branch off `main`, one PR, and a line in the PR saying what it fixes and who sees it (Who uses this / What breaks). No milestone, no ticket. *Milestone:* everything else, as now. If a quick fix turns out to need a migration or the human's input, stop and move it to a milestone.
+- **The inbox.** "inbox: <thing>" from the human appends one line to `docs/INBOX.md` and builds nothing. "Go through the inbox" sorts each item into a quick fix or a milestone, asking the human what's unclear, and removes it once it has a branch or a ticket.
+
 ## Agent setup
 *(Human, 2026-11-10.)*
 - **The main session** (planning, milestones, integrating review) runs on the model the human picks in the app, at **high** effort.
@@ -94,6 +100,7 @@ Branches and PRs:
 |---|---|
 | `docs/ROADMAP.md` | Milestone order and status, plus deferred "Next revision" items |
 | `docs/HANDOFF.md` | Where the last session stopped: read first, rewritten last |
+| `docs/INBOX.md` | The human's unsorted "inbox:" items |
 | `docs/milestones/` | One ticket per milestone, plus a file per large sub-ticket (copy `_TEMPLATE.md`) |
 | `docs/SOURCES.md` | The only authoritative sources |
 | `docs/DECISIONS.md` | The single chosen way for each concern, plus the hard-to-reverse designs |

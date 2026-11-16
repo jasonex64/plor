@@ -1,6 +1,6 @@
 # M15 15d — Ship on your word
 
-**Status:** in progress (2026-10-26). Approved by the human (2026-10-26: "Approved as drafted: commit the IDs, add the vercel logs page to SOURCES.md, and build 15d on the M15 branch"). Built ahead of the rest of M15 (S8), while M14 carries on in parallel (S9).
+**Status:** dropped (the human, 2026-11-13: "Drop it"; `main` keeps publishing on every merge). Kept as a record on `process-parallel-sessions` (the human, 2026-11-16: "Commit it as dropped (Recommended)"); its half-built code went with `RIFF-m15`'s discarded edits ("Discard them"). Earlier: in progress (2026-10-26). Approved by the human (2026-10-26: "Approved as drafted: commit the IDs, add the vercel logs page to SOURCES.md, and build 15d on the M15 branch"). Built ahead of the rest of M15 (S8), while M14 carries on in parallel (S9).
 
 ## Goal
 When the human says "ship it", a Claude session runs one command that pushes the pending migrations to the hosted database, deploys `origin/main` to plor.app and checks its health; plor.app never deploys on its own.
