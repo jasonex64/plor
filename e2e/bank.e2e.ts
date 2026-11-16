@@ -31,6 +31,15 @@ test("an admin sees the bank's questions and the days they ran; a player can't",
   await expect(animal.getByRole("cell").nth(1)).toHaveText("animal");
   await expect(animal.getByRole("listitem").filter({ hasText: dayText("2026-10-24") })).toBeVisible();
   await expect(questions.locator("tbody tr")).toHaveCount(QUESTIONS);
+  // Clicking a question opens its answer pool under the row (docs/milestones/M15-15g-the-answer-pool.md). The bank is the
+  // repo's own and asks real categories, which only a loaded answer database has: the fixture base on CI doesn't, and
+  // the panel says so there.
+  await animal.getByRole("button", { name: "Name an animal", exact: true }).click();
+  const pool = questions.getByRole("region", { name: "Answer pool: animal" });
+  await expect(pool.getByText(/answers? for any animal\.$/).or(pool.getByText("That category isn't in the answer database."))).toBeVisible();
+  await expect(questions.locator("tbody tr")).toHaveCount(QUESTIONS + 1);
+  await animal.getByRole("button", { name: "Name an animal", exact: true }).click();
+  await expect(pool).toHaveCount(0);
 
   const player = await (await browser.newContext()).newPage();
   await player.goto("/");

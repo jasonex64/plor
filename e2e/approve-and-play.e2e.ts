@@ -90,6 +90,41 @@ test("an admin approves a drafted day on the admin page", async ({ browser }) =>
   expect(rows[0]).toEqual({ approved: true, members: String(Object.keys(FIXTURE[0].members).length) });
 });
 
+// docs/milestones/M15-15g-the-answer-pool.md: question 2 asks the fixture's five fruits with C taken, so cherry is the
+// one answer whose name holds a taken letter. A page is 20 answers, more than any fixture category holds, so "Show
+// more" is checked in the database's tests (supabase/tests/answer_pool.test.sql) and the route's.
+test("an admin reads a question's answer pool on the admin page", async ({ browser }) => {
+  const admin = await (await browser.newContext()).newPage();
+  await admin.goto("/");
+  await signInAndPick(admin, "ap");
+  await expect(admin.getByRole("link", { name: "Play", exact: true })).toBeVisible();
+  await DB.query("insert into private.admin (user_id) select id from auth.users where email = $1", [`${RUN}-ap@example.test`]);
+  await admin.goto("/admin/puzzles");
+  const name = dayText(ahead);
+  await admin.getByRole("navigation", { name: "Days" }).getByRole("button", { name: new RegExp(`^${name}`) }).click();
+  const day = admin.getByRole("region", { name });
+  const open = day.getByRole("button", { name: "Answer pool for question 2" });
+  await open.click();
+  const pool = day.getByRole("region", { name: "Answer pool: fixture fruit" });
+  await expect(pool.locator("p").first()).toHaveText("5 answers for any fixture fruit; 4 have no taken letter (C) in the name.");
+  await expect(pool.getByRole("listitem")).toHaveText(["apple", "banana", "cherry (C is taken)", "kiwi", "mango"]);
+  await expect(pool.getByRole("button", { name: /^Show more/ })).toHaveCount(0);
+  // Found by part of another name, past its taken letter; the counts above stay the whole pool's.
+  await pool.getByPlaceholder("Part of any name").fill(" IES");
+  await pool.getByRole("button", { name: "Search" }).click();
+  await expect(pool.getByRole("status")).toHaveText("1 answer has “ies” in a name.");
+  await expect(pool.getByRole("listitem")).toHaveText(["cherry also “cherries” (C is taken)"]);
+  await expect(pool.locator("p").first()).toHaveText("5 answers for any fixture fruit; 4 have no taken letter (C) in the name.");
+  await pool.getByPlaceholder("Part of any name").fill("an");
+  await pool.getByRole("button", { name: "Search" }).click();
+  await expect(pool.getByRole("listitem")).toHaveText(["banana", "mango"]);
+  // Question 1 has no letter taken yet: one count, nothing marked.
+  await day.getByRole("button", { name: "Answer pool for question 1" }).click();
+  await expect(day.getByRole("region", { name: "Answer pool: fixture animal" }).locator("p").first()).toHaveText("11 answers for any fixture animal.");
+  await open.click();
+  await expect(pool).toHaveCount(0);
+});
+
 test("a player survives all seven questions of a day, past the stolen letters", async ({ browser }) => {
   const page = await (await browser.newContext()).newPage();
   await page.goto("/");

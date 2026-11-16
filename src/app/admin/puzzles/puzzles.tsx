@@ -8,7 +8,7 @@
 // and Approve waits until it's unticked (14b-2b-2b). Play test plays the day on the game screen and saves nothing: a
 // draft with the host answers ticked here, saved or not; an earlier day by its date (docs/milestones/
 // M14-14b-11-test-runs.md, answers 1 and 9).
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import type { DayView, HostChoice, QuestionView } from "@/admin/puzzles";
 import type { SubstringDayView } from "@/admin/substring-sets";
 import { normalize } from "@/content/puzzle";
@@ -21,6 +21,8 @@ import { dayText } from "../../day-text";
 import admin from "../admin.module.css";
 import kit from "../../kit.module.css";
 import styles from "./puzzles.module.css";
+import pool from "../pool.module.css";
+import { AnswerPool } from "../pool";
 import { Line, Skeleton } from "../../skeleton";
 import { tomorrowOf } from "../tomorrow";
 import { slotDates } from "../puzzle-dates";
@@ -149,6 +151,8 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
   const [problems, setProblems] = useState<string[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // The questions whose answer pool is open (M15 15g).
+  const [pools, setPools] = useState<number[]>([]);
   // Per question, its ticked host answers that players can't type or that this database doesn't have: approving refuses
   // both (checkHostNames), so they're fixed first.
   const blocked = shown.map((q, i) => q.hostBank.filter((a) => (a.stolen || a.name === null) && hosts[i].includes(a.id)));
@@ -225,12 +229,23 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
         </thead>
         <tbody role="rowgroup">
           {shown.map((q, i) => (
-            <tr role="row" key={i}>
+            <Fragment key={i}>
+            <tr role="row">
               <td role="cell" className={admin.muted} data-label="#">{i + 1}</td>
               <td role="cell" className={styles.question} data-label="Question">
                 <span className={admin.strong}>{q.prompt}</span>
                 <br />
                 <span className={admin.muted}>any {q.category.replaceAll("_", " ")}</span>
+                <br />
+                <button
+                  type="button"
+                  className={`${kit.link} ${pool.open}`}
+                  aria-expanded={pools.includes(i)}
+                  aria-label={`Answer pool for question ${i + 1}`}
+                  onClick={() => setPools(pools.includes(i) ? pools.filter((n) => n !== i) : [...pools, i])}
+                >
+                  Answer pool
+                </button>
               </td>
               <td role="cell" data-label="Steals">{q.steals ? <span className={kit.chip}>−{q.steals.toUpperCase()}</span> : <span className={admin.muted}>—</span>}</td>
               <td role="cell" data-label="Host answers">
@@ -258,6 +273,15 @@ function Day({ day, onApproved }: { day: DayView; onApproved: () => void }) {
                   ))}
               </td>
             </tr>
+            {pools.includes(i) && (
+              <tr role="row">
+                <td role="cell" colSpan={4}>
+                  {/* The letters taken by this question's turn, its own included, as the host chips count them. */}
+                  <AnswerPool key={q.category} category={q.category} taken={shown.slice(0, i + 1).flatMap((x) => (x.steals ? [x.steals] : []))} />
+                </td>
+              </tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>

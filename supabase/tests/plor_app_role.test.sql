@@ -80,6 +80,8 @@ select is(pg_temp.grants('plor_app'), array[
   'private.block insert', 'private.block select',
   -- A test run builds a draft as approval would and resolves its answers, admins only, writing nothing (M14 14b-11).
   'private.build_puzzle(uuid,jsonb) execute',
+  -- A category's answer pool on the admin pages, admins only, read-only (M15 15g).
+  'private.category_pool(uuid,text,text,integer,integer) execute',
   -- Sign-in code limits (M12 12e, L1 a): one function counts attempts per hashed key, one clears a key.
   'private.clear_auth_attempts(text,text) execute',
   -- Comments (M08 8a, D8): read, post, and delete your own (the route scopes the delete to the signed-in player).
