@@ -1,6 +1,6 @@
 # Process — Parallel sessions: three slots, a quick-fix lane and an inbox
 
-**Status:** in progress (2026-11-16), on `process-parallel-sessions`. The five open questions are answered (below, quoted).
+**Status:** in review (2026-11-16), on `process-parallel-sessions`, in its pull request, not merged. The five open questions are answered (below, quoted). Waiting on the human: two slots' full e2e at once (Evidence, not met), slot 3's go-ahead, and each old worktree's removal.
 
 ## Goal
 Up to three Claude sessions work on unrelated things at once, each in its own folder, port and local database, with no waiting on port 3000 and no session's migrations breaking another's.
