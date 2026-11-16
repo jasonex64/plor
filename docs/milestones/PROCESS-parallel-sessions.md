@@ -1,6 +1,6 @@
 # Process — Parallel sessions: three slots, a quick-fix lane and an inbox
 
-**Status:** in review (2026-11-16), in pull request #227 from `process-parallel-sessions`, not merged. Eight questions answered (below, quoted); every criterion has evidence but the first "inbox:", which is the human's.
+**Status:** in review (2026-11-16), in pull request #227 from `process-parallel-sessions`, not merged. Nine questions answered (below, quoted); every criterion has evidence but the first "inbox:", which is the human's.
 
 ## Goal
 Up to three Claude sessions work on unrelated things at once, each in its own folder, port and local database, with no waiting on port 3000 and no session's migrations breaking another's.
@@ -33,6 +33,7 @@ Asked after the build (2026-11-16, in chat):
 6. **Two full e2e suites at once time out about 10 tests each on the PC, which pass alone.** **Answer: "One full suite at a time (Recommended)":** a CLAUDE.md rule, one full e2e suite at a time on a machine; targeted e2e runs, dev servers and db tests run in every slot together. The criterion on two slots' e2e is amended to match (below).
 7. **Slot 3, after one slot measured about 3.1 GB.** **Answer: "Yes, make slot 3 now (Recommended)":** made, checked with all three running, then its stack stopped.
 8. **The old folders.** **Answer: all four:** "RIFF-m14 (1.5 GB), RIFF-m15 (0.9 GB), RIFF-m16 (0.8 GB), RIFF-m17 (empty)".
+9. **Where inbox items live.** Asked to check the inbox, a session found that `docs/INBOX.md` has a copy on every branch: an "inbox:" given in a session on a fix branch stays on that branch until it merges, unseen by other sessions, and two branches that each add a line clash on the second merge. **Answer: "GitHub issues (Recommended)":** each item is an issue labelled `inbox` plus `gameplay`, `ui` or `other`; it is public, as the repo is. `docs/INBOX.md` is removed.
 
 ## Acceptance criteria
 - [x] Three slot folders exist, and only three: `npm run slots` lists each folder, its branch, its port, its stack's state and its open PR, and nothing else in the user's home is a worktree of this repo (`git worktree list`).
@@ -47,18 +48,13 @@ Asked after the build (2026-11-16, in chat):
 - [x] Local sign-in works in every slot (Supabase `site_url` / `additional_redirect_urls` allow each slot's port); checked by signing in on each.
 - [x] Each slot's `.env.local` points at its own stack. No key is printed in chat, logs or commits while it is written (CLAUDE.md, Secrets never leave their home).
 - [x] CLAUDE.md has the quick-fix lane and the slot rule; DECISIONS.md's Log records both; HANDOFF's line on shared port 3000 and the shared stack is replaced.
-- [ ] `docs/INBOX.md` exists with the format below; a session told "inbox: …" appends one line and builds nothing. (The file and the rule exist; the first "inbox:" is the human's to give.)
+- [ ] ~~`docs/INBOX.md` exists with the format below; a session told "inbox: …" appends one line and builds nothing.~~ Amended by answer 9: a session told "inbox: …" opens one issue labelled `inbox` and builds nothing. (The rule and the labels exist; the first "inbox:" is the human's to give.)
 - [x] `RIFF-m14` and `RIFF-m16` are removed as worktrees, `RIFF-m17`'s leftover folder is gone, `RIFF-m15` is handled per open question 5. Their branches stay in git (`git branch -a` lists them).
 
 ## The rules this adds to CLAUDE.md
 - **Slots.** Work happens in one of three slot folders. A session takes a free slot (`npm run slots`), checks out its branch there and resets that slot's database. It never makes another folder or worktree. When its PR merges, the slot is free.
 - **Two lanes.** *Quick fix:* a change that needs no migration and no design input from the human. It gets its own `fix-<short-name>` branch off `main`, one PR, and a line in the PR saying what it fixes and who sees it (Who uses it / What breaks). No milestone, no ticket. *Milestone:* everything else, as now. If a quick fix turns out to need a migration or the human's input, stop and move it to a milestone. Add the quick-fix lane to CLAUDE.md's list of exceptions in "Find the ticket".
-- **The inbox.** "inbox: <thing>" from the human appends to `docs/INBOX.md` and builds nothing. "Go through the inbox" sorts each item into a quick fix or a milestone, asking the human what's unclear, and removes it from the inbox once it has a branch or a ticket.
-
-`docs/INBOX.md` format, one line each:
-```
-- [ ] <date> · <gameplay | ui | other> · <the human's words>
-```
+- **The inbox** (amended by answer 9). "inbox: <thing>" from the human opens one GitHub issue, labelled `inbox` and one of `gameplay`, `ui`, `other`, titled with the human's words, and builds nothing. "Go through the inbox" sorts each open `inbox` issue into a quick fix or a milestone, asking the human what's unclear, and closes it once it has a branch or a ticket.
 
 ## Out of scope
 - The hosted Supabase project and Vercel: unchanged.
@@ -79,7 +75,7 @@ Asked after the build (2026-11-16, in chat):
 1. Ask the open questions; record the answers here, quoted.
 2. On a `process-` branch: the slot script (`scripts/slots.ts`: list, take, free, reset; refuses past 3 and on a taken port), `npm run slots`, the per-slot `npm run dev`, Playwright's port, the e2e base-URL fix, the per-slot Supabase config, the redirect URLs.
 3. Measure RAM with one slot running (open question 4), then bring up slots 2 and 3.
-4. CLAUDE.md, DECISIONS.md, HANDOFF.md, `docs/INBOX.md`.
+4. CLAUDE.md, DECISIONS.md, HANDOFF.md, the inbox (`docs/INBOX.md`, replaced by GitHub issues in answer 9).
 5. Clean up the old worktrees, each removal on the human's word (deletion needs the human's permission on this PC).
 6. Evidence for every criterion; reviewer; PR.
 
