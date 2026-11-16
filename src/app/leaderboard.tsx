@@ -10,6 +10,7 @@
 import { useEffect, useId, useState, type CSSProperties } from "react";
 import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallWeek, Week } from "@/friends/leaderboard";
 import { ranked } from "@/friends/rank";
+import { PAR_POINTS } from "@/config/tunables";
 import { api } from "@/lib/api-client";
 import { latestOnly } from "@/lib/latest";
 import { GAME, OVERALL, SUBSTRINGS } from "@/platform/game";
@@ -100,10 +101,10 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
       )}
       {graph && !overall && board && <FindPlayer players={others.sort((a, b) => a.name.localeCompare(b.name))} picked={picked} onPick={setPicked} />}
       <p className={styles.note}>Weeks run Monday to Sunday. A day&apos;s points count once that day is over, so Sunday&apos;s arrive on Monday.</p>
-      {/* A game 2 week adds up places, not points (answer 24); the overall board's notes are Claude's words, approved with
-          the design (16e-3 in detail). */}
-      {places && <p className={styles.note}>Each day adds the % of players you beat.</p>}
-      {overall && <p className={styles.note}>{average ? "Your average % of players beaten, per game played." : "Each day adds the % of players you beat, in each game."}</p>}
+      {/* A game 2 week adds up par scores, not points; these notes are Claude's words, approved with the ticket
+          (docs/milestones/M15-15i-par-scores.md). */}
+      {places && <p className={styles.note}>Each day adds your score out of 100. {PAR_POINTS.substrings.toLocaleString("en-US")} points is a full 100.</p>}
+      {overall && <p className={styles.note}>{average ? "Your average score out of 100, per game played." : "Each day adds your score out of 100 in each game."}</p>}
       {board && overall && (
         <>
           <OverallStandings label="This week" week={(board as OverallBoard).thisWeek} average={average} />
@@ -261,8 +262,8 @@ function OverallStandings({ label, week, average }: { label: string; week: Overa
 
 // Mockup 3's rows: the place as a badge (the first in the accent), the avatar, the name, the points. The list's own order
 // is the place for screen readers, so the badge's number is drawn by CSS (kit.module.css's [data-place]) and isn't in
-// the row's text; a hidden ": " keeps the row read as "name: 3 points". A game 2 week's number is its places added up,
-// the plain total the note explains (answer 24).
+// the row's text; a hidden ": " keeps the row read as "name: 3 points". A game 2 week's number is its par scores added
+// up, the plain total the note explains (M16 16e, answer 24; M15 15i).
 function Entries({ entries, places = false }: { entries: LeaderboardEntry[]; places?: boolean }) {
   return (
     <ol className={kit.rows}>

@@ -11,13 +11,14 @@
 // doesn't list them, the viewer included (M19 19c). Each week
 // also gives every player's points on each of its days that are over, for the graph view
 // (docs/milestones/M14-14b-14-leaderboard-graph.md). Each board is one game's (M16 16e-2,
-// docs/milestones/M16-16e-points-and-boards.md): game 1's adds up points, and game 2's each day's place, the % of that
-// day's players beaten, counted from the day's midnight like game 1's points (answers 15 and 21). The overall board
-// (16e-3b, answers 2, 27 to 33) adds up both games' places, a game 1 day's place worked out like game 2's among every
-// player of that day, and averages them over the game-days played.
+// docs/milestones/M16-16e-points-and-boards.md): game 1's adds up points, and game 2's each day's par score, the day's
+// points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), counted from the day's midnight
+// like game 1's points (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up both games' par
+// scores and averages them over the game-days played.
+import { PAR_POINTS } from "@/config/tunables";
 import { GAME_ID, OVERALL, SUBSTRINGS_ID } from "@/platform/game";
 import { settleRuns } from "@/game/ledger";
-import { dayPercentiles, placeAverage, placeTotal } from "@/game/percentile";
+import { parScore, scoreAverage, scoreTotal } from "@/game/par";
 import { settleSubstringRuns } from "@/game/substring-places";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
@@ -26,7 +27,7 @@ import { ranked } from "./rank";
 
 // The games a board can be for.
 export type BoardGame = typeof GAME_ID | typeof SUBSTRINGS_ID;
-// What a board can show: one game's, or both games' places, the overall board.
+// What a board can show: one game's, or both games' par scores, the overall board.
 export type BoardChoice = BoardGame | typeof OVERALL.id;
 
 // A request names its game, as each game has its own board, thread and reactions (comments and reactions: M16 16f-3).
@@ -48,7 +49,7 @@ export type WeekEntry = LeaderboardEntry & { daily: number[] };
 // the viewer is still playing, by place in the week, which add nothing to anyone (M09 D5; 14b-14, answer 28).
 export type Week = { from: string; days: number; hidden: number[]; entries: WeekEntry[] };
 export type Leaderboard = { thisWeek: Week; lastWeek: Week };
-// The overall board's weeks: points is the Sum of a player's places in both games, average their Average per game-day
+// The overall board's weeks: points is the Sum of a player's par scores in both games, average their Average per game-day
 // played (answer 2). List only (answer 33), so no days.
 export type OverallEntry = LeaderboardEntry & { average: number };
 export type OverallWeek = { from: string; entries: OverallEntry[] };
@@ -79,9 +80,9 @@ function daysFrom(from: string, day: string): number {
 // joined is the puzzle day the account was made.
 type Row = { user_id: string; username: string; name: string; joined: string; days: Record<string, number> };
 
-// A player's points from (included) to (excluded). Game 2's are places with one decimal, so the sum keeps one.
+// A player's points from (included) to (excluded). Game 2's are par scores with one decimal, so the sum keeps one.
 function total(row: Row, from: string, to: string): number {
-  return placeTotal(inWeek(row, from, to));
+  return scoreTotal(inWeek(row, from, to));
 }
 
 function entry(row: Row, viewerId: string, points: number): LeaderboardEntry {
@@ -104,8 +105,8 @@ export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: str
 
 // Yesterday's standings, a closed day's, so final (M09 D9), for the game card (docs/milestones/M11-home-screen.md, H7):
 // the viewer and their friends, or the members of one of the viewer's groups (a non-member gets the group page's 404).
-// The card names its game as the weekly boards do (M16 16f-6, answer 20): Offbeat's points, Fragments' places, or both
-// games' places added up.
+// The card names its game as the weekly boards do (M16 16f-6, answer 20): Offbeat's points, Fragments' par scores, or
+// both games' par scores added up.
 export async function getYesterdayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<Day> {
   const circle =
     groupId === null
@@ -115,7 +116,7 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
   const yesterday = daysBefore(circle.today, 1);
   if (game === OVERALL.id) {
     const both = await bothGames(db, viewerId, circle.ids, groupId, yesterday, circle.today);
-    return { date: yesterday, entries: ranked(overallDays(both, groupId, yesterday, circle.today).map(({ row, days }) => entry(row, viewerId, placeTotal(days))), byTotal) };
+    return { date: yesterday, entries: ranked(overallDays(both, groupId, yesterday, circle.today).map(({ row, days }) => entry(row, viewerId, scoreTotal(days))), byTotal) };
   }
   const { rows } = await gameRows(db, game, viewerId, circle.ids, groupId, yesterday, circle.today);
   return { date: yesterday, entries: ranked(onBoard(rows, groupId, circle.today).map((r) => entry(r, viewerId, total(r, yesterday, circle.today))), byTotal) };
@@ -142,7 +143,7 @@ async function weeklyBoard(
     const overallWeek = (from: string, to: string): OverallWeek => ({
       from,
       entries: ranked(
-        overallDays(both, groupId, from, to).map(({ row, days }) => ({ ...entry(row, viewerId, placeTotal(days)), average: placeAverage(days) })),
+        overallDays(both, groupId, from, to).map(({ row, days }) => ({ ...entry(row, viewerId, scoreTotal(days)), average: scoreAverage(days) })),
         byTotal,
       ),
     });
@@ -165,7 +166,7 @@ async function weeklyBoard(
 }
 
 // A game's rows for a board, from (included) to (excluded), and the days the viewer is still playing, which hold
-// nothing. Game 1's are points, game 2's places. Settling takes every player's runs, as a place needs the whole day.
+// nothing. Game 1's are points, game 2's par scores.
 async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[], groupId: string | null, from: string, to: string) {
   if (game === GAME_ID) {
     await settleRuns(db);
@@ -174,17 +175,17 @@ async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[]
   }
   // A game 2 run stops at midnight, so no closed day waits on the viewer's own run.
   await settleSubstringRuns(db);
-  return { rows: await places(db, game, await ledger(db, game, ids, groupId, from, to, []), from, to), skip: [] };
+  return { rows: parScores(game, await ledger(db, game, ids, groupId, from, to, [])), skip: [] };
 }
 
-// Both games' rows for an overall board, from (included) to (excluded): game 1's turned into places, as game 2's are. Game
-// 1's places leave out the days the viewer is still playing, game 2's count (answer 32).
+// Both games' rows for an overall board, from (included) to (excluded): game 1's turned into par scores, as game 2's
+// are. Game 1's leave out the days the viewer is still playing, game 2's count (answer 32).
 async function bothGames(db: Db, viewerId: string, ids: string[], groupId: string | null, from: string, to: string): Promise<[Row[], Row[]]> {
   const first = await gameRows(db, GAME_ID, viewerId, ids, groupId, from, to);
-  return [await places(db, GAME_ID, first.rows, from, to), (await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to)).rows];
+  return [parScores(GAME_ID, first.rows), (await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to)).rows];
 }
 
-// Each player on an overall board with the places of both games they hold on the days from (included) to (excluded).
+// Each player on an overall board with the par scores of both games they hold on the days from (included) to (excluded).
 const overallDays = (both: [Row[], Row[]], groupId: string | null, from: string, to: string) =>
   onBoard(both[0], groupId, to).map((row) => ({ row, days: [row, both[1].find((s) => s.user_id === row.user_id)!].flatMap((r) => inWeek(r, from, to)) }));
 
@@ -206,19 +207,9 @@ async function circleOf(db: Db, players: string, params: unknown[]): Promise<{ i
   return { ids: people.map((p) => p.user_id), today: people[0].today };
 }
 
-// The board's rows with each day's points turned into that day's place among every player of the game that day, as
-// the circle is only part of the day (answers 15, 25, 26, 27).
-async function places(db: Db, game: BoardGame, rows: Row[], from: string, to: string): Promise<Row[]> {
-  const { rows: all } = await db.query<{ user_id: string; day: string; points: number }>(
-    `select user_id::text, puzzle_date::text as day, points from private.points_ledger
-     where game_id = $1 and puzzle_date >= $2::date and puzzle_date < $3::date`,
-    [game, from, to],
-  );
-  const byDay = new Map<string, Map<string, number>>();
-  for (const r of all) byDay.set(r.day, (byDay.get(r.day) ?? new Map()).set(r.user_id, r.points));
-  const placed = new Map([...byDay].map(([day, scores]) => [day, dayPercentiles(scores)]));
-  return rows.map((r) => ({ ...r, days: Object.fromEntries(Object.keys(r.days).map((day) => [day, placed.get(day)!.get(r.user_id)!])) }));
-}
+// The board's rows with each day's points turned into its par score in that game (M15 15i).
+const parScores = (game: BoardGame, rows: Row[]): Row[] =>
+  rows.map((r) => ({ ...r, days: Object.fromEntries(Object.entries(r.days).map(([day, points]) => [day, parScore(points, PAR_POINTS[game])])) }));
 
 // The puzzle days from (included) to (excluded) whose own run the viewer is still playing, in order: a run can be
 // finished after midnight, and one waiting at a reveal stays in progress until Next (DECISIONS.md, Game 1: Timer).
