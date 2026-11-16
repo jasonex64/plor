@@ -81,8 +81,9 @@ insert into private.round_word (user_id, game_id, puzzle_date, round_idx, word_k
 select is((pg_temp.sent('00000000-0000-0000-0000-0000000016d4'))[array_length(pg_temp.sent('00000000-0000-0000-0000-0000000016d4'), 1)],
   pg_temp.msg('finished', null), 'the last word is sent to a finished friend as finished');
 select is(array_length(pg_temp.sent('00000000-0000-0000-0000-0000000016d2'), 1), 1, 'and not to a friend who hasn''t finished');
+-- Without realtime.send's own `id`, a random uuid: its hex spelled "cafe" once on CI (2026-11-15) and failed this.
 select ok(not exists (select from realtime.messages where topic like 'board:00000000-0000-0000-0000-0000000016d%'
-  and event = 'friend_status' and (payload::text ~* '(rocks|brown|safari|stack|cafe|word|score|points)')),
+  and event = 'friend_status' and ((payload - 'id')::text ~* '(rocks|brown|safari|stack|cafe|word|score|points)')),
   'no board message names a word or a score');
 select ok((select bool_and(private) from realtime.messages where topic like 'board:00000000-0000-0000-0000-0000000016d%'),
   'every board message is private');
