@@ -225,7 +225,9 @@ export function assertTypedLength(typed: string): void {
 // player tries again (human, 2026-10-21). A retry naming the same thing returns the stored result; a different one for
 // an answered question is 409 already_answered (§5). After the question's 20 seconds the run_event trigger refuses
 // the insert with time_up, and the run has ended.
-export async function answer(db: Db, userId: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean }> {
+// Text that names only answers a taken letter has taken is a free retry too, with the letter (`needs`) and no miss: it
+// named a real answer (M15 15h).
+export async function answer(db: Db, userId: string, index: number, typed: string): Promise<{ run: RunState; notInList: boolean; needs?: string }> {
   const { rows } = await db.query<{ date: string; content: ApprovedPuzzle }>(
     `select r.puzzle_date::text as date, p.content
      from private.run r join private.puzzle p on p.game_id = r.game_id and p.puzzle_date = r.puzzle_date
@@ -252,7 +254,8 @@ export async function answer(db: Db, userId: string, index: number, typed: strin
   const stolen = isCurrent ? stolenLetters(puzzle, index) : [];
   if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
   assertTypedLength(typed);
-  const resolved = await resolveTyped(dayLookup(db, puzzle), puzzle, index, typed, stolen);
+  const resolved = await resolveTyped(dayLookup(db, puzzle), (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
+  if (resolved && "needs" in resolved) return { run: await stateOf(db, userId, date, puzzle), notInList: true, needs: resolved.needs };
   if (!resolved) {
     try {
       await logMiss(db, userId, puzzle, index, typed);
@@ -369,29 +372,34 @@ async function logMiss(db: Db, userId: string, puzzle: ApprovedPuzzle, index: nu
 // M14-14b-11c-test-misses-to-audit.md).
 export type TestMoves = { texts: string[]; open: boolean; timedOut: boolean; text: string | null };
 
-export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lookup: Lookup, moves: TestMoves): Promise<{ run: RunState; notInList: boolean }> {
+export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lookup: Lookup, moves: TestMoves): Promise<{ run: RunState; notInList: boolean; needs?: string }> {
   const total = puzzle.questions.length;
   const stored: StoredEvent[] = [];
   const resolve = async (index: number, typed: string) => {
     // As in play: a stolen letter can't be typed in the answer box (G11).
     const stolen = stolenLetters(puzzle, index);
     if (!avoids(typed, stolen)) throw new AppError("stolen_letter", 400);
-    return resolveTyped(lookup, puzzle, index, typed, stolen);
+    return resolveTyped(lookup, (ids) => thingNames(db, ids), puzzle, index, typed, stolen);
   };
   const over = () => stored.some((e) => e.matched) || stored.length === total;
   for (const typed of moves.texts) {
     if (over()) throw new AppError("bad_request", 400, "texts after the run's end");
     const resolved = await resolve(stored.length, typed);
-    if (!resolved) throw new AppError("bad_request", 400, "a text that names no answer");
+    if (!resolved || "needs" in resolved) throw new AppError("bad_request", 400, "a text that names no answer");
     // inDay: a test run's answers count as given on their day, so its bonus reads as play's provisional one.
     stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
   }
   const open = moves.open && !over();
   let notInList = false;
+  let needs: string | undefined;
   if (moves.text !== null) {
     if (!open || moves.timedOut) throw new AppError("not_open", 409);
     const resolved = await resolve(stored.length, moves.text);
-    if (resolved) stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
+    // As in play: a free retry that says the letter, and no report to the audit.
+    if (resolved && "needs" in resolved) {
+      notInList = true;
+      needs = resolved.needs;
+    } else if (resolved) stored.push({ question_idx: stored.length, entry_id: resolved.thingId, matched: resolved.caught, in_day: true });
     else {
       notInList = true;
       await reportTestMiss(db, userId, puzzle, lookup, stored.length, moves.text);
@@ -419,7 +427,7 @@ export async function testRun(db: Db, userId: string, puzzle: ApprovedPuzzle, lo
   const pooled = await pooledCounts(db, puzzle, false);
   // As its answers count as given on their day, a test run's day is never over.
   const clock = { status, msLeft: inPlay ? rows[0].ms_left : null, msToReset: rows[0].ms_to_reset, dayOver: false };
-  return { run: buildState(puzzle.date, puzzle, stored, clock, counts, pooled, names), notInList };
+  return { run: buildState(puzzle.date, puzzle, stored, clock, counts, pooled, names), notInList, needs };
 }
 
 // A test run's refused text, normalized as play's misses are, to the audit for the question's category, unless it's a

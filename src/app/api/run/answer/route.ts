@@ -12,6 +12,6 @@ export const POST = handle(async (request) => {
   const { index, text } = await readJsonObject(request);
   if (typeof index !== "number" || !Number.isInteger(index) || index < 0) throw new AppError("bad_request", 400, "index");
   if (typeof text !== "string" || text.trim() === "") throw new AppError("bad_request", 400, "text");
-  const { run, notInList } = await answer(getPool(), userId, index, text.trim());
-  return Response.json({ ok: true, run, notInList });
+  const { run, notInList, needs } = await answer(getPool(), userId, index, text.trim());
+  return Response.json({ ok: true, run, notInList, needs });
 });
