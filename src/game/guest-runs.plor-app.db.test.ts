@@ -54,6 +54,8 @@ describe("a guest run as plor_app", () => {
       const name = (i: number) => typeableName(puzzle, i, safeEntries(puzzle, i)[0])!;
       for (let i = 0; i < puzzle.questions.length - 1; i++) {
         if (i > 0) expect((await openNextGuest(client, hash)).question?.index).toBe(i);
+        // A guest, as a player: "Gaul" is France, shown with the C taken at question 2 (M15 15h).
+        if (i === 3) expect(await answerGuest(client, hash, 3, "gaul")).toMatchObject({ notInList: true, needs: "c", run: { question: { index: 3 } } });
         expect((await answerGuest(client, hash, i, name(i))).run.answered).toHaveLength(i + 1);
       }
       const last = puzzle.questions.length - 1;

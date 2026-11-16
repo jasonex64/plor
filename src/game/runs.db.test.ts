@@ -237,6 +237,13 @@ describe("a run, step by step", () => {
     expect(retry.body.run.answered).toHaveLength(3);
     expect(await answerText(3, "x".repeat(41))).toEqual({ status: 400, body: { ok: false, error: "text_invalid" } });
     // A later question answers 409 whatever letters it will steal, so its letters can't be probed (13c-3 review).
+    // "Gaul" is France, whose shown name holds the C taken at question 2: a free retry that says the letter, and no
+    // miss, since it named a real answer (docs/milestones/M15-15h-taken-letters-follow-the-name.md).
+    const gone = await answerText(3, " Gaul ");
+    expect(gone.status).toBe(200);
+    expect(gone.body).toMatchObject({ ok: true, notInList: true, needs: "c", run: { status: "in_progress", question: { index: 3 } } });
+    expect(gone.body.run.answered).toHaveLength(3);
+    expect(retry.body.needs).toBeUndefined();
     const later = `${puzzle.questions[4].steals}${puzzle.questions[6].steals} later`;
     expect(await answerText(5, later)).toEqual({ status: 409, body: { ok: false, error: "not_current_question" } });
     expect(await count()).toBe(1);

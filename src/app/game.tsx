@@ -41,7 +41,9 @@ import { resultExtras, type RunKind } from "./result-extras";
 // run is null on a day with no puzzle, with the time to the reset (M12 12f, F2).
 type RunResponse = { run: RunState } | { run: null; msToReset: number };
 type NoPuzzle = { msToReset: number };
-type AnswerResponse = { run: RunState; notInList: boolean };
+// needs: with notInList, the taken letter the answer the text named needs (M15 15h); a client from before it reads
+// the reply as "not in our list".
+type AnswerResponse = { run: RunState; notInList: boolean; needs?: string };
 
 // What a page showing the day's run hears. onOver: whether today's run is over, once the run's state has loaded and
 // each time that changes after, so the comments can open (M08 8a). Nothing is reported before the state loads, so a
@@ -435,7 +437,10 @@ function Run({
             busy={busy}
             // Keyed by each state the server sends, so a retry restarts the count from the server's own time left.
             clock={<Countdown key={`${run.question.index}:${run.msLeft}`} msLeft={run.msLeft!} onTimeUp={() => void runner.timeUp()} />}
-            onAnswer={async (text) => (await runner.answer(text))?.notInList ?? false}
+            onAnswer={async (text) => {
+              const reply = await runner.answer(text);
+              return reply?.notInList ? { needs: reply.needs ?? null } : false;
+            }}
           />
         )}
         {over && (
@@ -642,11 +647,13 @@ function Question({
   busy: boolean;
   // The seconds left, under the prompt.
   clock: ReactNode;
-  // Resolves true when the text named no entry (the player tries again).
-  onAnswer: (text: string) => Promise<boolean>;
+  // Resolves false when the text was an answer; else the player tries again: the text named no entry, or one whose
+  // name needs this taken letter (M15 15h).
+  onAnswer: (text: string) => Promise<false | { needs: string | null }>;
 }) {
   const [typed, setTyped] = useState("");
   const [notInList, setNotInList] = useState<string | null>(null);
+  const [needs, setNeeds] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const [blocked, setBlocked] = useState<string | null>(null);
 
@@ -667,8 +674,10 @@ function Question({
     event.preventDefault();
     const text = typed.trim();
     if (text === "" || busy) return;
-    if (await onAnswer(text)) {
+    const refused = await onAnswer(text);
+    if (refused) {
       setNotInList(text);
+      setNeeds(refused.needs);
       input.current?.select();
     }
   }
@@ -719,11 +728,16 @@ function Question({
             {blocked} is taken. Try a word without it.
           </p>
         )}
-        {notInList && (
-          <p role="status" className={styles.note}>
-            &quot;{notInList}&quot; isn&apos;t in our list. Try another answer.
-          </p>
-        )}
+        {notInList &&
+          (needs ? (
+            <p role="status" className={styles.note}>
+              That answer needs {needs.toUpperCase()}, which is taken. Try another answer.
+            </p>
+          ) : (
+            <p role="status" className={styles.note}>
+              &quot;{notInList}&quot; isn&apos;t in our list. Try another answer.
+            </p>
+          ))}
       </form>
     </div>
   );

@@ -9,6 +9,10 @@ import type { Db } from "../lib/db.ts";
 // A member some typed text can name: the alias it bears, whether the host catches it, and its ancestors.
 export type Candidate = { alias: string; thing_id: string; caught: boolean; ancestors: string[] };
 export type Resolved = { thingId: string; caught: boolean };
+// Typed text that names an answer the player can't give: its shown name holds this taken letter (M15 15h).
+export type NeedsTaken = { needs: string };
+// The shown names of some things (src/game/payload.ts, thingNames).
+export type NamesOf = (ids: string[]) => Promise<Map<string, string>>;
 
 // The characters a typo edit may insert or substitute: plain letters, digits and space, plus whatever the player
 // typed. A normalized alias can hold others ("ø", "&"), which a typo reaches only if the player typed them
@@ -103,18 +107,39 @@ export async function isNearTypo(lookup: Lookup, index: number, typed: string): 
 }
 
 // The answer the typed text names, or null when it names none ("not in our list, try again"). The caller has
-// already refused text with a stolen letter. An exact name or alias wins before any typo, so "moose" is never read as
-// a typo of "mouse". A typo counts only for text of 4+ letters (spaces and digits aren't letters: M02 2f B4; ROADMAP
-// Next revision, M13), only onto a name
-// that avoids every stolen letter (G12: "hors" is not horse once E is gone), and only when exactly one answer is that
-// close (answersAmong): when two are, the server would be guessing which one the player meant.
-export async function resolveTyped(lookup: Lookup, puzzle: ApprovedPuzzle, index: number, typed: string, stolen: string[]): Promise<Resolved | null> {
+// already refused text with a stolen letter. A stolen letter takes an answer whatever name is typed: only a thing whose
+// shown name avoids every stolen letter counts, the rule host answers follow, so "nyc" isn't New York City once I is
+// gone (docs/milestones/M15-15h-taken-letters-follow-the-name.md; human, 2026-11-15: "Shown name must be clean"). Text
+// that is exactly a name of such things only says which letter, and is no miss. An exact name or alias wins before
+// any typo, so "moose" is never read as a typo of "mouse". A typo counts only for text of 4+ letters (spaces and digits
+// aren't letters: M02 2f B4; ROADMAP Next revision, M13), only onto a name that avoids every stolen letter (G12: "hors"
+// is not horse once E is gone), and only when exactly one answer is that close (answersAmong): when two are, the
+// server would be guessing which one the player meant.
+export async function resolveTyped(
+  lookup: Lookup,
+  namesOf: NamesOf,
+  puzzle: ApprovedPuzzle,
+  index: number,
+  typed: string,
+  stolen: string[],
+): Promise<Resolved | NeedsTaken | null> {
   const query = normalize(typed);
   if (!query) return null;
   const levels = puzzle.questions[index].levels;
+  // With no letter stolen every name is clean, and no name is read.
+  const names = async (candidates: Candidate[]) => (stolen.length > 0 && candidates.length > 0 ? namesOf(candidates.map((c) => c.thing_id)) : null);
   const exact = await lookup(index, [query]);
-  if (exact.length) return pickAnswer(exact, levels);
+  if (exact.length) {
+    const shown = await names(exact);
+    const clean = shown ? exact.filter((c) => avoids(shown.get(c.thing_id)!, stolen)) : exact;
+    if (clean.length) return pickAnswer(clean, levels);
+    // The letter the answer it would have been needs.
+    const name = shown!.get(pickAnswer(exact, levels)!.thingId)!;
+    return { needs: stolen.find((letter) => !avoids(name, [letter]))! };
+  }
   if (query.replace(/[^\p{L}]/gu, "").length < TYPO_MIN_LETTERS) return null;
-  const near = (await lookup(index, withinTypo(query))).filter((c) => avoids(c.alias, stolen));
+  const close = (await lookup(index, withinTypo(query))).filter((c) => avoids(c.alias, stolen));
+  const shown = await names(close);
+  const near = shown ? close.filter((c) => avoids(shown.get(c.thing_id)!, stolen)) : close;
   return answersAmong(near) === 1 ? pickAnswer(near, levels) : null;
 }

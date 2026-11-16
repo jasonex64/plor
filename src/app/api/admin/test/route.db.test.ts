@@ -218,6 +218,16 @@ describe("a test run's refused answers go to the audit", () => {
     (await getPool().query<{ id: number; outcome: string }>("select id::int as id, outcome from private.miss_review where category = 'fixture_animal' and text = $1", [text])).rows;
   const misses = async () => (await getPool().query<{ n: number }>("select count(*)::int as n from private.missed_answer")).rows[0].n;
 
+  it("says the taken letter for a name whose answer's shown name holds it, as play does, and reports nothing", async () => {
+    // "Gaul" is France, shown with the C taken at question 2 (docs/milestones/M15-15h-taken-letters-follow-the-name.md).
+    const texts = [safe(puzzle, 0), safe(puzzle, 1), safe(puzzle, 2)];
+    const gone = await play(today, { texts, open: true, text: "Gaul" });
+    expect(gone.body).toMatchObject({ ok: true, notInList: true, needs: "c", run: { status: "in_progress", question: { index: 3 } } });
+    expect(await reported("gaul")).toHaveLength(0);
+    // Sent as an earlier answer it is refused, as any text that named no answer.
+    expect((await play(today, { texts: [...texts, "Gaul"], open: true })).status).toBe(400);
+  });
+
   it("reports a refused text for an approved day once, and never as a player's miss", async () => {
     const before = await misses();
     // apple is a fruit: refused at "Name an animal".

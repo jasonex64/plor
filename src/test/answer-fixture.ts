@@ -79,7 +79,9 @@ export const FIXTURE: FixtureQuestion[] = [
     members: {
       italy: { names: ["Italy"] },
       kenya: { names: ["Kenya"] },
-      france: { names: ["France"] },
+      // A second name with none of the letters taken by question 4 (C, P), under a shown name that holds one: the
+      // name can't be given (docs/milestones/M15-15h-taken-letters-follow-the-name.md).
+      france: { names: ["France", "Gaul"] },
       spain: { names: ["Spain"] },
       japan: { names: ["Japan"] },
       mali: { names: ["Mali"] },
