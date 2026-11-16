@@ -129,7 +129,7 @@
   }
 }
 
-/* Game 2's days, under game 1's: a card a day, its sets of letters as chips (M16 16c-2). */
+/* Game 2's day, under game 1's: a card, its sets of letters as chips (M16 16c-2). */
 .gameDays {
   display: flex;
   flex-direction: column;

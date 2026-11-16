@@ -23,9 +23,8 @@ import kit from "../../kit.module.css";
 import styles from "./puzzles.module.css";
 import { Line, Skeleton } from "../../skeleton";
 import { tomorrowOf } from "../tomorrow";
-import { SubstringDays } from "./substring-days";
-
-const dateOf = (slot: DayView | string) => (typeof slot === "string" ? slot : slot.date);
+import { slotDates } from "../puzzle-dates";
+import { SubstringDay } from "./substring-days";
 
 type DaysResponse = { today: string; days: DayView[]; substringDays: SubstringDayView[] };
 
@@ -61,50 +60,40 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
         <Line />
       </Skeleton>
     );
-  const gameTwo = (
-    <SubstringDays
-      days={data.substringDays}
-      onApproved={() => {
-        load();
-        onChanged();
-      }}
-    />
-  );
-  if (data.days.length === 0)
-    return (
-      <>
-        <p>No {GAME.name} days yet: a Claude session drafts them from the question bank.</p>
-        {gameTwo}
-      </>
-    );
-  const days = [...data.days].sort((a, b) => a.date.localeCompare(b.date));
-  // At first, the first day waiting for approval, else today, else the first day listed.
-  const first = days.find((d) => d.draft && !d.live) ?? days.find((d) => d.date === data.today) ?? days[0];
-  const day = days.find((d) => d.date === chosen) ?? first;
+  // Offbeat's days and Fragments' share one Days row: the chosen date shows each game's day for it, or says it has none
+  // (docs/milestones/M15-15f-fragments-test-run.md, 15f-1).
+  const offbeat = [...data.days].sort((a, b) => a.date.localeCompare(b.date));
   // Tomorrow with nothing drafted is an empty slot among the days, so the gap shows where it falls (design 7, 14b-6f).
   const tomorrow = tomorrowOf(data.today, data.days);
   const empty = tomorrow.state === "missing" ? tomorrow.date : null;
-  const emptyChosen = empty !== null && chosen === empty;
-  const slots: (DayView | string)[] = empty ? [...days, empty].sort((a, b) => dateOf(a).localeCompare(dateOf(b))) : days;
+  const dates = slotDates(
+    offbeat.map((d) => d.date),
+    data.substringDays.map((d) => d.date),
+    empty,
+  );
+  if (offbeat.length === 0 && data.substringDays.length === 0) return <p>No {GAME.name} days yet: a Claude session drafts them from the question bank.</p>;
+  // At first, the first day waiting for approval, else today, else the first Offbeat day, else the first date listed.
+  const first = offbeat.find((d) => d.draft && !d.live)?.date ?? offbeat.find((d) => d.date === data.today)?.date ?? offbeat[0]?.date ?? dates[0];
+  const date = chosen !== null && dates.includes(chosen) ? chosen : first;
+  const day = offbeat.find((d) => d.date === date);
+  const substringDay = data.substringDays.find((d) => d.date === date);
   return (
     <>
       <nav aria-label="Days" className={styles.days}>
-        {slots.map((d) => {
-          const picked = typeof d === "string" ? emptyChosen : d === day && !emptyChosen;
-          const { label, tone } = typeof d === "string" ? { label: "Not drafted", tone: `${kit.chip} ${kit.danger}` } : stateOf(d);
+        {dates.map((d) => {
+          const picked = d === date;
+          const offbeatDay = offbeat.find((o) => o.date === d);
+          const { label, tone } = offbeatDay ? stateOf(offbeatDay) : { label: "Not drafted", tone: `${kit.chip} ${kit.danger}` };
           return (
-            <button key={dateOf(d)} type="button" className={picked ? `${kit.small} ${styles.day} ${styles.chosen}` : `${kit.small} ${styles.day}`} aria-pressed={picked} onClick={() => setChosen(dateOf(d))}>
-              <span>{dayText(dateOf(d))}</span>
+            <button key={d} type="button" className={picked ? `${kit.small} ${styles.day} ${styles.chosen}` : `${kit.small} ${styles.day}`} aria-pressed={picked} onClick={() => setChosen(d)}>
+              <span>{dayText(d)}</span>
               <span className={tone}>{label}</span>
             </button>
           );
         })}
       </nav>
       <EarlierDay today={data.today} />
-      {emptyChosen ? (
-        // Answer 29: how days get drafted, as the page says when it has none.
-        <p>Nothing drafted for {dayText(empty)}. A Claude session drafts days from the question bank.</p>
-      ) : (
+      {day ? (
         <Day
           key={day.date}
           day={day}
@@ -115,8 +104,20 @@ export function Puzzles({ onChanged }: { onChanged: () => void }) {
             onChanged();
           }}
         />
+      ) : (
+        // Answer 29: how days get drafted, as the page says when it has none.
+        <p>Nothing drafted for {dayText(date)}. A Claude session drafts days from the question bank.</p>
       )}
-      {gameTwo}
+      <SubstringDay
+        key={`game-2-${date}`}
+        date={date}
+        day={substringDay ?? null}
+        onApproved={() => {
+          setChosen(date);
+          load();
+          onChanged();
+        }}
+      />
     </>
   );
 }
