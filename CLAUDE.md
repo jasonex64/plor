@@ -76,7 +76,7 @@ Branches and PRs:
 
 ## Slots, lanes and the inbox
 *(Human, 2026-11-15; `docs/milestones/PROCESS-parallel-sessions.md`.)*
-- **Slots.** Work happens in one of three slot folders: `RIFF`, `plor-2` and `plor-3`, each with its own dev port and local database. Run `npm run slots` to see them; `npm run slots -- take <branch>` puts your branch in a free slot and resets that slot's database to the branch's migrations. Never make another folder or worktree. When the PR merges, `npm run slots -- free <n>`.
+- **Slots.** Work happens in one of three slot folders: `RIFF`, `plor-2` and `plor-3`, each with its own dev port and local database. Run `npm run slots` to see them; `npm run slots -- take <branch>` puts your branch in a free slot and resets that slot's database to the branch's migrations. Never make another folder or worktree. When the PR merges, `npm run slots -- free <n>`. Run only one e2e run at a time on a machine, full or targeted: on the PC, two or three at once time out tests that pass alone. Dev servers and db tests may run in every slot together.
 - **Two lanes.** *Quick fix:* a change that needs no migration and no design input from the human. It gets its own `fix-<short-name>` branch off `main`, one PR, and a line in the PR saying what it fixes and who sees it (Who uses this / What breaks). No milestone, no ticket. *Milestone:* everything else, as now. If a quick fix turns out to need a migration or the human's input, stop and move it to a milestone.
 - **The inbox.** "inbox: <thing>" from the human appends one line to `docs/INBOX.md` and builds nothing. "Go through the inbox" sorts each item into a quick fix or a milestone, asking the human what's unclear, and removes it once it has a branch or a ticket.
 
