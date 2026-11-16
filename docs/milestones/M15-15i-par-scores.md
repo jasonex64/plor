@@ -1,6 +1,6 @@
 # M15 15i — Par scores on the boards
 
-**Status:** in review. Approved by the human on 2026-11-15 ("Approve 15i"), built the same day on `m15-launch-readiness`; not merged, not on plor.app.
+**Status:** done. Approved by the human on 2026-11-15 ("Approve 15i"), built the same day, merged in PR #222 (merge commit `a8f8576`, 2026-11-16 05:02 UTC, on nine green checks, by the human's "merge when green") and published to plor.app with it. The pars are reviewed after the beta's first week (answer 7; ROADMAP, For M15).
 
 ## Goal
 The overall board and Fragments' own boards count a day as the player's points against a fixed par for that game, 0 to 100, in place of the % of that day's players beaten.
@@ -93,7 +93,9 @@ All on 2026-11-15, local stack, checkout `C:/Users/jason/RIFF-m15`.
 - **The notes and the screens:** `npx playwright test e2e/overall-board.e2e.ts e2e/play2.e2e.ts -g "overall board shows|switches to game 2" --retries=0`: 2 passed. Overall on the Friends page and a group's: Sum, Y 100 then X 80; Average, X 80 then Y 33.3, each with its note; Fragments' note on the Friends board.
 - **Today's card and the live boards:** `npx playwright test e2e/today-games.e2e.ts e2e/boards.e2e.ts --retries=0`, after the review: 9 passed.
 - **Types and lint:** `npx tsc --noEmit -p .` and `npx eslint` on the five changed source files printed nothing.
-- **Not run:** the full db and e2e suites (CI's); nobody has looked at the boards in a browser by hand.
+- **CI on #222:** check, db, e2e, secrets and Vercel, nine checks, all SUCCESS before the merge.
+- **plor.app after the merge:** Vercel's status on `a8f8576` is "Deployment has completed"; `/` and `/privacy` answer 200. The boards are behind sign-in, so no agent has seen them there.
+- **Not done:** nobody has looked at the boards in a browser by hand.
 
 ## Review
 The `reviewer` agent, 2026-11-15, on the staged diff, in a fresh context. It worked every rewritten number by hand and found them right, and found nothing else using what was removed.
