@@ -1,16 +1,16 @@
 // The overall board against the local stack (`npm run test:db`; docs/milestones/M16-16e-points-and-boards.md, 16e-3b,
-// answers 2, 27 to 33 and 38): each day's place in each game, among every player of that game that day, added up
-// (Sum) and averaged over the game-days played (Average). Three closed days of last week are this test's own in both
-// games, so no one else's runs count in their places; the runs and their ledger rows are written directly, as those
-// days can't be played now.
+// answers 2, 29 to 33 and 38; docs/milestones/M15-15i-par-scores.md): each day's par score in each game, the day's
+// points against the game's par out of 100, added up (Sum) and averaged over the game-days played (Average). Three
+// closed days of last week are this test's own in both games; the runs and their ledger rows are written directly, as
+// those days can't be played now.
 //
-// A is the viewer; B and C are A's friends, C playing game 1 alone; S is a stranger, in the places only; G is in A's
-// group from Tuesday. Places by hand, (others beaten + half the others tied) ÷ others:
-// - Monday, game 1: C 150, A 100, S 75, B 50: C 100, A 66.7, S 33.3, B 0.
-// - Monday, game 2: G 200, B 120, S 90, A 60: G 100, B 66.7, S 33.3, A 0.
-// - Tuesday, game 1: B 200, G 100, A 25: B 100, G 50, A 0.
-// - Tuesday, game 2: A 300, G 300, B 100: A and G 75 each (one beaten, one tied), B 0.
-// - Wednesday, in the last test: game 1, B 10 and A's run still going, settled at 0; game 2, B 50 alone, 100.
+// A is the viewer; B and C are A's friends, C playing game 1 alone; S is a stranger; G is in A's group from Tuesday.
+// Par scores by hand, points ÷ par × 100, game 1's par 1,250 and game 2's 1,500:
+// - Monday, game 1: C 1300, A 1000, S 750, B 500: C 100 (over the par), A 80, S 60, B 40.
+// - Monday, game 2: G 1200, B 900, S 600, A 300: G 80, B 60, S 40, A 20.
+// - Tuesday, game 1: B 1000, G 625, A 250: B 80, G 50, A 20.
+// - Tuesday, game 2: A 1410, G 1350, B 150: A 94, G 90, close as their points are, B 10.
+// - Wednesday, in the last test: game 1, B 10 and A's run still going, settled at 0; game 2, B 50 alone, 3.3, not 100.
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { weekStart } from "@/friends/leaderboard";
 import { getPool } from "@/lib/db";
@@ -70,7 +70,7 @@ beforeAll(async () => {
   tuesday = lastMonday.toISOString().slice(0, 10);
   lastMonday.setUTCDate(lastMonday.getUTCDate() + 1);
   wednesday = lastMonday.toISOString().slice(0, 10);
-  // A place counts the whole day, so the days must be this test's own: an existing day fails the insert.
+  // The days are this test's own: an existing day fails the insert.
   for (const date of [monday, tuesday, wednesday]) {
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [GAME_ID, date, fixtureDay(date, `${date}T00:00:00Z`)]);
     await db.query("insert into private.puzzle (game_id, puzzle_date, content) values ($1, $2::date, $3)", [
@@ -104,10 +104,10 @@ describe("the overall board", () => {
     for (const friend of [B, C]) {
       await db.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [A.userId, friend.userId]);
     }
-    for (const [p, points] of [[C, 150], [A, 100], [S, 75], [B, 50]] as const) await scored(p, GAME_ID, monday, points);
-    for (const [p, points] of [[G, 200], [B, 120], [S, 90], [A, 60]] as const) await scored(p, SUBSTRINGS_ID, monday, points);
-    for (const [p, points] of [[B, 200], [G, 100], [A, 25]] as const) await scored(p, GAME_ID, tuesday, points);
-    for (const [p, points] of [[A, 300], [G, 300], [B, 100]] as const) await scored(p, SUBSTRINGS_ID, tuesday, points);
+    for (const [p, points] of [[C, 1300], [A, 1000], [S, 750], [B, 500]] as const) await scored(p, GAME_ID, monday, points);
+    for (const [p, points] of [[G, 1200], [B, 900], [S, 600], [A, 300]] as const) await scored(p, SUBSTRINGS_ID, monday, points);
+    for (const [p, points] of [[B, 1000], [G, 625], [A, 250]] as const) await scored(p, GAME_ID, tuesday, points);
+    for (const [p, points] of [[A, 1410], [G, 1350], [B, 150]] as const) await scored(p, SUBSTRINGS_ID, tuesday, points);
     // G joins A's group at Tuesday's noon. The creator must be a member by the statement's end, so the group and its
     // members go in together.
     club = (
@@ -122,18 +122,18 @@ describe("the overall board", () => {
     useSession((await signIn(A.email)).session);
   });
 
-  it("adds up each player's places in both games, and averages them over the game-days played", async () => {
+  it("adds up each player's par scores in both games, and averages them over the game-days played", async () => {
     const r = await call(friendsBoard, "/api/leaderboard?game=overall");
     expect(r.status).toBe(200);
     // Nothing but who, the Sum and the Average: no score of anyone's, no days.
     expect(Object.keys(r.body).sort()).toEqual(["lastWeek", "ok", "thisWeek"]);
     expect(Object.keys(r.body.lastWeek).sort()).toEqual(["entries", "from"]);
     for (const e of r.body.lastWeek.entries) expect(Object.keys(e).sort()).toEqual(["average", "name", "points", "username", "you"]);
-    // Ranked by Sum. B: 0 + 66.7 + 100 + 0 = 166.7 over 4 game-days, 41.7. A: 66.7 + 0 + 0 + 75 = 141.7 over 4, 35.4.
+    // Ranked by Sum. A: 80 + 20 + 20 + 94 = 214 over 4 game-days, 53.5. B: 40 + 60 + 80 + 10 = 190 over 4, 47.5.
     // C played game 1 on Monday alone: 100 over 1, 100. S, a stranger, isn't on A's board.
     expect(lastWeek(r.body)).toEqual([
-      [B.username, 166.7, 41.7],
-      [A.username, 141.7, 35.4],
+      [A.username, 214, 53.5],
+      [B.username, 190, 47.5],
       [C.username, 100, 100],
     ]);
     expect(r.body.lastWeek.from).toBe(monday);
@@ -145,26 +145,26 @@ describe("the overall board", () => {
     ]);
   });
 
-  it("counts a group member's places in both games from the day they joined", async () => {
-    // G's Monday, 100 in game 2, came before G joined: Tuesday's 50 + 75 = 125 over 2 game-days, 62.5.
+  it("counts a group member's par scores in both games from the day they joined", async () => {
+    // G's Monday, 80 in game 2, came before G joined: Tuesday's 50 + 90 = 140 over 2 game-days, 70.
     expect(lastWeek((await call(groupBoard, `/api/groups/leaderboard?id=${club}&game=overall`)).body)).toEqual([
-      [A.username, 141.7, 35.4],
-      [G.username, 125, 62.5],
+      [A.username, 214, 53.5],
+      [G.username, 140, 70],
     ]);
   });
 
-  it("leaves out every game 1 place of a day the viewer is still playing, and keeps game 2's", async () => {
+  it("leaves out every game 1 score of a day the viewer is still playing, and keeps game 2's", async () => {
     // Wednesday: B played both games. A started Wednesday's game 1 just now, as if resumed: its first question's 20
     // seconds have only begun, so it's still going.
     await scored(B, GAME_ID, wednesday, 10);
     await scored(B, SUBSTRINGS_ID, wednesday, 50);
     await getPool().query("insert into private.run (user_id, game_id, puzzle_date) values ($1, $2, $3::date)", [A.userId, GAME_ID, wednesday]);
-    // The read settles A's run at 0 (answer 38), so B's game 1 place is 100, left out, like A's own 0. B's game 2 place
-    // counts: 166.7 + 100 = 266.7 over 5 game-days, 53.3. Counting game 1 too would give B 366.7 over 6 and A 141.7
-    // over 5.
+    // The read settles A's run at 0 (answer 38); B's game 1 score, 0.8, is left out, like A's own 0. B's game 2 score
+    // counts, 3.3 for a day played alone: 190 + 3.3 = 193.3 over 5 game-days, 38.7. Counting game 1 too would give B
+    // 194.1 over 6 and A 214 over 5, 42.8.
     expect(lastWeek((await call(friendsBoard, "/api/leaderboard?game=overall")).body)).toEqual([
-      [B.username, 266.7, 53.3],
-      [A.username, 141.7, 35.4],
+      [A.username, 214, 53.5],
+      [B.username, 193.3, 38.7],
       [C.username, 100, 100],
     ]);
     const { rows } = await getPool().query("select points from private.points_ledger where user_id = $1 and game_id = $2 and puzzle_date = $3::date", [

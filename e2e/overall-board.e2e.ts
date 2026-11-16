@@ -1,9 +1,10 @@
 // The overall board on the Friends page and a group's (M16 16e-3b, docs/milestones/M16-16e-points-and-boards.md,
 // answers 29 and 33): the Game switch's third choice, list only, by Sum or by Average. Two closed days of last week,
-// Thursday and Friday, are this file's own in both games, so no one else's runs count in their places; the runs and
-// their ledger rows are written directly. X is the viewer, Y X's friend and fellow member of a group. Places:
-// Thursday's game 1, X 100 and Y 50, gives X 100 and Y 0; Thursday's and Friday's game 2, Y alone, give Y 100 each.
-// So by Sum Y leads, 200 to 100, and by Average X does, 100 over one game-day to 66.7 over three.
+// Thursday and Friday, are this file's own in both games; the runs and their ledger rows are written directly. X is
+// the viewer, Y X's friend and fellow member of a group. Par scores (docs/milestones/M15-15i-par-scores.md), game 1's
+// against 1,250 and game 2's against 1,500: Thursday's game 1, X 1000 and Y 500, gives X 80 and Y 40; Thursday's and
+// Friday's game 2, Y's 600 and 300, give Y 40 and 20. So by Sum Y leads, 100 to 80, and by Average X does, 80 over one
+// game-day to 33.3 over three.
 import { expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { fixtureDay } from "../src/test/answer-fixture";
@@ -18,7 +19,7 @@ test.beforeAll(async () => {
     `select (date_trunc('week', private.today())::date - 4)::text as thursday, (date_trunc('week', private.today())::date - 3)::text as friday`,
   );
   days = [rows[0].thursday, rows[0].friday];
-  // A place counts the whole day, so the days must be this file's own: an existing day fails the insert.
+  // The days are this file's own: an existing day fails the insert.
   for (const date of days) {
     await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('offbeat', $1::date, $2)", [date, fixtureDay(date, `${date}T00:00:00Z`)]);
     await DB.query("insert into private.puzzle (game_id, puzzle_date, content) values ('substrings', $1::date, $2)", [
@@ -62,11 +63,11 @@ async function bothViews(page: Page, board: string, x: string, y: string) {
   await expect(region.getByRole("radiogroup", { name: "View" })).toHaveCount(0);
   const count = region.getByRole("radiogroup", { name: "Count" });
   await expect(count.getByRole("radio", { name: "Sum" })).toBeChecked();
-  await expect(region.getByText("Each day adds the % of players you beat, in each game.")).toBeVisible();
-  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 200$`), new RegExp(`${x} \\(you\\): 100$`)]);
+  await expect(region.getByText("Each day adds your score out of 100 in each game.")).toBeVisible();
+  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${y}: 100$`), new RegExp(`${x} \\(you\\): 80$`)]);
   await count.getByText("Average").click();
-  await expect(region.getByText("Your average % of players beaten, per game played.")).toBeVisible();
-  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${x} \\(you\\): 100$`), new RegExp(`${y}: 66.7$`)]);
+  await expect(region.getByText("Your average score out of 100, per game played.")).toBeVisible();
+  await expect(lastWeek(page, board)).toHaveText([new RegExp(`${x} \\(you\\): 80$`), new RegExp(`${y}: 33.3$`)]);
 }
 
 test("the overall board shows Sum and Average on the Friends page and a group's", async ({ browser }) => {
@@ -81,10 +82,10 @@ test("the overall board shows Sum and Average on the Friends page and a group's"
   await DB.query("update private.profile set created_at = now() - interval '14 days' where user_id = any($1::uuid[])", [[x, y]]);
   await DB.query("insert into private.friendship (user_a, user_b) values (least($1::uuid, $2::uuid), greatest($1::uuid, $2::uuid))", [x, y]);
   const [thursday, friday] = days;
-  await scored(x, "offbeat", thursday, 100);
-  await scored(y, "offbeat", thursday, 50);
-  await scored(y, "substrings", thursday, 80);
-  await scored(y, "substrings", friday, 10);
+  await scored(x, "offbeat", thursday, 1000);
+  await scored(y, "offbeat", thursday, 500);
+  await scored(y, "substrings", thursday, 600);
+  await scored(y, "substrings", friday, 300);
   // The creator must be a member by the statement's end, so the group and its members go in together.
   const { rows } = await DB.query<{ id: string }>(
     `with g as (insert into private.player_group (name, creator_id, invite_code) values ('Overall Club', $1, $3) returning id),
