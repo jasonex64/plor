@@ -1,6 +1,6 @@
 # M15 15h — A taken letter takes the answer, whatever name is typed
 
-**Status:** in review. Drafted 2026-11-15 from the human's answers below; **approved by the human (2026-11-15: "Approve 15h")**, asked as "Approve 15h with the proposed line for players?", so the line under Design is confirmed; "Start 15h" the same night. Built and reviewed on `m15g-answer-pool` (checkout `C:/Users/jason/RIFF-m15g`; the branch 15g was built on, the human's exception to "one branch per milestone"), in a pull request, not merged. No migration. **Merging it changes the game for players on plor.app from that deployment on, on whatever day is live.**
+**Status:** done (PR #225, merged 2026-11-16 on nine green checks, by the human's "Merge when green"; merge commit `a8cc6c0`). Published with the merge: the rule is the game's on plor.app from that deployment on. Not verified: the line on plor.app. Drafted 2026-11-15 from the human's answers below; **approved by the human (2026-11-15: "Approve 15h")**, asked as "Approve 15h with the proposed line for players?", so the line under Design is confirmed; "Start 15h" the same night. Built and reviewed on `m15g-answer-pool` (the branch 15g was built on, the human's exception to "one branch per milestone"; deleted after this ticket's last pull request). No migration.
 
 ## Goal
 In Offbeat, an answer whose shown name holds a taken letter can't be given under any other name: with I taken, "nyc" no longer counts for New York City.
@@ -42,7 +42,7 @@ In Offbeat, an answer whose shown name holds a taken letter can't be given under
 - [x] A typo never lands on a thing whose shown name holds a taken letter (same tests; G12's existing db test still passes. The ticket said "unit test": G12's test is a database test, `src/game/matching.db.test.ts`).
 - [x] The answer route replies with `needs`, not a plain "not in our list", and no row is added to the miss log (`src/game/runs.db.test.ts`: the miss count stays 1 after "Gaul").
 - [x] A guest's run and a test run behave the same (`src/game/guest-runs.plor-app.db.test.ts`, as `plor_app`; `src/app/api/admin/test/route.db.test.ts`, which also shows nothing reported to the audit).
-- [ ] The play screen shows the confirmed words under the box (`e2e/approve-and-play.e2e.ts`; passed locally, **CI's result is the evidence**).
+- [x] The play screen shows the confirmed words under the box (`e2e/approve-and-play.e2e.ts`; passed locally and on CI, #225's e2e: "195 passed", the one flaky test `feel.e2e.ts:51`, not this file).
 - [x] DECISIONS.md's Log has the rule's row; DESIGN.md has the new line; `how-to-play.tsx` is unchanged ("On questions … a letter is taken. Answer without it." still holds: read at `src/app/how-to-play.tsx:25`).
 
 ## Out of scope
