@@ -7,9 +7,11 @@ import { useState } from "react";
 import { setsDiffer, type SubstringDayView, type SubstringSets } from "@/admin/substring-sets";
 import { ApiError, api } from "@/lib/api-client";
 import { SUBSTRINGS } from "@/platform/game";
+import { ButtonLink } from "../../button-link";
 import { dayText } from "../../day-text";
 import { errorText } from "../../messages";
 import kit from "../../kit.module.css";
+import { FORWARD } from "../../slide";
 import admin from "../admin.module.css";
 import styles from "./puzzles.module.css";
 
@@ -63,13 +65,17 @@ function Day({ day, onApproved }: { day: SubstringDayView; onApproved: () => voi
           <h3 className={admin.cardTitle}>{dayText(day.date)}</h3>
           <p className={admin.note}>{state}</p>
         </div>
-        {editable && (
-          <div className={styles.approve}>
+        <div className={styles.approve}>
+          {/* The date's draft if it has one, else its approved day (docs/milestones/M15-15f-fragments-test-run.md, 15f-2). */}
+          <ButtonLink href={`/admin/test2/${day.date}`} transitionTypes={FORWARD}>
+            Play test
+          </ButtonLink>
+          {editable && (
             <button type="button" className={`${kit.primary} ${kit.small} ${admin.button}`} disabled={busy} onClick={approve}>
               {day.live ? "Approve again" : "Approve day"}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {note && <p role="status" className={styles.note}>{note}</p>}
       {problems.length > 0 && (

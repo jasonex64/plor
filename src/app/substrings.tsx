@@ -6,7 +6,7 @@
 // starts the clock (16d, answer 5). The top row's running score, each word's points and the end's score come from the server
 // (16e); the end shows each round's word, and examples for one missed.
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { PlayedRound, SubstringRun, TryOutcome } from "@/game/substring-state";
 import { ApiError, api } from "@/lib/api-client";
 import { substringShareText } from "@/game/share";
@@ -27,43 +27,74 @@ import styles from "./substrings.module.css";
 
 type RunResponse = { run: SubstringRun | null };
 
+// What the screen reads a run from and sends its moves to: a player's own run on the server's routes, or an admin's test
+// run, which the browser holds and nothing saves (src/app/fragments-test.tsx; docs/milestones/M15-15f-fragments-test-run.md).
+// timeUp: a round's clock ran out here; index says which, as a real run's server has it from its own clock and a test run's
+// browser must say.
+export type SubstringsSource = {
+  state: () => Promise<RunResponse>;
+  start: (body?: unknown) => Promise<RunResponse>;
+  next: () => Promise<RunResponse>;
+  tryWord: (text: string) => Promise<RunResponse & { outcome: TryOutcome }>;
+  timeUp: (index: number) => Promise<RunResponse>;
+};
+
+function routesSource(family: RunFamily): SubstringsSource {
+  const routes = substringRoutes(family);
+  return {
+    state: () => api<RunResponse>(routes.state, { method: "GET" }),
+    start: (body) => api<RunResponse>(routes.start, { method: "POST", body }),
+    next: () => api<RunResponse>(routes.next, { method: "POST" }),
+    tryWord: (text) => api<RunResponse & { outcome: TryOutcome }>(routes.try, { method: "POST", body: { text } }),
+    timeUp: () => api<RunResponse>(routes.state, { method: "GET" }),
+  };
+}
+
+// A test run's way in: its source, and what the frame keeps above the round, with where the × goes.
+export type SubstringsTest = { source: SubstringsSource; label: ReactNode; onLeave: () => void };
+
 // A refusal that means this screen is behind the server: a tab left between rounds overnight has no clock to bring it
 // back, and its run isn't today's. Anything else is a failure, and is shown.
 const BEHIND = ["no_run", "no_puzzle_today", "run_over", "round_running"];
 
 // family: which routes it plays (src/app/run-routes.ts); a guest's Start runs botCheck first and sends its token (as game.tsx).
 // onPlaying: whether the play frame is up, when the screen shows only the game (src/app/guest-game.tsx). onOver: whether the
-// run is over, which opens the day's comments (src/app/fragments.tsx).
+// run is over, which opens the day's comments (src/app/fragments.tsx). test: an admin's test run in place of a player's, with
+// no Share (src/app/result-extras.ts).
 export function SubstringsScreen({
   family = "account",
   botCheck,
   onPlaying,
   onOver,
+  test,
 }: {
   family?: RunFamily;
   botCheck?: () => Promise<string>;
   onPlaying?: (playing: boolean) => void;
   onOver?: (over: boolean) => void;
+  test?: SubstringsTest;
 }) {
-  const routes = substringRoutes(family);
+  const own = useMemo(() => routesSource(family), [family]);
+  const source = test?.source ?? own;
   const router = useRouter();
   const [run, setRun] = useState<SubstringRun | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(() => {
-    api<RunResponse>(routes.state, { method: "GET" }).then(
+  const settle = useCallback((read: () => Promise<RunResponse>) => {
+    read().then(
       (r) => {
         setRun(r.run);
         setError(null);
       },
       (err) => setError(errorText(err)),
     );
-  }, [routes.state]);
+  }, []);
+  const load = useCallback(() => settle(source.state), [settle, source]);
   useEffect(load, [load]);
 
-  const send = async (path: string, body?: unknown) => {
+  const send = async (go: () => Promise<RunResponse>) => {
     try {
-      setRun((await api<RunResponse>(path, { method: "POST", body })).run);
+      setRun((await go()).run);
       setError(null);
     } catch (err) {
       if (err instanceof ApiError && BEHIND.includes(err.code)) load();
@@ -76,7 +107,7 @@ export function SubstringsScreen({
   const startRun = async () => {
     setStarting(true);
     try {
-      let body;
+      let body: unknown;
       if (family === "guest") {
         try {
           body = startBody(family, await botCheck!());
@@ -85,7 +116,7 @@ export function SubstringsScreen({
           return;
         }
       }
-      await send(routes.start, body);
+      await send(() => source.start(body));
     } finally {
       setStarting(false);
     }
@@ -120,16 +151,17 @@ export function SubstringsScreen({
           <HowToPlay steps={GAME_2_STEPS} />
         </>
       ) : run.status === "finished" ? (
-        inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} share={family === "account"} />
+        inFrame ? <Between run={run} onNext={() => setDone(true)} /> : <Results run={run} focus={seen && done} share={family === "account" && !test} />
       ) : run.open ? (
-        <Round key={run.open.index} run={run} tryPath={routes.try} onChange={setRun} onTimeUp={load} />
+        <Round key={run.open.index} run={run} tryWord={source.tryWord} onChange={setRun} onTimeUp={() => settle(() => source.timeUp(run.open!.index))} />
       ) : (
-        <Between run={run} onNext={() => send(routes.next)} />
+        <Between run={run} onNext={() => send(source.next)} />
       )}
     </section>
   );
   return inFrame ? (
-    <PlayFrame steps={GAME_2_STEPS} out="Back to Today" onLeave={() => router.push("/", { transitionTypes: BACK })}>
+    <PlayFrame steps={GAME_2_STEPS} out={test ? "Back to Puzzles" : "Back to Today"} onLeave={test ? test.onLeave : () => router.push("/", { transitionTypes: BACK })}>
+      {test?.label}
       {card}
     </PlayFrame>
   ) : (
@@ -148,7 +180,7 @@ const WHY: Partial<Record<TryOutcome, (letters: string) => string>> = {
   already_used: () => "Already used.",
 };
 
-function Round({ run, tryPath, onChange, onTimeUp }: { run: SubstringRun; tryPath: string; onChange: (run: SubstringRun) => void; onTimeUp: () => void }) {
+function Round({ run, tryWord, onChange, onTimeUp }: { run: SubstringRun; tryWord: SubstringsSource["tryWord"]; onChange: (run: SubstringRun) => void; onTimeUp: () => void }) {
   const open = run.open!;
   const [text, setText] = useState("");
   const [reason, setReason] = useState<string | null>(null);
@@ -167,7 +199,7 @@ function Round({ run, tryPath, onChange, onTimeUp }: { run: SubstringRun; tryPat
     trying.current = true;
     const sent = text;
     try {
-      const result = await api<RunResponse & { outcome: TryOutcome }>(tryPath, { method: "POST", body: { text: sent } });
+      const result = await tryWord(sent);
       setError(null);
       const why = WHY[result.outcome];
       if (why) {
