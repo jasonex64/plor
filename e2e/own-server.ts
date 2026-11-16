@@ -3,6 +3,10 @@
 import { currentSlot, heldBySlot, portHolder } from "../scripts/slot.ts";
 
 export default function ownServer(): void {
+  // CI never reuses a server (playwright.config.ts: reuseExistingServer is off there), so Playwright refuses a held port
+  // itself and the server is always its own. The check also failed on CI's first run, finding no listener on the
+  // port (PR #227); on Linux and the Mac it is unverified (ROADMAP, Next revision).
+  if (process.env.CI) return;
   const slot = currentSlot();
   const holder = portHolder(slot.devPort);
   if (!holder) throw new Error(`nothing listens on slot ${slot.number}'s port ${slot.devPort}`);
