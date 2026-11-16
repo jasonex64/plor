@@ -455,6 +455,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 16g-2a, wording and stale comments: "the first 10 drawn frames decide" is 10 gaps, so 11 draws, and the upper median (`scene.ts`, DESIGN.md, the ticket's Numbers); `scene.ts`'s comments on `dead` and `until` say they reject on a fault, but they now reject on stop too; a frame fault during `show()` reaches `fault` twice (logged twice, one alert). Found in M16 16g-2a (follow-up review, 2026-11-08).
 
 **For M15 (launch):**
+- [ ] DESIGN.md's older `src/app/admin/puzzles/puzzles.tsx` line cites (the Days row, "Test an earlier day", Play test: "82-93", "67-73", "76", "86", "96-110", "192-194") are 2 lines off since 15g added two imports. Found in M15 15g (review, 2026-11-15).
+- [ ] `GET /api/admin/pool` takes any run of digits as `offset` (`src/admin/pool.ts:29`); one too large for a Postgres integer would answer 500, not 400 (read, not run; admins only). Found in M15 15g (review, 2026-11-15).
+- [ ] The answer pool's panel neither orders nor cancels its requests, and keeps `clean` from an earlier fetch, if its category or letters changed while it is mounted (`src/app/admin/pool.tsx`); today it is keyed by category and day and its buttons wait while busy, so no failing case. Found in M15 15g (review, 2026-11-15).
+- [ ] The answer pool's two toggle buttons have `aria-expanded` but no `aria-controls` (`puzzles.tsx`, `bank.tsx`). Found in M15 15g (review, 2026-11-15).
+- [ ] The first open of a big category's pool on a question with taken letters reads every member's name to count the clean ones (982 ms for animal's 56,169 locally; `src/admin/pool.ts`); plor.app's time is unmeasured. Found in M15 15g (review, 2026-11-15).
+- [ ] `supabase/tests/answer_pool.test.sql` has no case for a member with no live alias or one accepted through `category_extra`. Found in M15 15g (review, 2026-11-15).
 - [ ] The answer pool lists names that start with a mark first ("'akepa" before "aardvark"): `private.category_pool` orders by the name's lowercase, marks included. Found in M15 15g (build, 2026-11-15).
 - [ ] The answer pool strikes a taken letter with the same one-line expression as the Puzzles page's `Struck` (`src/app/admin/pool.tsx`, `src/app/admin/puzzles/puzzles.tsx`): two copies. Found in M15 15g (build, 2026-11-15).
 - [ ] The answer pool's "Show more" has no e2e (a page is 20; no fixture category holds more), and the Bank's e2e can't check a count on CI, whose fixture base has none of the bank's categories. Found in M15 15g (build, 2026-11-15).

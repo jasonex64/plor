@@ -99,5 +99,6 @@ Nothing. It adds a view beside what is there. (`src/admin/puzzles.ts:30-31`'s co
 - **Not verified:** the panel on plor.app (it needs the merge and the human's `db push`); the largest pool's time on plor.app's database; a screen reader.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- The `reviewer` agent (a fresh context, 2026-11-15) read the diff against this ticket; it ran `npx tsc --noEmit -p .` and `answer_pool.test.sql` (15 passed) and read the rest.
+- Blocking findings and how each was fixed: none.
+- Deferred to ROADMAP "Next revision" (For M15), seven: DESIGN.md's older `puzzles.tsx` line cites are 2 lines off since this change's two imports; an `offset` too large for an integer would answer 500, not 400 (not run); the panel doesn't order or cancel requests if its category or letters changed while mounted (they can't today: it is keyed and its buttons wait); `clean` would keep an old count in the same case; the two buttons have `aria-expanded` but no `aria-controls`; the first open of a big category with taken letters reads every member (982 ms for animal); no pgTAP case for a member with no live alias or a `category_extra` member.
