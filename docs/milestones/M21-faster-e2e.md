@@ -1,6 +1,6 @@
 # M21 — Faster e2e
 
-**Status:** approved 2026-11-16 ("Approve, start with the upgrade (Recommended)"); next, Dependabot's Next.js 16.4.5 pull request, then 21a. Nothing is built.
+**Status:** approved 2026-11-16 ("Approve, start with the upgrade (Recommended)"). The Next.js 16.4.5 upgrade is merged (Dependabot's #235, 2026-11-16 22:55 UTC, merged before this session got to it) and local e2e starts again (Evidence). Next: 21a. Nothing of 21a to 21c is built.
 
 ## Goal
 Make the e2e check, which every pull request waits on, take far less time, in three measured steps: run the tests on a built app, give the tests that don't test sign-in a quicker signed-in player, then split the suite across two CI machines.
@@ -75,7 +75,7 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 3. If the two shards' times differ widely (uneven files), report it to the human before moving files around.
 
 ## Acceptance criteria
-- [ ] The Next.js upgrade is merged and local e2e starts its server (answer 7).
+- [x] The Next.js upgrade is merged and local e2e starts its server (answer 7).
 - [ ] `boards.e2e.ts:223` and `play.e2e.ts:232` pass on a built app, each with its cause recorded (answer 2).
 - [ ] Local and CI e2e both run on `npm run build` + `npm run start`; nothing runs e2e on `next dev` (answer 3).
 - [ ] Only the five sign-in files use the real sign-in; the admin key never appears in a file, a commit or CI's log (answer 5).
@@ -110,6 +110,7 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 |---|---|---|
 
 ## Evidence
+**The Next.js upgrade (answer 7).** `main` has `"next": "16.4.5"` (#235, merge commit `0f577d9`). In slot 3 on this branch, 2026-11-16, after `npm ci`: `npx next --version` → `Next.js v16.4.5`; `npx playwright test --project=chromium e2e/admin-area.e2e.ts` → `4 passed (45.3s)`. On 16.4.2 the same command ended `Error: Process from config.webServer was not able to start. Exit code: 1` at the upgrade notice (2026-11-16, slot 2). Hypothesis held: the notice was the cause.
 
 ## Review
 - Blocking findings and how each was fixed:
