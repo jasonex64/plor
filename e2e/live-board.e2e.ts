@@ -11,7 +11,7 @@ import { execSync } from "node:child_process";
 import { RUN, play, sent, signInAndPick, befriend, openBoard } from "./players";
 import { answerBox, caughtToCards, next, safe } from "./game";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
-import { localStack } from "../scripts/slot.ts";
+import { currentSlot, localStack } from "../scripts/slot.ts";
 
 const DB = new Pool({ connectionString: localStack().databaseUrl, max: 1 });
 let puzzle: TodayPuzzle;
@@ -251,7 +251,7 @@ test("a reconnect refetches the board", async ({ browser }) => {
   await signInAndPick(page, "r");
   await openBoard(page);
   const refetch = page.waitForRequest((r) => r.url().includes("/api/board?reason=reconnect"));
-  execSync("docker restart supabase_realtime_plor", { stdio: "ignore" });
+  execSync(`docker restart supabase_realtime_${currentSlot().projectId}`, { stdio: "ignore" });
   // While the channel is down, the page says so (M11 H6), and stops saying so once it's back.
   const paused = page.getByRole("region", { name: "Friends today" }).getByText("Live updates paused, reconnecting…");
   await expect(paused).toBeVisible();
@@ -271,7 +271,7 @@ test("a reconnect on Today shows the pause in the feed and fetches it again", as
   await page.goto("/");
   await signInAndPick(page, "rt");
   await openBoard(page, "/");
-  execSync("docker restart supabase_realtime_plor", { stdio: "ignore" });
+  execSync(`docker restart supabase_realtime_${currentSlot().projectId}`, { stdio: "ignore" });
   const paused = page.getByRole("region", { name: "Feed" }).locator("xpath=..").getByText("Live updates paused, reconnecting…");
   await expect(paused).toBeVisible();
   // Waited for only once the channel is down, so the feed's loads as the page starts can't count (the 14b-2c-4 review).

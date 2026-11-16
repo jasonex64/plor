@@ -90,9 +90,10 @@ function take(main: string, branch: string): void {
   git(["check-ref-format", "--branch", branch], main);
   const slots = slotsOf(main);
   const states = slots.map(stateOf);
-  const holding = slots.find((_, i) => states[i].branch === branch);
-  if (holding) throw new Error(`${branch} is already in slot ${holding.number} (${holding.dir})`);
-  const index = states.findIndex(isFree);
+  // A branch already in a slot is taken again there: that finishes a take a failed start or reset cut short, and
+  // resets the slot's database to the branch's migrations again (the reviewer, 2026-11-16).
+  const holding = states.findIndex((s) => s.branch === branch);
+  const index = holding !== -1 ? holding : states.findIndex(isFree);
   if (index === -1) {
     const busy = slots.map((s, i) => `slot ${s.number} ${s.dir}: ${states[i].branch ?? "detached"}${states[i].dirty ? ", uncommitted changes" : ""}${states[i].devHolder ? `, port ${s.devPort} in use` : ""}`);
     throw new Error(`REFUSED: all ${slots.length} slots are busy; there is no fourth.\n${busy.join("\n")}`);
@@ -105,7 +106,8 @@ function take(main: string, branch: string): void {
   }
   const local = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`], { cwd: slot.dir }).status === 0;
   const remote = spawnSync("git", ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branch}`], { cwd: slot.dir }).status === 0;
-  if (local) git(["switch", branch], slot.dir);
+  if (holding !== -1) console.log(`${branch} is already in slot ${slot.number}: finishing it there`);
+  else if (local) git(["switch", branch], slot.dir);
   else if (remote) git(["switch", "--track", `origin/${branch}`], slot.dir);
   else git(["switch", "-c", branch, "origin/main"], slot.dir);
   if (slot.number !== 1) writeFileSync(join(slot.dir, "supabase", ".env"), supabaseEnv(slot));
