@@ -224,6 +224,10 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
   await addDay();
   const page = await viewer(browser, "bve");
   const friend = await friendOf("bve", "bfe");
+  // Today's card read yesterday's board when the sign-in landed, before the viewer's account was dated back and the
+  // friend made; a friends board leaves out an account made after its day (M19 19c), so that read can be empty. On a
+  // built app the read is quick enough to win that race (docs/milestones/M21-faster-e2e.md, 21a): read it again now.
+  await page.reload();
   const card = page.getByRole("region", { name: "Leaderboard", exact: true });
   const choices = card.getByRole("radiogroup", { name: "Game", exact: true });
   const names = [friend.username, `bve${RUN}`].sort();
