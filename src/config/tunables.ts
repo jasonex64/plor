@@ -57,6 +57,10 @@ export const COMMENT_MAX_LENGTH = 280;
 // answer 30: "20").
 export const FEED_PAGE_SIZE = 20;
 
+// How many answers one page of a question's answer pool holds on the admin pages (human, 2026-11-15,
+// docs/milestones/M15-15g-the-answer-pool.md, answer 7: "20").
+export const POOL_PAGE_SIZE = 20;
+
 // The reaction set, in the order the page shows it (human, 2026-10-22; docs/milestones/M08-comments-and-reactions.md,
 // D3). The database's check constraint reaction_emoji holds the same five; the reactions route test sends each one
 // through it.

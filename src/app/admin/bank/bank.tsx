@@ -4,7 +4,7 @@
 // it ran and the share of answers the host caught on each, then the themes set for dates. Read-only: the bank is
 // content/bank.json, changed in pull requests. Laid out as round 10 draws it (docs/milestones/M14-14b-2b-2-admin-build.md,
 // criterion 6): one table with a filter, then the themes.
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import type { BankView } from "@/admin/bank";
 import { api } from "@/lib/api-client";
 import { errorText } from "../../messages";
@@ -12,11 +12,15 @@ import admin from "../admin.module.css";
 import kit from "../../kit.module.css";
 import { dayText } from "../../day-text";
 import { Line, Skeleton } from "../../skeleton";
+import pool from "../pool.module.css";
+import { AnswerPool } from "../pool";
 
 export function Bank() {
   const [bank, setBank] = useState<BankView | null>(null);
   const [filter, setFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // The questions whose answer pool is open, by ID (M15 15g).
+  const [pools, setPools] = useState<string[]>([]);
   useEffect(() => {
     api<BankView>("/api/admin/bank", { method: "GET" }).then(setBank, (err) => setError(errorText(err)));
   }, []);
@@ -56,8 +60,19 @@ export function Bank() {
             </thead>
             <tbody role="rowgroup">
               {questions.map((q) => (
-                <tr role="row" key={q.id} aria-label={q.prompt}>
-                  <td role="cell" className={admin.strong} data-label="Question">{q.prompt}</td>
+                <Fragment key={q.id}>
+                <tr role="row" aria-label={q.prompt}>
+                  <td role="cell" className={admin.strong} data-label="Question">
+                    {/* Clicking the question opens its answer pool under the row (the human, 2026-11-15). */}
+                    <button
+                      type="button"
+                      className={`${kit.link} ${admin.strong} ${pool.open}`}
+                      aria-expanded={pools.includes(q.id)}
+                      onClick={() => setPools(pools.includes(q.id) ? pools.filter((id) => id !== q.id) : [...pools, q.id])}
+                    >
+                      {q.prompt}
+                    </button>
+                  </td>
                   <td role="cell" data-label="Category">{q.category}</td>
                   <td role="cell" data-label="Themes">
                     {q.themes.length ? (
@@ -97,6 +112,14 @@ export function Bank() {
                     )}
                   </td>
                 </tr>
+                {pools.includes(q.id) && (
+                  <tr role="row">
+                    <td role="cell" colSpan={5}>
+                      <AnswerPool category={q.category} taken={[]} />
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>

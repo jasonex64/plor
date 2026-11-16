@@ -80,6 +80,7 @@ const MESSAGES: Record<string, string> = {
   day_past: "That day is over.",
   puzzle_started: "That day has started, so its puzzle can't change.",
   no_draft: "There's no drafted puzzle for that day yet.",
+  no_category: "That category isn't in the answer database.",
   puzzle_invalid: "The puzzle breaks a content rule. See the problems listed.",
   // A test run (docs/milestones/M14-14b-11-test-runs.md).
   no_puzzle: "There's no approved puzzle for that day.",
