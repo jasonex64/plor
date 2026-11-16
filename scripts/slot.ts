@@ -4,7 +4,11 @@
 import { execFileSync } from "node:child_process";
 import { createServer } from "node:net";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { SLOTS } from "../src/config/tunables.ts";
+
+// The checkout this file is in: its slot is the one in use, whatever the working directory (a test may mock process.cwd).
+const CHECKOUT = fileURLToPath(new URL("..", import.meta.url));
 
 export type Slot = { number: number; dir: string; projectId: string; devPort: number; stackBase: number; inspectorPort: number };
 
@@ -39,11 +43,11 @@ export function slotFor(topLevel: string, mainCheckout: string): Slot {
 }
 
 // The main checkout is the parent of the common .git directory, from the main checkout and from any worktree.
-export function mainCheckout(cwd = process.cwd()): string {
+export function mainCheckout(cwd = CHECKOUT): string {
   return dirname(resolve(cwd, git(["rev-parse", "--git-common-dir"], cwd)));
 }
 
-export function currentSlot(cwd = process.cwd()): Slot {
+export function currentSlot(cwd = CHECKOUT): Slot {
   return slotFor(git(["rev-parse", "--show-toplevel"], cwd), mainCheckout(cwd));
 }
 

@@ -32,16 +32,16 @@ Up to three Claude sessions work on unrelated things at once, each in its own fo
 ## Acceptance criteria
 - [ ] Three slot folders exist, and only three: `npm run slots` lists each folder, its branch, its port, its stack's state and its open PR, and nothing else in the user's home is a worktree of this repo (`git worktree list`).
 - [ ] A slot's dev server runs on its own port: `npm run dev` in each slot starts on that slot's port; started in all three at once, none waits or fails.
-- [ ] `npm run dev` refuses, with a message naming the process, when its slot's port is held by anything that isn't this slot.
+- [x] `npm run dev` refuses, with a message naming the process, when its slot's port is held by anything that isn't this slot.
 - [ ] A fourth slot can't be made: the slot script refuses past the cap of 3 and says which slots are busy.
-- [ ] Each slot has its own local database: a migration applied in slot 2 is absent from slot 3 (`supabase migration list` against each).
-- [ ] Starting a task in a slot resets that slot's database to that branch's migrations and seed, and touches no other slot's.
+- [x] Each slot has its own local database: a migration applied in slot 2 is absent from slot 3 (`supabase migration list` against each).
+- [x] Starting a task in a slot resets that slot's database to that branch's migrations and seed, and touches no other slot's.
 - [ ] `npm run test:e2e` in two slots at once passes in both (or each failure is shown to fail the same way when run alone).
-- [ ] `playwright.config.ts` reads the slot's port; `reuseExistingServer` can only reuse that slot's own server.
-- [ ] No e2e test asserts a literal `localhost:3000`; they use the configured base URL (closes ROADMAP's "`e2e/guest-play.e2e.ts`'s Share check expects `http://localhost:3000/`" item).
+- [x] `playwright.config.ts` reads the slot's port; `reuseExistingServer` can only reuse that slot's own server.
+- [x] No e2e test asserts a literal `localhost:3000`; they use the configured base URL (closes ROADMAP's "`e2e/guest-play.e2e.ts`'s Share check expects `http://localhost:3000/`" item).
 - [ ] Local sign-in works in every slot (Supabase `site_url` / `additional_redirect_urls` allow each slot's port); checked by signing in on each.
-- [ ] Each slot's `.env.local` points at its own stack. No key is printed in chat, logs or commits while it is written (CLAUDE.md, Secrets never leave their home).
-- [ ] CLAUDE.md has the quick-fix lane and the slot rule; DECISIONS.md's Log records both; HANDOFF's line on shared port 3000 and the shared stack is replaced.
+- [x] Each slot's `.env.local` points at its own stack. No key is printed in chat, logs or commits while it is written (CLAUDE.md, Secrets never leave their home).
+- [x] CLAUDE.md has the quick-fix lane and the slot rule; DECISIONS.md's Log records both; HANDOFF's line on shared port 3000 and the shared stack is replaced.
 - [ ] `docs/INBOX.md` exists with the format below; a session told "inbox: …" appends one line and builds nothing.
 - [ ] `RIFF-m14` and `RIFF-m16` are removed as worktrees, `RIFF-m17`'s leftover folder is gone, `RIFF-m15` is handled per open question 5. Their branches stay in git (`git branch -a` lists them).
 
@@ -90,9 +90,25 @@ Up to three Claude sessions work on unrelated things at once, each in its own fo
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Supabase, running multiple local projects: the supported way is the experimental `supabase stack` commands, with ports the CLI picks | Fixed port blocks per slot through `SUPABASE_` overrides in each slot's gitignored `supabase/.env` | The human's answer 3 ("Fixed ports per slot"): stack mode is experimental and makes a stack per branch with new ports each time. The page itself says ports set by environment variables are exact requests |
+| The ticket's plan: the slot script has list, take, free, **reset** | list, take, free; `take` on a branch already in a slot resets that slot's database again | One way to reset a slot; a separate `reset` would be a second |
+| The ticket's plan: no change to the e2e tests' database connections | 72 test files take the slot's database, Mailpit and API addresses from `scripts/slot.ts` | Needed by the criterion "two slots at once": they connected to slot 1's stack by literal port |
 
 ## Evidence
+*(2026-11-16, on this Windows PC, CLI 2.121.0.)*
+- **Overrides work (answer 3):** with `SUPABASE_PROJECT_ID=probe` in the environment, and again in `supabase/.env`, `supabase status` answered "No such container: supabase_db_probe". Slot 2's stack then started from its `supabase/.env`: `supabase status -o env` in `plor-2` gave `API_URL=http://127.0.0.1:54421`, `DB_URL=…@127.0.0.1:54422/postgres`, `MAILPIT_URL=http://127.0.0.1:54424`, `STUDIO_URL=http://127.0.0.1:54423`; `docker ps` shows `supabase_*_plor-2` containers on 54421, 54422, 54423, 54424, 54427. Its auth server: `GOTRUE_SITE_URL=http://127.0.0.1:3002`, `GOTRUE_URI_ALLOW_LIST=https://127.0.0.1:3002`; slot 1's: `…:3000`, `…:3000`.
+- **`npm run slots`** lists slot 1 (`RIFF`, busy on this branch, port 3000, stack `plor` running), slot 2, slot 3, and `NOT A SLOT:` for `RIFF-m14`, `RIFF-m15`, `RIFF-m16`.
+- **`take`:** `npm run slots -- take slot-check` made `C:/Users/jason/plor-2`, ran `npm ci`, started stack `plor-2`, applied all 16 migrations and printed `TAKEN: slot 2, C:\Users\jason\plor-2, on slot-check; … npm run dev serves http://localhost:3002.` Run again on the same branch: `slot-check is already in slot 2: finishing it there` … `TAKEN`. Its `.env.local` names `127.0.0.1:54422` and `:54421`; no key was printed (`supabase start`'s output, which holds the keys, is dropped).
+- **A fourth slot:** none can be made: `take` only picks slots 1 to 3, and with all busy it refuses with `REFUSED: all 3 slots are busy; there is no fourth.` and each one's branch (`scripts/slots.ts`; unit-tested in `scripts/slot.test.ts`, `isFree`).
+- **Each slot has its own database:** a temporary migration `29991231000000_slot_check.sql` applied in slot 2 (`supabase migration up`) is the last row of slot 2's `supabase migration list --local` and absent from slot 1's (which ends at `20261116051619`). A marker table made in both, then `take` reset slot 2: `slot1 marker: t  slot2 marker: f`. The temporary migration was deleted and slot 2 reset.
+- **Dev port:** `npm run dev` in slot 1 printed `slot 1: next dev on port 3000`; a second one: `REFUSED: slot 1's port 3000 is held by process 37820: node.exe … C:\Users\jason\RIFF\node_modules\next\dist\server\lib\start-server.js (this slot's own server, already running).` exit 1. With port 3002 held by a stray `node -e` listener, `npm run dev` in slot 2: `REFUSED: slot 2's port 3002 is held by process 53524: node.exe … (not this slot).` exit 1.
+- **Playwright:** reads `localStack().appUrl`; `e2e/own-server.ts` runs after the web server step and refuses a listener started from another folder (`heldBySlot`: on this PC the listener's command line names `C:\Users\jason\RIFF\node_modules\…`). `git grep localhost:3000 -- e2e` is empty.
+- **e2e in two slots at once (not met):** run 1, 29 min: slot 1 190 passed / 6 failed, slot 2 188 / 8. It found a real crossing: `live-board.e2e.ts` restarted `supabase_realtime_plor`, slot 1's container, from slot 2; fixed to the slot's own. Run 2, 42 min: 183 passed / 13 failed in each. **Alone**, the same failures: the three admin tests fail the same way in both slots ("Tomorrow isn't approved": `content/*/2026-11-17.json` is in `main`, ROADMAP Next revision), and of the other 15, 14 pass in each slot (one different flaky test fails in each: `guest-play.e2e.ts:58` in slot 1, `live-board.e2e.ts:32` in slot 2). Most concurrent failures are 30 s timeouts: two full suites at once load this PC past the tests' timeouts. **Waits on the human.**
+- **RAM (answer 4):** one slot, stack plus `next dev` after five pages: stack `plor` 2,254 MiB (`docker stats`), `next dev`'s three processes 892 MiB, about 3.1 GB; the PC had 35.8 GB of 63.8 GB free. Reported to the human; slot 3 waits for their word.
+- **Database tests in both slots at once:** `npm run test:db` in slot 1 and slot 2 together: 498 passed, 2 failed in each, the same 2 (`src/app/api/leaderboard/substrings.db.test.ts`, "adds up par scores…" and "keeps game 1's board to game 1"), plus one file that failed to start: `admin/puzzles/substrings/route.db.test.ts` mocks `process.cwd`, so `scripts/slot.ts` now finds its checkout from its own location (fixed; the file passes). The 2 board tests fail the same way on `main`'s code (`abcf04a`, run in slot 2 against slot 1's stack: "2 failed | 3 passed"): not this change (ROADMAP, Next revision). `npx supabase test db` (pgTAP): `Files=42, Tests=833 … Result: PASS` in slot 1 and in slot 2.
+- **Unit tests:** `npm test`: 71 files, 820 tests passed. `npx tsc --noEmit -p .` and `npx eslint scripts e2e playwright.config.ts src/test src/config`: clean.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- Blocking findings and how each was fixed: HANDOFF not rewritten (rewritten last, in this PR); Evidence empty (filled above); scraps (`slot-check` and slot 2 are freed at the end; the old worktrees wait for the human's word); `take` left a slot stuck after a failed start or reset, since a retry was refused "already in slot N" (fixed: a take of a branch already in a slot finishes it there, run above).
+- Found while gathering evidence: `live-board.e2e.ts` restarted slot 1's Realtime container from any slot (fixed).
+- Deferred to ROADMAP "Next revision": `heldBySlot`'s loose match, `name in replaced`, symlinked paths on the Mac, `free` not checking the PR is merged; the three admin e2e tests that assume no drafted tomorrow.
