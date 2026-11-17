@@ -91,10 +91,12 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   // (docs/milestones/M14-14b-2a-streak-ranks.md).
   await watcher.goto("/");
   await expect(watcher.getByRole("link", { name: "1 day streak, Daisy" })).toBeVisible();
-  // Yesterday's standings, friends by default (H7), in the leaderboard card (M14 14a-2a): neither played yesterday.
+  // Yesterday's standings, friends by default (H7), in the leaderboard card (M14 14a-2a), which opens on Today since M22
+  // (docs/milestones/M22-todays-board.md, answer 3): neither played yesterday.
   const leaderboard = watcher.getByRole("region", { name: "Leaderboard" });
-  await expect(leaderboard.getByRole("radio", { name: "Yesterday" })).toBeChecked();
+  await expect(leaderboard.getByRole("radio", { name: "Today" })).toBeChecked();
   await expect(leaderboard.getByLabel("Board")).toHaveValue("");
+  await leaderboard.getByRole("radio", { name: "Yesterday" }).check();
   const yesterday = leaderboard.getByRole("region", { name: "Yesterday" });
   await expect(yesterday.getByRole("listitem")).toHaveText([`${playerName}: 0 points`, `${watcherName} (you): 0 points`]);
   await openBoard(watcher);

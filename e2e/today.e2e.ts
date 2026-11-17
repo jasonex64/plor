@@ -83,7 +83,8 @@ test("one leaderboard card switches between yesterday and this week, for friends
 
   await page.goto("/");
   const card = page.getByRole("region", { name: "Leaderboard" });
-  await expect(card.getByRole("radio", { name: "Yesterday" })).toBeChecked();
+  // Today on every load (docs/milestones/M22-todays-board.md, answer 3).
+  await expect(card.getByRole("radio", { name: "Today" })).toBeChecked();
   // Dated, as "Fri 23 Oct" (L25), in a chip beside its heading since 14b-8b, and naming no game in its heading or chip: the
   // card is shared by every game (14b-4, answer 1), which it names only in its Game switch, on Offbeat on every load (M16
   // 16f-6, answer 20).

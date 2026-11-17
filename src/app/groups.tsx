@@ -284,6 +284,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
           key={`${day} ${group.members.map((m) => m.username).join(" ")}`}
           title="Group leaderboard"
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
+          todayPath={`/api/leaderboard/today?group=${encodeURIComponent(id)}`}
         />
       )}
       {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}

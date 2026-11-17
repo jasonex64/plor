@@ -715,7 +715,7 @@ function Friends({ username, timeUps, onRequestsChanged }: { username: string; t
     <Fragment key={day}>
       {error && <p role="alert">{error}</p>}
       <Board key={`${timeUps}-${changes}`} username={username} betterWithFriends />
-      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" />
+      <Leaderboard title="Friends leaderboard" path="/api/leaderboard" todayPath="/api/leaderboard/today" />
       <FriendsList
         onRequestsChanged={() => {
           setChanges((n) => n + 1);

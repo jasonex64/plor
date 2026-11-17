@@ -16,10 +16,13 @@
 // like game 1's points (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up both games' par
 // scores and averages them over the game-days played.
 import { PAR_POINTS } from "@/config/tunables";
+import type { ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID, OVERALL, SUBSTRINGS_ID } from "@/platform/game";
-import { settleRuns } from "@/game/ledger";
+import { pooledCounts, settleRuns } from "@/game/ledger";
 import { parScore, scoreAverage, scoreTotal } from "@/game/par";
-import { settleSubstringRuns } from "@/game/substring-places";
+import { scoreRun } from "@/game/scoring";
+import { FINISHED, type RunStatus } from "@/game/status";
+import { runTotals, settleSubstringRuns } from "@/game/substring-places";
 import type { Db } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { circleSql, groupCircleSql } from "./circle";
@@ -56,6 +59,11 @@ export type OverallWeek = { from: string; entries: OverallEntry[] };
 export type OverallBoard = { thisWeek: OverallWeek; lastWeek: OverallWeek };
 // One day's standings: date is the puzzle day.
 export type Day = { date: string; entries: LeaderboardEntry[] };
+// Today's standings (M22): games, today's approved games among those asked, none meaning no board today; open, whether
+// the viewer may see it, and until then no entries and no rest. entries: the finished players, ranked, each with their
+// Average too on Overall; rest: everyone else, by name, still playing or not played yet (answer 5).
+export type TodayWaiting = { username: string; name: string; you: boolean; state: "playing" | "not_played" };
+export type TodayBoard = { date: string; games: BoardGame[]; open: boolean; entries: (LeaderboardEntry | OverallEntry)[]; rest: TodayWaiting[] };
 
 // The Monday that starts the week holding this day. Days are calendar dates ("2026-10-22"), read in UTC so the
 // weekday can't shift with the server's time zone.
@@ -120,6 +128,95 @@ export async function getYesterdayBoard(db: Db, viewerId: string, groupId: strin
   }
   const { rows } = await gameRows(db, game, viewerId, circle.ids, groupId, yesterday, circle.today);
   return { date: yesterday, entries: ranked(onBoard(rows, groupId, circle.today).map((r) => entry(r, viewerId, total(r, yesterday, circle.today))), byTotal) };
+}
+
+// Today's standings (docs/milestones/M22-todays-board.md): the viewer and their friends, or a group's members, with the
+// score each finished run shows on its result screen, read from today's runs, not the ledger, which waits for midnight
+// (M09 D9). Closed, with no score and no one's state, until the viewer has finished that game today, or for Overall
+// each of today's games (answers 1 and 6; DECISIONS.md, Game 1: no spoilers). Once open: the finished players ranked,
+// then the rest by name (answer 5). Overall ranks a player who's finished one game by that game's par score (answer 6).
+export async function getTodayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<TodayBoard> {
+  const circle =
+    groupId === null
+      ? await circleOf(db, circleSql("$1"), [viewerId])
+      : await circleOf(db, groupCircleSql("$1", "$2"), [viewerId, groupId]);
+  if (!circle) throw new AppError("group_not_found", 404);
+  const asked: BoardGame[] = game === OVERALL.id ? [GAME_ID, SUBSTRINGS_ID] : [game];
+  const { rows: days } = await db.query<{ game_id: BoardGame; content: ApprovedPuzzle }>(
+    "select game_id, content from private.puzzle where puzzle_date = $1::date and game_id = any($2::text[])",
+    [circle.today, asked],
+  );
+  // Today's games among those asked, in the switch's order.
+  const games = asked.filter((g) => days.some((d) => d.game_id === g));
+  const closed: TodayBoard = { date: circle.today, games, open: false, entries: [], rest: [] };
+  if (games.length === 0) return closed;
+  const { rows: people } = await db.query<{ user_id: string; username: string; name: string; statuses: Partial<Record<BoardGame, RunStatus>> }>(
+    `select p.user_id::text, p.username::text as username, coalesce(p.display_name, p.username::text) as name,
+            coalesce(jsonb_object_agg(s.game_id, s.status) filter (where s.game_id is not null), '{}'::jsonb) as statuses
+     from private.profile p
+     left join private.run_status s on s.user_id = p.user_id and s.puzzle_date = $2::date and s.game_id = any($3::text[])
+     where p.user_id = any($1::uuid[])
+     group by p.user_id, p.username, p.display_name`,
+    [circle.ids, circle.today, games],
+  );
+  const done = (statuses: Partial<Record<BoardGame, RunStatus>>, g: BoardGame) => FINISHED.includes(statuses[g] ?? "not_started");
+  const viewer = people.find((p) => p.user_id === viewerId)!;
+  if (!games.every((g) => done(viewer.statuses, g))) return closed;
+
+  // Each finished player's score in each game, as their result screen shows it.
+  const scores = new Map<string, number[]>();
+  for (const g of games) {
+    const finished = people.filter((p) => done(p.statuses, g)).map((p) => p.user_id);
+    const points = g === GAME_ID ? await offbeatToday(db, days.find((d) => d.game_id === g)!.content, finished) : await runTotals(db, finished, finished.map(() => circle.today));
+    for (const id of finished) {
+      const score = g === GAME_ID ? points.get(id)! : points.get(`${id}:${circle.today}`)!;
+      // Shown as the boards show each game (M15 15i): Offbeat's own board in points, every other as par scores.
+      scores.set(id, [...(scores.get(id) ?? []), game === GAME_ID ? score : parScore(score, PAR_POINTS[g])]);
+    }
+  }
+  const finishedRows = people.filter((p) => scores.has(p.user_id));
+  const entries = ranked(
+    finishedRows.map((p) => ({
+      username: p.username,
+      name: p.name,
+      points: scoreTotal(scores.get(p.user_id)!),
+      average: scoreAverage(scores.get(p.user_id)!),
+      you: p.user_id === viewerId,
+    })),
+    byTotal,
+  ).map(({ average, ...e }) => (game === OVERALL.id ? { ...e, average } : e));
+  const rest = people
+    .filter((p) => !scores.has(p.user_id))
+    .sort((a, b) => a.name.localeCompare(b.name) || a.username.localeCompare(b.username))
+    .map((p) => ({
+      username: p.username,
+      name: p.name,
+      you: p.user_id === viewerId,
+      state: games.some((g) => p.statuses[g] === "in_progress") ? ("playing" as const) : ("not_played" as const),
+    }));
+  return { ...closed, open: true, entries, rest };
+}
+
+// Today's Offbeat score of each of these players' finished runs, by user ID: the ladder and the provisional rarity
+// bonus, the result screen's points + bonus (src/game/runs.ts, buildState), from the same events and pooled counts.
+async function offbeatToday(db: Db, puzzle: ApprovedPuzzle, userIds: string[]): Promise<Map<string, number>> {
+  const { rows } = await db.query<{ user_id: string; events: { index: number; entryId: string; matched: boolean; inDay: boolean }[] }>(
+    `select e.user_id::text,
+            jsonb_agg(jsonb_build_object('index', e.question_idx, 'entryId', e.entry_id, 'matched', e.matched,
+                                         'inDay', private.day_of(e.created_at) = e.puzzle_date) order by e.question_idx) as events
+     from private.run_event e
+     where e.game_id = $1 and e.puzzle_date = $2::date and e.user_id = any($3::uuid[])
+     group by e.user_id`,
+    [GAME_ID, puzzle.date, userIds],
+  );
+  const pooled = await pooledCounts(db, puzzle, false);
+  // A run that ran out of time on question 1 has no answer, and scores 0.
+  const byUser = new Map(userIds.map((id) => [id, 0]));
+  for (const r of rows) {
+    const score = scoreRun(puzzle, r.events, pooled);
+    byUser.set(r.user_id, score.ladder + score.bonus);
+  }
+  return byUser;
 }
 
 // groupId: the group whose members players lists, or null for the friends board.
