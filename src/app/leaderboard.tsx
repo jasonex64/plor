@@ -8,7 +8,7 @@
 // picks game 1's board or game 2's, and since 16e-3b the overall one, list only, by Sum or Average
 // (docs/milestones/M16-16e-points-and-boards.md, answers 23, 29 and 33).
 import { useEffect, useId, useState, type CSSProperties } from "react";
-import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallWeek, Week } from "@/friends/leaderboard";
+import type { Leaderboard as Board, Day, LeaderboardEntry, OverallBoard, OverallEntry, OverallWeek, TodayBoard, Week } from "@/friends/leaderboard";
 import { ranked } from "@/friends/rank";
 import { PAR_POINTS } from "@/config/tunables";
 import { api } from "@/lib/api-client";
@@ -44,10 +44,14 @@ export function GameSwitch<T extends string>({ choices, value, onChange }: { cho
   );
 }
 
-// title names the board (its heading and region); path is the API route that returns it, which the game is added to.
-export function Leaderboard({ title, path }: { title: string; path: string }) {
+// title names the board (its heading and region); path is the API route that returns it, which the game is added to;
+// todayPath is today's (docs/milestones/M22-todays-board.md, answer 9), shown above This week.
+export function Leaderboard({ title, path, todayPath }: { title: string; path: string; todayPath: string }) {
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
+  const [today, setToday] = useState<TodayBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Today's own, so the week's answer arriving after a failed Today doesn't clear it (M22 review).
+  const [todayError, setTodayError] = useState<string | null>(null);
   const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
@@ -58,6 +62,7 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
   const countName = useId();
   // Switching games faster than the answers come back shows only the newest game's (M11 H6).
   const [latest] = useState(latestOnly);
+  const [latestToday] = useState(latestOnly);
   const places = game === SUBSTRINGS.id;
   const overall = game === OVERALL.id;
 
@@ -65,6 +70,10 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
     const url = `${path}${path.includes("?") ? "&" : "?"}game=${game}`;
     latest(api<Board | OverallBoard>(url, { method: "GET" }), (b) => (setBoard(b), setError(null)), (err) => setError(errorText(err)));
   }, [path, game, latest]);
+  useEffect(() => {
+    const url = `${todayPath}${todayPath.includes("?") ? "&" : "?"}game=${game}`;
+    latestToday(api<{ board: TodayBoard }>(url, { method: "GET" }), (r) => (setToday(r.board), setTodayError(null)), (err) => setTodayError(errorText(err)));
+  }, [todayPath, game, latestToday]);
 
   const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
   return (
@@ -75,6 +84,7 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
         value={game}
         onChange={(id) => {
           setBoard(null);
+          setToday(null);
           setGame(id);
         }}
       />
@@ -105,6 +115,15 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
           (docs/milestones/M15-15i-par-scores.md). */}
       {places && <p className={styles.note}>Each day adds your score out of 100. {PAR_POINTS.substrings.toLocaleString("en-US")} points is a full 100.</p>}
       {overall && <p className={styles.note}>{average ? "Your average score out of 100, per game played." : "Each day adds your score out of 100 in each game."}</p>}
+      {today && (
+        <section aria-label="Today" className={styles.week}>
+          <div className={kit.head}>
+            <h3>Today</h3>
+            <span className={kit.chip}>{dayText(today.date)}</span>
+          </div>
+          <TodayStandings board={today} game={game} average={average} />
+        </section>
+      )}
       {board && overall && (
         <>
           <OverallStandings label="This week" week={(board as OverallBoard).thisWeek} average={average} />
@@ -123,9 +142,13 @@ export function Leaderboard({ title, path }: { title: string; path: string }) {
         </Skeleton>
       )}
       {error && <p role="alert">{error}</p>}
+      {todayError && <p role="alert">{todayError}</p>}
     </section>
   );
 }
+
+// The card's periods, each by its name (M22, answer 3).
+const PERIODS = { today: "Today", yesterday: "Yesterday", week: "This week" } as const;
 
 // Today's one leaderboard card (docs/milestones/M14-14a-2a-today.md; L41): Yesterday or This week, for friends or one
 // of the player's groups, from the routes the boards already use, and for Offbeat, Fragments or Overall (M16 16f-6,
@@ -135,8 +158,10 @@ export function LeaderboardCard() {
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
   // null: the friends board.
   const [group, setGroup] = useState<string | null>(null);
-  const [period, setPeriod] = useState<"yesterday" | "week">("yesterday");
+  // Today on every load (M22, answer 3).
+  const [period, setPeriod] = useState<"today" | "yesterday" | "week">("today");
   const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
+  const [today, setToday] = useState<TodayBoard | null>(null);
   const [day, setDay] = useState<Day | null>(null);
   const [week, setWeek] = useState<Week | OverallWeek | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -146,10 +171,11 @@ export function LeaderboardCard() {
   const [latest] = useState(latestOnly);
   // A new choice clears the last one's rows and error, so they aren't shown under the new label while it loads, or
   // for good if it fails (docs/milestones/M14-14b-2c-review-items.md, item 13).
-  function choose(next: { period?: "yesterday" | "week"; group?: string | null; game?: (typeof GAMES)[number]["id"] }) {
+  function choose(next: { period?: "today" | "yesterday" | "week"; group?: string | null; game?: (typeof GAMES)[number]["id"] }) {
     if (next.period !== undefined) setPeriod(next.period);
     if (next.group !== undefined) setGroup(next.group);
     if (next.game !== undefined) setGame(next.game);
+    setToday(null);
     setDay(null);
     setWeek(null);
     setError(null);
@@ -163,28 +189,31 @@ export function LeaderboardCard() {
   }, []);
   useEffect(() => {
     const failed = (err: unknown) => setError(errorText(err));
-    if (period === "yesterday") {
+    if (period === "today") {
+      const path = `/api/leaderboard/today?game=${game}${group === null ? "" : `&group=${encodeURIComponent(group)}`}`;
+      latest(api<{ board: TodayBoard }>(path, { method: "GET" }), (r) => (setToday(r.board), setDay(null), setWeek(null), setError(null)), failed);
+    } else if (period === "yesterday") {
       const path = `/api/leaderboard/yesterday?game=${game}${group === null ? "" : `&group=${encodeURIComponent(group)}`}`;
-      latest(api<{ day: Day }>(path, { method: "GET" }), (r) => (setDay(r.day), setWeek(null), setError(null)), failed);
+      latest(api<{ day: Day }>(path, { method: "GET" }), (r) => (setDay(r.day), setToday(null), setWeek(null), setError(null)), failed);
     } else {
       const path = group === null ? `/api/leaderboard?game=${game}` : `/api/groups/leaderboard?id=${encodeURIComponent(group)}&game=${game}`;
-      latest(api<Board | OverallBoard>(path, { method: "GET" }), (r) => (setWeek(r.thisWeek), setDay(null), setError(null)), failed);
+      latest(api<Board | OverallBoard>(path, { method: "GET" }), (r) => (setWeek(r.thisWeek), setToday(null), setDay(null), setError(null)), failed);
     }
   }, [group, period, game, latest]);
 
-  const label = period === "yesterday" ? "Yesterday" : "This week";
+  const label = PERIODS[period];
   return (
     <section aria-label="Leaderboard" className={kit.card}>
       {/* Mockup 3's card: the heading with the day it shows as a chip (M14 14b-8b). */}
       <div className={kit.head}>
         <h2>Leaderboard</h2>
-        {(day || week) && <span className={kit.chip}>{day ? dayText(day.date) : `From ${dayText(week!.from)}`}</span>}
+        {(today || day || week) && <span className={kit.chip}>{today ? dayText(today.date) : day ? dayText(day.date) : `From ${dayText(week!.from)}`}</span>}
       </div>
       <div role="radiogroup" aria-label="Period" className={styles.switch}>
-        {(["yesterday", "week"] as const).map((p) => (
+        {(["today", "yesterday", "week"] as const).map((p) => (
           <label key={p} className={period === p ? `${styles.choice} ${styles.on}` : styles.choice}>
             <input type="radio" name="leaderboard-period" checked={period === p} onChange={() => choose({ period: p })} />
-            {p === "yesterday" ? "Yesterday" : "This week"}
+            {PERIODS[p]}
           </label>
         ))}
       </div>
@@ -202,9 +231,10 @@ export function LeaderboardCard() {
         </select>
       </label>
       <section aria-label={label}>
+        {today && <TodayStandings board={today} game={game} average={false} />}
         {day && <Entries entries={day.entries} places={game !== GAME.id} />}
         {week && <Entries entries={week.entries} places={game !== GAME.id} />}
-        {!day && !week && !error && (
+        {!today && !day && !week && !error && (
           <Skeleton label="Loading scores">
             <Line />
           </Skeleton>
@@ -213,6 +243,41 @@ export function LeaderboardCard() {
       {groupsError && <p role="alert">{groupsError}</p>}
       {error && <p role="alert">{error}</p>}
     </section>
+  );
+}
+
+// Today's board (docs/milestones/M22-todays-board.md): no board without today's day, the line that says what opens it
+// until the player has finished (answers 7 and 10), then the finished players ranked and the rest below, playing or not
+// played yet (answer 5). On Overall, average ranks by the Average, per game finished today, as the weekly Count does.
+function TodayStandings({ board, game, average }: { board: TodayBoard; game: (typeof GAMES)[number]["id"]; average: boolean }) {
+  const named = (id: string) => GAMES.find((g) => g.id === id)!.name;
+  // Claude's words for Overall and for a day with no game (M22, Design), the human's for a game (answer 10).
+  if (board.games.length === 0) return <p className={styles.note}>{game === OVERALL.id ? "No games today." : `No ${named(game)} today.`}</p>;
+  if (!board.open) {
+    const what = board.games.length === 2 ? "both of today's games" : `today's ${named(board.games[0])}`;
+    return <p className={styles.note}>Finish {what} to see today&apos;s board.</p>;
+  }
+  const entries =
+    game === OVERALL.id && average ? ranked((board.entries as OverallEntry[]).map((e) => ({ ...e, points: e.average })), (e) => e.points) : board.entries;
+  return (
+    <>
+      <Entries entries={entries} places={game !== GAME.id} />
+      {board.rest.length > 0 && (
+        <ul className={kit.rows}>
+          {board.rest.map((r) => (
+            <li key={r.username} className={r.you ? `${kit.row} ${kit.you} ${styles.entry}` : `${kit.row} ${styles.entry}`}>
+              <Avatar name={r.name} />
+              <span className={`${kit.grow} ${styles.name}`}>
+                {r.name}
+                {r.you && " (you)"}
+                <span className="sr-only">: </span>
+              </span>
+              <span>{r.state === "playing" ? "playing" : "not played yet"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 

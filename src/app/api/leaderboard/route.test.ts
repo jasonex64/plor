@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiRequest, cookieJar } from "@/test/request-scope";
 import { GET as leaderboard } from "./route";
+import { GET as today } from "./today/route";
 import { GET as yesterday } from "./yesterday/route";
 
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
@@ -16,10 +17,11 @@ beforeEach(() => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_unit_test");
 });
 
-describe("GET /api/leaderboard (M09 9b) and /api/leaderboard/yesterday (M11 11a)", () => {
+describe("GET /api/leaderboard (M09 9b), /api/leaderboard/yesterday (M11 11a) and /api/leaderboard/today (M22)", () => {
   it.each([
     ["GET /api/leaderboard", () => leaderboard(apiRequest("/api/leaderboard", { method: "GET" }))],
     ["GET /api/leaderboard/yesterday", () => yesterday(apiRequest("/api/leaderboard/yesterday", { method: "GET" }))],
+    ["GET /api/leaderboard/today", () => today(apiRequest("/api/leaderboard/today?game=offbeat", { method: "GET" }))],
   ])("%s refuses a signed-out player with 401 not_signed_in", async (_name, call) => {
     const response = await call();
     expect(response.status).toBe(401);
