@@ -19,6 +19,7 @@ import { Game } from "./game";
 import { SubstringsScreen } from "./substrings";
 import styles from "./offbeat.module.css";
 import { GAME } from "@/platform/game";
+import { BOT_CHECK_LOAD_MS } from "@/config/tunables";
 import { SIGN_IN_HREF } from "./sign-in-open";
 
 type TurnstileApi = {
@@ -42,6 +43,14 @@ export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" 
   const [gameDay, setGameDay] = useState(0);
   // The script's own failure to load is shown as the check being unavailable, when Start is next pressed.
   const failed = useRef(false);
+  // Starts pressed before the script has loaded, waiting for it to load or fail (docs/milestones/M21-faster-e2e.md,
+  // answers 12 to 14).
+  const waiting = useRef<(() => void)[]>([]);
+  const loadedOrFailed = useCallback(() => {
+    const starts = waiting.current;
+    waiting.current = [];
+    for (const start of starts) start();
+  }, []);
 
   // Each start attempt uses a fresh token: the widget is reset as each attempt ends, pass or fail.
   const settle = useCallback((end: (p: Pending) => void) => {
@@ -62,7 +71,8 @@ export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" 
       "error-callback": () => settle((p) => p.reject(new ApiError("captcha_failed", 0))),
       "timeout-callback": () => settle((p) => p.reject(new ApiError("captcha_failed", 0))),
     });
-  }, [siteKey, settle]);
+    loadedOrFailed();
+  }, [siteKey, settle, loadedOrFailed]);
 
   useEffect(() => {
     const mounted = container.current;
@@ -75,9 +85,23 @@ export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" 
   const botCheck = useCallback(
     () =>
       new Promise<string>((resolve, reject) => {
-        if (widget.current === null || failed.current) return reject(new ApiError("captcha_unavailable", 0));
-        pending.current = { resolve, reject };
-        turnstile()!.execute(widget.current);
+        const check = () => {
+          if (widget.current === null || failed.current) return reject(new ApiError("captcha_unavailable", 0));
+          pending.current = { resolve, reject };
+          turnstile()!.execute(widget.current);
+        };
+        if (widget.current !== null || failed.current) return check();
+        // Pressed before the script has loaded: the check runs once it has, or says it's unavailable once it fails or
+        // BOT_CHECK_LOAD_MS has passed, whichever comes first.
+        const start = () => {
+          clearTimeout(timer);
+          check();
+        };
+        const timer = setTimeout(() => {
+          waiting.current = waiting.current.filter((s) => s !== start);
+          check();
+        }, BOT_CHECK_LOAD_MS);
+        waiting.current.push(start);
       }),
     [],
   );
@@ -88,7 +112,11 @@ export function GuestGame({ siteKey, game }: { siteKey: string; game: "offbeat" 
 
   return (
     <div className={styles.screen}>
-      <Script src={SCRIPT} strategy="afterInteractive" onReady={ready} onError={() => (failed.current = true)} />
+      <Script src={SCRIPT} strategy="afterInteractive" onReady={ready} onError={() => {
+          failed.current = true;
+          loadedOrFailed();
+        }}
+      />
       <p className={styles.back} hidden={playing}>
         <ButtonLink href={SIGN_IN_HREF} transitionTypes={BACK}>
           Sign in

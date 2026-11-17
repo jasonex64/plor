@@ -230,3 +230,20 @@ test("the front page shows the sign-in form only at /?sign-in", async ({ page })
   await expect(page.getByLabel("Email")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toHaveCount(0);
 });
+
+// Start pressed before Cloudflare's script has loaded waits for it, up to BOT_CHECK_LOAD_MS, and then plays; it isn't
+// the check being down (docs/milestones/M21-faster-e2e.md, answers 12 to 14: seen on a built app, where the page can be
+// pressed before the script arrives). The script is held until Start has been pressed.
+test("a Start pressed before the bot check has loaded waits for it", async ({ page }) => {
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("https://challenges.cloudflare.com/turnstile/**", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("/play");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  release();
+  await asked(page, "Name an animal");
+  await expect(page.getByText("The check isn't working on our side right now.", { exact: false })).toHaveCount(0);
+});
