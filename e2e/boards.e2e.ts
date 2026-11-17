@@ -247,12 +247,12 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
   await card.getByText("Yesterday", { exact: true }).click();
   await expect(list("Yesterday")).toHaveText(names.map((n) => `${n}${n === `bve${RUN}` ? " (you)" : ""}: 0 points`));
 
-  // Fragments' and Overall's are places, a plain number, and the route is told the game.
-  for (const [game, id] of [[SUBSTRINGS.name, "substrings"], ["Overall", "overall"]] as const) {
+  // Fragments' are points too (issue #265), Overall's a plain number, and the route is told the game.
+  for (const [game, id, shown] of [[SUBSTRINGS.name, "substrings", "0 points"], ["Overall", "overall", "0"]] as const) {
     const asked = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/leaderboard/yesterday" && new URL(r.url()).searchParams.get("game") === id);
     await choices.getByText(game, { exact: true }).click();
     await asked;
-    await expect(list("Yesterday")).toHaveText(names.map((n) => `${n}${n === `bve${RUN}` ? " (you)" : ""}: 0`));
+    await expect(list("Yesterday")).toHaveText(names.map((n) => `${n}${n === `bve${RUN}` ? " (you)" : ""}: ${shown}`));
   }
   // The week follows the game too.
   const week = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/leaderboard" && new URL(r.url()).searchParams.get("game") === "overall");

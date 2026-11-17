@@ -2,9 +2,14 @@
 
 Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It holds only what isn't in ROADMAP.md or the tickets. Older notes are in git (`git log -p docs/HANDOFF.md`); this file was cut down on 2026-11-11 (audit W10).
 
-**Updated last:** 2026-11-17, evening, on `fix-long-status-wraps` (slot 1, `C:/Users/jason/RIFF`), by the session that widened M20 and built 20a. **This file is the newest handoff.**
+**Updated last:** 2026-11-17, late evening, on `fix-fragments-raw-points` (slot 1, `C:/Users/jason/RIFF`), by a session that filed the human's second batch of inbox items and fixed one. **This file is the newest handoff.**
 
-**This session (2026-11-17):**
+**Latest (2026-11-17, late evening):**
+- **Inbox:** nine new items are issues #262 to #270. #262 (tap a name to open a profile) is closed into M20's 20e. #263 to #270 stay in the inbox, unsorted: the default group page with favourite groups, favourite friends, the feed's "loading more" motion, too much information (show or hide details), the top three standing out, posting like X, and the reaction ⋯ shown on hover. #265 is the urgent one and is fixed here.
+- **#265, each game's own board in raw points:** branch `fix-fragments-raw-points`, PR open. Fragments' weekly, graph, yesterday's and today's boards add up points. The overall board keeps par scores for both games. The "score out of 100" note is gone from Fragments' board. No migration. The db board tests pass (42). The changed e2e in `e2e/play2.e2e.ts` was **not run locally**, because another slot held the machine's e2e run; CI runs it. The reviewer found nothing blocking; one doc item went to ROADMAP, For M15. **Next:** merge the PR on green checks when the human says. Merging it publishes to plor.app: Fragments' boards show points in place of scores out of 100. Then `npm run slots -- free 1` and delete the branch.
+- #259 is merged; slot 1 was free and is now taken by this branch.
+
+**Earlier, 2026-11-17 (evening, the session that widened M20 and built 20a):**
 - **The inbox:** the human's twelve items are issues #243 to #254. #243, #244, #245, #248 and #249 are closed into M20 (sub-tickets 20a, 20h to 20k); #246, #247 and #250 are closed as quick fixes; **#251 to #254 stay in the inbox, unsorted** (Offbeat approval edits, adding an answer to the pool, Fragments' letter points, free replays). #231 and #232 stay ("Ticket after beta").
 - **M20 widened and approved** ("yes, let's just get started on M20"): answers 13 to 28 (personality by colour, size and motion; "a calm frame, loud moments"; three looks judged on `/admin/kit`), 29 to 33 Claude's overnight decisions. **Opus for M20 except the logo** (answer 16; the human was out of Fable): 20g waits for Fable.
 - **20a is merged** (#258, by the human, 2026-11-17): the rule book, the hover rule once in the kit, `/admin/kit` with the moments in four looks and the motion menu. **Waits on the human:** pick a look and timings on `/admin/kit` (20k), and answer what's for the human in the M20 ticket's "The look audit". The M20 branch can be deleted once nothing more is built on it; 20b onwards continue on `m20-design-rules-and-clean-up` (slot 2).

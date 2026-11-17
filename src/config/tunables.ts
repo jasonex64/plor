@@ -216,8 +216,8 @@ export const SUBSTRING_WORD_POINTS = { at: 3, points: 20, growth: 1.25 } as cons
 export const SUBSTRING_LETTERS_POINTS = { at: 18, points: 350, growth: 1.15 } as const;
 export const SUBSTRING_BONUS_LETTER_POINTS = 120;
 
-// A game's par, by its permanent ID: the day's points that count as a full 100 on Fragments' boards and the overall
-// one (docs/milestones/M15-15i-par-scores.md; human, 2026-11-15: Offbeat "1,250: perfect plus half the bonus", Fragments
+// A game's par, by its permanent ID: the day's points that count as a full 100 on the overall board
+// (docs/milestones/M15-15i-par-scores.md; each game's own board is in points since issue #265; human, 2026-11-15: Offbeat "1,250: perfect plus half the bonus", Fragments
 // "1,500"). A new game joins the overall board by naming its par. The human reviews them after the beta's first week
 // (answer 7); boards work the score out on each read, so a changed par rescores past days (answer 8).
 export const PAR_POINTS = { offbeat: 1250, substrings: 1500 } as const;

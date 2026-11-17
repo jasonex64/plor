@@ -11,10 +11,11 @@
 // doesn't list them, the viewer included (M19 19c). Each week
 // also gives every player's points on each of its days that are over, for the graph view
 // (docs/milestones/M14-14b-14-leaderboard-graph.md). Each board is one game's (M16 16e-2,
-// docs/milestones/M16-16e-points-and-boards.md): game 1's adds up points, and game 2's each day's par score, the day's
-// points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), counted from the day's midnight
-// like game 1's points (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up both games' par
-// scores and averages them over the game-days played.
+// docs/milestones/M16-16e-points-and-boards.md): each adds up its game's points (the human, 2026-11-17, issue #265:
+// "each individual game leaderboard should just be the raw points"), game 2's counted from the day's midnight like game
+// 1's (16e, answer 21). The overall board (16e-3b, answers 2, 29 to 33) adds up both games' par scores, each day's
+// points against the game's par, out of 100 (docs/milestones/M15-15i-par-scores.md), and averages them over the
+// game-days played.
 import { PAR_POINTS } from "@/config/tunables";
 import type { ApprovedPuzzle } from "@/content/puzzle";
 import { GAME_ID, OVERALL, SUBSTRINGS_ID } from "@/platform/game";
@@ -88,7 +89,7 @@ function daysFrom(from: string, day: string): number {
 // joined is the puzzle day the account was made.
 type Row = { user_id: string; username: string; name: string; joined: string; days: Record<string, number> };
 
-// A player's points from (included) to (excluded). Game 2's are par scores with one decimal, so the sum keeps one.
+// A player's points from (included) to (excluded).
 function total(row: Row, from: string, to: string): number {
   return scoreTotal(inWeek(row, from, to));
 }
@@ -113,8 +114,8 @@ export async function getGroupLeaderboard(db: Db, viewerId: string, groupId: str
 
 // Yesterday's standings, a closed day's, so final (M09 D9), for the game card (docs/milestones/M11-home-screen.md, H7):
 // the viewer and their friends, or the members of one of the viewer's groups (a non-member gets the group page's 404).
-// The card names its game as the weekly boards do (M16 16f-6, answer 20): Offbeat's points, Fragments' par scores, or
-// both games' par scores added up.
+// The card names its game as the weekly boards do (M16 16f-6, answer 20): that game's points, or both games' par scores
+// added up.
 export async function getYesterdayBoard(db: Db, viewerId: string, groupId: string | null, game: BoardChoice): Promise<Day> {
   const circle =
     groupId === null
@@ -170,8 +171,8 @@ export async function getTodayBoard(db: Db, viewerId: string, groupId: string | 
     const points = g === GAME_ID ? await offbeatToday(db, days.find((d) => d.game_id === g)!.content, finished) : await runTotals(db, finished, finished.map(() => circle.today));
     for (const id of finished) {
       const score = g === GAME_ID ? points.get(id)! : points.get(`${id}:${circle.today}`)!;
-      // Shown as the boards show each game (M15 15i): Offbeat's own board in points, every other as par scores.
-      scores.set(id, [...(scores.get(id) ?? []), game === GAME_ID ? score : parScore(score, PAR_POINTS[g])]);
+      // Shown as the boards show each game: a game's own board in points (issue #265), Overall as par scores (M15 15i).
+      scores.set(id, [...(scores.get(id) ?? []), game === OVERALL.id ? parScore(score, PAR_POINTS[g]) : score]);
     }
   }
   const finishedRows = people.filter((p) => scores.has(p.user_id));
@@ -263,7 +264,7 @@ async function weeklyBoard(
 }
 
 // A game's rows for a board, from (included) to (excluded), and the days the viewer is still playing, which hold
-// nothing. Game 1's are points, game 2's par scores.
+// nothing.
 async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[], groupId: string | null, from: string, to: string) {
   if (game === GAME_ID) {
     await settleRuns(db);
@@ -272,14 +273,15 @@ async function gameRows(db: Db, game: BoardGame, viewerId: string, ids: string[]
   }
   // A game 2 run stops at midnight, so no closed day waits on the viewer's own run.
   await settleSubstringRuns(db);
-  return { rows: parScores(game, await ledger(db, game, ids, groupId, from, to, [])), skip: [] };
+  return { rows: await ledger(db, game, ids, groupId, from, to, []), skip: [] };
 }
 
-// Both games' rows for an overall board, from (included) to (excluded): game 1's turned into par scores, as game 2's
-// are. Game 1's leave out the days the viewer is still playing, game 2's count (answer 32).
+// Both games' rows for an overall board, from (included) to (excluded), each turned into par scores. Game 1's leave out
+// the days the viewer is still playing, game 2's count (answer 32).
 async function bothGames(db: Db, viewerId: string, ids: string[], groupId: string | null, from: string, to: string): Promise<[Row[], Row[]]> {
   const first = await gameRows(db, GAME_ID, viewerId, ids, groupId, from, to);
-  return [parScores(GAME_ID, first.rows), (await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to)).rows];
+  const second = await gameRows(db, SUBSTRINGS_ID, viewerId, ids, groupId, from, to);
+  return [parScores(GAME_ID, first.rows), parScores(SUBSTRINGS_ID, second.rows)];
 }
 
 // Each player on an overall board with the par scores of both games they hold on the days from (included) to (excluded).
