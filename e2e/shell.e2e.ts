@@ -52,12 +52,25 @@ const sections = (page: Page) =>
     .locator("main section")
     .evaluateAll((all) => all.filter((s) => s.checkVisibility() && !s.parentElement?.closest("section")).map((s) => s.getAttribute("aria-label")));
 
+// The width a bar fixed to both edges of the window gets (the shell's bars and the right column are fixed).
+const fixedWidth = (page: Page) =>
+  page.evaluate(() => {
+    const probe = document.createElement("div");
+    probe.style.cssText = "position: fixed; left: 0; right: 0; top: 0; height: 1px";
+    document.body.append(probe);
+    const width = probe.getBoundingClientRect().width;
+    probe.remove();
+    return width;
+  });
+
 test("a phone gets a bottom tab bar, and each tab holds its sections", async ({ browser }) => {
   const { page, requests, nav } = await player(browser, "sa", { width: 360, height: 800 });
   await expect(nav.getByRole("link")).toHaveText(TABS.map((t) => t.name));
-  // Along the bottom edge and the full width: a tab bar, not a sidebar.
+  // Along the bottom edge and the full width: a tab bar, not a sidebar. The full width is what a bar fixed to both edges
+  // gets: the window's, less the scrollbar's room the page keeps (M20 answer 43), which Chromium keeps for fixed bars
+  // here though it hides its scrollbars.
   const box = (await nav.boundingBox())!;
-  expect([box.x, box.width, box.y + box.height]).toEqual([0, 360, 800]);
+  expect([box.x, box.width, box.y + box.height]).toEqual([0, await fixedWidth(page), 800]);
   for (const tab of TABS) {
     await nav.getByRole("link", { name: tab.name }).click();
     await expect(page).toHaveURL(tab.path);
@@ -330,11 +343,13 @@ test("the sidebar is 280px, the right column holds the feed from 1200px, and no 
   await expect(page).toHaveURL("/me");
   const feed = page.getByRole("complementary", { name: "Friends feed" });
   await expect(feed.getByRole("region", { name: "Feed" })).toBeVisible();
-  expect(await feed.boundingBox()).toEqual({ x: 1080, y: 0, width: 360, height: 900 });
+  // At the right edge of what a fixed bar gets, less the scrollbar's room the page keeps (M20 answer 43).
+  const room = await fixedWidth(page);
+  expect(await feed.boundingBox()).toEqual({ x: room - 360, y: 0, width: 360, height: 900 });
   expect(await feed.evaluate((el) => getComputedStyle(el).borderLeftWidth)).toBe("1px");
   // The page's own content stops at the column.
   const main = (await page.locator("main").filter({ visible: true }).boundingBox())!;
-  expect(main.x + main.width).toBeLessThanOrEqual(1080);
+  expect(main.x + main.width).toBeLessThanOrEqual(room - 360);
   await expect(page.locator("footer").filter({ visible: true })).toHaveCount(0);
 
   for (const tab of TABS) {
