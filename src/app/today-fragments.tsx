@@ -7,13 +7,15 @@
 import type { SubstringRun } from "@/game/substring-state";
 import { SUBSTRINGS } from "@/platform/game";
 import { ButtonLink } from "./button-link";
-import { Banner, Facts, pointsText } from "./game";
+import { Banner, Facts, pointsText, ResetCountdown } from "./game";
 import styles from "./game.module.css";
 import { GAME_2_STEPS, HowToPlay } from "./how-to-play";
 import kit from "./kit.module.css";
 import { FORWARD } from "./slide";
 
-export function FragmentsBanner({ run }: { run: SubstringRun }) {
+// msToReset: the time to the next reset, which Fragments' state doesn't carry; Offbeat's does (src/app/today-cards.tsx), and the
+// reset is the one for both games.
+export function FragmentsBanner({ run, msToReset }: { run: SubstringRun; msToReset: number }) {
   return (
     <Banner date={run.date} game={SUBSTRINGS}>
       {run.status === "not_started" && (
@@ -39,6 +41,7 @@ export function FragmentsBanner({ run }: { run: SubstringRun }) {
           <ButtonLink href={SUBSTRINGS.path} transitionTypes={FORWARD} className={`${kit.primary} ${styles.play}`}>
             Result
           </ButtonLink>
+          <ResetCountdown label="Next puzzle in" msToReset={msToReset} />
         </>
       )}
     </Banner>

@@ -56,6 +56,7 @@
 }
 
 .slide {
+  display: flex;
   flex: 0 0 82%;
   min-width: 0;
   scroll-snap-align: start;
@@ -69,4 +70,16 @@
 
 .wide .slide {
   flex: none;
+}
+
+/* The cards are one height whatever they hold (inbox #246; human, 2026-11-17: "the same content"): the slide, its section
+   and the banner each fill the row the taller card sets. */
+.slide > section {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.slide > section > * {
+  flex: 1;
 }
