@@ -1,6 +1,6 @@
 # M22 — Today's board
 
-**Status:** in review: approved 2026-11-17 (the human: "approve and lets make it so that ppl who playtest can see it rn"), so 22a is merged as soon as its checks are green. One sub-ticket, 22a, one PR.
+**Status:** done: approved 2026-11-17 (the human: "approve and lets make it so that ppl who playtest can see it rn"); 22a merged in PR #241 (`3c1afd9`, 2026-11-17, every check green, the human's "Yes, auto-merge") and live on plor.app.
 
 ## Goal
 A player sees today's scores on the leaderboards as soon as their own run of that game is over, instead of the morning after.
@@ -47,7 +47,7 @@ A player sees today's scores on the leaderboards as soon as their own run of tha
 - [x] **22a** Signed out gets 401; a non-member asking for a group gets 404; a game with no approved day says so. Route and db tests.
 - [x] **22a** The ledger is untouched: reading today's board writes no `points_ledger` row for today. Db test.
 - [x] **22a** Today's card opens on Today and shows the "finish to see" line before the player's run is over and the ranked board after it; the Friends tab's board shows the Today section above This week. Targeted e2e.
-- [ ] **22a** `npx tsc --noEmit -p .`, `npm run lint` and `npm test` pass; CI's checks are green. (Local: done; CI: on the PR.)
+- [x] **22a** `npx tsc --noEmit -p .`, `npm run lint` and `npm test` pass; CI's checks are green.
 - [x] **22a** DESIGN.md describes the Today choice and section.
 
 ## Out of scope
@@ -84,6 +84,8 @@ Nothing yet: this adds a route and a board section. Anything the change makes un
 - Signed out: `npm test` (2026-11-17): `Test Files  71 passed (71)`, `Tests  822 passed (822)`, including `GET /api/leaderboard/today refuses a signed-out player with 401`.
 - `npx tsc --noEmit -p .`: no output. `npx eslint` on every changed file: exit 0 (`npm run lint`'s 188 warnings are all in `.claude/` and `.github/` skill scripts, none in this change).
 - E2e, `npm run test:e2e -- e2e/boards.e2e.ts e2e/live-board.e2e.ts e2e/today.e2e.ts e2e/alive.e2e.ts e2e/calm.e2e.ts`: `1 failed, 23 passed (3.8m)`. The failure was "the reset reloads every section of Today" still waiting for the card's Yesterday read; it now waits for Today's. Rerun of `e2e/live-board.e2e.ts e2e/boards.e2e.ts`: `14 passed (1.6m)`, including "today's board opens once the viewer has finished, on Today's card and the Friends tab" and the card's closed lines for Offbeat, Fragments and Overall.
+
+- CI on PR #241 (`gh pr checks 241`, 2026-11-17): check, db, e2e, secrets, Vercel and Vercel Preview Comments all `pass`. After the merge, Vercel's status on `3c1afd9`: "Deployment has completed"; `GET https://plor.app/api/leaderboard/today?game=offbeat` without the app's headers answers 409 where it answered 404 before the deploy (the route is there). Not checked: the board signed in on plor.app.
 
 ## Review
 - The `reviewer` agent (fresh context, 2026-11-17) found no leak, the Offbeat score equal to `buildState`'s, Overall and the group 404 right. Blocking findings and how each was fixed: the Friends and group boards shared one error between today's read and the week's, so the week's answer could clear a failed Today silently: Today has its own error line now (`leaderboard.tsx`, `todayError`); this ticket's Evidence and Review, and `docs/HANDOFF.md`, were not written yet: written.
