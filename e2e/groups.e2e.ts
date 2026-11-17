@@ -63,8 +63,13 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await signInAndPick(joiner, "gb");
   await joiner.getByRole("button", { name: "Join group" }).click();
   await expect(joiner).toHaveURL(groupUrl);
-  const members = joiner.getByRole("region", { name: "Group", exact: true }).getByRole("listitem");
+  const members = joiner.getByRole("region", { name: "Members", exact: true }).getByRole("listitem");
   await expect(members).toHaveText([`ga${RUN} (creator)`, `gb${RUN}`]);
+  // The page's order is the board, then the comments, then the members (inbox #247; human, 2026-11-17: "Board, comments, members").
+  const top = async (name: string) => (await joiner.getByRole("heading", { name, exact: true }).boundingBox())!.y;
+  const [boardY, commentsY, membersY] = [await top("Group leaderboard"), await top("Comments"), await top("Members")];
+  expect(boardY).toBeLessThan(commentsY);
+  expect(commentsY).toBeLessThan(membersY);
   // Neither has points this week: a tie, by name, with the viewer marked (10c).
   const board = joiner.getByRole("region", { name: "Group leaderboard" }).getByRole("region", { name: "This week" });
   await expect(board.getByRole("listitem")).toHaveText([`ga${RUN}: 0 points`, `gb${RUN} (you): 0 points`]);
