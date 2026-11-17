@@ -176,7 +176,7 @@ test("Share copies on a computer and opens the share sheet on a phone", async ({
   const computer = await (await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] })).newPage();
   await computer.addInitScript(stubShare);
   await computer.goto("/groups");
-  await signInAndPick(computer, "sc");
+  await signInAndPick(computer, "shc");
   await computer.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Desk Set");
   await computer.getByRole("button", { name: "Create group" }).click();
   const link = await sharedLink(computer, computer.getByRole("button", { name: "Share group link" }));
@@ -186,7 +186,7 @@ test("Share copies on a computer and opens the share sheet on a phone", async ({
   const phone = await (await browser.newContext({ ...devices["Pixel 7"] })).newPage();
   await phone.addInitScript(stubShare);
   await phone.goto("/groups");
-  await signInAndPick(phone, "sp");
+  await signInAndPick(phone, "shp");
   await phone.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Pocket Set");
   await phone.getByRole("button", { name: "Create group" }).click();
   await phone.getByRole("button", { name: "Share group link" }).click();
