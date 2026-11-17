@@ -592,7 +592,7 @@ const NOTHING = () => {};
 
 // Time to the next reset at midnight Pacific, from the server's next reset (ROADMAP item from the M00 review). label
 // says what comes then: the next puzzle after a run, only a new day when today has none, since tomorrow may not either.
-function ResetCountdown({ label, msToReset }: { label: string; msToReset: number }) {
+export function ResetCountdown({ label, msToReset }: { label: string; msToReset: number }) {
   const total = Math.ceil(useCountdown(msToReset, NOTHING) / 1000);
   const two = (n: number) => String(n).padStart(2, "0");
   return (
