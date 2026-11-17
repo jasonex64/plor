@@ -60,7 +60,7 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await openBoard(watcher);
   // The plain list of friends, not the lists inside "where everyone ended".
   const row = watcher.getByRole("region", { name: "Friends today" }).locator(":scope > ul > li").filter({ hasText: playerName });
-  await expect(row).toHaveText(`${playerName}: hasn't played yet`);
+  await expect(row).toHaveText(`${playerName}: Not yet`);
 
   // The player starts and is caught on question 1; the watcher's page shows the start without a reload, and the
   // watcher, who hasn't played, sees nothing more: not the question, not that the run is over (12d).
@@ -111,18 +111,24 @@ test("a friend's run shows up live, with no spoiler", async ({ browser }) => {
   await expect(row).toHaveText(`${playerName}: caught on question 1 by "${hostAnswer}"`);
   await expect(more).toBeVisible();
   // On a phone the ⋯ sits beside the name and how the run stands, not over them (reactions did: 14b-8's critique;
-  // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e).
+  // docs/milestones/M14-14b-8-the-new-look.md, 14b-8e). Since inbox #250 the order is the name, the ⋯, then the status chip at
+  // the row's right edge, so the chips end at one edge whether or not a row has a ⋯.
   // Measured once the row has laid out again at the new width: straight after the resize it can still be the old one
   // (it failed twice that way, in PR #149's and #152's CI).
   await watcher.setViewportSize({ width: 390, height: 844 });
-  for (const words of [row.locator("b"), row.getByText(/^caught on/)]) {
-    await expect
-      .poll(async () => {
-        const [dots, box] = [(await more.boundingBox())!, (await words.boundingBox())!];
-        return dots.x - (box.x + box.width);
-      })
-      .toBeGreaterThanOrEqual(0);
-  }
+  const chip = row.getByText(/^caught on/);
+  await expect
+    .poll(async () => {
+      const [dots, name] = [(await more.boundingBox())!, (await row.locator("b").boundingBox())!];
+      return dots.x - (name.x + name.width);
+    })
+    .toBeGreaterThanOrEqual(0);
+  await expect
+    .poll(async () => {
+      const [dots, box] = [(await more.boundingBox())!, (await chip.boundingBox())!];
+      return box.x - (dots.x + dots.width);
+    })
+    .toBeGreaterThanOrEqual(0);
   // Each row opens by a 44px summary, at both widths (docs/milestones/M14-14b-23-small-jumps-and-finds.md, answer 4).
   const place = watcher.getByRole("region", { name: "Where everyone ended" }).locator("details");
   expect((await place.locator("summary").boundingBox())!.height).toBeGreaterThanOrEqual(44);
