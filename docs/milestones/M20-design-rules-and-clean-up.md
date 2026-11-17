@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is being built overnight (the `goodnight` skill); 20d left M20 for the quick fix of inbox #250 (answer 22).
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is built, in PR #258 (overnight, the `goodnight` skill), waiting for the human to merge; 20d left M20 for the quick fix of inbox #250 (answer 22).
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
