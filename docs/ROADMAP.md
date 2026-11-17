@@ -194,6 +194,12 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] A tab left open across 16f-1's publish gets a 400 if it flips the removed switch, until it reloads. Found in M16 16f-1 (review).
 - [ ] Replies to a comment, tucked under it behind a count (M16, 16f answers 28 and 32: left out of 16f, "Leave replies out"): a new feature, after the beta.
 
+**For M22**
+- [ ] Today's Leaderboard card has no Count switch, so its Overall Today is Sum only (the Friends and group boards follow Count). As the ticket says; ask the human if Average is wanted there. Found in M22 22a (review).
+- [ ] `getTodayBoard` (`src/friends/leaderboard.ts`) reads Offbeat's pooled counts on every open of the card, uncached; fine at beta scale, measure before launch. Found in M22 22a (review).
+- [ ] No test of a failed today's read on the Friends or group board (the Today error line). Found in M22 22a (review).
+- [ ] `docs/DESIGN.md`'s `leaderboard.tsx:157-173` (Show table) and `leaderboard.tsx:170` (the Monday note) already pointed at the wrong lines on `main` before M22 (they are now around `:285-308` and `:305`). Found in M22 22a.
+
 **For M21**
 - [ ] `e2e/leaderboard-graph.e2e.ts:127` may race as `boards.e2e.ts:223` did: `withFriends` signs in, then dates accounts back and adds friends and points, and the test reads the board with no reload; passed locally and on CI on the built app. Found in M21 21a (review, 2026-11-16).
 - [ ] `e2e/player-screens.e2e.ts:158` ("the banner's Result opens the game screen at the result") was flaky on CI on the built app (`toHaveURL`); passed 3 of 3 locally. Found in M21 21a (build, 2026-11-16).

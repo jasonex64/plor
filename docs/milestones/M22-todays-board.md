@@ -41,14 +41,14 @@ A player sees today's scores on the leaderboards as soon as their own run of tha
 - `docs/SOURCES.md`: Next.js 16.4 (route handlers; read in `node_modules/next/dist/docs/` before writing the route), PostgreSQL 17 (queries), Vitest, Playwright.
 
 ## Acceptance criteria
-- [ ] **22a** The route returns no score and no player's state to a viewer who hasn't finished that game today (Overall: both games), for friends and for a group. Db test.
-- [ ] **22a** Once the viewer has finished: finished players ranked by score, ties by name, then the rest by name as "playing" or "not played yet". An Offbeat player's score equals the result screen's `points + bonus` for the same run (`buildState`); a Fragments player's equals `parScore(runTotals)`. Db tests.
-- [ ] **22a** Overall opens only after both of today's games are finished, and a player who's finished one is ranked with that game's par score. Db test.
-- [ ] **22a** Signed out gets 401; a non-member asking for a group gets 404; a game with no approved day says so. Route and db tests.
-- [ ] **22a** The ledger is untouched: reading today's board writes no `points_ledger` row for today. Db test.
-- [ ] **22a** Today's card opens on Today and shows the "finish to see" line before the player's run is over and the ranked board after it; the Friends tab's board shows the Today section above This week. Targeted e2e.
-- [ ] **22a** `npx tsc --noEmit -p .`, `npm run lint` and `npm test` pass; CI's checks are green.
-- [ ] **22a** DESIGN.md describes the Today choice and section.
+- [x] **22a** The route returns no score and no player's state to a viewer who hasn't finished that game today (Overall: both games), for friends and for a group. Db test.
+- [x] **22a** Once the viewer has finished: finished players ranked by score, ties by name, then the rest by name as "playing" or "not played yet". An Offbeat player's score equals the result screen's `points + bonus` for the same run (`buildState`); a Fragments player's equals `parScore(runTotals)`. Db tests.
+- [x] **22a** Overall opens only after both of today's games are finished, and a player who's finished one is ranked with that game's par score. Db test.
+- [x] **22a** Signed out gets 401; a non-member asking for a group gets 404; a game with no approved day says so. Route and db tests.
+- [x] **22a** The ledger is untouched: reading today's board writes no `points_ledger` row for today. Db test.
+- [x] **22a** Today's card opens on Today and shows the "finish to see" line before the player's run is over and the ranked board after it; the Friends tab's board shows the Today section above This week. Targeted e2e.
+- [ ] **22a** `npx tsc --noEmit -p .`, `npm run lint` and `npm test` pass; CI's checks are green. (Local: done; CI: on the PR.)
+- [x] **22a** DESIGN.md describes the Today choice and section.
 
 ## Out of scope
 - Live updates (answer 8); adding today to the weekly totals (answer 3); Today's page on phones (answer 9).
@@ -75,9 +75,16 @@ Nothing yet: this adds a route and a board section. Anything the change makes un
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| M09 D9/D10: a day's points reach the boards once it closes at midnight | Today's board shows today's scores before midnight, read from runs; the ledger, the weekly totals and Yesterday still wait for midnight | The human's answers 1 to 3, 2026-11-17; DECISIONS.md, Log, 2026-11-17 |
+| Design: "No Offbeat today." for a game with no day | Also "No games today." on Overall when neither game has a day | Overall needed a line too; Claude's words, like the Overall "finish" line |
+| Design: the Friends and group boards show Today above This week | As designed; a failed today's read shows its own error line | Review: one shared error let the week's answer clear today's |
 
 ## Evidence
+- Db tests, `npm run test:db -- -t "today's board"` (2026-11-17): `Tests  8 passed | 512 skipped (520)`. They cover the closed board for friends and a group, ranking with each Offbeat score equal to the answer route's `points + bonus`, the rest's "playing" and "not played yet", a stranger never listed, a group's members and a non-member's 404, Fragments' par scores, Overall after both with a one-game player's par score and the Average, no day today, and no ledger row written. The whole db suite ran once by mistake (a file filter is ignored): `Test Files  1 failed | 65 passed`, the one being this file before its typed-answer fix.
+- Signed out: `npm test` (2026-11-17): `Test Files  71 passed (71)`, `Tests  822 passed (822)`, including `GET /api/leaderboard/today refuses a signed-out player with 401`.
+- `npx tsc --noEmit -p .`: no output. `npx eslint` on every changed file: exit 0 (`npm run lint`'s 188 warnings are all in `.claude/` and `.github/` skill scripts, none in this change).
+- E2e, `npm run test:e2e -- e2e/boards.e2e.ts e2e/live-board.e2e.ts e2e/today.e2e.ts e2e/alive.e2e.ts e2e/calm.e2e.ts`: `1 failed, 23 passed (3.8m)`. The failure was "the reset reloads every section of Today" still waiting for the card's Yesterday read; it now waits for Today's. Rerun of `e2e/live-board.e2e.ts e2e/boards.e2e.ts`: `14 passed (1.6m)`, including "today's board opens once the viewer has finished, on Today's card and the Friends tab" and the card's closed lines for Offbeat, Fragments and Overall.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+- The `reviewer` agent (fresh context, 2026-11-17) found no leak, the Offbeat score equal to `buildState`'s, Overall and the group 404 right. Blocking findings and how each was fixed: the Friends and group boards shared one error between today's read and the week's, so the week's answer could clear a failed Today silently: Today has its own error line now (`leaderboard.tsx`, `todayError`); this ticket's Evidence and Review, and `docs/HANDOFF.md`, were not written yet: written.
+- Deferred to ROADMAP "Next revision" (For M22): the card's Overall Today is Sum only; the uncached pooled-counts read per card open; no test of a failed today's read; two DESIGN.md citations into `leaderboard.tsx` already stale on `main`.

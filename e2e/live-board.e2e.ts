@@ -303,7 +303,7 @@ test("the reset reloads every section of Today", async ({ browser }) => {
   await signInAndPick(page, "m");
   await openBoard(page, "/");
   await expect(page.getByRole("region", { name: "Feed" }).getByText("No comments yet.")).toBeVisible();
-  const reloads = ["/api/run", "/api/feed/items", "/api/leaderboard/yesterday"].map((path) =>
+  const reloads = ["/api/run", "/api/feed/items", "/api/leaderboard/today"].map((path) =>
     page.waitForRequest((r) => new URL(r.url()).pathname === path),
   );
   await page.clock.fastForward("25:00:00");

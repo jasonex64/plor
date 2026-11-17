@@ -50,6 +50,8 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
   const [board, setBoard] = useState<Board | OverallBoard | null>(null);
   const [today, setToday] = useState<TodayBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Today's own, so the week's answer arriving after a failed Today doesn't clear it (M22 review).
+  const [todayError, setTodayError] = useState<string | null>(null);
   const [game, setGame] = useState<(typeof GAMES)[number]["id"]>(GAME.id);
   // List on every load (answer 3); the player found, by username, the same in both weeks (answer 18).
   const [graph, setGraph] = useState(false);
@@ -70,7 +72,7 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
   }, [path, game, latest]);
   useEffect(() => {
     const url = `${todayPath}${todayPath.includes("?") ? "&" : "?"}game=${game}`;
-    latestToday(api<{ board: TodayBoard }>(url, { method: "GET" }), (r) => setToday(r.board), (err) => setError(errorText(err)));
+    latestToday(api<{ board: TodayBoard }>(url, { method: "GET" }), (r) => (setToday(r.board), setTodayError(null)), (err) => setTodayError(errorText(err)));
   }, [todayPath, game, latestToday]);
 
   const others = board ? board.thisWeek.entries.filter((e) => !e.you).map((e) => ({ key: e.username, name: e.name })) : [];
@@ -140,6 +142,7 @@ export function Leaderboard({ title, path, todayPath }: { title: string; path: s
         </Skeleton>
       )}
       {error && <p role="alert">{error}</p>}
+      {todayError && <p role="alert">{todayError}</p>}
     </section>
   );
 }
