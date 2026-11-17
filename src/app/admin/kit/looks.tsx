@@ -22,12 +22,12 @@ const LOOKS: Look[] = [
   {
     name: "Balanced",
     key: "balanced",
-    about: "Game cards and results get a band in their game's colour; scores larger; board rows carry their game's edge; your row an accent edge.",
+    about: "Game cards and results get a band in their game's colour; scores larger; board rows carry their game's edge and only a hairline border; your row an accent edge.",
   },
   {
     name: "Bold",
     key: "bold",
-    about: "Game cards and results filled with their game's colour; scores at the largest size in use; results in the feed filled too.",
+    about: "Game cards and results filled with their game's colour; scores at the largest size in use; results in the feed filled too; rows with a hairline border.",
   },
 ];
 

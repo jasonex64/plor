@@ -100,6 +100,12 @@
   box-shadow: inset 4px 0 0 var(--game);
 }
 
+/* Balanced and Bold: one border level for the frame (the look audit's second finding): rows keep only a hairline in
+   the theme's --line, and a comment has no box, so the card's ink edge is the one strong line. */
+:is(.balanced, .bold) .boardRow {
+  border-color: var(--line);
+}
+
 /* Your own row: an accent edge in every proposal (answer 21). After the game edge, so it wins. */
 :is(.restrained, .balanced, .bold) .boardRow.you {
   box-shadow: inset 4px 0 0 var(--accent);

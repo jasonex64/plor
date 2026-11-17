@@ -40,7 +40,7 @@ test("the admin area sits in the shell, with grouped sub-tabs and what needs the
 
   const tabs = page.getByRole("navigation", { name: "Admin" });
   await expect(tabs.getByRole("group", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
-  await expect(tabs.getByRole("group", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database"]);
+  await expect(tabs.getByRole("group", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database", "Kit"]);
   await expect(tabs.getByRole("link", { name: /^Puzzles/ })).toHaveAttribute("aria-current", "page");
 
   const needs = page.getByRole("complementary", { name: "What needs you" });
@@ -84,7 +84,7 @@ test("on a phone the admin pages are one menu in the sub-tabs' order", async ({ 
   expect(await cell.evaluate((td) => [td.getAttribute("data-label"), getComputedStyle(td, "::before").content])).toEqual(["Category", expect.stringContaining("Category")]);
   await button.click();
   await expect(menu.getByRole("list", { name: "To do" }).getByRole("link")).toHaveText([/^Puzzles/, /^Audit/, /^Reports/]);
-  await expect(menu.getByRole("list", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database"]);
+  await expect(menu.getByRole("list", { name: "Look up" }).getByRole("link")).toHaveText(["Insights", "Bank", "Database", "Kit"]);
   await menu.getByRole("link", { name: "Database" }).click();
   await expect(page).toHaveURL("/admin/base");
   await expect(page.getByRole("heading", { level: 2, name: "Database" })).toBeVisible();

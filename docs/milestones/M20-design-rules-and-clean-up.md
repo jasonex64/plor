@@ -47,6 +47,11 @@ The human opened the day with twelve items, each now an inbox issue (#243 to #25
 | 26 | #247: a group page's order | "Board, comments, members (Recommended)" |
 | 27 | #248: what the boards' switch opens on | "Today, every load (Recommended)" |
 | 28 | #249: whose names show on a reaction | "Everyone's names (Recommended)": reactions are only between friends and group members, so the names are people the viewer can already see (*unverified*: to check against the code first); a long press on phones |
+| 29 | *Claude's overnight decision, 2026-11-17 (the `goodnight` skill):* the hover rule is written once in the kit (`.hover`, rows, `.link`), so the tabs take it at every width; on a narrow window with a mouse, a bottom tab bar's tab now takes the soft fill too | Taken: one definition. Not taken: the tabs keep their own rule gated at 768px (a second way to write the same hover) |
+| 30 | *Claude's overnight decision:* 20a does not add heading and small-text classes; `/admin/kit` shows the sizes in use, and the classes come in 20f with the sizes the human picks | Taken: no sizes chosen by Claude. Not taken: classes at today's sizes, which 20f would change again |
+| 31 | *Claude's overnight decision:* the flat button is the kit's existing `.link`, given the hover rule | Taken: one flat kind. Not taken: a new `.flat` beside `.link` |
+| 32 | *Claude's overnight decision:* `/admin/kit` shows each piece at rest and disabled, live under the pointer, the press and the keyboard, not frozen in each state | Taken: no test-only CSS in the kit. Not taken: forced-state classes for the sample page |
+| 33 | *Claude's overnight decision:* the three looks use only values already in the app (the games' colours, the 4px button edge, sizes in use, `--line`); no game-colour tints, since nothing gives their strength in the dark themes | Taken: no invented numbers. Not taken: tints at `--soft`'s strength |
 
 Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), the sidebar's one left edge and the pill's and avatar's one height (20c), 20e's four questions, and which of the three looks (and which timings) after the human sees `/admin/kit`.
 
@@ -133,7 +138,24 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 **Quick fixes from the same night (answer 22), each its own `fix-` branch off `main` and its own PR, not M20's:** #246 `fix-game-cards-match` (answer 25: Fragments' card gains the next-puzzle line, so both cards hold the same parts and match), #247 `fix-group-board-first` (answer 26), #250 `fix-friends-today-status` (answer 5, as 20d above).
 
 ## The look audit
-*Filled in by the overnight session of 2026-11-17 (answer 23).*
+*Filled in by the overnight session of 2026-11-17 (answer 23).* An Opus subagent built the branch at 20a's start, served it on port 3002 against slot 2's local stack with a fixture scene (the viewer played both games; one friend finished both, one partway, one not yet; a group with comments and reactions), and took 160 full-page screenshots: 16 screens, at 375px and 1280px, in the five themes. It critiqued them with the impeccable skill, in one context (no human to ask), and the local database was checked clean afterwards. The screenshots are outside the repo, in the session's scratch folder (`look-audit/shots/`). A second (Sonnet) subagent did the web research, kept in `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`. Nothing here was measured on plor.app or on a real phone.
+
+Ranked, most damaging first; each marks **frame** or **moment** (answer 21) and where M20 takes it:
+1. **The score is the smallest thing on screen** (moment). The game cards' score is a 12px chip while the game's name is 40px (`game.tsx:512`, `:528-537`; `today-fragments.tsx:38`); the result card puts it mid-sentence (`game.tsx:766-772`); Fragments' total is a 1rem table cell (`substrings.tsx:272-321`). → the looks on `/admin/kit` make the score the main thing at three sizes; 20k.
+2. **Everything is a box inside a box** (frame). Cards 2px, rows, chips, switches, avatars and badges 1.5px, all in ink (`kit.module.css`); on Friends and a group's page cards touch, so their borders double into a 4px line. → 20c (the 16px gap), and the Balanced and Bold looks drop rows to a hairline; the border levels are a question for the human with the looks.
+3. **A comment, a result and a score look the same in the feed** (moment; `feed.tsx:348`, `:418`). Confirms #243. → 20h.
+4. **Colour lives only on the two banners and the blue button** (moment). `--safe` and `--caught` are used only by Friends today's chips and yesterday's card; the recap and result say "(safe, +25 points)" as words (`game.tsx:442-449`, `:778-782`). → 20k; the safe and caught colours on answer rows are a new item for the human's pick.
+5. **The two games' result screens don't match** (moment). Offbeat's has the banner and marks Today; Fragments' has neither (`substrings.tsx:106-108`). → new, for the human: not in M20's list.
+6. **Desktop Today shows a half card** (moment). At 1280px with the right column, the cards' row is under 768px, so they stay a carousel with the plum card cut off (`today-cards.tsx:98-111`). → new, for the human; close to #246.
+7. **Layouts that break** (frame): on phones, Your friends rows wrap a name one letter per line beside Profile, Remove and Block (`friends-list.tsx:152-165`); the feed's chip "Offbeat · Book Club · 3:54 AM" wraps in the right column; Today's leaderboard switch leaves an empty fourth cell (`leaderboard.tsx:32-44`); a status chip is a whole sentence, "started (you'll see how it's going once you finish)" (`board.tsx:219`). → the switch goes with 20i; the friends rows with 20e; the others new, for the human.
+8. **Four button looks on one group page** (frame), with the group's settings above the board. → 20b; the settings' place goes with #247's order (answer 26).
+9. **The signed-out front page is a plain document** (moment; the first impression): no banner, no game colour, headed "Today's game: Offbeat" though there are two (`(shell)/page.tsx:23-27`, `home.tsx:299-325`). → new, for the human.
+10. **Moonlit nearly hides Offbeat's navy banner; Ink's white lines dominate** (`globals.css:35-40`). The themes are out of scope (answer 21) → for the human.
+11. **"Plor" twice on desktop, the page's name in grey** → 20f.
+12. **Two identities**: the sidebar avatar's letter comes from the username, the feed's from the display name (`shell.tsx:259`; `me.tsx:79-81`); *unverified* whether intended → for the human.
+13. **Nothing moves on the moments**: count-ups only on Me and the streak pill (`shown.ts`) → the motion menu on `/admin/kit`; 20k.
+
+The audit's three that would change the feel most: the score as the main thing, in its game's colour, counting up once; one border level for the frame; the games' colours out of the banners (safe and caught on answer rows, the game's colour on its rows, chips and feed items, both cards side by side on desktop).
 
 ## Acceptance criteria
 - [ ] DESIGN.md's Rules name every component on the main tabs, and `/admin/kit` shows each.
@@ -181,8 +203,17 @@ Expected, each in its own sub-ticket's commit: `button-link.module.css`'s copy o
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| 20a: the kit gains a flat button, a text link, the heading and small-text styles | The flat button is `.link` with the hover rule; the text link is the base `a`; no heading or small-text classes yet, `/admin/kit` shows the sizes in use | Answers 30 and 31 (overnight decisions): one way each; no sizes chosen before 20f asks |
+| 20a: `/admin/kit` renders each component in each state | At rest and disabled; hover, press and focus live | Answer 32 (overnight decision) |
+| Research report: timings "a menu, not a recommendation" | `/admin/kit` plays each motion at each menu timing; none is used on a player screen | The human picks (answer 20); 20k uses the picks |
 
 ## Evidence
+**20a (2026-11-17, overnight, slot 2):**
+- `npm run test:e2e -- e2e/kit.e2e.ts`: "an admin finds every piece of the Rules and the four looks on /admin/kit" and "a player who isn't an admin gets the refusal on /admin/kit": 2 passed. The first reads the pieces from DESIGN.md's Rules table, so a piece named there and missing from the page fails it.
+- `npm run test:e2e -- e2e/admin-area.e2e.ts e2e/shell.e2e.ts e2e/look.e2e.ts e2e/kit.e2e.ts`: 23 passed (the two admin sub-tab lists gained "Kit"); `e2e/alive.e2e.ts` (the tabs' and rows' hover): 4 passed.
+- `npm test`: 71 files, 822 tests passed. `npx tsc --noEmit -p .` and `npx eslint` on the changed files: clean.
+- Screenshots of `/admin/kit` at 1280px and 375px in the five themes, and each look alone, in the session's scratch folder (`look-audit/kit-shots/`).
+- Each Next.js build stops once with a "SecurityFatalError" saying this Next.js has a known vulnerability, and passes when run again; the upgrade it names is for the human (HANDOFF.md).
 
 ## Review
 - Blocking findings and how each was fixed:
