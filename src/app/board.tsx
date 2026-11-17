@@ -26,6 +26,7 @@ import {
   type StatusMessage,
 } from "./board-channel";
 import { Avatar } from "./avatar";
+import styles from "./board.module.css";
 import kit from "./kit.module.css";
 import { LiveStatus } from "./live-status";
 import { errorText } from "./messages";
@@ -169,20 +170,27 @@ export function Board({
           <p>{BETTER_WITH_FRIENDS.text}</p>
         </>
       )}
-      {/* Mockup 3's rows: the avatar, the name, how the run stands as a chip, and the reactions used on a line under
-          them, as a comment's are (beside them, they covered the name on phones: M14 14b-8e); the ⋯ to react at the top
-          right (14b-13, answer 3). */}
+      {/* Mockup 3's rows: the avatar, the name cut on one line, the ⋯ to react (14b-13, answer 3) and how the run stands
+          as a chip, in its own column at the row's right edge, and the reactions used on a line under the name, as a
+          comment's are (beside them, they covered the name on phones: M14 14b-8e). Short words in the chip (inbox #250;
+          M20 answers 5 and 9). */}
       {shownBoard && shownBoard.friends.length > 0 && (
         <ul className={kit.rows}>
           {shownBoard.friends.map((f) => (
-            <li key={f.username} className={kit.row}>
+            <li key={f.username} className={`${kit.row} ${styles.friend}`}>
               <Avatar name={f.name} />
-              <div className={kit.grow}>
-                <b>{f.name}</b>
-                <span className="sr-only">:</span> <span className={toneOf(f)}>{describe(f, shownBoard.rounds)}</span>
-                {f.reactions && <Reactions reactions={f.reactions} below />}
-              </div>
-              {f.reactions && <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />}
+              <b className={styles.name}>{f.name}</b>
+              <span className="sr-only">:</span> <span className={`${toneOf(f)} ${styles.status}`}>{describe(f, shownBoard.rounds)}</span>
+              {f.reactions && (
+                <div className={styles.reactions}>
+                  <Reactions reactions={f.reactions} below />
+                </div>
+              )}
+              {f.reactions && (
+                <div className={styles.menu}>
+                  <ReactMenu label={`React to ${f.name}'s run`} reactions={f.reactions} onReact={(emoji) => react(f, emoji)} />
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -215,9 +223,9 @@ function toneOf(f: BoardFriend): string {
 function describe(f: BoardFriend, rounds: number | null): string {
   if (f.ended) return endedText(f.ended);
   if (f.score !== null) return pointsText(f.score);
-  if (f.state === "playing") return rounds === null ? `on question ${f.question}` : `on round ${f.question} of ${rounds}`;
+  if (f.state === "playing") return rounds === null ? `Question ${f.question}` : `on round ${f.question} of ${rounds}`;
   if (f.state === "started") return "started (you'll see how it's going once you finish)";
-  return "hasn't played yet";
+  return "Not yet";
 }
 
 function placeLabel(place: Place): string {
