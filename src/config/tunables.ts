@@ -235,6 +235,10 @@ export const GUEST_TOKEN_BYTES = 20;
 // page says to set a timeout and gives no number (developers.cloudflare.com/turnstile/get-started/server-side-validation/).
 export const SITEVERIFY_TIMEOUT_MS = 10_000;
 
+// How long a guest's Start, pressed before Cloudflare's bot-check script has loaded, waits for it before saying the check
+// isn't working, in milliseconds (human, 2026-11-16: "10 seconds"; docs/milestones/M21-faster-e2e.md, answer 14).
+export const BOT_CHECK_LOAD_MS = 10_000;
+
 // The three slots, the folders sessions work in at once, and each one's ports (docs/milestones/PROCESS-parallel-sessions.md).
 // Three, on the PC and the Mac (human, 2026-11-15: "just do three … for both right now"). The dev servers' ports (human,
 // 2026-11-16: "3000, 3002, 3003 (Recommended)"). Each stack's ports are a block of ten from stackBase, 100 apart (human,
