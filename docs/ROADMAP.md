@@ -198,6 +198,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] Today's Leaderboard card has no Count switch, so its Overall Today is Sum only (the Friends and group boards follow Count). As the ticket says; ask the human if Average is wanted there. Found in M22 22a (review).
 - [ ] `getTodayBoard` (`src/friends/leaderboard.ts`) reads Offbeat's pooled counts on every open of the card, uncached; fine at beta scale, measure before launch. Found in M22 22a (review).
 - [ ] No test of a failed today's read on the Friends or group board (the Today error line). Found in M22 22a (review).
+- [ ] `e2e/alive.e2e.ts:94` ("a hovered button lifts 2px…") failed both tries on CI for docs-only PR #242 (run 44073797601, 2026-11-17), with `transitionDuration` read as `""` after `mouse.up()`. It passed in #239, #240 and #241. Likely a race: the release clicks Start, and once the run starts the button leaves the page, so the read can hit a removed node (not proven: the trace wasn't opened). Found in M22 (the done PR).
 - [ ] `docs/DESIGN.md`'s `leaderboard.tsx:157-173` (Show table) and `leaderboard.tsx:170` (the Monday note) already pointed at the wrong lines on `main` before M22 (they are now around `:285-308` and `:305`). Found in M22 22a.
 
 **For M21**
