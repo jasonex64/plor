@@ -298,3 +298,52 @@ test("a long name is cut with an ellipsis on one line and every status chip ends
   expect(longChip!.x + longChip!.width).toBeLessThanOrEqual(longRow!.x + longRow!.width);
   expect(longChip!.x + longChip!.width).toBeCloseTo(shortChip!.x + shortChip!.width, 0);
 });
+
+// #257's review: a long finished status beside a long name on a 320px phone. The status wraps to a second line inside its
+// chip rather than take the name's room (the human, 2026-11-17: "Wrap them to a second line"); the chip still ends at the
+// row's right edge.
+test("a long finished status wraps inside its chip and leaves the name its room", async ({ browser }) => {
+  test.slow();
+  await removeDay();
+  const page = await viewer(browser, "bvw", { width: 320, height: 640 });
+  const longName = "W".repeat(24);
+  const [caught, waiting] = [await friendOf("bvw", "bfw"), await friendOf("bvw", "bfx")];
+  await DB.query("update private.profile set display_name = $2 where username = $1", [caught.username, longName]);
+  // The friend was caught on question 1, written as feed.e2e.ts writes it, with the rules off.
+  const client = await ADMIN.connect();
+  try {
+    await client.query("begin");
+    await client.query("set local session_replication_role = replica");
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [caught.id]);
+    await client.query(
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       select $1, 'offbeat', private.today(), 0, content #>> '{questions,0,host_answers,0}', true, now() - interval '30 minutes'
+       from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()`,
+      [caught.id],
+    );
+    await client.query("commit");
+  } finally {
+    client.release();
+  }
+  // How a friend's run ended shows only to a viewer who has finished (M12 12d).
+  await finishOffbeat(page);
+  await openBoard(page);
+  const [longRow, shortRow] = [row(page, longName), row(page, waiting.username)];
+  await expect(longRow).toContainText(`${longName}: caught on question 1 by "`);
+  const longChip = longRow.getByText(/^caught on question 1 by "/);
+  const shortChip = shortRow.getByText("Not yet", { exact: true });
+  const [name, avatar, chip, notYet, box] = await Promise.all([
+    longRow.getByText(longName, { exact: true }).boundingBox(),
+    longRow.locator("[data-initial]").boundingBox(),
+    longChip.boundingBox(),
+    shortChip.boundingBox(),
+    longRow.boundingBox(),
+  ]);
+  // The status takes more than one line: its chip is taller than the one-line "Not yet".
+  expect(chip!.height).toBeGreaterThan(notYet!.height);
+  // The name keeps room: wider than the avatar beside it, so its first letters show before the ellipsis.
+  expect(name!.width).toBeGreaterThan(avatar!.width);
+  // The chip is inside its row, with the same right edge as the one-line chip's.
+  expect(chip!.x + chip!.width).toBeLessThanOrEqual(box!.x + box!.width);
+  expect(chip!.x + chip!.width).toBeCloseTo(notYet!.x + notYet!.width, 0);
+});

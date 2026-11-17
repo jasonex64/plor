@@ -200,6 +200,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] No e2e covers the flat button's hover fill itself (`e2e/alive.e2e.ts` covers the tabs and rows; `e2e/kit.e2e.ts` the danger text).
 - [ ] From the look audit (the M20 ticket, "The look audit"), not yet in any sub-ticket and for the human: the two games' result screens differ (5); desktop Today's half card at 1280px with the right column (6); the feed chip that wraps, and a status chip that is a sentence (7); the signed-out front page (9); Moonlit's and Ink's banners (10); the avatar's letter from the username (12).
 - [ ] Each Next.js build stops once with "SecurityFatalError" (a known vulnerability in this Next.js version) and passes when run again; the upgrade it names waits for the human.
+- [ ] Friends today's row (`src/app/board.module.css:11`): the reactions line under the name counts toward the name's column, so a friend with a short name and many reactions may get a wrapped status chip that had room to stay on one line; untested and not seen (predicted from the grid spec). If it shows up, give the reactions line its own spanning track. Found in fix `fix-long-status-wraps` (review).
 
 **For M22**
 - [ ] Today's Leaderboard card has no Count switch, so its Overall Today is Sum only (the Friends and group boards follow Count). As the ticket says; ask the human if Average is wanted there. Found in M22 22a (review).
