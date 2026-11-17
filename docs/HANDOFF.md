@@ -10,7 +10,7 @@ Read this first; rewrite it last (CLAUDE.md, "Sessions are independent"). It hol
 - **Two new inbox issues**: #260 (admin: type your own question and the site gathers its answers over time; low priority) and #261 (more colour themes, after checking rights to Monkeytype's keycap-set colours). #251 to #254 are still unsorted.
 - **#261's research is done** (not legal advice), kept only in the session's scratch folder (`theme-licensing.md`): open palettes (Rosé Pine, Catppuccin, Dracula, Solarized, Everforest, Kanagawa: MIT, licence files read; Nord, Gruvbox: MIT per their pages; Tokyo Night unverified) need only the licence notice kept; keycap-set colours are a weak copyright target in the US but the names (GMK, set names) are the risk, so rename; Monkeytype is GPL-3.0, no permission or partnership statement found. Questions and a ticket come next, with these notes saved in `docs/research/research_notes/`.
 - **Plor.app has no puzzle after 2026-11-17 for either game** (read through the connector at about 15:30 Pacific): Nov 18 to 30 wait for the human's approval on `/admin/puzzles`, told to the human.
-- #259 waits on its e2e check and the human's word to merge.
+- #259 is merged (by the human, 2026-11-17); slot 1 is freed (its stack stopped) and `fix-long-status-wraps` is deleted. #271 (`fix-fragments-raw-points`) is open and not this session's.
 
 **This session (2026-11-17):**
 - **The inbox:** the human's twelve items are issues #243 to #254. #243, #244, #245, #248 and #249 are closed into M20 (sub-tickets 20a, 20h to 20k); #246, #247 and #250 are closed as quick fixes; **#251 to #254 stay in the inbox, unsorted** (Offbeat approval edits, adding an answer to the pool, Fragments' letter points, free replays). #231 and #232 stay ("Ticket after beta").

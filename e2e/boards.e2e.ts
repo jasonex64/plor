@@ -140,10 +140,10 @@ test("a friend's Fragments row moves live to the round they're on, then to their
   await expect(gameSwitch(page)).toBeVisible();
   await expect(gameSwitch(page).getByRole("radio", { name: GAME.name, exact: true })).toBeChecked();
   await expect(gameSwitch(page).getByRole("radio", { name: SUBSTRINGS.name, exact: true })).not.toBeChecked();
-  await expect(row(page, friend.username)).toContainText("hasn't played yet");
+  await expect(row(page, friend.username)).toContainText("Not yet");
   await gameSwitch(page).getByText(SUBSTRINGS.name, { exact: true }).click();
   await expect(gameSwitch(page).getByRole("radio", { name: SUBSTRINGS.name, exact: true })).toBeChecked();
-  await expect(row(page, friend.username)).toContainText("hasn't played yet");
+  await expect(row(page, friend.username)).toContainText("Not yet");
 
   // The viewer has finished Fragments, so the friend's progress shows as it happens: the round, counted against the day's
   // rounds, then the score once they finish too.
@@ -165,7 +165,7 @@ test("a friend's Fragments row moves live to the round they're on, then to their
 
   // Offbeat's board is its own: the friend has no Offbeat run.
   await gameSwitch(page).getByText(GAME.name, { exact: true }).click();
-  await expect(row(page, friend.username)).toContainText("hasn't played yet");
+  await expect(row(page, friend.username)).toContainText("Not yet");
 });
 
 test("a day with an approved day in one game only has no switch on the board", async ({ browser }) => {
@@ -174,7 +174,7 @@ test("a day with an approved day in one game only has no switch on the board", a
   await friendOf("bvb", "bfb");
   await openBoard(page);
   await expect(board(page)).toBeVisible();
-  await expect(row(page, `bfb${RUN}`)).toContainText("hasn't played yet");
+  await expect(row(page, `bfb${RUN}`)).toContainText("Not yet");
   await expect(gameSwitch(page)).toHaveCount(0);
 });
 
@@ -191,7 +191,7 @@ test("with the cards side by side, Today's board has the switch, opened on the g
   await expect(gameSwitch(page).getByRole("radio", { name: SUBSTRINGS.name, exact: true })).toBeChecked();
   await expect(row(page, friend.username)).toContainText(started);
   await gameSwitch(page).getByText(GAME.name, { exact: true }).click();
-  await expect(row(page, friend.username)).toContainText("hasn't played yet");
+  await expect(row(page, friend.username)).toContainText("Not yet");
 
   // Both over: it opens on Offbeat.
   await finishFragments(await idOf("bvc"));
@@ -215,7 +215,7 @@ test("with the cards in a carousel, Today's board has no switch and follows the 
   await expect(row(page, friend.username)).toContainText(started);
   // Offbeat in front: Offbeat's board, where the friend hasn't played.
   await page.getByRole("button", { name: "Previous game", exact: true }).click();
-  await expect(row(page, friend.username)).toContainText("hasn't played yet");
+  await expect(row(page, friend.username)).toContainText("Not yet");
   await page.getByRole("button", { name: "Next game", exact: true }).click();
   await expect(row(page, friend.username)).toContainText(started);
 });
@@ -275,4 +275,75 @@ test("today's board opens once the viewer has finished, on Today's card and the 
   await expect(card.getByRole("region", { name: "Today", exact: true }).getByRole("listitem")).toHaveText(rows);
   await openBoard(page);
   await expect(page.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "Today", exact: true }).getByRole("listitem")).toHaveText(rows);
+});
+
+// Inbox #250 (human, 2026-11-17, M20 answers 5 and 9: "short words"): a long name is cut on one line, and each friend's status
+// chip sits in its own column at the row's right edge, in the same place on every row.
+test("a long name is cut with an ellipsis on one line and every status chip ends at the row's right edge", async ({ browser }) => {
+  await removeDay();
+  const page = await viewer(browser, "bvf", { width: 320, height: 640 });
+  const longName = "W".repeat(24);
+  const [long, short] = [await friendOf("bvf", "bff"), await friendOf("bvf", "bfg")];
+  await DB.query("update private.profile set display_name = $2 where username = $1", [long.username, longName]);
+  await openBoard(page);
+  const rows = [row(page, longName), row(page, short.username)];
+  await expect(rows[0]).toContainText(`${longName}: Not yet`);
+  const chips = rows.map((r) => r.getByText("Not yet", { exact: true }));
+  const [longRow, shortRow] = await Promise.all(rows.map((r) => r.boundingBox()));
+  const [longChip, shortChip] = await Promise.all(chips.map((c) => c.boundingBox()));
+  // One line: the long name's row is as tall as the short one's, and its name keeps the 24 letters, cut by an ellipsis.
+  expect(longRow!.height).toBeCloseTo(shortRow!.height, 0);
+  expect(await rows[0].getByText(longName, { exact: true }).evaluate((el) => getComputedStyle(el).textOverflow)).toBe("ellipsis");
+  // The chip is inside its row, with the same right edge on both.
+  expect(longChip!.x + longChip!.width).toBeLessThanOrEqual(longRow!.x + longRow!.width);
+  expect(longChip!.x + longChip!.width).toBeCloseTo(shortChip!.x + shortChip!.width, 0);
+});
+
+// #257's review: a long finished status beside a long name on a 320px phone. The status wraps to a second line inside its
+// chip rather than take the name's room (the human, 2026-11-17: "Wrap them to a second line"); the chip still ends at the
+// row's right edge.
+test("a long finished status wraps inside its chip and leaves the name its room", async ({ browser }) => {
+  test.slow();
+  await removeDay();
+  const page = await viewer(browser, "bvw", { width: 320, height: 640 });
+  const longName = "W".repeat(24);
+  const [caught, waiting] = [await friendOf("bvw", "bfw"), await friendOf("bvw", "bfx")];
+  await DB.query("update private.profile set display_name = $2 where username = $1", [caught.username, longName]);
+  // The friend was caught on question 1, written as feed.e2e.ts writes it, with the rules off.
+  const client = await ADMIN.connect();
+  try {
+    await client.query("begin");
+    await client.query("set local session_replication_role = replica");
+    await client.query("insert into private.run (user_id, game_id, puzzle_date, started_at) values ($1, 'offbeat', private.today(), now() - interval '1 hour')", [caught.id]);
+    await client.query(
+      `insert into private.run_event (user_id, game_id, puzzle_date, question_idx, entry_id, matched, created_at)
+       select $1, 'offbeat', private.today(), 0, content #>> '{questions,0,host_answers,0}', true, now() - interval '30 minutes'
+       from private.puzzle where game_id = 'offbeat' and puzzle_date = private.today()`,
+      [caught.id],
+    );
+    await client.query("commit");
+  } finally {
+    client.release();
+  }
+  // How a friend's run ended shows only to a viewer who has finished (M12 12d).
+  await finishOffbeat(page);
+  await openBoard(page);
+  const [longRow, shortRow] = [row(page, longName), row(page, waiting.username)];
+  await expect(longRow).toContainText(`${longName}: caught on question 1 by "`);
+  const longChip = longRow.getByText(/^caught on question 1 by "/);
+  const shortChip = shortRow.getByText("Not yet", { exact: true });
+  const [name, avatar, chip, notYet, box] = await Promise.all([
+    longRow.getByText(longName, { exact: true }).boundingBox(),
+    longRow.locator("[data-initial]").boundingBox(),
+    longChip.boundingBox(),
+    shortChip.boundingBox(),
+    longRow.boundingBox(),
+  ]);
+  // The status takes more than one line: its chip is taller than the one-line "Not yet".
+  expect(chip!.height).toBeGreaterThan(notYet!.height);
+  // The name keeps room: wider than the avatar beside it, so its first letters show before the ellipsis.
+  expect(name!.width).toBeGreaterThan(avatar!.width);
+  // The chip is inside its row, with the same right edge as the one-line chip's.
+  expect(chip!.x + chip!.width).toBeLessThanOrEqual(box!.x + box!.width);
+  expect(chip!.x + chip!.width).toBeCloseTo(notYet!.x + notYet!.width, 0);
 });

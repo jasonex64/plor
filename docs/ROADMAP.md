@@ -205,6 +205,7 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] 20c's review: on phones, a cold load of a detail page shows the top bar's "Plor" until the profile has loaded and Back replaces it.
 - [ ] 20c's review: `.page-back`'s 1.34em restates the browser's h1 margin (0.67em of 2em) rather than reading it; if the h1's size or margin changes, Back leaves the heading's line. `e2e/frame.e2e.ts` checks it on `/streak` at 1280px only (not a long group name, the 1200px right column, a bigger text size).
 - [ ] 20c's review: `kit.module.css`'s `main > * + .card` (0,1,1) beats a page class setting a margin on a card straight in `main`; none found today.
+- [ ] Friends today's row (`src/app/board.module.css:11`): the reactions line under the name counts toward the name's column, so a friend with a short name and many reactions may get a wrapped status chip that had room to stay on one line; untested and not seen (predicted from the grid spec). If it shows up, give the reactions line its own spanning track. Found in fix `fix-long-status-wraps` (review).
 
 **For M22**
 - [ ] Today's Leaderboard card has no Count switch, so its Overall Today is Sum only (the Friends and group boards follow Count). As the ticket says; ask the human if Average is wanted there. Found in M22 22a (review).
