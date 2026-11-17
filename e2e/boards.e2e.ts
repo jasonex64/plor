@@ -10,7 +10,7 @@ import { SUBSTRING_ROUNDS } from "../src/config/tunables";
 import { scoreRun } from "../src/game/substring-scoring";
 import { GAME, SUBSTRINGS } from "../src/platform/game";
 import { asked, caughtToCards } from "./game";
-import { RUN, openBoard, signInAndPick } from "./players";
+import { RUN, openBoard, play, signInAndPick } from "./players";
 import { removePuzzle, todayPuzzle, type TodayPuzzle } from "./puzzle";
 import { localStack } from "../scripts/slot.ts";
 
@@ -232,6 +232,19 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
   // Offbeat on load, as the other leaderboards, in points.
   await expect(choices.getByRole("radio", { name: GAME.name, exact: true })).toBeChecked();
   await expect(choices.getByRole("radio")).toHaveCount(3);
+  // Today on load, closed until the viewer has finished that game, or both for Overall (docs/milestones/M22-todays-board.md,
+  // answers 3, 6 and 10).
+  await expect(card.getByRole("radio", { name: "Today", exact: true })).toBeChecked();
+  for (const [game, line] of [
+    [SUBSTRINGS.name, `Finish today's ${SUBSTRINGS.name} to see today's board.`],
+    ["Overall", "Finish both of today's games to see today's board."],
+    [GAME.name, `Finish today's ${GAME.name} to see today's board.`],
+  ] as const) {
+    await choices.getByText(game, { exact: true }).click();
+    await expect(card.getByRole("region", { name: "Today", exact: true })).toHaveText(line);
+  }
+  // Yesterday is read once chosen, after the viewer's account was dated back and the friend made.
+  await card.getByText("Yesterday", { exact: true }).click();
   await expect(list("Yesterday")).toHaveText(names.map((n) => `${n}${n === `bve${RUN}` ? " (you)" : ""}: 0 points`));
 
   // Fragments' and Overall's are places, a plain number, and the route is told the game.
@@ -246,4 +259,20 @@ test("Today's leaderboard card switches between Offbeat, Fragments and Overall",
   await card.getByText("This week", { exact: true }).click();
   await week;
   await expect(list("This week")).toHaveCount(2);
+});
+
+// Today's board (docs/milestones/M22-todays-board.md): open once the viewer's own run is over, with their result screen's
+// score, and a friend who hasn't played below it, on Today's card and on the Friends tab's board (answers 5 and 9).
+test("today's board opens once the viewer has finished, on Today's card and the Friends tab", async ({ browser }) => {
+  const page = await viewer(browser, "bvt", WIDE);
+  const friend = await friendOf("bvt", "bft");
+  await play(page);
+  await caughtToCards(page, puzzle.hostAnswer);
+  await expect(page.locator("#result")).toContainText("You survived 0 of 7 questions");
+  const rows = [`bvt${RUN} (you): 0 points`, `${friend.username}: not played yet`];
+  await page.goto("/");
+  const card = page.getByRole("region", { name: "Leaderboard", exact: true });
+  await expect(card.getByRole("region", { name: "Today", exact: true }).getByRole("listitem")).toHaveText(rows);
+  await openBoard(page);
+  await expect(page.getByRole("region", { name: "Friends leaderboard" }).getByRole("region", { name: "Today", exact: true }).getByRole("listitem")).toHaveText(rows);
 });

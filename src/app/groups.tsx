@@ -22,7 +22,7 @@ import { FORWARD } from "./slide";
 
 type GroupSummary = { id: string; name: string };
 type Member = { userId: string; username: string; name: string; creator: boolean };
-type Group = GroupSummary & { inviteCode: string; creator: boolean; members: Member[] };
+type Group = GroupSummary & { inviteCode: string; creator: boolean; startedOn: string; members: Member[] };
 
 // Runs one action at a time with its error shown, as the Friends section does.
 function useAction() {
@@ -199,6 +199,11 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
         {group && link && (
           <>
             <h2>{group.name}</h2>
+            {/* How old the group is (inbox #233; the human 2026-11-16: "Started Nov 2"). The day is already Pacific
+                text, so it's read in UTC and can't shift a day. */}
+            <p>
+              Started {new Date(`${group.startedOn}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}
+            </p>
             {group.creator && (
               <form onSubmit={rename} className={kit.chips}>
                 <label className={kit.grow}>
@@ -279,6 +284,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
           key={`${day} ${group.members.map((m) => m.username).join(" ")}`}
           title="Group leaderboard"
           path={`/api/groups/leaderboard?id=${encodeURIComponent(id)}`}
+          todayPath={`/api/leaderboard/today?group=${encodeURIComponent(id)}`}
         />
       )}
       {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}

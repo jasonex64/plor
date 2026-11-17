@@ -3,7 +3,7 @@
 // signs in, picks a username, joins, and lands on the group's page with both members listed and on its leaderboard.
 // Once both have played, a comment in the group's thread reaches the other member's open group page live, and stays
 // out of the friends thread.
-import { expect, test } from "@playwright/test";
+import { devices, expect, test, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { RUN, play, sent, signInAndPick, sharedLink } from "./players";
 import { caughtToCards } from "./game";
@@ -39,6 +39,9 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const groupUrl = creator.url();
   await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
+  // How old it is, from the Pacific day it was made (inbox #233: "Started Nov 2").
+  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/Los_Angeles" });
+  await expect(creator.getByText(`Started ${today}`, { exact: true })).toBeVisible();
   // Shared from a button, never shown (M14 14b-3, answer 9), on /g/ with a 10-character code.
   const link = await sharedLink(creator, creator.getByRole("button", { name: "Share group link" }));
   expect(link).toMatch(new RegExp(`^${localStack().appUrl}/g/[A-Za-z0-9_-]{10}$`));
@@ -159,4 +162,37 @@ test("the reset reloads a group's page", async ({ browser }) => {
   const reloads = ["/api/groups/detail", "/api/groups/leaderboard"].map((path) => page.waitForRequest((r) => new URL(r.url()).pathname === path));
   await page.clock.fastForward("25:00:00");
   await Promise.all(reloads);
+});
+
+// Share opens the system share menu only on a phone or tablet (inbox #230, the human 2026-11-16: "I don't want it to open
+// something else on my computer"; answer: "Copy on computers only"). Chrome on Windows has navigator.share, so the stub
+// stands in for it: a computer copies and never calls it; a touch device (Playwright's Pixel 7) still gets the sheet.
+test("Share copies on a computer and opens the share sheet on a phone", async ({ browser }) => {
+  const stubShare = () => {
+    (window as unknown as { sheet: ShareData[] }).sheet = [];
+    navigator.share = async (data?: ShareData) => {
+      (window as unknown as { sheet: ShareData[] }).sheet.push(data!);
+    };
+  };
+  const sheet = (page: Page) => page.evaluate(() => (window as unknown as { sheet: ShareData[] }).sheet);
+
+  const computer = await (await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] })).newPage();
+  await computer.addInitScript(stubShare);
+  await computer.goto("/groups");
+  await signInAndPick(computer, "shc");
+  await computer.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Desk Set");
+  await computer.getByRole("button", { name: "Create group" }).click();
+  const link = await sharedLink(computer, computer.getByRole("button", { name: "Share group link" }));
+  expect(link).toMatch(/\/g\/[A-Za-z0-9_-]{10}$/);
+  expect(await sheet(computer)).toEqual([]);
+
+  const phone = await (await browser.newContext({ ...devices["Pixel 7"] })).newPage();
+  await phone.addInitScript(stubShare);
+  await phone.goto("/groups");
+  await signInAndPick(phone, "shp");
+  await phone.getByRole("region", { name: "Groups" }).getByLabel("New group's name").fill("Pocket Set");
+  await phone.getByRole("button", { name: "Create group" }).click();
+  await phone.getByRole("button", { name: "Share group link" }).click();
+  await expect.poll(() => sheet(phone)).toEqual([{ text: "Join Pocket Set on Plor", url: expect.stringMatching(/\/g\/[A-Za-z0-9_-]{10}$/) }]);
+  await expect(phone.getByText("Copied.")).toHaveCount(0);
 });

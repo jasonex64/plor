@@ -11,7 +11,7 @@ export type GroupSummary = { id: string; name: string };
 // display name if set (M07 7a).
 export type Member = FriendWithId & { creator: boolean };
 // creator says whether the viewer is the creator, which decides the controls the page shows (G1).
-export type Group = GroupSummary & { inviteCode: string; creator: boolean; members: Member[] };
+export type Group = GroupSummary & { inviteCode: string; creator: boolean; startedOn: string; members: Member[] };
 
 // A group ID from a link or a request body. Anything that can't be one is the same 404 as a group the player isn't in.
 export function readGroupId(input: unknown): string {
@@ -54,6 +54,8 @@ export async function listGroups(db: Db, userId: string): Promise<GroupSummary[]
 export async function getGroup(db: Db, userId: string, groupId: string): Promise<Group> {
   const { rows } = await db.query<Group>(
     `select g.id, g.name, g.invite_code as "inviteCode", g.creator_id = $1 as creator,
+            -- The Pacific day it was made, as the games' days are (inbox #233).
+            to_char(g.created_at at time zone 'America/Los_Angeles', 'YYYY-MM-DD') as "startedOn",
             (select json_agg(json_build_object('userId', p.user_id, 'username', p.username, 'name', coalesce(p.display_name, p.username::text),
                                                'creator', m.user_id = g.creator_id)
                              order by lower(coalesce(p.display_name, p.username::text)), p.username)

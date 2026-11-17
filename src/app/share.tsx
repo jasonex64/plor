@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import kit from "./kit.module.css";
 import styles from "./share.module.css";
 
-// Sharing a link, for the result's Share (M05, S4) and a group's invite link: the phone's share sheet where the browser has one (MDN, Navigator.share), otherwise the clipboard (MDN,
-// Clipboard.writeText). A cancelled sheet rejects with AbortError, which isn't a failure (MDN). A clipboard the page
-// may not write to rejects with NotAllowedError (MDN), and the caller shows the text to copy by hand (CopyField; docs/
+// Sharing a link, for the result's Share (M05, S4) and a group's invite link: a phone or tablet's share sheet (MDN,
+// Navigator.share), the clipboard on a computer or where there's no sheet (MDN, Clipboard.writeText). A computer copies
+// even when it has a sheet, as Chrome on Windows does (inbox #230, the human 2026-11-16: "Copy on computers only"): the
+// sheet is for a device whose main pointer is a finger (MDN, the pointer media feature, "coarse"). A cancelled sheet
+// rejects with AbortError, which isn't a failure (MDN). A clipboard the page may not write to rejects with
+// NotAllowedError (MDN), and the caller shows the text to copy by hand (CopyField; docs/
 // milestones/M14-14b-18-headings-today-invites-words.md, answer 9). Anything else is thrown for the caller to show.
 export type Shared = "shared" | "copied" | "refused";
 
 export async function shareLink(text: string, url: string): Promise<Shared> {
-  if (typeof navigator.share !== "function") {
+  if (typeof navigator.share !== "function" || !window.matchMedia("(pointer: coarse)").matches) {
     try {
       await navigator.clipboard.writeText(`${text}\n${url}`);
     } catch (err) {

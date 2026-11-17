@@ -1,0 +1,144 @@
+# Tension, typed-word feedback and escalation in typing and time-pressure games (identity sources for Fragments)
+
+Reading note: every line under "Cited Findings" was read from the linked page in this session (2026-11-16). Anything recalled from memory is not there; it sits under "Gaps" marked **unverified (memory)**, so the report writer can use it only with that label. Design suggestions for Fragments sit under "Inferences" and are mine, not a source's. No numbers in the inferences are recommendations of values: any duration, threshold or size would have to come from the ticket or the human.
+
+## 1. Typing and word games: what each one does with the word, the clock and the reward
+
+### Takeaway
+The verified sources agree on one pattern: the typed word is attached to the thing it affects (an enemy, a tree, a bomb), and the game's cleverness goes into word selection and input forgiveness rather than into scenery. Detailed, citable descriptions of BombParty's own UI are scarce; the official FAQ confirms only the bonus-letters-for-a-life mechanic.
+
+### Cited Findings
+- **BombParty (JKLM.fun):** a player gains a life by using all the letters shown on the right side of the screen; the party leader sets the minimum and maximum lives per player. — [JKLM.FUN FAQ](https://jklm.fun/faq)
+- **BombParty:** dictionaries and word suggestions are handled on the official Discord (a `#contribute-bombparty` channel staffed by "Game Content Editors"), so the Discord, not the website, is where rules and UI changes are discussed. — [JKLM.FUN FAQ](https://jklm.fun/faq)
+- **ZType (Dominic Szablewski, 2011):** made for Mozilla's Game On contest; its stated inspirations are Crimsonland's "Type-o-Shooter" mode and the Dreamcast *Typing of the Dead*. — [PhobosLab, "Z-Type"](https://phoboslab.org/log/2011/01/z-type)
+- **ZType on phones, custom keyboard:** the stock iOS keyboard was rejected (predictive text, space bar and extras take room); the game draws its own on-screen keyboard. — [PhobosLab, "What makes an on-screen keyboard fun"](https://phoboslab.org/log/2015/07/what-makes-an-on-screen-keyboard-fun)
+- **ZType on phones, forgiving input:** the touch area of each currently valid key is enlarged and its neighbours shrink; once a word is started only the next letter is valid, so that key gets the largest area. Tuned by hours of playtesting. — [PhobosLab, same post](https://phoboslab.org/log/2015/07/what-makes-an-on-screen-keyboard-fun)
+- **ZType, word selection serves input:** no two active words start with the same letter, and active first letters are spread across the QWERTY layout so enlarged keys do not collide. — [PhobosLab, same post](https://phoboslab.org/log/2015/07/what-makes-an-on-screen-keyboard-fun)
+- **ZType, timing forgiveness:** a letter normally registers on finger lift; the game also accepts a quick touch whose lift lands one row below within 30 ms as the key at the touch-down point. (The 30 ms is ZType's value, quoted as a fact about ZType, not a value for Plor.) — [PhobosLab, same post](https://phoboslab.org/log/2015/07/what-makes-an-on-screen-keyboard-fun)
+- **Typing of the Dead:** a modification of *The House of the Dead 2* in which each enemy carries a box showing the word, sentence or phrase to type; phrases get longer and more complex as the game goes on; each level has timed challenge areas (kill a set number within a limit) and ends on a boss that changes the typing rule (a long phrase, or a question whose answer must be typed). Reviewers praised the absurd humour of the later phrases. — [Wikipedia, "The Typing of the Dead"](https://en.wikipedia.org/wiki/The_Typing_of_the_Dead)
+- **Epistory:** entering typing mode puts a word on every interactable object in view; the words come from themed sets (tree words on fallen trees, flower names when planting, mineral names on rocks, element words for spells) rather than one dictionary; narration is printed on the landscape itself. — [Game Developer, "Let's talk about Epistory"](https://www.gamedeveloper.com/design/let-s-talk-about-epistory-typing-chronicles)
+- **Monkeytype:** open source under GPL-3.0; its listed features are a minimal design, typed characters appearing in place, live error / WPM / accuracy displays, a "smooth caret" option, configurable sounds and themes, and a focus mode while typing. — [monkeytypegame/monkeytype on GitHub](https://github.com/monkeytypegame/monkeytype)
+- **Bookworm Adventures:** longer words deal more damage and words built from less common letters hit harder; stronger words generate gem tiles with effects (heal, weaken the enemy); the sequel gives badges for feats such as a 12-letter word. PopCap spent over two and a half years and US$700,000 on it. — [Wikipedia, "Bookworm Adventures"](https://en.wikipedia.org/wiki/Bookworm_Adventures)
+- **SpellTower:** a made word's tiles vanish and the tiles above fall into the gap; a word of five or more tiles also clears the adjacent tiles; longer words score more. — [Wikipedia, "SpellTower"](https://en.wikipedia.org/wiki/SpellTower)
+
+### Inferences
+- **The rarity reward has two proven shapes.** Bookworm Adventures pays rarity as *magnitude* (more damage) plus a *lasting object* (a gem that stays on the board). SpellTower pays length as *spill-over* (the long word clears its neighbours too). Both make the bigger word visibly do more to the same playfield rather than playing a separate celebration. That fits the owner's "reward scales with rarity" and "no finale that costs clock time": the reward is a bigger version of the normal acceptance, landing on things already on screen.
+- **Typing of the Dead's escalation is in the text, not the scenery** (words become phrases, bosses change the rule). Fragments has seven fixed rounds and a chunk each, so its equivalent lever is the chunk itself: how it is shown can grow or harden round by round without any scene.
+- **Epistory's "the word lives on the object" is the cheapest route to a scene.** In Fragments the only objects are the chunk, the clock and the player's own earlier words, so those three are what words can attach to.
+- **ZType shows that input forgiveness is part of feel.** Fragments uses the system keyboard, so the ZType tricks do not transfer directly, but the principle does: nothing in the feedback should make a correct keystroke look late or wrong.
+- **Monkeytype's lesson is subtraction.** Its listed selling points are in-place text, a smooth caret and a UI that gets out of the way while typing. This supports "the camera/scene stays still while typing".
+
+### Gaps
+- **BombParty's UI in detail is not sourced.** I found no public page describing the bomb graphic, the arrow, turn order, or the bonus-alphabet bar beyond the FAQ line above; the Discord is not publicly searchable. **Unverified (memory):** players sit in a ring around a central bomb; an arrow from the bomb points at the player whose turn it is; the syllable is printed on or beside the bomb; each player's in-progress typing appears live under their avatar to everyone; in the accepted word the prompt syllable is highlighted in a second colour; a wrong word shakes the player's entry and plays a buzz without ending the turn; the bomb's fuse length is hidden and partly random, with a minimum turn time; a syllable that survives several players gets replaced; the bonus alphabet is a column of letters that dim as used, refilling and granting a life when complete. Someone should confirm these by playing a round before the report states them.
+- **ZType's destruction feedback** (letters disappearing from the word as typed, a shot fired per keystroke, the target locking once started, an EMP for clearing the screen, speed rising by wave) is **unverified (memory)**; neither PhobosLab post describes it. The 2011 post says nothing about escalation; a search summary quoting a "faster and faster" design goal could not be confirmed on the page.
+- **Typing of the Dead: Overkill** differences, and grading / rank screens in either game: not in the source read. No GDC talk or Game Developer post-mortem on Typing of the Dead was found.
+- **Epistory's per-letter feedback, combo and scoring** are not in the article read (its author had not finished the game). A Fishing Cactus retrospective exists on [gamedev.net](https://gamedev.net/blogs/entry/2262740-epistory-retrospective-looking-back-over-the-development-of-epistory) and was not read. **Nanotale**: nothing read beyond titles ([80.lv on its watercolour 3D look](https://80.lv/articles/nanotale-a-watercolor-painting-in-3d), not read).
+- **Monkeytype per-letter colouring** (untyped text dim, correct letters in the main colour, wrong letters in the error colour, extra letters appended in a darker error colour, optional pace caret, optional "flip" and "blind" modes) is **unverified (memory)**; the README lists only the features cited above. The source would settle it, and because the licence is GPL-3.0, code should be read for ideas and not copied into Plor without a licence decision.
+- **Typeracer, Nitro Type, Keyboard-Hero-style rhythm typing, Letter Quest, Wordament and Boggle-like round timers:** not researched within the call budget. **Unverified (memory):** Typeracer and Nitro Type show progress as cars moving along lanes, so the "scene" is a one-dimensional progress bar with a skin; Wordament shows a round clock and colours a traced path green for valid, red for invalid and yellow for already found.
+- **GamesRadar, "How to make word games people will actually play"** ([link](https://www.gamesradar.com/how-to-make-word-games-people-will-actually-play)) looked directly relevant but the page came back truncated; unread.
+
+## 2. Timer forms: which read at a glance while the eyes are on the input
+
+### Takeaway
+The best-documented tension devices are audio (a warning sting, then faster or different music) and a clock that visibly changes its own rate; I found no controlled comparison of bar versus ring versus number for peripheral reading, so any ranking of visual forms is inference.
+
+### Cited Findings
+- **Perceived time can be bent by the clock display itself.** In a study summarised by psychologist Jamie Madigan (Sackett et al.), subjects did a task beside a timer secretly run 20% fast or 20% slow; the article's design suggestion is that a faster-seeming clock at constant difficulty can make a task feel more enjoyable. Madigan presents this as a hypothesis for designers, not a tested game result, and I did not read the original paper. — [Game Developer, "Analysis: Fun is had when your time flies"](https://www.gamedeveloper.com/game-platforms/analysis-fun-is-had-when-your-time-flies)
+- **Tetris 99 escalates by swapping the music at fixed stages of the match:** separate tracks for 99–51, 50–11 and 10–2 players remaining. — [Super Mario Wiki, "Tetris 99"](https://www.mariowiki.com/Tetris_99)
+- **Keep Talking and Nobody Explodes ties clock speed to the player's own mistakes:** a wrong action adds a strike, and strikes make the timer run faster. — [Mechanics of Magic, "MDA: Keep Talking and Nobody Explodes"](https://mechanicsofmagic.com/2024/04/05/mda-keep-talking-and-nobody-explodes); corroborated by [TV Tropes' page on the game](https://tvtropes.org/pmwiki/pmwiki.php/VideoGame/KeepTalkingAndNobodyExplodes) (search summary only; page not opened)
+- **Keep Talking also uses the room:** lights going out and alarms ringing raise tension independently of the bomb's digits. — [Mechanics of Magic, same analysis](https://mechanicsofmagic.com/2024/04/05/mda-keep-talking-and-nobody-explodes)
+- **Juice reinforces, it does not replace:** the 2012 talk "Juice it or lose it" (Martin Jonasson, Petri Purho) turned a plain Breakout clone lively with flash, shake, floating text, sound and particles; later commentary warns that juice only works when it reinforces something the play already does. Sources disagree on the talk's venue (GDC versus Nordic Game Jam). — [GDQuest glossary, "Juicing"](https://school.gdquest.com/glossary/juicing) (search summary only; page not opened)
+
+### Inferences
+- **For a typing game the eyes are on the input line, so the clock must be read without looking at it.** That argues for forms that are large, change one property continuously, and sit next to or behind the typed word: a bar shrinking along the full width directly above or below the input, or the input's own border / underline draining. A ring or a number in a corner needs a glance away. This is reasoning from where attention sits, not a cited result.
+- **Sound is the only channel that needs no glance at all,** and it is what Mario, Tetris 99 and Keep Talking all lean on. But a phone web game is often played muted, so audio can only double a visual cue, never carry one alone.
+- **A discrete warning beats a smooth ramp for being noticed.** Tetris 99's track swaps and the Mario "hurry up" sting (see Gaps) are step changes. A smooth colour drift is easy to miss in peripheral vision; a step change at a named point (ticket-defined) is not. Applied to Fragments: one visible state change of the timer late in the round, rather than only a gradual hue shift.
+- **Keep Talking's "your mistake speeds the clock" is the same idea as Fragments' wrong-try lockout:** a mistake costs time. The lockout is therefore already a tension device and deserves to look like one (the clock visibly keeps burning while the input is locked), which also gives the "visible cause" the owner asks for.
+- **A burning fuse is the one timer form that is also a movement dynamic.** It has a moving point (the spark), a consumed length behind it, and a natural end state, and it is native to the BombParty lineage. In SVG it is a path with an animated `stroke-dashoffset` plus one small element riding the path end, which is compositor-friendly if only transform and opacity animate elsewhere. This speaks directly to the owner's "not enough of a movement dynamic" without moving the scene.
+- **The Madigan/Sackett finding suggests the clock's *apparent* rate is a feel lever** (for example a tick or pulse that quickens), separate from the real time limit. It must never misreport the real time, which would break trust in a scored daily game.
+
+### Gaps
+- **No source compares timer forms for peripheral legibility** (bar, ring, fuse, number, vignette, colour shift). I found no HCI or game-UX study on this in the searches run. The ranking above is inference.
+- **Super Mario "hurry up":** **unverified (memory)**: when the level timer reaches 100 a short warning jingle plays and the music restarts faster. The TV Tropes page that documents the pattern ([Songs in the Key of Panic](https://tvtropes.org/pmwiki/pmwiki.php/Main/SongsintheKeyOfPanic)) returned HTTP 403; only a search summary of it was seen.
+- **WarioWare speed-ups, Spelunky's bomb fuse, Mario Party's last-five-seconds countdown, heartbeat / low-health pulses, screen-edge vignettes:** nothing sourced. **Unverified (memory):** WarioWare shows a literal burning-fuse bomb as its microgame timer and announces "speed up" between sets while raising the music tempo; Mario Party shows large numerals with a beep for the last seconds of a minigame.
+- **Keep Talking's beep cadence and music design:** no developer source found. A Game Developer "Road to the IGF" interview with Steel Crate Games exists ([link](https://www.gamedeveloper.com/design/road-to-the-igf-steel-crate-games-i-keep-talking-and-nobody-explodes-i-)) and was not read.
+- **Whether Tetris 99's tempo itself rises** between stages (as opposed to the track changing) is not confirmed by the wiki.
+
+## 3. Typed-word feedback: per-letter response, the chunk inside the word, accept, reject, rarity, the trail
+
+### Takeaway
+Sourced evidence supports three things: show typed text in place with live feedback (Monkeytype), make a stronger word do visibly more to the same board (Bookworm Adventures, SpellTower), and leave something behind from a good word (Bookworm's gems). The specific animation recipes (pop, stamp, shake) are established craft but I did not find a primary source for them in this session.
+
+### Cited Findings
+- Typed characters appear in place with live error, speed and accuracy displays and an optional smooth caret. — [Monkeytype README](https://github.com/monkeytypegame/monkeytype)
+- Stronger words (longer, rarer letters) both hit harder and leave a persistent bonus tile on the board. — [Wikipedia, "Bookworm Adventures"](https://en.wikipedia.org/wiki/Bookworm_Adventures)
+- A long word (five tiles or more) clears its neighbours as well as itself. — [Wikipedia, "SpellTower"](https://en.wikipedia.org/wiki/SpellTower)
+- Acceptance removes the word's tiles and the rest of the board physically settles into the gap. — [Wikipedia, "SpellTower"](https://en.wikipedia.org/wiki/SpellTower)
+- The standard juice vocabulary is flash, shake, floating text, sound and particles, applied to events the game already has. — [GDQuest glossary, "Juicing"](https://school.gdquest.com/glossary/juicing) (search summary only)
+
+### Inferences
+A menu of techniques for Fragments, each buildable in DOM/CSS/SVG. All are proposals to choose between, not a design.
+- **Per-letter arrival.** Render the typed word as one `<span>` per letter over (or instead of) the native input's text, and give the newest letter a one-shot transform/opacity keyframe. Because only the new span animates, the rest of the word stays still ("scene stays still while typing").
+- **The chunk lights up inside the word.** The moment the typed string contains the round's chunk, those letters take the chunk's colour or weight, and the big chunk display answers (for example it dims or "docks"). This gives a mid-word reward before submit and tells the player the hard part is done. It is the BombParty highlight (unverified, see section 1 Gaps) moved earlier, from after acceptance to during typing.
+- **Accepted: the word leaves the input and becomes an object.** SpellTower's "tiles vanish and the board settles" suggests the accepted word should travel to where it will live (the trail below), using a single transform so it costs nothing on the clock; the next round's chunk can appear while it is still in flight.
+- **Rejected: local and short.** A horizontal shake of the input only, plus the lockout shown as a visible drain or bar on the input itself, so the cause of the lost time is on screen.
+- **Rarity as magnitude, not as a separate show.** Following Bookworm and SpellTower: the same acceptance motion, scaled. A rarer word could land larger in the trail, carry a mark (Bookworm's gem), or disturb its neighbours in the trail (SpellTower's spill-over). Nothing modal, nothing that pauses input.
+- **The trail as the cheap scene.** Seven rounds give at most seven words. Stacked as a column or tower that grows upward toward the chunk, each word sized or marked by its rarity, they are a record of the run made only of text, and by round seven the screen is visibly fuller and brighter than at round one because of what the player did. That is a "visible cause" for escalation. It also doubles as the share image / results view.
+- **Latency.** Anything on keystroke should be driven straight from the `input` / `beforeinput` event into a class or style change, animating only `transform` and `opacity`, so no layout work sits between key and response.
+
+### Gaps
+- **No primary source read for per-letter pop, stamp or shake recipes.** Codrops text-effect articles were suggested but not fetched within budget. A pygame guide in search results recommended shakes of 50–300 ms with easing and decaying amplitude ([slicker.me](https://slicker.me/python/game_feel_pygame.htm)); it was seen only as a search summary, is not a primary source, and its numbers should not be adopted without the human.
+- **No source found on how rarity-scaled celebration affects players of a timed word game** (whether it distracts). The owner's "no finale that costs clock time" is the governing constraint.
+- **Wordament / Boggle-like "found words" lists** as precedent for the trail: not researched.
+
+## 4. Escalation across rounds without a 3D scene
+
+### Takeaway
+The sourced examples escalate by stepping a small number of things at known points: the text itself (Typing of the Dead), the music track (Tetris 99), the clock's rate (Keep Talking) and the room lighting (Keep Talking). None needs geometry.
+
+### Cited Findings
+- Words grow into longer and more complex phrases over the game, and bosses change the typing rule. — [Wikipedia, "The Typing of the Dead"](https://en.wikipedia.org/wiki/The_Typing_of_the_Dead)
+- Music is swapped at three fixed stages of a match. — [Super Mario Wiki, "Tetris 99"](https://www.mariowiki.com/Tetris_99)
+- The timer speeds up with each strike; lights go out and alarms ring. — [Mechanics of Magic, "MDA: Keep Talking and Nobody Explodes"](https://mechanicsofmagic.com/2024/04/05/mda-keep-talking-and-nobody-explodes)
+- Epistory builds its world from themed word sets and printed narration on the landscape, so text is the scenery. — [Game Developer, "Let's talk about Epistory"](https://www.gamedeveloper.com/design/let-s-talk-about-epistory-typing-chronicles)
+
+### Inferences
+- **Step, don't drift.** The cut "Midnight Brew" scene escalated at rounds 3 and 6; Tetris 99 does the same with three stages. The same two step points can be kept with CSS alone: a round-indexed attribute on the game root (`data-stage`) that switches a handful of custom properties.
+- **Dark to bright with a cause.** If the trail of accepted words is what carries light (each accepted word adds a lit element; rarer words are brighter), the page brightens because the player fed it. This is the same causal story as words into the cauldron, with text instead of models. A missed round then leaves a visible dark gap, which is honest and readable.
+- **Cheap levers, roughly in order of cost:** (1) custom-property palette steps; (2) the chunk's size or weight stepping up; (3) an SVG or CSS background pattern whose density or opacity steps up; (4) the timer's form changing state (the fuse burning hotter); (5) stacked audio layers that unmute at each stage, the Tetris 99 idea in miniature. Items 1–4 are static between steps, so they cost no frames while typing.
+- **Keep-Talking-style "lights" translate to a vignette or background dim** that responds to the clock within a round, separate from the across-round brightening. The two must not fight: one axis for the round's clock, another for the run's progress.
+
+### Gaps
+- No source read on stacked or adaptive music layers in web games, or on Web Audio cost on low-end phones.
+- No evidence gathered on whether players notice palette steps while typing; this would need a playtest.
+- WarioWare's speed-up interstitial is the best-known example of an announced escalation step, but it is unsourced here (see section 2 Gaps) and it costs clock time, which the owner rules out.
+
+## 5. Phone specifics: the on-screen keyboard, latency and haptics
+
+### Takeaway
+On iOS Safari and on Chrome for Android since version 108 the keyboard shrinks only the visual viewport, so anything laid out against the full page height or fixed to the bottom can end up under the keyboard; `window.visualViewport` is the cross-browser way to learn the visible height. Vibration is not available in Safari, so haptics can only ever be an extra.
+
+### Cited Findings
+- Since Chrome 108 on Android the on-screen keyboard resizes only the visual viewport, not the layout viewport, matching Safari and Chrome on iOS; viewport-relative units keep their values when the keyboard shows, and `position: fixed` elements stay put and can be covered. — [Chrome for Developers, "Prepare for viewport resize behavior changes"](https://developer.chrome.com/blog/viewport-resize-behavior)
+- The viewport meta key `interactive-widget` chooses the behaviour: `resizes-visual` (default), `resizes-content` (layout viewport resizes too, the old Android behaviour) or `overlays-content` (nothing resizes). It applies to Blink-based Chrome 108+, not to browsers on iOS. — [Chrome for Developers, same post](https://developer.chrome.com/blog/viewport-resize-behavior)
+- Firefox support for `interactive-widget` from version 132 is claimed by one secondary source only; treat as unconfirmed. — [HTMHell advent calendar 2024, "Control the viewport resize behavior on mobile with interactive-widget"](https://htmhell.dev/adventcalendar/2024/4/) (search summary only)
+- `window.visualViewport` exposes `width`, `height`, `offsetTop`, `offsetLeft`, `pageTop`, `pageLeft` and `scale`, with `resize`, `scroll` and `scrollend` events; it is Baseline "widely available" since August 2021. MDN's pattern for pinning an element to the visible area is to listen for `resize` and `scroll` and reposition with a transform, and it warns the technique can flicker during scrolling. — [MDN, "Visual Viewport API"](https://developer.mozilla.org/en-US/docs/Web/API/Visual_Viewport_API)
+- WebKit has an open request because Safari offers no way to control this resize behaviour; the described workaround is detecting the keyboard from a `visualViewport` resize while an input is focused. — [WebKit Bugzilla 230225](https://bugs.webkit.org/show_bug.cgi?id=230225) (search summary only)
+- `navigator.vibrate(pattern)` takes a duration or an alternating vibrate/pause array in milliseconds, needs prior user interaction, does nothing in silent / do-not-disturb modes, and is marked "limited availability" by MDN. — [MDN, "Navigator: vibrate()"](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/vibrate)
+- ZType's developer concluded that the stock mobile keyboard was the main obstacle to fun and replaced it, enlarging valid keys. — [PhobosLab, "What makes an on-screen keyboard fun"](https://phoboslab.org/log/2015/07/what-makes-an-on-screen-keyboard-fun)
+
+### Inferences
+- **Lay the round out inside the visible area, not the page.** Set one custom property from `visualViewport.height` on `resize` and size the play column from it, so the chunk, the timer and the input always share the space above the keyboard. On Android Chrome `interactive-widget=resizes-content` gets much of this for free, but iOS needs the script path anyway, so the script path is the one way that covers both.
+- **Budget the layout for the keyboard-open state first.** With roughly half the screen gone, the vertical order that keeps everything in one eye-span is: trail (compressible, can scroll off the top), chunk, timer, input, keyboard. The timer sits between chunk and input so it is in peripheral view of both.
+- **Avoid scrolling the page at all during a round.** MDN's flicker warning applies to repositioning on scroll; a fixed-height, non-scrolling game column sidesteps it.
+- **A custom keyboard (the ZType route) is a real option with real costs.** It removes autocorrect, the suggestion strip and viewport surprises, gives full control of key feedback, and makes the layout deterministic; it costs build and test effort, accessibility work, and non-English layouts. This is a design decision for the human, not something to slide in.
+- **Haptics:** a short pulse on accept and a different one on reject would work on Android Chrome only. Since Safari lacks the API, no information may be carried by vibration alone.
+- **Keep the native input's own caret and text visible or perfectly mirrored.** If letters are re-rendered as spans for animation, the mirror must update in the same event as the keystroke, or the game will feel laggy in the one place the player is looking.
+
+### Gaps
+- **Safari / iOS support for `navigator.vibrate`:** MDN's compatibility table did not come through in the fetch; "Safari does not support it" is **unverified (memory)**, though consistent with MDN's "limited availability" label. **Unverified (memory):** recent iOS Safari versions fire a system haptic when a `<input type="checkbox" switch>` is toggled, which some sites use as a workaround; I did not check this.
+- **`dvh` / `svh` units and the keyboard:** the Chrome post does not name them. **Unverified (memory):** dynamic viewport units respond to browser toolbars, not to the keyboard, under the default `resizes-visual` behaviour.
+- **The VirtualKeyboard API** (`navigator.virtualKeyboard`, `env(keyboard-inset-height)`), a Chromium-only alternative: not researched.
+- **Suppressing autocorrect and the suggestion strip** (`autocomplete`, `autocorrect`, `autocapitalize`, `spellcheck`, `inputmode`, `enterkeyhint`): not researched here; behaviour differs between iOS and Android keyboards and should be checked on devices.
+- **Measured input-to-paint latency on mid-range phones** for span-per-letter rendering: no data found; needs a measurement on Plor's own build.
+- web.dev's own article on the visual viewport was not found in search; MDN and the Chrome blog were used instead.

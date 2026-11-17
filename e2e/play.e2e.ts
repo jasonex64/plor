@@ -240,8 +240,9 @@ test("a Next that fails says so, and the × still leaves", async ({ browser }) =
     return route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ ok: false, error: "internal" }) });
   });
   await nextButton(page).click();
-  // Next.js keeps an alert of its own for route changes, so the error is the one with text beyond the page's title.
-  await expect(page.getByRole("alert").filter({ hasText: /\S/ }).filter({ hasNotText: "Plor" })).toBeVisible();
+  // Next.js keeps an alert of its own for route changes, `#__next-route-announcer__`, which reads the page's title: "Plor"
+  // on the dev server, the game's name on a built app (docs/milestones/M21-faster-e2e.md, 21a). The error is the other one.
+  await expect(page.getByRole("alert").and(page.locator(":not(#__next-route-announcer__)")).filter({ hasText: /\S/ })).toBeVisible();
   expect(tries).toBe(1);
   await expect(wayOut(page)).toBeVisible();
   await wayOut(page).click();
