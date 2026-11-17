@@ -39,6 +39,9 @@ test("a group is made on the Groups tab and joined by its link", async ({ browse
   await expect(creator).toHaveURL(/\/groups\/[0-9a-f-]{36}$/);
   const groupUrl = creator.url();
   await expect(creator.getByRole("heading", { name: "Book Club" })).toBeVisible();
+  // How old it is, from the Pacific day it was made (inbox #233: "Started Nov 2").
+  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/Los_Angeles" });
+  await expect(creator.getByText(`Started ${today}`, { exact: true })).toBeVisible();
   // Shared from a button, never shown (M14 14b-3, answer 9), on /g/ with a 10-character code.
   const link = await sharedLink(creator, creator.getByRole("button", { name: "Share group link" }));
   expect(link).toMatch(new RegExp(`^${localStack().appUrl}/g/[A-Za-z0-9_-]{10}$`));

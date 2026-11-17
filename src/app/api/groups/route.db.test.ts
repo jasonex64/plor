@@ -21,6 +21,9 @@ import { POST as remove } from "./remove/route";
 import { POST as rename } from "./rename/route";
 import { GET as groups } from "./route";
 
+// A group's start day (inbox #233); which day it is, at the Pacific boundary, is src/groups/groups.plor-app.db.test.ts's.
+const DAY = expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/);
+
 vi.mock("next/headers", () => import("@/test/request-scope").then((m) => m.nextHeaders));
 vi.mock("next/server", () => import("@/test/request-scope").then((m) => m.nextServer()));
 
@@ -92,7 +95,7 @@ describe("groups", () => {
     expect(page.body.msToReset).toBeLessThanOrEqual(25 * 60 * 60 * 1000);
     code = page.body.group.inviteCode;
     expect(code).toMatch(/^[A-Za-z0-9_-]{10}$/);
-    expect(page.body.group).toEqual({ id: club, name: "Book Club", inviteCode: code, creator: true, members: [member(A, true)] });
+    expect(page.body.group).toEqual({ id: club, name: "Book Club", inviteCode: code, creator: true, startedOn: DAY, members: [member(A, true)] });
 
     useSession(C.session);
     expect(await call(create, "/api/groups/create", "POST", { name: "Club" })).toEqual(error(409, "no_profile"));
@@ -118,6 +121,7 @@ describe("groups", () => {
       name: "Book Club",
       inviteCode: code,
       creator: false,
+      startedOn: DAY,
       members: [member(A, true, "Ana"), member(B, false)],
     });
     useSession(C.session);
