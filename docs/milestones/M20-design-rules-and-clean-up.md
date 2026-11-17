@@ -1,6 +1,6 @@
 # M20 — Design rules and clean-up
 
-**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is built, in PR #258 (overnight, the `goodnight` skill), waiting for the human to merge; 20d left M20 for the quick fix of inbox #250 (answer 22).
+**Status:** building. Settled with the human on 2026-11-16 (answers 1 to 12) and widened on 2026-11-17 (answers 13 to 28); approved to build on 2026-11-17: "yes, let's just get started on M20". 20a is merged (PR #258); 20d left M20 for the quick fix of inbox #250 (answer 22). The look and timings are picked (answers 34 to 36, 2026-11-17): Balanced, the pop at 300ms, the fade at 400ms. Next: 20c, then 20b (answer 40).
 
 ## Goal
 One written set of design rules and one kit of components that every later change builds from, and the shell and the main tabs cleaned up to follow them. Since 2026-11-17 also: the look stops reading as boring, by colour, size and motion on what comes from playing, with a calm frame around it (answers 14 to 21).
@@ -53,7 +53,19 @@ The human opened the day with twelve items, each now an inbox issue (#243 to #25
 | 32 | *Claude's overnight decision:* `/admin/kit` shows each piece at rest and disabled, live under the pointer, the press and the keyboard, not frozen in each state | Taken: no test-only CSS in the kit. Not taken: forced-state classes for the sample page |
 | 33 | *Claude's overnight decision:* the three looks use only values already in the app (the games' colours, the 4px button edge, sizes in use, `--line`); no game-colour tints, since nothing gives their strength in the dark themes | Taken: no invented numbers. Not taken: tints at `--soft`'s strength |
 
-Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), the sidebar's one left edge and the pill's and avatar's one height (20c), 20e's four questions, and which of the three looks (and which timings) after the human sees `/admin/kit`.
+## The human's answers (2026-11-17, evening, after looking at `/admin/kit`)
+| # | Asked | Answer |
+|---|---|---|
+| 34 | Which of the three looks (answer 24)? | "let's go for the balanced look. I think that one looks the best so far." |
+| 35 | Which pop timing on the motion menu? | "I do kind of like the connections bounce. So let's keep it that.": the pop in from 90% at Connections' 300ms |
+| 36 | Which fade timing? | "as for the fade in, I like the 400 ms as well": the fade in from 95% at Atlassian's xlong 400ms |
+| 37 | The human: "we did the tabs like today, friends, groups, and me, like a little icon that changes when you hover over that [...] I want that to be kind of like an essential thing that's used in a lot of places [...] settings button doesn't have that." Where does the hover rule go? | "Everything pressable (Recommended)": every button, link, row and icon that can be pressed, except a screen's one raised main button, takes the soft fill; an icon with an outline and a solid form swaps them. Settings, Admin, Close and Back included (the look audit found the sidebar's Settings and Admin entries with no hover) |
+| 38 | The human: "if everything is kind of square, I think the circle will stand out. I think so the close button doesn't need to be circle anymore." Which square? | "Bare icon, square fill on hover (Recommended)": the X alone, no border; the hover rule's fill is square |
+| 39 | The human: "whenever there's like an arrow that you need to click, for example, switching between games, I think that arrow looks very jarring. It's not done in this style that matches the site. Like it kind of seems like a default thing." What replaces the browser's dropdowns? | "Switch for few, styled dropdown for many (Recommended)": the Offbeat / Fragments picker when posting a comment (`feed.tsx:298`, `comments.tsx:292`) becomes a switch like the leaderboard's; the leaderboard's group picker (`leaderboard.tsx:224`) stays a dropdown with the kit's own arrow and the field's border |
+| 40 | The human: "Still haven't seen a fix for the streak badge next to the player thing on the top left of the screen. The fact that it's like different sizes and doesn't line up right looks quite ugly." When, and which way? | "20c next, badge matches avatar (Recommended)": 20c is built before 20b; the streak pill takes the avatar's height, on one centre line, measured first and the numbers shown to the human |
+| 41 | #256 moved a group's Share, Reset, Leave and Delete into the Members card at the bottom: keep it? | "Move the groups reset into the members card at the bottom. I think that's fine." |
+
+Still to ask, each in its own sub-ticket: the heading and small-text sizes (20f), the sidebar's one left edge (20c), 20e's four questions.
 
 ## What the team found (2026-11-16; four Sonnet subagents, read from code and the web, **nothing measured in a browser**)
 **The audit of `src/app`** (branch `process-parallel-sessions` at `8d76800`, which holds `main` to #226):
@@ -96,6 +108,7 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 
 **20b — buttons** (answers 6 and 11).
 - The raised look only on a screen's main action; every other button and button-drawn link becomes the flat kit button with the hover rule. The raised button no longer stands taller than a field beside it.
+- Since 2026-11-17 evening: the hover rule on everything pressable, Settings and Admin included (answer 37); the round Close becomes a bare icon with the square fill (answer 38); the comment's game picker becomes a switch and the group picker a dropdown with the kit's arrow (answer 39).
 - → verify: `e2e/look.e2e.ts` gains a check that, in each of the four rows above, the button's and the field's painted tops and bottoms match; and that each of the main tabs has at most one raised button in view.
 
 **20c — spacing and alignment.**
@@ -132,7 +145,7 @@ One PR each, from `m20-design-rules-and-clean-up`, in this order. **Every merge 
 **20j — who reacted** (#249; answer 28). Hovering a reaction, or a long press on a phone, lists the names of everyone who reacted with it. First: check that a reaction is only possible between people who can see each other; if not, stop and ask.
 - → verify: a db test reads the names for a reaction and finds the reactors and no one else; an e2e hovers a reaction and finds the names.
 
-**20k — the chosen look on the moments** (answers 18 to 21, 24). The look the human picks on `/admin/kit`, with the timings picked there, goes onto the moments listed in 20a; the frame follows 20b to 20f.
+**20k — the chosen look on the moments** (answers 18 to 21, 24). The look the human picks on `/admin/kit`, with the timings picked there, goes onto the moments listed in 20a; the frame follows 20b to 20f. Picked (answers 34 to 36): Balanced, the pop at 300ms, the fade at 400ms.
 - → verify: chosen when the look is: the moments' look e2e matches `/admin/kit`'s chosen version.
 
 **Quick fixes from the same night (answer 22), each its own `fix-` branch off `main` and its own PR, not M20's:** #246 `fix-game-cards-match` (answer 25: Fragments' card gains the next-puzzle line, so both cards hold the same parts and match), #247 `fix-group-board-first` (answer 26), #250 `fix-friends-today-status` (answer 5, as 20d above).
