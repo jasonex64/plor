@@ -1,0 +1,188 @@
+/* The moments in four looks (docs/milestones/M20-design-rules-and-clean-up.md, 20a; answers 18 to 24). Every value is
+   one already in the app: the games' colours (globals.css, --offbeat and --fragments with their on- colours), the 4px
+   edge of the raised button (--shadow-button), the card's 14px padding, the stat's 10px 14px, the row's 8px 10px and
+   1.5px border, and type sizes in use (1.5rem the card heading, 1.875rem the game prompt, 2.5rem the largest heading;
+   the M20 audit). Which look the moments take is the human's pick (20k). */
+.about {
+  color: var(--muted);
+}
+
+.moments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.moments :where(p) {
+  margin: 0;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.offbeat {
+  --game: var(--offbeat);
+  --on-game: var(--on-offbeat);
+}
+
+.fragments {
+  --game: var(--fragments);
+  --on-game: var(--on-fragments);
+}
+
+.band,
+.who {
+  font-weight: 700;
+}
+
+.score {
+  font-weight: 800;
+}
+
+.meta {
+  color: var(--muted);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.points,
+.resultScore {
+  font-weight: 800;
+}
+
+.reactions {
+  margin-top: 6px;
+}
+
+.reaction {
+  margin-right: 8px;
+  font-size: 0.8125rem;
+}
+
+.reactionMine {
+  padding: 0 4px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-small);
+  background: var(--soft);
+}
+
+/* As built: a comment and a result are the same bordered row. */
+.built .comment,
+.built .result,
+.restrained .result,
+.balanced .result {
+  padding: 8px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-small);
+}
+
+/* Restrained: the game's colour as a 4px edge on its own things; the score at the card heading's size; a comment with no
+   box. */
+.restrained .game {
+  border-top: 4px solid var(--game);
+}
+
+.restrained .score,
+.balanced .resultScore {
+  font-size: 1.5rem;
+}
+
+.restrained .result,
+.balanced .result,
+:is(.restrained, .balanced, .bold) .boardRow {
+  box-shadow: inset 4px 0 0 var(--game);
+}
+
+/* Balanced and Bold: one border level for the frame (the look audit's second finding): rows keep only a hairline in
+   the theme's --line, and a comment has no box, so the card's ink edge is the one strong line. */
+:is(.balanced, .bold) .boardRow {
+  border-color: var(--line);
+}
+
+/* Your own row: an accent edge in every proposal (answer 21). After the game edge, so it wins. */
+:is(.restrained, .balanced, .bold) .boardRow.you {
+  box-shadow: inset 4px 0 0 var(--accent);
+  font-weight: 700;
+}
+
+/* Balanced: a band in the game's colour across the card's top, the score larger. */
+.balanced .band {
+  margin: -14px -14px 0;
+  padding: 10px 14px;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  background: var(--game);
+  color: var(--on-game);
+}
+
+.balanced .score {
+  font-size: 1.875rem;
+}
+
+/* Bold: game cards and the feed's results filled with their game's colour, the score at the largest size in use. */
+.bold .game,
+.bold .result {
+  background: var(--game);
+  color: var(--on-game);
+}
+
+.bold .game .meta {
+  color: var(--on-game);
+}
+
+.bold .result {
+  padding: 10px 14px;
+  border-radius: var(--r-small);
+}
+
+.bold .score {
+  font-size: 2.5rem;
+}
+
+.bold .resultScore {
+  font-size: 1.875rem;
+}
+
+/* The motions, each at its timing (looks.tsx sets the duration). Nothing moves under reduced motion. */
+.motion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pop {
+  animation-name: pop;
+  animation-timing-function: var(--ease);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+  }
+}
+
+.slide {
+  animation-name: slide;
+  animation-timing-function: var(--ease);
+}
+
+/* Atlassian's entrance, 95% to 100% and faded in (docs/research/research_notes/2026-11-17 calm frame, loud moments.md). */
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop,
+  .slide {
+    animation: none;
+  }
+}

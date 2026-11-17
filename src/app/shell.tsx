@@ -264,7 +264,7 @@ export function Shell({ lost, admin, profile, streak, requests, onChanged, onSet
             const here = lost ? undefined : current(path, tab.href, sidebar);
             return (
               <li key={tab.href}>
-                <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${styles.on}` : styles.tab}>
+                <Link href={tab.href} aria-current={here} className={here ? `${styles.tab} ${kit.hover} ${styles.on}` : `${styles.tab} ${kit.hover}`}>
                   <TabIcon art={tab.art} />
                   {tab.label}
                   {tab.href === "/friends" && requests > 0 && (

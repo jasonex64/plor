@@ -13,7 +13,7 @@ import type { ReportedComment } from "@/admin/reports";
 import { api } from "@/lib/api-client";
 import { ButtonLink } from "../button-link";
 import kit from "../kit.module.css";
-import { errorText } from "../messages";
+import { errorText, messageFor } from "../messages";
 import { useDismiss } from "../dismiss";
 import { useMinWidth } from "../min-width";
 import { SideColumn } from "../side-column";
@@ -22,13 +22,14 @@ import { AnswerBase } from "./base/base";
 import { Bank } from "./bank/bank";
 import { dayText, whenText } from "../day-text";
 import { Insights } from "./insights";
+import { Kit } from "./kit/kit";
 import { Puzzles } from "./puzzles/puzzles";
 import { Reports } from "./reports/reports";
 import styles from "./admin.module.css";
 import { Line, Skeleton } from "../skeleton";
 import { warningOf, tomorrowOf, type Tomorrow } from "./tomorrow";
 
-export type AdminPage = "puzzles" | "audit" | "reports" | "insights" | "bank" | "base";
+export type AdminPage = "puzzles" | "audit" | "reports" | "insights" | "bank" | "base" | "kit";
 
 // What waits for the admin: drafted days not yet approved (and the first), texts to review, reported comments (and
 // when the first was reported), the approved days after today (and the last), and whether tomorrow has a puzzle
@@ -44,6 +45,8 @@ const LOOK_UP: { page: AdminPage; name: string }[] = [
   { page: "insights", name: "Insights" },
   { page: "bank", name: "Bank" },
   { page: "base", name: "Database" },
+  // The kit's sample page (docs/milestones/M20-design-rules-and-clean-up.md, 20a).
+  { page: "kit", name: "Kit" },
 ];
 const NAMES = Object.fromEntries([...TO_DO, ...LOOK_UP].map((p) => [p.page, p.name])) as Record<AdminPage, string>;
 
@@ -76,8 +79,9 @@ function useCounts(): { counts: Counts | null; error: string | null; refresh: ()
 }
 
 export function AdminArea({ page, admin }: { page: AdminPage; admin: boolean }) {
-  // A player who isn't an admin gets the page itself, which shows the API's refusal.
-  if (!admin) return <Page page={page} onChanged={() => {}} />;
+  // A player who isn't an admin gets the page itself, which shows the API's refusal; the kit's page reads no API, so it
+  // shows the same refusal itself.
+  if (!admin) return page === "kit" ? <p role="alert">{messageFor("admins_only")}</p> : <Page page={page} onChanged={() => {}} />;
   return <Area page={page} />;
 }
 
@@ -113,6 +117,8 @@ function Page({ page, onChanged }: { page: AdminPage; onChanged: () => void }) {
       return <Bank />;
     case "base":
       return <AnswerBase />;
+    case "kit":
+      return <Kit />;
   }
 }
 

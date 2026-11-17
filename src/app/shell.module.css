@@ -238,22 +238,11 @@
     background: var(--soft);
     border-color: var(--ink);
   }
-
-  /* A tab under the pointer takes the soft fill and its icon's solid version, held while the pointer stays (14b-10,
-     answers 8 and 30). */
-  .tab {
-    transition:
-      background-color var(--quick) var(--ease),
-      color var(--quick) var(--ease);
-  }
 }
 
+/* A tab under the pointer takes the kit's hover rule (kit.hover, M20 20a) and, from 768px, its icon's solid version,
+   held while the pointer stays (14b-10, answers 8 and 30). */
 @media (min-width: 768px) and (hover: hover) {
-  .tab:hover {
-    background: var(--soft);
-    color: var(--text);
-  }
-
   .tab:hover .solid {
     opacity: 1;
   }
@@ -268,13 +257,6 @@
 
   .tab:hover .solid .turn {
     transform: none;
-  }
-}
-
-/* After the sidebar's own .tab transition, so it wins. */
-@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-  .tab {
-    transition: none;
   }
 }
 
