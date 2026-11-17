@@ -87,19 +87,32 @@
   background: var(--soft);
 }
 
-/* A row under the pointer takes the soft tint (14b-10, answer 12). */
+/* The hover rule (docs/milestones/M20-design-rules-and-clean-up.md, 20a): anything pressable that isn't the main
+   button takes the soft fill and the text colour under the pointer, over --quick with --ease, as the sidebar tabs did
+   (the human, 2026-11-16: "I want that to be something that's like a design rule"); a state still changes under
+   reduced motion, at once. Written once: rows (14b-10, answer 12), the minor button, and .hover on anything else, such
+   as the tabs. */
 @media (hover: hover) {
-  .row {
-    transition: background-color var(--quick) var(--ease);
+  .row,
+  .hover,
+  button.link {
+    transition:
+      background-color var(--quick) var(--ease),
+      color var(--quick) var(--ease);
   }
 
-  .row:hover {
+  .row:hover,
+  .hover:hover,
+  button.link:hover:not(:disabled) {
     background: var(--soft);
+    color: var(--text);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .row {
+  .row,
+  .hover,
+  button.link {
     transition: none;
   }
 }

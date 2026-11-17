@@ -1,0 +1,35 @@
+/* The kit's sample page (docs/milestones/M20-design-rules-and-clean-up.md, 20a). Cards 16px apart, the gap between
+   cards on every page (answer 11). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* A piece's "when to use" line, as DESIGN.md's Rules give it. */
+.when {
+  color: var(--muted);
+}
+
+.sample,
+.small {
+  margin: 0;
+}
+
+.sample {
+  font-weight: 800;
+}
+
+.small {
+  color: var(--muted);
+}
+
+/* A pressable thing drawn as a row's box, so the hover rule's fill has room to show (the row's padding and corners,
+   kit.module.css .row). */
+.hoverSample {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--r-small);
+  color: var(--text);
+  text-decoration: none;
+}

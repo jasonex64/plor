@@ -2,6 +2,30 @@
 
 What Plor's interface is made of today, read from the code. Each value names the file and line that holds it. It records no reasons and no history; a PR that changes what it describes updates it (CLAUDE.md, Docs).
 
+## Rules
+Every screen builds from these; a piece not named here is added here and to the kit first (docs/milestones/M20-design-rules-and-clean-up.md, answer 2). Each piece is drawn at `/admin/kit` (`src/app/admin/kit/kit.tsx`), under the name it has here.
+
+**A calm frame, loud moments** (M20, answer 21). The **frame** is what a player reads and moves through: the sidebar and tab bar, page headings, comments, member and friend lists, settings, the gaps between cards. It stays plain. The **moments** are what comes from playing: the game cards, results, scores, board rows, friends' results in the feed, rank changes, reactions. Only a moment may use the levers (answer 18): its game's colour, a bigger size, a motion. No art and no second font. Which look the moments take is chosen on `/admin/kit` (20k).
+
+| Piece | When to use | Rest | Hover (a device that hovers) | Pressed | Focus | Disabled |
+|---|---|---|---|---|---|---|
+| Main button (`.primary`) | A screen's one main action | the accent fill, `--on-accent` text, 17px 700, the ink border and `--shadow-button` (`kit.module.css:219-225`, `globals.css:426-440`) | lifts 2px, the shadow 6px (`globals.css:442-450`) | drops 4px onto the shadow in 80ms (`globals.css:452-456`) | the focus ring | flat: `--edge` border, `--surface`, `--muted` text (`globals.css:474-480`) |
+| Raised button (base `button`, `.small`, `ButtonLink`) | As built; 20b keeps it for main actions only | the surface, the ink border, the shadow (`globals.css:426-440`; `.small` `kit.module.css:229-235`) | as the main button (`.small`'s shadow 5px, `kit.module.css:237-241`) | as the main button | the focus ring | as the main button |
+| Flat button (`.link`) | Every action that isn't the main one | a 1.5px ink outline, no shadow, 14px 700 (`kit.module.css:263-274`) | the hover rule | nothing moves (`kit.module.css:276-279`) | the focus ring | as the main button |
+| Danger (`.danger`) | A warning, or a step that can't be undone | the danger colour on the edge and text, on a button, link or chip (`kit.module.css:283-286`) | its button's | its button's | the focus ring | its button's |
+| Close button (`.close`) | The one × for a frame, a dialog or a sheet | 44px round (`kit.module.css:250-261`) | as the raised button | as the raised button | the focus ring | — |
+| Text link (`a`) | A link inside running text | the accent colour, underlined (`globals.css:347-349`) | — | — | the focus ring | — |
+| Field (`input`, `select`, `textarea`) | Typed input | 44px, a 2px ink border, the small corners (`globals.css:395-411`) | — | — | the focus ring | the browser's |
+| Card (`.card`, `.soft`) | A section of a page; `.soft` is the one tinted card on a screen | 14px padding, 10px gap, 2px ink border, flat (`kit.module.css:7-20`) | — | — | — | — |
+| Row (`.rows`, `.row`, `.you`) | One item in a list; `.you` is the player's own | 8px 10px, 1.5px ink border, 8px apart (`kit.module.css:48-65`); `.you` the soft tint (`:86-88`) | the hover rule | — | — | — |
+| Chip (`.chip`, `.dark`, `.safe`, `.caught`) | A short fact beside something else | 12px 700, 1.5px ink border (`kit.module.css:138-176`) | — | — | — | — |
+| Badge (`.badge`, `.hot`) | A place or a count; the first is `.hot` | 24px round, the ink fill (`kit.module.css:191-213`) | — | — | — | — |
+| Headings and small text | Sizes in use today, shown at `/admin/kit`; which stay is 20f's question | — | — | — | — | — |
+
+- **The hover rule** (`kit.module.css:90-118`): anything pressable that isn't the main button takes the `--soft` fill and the `--text` colour under the pointer, over `--quick` with `--ease`; under reduced motion the state still changes, at once. Rows and the flat button have it; anything else takes `.hover`, as the sidebar and tab-bar tabs do (`src/app/shell.tsx:267`). An icon with an outline and a solid version swaps them too (the tabs, `shell.module.css`).
+- **The focus ring**, everywhere: 3px in the accent, 3px out (`globals.css:352-355`).
+- **Gaps:** 16px between cards on every page (M20, answer 11).
+
 ## Colour slots and themes
 Components use these slots through CSS Modules, never hex values (`src/app/globals.css:1`).
 
@@ -45,15 +69,15 @@ Components use these slots through CSS Modules, never hex values (`src/app/globa
 | Card | 14px padding, 10px gap, 2px ink border, card corners, flat | 7-15 |
 | Rows | 8px apart; each 8px 10px, 10px gap, 1.5px ink border, small corners | 48-65 |
 | A row that opens (`.row > details`, "Where everyone ended") | its summary is the whole row, 44px tall for one line (`calc((44px - 1lh) / 2)` above and below); 8px under the open list | 69-83 |
-| Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 68-70 |
-| A row's second line (`.below`) | 6px gap, 6px above | 97-103 |
-| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 107-125 |
-| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: the game screen's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:88`) | 147-155 |
-| Badge | 24px round, ink fill, 12px 800; the first in the accent | 157-182 |
-| Main button (`.primary`) | 0 18px, accent fill, 17px | 188-194 |
-| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 198-204 |
-| Minor button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px | 218-229 |
-| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 238-241 |
+| Your own row (`.row.you`) | the soft tint, on boards and in "Where everyone ended" | 86-88 |
+| A row's second line (`.below`) | 6px gap, 6px above | 128-136 |
+| Chip | 2px 9px, 1.5px ink border, small corners, 12px 700; 8px between chips | 138-156 |
+| Stat | A cell on its card, no border, corners or fill: 10px 14px, centred, a size container for its number. The screen draws a 1px `--line` between cells: the game screen's three in a row (`src/app/offbeat.module.css:74-76`), Me's four as a cross (`src/app/me.module.css:51-57`). Me's "All games" card is that screen's one tinted card (`src/app/me.tsx:88`) | 182-188 |
+| Badge | 24px round, ink fill, 12px 800; the first in the accent | 191-213 |
+| Main button (`.primary`) | 0 18px, accent fill, 17px | 219-225 |
+| Small button (`.small`) | 0 12px, small corners, small button shadow, 14px | 229-235 |
+| Flat button (`.link`) | 0 10px, 1.5px ink border, no shadow, 14px; the hover rule (`:90-118`) | 263-274 |
+| Danger (`.danger`) | the danger colour for the edge and text, on buttons, links and chips | 283-286 |
 
 Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 
@@ -106,12 +130,12 @@ Chromium draws the 1.5px borders as 1px (`e2e/look.e2e.ts:109-110`).
 - **A group's comments** list both games' for the day, oldest first, each with a chip of its game; the box has the "Game" choice (`src/app/comments.tsx`, `src/app/groups.tsx`).
 ## Motion
 - One easing and time: `--ease` `cubic-bezier(0.2, 0.8, 0.2, 1)` and `--quick` 200ms (`globals.css:373-376`). Under reduced motion nothing moves; a state still changes, at once.
-- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:442-450`); a small one's to 5px (`kit.module.css:224-228`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
-- **Rows** take the soft tint under the pointer (`kit.module.css:90-105`).
+- **Buttons**, on a device that hovers, lift 2px and their shadow grows to 6px, through `--shadow-button` (`globals.css:442-450`); a small one's to 5px (`kit.module.css:237-241`); a link drawn as a button the same (`button-link.module.css:25-30`). The reactions' ⋯ and its popover's items don't lift (`src/app/reactions.module.css:36-51`, `:82-91`).
+- **The hover rule:** rows, the flat button and anything with `.hover` (the tabs) take the soft fill and the text colour under the pointer (`kit.module.css:90-118`).
 - **The reactions' popover** pops in from 90%, from its top right corner (`reactions.tsx:107`, `reactions.module.css:66-75`); its emoji and actions take the soft tint under the pointer (`reactions.module.css:120-130`).
-- **Tab icons** have two versions, an outline and a solid one that does something (Today's calendar peels a corner, Friends goes ^ ^ with a grin, Groups turns point-down, Me gains a sparkle), in the tab's own colour, muted at rest and the text colour hovered or current, as its label is (`src/app/shell.tsx:39-164`). The current tab shows the solid one; from 768px a hovered tab takes the soft fill and the solid one, which Groups turns 60° into (`shell.module.css:128-163`, `:251-279`).
+- **Tab icons** have two versions, an outline and a solid one that does something (Today's calendar peels a corner, Friends goes ^ ^ with a grin, Groups turns point-down, Me gains a sparkle), in the tab's own colour, muted at rest and the text colour hovered or current, as its label is (`src/app/shell.tsx:39-164`). The current tab shows the solid one; a hovered tab takes the hover rule (`.hover`, `shell.tsx:267`) and, from 768px, the solid one, which Groups turns 60° into (`shell.module.css:128-163`, `:242-265`).
 - **Count-ups:** points and streaks (Me's totals, the game screen's streak and best score, the streak pill) count to their value over 600ms when it differs from what this browser last showed (`src/app/shown.ts:9`, `:53-79`, `src/app/count-up.tsx`).
-- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:268-284`).
+- **Pops:** a reaction added, a comment that arrives and a new streak rank come in from 90% of their size (`kit.module.css:297-311`).
 
 ## The game screen's run (Game 1, `src/app/game.tsx`)
 Game 1's run from Start to See results, drawn in the app's own look with the kit's pieces (docs/milestones/M14-14c-8-plain-game-1.md); its words are in `src/app/game.tsx`, the layout in `src/app/game.module.css`.
@@ -123,7 +147,7 @@ Game 1's run from Start to See results, drawn in the app's own look with the kit
 - **The recap** when the run ends, the kit's soft card (`src/app/recap.tsx:25-45`): the heading ("You survived all 7!", "Time's up on question N" or "Caught on question N", `game.tsx:571-576`), which takes focus; the answers as the kit's rows, each "prompt: you said X, the host said Y (caught)" or "prompt: you said X (safe, +N points)" (`game.tsx:442-449`); the bold total with the bonus if it counts; and the main See results button, which opens the result on the cards, or a test run's goes back to `/admin/puzzles` (`game.tsx:450-455`).
 - **Past midnight and errors** show as lines above the question; a test run's label and Restart sit there too (`game.tsx:424-426`).
 - **How to play** is a modal `<dialog>`, opened by a How to play button: in the play frame's top row, on the game screen under Start (a plain button) and on Today's banner under Play (the kit's small button) (`game.tsx:123`, `:136`, `:474`, `play-frame.tsx:28`; game 2's on its card, `substrings.tsx:120`). The panel is centred, `min(440px, 100% - 32px)` wide, in the card's padding, border, corners and fill, on a dimmed backdrop (`src/app/how-to-play.module.css:5-18`). Its top row holds the 1.5rem "How to play" and the shared × read "Close" (`how-to-play.tsx:55-62`, `how-to-play.module.css:21-32`). Both games open the same panel with their own four steps, one at a time, in a grid cell so the panel is as tall as the longest (`how-to-play.module.css:35-49`; each game's four steps, built from the source's own numbers, `how-to-play.tsx:22-35`). Under them Previous (the small button, unavailable on step 1 with `aria-disabled` and still in its place), "N of 4" in `--muted` at 0.875rem, and the small main Next, which reads Close on step 4 (`how-to-play.tsx:71-82`, `how-to-play.module.css:51-67`). The × and Escape close it, and focus goes back to the button. For screen readers a carousel named "Rules" of slides named "1 of 4" and so on, announced politely (`how-to-play.tsx:63-70`).
-- **The shared close button** is a round 44px ×, used by the play frame's, How to play's and the settings sheet's (`src/app/kit.module.css:237-246`).
+- **The shared close button** is a round 44px ×, used by the play frame's, How to play's and the settings sheet's (`src/app/kit.module.css:250-261`).
 - **Shown again:** a game screen Next.js kept hidden, shown again while its run was in play, waits on the question's placeholder until the run has loaded again, so a run that ended away from it opens on the cards (`game.tsx:367-384`, `:410-418`).
 
 ## The countdown (both games, `src/app/countdown-bar.tsx`)
