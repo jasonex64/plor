@@ -45,3 +45,24 @@ it("creates, joins, renames, resets, removes, hands over and deletes as plor_app
     client.release();
   }
 });
+
+// A group's start is the Pacific day it was made, as the games' days are (inbox #233; the human 2026-11-16: "Started
+// Nov 2"): 07:30 UTC on 3 November 2026 is 23:30 on the 2nd in Los Angeles (PST, after 1 November's change).
+it("gives a group's start as the Pacific day it was made", async () => {
+  const client = await admin.connect();
+  try {
+    await client.query("begin");
+    const a = randomUUID();
+    await client.query("insert into auth.users (id, email) values ($1, $2)", [a, `${a}@example.test`]);
+    await client.query("insert into private.profile (user_id, username) values ($1, $2)", [a, `s${a.slice(0, 8)}`]);
+    await client.query("set local role plor_app");
+    const group = await createGroup(client, a, "Night Club");
+    await client.query("reset role");
+    await client.query("update private.player_group set created_at = '2026-11-03T07:30:00Z' where id = $1", [group.id]);
+    await client.query("set local role plor_app");
+    expect((await getGroup(client, a, group.id)).startedOn).toBe("2026-11-02");
+  } finally {
+    await client.query("rollback");
+    client.release();
+  }
+});
