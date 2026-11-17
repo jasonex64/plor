@@ -36,7 +36,7 @@ const frame = (page: Page) =>
     const box = flowing[0].children.length > 1 && !/card/.test(String(flowing[0].className)) ? flowing[0] : main;
     const cards = [...box.children].filter((el) => /card/.test(String(el.className)) && el.getBoundingClientRect().height > 0);
     const gaps = cards.slice(1, 3).map((c, i) => Math.round(c.getBoundingClientRect().top - cards[i].getBoundingClientRect().bottom));
-    return { left: first.left, top: first.top, gaps };
+    return { left: first.left, top: first.top, gaps, scrolls: document.documentElement.scrollHeight > innerHeight };
   });
 
 test("every tab starts its content at one place, with cards 16px apart", async ({ browser }) => {
@@ -52,13 +52,15 @@ test("every tab starts its content at one place, with cards 16px apart", async (
   const stacked = ["/friends", "/me", group, `/u/lf${RUN}`];
   for (const width of [1280, 1920]) {
     await page.setViewportSize({ width, height: 400 });
-    const seen: Record<string, { left: number; top: number; gaps: number[] }> = {};
+    const seen: Record<string, { left: number; top: number; gaps: number[]; scrolls: boolean }> = {};
     for (const path of ["/", "/friends", "/groups", "/me", group, `/u/lf${RUN}`, "/streak"]) {
       await page.goto(path);
       await expect(page.locator("main [class*='card']").first()).toBeVisible();
       await page.waitForLoadState("networkidle");
       seen[path] = await frame(page);
     }
+    // Groups, with one group, doesn't scroll at this height and Friends does, so the scrollbar's room is compared.
+    expect([seen["/groups"].scrolls, seen["/friends"].scrolls]).toEqual([false, true]);
     const at = seen["/friends"];
     for (const [path, place] of Object.entries(seen)) {
       expect({ path, width, left: place.left, top: place.top }).toEqual({ path, width, left: at.left, top: at.top });
