@@ -185,7 +185,7 @@ The audit's three that would change the feel most: the score as the main thing, 
 | heading and small-text sizes | 20f | **asks**: chosen from the sizes in use |
 | the sidebar's one left edge; the pill's and avatar's one height | 20c | **asks**: after measuring |
 | the 40% safe circle | 20g | web.dev, maskable icons (SOURCES.md) |
-| the menu of motion timings shown on `/admin/kit`: Plor's 200ms; Wordle's 100ms pop and 600ms shake; Connections' 300ms bounce; BombParty's 500ms and 600ms | 20a (shown only), 20k (the picked ones) | `docs/research/reports/Game look directions for Plor.md`, "Try Route 1 first", which cites each; "a menu, not a recommendation"; **the human picks** (answer 20) |
+| the menu of motion timings shown on `/admin/kit`: a pop in from 90% at Wordle's 100ms, Plor's 200ms and Connections' 300ms; a fade in from 95% at Carbon's moderate-02 240ms, Material's medium1 250ms and Atlassian's xlong 400ms | 20a (shown only), 20k (the picked ones) | the pop's timings: `docs/research/reports/Game look directions for Plor.md`, "Try Route 1 first" ("a menu, not a recommendation"); the pop's 90% start: the app's pops as built (`kit.module.css` `.pop`, DESIGN.md Motion); the fade's timings and its 95% start (Atlassian's entrance): `docs/research/research_notes/2026-11-17 calm frame, loud moments.md`, "Motion menu", each with its page; **the human picks** (answer 20) |
 | the three proposals' colour strengths and sizes | 20a (shown only) | the five themes' slots and the games' colours as built (DESIGN.md, "Colour slots and themes"); sizes from those in use; **the human picks** one version (answer 24) |
 
 ## Plan
@@ -206,9 +206,12 @@ Expected, each in its own sub-ticket's commit: `button-link.module.css`'s copy o
 | 20a: the kit gains a flat button, a text link, the heading and small-text styles | The flat button is `.link` with the hover rule; the text link is the base `a`; no heading or small-text classes yet, `/admin/kit` shows the sizes in use | Answers 30 and 31 (overnight decisions): one way each; no sizes chosen before 20f asks |
 | 20a: `/admin/kit` renders each component in each state | At rest and disabled; hover, press and focus live | Answer 32 (overnight decision) |
 | Research report: timings "a menu, not a recommendation" | `/admin/kit` plays each motion at each menu timing; none is used on a player screen | The human picks (answer 20); 20k uses the picks |
+| The report's menu also names Wordle's 600ms shake and BombParty's 500ms and 600ms | Not shown; a fade in from the research notes' design systems is shown instead | The shake is a refused word's motion, on the game screens, after M20 (answer 21); the feed and the boards need an entrance, which the notes' sources give |
+| The ticket's Numbers listed the menu before the research notes existed | Numbers now list the fade's three timings and the 95% and 90% starts, each with its source | 20a's review: every number's origin in the ticket |
 
 ## Evidence
 **20a (2026-11-17, overnight, slot 2):**
+- After the review's fix: `e2e/kit.e2e.ts`, `alive`, `admin-area` and `groups` e2e: 13 passed.
 - `npm run test:e2e -- e2e/kit.e2e.ts`: "an admin finds every piece of the Rules and the four looks on /admin/kit" and "a player who isn't an admin gets the refusal on /admin/kit": 2 passed. The first reads the pieces from DESIGN.md's Rules table, so a piece named there and missing from the page fails it.
 - `npm run test:e2e -- e2e/admin-area.e2e.ts e2e/shell.e2e.ts e2e/look.e2e.ts e2e/kit.e2e.ts`: 23 passed (the two admin sub-tab lists gained "Kit"); `e2e/alive.e2e.ts` (the tabs' and rows' hover): 4 passed.
 - `npm test`: 71 files, 822 tests passed. `npx tsc --noEmit -p .` and `npx eslint` on the changed files: clean.
@@ -216,5 +219,6 @@ Expected, each in its own sub-ticket's commit: `button-link.module.css`'s copy o
 - Each Next.js build stops once with a "SecurityFatalError" saying this Next.js has a known vulnerability, and passes when run again; the upgrade it names is for the human (HANDOFF.md).
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+**20a** (the `reviewer` agent, Sonnet, fresh context, 2026-11-17):
+- Blocking findings and how each was fixed: (1) the hover rule turned a danger flat button's and a danger row's text to `--text` under the pointer ("Reset link", "Delete group", the admin's warning rows): `e2e/kit.e2e.ts` gained a check, red first (expected `rgb(180, 35, 47)`, received `rgb(26, 26, 24)`), then the kit keeps the danger text (`kit.module.css:112-116`), green. (2) The motion menu's fade timings and its 95% and 90% starts had no origin in the ticket: added to Numbers with their sources, and the Source diff says why the shake isn't shown.
+- Deferred to ROADMAP "Next revision": heading levels and the sample reactions' names on `/admin/kit`; DESIGN.md's two tables; no e2e of the flat button's hover; the audit's items for the human; the Next.js security notice.

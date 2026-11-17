@@ -194,6 +194,13 @@ These are non-blocking items found during work or review. Record each one here *
 - [ ] A tab left open across 16f-1's publish gets a 400 if it flips the removed switch, until it reloads. Found in M16 16f-1 (review).
 - [ ] Replies to a comment, tucked under it behind a count (M16, 16f answers 28 and 32: left out of 16f, "Leave replies out"): a new feature, after the beta.
 
+**For M20** (20a's review, 2026-11-17)
+- [ ] `/admin/kit`: headings jump levels (a card's `h2` inside an `h3` section, `src/app/admin/kit/kit.tsx`, `looks.tsx`); the sample reactions have no accessible name.
+- [ ] DESIGN.md's Rules table and "The kit" table record the same classes with their lines: two places to keep in step; one could point at the other.
+- [ ] No e2e covers the flat button's hover fill itself (`e2e/alive.e2e.ts` covers the tabs and rows; `e2e/kit.e2e.ts` the danger text).
+- [ ] From the look audit (the M20 ticket, "The look audit"), not yet in any sub-ticket and for the human: the two games' result screens differ (5); desktop Today's half card at 1280px with the right column (6); the feed chip that wraps, and a status chip that is a sentence (7); the signed-out front page (9); Moonlit's and Ink's banners (10); the avatar's letter from the username (12).
+- [ ] Each Next.js build stops once with "SecurityFatalError" (a known vulnerability in this Next.js version) and passes when run again; the upgrade it names waits for the human.
+
 **For M22**
 - [ ] Today's Leaderboard card has no Count switch, so its Overall Today is Sum only (the Friends and group boards follow Count). As the ticket says; ask the human if Average is wanted there. Found in M22 22a (review).
 - [ ] `getTodayBoard` (`src/friends/leaderboard.ts`) reads Offbeat's pooled counts on every open of the card, uncached; fine at beta scale, measure before launch. Found in M22 22a (review).

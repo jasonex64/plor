@@ -92,7 +92,7 @@ function Moments({ look }: { look: Look["key"] }) {
   );
 }
 
-// The motion menu: the ticket's Numbers, from docs/research/reports/Game look directions for Plor.md ("Try Route 1
+// The motion menu, as the ticket's Numbers list it, from docs/research/reports/Game look directions for Plor.md ("Try Route 1
 // first"), docs/research/research_notes/2026-11-17 calm frame, loud moments.md ("Motion menu") and Plor's own --quick. Each plays on Replay; under reduced motion nothing moves (looks.module.css).
 const MOTIONS: { name: string; className: string; timings: { ms: number; from: string }[] }[] = [
   {

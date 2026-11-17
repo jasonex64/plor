@@ -238,7 +238,6 @@
     background: var(--soft);
     border-color: var(--ink);
   }
-
 }
 
 /* A tab under the pointer takes the kit's hover rule (kit.hover, M20 20a) and, from 768px, its icon's solid version,

@@ -35,6 +35,14 @@ test("an admin finds every piece of the Rules and the four looks on /admin/kit",
   for (const look of ["As built", "Restrained", "Balanced", "Bold"]) {
     await expect(page.getByRole("region", { name: look, exact: true })).toBeVisible();
   }
+
+  // A danger button keeps its danger text under the pointer: the hover rule changes the fill, not the warning (20a's
+  // review).
+  const danger = page.getByRole("region", { name: "Danger", exact: true });
+  const warning = await danger.getByText("Not drafted").evaluate((el) => getComputedStyle(el).color);
+  const remove = danger.getByRole("button", { name: "Delete" });
+  await remove.hover();
+  await expect.poll(() => remove.evaluate((el) => getComputedStyle(el).color)).toBe(warning);
 });
 
 test("a player who isn't an admin gets the refusal on /admin/kit", async ({ browser }) => {

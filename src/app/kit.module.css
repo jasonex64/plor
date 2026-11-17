@@ -107,6 +107,12 @@
     background: var(--soft);
     color: var(--text);
   }
+
+  /* A warning keeps its danger text under the pointer: the rule changes the fill, not the warning (20a's review). */
+  .row.danger:hover,
+  button.link.danger:hover:not(:disabled) {
+    color: var(--danger);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
