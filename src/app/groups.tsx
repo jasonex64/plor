@@ -190,6 +190,11 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
   };
 
   const link = group ? `${window.location.origin}/g/${group.inviteCode}` : null;
+  const goToday = (
+    <p>
+      <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
+    </p>
+  );
   return (
     <>
       {/* By analogy with mockup 3's Friends: a card, the members as rows, Share the accent small button and the rest
@@ -215,57 +220,6 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
                 </button>
               </form>
             )}
-            <h3>Members</h3>
-            <ul className={kit.rows}>
-              {group.members.map((m) => (
-                <li key={m.username} className={kit.row}>
-                  <Avatar name={m.name} />
-                  <span className={kit.grow}>
-                    {m.name}
-                    {m.creator && " (creator)"}
-                  </span>
-                  {group.creator && !m.creator && (
-                    <button type="button" className={kit.link} disabled={busy} onClick={() => removeMember(m)}>
-                      Remove
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <p className={kit.chips}>
-              {/* Shared from a button (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share sheet, or the
-                  clipboard where there's none; shown only when the clipboard refuses it (14b-18, answer 9). */}
-              <button
-                type="button"
-                className={`${kit.primary} ${kit.small}`}
-                disabled={busy}
-                onClick={() =>
-                  act(async () => {
-                    setShared(await shareLink(`Join ${group.name} on Plor`, link));
-                  })
-                }
-              >
-                Share group link
-              </button>
-              {group.creator && (
-                <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={resetLink}>
-                  Reset link
-                </button>
-              )}
-              {shared === "copied" && " Copied."}
-              {linkReset && " New link made. The old one no longer works."}
-            </p>
-            {shared === "refused" && <CopyField value={link} />}
-            <p className={kit.chips}>
-              <button type="button" className={kit.link} disabled={busy} onClick={leave}>
-                Leave group
-              </button>
-              {group.creator && (
-                <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={deleteGroup}>
-                  Delete group
-                </button>
-              )}
-            </p>
           </>
         )}
         {!group && !error && (
@@ -274,9 +228,7 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
           </Skeleton>
         )}
         {error && <p role="alert">{error}</p>}
-        <p>
-          <ButtonLink href="/">Go to today&apos;s puzzle</ButtonLink>
-        </p>
+        {!group && goToday}
       </section>
       {/* Shown once the page proves membership, and reloaded when the members change (a removal). */}
       {group && (
@@ -289,6 +241,62 @@ export function GroupPage({ id, username, name, timeUps }: { id: string; usernam
       )}
       {/* Loaded again when the clock bar's time runs out: the thread opens once the run is over (the frame's timeUps). */}
       {group && <Comments key={`${day}-${timeUps}`} username={username} name={name} runOver={false} nudge={threadNudge} games={BOTH_GAMES} group={id} />}
+      {group && link && (
+        <section aria-label="Members" className={kit.card}>
+          <h2>Members</h2>
+          <ul className={kit.rows}>
+            {group.members.map((m) => (
+              <li key={m.username} className={kit.row}>
+                <Avatar name={m.name} />
+                <span className={kit.grow}>
+                  {m.name}
+                  {m.creator && " (creator)"}
+                </span>
+                {group.creator && !m.creator && (
+                  <button type="button" className={kit.link} disabled={busy} onClick={() => removeMember(m)}>
+                    Remove
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className={kit.chips}>
+            {/* Shared from a button (docs/milestones/M14-14b-3-invite-button.md, answer 9): the share sheet, or the
+                clipboard where there's none; shown only when the clipboard refuses it (14b-18, answer 9). */}
+            <button
+              type="button"
+              className={`${kit.primary} ${kit.small}`}
+              disabled={busy}
+              onClick={() =>
+                act(async () => {
+                  setShared(await shareLink(`Join ${group.name} on Plor`, link));
+                })
+              }
+            >
+              Share group link
+            </button>
+            {group.creator && (
+              <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={resetLink}>
+                Reset link
+              </button>
+            )}
+            {shared === "copied" && " Copied."}
+            {linkReset && " New link made. The old one no longer works."}
+          </p>
+          {shared === "refused" && <CopyField value={link} />}
+          <p className={kit.chips}>
+            <button type="button" className={kit.link} disabled={busy} onClick={leave}>
+              Leave group
+            </button>
+            {group.creator && (
+              <button type="button" className={`${kit.link} ${kit.danger}`} disabled={busy} onClick={deleteGroup}>
+                Delete group
+              </button>
+            )}
+          </p>
+          {goToday}
+        </section>
+      )}
     </>
   );
 }

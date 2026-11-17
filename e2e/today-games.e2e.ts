@@ -218,3 +218,26 @@ test("Fragments' card has Play before the run, Continue during it, and the score
   await page.goto("/");
   await expect(card.getByText(/^better than \d+(\.\d+)?% of players$/)).toBeVisible();
 });
+
+// Inbox #246 (human, 2026-11-17: "you should just have the same content"): side by side, the two cards are one height
+// in each state, and a finished Fragments card holds the next-puzzle line a finished Offbeat card does.
+test("side by side the cards are the same height before and after the runs, both with the next-puzzle line once over", async ({ browser }) => {
+  await addDay();
+  const page = await player(browser, "gce", ROOMY);
+  const heights = async () => {
+    const [a, b] = await Promise.all([offbeat(page).boundingBox(), fragments(page).boundingBox()]);
+    return [a!.height, b!.height];
+  };
+  await expect(fragments(page).getByRole("link", { name: "Play", exact: true })).toBeVisible();
+  const before = await heights();
+  expect(before[1]).toBeCloseTo(before[0], 0);
+
+  await finishOffbeat(page);
+  await finishFragments(await idOf("gce"));
+  await page.goto("/");
+  await expect(fragments(page).getByRole("link", { name: "Result", exact: true })).toBeVisible();
+  await expect(offbeat(page).getByRole("timer")).toContainText("Next puzzle in");
+  await expect(fragments(page).getByRole("timer")).toContainText("Next puzzle in");
+  const after = await heights();
+  expect(after[1]).toBeCloseTo(after[0], 0);
+});

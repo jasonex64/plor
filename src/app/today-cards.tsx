@@ -86,7 +86,7 @@ export function TodayCards({
       </section>
     ) : (
       <section key={card} aria-label={SUBSTRINGS.name}>
-        <FragmentsBanner run={days!.fragments!} />
+        <FragmentsBanner run={days!.fragments!} msToReset={days!.offbeat.run ? days!.offbeat.run.msToReset : days!.offbeat.msToReset} />
       </section>
     ),
   );
