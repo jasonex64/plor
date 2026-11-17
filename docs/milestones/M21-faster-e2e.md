@@ -1,6 +1,6 @@
 # M21 — Faster e2e
 
-**Status:** approved 2026-11-16 ("Approve, start with the upgrade (Recommended)"). The Next.js 16.4.5 upgrade is merged (Dependabot's #235, 2026-11-16 22:55 UTC, merged before this session got to it) and local e2e starts again (Evidence). Next: 21a. Nothing of 21a to 21c is built.
+**Status:** approved 2026-11-16 ("Approve, start with the upgrade (Recommended)"). The Next.js 16.4.5 upgrade is merged (Dependabot's #235, 2026-11-16 22:55 UTC, merged before this session got to it) and local e2e starts again (Evidence). **21a is built and reviewed, in pull request #238; merge on green checks and the human's word.** Next: 21b. Nothing of 21b or 21c is built.
 
 ## Goal
 Make the e2e check, which every pull request waits on, take far less time, in three measured steps: run the tests on a built app, give the tests that don't test sign-in a quicker signed-in player, then split the suite across two CI machines.
@@ -35,6 +35,11 @@ Approval
 9. "Approve, start with the upgrade (Recommended)".
 10. Supabase's auth admin API pages in SOURCES.md: "Yes, add them (Recommended)".
 11. How long the test runner waits for the build and start: "3 minutes".
+
+During 21a (2026-11-16): the full suite on a built app, locally, failed `guest-play.e2e.ts:58` once in three: a guest's Start pressed before Cloudflare's bot-check script had loaded showed "The check isn't working on our side right now". A real fault the dev server hid (its slow page was never pressed before the script arrived); players on plor.app could meet it.
+12. How Start behaves instead: "Start waits for the check (Recommended)": an early press waits for the script, and the error shows only if it fails to load.
+13. Where the fix goes: "In 21a, before it merges (Recommended)", a test that reproduces it first.
+14. How long Start waits: "10 seconds" (the same as the server's Siteverify wait, `SITEVERIFY_TIMEOUT_MS`).
 
 ## What was measured (PR #237, 2026-11-16, closed unmerged)
 The whole suite twice at once on CI, once on `next dev` and once on `next build` + `next start`, with every sign-in timed as steps (`signInAndPick`, `e2e/players.ts`).
@@ -76,8 +81,9 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 
 ## Acceptance criteria
 - [x] The Next.js upgrade is merged and local e2e starts its server (answer 7).
-- [ ] `boards.e2e.ts:223` and `play.e2e.ts:232` pass on a built app, each with its cause recorded (answer 2).
-- [ ] Local and CI e2e both run on `npm run build` + `npm run start`; nothing runs e2e on `next dev` (answer 3).
+- [x] `boards.e2e.ts:223` and `play.e2e.ts:232` pass on a built app, each with its cause recorded (answer 2).
+- [x] Local and CI e2e both run on `npm run build` + `npm run start`; nothing runs e2e on `next dev` (answer 3).
+- [x] A guest's Start pressed before the bot check has loaded waits for it, up to 10 seconds (answers 12 to 14).
 - [ ] Only the five sign-in files use the real sign-in; the admin key never appears in a file, a commit or CI's log (answer 5).
 - [ ] e2e runs on two machines and the required `e2e` check passes only when both do (answer 6).
 - [ ] `main` still runs the full suite after each merge (answer 4).
@@ -96,6 +102,7 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 | The five sign-in files | 21b's real-sign-in files | `grep -l "Email me a sign-in code\|emailedCode" e2e/*.e2e.ts`, 2026-11-16 |
 | The #237 times | Evidence's before | PR #237's two runs, 2026-11-16 |
 | 3 minutes | The web server's `timeout` for the build and start, 21a step 2 | The human, 2026-11-16 (answer 11); #237's built run took about 1.4 min on CI |
+| 10 seconds | `BOT_CHECK_LOAD_MS`, how long an early Start waits for the bot check's script | The human, 2026-11-16 (answer 14) |
 
 ## Removes
 - The `npm run dev` web server in `playwright.config.ts` (21a), and ROADMAP's Next revision item "Run e2e on a production build", which 21a does.
@@ -108,10 +115,22 @@ Each sub-ticket is its own pull request from `m21-faster-e2e`, merged before the
 ## Source diff
 | Source says | We built | Why different |
 |---|---|---|
+| Next.js deploying, "Node.js server": `npm run build` then `npm run start` | `npm run build && npm run start -- -p <slot port>` | The slot's own port (PROCESS-parallel-sessions); `next start` takes `-p` |
+| Playwright webServer: `reuseExistingServer` commonly `!process.env.CI` | `false` everywhere | Answer 3: one way, the built app; a reused server could be a running `next dev` |
 
 ## Evidence
+**21a's two built-app failures (answer 2), causes found 2026-11-16, both in the tests:**
+- `boards.e2e.ts:223` (now `:223`, the reload at `:227`): Today's card fetched yesterday's board as the sign-in landed, before the test dated the viewer's account back and made the friend; `onBoard` (`src/friends/leaderboard.ts`) leaves out a friends-board account made after its day (M19 19c). PR #237's built run: `expected [] to deeply equal` the two names, first try and retry. Passed locally once on a built app before the fix (the race), and after it in the full local run and on CI.
+- `play.e2e.ts:232`: `strict mode violation ... resolved to 2 elements: <p role="alert">Something went wrong (internal). Try again.</p>` and `<div role="alert" ... id="__next-route-announcer__">Offbeat</div>`, locally on a built app before the fix (as in #237). After: passes (both files, `11 passed (56.5s)`).
+
+**The guest's early Start (answers 12 to 14).** Before the fix, the new test (`guest-play.e2e.ts`, "a Start pressed before the bot check has loaded waits for it") failed with the page showing `alert: The check isn't working on our side right now. Try again in a few minutes.`; `guest-play.e2e.ts:58` had failed 1 of 3 (`--repeat-each=3`). After: the guest file `6 passed (44.7s)`; `:58` and the new test with `--repeat-each=3`, `12 passed (59.0s)`.
+
+**The built app in the full suite.** Locally (slot 3, before the guest fix): `194 passed (16.6m)`, 2 failed (`feel.e2e.ts:52`, flaky before M21; `guest-play.e2e.ts:58`, fixed above). On CI, #238 at `d355247`: the e2e job passed, its test step 23:48:12 to 00:02:19 UTC, 14.1 min with the build (`194 passed (14.1m)`, 2 flaky: `feel.e2e.ts:52`, `player-screens.e2e.ts:158`), against 19 to 30 min a run on `next dev` before (the last 30 runs, 2026-11-16).
+
+## Evidence, earlier
 **The Next.js upgrade (answer 7).** `main` has `"next": "16.4.5"` (#235, merge commit `0f577d9`). In slot 3 on this branch, 2026-11-16, after `npm ci`: `npx next --version` → `Next.js v16.4.5`; `npx playwright test --project=chromium e2e/admin-area.e2e.ts` → `4 passed (45.3s)`. On 16.4.2 the same command ended `Error: Process from config.webServer was not able to start. Exit code: 1` at the upgrade notice (2026-11-16, slot 2). Hypothesis held: the notice was the cause.
 
 ## Review
-- Blocking findings and how each was fixed:
-- Deferred to ROADMAP "Next revision":
+21a, by the `reviewer` agent (2026-11-16, fresh context):
+- Blocking findings and how each was fixed: (1) the ticket, ROADMAP row and handoff still said 21a hadn't started, and the "production build" ROADMAP item wasn't closed: filled in with this commit. (2) `leaderboard-graph.e2e.ts:127` may have the same race as the boards test (no reload after its setup), "blocking only if CI shows it failing": it passed in the local full run and on CI, so deferred.
+- Deferred to ROADMAP "Next revision": `leaderboard-graph.e2e.ts:127`'s possible race; HANDOFF's `.next/dev` note now applies to `npm run dev` only (fixed in the handoff); `e2e/test-run.e2e.ts:55`'s comment about `next dev`; `player-screens.e2e.ts:158` flaky on the built app (passed 3 of 3 locally); `reuseExistingServer: false` is Playwright's default (kept explicit).
